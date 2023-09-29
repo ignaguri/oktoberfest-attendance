@@ -1,21 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Avatar from "./avatar";
+
 import { Database } from "@/lib/database.types";
 import {
   Session,
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
+import SignOut from "@/components/Auth/SignOut";
+import Avatar from "@/components/Avatar";
+import Link from "next/link";
 
-export default function AccountForm({ session }: { session: Session | null }) {
+interface AccountFormProps {
+  user: Session["user"];
+}
+
+export default function AccountForm({ user }: AccountFormProps) {
   const supabase = createClientComponentClient<Database>();
+
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [fullname, setFullname] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-  const [website, setWebsite] = useState<string | null>(null);
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
-  const user = session?.user;
 
   const getProfile = useCallback(async () => {
     try {
@@ -23,8 +30,8 @@ export default function AccountForm({ session }: { session: Session | null }) {
 
       const { data, error, status } = await supabase
         .from("profiles")
-        .select(`full_name, username, website, avatar_url`)
-        .eq("id", user?.id ?? "")
+        .select(`full_name, username, avatar_url`)
+        .eq("id", user.id)
         .single();
 
       if (error && status !== 406) {
@@ -34,7 +41,6 @@ export default function AccountForm({ session }: { session: Session | null }) {
       if (data) {
         setFullname(data.full_name);
         setUsername(data.username);
-        setWebsite(data.website);
         setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
@@ -50,12 +56,10 @@ export default function AccountForm({ session }: { session: Session | null }) {
 
   async function updateProfile({
     username,
-    website,
     avatar_url,
   }: {
     username: string | null;
     fullname: string | null;
-    website: string | null;
     avatar_url: string | null;
   }) {
     try {
@@ -64,10 +68,9 @@ export default function AccountForm({ session }: { session: Session | null }) {
       const { error } = await supabase.from("profiles").upsert({
         avatar_url,
         full_name: fullname,
-        id: user?.id as string,
+        id: user.id as string,
         updated_at: new Date().toISOString(),
         username,
-        website,
       });
 
       if (error) throw error;
@@ -77,41 +80,46 @@ export default function AccountForm({ session }: { session: Session | null }) {
       alert("Error updating the data!");
     } finally {
       setLoading(false);
+      setIsEditing(false);
     }
   }
 
   return (
-    <div className="form-widget">
+    <div className="card">
+      <h2>Your Profile</h2>
       <Avatar
-        uid={user!.id}
+        className="justify-self-center mb-4"
+        isEditing={isEditing}
+        uid={user.id}
         url={avatar_url}
-        size={150}
         onUpload={(url) => {
           setAvatarUrl(url);
           updateProfile({
             avatar_url: url,
             fullname,
             username,
-            website,
           });
         }}
       />
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session?.user.email} disabled />
+      <div className="rounded-lg border border-gray-300">
+        <p className="p-2 font-semibold">{user.email}</p>
       </div>
-      <div>
+      <div className="grid grid-cols-2 items-center">
         <label htmlFor="fullName">Full Name</label>
         <input
+          className="input"
+          disabled={!isEditing}
           id="fullName"
           type="text"
           value={fullname || ""}
           onChange={(e) => setFullname(e.target.value)}
         />
       </div>
-      <div>
+      <div className="grid grid-cols-2 items-center">
         <label htmlFor="username">Username</label>
         <input
+          className="input"
+          disabled={!isEditing}
           id="username"
           type="text"
           value={username || ""}
@@ -119,31 +127,34 @@ export default function AccountForm({ session }: { session: Session | null }) {
         />
       </div>
       <div>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="url"
-          value={website || ""}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
+        {isEditing ? (
+          <button
+            className="button justify-self-center mt-4"
+            onClick={() =>
+              updateProfile({
+                avatar_url,
+                fullname,
+                username,
+              })
+            }
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Update"}
+          </button>
+        ) : (
+          <button
+            className="button justify-self-center mt-4"
+            onClick={() => setIsEditing(true)}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Edit"}
+          </button>
+        )}
       </div>
-
-      <div>
-        <button
-          className="button primary block"
-          onClick={() =>
-            updateProfile({
-              avatar_url,
-              fullname,
-              username,
-              website,
-            })
-          }
-          disabled={loading}
-        >
-          {loading ? "Loading..." : "Update"}
-        </button>
-      </div>
+      <Link className="button" href="/">
+        Go Home
+      </Link>
+      <SignOut />
     </div>
   );
 }

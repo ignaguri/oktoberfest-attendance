@@ -1,23 +1,29 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Database } from "@/lib/database.types";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
+import { useSupabase } from "@/lib/supabase-provider";
 
 type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
 
-export default function Avatar({
-  uid,
-  url,
-  size,
-  onUpload,
-}: {
+interface AvatarProps {
+  className?: string;
+  isEditing?: boolean;
   uid: string;
   url: Profiles["avatar_url"];
-  size: number;
+  size?: number;
   onUpload: (url: string) => void;
-}) {
-  const supabase = createClientComponentClient<Database>();
+}
+
+export default function Avatar({
+  className,
+  isEditing,
+  uid,
+  url,
+  size = 150,
+  onUpload,
+}: AvatarProps) {
+  const supabase = useSupabase();
   const [avatarUrl, setAvatarUrl] = useState<Profiles["avatar_url"]>(url);
   const [uploading, setUploading] = useState(false);
 
@@ -72,38 +78,42 @@ export default function Avatar({
   };
 
   return (
-    <div>
+    <div className={className}>
       {avatarUrl ? (
         <Image
           width={size}
           height={size}
           src={avatarUrl}
           alt="Avatar"
-          className="avatar image"
+          className="rounded-full"
           style={{ height: size, width: size }}
         />
       ) : (
         <div
-          className="avatar no-image"
+          className="border border-gray-300 bg-gray-100 rounded-full flex justify-center items-center"
           style={{ height: size, width: size }}
-        />
+        >
+          <span className="text-2xl text-gray-500">No image</span>
+        </div>
       )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? "Uploading ..." : "Upload"}
-        </label>
-        <input
-          style={{
-            position: "absolute",
-            visibility: "hidden",
-          }}
-          type="file"
-          id="single"
-          accept="image/*"
-          onChange={uploadAvatar}
-          disabled={uploading}
-        />
-      </div>
+      {isEditing && (
+        <div className="mt-4" style={{ width: size }}>
+          <label className="button" htmlFor="single">
+            {uploading ? "Uploading..." : "Upload"}
+          </label>
+          <input
+            style={{
+              position: "absolute",
+              visibility: "hidden",
+            }}
+            type="file"
+            id="single"
+            accept="image/*"
+            onChange={uploadAvatar}
+            disabled={uploading}
+          />
+        </div>
+      )}
     </div>
   );
 }

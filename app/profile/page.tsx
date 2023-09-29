@@ -1,9 +1,8 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import SignOut from "@/components/Auth/SignOut";
+import AccountForm from "./account-form";
 
 export default async function Profile() {
   const supabase = createServerComponentClient({ cookies });
@@ -16,20 +15,5 @@ export default async function Profile() {
     redirect("/sign-in");
   }
 
-  return (
-    <div className="card">
-      <h2>User Profile</h2>
-      <code className="highlight">{user.email}</code>
-      <div className="heading">Last Signed In:</div>
-      <code className="highlight">
-        {user.last_sign_in_at
-          ? new Date(user.last_sign_in_at).toUTCString()
-          : "Never"}
-      </code>
-      <Link className="button" href="/">
-        Go Home
-      </Link>
-      <SignOut />
-    </div>
-  );
+  return <AccountForm user={user} />;
 }

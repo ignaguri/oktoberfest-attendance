@@ -9,7 +9,7 @@ export const revalidate = 0;
 
 export const metadata = {
   description: "Oktoberfest attendance registering app",
-  title: "ProstCounter",
+  title: "ProstCounter 🍻",
 };
 
 export default async function RootLayout({
@@ -30,7 +30,10 @@ export default async function RootLayout({
           <main className="flex w-full flex-1 shrink-0 flex-col items-center justify-center px-8 text-center sm:px-20">
             <h1 className="mb-12 text-5xl font-bold sm:text-6xl">
               <span className="font-extrabold text-yellow-600">
-                ProstCounter
+                Prost
+              </span>
+              <span className="font-extrabold text-yellow-500">
+                Counter
               </span>{" "}
               🍻
             </h1>
