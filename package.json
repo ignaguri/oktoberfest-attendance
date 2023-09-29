@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "sup:start": "supabase start",
+    "sup:stop": "supabase stop",
     "lint": "next lint"
   },
   "dependencies": {
@@ -37,6 +39,7 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
+    "supabase": "^1.99.5",
     "tailwindcss": "^3.3.3"
   }
 }
