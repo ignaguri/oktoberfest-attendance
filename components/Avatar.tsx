@@ -2,28 +2,40 @@
 import React, { useEffect, useState } from "react";
 import { Database } from "@/lib/database.types";
 import Image from "next/image";
-import { useSupabase } from "@/lib/supabase-provider";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import cn from "classnames";
 
 type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
 
-interface AvatarProps {
+export interface AvatarProps {
   className?: string;
   isEditing?: boolean;
   uid: string;
   url: Profiles["avatar_url"];
-  size?: number;
-  onUpload: (url: string) => void;
+  size?: "small" | "medium" | "large";
+  onUpload?: (url: string) => void;
 }
+
+const getMeasure = (size: AvatarProps["size"]) => {
+  switch (size) {
+    case "small":
+      return 40;
+    case "medium":
+      return 100;
+    case "large":
+      return 150;
+  }
+};
 
 export default function Avatar({
   className,
   isEditing,
   uid,
   url,
-  size = 150,
+  size = "small",
   onUpload,
 }: AvatarProps) {
-  const supabase = useSupabase();
+  const supabase = createClientComponentClient<Database>();
   const [avatarUrl, setAvatarUrl] = useState<Profiles["avatar_url"]>(url);
   const [uploading, setUploading] = useState(false);
 
@@ -69,7 +81,7 @@ export default function Avatar({
         throw uploadError;
       }
 
-      onUpload(filePath);
+      onUpload?.(filePath);
     } catch (error) {
       alert("Error uploading avatar!");
     } finally {
@@ -81,23 +93,31 @@ export default function Avatar({
     <div className={className}>
       {avatarUrl ? (
         <Image
-          width={size}
-          height={size}
+          width={getMeasure(size)}
+          height={getMeasure(size)}
           src={avatarUrl}
           alt="Avatar"
           className="rounded-full"
-          style={{ height: size, width: size }}
+          style={{ height: getMeasure(size), width: getMeasure(size) }}
         />
       ) : (
         <div
-          className="border border-gray-300 bg-gray-100 rounded-full flex justify-center items-center"
-          style={{ height: size, width: size }}
+          className="border border-gray-300 bg-gray-100 rounded-full flex justify-center items-center text-center"
+          style={{ height: getMeasure(size), width: getMeasure(size) }}
         >
-          <span className="text-2xl text-gray-500">No image</span>
+          <span
+            className={cn("text-gray-500", {
+              "text-2xl": size === "large",
+              "text-lg": size === "medium",
+              "text-sm leading-none": size === "small",
+            })}
+          >
+            No image
+          </span>
         </div>
       )}
       {isEditing && (
-        <div className="mt-4" style={{ width: size }}>
+        <div className="mt-4" style={{ width: getMeasure(size) }}>
           <label className="button" htmlFor="single">
             {uploading ? "Uploading..." : "Upload"}
           </label>

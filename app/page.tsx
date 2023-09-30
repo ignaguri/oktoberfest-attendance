@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import SignOut from "@/components/Auth/SignOut";
-
 export default async function Home() {
   const supabase = createServerComponentClient({ cookies });
 
@@ -17,14 +15,18 @@ export default async function Home() {
   }
 
   return (
-    <div className="card">
-      <h2>Welcome!</h2>
-      <code className="highlight">Email: {user.email}</code>
-      <code className="highlight">Role: {user.role}</code>
-      <Link className="button" href="/profile">
-        Go to Profile
-      </Link>
-      <SignOut />
-    </div>
+    <>
+      <h1 className="mb-12 text-5xl font-bold sm:text-6xl">
+        <span className="font-extrabold text-yellow-600">Prost</span>
+        <span className="font-extrabold text-yellow-500">Counter</span> 🍻
+      </h1>
+      <div className="card">
+        <h2>Welcome!</h2>
+        <code className="highlight">Email: {user.email}</code>
+        <Link className="button" href="/attendance">
+          Register attendance
+        </Link>
+      </div>
+    </>
   );
 }

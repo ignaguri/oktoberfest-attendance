@@ -2,21 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Database } from "@/lib/database.types";
-import {
-  Session,
-  createClientComponentClient,
-} from "@supabase/auth-helpers-nextjs";
-import SignOut from "@/components/Auth/SignOut";
+import { Session } from "@supabase/auth-helpers-nextjs";
 import Avatar from "@/components/Avatar";
-import Link from "next/link";
+import { useSupabase } from "@/lib/supabase-provider";
 
 interface AccountFormProps {
   user: Session["user"];
 }
 
 export default function AccountForm({ user }: AccountFormProps) {
-  const supabase = createClientComponentClient<Database>();
+  const supabase = useSupabase();
 
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -90,6 +85,7 @@ export default function AccountForm({ user }: AccountFormProps) {
       <Avatar
         className="justify-self-center mb-4"
         isEditing={isEditing}
+        size="large"
         uid={user.id}
         url={avatar_url}
         onUpload={(url) => {
@@ -128,22 +124,31 @@ export default function AccountForm({ user }: AccountFormProps) {
       </div>
       <div>
         {isEditing ? (
-          <button
-            className="button justify-self-center mt-4"
-            onClick={() =>
-              updateProfile({
-                avatar_url,
-                fullname,
-                username,
-              })
-            }
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Update"}
-          </button>
+          <div className="flex flex-col gap-2 mt-4">
+            <button
+              className="button"
+              onClick={() =>
+                updateProfile({
+                  avatar_url,
+                  fullname,
+                  username,
+                })
+              }
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Update"}
+            </button>
+            <button
+              className="button"
+              onClick={() => setIsEditing(false)}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+          </div>
         ) : (
           <button
-            className="button justify-self-center mt-4"
+            className="button mt-4"
             onClick={() => setIsEditing(true)}
             disabled={loading}
           >
@@ -151,10 +156,6 @@ export default function AccountForm({ user }: AccountFormProps) {
           </button>
         )}
       </div>
-      <Link className="button" href="/">
-        Go Home
-      </Link>
-      <SignOut />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Database } from "./database.types";
 
-type MaybeSession = Session | null;
+export type MaybeSession = Session | null;
 
 type SupabaseContext = {
   supabase: SupabaseClient<any, string>;

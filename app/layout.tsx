@@ -4,6 +4,7 @@ import SupabaseProvider from "@/lib/supabase-provider";
 
 import "@/styles/globals.css";
 import { Metadata } from "next";
+import Navbar from "@/components/Navbar";
 
 // do not cache this layout
 export const revalidate = 0;
@@ -27,12 +28,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="flex min-h-screen flex-col items-center justify-center py-2">
-          <main className="flex w-full flex-1 shrink-0 flex-col items-center justify-center px-8 text-center sm:px-20">
-            <h1 className="mb-12 text-5xl font-bold sm:text-6xl">
-              <span className="font-extrabold text-yellow-600">Prost</span>
-              <span className="font-extrabold text-yellow-500">Counter</span> 🍻
-            </h1>
+        <div className="flex min-h-screen flex-col items-center justify-center sm:py-2">
+          <Navbar session={session} />
+          <main className="flex w-full flex-1 shrink-0 flex-col items-center sm:justify-center p-8 text-center sm:px-20 bg-slate-50">
             <SupabaseProvider session={session}>{children}</SupabaseProvider>
           </main>
         </div>
