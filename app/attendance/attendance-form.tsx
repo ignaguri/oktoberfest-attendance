@@ -32,25 +32,25 @@ export default function AttendanceForm() {
   ) {
     setLoading(true);
 
-    // const { error } = await supabase.auth.signUp({
-    //   email: formData.email,
-    //   password: formData.password,
-    //   // redirectTo: `${window.location.origin}/auth/callback`,
-    // });
-    alert(
-      "Viniste el: " +
-        formData.date +
-        " y tomaste " +
-        formData.amount +
-        " cervezas"
-    );
-    // if (error) {
-    //   setErrorMsg(error.message);
-    // } else {
-    //   setSuccessMsg(
-    //     "Success! Please check your email for further instructions."
-    //   );
-    // }
+    const user = await supabase.auth.getUser();
+
+    const { data, status, statusText, error } = await supabase
+      .from("attendance")
+      .upsert({
+        date: formData.date,
+        liters: formData.amount,
+        user_id: user.data.user?.id,
+      });
+
+    console.log("after upsert", { data, status, statusText });
+
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      setSuccessMsg(
+        "Success! Please update the amount of beers or add another day."
+      );
+    }
 
     setLoading(false);
     resetForm();
