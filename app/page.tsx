@@ -1,3 +1,4 @@
+import { DbResult, Tables } from "@/lib/database-helpers.types";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -14,6 +15,38 @@ export default async function Home() {
     redirect("/sign-in");
   }
 
+  const getProfileMissingData = async () => {
+    const query = supabase
+      .from("profiles")
+      .select(`full_name, username, avatar_url`)
+      .eq("id", user.id)
+      .single();
+
+    const { data }: DbResult<typeof query> = await query;
+
+    const userData = data as Tables<"profiles">;
+
+    let missingFields: {
+      full_name?: string;
+      username?: string;
+      avatar_url?: string;
+    } = {};
+
+    if (!userData.full_name) {
+      missingFields = { ...missingFields, full_name: "Name" };
+    }
+    if (!userData.username) {
+      missingFields = { ...missingFields, username: "Username" };
+    }
+    if (!userData.avatar_url) {
+      missingFields = { ...missingFields, avatar_url: "Profile picture" };
+    }
+
+    return missingFields;
+  };
+
+  const profileMissingData = await getProfileMissingData();
+
   return (
     <>
       <h1 className="mb-12 text-5xl font-bold sm:text-6xl">
@@ -22,10 +55,31 @@ export default async function Home() {
       </h1>
       <div className="card">
         <h2>Welcome!</h2>
-        <code className="highlight">Email: {user.email}</code>
-        <Link className="button" href="/attendance">
-          Register attendance
-        </Link>
+        {profileMissingData && (
+          <div className="flex flex-col gap-2">
+            <h5 className="text-sm text-gray-500">
+              It seems you have some missing data in your profile:
+            </h5>
+            <ul className="highlight text-center">
+              {Object.values(profileMissingData).map((value) => (
+                <li key={value}>{`• ${value}`}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div className="flex flex-col gap-2">
+          {profileMissingData && (
+            <Link className="button" href="/profile">
+              Complete your profile
+            </Link>
+          )}
+          <Link className="button-inverse" href="/attendance">
+            Register attendance
+          </Link>
+          <Link className="button-inverse bg-yellow-600" href="/results">
+            Results table
+          </Link>
+        </div>
       </div>
     </>
   );

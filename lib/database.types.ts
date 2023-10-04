@@ -101,7 +101,17 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      results: {
+        Row: {
+          average_liters: number | null
+          email: string | null
+          full_name: string | null
+          total_days: number | null
+          total_liters: number | null
+          username: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

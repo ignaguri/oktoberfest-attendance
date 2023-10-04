@@ -6,7 +6,7 @@ import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useSupabase } from "@/lib/supabase-provider";
 import { MyDatePicker } from "@/components/DatePicker";
-import AttendanceTable from "@/components/AttendanceTable";
+import PersonalAttendanceTable from "@/components/PersonalAttendanceTable";
 import { Database } from "@/lib/database.types";
 
 type AttendanceDBType = Database["public"]["Tables"]["attendance"]["Row"];
@@ -39,7 +39,8 @@ export default function AttendanceForm() {
     const { data } = await supabase
       .from("attendance")
       .select("date, liters")
-      .filter("user_id", "eq", userData.user.id);
+      .filter("user_id", "eq", userData.user.id)
+      .order("date", { ascending: true });
     if (!data) return;
     setAttendance(data);
   }, [supabase]);
@@ -126,7 +127,7 @@ export default function AttendanceForm() {
         {errorMsg && <div className="text-red-600">{errorMsg}</div>}
         {successMsg && <div className="text-green-700">{successMsg}</div>}
       </div>
-      <AttendanceTable data={attendance} />
+      <PersonalAttendanceTable data={attendance} />
     </div>
   );
 }

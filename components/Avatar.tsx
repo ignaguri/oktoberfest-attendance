@@ -112,7 +112,7 @@ export default function Avatar({
               "text-sm leading-none": size === "small",
             })}
           >
-            No image
+            No img
           </span>
         </div>
       )}
