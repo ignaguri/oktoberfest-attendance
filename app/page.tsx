@@ -46,6 +46,7 @@ export default async function Home() {
   };
 
   const profileMissingData = await getProfileMissingData();
+  const showMissingSection = Object.values(profileMissingData).length > 0;
 
   return (
     <>
@@ -55,7 +56,7 @@ export default async function Home() {
       </h1>
       <div className="card">
         <h2>Welcome!</h2>
-        {profileMissingData && (
+        {showMissingSection && (
           <div className="flex flex-col gap-2">
             <h5 className="text-sm text-gray-500">
               It seems you have some missing data in your profile:
@@ -68,7 +69,7 @@ export default async function Home() {
           </div>
         )}
         <div className="flex flex-col gap-2">
-          {profileMissingData && (
+          {showMissingSection && (
             <Link className="button" href="/profile">
               Complete your profile
             </Link>
