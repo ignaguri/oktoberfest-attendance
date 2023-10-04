@@ -16,7 +16,7 @@ export const END_OF_WIESN = new Date("2023-10-03");
 
 const AttendanceSchema = Yup.object().shape({
   amount: Yup.number()
-    .min(1, "Come on! You must have drank at least once")
+    .min(1, "Come on! You must have drank at least one")
     .required("Required"),
   date: Yup.date()
     .min(BEGGINING_OF_WIESN, "Wiesn hadn't started")
@@ -33,7 +33,13 @@ export default function AttendanceForm() {
     useState<Pick<AttendanceDBType, "date" | "liters">[]>();
 
   const fetchAttendance = useCallback(async () => {
-    const { data } = await supabase.from("attendance").select("date, liters");
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData || !userData.user) return;
+
+    const { data } = await supabase
+      .from("attendance")
+      .select("date, liters")
+      .filter("user_id", "eq", userData.user.id);
     if (!data) return;
     setAttendance(data);
   }, [supabase]);
@@ -48,19 +54,20 @@ export default function AttendanceForm() {
   ) {
     setLoading(true);
 
-    const user = await supabase.auth.getUser();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData || !userData.user) return;
 
     const { error } = await supabase.from("attendance").upsert({
       date: formData.date,
       liters: formData.amount,
-      user_id: user.data.user?.id,
+      user_id: userData.user.id,
     });
 
     if (error) {
       setErrorMsg(error.message);
     } else {
       setSuccessMsg(
-        "Success! Please update the amount of beers or add another day."
+        "Success! You can add another day or update the amount of beers for the same day."
       );
       fetchAttendance();
     }
