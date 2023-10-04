@@ -3,7 +3,7 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
 
-import LogoutIcon from "../../public/icons/logout-icon-fa.svg";
+import LogoutIcon from "@/public/icons/logout-icon-fa.svg";
 
 const ICON_SIZE = 20;
 

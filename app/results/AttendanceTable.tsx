@@ -4,7 +4,12 @@ import { useState } from "react";
 import cn from "classnames";
 import { Session } from "@supabase/supabase-js";
 import Loading from "@/app/loading";
-import Avatar from "./Avatar";
+import Avatar from "@/components/Avatar";
+import Image from "next/image";
+
+import UpAndDownArrowIcon from "@/public/icons/up-down-arrows-fa.svg";
+
+const ICON_SIZE = 12;
 
 type SortableCols = "totalDays" | "totalLiters" | "averageLiters";
 
@@ -72,24 +77,53 @@ const AttendanceTable = ({ data, session }: AttendanceTableProps) => {
       <thead>
         <tr className="bg-gray-200">
           <th className="px-2 py-1 sm:px-4 sm:py-2"></th>
-          <th className="px-2 py-1 sm:px-4 sm:py-2">Name</th>
+          <th className="max-w-[164px] sm:max-w-full px-0 py-1 sm:px-4 sm:py-2">
+            Name
+          </th>
           <th
             className="px-2 py-1 sm:px-4 sm:py-2 cursor-pointer"
             onClick={() => handleSort("totalDays")}
           >
-            Days
+            <div className="flex items-center gap-1">
+              Days
+              <Image
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+                src={UpAndDownArrowIcon}
+                alt="Sort"
+                style={{ height: ICON_SIZE, width: ICON_SIZE }}
+              />
+            </div>
           </th>
           <th
             className="px-2 py-1 sm:px-4 sm:py-2 cursor-pointer"
             onClick={() => handleSort("totalLiters")}
           >
-            Liters
+            <div className="flex items-center gap-1">
+              Liters
+              <Image
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+                src={UpAndDownArrowIcon}
+                alt="Sort"
+                style={{ height: ICON_SIZE, width: ICON_SIZE }}
+              />
+            </div>
           </th>
           <th
             className="px-2 py-1 sm:px-4 sm:py-2 cursor-pointer"
             onClick={() => handleSort("averageLiters")}
           >
-            Avg.
+            <div className="flex items-center gap-1">
+              Avg.
+              <Image
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+                src={UpAndDownArrowIcon}
+                alt="Sort"
+                style={{ height: ICON_SIZE, width: ICON_SIZE }}
+              />
+            </div>
           </th>
         </tr>
       </thead>

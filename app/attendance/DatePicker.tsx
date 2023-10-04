@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   END_OF_WIESN,
   BEGGINING_OF_WIESN,
-} from "@/app/attendance/attendance-form";
+} from "@/app/attendance/AttendanceForm";
 
 interface MyDatePickerProps {
   disabled?: boolean;

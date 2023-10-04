@@ -5,8 +5,8 @@ import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useSupabase } from "@/lib/supabase-provider";
-import { MyDatePicker } from "@/components/DatePicker";
-import PersonalAttendanceTable from "@/components/PersonalAttendanceTable";
+import { MyDatePicker } from "./DatePicker";
+import PersonalAttendanceTable from "./PersonalAttendanceTable";
 import { Database } from "@/lib/database.types";
 
 type AttendanceDBType = Database["public"]["Tables"]["attendance"]["Row"];

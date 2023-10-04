@@ -1,11 +1,11 @@
-import AttendanceTable from "@/components/AttendanceTable";
+import AttendanceTable from "./AttendanceTable";
 import { DbResult } from "@/lib/database-helpers.types";
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import type { AttendanceResult } from "@/components/AttendanceTable";
+import type { AttendanceResult } from "./AttendanceTable";
 
 export default async function Results() {
   const supabase = createServerComponentClient({ cookies });
@@ -22,7 +22,8 @@ export default async function Results() {
     const query = supabase
       .from("results")
       .select()
-      .order("total_days", { ascending: false });
+      .order("total_days", { ascending: false })
+      .order("total_liters", { ascending: false });
 
     const { data }: DbResult<typeof query> = await query;
 

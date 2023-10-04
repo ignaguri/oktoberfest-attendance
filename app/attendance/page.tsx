@@ -2,7 +2,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import AttendanceForm from "./attendance-form";
+import AttendanceForm from "./AttendanceForm";
 
 export default async function Attendance() {
   const supabase = createServerComponentClient({ cookies });
