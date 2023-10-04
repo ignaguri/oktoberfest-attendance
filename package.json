@@ -6,6 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "sup:db:pull": "supabase db pull",
+    "sup:db:reset": "supabase db reset",
+    "sup:db:types": "supabase gen types typescript --local > lib/database.types.ts",
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
     "lint": "next lint"

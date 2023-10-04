@@ -15,7 +15,7 @@ export default async function Home() {
     redirect("/sign-in");
   }
 
-  const getProfileMissingData = async () => {
+  const getProfileData = async () => {
     const query = supabase
       .from("profiles")
       .select(`full_name, username, avatar_url`)
@@ -42,11 +42,11 @@ export default async function Home() {
       missingFields = { ...missingFields, avatar_url: "Profile picture" };
     }
 
-    return missingFields;
+    return { missingFields, username: userData.username };
   };
 
-  const profileMissingData = await getProfileMissingData();
-  const showMissingSection = Object.values(profileMissingData).length > 0;
+  const { missingFields, username } = await getProfileData();
+  const showMissingSection = Object.values(missingFields).length > 0;
 
   return (
     <>
@@ -55,14 +55,14 @@ export default async function Home() {
         <span className="font-extrabold text-yellow-500">Counter</span> 🍻
       </h1>
       <div className="card">
-        <h2>Welcome!</h2>
+        <h2>{username ? `Welcome, ${username}!` : "Welcome!"}</h2>
         {showMissingSection && (
           <div className="flex flex-col gap-2">
             <h5 className="text-sm text-gray-500">
               It seems you have some missing data in your profile:
             </h5>
             <ul className="highlight text-center">
-              {Object.values(profileMissingData).map((value) => (
+              {Object.values(missingFields).map((value) => (
                 <li key={value}>{`• ${value}`}</li>
               ))}
             </ul>
