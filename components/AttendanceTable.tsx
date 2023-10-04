@@ -109,7 +109,7 @@ const AttendanceTable = ({ data, session }: AttendanceTableProps) => {
                 size="small"
               />
             </td>
-            <td className="px-0 py-1 sm:px-4 sm:py-2 leading-none truncate">
+            <td className="max-w-[164px] sm:max-w-full px-0 py-1 sm:px-4 sm:py-2 leading-none truncate">
               {getDisplayName(item)}
             </td>
             <td className="px-2 py-1 sm:px-4 sm:py-2">{item.totalDays}</td>
