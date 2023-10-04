@@ -49,11 +49,11 @@ export function MyDatePicker({
         <DatePicker
           {...field}
           dateFormat="dd/MM/yyyy"
-          includeDateIntervals={[
-            { end: END_OF_WIESN, start: BEGGINING_OF_WIESN },
-          ]}
           inline
+          maxDate={END_OF_WIESN}
+          minDate={BEGGINING_OF_WIESN}
           onChange={handleOnChange}
+          onClickOutside={() => setIsOpen(false)}
           selected={value}
           todayButton="Today"
         />
