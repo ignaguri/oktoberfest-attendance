@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import cn from "classnames";
-import Loading from "@/app/loading";
-import AvatarForSession from "./AvatarForSession";
 import { Session } from "@supabase/supabase-js";
+import Loading from "@/app/loading";
+import Avatar from "./Avatar";
 
 type SortableCols = "totalDays" | "totalLiters" | "averageLiters";
 
 export type AttendanceResult = {
+  avatarUrl?: string;
   username?: string;
   fullName?: string;
   email: string;
@@ -57,6 +58,15 @@ const AttendanceTable = ({ data, session }: AttendanceTableProps) => {
     return email;
   };
 
+  const getFormattedAvg = (avg: number) => {
+    try {
+      return Number(avg.toFixed(2));
+    } catch (error) {
+      console.error("Error parsing avg.", error);
+      return 0;
+    }
+  };
+
   return (
     <table className="w-full bg-white rounded-lg shadow-md">
       <thead>
@@ -93,14 +103,20 @@ const AttendanceTable = ({ data, session }: AttendanceTableProps) => {
             })}
           >
             <td className="px-2 py-1 sm:px-4 sm:py-2">
-              <AvatarForSession session={session} size="small" />
+              <Avatar
+                uid={session.user.id}
+                url={item.avatarUrl ?? null}
+                size="small"
+              />
             </td>
             <td className="px-0 py-1 sm:px-4 sm:py-2 leading-none truncate">
               {getDisplayName(item)}
             </td>
             <td className="px-2 py-1 sm:px-4 sm:py-2">{item.totalDays}</td>
             <td className="px-2 py-1 sm:px-4 sm:py-2">{`${item.totalLiters}🍺`}</td>
-            <td className="px-2 py-1 sm:px-4 sm:py-2">{Number(item.averageLiters.toFixed(2))}</td>
+            <td className="px-2 py-1 sm:px-4 sm:py-2">
+              {getFormattedAvg(item.averageLiters)}
+            </td>
           </tr>
         ))}
       </tbody>

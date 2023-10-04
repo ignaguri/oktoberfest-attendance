@@ -31,6 +31,7 @@ export default async function Results() {
     }
 
     const formattedData: AttendanceResult[] = data.map((item) => ({
+      avatarUrl: item.avatar_url,
       averageLiters: item.average_liters,
       email: item.email,
       fullName: item.full_name,

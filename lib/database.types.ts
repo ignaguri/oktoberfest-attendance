@@ -103,6 +103,7 @@ export interface Database {
     Views: {
       results: {
         Row: {
+          avatar_url: string | null
           average_liters: number | null
           email: string | null
           full_name: string | null
