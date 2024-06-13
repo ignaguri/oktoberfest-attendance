@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
-import format from "date-fns/format";
+import { formatDate } from "date-fns/format";
 
 // Styles
 import "react-datepicker/dist/react-datepicker.css";
@@ -25,9 +25,9 @@ export function MyDatePicker({
   const { value } = meta;
   const { setValue } = helpers;
 
-  const handleOnChange = (date: Date) => {
+  const handleOnChange = (date: Date | null) => {
     setIsOpen(!isOpen);
-    setValue(date);
+    setValue(date as Date);
   };
 
   const handleOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -43,7 +43,7 @@ export function MyDatePicker({
         onClick={handleOnClick}
         suppressHydrationWarning
       >
-        {format(value, "dd/MM/yyyy")}
+        {formatDate(value, "dd/MM/yyyy")}
       </button>
       {isOpen && (
         <DatePicker
