@@ -1,14 +1,13 @@
 import AttendanceTable from "./AttendanceTable";
 import { DbResult } from "@/lib/database-helpers.types";
+import { createClient } from "@/utils/supabase/server";
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import type { AttendanceResult } from "./AttendanceTable";
 
 export default async function Results() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = createClient();
 
   const {
     data: { session },

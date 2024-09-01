@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  Session,
-  createClientComponentClient,
-} from "@supabase/auth-helpers-nextjs";
 import Avatar, { AvatarProps } from "@/components/Avatar";
-import { Database } from "@/lib/database.types";
+import { createClient } from "@/utils/supabase/client";
+import { Session } from "@supabase/supabase-js";
 
 interface AvatarForSessionProps extends Omit<AvatarProps, "uid" | "url"> {
   session: Session;
@@ -17,7 +14,7 @@ export default function AvatarForSession({
   session,
   ...avatarProps
 }: AvatarForSessionProps) {
-  const supabase = createClientComponentClient<Database>();
+  const supabase = createClient();
 
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 

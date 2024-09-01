@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { Database } from "@/lib/database.types";
 import Image from "next/image";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import cn from "classnames";
+import { createClient } from "@/utils/supabase/client";
 
 type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -35,8 +36,8 @@ export default function Avatar({
   size = "small",
   onUpload,
 }: AvatarProps) {
-  const supabase = createClientComponentClient<Database>();
-  const [avatarUrl, setAvatarUrl] = useState<Profiles["avatar_url"]>(url);
+  const supabase = createClient();
+  const [avatarUrl, setAvatarUrl] = useState<Profiles["avatar_url"]>(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function Avatar({
       onUpload?.(filePath);
     } catch (error) {
       alert("Error uploading avatar!");
+      // TODO: reset the form somehow
     } finally {
       setUploading(false);
     }
