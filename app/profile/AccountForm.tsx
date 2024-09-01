@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Session } from "@supabase/auth-helpers-nextjs";
 import Avatar from "@/components/Avatar";
 import { useSupabase } from "@/lib/supabase-provider";
+import { Session } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
 interface AccountFormProps {
   user: Session["user"];
@@ -76,6 +77,7 @@ export default function AccountForm({ user }: AccountFormProps) {
     } finally {
       setLoading(false);
       setIsEditing(false);
+      revalidatePath("/profile", "page");
     }
   }
 

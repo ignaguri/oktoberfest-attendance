@@ -1,14 +1,14 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
 
 import LogoutIcon from "@/public/icons/logout-icon-fa.svg";
+import { createClient } from "@/utils/supabase/client";
 
 const ICON_SIZE = 20;
 
 export default function SignOut() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   async function handleSignOut() {
     const { error } = await supabase.auth.signOut();
@@ -31,6 +31,7 @@ export default function SignOut() {
         src={LogoutIcon}
         alt="Sign out"
         style={{ height: ICON_SIZE, width: ICON_SIZE }}
+        priority
       />
       <span className="hidden sm:block">Sign Out</span>
     </button>

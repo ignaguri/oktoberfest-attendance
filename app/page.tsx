@@ -1,11 +1,10 @@
 import { DbResult, Tables } from "@/lib/database-helpers.types";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -22,7 +21,11 @@ export default async function Home() {
       .eq("id", user.id)
       .single();
 
-    const { data }: DbResult<typeof query> = await query;
+    const { data, error }: DbResult<typeof query> = await query;
+
+    if (!data || error) {
+      redirect("/error");
+    }
 
     const userData = data as Tables<"profiles">;
 
