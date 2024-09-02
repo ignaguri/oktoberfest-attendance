@@ -3,19 +3,13 @@
 import Image from "next/image";
 
 import LogoutIcon from "@/public/icons/logout-icon-fa.svg";
-import { createClient } from "@/utils/supabase/client";
+import { logout } from "./actions";
 
 const ICON_SIZE = 20;
 
 export default function SignOut() {
-  const supabase = createClient();
-
   async function handleSignOut() {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error("Error signing out:", error);
-    }
+    await logout();
   }
 
   return (

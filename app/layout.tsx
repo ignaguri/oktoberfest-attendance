@@ -1,5 +1,4 @@
 import { createClient } from "@/utils/supabase/server";
-import SupabaseProvider from "@/lib/supabase-provider";
 
 import "@/styles/globals.css";
 import { Metadata } from "next";
@@ -30,7 +29,7 @@ export default async function RootLayout({
         <div className="flex min-h-screen flex-col items-center justify-center sm:py-2">
           <Navbar session={session} />
           <main className="flex w-full flex-1 shrink-0 flex-col items-center sm:justify-center p-8 text-center sm:px-20 bg-slate-50">
-            <SupabaseProvider session={session}>{children}</SupabaseProvider>
+            {children}
           </main>
         </div>
       </body>

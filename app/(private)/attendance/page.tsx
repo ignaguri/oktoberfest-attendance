@@ -4,15 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { useSupabase } from "@/lib/supabase-provider";
 import { MyDatePicker } from "./DatePicker";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
-import { Database } from "@/lib/database.types";
+import type { Database } from "@/lib/database.types";
+import { useSupabase } from "@/hooks/useSupabase";
+import { BEGGINING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 
 type AttendanceDBType = Database["public"]["Tables"]["attendance"]["Row"];
-
-export const BEGGINING_OF_WIESN = new Date("2023-09-16"); // TODO: move this to a constants file
-export const END_OF_WIESN = new Date("2023-10-03");
 
 const AttendanceSchema = Yup.object().shape({
   amount: Yup.number()
@@ -25,7 +23,7 @@ const AttendanceSchema = Yup.object().shape({
 });
 
 export default function AttendanceForm() {
-  const supabase = useSupabase();
+  const { supabase, user } = useSupabase();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [successMsg, setSuccessMsg] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,42 +31,37 @@ export default function AttendanceForm() {
     useState<Pick<AttendanceDBType, "date" | "liters">[]>();
 
   const fetchAttendance = useCallback(async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData || !userData.user) return;
-
     const { data } = await supabase
       .from("attendance")
       .select("date, liters")
-      .filter("user_id", "eq", userData.user.id)
+      .filter("user_id", "eq", user?.id)
       .order("date", { ascending: true });
-    if (!data) return;
-    setAttendance(data);
-  }, [supabase]);
 
-  useEffect(() => {
-    fetchAttendance();
-  }, [fetchAttendance]);
+    if (!data) {
+      console.error("No data found");
+      return;
+    }
+
+    setAttendance(data);
+  }, [supabase, user]);
 
   async function handleSubmit(
     formData: { amount: number; date: Date },
-    { resetForm }: { resetForm: () => void }
+    { resetForm }: { resetForm: () => void },
   ) {
     setLoading(true);
-
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData || !userData.user) return;
 
     const { error } = await supabase.from("attendance").upsert({
       date: formData.date,
       liters: formData.amount,
-      user_id: userData.user.id,
+      user_id: user?.id,
     });
 
     if (error) {
       setErrorMsg(error.message);
     } else {
       setSuccessMsg(
-        "Success! You can add another day or update the amount of beers for the same day."
+        "Success! You can add another day or update the amount of beers for the same day.",
       );
       fetchAttendance();
     }
@@ -78,8 +71,10 @@ export default function AttendanceForm() {
   }
 
   useEffect(() => {
-    fetchAttendance();
-  }, [fetchAttendance]);
+    if (user) {
+      fetchAttendance();
+    }
+  }, [fetchAttendance, user]);
 
   return (
     <div className="flex flex-col gap-4">

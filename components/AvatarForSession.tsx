@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import Avatar, { AvatarProps } from "@/components/Avatar";
-import { createClient } from "@/utils/supabase/client";
 import { Session } from "@supabase/supabase-js";
+import { useSupabase } from "@/hooks/useSupabase";
 
 interface AvatarForSessionProps extends Omit<AvatarProps, "uid" | "url"> {
   session: Session;
@@ -14,7 +14,7 @@ export default function AvatarForSession({
   session,
   ...avatarProps
 }: AvatarForSessionProps) {
-  const supabase = createClient();
+  const { supabase } = useSupabase();
 
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 

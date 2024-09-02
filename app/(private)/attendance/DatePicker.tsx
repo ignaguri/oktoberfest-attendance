@@ -5,10 +5,7 @@ import { formatDate } from "date-fns/format";
 
 // Styles
 import "react-datepicker/dist/react-datepicker.css";
-import {
-  END_OF_WIESN,
-  BEGGINING_OF_WIESN,
-} from "@/app/attendance/AttendanceForm";
+import { BEGGINING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 
 interface MyDatePickerProps {
   disabled?: boolean;

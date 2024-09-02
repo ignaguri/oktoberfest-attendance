@@ -13,7 +13,7 @@ const SignInSchema = Yup.object().shape({
 
 const handleLogin = async (formData: { email: string; password: string }) => {
   await login(formData);
-}
+};
 
 const SignIn = () => (
   <div className="card">
@@ -32,7 +32,7 @@ const SignIn = () => (
           <Field
             className={cn(
               "input",
-              errors.email && touched.email && "bg-red-50"
+              errors.email && touched.email && "bg-red-50",
             )}
             id="email"
             name="email"
@@ -47,7 +47,7 @@ const SignIn = () => (
           <Field
             className={cn(
               "input",
-              errors.password && touched.password && "bg-red-50"
+              errors.password && touched.password && "bg-red-50",
             )}
             id="password"
             name="password"

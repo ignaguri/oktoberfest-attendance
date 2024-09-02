@@ -3,16 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import Avatar from "@/components/Avatar";
-import { useSupabase } from "@/lib/supabase-provider";
-import { Session } from "@supabase/supabase-js";
-import { revalidatePath } from "next/cache";
+import { useSupabase } from "@/hooks/useSupabase";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
-interface AccountFormProps {
-  user: Session["user"];
-}
-
-export default function AccountForm({ user }: AccountFormProps) {
-  const supabase = useSupabase();
+export default function AccountForm() {
+  const { user, supabase } = useSupabase();
 
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -27,7 +22,7 @@ export default function AccountForm({ user }: AccountFormProps) {
       const { data, error, status } = await supabase
         .from("profiles")
         .select(`full_name, username, avatar_url`)
-        .eq("id", user.id)
+        .eq("id", user?.id)
         .single();
 
       if (error && status !== 406) {
@@ -47,7 +42,9 @@ export default function AccountForm({ user }: AccountFormProps) {
   }, [user, supabase]);
 
   useEffect(() => {
-    getProfile();
+    if (user) {
+      getProfile();
+    }
   }, [user, getProfile]);
 
   async function updateProfile({
@@ -64,7 +61,7 @@ export default function AccountForm({ user }: AccountFormProps) {
       const { error } = await supabase.from("profiles").upsert({
         avatar_url,
         full_name: fullname,
-        id: user.id as string,
+        id: user?.id as string,
         updated_at: new Date().toISOString(),
         username,
       });
@@ -77,8 +74,11 @@ export default function AccountForm({ user }: AccountFormProps) {
     } finally {
       setLoading(false);
       setIsEditing(false);
-      revalidatePath("/profile", "page");
     }
+  }
+
+  if (!user) {
+    return <LoadingSpinner />;
   }
 
   return (

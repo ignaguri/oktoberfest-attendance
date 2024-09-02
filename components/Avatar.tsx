@@ -1,17 +1,18 @@
 "use client";
+
+import cn from "classnames";
 import React, { useEffect, useState } from "react";
 import { Database } from "@/lib/database.types";
 import Image from "next/image";
 
-import cn from "classnames";
-import { createClient } from "@/utils/supabase/client";
+import { useSupabase } from "@/hooks/useSupabase";
 
 type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
 
 export interface AvatarProps {
   className?: string;
   isEditing?: boolean;
-  uid: string;
+  uid?: string;
   url: Profiles["avatar_url"];
   size?: "small" | "medium" | "large";
   onUpload?: (url: string) => void;
@@ -36,7 +37,7 @@ export default function Avatar({
   size = "small",
   onUpload,
 }: AvatarProps) {
-  const supabase = createClient();
+  const { supabase } = useSupabase();
   const [avatarUrl, setAvatarUrl] = useState<Profiles["avatar_url"]>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -61,7 +62,7 @@ export default function Avatar({
   }, [url, supabase]);
 
   const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
+    event,
   ) => {
     try {
       setUploading(true);

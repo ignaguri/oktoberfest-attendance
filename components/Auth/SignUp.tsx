@@ -13,7 +13,7 @@ const SignUpSchema = Yup.object().shape({
 
 const handleSignUp = async (formData: { email: string; password: string }) => {
   await signUp(formData);
-}
+};
 
 // TODO: use useFormStatus
 const SignUp = () => (
@@ -45,7 +45,7 @@ const SignUp = () => (
           <Field
             className={cn(
               "input",
-              errors.password && touched.password && "bg-red-50"
+              errors.password && touched.password && "bg-red-50",
             )}
             id="password"
             name="password"

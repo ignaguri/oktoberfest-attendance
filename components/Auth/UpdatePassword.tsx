@@ -5,14 +5,14 @@ import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import { useRouter } from "next/navigation";
 import * as Yup from "yup";
-import { useSupabase } from "@/lib/supabase-provider";
+import { useSupabase } from "@/hooks/useSupabase";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
 const UpdatePassword = () => {
-  const supabase = useSupabase();
+  const { supabase } = useSupabase();
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState<string>();
 
@@ -45,7 +45,7 @@ const UpdatePassword = () => {
             <Field
               className={cn(
                 "input",
-                errors.password && touched.password && "bg-red-50"
+                errors.password && touched.password && "bg-red-50",
               )}
               id="password"
               name="password"

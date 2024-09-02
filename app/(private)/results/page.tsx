@@ -2,20 +2,10 @@ import AttendanceTable from "./AttendanceTable";
 import { DbResult } from "@/lib/database-helpers.types";
 import { createClient } from "@/utils/supabase/server";
 
-import { redirect } from "next/navigation";
-
 import type { AttendanceResult } from "./AttendanceTable";
 
 export default async function Results() {
   const supabase = createClient();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/sign-in");
-  }
 
   const retrieveAttendance = async () => {
     const query = supabase
@@ -48,8 +38,10 @@ export default async function Results() {
   return (
     <div className="flex flex-col min-w-[20rem] items-center gap-4 mt-4 shadow-md sm:min-w-[24rem]">
       <h2 className="w-full text-center p-2">Results</h2>
-      <h4 className="text-center">Who went more times to this year's Wiesn?</h4>
-      <AttendanceTable data={tableData} session={session} />
+      <h4 className="text-center">
+        Who went more times to this year&apos;s Wiesn?
+      </h4>
+      <AttendanceTable data={tableData} />
     </div>
   );
 }

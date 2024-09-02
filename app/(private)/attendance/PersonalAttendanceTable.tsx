@@ -1,4 +1,4 @@
-import Loading from "@/app/loading";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Tables } from "@/lib/database-helpers.types";
 
 type AttendanceDBType = Tables<"attendance">;
@@ -9,7 +9,7 @@ interface PersonalAttendanceTableProps {
 
 const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
   if (!data) {
-    return <Loading />;
+    return <LoadingSpinner />;
   }
 
   return (
