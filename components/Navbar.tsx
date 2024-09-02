@@ -1,7 +1,8 @@
-import { MaybeSession } from "@/lib/supabase-provider";
 import Link from "next/link";
 import SignOut from "./Auth/SignOut";
 import AvatarForSession from "./AvatarForSession";
+
+import type { MaybeSession } from "@/lib/types";
 
 interface NavbarProps {
   session: MaybeSession;

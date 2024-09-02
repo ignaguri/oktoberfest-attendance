@@ -3,16 +3,16 @@
 import { useCallback, useEffect, useState } from "react";
 
 import Avatar from "@/components/Avatar";
-import { useSupabase } from "@/lib/supabase-provider";
 import { Session } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { createClient } from "@/utils/supabase/client";
 
 interface AccountFormProps {
   user: Session["user"];
 }
 
 export default function AccountForm({ user }: AccountFormProps) {
-  const supabase = useSupabase();
+  const supabase = createClient();
 
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);

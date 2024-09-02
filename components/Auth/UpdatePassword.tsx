@@ -5,14 +5,14 @@ import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import { useRouter } from "next/navigation";
 import * as Yup from "yup";
-import { useSupabase } from "@/lib/supabase-provider";
+import { createClient } from "@/utils/supabase/client";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
 const UpdatePassword = () => {
-  const supabase = useSupabase();
+  const supabase = createClient();
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState<string>();
 

@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { useSupabase } from "@/lib/supabase-provider";
 import { MyDatePicker } from "./DatePicker";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
 import { Database } from "@/lib/database.types";
+import { createClient } from "@/utils/supabase/client";
 
 type AttendanceDBType = Database["public"]["Tables"]["attendance"]["Row"];
 
@@ -25,7 +25,7 @@ const AttendanceSchema = Yup.object().shape({
 });
 
 export default function AttendanceForm() {
-  const supabase = useSupabase();
+  const supabase = createClient();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [successMsg, setSuccessMsg] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
