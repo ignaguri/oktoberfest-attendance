@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import cn from "classnames";
-import { Session } from "@supabase/supabase-js";
-import Loading from "@/app/loading";
 import Avatar from "@/components/Avatar";
 import Image from "next/image";
 
 import UpAndDownArrowIcon from "@/public/icons/up-down-arrows-fa.svg";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ICON_SIZE = 12;
 
@@ -25,15 +24,14 @@ export type AttendanceResult = {
 
 interface AttendanceTableProps {
   data?: AttendanceResult[];
-  session: Session;
 }
 
-const AttendanceTable = ({ data, session }: AttendanceTableProps) => {
+const AttendanceTable = ({ data }: AttendanceTableProps) => {
   const [tableData, setTableData] = useState(data);
   const [sortKey, setSortKey] = useState("");
 
   if (!tableData) {
-    return <Loading />;
+    return <LoadingSpinner />;
   }
 
   const handleSort = (key: SortableCols) => {
@@ -137,11 +135,7 @@ const AttendanceTable = ({ data, session }: AttendanceTableProps) => {
             })}
           >
             <td className="px-2 py-1 sm:px-4 sm:py-2">
-              <Avatar
-                uid={session.user.id}
-                url={item.avatarUrl ?? null}
-                size="small"
-              />
+              <Avatar url={item.avatarUrl ?? null} size="small" />
             </td>
             <td className="max-w-[164px] sm:max-w-full px-0 py-1 sm:px-4 sm:py-2 leading-none truncate">
               {getDisplayName(item)}
