@@ -2,12 +2,12 @@
 
 import cn from "classnames";
 import React, { useEffect, useState } from "react";
-import { Database } from "@/lib/database.types";
 import Image from "next/image";
 
 import { useSupabase } from "@/hooks/useSupabase";
+import { Tables } from "@/lib/database.types";
 
-type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
+type Profiles = Tables<"profiles">;
 
 export interface AvatarProps {
   className?: string;
@@ -105,7 +105,7 @@ export default function Avatar({
         />
       ) : (
         <div
-          className="border border-gray-300 bg-gray-100 rounded-full flex justify-center items-center text-center"
+          className="border border-gray-300 bg-gray-100 rounded-full flex flex-col justify-center items-center text-center"
           style={{ height: getMeasure(size), width: getMeasure(size) }}
         >
           <span
@@ -115,7 +115,16 @@ export default function Avatar({
               "text-sm leading-none": size === "small",
             })}
           >
-            No img
+            No
+          </span>
+          <span
+            className={cn("text-gray-500", {
+              "text-2xl": size === "large",
+              "text-lg": size === "medium",
+              "text-sm leading-none": size === "small",
+            })}
+          >
+            img
           </span>
         </div>
       )}

@@ -1,5 +1,5 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Tables } from "@/lib/database-helpers.types";
+import { Tables } from "@/lib/database.types";
 
 type AttendanceDBType = Tables<"attendance">;
 

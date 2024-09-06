@@ -1,11 +1,38 @@
-import { PostgrestError } from "@supabase/supabase-js";
 import { Database } from "./database.types";
 
-export type Tables<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Row"];
+type PublicSchema = Database[Extract<keyof Database, "public">];
 
-export type DbResult<T> = T extends PromiseLike<infer U> ? U : never;
-export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }>
-  ? Exclude<U, null>
-  : never;
-export type DbResultErr = PostgrestError;
+export type Views<
+  PublicViewNameOrOptions extends
+    | keyof PublicSchema["Views"]
+    | { schema: keyof Database },
+  ViewName extends PublicViewNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicViewNameOrOptions["schema"]]["Views"]
+    : never = never,
+> = PublicViewNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicViewNameOrOptions["schema"]]["Views"][ViewName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : PublicViewNameOrOptions extends keyof PublicSchema["Views"]
+    ? PublicSchema["Views"][PublicViewNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+/* TODO: manually change the type in generated code for function:
+          create_group_with_member: {
+                  Args: {
+                    p_group_name: string
+                    p_password: string
+                    p_user_id: string
+                  }
+                  Returns: {
+                    group_id: string
+                    group_name: string
+                  }
+                }
+      */

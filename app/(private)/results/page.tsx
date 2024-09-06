@@ -1,5 +1,4 @@
 import AttendanceTable from "./AttendanceTable";
-import { DbResult } from "@/lib/database-helpers.types";
 import { createClient } from "@/utils/supabase/server";
 
 import type { AttendanceResult } from "./AttendanceTable";
@@ -8,26 +7,24 @@ export default async function Results() {
   const supabase = createClient();
 
   const retrieveAttendance = async () => {
-    const query = supabase
+    const { data } = await supabase
       .from("results")
       .select()
       .order("total_days", { ascending: false })
       .order("total_liters", { ascending: false });
-
-    const { data }: DbResult<typeof query> = await query;
 
     if (!data) {
       return [];
     }
 
     const formattedData: AttendanceResult[] = data.map((item) => ({
-      avatarUrl: item.avatar_url,
-      averageLiters: item.average_liters,
-      email: item.email,
-      fullName: item.full_name,
-      totalDays: item.total_days,
-      totalLiters: item.total_liters,
-      username: item.username,
+      avatarUrl: item.avatar_url || undefined,
+      username: item.username || undefined,
+      fullName: item.full_name || undefined,
+      email: item.email || "",
+      totalDays: item.total_days || 0,
+      totalLiters: item.total_liters || 0,
+      averageLiters: item.average_liters || 0,
     }));
 
     return formattedData;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/client";
@@ -42,14 +42,14 @@ export function useSupabase() {
     };
   }, [router, supabase]);
 
-  if (loading) {
-    return { user: null, supabase };
-  }
+  const memoizedUser = useMemo(() => {
+    if (loading) return null;
+    return {
+      id: user?.id,
+      email: user?.email,
+      role: user?.role,
+    };
+  }, [user, loading]);
 
-  const partialUser = {
-    id: user?.id,
-    email: user?.email,
-    role: user?.role,
-  };
-  return { user: partialUser, supabase };
+  return { user: memoizedUser, supabase };
 }

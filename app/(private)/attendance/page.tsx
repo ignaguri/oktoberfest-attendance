@@ -51,11 +51,17 @@ export default function AttendanceForm() {
   ) {
     setLoading(true);
 
+    if (!user) {
+      setErrorMsg("You must be logged in to submit attendance");
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.from("attendance").upsert({
-      date: formData.date,
+      date: formData.date.toISOString(),
       liters: formData.amount,
-      user_id: user?.id,
-    });
+      user_id: user.id,
+    } as { date: string; liters: number; user_id: string });
 
     if (error) {
       setErrorMsg(error.message);
