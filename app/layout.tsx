@@ -28,7 +28,7 @@ export default async function RootLayout({
       <body>
         <div className="flex min-h-screen flex-col items-center justify-center sm:py-2">
           <Navbar session={session} />
-          <main className="flex w-full flex-1 shrink-0 flex-col items-center sm:justify-center p-8 text-center sm:px-20 bg-slate-50">
+          <main className="flex w-full flex-1 shrink-0 flex-col items-center sm:justify-center p-2 text-center sm:px-20 bg-slate-50">
             {children}
           </main>
         </div>

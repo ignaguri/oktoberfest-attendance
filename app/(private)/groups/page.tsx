@@ -1,8 +1,12 @@
 import { redirect } from "next/navigation";
+
+import GroupsClient from "./GroupsClient";
+import { fetchGroups } from "./helpers";
 import { createClient } from "@/utils/supabase/server";
 
-export default async function Root() {
+export default async function GroupsPage() {
   const supabase = createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -11,5 +15,7 @@ export default async function Root() {
     redirect("/sign-in");
   }
 
-  redirect("/home");
+  const groups = await fetchGroups(supabase, user.id);
+
+  return <GroupsClient groups={groups} />;
 }
