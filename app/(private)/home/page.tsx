@@ -10,7 +10,7 @@ const getProfileData = async () => {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/sign-in");
   }
 
   const { data, error } = await supabase
