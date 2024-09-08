@@ -6,18 +6,18 @@ import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { MyDatePicker } from "./DatePicker";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
-import type { Database } from "@/lib/database.types";
+import type { Tables } from "@/lib/database.types";
 import { useSupabase } from "@/hooks/useSupabase";
-import { BEGGINING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 
-type AttendanceDBType = Database["public"]["Tables"]["attendance"]["Row"];
+type AttendanceDBType = Tables<"attendances">;
 
 const AttendanceSchema = Yup.object().shape({
   amount: Yup.number()
     .min(1, "Come on! You must have drank at least one")
     .required("Required"),
   date: Yup.date()
-    .min(BEGGINING_OF_WIESN, "Wiesn hadn't started")
+    .min(BEGINNING_OF_WIESN, "Wiesn hadn't started")
     .max(END_OF_WIESN, "Sadly it's over")
     .required("Required"),
 });
@@ -28,21 +28,27 @@ export default function AttendanceForm() {
   const [successMsg, setSuccessMsg] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
   const [attendance, setAttendance] =
-    useState<Pick<AttendanceDBType, "date" | "liters">[]>();
+    useState<Pick<AttendanceDBType, "date" | "beer_count">[]>();
 
-  const fetchAttendance = useCallback(async () => {
-    const { data } = await supabase
-      .from("attendance")
-      .select("date, liters")
-      .filter("user_id", "eq", user?.id)
-      .order("date", { ascending: true });
-
-    if (!data) {
-      console.error("No data found");
+  const fetchAttendances = useCallback(async () => {
+    if (!user?.id) {
       return;
     }
 
-    setAttendance(data);
+    const { data, error } = await supabase
+      .from("attendances")
+      .select("*")
+      .eq("user_id", user?.id)
+      .order("date", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching profile", error);
+      return;
+    }
+
+    if (data) {
+      setAttendance(data);
+    }
   }, [supabase, user]);
 
   async function handleSubmit(
@@ -57,37 +63,46 @@ export default function AttendanceForm() {
       return;
     }
 
-    const { error } = await supabase.from("attendance").upsert({
-      date: formData.date.toISOString(),
-      liters: formData.amount,
-      user_id: user.id,
-    } as { date: string; liters: number; user_id: string });
+    const { error } = await supabase.from("attendances").upsert(
+      {
+        user_id: user.id,
+        date: formData.date.toISOString(),
+        beer_count: formData.amount,
+      },
+      {
+        onConflict: "date",
+      },
+    );
 
     if (error) {
       setErrorMsg(error.message);
     } else {
+      setErrorMsg(undefined);
       setSuccessMsg(
         "Success! You can add another day or update the amount of beers for the same day.",
       );
-      fetchAttendance();
+      fetchAttendances();
+      resetForm();
     }
 
     setLoading(false);
-    resetForm();
   }
 
   useEffect(() => {
     if (user) {
-      fetchAttendance();
+      fetchAttendances();
     }
-  }, [fetchAttendance, user]);
+  }, [fetchAttendances, user]);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="card">
         <h2 className="w-full text-center">Register attendance</h2>
         <Formik
-          initialValues={{ amount: 0, date: BEGGINING_OF_WIESN }}
+          initialValues={{
+            amount: 0,
+            date: new Date() > END_OF_WIESN ? BEGINNING_OF_WIESN : new Date(),
+          }}
           validationSchema={AttendanceSchema}
           onSubmit={handleSubmit}
         >

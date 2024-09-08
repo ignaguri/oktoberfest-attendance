@@ -47,7 +47,7 @@ export const Leaderboard = ({ entries }: { entries: LeaderboardEntry[] }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-4 sm:py-8">
+    <div className="bg-gray-100 py-4 sm:py-8">
       <div className="max-w-full">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <div className="overflow-x-auto">

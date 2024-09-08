@@ -1,64 +1,25 @@
-import { useSupabase } from "@/hooks/useSupabase";
-import { useState } from "react";
+import { createGroup } from "./actions";
 
-export const CreateGroup = ({
-  onGroupCreated,
-}: {
-  onGroupCreated: (groupId: string) => void;
-}) => {
-  const { supabase, user } = useSupabase();
-  const [groupName, setGroupName] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!user?.id) {
-      return;
-    }
-
-    const { data, error } = await supabase.rpc("create_group_with_member", {
-      p_group_name: groupName,
-      p_password: password,
-      p_user_id: user.id,
-    });
-
-    if (error) {
-      console.error("Error creating group", error);
-      return;
-    }
-
-    if (data) {
-      setGroupName("");
-      setPassword("");
-      alert("Group created successfully!");
-      onGroupCreated(data.group_id);
-    }
-  };
-
+// TODO: use Formik
+export const CreateGroupForm = () => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form action={createGroup} className="space-y-2">
       <h3 className="text-xl font-semibold">Create a New Group</h3>
       <input
         type="text"
+        name="groupName"
         placeholder="Group Name"
-        value={groupName}
-        onChange={(e) => setGroupName(e.target.value)}
-        className="w-full p-2 border rounded"
+        className="w-full p-2 border rounded-lg"
         required
       />
       <input
         type="password"
+        name="password"
         placeholder="Group Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full p-2 border rounded"
+        className="w-full p-2 border rounded-lg"
         required
       />
-      <button
-        type="submit"
-        className="w-full p-2 bg-blue-500 text-white rounded"
-      >
+      <button type="submit" className="button-inverse">
         Create Group
       </button>
     </form>
