@@ -1,5 +1,3 @@
-DROP VIEW leaderboard
-
 CREATE OR REPLACE VIEW
   public.leaderboard AS
 SELECT
