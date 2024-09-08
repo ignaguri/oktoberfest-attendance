@@ -1,10 +1,10 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Tables } from "@/lib/database-helpers.types";
+import { Tables } from "@/lib/database.types";
 
-type AttendanceDBType = Tables<"attendance">;
+type AttendanceDBType = Tables<"attendances">;
 
 interface PersonalAttendanceTableProps {
-  data?: Pick<AttendanceDBType, "date" | "liters">[];
+  data?: Pick<AttendanceDBType, "date" | "beer_count">[];
 }
 
 const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
@@ -32,7 +32,7 @@ const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
                 {new Date(row.date).toLocaleDateString()}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {`${row.liters ? "🍺".repeat(row.liters) : ""}`}
+                {`${row.beer_count ? "🍺".repeat(row.beer_count) : ""}`}
               </td>
             </tr>
           ))}

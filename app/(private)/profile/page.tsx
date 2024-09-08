@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import Avatar from "@/components/Avatar";
 import { useSupabase } from "@/hooks/useSupabase";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import clearCachesByServerAction from "@/utils/revalidate";
 
 export default function AccountForm() {
   const { user, supabase } = useSupabase();
@@ -19,10 +20,14 @@ export default function AccountForm() {
     try {
       setLoading(true);
 
+      if (!user?.id) {
+        return;
+      }
+
       const { data, error, status } = await supabase
         .from("profiles")
         .select(`full_name, username, avatar_url`)
-        .eq("id", user?.id)
+        .eq("id", user.id)
         .single();
 
       if (error && status !== 406) {
@@ -39,13 +44,13 @@ export default function AccountForm() {
     } finally {
       setLoading(false);
     }
-  }, [user, supabase]);
+  }, [user?.id, supabase]);
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       getProfile();
     }
-  }, [user, getProfile]);
+  }, [getProfile, user?.id]);
 
   async function updateProfile({
     username,
@@ -74,6 +79,7 @@ export default function AccountForm() {
     } finally {
       setLoading(false);
       setIsEditing(false);
+      clearCachesByServerAction("/profile");
     }
   }
 

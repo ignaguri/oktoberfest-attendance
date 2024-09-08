@@ -1,11 +1,11 @@
 import { useField } from "formik";
-import { useState } from "react";
+import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { formatDate } from "date-fns/format";
 
 // Styles
 import "react-datepicker/dist/react-datepicker.css";
-import { BEGGINING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 
 interface MyDatePickerProps {
   disabled?: boolean;
@@ -16,45 +16,44 @@ export function MyDatePicker({
   disabled = false,
   name = "date",
 }: MyDatePickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [field, meta, helpers] = useField(name);
 
   const { value } = meta;
   const { setValue } = helpers;
 
   const handleOnChange = (date: Date | null) => {
-    setIsOpen(!isOpen);
     setValue(date as Date);
   };
 
-  const handleOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setIsOpen(!isOpen);
-  };
+  type ButtonProps = React.HTMLProps<HTMLButtonElement>;
+  const CustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
+    function CustomInput({ onClick }, ref) {
+      return (
+        <button
+          className="input h-11 px-4"
+          disabled={disabled}
+          onClick={onClick}
+          ref={ref}
+          type="button"
+        >
+          {formatDate(value, "dd/MM/yyyy")}
+        </button>
+      );
+    },
+  );
 
   return (
-    <>
-      <button
-        className="input"
-        disabled={disabled}
-        onClick={handleOnClick}
-        suppressHydrationWarning
-      >
-        {formatDate(value, "dd/MM/yyyy")}
-      </button>
-      {isOpen && (
-        <DatePicker
-          {...field}
-          dateFormat="dd/MM/yyyy"
-          inline
-          maxDate={END_OF_WIESN}
-          minDate={BEGGINING_OF_WIESN}
-          onChange={handleOnChange}
-          onClickOutside={() => setIsOpen(false)}
-          selected={value}
-          todayButton="Today"
-        />
-      )}
-    </>
+    <div className="w-full">
+      <DatePicker
+        {...field}
+        dateFormat="dd/MM/yyyy"
+        maxDate={END_OF_WIESN}
+        minDate={BEGINNING_OF_WIESN}
+        customInput={<CustomInput />}
+        onChange={handleOnChange}
+        selected={value}
+        todayButton="Today"
+      />
+    </div>
   );
 }
