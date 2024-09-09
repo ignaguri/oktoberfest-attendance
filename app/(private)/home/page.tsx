@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import MissingFields from "./MissingFields";
 
 const getProfileData = async () => {
   const supabase = createClient();
@@ -64,62 +65,8 @@ export default async function Home() {
         ultimate Wiesnmeister.
       </p>
       <div className="card gap-4">
-        {showMissingSection && (
-          <>
-            <p className="text-sm text-center text-gray-600 mb-2">
-              Let&apos;s complete your profile to get started:
-            </p>
-            <div className="space-y-4 mb-4">
-              {missingFields.full_name && (
-                <div className="flex items-center space-x-4 p-3 bg-gray-100 rounded-lg">
-                  <span className="text-xl" role="img" aria-label="User">
-                    👤
-                  </span>
-                  <span className="flex-grow text-gray-700">Name</span>
-                  <Link
-                    href="/profile"
-                    className="text-xl cursor-pointer hover:opacity-70 transition-opacity"
-                    aria-label="Edit"
-                  >
-                    ✏️
-                  </Link>
-                </div>
-              )}
-              {missingFields.username && (
-                <div className="flex items-center space-x-4 p-3 bg-gray-100 rounded-lg">
-                  <span className="text-xl" role="img" aria-label="User">
-                    👤
-                  </span>
-                  <span className="flex-grow text-gray-700">Username</span>
-                  <Link
-                    href="/profile"
-                    className="text-xl cursor-pointer hover:opacity-70 transition-opacity"
-                    aria-label="Edit"
-                  >
-                    ✏️
-                  </Link>
-                </div>
-              )}
-              {missingFields.avatar_url && (
-                <div className="flex items-center space-x-4 p-3 bg-gray-100 rounded-lg">
-                  <span className="text-xl" role="img" aria-label="Image">
-                    🖼️
-                  </span>
-                  <span className="flex-grow text-gray-700">
-                    Profile picture
-                  </span>
-                  <Link
-                    href="/profile"
-                    className="text-xl cursor-pointer hover:opacity-70 transition-opacity"
-                    aria-label="Edit"
-                  >
-                    ✏️
-                  </Link>
-                </div>
-              )}
-            </div>
-          </>
-        )}
+        {showMissingSection && <MissingFields missingFields={missingFields} />}
+
         <div className="flex flex-col gap-2">
           {showMissingSection && (
             <Link className="button" href="/profile">
