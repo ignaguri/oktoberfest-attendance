@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ErrorInfo, ReactNode } from "react";
-import Link from "next/link";
+import ErrorPage from "./ErrorPage";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -31,21 +31,7 @@ class ErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      return (
-        <div className="flex flex-col items-center p-2 bg-gray-100">
-          <div className="p-8 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">
-              Oops! Something went wrong.
-            </h1>
-            <p className="text-gray-600 mb-4">
-              {this.state.error?.message || "An unexpected error occurred."}
-            </p>
-            <Link href="/" className="text-blue-500 hover:underline">
-              Go back to home page
-            </Link>
-          </div>
-        </div>
-      );
+      return <ErrorPage error={this.state.error} />;
     }
 
     return this.props.children;

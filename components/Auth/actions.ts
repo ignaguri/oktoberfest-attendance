@@ -16,7 +16,7 @@ export async function login(formData: { email: string; password: string }) {
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    redirect("/error");
+    throw new Error(error.message);
   }
 
   revalidatePath("/", "layout");
@@ -49,7 +49,7 @@ export async function signUp(formData: { email: string; password: string }) {
 
   if (error) {
     console.error("Error while trying to sign up", error);
-    redirect("/error");
+    throw new Error(error.message);
   }
 
   revalidatePath("/", "layout");
@@ -69,5 +69,17 @@ export async function resetPassword(formData: {
     return [false, error.message];
   } else {
     return [true, null];
+  }
+}
+
+export async function updatePassword(formData: { password: string }) {
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password: formData.password,
+  });
+
+  if (error) {
+    throw new Error(error.message);
   }
 }

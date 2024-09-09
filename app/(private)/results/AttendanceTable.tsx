@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import cn from "classnames";
-import Avatar from "@/components/Avatar";
+import Avatar from "@/components/Avatar/Avatar";
 import Image from "next/image";
 
 import UpAndDownArrowIcon from "@/public/icons/up-down-arrows-fa.svg";

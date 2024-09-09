@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import SignOut from "./Auth/SignOut";
-import AvatarForSession from "./AvatarForSession";
+import AvatarForSession from "./Avatar/AvatarForSession";
 
 import type { MaybeSession } from "@/lib/types";
 

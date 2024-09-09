@@ -41,7 +41,7 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    !["/auth", "/sign-in", "/sign-up", "/reset-password"].includes(
+    !["/auth", "/sign-in", "/sign-up", "/reset-password", "/error"].includes(
       request.nextUrl.pathname,
     )
   ) {
