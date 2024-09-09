@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import MissingFields from "./MissingFields";
 
 const getProfileData = async () => {
   const supabase = createClient();
@@ -41,33 +42,31 @@ const getProfileData = async () => {
     missingFields = { ...missingFields, avatar_url: "Profile picture" };
   }
 
-  return { missingFields, username: userData.username };
+  return { missingFields };
 };
 
 export default async function Home() {
-  const { missingFields, username } = await getProfileData();
+  const { missingFields } = await getProfileData();
   const showMissingSection = Object.values(missingFields).length > 0;
 
   return (
-    <>
+    <div className="max-w-lg">
       <h1 className="mb-12 text-5xl font-bold sm:text-6xl">
         <span className="font-extrabold text-yellow-600">Prost</span>
-        <span className="font-extrabold text-yellow-500">Counter</span> 🍻
+        <span className="font-extrabold text-yellow-500">Counter</span>
+        <br />
+        <span role="img" aria-label="beer">
+          🍻
+        </span>
       </h1>
-      <div className="card">
-        <h2>{username ? `Welcome, ${username}!` : "Welcome!"}</h2>
-        {showMissingSection && (
-          <div className="flex flex-col gap-2">
-            <h5 className="text-sm text-gray-500">
-              It seems you have some missing data in your profile:
-            </h5>
-            <ul className="highlight text-center">
-              {Object.values(missingFields).map((value) => (
-                <li key={value}>{`• ${value}`}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+      <p className="text-center text-gray-700 mb-6 px-4">
+        Compete with friends in different groups to see who visits Oktoberfest
+        more often and drinks the most! Track your progress and become the
+        ultimate Wiesnmeister.
+      </p>
+      <div className="card gap-4">
+        {showMissingSection && <MissingFields missingFields={missingFields} />}
+
         <div className="flex flex-col gap-2">
           {showMissingSection && (
             <Link className="button" href="/profile">
@@ -82,6 +81,6 @@ export default async function Home() {
           </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }

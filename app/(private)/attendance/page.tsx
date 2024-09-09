@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
-import { Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { MyDatePicker } from "./DatePicker";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
@@ -18,16 +18,13 @@ const AttendanceSchema = Yup.object().shape({
     .min(1, "Come on! You must have drank at least one")
     .required("Required"),
   date: Yup.date()
-    .min(BEGINNING_OF_WIESN, "Wiesn hadn't started")
-    .max(END_OF_WIESN, "Sadly it's over")
+    .min(BEGINNING_OF_WIESN, "Wrong date: Wiesn hadn't started")
+    .max(END_OF_WIESN, "Wrong date: Sadly it's over")
     .required("Required"),
 });
 
 export default function AttendanceForm() {
   const { supabase, user } = useSupabase();
-  const [errorMsg, setErrorMsg] = useState<string>();
-  const [successMsg, setSuccessMsg] = useState<string>();
-  const [loading, setLoading] = useState<boolean>(false);
   const [attendance, setAttendance] =
     useState<Pick<AttendanceDBType, "date" | "beer_count">[]>();
 
@@ -54,13 +51,13 @@ export default function AttendanceForm() {
 
   async function handleSubmit(
     formData: { amount: number; date: Date },
-    { resetForm }: { resetForm: () => void },
+    { setStatus }: { setStatus: (status?: any) => void },
   ) {
-    setLoading(true);
-
     if (!user) {
-      setErrorMsg("You must be logged in to submit attendance");
-      setLoading(false);
+      setStatus({
+        error: true,
+        msg: "You must be logged in to submit attendance",
+      });
       return;
     }
 
@@ -76,17 +73,17 @@ export default function AttendanceForm() {
     );
 
     if (error) {
-      setErrorMsg(error.message);
+      setStatus({
+        error: true,
+        msg: "Error submitting attendance",
+      });
     } else {
-      setErrorMsg(undefined);
-      setSuccessMsg(
-        "Success! You can add another day or update the amount of beers for the same day.",
-      );
+      setStatus({
+        error: false,
+        msg: "Success! You can add another day or update the amount of beers for the same day.",
+      });
       fetchAttendances();
-      resetForm();
     }
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -111,19 +108,22 @@ export default function AttendanceForm() {
           }}
           validationSchema={AttendanceSchema}
           onSubmit={handleSubmit}
+          initialStatus={{ error: false, msg: "" }}
         >
-          {({ errors, touched }) => (
+          {({ errors, isSubmitting, status }) => (
             <Form className="column w-full">
               <label htmlFor="date">When did you go?</label>
               <MyDatePicker name="date" />
-              {errors.date && touched.date ? (
-                <div className="text-red-600">{`Wrong date: ${errors.date}`}</div>
-              ) : null}
+              <ErrorMessage
+                name="date"
+                component="span"
+                className="text-red-600 my-2 self-center"
+              />
               <label htmlFor="amount">How many Maße 🍻 did you have?</label>
               <Field
                 className={cn(
                   "input w-auto self-center",
-                  errors.amount && "bg-red-50",
+                  errors.amount && "bg-red-50 border-red-200",
                 )}
                 id="amount"
                 name="amount"
@@ -136,21 +136,31 @@ export default function AttendanceForm() {
                   </option>
                 ))}
               </Field>
-              {errors.amount && touched.amount ? (
-                <div className="text-red-600">{errors.amount}</div>
-              ) : null}
+              <ErrorMessage
+                name="amount"
+                component="span"
+                className="text-red-600 my-2 self-center"
+              />
               <button
                 className="button-inverse self-center"
                 type="submit"
-                disabled={loading}
+                disabled={isSubmitting}
               >
                 Submit
               </button>
+              {status.msg && (
+                <div
+                  className={cn(
+                    status.error && "text-red-600",
+                    !status.error && "text-green-700",
+                  )}
+                >
+                  {status.msg}
+                </div>
+              )}
             </Form>
           )}
         </Formik>
-        {errorMsg && <div className="text-red-600">{errorMsg}</div>}
-        {successMsg && <div className="text-green-700">{successMsg}</div>}
       </div>
       <PersonalAttendanceTable data={attendance} />
     </div>

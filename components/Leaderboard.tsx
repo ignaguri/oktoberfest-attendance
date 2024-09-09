@@ -2,7 +2,7 @@
 
 import { Views } from "@/lib/database-helpers.types";
 import { useState } from "react";
-import Avatar from "./Avatar";
+import Avatar from "./Avatar/Avatar";
 
 type LeaderboardEntry = Views<"leaderboard">;
 

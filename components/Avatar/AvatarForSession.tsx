@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import Avatar, { AvatarProps } from "@/components/Avatar";
+import Avatar, { AvatarProps } from "@/components/Avatar/Avatar";
 import { Session } from "@supabase/supabase-js";
 import { useSupabase } from "@/hooks/useSupabase";
 
