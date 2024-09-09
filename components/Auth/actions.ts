@@ -45,15 +45,29 @@ export async function signUp(formData: { email: string; password: string }) {
     password: formData.password,
   };
 
-  const { error, data: authData } = await supabase.auth.signUp(data);
+  const { error } = await supabase.auth.signUp(data);
 
   if (error) {
     console.error("Error while trying to sign up", error);
     redirect("/error");
   }
 
-  console.log("authData", authData);
-
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+export async function resetPassword(formData: {
+  email: string;
+}): Promise<[boolean, string | null]> {
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+    redirectTo: `${window.location.origin}/auth/update-password`,
+  });
+
+  if (error) {
+    return [false, error.message];
+  } else {
+    return [true, null];
+  }
 }

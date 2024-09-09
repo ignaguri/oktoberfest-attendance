@@ -71,7 +71,6 @@ export type Database = {
           beer_count: number
           created_at: string | null
           date: string
-          group_id: string | null
           id: string
           updated_at: string | null
           user_id: string | null
@@ -80,7 +79,6 @@ export type Database = {
           beer_count?: number
           created_at?: string | null
           date: string
-          group_id?: string | null
           id?: string
           updated_at?: string | null
           user_id?: string | null
@@ -89,26 +87,11 @@ export type Database = {
           beer_count?: number
           created_at?: string | null
           date?: string
-          group_id?: string | null
           id?: string
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "attendances_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "attendances_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["group_id"]
-          },
           {
             foreignKeyName: "attendances_user_id_fkey"
             columns: ["user_id"]
@@ -294,16 +277,16 @@ export type Database = {
     }
     Functions: {
       create_group_with_member: {
-              Args: {
-                p_group_name: string
-                p_password: string
-                p_user_id: string
-              }
-              Returns: {
-                group_id: string
-                group_name: string
-              }
-            }
+        Args: {
+          p_group_name: string
+          p_password: string
+          p_user_id: string
+        }
+        Returns: {
+          group_id: string
+          group_name: string
+        }
+      }
       get_user_groups: {
         Args: Record<PropertyKey, never>
         Returns: string[]

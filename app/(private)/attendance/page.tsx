@@ -9,6 +9,7 @@ import PersonalAttendanceTable from "./PersonalAttendanceTable";
 import type { Tables } from "@/lib/database.types";
 import { useSupabase } from "@/hooks/useSupabase";
 import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { isWithinInterval } from "date-fns/isWithinInterval";
 
 type AttendanceDBType = Tables<"attendances">;
 
@@ -95,13 +96,18 @@ export default function AttendanceForm() {
   }, [fetchAttendances, user]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="max-w-lg sm:w-full flex flex-col gap-6">
       <div className="card">
         <h2 className="w-full text-center">Register attendance</h2>
         <Formik
           initialValues={{
             amount: 0,
-            date: new Date() > END_OF_WIESN ? BEGINNING_OF_WIESN : new Date(),
+            date: isWithinInterval(new Date(), {
+              start: BEGINNING_OF_WIESN,
+              end: END_OF_WIESN,
+            })
+              ? new Date()
+              : BEGINNING_OF_WIESN,
           }}
           validationSchema={AttendanceSchema}
           onSubmit={handleSubmit}
@@ -113,9 +119,12 @@ export default function AttendanceForm() {
               {errors.date && touched.date ? (
                 <div className="text-red-600">{`Wrong date: ${errors.date}`}</div>
               ) : null}
-              <label htmlFor="amount">How many Maß did you have?</label>
+              <label htmlFor="amount">How many Maße 🍻 did you have?</label>
               <Field
-                className={cn("input", errors.amount && "bg-red-50")}
+                className={cn(
+                  "input w-auto self-center",
+                  errors.amount && "bg-red-50",
+                )}
                 id="amount"
                 name="amount"
                 placeholder="At least how many do you remember?"
@@ -131,7 +140,7 @@ export default function AttendanceForm() {
                 <div className="text-red-600">{errors.amount}</div>
               ) : null}
               <button
-                className="button-inverse w-full"
+                className="button-inverse self-center"
                 type="submit"
                 disabled={loading}
               >

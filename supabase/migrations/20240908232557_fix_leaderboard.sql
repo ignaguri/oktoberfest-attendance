@@ -1,3 +1,5 @@
+DROP VIEW IF EXISTS public.leaderboard;
+
 CREATE OR REPLACE VIEW
   public.leaderboard AS
 SELECT

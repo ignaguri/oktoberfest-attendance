@@ -52,19 +52,21 @@ export default async function GroupPage({
   ]);
 
   return (
-    <div className="container w-full">
+    <div className="w-full max-w-lg">
       <Suspense fallback={<LoadingSpinner />}>
         <h2 className="text-3xl font-bold">Group &quot;{group?.name}&quot;</h2>
 
         <div className="flex flex-col gap-4">
           <Leaderboard entries={leaderboardEntries ?? []} />
 
-          <Link className="button-inverse" href="/attendance">
-            Register attendance
-          </Link>
-          <Link className="button" href={`/group-settings/${groupId}`}>
-            Group Settings
-          </Link>
+          <div className="flex flex-col gap-4 items-center">
+            <Link className="button-inverse w-fit" href="/attendance">
+              Register attendance
+            </Link>
+            <Link className="button w-fit" href={`/group-settings/${groupId}`}>
+              Group Settings
+            </Link>
+          </div>
         </div>
       </Suspense>
     </div>
