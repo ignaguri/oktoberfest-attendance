@@ -16,12 +16,12 @@ interface FormValues {
   avatar: File | null;
 }
 
-const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 const validationSchema = Yup.object().shape({
   avatar: Yup.mixed()
     .required("An avatar file is required")
-    .test("fileSize", "File is too large (max 1MB)", (value) => {
+    .test("fileSize", "File is too large (max 2MB)", (value) => {
       if (!value) return true;
       return value instanceof File && value.size <= MAX_FILE_SIZE;
     })
