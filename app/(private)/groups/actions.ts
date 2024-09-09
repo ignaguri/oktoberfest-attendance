@@ -28,9 +28,11 @@ export async function fetchGroups(): Promise<Tables<"groups">[]> {
   return groups;
 }
 
-export async function createGroup(formData: FormData) {
-  const groupName = formData.get("groupName") as string;
-  const password = formData.get("password") as string;
+export async function createGroup(formData: {
+  groupName: string;
+  password: string;
+}) {
+  const { groupName, password } = formData;
 
   const supabase = createClient();
   const {
@@ -49,7 +51,7 @@ export async function createGroup(formData: FormData) {
 
   if (error) {
     console.error("Error creating group", error);
-    return;
+    throw new Error("Error creating group");
   }
 
   if (data) {
@@ -58,9 +60,11 @@ export async function createGroup(formData: FormData) {
   }
 }
 
-export async function joinGroup(formData: FormData) {
-  const groupName = formData.get("groupName") as string;
-  const password = formData.get("password") as string;
+export async function joinGroup(formData: {
+  groupName: string;
+  password: string;
+}) {
+  const { groupName, password } = formData;
 
   const supabase = createClient();
   const {
@@ -79,7 +83,7 @@ export async function joinGroup(formData: FormData) {
 
   if (error || !groupId) {
     console.error("Error joining group", error);
-    return;
+    throw new Error("Error joining group");
   }
 
   revalidatePath("/groups");

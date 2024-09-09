@@ -5,31 +5,25 @@ import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
-import { useSupabase } from "@/hooks/useSupabase";
+import { resetPassword } from "./actions";
 
 const ResetPasswordSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
 });
 
 const ResetPassword = () => {
-  const { supabase } = useSupabase();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [successMsg, setSuccessMsg] = useState<string>();
 
-  async function resetPassword(formData: { email: string }) {
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      formData.email,
-      {
-        redirectTo: `${window.location.origin}/auth/update-password`,
-      },
-    );
+  const handleResetPassword = async (formData: { email: string }) => {
+    const [_, errorMessage] = await resetPassword(formData);
 
-    if (error) {
-      setErrorMsg(error.message);
+    if (errorMessage) {
+      setErrorMsg(errorMessage);
     } else {
-      setSuccessMsg("Password reset instructions sent.");
+      setSuccessMsg("Instructions sent. Check your email.");
     }
-  }
+  };
 
   return (
     <div className="card">
@@ -39,7 +33,7 @@ const ResetPassword = () => {
           email: "",
         }}
         validationSchema={ResetPasswordSchema}
-        onSubmit={resetPassword}
+        onSubmit={handleResetPassword}
       >
         {({ errors, touched }) => (
           <Form className="column w-full">
@@ -54,7 +48,7 @@ const ResetPassword = () => {
             {errors.email && touched.email ? (
               <div className="text-red-600">{errors.email}</div>
             ) : null}
-            <button className="button-inverse w-full" type="submit">
+            <button className="button-inverse self-center" type="submit">
               Send Instructions
             </button>
           </Form>

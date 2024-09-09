@@ -17,6 +17,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
   const [name, setName] = useState(group.name);
   const [password, setPassword] = useState(group.password);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleUpdateGroup = useCallback(async () => {
     if (!isCreator) {
@@ -61,7 +62,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-lg space-y-6">
       <h2 className="text-2xl font-semibold">Group Settings</h2>
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
@@ -92,22 +93,30 @@ export default function GroupSettingsClient({ group, members }: Props) {
               >
                 Group Password
               </label>
-              <input
-                type="password"
-                id="groupPassword"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                disabled={!isCreator}
-              />
+              <div className="relative mt-1">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="groupPassword"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  disabled={!isCreator}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
             {isCreator && (
-              <button
-                onClick={handleUpdateGroup}
-                className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
-              >
-                Update Group
-              </button>
+              <div className="flex justify-center">
+                <button onClick={handleUpdateGroup} className="button-inverse">
+                  Update Group
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -117,14 +126,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Username
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
               {isCreator && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               )}
@@ -140,7 +149,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   {member.full_name || "–"}
                 </td>
                 {isCreator && (
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       className="text-red-600 hover:text-red-900 underline disabled:text-gray-400 disabled:no-underline"
                       disabled={member.id === user?.id}

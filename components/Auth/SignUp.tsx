@@ -55,13 +55,13 @@ const SignUp = () => (
             <div className="text-red-600">{errors.password}</div>
           ) : null}
 
-          <button className="button-inverse w-full" type="submit">
+          <button className="button-inverse self-center" type="submit">
             Submit
           </button>
         </Form>
       )}
     </Formik>
-    <Link href="/sign-in" className="link w-full">
+    <Link href="/sign-in" className="link">
       Already have an account? Sign In.
     </Link>
   </div>

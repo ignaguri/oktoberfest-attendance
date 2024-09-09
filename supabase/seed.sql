@@ -43,33 +43,67 @@ INSERT INTO
             generate_series(1, 10)
     );
 
-
 -- Seed the profiles table using data from auth.users
-INSERT INTO profiles (id, updated_at, username, full_name, avatar_url, website)
+INSERT INTO profiles (id, updated_at, username, full_name, avatar_url)
 SELECT
     u.id,
     current_timestamp AS updated_at,
-    REPLACE(u.email, '@', '') AS username,
+    substring(u.email from 1 for position('@' in u.email) - 1) AS username,
     '' AS full_name,
-    '' AS avatar_url,
-    '' AS website
+    '' AS avatar_url
 FROM auth.users u
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM profiles p
-    WHERE p.id = u.id
-);
+ON CONFLICT (id) DO UPDATE
+SET
+    updated_at = EXCLUDED.updated_at,
+    username = EXCLUDED.username,
+    full_name = EXCLUDED.full_name,
+    avatar_url = EXCLUDED.avatar_url;
 
--- Seed the attendance table with random attendances for the 10 users
+-- Seed the attendances table with random attendances for the 10 users
 -- Replace 'userX_id' with the actual user IDs from the profiles table
 
-INSERT INTO attendance (user_id, date, liters)
+INSERT INTO attendances (user_id, date, beer_count)
 SELECT
     p.id AS user_id,
     current_timestamp - (random() * 365)::integer * interval '1 day' AS date,
-    (random() * 10)::integer AS liters
+    (random() * 10)::integer AS beer_count
 FROM profiles p;
 
--- Commit the transaction to save the changes
+-- Insert groups with created_by set to one of the user IDs
+INSERT INTO groups (id, name, password, created_at, created_by)
+SELECT
+    uuid_generate_v4(),
+    'Group ' || chr(65 + (ROW_NUMBER() OVER ())::int - 1),
+    crypt('password' || chr(65 + (ROW_NUMBER() OVER ())::int - 1), gen_salt('bf')),
+    current_timestamp,
+    u.id
+FROM
+    auth.users u
+LIMIT 3;
 
+-- Insert group members using user IDs
+INSERT INTO group_members (id, group_id, user_id, joined_at)
+SELECT
+    uuid_generate_v4(),
+    g.id,
+    u.id,
+    current_timestamp
+FROM
+    groups g,
+    auth.users u
+WHERE
+    (g.name = 'Group A' AND u.id IN (
+        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 0),
+        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 1)
+    ))
+    OR (g.name = 'Group B' AND u.id IN (
+        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 2),
+        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 3)
+    ))
+    OR (g.name = 'Group C' AND u.id IN (
+        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 4),
+        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 5)
+    ));
+
+-- Commit the transaction to save the changes
 COMMIT;

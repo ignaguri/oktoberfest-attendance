@@ -54,7 +54,7 @@ const UpdatePassword = () => {
             {errors.password && touched.password ? (
               <div className="text-red-600">{errors.password}</div>
             ) : null}
-            <button className="button-inverse w-full" type="submit">
+            <button className="button-inverse self-center" type="submit">
               Update Password
             </button>
           </Form>

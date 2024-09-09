@@ -57,17 +57,16 @@ const SignIn = () => (
             <div className="text-red-600">{errors.password}</div>
           ) : null}
 
-          <Link href="/reset-password" className="link w-full">
-            Forgot your password?
-          </Link>
-
-          <button className="button-inverse w-full" type="submit">
+          <button className="button-inverse self-center" type="submit">
             Submit
           </button>
         </Form>
       )}
     </Formik>
-    <Link href="/sign-up" className="link w-full">
+    <Link href="/reset-password" className="link">
+      Forgot your password?
+    </Link>
+    <Link href="/sign-up" className="link">
       Don&apos;t have an account? Sign Up.
     </Link>
   </div>
