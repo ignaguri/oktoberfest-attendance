@@ -110,7 +110,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
               <ErrorMessage
                 name="fullname"
                 component="span"
-                className="text-red-600 my-2"
+                className="error"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
               <ErrorMessage
                 name="username"
                 component="span"
-                className="text-red-600 my-2"
+                className="error"
               />
             </div>
             {isEditing && (

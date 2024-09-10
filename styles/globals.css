@@ -43,6 +43,14 @@
     @apply custom-focus w-full rounded-xl border border-slate-300 focus:shadow-none disabled:opacity-50;
   }
 
+  .input-error {
+    @apply input border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500;
+  }
+
+  .error {
+    @apply text-red-600 text-sm mt-1;
+  }
+
   .link {
     @apply custom-focus rounded-md font-semibold text-yellow-400;
   }

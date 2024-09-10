@@ -1,8 +1,9 @@
 "use client";
 
-import { Formik, Field, Form } from "formik";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { createGroup } from "./actions";
+import cn from "classnames";
 
 // Define validation schema
 const CreateGroupSchema = Yup.object().shape({
@@ -18,7 +19,9 @@ export const CreateGroupForm = () => {
     try {
       await createGroup(values);
     } catch (error) {
-      alert("There was an error creating the group. Please try again.");
+      alert(
+        "There was an error creating the group. Maybe try a different name?",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -37,22 +40,26 @@ export const CreateGroupForm = () => {
             type="text"
             name="groupName"
             placeholder="Group Name"
-            className="w-full p-2 border rounded-lg"
+            className={cn(
+              "input",
+              errors.groupName && touched.groupName && "input-error",
+            )}
             required
           />
-          {errors.groupName && touched.groupName ? (
-            <div className="text-red-600">{errors.groupName}</div>
-          ) : null}
+          <ErrorMessage name="groupName" component="span" className="error" />
+
           <Field
             type="password"
             name="password"
             placeholder="Group Password"
-            className="w-full p-2 border rounded-lg"
+            className={cn(
+              "input",
+              errors.password && touched.password && "input-error",
+            )}
             required
           />
-          {errors.password && touched.password ? (
-            <div className="text-red-600">{errors.password}</div>
-          ) : null}
+          <ErrorMessage name="password" component="span" className="error" />
+
           <button
             type="submit"
             className="button-inverse"

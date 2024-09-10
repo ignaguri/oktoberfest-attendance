@@ -1,8 +1,9 @@
 "use client";
 
-import { Formik, Field, Form } from "formik";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { joinGroup } from "./actions";
+import cn from "classnames";
 
 // Define validation schema
 const JoinGroupSchema = Yup.object().shape({
@@ -10,17 +11,26 @@ const JoinGroupSchema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 
-export const JoinGroupForm = () => {
+interface JoinGroupFormProps {
+  groupName?: string;
+  groupId?: string;
+}
+
+export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   const handleSubmit = async (
     values: { groupName: string; password: string },
-    { setSubmitting }: any,
+    { setSubmitting, setErrors }: any,
   ) => {
     try {
       await joinGroup(values);
+      if (groupId) {
+        // If groupId is provided, we're on the group page, so reload
+        window.location.reload();
+      } else {
+        // Otherwise, we're on the groups page, so the existing logic will handle redirection
+      }
     } catch (error) {
-      alert(
-        "There was an error joining the group. Did you enter the correct group name and password?",
-      );
+      setErrors({ password: "Incorrect password or unable to join group" });
     } finally {
       setSubmitting(false);
     }
@@ -28,7 +38,7 @@ export const JoinGroupForm = () => {
 
   return (
     <Formik
-      initialValues={{ groupName: "", password: "" }}
+      initialValues={{ groupName: groupName || "", password: "" }}
       validationSchema={JoinGroupSchema}
       onSubmit={handleSubmit}
     >
@@ -39,22 +49,24 @@ export const JoinGroupForm = () => {
             type="text"
             name="groupName"
             placeholder="Group Name"
-            className="w-full p-2 border rounded-lg"
+            className={cn(
+              "input",
+              errors.groupName && touched.groupName && "input-error",
+            )}
             required
           />
-          {errors.groupName && touched.groupName ? (
-            <div className="text-red-600">{errors.groupName}</div>
-          ) : null}
+          <ErrorMessage name="groupName" component="span" className="error" />
           <Field
             type="password"
             name="password"
             placeholder="Group Password"
-            className="w-full p-2 border rounded-lg"
+            className={cn(
+              "input",
+              errors.password && touched.password && "input-error",
+            )}
             required
           />
-          {errors.password && touched.password ? (
-            <div className="text-red-600">{errors.password}</div>
-          ) : null}
+          <ErrorMessage name="password" component="span" className="error" />
           <button
             type="submit"
             className="button-inverse"
