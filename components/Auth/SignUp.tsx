@@ -9,7 +9,9 @@ import { signUp } from "./actions";
 
 const SignUpSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().required("Required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Required"),
 });
 
 export default function SignUp() {
@@ -26,7 +28,11 @@ export default function SignUp() {
     try {
       await signUp(formData);
     } catch (error) {
-      setErrorMessage("Sign up failed. Please try again.");
+      if (error instanceof Error) {
+        setErrorMessage(`Sign up failed. ${error.message}`);
+      } else {
+        setErrorMessage("Sign up failed. An unexpected error occurred.");
+      }
       if (emailRef.current) {
         emailRef.current.focus();
       }
@@ -50,7 +56,10 @@ export default function SignUp() {
           <Form className="column w-full">
             <label htmlFor="email">Email</label>
             <Field
-              className={cn("input", errors.email && "bg-red-50")}
+              className={cn(
+                "input",
+                errors.email && touched.email && "bg-red-50",
+              )}
               id="email"
               name="email"
               placeholder="jane@acme.com"
