@@ -1,7 +1,7 @@
 "use server";
 
 import { v4 as uuidv4 } from "uuid";
-
+import sharp from "sharp";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -33,14 +33,28 @@ export async function uploadAvatar(formData: FormData) {
     throw new Error("User ID is required");
   }
 
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${userId}_${uuidv4()}.${fileExt}`;
+  const buffer = await file.arrayBuffer();
+
+  // Compress and resize the image
+  let compressedBuffer;
+  try {
+    compressedBuffer = await sharp(buffer)
+      .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toBuffer();
+  } catch (error) {
+    console.error("Error compressing image:", error);
+    throw new Error("Error compressing image");
+  }
+
+  const fileName = `${userId}_${uuidv4()}.webp`;
 
   const supabase = createClient();
 
   const { error } = await supabase.storage
     .from("avatars")
-    .upload(fileName, file, {
+    .upload(fileName, compressedBuffer, {
+      contentType: "image/webp",
       cacheControl: "3600",
       upsert: false,
     });

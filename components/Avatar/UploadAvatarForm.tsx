@@ -16,24 +16,22 @@ interface FormValues {
   avatar: File | null;
 }
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
+const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 const validationSchema = Yup.object().shape({
   avatar: Yup.mixed()
     .required("An avatar file is required")
-    .test("fileSize", "File is too large (max 2MB)", (value) => {
+    .test("fileSize", "File is too large (max 12MB)", (value) => {
       if (!value) return true;
       return value instanceof File && value.size <= MAX_FILE_SIZE;
     })
     .test(
       "fileType",
-      "Unsupported file format (use JPEG, PNG, or GIF)",
+      "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
       (value) => {
         if (!value) return true;
-        return (
-          value instanceof File &&
-          ["image/jpeg", "image/png", "image/gif"].includes(value.type)
-        );
+        return value instanceof File && VALID_FILE_TYPES.includes(value.type);
       },
     ),
 });

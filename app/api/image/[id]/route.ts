@@ -1,6 +1,23 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
+const getMimeType = (filename: string): string => {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  switch (ext) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "gif":
+      return "image/gif";
+    case "webp":
+      return "image/webp";
+    default:
+      return "application/octet-stream";
+  }
+};
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -20,7 +37,7 @@ export async function GET(
 
     const buffer = await data.arrayBuffer();
     const headers = new Headers();
-    headers.set("Content-Type", "image/jpeg");
+    headers.set("Content-Type", getMimeType(id));
 
     return new NextResponse(Buffer.from(buffer), {
       status: 200,
