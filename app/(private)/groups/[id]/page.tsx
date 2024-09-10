@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { createClient } from "@/utils/supabase/server";
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import ShareButton from "@/components/ShareButton";
 
 const fetchGroup = async (groupId: string) => {
   const supabase = createClient();
@@ -54,7 +55,15 @@ export default async function GroupPage({
   return (
     <div className="w-full max-w-lg">
       <Suspense fallback={<LoadingSpinner />}>
-        <h2 className="text-3xl font-bold">Group &quot;{group?.name}&quot;</h2>
+        <div className="flex items-center justify-center mb-4">
+          <h2 className="text-3xl font-bold text-center flex-grow pr-2">
+            Group &quot;{group?.name}&quot;
+          </h2>
+          <ShareButton
+            groupName={group?.name ?? ""}
+            groupPassword={group?.password ?? ""}
+          />
+        </div>
 
         <div className="flex flex-col gap-4">
           <Leaderboard entries={leaderboardEntries ?? []} />
