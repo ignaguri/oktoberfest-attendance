@@ -50,7 +50,10 @@ export default function SignUp() {
           <Form className="column w-full">
             <label htmlFor="email">Email</label>
             <Field
-              className={cn("input", errors.email && "bg-red-50")}
+              className={cn(
+                "input",
+                errors.email && touched.email && "bg-red-50",
+              )}
               id="email"
               name="email"
               placeholder="jane@acme.com"

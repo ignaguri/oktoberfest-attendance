@@ -12,7 +12,7 @@ const SignInSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
-const SignIn = () => {
+export default function SignIn() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -98,6 +98,4 @@ const SignIn = () => {
       </Link>
     </div>
   );
-};
-
-export default SignIn;
+}
