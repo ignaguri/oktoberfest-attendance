@@ -17,7 +17,6 @@ interface ShareButtonProps {
   groupPassword: string;
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "localhost:3000";
 const ICON_SIZE = 20;
 
 export default function ShareButton({
@@ -27,9 +26,8 @@ export default function ShareButton({
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareText = `Join my group on the ProstCounter app! ${APP_URL}
-                        Name: ${groupName}
-            Group password: ${groupPassword}`;
+  const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
+  const shareText = `Join my group on the ProstCounter app! ${APP_URL}\nName: ${groupName}\nGroup password: ${groupPassword}`;
 
   const copyToClipboard = async () => {
     try {
@@ -51,7 +49,7 @@ export default function ShareButton({
     <>
       <button
         type="button"
-        className="button-inverse px-2 py-2 sm:px-8 flex gap-1 items-center"
+        className="button-inverse px-2 py-2 flex items-center"
         onClick={() => setIsOpen(true)}
         title="Share group"
       >
