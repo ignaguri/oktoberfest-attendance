@@ -14,6 +14,7 @@ import ShareIcon from "@/public/icons/share-ios-icon.svg";
 
 interface ShareButtonProps {
   groupName: string;
+  groupId: string;
   groupPassword: string;
 }
 
@@ -21,13 +22,15 @@ const ICON_SIZE = 20;
 
 export default function ShareButton({
   groupName,
+  groupId,
   groupPassword,
 }: ShareButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
-  const shareText = `Join my group on the ProstCounter app! ${APP_URL}\nName: ${groupName}\nGroup password: ${groupPassword}`;
+  const groupLink = `${APP_URL}/groups/${groupId}`;
+  const shareText = `Join my group "${groupName}" on the ProstCounter app!\nGroup password: ${groupPassword}.\nClick here to join: ${groupLink}`;
 
   const copyToClipboard = async () => {
     try {

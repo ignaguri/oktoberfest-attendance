@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import cn from "classnames";
-import { Field, Form, Formik } from "formik";
 import Link from "next/link";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { login } from "./actions";
+import { useSearchParams } from "next/navigation";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -13,22 +12,19 @@ const SignInSchema = Yup.object().shape({
 });
 
 export default function SignIn() {
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const emailRef = useRef<HTMLInputElement>(null);
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
-  const handleLogin = async (formData: { email: string; password: string }) => {
-    setIsSubmitting(true);
-    setErrorMessage("");
+  const handleSubmit = async (
+    values: { email: string; password: string },
+    { setSubmitting, setErrors }: any,
+  ) => {
     try {
-      await login(formData);
+      await login(values, redirect);
     } catch (error) {
-      setErrorMessage("Login failed. Please try again.");
-      if (emailRef.current) {
-        emailRef.current.focus();
-      }
+      setErrors({ password: "Invalid email or password" });
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
@@ -36,57 +32,42 @@ export default function SignIn() {
     <div className="card">
       <h2 className="w-full text-center">Sign In</h2>
       <Formik
-        initialValues={{
-          email: "",
-          password: "",
-        }}
+        initialValues={{ email: "", password: "" }}
         validationSchema={SignInSchema}
-        onSubmit={handleLogin}
+        onSubmit={handleSubmit}
       >
-        {({ errors, touched }) => (
+        {({ errors, touched, isSubmitting }) => (
           <Form className="column w-full">
             <label htmlFor="email">Email</label>
             <Field
-              className={cn(
-                "input",
-                errors.email && touched.email && "bg-red-50",
-              )}
+              className={
+                errors.email && touched.email ? "input-error" : "input"
+              }
               id="email"
               name="email"
               placeholder="jane@acme.com"
               type="email"
-              innerRef={emailRef}
-              disabled={isSubmitting}
             />
-            {errors.email && touched.email ? (
-              <div className="text-red-600">{errors.email}</div>
-            ) : null}
+            <ErrorMessage name="email" component="span" className="error" />
 
             <label htmlFor="password">Password</label>
             <Field
-              className={cn(
-                "input",
-                errors.password && touched.password && "bg-red-50",
-              )}
+              className={
+                errors.password && touched.password ? "input-error" : "input"
+              }
               id="password"
               name="password"
               type="password"
-              disabled={isSubmitting}
             />
-            {errors.password && touched.password ? (
-              <div className="text-red-600">{errors.password}</div>
-            ) : null}
+            <ErrorMessage name="password" component="span" className="error" />
 
             <button
               className="button-inverse self-center"
               type="submit"
               disabled={isSubmitting}
             >
-              Submit
+              {isSubmitting ? "Signing In..." : "Sign In"}
             </button>
-            {errorMessage && (
-              <p className="text-red-600 mt-2 self-center">{errorMessage}</p>
-            )}
           </Form>
         )}
       </Formik>

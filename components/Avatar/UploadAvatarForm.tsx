@@ -92,11 +92,7 @@ export default function UploadAvatarForm({
         {({ isSubmitting, setFieldValue }) => (
           <Form id="avatar-upload-form" className="flex flex-col items-center">
             <AvatarPreview url={null} previewUrl={previewUrl} size="large" />
-            <ErrorMessage
-              name="avatar"
-              component="span"
-              className="text-red-500 my-2"
-            />
+            <ErrorMessage name="avatar" component="span" className="error" />
             <label htmlFor="avatar-upload" className="mt-2 mb-2">
               <div className="button">Choose Avatar</div>
             </label>

@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
 
-export async function login(formData: { email: string; password: string }) {
+export async function login(
+  formData: { email: string; password: string },
+  redirectTo?: string | null,
+) {
   const supabase = createClient();
 
   const data = {
@@ -20,7 +23,12 @@ export async function login(formData: { email: string; password: string }) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  } else {
+    redirect("/");
+  }
 }
 
 export async function logout() {
