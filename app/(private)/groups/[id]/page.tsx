@@ -118,7 +118,7 @@ export default async function GroupPage({
         <div className="flex flex-col gap-4">
           <Leaderboard
             entries={leaderboardEntries ?? []}
-            winningCriteria={group.winning_criteria}
+            winningCriteria={group.winning_criteria as WinningCriteria}
           />
 
           <div className="flex flex-col gap-4 items-center">
