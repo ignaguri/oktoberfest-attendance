@@ -6,6 +6,7 @@ import { createGroup } from "./actions";
 import cn from "classnames";
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Import SVG icons
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
@@ -18,6 +19,7 @@ const CreateGroupSchema = Yup.object().shape({
 });
 
 export const CreateGroupForm = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (
@@ -25,7 +27,10 @@ export const CreateGroupForm = () => {
     { setSubmitting }: any,
   ) => {
     try {
-      await createGroup(values);
+      const groupId = await createGroup(values);
+      if (groupId) {
+        router.push(`/group-settings/${groupId}`);
+      }
     } catch (error) {
       alert(
         "There was an error creating the group. Maybe try a different name?",

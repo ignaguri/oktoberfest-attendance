@@ -2,45 +2,73 @@
 
 import { useSupabase } from "@/hooks/useSupabase";
 import { Tables } from "@/lib/database.types";
+import { WinningCriteria, WinningCriteriaValues } from "@/lib/types";
 import clearCachesByServerAction from "@/utils/revalidate";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
-// Import SVG icons
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
+import { winningCriteriaText } from "@/lib/constants";
 
 type Props = {
   group: Tables<"groups">;
   members: Tables<"profiles">[];
 };
 
+const GroupSettingsSchema = Yup.object().shape({
+  name: Yup.string().required("Group name is required"),
+  password: Yup.string().required("Password is required"),
+  description: Yup.string(),
+  winning_criteria: Yup.string()
+    .oneOf(Object.values(WinningCriteriaValues))
+    .required("Winning criteria is required"),
+});
+
 export default function GroupSettingsClient({ group, members }: Props) {
   const { supabase, user } = useSupabase();
-
   const isCreator = group.created_by === user?.id;
-
-  const [name, setName] = useState(group.name);
-  const [password, setPassword] = useState(group.password);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleUpdateGroup = useCallback(async () => {
-    if (!isCreator) {
-      alert("Only the group creator can update group details.");
-      return;
-    }
+  const handleUpdateGroup = useCallback(
+    async (
+      values: Partial<Tables<"groups">>,
+      { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
+    ) => {
+      if (!isCreator) {
+        alert("Only the group creator can update group details.");
+        setSubmitting(false);
+        return;
+      }
 
-    const { error } = await supabase
-      .from("groups")
-      .update({ name, password })
-      .eq("id", group.id);
+      try {
+        const { error } = await supabase
+          .from("groups")
+          .update({
+            name: values.name,
+            password: values.password,
+            description: values.description,
+            winning_criteria: values.winning_criteria,
+          })
+          .eq("id", group.id);
 
-    if (error) {
-      alert("Error updating group: " + error.message);
-    } else {
-      alert("Group updated successfully!");
-    }
-  }, [group.id, isCreator, name, password, supabase]);
+        if (error) {
+          alert("Error updating group: " + error.message);
+        } else {
+          alert("Group updated successfully!");
+          clearCachesByServerAction(`/groups/${group.id}`);
+        }
+      } catch (error) {
+        console.error("Error updating group:", error);
+        alert("An unexpected error occurred while updating the group.");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [group.id, isCreator, supabase],
+  );
 
   const handleRemoveMember = useCallback(
     async (userId: string) => {
@@ -74,61 +102,139 @@ export default function GroupSettingsClient({ group, members }: Props) {
           <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
             Group Details
           </h3>
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="groupName"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Group Name
-              </label>
-              <input
-                type="text"
-                id="groupName"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                disabled={!isCreator}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="groupPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Group Password
-              </label>
-              <div className="relative mt-1">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="groupPassword"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  disabled={!isCreator}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                >
-                  <Image
-                    src={showPassword ? EyeClosedIcon : EyeOpenIcon}
-                    alt={showPassword ? "Hide password" : "Show password"}
-                    width={20}
-                    height={20}
+          <Formik
+            initialValues={{
+              name: group.name,
+              password: group.password,
+              description: group.description || "",
+              winning_criteria: group.winning_criteria,
+            }}
+            validationSchema={GroupSettingsSchema}
+            onSubmit={handleUpdateGroup}
+          >
+            {({ isSubmitting }) => (
+              <Form className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Group Name
+                  </label>
+                  <Field
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    disabled={!isCreator}
                   />
-                </button>
-              </div>
-            </div>
-            {isCreator && (
-              <div className="flex justify-center">
-                <button onClick={handleUpdateGroup} className="button-inverse">
-                  Update Group
-                </button>
-              </div>
+                  <ErrorMessage
+                    name="name"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Group Password
+                  </label>
+                  <div className="relative mt-1">
+                    <Field
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      className="block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      disabled={!isCreator}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                    >
+                      <Image
+                        src={showPassword ? EyeClosedIcon : EyeOpenIcon}
+                        alt={showPassword ? "Hide password" : "Show password"}
+                        width={20}
+                        height={20}
+                      />
+                    </button>
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Group Description
+                  </label>
+                  <Field
+                    as="textarea"
+                    id="description"
+                    name="description"
+                    rows={3}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    disabled={!isCreator}
+                  />
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="winning_criteria"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Winning Criteria
+                  </label>
+                  <Field
+                    as="select"
+                    id="winning_criteria"
+                    name="winning_criteria"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    disabled={!isCreator}
+                  >
+                    {Object.entries(WinningCriteriaValues).map(
+                      ([key, value]) => (
+                        <option key={key} value={value}>
+                          {winningCriteriaText[value as WinningCriteria]}
+                        </option>
+                      ),
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="winning_criteria"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
+                {isCreator && (
+                  <div className="flex justify-center">
+                    <button
+                      type="submit"
+                      className="button-inverse"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Updating..." : "Update Group"}
+                    </button>
+                  </div>
+                )}
+              </Form>
             )}
-          </div>
+          </Formik>
         </div>
       </div>
       <div>
