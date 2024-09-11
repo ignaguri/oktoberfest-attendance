@@ -61,8 +61,9 @@ export default async function Home() {
       </h1>
       <p className="text-center text-gray-700 mb-6 px-4">
         Compete with friends in different groups to see who visits Oktoberfest
-        more often and drinks the most! Track your progress and become the
-        ultimate Wiesnmeister.
+        more often and drinks the most!
+        <br />
+        Track your progress and become the ultimate Wiesnmeister.
       </p>
       <div className="card gap-4">
         {showMissingSection && <MissingFields missingFields={missingFields} />}
