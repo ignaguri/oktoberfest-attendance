@@ -129,6 +129,7 @@ export default function AttendanceForm() {
                 name="amount"
                 placeholder="At least how many do you remember?"
                 component="select"
+                autoComplete="off"
               >
                 {[...Array(11)].map((_, i) => (
                   <option key={i} value={i}>

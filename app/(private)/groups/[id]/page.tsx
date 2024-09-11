@@ -7,6 +7,8 @@ import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ShareButton from "@/components/ShareButton";
 import { JoinGroupForm } from "../JoinGroupForm";
+import { WinningCriteria } from "@/lib/types";
+import { winningCriteriaText } from "@/lib/constants";
 
 const fetchGroupAndMembership = async (groupId: string) => {
   const supabase = createClient();
@@ -104,8 +106,20 @@ export default async function GroupPage({
           />
         </div>
 
+        {group.description && (
+          <p className="text-gray-600 mb-4">{group.description}</p>
+        )}
+
+        <p className="text-sm font-medium text-gray-500 mb-4">
+          Winning Criteria:{" "}
+          {winningCriteriaText[group.winning_criteria as WinningCriteria]}
+        </p>
+
         <div className="flex flex-col gap-4">
-          <Leaderboard entries={leaderboardEntries ?? []} />
+          <Leaderboard
+            entries={leaderboardEntries ?? []}
+            winningCriteria={group.winning_criteria as WinningCriteria}
+          />
 
           <div className="flex flex-col gap-4 items-center">
             <Link className="button-inverse w-fit" href="/attendance">

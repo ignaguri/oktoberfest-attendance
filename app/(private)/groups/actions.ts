@@ -44,8 +44,8 @@ export async function createGroup(formData: {
   }
 
   const { data, error } = await supabase.rpc("create_group_with_member", {
-    p_group_name: groupName,
-    p_password: password,
+    p_group_name: groupName.trim(),
+    p_password: password.trim(),
     p_user_id: user.id,
   });
 
@@ -56,7 +56,7 @@ export async function createGroup(formData: {
 
   if (data) {
     revalidatePath("/groups");
-    redirect(`/groups/${data.group_id}`);
+    return data.group_id;
   }
 }
 
@@ -77,8 +77,8 @@ export async function joinGroup(formData: {
 
   const { data: groupId, error } = await supabase.rpc("join_group", {
     p_user_id: user.id,
-    p_group_name: groupName,
-    p_password: password,
+    p_group_name: groupName.trim(),
+    p_password: password.trim(),
   });
 
   if (error || !groupId) {

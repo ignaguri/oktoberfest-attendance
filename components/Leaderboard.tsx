@@ -3,6 +3,7 @@
 import { Views } from "@/lib/database-helpers.types";
 import { useState } from "react";
 import Avatar from "./Avatar/Avatar";
+import { WinningCriteria } from "@/lib/types";
 
 type LeaderboardEntry = Views<"leaderboard">;
 
@@ -19,7 +20,13 @@ const getDisplayName = ({
   return "No name";
 };
 
-export const Leaderboard = ({ entries }: { entries: LeaderboardEntry[] }) => {
+export const Leaderboard = ({
+  entries,
+  winningCriteria,
+}: {
+  entries: LeaderboardEntry[];
+  winningCriteria: WinningCriteria;
+}) => {
   const [data, setData] = useState<LeaderboardEntry[]>(entries);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof LeaderboardEntry;
@@ -46,6 +53,10 @@ export const Leaderboard = ({ entries }: { entries: LeaderboardEntry[] }) => {
     setSortConfig({ key, direction });
   };
 
+  const getCrownEmoji = (columnKey: string) => {
+    return columnKey === winningCriteria ? "👑 " : "";
+  };
+
   return (
     <div className="max-w-full">
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -60,7 +71,7 @@ export const Leaderboard = ({ entries }: { entries: LeaderboardEntry[] }) => {
                   className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => sortData("days_attended")}
                 >
-                  Days{" "}
+                  {getCrownEmoji("days_attended")}Days{" "}
                   {sortConfig?.key === "days_attended" &&
                     (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </th>
@@ -68,7 +79,7 @@ export const Leaderboard = ({ entries }: { entries: LeaderboardEntry[] }) => {
                   className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => sortData("total_beers")}
                 >
-                  Liters{" "}
+                  {getCrownEmoji("total_beers")}Liters{" "}
                   {sortConfig?.key === "total_beers" &&
                     (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </th>
@@ -76,7 +87,7 @@ export const Leaderboard = ({ entries }: { entries: LeaderboardEntry[] }) => {
                   className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => sortData("avg_beers")}
                 >
-                  Avg.{" "}
+                  {getCrownEmoji("avg_beers")}Avg.{" "}
                   {sortConfig?.key === "avg_beers" &&
                     (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </th>

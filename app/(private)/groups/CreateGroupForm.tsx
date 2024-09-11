@@ -4,6 +4,13 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { createGroup } from "./actions";
 import cn from "classnames";
+import { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+// Import SVG icons
+import EyeOpenIcon from "@/public/icons/eye-open.svg";
+import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 
 // Define validation schema
 const CreateGroupSchema = Yup.object().shape({
@@ -12,12 +19,18 @@ const CreateGroupSchema = Yup.object().shape({
 });
 
 export const CreateGroupForm = () => {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = async (
     values: { groupName: string; password: string },
     { setSubmitting }: any,
   ) => {
     try {
-      await createGroup(values);
+      const groupId = await createGroup(values);
+      if (groupId) {
+        router.push(`/group-settings/${groupId}`);
+      }
     } catch (error) {
       alert(
         "There was an error creating the group. Maybe try a different name?",
@@ -45,19 +58,35 @@ export const CreateGroupForm = () => {
               errors.groupName && touched.groupName && "input-error",
             )}
             required
+            autoComplete="off"
           />
           <ErrorMessage name="groupName" component="span" className="error" />
 
-          <Field
-            type="password"
-            name="password"
-            placeholder="Group Password"
-            className={cn(
-              "input",
-              errors.password && touched.password && "input-error",
-            )}
-            required
-          />
+          <div className="relative">
+            <Field
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Group Password"
+              className={cn(
+                "input pr-10",
+                errors.password && touched.password && "input-error",
+              )}
+              required
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 cursor-pointer"
+            >
+              <Image
+                src={showPassword ? EyeClosedIcon : EyeOpenIcon}
+                alt={showPassword ? "Hide password" : "Show password"}
+                width={20}
+                height={20}
+              />
+            </button>
+          </div>
           <ErrorMessage name="password" component="span" className="error" />
 
           <button
