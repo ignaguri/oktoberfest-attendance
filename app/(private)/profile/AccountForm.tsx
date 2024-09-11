@@ -99,6 +99,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                   name="fullname"
                   type="text"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               ) : (
                 <div className="p-2">
@@ -124,6 +125,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                   name="username"
                   type="text"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               ) : (
                 <div className="p-2">

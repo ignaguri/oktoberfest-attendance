@@ -62,6 +62,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
               errors.groupName && touched.groupName && "input-error",
             )}
             required
+            autoComplete="off"
           />
           <ErrorMessage name="groupName" component="span" className="error" />
           <div className="relative">
@@ -74,6 +75,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
                 errors.password && touched.password && "input-error",
               )}
               required
+              autoComplete="off"
             />
             <button
               type="button"

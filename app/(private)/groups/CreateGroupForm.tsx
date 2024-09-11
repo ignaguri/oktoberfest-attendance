@@ -53,6 +53,7 @@ export const CreateGroupForm = () => {
               errors.groupName && touched.groupName && "input-error",
             )}
             required
+            autoComplete="off"
           />
           <ErrorMessage name="groupName" component="span" className="error" />
 
@@ -66,6 +67,7 @@ export const CreateGroupForm = () => {
                 errors.password && touched.password && "input-error",
               )}
               required
+              autoComplete="off"
             />
             <button
               type="button"
