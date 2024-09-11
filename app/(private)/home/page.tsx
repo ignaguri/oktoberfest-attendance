@@ -114,14 +114,14 @@ export default async function Home() {
 
       <div className="flex flex-col gap-4">
         {topPositions.length > 0 && (
-          <div className="card-transparent">
+          <div className="card-transparent gap-0 bg-slate-500/20">
             <h2 className="text-xl font-bold">👑 You&apos;re #1 in:</h2>
             <ul>
               {topPositions.map((group) => (
                 <li key={group.id}>
                   <Link
                     href={`/groups/${group.id}`}
-                    className="text-blue-600 hover:underline"
+                    className="text-gray-600 underline"
                   >
                     {group.name}
                   </Link>
@@ -133,7 +133,7 @@ export default async function Home() {
 
         <MyGroups groups={groups} />
 
-        <div className="flex flex-col gap-2 items-center mt-2">
+        <div className="flex flex-col gap-2 items-center mt-4">
           <Link className="button-inverse" href="/attendance">
             Register attendance
           </Link>
