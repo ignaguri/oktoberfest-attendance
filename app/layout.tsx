@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
+import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 
 import "@/styles/globals.css";
 import { Metadata } from "next";
@@ -28,7 +29,8 @@ export default async function RootLayout({
       <body>
         <div className="flex min-h-screen flex-col items-center justify-center">
           <Navbar session={session} />
-          <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 mt-3 text-center sm:px-20 sm:justify-start bg-slate-50">
+          <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:px-20 sm:justify-start bg-slate-50">
+            <Breadcrumbs />
             {children}
           </main>
         </div>
