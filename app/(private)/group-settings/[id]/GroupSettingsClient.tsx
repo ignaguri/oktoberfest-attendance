@@ -4,6 +4,11 @@ import { useSupabase } from "@/hooks/useSupabase";
 import { Tables } from "@/lib/database.types";
 import clearCachesByServerAction from "@/utils/revalidate";
 import { useState, useCallback } from "react";
+import Image from "next/image";
+
+// Import SVG icons
+import EyeOpenIcon from "@/public/icons/eye-open.svg";
+import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 
 type Props = {
   group: Tables<"groups">;
@@ -107,7 +112,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  <Image
+                    src={showPassword ? EyeClosedIcon : EyeOpenIcon}
+                    alt={showPassword ? "Hide password" : "Show password"}
+                    width={20}
+                    height={20}
+                  />
                 </button>
               </div>
             </div>
