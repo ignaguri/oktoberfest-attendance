@@ -96,7 +96,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   );
 
   return (
-    <div className="w-full max-w-lg space-y-6">
+    <div className="w-full max-w-lg">
       <h2 className="text-2xl font-semibold">Group Settings</h2>
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
@@ -152,6 +152,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                       disabled={!isCreator}
                     />
                     <Button
+                      type="button"
                       variant="ghost"
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                       onClick={() => setShowPassword(!showPassword)}
@@ -223,7 +224,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 </div>
 
                 {isCreator && (
-                  <div className="flex justify-center">
+                  <div>
                     <Button
                       type="submit"
                       variant="yellow"
@@ -238,7 +239,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </Formik>
         </div>
       </div>
-      <div>
+      <div className="mt-4">
         <h3 className="text-xl font-semibold mb-2">Group Members</h3>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
