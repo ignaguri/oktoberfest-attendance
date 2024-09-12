@@ -1,23 +1,34 @@
-"use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import SignOut from "./Auth/SignOut";
-import AvatarForSession from "./Avatar/AvatarForSession";
 
-import type { MaybeSession } from "@/lib/types";
+import { createClient } from "@/utils/supabase/server";
+import Avatar from "@/components/Avatar/Avatar";
 
-interface NavbarProps {
-  session: MaybeSession;
-}
+const getUserAndAvatarUrl = async () => {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-export default function Navbar({ session }: NavbarProps) {
-  const [shouldShowAvatar, setShouldShowAvatar] = useState(false);
+  if (!user) {
+    return { user: null, avatarUrl: null };
+  }
 
-  useEffect(() => {
-    if (session) {
-      setShouldShowAvatar(true);
-    }
-  }, [session]);
+  const { data, error } = await supabase
+    .from("profiles")
+    .select(`avatar_url`)
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return { user, avatarUrl: data.avatar_url };
+};
+
+export default async function Navbar() {
+  const { user, avatarUrl } = await getUserAndAvatarUrl();
 
   return (
     <nav className="w-full bg-gray-800 shadow">
@@ -25,12 +36,19 @@ export default function Navbar({ session }: NavbarProps) {
         <Link className="text-base sm:text-xl text-white font-bold" href="/">
           ProstCounter 🍻
         </Link>
-        {shouldShowAvatar && session && (
+        {user && (
           <div className="flex gap-2 items-center">
             <Link href="/profile">
-              <AvatarForSession session={session} size="small" />
+              <Avatar url={avatarUrl} size="small" />
             </Link>
             <SignOut />
+          </div>
+        )}
+        {!user && (
+          <div className="h-10 flex items-center">
+            <Link href="/sign-in" className="text-white">
+              Sign In
+            </Link>
           </div>
         )}
       </div>

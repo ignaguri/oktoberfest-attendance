@@ -10,7 +10,7 @@ export default async function GroupsPage() {
   const groups = await fetchGroups();
 
   return (
-    <div className="max-w-lg mx-auto p-4">
+    <div className="max-w-lg mx-auto">
       <h1 className="text-3xl font-bold mb-6">Your Groups</h1>
 
       <Suspense fallback={<LoadingSpinner />}>

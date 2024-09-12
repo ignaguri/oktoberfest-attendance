@@ -7,6 +7,12 @@ import MyGroups from "@/components/MyGroups";
 import { Tables } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import Highlights from "./Highlights";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const getProfileData = async () => {
   const supabase = createClient();
@@ -77,12 +83,23 @@ export default async function Home() {
         <OktoberfestStatus />
       </div>
 
-      <p className="text-center text-gray-600 mb-4 px-4">
-        Compete with friends in different groups to see who visits Oktoberfest
-        more often and drinks the most!
-        <br />
-        Track your progress and become the ultimate Wiesnmeister.
-      </p>
+      <div className="mb-4">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              What can I do with Prost Counter?
+            </AccordionTrigger>
+            <AccordionContent className="max-w-80 mx-auto">
+              <p className="text-center text-gray-600">
+                Compete with friends in different groups to see who visits
+                Oktoberfest more often and drinks the most!
+                <br />
+                Track your progress and become the ultimate Wiesnmeister.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
 
       <div className="flex flex-col gap-4">
         <MissingFields missingFields={missingFields} />

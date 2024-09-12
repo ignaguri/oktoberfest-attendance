@@ -1,7 +1,9 @@
 import GroupSettingsClient from "./GroupSettingsClient";
 import { createClient } from "@/utils/supabase/server";
 
-async function fetchGroupDetails(supabase: any, groupId: string) {
+async function fetchGroupDetails(groupId: string) {
+  const supabase = createClient();
+
   const { data, error } = await supabase
     .from("groups")
     .select("*")
@@ -15,7 +17,9 @@ async function fetchGroupDetails(supabase: any, groupId: string) {
   return data;
 }
 
-async function fetchGroupMembers(supabase: any, groupId: string) {
+async function fetchGroupMembers(groupId: string) {
+  const supabase = createClient();
+
   const { data, error } = await supabase
     .from("group_members")
     .select("profiles:user_id(id, username, full_name)")
@@ -34,10 +38,9 @@ export default async function GroupSettingsPage({
   params: { id: string };
 }) {
   const groupId = params.id;
-  const supabase = createClient();
 
-  const groupData = fetchGroupDetails(supabase, groupId);
-  const membersData = fetchGroupMembers(supabase, groupId);
+  const groupData = fetchGroupDetails(groupId);
+  const membersData = fetchGroupMembers(groupId);
 
   const [group, members] = await Promise.all([groupData, membersData]);
 

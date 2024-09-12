@@ -62,7 +62,7 @@ export const Leaderboard = ({
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-200">
               <tr>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name
@@ -71,25 +71,43 @@ export const Leaderboard = ({
                   className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => sortData("days_attended")}
                 >
-                  {getCrownEmoji("days_attended")}Days{" "}
-                  {sortConfig?.key === "days_attended" &&
-                    (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <div className="flex items-center">
+                    {getCrownEmoji("days_attended")}
+                    <span>Days</span>
+                    {sortConfig?.key === "days_attended" && (
+                      <span className="ml-1">
+                        {sortConfig.direction === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
                 </th>
                 <th
                   className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => sortData("total_beers")}
                 >
-                  {getCrownEmoji("total_beers")}Liters{" "}
-                  {sortConfig?.key === "total_beers" &&
-                    (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <div className="flex items-center">
+                    {getCrownEmoji("total_beers")}
+                    <span>Liters</span>
+                    {sortConfig?.key === "total_beers" && (
+                      <span className="ml-1">
+                        {sortConfig.direction === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
                 </th>
                 <th
                   className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => sortData("avg_beers")}
                 >
-                  {getCrownEmoji("avg_beers")}Avg.{" "}
-                  {sortConfig?.key === "avg_beers" &&
-                    (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <div className="flex items-center">
+                    {getCrownEmoji("avg_beers")}
+                    <span>Avg.</span>
+                    {sortConfig?.key === "avg_beers" && (
+                      <span className="ml-1">
+                        {sortConfig.direction === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
                 </th>
               </tr>
             </thead>
@@ -97,9 +115,9 @@ export const Leaderboard = ({
               {data.map((attendee, index) => (
                 <tr
                   key={index}
-                  className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
                 >
-                  <td className="px-3 py-4 whitespace-nowrap">
+                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate">
                     <div className="flex items-center gap-2">
                       <Avatar url={attendee.avatar_url} size="small" />
 
