@@ -4,6 +4,7 @@ import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import "@/styles/globals.css";
 import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/toaster";
 
 // do not cache this layout
 export const revalidate = 0;
@@ -34,6 +35,7 @@ export default async function RootLayout({
             {children}
           </main>
         </div>
+        <Toaster />
       </body>
     </html>
   );

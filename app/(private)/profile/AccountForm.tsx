@@ -7,6 +7,7 @@ import Avatar from "@/components/Avatar/Avatar";
 import { updateProfile } from "./actions";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const ProfileSchema = Yup.object().shape({
   fullname: Yup.string(),
@@ -27,13 +28,12 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile.avatar_url || null,
   );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  async function handleUpdateProfile(values: {
+  const handleUpdateProfile = async (values: {
     fullname: string | null;
     username: string | null;
-  }) {
+  }) => {
     const { fullname, username } = values;
     try {
       await updateProfile({
@@ -41,15 +41,20 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
         ...(username && { username: username }),
         ...(fullname && { fullname: fullname }),
       });
-      setSuccessMsg("Profile updated!");
-      setErrorMsg(null);
-    } catch {
-      setErrorMsg("Error updating the data!");
-      setSuccessMsg(null);
-    } finally {
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Profile updated successfully!",
+      });
       setIsEditing(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+      });
     }
-  }
+  };
 
   return (
     <div className="card">
@@ -168,8 +173,6 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
           Edit
         </Button>
       )}
-      {errorMsg && <div className="text-red-600 mt-2">{errorMsg}</div>}
-      {successMsg && <div className="text-green-600 mt-2">{successMsg}</div>}
     </div>
   );
 }

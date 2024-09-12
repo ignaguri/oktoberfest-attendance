@@ -1,28 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import cn from "classnames";
-import { Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { updatePassword } from "./actions";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
 export default function UpdatePassword() {
-  const [errorMsg, setErrorMsg] = useState<string>();
-  const [successMsg, setSuccessMsg] = useState<string>();
+  const { toast } = useToast();
 
   async function handleUpdatePassword(formData: { password: string }) {
     try {
       await updatePassword({ password: formData.password });
-      setSuccessMsg("Password updated successfully.");
-      setErrorMsg("");
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Password updated successfully.",
+      });
     } catch (error: any) {
-      setErrorMsg(error.message);
-      setSuccessMsg("");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error.message || "An error occurred while updating the password.",
+      });
     }
   }
 
@@ -49,22 +55,18 @@ export default function UpdatePassword() {
               type="password"
               disabled={isSubmitting}
             />
-            {errors.password && touched.password ? (
-              <div className="text-red-600">{errors.password}</div>
-            ) : null}
+            <ErrorMessage name="password" component="span" className="error" />
             <Button
               variant="yellow"
               className="self-center"
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Submitting..." : "Update Password"}
+              {isSubmitting ? "Updating..." : "Update Password"}
             </Button>
           </Form>
         )}
       </Formik>
-      {errorMsg && <div className="text-red-600">{errorMsg}</div>}
-      {successMsg && <div className="text-green-600">{successMsg}</div>}
     </div>
   );
 }
