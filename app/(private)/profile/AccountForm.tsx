@@ -86,9 +86,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 Email:
               </label>
               <div className="p-2">
-                {profile.full_name || (
-                  <span className="text-gray-500">{user.email}</span>
-                )}
+                <span className="text-gray-500">{user.email}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
