@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function ErrorPage({ error }: { error?: Error }) {
   return (
@@ -10,9 +11,9 @@ export default function ErrorPage({ error }: { error?: Error }) {
         <p className="text-gray-600 mb-4">
           {error?.message || "An unexpected error occurred."}
         </p>
-        <Link href="/" className="text-blue-500 hover:underline">
-          Go back to home page
-        </Link>
+        <Button asChild variant="link">
+          <Link href="/">Go back to home page</Link>
+        </Button>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { login } from "./actions";
 import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -61,22 +62,25 @@ export default function SignIn() {
             />
             <ErrorMessage name="password" component="span" className="error" />
 
-            <button
-              className="button-inverse self-center"
+            <Button
+              variant="yellow"
+              className="self-center"
               type="submit"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Signing In..." : "Sign In"}
-            </button>
+            </Button>
           </Form>
         )}
       </Formik>
-      <Link href="/reset-password" className="link">
-        Forgot your password?
-      </Link>
-      <Link href="/sign-up" className="link">
-        Don&apos;t have an account? Sign Up.
-      </Link>
+      <div className="flex flex-col gap-2">
+        <Button variant="link" asChild>
+          <Link href="/reset-password">Forgot your password?</Link>
+        </Button>
+        <Button variant="link" asChild>
+          <Link href="/sign-up">Don&apos;t have an account? Sign Up.</Link>
+        </Button>
+      </div>
     </div>
   );
 }

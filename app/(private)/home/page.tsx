@@ -5,6 +5,8 @@ import MissingFields from "./MissingFields";
 import OktoberfestStatus from "./OktoberfestStatus";
 import MyGroups from "@/components/MyGroups";
 import { Tables } from "@/lib/database.types";
+import { Button } from "@/components/ui/button";
+import Highlights from "./Highlights";
 
 const getProfileData = async () => {
   const supabase = createClient();
@@ -48,36 +50,17 @@ const getProfileData = async () => {
   const groups = groupsData
     ?.map((group) => group.groups)
     .filter((group) => group !== null) as Tables<"groups">[];
-  const topPositions = [];
-  for (const group of groups || []) {
-    if (group && group.id) {
-      const { data: leaderboardData } = await supabase
-        .from("leaderboard")
-        .select("*")
-        .eq("group_id", group.id)
-        .order(group.winning_criteria ?? "total_beers", { ascending: false })
-        .limit(1);
-
-      if (leaderboardData && leaderboardData[0]?.user_id === user.id) {
-        topPositions.push({
-          id: group.id,
-          name: group.name ?? "Unknown Group",
-        });
-      }
-    }
-  }
 
   let missingFields: { [key: string]: string } = {};
   if (!profileData.full_name) missingFields.full_name = "Name";
   if (!profileData.username) missingFields.username = "Username";
   if (!profileData.avatar_url) missingFields.avatar_url = "Profile picture";
 
-  return { missingFields, groups, topPositions };
+  return { missingFields, groups };
 };
 
 export default async function Home() {
-  const { missingFields, groups, topPositions } = await getProfileData();
-  const showMissingSection = Object.values(missingFields).length > 0;
+  const { missingFields, groups } = await getProfileData();
 
   return (
     <div className="max-w-lg flex flex-col">
@@ -101,45 +84,18 @@ export default async function Home() {
         Track your progress and become the ultimate Wiesnmeister.
       </p>
 
-      {showMissingSection && (
-        <div className="flex flex-col gap-4">
-          <div className="card gap-4 py-4">
-            <MissingFields missingFields={missingFields} />
-            <Link className="button" href="/profile">
-              Complete your profile
-            </Link>
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-col gap-4">
-        {topPositions.length > 0 && (
-          <div className="card-transparent">
-            <h2 className="text-xl font-bold">👑 You&apos;re #1 in:</h2>
-            <ul>
-              {topPositions.map((group) => (
-                <li key={group.id}>
-                  <Link
-                    href={`/groups/${group.id}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {group.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
+        <MissingFields missingFields={missingFields} />
+        <Highlights groups={groups} />
         <MyGroups groups={groups} />
 
-        <div className="flex flex-col gap-2 items-center mt-2">
-          <Link className="button-inverse" href="/attendance">
-            Register attendance
-          </Link>
-          <Link className="button-inverse bg-yellow-600" href="/groups">
-            Groups
-          </Link>
+        <div className="flex flex-col gap-2 items-center mt-4">
+          <Button asChild variant="yellow">
+            <Link href="/attendance">Register attendance</Link>
+          </Button>
+          <Button asChild variant="darkYellow">
+            <Link href="/groups">Groups</Link>
+          </Button>
         </div>
       </div>
     </div>

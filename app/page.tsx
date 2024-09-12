@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function Root() {
   const supabase = createClient();
@@ -29,9 +30,9 @@ export default async function Root() {
         Track your progress and become the ultimate Wiesnmeister.
       </p>
       <div>
-        <Link className="button-inverse" href="/sign-in">
-          Sign In
-        </Link>
+        <Button variant="yellow" asChild>
+          <Link href="/sign-in">Sign In</Link>
+        </Button>
       </div>
     </div>
   );

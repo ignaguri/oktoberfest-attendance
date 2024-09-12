@@ -4,6 +4,7 @@ import { CreateGroupForm } from "./CreateGroupForm";
 import { JoinGroupForm } from "./JoinGroupForm";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 
 export default async function GroupsPage() {
   const groups = await fetchGroups();
@@ -21,13 +22,9 @@ export default async function GroupsPage() {
               </p>
             )}
             {groups.map((group) => (
-              <Link
-                key={group.id}
-                href={`/groups/${group.id}`}
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
-              >
-                {group.name}
-              </Link>
+              <Button key={group.id} asChild variant="outline">
+                <Link href={`/groups/${group.id}`}>{group.name}</Link>
+              </Button>
             ))}
           </div>
           <div className="border-t-2 border-gray-300 my-6" />

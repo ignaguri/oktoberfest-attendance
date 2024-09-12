@@ -9,6 +9,7 @@ import ShareButton from "@/components/ShareButton";
 import { JoinGroupForm } from "../JoinGroupForm";
 import { WinningCriteria } from "@/lib/types";
 import { winningCriteriaText } from "@/lib/constants";
+import { Button } from "@/components/ui/button"; // Import Button component
 
 const fetchGroupAndMembership = async (groupId: string) => {
   const supabase = createClient();
@@ -122,12 +123,18 @@ export default async function GroupPage({
           />
 
           <div className="flex flex-col gap-4 items-center">
-            <Link className="button-inverse w-fit" href="/attendance">
-              Register attendance
-            </Link>
-            <Link className="button w-fit" href={`/group-settings/${groupId}`}>
-              Group Settings
-            </Link>
+            <Button asChild variant="darkYellow">
+              <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
+            </Button>
+            <ShareButton
+              groupName={group.name}
+              groupId={group.id}
+              groupPassword={group.password}
+              withText
+            />
+            <Button asChild variant="yellowOutline">
+              <Link href="/attendance">Register attendance</Link>
+            </Button>
           </div>
         </div>
       </Suspense>

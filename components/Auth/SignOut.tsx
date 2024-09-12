@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import LogoutIcon from "@/public/icons/logout-icon-fa.svg";
 import { logout } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const ICON_SIZE = 20;
 
@@ -13,11 +14,12 @@ export default function SignOut() {
   }
 
   return (
-    <button
+    <Button
       type="button"
-      className="button-inverse px-2 py-2 sm:px-8 flex gap-1 items-center"
+      variant="yellow"
       onClick={handleSignOut}
       title="Sign out"
+      className="px-2 py-2 sm:px-8 flex gap-1 items-center"
     >
       <Image
         width={ICON_SIZE}
@@ -28,6 +30,6 @@ export default function SignOut() {
         priority
       />
       <span className="hidden sm:block">Sign Out</span>
-    </button>
+    </Button>
   );
 }
