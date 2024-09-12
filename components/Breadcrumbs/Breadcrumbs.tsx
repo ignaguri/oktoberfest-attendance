@@ -73,7 +73,7 @@ export default function Breadcrumbs() {
   if (breadcrumbs.length === 0) return null;
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className="mb-2">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>

@@ -176,7 +176,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     <Button
                       type="button"
                       variant="ghost"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       <Image

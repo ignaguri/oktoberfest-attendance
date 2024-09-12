@@ -12,6 +12,7 @@ import { isWithinInterval } from "date-fns/isWithinInterval";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { addAttendance, fetchAttendances } from "./actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type AttendanceDBType = Tables<"attendances">;
 
@@ -67,66 +68,68 @@ export default function AttendanceForm() {
   }, [fetchAttendancesCbk]);
 
   return (
-    <div className="max-w-lg sm:w-full flex flex-col gap-6 mt-2">
-      <div className="card">
-        <h2 className="w-full text-center">Register attendance</h2>
-        <Formik
-          initialValues={{
-            amount: 0,
-            date: isWithinInterval(new Date(), {
-              start: BEGINNING_OF_WIESN,
-              end: END_OF_WIESN,
-            })
-              ? new Date()
-              : BEGINNING_OF_WIESN,
-          }}
-          validationSchema={AttendanceSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ errors, isSubmitting }) => (
-            <Form className="column w-full">
-              <label htmlFor="date">When did you go?</label>
-              <MyDatePicker name="date" />
-              <ErrorMessage
-                name="date"
-                component="span"
-                className="text-red-600 my-2 self-center"
-              />
-              <label htmlFor="amount">How many Maße 🍻 did you have?</label>
-              <Field
-                className={cn(
-                  "input w-auto self-center",
-                  errors.amount && "bg-red-50 border-red-200",
-                )}
-                id="amount"
-                name="amount"
-                placeholder="At least how many do you remember?"
-                component="select"
-                autoComplete="off"
-              >
-                {[...Array(11)].map((_, i) => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage
-                name="amount"
-                component="span"
-                className="text-red-600 my-2 self-center"
-              />
-              <Button
-                variant="yellowOutline"
-                className="self-center"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                Submit
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </div>
+    <div className="w-full max-w-lg flex flex-col gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center">
+            Register your attendance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Formik
+            initialValues={{
+              amount: 0,
+              date: isWithinInterval(new Date(), {
+                start: BEGINNING_OF_WIESN,
+                end: END_OF_WIESN,
+              })
+                ? new Date()
+                : BEGINNING_OF_WIESN,
+            }}
+            validationSchema={AttendanceSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ errors, isSubmitting }) => (
+              <Form className="column w-full">
+                <label htmlFor="date">When did you go?</label>
+                <MyDatePicker name="date" />
+                <ErrorMessage name="date" component="span" className="error" />
+                <label htmlFor="amount">How many Maße 🍻 did you have?</label>
+                <Field
+                  className={cn(
+                    "input w-auto self-center",
+                    errors.amount && "bg-red-50 border-red-200",
+                  )}
+                  id="amount"
+                  name="amount"
+                  placeholder="At least how many do you remember?"
+                  component="select"
+                  autoComplete="off"
+                >
+                  {[...Array(11)].map((_, i) => (
+                    <option key={i} value={i}>
+                      {i}
+                    </option>
+                  ))}
+                </Field>
+                <ErrorMessage
+                  name="amount"
+                  component="span"
+                  className="error"
+                />
+                <Button
+                  variant="yellowOutline"
+                  className="self-center"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  Submit
+                </Button>
+              </Form>
+            )}
+          </Formik>
+        </CardContent>
+      </Card>
       <PersonalAttendanceTable data={attendance} />
     </div>
   );

@@ -4,14 +4,14 @@ import SignOut from "./Auth/SignOut";
 import { createClient } from "@/utils/supabase/server";
 import Avatar from "@/components/Avatar/Avatar";
 
-const getAvatarUrl = async () => {
+const getUserAndAvatarUrl = async () => {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return null;
+    return { user: null, avatarUrl: null };
   }
 
   const { data, error } = await supabase
@@ -24,15 +24,11 @@ const getAvatarUrl = async () => {
     throw error;
   }
 
-  if (data) {
-    return data.avatar_url;
-  }
-
-  return null;
+  return { user, avatarUrl: data.avatar_url };
 };
 
 export default async function Navbar() {
-  const avatarUrl = await getAvatarUrl();
+  const { user, avatarUrl } = await getUserAndAvatarUrl();
 
   return (
     <nav className="w-full bg-gray-800 shadow">
@@ -40,12 +36,19 @@ export default async function Navbar() {
         <Link className="text-base sm:text-xl text-white font-bold" href="/">
           ProstCounter 🍻
         </Link>
-        {avatarUrl && (
+        {user && (
           <div className="flex gap-2 items-center">
             <Link href="/profile">
               <Avatar url={avatarUrl} size="small" />
             </Link>
             <SignOut />
+          </div>
+        )}
+        {!user && (
+          <div className="h-10 flex items-center">
+            <Link href="/sign-in" className="text-white">
+              Sign In
+            </Link>
           </div>
         )}
       </div>
