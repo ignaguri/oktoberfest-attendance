@@ -67,10 +67,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
         url={avatar_url}
         onUpload={(url) => {
           setAvatarUrl(url);
-          handleUpdateProfile({
-            fullname: profile.full_name,
-            username: profile.username,
-          });
+          setIsEditing(false);
         }}
       />
       <Formik

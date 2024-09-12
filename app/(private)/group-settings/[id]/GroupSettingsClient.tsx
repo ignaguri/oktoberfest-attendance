@@ -1,10 +1,9 @@
 "use client";
 
-import { useSupabase } from "@/hooks/useSupabase";
 import { Tables } from "@/lib/database.types";
 import { WinningCriteria, WinningCriteriaValues } from "@/lib/types";
 import clearCachesByServerAction from "@/utils/revalidate";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -13,6 +12,18 @@ import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import { winningCriteriaText } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { getCurrentUser, removeMember, updateGroup } from "./actions";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Props = {
   group: Tables<"groups">;
@@ -29,71 +40,82 @@ const GroupSettingsSchema = Yup.object().shape({
 });
 
 export default function GroupSettingsClient({ group, members }: Props) {
-  const { supabase, user } = useSupabase();
-  const isCreator = group.created_by === user?.id;
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    userId: string;
+    isCreator: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const result = await getCurrentUser(group.id);
+      if (result) {
+        const { userId, isCreator } = result;
+        setCurrentUser({ userId, isCreator });
+      }
+    };
+
+    fetchCurrentUser();
+  }, [group.id]);
 
   const handleUpdateGroup = useCallback(
     async (
       values: Partial<Tables<"groups">>,
       { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
     ) => {
-      if (!isCreator) {
+      if (!currentUser?.isCreator) {
         alert("Only the group creator can update group details.");
         setSubmitting(false);
         return;
       }
 
       try {
-        const { error } = await supabase
-          .from("groups")
-          .update({
-            name: values.name,
-            password: values.password,
-            description: values.description,
-            winning_criteria: values.winning_criteria,
-          })
-          .eq("id", group.id);
+        await updateGroup(group.id, values);
 
-        if (error) {
-          alert("Error updating group: " + error.message);
-        } else {
-          alert("Group updated successfully!");
-          clearCachesByServerAction(`/groups/${group.id}`);
-        }
+        toast({
+          variant: "success",
+          title: "Group updated successfully!",
+          description: "Your group details have been updated.",
+        });
+        clearCachesByServerAction(`/groups/${group.id}`);
       } catch (error) {
-        console.error("Error updating group:", error);
-        alert("An unexpected error occurred while updating the group.");
+        toast({
+          variant: "destructive",
+          title: "Error updating group",
+          description: "An unexpected error occurred while updating the group.",
+        });
       } finally {
         setSubmitting(false);
       }
     },
-    [group.id, isCreator, supabase],
+    [currentUser?.isCreator, group.id, toast],
   );
 
-  const handleRemoveMember = useCallback(
-    async (userId: string) => {
-      if (!isCreator) {
-        alert("Only the group creator can remove members.");
-        return;
-      }
+  const handleRemoveMember = useCallback(async () => {
+    if (!currentUser?.isCreator || !selectedUserId) return;
 
-      if (confirm("Are you sure you want to remove this member?")) {
-        const { error } = await supabase
-          .from("group_members")
-          .delete()
-          .match({ group_id: group.id, user_id: userId });
-
-        if (error) {
-          alert("Error removing member: " + error.message);
-        } else {
-          alert("Member removed successfully!");
-          clearCachesByServerAction(`/groups/${group.id}`);
-        }
-      }
-    },
-    [group.id, isCreator, supabase],
-  );
+    try {
+      await removeMember(group.id, selectedUserId);
+      toast({
+        variant: "success",
+        title: "Member removed successfully!",
+        description: "The member has been removed from the group.",
+      });
+      clearCachesByServerAction(`/groups/${group.id}`);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error removing member",
+        description: "An unexpected error occurred while removing the member.",
+      });
+    } finally {
+      setIsDialogOpen(false);
+      setSelectedUserId(null);
+    }
+  }, [currentUser?.isCreator, group.id, selectedUserId, toast]);
 
   return (
     <div className="w-full max-w-lg">
@@ -127,7 +149,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     id="name"
                     name="name"
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    disabled={!isCreator}
+                    disabled={!currentUser?.isCreator}
                   />
                   <ErrorMessage
                     name="name"
@@ -149,7 +171,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                       id="password"
                       name="password"
                       className="block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                      disabled={!isCreator}
+                      disabled={!currentUser?.isCreator}
                     />
                     <Button
                       type="button"
@@ -185,7 +207,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     name="description"
                     rows={3}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    disabled={!isCreator}
+                    disabled={!currentUser?.isCreator}
                   />
                   <ErrorMessage
                     name="description"
@@ -206,7 +228,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     id="winning_criteria"
                     name="winning_criteria"
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    disabled={!isCreator}
+                    disabled={!currentUser?.isCreator}
                   >
                     {Object.entries(WinningCriteriaValues).map(
                       ([key, value]) => (
@@ -223,7 +245,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   />
                 </div>
 
-                {isCreator && (
+                {currentUser?.isCreator && (
                   <div>
                     <Button
                       type="submit"
@@ -250,7 +272,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              {isCreator && (
+              {currentUser?.isCreator && (
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -266,13 +288,16 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {member.full_name || "–"}
                 </td>
-                {isCreator && (
+                {currentUser?.isCreator && (
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Button
                       variant="ghost"
                       className="text-red-600 hover:text-red-900 underline disabled:text-gray-400 disabled:no-underline"
-                      disabled={member.id === user?.id}
-                      onClick={() => handleRemoveMember(member.id)}
+                      disabled={member.id === currentUser?.userId}
+                      onClick={() => {
+                        setSelectedUserId(member.id);
+                        setIsDialogOpen(true);
+                      }}
                     >
                       Kick out
                     </Button>
@@ -283,6 +308,28 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </tbody>
         </table>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Removal</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this member?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleRemoveMember}>
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
