@@ -7,6 +7,7 @@ import cn from "classnames";
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 // Import SVG icons
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
@@ -74,8 +75,9 @@ export const CreateGroupForm = () => {
               required
               autoComplete="off"
             />
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 cursor-pointer"
             >
@@ -85,17 +87,13 @@ export const CreateGroupForm = () => {
                 width={20}
                 height={20}
               />
-            </button>
+            </Button>
           </div>
           <ErrorMessage name="password" component="span" className="error" />
 
-          <button
-            type="submit"
-            className="button-inverse"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" variant="yellow" disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create Group"}
-          </button>
+          </Button>
         </Form>
       )}
     </Formik>

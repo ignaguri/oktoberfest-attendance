@@ -6,6 +6,7 @@ import { Field, Form, Formik } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
 import { resetPassword } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const ResetPasswordSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -48,17 +49,19 @@ const ResetPassword = () => {
             {errors.email && touched.email ? (
               <div className="text-red-600">{errors.email}</div>
             ) : null}
-            <button className="button-inverse self-center" type="submit">
-              Send Instructions
-            </button>
+            <Button variant="yellow" asChild>
+              <Link href="/reset-password" className="link">
+                Send Instructions
+              </Link>
+            </Button>
           </Form>
         )}
       </Formik>
       {errorMsg && <div className="text-center text-red-600">{errorMsg}</div>}
       {successMsg && <div className="text-center text-black">{successMsg}</div>}
-      <Link href="/sign-in" className="link">
-        Remember your password? Sign In.
-      </Link>
+      <Button asChild variant="link">
+        <Link href="/sign-in">Remember your password? Sign In.</Link>
+      </Button>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import type { Tables } from "@/lib/database.types";
 import { useSupabase } from "@/hooks/useSupabase";
 import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 import { isWithinInterval } from "date-fns/isWithinInterval";
+import { Button } from "@/components/ui/button";
 
 type AttendanceDBType = Tables<"attendances">;
 
@@ -142,13 +143,14 @@ export default function AttendanceForm() {
                 component="span"
                 className="text-red-600 my-2 self-center"
               />
-              <button
-                className="button-inverse self-center"
+              <Button
+                variant="yellowOutline"
+                className="self-center"
                 type="submit"
                 disabled={isSubmitting}
               >
                 Submit
-              </button>
+              </Button>
               {status.msg && (
                 <div
                   className={cn(

@@ -2,6 +2,7 @@ import { useField } from "formik";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { formatDate } from "date-fns/format";
+import { Button } from "@/components/ui/button";
 
 // Styles
 import "react-datepicker/dist/react-datepicker.css";
@@ -29,15 +30,16 @@ export function MyDatePicker({
   const CustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
     function CustomInput({ onClick }, ref) {
       return (
-        <button
-          className="input h-11 px-4"
+        <Button
+          variant="outline"
+          className="h-11 px-4"
           disabled={disabled}
           onClick={onClick}
           ref={ref}
           type="button"
         >
           {formatDate(value, "dd/MM/yyyy")}
-        </button>
+        </Button>
       );
     },
   );

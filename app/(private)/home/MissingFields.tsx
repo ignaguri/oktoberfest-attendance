@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { FC } from "react";
+import { Button } from "@/components/ui/button";
 
 interface MissingFieldProps {
   label: string;
@@ -15,13 +16,11 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
         {icon}
       </span>
       <span className="flex-grow text-gray-700">{label}</span>
-      <Link
-        href={link}
-        className="text-xl cursor-pointer hover:opacity-70 transition-opacity"
-        aria-label="Edit"
-      >
-        ✏️
-      </Link>
+      <Button asChild variant="link">
+        <Link href={link} aria-label="Edit">
+          ✏️
+        </Link>
+      </Button>
     </div>
   );
 };

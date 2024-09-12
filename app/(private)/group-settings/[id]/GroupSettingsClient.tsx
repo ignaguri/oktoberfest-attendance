@@ -12,6 +12,7 @@ import * as Yup from "yup";
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import { winningCriteriaText } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   group: Tables<"groups">;
@@ -150,10 +151,10 @@ export default function GroupSettingsClient({ group, members }: Props) {
                       className="block w-full border border-gray-300 rounded-md shadow-sm p-2"
                       disabled={!isCreator}
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
+                    <Button
+                      variant="ghost"
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      onClick={() => setShowPassword(!showPassword)}
                     >
                       <Image
                         src={showPassword ? EyeClosedIcon : EyeOpenIcon}
@@ -161,7 +162,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                         width={20}
                         height={20}
                       />
-                    </button>
+                    </Button>
                   </div>
                   <ErrorMessage
                     name="password"
@@ -223,13 +224,13 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
                 {isCreator && (
                   <div className="flex justify-center">
-                    <button
+                    <Button
                       type="submit"
-                      className="button-inverse"
+                      variant="yellow"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Updating..." : "Update Group"}
-                    </button>
+                    </Button>
                   </div>
                 )}
               </Form>
@@ -266,13 +267,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 </td>
                 {isCreator && (
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
+                    <Button
+                      variant="ghost"
                       className="text-red-600 hover:text-red-900 underline disabled:text-gray-400 disabled:no-underline"
                       disabled={member.id === user?.id}
                       onClick={() => handleRemoveMember(member.id)}
                     >
                       Kick out
-                    </button>
+                    </Button>
                   </td>
                 )}
               </tr>

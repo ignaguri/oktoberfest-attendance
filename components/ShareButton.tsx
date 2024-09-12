@@ -9,6 +9,7 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button"; // Import the Button component
 
 import ShareIcon from "@/public/icons/share-ios-icon.svg";
 
@@ -50,11 +51,12 @@ export default function ShareButton({
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        className="button-inverse px-2 py-2 flex items-center"
+        variant="yellow"
         onClick={() => setIsOpen(true)}
         title="Share group"
+        className="flex items-center"
       >
         <Image
           width={ICON_SIZE}
@@ -64,7 +66,7 @@ export default function ShareButton({
           style={{ height: ICON_SIZE, width: ICON_SIZE }}
           priority
         />
-      </button>
+      </Button>
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
@@ -109,20 +111,20 @@ export default function ShareButton({
                   </div>
 
                   <div className="mt-4 flex flex-col gap-2 items-center">
-                    <button
+                    <Button
                       type="button"
-                      className="button w-fit"
+                      variant="yellowOutline"
                       onClick={copyToClipboard}
                     >
                       {copied ? "Copied!" : "Copy Invite Text"}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
-                      className="button-inverse w-fit"
+                      variant="yellow"
                       onClick={shareViaWhatsApp}
                     >
                       Share via WhatsApp
-                    </button>
+                    </Button>
                   </div>
                 </DialogPanel>
               </TransitionChild>

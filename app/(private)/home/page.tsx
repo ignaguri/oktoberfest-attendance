@@ -5,6 +5,7 @@ import MissingFields from "./MissingFields";
 import OktoberfestStatus from "./OktoberfestStatus";
 import MyGroups from "@/components/MyGroups";
 import { Tables } from "@/lib/database.types";
+import { Button } from "@/components/ui/button";
 
 const getProfileData = async () => {
   const supabase = createClient();
@@ -105,9 +106,9 @@ export default async function Home() {
         <div className="flex flex-col gap-4">
           <div className="card gap-4 py-4">
             <MissingFields missingFields={missingFields} />
-            <Link className="button" href="/profile">
-              Complete your profile
-            </Link>
+            <Button asChild variant="yellowOutline">
+              <Link href="/profile">Complete your profile</Link>
+            </Button>
           </div>
         </div>
       )}
@@ -119,12 +120,9 @@ export default async function Home() {
             <ul>
               {topPositions.map((group) => (
                 <li key={group.id}>
-                  <Link
-                    href={`/groups/${group.id}`}
-                    className="text-gray-600 underline"
-                  >
-                    {group.name}
-                  </Link>
+                  <Button asChild variant="link">
+                    <Link href={`/groups/${group.id}`}>{group.name}</Link>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -134,12 +132,12 @@ export default async function Home() {
         <MyGroups groups={groups} />
 
         <div className="flex flex-col gap-2 items-center mt-4">
-          <Link className="button-inverse" href="/attendance">
-            Register attendance
-          </Link>
-          <Link className="button-inverse bg-yellow-600" href="/groups">
-            Groups
-          </Link>
+          <Button asChild variant="yellow">
+            <Link href="/attendance">Register attendance</Link>
+          </Button>
+          <Button asChild variant="darkYellow">
+            <Link href="/groups">Groups</Link>
+          </Button>
         </div>
       </div>
     </div>

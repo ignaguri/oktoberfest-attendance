@@ -5,6 +5,7 @@ import cn from "classnames";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { updatePassword } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
@@ -51,13 +52,14 @@ export default function UpdatePassword() {
             {errors.password && touched.password ? (
               <div className="text-red-600">{errors.password}</div>
             ) : null}
-            <button
-              className="button-inverse self-center"
+            <Button
+              variant="yellow"
+              className="self-center"
               type="submit"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Update Password"}
-            </button>
+            </Button>
           </Form>
         )}
       </Formik>

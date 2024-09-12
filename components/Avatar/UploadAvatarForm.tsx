@@ -5,6 +5,7 @@ import { uploadAvatar } from "./actions";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AvatarPreview } from "./Avatar";
+import { Button } from "@/components/ui/button";
 
 export interface UploadAvatarFormProps {
   className?: string;
@@ -104,13 +105,13 @@ export default function UploadAvatarForm({
               onChange={(event) => handleFileChange(event, setFieldValue)}
               className="hidden"
             />
-            <button
+            <Button
               type="submit"
+              variant="yellow"
               disabled={isSubmitting || !previewUrl}
-              className="button-inverse"
             >
               Upload
-            </button>
+            </Button>
           </Form>
         )}
       </Formik>

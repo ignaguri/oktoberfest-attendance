@@ -6,6 +6,7 @@ import { Field, Form, Formik } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
 import { signUp } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const SignUpSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -86,22 +87,23 @@ export default function SignUp() {
               <div className="text-red-600">{errors.password}</div>
             ) : null}
 
-            <button
-              className="button-inverse self-center"
+            <Button
+              className="self-center"
               type="submit"
+              variant="yellow"
               disabled={isSubmitting}
             >
               Submit
-            </button>
+            </Button>
             {errorMessage && (
               <p className="text-red-600 mt-2 self-center">{errorMessage}</p>
             )}
           </Form>
         )}
       </Formik>
-      <Link href="/sign-in" className="link">
-        Already have an account? Sign In.
-      </Link>
+      <Button asChild variant="link">
+        <Link href="/sign-in">Already have an account? Sign In.</Link>
+      </Button>
     </div>
   );
 }
