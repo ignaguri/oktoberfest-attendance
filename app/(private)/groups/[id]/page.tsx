@@ -123,11 +123,17 @@ export default async function GroupPage({
           />
 
           <div className="flex flex-col gap-4 items-center">
-            <Button asChild variant="yellow">
-              <Link href="/attendance">Register attendance</Link>
-            </Button>
-            <Button asChild variant="yellowOutline">
+            <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
+            </Button>
+            <ShareButton
+              groupName={group.name}
+              groupId={group.id}
+              groupPassword={group.password}
+              withText
+            />
+            <Button asChild variant="yellowOutline">
+              <Link href="/attendance">Register attendance</Link>
             </Button>
           </div>
         </div>
