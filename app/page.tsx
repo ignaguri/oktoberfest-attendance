@@ -25,7 +25,7 @@ export default async function Root() {
       </h1>
       <p className="text-center text-gray-700 px-4">
         Compete with friends in different groups to see who visits Oktoberfest
-        more often and drinks the most!
+        more often and drinks the most beers!
         <br />
         Track your progress and become the ultimate Wiesnmeister.
       </p>
