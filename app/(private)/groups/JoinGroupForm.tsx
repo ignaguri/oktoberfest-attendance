@@ -52,7 +52,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       onSubmit={handleSubmit}
     >
       {({ errors, touched, isSubmitting }) => (
-        <Form className="space-y-2">
+        <Form className="space-y-2 flex flex-col gap-2">
           <h3 className="text-xl font-semibold">Join a Group</h3>
           <Field
             type="text"
@@ -93,7 +93,12 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
             </Button>
           </div>
           <ErrorMessage name="password" component="span" className="error" />
-          <Button type="submit" variant="yellow" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="yellow"
+            className="w-fit self-center"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Joining..." : "Join Group"}
           </Button>
         </Form>

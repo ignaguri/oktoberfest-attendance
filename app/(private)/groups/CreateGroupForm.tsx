@@ -48,7 +48,7 @@ export const CreateGroupForm = () => {
       onSubmit={handleSubmit}
     >
       {({ errors, touched, isSubmitting }) => (
-        <Form className="space-y-2">
+        <Form className="space-y-2 flex flex-col gap-2">
           <h3 className="text-xl font-semibold">Create a New Group</h3>
           <Field
             type="text"
@@ -91,7 +91,12 @@ export const CreateGroupForm = () => {
           </div>
           <ErrorMessage name="password" component="span" className="error" />
 
-          <Button type="submit" variant="yellow" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="yellow"
+            className="w-fit self-center"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Creating..." : "Create Group"}
           </Button>
         </Form>

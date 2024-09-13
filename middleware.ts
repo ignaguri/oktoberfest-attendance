@@ -4,9 +4,28 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === "/") {
+  const publicPaths = [
+    "/",
+    "/auth",
+    "/auth/confirm",
+    "/auth/update-password",
+    "/auth/callback",
+    "/sign-in",
+    "/sign-up",
+    "/reset-password",
+    "/error",
+  ];
+
+  if (request.nextUrl.search.startsWith("?redirectUrl=")) {
+    const redirectUrl = request.nextUrl.search.split("redirectUrl=")[1];
+    const unescapedUrl = decodeURIComponent(redirectUrl);
+    return NextResponse.redirect(new URL(unescapedUrl, request.url));
+  }
+
+  if (publicPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
+
   return await updateSession(request);
 }
 

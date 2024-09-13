@@ -43,7 +43,7 @@ export const Leaderboard = ({
       direction = "desc";
     }
     const sortedData = [...data].sort((a, b) => {
-      if (a[key] && b[key]) {
+      if (a[key] !== null && b[key] !== null) {
         if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
         if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
       }

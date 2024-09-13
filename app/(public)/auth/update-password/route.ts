@@ -14,7 +14,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/update-password", req.url));
   }
 
-  console.error("ERROR: Invalid auth code or no auth code found");
-
   return NextResponse.redirect(new URL("/sign-in", req.url));
 }
