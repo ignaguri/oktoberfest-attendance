@@ -8,6 +8,7 @@ import { updateProfile } from "./actions";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 const ProfileSchema = Yup.object().shape({
   fullname: Yup.string(),
@@ -160,13 +161,18 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
         )}
       </Formik>
       {!isEditing && (
-        <Button
-          variant="yellowOutline"
-          type="button"
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </Button>
+        <div className="flex flex-col gap-4 items-center">
+          <Button
+            variant="yellow"
+            type="button"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </Button>
+          <Button variant="yellowOutline" type="button" asChild>
+            <Link href="/update-password">Change Password</Link>
+          </Button>
+        </div>
       )}
     </div>
   );

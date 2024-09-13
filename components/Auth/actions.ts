@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
 export async function login(
   formData: { email: string; password: string },
@@ -37,7 +38,6 @@ export async function logout() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    console.error("Error while trying to log out", error);
     redirect("/error");
   }
 
@@ -56,12 +56,8 @@ export async function signUp(formData: { email: string; password: string }) {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    console.error("Error while trying to sign up", error);
     throw new Error(error.message);
   }
-
-  revalidatePath("/", "layout");
-  redirect("/");
 }
 
 export async function resetPassword(formData: {
@@ -69,8 +65,14 @@ export async function resetPassword(formData: {
 }): Promise<[boolean, string | null]> {
   const supabase = createClient();
 
+  const passwordUpdateUrlBase =
+    process.env.NODE_ENV === "development"
+      ? process.env.__NEXT_PRIVATE_ORIGIN
+      : process.env.NEXT_PUBLIC_APP_URL;
+  const passwordResetUrl = `${passwordUpdateUrlBase}/update-password`;
+
   const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-    redirectTo: `${window.location.origin}/auth/update-password`,
+    redirectTo: passwordResetUrl,
   });
 
   if (error) {
