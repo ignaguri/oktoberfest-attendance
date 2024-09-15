@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import QuickAttendanceRegistration from "@/app/(private)/attendance/QuickAttendanceRegistration";
+import InstallPWA from "@/components/InstallPWA";
 
 export default async function Home() {
   return (
@@ -61,6 +62,7 @@ export default async function Home() {
           </Button>
         </div>
       </div>
+      <InstallPWA />
     </div>
   );
 }
