@@ -1,22 +1,19 @@
-"use client";
-
 import Link from "next/link";
-import { Tables } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
+import { fetchGroups } from "@/lib/actions";
 
-interface MyGroupsProps {
-  groups: Tables<"groups">[];
-}
-
-export default function MyGroups({ groups }: MyGroupsProps) {
-  if (!groups || groups.length === 0) {
-    return null;
-  }
+export default async function MyGroups() {
+  const groups = await fetchGroups();
 
   return (
     <div>
       <h2 className="text-xl font-bold mb-2">Your Groups:</h2>
       <div className="flex flex-wrap gap-2 justify-center">
+        {groups.length === 0 && (
+          <p className="text-sm text-gray-500">
+            You are not a member of any group yet.
+          </p>
+        )}
         {groups.map((group) => (
           <Button key={group.id} asChild variant="outline">
             <Link

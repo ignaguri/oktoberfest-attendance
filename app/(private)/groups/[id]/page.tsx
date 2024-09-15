@@ -72,11 +72,10 @@ export default async function GroupPage({
   const groupId = params.id;
   const groupData = fetchGroupAndMembership(groupId);
   const leaderboardData = fetchLeaderboard(groupId);
+  const winningCriteriaData = fetchWinningCriteriaForGroup(groupId);
 
-  const [{ group, isMember }, leaderboardEntries] = await Promise.all([
-    groupData,
-    leaderboardData,
-  ]);
+  const [{ group, isMember }, leaderboardEntries, winningCriteria] =
+    await Promise.all([groupData, leaderboardData, winningCriteriaData]);
 
   if (!group) {
     redirect("/groups");
@@ -113,13 +112,13 @@ export default async function GroupPage({
 
         <p className="text-sm font-medium text-gray-500 mb-4">
           Winning Criteria:{" "}
-          {winningCriteriaText[group.winning_criteria as WinningCriteria]}
+          {winningCriteriaText[winningCriteria?.name as WinningCriteria]}
         </p>
 
         <div className="flex flex-col gap-4">
           <Leaderboard
             entries={leaderboardEntries ?? []}
-            winningCriteria={group.winning_criteria as WinningCriteria}
+            winningCriteria={winningCriteria?.name as WinningCriteria}
           />
 
           <div className="flex flex-col gap-4 items-center">

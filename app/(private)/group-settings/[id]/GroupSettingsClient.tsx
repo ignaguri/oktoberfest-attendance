@@ -27,7 +27,7 @@ import {
 
 type Props = {
   group: Tables<"groups">;
-  members: Tables<"profiles">[];
+  members: Pick<Tables<"profiles">, "id" | "username" | "full_name">[];
 };
 
 const GroupSettingsSchema = Yup.object().shape({
@@ -48,6 +48,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
     userId: string;
     isCreator: boolean;
   } | null>(null);
+  const [winningCriterias, setWinningCriterias] = useState<
+    { id: number; name: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -61,9 +64,26 @@ export default function GroupSettingsClient({ group, members }: Props) {
     fetchCurrentUser();
   }, [group.id]);
 
+  useEffect(() => {
+    const fetchWinningCriteria = async () => {
+      if (!group.winning_criteria_id) return;
+
+      const result = await fetchWinningCriterias();
+      if (result) {
+        const criterias = result.map((criteria) => ({
+          id: criteria.id,
+          name: criteria.name,
+        }));
+        setWinningCriterias(criterias);
+      }
+    };
+
+    fetchWinningCriteria();
+  }, [group.winning_criteria_id]);
+
   const handleUpdateGroup = useCallback(
     async (
-      values: Partial<Tables<"groups">>,
+      values: Partial<Tables<"groups"> & { winning_criteria: WinningCriteria }>,
       { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
     ) => {
       if (!currentUser?.isCreator) {
@@ -81,6 +101,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
           description: "Your group details have been updated.",
         });
         clearCachesByServerAction(`/groups/${group.id}`);
+        clearCachesByServerAction(`/group-settings/${group.id}`);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -130,7 +151,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
               name: group.name,
               password: group.password,
               description: group.description || "",
-              winning_criteria: group.winning_criteria,
+              winning_criteria: winningCriterias.find(
+                (criteria) => criteria.id === group.winning_criteria_id,
+              )?.name as WinningCriteria,
             }}
             validationSchema={GroupSettingsSchema}
             onSubmit={handleUpdateGroup}
@@ -230,13 +253,11 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                     disabled={!currentUser?.isCreator}
                   >
-                    {Object.entries(WinningCriteriaValues).map(
-                      ([key, value]) => (
-                        <option key={key} value={value}>
-                          {winningCriteriaText[value as WinningCriteria]}
-                        </option>
-                      ),
-                    )}
+                    {winningCriterias.map((criteria) => (
+                      <option key={criteria.id} value={criteria.name}>
+                        {winningCriteriaText[criteria.name as WinningCriteria]}
+                      </option>
+                    ))}
                   </Field>
                   <ErrorMessage
                     name="winning_criteria"
