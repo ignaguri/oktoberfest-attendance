@@ -1,8 +1,7 @@
 "use client";
 
 import { Tables } from "@/lib/database.types";
-import { WinningCriteria, WinningCriteriaValues } from "@/lib/types";
-import clearCachesByServerAction from "@/utils/revalidate";
+import { WinningCriteria } from "@/lib/types";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -39,9 +38,7 @@ const GroupSettingsSchema = Yup.object().shape({
   name: Yup.string().required("Group name is required"),
   password: Yup.string().required("Password is required"),
   description: Yup.string(),
-  winning_criteria: Yup.string()
-    .oneOf(Object.values(WinningCriteriaValues))
-    .required("Winning criteria is required"),
+  winning_criteria_id: Yup.number().required("Winning criteria is required"),
 });
 
 export default function GroupSettingsClient({ group, members }: Props) {
@@ -69,25 +66,19 @@ export default function GroupSettingsClient({ group, members }: Props) {
   }, [group.id]);
 
   useEffect(() => {
-    const fetchWinningCriteria = async () => {
-      if (!group.winning_criteria_id) return;
-
+    const fetchWinningCriteriasData = async () => {
       const result = await fetchWinningCriterias();
       if (result) {
-        const criterias = result.map((criteria) => ({
-          id: criteria.id,
-          name: criteria.name,
-        }));
-        setWinningCriterias(criterias);
+        setWinningCriterias(result);
       }
     };
 
-    fetchWinningCriteria();
-  }, [group.winning_criteria_id]);
+    fetchWinningCriteriasData();
+  }, []);
 
   const handleUpdateGroup = useCallback(
     async (
-      values: Partial<Tables<"groups"> & { winning_criteria: WinningCriteria }>,
+      values: Partial<Tables<"groups">>,
       { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
     ) => {
       if (!currentUser?.isCreator) {
@@ -104,8 +95,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
           title: "Group updated successfully!",
           description: "Your group details have been updated.",
         });
-        clearCachesByServerAction(`/groups/${group.id}`);
-        clearCachesByServerAction(`/group-settings/${group.id}`);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -129,7 +118,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
         title: "Member removed successfully!",
         description: "The member has been removed from the group.",
       });
-      clearCachesByServerAction(`/groups/${group.id}`);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -155,9 +143,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               name: group.name,
               password: group.password,
               description: group.description || "",
-              winning_criteria: winningCriterias.find(
-                (criteria) => criteria.id === group.winning_criteria_id,
-              )?.name as WinningCriteria,
+              winning_criteria_id: group.winning_criteria_id,
             }}
             validationSchema={GroupSettingsSchema}
             onSubmit={handleUpdateGroup}
@@ -252,19 +238,19 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   </label>
                   <Field
                     as="select"
-                    id="winning_criteria"
-                    name="winning_criteria"
+                    id="winning_criteria_id"
+                    name="winning_criteria_id"
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                     disabled={!currentUser?.isCreator}
                   >
                     {winningCriterias.map((criteria) => (
-                      <option key={criteria.id} value={criteria.name}>
+                      <option key={criteria.id} value={criteria.id}>
                         {winningCriteriaText[criteria.name as WinningCriteria]}
                       </option>
                     ))}
                   </Field>
                   <ErrorMessage
-                    name="winning_criteria"
+                    name="winning_criteria_id"
                     component="div"
                     className="text-red-500 text-sm mt-1"
                   />

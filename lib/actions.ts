@@ -349,23 +349,14 @@ export async function updateGroup(
   values: Partial<Tables<"groups">>,
 ) {
   const supabase = createClient();
-  let winningCriteriaId: number | null = null;
-  if (values.winning_criteria_id) {
-    const criteriaData = await fetchWinningCriteriaById(
-      values.winning_criteria_id,
-    );
-    if (!criteriaData) {
-      throw new Error("Error fetching winning criteria");
-    }
-    winningCriteriaId = criteriaData?.id || null;
-  }
+
   const { error } = await supabase
     .from("groups")
     .update({
       name: values.name,
       password: values.password,
       description: values.description,
-      winning_criteria_id: winningCriteriaId,
+      winning_criteria_id: values.winning_criteria_id,
     })
     .eq("id", groupId);
   if (error) {
@@ -437,6 +428,7 @@ export async function removeMember(groupId: string, userId: string) {
   if (error) {
     throw error;
   }
+  clearCachesByServerAction(`/groups/${groupId}`);
   return true;
 }
 
@@ -482,6 +474,19 @@ export async function fetchWinningCriteriaById(id: number) {
     .from("winning_criteria")
     .select("*")
     .eq("id", id)
+    .single();
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+export async function fetchWinningCriteriaByName(name: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("winning_criteria")
+    .select("*")
+    .eq("name", name)
     .single();
   if (error) {
     throw error;

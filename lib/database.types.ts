@@ -173,7 +173,7 @@ export type Database = {
           id: string
           name: string
           password: string
-          winning_criteria_id: number | null
+          winning_criteria_id: number
         }
         Insert: {
           created_at?: string | null
@@ -182,7 +182,7 @@ export type Database = {
           id?: string
           name: string
           password: string
-          winning_criteria_id?: number | null
+          winning_criteria_id: number
         }
         Update: {
           created_at?: string | null
@@ -191,7 +191,7 @@ export type Database = {
           id?: string
           name?: string
           password?: string
-          winning_criteria_id?: number | null
+          winning_criteria_id?: number
         }
         Relationships: [
           {
