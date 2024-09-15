@@ -7,10 +7,18 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import clearCachesByServerAction from "@/utils/revalidate";
 import { redirect } from "next/navigation";
+import { setCache, getCache, deleteCache } from "@/lib/cache"; // Import cache functions
+
+import type { User } from "@supabase/supabase-js";
 
 const NO_ROWS_ERROR = "PGRST116";
 
-export async function getUser() {
+export async function getUser(): Promise<User> {
+  const cachedUser = getCache<User>("user");
+  if (cachedUser) {
+    return cachedUser;
+  }
+
   const supabase = createClient();
   const {
     data: { user },
@@ -18,6 +26,8 @@ export async function getUser() {
   if (!user) {
     throw new Error("User not found");
   }
+
+  setCache("user", user); // Cache the user
   return user;
 }
 
@@ -38,6 +48,8 @@ export async function login(
     throw new Error(error.message);
   }
 
+  // Invalidate the user cache on login
+  deleteCache("user");
   revalidatePath("/", "layout");
 
   if (redirectTo) {
@@ -56,6 +68,8 @@ export async function logout() {
     redirect("/error");
   }
 
+  // Clear cached user on logout
+  deleteCache("user");
   revalidatePath("/", "layout");
   redirect("/");
 }
@@ -73,6 +87,9 @@ export async function signUp(formData: { email: string; password: string }) {
   if (error) {
     throw new Error(error.message);
   }
+
+  // Invalidate the user cache on sign up
+  deleteCache("user");
 }
 
 export async function resetPassword(formData: {
@@ -107,6 +124,9 @@ export async function updatePassword(formData: { password: string }) {
   if (error) {
     throw new Error(error.message);
   }
+
+  // Invalidate the user cache on password update
+  deleteCache("user");
 }
 
 export async function updateProfile({
@@ -128,6 +148,9 @@ export async function updateProfile({
   if (error) {
     throw new Error(error.message);
   }
+
+  // Invalidate cached user data
+  deleteCache("user");
   revalidatePath("/profile");
 }
 
@@ -271,6 +294,7 @@ export async function addAttendance(formData: { amount: number; date: Date }) {
   const supabase = createClient();
   const user = await getUser();
   const { amount, date } = formData;
+
   const { error } = await supabase.from("attendances").upsert(
     {
       user_id: user.id,
@@ -281,9 +305,13 @@ export async function addAttendance(formData: { amount: number; date: Date }) {
       onConflict: "date",
     },
   );
+
   if (error) {
     throw new Error("Error adding attendance: " + error.message);
   }
+
+  // Invalidate cached attendance data if necessary
+  deleteCache(`attendance-${user.id}`);
   revalidatePath("/attendance");
 }
 
@@ -296,7 +324,9 @@ async function fetchGroupsFromDB(userId: string) {
   if (error) {
     throw new Error("Error fetching groups: " + error.message);
   }
-  return data.map((item) => item.groups) as Tables<"groups">[];
+  const groups = data.map((item) => item.groups) as Tables<"groups">[];
+  setCache(`groups-${userId}`, groups);
+  return groups;
 }
 
 export async function fetchGroups(): Promise<Tables<"groups">[]> {
@@ -311,16 +341,19 @@ export async function createGroup(formData: {
   const supabase = createClient();
   const { groupName, password } = formData;
   const user = await getUser();
+
   const { data, error } = await supabase.rpc("create_group_with_member", {
     p_group_name: groupName.trim(),
     p_password: password.trim(),
     p_user_id: user.id,
   });
+
   if (error) {
     throw new Error("Error creating group");
   }
   if (data) {
     revalidatePath("/groups");
+    deleteCache(`group-${data.group_id}`);
     return data.group_id;
   }
 }
@@ -332,14 +365,19 @@ export async function joinGroup(formData: {
   const supabase = createClient();
   const { groupName, password } = formData;
   const user = await getUser();
+
   const { data: groupId, error } = await supabase.rpc("join_group", {
     p_user_id: user.id,
     p_group_name: groupName.trim(),
     p_password: password.trim(),
   });
+
   if (error || !groupId) {
     throw new Error("Error joining group");
   }
+
+  // Invalidate cached groups data
+  deleteCache(`group-${groupId}`);
   revalidatePath("/groups");
   return groupId;
 }
@@ -364,10 +402,16 @@ export async function updateGroup(
   }
   clearCachesByServerAction(`/groups/${groupId}`);
   clearCachesByServerAction(`/group-settings/${groupId}`);
+  deleteCache(`group-${groupId}`);
   return true;
 }
 
 export async function fetchGroupDetails(groupId: string) {
+  const cachedData = getCache<Tables<"groups">>("groupDetails-" + groupId);
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase
     .from("groups")
@@ -377,10 +421,19 @@ export async function fetchGroupDetails(groupId: string) {
   if (error) {
     throw new Error("Error fetching group details: " + error.message);
   }
+
+  setCache(`group-${groupId}`, data); // Cache the group details
   return data;
 }
 
 export async function fetchGroupMembers(groupId: string) {
+  const cachedData = getCache<
+    Pick<Tables<"profiles">, "id" | "username" | "full_name">[]
+  >("groupMembers-" + groupId);
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   type PartialProfile = Pick<
     Tables<"profiles">,
@@ -393,10 +446,21 @@ export async function fetchGroupMembers(groupId: string) {
   if (error) {
     throw new Error("Error fetching group members: " + error.message);
   }
-  return data.map((item: any) => item.profiles as PartialProfile);
+
+  const groupMembers = data.map((item: any) => item.profiles as PartialProfile);
+  setCache("groupMembers-" + groupId, groupMembers); // Cache the group members
+  return groupMembers;
 }
 
 export async function fetchGroupAndMembership(groupId: string) {
+  const cachedData = getCache<{
+    group: Tables<"groups"> | null;
+    isMember: boolean;
+  }>("groupAndMembership-" + groupId);
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const user = await getUser();
   const { data: group, error: groupError } = await supabase
@@ -416,7 +480,10 @@ export async function fetchGroupAndMembership(groupId: string) {
   if (membershipError && membershipError.code !== "PGRST116") {
     throw new Error("Error checking membership: " + membershipError.message);
   }
-  return { group, isMember: !!membership };
+
+  const groupAndMembership = { group, isMember: !!membership };
+  setCache("groupAndMembership-" + groupId, groupAndMembership); // Cache the group and membership
+  return groupAndMembership;
 }
 
 export async function removeMember(groupId: string, userId: string) {
@@ -429,10 +496,18 @@ export async function removeMember(groupId: string, userId: string) {
     throw error;
   }
   clearCachesByServerAction(`/groups/${groupId}`);
+  deleteCache(`groupMembers-${groupId}`);
   return true;
 }
 
 export async function getCurrentUserForGroup(groupId: string) {
+  const cachedData = getCache<{ userId: string; isCreator: boolean }>(
+    "currentUserForGroup-" + groupId,
+  );
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const user = await getUser();
   const { data, error } = await supabase
@@ -443,10 +518,21 @@ export async function getCurrentUserForGroup(groupId: string) {
   if (error) {
     throw error;
   }
-  return { userId: user.id, isCreator: data.created_by === user.id };
+
+  const currentUserForGroup = {
+    userId: user.id,
+    isCreator: data.created_by === user.id,
+  };
+  setCache(`currentUserForGroup-${groupId}`, currentUserForGroup); // Cache the current user for the group
+  return currentUserForGroup;
 }
 
 export async function getGroupName(groupId: string) {
+  const cachedData = getCache<string>("groupName-" + groupId);
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase
     .from("groups")
@@ -456,19 +542,35 @@ export async function getGroupName(groupId: string) {
   if (error) {
     return null;
   }
+
+  setCache("groupName-" + groupId, data.name); // Cache the group name
   return data.name;
 }
 
 export async function fetchWinningCriterias() {
+  const cachedData = getCache<Tables<"winning_criteria">[]>("winningCriterias");
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase.from("winning_criteria").select("*");
   if (error) {
     throw error;
   }
+
+  setCache("winningCriterias", data); // Cache the winning criteria
   return data;
 }
 
 export async function fetchWinningCriteriaById(id: number) {
+  const cachedData = getCache<Tables<"winning_criteria">>(
+    "winningCriteriaById-" + id,
+  );
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase
     .from("winning_criteria")
@@ -478,10 +580,19 @@ export async function fetchWinningCriteriaById(id: number) {
   if (error) {
     throw error;
   }
+
+  setCache("winningCriteriaById-" + id, data); // Cache the winning criteria by ID
   return data;
 }
 
 export async function fetchWinningCriteriaByName(name: string) {
+  const cachedData = getCache<Tables<"winning_criteria">>(
+    "winningCriteriaByName-" + name,
+  );
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase
     .from("winning_criteria")
@@ -491,10 +602,19 @@ export async function fetchWinningCriteriaByName(name: string) {
   if (error) {
     throw error;
   }
+
+  setCache("winningCriteriaByName-" + name, data); // Cache the winning criteria by name
   return data;
 }
 
 export async function fetchWinningCriteriaForGroup(groupId: string) {
+  const cachedData = getCache<Tables<"winning_criteria">>(
+    "winningCriteriaForGroup-" + groupId,
+  );
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase
     .from("groups")
@@ -510,10 +630,18 @@ export async function fetchWinningCriteriaForGroup(groupId: string) {
   const winningCriteria = await fetchWinningCriteriaById(
     data.winning_criteria_id,
   );
+  setCache("winningCriteriaForGroup-" + groupId, winningCriteria); // Cache the winning criteria for the group
   return winningCriteria;
 }
 
 export async function fetchLeaderboard(groupId: string) {
+  const cachedData = getCache<Tables<"leaderboard">[]>(
+    "leaderboard-" + groupId,
+  );
+  if (cachedData) {
+    return cachedData;
+  }
+
   const supabase = createClient();
   const { data, error } = await supabase
     .from("leaderboard")
@@ -523,6 +651,8 @@ export async function fetchLeaderboard(groupId: string) {
   if (error) {
     throw new Error("Error fetching leaderboard: " + error.message);
   }
+
+  setCache("leaderboard-" + groupId, data); // Cache the leaderboard
   return data;
 }
 
