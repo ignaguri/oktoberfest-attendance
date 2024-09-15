@@ -1,5 +1,7 @@
 import { differenceInDays, isWithinInterval } from "date-fns";
 import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { OctagonAlert } from "lucide-react";
 
 export default function OktoberfestStatus() {
   const today = new Date();
@@ -19,6 +21,15 @@ export default function OktoberfestStatus() {
   }
 
   return (
-    <p className="text-center text-gray-900 font-semibold px-4">{status}</p>
+    <>
+      <p className="text-center text-gray-900 font-semibold px-4">{status}</p>
+      <Alert variant="warning" className="mt-4">
+        <OctagonAlert className="w-4 h-4" />
+        <AlertDescription>
+          All attendance data loaded now is just for testing and will be deleted
+          before Oktoberfest starts.
+        </AlertDescription>
+      </Alert>
+    </>
   );
 }

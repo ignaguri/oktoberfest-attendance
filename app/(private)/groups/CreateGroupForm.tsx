@@ -5,13 +5,10 @@ import * as Yup from "yup";
 import { createGroup } from "./actions";
 import cn from "classnames";
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-// Import SVG icons
-import EyeOpenIcon from "@/public/icons/eye-open.svg";
-import EyeClosedIcon from "@/public/icons/eye-closed.svg";
+import { EyeOff, Eye } from "lucide-react";
 
 // Define validation schema
 const CreateGroupSchema = Yup.object().shape({
@@ -81,12 +78,7 @@ export const CreateGroupForm = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
             >
-              <Image
-                src={showPassword ? EyeClosedIcon : EyeOpenIcon}
-                alt={showPassword ? "Hide password" : "Show password"}
-                width={20}
-                height={20}
-              />
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </Button>
           </div>
           <ErrorMessage name="password" component="span" className="error" />

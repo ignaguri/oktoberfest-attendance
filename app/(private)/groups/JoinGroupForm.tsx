@@ -5,11 +5,7 @@ import * as Yup from "yup";
 import { joinGroup } from "./actions";
 import cn from "classnames";
 import { useState } from "react";
-import Image from "next/image";
-
-// Import SVG icons
-import EyeOpenIcon from "@/public/icons/eye-open.svg";
-import EyeClosedIcon from "@/public/icons/eye-closed.svg";
+import { EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Define validation schema
@@ -84,12 +80,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
             >
-              <Image
-                src={showPassword ? EyeClosedIcon : EyeOpenIcon}
-                alt={showPassword ? "Hide password" : "Show password"}
-                width={20}
-                height={20}
-              />
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </Button>
           </div>
           <ErrorMessage name="password" component="span" className="error" />
