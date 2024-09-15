@@ -1,8 +1,7 @@
 "use client";
 
 import { Tables } from "@/lib/database.types";
-import { WinningCriteria, WinningCriteriaValues } from "@/lib/types";
-import clearCachesByServerAction from "@/utils/revalidate";
+import { WinningCriteria } from "@/lib/types";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -12,7 +11,12 @@ import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import { winningCriteriaText } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser, removeMember, updateGroup } from "./actions";
+import {
+  fetchWinningCriterias,
+  getCurrentUserForGroup,
+  removeMember,
+  updateGroup,
+} from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -27,16 +31,14 @@ import {
 
 type Props = {
   group: Tables<"groups">;
-  members: Tables<"profiles">[];
+  members: Pick<Tables<"profiles">, "id" | "username" | "full_name">[];
 };
 
 const GroupSettingsSchema = Yup.object().shape({
   name: Yup.string().required("Group name is required"),
   password: Yup.string().required("Password is required"),
   description: Yup.string(),
-  winning_criteria: Yup.string()
-    .oneOf(Object.values(WinningCriteriaValues))
-    .required("Winning criteria is required"),
+  winning_criteria_id: Yup.number().required("Winning criteria is required"),
 });
 
 export default function GroupSettingsClient({ group, members }: Props) {
@@ -48,18 +50,31 @@ export default function GroupSettingsClient({ group, members }: Props) {
     userId: string;
     isCreator: boolean;
   } | null>(null);
+  const [winningCriterias, setWinningCriterias] = useState<
+    { id: number; name: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const result = await getCurrentUser(group.id);
+      const result = await getCurrentUserForGroup(group.id);
       if (result) {
-        const { userId, isCreator } = result;
-        setCurrentUser({ userId, isCreator });
+        setCurrentUser(result);
       }
     };
 
     fetchCurrentUser();
   }, [group.id]);
+
+  useEffect(() => {
+    const fetchWinningCriteriasData = async () => {
+      const result = await fetchWinningCriterias();
+      if (result) {
+        setWinningCriterias(result);
+      }
+    };
+
+    fetchWinningCriteriasData();
+  }, []);
 
   const handleUpdateGroup = useCallback(
     async (
@@ -80,7 +95,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
           title: "Group updated successfully!",
           description: "Your group details have been updated.",
         });
-        clearCachesByServerAction(`/groups/${group.id}`);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -104,7 +118,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
         title: "Member removed successfully!",
         description: "The member has been removed from the group.",
       });
-      clearCachesByServerAction(`/groups/${group.id}`);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -130,7 +143,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               name: group.name,
               password: group.password,
               description: group.description || "",
-              winning_criteria: group.winning_criteria,
+              winning_criteria_id: group.winning_criteria_id,
             }}
             validationSchema={GroupSettingsSchema}
             onSubmit={handleUpdateGroup}
@@ -225,21 +238,19 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   </label>
                   <Field
                     as="select"
-                    id="winning_criteria"
-                    name="winning_criteria"
+                    id="winning_criteria_id"
+                    name="winning_criteria_id"
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                     disabled={!currentUser?.isCreator}
                   >
-                    {Object.entries(WinningCriteriaValues).map(
-                      ([key, value]) => (
-                        <option key={key} value={value}>
-                          {winningCriteriaText[value as WinningCriteria]}
-                        </option>
-                      ),
-                    )}
+                    {winningCriterias.map((criteria) => (
+                      <option key={criteria.id} value={criteria.id}>
+                        {winningCriteriaText[criteria.name as WinningCriteria]}
+                      </option>
+                    ))}
                   </Field>
                   <ErrorMessage
-                    name="winning_criteria"
+                    name="winning_criteria_id"
                     component="div"
                     className="text-red-500 text-sm mt-1"
                   />

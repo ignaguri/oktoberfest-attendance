@@ -1,10 +1,7 @@
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import MissingFields from "./MissingFields";
 import OktoberfestStatus from "./OktoberfestStatus";
 import MyGroups from "@/components/MyGroups";
-import { Tables } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import Highlights from "./Highlights";
 import {
@@ -13,61 +10,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-const getProfileData = async () => {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/sign-in");
-  }
-
-  const { data: profileData, error: profileError } = await supabase
-    .from("profiles")
-    .select(`full_name, username, avatar_url`)
-    .eq("id", user.id)
-    .single();
-
-  if (!profileData || profileError) {
-    redirect("/error");
-  }
-
-  const { data: groupsData, error: groupsError } = await supabase
-    .from("group_members")
-    .select(
-      `
-      group_id,
-      groups (
-        id,
-        name,
-        winning_criteria
-      )
-    `,
-    )
-    .eq("user_id", user.id);
-
-  if (groupsError) {
-    console.error("Error fetching groups", groupsError);
-  }
-
-  const groups = groupsData
-    ?.map((group) => group.groups)
-    .filter((group) => group !== null) as Tables<"groups">[];
-
-  let missingFields: { [key: string]: string } = {};
-  if (!profileData.full_name) missingFields.full_name = "Name";
-  if (!profileData.username) missingFields.username = "Username";
-  if (!profileData.avatar_url) missingFields.avatar_url = "Profile picture";
-
-  return { missingFields, groups };
-};
+import QuickAttendanceRegistration from "@/app/(private)/attendance/QuickAttendanceRegistration";
 
 export default async function Home() {
-  const { missingFields, groups } = await getProfileData();
-
   return (
     <div className="max-w-lg flex flex-col">
       <h1 className="mb-6 text-5xl font-bold sm:text-6xl">
@@ -79,8 +24,9 @@ export default async function Home() {
         </span>
       </h1>
 
-      <div className="mb-4">
+      <div className="mb-4 flex flex-col gap-4">
         <OktoberfestStatus />
+        <QuickAttendanceRegistration />
       </div>
 
       <div className="mb-4">
@@ -102,16 +48,16 @@ export default async function Home() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <MissingFields missingFields={missingFields} />
-        <Highlights groups={groups} />
-        <MyGroups groups={groups} />
+        <MissingFields />
+        <Highlights />
+        <MyGroups />
 
         <div className="flex flex-col gap-2 items-center mt-4">
           <Button asChild variant="yellow">
             <Link href="/attendance">Register attendance</Link>
           </Button>
           <Button asChild variant="darkYellow">
-            <Link href="/groups">Groups</Link>
+            <Link href="/groups">Join or Create a group</Link>
           </Button>
         </div>
       </div>

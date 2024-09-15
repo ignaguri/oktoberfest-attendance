@@ -20,8 +20,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import Image from "next/image";
-import ShareIcon from "@/public/icons/share-ios-icon.svg";
+import { Share2 } from "lucide-react";
 
 interface ShareButtonProps {
   groupName: string;
@@ -63,14 +62,7 @@ export default function ShareButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="yellow">
-            <Image
-              width={ICON_SIZE}
-              height={ICON_SIZE}
-              src={ShareIcon}
-              alt="Share group"
-              style={{ height: ICON_SIZE, width: ICON_SIZE }}
-              priority
-            />
+            <Share2 size={ICON_SIZE} />
             {withText && <span className="ml-2">Share group</span>}
           </Button>
         </DialogTrigger>
@@ -106,14 +98,7 @@ export default function ShareButton({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="yellow" className="flex items-center">
-          <Image
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            src={ShareIcon}
-            alt="Share group"
-            style={{ height: ICON_SIZE, width: ICON_SIZE }}
-            priority
-          />
+          <Share2 size={ICON_SIZE} />
           {withText && <span className="ml-2">Share group</span>}
         </Button>
       </DrawerTrigger>

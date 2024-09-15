@@ -3,7 +3,7 @@
 import cn from "classnames";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { updatePassword } from "./actions";
+import { updatePassword } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 

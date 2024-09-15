@@ -1,31 +1,8 @@
 import Link from "next/link";
 import SignOut from "./Auth/SignOut";
 
-import { createClient } from "@/utils/supabase/server";
 import Avatar from "@/components/Avatar/Avatar";
-
-const getUserAndAvatarUrl = async () => {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { user: null, avatarUrl: null };
-  }
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(`avatar_url`)
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return { user, avatarUrl: data.avatar_url };
-};
+import { getUserAndAvatarUrl } from "@/lib/actions";
 
 export default async function Navbar() {
   const { user, avatarUrl } = await getUserAndAvatarUrl();

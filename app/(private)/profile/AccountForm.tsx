@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Avatar from "@/components/Avatar/Avatar";
-import { updateProfile } from "./actions";
+import { updateProfile } from "@/lib/actions";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";

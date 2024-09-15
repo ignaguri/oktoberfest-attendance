@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { login } from "./actions";
+import { login } from "@/lib/actions";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 

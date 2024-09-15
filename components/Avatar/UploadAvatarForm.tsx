@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { uploadAvatar } from "./actions";
+import { uploadAvatar } from "@/lib/actions";
 import { Formik, Form, ErrorMessage, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { useToast } from "@/hooks/use-toast";

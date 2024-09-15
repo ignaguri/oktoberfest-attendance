@@ -173,7 +173,7 @@ export type Database = {
           id: string
           name: string
           password: string
-          winning_criteria: string
+          winning_criteria_id: number
         }
         Insert: {
           created_at?: string | null
@@ -182,7 +182,7 @@ export type Database = {
           id?: string
           name: string
           password: string
-          winning_criteria: string
+          winning_criteria_id: number
         }
         Update: {
           created_at?: string | null
@@ -191,7 +191,7 @@ export type Database = {
           id?: string
           name?: string
           password?: string
-          winning_criteria?: string
+          winning_criteria_id?: number
         }
         Relationships: [
           {
@@ -206,6 +206,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_winning_criteria_id_fkey"
+            columns: ["winning_criteria_id"]
+            isOneToOne: false
+            referencedRelation: "winning_criteria"
             referencedColumns: ["id"]
           },
         ]
@@ -252,6 +259,21 @@ export type Database = {
           },
         ]
       }
+      winning_criteria: {
+        Row: {
+          id: number
+          name: string
+        }
+        Insert: {
+          id?: number
+          name: string
+        }
+        Update: {
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       leaderboard: {
@@ -296,6 +318,16 @@ export type Database = {
       get_user_groups: {
         Args: Record<PropertyKey, never>
         Returns: string[]
+      }
+      get_user_stats: {
+        Args: {
+          input_user_id: string
+        }
+        Returns: {
+          top_positions: Json
+          total_beers: number
+          days_attended: number
+        }[]
       }
       is_group_member: {
         Args: {

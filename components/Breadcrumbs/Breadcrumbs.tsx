@@ -11,7 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getGroupName } from "./actions";
+import { getGroupName } from "@/lib/actions";
 
 function isUUID(str: string) {
   const uuidRegex =
@@ -29,6 +29,7 @@ function formatSegmentName(segment: string): string {
 export default function Breadcrumbs() {
   const pathname = usePathname();
   const [groupName, setGroupName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const segments = pathname.split("/").filter((segment) => segment !== "");
 
@@ -41,7 +42,11 @@ export default function Breadcrumbs() {
           setGroupName(name);
         } catch (error) {
           console.error("Failed to fetch group name:", error);
+        } finally {
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
     }
 
@@ -57,16 +62,34 @@ export default function Breadcrumbs() {
       let title = formatSegmentName(segment);
       const isLast = index === array.length - 1;
 
-      if (isLast && isUUID(segment) && groupName) {
-        title = groupName;
+      if (isLast && isUUID(segment)) {
+        if (isLoading || !groupName) {
+          title = "Loading...";
+        } else {
+          title = groupName;
+        }
       }
 
       return { href, title, isLast };
     });
 
   // Remove the first breadcrumb if it's "Home"
-  if (breadcrumbs.length > 0 && breadcrumbs[0].title.toLowerCase() === "home") {
-    breadcrumbs.shift();
+  if (breadcrumbs.length > 0) {
+    if (breadcrumbs[0].title.toLowerCase() === "home") {
+      breadcrumbs.shift();
+    }
+    if (breadcrumbs[0].title.toLowerCase() === "group settings") {
+      const last = breadcrumbs.pop();
+      const secondLast = breadcrumbs.pop();
+      if (last && secondLast) {
+        last.isLast = false;
+        last.href = last.href.replace("group-settings", "groups");
+        breadcrumbs.push(last);
+        secondLast.isLast = true;
+        secondLast.title = "Settings";
+        breadcrumbs.push(secondLast);
+      }
+    }
   }
 
   // If there are no breadcrumbs left after filtering, return null
