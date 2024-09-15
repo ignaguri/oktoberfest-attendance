@@ -77,8 +77,7 @@ export default function Breadcrumbs() {
   if (breadcrumbs.length > 0) {
     if (breadcrumbs[0].title.toLowerCase() === "home") {
       breadcrumbs.shift();
-    }
-    if (breadcrumbs[0].title.toLowerCase() === "group settings") {
+    } else if (breadcrumbs[0].title.toLowerCase() === "group settings") {
       const last = breadcrumbs.pop();
       const secondLast = breadcrumbs.pop();
       if (last && secondLast) {
