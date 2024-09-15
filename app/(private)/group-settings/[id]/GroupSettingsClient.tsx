@@ -12,7 +12,12 @@ import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import { winningCriteriaText } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser, removeMember, updateGroup } from "./actions";
+import {
+  fetchWinningCriterias,
+  getCurrentUserForGroup,
+  removeMember,
+  updateGroup,
+} from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -54,10 +59,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const result = await getCurrentUser(group.id);
+      const result = await getCurrentUserForGroup(group.id);
       if (result) {
-        const { userId, isCreator } = result;
-        setCurrentUser({ userId, isCreator });
+        setCurrentUser(result);
       }
     };
 

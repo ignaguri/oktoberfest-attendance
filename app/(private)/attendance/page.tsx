@@ -11,7 +11,7 @@ import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 import { isWithinInterval } from "date-fns/isWithinInterval";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { addAttendance, fetchAttendances } from "./actions";
+import { addAttendance, fetchAttendances } from "@/lib/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type AttendanceDBType = Tables<"attendances">;
@@ -32,7 +32,7 @@ export default function AttendanceForm() {
 
   const fetchAttendancesCbk = useCallback(async () => {
     const data = await fetchAttendances();
-    setAttendance(data);
+    setAttendance(data as Pick<AttendanceDBType, "date" | "beer_count">[]);
   }, []);
 
   const { toast } = useToast();

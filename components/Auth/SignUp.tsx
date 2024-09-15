@@ -5,7 +5,7 @@ import cn from "classnames";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
-import { signUp } from "./actions";
+import { signUp } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 

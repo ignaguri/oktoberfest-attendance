@@ -3,6 +3,7 @@ import type { FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
+import { getMissingProfileFields } from "@/lib/actions";
 
 interface MissingFieldProps {
   label: string;
@@ -28,16 +29,14 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
   );
 };
 
-interface MissingFieldsProps {
-  missingFields: {
-    full_name?: string;
-    username?: string;
-    avatar_url?: string;
-  };
-}
+export default async function MissingFields() {
+  const missingFields = await getMissingProfileFields();
 
-const MissingFields: FC<MissingFieldsProps> = ({ missingFields }) => {
-  if (Object.values(missingFields).length === 0) {
+  if (
+    !missingFields.fullName &&
+    !missingFields.username &&
+    !missingFields.avatarUrl
+  ) {
     return null;
   }
 
@@ -48,6 +47,7 @@ const MissingFields: FC<MissingFieldsProps> = ({ missingFields }) => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-2">
+          {missingFields.fullName && (
             <MissingField
               label="Name"
               icon={<User className="w-4 h-4" />}
@@ -61,6 +61,7 @@ const MissingFields: FC<MissingFieldsProps> = ({ missingFields }) => {
               link="/profile"
             />
           )}
+          {missingFields.avatarUrl && (
             <MissingField
               label="Profile picture"
               icon={<ImageIcon className="w-4 h-4" />}
@@ -71,6 +72,4 @@ const MissingFields: FC<MissingFieldsProps> = ({ missingFields }) => {
       </CardContent>
     </Card>
   );
-};
-
-export default MissingFields;
+}

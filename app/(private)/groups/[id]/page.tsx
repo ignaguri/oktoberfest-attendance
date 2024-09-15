@@ -2,67 +2,18 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/utils/supabase/server";
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ShareButton from "@/components/ShareButton";
 import { JoinGroupForm } from "../JoinGroupForm";
 import { WinningCriteria } from "@/lib/types";
 import { winningCriteriaText } from "@/lib/constants";
-import { Button } from "@/components/ui/button"; // Import Button component
-
-const fetchGroupAndMembership = async (groupId: string) => {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { group: null, isMember: false };
-  }
-
-  // First, fetch the group data
-  const { data: group, error: groupError } = await supabase
-    .from("groups")
-    .select("*")
-    .eq("id", groupId)
-    .single();
-
-  if (groupError) {
-    console.error("Error fetching group", groupError);
-    return { group: null, isMember: false };
-  }
-
-  // Then, check for membership
-  const { data: membership, error: membershipError } = await supabase
-    .from("group_members")
-    .select("user_id")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (membershipError && membershipError.code !== "PGRST116") {
-    console.error("Error checking membership", membershipError);
-  }
-
-  return { group, isMember: !!membership };
-};
-
-const fetchLeaderboard = async (groupId: string) => {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("leaderboard")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("total_beers", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching leaderboard", error);
-    return null;
-  }
-
-  return data;
-};
+import { Button } from "@/components/ui/button";
+import {
+  fetchGroupAndMembership,
+  fetchLeaderboard,
+  fetchWinningCriteriaForGroup,
+} from "@/lib/actions";
 
 export default async function GroupPage({
   params,

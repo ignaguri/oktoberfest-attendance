@@ -1,17 +1,14 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/utils/supabase/server";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { getUser } from "@/lib/actions";
 
 async function AuthCheck() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  try {
+    await getUser();
+  } catch (error) {
     redirect("/sign-in");
   }
 

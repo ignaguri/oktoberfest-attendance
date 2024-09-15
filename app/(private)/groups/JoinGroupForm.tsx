@@ -2,7 +2,7 @@
 
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { joinGroup } from "./actions";
+import { joinGroup } from "@/lib/actions";
 import cn from "classnames";
 import { useState } from "react";
 import { EyeOff, Eye } from "lucide-react";

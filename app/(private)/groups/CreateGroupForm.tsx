@@ -2,7 +2,7 @@
 
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { createGroup } from "./actions";
+import { createGroup } from "@/lib/actions";
 import cn from "classnames";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

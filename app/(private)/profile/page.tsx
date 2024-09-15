@@ -1,26 +1,16 @@
-import { createClient } from "@/utils/supabase/server";
 import AccountForm from "./AccountForm";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { getProfileShort, getUser } from "@/lib/actions";
 
 export default async function ProfilePage() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const userData = getUser();
+  const profileData = getProfileShort();
 
-  if (!user) {
+  const [user, profile] = await Promise.all([userData, profileData]);
+
+  if (!user || !profile) {
     return <LoadingSpinner />;
   }
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(`full_name, username, avatar_url`)
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    throw new Error("Error loading user data!");
-  }
-
-  return <AccountForm user={user} profile={data} />;
+  return <AccountForm user={user} profile={profile} />;
 }

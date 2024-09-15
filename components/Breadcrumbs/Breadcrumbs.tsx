@@ -11,7 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getGroupName } from "./actions";
+import { getGroupName } from "@/lib/actions";
 
 function isUUID(str: string) {
   const uuidRegex =
@@ -29,6 +29,7 @@ function formatSegmentName(segment: string): string {
 export default function Breadcrumbs() {
   const pathname = usePathname();
   const [groupName, setGroupName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const segments = pathname.split("/").filter((segment) => segment !== "");
 
@@ -41,7 +42,11 @@ export default function Breadcrumbs() {
           setGroupName(name);
         } catch (error) {
           console.error("Failed to fetch group name:", error);
+        } finally {
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
     }
 
@@ -57,7 +62,7 @@ export default function Breadcrumbs() {
       let title = formatSegmentName(segment);
       const isLast = index === array.length - 1;
 
-      if (isLast && isUUID(segment) && groupName) {
+      if (isLast && isUUID(segment) && groupName && !isLoading) {
         title = groupName;
       }
 

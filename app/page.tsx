@@ -1,13 +1,17 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/actions";
+
+import "server-only";
 
 export default async function Root() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user;
+  try {
+    user = await getUser();
+  } catch (error) {
+    // do nothing
+  }
 
   if (user) {
     redirect("/home");

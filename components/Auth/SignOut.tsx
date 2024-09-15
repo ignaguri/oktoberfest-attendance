@@ -2,8 +2,7 @@
 
 import { LogOut } from "lucide-react";
 
-import LogoutIcon from "@/public/icons/logout-icon-fa.svg";
-import { logout } from "./actions";
+import { logout } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 
 export default function SignOut() {

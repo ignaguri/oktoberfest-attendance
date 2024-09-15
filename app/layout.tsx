@@ -5,9 +5,6 @@ import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 
-// do not cache this layout
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   description: "Oktoberfest attendance registering app",
   title: "ProstCounter 🍻",
