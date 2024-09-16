@@ -10,3 +10,6 @@ export const winningCriteriaText: Record<WinningCriteria, string> = {
 };
 
 export const COST_PER_BEER = 15.5;
+
+export const PROD_URL = "https://prostcounter.fun";
+export const DEV_URL = "http://localhost:3000";

@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { setCache, getCache, deleteCache } from "@/lib/cache"; // Import cache functions
 
 import type { User } from "@supabase/supabase-js";
+import { DEV_URL, PROD_URL } from "./constants";
 
 const NO_ROWS_ERROR = "PGRST116";
 
@@ -98,9 +99,7 @@ export async function resetPassword(formData: {
   const supabase = createClient();
 
   const passwordUpdateUrlBase =
-    process.env.NODE_ENV === "development"
-      ? process.env.__NEXT_PRIVATE_ORIGIN
-      : process.env.NEXT_PUBLIC_APP_URL;
+    process.env.NODE_ENV === "development" ? DEV_URL : PROD_URL;
   const passwordResetUrl = `${passwordUpdateUrlBase}/update-password`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
@@ -181,7 +180,8 @@ export async function uploadAvatar(formData: FormData) {
   let compressedBuffer;
   try {
     compressedBuffer = await sharp(buffer)
-      .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+      .rotate()
+      .resize({ width: 800, height: 800, fit: "inside" })
       .webp({ quality: 80 })
       .toBuffer();
   } catch (error) {
@@ -379,7 +379,43 @@ export async function joinGroup(formData: {
   // Invalidate cached groups data
   deleteCache(`group-${groupId}`);
   revalidatePath("/groups");
+  revalidatePath(`/groups/${groupId}`);
   return groupId;
+}
+
+export async function joinGroupWithToken(formData: { token: string }) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  const { data: groupId, error } = await supabase.rpc("join_group_with_token", {
+    p_user_id: user.id,
+    p_token: formData.token,
+  });
+
+  if (error || !groupId) {
+    throw new Error("Error joining group with token");
+  }
+
+  // Invalidate cached groups data
+  deleteCache(`group-${groupId}`);
+  revalidatePath("/groups");
+  revalidatePath(`/groups/${groupId}`);
+
+  return groupId;
+}
+
+export async function renewGroupToken(groupId: string) {
+  const supabase = createClient();
+
+  const { data: newToken, error } = await supabase.rpc("renew_group_token", {
+    p_group_id: groupId,
+  });
+
+  if (error || !newToken) {
+    throw new Error("Error renewing group token");
+  }
+
+  return newToken;
 }
 
 export async function updateGroup(
