@@ -180,7 +180,8 @@ export async function uploadAvatar(formData: FormData) {
   let compressedBuffer;
   try {
     compressedBuffer = await sharp(buffer)
-      .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+      .rotate()
+      .resize({ width: 800, height: 800, fit: "inside" })
       .webp({ quality: 80 })
       .toBuffer();
   } catch (error) {
@@ -378,7 +379,43 @@ export async function joinGroup(formData: {
   // Invalidate cached groups data
   deleteCache(`group-${groupId}`);
   revalidatePath("/groups");
+  revalidatePath(`/groups/${groupId}`);
   return groupId;
+}
+
+export async function joinGroupWithToken(formData: { token: string }) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  const { data: groupId, error } = await supabase.rpc("join_group_with_token", {
+    p_user_id: user.id,
+    p_token: formData.token,
+  });
+
+  if (error || !groupId) {
+    throw new Error("Error joining group with token");
+  }
+
+  // Invalidate cached groups data
+  deleteCache(`group-${groupId}`);
+  revalidatePath("/groups");
+  revalidatePath(`/groups/${groupId}`);
+
+  return groupId;
+}
+
+export async function renewGroupToken(groupId: string) {
+  const supabase = createClient();
+
+  const { data: newToken, error } = await supabase.rpc("renew_group_token", {
+    p_group_id: groupId,
+  });
+
+  if (error || !newToken) {
+    throw new Error("Error renewing group token");
+  }
+
+  return newToken;
 }
 
 export async function updateGroup(
