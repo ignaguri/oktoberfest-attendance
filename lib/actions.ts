@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { setCache, getCache, deleteCache } from "@/lib/cache"; // Import cache functions
 
 import type { User } from "@supabase/supabase-js";
+import { DEV_URL, PROD_URL } from "./constants";
 
 const NO_ROWS_ERROR = "PGRST116";
 
@@ -98,9 +99,7 @@ export async function resetPassword(formData: {
   const supabase = createClient();
 
   const passwordUpdateUrlBase =
-    process.env.NODE_ENV === "development"
-      ? process.env.__NEXT_PRIVATE_ORIGIN
-      : process.env.NEXT_PUBLIC_APP_URL;
+    process.env.NODE_ENV === "development" ? DEV_URL : PROD_URL;
   const passwordResetUrl = `${passwordUpdateUrlBase}/update-password`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
