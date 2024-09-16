@@ -171,8 +171,10 @@ export type Database = {
           created_by: string | null
           description: string | null
           id: string
+          invite_token: string | null
           name: string
           password: string
+          token_expiration: string | null
           winning_criteria_id: number
         }
         Insert: {
@@ -180,8 +182,10 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          invite_token?: string | null
           name: string
           password: string
+          token_expiration?: string | null
           winning_criteria_id: number
         }
         Update: {
@@ -189,8 +193,10 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          invite_token?: string | null
           name?: string
           password?: string
+          token_expiration?: string | null
           winning_criteria_id?: number
         }
         Relationships: [
@@ -341,6 +347,19 @@ export type Database = {
           p_user_id: string
           p_group_name: string
           p_password: string
+        }
+        Returns: string
+      }
+      join_group_with_token: {
+        Args: {
+          p_user_id: string
+          p_token: string
+        }
+        Returns: string
+      }
+      renew_group_token: {
+        Args: {
+          p_group_id: string
         }
         Returns: string
       }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Share2 } from "lucide-react";
+import { renewGroupToken } from "@/lib/actions";
+import { useToast } from "@/hooks/use-toast";
 
 interface ShareButtonProps {
   groupName: string;
@@ -39,10 +41,27 @@ export default function ShareButton({
 }: ShareButtonProps) {
   const [open, setOpen] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState("Copy Invite Text");
+  const [groupLink, setGroupLink] = useState("");
+  const [tokenGenerated, setTokenGenerated] = useState(false);
+  const { toast } = useToast();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
-  const groupLink = `${APP_URL}/groups/${groupId}`;
+
+  const generateShareLink = useCallback(async () => {
+    try {
+      const token = await renewGroupToken(groupId);
+      const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
+      setGroupLink(newGroupLink);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to generate share link. Please try again.",
+      });
+    }
+  }, [groupId, APP_URL, toast]);
+
   const shareText = `Join my group "${groupName}" on the ProstCounter app!\nGroup password: ${groupPassword}.\nClick here to join: ${groupLink}`;
 
   const copyToClipboard = async () => {
@@ -54,8 +73,42 @@ export default function ShareButton({
       }, 3000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy text to clipboard.",
+      });
     }
   };
+
+  useEffect(() => {
+    if (open && !tokenGenerated) {
+      generateShareLink();
+      setTokenGenerated(true); // Set to true after generating the token
+    }
+  }, [generateShareLink, open, tokenGenerated]);
+
+  const title = "Share group";
+  const description = "Choose how you’d like to share the group information:";
+
+  const ButtonsGroup = () => (
+    <div className="flex flex-col gap-2 items-center">
+      <Button variant="yellowOutline" onClick={copyToClipboard}>
+        {copyButtonText}
+      </Button>
+      <Button
+        variant="yellow"
+        onClick={() =>
+          window.open(
+            `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+            "_blank",
+          )
+        }
+      >
+        Share via WhatsApp
+      </Button>
+    </div>
+  );
 
   if (isDesktop) {
     return (
@@ -63,32 +116,15 @@ export default function ShareButton({
         <DialogTrigger asChild>
           <Button variant="yellow">
             <Share2 size={ICON_SIZE} />
-            {withText && <span className="ml-2">Share group</span>}
+            {withText && <span className="ml-2">{title}</span>}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Share Group</DialogTitle>
-            <DialogDescription>
-              Choose how you’d like to share the group information:
-            </DialogDescription>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <div className="mt-4 flex flex-col gap-2 items-center">
-            <Button variant="yellowOutline" onClick={copyToClipboard}>
-              {copyButtonText}
-            </Button>
-            <Button
-              variant="yellow"
-              onClick={() =>
-                window.open(
-                  `https://wa.me/?text=${encodeURIComponent(shareText)}`,
-                  "_blank",
-                )
-              }
-            >
-              Share via WhatsApp
-            </Button>
-          </div>
+          <ButtonsGroup />
         </DialogContent>
       </Dialog>
     );
@@ -99,32 +135,15 @@ export default function ShareButton({
       <DrawerTrigger asChild>
         <Button variant="yellow" className="flex items-center">
           <Share2 size={ICON_SIZE} />
-          {withText && <span className="ml-2">Share group</span>}
+          {withText && <span className="ml-2">{title}</span>}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Share Group</DrawerTitle>
-          <DrawerDescription>
-            Choose how you’d like to share the group information:
-          </DrawerDescription>
+          <DrawerTitle>{title}</DrawerTitle>
+          <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="mt-4 flex flex-col gap-2 items-center">
-          <Button variant="yellowOutline" onClick={copyToClipboard}>
-            {copyButtonText}
-          </Button>
-          <Button
-            variant="yellow"
-            onClick={() =>
-              window.open(
-                `https://wa.me/?text=${encodeURIComponent(shareText)}`,
-                "_blank",
-              )
-            }
-          >
-            Share via WhatsApp
-          </Button>
-        </div>
+        <ButtonsGroup />
         <DrawerFooter className="pt-2"></DrawerFooter>
       </DrawerContent>
     </Drawer>

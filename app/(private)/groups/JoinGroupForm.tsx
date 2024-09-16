@@ -7,6 +7,8 @@ import cn from "classnames";
 import { useState } from "react";
 import { EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 
 // Define validation schema
 const JoinGroupSchema = Yup.object().shape({
@@ -19,23 +21,30 @@ interface JoinGroupFormProps {
   groupId?: string;
 }
 
-export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
+export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (
     values: { groupName: string; password: string },
-    { setSubmitting, setErrors }: any,
+    { setSubmitting }: any,
   ) => {
     try {
-      await joinGroup(values);
-      if (groupId) {
-        // If groupId is provided, we're on the group page, so reload
-        window.location.reload();
-      } else {
-        // Otherwise, we're on the groups page, so the existing logic will handle redirection
-      }
+      const joinedGroupId = await joinGroup(values);
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Successfully joined the group!",
+      });
+      router.push(`/groups/${joinedGroupId}`);
+      window.location.reload();
     } catch (error) {
-      setErrors({ password: "Incorrect password or unable to join group" });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Incorrect password or unable to join group.",
+      });
     } finally {
       setSubmitting(false);
     }

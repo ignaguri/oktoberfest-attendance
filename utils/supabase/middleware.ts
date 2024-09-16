@@ -47,8 +47,19 @@ export async function updateSession(request: NextRequest) {
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
+
+    // if the url.search contains a token, remove it from the url object and append it to the redirect url
     url.pathname = "/sign-in";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
+    if (url.search.includes("token")) {
+      const token = url.search.split("token=")[1];
+      url.searchParams.delete("token");
+      url.searchParams.set(
+        "redirect",
+        request.nextUrl.pathname + "?token=" + token,
+      );
+    } else {
+      url.searchParams.set("redirect", request.nextUrl.pathname);
+    }
     return NextResponse.redirect(url);
   }
 
