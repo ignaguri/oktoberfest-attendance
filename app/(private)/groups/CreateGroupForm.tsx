@@ -7,7 +7,7 @@ import cn from "classnames";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { EyeOff, Eye } from "lucide-react";
 
 // Define validation schema
@@ -19,6 +19,7 @@ const CreateGroupSchema = Yup.object().shape({
 export const CreateGroupForm = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast(); // Initialize toast
 
   const handleSubmit = async (
     values: { groupName: string; password: string },
@@ -28,11 +29,19 @@ export const CreateGroupForm = () => {
       const groupId = await createGroup(values);
       if (groupId) {
         router.push(`/group-settings/${groupId}`);
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Group created successfully!",
+        });
       }
     } catch (error) {
-      alert(
-        "There was an error creating the group. Maybe try a different name?",
-      );
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          "There was an error creating the group. Maybe try a different name?",
+      });
     } finally {
       setSubmitting(false);
     }

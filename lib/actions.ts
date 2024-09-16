@@ -349,7 +349,7 @@ export async function createGroup(formData: {
   });
 
   if (error) {
-    throw new Error("Error creating group");
+    throw new Error("Error creating group: " + error.message);
   }
   if (data) {
     revalidatePath("/groups");
