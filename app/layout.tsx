@@ -5,9 +5,23 @@ import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { PROD_URL } from "@/lib/constants";
 
 // do not cache this layout
 export const revalidate = 0;
+
+const ogImages = [
+  "/images/prost-counter-og-1.jpg",
+  "/images/prost-counter-og-2.jpg",
+  "/images/prost-counter-og-3.jpg",
+  "/images/prost-counter-og-4.jpg",
+  "/images/prost-counter-og-5.jpg",
+  "/images/prost-counter-og-6.jpg",
+  "/images/prost-counter-og-7.jpg",
+];
+
+const getRandomImage = () =>
+  ogImages[Math.floor(Math.random() * ogImages.length)];
 
 export const metadata: Metadata = {
   description: "Track your Oktoberfest attendance and compete with friends!",
@@ -15,7 +29,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ProstCounter 🍻",
     description: "Join your friends in tracking Oktoberfest attendance!",
-    url: "https://oktoberfest-attendance.vercel.app/",
+    url: PROD_URL,
+    images: [
+      {
+        url: getRandomImage(),
+        width: 1200,
+        height: 630,
+        alt: "ProstCounter",
+      },
+    ],
     siteName: "ProstCounter",
     locale: "en_US",
     type: "website",
@@ -24,6 +46,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ProstCounter 🍻",
     description: "Join your friends in tracking Oktoberfest attendance!",
+    images: [getRandomImage()],
+    creator: "@ignaguri",
   },
   manifest: "/manifest.json",
 };
