@@ -98,6 +98,7 @@ export default function InstallPWA() {
   }, []);
 
   if (!supportsPWA || isInstalled || hide) {
+    console.debug("PWA not supported or already installed");
     return null;
   }
 
