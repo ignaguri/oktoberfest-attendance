@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
     "/sign-up",
     "/reset-password",
     "/error",
+    "/manifest.json",
   ];
 
   if (request.nextUrl.search.startsWith("?redirectUrl=")) {
