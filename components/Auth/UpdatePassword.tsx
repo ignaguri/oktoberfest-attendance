@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import cn from "classnames";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { updatePassword } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { EyeOff, Eye } from "lucide-react";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
@@ -13,6 +15,7 @@ const UpdatePasswordSchema = Yup.object().shape({
 
 export default function UpdatePassword() {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleUpdatePassword(formData: { password: string }) {
     try {
@@ -45,16 +48,26 @@ export default function UpdatePassword() {
         {({ errors, touched, isSubmitting }) => (
           <Form className="column w-full">
             <label htmlFor="password">New Password</label>
-            <Field
-              className={cn(
-                "input",
-                errors.password && touched.password && "bg-red-50",
-              )}
-              id="password"
-              name="password"
-              type="password"
-              disabled={isSubmitting}
-            />
+            <div className="relative w-full">
+              <Field
+                className={cn(
+                  "input",
+                  errors.password && touched.password && "bg-red-50",
+                )}
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                disabled={isSubmitting}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </Button>
+            </div>
             <ErrorMessage name="password" component="span" className="error" />
             <Button
               variant="yellow"

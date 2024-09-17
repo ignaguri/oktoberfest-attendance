@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { login } from "@/lib/actions";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { EyeOff, Eye } from "lucide-react";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -15,6 +17,7 @@ const SignInSchema = Yup.object().shape({
 export default function SignIn() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (
     values: { email: string; password: string },
@@ -52,14 +55,24 @@ export default function SignIn() {
             <ErrorMessage name="email" component="span" className="error" />
 
             <label htmlFor="password">Password</label>
-            <Field
-              className={
-                errors.password && touched.password ? "input-error" : "input"
-              }
-              id="password"
-              name="password"
-              type="password"
-            />
+            <div className="relative w-full">
+              <Field
+                className={
+                  errors.password && touched.password ? "input-error" : "input"
+                }
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </Button>
+            </div>
             <ErrorMessage name="password" component="span" className="error" />
 
             <Button
