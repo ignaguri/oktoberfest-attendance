@@ -108,7 +108,8 @@ export default function DetailedAttendanceForm({
     }
   };
 
-  const handleDateChange = (date: Date) => {
+  const handleDateChange = (date: Date | null) => {
+    if (!date) return;
     setCurrentDate(date);
   };
 

@@ -1,4 +1,4 @@
-import { useField, useFormikContext } from "formik";
+import { useField } from "formik";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { formatDate } from "date-fns/format";
@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 interface MyDatePickerProps {
   disabled?: boolean;
   name?: string;
-  onDateChange: (date: Date) => void;
+  onDateChange: (date: Date | null) => void;
 }
 
 export function MyDatePicker({
@@ -18,17 +18,8 @@ export function MyDatePicker({
   name = "date",
   onDateChange,
 }: MyDatePickerProps) {
-  const [field, meta, helpers] = useField(name);
-  const { setFieldValue } = useFormikContext();
-
+  const [field, meta] = useField(name);
   const { value } = meta;
-  const { setValue } = helpers;
-
-  const handleDateChange = (date: Date) => {
-    setValue(date);
-    setFieldValue(name, date);
-    onDateChange(date);
-  };
 
   type ButtonProps = React.HTMLProps<HTMLButtonElement>;
   const CustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -56,7 +47,7 @@ export function MyDatePicker({
         maxDate={END_OF_WIESN}
         minDate={BEGINNING_OF_WIESN}
         customInput={<CustomInput />}
-        onChange={(date) => handleDateChange(date as Date)}
+        onChange={onDateChange}
         selected={value as Date}
         todayButton="Today"
       />
