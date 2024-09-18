@@ -1,38 +1,26 @@
 import { cn } from "@/lib/utils";
 
 interface LoadingSpinnerProps {
-  color?: "gray" | "blue" | "red";
   size?: number;
 }
 
-const colorPairs = {
-  gray: {
-    static: "text-gray-900/50",
-    dynamic: "text-gray-900",
-  },
-  blue: {
-    static: "text-blue-500/50",
-    dynamic: "text-blue-500",
-  },
-  red: {
-    static: "text-red-500/50",
-    dynamic: "text-red-500",
-  },
+const sizeMap = {
+  16: "w-4 h-4",
+  24: "w-6 h-6",
+  32: "w-8 h-8",
+  48: "w-12 h-12",
+  64: "w-16 h-16",
 };
 
-export default function LoadingSpinner({
-  color = "gray",
-  size = 64,
-}: LoadingSpinnerProps) {
-  const colors = colorPairs[color];
+export default function LoadingSpinner({ size = 32 }: LoadingSpinnerProps) {
+  const sizeClass = sizeMap[size as keyof typeof sizeMap];
 
   return (
     <div className="grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible">
       <div
         className={cn(
           "animate-spin rounded-full border-4 border-t-transparent",
-          colors.dynamic,
-          `w-${size / 4} h-${size / 4}`,
+          sizeClass,
         )}
       ></div>
     </div>
