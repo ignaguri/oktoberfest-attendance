@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import QuickAttendanceRegistration from "@/app/(private)/attendance/QuickAttendanceRegistration";
+import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 import InstallPWA from "@/components/InstallPWA";
 import { Separator } from "@/components/ui/separator";
 

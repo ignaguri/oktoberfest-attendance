@@ -283,36 +283,68 @@ export async function fetchAttendances() {
 
 export async function fetchAttendanceByDate(date: Date) {
   const user = await getUser();
-  const data = await fetchAttendancesFromDB(user.id, date, true);
-  if (!data) {
-    return null;
+  const attendanceData = await fetchAttendancesFromDB(user.id, date, true);
+
+  const supabase = createClient();
+  const { data: tentVisits, error: tentVisitsError } = await supabase
+    .from("tent_visits")
+    .select("tent_id")
+    .eq("user_id", user.id)
+    .eq("visit_date", date.toISOString().split("T")[0]);
+
+  if (tentVisitsError) {
+    throw new Error(`Error fetching tent visits: ${tentVisitsError.message}`);
   }
-  return Array.isArray(data) ? data[0] : data;
+
+  const attendance = Array.isArray(attendanceData)
+    ? attendanceData[0]
+    : attendanceData;
+
+  return {
+    ...attendance,
+    tent_visits: tentVisits,
+    tent_ids: tentVisits.map((visit) => visit.tent_id),
+  };
 }
 
-export async function addAttendance(formData: { amount: number; date: Date }) {
+export async function addAttendance(formData: {
+  amount: number;
+  date: Date;
+  tents: string[];
+}) {
   const supabase = createClient();
   const user = await getUser();
-  const { amount, date } = formData;
+  const { amount, date, tents } = formData;
 
-  const { error } = await supabase.from("attendances").upsert(
-    {
-      user_id: user.id,
-      date: date.toISOString(),
-      beer_count: amount,
-    },
-    {
-      onConflict: "date",
-    },
-  );
+  const { error } = await supabase.rpc("add_or_update_attendance_with_tents", {
+    p_user_id: user.id,
+    p_date: date.toISOString(),
+    p_beer_count: amount,
+    p_tent_ids: tents,
+  });
 
   if (error) {
-    throw new Error("Error adding attendance: " + error.message);
+    throw new Error("Error adding/updating attendance: " + error.message);
   }
 
-  // Invalidate cached attendance data if necessary
   deleteCache(`attendance-${user.id}`);
   revalidatePath("/attendance");
+}
+
+export async function fetchTents() {
+  const cachedTents = getCache<Tables<"tents">[]>("tents");
+  if (cachedTents) {
+    return cachedTents;
+  }
+
+  const supabase = createClient();
+  const { data, error } = await supabase.from("tents").select("*");
+  if (error) {
+    throw new Error("Error fetching tents: " + error.message);
+  }
+
+  setCache("tents", data);
+  return data;
 }
 
 async function fetchGroupsFromDB(userId: string) {
