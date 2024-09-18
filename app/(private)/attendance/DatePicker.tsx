@@ -3,28 +3,23 @@ import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { formatDate } from "date-fns/format";
 import { Button } from "@/components/ui/button";
-
-// Styles
-import "react-datepicker/dist/react-datepicker.css";
 import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 interface MyDatePickerProps {
   disabled?: boolean;
   name?: string;
+  onDateChange: (date: Date | null) => void;
 }
 
 export function MyDatePicker({
   disabled = false,
   name = "date",
+  onDateChange,
 }: MyDatePickerProps) {
-  const [field, meta, helpers] = useField(name);
-
+  const [field, meta] = useField(name);
   const { value } = meta;
-  const { setValue } = helpers;
-
-  const handleOnChange = (date: Date | null) => {
-    setValue(date as Date);
-  };
 
   type ButtonProps = React.HTMLProps<HTMLButtonElement>;
   const CustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -52,8 +47,8 @@ export function MyDatePicker({
         maxDate={END_OF_WIESN}
         minDate={BEGINNING_OF_WIESN}
         customInput={<CustomInput />}
-        onChange={handleOnChange}
-        selected={value}
+        onChange={onDateChange}
+        selected={value as Date}
         todayButton="Today"
       />
     </div>

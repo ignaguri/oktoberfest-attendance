@@ -265,6 +265,60 @@ export type Database = {
           },
         ]
       }
+      tent_visits: {
+        Row: {
+          id: string
+          tent_id: string
+          user_id: string
+          visit_date: string
+        }
+        Insert: {
+          id: string
+          tent_id: string
+          user_id: string
+          visit_date: string
+        }
+        Update: {
+          id?: string
+          tent_id?: string
+          user_id?: string
+          visit_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tent_visits_tent_id_fkey"
+            columns: ["tent_id"]
+            isOneToOne: false
+            referencedRelation: "tents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tent_visits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tents: {
+        Row: {
+          category: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          category?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       winning_criteria: {
         Row: {
           id: number
@@ -310,6 +364,15 @@ export type Database = {
       }
     }
     Functions: {
+      add_or_update_attendance_with_tents: {
+        Args: {
+          p_user_id: string
+          p_date: string
+          p_beer_count: number
+          p_tent_ids: string[]
+        }
+        Returns: undefined
+      }
       create_group_with_member: {
         Args: {
           p_group_name: string

@@ -10,8 +10,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import QuickAttendanceRegistration from "@/app/(private)/attendance/QuickAttendanceRegistration";
+import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 import InstallPWA from "@/components/InstallPWA";
+import { Separator } from "@/components/ui/separator";
 
 export default async function Home() {
   return (
@@ -52,6 +53,8 @@ export default async function Home() {
         <MissingFields />
         <Highlights />
         <MyGroups />
+
+        <Separator decorative />
 
         <div className="flex flex-col gap-2 items-center mt-4">
           <Button asChild variant="yellow">

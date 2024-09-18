@@ -3,6 +3,7 @@ import { JoinGroupForm } from "./JoinGroupForm";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import MyGroups from "@/components/MyGroups";
+import { Separator } from "@/components/ui/separator";
 
 export default async function GroupsPage() {
   return (
@@ -10,9 +11,11 @@ export default async function GroupsPage() {
       <h1 className="text-3xl font-bold mb-6">Groups</h1>
 
       <Suspense fallback={<LoadingSpinner />}>
-        <div className="space-y-8">
+        <div className="flex flex-col gap-6">
           <MyGroups />
-          <div className="border-t-2 border-gray-300 my-6" />
+
+          <Separator />
+
           <section className="flex flex-col gap-8">
             <JoinGroupForm />
             <CreateGroupForm />
