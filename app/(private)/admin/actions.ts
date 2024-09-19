@@ -3,6 +3,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { getCacheKeys, deleteCache, clearAllCaches } from "@/lib/cache";
 import { Tables } from "@/lib/database.types";
 
 import "server-only";
@@ -187,4 +188,18 @@ export async function getTentVisitsForAttendance(userId: string, date: Date) {
 
   if (error) throw new Error("Error fetching tent visits: " + error.message);
   return tentVisits;
+}
+
+export async function listCacheKeys() {
+  return getCacheKeys(); // Return the list of cache keys
+}
+
+export async function deleteCacheKey(key: string) {
+  deleteCache(key); // Delete the specified cache key
+  revalidatePath("/admin"); // Revalidate the admin page
+}
+
+export async function deleteAllCaches() {
+  clearAllCaches(); // Clear all caches
+  revalidatePath("/admin"); // Revalidate the admin page
 }
