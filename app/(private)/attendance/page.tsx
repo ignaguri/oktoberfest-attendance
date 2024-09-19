@@ -7,18 +7,26 @@ import { fetchAttendances } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/lib/database.types";
 
-type AttendanceDBType = Tables<"attendances">;
+type TentVisit = Tables<"tent_visits"> & {
+  tentName: string | undefined;
+};
+
+export type AttendanceWithTentVisits = Tables<"attendances"> & {
+  tentVisits: TentVisit[];
+};
 
 export default function AttendancePage() {
-  const [attendances, setAttendances] = useState<
-    Pick<AttendanceDBType, "date" | "beer_count">[]
-  >([]);
+  const [attendances, setAttendances] = useState<AttendanceWithTentVisits[]>(
+    [],
+  );
   const { toast } = useToast();
 
   const fetchAttendanceData = useCallback(async () => {
     try {
       const data = await fetchAttendances();
-      setAttendances(data as Pick<AttendanceDBType, "date" | "beer_count">[]);
+      if (data) {
+        setAttendances(data as AttendanceWithTentVisits[]);
+      }
     } catch (error) {
       toast({
         variant: "destructive",
