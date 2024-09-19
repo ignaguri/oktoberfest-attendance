@@ -228,6 +228,7 @@ export type Database = {
           avatar_url: string | null
           full_name: string | null
           id: string
+          is_super_admin: boolean | null
           updated_at: string | null
           username: string | null
           website: string | null
@@ -236,6 +237,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id: string
+          is_super_admin?: boolean | null
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -244,6 +246,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id?: string
+          is_super_admin?: boolean | null
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -403,6 +406,10 @@ export type Database = {
           group_id: string
           user_id: string
         }
+        Returns: boolean
+      }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       join_group: {
