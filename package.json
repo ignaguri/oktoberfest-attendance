@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "sup:db:pull": "supabase db pull",
+    "sup:db:push": "supabase db push",
     "sup:db:reset": "supabase db reset",
     "sup:db:types": "supabase gen types typescript --local > lib/database.types.ts",
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
+    "sup:restart": "supabase stop && supabase start",
     "lint": "eslint ."
   },
   "dependencies": {

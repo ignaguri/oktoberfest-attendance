@@ -7,9 +7,11 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import clearCachesByServerAction from "@/utils/revalidate";
 import { redirect } from "next/navigation";
-import { setCache, getCache, deleteCache } from "@/lib/cache"; // Import cache functions
+import { setCache, getCache, deleteCache } from "@/lib/cache";
 
 import type { User } from "@supabase/supabase-js";
+
+import "server-only";
 
 const NO_ROWS_ERROR = "PGRST116";
 
