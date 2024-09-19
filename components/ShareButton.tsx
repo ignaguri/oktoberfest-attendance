@@ -1,25 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import useMediaQuery from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Share2 } from "lucide-react";
 import { renewGroupToken } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -44,7 +27,6 @@ export default function ShareButton({
   const [groupLink, setGroupLink] = useState("");
   const [tokenGenerated, setTokenGenerated] = useState(false);
   const { toast } = useToast();
-  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -110,42 +92,21 @@ export default function ShareButton({
     </div>
   );
 
-  if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="yellow">
-            <Share2 size={ICON_SIZE} />
-            {withText && <span className="ml-2">{title}</span>}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <ButtonsGroup />
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={setOpen}
+      title={title}
+      description={description}
+      trigger={
         <Button variant="yellow" className="flex items-center">
           <Share2 size={ICON_SIZE} />
           {withText && <span className="ml-2">{title}</span>}
         </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{description}</DrawerDescription>
-        </DrawerHeader>
-        <ButtonsGroup />
-        <DrawerFooter className="pt-2"></DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+      }
+      className="sm:max-w-[425px]" // Pass className here
+    >
+      <ButtonsGroup />
+    </ResponsiveDialog>
   );
 }

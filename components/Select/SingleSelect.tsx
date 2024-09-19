@@ -16,6 +16,7 @@ interface SingleSelectProps
   onSelect?: (option: Option) => void;
   onUnselect?: () => void;
   value?: string | null;
+  closeOnSelect?: boolean;
 }
 
 export function SingleSelect({
@@ -28,8 +29,10 @@ export function SingleSelect({
   onSelect,
   onUnselect,
   value,
+  closeOnSelect = true,
 }: SingleSelectProps) {
   const [selected, setSelected] = useState<Option | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (value) {
@@ -52,6 +55,7 @@ export function SingleSelect({
       setSelected(option);
       onSelect?.(option);
     }
+    if (closeOnSelect) setOpen(false);
   };
 
   return (
@@ -68,6 +72,8 @@ export function SingleSelect({
       renderTrigger={(value) =>
         (value as Option)?.label || placeholder || "Select option"
       }
+      open={open}
+      setOpen={setOpen}
     />
   );
 }

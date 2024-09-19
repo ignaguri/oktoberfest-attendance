@@ -41,6 +41,8 @@ export interface SelectBaseProps {
   renderValue: (value: Option | Option[]) => React.ReactNode;
   renderTrigger: (value: Option | Option[]) => React.ReactNode;
   disabled?: boolean;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }
 
 export function SelectBase({
@@ -53,9 +55,9 @@ export function SelectBase({
   renderValue,
   renderTrigger,
   disabled = false,
+  open,
+  setOpen,
 }: SelectBaseProps) {
-  const [open, setOpen] = React.useState(false);
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
