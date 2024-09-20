@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Tables } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
 import { add } from "date-fns/add";
+import { format } from "date-fns";
 import { isWithinInterval } from "date-fns/isWithinInterval";
 
 const DAY_AFTER_WIESN = add(new Date(END_OF_WIESN), { days: 1 });
@@ -42,22 +43,23 @@ type AttendanceData = Tables<"attendances"> & {
 
 interface DetailedAttendanceFormProps {
   onAttendanceUpdate: () => void;
+  selectedDate: Date | null;
 }
 
 export default function DetailedAttendanceForm({
   onAttendanceUpdate,
+  selectedDate,
 }: DetailedAttendanceFormProps) {
   const [existingAttendance, setExistingAttendance] =
     useState<AttendanceData | null>(null);
-  const today = useMemo(() => new Date(), []);
   const initialDate = useMemo(() => {
-    return isWithinInterval(today, {
+    return isWithinInterval(new Date(), {
       start: BEGINNING_OF_WIESN,
       end: END_OF_WIESN,
     })
-      ? today
+      ? new Date()
       : BEGINNING_OF_WIESN;
-  }, [today]);
+  }, []);
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const { toast } = useToast();
 
@@ -65,6 +67,10 @@ export default function DetailedAttendanceForm({
     async (date: Date) => {
       try {
         const attendanceData = await fetchAttendanceByDate(date);
+        console.log(
+          `fetched attendance for ${format(date, "dd.MM.yyyy")}`,
+          attendanceData,
+        );
         setExistingAttendance(attendanceData as AttendanceData);
       } catch (error) {
         toast({
@@ -80,6 +86,12 @@ export default function DetailedAttendanceForm({
   useEffect(() => {
     fetchAttendanceForDate(currentDate);
   }, [fetchAttendanceForDate, currentDate]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      setCurrentDate(selectedDate);
+    }
+  }, [selectedDate]);
 
   const handleSubmit = async (
     values: { amount: number; date: Date; tents: string[] },

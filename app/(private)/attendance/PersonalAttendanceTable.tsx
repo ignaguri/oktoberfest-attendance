@@ -9,9 +9,13 @@ import { Button } from "@/components/ui/button";
 
 interface PersonalAttendanceTableProps {
   data?: AttendanceWithTentVisits[];
+  onDateSelect: (date: Date) => void;
 }
 
-const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
+const PersonalAttendanceTable = ({
+  data,
+  onDateSelect,
+}: PersonalAttendanceTableProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState<string | null>(
     null,
@@ -26,9 +30,14 @@ const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
     return <LoadingSpinner />;
   }
 
+  const handleRowClick = (date: Date) => {
+    onDateSelect(date);
+  };
+
   const handleTentClick = (attendance: string) => {
     setSelectedAttendance(attendance);
     setDialogOpen(true);
+    onDateSelect(new Date(attendance));
   };
 
   return (
@@ -49,18 +58,22 @@ const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {data.map(({ date, beer_count, tentVisits }) => (
-            <tr key={date.toString()}>
-              <td className="px-6 py-4 whitespace-nowrap">
+            <tr
+              key={date.toString()}
+              onClick={() => handleRowClick(new Date(date))}
+            >
+              <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                 {formatDate(date, "dd/MM/yyyy")}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {`${beer_count ? "🍺".repeat(beer_count) : ""}`}
               </td>
-              <td
-                className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                onClick={() => handleTentClick(date)}
-              >
-                <Button variant="outline" className="flex items-center gap-1">
+              <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-1"
+                  onClick={() => handleTentClick(date)}
+                >
                   <span>{tentVisits.length}</span>
                   <Tent size={24} />
                 </Button>
@@ -76,16 +89,32 @@ const PersonalAttendanceTable = ({ data }: PersonalAttendanceTableProps) => {
         title="Visited Tents"
         description="Details of the tents you visited."
       >
-        {selectedAttendance && (
-          <ul>
-            {tentVisitsForDate?.map((tentVisit) => (
-              <li key={tentVisit.tent_id}>
-                Tent Name: {tentVisit.tent_id} - Check-in Hour:{" "}
-                {tentVisit.visit_date}
-              </li>
-            ))}
-          </ul>
-        )}
+        {selectedAttendance &&
+          (tentVisitsForDate?.length === 0 ? (
+            <div className="flex justify-center mb-4">
+              <p>No tents registered on this date.</p>
+            </div>
+          ) : (
+            <ul className="p-4 space-y-2">
+              {tentVisitsForDate?.map((tentVisit) => (
+                <li
+                  key={`${tentVisit.tent_id}-${tentVisit.visit_date}`}
+                  className="text-base text-gray-700"
+                >
+                  Tent:{" "}
+                  <span className="font-semibold">{tentVisit.tentName}</span>
+                  {tentVisit.visit_date ? (
+                    <>
+                      <span>- Check-in: </span>
+                      <span className="font-semibold">
+                        {formatDate(new Date(tentVisit.visit_date), "p")}
+                      </span>
+                    </>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ))}
       </ResponsiveDialog>
     </div>
   );

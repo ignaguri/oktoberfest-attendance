@@ -8,12 +8,17 @@ import { v4 as uuidv4 } from "uuid";
 import clearCachesByServerAction from "@/utils/revalidate";
 import { redirect } from "next/navigation";
 import { setCache, getCache, deleteCache } from "@/lib/cache";
+import { isSameDay } from "date-fns/isSameDay";
+import { TZDate } from "@date-fns/tz";
 
 import type { User } from "@supabase/supabase-js";
 
 import "server-only";
 
 const NO_ROWS_ERROR = "PGRST116";
+
+// Define the UTC+1 time zone (e.g., 'Europe/Berlin' for CET/CEST)
+const TIMEZONE = "Europe/Berlin";
 
 export async function getUser(): Promise<User> {
   const supabase = createClient();
@@ -285,6 +290,7 @@ async function fetchAttendancesFromDB(
   if (date) {
     query.eq("date", date.toISOString().split("T")[0]);
   }
+  query.order("date", { ascending: true });
   const { data, error } = await (single ? query.single() : query);
   if (error) {
     if (error.code === NO_ROWS_ERROR) {
@@ -325,7 +331,11 @@ export async function fetchAttendances() {
   const attendancesWithTentVisits = attendances.map((attendance) => ({
     ...attendance,
     tentVisits: tentVisits
-      .filter((tentVisit) => tentVisit.visit_date === attendance.date)
+      .filter(
+        (tentVisit) =>
+          tentVisit.visit_date &&
+          isSameDay(new Date(tentVisit.visit_date), new Date(attendance.date)),
+      )
       .map((tentVisit) => {
         const { tents, ...tentVisitWithoutTent } = tentVisit;
         return {
@@ -353,13 +363,18 @@ export async function fetchAttendanceByDate(date: Date) {
   const supabase = createClient();
   const { data: tentVisits, error: tentVisitsError } = await supabase
     .from("tent_visits")
-    .select("tent_id")
-    .eq("user_id", user.id)
-    .eq("visit_date", date.toISOString().split("T")[0]);
+    .select("tent_id, visit_date")
+    .eq("user_id", user.id);
 
   if (tentVisitsError) {
     throw new Error(`Error fetching tent visits: ${tentVisitsError.message}`);
   }
+
+  // Filter tent visits for the given date as the visit_date is a timestamptz in the db
+  // and casting visit_date::date didn't work
+  const tentVisitsForDate = tentVisits.filter((tentVisit) =>
+    isSameDay(new Date(tentVisit.visit_date || ""), date),
+  );
 
   const attendance = Array.isArray(attendanceData)
     ? attendanceData[0]
@@ -367,7 +382,7 @@ export async function fetchAttendanceByDate(date: Date) {
 
   const result = {
     ...attendance,
-    tent_ids: tentVisits.map((visit) => visit.tent_id),
+    tent_ids: tentVisitsForDate.map((visit) => visit.tent_id),
   };
   setCache(`attendanceByDate-${user.id}-${date.toISOString()}`, result);
   return result;
@@ -382,9 +397,13 @@ export async function addAttendance(formData: {
   const user = await getUser();
   const { amount, date, tents } = formData;
 
+  const dateWithTime = new TZDate(date, TIMEZONE);
+  const now = new TZDate(new Date(), TIMEZONE);
+  dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+
   const { error } = await supabase.rpc("add_or_update_attendance_with_tents", {
     p_user_id: user.id,
-    p_date: date.toISOString(),
+    p_date: dateWithTime.toISOString(),
     p_beer_count: amount,
     p_tent_ids: tents,
   });

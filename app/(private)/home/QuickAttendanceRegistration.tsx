@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -17,13 +17,12 @@ const QuickAttendanceRegistration = () => {
   const [currentTents, setCurrentTents] = useState<string[]>([]);
   const [currentTent, setCurrentTent] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const today = useMemo(() => new Date(), []);
 
   useEffect(() => {
     const loadAttendance = async () => {
       try {
         setIsSubmitting(true);
-        const attendance = await fetchAttendanceByDate(today);
+        const attendance = await fetchAttendanceByDate(new Date());
         if (attendance && attendance.beer_count && attendance.beer_count >= 0) {
           setBeerCount(attendance.beer_count);
           setAttendanceExists(true);
@@ -49,12 +48,12 @@ const QuickAttendanceRegistration = () => {
     };
 
     loadAttendance();
-  }, [today, toast]);
+  }, [toast]);
 
   const handleAddAttendance = async (tentId: string) => {
     try {
       setIsSubmitting(true);
-      await addAttendance({ amount: 0, date: today, tents: [tentId] });
+      await addAttendance({ amount: 0, date: new Date(), tents: [tentId] });
       setBeerCount(0);
       setAttendanceExists(true);
       setCurrentTents([tentId]);
@@ -87,7 +86,7 @@ const QuickAttendanceRegistration = () => {
       const updatedTents = [...currentTents, option.value];
       await addAttendance({
         amount: beerCount || 0,
-        date: today,
+        date: new Date(),
         tents: updatedTents,
       });
       setCurrentTents(updatedTents);
@@ -115,7 +114,7 @@ const QuickAttendanceRegistration = () => {
     try {
       await addAttendance({
         amount: newBeerCount,
-        date: today,
+        date: new Date(),
         tents: currentTents,
       });
       toast({
@@ -140,7 +139,7 @@ const QuickAttendanceRegistration = () => {
       try {
         await addAttendance({
           amount: newBeerCount,
-          date: today,
+          date: new Date(),
           tents: currentTents,
         });
         toast({
@@ -176,7 +175,10 @@ const QuickAttendanceRegistration = () => {
         <p>Are you at the Wiesn today?</p>
         <SingleSelect
           buttonClassName="w-fit self-center"
-          options={tents}
+          options={tents.map((tent) => ({
+            title: tent.category,
+            options: tent.options,
+          }))}
           placeholder="Select your current tent"
           onSelect={(option) => handleAddAttendance(option.value)}
         />
@@ -190,7 +192,10 @@ const QuickAttendanceRegistration = () => {
         <span>You are at:</span>
         <SingleSelect
           buttonClassName="w-fit self-center"
-          options={tents}
+          options={tents.map((tent) => ({
+            title: tent.category,
+            options: tent.options,
+          }))}
           placeholder="Select your current tent"
           onSelect={handleChangeTent}
           value={currentTent}

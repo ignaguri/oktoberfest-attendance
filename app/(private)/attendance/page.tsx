@@ -19,6 +19,7 @@ export default function AttendancePage() {
   const [attendances, setAttendances] = useState<AttendanceWithTentVisits[]>(
     [],
   );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const fetchAttendanceData = useCallback(async () => {
@@ -44,10 +45,20 @@ export default function AttendancePage() {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
 
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
+
   return (
     <div className="w-full max-w-lg flex flex-col gap-6">
-      <DetailedAttendanceForm onAttendanceUpdate={handleAttendanceUpdate} />
-      <PersonalAttendanceTable data={attendances} />
+      <DetailedAttendanceForm
+        onAttendanceUpdate={handleAttendanceUpdate}
+        selectedDate={selectedDate}
+      />
+      <PersonalAttendanceTable
+        data={attendances}
+        onDateSelect={handleDateSelect}
+      />
     </div>
   );
 }

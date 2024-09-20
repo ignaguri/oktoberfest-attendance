@@ -273,19 +273,19 @@ export type Database = {
           id: string
           tent_id: string
           user_id: string
-          visit_date: string
+          visit_date: string | null
         }
         Insert: {
           id: string
           tent_id: string
           user_id: string
-          visit_date: string
+          visit_date?: string | null
         }
         Update: {
           id?: string
           tent_id?: string
           user_id?: string
-          visit_date?: string
+          visit_date?: string | null
         }
         Relationships: [
           {
