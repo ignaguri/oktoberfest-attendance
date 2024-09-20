@@ -415,7 +415,12 @@ export async function addAttendance(formData: {
   deleteCache(`attendance-${user.id}`);
   deleteCache(`attendances-${user.id}`);
   deleteCache(`attendanceByDate-${user.id}-${date.toISOString()}`);
+  deleteCache(`highlights-${user.id}`);
+  deleteCache(`topPositions-${user.id}`);
+  deleteCache(`totalBeers-${user.id}`);
+  deleteCache(`daysAttended-${user.id}`);
   revalidatePath("/attendance");
+  revalidatePath("/home");
 }
 
 export async function fetchTents() {
