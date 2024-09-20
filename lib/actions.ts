@@ -248,7 +248,12 @@ export async function getMissingProfileFields() {
 }
 
 export async function getUserAndAvatarUrl() {
-  const user = await getUser();
+  let user;
+  try {
+    user = await getUser();
+  } catch (error) {
+    return { user: null, avatarUrl: null };
+  }
   const cachedData = getCache<{ user: User; avatarUrl: string | null }>(
     `userAndAvatarUrl-${user.id}`,
   );
