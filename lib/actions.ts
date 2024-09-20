@@ -7,11 +7,18 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import clearCachesByServerAction from "@/utils/revalidate";
 import { redirect } from "next/navigation";
-import { setCache, getCache, deleteCache } from "@/lib/cache"; // Import cache functions
+import { setCache, getCache, deleteCache } from "@/lib/cache";
+import { isSameDay } from "date-fns/isSameDay";
+import { TZDate } from "@date-fns/tz";
 
 import type { User } from "@supabase/supabase-js";
 
+import "server-only";
+
 const NO_ROWS_ERROR = "PGRST116";
+
+// Define the UTC+1 time zone (e.g., 'Europe/Berlin' for CET/CEST)
+const TIMEZONE = "Europe/Berlin";
 
 export async function getUser(): Promise<User> {
   const supabase = createClient();
@@ -205,8 +212,13 @@ export async function uploadAvatar(formData: FormData) {
 }
 
 export async function getProfileShort() {
-  const supabase = createClient();
   const user = await getUser();
+  const cachedProfile = getCache<Tables<"profiles">>(`profileShort-${user.id}`);
+  if (cachedProfile) {
+    return cachedProfile;
+  }
+
+  const supabase = createClient();
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
     .select(`full_name, username, avatar_url`)
@@ -215,27 +227,46 @@ export async function getProfileShort() {
   if (!profileData || profileError) {
     throw new Error("Error fetching profile");
   }
+  setCache(`profileShort-${user.id}`, profileData);
   return profileData;
 }
 
 export async function getMissingProfileFields() {
+  const user = await getUser();
+  const cachedMissingFields = getCache<{
+    fullName: boolean;
+    username: boolean;
+    avatarUrl: boolean;
+  }>(`missingProfileFields-${user.id}`);
+  if (cachedMissingFields) {
+    return cachedMissingFields;
+  }
+
   const profileData = await getProfileShort();
   let missingFields = {
     fullName: !profileData.full_name,
     username: !profileData.username,
     avatarUrl: !profileData.avatar_url,
   };
+  setCache(`missingProfileFields-${user.id}`, missingFields);
   return missingFields;
 }
 
 export async function getUserAndAvatarUrl() {
-  const supabase = createClient();
   let user;
   try {
     user = await getUser();
   } catch (error) {
     return { user: null, avatarUrl: null };
   }
+  const cachedData = getCache<{ user: User; avatarUrl: string | null }>(
+    `userAndAvatarUrl-${user.id}`,
+  );
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const supabase = createClient();
   const { data, error } = await supabase
     .from("profiles")
     .select(`avatar_url`)
@@ -244,7 +275,9 @@ export async function getUserAndAvatarUrl() {
   if (error) {
     throw error;
   }
-  return { user, avatarUrl: data.avatar_url };
+  const result = { user, avatarUrl: data.avatar_url };
+  setCache(`userAndAvatarUrl-${user.id}`, result);
+  return result;
 }
 
 async function fetchAttendancesFromDB(
@@ -257,6 +290,7 @@ async function fetchAttendancesFromDB(
   if (date) {
     query.eq("date", date.toISOString().split("T")[0]);
   }
+  query.order("date", { ascending: true });
   const { data, error } = await (single ? query.single() : query);
   if (error) {
     if (error.code === NO_ROWS_ERROR) {
@@ -269,37 +303,89 @@ async function fetchAttendancesFromDB(
 
 export async function fetchAttendances() {
   const user = await getUser();
-  const data = await fetchAttendancesFromDB(user.id);
-  if (!data) {
+  const cachedAttendances = getCache<any[]>(`attendances-${user.id}`);
+  if (cachedAttendances) {
+    return cachedAttendances;
+  }
+
+  const attendanceData = await fetchAttendancesFromDB(user.id);
+
+  if (!attendanceData) {
     return null;
   }
-  return Array.isArray(data) ? data : [data];
-}
-
-export async function fetchAttendanceByDate(date: Date) {
-  const user = await getUser();
-  const attendanceData = await fetchAttendancesFromDB(user.id, date, true);
 
   const supabase = createClient();
   const { data: tentVisits, error: tentVisitsError } = await supabase
     .from("tent_visits")
-    .select("tent_id")
-    .eq("user_id", user.id)
-    .eq("visit_date", date.toISOString().split("T")[0]);
+    .select("tent_id, visit_date, tents(name)")
+    .eq("user_id", user.id);
 
   if (tentVisitsError) {
     throw new Error(`Error fetching tent visits: ${tentVisitsError.message}`);
   }
 
+  const attendances = Array.isArray(attendanceData)
+    ? attendanceData
+    : [attendanceData];
+
+  const attendancesWithTentVisits = attendances.map((attendance) => ({
+    ...attendance,
+    tentVisits: tentVisits
+      .filter(
+        (tentVisit) =>
+          tentVisit.visit_date &&
+          isSameDay(new Date(tentVisit.visit_date), new Date(attendance.date)),
+      )
+      .map((tentVisit) => {
+        const { tents, ...tentVisitWithoutTent } = tentVisit;
+        return {
+          ...tentVisitWithoutTent,
+          tentName: tents?.name,
+        };
+      }),
+  }));
+
+  setCache(`attendances-${user.id}`, attendancesWithTentVisits);
+  return attendancesWithTentVisits;
+}
+
+export async function fetchAttendanceByDate(date: Date) {
+  const user = await getUser();
+  const cachedAttendance = getCache<any>(
+    `attendanceByDate-${user.id}-${date.toISOString()}`,
+  );
+  if (cachedAttendance) {
+    return cachedAttendance;
+  }
+
+  const attendanceData = await fetchAttendancesFromDB(user.id, date, true);
+
+  const supabase = createClient();
+  const { data: tentVisits, error: tentVisitsError } = await supabase
+    .from("tent_visits")
+    .select("tent_id, visit_date")
+    .eq("user_id", user.id);
+
+  if (tentVisitsError) {
+    throw new Error(`Error fetching tent visits: ${tentVisitsError.message}`);
+  }
+
+  // Filter tent visits for the given date as the visit_date is a timestamptz in the db
+  // and casting visit_date::date didn't work
+  const tentVisitsForDate = tentVisits.filter((tentVisit) =>
+    isSameDay(new Date(tentVisit.visit_date || ""), date),
+  );
+
   const attendance = Array.isArray(attendanceData)
     ? attendanceData[0]
     : attendanceData;
 
-  return {
+  const result = {
     ...attendance,
-    tent_visits: tentVisits,
-    tent_ids: tentVisits.map((visit) => visit.tent_id),
+    tent_ids: tentVisitsForDate.map((visit) => visit.tent_id),
   };
+  setCache(`attendanceByDate-${user.id}-${date.toISOString()}`, result);
+  return result;
 }
 
 export async function addAttendance(formData: {
@@ -311,9 +397,13 @@ export async function addAttendance(formData: {
   const user = await getUser();
   const { amount, date, tents } = formData;
 
+  const dateWithTime = new TZDate(date, TIMEZONE);
+  const now = new TZDate(new Date(), TIMEZONE);
+  dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+
   const { error } = await supabase.rpc("add_or_update_attendance_with_tents", {
     p_user_id: user.id,
-    p_date: date.toISOString(),
+    p_date: dateWithTime.toISOString(),
     p_beer_count: amount,
     p_tent_ids: tents,
   });
@@ -323,13 +413,20 @@ export async function addAttendance(formData: {
   }
 
   deleteCache(`attendance-${user.id}`);
+  deleteCache(`attendances-${user.id}`);
+  deleteCache(`attendanceByDate-${user.id}-${date.toISOString()}`);
+  deleteCache(`highlights-${user.id}`);
+  deleteCache(`topPositions-${user.id}`);
+  deleteCache(`totalBeers-${user.id}`);
+  deleteCache(`daysAttended-${user.id}`);
   revalidatePath("/attendance");
+  revalidatePath("/home");
 }
 
 export async function fetchTents() {
   const user = await getUser();
   const cachedTents = getCache<Tables<"tents">[]>(`tents-${user.id}`);
-  if (cachedTents) {
+  if (cachedTents && cachedTents.length > 0) {
     return cachedTents;
   }
 
@@ -386,6 +483,7 @@ export async function createGroup(formData: {
   if (data) {
     revalidatePath("/groups");
     deleteCache(`group-${user.id}-${data.group_id}`);
+    deleteCache(`groups-${user.id}`);
     return data.group_id;
   }
 }
@@ -410,6 +508,7 @@ export async function joinGroup(formData: {
 
   // Invalidate cached groups data
   deleteCache(`group-${user.id}-${groupId}`);
+  deleteCache(`groups-${user.id}`);
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
   return groupId;
@@ -430,6 +529,7 @@ export async function joinGroupWithToken(formData: { token: string }) {
 
   // Invalidate cached groups data
   deleteCache(`group-${user.id}-${groupId}`);
+  deleteCache(`groups-${user.id}`);
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
 
@@ -472,6 +572,8 @@ export async function updateGroup(
   clearCachesByServerAction(`/groups/${groupId}`);
   clearCachesByServerAction(`/group-settings/${groupId}`);
   deleteCache(`group-${user.id}-${groupId}`);
+  deleteCache(`groupDetails-${user.id}-${groupId}`);
+  deleteCache(`groupAndMembership-${user.id}-${groupId}`);
   return true;
 }
 
@@ -570,6 +672,7 @@ export async function removeMember(groupId: string, userId: string) {
   }
   clearCachesByServerAction(`/groups/${groupId}`);
   deleteCache(`groupMembers-${userId}-${groupId}`);
+  deleteCache(`groups-${userId}`);
   return true;
 }
 
@@ -733,12 +836,21 @@ export async function fetchLeaderboard(groupId: string) {
 }
 
 export async function fetchHighlights() {
+  const user = await getUser();
+  const cachedHighlights = getCache<{
+    topPositions: any[];
+    totalBeers: number;
+    daysAttended: number;
+  }>(`highlights-${user.id}`);
+  if (cachedHighlights) {
+    return cachedHighlights;
+  }
+
   const supabase = createClient();
   type TopPosition = {
     group_id: string;
     group_name: string;
   };
-  const user = await getUser();
   const { data, error } = await supabase.rpc("get_user_stats", {
     input_user_id: user.id,
   });
@@ -749,9 +861,11 @@ export async function fetchHighlights() {
     return { topPositions: [], totalBeers: 0, daysAttended: 0 };
   }
   const firstItem = data[0];
-  return {
+  const result = {
     topPositions: (firstItem.top_positions as unknown as TopPosition[]) || [],
     totalBeers: firstItem.total_beers || 0,
     daysAttended: firstItem.days_attended || 0,
   };
+  setCache(`highlights-${user.id}`, result);
+  return result;
 }

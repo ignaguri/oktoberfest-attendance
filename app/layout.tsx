@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { PROD_URL } from "@/lib/constants";
+import Footer from "@/components/Footer";
+import { getUser } from "@/lib/actions";
 
 // do not cache this layout
 export const revalidate = 0;
@@ -58,21 +60,33 @@ export const viewport = {
   width: "device-width",
 };
 
+async function checkUser() {
+  try {
+    await getUser();
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const isLoggedIn = await checkUser();
+
   return (
     <html lang="en">
-      <body>
-        <div className="flex min-h-screen flex-col items-center justify-center">
+      <body className="bg-slate-50">
+        <div className="flex min-h-screen flex-col items-center justify-center pb-2">
           <Navbar />
           <OfflineBanner />
-          <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 pb-6 text-center sm:px-20 sm:justify-start bg-slate-50">
+          <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:px-20 sm:justify-start">
             <Breadcrumbs />
             {children}
           </main>
+          <Footer isLoggedIn={isLoggedIn} />
         </div>
         <Toaster />
       </body>

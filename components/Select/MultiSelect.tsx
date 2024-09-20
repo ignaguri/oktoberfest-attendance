@@ -18,6 +18,7 @@ interface MultiSelectProps
   onSelect?: (option: Option) => void;
   onUnselect?: (option: Option) => void;
   value: Option["value"][];
+  closeOnSelect?: boolean;
 }
 
 export function MultiSelect({
@@ -30,8 +31,10 @@ export function MultiSelect({
   onSelect,
   onUnselect,
   value,
+  closeOnSelect = false,
 }: MultiSelectProps) {
   const [selected, setSelected] = useState<Option[]>([]);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const selectedOptions = options
@@ -48,6 +51,7 @@ export function MultiSelect({
       setSelected((prev) => [...prev, option]);
       onSelect?.(option);
     }
+    if (closeOnSelect) setOpen(false);
   };
 
   const handleUnselect = (option: Option) => {
@@ -65,6 +69,8 @@ export function MultiSelect({
       value={selected}
       disabled={disabled}
       onSelect={handleSelect}
+      open={open}
+      setOpen={setOpen}
       renderValue={(value) => (
         <div className="mt-2 flex flex-wrap gap-1">
           {(value as Option[]).map((item) => (

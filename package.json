@@ -1,19 +1,23 @@
 {
   "name": "oktoberfest-attendance",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "sup:db:pull": "supabase db pull",
+    "sup:db:push": "supabase db push",
     "sup:db:reset": "supabase db reset",
     "sup:db:types": "supabase gen types typescript --local > lib/database.types.ts",
+    "sup:mig:new": "supabase migration new",
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
+    "sup:restart": "supabase stop && supabase start",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@date-fns/tz": "^1.0.2",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -22,6 +26,7 @@
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@supabase/auth-ui-react": "0.4.7",
     "@supabase/auth-ui-shared": "0.1.8",

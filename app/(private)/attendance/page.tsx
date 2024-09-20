@@ -7,18 +7,27 @@ import { fetchAttendances } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/lib/database.types";
 
-type AttendanceDBType = Tables<"attendances">;
+type TentVisit = Tables<"tent_visits"> & {
+  tentName: string | undefined;
+};
+
+export type AttendanceWithTentVisits = Tables<"attendances"> & {
+  tentVisits: TentVisit[];
+};
 
 export default function AttendancePage() {
-  const [attendances, setAttendances] = useState<
-    Pick<AttendanceDBType, "date" | "beer_count">[]
-  >([]);
+  const [attendances, setAttendances] = useState<AttendanceWithTentVisits[]>(
+    [],
+  );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const fetchAttendanceData = useCallback(async () => {
     try {
       const data = await fetchAttendances();
-      setAttendances(data as Pick<AttendanceDBType, "date" | "beer_count">[]);
+      if (data) {
+        setAttendances(data as AttendanceWithTentVisits[]);
+      }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -36,10 +45,20 @@ export default function AttendancePage() {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
 
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
+
   return (
     <div className="w-full max-w-lg flex flex-col gap-6">
-      <DetailedAttendanceForm onAttendanceUpdate={handleAttendanceUpdate} />
-      <PersonalAttendanceTable data={attendances} />
+      <DetailedAttendanceForm
+        onAttendanceUpdate={handleAttendanceUpdate}
+        selectedDate={selectedDate}
+      />
+      <PersonalAttendanceTable
+        data={attendances}
+        onDateSelect={handleDateSelect}
+      />
     </div>
   );
 }
