@@ -13,3 +13,6 @@ export const COST_PER_BEER = 15.5;
 
 export const PROD_URL = "https://prostcounter.fun";
 export const DEV_URL = "http://localhost:3000";
+
+export const GA_ID = "G-HL3ZYBCMN2";
+export const IS_PROD = process.env.NODE_ENV === "production";

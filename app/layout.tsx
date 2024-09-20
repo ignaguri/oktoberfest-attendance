@@ -1,11 +1,12 @@
-import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 import "@/styles/globals.css";
 import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
+import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import { OfflineBanner } from "@/components/OfflineBanner";
-import { PROD_URL } from "@/lib/constants";
+import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import Footer from "@/components/Footer";
 import { getUser } from "@/lib/actions";
 
@@ -90,6 +91,7 @@ export default async function RootLayout({
         </div>
         <Toaster />
       </body>
+      {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
     </html>
   );
 }
