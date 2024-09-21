@@ -6,13 +6,14 @@ const withPWA = require("next-pwa")({
   buildExcludes: [/middleware-manifest\.json$/], // Exclude middleware manifest if needed
   runtimeCaching: [
     {
-      urlPattern: /^https:\/\/oktoberfest-attendance\.vercel\.app\/.*$/, // Adjust to your API
+      urlPattern: /^https?:\/\/(?:www\.)?prostcounter\.fun\/.*$/,
       handler: "NetworkFirst",
       options: {
         cacheName: "api-cache",
+        networkTimeoutSeconds: 10,
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 60 * 60 * 24, // 1 day
+          maxAgeSeconds: 60 * 5, // 5 minutes
         },
       },
     },
@@ -28,7 +29,7 @@ const withPWA = require("next-pwa")({
       },
     },
     {
-      urlPattern: /^\/.*$/, // Cache all pages
+      urlPattern: /^\/.*$/,
       handler: "NetworkFirst",
       options: {
         cacheName: "pages-cache",

@@ -153,6 +153,7 @@ export async function updateProfile({
   // Invalidate cached user data
   deleteCache(`user-${id}`);
   revalidatePath("/profile");
+  revalidatePath("/home");
 }
 
 export async function getAvatarId(userId: string) {
@@ -208,6 +209,8 @@ export async function uploadAvatar(formData: FormData) {
     throw new Error("Error updating user profile");
   }
   revalidatePath("/profile");
+  revalidatePath("/home");
+  revalidatePath("/", "layout");
   return fileName;
 }
 
@@ -482,6 +485,8 @@ export async function createGroup(formData: {
   }
   if (data) {
     revalidatePath("/groups");
+    revalidatePath(`/groups/${data.group_id}`);
+    revalidatePath("/home");
     deleteCache(`group-${user.id}-${data.group_id}`);
     deleteCache(`groups-${user.id}`);
     return data.group_id;
@@ -511,6 +516,7 @@ export async function joinGroup(formData: {
   deleteCache(`groups-${user.id}`);
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
+  revalidatePath("/home");
   return groupId;
 }
 
@@ -532,7 +538,7 @@ export async function joinGroupWithToken(formData: { token: string }) {
   deleteCache(`groups-${user.id}`);
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
-
+  revalidatePath("/home");
   return groupId;
 }
 
@@ -569,8 +575,10 @@ export async function updateGroup(
     throw error;
   }
   const user = await getUser();
-  clearCachesByServerAction(`/groups/${groupId}`);
-  clearCachesByServerAction(`/group-settings/${groupId}`);
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/group-settings/${groupId}`);
+  revalidatePath("/groups");
+  revalidatePath("/home");
   deleteCache(`group-${user.id}-${groupId}`);
   deleteCache(`groupDetails-${user.id}-${groupId}`);
   deleteCache(`groupAndMembership-${user.id}-${groupId}`);
@@ -670,7 +678,10 @@ export async function removeMember(groupId: string, userId: string) {
   if (error) {
     throw error;
   }
-  clearCachesByServerAction(`/groups/${groupId}`);
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/group-settings/${groupId}`);
+  revalidatePath("/groups");
+  revalidatePath("/home");
   deleteCache(`groupMembers-${userId}-${groupId}`);
   deleteCache(`groups-${userId}`);
   return true;
