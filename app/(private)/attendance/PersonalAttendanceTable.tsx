@@ -95,25 +95,26 @@ const PersonalAttendanceTable = ({
               <p>No tents registered on this date.</p>
             </div>
           ) : (
-            <ul className="p-4 space-y-2">
-              {tentVisitsForDate?.map((tentVisit) => (
-                <li
-                  key={`${tentVisit.tent_id}-${tentVisit.visit_date}`}
-                  className="text-base text-gray-700"
-                >
-                  Tent:{" "}
-                  <span className="font-semibold">{tentVisit.tentName}</span>
-                  {tentVisit.visit_date ? (
-                    <>
-                      <span>- Check-in: </span>
-                      <span className="font-semibold">
-                        {formatDate(new Date(tentVisit.visit_date), "p")}
-                      </span>
-                    </>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+            <div className="p-4 mb-8">
+              <ul className="space-y-2">
+                {tentVisitsForDate?.map((tentVisit) => (
+                  <li
+                    key={`${tentVisit.tent_id}-${tentVisit.visit_date}`}
+                    className="text-base text-gray-700 list-disc list-inside"
+                  >
+                    <span className="font-semibold">{tentVisit.tentName}</span>
+                    {tentVisit.visit_date ? (
+                      <>
+                        <span> - Check-in: </span>
+                        <span className="font-semibold">
+                          {formatDate(new Date(tentVisit.visit_date), "p")}
+                        </span>
+                      </>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
       </ResponsiveDialog>
     </div>
