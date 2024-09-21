@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Tables } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
 import { add } from "date-fns/add";
-import { format } from "date-fns";
 import { isWithinInterval } from "date-fns/isWithinInterval";
 
 const DAY_AFTER_WIESN = add(new Date(END_OF_WIESN), { days: 1 });
@@ -67,10 +66,6 @@ export default function DetailedAttendanceForm({
     async (date: Date) => {
       try {
         const attendanceData = await fetchAttendanceByDate(date);
-        console.log(
-          `fetched attendance for ${format(date, "dd.MM.yyyy")}`,
-          attendanceData,
-        );
         setExistingAttendance(attendanceData as AttendanceData);
       } catch (error) {
         toast({
