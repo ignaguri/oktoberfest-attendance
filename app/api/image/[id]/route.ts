@@ -25,7 +25,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const id = params.id;
+  const id = decodeURIComponent(params.id);
 
   // Check if the image is cached
   const cachedImage = imageCache.get<Buffer>(id);
@@ -39,9 +39,7 @@ export async function GET(
   try {
     const supabase = createClient();
 
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .download(`${id}`);
+    const { data, error } = await supabase.storage.from("avatars").download(id);
 
     if (error) {
       throw error;

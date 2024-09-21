@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { Tables } from "@/lib/database.types";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
-import clearCachesByServerAction from "@/utils/revalidate";
 import { redirect } from "next/navigation";
 import { setCache, getCache, deleteCache } from "@/lib/cache";
 import { isSameDay } from "date-fns/isSameDay";
@@ -660,7 +659,7 @@ export async function fetchGroupAndMembership(groupId: string) {
     .eq("group_id", groupId)
     .eq("user_id", user.id)
     .single();
-  if (membershipError && membershipError.code !== "PGRST116") {
+  if (membershipError && membershipError.code !== NO_ROWS_ERROR) {
     throw new Error("Error checking membership: " + membershipError.message);
   }
 

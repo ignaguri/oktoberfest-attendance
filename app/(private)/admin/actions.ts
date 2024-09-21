@@ -1,8 +1,9 @@
 "use server";
 
 import { v4 as uuidv4 } from "uuid";
-import { createClient } from "@/utils/supabase/server";
+import sharp from "sharp";
 import { revalidatePath } from "next/cache";
+import { createClient } from "@/utils/supabase/server";
 import { getCacheKeys, deleteCache, clearAllCaches } from "@/lib/cache";
 import { Tables } from "@/lib/database.types";
 
@@ -202,4 +203,84 @@ export async function deleteCacheKey(key: string) {
 export async function deleteAllCaches() {
   clearAllCaches(); // Clear all caches
   revalidatePath("/admin"); // Revalidate the admin page
+}
+
+export async function listNonWebPImages() {
+  const supabase = createClient(true);
+  const { data, error } = await supabase.storage.from("avatars").list();
+
+  if (error) throw new Error("Error listing images: " + error.message);
+
+  const nonWebPImages = data
+    .filter((file) => !file.name.endsWith(".webp"))
+    .map((file) => ({
+      path: file.name,
+      url: `/api/image/${encodeURIComponent(file.name)}`,
+    }));
+
+  return nonWebPImages;
+}
+
+export async function convertAndUpdateImage(path: string) {
+  const supabase = createClient(true);
+
+  // Download the image
+  const { data, error } = await supabase.storage.from("avatars").download(path);
+  if (error) throw new Error("Error downloading image: " + error.message);
+
+  // Convert to WebP
+  const webpBuffer = await convertToWebP(await data.arrayBuffer());
+
+  // Upload the converted image
+  const fileName = `${path.split(".")[0]}.webp`;
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(fileName, webpBuffer, {
+      contentType: "image/webp",
+      cacheControl: "3600",
+      upsert: true,
+    });
+
+  if (uploadError)
+    throw new Error("Error uploading converted image: " + uploadError.message);
+
+  console.log("Converted image to WebP and uploaded to: ", fileName);
+
+  // Update the profile
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ avatar_url: fileName })
+    .eq("avatar_url", path);
+
+  if (updateError)
+    throw new Error("Error updating profile: " + updateError.message);
+
+  console.log("updated profile");
+
+  // Delete the old image
+  await deleteImage(path);
+  console.log("deleted old image", path);
+
+  revalidatePath("/admin");
+  return fileName;
+}
+
+async function convertToWebP(imageBuffer: ArrayBuffer): Promise<Buffer> {
+  try {
+    const webpBuffer = await sharp(Buffer.from(imageBuffer))
+      .rotate()
+      .resize({ width: 800, height: 800, fit: "inside" })
+      .webp({ quality: 80 })
+      .toBuffer();
+    return webpBuffer;
+  } catch (error) {
+    throw new Error("Error converting image to WebP");
+  }
+}
+
+async function deleteImage(path: string) {
+  const supabase = createClient(true);
+  const { error } = await supabase.storage.from("avatars").remove([path]);
+  if (error) throw new Error("Error deleting image: " + error.message);
+  revalidatePath("/admin");
 }
