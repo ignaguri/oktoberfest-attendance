@@ -14,6 +14,7 @@ interface MultiSelectProps
     | "searchPlaceholder"
     | "emptyMessage"
     | "disabled"
+    | "id"
   > {
   onSelect?: (option: Option) => void;
   onUnselect?: (option: Option) => void;
@@ -28,6 +29,7 @@ export function MultiSelect({
   searchPlaceholder,
   emptyMessage,
   disabled = false,
+  id,
   onSelect,
   onUnselect,
   value,
@@ -69,6 +71,7 @@ export function MultiSelect({
       value={selected}
       disabled={disabled}
       onSelect={handleSelect}
+      id={id}
       open={open}
       setOpen={setOpen}
       renderValue={(value) => (

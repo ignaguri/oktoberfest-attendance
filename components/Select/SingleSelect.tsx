@@ -13,6 +13,7 @@ interface SingleSelectProps
     | "emptyMessage"
     | "disabled"
   > {
+  id?: string;
   onSelect?: (option: Option) => void;
   onUnselect?: () => void;
   value?: string | null;
@@ -20,6 +21,7 @@ interface SingleSelectProps
 }
 
 export function SingleSelect({
+  id,
   buttonClassName,
   disabled,
   options,
@@ -60,6 +62,7 @@ export function SingleSelect({
 
   return (
     <SelectBase
+      id={id}
       buttonClassName={buttonClassName}
       options={options}
       disabled={disabled}

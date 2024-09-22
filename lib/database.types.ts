@@ -319,19 +319,19 @@ export type Database = {
           id: string
           tent_id: string
           user_id: string
-          visit_date: string
+          visit_date: string | null
         }
         Insert: {
           id: string
           tent_id: string
           user_id: string
-          visit_date: string
+          visit_date?: string | null
         }
         Update: {
           id?: string
           tent_id?: string
           user_id?: string
-          visit_date?: string
+          visit_date?: string | null
         }
         Relationships: [
           {
@@ -451,6 +451,21 @@ export type Database = {
           username: string
           full_name: string
           picture_data: Json
+        }[]
+      }
+      get_global_leaderboard: {
+        Args: {
+          p_winning_criteria_id: number
+        }
+        Returns: {
+          user_id: string
+          username: string
+          full_name: string
+          avatar_url: string
+          days_attended: number
+          total_beers: number
+          avg_beers: number
+          group_count: number
         }[]
       }
       get_user_groups: {
