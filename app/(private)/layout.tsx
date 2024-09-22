@@ -5,6 +5,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { getUser } from "@/lib/actions";
 import { WhatsNew } from "@/components/WhatsNew";
+import { VersionChecker } from "@/components/VersionChecker";
 
 async function AuthCheck() {
   try {
@@ -27,6 +28,7 @@ export default function PrivateLayout({
         <AuthCheck />
         {children}
         <WhatsNew />
+        <VersionChecker />
       </Suspense>
     </ErrorBoundary>
   );

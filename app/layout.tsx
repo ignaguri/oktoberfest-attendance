@@ -10,7 +10,6 @@ import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import Footer from "@/components/Footer";
 import { getUser } from "@/lib/actions";
 import { APP_VERSION } from "@/version";
-import { VersionChecker } from "@/components/VersionChecker";
 
 // do not cache this layout
 export const revalidate = 0;
@@ -91,7 +90,6 @@ export default async function RootLayout({
           </main>
           <Footer isLoggedIn={isLoggedIn} />
         </div>
-        <VersionChecker />
         <Toaster />
       </body>
       {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
