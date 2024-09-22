@@ -1,3 +1,4 @@
+import React from "react";
 import { Column } from "@tanstack/react-table";
 import { ChevronsUpDown, EyeOff, SortAsc, SortDesc } from "lucide-react";
 
@@ -11,10 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface DataTableColumnHeaderProps<TData, TValue>
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>;
-  title: string;
+  title: React.ReactNode;
+  className?: string;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -35,7 +36,7 @@ export function DataTableColumnHeader<TData, TValue>({
             size="sm"
             className="-ml-3 h-8 data-[state=open]:bg-accent"
           >
-            <span>{title}</span>
+            {title}
             {column.getIsSorted() === "desc" ? (
               <SortDesc className="ml-2 h-4 w-4" />
             ) : column.getIsSorted() === "asc" ? (

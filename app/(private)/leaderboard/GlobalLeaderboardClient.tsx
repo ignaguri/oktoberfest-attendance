@@ -9,9 +9,13 @@ import { Tables } from "@/lib/database.types";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { WinningCriteria } from "@/lib/types";
 
 export default function GlobalLeaderboardClient() {
   const [winningCriteriaId, setWinningCriteriaId] = useState<number>(1);
+  const [winningCriteria, setWinningCriteria] = useState<WinningCriteria>(
+    WinningCriteria.days_attended,
+  );
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
   const [winningCriterias, setWinningCriterias] = useState<
     Tables<"winning_criteria">[]
@@ -99,12 +103,24 @@ export default function GlobalLeaderboardClient() {
           id="winning-criteria-select"
           options={[{ title: "Winning Criteria", options: criteriaOptions }]}
           value={winningCriteriaId.toString()}
-          onSelect={(option) => setWinningCriteriaId(Number(option.value))}
+          onSelect={(option) => {
+            setWinningCriteriaId(Number(option.value));
+            const criteria = winningCriterias.find(
+              (c) => c.id === Number(option.value),
+            );
+            if (criteria) {
+              setWinningCriteria(criteria.name as WinningCriteria);
+            }
+          }}
           placeholder="Select winning criteria"
         />
       </div>
       {selectedCriteria && leaderboardData.length > 0 && (
-        <Leaderboard entries={leaderboardData} showGroupCount />
+        <Leaderboard
+          entries={leaderboardData}
+          showGroupCount
+          winningCriteria={winningCriteria}
+        />
       )}
     </div>
   );

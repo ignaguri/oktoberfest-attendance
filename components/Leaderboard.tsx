@@ -21,6 +21,8 @@ import {
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
 import Avatar from "./Avatar/Avatar";
 import { Views } from "@/lib/database-helpers.types";
+import { WinningCriteria } from "@/lib/types";
+import { Crown } from "lucide-react";
 
 type LeaderboardEntry = Views<"leaderboard"> & {
   group_count?: number;
@@ -41,9 +43,11 @@ const getDisplayName = ({
 
 export const Leaderboard = ({
   entries,
+  winningCriteria,
   showGroupCount = false,
 }: {
   entries: LeaderboardEntry[];
+  winningCriteria: WinningCriteria;
   showGroupCount?: boolean;
 }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -62,20 +66,50 @@ export const Leaderboard = ({
     {
       accessorKey: "days_attended",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Days" />
+        <DataTableColumnHeader
+          column={column}
+          title={
+            <div className="flex items-center gap-1">
+              {winningCriteria === "days_attended" && (
+                <Crown className="text-yellow-500" size={16} />
+              )}
+              <span>Days</span>
+            </div>
+          }
+        />
       ),
     },
     {
       accessorKey: "total_beers",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Liters" />
+        <DataTableColumnHeader
+          column={column}
+          title={
+            <div className="flex items-center gap-1">
+              {winningCriteria === "total_beers" && (
+                <Crown className="text-yellow-500" size={16} />
+              )}
+              <span>Liters</span>
+            </div>
+          }
+        />
       ),
       cell: ({ row }) => `${row.original.total_beers} 🍺`,
     },
     {
       accessorKey: "avg_beers",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Avg." />
+        <DataTableColumnHeader
+          column={column}
+          title={
+            <div className="flex items-center gap-1">
+              {winningCriteria === "avg_beers" && (
+                <Crown className="text-yellow-500" size={16} />
+              )}
+              <span>Avg.</span>
+            </div>
+          }
+        />
       ),
       cell: ({ row }) => row.original.avg_beers?.toFixed(2),
     },
