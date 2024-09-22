@@ -92,17 +92,18 @@ export default function GlobalLeaderboardClient() {
 
   return (
     <div>
-      <div className="mb-4 space-y-2">
+      <div className="mb-4 flex items-center justify-center gap-2">
         <Label
           htmlFor="winning-criteria-select"
           className="text-sm font-medium text-gray-700"
         >
-          Select Winning Criteria
+          Winning Criteria:
         </Label>
         <SingleSelect
           id="winning-criteria-select"
           options={[{ title: "Winning Criteria", options: criteriaOptions }]}
           value={winningCriteriaId.toString()}
+          buttonClassName="w-fit"
           onSelect={(option) => {
             setWinningCriteriaId(Number(option.value));
             const criteria = winningCriterias.find(

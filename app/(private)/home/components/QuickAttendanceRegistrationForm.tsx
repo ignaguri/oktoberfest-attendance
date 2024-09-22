@@ -114,7 +114,7 @@ export const QuickAttendanceRegistrationForm = ({
         <Form className="flex flex-col items-center gap-4">
           {!attendanceData && <p>Are you at the Wiesn today?</p>}
           <div className="flex items-center gap-2">
-            <span>{attendanceData ? "You are at:" : "Select your tent:"}</span>
+            <span>{attendanceData ? "You are at:" : "Which tent?"}</span>
             <Field name="tentId">
               {({ field }: { field: any }) => (
                 <SingleSelect
