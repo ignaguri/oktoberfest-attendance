@@ -1,4 +1,9 @@
 export const changelog: Record<string, string[]> = {
+  "0.2.2": [
+    // Changes omitted for brevity
+    // "Added Sentry",
+    "New Global leaderboard! 🥇",
+  ],
   "0.2.1": [
     // Changes omitted for brevity
     // "Added app version checking",
