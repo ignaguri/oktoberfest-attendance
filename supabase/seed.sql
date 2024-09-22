@@ -70,11 +70,12 @@ SELECT
 FROM profiles p;
 
 -- Insert groups with created_by set to one of the user IDs
-INSERT INTO groups (id, name, password, created_at, created_by)
+INSERT INTO groups (id, name, password, winning_criteria_id, created_at, created_by)
 SELECT
     uuid_generate_v4(),
     'Group ' || chr(65 + (ROW_NUMBER() OVER ())::int - 1),
     crypt('password' || chr(65 + (ROW_NUMBER() OVER ())::int - 1), gen_salt('bf')),
+    (SELECT id FROM winning_criteria ORDER BY RANDOM() LIMIT 1),
     current_timestamp,
     u.id
 FROM

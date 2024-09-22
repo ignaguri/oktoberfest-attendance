@@ -244,8 +244,6 @@ export async function convertAndUpdateImage(path: string) {
   if (uploadError)
     throw new Error("Error uploading converted image: " + uploadError.message);
 
-  console.log("Converted image to WebP and uploaded to: ", fileName);
-
   // Update the profile
   const { error: updateError } = await supabase
     .from("profiles")
@@ -255,11 +253,8 @@ export async function convertAndUpdateImage(path: string) {
   if (updateError)
     throw new Error("Error updating profile: " + updateError.message);
 
-  console.log("updated profile");
-
   // Delete the old image
   await deleteImage(path);
-  console.log("deleted old image", path);
 
   revalidatePath("/admin");
   return fileName;

@@ -4,7 +4,7 @@ import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { useMemo, useState } from "react";
 
 import type { AttendanceWithTentVisits } from "./page";
-import { Tent } from "lucide-react";
+import { Beer, Tent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PersonalAttendanceTableProps {
@@ -66,12 +66,17 @@ const PersonalAttendanceTable = ({
                 {formatDate(date, "dd/MM/yyyy")}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {`${beer_count ? "🍺".repeat(beer_count) : ""}`}
+                {beer_count && (
+                  <div className="flex items-center justify-center gap-1">
+                    <span>{beer_count}</span>
+                    <Beer size={24} />
+                  </div>
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                 <Button
                   variant="outline"
-                  className="flex items-center gap-1"
+                  className="flex items-center justify-center gap-1"
                   onClick={() => handleTentClick(date)}
                 >
                   <span>{tentVisits.length}</span>

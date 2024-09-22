@@ -4,6 +4,13 @@ import NodeCache from "node-cache";
 
 const imageCache = new NodeCache({ stdTTL: 86400 }); // Cache images for 24 hours
 
+type AllowedBucket = "avatars" | "beer_pictures";
+
+const ALLOWED_BUCKETS: Record<AllowedBucket, true> = {
+  avatars: true,
+  beer_pictures: true,
+};
+
 const getMimeType = (filename: string): string => {
   const ext = filename.split(".").pop()?.toLowerCase();
   switch (ext) {
@@ -26,9 +33,21 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const id = decodeURIComponent(params.id);
+  const { searchParams } = new URL(request.url);
+  const bucketParam = searchParams.get("bucket") || "avatars";
+
+  if (!ALLOWED_BUCKETS[bucketParam as AllowedBucket]) {
+    return NextResponse.json(
+      { error: "Invalid bucket specified" },
+      { status: 400 },
+    );
+  }
+
+  const bucket = bucketParam as AllowedBucket;
 
   // Check if the image is cached
-  const cachedImage = imageCache.get<Buffer>(id);
+  const cacheKey = `${bucket}:${id}`;
+  const cachedImage = imageCache.get<Buffer>(cacheKey);
   if (cachedImage) {
     return new NextResponse(cachedImage, {
       status: 200,
@@ -39,7 +58,7 @@ export async function GET(
   try {
     const supabase = createClient();
 
-    const { data, error } = await supabase.storage.from("avatars").download(id);
+    const { data, error } = await supabase.storage.from(bucket).download(id);
 
     if (error) {
       throw error;
@@ -49,7 +68,7 @@ export async function GET(
     const imageBuffer = Buffer.from(buffer);
 
     // Cache the image
-    imageCache.set(id, imageBuffer);
+    imageCache.set(cacheKey, imageBuffer);
 
     const headers = new Headers();
     headers.set("Content-Type", getMimeType(id));

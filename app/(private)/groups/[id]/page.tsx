@@ -14,6 +14,7 @@ import {
   fetchLeaderboard,
   fetchWinningCriteriaForGroup,
 } from "@/lib/actions";
+import { Images } from "lucide-react";
 
 export default async function GroupPage({
   params,
@@ -73,6 +74,12 @@ export default async function GroupPage({
           />
 
           <div className="flex flex-col gap-4 items-center">
+            <Button asChild variant="default">
+              <Link href={`/groups/${groupId}/gallery`}>
+                <Images size={24} />
+                <span className="ml-2">Gallery</span>
+              </Link>
+            </Button>
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
             </Button>

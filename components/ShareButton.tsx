@@ -54,7 +54,6 @@ export default function ShareButton({
         setCopyButtonText("Copy Invite Text");
       }, 3000);
     } catch (err) {
-      console.error("Failed to copy text: ", err);
       toast({
         variant: "destructive",
         title: "Error",
@@ -74,7 +73,7 @@ export default function ShareButton({
   const description = "Choose how you’d like to share the group information:";
 
   const ButtonsGroup = () => (
-    <div className="flex flex-col gap-2 items-center">
+    <div className="flex flex-col gap-2 items-center p-8">
       <Button variant="yellowOutline" onClick={copyToClipboard}>
         {copyButtonText}
       </Button>

@@ -3,9 +3,10 @@ import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import { formatDate } from "date-fns/format";
 import { Button } from "@/components/ui/button";
-import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { TZDate } from "@date-fns/tz";
 
 interface MyDatePickerProps {
   disabled?: boolean;
@@ -33,7 +34,7 @@ export function MyDatePicker({
           ref={ref}
           type="button"
         >
-          {formatDate(value, "dd/MM/yyyy")}
+          {formatDate(new TZDate(value, TIMEZONE), "dd/MM/yyyy")}
         </Button>
       );
     },
