@@ -70,7 +70,8 @@ const Highlights = async () => {
                 {totalBeers > 0 && (
                   <li>
                     You have spent{" "}
-                    <strong>~€{totalBeers * COST_PER_BEER}</strong> on beers
+                    <strong>~€{(totalBeers * COST_PER_BEER).toFixed(2)}</strong>{" "}
+                    on beers
                   </li>
                 )}
               </ul>
