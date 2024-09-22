@@ -15,6 +15,8 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
     "/error",
     "/manifest.json",
+    "/robots.txt",
+    "/sitemap.xml",
   ];
 
   if (request.nextUrl.search.startsWith("?redirectUrl=")) {
@@ -37,8 +39,11 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - robots.txt (robots file)
+     * - sitemap.xml (sitemap file)
+     * - manifest.json (web app manifest file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
