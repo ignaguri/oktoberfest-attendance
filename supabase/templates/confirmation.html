@@ -1,22 +1,56 @@
 <html>
-
-<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;">
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    "
+  >
     <div
-        style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #ddd; border-radius: 10px;">
-        <div style="text-align: center; padding-bottom: 20px;">
-            <h2 style="color: #333333;">Thank you for joining ProstCounter! 🍻</h2>
-        </div>
-        <div style="font-size: 16px; line-height: 1.6; color: #333333;">
-            <h3>Confirm your signup</h3>
-            <p>Follow the link below to confirm your user:</p>
-            <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup"
-                style="display: block; width: 200px; margin: 20px auto; padding: 10px 20px; background-color: #facc15; color: #ffffff; text-align: center; text-decoration: none; border-radius: 5px;">Confirm
-                your mail</a>
-        </div>
-        <div style="text-align: center; padding-top: 20px; font-size: 14px; color: #666666;">
-            <p>If you did not sign up for this account, please ignore this email.</p>
-        </div>
+      style="
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+      "
+    >
+      <div style="text-align: center; padding-bottom: 20px">
+        <h2 style="color: #333333">Thank you for joining ProstCounter! 🍻</h2>
+      </div>
+      <div style="font-size: 16px; line-height: 1.6; color: #333333">
+        <h3>Confirm your signup</h3>
+        <p>Follow the link below to confirm your user:</p>
+        <a
+          href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup"
+          style="
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #facc15;
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+          "
+          >Confirm your mail</a
+        >
+      </div>
+      <div
+        style="
+          text-align: center;
+          padding-top: 20px;
+          font-size: 14px;
+          color: #666666;
+        "
+      >
+        <p>
+          If you did not sign up for this account, please ignore this email.
+        </p>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>

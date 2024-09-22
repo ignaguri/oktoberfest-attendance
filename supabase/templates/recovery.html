@@ -1,18 +1,43 @@
 <html>
-
-<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;">
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    "
+  >
     <div
-        style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #ddd; border-radius: 10px;">
-        <div style="text-align: center; padding-bottom: 20px;">
-            <h2 style="color: #333333;">Reset your ProstCounter 🍻 password</h2>
-        </div>
-        <div style="font-size: 16px; line-height: 1.6; color: #333333;">
-            <p>Follow this link to reset the password for your user:</p>
-            <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/update-password"
-                style="display: block; width: 200px; margin: 20px auto; padding: 10px 20px; background-color: #facc15; color: #ffffff; text-align: center; text-decoration: none; border-radius: 5px;">Reset
-                Password</a>
-        </div>
+      style="
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+      "
+    >
+      <div style="text-align: center; padding-bottom: 20px">
+        <h2 style="color: #333333">Reset your ProstCounter 🍻 password</h2>
+      </div>
+      <div style="font-size: 16px; line-height: 1.6; color: #333333">
+        <p>Follow this link to reset the password for your user:</p>
+        <a
+          href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/update-password"
+          style="
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #facc15;
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+          "
+          >Reset Password</a
+        >
+      </div>
     </div>
-</body>
-
+  </body>
 </html>
