@@ -6,9 +6,9 @@ import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Leaderboard } from "@/components/Leaderboard";
 import { winningCriteriaText } from "@/lib/constants";
 import { Tables } from "@/lib/database.types";
-import { WinningCriteria } from "@/lib/types";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 export default function GlobalLeaderboardClient() {
   const [winningCriteriaId, setWinningCriteriaId] = useState<number>(1);
@@ -88,8 +88,15 @@ export default function GlobalLeaderboardClient() {
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="mb-4 space-y-2">
+        <Label
+          htmlFor="winning-criteria-select"
+          className="text-sm font-medium text-gray-700"
+        >
+          Select Winning Criteria
+        </Label>
         <SingleSelect
+          id="winning-criteria-select"
           options={[{ title: "Winning Criteria", options: criteriaOptions }]}
           value={winningCriteriaId.toString()}
           onSelect={(option) => setWinningCriteriaId(Number(option.value))}
@@ -97,11 +104,7 @@ export default function GlobalLeaderboardClient() {
         />
       </div>
       {selectedCriteria && leaderboardData.length > 0 && (
-        <Leaderboard
-          entries={leaderboardData}
-          winningCriteria={selectedCriteria.name as WinningCriteria}
-          showGroupCount
-        />
+        <Leaderboard entries={leaderboardData} showGroupCount />
       )}
     </div>
   );

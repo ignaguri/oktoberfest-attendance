@@ -31,6 +31,7 @@ export interface OptionGroup {
 }
 
 export interface SelectBaseProps {
+  id?: string;
   buttonClassName?: string;
   options: OptionGroup[];
   placeholder?: string;
@@ -46,6 +47,7 @@ export interface SelectBaseProps {
 }
 
 export function SelectBase({
+  id,
   buttonClassName,
   options,
   placeholder = "Select option",
@@ -62,6 +64,7 @@ export function SelectBase({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           role="combobox"
           aria-expanded={open}

@@ -1,11 +1,15 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { formatDate } from "date-fns/format";
-import ResponsiveDialog from "@/components/ResponsiveDialog";
-import { useMemo, useState } from "react";
+"use client";
 
-import type { AttendanceWithTentVisits } from "./page";
+import { useMemo, useState } from "react";
+import { formatDate } from "date-fns/format";
 import { Beer, Tent } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ResponsiveDialog from "@/components/ResponsiveDialog";
+import { DataTable } from "@/components/Table/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
+
+import type { AttendanceWithTentVisits } from "./page";
 
 interface PersonalAttendanceTableProps {
   data?: AttendanceWithTentVisits[];
@@ -26,67 +30,57 @@ const PersonalAttendanceTable = ({
       ?.tentVisits;
   }, [data, selectedAttendance]);
 
-  if (!data) {
-    return <LoadingSpinner />;
-  }
-
-  const handleRowClick = (date: Date) => {
-    onDateSelect(date);
-  };
-
   const handleTentClick = (attendance: string) => {
     setSelectedAttendance(attendance);
     setDialogOpen(true);
     onDateSelect(new Date(attendance));
   };
 
+  const columns: ColumnDef<AttendanceWithTentVisits>[] = [
+    {
+      accessorKey: "date",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Date" />
+      ),
+      cell: ({ row }) => formatDate(new Date(row.original.date), "dd/MM/yyyy"),
+    },
+    {
+      accessorKey: "beer_count",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Amount" />
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center gap-1">
+          <span>{row.original.beer_count}</span>
+          <Beer size={24} />
+        </div>
+      ),
+    },
+    {
+      accessorKey: "tentVisits",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Tents" />
+      ),
+      cell: ({ row }) => (
+        <Button
+          variant="outline"
+          className="flex items-center justify-center gap-1"
+          onClick={() => handleTentClick(row.original.date)}
+        >
+          <span>{row.original.tentVisits.length}</span>
+          <Tent size={24} />
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center shadow-md">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Date
-            </th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Amount
-            </th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Tents
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {data.map(({ date, beer_count, tentVisits }) => (
-            <tr
-              key={date.toString()}
-              onClick={() => handleRowClick(new Date(date))}
-            >
-              <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                {formatDate(date, "dd/MM/yyyy")}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {beer_count && (
-                  <div className="flex items-center justify-center gap-1">
-                    <span>{beer_count}</span>
-                    <Beer size={24} />
-                  </div>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                <Button
-                  variant="outline"
-                  className="flex items-center justify-center gap-1"
-                  onClick={() => handleTentClick(date)}
-                >
-                  <span>{tentVisits.length}</span>
-                  <Tent size={24} />
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-4">
+      <DataTable
+        columns={columns}
+        data={data || []}
+        onRowClick={(row) => onDateSelect(new Date(row.original.date))}
+      />
 
       <ResponsiveDialog
         open={dialogOpen}

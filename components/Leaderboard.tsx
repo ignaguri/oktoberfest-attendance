@@ -1,9 +1,26 @@
 "use client";
 
-import { Views } from "@/lib/database-helpers.types";
 import { useState } from "react";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
 import Avatar from "./Avatar/Avatar";
-import { WinningCriteria } from "@/lib/types";
+import { Views } from "@/lib/database-helpers.types";
 
 type LeaderboardEntry = Views<"leaderboard"> & {
   group_count?: number;
@@ -24,140 +41,109 @@ const getDisplayName = ({
 
 export const Leaderboard = ({
   entries,
-  winningCriteria,
   showGroupCount = false,
 }: {
   entries: LeaderboardEntry[];
-  winningCriteria: WinningCriteria;
   showGroupCount?: boolean;
 }) => {
-  const [data, setData] = useState<LeaderboardEntry[]>(entries);
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof LeaderboardEntry;
-    direction: "asc" | "desc";
-  } | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  const sortData = (key: keyof LeaderboardEntry) => {
-    // Exclude group_count from sorting
-    if (key === "group_count") return;
+  const columns: ColumnDef<LeaderboardEntry>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Avatar url={row.original.avatar_url} size="small" />
+          <span className="font-medium">{getDisplayName(row.original)}</span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "days_attended",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Days" />
+      ),
+    },
+    {
+      accessorKey: "total_beers",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Liters" />
+      ),
+      cell: ({ row }) => `${row.original.total_beers} 🍺`,
+    },
+    {
+      accessorKey: "avg_beers",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Avg." />
+      ),
+      cell: ({ row }) => row.original.avg_beers?.toFixed(2),
+    },
+  ];
 
-    let direction: "asc" | "desc" = "asc";
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === "asc"
-    ) {
-      direction = "desc";
-    }
-    const sortedData = [...data].sort((a, b) => {
-      if (a[key] !== null && b[key] !== null) {
-        if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-        if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
-      }
-      return 0;
+  if (showGroupCount) {
+    columns.push({
+      accessorKey: "group_count",
+      header: "Groups",
     });
-    setData(sortedData);
-    setSortConfig({ key, direction });
-  };
+  }
 
-  const getCrownEmoji = (columnKey: string) => {
-    return columnKey === winningCriteria ? "👑 " : "";
-  };
+  const table = useReactTable({
+    data: entries,
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
 
   return (
-    <div className="max-w-full">
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => sortData("days_attended")}
-                >
-                  <div className="flex items-center">
-                    {getCrownEmoji("days_attended")}
-                    <span>Days</span>
-                    {sortConfig?.key === "days_attended" && (
-                      <span className="ml-1">
-                        {sortConfig.direction === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => sortData("total_beers")}
-                >
-                  <div className="flex items-center">
-                    {getCrownEmoji("total_beers")}
-                    <span>Liters</span>
-                    {sortConfig?.key === "total_beers" && (
-                      <span className="ml-1">
-                        {sortConfig.direction === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => sortData("avg_beers")}
-                >
-                  <div className="flex items-center">
-                    {getCrownEmoji("avg_beers")}
-                    <span>Avg.</span>
-                    {sortConfig?.key === "avg_beers" && (
-                      <span className="ml-1">
-                        {sortConfig.direction === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                {showGroupCount && (
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Groups
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {data.map((attendee, index) => (
-                <tr
-                  key={index}
-                  className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
-                >
-                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate">
-                    <div className="flex items-center gap-2">
-                      <Avatar url={attendee.avatar_url} size="small" />
-
-                      <p className="text-xs sm:text-sm font-medium text-gray-900">
-                        {getDisplayName(attendee)}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                    {attendee.days_attended}
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                    {attendee.total_beers} 🍺
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                    {attendee.avg_beers?.toFixed(2)}
-                  </td>
-                  {showGroupCount && (
-                    <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                      {attendee.group_count}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row, index) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };
