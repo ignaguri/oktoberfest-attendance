@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { getUser } from "@/lib/actions";
+import { WhatsNew } from "@/components/WhatsNew";
 
 async function AuthCheck() {
   try {
@@ -25,6 +26,7 @@ export default function PrivateLayout({
       <Suspense fallback={<LoadingSpinner />}>
         <AuthCheck />
         {children}
+        <WhatsNew />
       </Suspense>
     </ErrorBoundary>
   );
