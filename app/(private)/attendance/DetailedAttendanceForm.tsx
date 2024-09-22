@@ -4,18 +4,22 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { MyDatePicker } from "./DatePicker";
-import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import TentSelector from "@/components/TentSelector";
 import { useToast } from "@/hooks/use-toast";
-import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
+import {
+  addAttendance,
+  AttendanceByDate,
+  fetchAttendanceByDate,
+} from "@/lib/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Tables } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
-import { add } from "date-fns/add";
-import { isWithinInterval } from "date-fns/isWithinInterval";
+import { add, isWithinInterval } from "date-fns";
+import { BeerPicturesUpload } from "./BeerPicturesUpload";
+import { TZDate } from "@date-fns/tz";
 
-const DAY_AFTER_WIESN = add(new Date(END_OF_WIESN), { days: 1 });
+const DAY_AFTER_WIESN = add(new TZDate(END_OF_WIESN, TIMEZONE), { days: 1 });
 
 const AttendanceSchema = Yup.object().shape({
   amount: Yup.number()
@@ -35,11 +39,6 @@ const AttendanceSchema = Yup.object().shape({
     .required("Required"),
 });
 
-type AttendanceData = Tables<"attendances"> & {
-  tent_visits?: { tent_id: string }[];
-  tent_ids?: string[];
-};
-
 interface DetailedAttendanceFormProps {
   onAttendanceUpdate: () => void;
   selectedDate: Date | null;
@@ -50,7 +49,7 @@ export default function DetailedAttendanceForm({
   selectedDate,
 }: DetailedAttendanceFormProps) {
   const [existingAttendance, setExistingAttendance] =
-    useState<AttendanceData | null>(null);
+    useState<AttendanceByDate | null>(null);
   const initialDate = useMemo(() => {
     return isWithinInterval(new Date(), {
       start: BEGINNING_OF_WIESN,
@@ -66,7 +65,7 @@ export default function DetailedAttendanceForm({
     async (date: Date) => {
       try {
         const attendanceData = await fetchAttendanceByDate(date);
-        setExistingAttendance(attendanceData as AttendanceData);
+        setExistingAttendance(attendanceData as AttendanceByDate);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -118,6 +117,15 @@ export default function DetailedAttendanceForm({
   const handleDateChange = (date: Date | null) => {
     if (!date) return;
     setCurrentDate(date);
+  };
+
+  const handlePicturesUpdate = (newUrls: string[]) => {
+    if (existingAttendance) {
+      setExistingAttendance({
+        ...existingAttendance,
+        picture_urls: newUrls,
+      });
+    }
   };
 
   return (
@@ -188,6 +196,16 @@ export default function DetailedAttendanceForm({
             </Form>
           )}
         </Formik>
+
+        {existingAttendance && (
+          <div className="mt-8">
+            <BeerPicturesUpload
+              attendanceId={existingAttendance.id}
+              existingPictureUrls={existingAttendance.picture_urls || []}
+              onPicturesUpdate={handlePicturesUpdate}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
