@@ -430,7 +430,7 @@ export async function uploadBeerPicture(formData: FormData) {
   try {
     compressedBuffer = await sharp(buffer)
       .rotate()
-      .resize({ width: 800, height: 800, fit: "inside" })
+      .resize({ width: 1000, height: 1000, fit: "inside" })
       .webp({ quality: 80 })
       .toBuffer();
   } catch (error) {

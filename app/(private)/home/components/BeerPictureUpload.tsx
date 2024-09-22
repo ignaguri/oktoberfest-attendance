@@ -5,8 +5,9 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { uploadBeerPicture } from "@/lib/actions";
-import { Formik, Form, useFormikContext } from "formik";
+import { Formik, Form, useFormikContext, ErrorMessage } from "formik";
 import { Camera } from "lucide-react";
+import * as Yup from "yup";
 
 interface PictureFormValues {
   picture: File | null;
@@ -15,6 +16,26 @@ interface PictureFormValues {
 interface BeerPictureUploadProps {
   attendanceId: string | null;
 }
+
+const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
+const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+const validationSchema = Yup.object().shape({
+  picture: Yup.mixed()
+    .required("A beer picture is required")
+    .test("fileSize", "File is too large (max 12MB)", (value) => {
+      if (!value) return true;
+      return value instanceof File && value.size <= MAX_FILE_SIZE;
+    })
+    .test(
+      "fileType",
+      "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+      (value) => {
+        if (!value) return true;
+        return value instanceof File && VALID_FILE_TYPES.includes(value.type);
+      },
+    ),
+});
 
 const PicturePreview = () => {
   const { values } = useFormikContext<PictureFormValues>();
@@ -81,8 +102,12 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
   }
 
   return (
-    <Formik initialValues={{ picture: null }} onSubmit={handleSubmit}>
-      {({ setFieldValue, isSubmitting, values }) => (
+    <Formik
+      initialValues={{ picture: null }}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      {({ setFieldValue, isSubmitting, values, errors }) => (
         <Form className="flex flex-col items-center gap-4">
           <input
             type="file"
@@ -113,8 +138,9 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
               </div>
             )}
           </label>
+          <ErrorMessage name="picture" component="span" className="error" />
           <PicturePreview />
-          {values.picture && (
+          {values.picture && !errors.picture && (
             <Button type="submit" disabled={isSubmitting} variant="darkYellow">
               {isSubmitting ? "Uploading..." : "Upload picture"}
             </Button>
