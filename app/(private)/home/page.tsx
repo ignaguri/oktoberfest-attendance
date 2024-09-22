@@ -63,6 +63,9 @@ export default async function Home() {
           <Button asChild variant="darkYellow">
             <Link href="/groups">Join or Create a group</Link>
           </Button>
+          <Button asChild variant="yellowOutline">
+            <Link href="/leaderboard">Global Leaderboard</Link>
+          </Button>
         </div>
       </div>
       <InstallPWA />

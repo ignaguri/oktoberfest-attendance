@@ -382,11 +382,13 @@ export async function fetchAttendanceByDate(
 
   // Filter tent visits for the given date as the visit_date is a timestamptz in the db
   // and casting visit_date::date didn't work
-  const tentVisitsForDate = tentVisits.filter((tentVisit) =>
-    isSameDay(
-      new TZDate(tentVisit.visit_date, TIMEZONE),
-      new TZDate(date, TIMEZONE),
-    ),
+  const tentVisitsForDate = tentVisits.filter(
+    (tentVisit) =>
+      tentVisit.visit_date &&
+      isSameDay(
+        new TZDate(tentVisit.visit_date, TIMEZONE),
+        new TZDate(date, TIMEZONE),
+      ),
   );
 
   const attendance = Array.isArray(attendanceData)
@@ -1008,4 +1010,17 @@ export async function fetchGroupGallery(groupId: string) {
 
   setCache(`groupGallery-${user.id}-${groupId}`, galleryData);
   return galleryData;
+}
+
+export async function fetchGlobalLeaderboard(winningCriteriaId: number) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("get_global_leaderboard", {
+    p_winning_criteria_id: winningCriteriaId,
+  });
+
+  if (error) {
+    throw new Error(`Error fetching global leaderboard: ${error.message}`);
+  }
+
+  return data;
 }

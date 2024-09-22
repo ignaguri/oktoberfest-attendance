@@ -5,7 +5,9 @@ import { useState } from "react";
 import Avatar from "./Avatar/Avatar";
 import { WinningCriteria } from "@/lib/types";
 
-type LeaderboardEntry = Views<"leaderboard">;
+type LeaderboardEntry = Views<"leaderboard"> & {
+  group_count?: number;
+};
 
 const getDisplayName = ({
   username,
@@ -23,9 +25,11 @@ const getDisplayName = ({
 export const Leaderboard = ({
   entries,
   winningCriteria,
+  showGroupCount = false,
 }: {
   entries: LeaderboardEntry[];
   winningCriteria: WinningCriteria;
+  showGroupCount?: boolean;
 }) => {
   const [data, setData] = useState<LeaderboardEntry[]>(entries);
   const [sortConfig, setSortConfig] = useState<{
@@ -34,6 +38,9 @@ export const Leaderboard = ({
   } | null>(null);
 
   const sortData = (key: keyof LeaderboardEntry) => {
+    // Exclude group_count from sorting
+    if (key === "group_count") return;
+
     let direction: "asc" | "desc" = "asc";
     if (
       sortConfig &&
@@ -109,6 +116,11 @@ export const Leaderboard = ({
                     )}
                   </div>
                 </th>
+                {showGroupCount && (
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Groups
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -135,6 +147,11 @@ export const Leaderboard = ({
                   <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {attendee.avg_beers?.toFixed(2)}
                   </td>
+                  {showGroupCount && (
+                    <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                      {attendee.group_count}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
