@@ -58,7 +58,7 @@ module.exports = withSentryConfig(
     // https://github.com/getsentry/sentry-webpack-plugin#options
 
     org: "prostcounter",
-    project: "javascript-nextjs",
+    project: "prost-counter",
     sentryUrl: "https://sentry.io/",
 
     // Only print logs for uploading source maps in CI
