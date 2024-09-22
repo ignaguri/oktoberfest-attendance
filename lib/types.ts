@@ -13,3 +13,31 @@ export const WinningCriteriaValues = {
   total_beers: WinningCriteria.total_beers,
   avg_beers: WinningCriteria.avg_beers,
 } as const;
+
+export interface GalleryImage {
+  id: string;
+  url: string;
+  uploadedAt: string;
+  userId: string;
+  username: string;
+}
+
+export interface GalleryData {
+  [date: string]: {
+    [userId: string]: GalleryImage[];
+  };
+}
+
+export interface PictureData {
+  id: string;
+  url: string;
+  uploadedAt: string;
+}
+
+export interface GalleryItem {
+  date: string;
+  user_id: string;
+  username: string | null;
+  full_name: string | null;
+  picture_data: PictureData[];
+}

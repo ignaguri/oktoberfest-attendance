@@ -26,72 +26,81 @@ function formatSegmentName(segment: string): string {
     .join(" ");
 }
 
+interface BreadcrumbSegment {
+  href: string;
+  title: string;
+  isLast: boolean;
+  isLoading: boolean;
+}
+
 export default function Breadcrumbs() {
   const pathname = usePathname();
-  const [groupName, setGroupName] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const segments = pathname.split("/").filter((segment) => segment !== "");
+  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbSegment[]>([]);
 
   useEffect(() => {
-    async function fetchGroupName() {
-      if (segments.length > 0 && isUUID(segments[segments.length - 1])) {
-        const uuid = segments[segments.length - 1];
-        try {
-          const name = await getGroupName(uuid);
-          setGroupName(name);
-        } catch (error) {
-          console.error("Failed to fetch group name:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    }
+    async function fetchGroupNames() {
+      const segments = pathname.split("/").filter((segment) => segment !== "");
+      const newBreadcrumbs: BreadcrumbSegment[] = [];
 
-    fetchGroupName();
-  }, [segments]);
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        const href = `/${segments.slice(0, i + 1).join("/")}`;
+        let title = formatSegmentName(segment);
+        const isLast = i === segments.length - 1;
 
-  if (segments.length === 0) return null;
-
-  const breadcrumbs = segments
-    .filter((segment) => !segment.startsWith("("))
-    .map((segment, index, array) => {
-      const href = `/${array.slice(0, index + 1).join("/")}`;
-      let title = formatSegmentName(segment);
-      const isLast = index === array.length - 1;
-
-      if (isLast && isUUID(segment)) {
-        if (isLoading || !groupName) {
-          title = "Loading...";
+        if (isUUID(segment)) {
+          newBreadcrumbs.push({
+            href,
+            title: "Loading...",
+            isLast,
+            isLoading: true,
+          });
+          try {
+            const name = await getGroupName(segment);
+            newBreadcrumbs[newBreadcrumbs.length - 1] = {
+              href,
+              title: name ?? "Unknown Group",
+              isLast,
+              isLoading: false,
+            };
+          } catch (error) {
+            console.error(`Failed to fetch group name for ${segment}:`, error);
+            newBreadcrumbs[newBreadcrumbs.length - 1] = {
+              href,
+              title: "Unknown Group",
+              isLast,
+              isLoading: false,
+            };
+          }
         } else {
-          title = groupName;
+          newBreadcrumbs.push({ href, title, isLast, isLoading: false });
         }
       }
 
-      return { href, title, isLast };
-    });
-
-  // Remove the first breadcrumb if it's "Home"
-  if (breadcrumbs.length > 0) {
-    if (breadcrumbs[0].title.toLowerCase() === "home") {
-      breadcrumbs.shift();
-    } else if (breadcrumbs[0].title.toLowerCase() === "group settings") {
-      const last = breadcrumbs.pop();
-      const secondLast = breadcrumbs.pop();
-      if (last && secondLast) {
-        last.isLast = false;
-        last.href = last.href.replace("group-settings", "groups");
-        breadcrumbs.push(last);
-        secondLast.isLast = true;
-        secondLast.title = "Settings";
-        breadcrumbs.push(secondLast);
+      // Apply the existing filtering logic
+      if (newBreadcrumbs.length > 0) {
+        if (newBreadcrumbs[0].title.toLowerCase() === "home") {
+          newBreadcrumbs.shift();
+        } else if (newBreadcrumbs[0].title.toLowerCase() === "group settings") {
+          const last = newBreadcrumbs.pop();
+          const secondLast = newBreadcrumbs.pop();
+          if (last && secondLast) {
+            last.isLast = false;
+            last.href = last.href.replace("group-settings", "groups");
+            newBreadcrumbs.push(last);
+            secondLast.isLast = true;
+            secondLast.title = "Settings";
+            newBreadcrumbs.push(secondLast);
+          }
+        }
       }
-    }
-  }
 
-  // If there are no breadcrumbs left after filtering, return null
+      setBreadcrumbs(newBreadcrumbs);
+    }
+
+    fetchGroupNames();
+  }, [pathname]);
+
   if (breadcrumbs.length === 0) return null;
 
   return (
@@ -101,13 +110,17 @@ export default function Breadcrumbs() {
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
-        {breadcrumbs.map(({ href, title, isLast }, index) => (
+        {breadcrumbs.map(({ href, title, isLast, isLoading }, index) => (
           <BreadcrumbItem key={href}>
             {isLast ? (
-              <BreadcrumbPage>{title}</BreadcrumbPage>
+              <BreadcrumbPage>
+                {isLoading ? "Loading..." : title}
+              </BreadcrumbPage>
             ) : (
               <>
-                <BreadcrumbLink href={href}>{title}</BreadcrumbLink>
+                <BreadcrumbLink href={href}>
+                  {isLoading ? "Loading..." : title}
+                </BreadcrumbLink>
                 {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
               </>
             )}

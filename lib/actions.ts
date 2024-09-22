@@ -9,15 +9,14 @@ import { redirect } from "next/navigation";
 import { setCache, getCache, deleteCache } from "@/lib/cache";
 import { isSameDay } from "date-fns/isSameDay";
 import { TZDate } from "@date-fns/tz";
+import { TIMEZONE } from "./constants";
 
 import type { User } from "@supabase/supabase-js";
+import type { GalleryData, GalleryItem, PictureData } from "./types";
 
 import "server-only";
 
 const NO_ROWS_ERROR = "PGRST116";
-
-// Define the UTC+1 time zone (e.g., 'Europe/Berlin' for CET/CEST)
-const TIMEZONE = "Europe/Berlin";
 
 export async function getUser(): Promise<User> {
   const supabase = createClient();
@@ -336,7 +335,10 @@ export async function fetchAttendances() {
       .filter(
         (tentVisit) =>
           tentVisit.visit_date &&
-          isSameDay(new Date(tentVisit.visit_date), new Date(attendance.date)),
+          isSameDay(
+            new TZDate(tentVisit.visit_date, TIMEZONE),
+            new TZDate(attendance.date, TIMEZONE),
+          ),
       )
       .map((tentVisit) => {
         const { tents, ...tentVisitWithoutTent } = tentVisit;
@@ -351,9 +353,15 @@ export async function fetchAttendances() {
   return attendancesWithTentVisits;
 }
 
-export async function fetchAttendanceByDate(date: Date) {
+export type AttendanceByDate = Tables<"attendances"> & {
+  tent_ids: string[];
+  picture_urls: string[];
+};
+export async function fetchAttendanceByDate(
+  date: Date,
+): Promise<AttendanceByDate | null> {
   const user = await getUser();
-  const cachedAttendance = getCache<any>(
+  const cachedAttendance = getCache<AttendanceByDate>(
     `attendanceByDate-${user.id}-${date.toISOString()}`,
   );
   if (cachedAttendance) {
@@ -375,19 +383,87 @@ export async function fetchAttendanceByDate(date: Date) {
   // Filter tent visits for the given date as the visit_date is a timestamptz in the db
   // and casting visit_date::date didn't work
   const tentVisitsForDate = tentVisits.filter((tentVisit) =>
-    isSameDay(new Date(tentVisit.visit_date || ""), date),
+    isSameDay(
+      new TZDate(tentVisit.visit_date, TIMEZONE),
+      new TZDate(date, TIMEZONE),
+    ),
   );
 
   const attendance = Array.isArray(attendanceData)
     ? attendanceData[0]
     : attendanceData;
 
+  if (!attendance) {
+    return null;
+  }
+
+  const { data: beerPictures, error: beerPicturesError } = await supabase
+    .from("beer_pictures")
+    .select("picture_url")
+    .eq("user_id", user.id)
+    .eq("attendance_id", attendance.id);
+
+  if (beerPicturesError) {
+    throw new Error(
+      `Error fetching beer pictures: ${beerPicturesError.message}`,
+    );
+  }
+
   const result = {
     ...attendance,
     tent_ids: tentVisitsForDate.map((visit) => visit.tent_id),
+    picture_urls: beerPictures.map((pic) => pic.picture_url),
   };
   setCache(`attendanceByDate-${user.id}-${date.toISOString()}`, result);
   return result;
+}
+
+export async function uploadBeerPicture(formData: FormData) {
+  const picture = formData.get("picture") as File;
+  const attendanceId = formData.get("attendanceId") as string;
+  const supabase = createClient();
+  const user = await getUser();
+
+  const buffer = await picture.arrayBuffer();
+
+  let compressedBuffer;
+  try {
+    compressedBuffer = await sharp(buffer)
+      .rotate()
+      .resize({ width: 800, height: 800, fit: "inside" })
+      .webp({ quality: 80 })
+      .toBuffer();
+  } catch (error) {
+    throw new Error("Error compressing image: " + JSON.stringify(error));
+  }
+
+  const fileName = `${user.id}_${attendanceId}_${uuidv4()}.webp`;
+  const { error } = await supabase.storage
+    .from("beer_pictures")
+    .upload(fileName, compressedBuffer, {
+      contentType: "image/webp",
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error("Error uploading beer picture: " + error.message);
+  }
+
+  const { error: beerPicturesError } = await supabase
+    .from("beer_pictures")
+    .insert({
+      user_id: user.id,
+      attendance_id: attendanceId,
+      picture_url: fileName,
+    });
+  if (beerPicturesError) {
+    throw new Error(
+      "Error uploading beer picture: " + beerPicturesError.message,
+    );
+  }
+
+  return fileName;
 }
 
 export async function addAttendance(formData: {
@@ -403,17 +479,23 @@ export async function addAttendance(formData: {
   const now = new TZDate(new Date(), TIMEZONE);
   dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
 
-  const { error } = await supabase.rpc("add_or_update_attendance_with_tents", {
-    p_user_id: user.id,
-    p_date: dateWithTime.toISOString(),
-    p_beer_count: amount,
-    p_tent_ids: tents,
-  });
+  const { data: attendanceData, error } = await supabase.rpc(
+    "add_or_update_attendance_with_tents",
+    {
+      p_user_id: user.id,
+      p_date: dateWithTime.toISOString(),
+      p_beer_count: amount,
+      p_tent_ids: tents,
+    },
+  );
 
   if (error) {
     throw new Error("Error adding/updating attendance: " + error.message);
   }
 
+  const attendanceId = attendanceData as string;
+
+  // Clear caches and revalidate paths as before
   deleteCache(`attendance-${user.id}`);
   deleteCache(`attendances-${user.id}`);
   deleteCache(`attendanceByDate-${user.id}-${date.toISOString()}`);
@@ -423,6 +505,8 @@ export async function addAttendance(formData: {
   deleteCache(`daysAttended-${user.id}`);
   revalidatePath("/attendance");
   revalidatePath("/home");
+
+  return attendanceId;
 }
 
 export async function fetchTents() {
@@ -878,4 +962,50 @@ export async function fetchHighlights() {
   };
   setCache(`highlights-${user.id}`, result);
   return result;
+}
+
+export async function fetchGroupGallery(groupId: string) {
+  const user = await getUser();
+  const cachedGallery = getCache<GalleryData>(
+    `groupGallery-${user.id}-${groupId}`,
+  );
+  if (cachedGallery) {
+    return cachedGallery;
+  }
+
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("fetch_group_gallery", {
+    p_group_id: groupId,
+  });
+
+  if (error) {
+    throw new Error(`Error fetching group gallery: ${error.message}`);
+  }
+
+  // maybe use a reducer here?
+  const galleryData: GalleryData = {};
+
+  (data as unknown as GalleryItem[]).forEach((item) => {
+    const date = new TZDate(item.date, TIMEZONE).toDateString();
+    const username = item.username || item.full_name || "Unknown User";
+
+    if (!galleryData[date]) {
+      galleryData[date] = {};
+    }
+
+    if (!galleryData[date][username]) {
+      galleryData[date][username] = [];
+    }
+
+    galleryData[date][username] = item.picture_data.map((pic: PictureData) => ({
+      id: pic.id,
+      url: pic.url,
+      uploadedAt: pic.uploadedAt,
+      userId: item.user_id,
+      username,
+    }));
+  });
+
+  setCache(`groupGallery-${user.id}-${groupId}`, galleryData);
+  return galleryData;
 }

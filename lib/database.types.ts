@@ -108,6 +108,52 @@ export type Database = {
           },
         ]
       }
+      beer_pictures: {
+        Row: {
+          attendance_id: string
+          created_at: string
+          id: string
+          picture_url: string
+          user_id: string
+        }
+        Insert: {
+          attendance_id: string
+          created_at?: string
+          id?: string
+          picture_url: string
+          user_id: string
+        }
+        Update: {
+          attendance_id?: string
+          created_at?: string
+          id?: string
+          picture_url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beer_pictures_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "attendances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beer_pictures_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "beer_pictures_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string | null
@@ -273,19 +319,19 @@ export type Database = {
           id: string
           tent_id: string
           user_id: string
-          visit_date: string | null
+          visit_date: string
         }
         Insert: {
           id: string
           tent_id: string
           user_id: string
-          visit_date?: string | null
+          visit_date: string
         }
         Update: {
           id?: string
           tent_id?: string
           user_id?: string
-          visit_date?: string | null
+          visit_date?: string
         }
         Relationships: [
           {
@@ -367,6 +413,14 @@ export type Database = {
       }
     }
     Functions: {
+      add_beer_picture: {
+        Args: {
+          p_user_id: string
+          p_attendance_id: string
+          p_picture_url: string
+        }
+        Returns: string
+      }
       add_or_update_attendance_with_tents: {
         Args: {
           p_user_id: string
@@ -374,7 +428,7 @@ export type Database = {
           p_beer_count: number
           p_tent_ids: string[]
         }
-        Returns: undefined
+        Returns: string
       }
       create_group_with_member: {
         Args: {
@@ -386,6 +440,18 @@ export type Database = {
           group_id: string
           group_name: string
         }
+      }
+      fetch_group_gallery: {
+        Args: {
+          p_group_id: string
+        }
+        Returns: {
+          date: string
+          user_id: string
+          username: string
+          full_name: string
+          picture_data: Json
+        }[]
       }
       get_user_groups: {
         Args: Record<PropertyKey, never>
