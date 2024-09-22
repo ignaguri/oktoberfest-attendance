@@ -1,4 +1,5 @@
 export const changelog: Record<string, string[]> = {
+  "0.2.3": ["You can set a custom beer cost in your profile! 💶"],
   "0.2.2": [
     // Changes omitted for brevity
     // "Added Sentry",

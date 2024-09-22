@@ -272,6 +272,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null;
+          custom_beer_cost: number | null;
           full_name: string | null;
           id: string;
           is_super_admin: boolean | null;
@@ -281,6 +282,7 @@ export type Database = {
         };
         Insert: {
           avatar_url?: string | null;
+          custom_beer_cost?: number | null;
           full_name?: string | null;
           id: string;
           is_super_admin?: boolean | null;
@@ -290,6 +292,7 @@ export type Database = {
         };
         Update: {
           avatar_url?: string | null;
+          custom_beer_cost?: number | null;
           full_name?: string | null;
           id?: string;
           is_super_admin?: boolean | null;
