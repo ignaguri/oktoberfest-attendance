@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import { setCache, getCache, deleteCache } from "@/lib/cache";
 import { isSameDay } from "date-fns/isSameDay";
 import { TZDate } from "@date-fns/tz";
-import { TIMEZONE } from "./constants";
+import { COST_PER_BEER, TIMEZONE } from "./constants";
 
 import type { User } from "@supabase/supabase-js";
 import type { GalleryData, GalleryItem, PictureData } from "./types";
@@ -132,16 +132,19 @@ export async function updateProfile({
   id,
   fullname,
   username,
+  custom_beer_cost,
 }: {
   id: string;
   fullname?: string;
   username?: string;
+  custom_beer_cost?: number;
 }) {
   const supabase = createClient();
   const { error } = await supabase.from("profiles").upsert({
     id,
     full_name: fullname,
     username,
+    custom_beer_cost,
     updated_at: new Date().toISOString(),
   });
   if (error) {
@@ -222,7 +225,7 @@ export async function getProfileShort() {
   const supabase = createClient();
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
-    .select(`full_name, username, avatar_url`)
+    .select("full_name, username, avatar_url, custom_beer_cost")
     .eq("id", user.id)
     .single();
   if (!profileData || profileError) {
@@ -937,6 +940,7 @@ export async function fetchHighlights() {
     topPositions: any[];
     totalBeers: number;
     daysAttended: number;
+    custom_beer_cost: number;
   }>(`highlights-${user.id}`);
   if (cachedHighlights) {
     return cachedHighlights;
@@ -950,17 +954,34 @@ export async function fetchHighlights() {
   const { data, error } = await supabase.rpc("get_user_stats", {
     input_user_id: user.id,
   });
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("custom_beer_cost")
+    .eq("id", user.id)
+    .single();
+
   if (error) {
-    return { topPositions: [], totalBeers: 0, daysAttended: 0 };
+    return {
+      topPositions: [],
+      totalBeers: 0,
+      daysAttended: 0,
+      custom_beer_cost: profileData?.custom_beer_cost ?? COST_PER_BEER,
+    };
   }
   if (!data || !Array.isArray(data) || data.length === 0) {
-    return { topPositions: [], totalBeers: 0, daysAttended: 0 };
+    return {
+      topPositions: [],
+      totalBeers: 0,
+      daysAttended: 0,
+      custom_beer_cost: COST_PER_BEER,
+    };
   }
   const firstItem = data[0];
   const result = {
     topPositions: (firstItem.top_positions as unknown as TopPosition[]) || [],
     totalBeers: firstItem.total_beers || 0,
     daysAttended: firstItem.days_attended || 0,
+    custom_beer_cost: profileData?.custom_beer_cost ?? COST_PER_BEER,
   };
   setCache(`highlights-${user.id}`, result);
   return result;

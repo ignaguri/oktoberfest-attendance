@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
 import "server-only";
 
 const Highlights = async () => {
-  const { topPositions, totalBeers, daysAttended } = await fetchHighlights();
+  const { topPositions, totalBeers, daysAttended, custom_beer_cost } =
+    await fetchHighlights();
 
   if (topPositions.length === 0 && totalBeers === 0 && daysAttended === 0) {
     return null;
@@ -69,8 +70,13 @@ const Highlights = async () => {
                 )}
                 {totalBeers > 0 && (
                   <li>
-                    You have spent{" "}
-                    <strong>~€{(totalBeers * COST_PER_BEER).toFixed(2)}</strong>{" "}
+                    You&apos;ve spent{" "}
+                    <strong>
+                      ~€
+                      {(
+                        totalBeers * (custom_beer_cost || COST_PER_BEER)
+                      ).toFixed(2)}
+                    </strong>{" "}
                     on beers
                   </li>
                 )}

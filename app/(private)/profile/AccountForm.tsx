@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Avatar from "@/components/Avatar/Avatar";
-import { updateProfile } from "@/lib/actions";
+import { getProfileShort, updateProfile } from "@/lib/actions";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,15 +13,22 @@ import Link from "next/link";
 const ProfileSchema = Yup.object().shape({
   fullname: Yup.string(),
   username: Yup.string().required("Required"),
+  custom_beer_cost: Yup.number()
+    .min(0, "Cost must be positive")
+    .max(1000, "Cost is too high")
+    .nullable(),
 });
+
+interface ProfileShort {
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  custom_beer_cost: number | null;
+}
 
 interface AccountFormProps {
   user: User;
-  profile: {
-    full_name: string | null;
-    username: string | null;
-    avatar_url: string | null;
-  };
+  profile: ProfileShort;
 }
 
 export default function AccountForm({ user, profile }: AccountFormProps) {
@@ -29,24 +36,29 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile.avatar_url || null,
   );
+  const [profileData, setProfileData] = useState<ProfileShort>(profile);
   const { toast } = useToast();
 
   const handleUpdateProfile = async (values: {
     fullname: string | null;
     username: string | null;
+    custom_beer_cost: number | null;
   }) => {
-    const { fullname, username } = values;
+    const { fullname, username, custom_beer_cost } = values;
     try {
       await updateProfile({
         id: user.id,
         ...(username && { username: username }),
         ...(fullname && { fullname: fullname }),
+        ...(custom_beer_cost !== null && { custom_beer_cost }),
       });
       toast({
         variant: "success",
         title: "Success",
         description: "Profile updated successfully!",
       });
+      const updatedProfile = await getProfileShort();
+      setProfileData(updatedProfile);
       setIsEditing(false);
     } catch (error) {
       toast({
@@ -73,8 +85,9 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
       />
       <Formik
         initialValues={{
-          fullname: profile.full_name || "",
-          username: profile.username || "",
+          fullname: profileData.full_name || "",
+          username: profileData.username || "",
+          custom_beer_cost: profileData.custom_beer_cost || 16.2,
         }}
         enableReinitialize
         validationSchema={ProfileSchema}
@@ -105,7 +118,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 />
               ) : (
                 <div className="p-2">
-                  {profile.full_name || (
+                  {profileData.full_name || (
                     <span className="text-gray-500">n/a</span>
                   )}
                 </div>
@@ -131,13 +144,37 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 />
               ) : (
                 <div className="p-2">
-                  {profile.username || (
+                  {profileData.username || (
                     <span className="text-gray-500">n/a</span>
                   )}
                 </div>
               )}
               <ErrorMessage
                 name="username"
+                component="span"
+                className="error"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="custom_beer_cost" className="font-semibold">
+                Average cost of a beer (€):
+              </label>
+              {isEditing ? (
+                <Field
+                  className="input"
+                  id="custom_beer_cost"
+                  name="custom_beer_cost"
+                  type="number"
+                  step="0.1"
+                  disabled={isSubmitting}
+                />
+              ) : (
+                <div className="p-2">
+                  {profileData.custom_beer_cost?.toFixed(2) || "16.20"}
+                </div>
+              )}
+              <ErrorMessage
+                name="custom_beer_cost"
                 component="span"
                 className="error"
               />
