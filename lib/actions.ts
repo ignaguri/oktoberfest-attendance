@@ -153,6 +153,7 @@ export async function updateProfile({
 
   // Invalidate cached user data
   deleteCache(`user-${id}`);
+  deleteCache(`profileShort-${id}`);
   revalidatePath("/profile");
   revalidatePath("/home");
 }
