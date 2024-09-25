@@ -12,6 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useCallback } from "react";
 
 import { listNonWebPImages, convertAndUpdateImage } from "../actions";
 
@@ -25,11 +26,7 @@ export function ImageConversion() {
   const [converting, setConverting] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchImages();
-  }, []);
-
-  async function fetchImages() {
+  const fetchImages = useCallback(async () => {
     try {
       const imageList = await listNonWebPImages();
       setImages(imageList);
@@ -40,7 +37,11 @@ export function ImageConversion() {
         variant: "destructive",
       });
     }
-  }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchImages();
+  }, [fetchImages]);
 
   async function handleConvert(path: string) {
     setConverting(path);

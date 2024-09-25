@@ -1,5 +1,3 @@
-import { GoogleAnalytics } from "@next/third-parties/google";
-
 import "@/styles/globals.css";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import Footer from "@/components/Footer";
@@ -9,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { getUser } from "@/lib/actions";
 import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { APP_VERSION } from "@/version";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 import type { Metadata } from "next";
 
