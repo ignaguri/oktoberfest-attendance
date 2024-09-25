@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import Image from "next/image";
 interface ImageModalProps {
   imageUrl: string | null;
   onClose: () => void;

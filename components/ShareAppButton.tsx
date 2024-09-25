@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
-import { Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Share2 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 const ICON_SIZE = 20;
 

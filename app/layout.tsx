@@ -1,15 +1,16 @@
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 import "@/styles/globals.css";
-import { Metadata } from "next";
-import Navbar from "@/components/Navbar";
-import { Toaster } from "@/components/ui/toaster";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
-import { OfflineBanner } from "@/components/OfflineBanner";
-import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { Toaster } from "@/components/ui/toaster";
 import { getUser } from "@/lib/actions";
+import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { APP_VERSION } from "@/version";
+
+import type { Metadata } from "next";
 
 // do not cache this layout
 export const revalidate = 0;

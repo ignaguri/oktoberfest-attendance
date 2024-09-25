@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
 import { uploadBeerPicture } from "@/lib/actions";
 import { Formik, Form, ErrorMessage, FieldArray } from "formik";
 import { Camera, X } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 import * as Yup from "yup";
 
 interface PictureFormValues {

@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/actions";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import "server-only";
 

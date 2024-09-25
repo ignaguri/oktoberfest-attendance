@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { BeerPictureUpload } from "./components/BeerPictureUpload";
 import { QuickAttendanceRegistrationForm } from "./components/QuickAttendanceRegistrationForm";
 

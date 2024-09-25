@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import { buttonVariants } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { uploadAvatar } from "@/lib/actions";
 import { Formik, Form, ErrorMessage, useFormikContext } from "formik";
+import React, { useState, useRef } from "react";
 import * as Yup from "yup";
-import { useToast } from "@/hooks/use-toast";
+
 import { AvatarPreview } from "./Avatar";
-import { buttonVariants } from "@/components/ui/button";
 
 export interface UploadAvatarFormProps {
   className?: string;

@@ -1,9 +1,10 @@
-import { CreateGroupForm } from "./CreateGroupForm";
-import { JoinGroupForm } from "./JoinGroupForm";
-import { Suspense } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import MyGroups from "@/components/MyGroups";
 import { Separator } from "@/components/ui/separator";
+import { Suspense } from "react";
+
+import { CreateGroupForm } from "./CreateGroupForm";
+import { JoinGroupForm } from "./JoinGroupForm";
 
 export default async function GroupsPage() {
   return (

@@ -1,8 +1,8 @@
-import Link from "next/link";
-import SignOut from "./Auth/SignOut";
-
 import Avatar from "@/components/Avatar/Avatar";
 import { getUserAndAvatarUrl } from "@/lib/actions";
+import Link from "next/link";
+
+import SignOut from "./Auth/SignOut";
 
 export default async function Navbar() {
   const { user, avatarUrl } = await getUserAndAvatarUrl();

@@ -1,23 +1,6 @@
 "use client";
 
-import { Tables } from "@/lib/database.types";
-import { WinningCriteria } from "@/lib/types";
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-
-import EyeOpenIcon from "@/public/icons/eye-open.svg";
-import EyeClosedIcon from "@/public/icons/eye-closed.svg";
-import { winningCriteriaText } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import {
-  fetchWinningCriterias,
-  getCurrentUserForGroup,
-  removeMember,
-  updateGroup,
-} from "@/lib/actions";
-import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogClose,
@@ -28,6 +11,23 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import {
+  fetchWinningCriterias,
+  getCurrentUserForGroup,
+  removeMember,
+  updateGroup,
+} from "@/lib/actions";
+import { winningCriteriaText } from "@/lib/constants";
+import EyeClosedIcon from "@/public/icons/eye-closed.svg";
+import EyeOpenIcon from "@/public/icons/eye-open.svg";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import * as Yup from "yup";
+
+import type { Tables } from "@/lib/database.types";
+import type { WinningCriteria } from "@/lib/types";
 
 type Props = {
   group: Tables<"groups">;

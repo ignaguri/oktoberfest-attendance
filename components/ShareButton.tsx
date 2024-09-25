@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
-import { Share2 } from "lucide-react";
-import { renewGroupToken } from "@/lib/actions";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { renewGroupToken } from "@/lib/actions";
+import { Share2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 
 interface ShareButtonProps {
   groupName: string;

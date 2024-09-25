@@ -1,6 +1,7 @@
-import { Suspense } from "react";
-import GlobalLeaderboardClient from "./GlobalLeaderboardClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Suspense } from "react";
+
+import GlobalLeaderboardClient from "./GlobalLeaderboardClient";
 
 export default function GlobalLeaderboardPage() {
   return (

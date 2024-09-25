@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function BugReportLink({ className }: { className?: string }) {
   const [mailtoLink, setMailtoLink] = useState<string>("");

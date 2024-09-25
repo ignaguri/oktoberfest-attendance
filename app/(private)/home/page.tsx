@@ -1,19 +1,20 @@
-import Link from "next/link";
-import MissingFields from "./MissingFields";
-import OktoberfestStatus from "./OktoberfestStatus";
+import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups";
-import { Button } from "@/components/ui/button";
-import Highlights from "./Highlights";
+import ShareAppButton from "@/components/ShareAppButton";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
-import InstallPWA from "@/components/InstallPWA";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import ShareAppButton from "@/components/ShareAppButton";
+import Link from "next/link";
+
+import Highlights from "./Highlights";
+import MissingFields from "./MissingFields";
+import OktoberfestStatus from "./OktoberfestStatus";
+import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 
 export default async function Home() {
   return (

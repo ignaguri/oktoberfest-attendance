@@ -1,11 +1,12 @@
 "use server";
 
-import { v4 as uuidv4 } from "uuid";
-import sharp from "sharp";
-import { revalidatePath } from "next/cache";
-import { createClient } from "@/utils/supabase/server";
 import { getCacheKeys, deleteCache, clearAllCaches } from "@/lib/cache";
-import { Tables } from "@/lib/database.types";
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
+import sharp from "sharp";
+import { v4 as uuidv4 } from "uuid";
+
+import type { Tables } from "@/lib/database.types";
 
 import "server-only";
 

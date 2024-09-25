@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 
 const MAX_PROMPT_COUNT = 3;
 

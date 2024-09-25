@@ -1,6 +1,7 @@
-import AccountForm from "./AccountForm";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getProfileShort, getUser } from "@/lib/actions";
+
+import AccountForm from "./AccountForm";
 
 export default async function ProfilePage() {
   const userData = getUser();

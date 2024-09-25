@@ -1,6 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import NodeCache from "node-cache";
+
+import type { NextRequest } from "next/server";
 
 const imageCache = new NodeCache({ stdTTL: 86400 }); // Cache images for 24 hours
 

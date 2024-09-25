@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { Heart, Beer } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import BugReportLink from "@/components/BugReportLink";
+import { Separator } from "@/components/ui/separator";
+import { Heart, Beer } from "lucide-react";
+import Link from "next/link";
 
 const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   return (

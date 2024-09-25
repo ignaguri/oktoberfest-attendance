@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import cn from "classnames";
 import Avatar from "@/components/Avatar/Avatar";
-import Image from "next/image";
-
-import UpAndDownArrowIcon from "@/public/icons/up-down-arrows-fa.svg";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import UpAndDownArrowIcon from "@/public/icons/up-down-arrows-fa.svg";
+import cn from "classnames";
+import Image from "next/image";
+import { useState } from "react";
 
 const ICON_SIZE = 12;
 

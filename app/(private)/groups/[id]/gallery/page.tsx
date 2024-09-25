@@ -1,7 +1,8 @@
-import { Suspense } from "react";
-import { fetchGroupGallery } from "@/lib/actions";
-import { GalleryGrid } from "./GalleryGrid";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { fetchGroupGallery } from "@/lib/actions";
+import { Suspense } from "react";
+
+import { GalleryGrid } from "./GalleryGrid";
 
 interface GalleryPageProps {
   params: { id: string };

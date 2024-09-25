@@ -1,11 +1,13 @@
 "use client";
 
+import { useToast } from "@/hooks/use-toast";
+import { fetchAttendances } from "@/lib/actions";
 import { useState, useEffect, useCallback } from "react";
+
+import type { Tables } from "@/lib/database.types";
+
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
-import { fetchAttendances } from "@/lib/actions";
-import { useToast } from "@/hooks/use-toast";
-import type { Tables } from "@/lib/database.types";
 
 type TentVisit = Tables<"tent_visits"> & {
   tentName: string | undefined;

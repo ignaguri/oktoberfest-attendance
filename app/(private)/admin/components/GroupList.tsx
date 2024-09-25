@@ -1,14 +1,16 @@
 "use client";
 
-import { Tables } from "@/lib/database.types";
-import { Button } from "@/components/ui/button";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { getGroups, updateGroup, deleteGroup } from "../actions";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import { useEffect, useState } from "react";
+import * as Yup from "yup";
+
+import type { Tables } from "@/lib/database.types";
+
+import { getGroups, updateGroup, deleteGroup } from "../actions";
 
 const GroupSchema = Yup.object().shape({
   name: Yup.string().required("Required"),

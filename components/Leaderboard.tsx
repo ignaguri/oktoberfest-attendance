@@ -1,15 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-
+import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
 import {
   Table,
   TableBody,
@@ -18,11 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
-import Avatar from "./Avatar/Avatar";
-import { Views } from "@/lib/database-helpers.types";
-import { WinningCriteria } from "@/lib/types";
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { Crown } from "lucide-react";
+import { useState } from "react";
+
+import type { Views } from "@/lib/database-helpers.types";
+import type { WinningCriteria } from "@/lib/types";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
+
+import Avatar from "./Avatar/Avatar";
 
 type LeaderboardEntry = Views<"leaderboard"> & {
   group_count?: number;

@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { fetchGlobalLeaderboard, fetchWinningCriterias } from "@/lib/actions";
-import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Leaderboard } from "@/components/Leaderboard";
-import { winningCriteriaText } from "@/lib/constants";
-import { Tables } from "@/lib/database.types";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useToast } from "@/hooks/use-toast";
+import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { fetchGlobalLeaderboard, fetchWinningCriterias } from "@/lib/actions";
+import { winningCriteriaText } from "@/lib/constants";
 import { WinningCriteria } from "@/lib/types";
+import { useState, useEffect, useCallback, useMemo } from "react";
+
+import type { Tables } from "@/lib/database.types";
 
 export default function GlobalLeaderboardClient() {
   const [winningCriteriaId, setWinningCriteriaId] = useState<number>(1);

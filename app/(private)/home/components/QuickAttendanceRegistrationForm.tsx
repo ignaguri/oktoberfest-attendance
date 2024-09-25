@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  addAttendance,
-  fetchAttendanceByDate,
-  AttendanceByDate,
-} from "@/lib/actions";
-import { useToast } from "@/hooks/use-toast";
-import { Plus, Minus } from "lucide-react";
-import { SingleSelect } from "@/components/Select/SingleSelect";
-import { useTents } from "@/hooks/use-tents";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { SingleSelect } from "@/components/Select/SingleSelect";
+import { Button } from "@/components/ui/button";
+import { useTents } from "@/hooks/use-tents";
+import { useToast } from "@/hooks/use-toast";
+import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
 import { Formik, Form, Field } from "formik";
+import { Plus, Minus } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import type { AttendanceByDate } from "@/lib/actions";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;

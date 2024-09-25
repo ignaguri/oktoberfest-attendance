@@ -1,8 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,6 +9,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { getGroupName } from "@/lib/actions";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function isUUID(str: string) {
   const uuidRegex =

@@ -1,6 +1,6 @@
-import { differenceInDays, isWithinInterval, isBefore } from "date-fns";
-import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { differenceInDays, isWithinInterval, isBefore } from "date-fns";
 import { OctagonAlert } from "lucide-react";
 
 export default function OktoberfestStatus() {

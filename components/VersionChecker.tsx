@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { APP_VERSION } from "../version";
+import { useToast } from "@/hooks/use-toast";
 import { RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { APP_VERSION } from "../version";
 
 export function VersionChecker() {
   const [newVersionAvailable, setNewVersionAvailable] = useState(false);
