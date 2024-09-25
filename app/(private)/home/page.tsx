@@ -13,6 +13,7 @@ import {
 import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 import InstallPWA from "@/components/InstallPWA";
 import { Separator } from "@/components/ui/separator";
+import ShareAppButton from "@/components/ShareAppButton";
 
 export default async function Home() {
   return (
@@ -58,14 +59,15 @@ export default async function Home() {
 
         <div className="flex flex-col gap-2 items-center mt-4">
           <Button asChild variant="yellow">
-            <Link href="/attendance">Register attendance</Link>
+            <Link href="/attendance">My attendances</Link>
           </Button>
           <Button asChild variant="darkYellow">
             <Link href="/groups">Join or Create a group</Link>
           </Button>
-          <Button asChild variant="yellowOutline">
+          <Button asChild variant="default">
             <Link href="/leaderboard">Global Leaderboard</Link>
           </Button>
+          <ShareAppButton />
         </div>
       </div>
       <InstallPWA />

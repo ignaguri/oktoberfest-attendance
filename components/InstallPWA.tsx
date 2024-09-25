@@ -9,13 +9,21 @@ const MAX_PROMPT_COUNT = 3;
 
 function isPWAInstalled(): boolean {
   if (typeof window !== "undefined") {
-    if (window.matchMedia("(display-mode: standalone)").matches) return true;
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      console.debug("PWA already installed");
+      return true;
+    }
     if (
       "standalone" in window.navigator &&
       (window.navigator as any).standalone === true
-    )
+    ) {
+      console.debug("PWA already installed");
       return true;
-    if (document.referrer.includes("android-app://")) return true;
+    }
+    if (document.referrer.includes("android-app://")) {
+      console.debug("PWA already installed");
+      return true;
+    }
   }
   return false;
 }
@@ -44,7 +52,6 @@ export default function InstallPWA() {
       setPromptInstall(e);
       incrementPromptCount();
     };
-    window.addEventListener("beforeinstallprompt", handler);
 
     const checkInstalled = () => {
       if (isPWAInstalled()) {
@@ -56,6 +63,7 @@ export default function InstallPWA() {
     if (promptCount < MAX_PROMPT_COUNT) {
       window.addEventListener("beforeinstallprompt", handler);
     }
+    console.debug("PWA prompt showed too many times");
 
     checkInstalled();
     window.addEventListener("appinstalled", checkInstalled);
@@ -98,7 +106,6 @@ export default function InstallPWA() {
   }, []);
 
   if (!supportsPWA || isInstalled || hide) {
-    console.debug("PWA not supported or already installed");
     return null;
   }
 
