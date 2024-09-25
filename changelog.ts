@@ -1,4 +1,10 @@
 export const changelog: Record<string, string[]> = {
+  "0.2.4": [
+    // Changes omitted for brevity
+    // "Added Invalidate cache tags",
+    "You can now delete an attendance in My attendance page 🗑️",
+    "Added Share App button 📣",
+  ],
   "0.2.3": ["You can set a custom beer cost in your profile! 💶"],
   "0.2.2": [
     // Changes omitted for brevity
