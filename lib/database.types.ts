@@ -444,6 +444,12 @@ export type Database = {
           group_name: string;
         };
       };
+      delete_attendance: {
+        Args: {
+          p_attendance_id: string;
+        };
+        Returns: undefined;
+      };
       fetch_group_gallery: {
         Args: {
           p_group_id: string;

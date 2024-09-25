@@ -1,18 +1,19 @@
 "use server";
 
+import { setCache, getCache, invalidateTags } from "@/lib/cache";
 import { createClient } from "@/utils/supabase/server";
+import { TZDate } from "@date-fns/tz";
+import { isSameDay } from "date-fns/isSameDay";
 import { revalidatePath } from "next/cache";
-import { Tables } from "@/lib/database.types";
+import { redirect } from "next/navigation";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
-import { redirect } from "next/navigation";
-import { setCache, getCache, deleteCache } from "@/lib/cache";
-import { isSameDay } from "date-fns/isSameDay";
-import { TZDate } from "@date-fns/tz";
-import { COST_PER_BEER, TIMEZONE } from "./constants";
 
-import type { User } from "@supabase/supabase-js";
 import type { GalleryData, GalleryItem, PictureData } from "./types";
+import type { Tables } from "@/lib/database.types";
+import type { User } from "@supabase/supabase-js";
+
+import { COST_PER_BEER, TIMEZONE } from "./constants";
 
 import "server-only";
 
@@ -27,7 +28,7 @@ export async function getUser(): Promise<User> {
     throw new Error("User not found");
   }
 
-  setCache(`user-${user.id}`, user); // Cache the user with user-specific key
+  setCache(`user-${user.id}`, user, [`user-${user.id}`]); // Cache the user with user-specific key and tag
   return user;
 }
 
@@ -50,7 +51,7 @@ export async function login(
 
   // Invalidate the user cache on login
   const user = await getUser();
-  deleteCache(`user-${user.id}`);
+  invalidateTags([`user-${user.id}`]);
   revalidatePath("/", "layout");
 
   if (redirectTo) {
@@ -71,9 +72,8 @@ export async function logout() {
   }
 
   // Clear all user-specific cached data
-  deleteCache(`user-${user.id}`);
-  deleteCache(`groups-${user.id}`);
-  // Add more deleteCache calls for other user-specific data as needed
+  invalidateTags([`user-${user.id}`, `groups-${user.id}`]);
+  // Add more invalidateTag calls for other user-specific data as needed
 
   revalidatePath("/", "layout");
   redirect("/");
@@ -95,7 +95,7 @@ export async function signUp(formData: { email: string; password: string }) {
 
   // Invalidate the user cache on sign up
   const user = await getUser();
-  deleteCache(`user-${user.id}`);
+  invalidateTags([`user-${user.id}`]);
 }
 
 export async function resetPassword(formData: {
@@ -125,7 +125,7 @@ export async function updatePassword(formData: { password: string }) {
 
   // Invalidate the user cache on password update
   const user = await getUser();
-  deleteCache(`user-${user.id}`);
+  invalidateTags([`user-${user.id}`]);
 }
 
 export async function updateProfile({
@@ -152,8 +152,7 @@ export async function updateProfile({
   }
 
   // Invalidate cached user data
-  deleteCache(`user-${id}`);
-  deleteCache(`profileShort-${id}`);
+  invalidateTags([`user-${id}`, `profileShort-${id}`]);
   revalidatePath("/profile");
   revalidatePath("/home");
 }
@@ -210,6 +209,7 @@ export async function uploadAvatar(formData: FormData) {
   if (updateError) {
     throw new Error("Error updating user profile");
   }
+  invalidateTags([`user-${userId}`, `profileShort-${userId}`]);
   revalidatePath("/profile");
   revalidatePath("/home");
   revalidatePath("/", "layout");
@@ -232,7 +232,7 @@ export async function getProfileShort() {
   if (!profileData || profileError) {
     throw new Error("Error fetching profile");
   }
-  setCache(`profileShort-${user.id}`, profileData);
+  setCache(`profileShort-${user.id}`, profileData, [`profileShort-${user.id}`]);
   return profileData;
 }
 
@@ -253,7 +253,9 @@ export async function getMissingProfileFields() {
     username: !profileData.username,
     avatarUrl: !profileData.avatar_url,
   };
-  setCache(`missingProfileFields-${user.id}`, missingFields);
+  setCache(`missingProfileFields-${user.id}`, missingFields, [
+    `missingProfileFields-${user.id}`,
+  ]);
   return missingFields;
 }
 
@@ -281,7 +283,9 @@ export async function getUserAndAvatarUrl() {
     throw error;
   }
   const result = { user, avatarUrl: data.avatar_url };
-  setCache(`userAndAvatarUrl-${user.id}`, result);
+  setCache(`userAndAvatarUrl-${user.id}`, result, [
+    `userAndAvatarUrl-${user.id}`,
+  ]);
   return result;
 }
 
@@ -353,7 +357,9 @@ export async function fetchAttendances() {
       }),
   }));
 
-  setCache(`attendances-${user.id}`, attendancesWithTentVisits);
+  setCache(`attendances-${user.id}`, attendancesWithTentVisits, [
+    `attendances-${user.id}`,
+  ]);
   return attendancesWithTentVisits;
 }
 
@@ -420,7 +426,9 @@ export async function fetchAttendanceByDate(
     tent_ids: tentVisitsForDate.map((visit) => visit.tent_id),
     picture_urls: beerPictures.map((pic) => pic.picture_url),
   };
-  setCache(`attendanceByDate-${user.id}-${date.toISOString()}`, result);
+  setCache(`attendanceByDate-${user.id}-${date.toISOString()}`, result, [
+    `attendanceByDate-${user.id}-${date.toISOString()}`,
+  ]);
   return result;
 }
 
@@ -469,6 +477,7 @@ export async function uploadBeerPicture(formData: FormData) {
     );
   }
 
+  invalidateTags([`attendanceByDate-${user.id}-${attendanceId}`]);
   return fileName;
 }
 
@@ -502,17 +511,44 @@ export async function addAttendance(formData: {
   const attendanceId = attendanceData as string;
 
   // Clear caches and revalidate paths as before
-  deleteCache(`attendance-${user.id}`);
-  deleteCache(`attendances-${user.id}`);
-  deleteCache(`attendanceByDate-${user.id}-${date.toISOString()}`);
-  deleteCache(`highlights-${user.id}`);
-  deleteCache(`topPositions-${user.id}`);
-  deleteCache(`totalBeers-${user.id}`);
-  deleteCache(`daysAttended-${user.id}`);
+  invalidateTags([
+    `attendance-${user.id}`,
+    `attendances-${user.id}`,
+    `attendanceByDate-${user.id}-${date.toISOString()}`,
+    `highlights-${user.id}`,
+    `topPositions-${user.id}`,
+    `totalBeers-${user.id}`,
+    `daysAttended-${user.id}`,
+  ]);
   revalidatePath("/attendance");
   revalidatePath("/home");
 
   return attendanceId;
+}
+
+export async function deleteAttendance(attendanceId: string) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  const { error } = await supabase.rpc("delete_attendance", {
+    p_attendance_id: attendanceId,
+  });
+
+  if (error) {
+    throw new Error("Error deleting attendance: " + error.message);
+  }
+
+  invalidateTags([
+    `attendance-${user.id}`,
+    `attendances-${user.id}`,
+    `attendanceByDate-${user.id}-${attendanceId}`,
+    `highlights-${user.id}`,
+    `topPositions-${user.id}`,
+    `totalBeers-${user.id}`,
+    `daysAttended-${user.id}`,
+  ]);
+  revalidatePath("/attendance");
+  revalidatePath("/home");
 }
 
 export async function fetchTents() {
@@ -528,7 +564,7 @@ export async function fetchTents() {
     throw new Error("Error fetching tents: " + error.message);
   }
 
-  setCache(`tents-${user.id}`, data);
+  setCache(`tents-${user.id}`, data, [`tents-${user.id}`]);
   return data;
 }
 
@@ -542,7 +578,7 @@ async function fetchGroupsFromDB(userId: string) {
     throw new Error("Error fetching groups: " + error.message);
   }
   const groups = data.map((item) => item.groups) as Tables<"groups">[];
-  setCache(`groups-${userId}`, groups);
+  setCache(`groups-${userId}`, groups, [`groups-${userId}`]);
   return groups;
 }
 
@@ -576,8 +612,7 @@ export async function createGroup(formData: {
     revalidatePath("/groups");
     revalidatePath(`/groups/${data.group_id}`);
     revalidatePath("/home");
-    deleteCache(`group-${user.id}-${data.group_id}`);
-    deleteCache(`groups-${user.id}`);
+    invalidateTags([`group-${user.id}-${data.group_id}`, `groups-${user.id}`]);
     return data.group_id;
   }
 }
@@ -601,8 +636,7 @@ export async function joinGroup(formData: {
   }
 
   // Invalidate cached groups data
-  deleteCache(`group-${user.id}-${groupId}`);
-  deleteCache(`groups-${user.id}`);
+  invalidateTags([`group-${user.id}-${groupId}`, `groups-${user.id}`]);
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
   revalidatePath("/home");
@@ -623,8 +657,7 @@ export async function joinGroupWithToken(formData: { token: string }) {
   }
 
   // Invalidate cached groups data
-  deleteCache(`group-${user.id}-${groupId}`);
-  deleteCache(`groups-${user.id}`);
+  invalidateTags([`group-${user.id}-${groupId}`, `groups-${user.id}`]);
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
   revalidatePath("/home");
@@ -668,9 +701,11 @@ export async function updateGroup(
   revalidatePath(`/group-settings/${groupId}`);
   revalidatePath("/groups");
   revalidatePath("/home");
-  deleteCache(`group-${user.id}-${groupId}`);
-  deleteCache(`groupDetails-${user.id}-${groupId}`);
-  deleteCache(`groupAndMembership-${user.id}-${groupId}`);
+  invalidateTags([
+    `group-${user.id}-${groupId}`,
+    `groupDetails-${user.id}-${groupId}`,
+    `groupAndMembership-${user.id}-${groupId}`,
+  ]);
   return true;
 }
 
@@ -693,7 +728,9 @@ export async function fetchGroupDetails(groupId: string) {
     throw new Error("Error fetching group details: " + error.message);
   }
 
-  setCache(`groupDetails-${user.id}-${groupId}`, data);
+  setCache(`groupDetails-${user.id}-${groupId}`, data, [
+    `groupDetails-${user.id}-${groupId}`,
+  ]);
   return data;
 }
 
@@ -720,7 +757,9 @@ export async function fetchGroupMembers(groupId: string) {
   }
 
   const groupMembers = data.map((item: any) => item.profiles as PartialProfile);
-  setCache(`groupMembers-${user.id}-${groupId}`, groupMembers);
+  setCache(`groupMembers-${user.id}-${groupId}`, groupMembers, [
+    `groupMembers-${user.id}-${groupId}`,
+  ]);
   return groupMembers;
 }
 
@@ -754,7 +793,9 @@ export async function fetchGroupAndMembership(groupId: string) {
   }
 
   const groupAndMembership = { group, isMember: !!membership };
-  setCache(`groupAndMembership-${user.id}-${groupId}`, groupAndMembership);
+  setCache(`groupAndMembership-${user.id}-${groupId}`, groupAndMembership, [
+    `groupAndMembership-${user.id}-${groupId}`,
+  ]);
   return groupAndMembership;
 }
 
@@ -771,8 +812,7 @@ export async function removeMember(groupId: string, userId: string) {
   revalidatePath(`/group-settings/${groupId}`);
   revalidatePath("/groups");
   revalidatePath("/home");
-  deleteCache(`groupMembers-${userId}-${groupId}`);
-  deleteCache(`groups-${userId}`);
+  invalidateTags([`groupMembers-${userId}-${groupId}`, `groups-${userId}`]);
   return true;
 }
 
@@ -799,7 +839,9 @@ export async function getCurrentUserForGroup(groupId: string) {
     userId: user.id,
     isCreator: data.created_by === user.id,
   };
-  setCache(`currentUserForGroup-${user.id}-${groupId}`, currentUserForGroup);
+  setCache(`currentUserForGroup-${user.id}-${groupId}`, currentUserForGroup, [
+    `currentUserForGroup-${user.id}-${groupId}`,
+  ]);
   return currentUserForGroup;
 }
 
@@ -820,7 +862,9 @@ export async function getGroupName(groupId: string) {
     return null;
   }
 
-  setCache(`groupName-${user.id}-${groupId}`, data.name);
+  setCache(`groupName-${user.id}-${groupId}`, data.name, [
+    `groupName-${user.id}-${groupId}`,
+  ]);
   return data.name;
 }
 
@@ -836,7 +880,7 @@ export async function fetchWinningCriterias() {
     throw error;
   }
 
-  setCache("winningCriterias", data);
+  setCache("winningCriterias", data, ["winningCriterias"]);
   return data;
 }
 
@@ -858,7 +902,7 @@ export async function fetchWinningCriteriaById(id: number) {
     throw error;
   }
 
-  setCache(`winningCriteriaById-${id}`, data);
+  setCache(`winningCriteriaById-${id}`, data, [`winningCriteriaById-${id}`]);
   return data;
 }
 
@@ -880,7 +924,9 @@ export async function fetchWinningCriteriaByName(name: string) {
     throw error;
   }
 
-  setCache(`winningCriteriaByName-${name}`, data);
+  setCache(`winningCriteriaByName-${name}`, data, [
+    `winningCriteriaByName-${name}`,
+  ]);
   return data;
 }
 
@@ -908,7 +954,9 @@ export async function fetchWinningCriteriaForGroup(groupId: string) {
   const winningCriteria = await fetchWinningCriteriaById(
     data.winning_criteria_id,
   );
-  setCache(`winningCriteriaForGroup-${user.id}-${groupId}`, winningCriteria);
+  setCache(`winningCriteriaForGroup-${user.id}-${groupId}`, winningCriteria, [
+    `winningCriteriaForGroup-${user.id}-${groupId}`,
+  ]);
   return winningCriteria;
 }
 
@@ -931,7 +979,9 @@ export async function fetchLeaderboard(groupId: string) {
     throw new Error("Error fetching leaderboard: " + error.message);
   }
 
-  setCache(`leaderboard-${user.id}-${groupId}`, data);
+  setCache(`leaderboard-${user.id}-${groupId}`, data, [
+    `leaderboard-${user.id}-${groupId}`,
+  ]);
   return data;
 }
 
@@ -984,7 +1034,7 @@ export async function fetchHighlights() {
     daysAttended: firstItem.days_attended || 0,
     custom_beer_cost: profileData?.custom_beer_cost ?? COST_PER_BEER,
   };
-  setCache(`highlights-${user.id}`, result);
+  setCache(`highlights-${user.id}`, result, [`highlights-${user.id}`]);
   return result;
 }
 
@@ -1030,7 +1080,9 @@ export async function fetchGroupGallery(groupId: string) {
     }));
   });
 
-  setCache(`groupGallery-${user.id}-${groupId}`, galleryData);
+  setCache(`groupGallery-${user.id}-${groupId}`, galleryData, [
+    `groupGallery-${user.id}-${groupId}`,
+  ]);
   return galleryData;
 }
 

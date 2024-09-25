@@ -1,20 +1,21 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ShareButton from "@/components/ShareButton";
-import { JoinGroupForm } from "../JoinGroupForm";
-import { WinningCriteria } from "@/lib/types";
-import { winningCriteriaText } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import {
   fetchGroupAndMembership,
   fetchLeaderboard,
   fetchWinningCriteriaForGroup,
 } from "@/lib/actions";
+import { winningCriteriaText } from "@/lib/constants";
 import { Images } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import type { WinningCriteria } from "@/lib/types";
+
+import { JoinGroupForm } from "../JoinGroupForm";
 
 export default async function GroupPage({
   params,

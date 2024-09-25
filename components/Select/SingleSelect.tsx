@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SelectBase, Option, SelectBaseProps } from "./SelectBase";
+
+import type { Option, SelectBaseProps } from "./SelectBase";
+
+import { SelectBase } from "./SelectBase";
 
 interface SingleSelectProps
   extends Pick<

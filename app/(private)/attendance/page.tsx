@@ -1,11 +1,13 @@
 "use client";
 
+import { useToast } from "@/hooks/use-toast";
+import { fetchAttendances } from "@/lib/actions";
 import { useState, useEffect, useCallback } from "react";
+
+import type { Tables } from "@/lib/database.types";
+
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
-import { fetchAttendances } from "@/lib/actions";
-import { useToast } from "@/hooks/use-toast";
-import type { Tables } from "@/lib/database.types";
 
 type TentVisit = Tables<"tent_visits"> & {
   tentName: string | undefined;
@@ -45,9 +47,14 @@ export default function AttendancePage() {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
 
-  const handleDateSelect = (date: Date) => {
+  const handleDateSelect = (date: Date | null) => {
     setSelectedDate(date);
   };
+
+  const handleAttendanceDelete = useCallback(() => {
+    handleDateSelect(null);
+    handleAttendanceUpdate();
+  }, [handleAttendanceUpdate]);
 
   return (
     <div className="w-full max-w-lg flex flex-col gap-6">
@@ -58,6 +65,7 @@ export default function AttendancePage() {
       <PersonalAttendanceTable
         data={attendances}
         onDateSelect={handleDateSelect}
+        onAttendanceDelete={handleAttendanceDelete}
       />
     </div>
   );

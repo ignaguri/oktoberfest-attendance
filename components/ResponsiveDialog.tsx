@@ -1,4 +1,3 @@
-import useMediaQuery from "@/hooks/use-media-query";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +14,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import useMediaQuery from "@/hooks/use-media-query";
 
 interface ResponsiveDialogProps {
   open: boolean;

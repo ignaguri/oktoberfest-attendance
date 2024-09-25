@@ -1,10 +1,11 @@
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+
 import { listCacheKeys, deleteCacheKey, deleteAllCaches } from "../actions";
-import LoadingSpinner from "@/components/LoadingSpinner";
 
 const CacheManagement = () => {
   const { toast } = useToast();

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { login } from "@/lib/actions";
-import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { login } from "@/lib/actions";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import * as Yup from "yup";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),

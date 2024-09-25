@@ -1,9 +1,10 @@
-import Link from "next/link";
-import type { FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
 import { getMissingProfileFields } from "@/lib/actions";
+import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
+import Link from "next/link";
+
+import type { FC } from "react";
 
 interface MissingFieldProps {
   label: string;

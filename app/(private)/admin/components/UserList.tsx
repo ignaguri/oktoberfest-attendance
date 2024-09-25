@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import ResponsiveDialog from "@/components/ResponsiveDialog";
+import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { Tables } from "@/lib/database.types";
-import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import { useEffect, useState } from "react";
+import * as Yup from "yup";
+
+import type { Tables } from "@/lib/database.types";
+import type { User } from "@supabase/supabase-js";
+
 import {
   deleteAttendance,
   deleteUser,
@@ -16,9 +21,6 @@ import {
   updateUserAuth,
   updateUserProfile,
 } from "../actions";
-import TentSelector from "@/components/TentSelector";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import ResponsiveDialog from "@/components/ResponsiveDialog";
 
 type CombinedUser = User & { profile: Tables<"profiles"> };
 interface AttendanceWithTents extends Tables<"attendances"> {

@@ -1,11 +1,10 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-
-import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { getUser } from "@/lib/actions";
-import { WhatsNew } from "@/components/WhatsNew";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { VersionChecker } from "@/components/VersionChecker";
+import { WhatsNew } from "@/components/WhatsNew";
+import { getUser } from "@/lib/actions";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 async function AuthCheck() {
   try {

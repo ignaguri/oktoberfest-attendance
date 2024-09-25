@@ -1,8 +1,9 @@
 "use client";
 
 import cn from "classnames";
-import React from "react";
 import Image from "next/image";
+import React from "react";
+
 import UploadAvatarForm from "./UploadAvatarForm";
 
 export interface AvatarProps {

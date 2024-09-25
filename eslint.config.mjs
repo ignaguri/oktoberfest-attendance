@@ -21,26 +21,27 @@ const patchedConfig = fixupConfigRules([
 ]);
 
 const config = [
-  ...patchedConfig,
   {
-    plugins: {
-      "@typescript-eslint": typescriptEslint,
-      "simple-import-sort": simpleImportSort,
-      "unused-imports": unusedImports,
-    },
-
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
       globals: {
         React: true,
         JSX: true,
       },
     },
-
+    plugins: {
+      "@typescript-eslint": typescriptEslint,
+      "simple-import-sort": simpleImportSort,
+      "unused-imports": unusedImports,
+    },
     rules: {
       "no-console": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "react/display-name": "off",
-
       "react/jsx-curly-brace-presence": [
         "warn",
         {
@@ -48,23 +49,22 @@ const config = [
           children: "never",
         },
       ],
+      "@typescript-eslint/consistent-type-imports": "error",
+      "import/order": [
+        "error",
+        {
+          groups: [
+            ["builtin", "external", "internal", "index", "object"],
 
-      // "@typescript-eslint/consistent-type-imports": "error",
-      // 'import/order': [
-      // 'error',
-      // {
-      //   'groups': [
-      //     ['builtin', 'external', 'internal'],
-      //     ['type'], // All type imports go after other imports
-      //   ],
-      //   'newlines-between': 'always', // Add a new line between groups
-      //   'alphabetize': {
-      //     order: 'asc', // Sort in ascending order
-      //     caseInsensitive: true,
-      //   },
-      // },
-      // ],
-
+            ["type"], // All type imports go after other imports
+          ],
+          "newlines-between": "always", // Add a new line between groups
+          alphabetize: {
+            order: "asc", // Sort in ascending order
+            caseInsensitive: true,
+          },
+        },
+      ],
       "unused-imports/no-unused-imports": "warn",
       "unused-imports/no-unused-vars": [
         "warn",
@@ -75,10 +75,10 @@ const config = [
           argsIgnorePattern: "^_",
         },
       ],
-
       "simple-import-sort/exports": "warn",
     },
   },
+  ...patchedConfig,
   prettierConfigRecommended,
   { ignores: [".next/*"] },
 ];

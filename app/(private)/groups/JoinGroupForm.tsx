@@ -1,14 +1,14 @@
 "use client";
 
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { joinGroup } from "@/lib/actions";
 import cn from "classnames";
-import { useState } from "react";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { useState } from "react";
+import * as Yup from "yup";
 
 // Define validation schema
 const JoinGroupSchema = Yup.object().shape({

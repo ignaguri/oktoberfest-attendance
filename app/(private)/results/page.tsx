@@ -1,7 +1,8 @@
-import AttendanceTable from "./AttendanceTable";
 import { createClient } from "@/utils/supabase/server";
 
 import type { AttendanceResult } from "./AttendanceTable";
+
+import AttendanceTable from "./AttendanceTable";
 
 export default async function Results() {
   const supabase = createClient();

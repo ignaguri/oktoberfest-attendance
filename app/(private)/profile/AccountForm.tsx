@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import Avatar from "@/components/Avatar/Avatar";
-import { getProfileShort, updateProfile } from "@/lib/actions";
-import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { getProfileShort, updateProfile } from "@/lib/actions";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import Link from "next/link";
+import { useState } from "react";
+import * as Yup from "yup";
+
+import type { User } from "@supabase/supabase-js";
 
 const ProfileSchema = Yup.object().shape({
   fullname: Yup.string(),

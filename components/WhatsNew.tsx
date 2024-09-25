@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { changelog } from "@/changelog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,15 +16,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { changelog } from "@/changelog";
 import { APP_VERSION } from "@/version";
+import { useState, useEffect } from "react";
 
 export function WhatsNew() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -5,11 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { fetchHighlights } from "@/lib/actions";
 import { COST_PER_BEER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 import "server-only";
 

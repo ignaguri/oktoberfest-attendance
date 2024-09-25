@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
-import * as Yup from "yup";
-import { MyDatePicker } from "./DatePicker";
-import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
 import TentSelector from "@/components/TentSelector";
-import { useToast } from "@/hooks/use-toast";
-import {
-  addAttendance,
-  AttendanceByDate,
-  fetchAttendanceByDate,
-} from "@/lib/actions";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
+import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { add, isWithinInterval } from "date-fns";
-import { BeerPicturesUpload } from "./BeerPicturesUpload";
 import { TZDate } from "@date-fns/tz";
+import { add, isWithinInterval } from "date-fns";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import * as Yup from "yup";
+
+import type { AttendanceByDate } from "@/lib/actions";
+import type { FormikHelpers } from "formik";
+
+import { BeerPicturesUpload } from "./BeerPicturesUpload";
+import { MyDatePicker } from "./DatePicker";
 
 const DAY_AFTER_WIESN = add(new TZDate(END_OF_WIESN, TIMEZONE), { days: 1 });
 
@@ -82,10 +82,12 @@ export default function DetailedAttendanceForm({
   }, [fetchAttendanceForDate, currentDate]);
 
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate === null) {
+      setCurrentDate(initialDate);
+    } else {
       setCurrentDate(selectedDate);
     }
-  }, [selectedDate]);
+  }, [initialDate, selectedDate]);
 
   const handleSubmit = async (
     values: { amount: number; date: Date; tents: string[] },
@@ -200,6 +202,7 @@ export default function DetailedAttendanceForm({
         {existingAttendance && (
           <div className="mt-8">
             <BeerPicturesUpload
+              key={existingAttendance.id} // Ensure re-render when existingAttendance changes
               attendanceId={existingAttendance.id}
               existingPictureUrls={existingAttendance.picture_urls || []}
               onPicturesUpdate={handlePicturesUpdate}

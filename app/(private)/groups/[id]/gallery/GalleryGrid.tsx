@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { TIMEZONE } from "@/lib/constants";
+import { TZDate } from "@date-fns/tz";
 import { format } from "date-fns";
-import { ImageModal } from "./ImageModal";
+import Image from "next/image";
+import { useState } from "react";
 
 import type { GalleryData } from "@/lib/types";
-import { TZDate } from "@date-fns/tz";
-import { TIMEZONE } from "@/lib/constants";
+
+import { ImageModal } from "./ImageModal";
 
 interface GalleryGridProps {
   galleryData: GalleryData;
