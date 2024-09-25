@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { formatDate } from "date-fns/format";
-import { Beer, Tent } from "lucide-react";
+import { Beer, Tent, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { DataTable } from "@/components/Table/DataTable";
@@ -10,31 +10,78 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
 
 import type { AttendanceWithTentVisits } from "./page";
+import { deleteAttendance } from "@/lib/actions";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface PersonalAttendanceTableProps {
   data?: AttendanceWithTentVisits[];
   onDateSelect: (date: Date) => void;
+  onAttendanceDelete: () => void;
 }
 
 const PersonalAttendanceTable = ({
   data,
   onDateSelect,
+  onAttendanceDelete,
 }: PersonalAttendanceTableProps) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isVisitedTentsDialogOpen, setVisitedTentsDialogOpen] = useState(false);
+  const [isDeleteAttendanceDialogOpen, setDeleteAttendanceDialogOpen] =
+    useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState<string | null>(
     null,
   );
+  const { toast } = useToast();
 
   const tentVisitsForDate = useMemo(() => {
     return data?.find((attendance) => attendance.date === selectedAttendance)
       ?.tentVisits;
   }, [data, selectedAttendance]);
 
-  const handleTentClick = (attendance: string) => {
-    setSelectedAttendance(attendance);
-    setDialogOpen(true);
-    onDateSelect(new Date(attendance));
-  };
+  const selectedAttendanceData = useMemo(() => {
+    return data?.find((attendance) => attendance.date === selectedAttendance);
+  }, [data, selectedAttendance]);
+
+  const handleTentClick = useCallback(
+    (attendance: string) => {
+      setSelectedAttendance(attendance);
+      setVisitedTentsDialogOpen(true);
+      onDateSelect(new Date(attendance));
+    },
+    [onDateSelect],
+  );
+
+  const handleDelete = useCallback(
+    async (attendanceId: string) => {
+      try {
+        await deleteAttendance(attendanceId);
+
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Attendance deleted successfully.",
+        });
+        setSelectedAttendance(null);
+        onAttendanceDelete();
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete attendance. Please try again.",
+        });
+      }
+    },
+    [onAttendanceDelete, toast],
+  );
 
   const columns: ColumnDef<AttendanceWithTentVisits>[] = [
     {
@@ -72,6 +119,25 @@ const PersonalAttendanceTable = ({
         </Button>
       ),
     },
+    {
+      id: "delete",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="" />
+      ),
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Button
+          variant="outline"
+          className="flex items-center justify-center gap-1"
+          onClick={() => {
+            setSelectedAttendance(row.original.date);
+            setDeleteAttendanceDialogOpen(true);
+          }}
+        >
+          <Trash size={24} />
+        </Button>
+      ),
+    },
   ];
 
   return (
@@ -83,8 +149,8 @@ const PersonalAttendanceTable = ({
       />
 
       <ResponsiveDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        open={isVisitedTentsDialogOpen}
+        onOpenChange={setVisitedTentsDialogOpen}
         title="Visited Tents"
         description="Details of the tents you visited."
       >
@@ -116,6 +182,42 @@ const PersonalAttendanceTable = ({
             </div>
           ))}
       </ResponsiveDialog>
+      <Dialog
+        open={isDeleteAttendanceDialogOpen}
+        onOpenChange={setDeleteAttendanceDialogOpen}
+      >
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this attendance? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteAttendanceDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (selectedAttendanceData) {
+                  await handleDelete(selectedAttendanceData.id);
+                  setDeleteAttendanceDialogOpen(false);
+                }
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

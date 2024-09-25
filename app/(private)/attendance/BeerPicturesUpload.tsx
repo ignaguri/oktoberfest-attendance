@@ -61,9 +61,9 @@ const PicturePreview = ({
       <Image
         src={src}
         alt="Beer picture preview"
-        layout="fill"
-        objectFit="cover"
-        className="rounded"
+        className="rounded object-cover"
+        width={96}
+        height={96}
       />
       {!isUploaded && onRemove && (
         <button

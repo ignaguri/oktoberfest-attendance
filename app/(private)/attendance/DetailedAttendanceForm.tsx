@@ -82,10 +82,12 @@ export default function DetailedAttendanceForm({
   }, [fetchAttendanceForDate, currentDate]);
 
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate === null) {
+      setCurrentDate(initialDate);
+    } else {
       setCurrentDate(selectedDate);
     }
-  }, [selectedDate]);
+  }, [initialDate, selectedDate]);
 
   const handleSubmit = async (
     values: { amount: number; date: Date; tents: string[] },
@@ -200,6 +202,7 @@ export default function DetailedAttendanceForm({
         {existingAttendance && (
           <div className="mt-8">
             <BeerPicturesUpload
+              key={existingAttendance.id} // Ensure re-render when existingAttendance changes
               attendanceId={existingAttendance.id}
               existingPictureUrls={existingAttendance.picture_urls || []}
               onPicturesUpdate={handlePicturesUpdate}

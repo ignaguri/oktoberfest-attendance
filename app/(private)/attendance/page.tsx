@@ -45,9 +45,14 @@ export default function AttendancePage() {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
 
-  const handleDateSelect = (date: Date) => {
+  const handleDateSelect = (date: Date | null) => {
     setSelectedDate(date);
   };
+
+  const handleAttendanceDelete = useCallback(() => {
+    handleDateSelect(null);
+    handleAttendanceUpdate();
+  }, [handleAttendanceUpdate]);
 
   return (
     <div className="w-full max-w-lg flex flex-col gap-6">
@@ -58,6 +63,7 @@ export default function AttendancePage() {
       <PersonalAttendanceTable
         data={attendances}
         onDateSelect={handleDateSelect}
+        onAttendanceDelete={handleAttendanceDelete}
       />
     </div>
   );

@@ -525,6 +525,31 @@ export async function addAttendance(formData: {
   return attendanceId;
 }
 
+export async function deleteAttendance(attendanceId: string) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  const { error } = await supabase.rpc("delete_attendance", {
+    p_attendance_id: attendanceId,
+  });
+
+  if (error) {
+    throw new Error("Error deleting attendance: " + error.message);
+  }
+
+  invalidateTags([
+    `attendance-${user.id}`,
+    `attendances-${user.id}`,
+    `attendanceByDate-${user.id}-${attendanceId}`,
+    `highlights-${user.id}`,
+    `topPositions-${user.id}`,
+    `totalBeers-${user.id}`,
+    `daysAttended-${user.id}`,
+  ]);
+  revalidatePath("/attendance");
+  revalidatePath("/home");
+}
+
 export async function fetchTents() {
   const user = await getUser();
   const cachedTents = getCache<Tables<"tents">[]>(`tents-${user.id}`);
