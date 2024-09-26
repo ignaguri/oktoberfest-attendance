@@ -154,7 +154,11 @@ export async function updateProfile({
   }
 
   // Invalidate cached user data
-  invalidateTags([`user-${id}`, `profileShort-${id}`]);
+  invalidateTags([
+    `user-${id}`,
+    `profileShort-${id}`,
+    `missingProfileFields-${id}`,
+  ]);
   revalidatePath("/profile");
   revalidatePath("/home", "layout");
   revalidatePath("/home", "page");
@@ -212,7 +216,11 @@ export async function uploadAvatar(formData: FormData) {
   if (updateError) {
     throw new Error("Error updating user profile");
   }
-  invalidateTags([`user-${userId}`, `profileShort-${userId}`]);
+  invalidateTags([
+    `user-${userId}`,
+    `profileShort-${userId}`,
+    `missingProfileFields-${userId}`,
+  ]);
   revalidatePath("/profile");
   revalidatePath("/home", "layout");
   revalidatePath("/home", "page");
