@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/actions";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Link } from "next-view-transitions";
 
 import "server-only";
 

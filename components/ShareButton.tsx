@@ -69,7 +69,7 @@ export default function ShareButton({
     }
   }, [generateShareLink, open, tokenGenerated]);
 
-  const title = "Share group";
+  const title = "Invite to join";
   const description = "Choose how you’d like to share the group information:";
 
   const ButtonsGroup = () => (

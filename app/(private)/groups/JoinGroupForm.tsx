@@ -6,7 +6,7 @@ import { joinGroup } from "@/lib/actions";
 import cn from "classnames";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import * as Yup from "yup";
 
@@ -23,7 +23,7 @@ interface JoinGroupFormProps {
 
 export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { toast } = useToast();
 
   const handleSubmit = async (

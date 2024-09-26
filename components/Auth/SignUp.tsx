@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { signUp } from "@/lib/actions";
 import cn from "classnames";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import React, { useState, useRef } from "react";
 import * as Yup from "yup";
 

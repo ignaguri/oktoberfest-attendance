@@ -80,7 +80,11 @@ export function WhatsNew() {
               className="w-full"
             >
               {previousVersions.map((version) => (
-                <AccordionItem key={version} value={version}>
+                <AccordionItem
+                  key={version}
+                  value={version}
+                  className="ring-transparent"
+                >
                   <AccordionTrigger onClick={() => toggleVersion(version)}>
                     Version {version}
                   </AccordionTrigger>

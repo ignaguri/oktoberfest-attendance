@@ -1,4 +1,11 @@
 export const changelog: Record<string, string[]> = {
+  "0.2.5": [
+    // Changes omitted for brevity
+    // "Initials for avatar",
+    // "Move "what can the app do" to the bottom",
+    "Added link to Oktoberfest map 🗺️",
+    "Smoother page transtitions 🚀",
+  ],
   "0.2.4": [
     // Changes omitted for brevity
     // "Added Invalidate cache tags",

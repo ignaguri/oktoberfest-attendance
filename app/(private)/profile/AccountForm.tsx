@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getProfileShort, updateProfile } from "@/lib/actions";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { useState } from "react";
 import * as Yup from "yup";
 
@@ -82,6 +82,11 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
         onUpload={(url) => {
           setAvatarUrl(url);
           setIsEditing(false);
+        }}
+        fallback={{
+          username: profileData.username,
+          full_name: profileData.full_name,
+          email: user.email!,
         }}
       />
       <Formik

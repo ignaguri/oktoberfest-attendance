@@ -1,12 +1,16 @@
 "use client";
 
-import cn from "classnames";
-import Image from "next/image";
+import {
+  Avatar as AvatarUI,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { cva } from "class-variance-authority";
 import React from "react";
 
 import UploadAvatarForm from "./UploadAvatarForm";
 
-export interface AvatarProps {
+interface AvatarProps {
   className?: string;
   isEditing?: boolean;
   uid?: string;
@@ -14,66 +18,63 @@ export interface AvatarProps {
   size?: "small" | "medium" | "large";
   onUpload?: (url: string) => void;
   previewUrl?: string | null;
+  fallback: {
+    username: string | null;
+    full_name: string | null;
+    email: string;
+  };
 }
 
-const getMeasure = (size: AvatarProps["size"]) => {
-  switch (size) {
-    case "small":
-      return 40;
-    case "medium":
-      return 100;
-    case "large":
-      return 150;
+const avatarSizeVariants = cva("", {
+  variants: {
+    size: {
+      small: "h-10 w-10", // 40px
+      medium: "h-24 w-24", // 100px
+      large: "h-36 w-36", // 150px
+    },
+  },
+  defaultVariants: {
+    size: "small",
+  },
+});
+
+function extractName({ username, full_name, email }: AvatarProps["fallback"]) {
+  if (full_name) {
+    const [first, last] = full_name.split(" ");
+    return {
+      initials: `${first[0].toUpperCase()}${last ? last[0].toUpperCase() : ""}`,
+      full: full_name,
+    };
   }
-};
+  if (username) {
+    const [first, last] = username.split(" ");
+    return {
+      initials: `${first[0].toUpperCase()}${last ? last[0].toUpperCase() : ""}`,
+      full: username,
+    };
+  }
+
+  const [first, last] = email.split("@")[0].split(".");
+  return {
+    initials: `${first[0].toUpperCase()}${last ? last[0].toUpperCase() : ""}`,
+    full: email,
+  };
+}
 
 export function AvatarPreview({
   url,
   previewUrl,
   size = "small",
-}: Pick<AvatarProps, "url" | "previewUrl" | "size">) {
-  const measure = getMeasure(size);
-  const imageUrl = previewUrl || (url ? `/api/image/${url}` : null);
+  fallback,
+}: Pick<AvatarProps, "url" | "previewUrl" | "size" | "fallback">) {
+  const imageUrl = previewUrl || (url ? `/api/image/${url}` : undefined);
+  const { initials, full } = extractName(fallback);
 
   return (
-    <div
-      className={cn("rounded-full overflow-hidden", {
-        "border border-gray-300 bg-gray-100": !imageUrl,
-      })}
-      style={{ height: measure, width: measure }}
-    >
-      {imageUrl ? (
-        <Image
-          width={measure}
-          height={measure}
-          src={imageUrl}
-          alt="Avatar"
-          className="rounded-full object-cover"
-          style={{ height: measure, width: measure }}
-        />
-      ) : (
-        <div className="h-full w-full flex flex-col justify-center items-center text-center">
-          <span
-            className={cn("text-gray-500", {
-              "text-2xl": size === "large",
-              "text-lg": size === "medium",
-              "text-sm leading-none": size === "small",
-            })}
-          >
-            No
-          </span>
-          <span
-            className={cn("text-gray-500", {
-              "text-2xl": size === "large",
-              "text-lg": size === "medium",
-              "text-sm leading-none": size === "small",
-            })}
-          >
-            img
-          </span>
-        </div>
-      )}
-    </div>
+    <AvatarUI className={avatarSizeVariants({ size })}>
+      <AvatarImage src={imageUrl} alt={`${full} avatar`} />
+      <AvatarFallback>{initials}</AvatarFallback>
+    </AvatarUI>
   );
 }
 
@@ -85,11 +86,17 @@ export default function Avatar({
   size = "small",
   onUpload,
   previewUrl,
+  fallback,
 }: AvatarProps) {
   return (
     <div className={className}>
       {!isEditing && (
-        <AvatarPreview url={url} previewUrl={previewUrl} size={size} />
+        <AvatarPreview
+          url={url}
+          previewUrl={previewUrl}
+          size={size}
+          fallback={fallback}
+        />
       )}
       {isEditing && uid && <UploadAvatarForm onUpload={onUpload} uid={uid} />}
     </div>

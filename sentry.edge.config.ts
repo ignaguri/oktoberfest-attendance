@@ -5,6 +5,8 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+import { APP_VERSION } from "./version";
+
 Sentry.init({
   dsn: "https://976065906ffaab22c65cb37405653cea@o4507997605527552.ingest.de.sentry.io/4507997611098192",
 
@@ -13,4 +15,6 @@ Sentry.init({
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  release: APP_VERSION,
 });

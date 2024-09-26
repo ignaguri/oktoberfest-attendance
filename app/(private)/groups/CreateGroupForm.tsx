@@ -6,7 +6,7 @@ import { createGroup } from "@/lib/actions";
 import cn from "classnames";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import * as Yup from "yup";
 
@@ -17,7 +17,7 @@ const CreateGroupSchema = Yup.object().shape({
 });
 
 export const CreateGroupForm = () => {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast(); // Initialize toast
 

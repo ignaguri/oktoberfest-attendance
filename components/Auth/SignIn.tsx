@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { login } from "@/lib/actions";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Link } from "next-view-transitions";
 import { useState } from "react";
 import * as Yup from "yup";
 

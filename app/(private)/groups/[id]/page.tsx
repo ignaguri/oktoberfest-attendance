@@ -9,8 +9,8 @@ import {
 } from "@/lib/actions";
 import { winningCriteriaText } from "@/lib/constants";
 import { Images } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Link } from "next-view-transitions";
 import { Suspense } from "react";
 
 import type { WinningCriteria } from "@/lib/types";

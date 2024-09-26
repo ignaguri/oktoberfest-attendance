@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 
 export default function BugReportLink({ className }: { className?: string }) {
@@ -23,8 +23,6 @@ export default function BugReportLink({ className }: { className?: string }) {
 ----- Environment Information -----
 ${info}
 ----- End Environment Information -----
-
-Describe the bug here:
 `;
 
     setMailtoLink(

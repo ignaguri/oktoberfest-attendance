@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { fetchGroups } from "@/lib/actions";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 export default async function MyGroups() {
   const groups = await fetchGroups();

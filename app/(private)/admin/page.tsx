@@ -1,7 +1,8 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
 import CacheManagement from "./components/CacheManagement";
@@ -14,7 +15,7 @@ const tabValues = ["users", "groups", "cache", "images"];
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("users");
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useTransitionRouter();
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);

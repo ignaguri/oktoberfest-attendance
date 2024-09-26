@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
+import { WIESN_MAP_URL } from "@/lib/constants";
+import { ExternalLink } from "lucide-react";
+import { Link } from "next-view-transitions";
 
 import Highlights from "./Highlights";
 import MissingFields from "./MissingFields";
@@ -33,24 +35,6 @@ export default async function Home() {
         <QuickAttendanceRegistration />
       </div>
 
-      <div className="mb-4">
-        <Accordion type="single" collapsible>
-          <AccordionItem value="item-1">
-            <AccordionTrigger>
-              What can I do with Prost Counter?
-            </AccordionTrigger>
-            <AccordionContent className="max-w-80 mx-auto">
-              <p className="text-center text-gray-600">
-                Compete with friends in different groups to see who visits
-                Oktoberfest more often and drinks the most beers!
-                <br />
-                Track your progress and become the ultimate Wiesnmeister.
-              </p>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-
       <div className="flex flex-col gap-4">
         <MissingFields />
         <Highlights />
@@ -68,8 +52,34 @@ export default async function Home() {
           <Button asChild variant="default">
             <Link href="/leaderboard">Global Leaderboard</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href={WIESN_MAP_URL} target="_blank">
+              <span className="mr-1">Oktoberfest Map</span>
+              <ExternalLink size={20} />
+            </Link>
+          </Button>
           <ShareAppButton />
         </div>
+      </div>
+
+      <Separator className="my-4" decorative />
+
+      <div className="mb-4">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              What can I do with Prost Counter?
+            </AccordionTrigger>
+            <AccordionContent className="max-w-80 mx-auto">
+              <p className="text-center text-gray-600">
+                Compete with friends in different groups to see who visits
+                Oktoberfest more often and drinks the most beers!
+                <br />
+                Track your progress and become the ultimate Wiesnmeister.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
       <InstallPWA />
     </div>
