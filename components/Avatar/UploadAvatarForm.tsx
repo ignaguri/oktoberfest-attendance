@@ -126,7 +126,16 @@ export default function UploadAvatarForm({
       >
         {() => (
           <Form className="flex flex-col items-center gap-4">
-            <AvatarPreview url={null} previewUrl={previewUrl} size="large" />
+            <AvatarPreview
+              url={null}
+              previewUrl={previewUrl}
+              size="large"
+              fallback={{
+                username: null,
+                full_name: null,
+                email: "no.name@email.com",
+              }}
+            />
             <FileInput />
           </Form>
         )}

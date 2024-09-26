@@ -58,7 +58,14 @@ export const Leaderboard = ({
       header: "Name",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <Avatar url={row.original.avatar_url} size="small" />
+          <Avatar
+            url={row.original.avatar_url}
+            fallback={{
+              username: row.original.username,
+              full_name: row.original.full_name,
+              email: "no.name@email.com",
+            }}
+          />
           <span className="font-medium">{getDisplayName(row.original)}</span>
         </div>
       ),

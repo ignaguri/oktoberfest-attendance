@@ -156,7 +156,8 @@ export async function updateProfile({
   // Invalidate cached user data
   invalidateTags([`user-${id}`, `profileShort-${id}`]);
   revalidatePath("/profile");
-  revalidatePath("/home");
+  revalidatePath("/home", "layout");
+  revalidatePath("/home", "page");
 }
 
 export async function getAvatarId(userId: string) {
@@ -213,14 +214,18 @@ export async function uploadAvatar(formData: FormData) {
   }
   invalidateTags([`user-${userId}`, `profileShort-${userId}`]);
   revalidatePath("/profile");
-  revalidatePath("/home");
-  revalidatePath("/", "layout");
+  revalidatePath("/home", "layout");
+  revalidatePath("/home", "page");
   return fileName;
 }
 
 export async function getProfileShort() {
   const user = await getUser();
-  const cachedProfile = getCache<Tables<"profiles">>(`profileShort-${user.id}`);
+  const cachedProfile = getCache<
+    Tables<"profiles"> & {
+      email: string;
+    }
+  >(`profileShort-${user.id}`);
   if (cachedProfile) {
     return cachedProfile;
   }
@@ -235,7 +240,15 @@ export async function getProfileShort() {
     throw new Error("Error fetching profile");
   }
   setCache(`profileShort-${user.id}`, profileData, [`profileShort-${user.id}`]);
-  return profileData;
+  return { ...profileData, email: user.email };
+}
+
+export async function getProfileShortFailsafe() {
+  try {
+    return await getProfileShort();
+  } catch {
+    return null;
+  }
 }
 
 export async function getMissingProfileFields() {
@@ -259,36 +272,6 @@ export async function getMissingProfileFields() {
     `missingProfileFields-${user.id}`,
   ]);
   return missingFields;
-}
-
-export async function getUserAndAvatarUrl() {
-  let user;
-  try {
-    user = await getUser();
-  } catch (error) {
-    return { user: null, avatarUrl: null };
-  }
-  const cachedData = getCache<{ user: User; avatarUrl: string | null }>(
-    `userAndAvatarUrl-${user.id}`,
-  );
-  if (cachedData) {
-    return cachedData;
-  }
-
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(`avatar_url`)
-    .eq("id", user.id)
-    .single();
-  if (error) {
-    throw error;
-  }
-  const result = { user, avatarUrl: data.avatar_url };
-  setCache(`userAndAvatarUrl-${user.id}`, result, [
-    `userAndAvatarUrl-${user.id}`,
-  ]);
-  return result;
 }
 
 async function fetchAttendancesFromDB(

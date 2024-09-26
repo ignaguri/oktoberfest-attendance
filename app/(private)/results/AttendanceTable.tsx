@@ -134,7 +134,14 @@ const AttendanceTable = ({ data }: AttendanceTableProps) => {
             })}
           >
             <td className="px-2 py-1 sm:px-4 sm:py-2">
-              <Avatar url={item.avatarUrl ?? null} size="small" />
+              <Avatar
+                url={item.avatarUrl ?? null}
+                fallback={{
+                  username: item.username ?? null,
+                  full_name: item.fullName ?? null,
+                  email: item.email,
+                }}
+              />
             </td>
             <td className="max-w-[164px] sm:max-w-full px-0 py-1 sm:px-4 sm:py-2 leading-none truncate">
               {getDisplayName(item)}

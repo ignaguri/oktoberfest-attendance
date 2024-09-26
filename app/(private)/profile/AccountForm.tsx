@@ -83,6 +83,11 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
           setAvatarUrl(url);
           setIsEditing(false);
         }}
+        fallback={{
+          username: profileData.username,
+          full_name: profileData.full_name,
+          email: user.email!,
+        }}
       />
       <Formik
         initialValues={{
