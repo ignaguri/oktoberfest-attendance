@@ -35,24 +35,6 @@ export default async function Home() {
         <QuickAttendanceRegistration />
       </div>
 
-      <div className="mb-4">
-        <Accordion type="single" collapsible>
-          <AccordionItem value="item-1">
-            <AccordionTrigger>
-              What can I do with Prost Counter?
-            </AccordionTrigger>
-            <AccordionContent className="max-w-80 mx-auto">
-              <p className="text-center text-gray-600">
-                Compete with friends in different groups to see who visits
-                Oktoberfest more often and drinks the most beers!
-                <br />
-                Track your progress and become the ultimate Wiesnmeister.
-              </p>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-
       <div className="flex flex-col gap-4">
         <MissingFields />
         <Highlights />
@@ -78,6 +60,26 @@ export default async function Home() {
           </Button>
           <ShareAppButton />
         </div>
+      </div>
+
+      <Separator className="my-4" decorative />
+
+      <div className="mb-4">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              What can I do with Prost Counter?
+            </AccordionTrigger>
+            <AccordionContent className="max-w-80 mx-auto">
+              <p className="text-center text-gray-600">
+                Compete with friends in different groups to see who visits
+                Oktoberfest more often and drinks the most beers!
+                <br />
+                Track your progress and become the ultimate Wiesnmeister.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
       <InstallPWA />
     </div>
