@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { WIESN_MAP_URL } from "@/lib/constants";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 import Highlights from "./Highlights";
@@ -67,6 +69,12 @@ export default async function Home() {
           </Button>
           <Button asChild variant="default">
             <Link href="/leaderboard">Global Leaderboard</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={WIESN_MAP_URL} target="_blank">
+              <span className="mr-1">Oktoberfest Map</span>
+              <ExternalLink size={20} />
+            </Link>
           </Button>
           <ShareAppButton />
         </div>

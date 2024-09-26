@@ -3,6 +3,9 @@ import type { WinningCriteria } from "./types";
 export const BEGINNING_OF_WIESN = new Date("2024-09-21");
 export const END_OF_WIESN = new Date("2024-10-06");
 
+export const WIESN_MAP_URL =
+  "https://stadt.muenchen.de/dam/Home/Stadtverwaltung/Referat-fuer-Arbeit-und-Wirtschaft/presse/pm/PR-Meldungen-OF/Oktoberfest_Plan_FINAL_webres.jpg";
+
 export const winningCriteriaText: Record<WinningCriteria, string> = {
   days_attended: "Most Days Attended",
   total_beers: "Most Beers Drank",
