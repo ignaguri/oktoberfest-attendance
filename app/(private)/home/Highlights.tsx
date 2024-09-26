@@ -9,7 +9,7 @@ import {
 import { fetchHighlights } from "@/lib/actions";
 import { COST_PER_BEER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 import "server-only";
 

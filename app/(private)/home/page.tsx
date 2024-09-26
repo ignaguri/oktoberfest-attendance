@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { WIESN_MAP_URL } from "@/lib/constants";
 import { ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 import Highlights from "./Highlights";
 import MissingFields from "./MissingFields";

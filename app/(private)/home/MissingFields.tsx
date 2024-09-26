@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getMissingProfileFields } from "@/lib/actions";
 import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 import type { FC } from "react";
 

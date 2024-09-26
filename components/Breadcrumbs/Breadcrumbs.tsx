@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { getGroupName } from "@/lib/actions";
 import { usePathname } from "next/navigation";
+import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
 function isUUID(str: string) {
@@ -106,7 +107,9 @@ export default function Breadcrumbs() {
     <Breadcrumb className="mb-2">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          <BreadcrumbLink asChild>
+            <Link href="/">Home</Link>
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         {breadcrumbs.map(({ href, title, isLast, isLoading }, index) => (
@@ -117,8 +120,8 @@ export default function Breadcrumbs() {
               </BreadcrumbPage>
             ) : (
               <>
-                <BreadcrumbLink href={href}>
-                  {isLoading ? "Loading..." : title}
+                <BreadcrumbLink asChild>
+                  <Link href={href}>{isLoading ? "Loading..." : title}</Link>
                 </BreadcrumbLink>
                 {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
               </>

@@ -8,6 +8,7 @@ import { getUser } from "@/lib/actions";
 import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { APP_VERSION } from "@/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { ViewTransitions } from "next-view-transitions";
 
 import type { Metadata } from "next";
 
@@ -79,20 +80,22 @@ export default async function RootLayout({
   const isLoggedIn = await checkUser();
 
   return (
-    <html lang="en" data-version={APP_VERSION}>
-      <body className="bg-slate-50">
-        <div className="flex min-h-screen flex-col items-center justify-center pb-2">
-          <Navbar />
-          <OfflineBanner />
-          <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:px-20 sm:justify-start">
-            <Breadcrumbs />
-            {children}
-          </main>
-          <Footer isLoggedIn={isLoggedIn} />
-        </div>
-        <Toaster />
-      </body>
-      {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
-    </html>
+    <ViewTransitions>
+      <html lang="en" data-version={APP_VERSION}>
+        <body className="bg-slate-50">
+          <div className="flex min-h-screen flex-col items-center justify-center pb-2">
+            <Navbar />
+            <OfflineBanner />
+            <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:px-20 sm:justify-start">
+              <Breadcrumbs />
+              {children}
+            </main>
+            <Footer isLoggedIn={isLoggedIn} />
+          </div>
+          <Toaster />
+        </body>
+        {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
+      </html>
+    </ViewTransitions>
   );
 }
