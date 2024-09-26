@@ -3,6 +3,7 @@
 import { setCache, getCache, invalidateTags } from "@/lib/cache";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
+import * as Sentry from "@sentry/nextjs";
 import { isSameDay } from "date-fns/isSameDay";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -29,6 +30,7 @@ export async function getUser(): Promise<User> {
   }
 
   setCache(`user-${user.id}`, user, [`user-${user.id}`]); // Cache the user with user-specific key and tag
+  Sentry.setUser({ email: user.email, id: user.id }); // Set the user in Sentry
   return user;
 }
 
