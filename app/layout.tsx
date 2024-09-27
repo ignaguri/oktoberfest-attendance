@@ -8,6 +8,7 @@ import { getUser } from "@/lib/actions";
 import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { APP_VERSION } from "@/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ViewTransitions } from "next-view-transitions";
 
 import type { Metadata } from "next";
@@ -93,8 +94,9 @@ export default async function RootLayout({
             <Footer isLoggedIn={isLoggedIn} />
           </div>
           <Toaster />
+          <SpeedInsights />
+          {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
         </body>
-        {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
       </html>
     </ViewTransitions>
   );
