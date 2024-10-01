@@ -2,12 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { updatePassword } from "@/lib/actions";
 import cn from "classnames";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import * as Yup from "yup";
+
+import { updatePassword } from "./actions";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string().required("Required"),

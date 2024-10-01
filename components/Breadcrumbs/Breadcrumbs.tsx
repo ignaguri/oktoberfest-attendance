@@ -8,10 +8,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getGroupName } from "@/lib/actions";
 import { usePathname } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
+
+import { getGroupName } from "./actions";
 
 function isUUID(str: string) {
   const uuidRegex =

@@ -1,11 +1,11 @@
 "use client";
 
 import { useToast } from "@/hooks/use-toast";
-import { fetchAttendances } from "@/lib/actions";
 import { useState, useEffect, useCallback } from "react";
 
 import type { Tables } from "@/lib/database.types";
 
+import { fetchAttendances } from "./actions";
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
 

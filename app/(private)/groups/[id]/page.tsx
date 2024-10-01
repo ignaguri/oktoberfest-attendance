@@ -1,12 +1,7 @@
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import ShareButton from "@/components/ShareButton";
+import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
-import {
-  fetchGroupAndMembership,
-  fetchLeaderboard,
-  fetchWinningCriteriaForGroup,
-} from "@/lib/actions";
 import { winningCriteriaText } from "@/lib/constants";
 import { Images } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -15,6 +10,11 @@ import { Suspense } from "react";
 
 import type { WinningCriteria } from "@/lib/types";
 
+import {
+  fetchGroupAndMembership,
+  fetchLeaderboard,
+  fetchWinningCriteriaForGroup,
+} from "../actions";
 import { JoinGroupForm } from "../JoinGroupForm";
 
 export default async function GroupPage({

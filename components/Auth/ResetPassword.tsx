@@ -2,11 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { resetPassword } from "@/lib/actions";
 import cn from "classnames";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Link } from "next-view-transitions";
 import * as Yup from "yup";
+
+import { resetPassword } from "./actions";
 
 const ResetPasswordSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),

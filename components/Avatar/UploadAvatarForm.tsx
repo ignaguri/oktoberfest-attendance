@@ -2,11 +2,11 @@
 
 import { buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { uploadAvatar } from "@/lib/actions";
 import { Formik, Form, ErrorMessage, useFormikContext } from "formik";
 import React, { useState, useRef } from "react";
 import * as Yup from "yup";
 
+import { uploadAvatar } from "./actions";
 import { AvatarPreview } from "./Avatar";
 
 export interface UploadAvatarFormProps {
