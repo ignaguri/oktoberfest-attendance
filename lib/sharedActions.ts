@@ -88,7 +88,8 @@ export async function fetchAttendanceByDate(
 ): Promise<AttendanceByDate | null> {
   const user = await getUser();
 
-  const attendanceData = await fetchAttendancesFromDB(user.id, date, true);
+  const zonedDate = new TZDate(date, TIMEZONE);
+  const attendanceData = await fetchAttendancesFromDB(user.id, zonedDate, true);
 
   const supabase = createClient();
   const { data: tentVisits, error: tentVisitsError } = await supabase
