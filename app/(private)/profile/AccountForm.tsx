@@ -3,7 +3,7 @@
 import Avatar from "@/components/Avatar/Avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { getProfileShort } from "@/lib/actions";
+import { getProfileShort } from "@/lib/sharedActions";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { Link } from "next-view-transitions";
 import { useState } from "react";

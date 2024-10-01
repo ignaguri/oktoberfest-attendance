@@ -1,6 +1,6 @@
 "use server";
 
-import { fetchAttendancesFromDB, getUser } from "@/lib/actions";
+import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
 import { TIMEZONE } from "@/lib/constants";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";

@@ -1,5 +1,5 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { getProfileShort, getUser } from "@/lib/actions";
+import { getProfileShort, getUser } from "@/lib/sharedActions";
 
 import AccountForm from "./AccountForm";
 

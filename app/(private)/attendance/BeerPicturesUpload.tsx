@@ -2,7 +2,7 @@
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { uploadBeerPicture } from "@/lib/actions";
+import { uploadBeerPicture } from "@/lib/sharedActions";
 import { Formik, Form, ErrorMessage, FieldArray } from "formik";
 import { Camera, X } from "lucide-react";
 import Image from "next/image";

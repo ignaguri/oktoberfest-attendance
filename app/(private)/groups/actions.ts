@@ -1,6 +1,6 @@
 "use server";
 
-import { getUser } from "@/lib/actions";
+import { getUser } from "@/lib/sharedActions";
 import { NO_ROWS_ERROR, TIMEZONE } from "@/lib/constants";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";

@@ -1,6 +1,6 @@
 "use server";
 
-import { getProfileShort, getUser } from "@/lib/actions";
+import { getProfileShort, getUser } from "@/lib/sharedActions";
 import { COST_PER_BEER } from "@/lib/constants";
 import { createClient } from "@/utils/supabase/server";
 

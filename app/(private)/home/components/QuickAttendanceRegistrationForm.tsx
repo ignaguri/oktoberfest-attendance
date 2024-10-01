@@ -5,12 +5,12 @@ import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
-import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
+import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { Formik, Form, Field } from "formik";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import type { AttendanceByDate } from "@/lib/actions";
+import type { AttendanceByDate } from "@/lib/sharedActions";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;

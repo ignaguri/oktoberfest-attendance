@@ -4,7 +4,7 @@ import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
+import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { TZDate } from "@date-fns/tz";
@@ -13,7 +13,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import * as Yup from "yup";
 
-import type { AttendanceByDate } from "@/lib/actions";
+import type { AttendanceByDate } from "@/lib/sharedActions";
 import type { FormikHelpers } from "formik";
 
 import { BeerPicturesUpload } from "./BeerPicturesUpload";

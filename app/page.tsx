@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getUser } from "@/lib/actions";
+import { getUser } from "@/lib/sharedActions";
 import { redirect } from "next/navigation";
 import { Link } from "next-view-transitions";
 

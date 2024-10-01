@@ -1,6 +1,6 @@
 "use server";
 
-import { getUser } from "@/lib/actions";
+import { getUser } from "@/lib/sharedActions";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
