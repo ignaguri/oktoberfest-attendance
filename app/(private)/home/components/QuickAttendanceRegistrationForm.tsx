@@ -51,16 +51,20 @@ export const QuickAttendanceRegistrationForm = ({
   ) => {
     try {
       setSubmitting(true);
+      const allVisitedTents = [
+        ...(attendanceData?.tent_ids ?? []),
+        values.tentId,
+      ];
       const newAttendanceId = await addAttendance({
         amount: values.beerCount,
         date: new Date(),
-        tents: [values.tentId],
+        tents: allVisitedTents,
       });
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
         beer_count: values.beerCount,
-        tent_ids: [values.tentId],
+        tent_ids: allVisitedTents,
       };
       setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);
@@ -102,7 +106,8 @@ export const QuickAttendanceRegistrationForm = ({
   return (
     <Formik
       initialValues={{
-        tentId: attendanceData?.tent_ids[0] || "",
+        tentId:
+          attendanceData?.tent_ids[attendanceData.tent_ids.length - 1] || "",
         beerCount: attendanceData?.beer_count || 0,
       }}
       onSubmit={handleSubmit}
