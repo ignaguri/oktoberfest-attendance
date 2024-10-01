@@ -1,5 +1,6 @@
 "use server";
 
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 import "server-only";
@@ -12,6 +13,7 @@ export async function fetchGlobalLeaderboard(winningCriteriaId: number) {
   });
 
   if (error) {
+    reportSupabaseException("fetchGlobalLeaderboard", error);
     throw new Error(`Error fetching global leaderboard: ${error.message}`);
   }
 

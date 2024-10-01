@@ -1,6 +1,7 @@
 "use server";
 
 import { getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -16,6 +17,7 @@ export async function fetchGroupDetails(groupId: string) {
     .eq("id", groupId)
     .single();
   if (error) {
+    reportSupabaseException("fetchGroupDetails", error);
     throw new Error("Error fetching group details: " + error.message);
   }
 
@@ -36,6 +38,7 @@ export async function fetchGroupMembers(groupId: string) {
     .eq("group_id", groupId);
 
   if (error) {
+    reportSupabaseException("fetchGroupMembers", error);
     throw new Error("Error fetching group members: " + error.message);
   }
 
@@ -61,6 +64,7 @@ export async function updateGroup(
     .eq("id", groupId);
 
   if (error) {
+    reportSupabaseException("updateGroup", error);
     throw error;
   }
 
@@ -80,6 +84,7 @@ export async function removeMember(groupId: string, userId: string) {
     .match({ group_id: groupId, user_id: userId });
 
   if (error) {
+    reportSupabaseException("removeMember", error);
     throw error;
   }
 
@@ -99,7 +104,12 @@ export async function getCurrentUserForGroup(groupId: string) {
     .select("created_by")
     .eq("id", groupId)
     .single();
+
   if (error) {
+    reportSupabaseException("getCurrentUserForGroup", error, {
+      id: user.id,
+      email: user.email,
+    });
     throw error;
   }
 

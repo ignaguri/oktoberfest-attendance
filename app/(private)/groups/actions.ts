@@ -1,7 +1,8 @@
 "use server";
 
-import { getUser } from "@/lib/sharedActions";
 import { NO_ROWS_ERROR, TIMEZONE } from "@/lib/constants";
+import { getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import { revalidatePath } from "next/cache";
@@ -25,8 +26,13 @@ export async function createGroup(formData: {
   });
 
   if (error) {
+    reportSupabaseException("createGroup", error, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error("Error creating group: " + error.message);
   }
+
   if (data) {
     revalidatePath("/groups");
     revalidatePath(`/groups/${data.group_id}`);
@@ -50,6 +56,12 @@ export async function joinGroup(formData: {
   });
 
   if (error || !groupId) {
+    if (error) {
+      reportSupabaseException("joinGroup", error, {
+        id: user.id,
+        email: user.email,
+      });
+    }
     throw new Error("Error joining group");
   }
 
@@ -68,16 +80,27 @@ export async function fetchGroupAndMembership(groupId: string) {
     .select("*")
     .eq("id", groupId)
     .single();
+
   if (groupError) {
+    reportSupabaseException("fetchGroupAndMembership", groupError, {
+      id: user.id,
+      email: user.email,
+    });
     return { group: null, isMember: false };
   }
+
   const { data: membership, error: membershipError } = await supabase
     .from("group_members")
     .select("user_id")
     .eq("group_id", groupId)
     .eq("user_id", user.id)
     .single();
+
   if (membershipError && membershipError.code !== NO_ROWS_ERROR) {
+    reportSupabaseException("fetchGroupAndMembership", membershipError, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error("Error checking membership: " + membershipError.message);
   }
 
@@ -95,6 +118,7 @@ export async function fetchLeaderboard(groupId: string) {
     .order("total_beers", { ascending: false });
 
   if (error) {
+    reportSupabaseException("fetchLeaderboard", error);
     throw new Error("Error fetching leaderboard: " + error.message);
   }
 
@@ -110,6 +134,7 @@ export async function fetchWinningCriteriaById(id: number) {
     .single();
 
   if (error) {
+    reportSupabaseException("fetchWinningCriteriaById", error);
     throw error;
   }
 
@@ -124,6 +149,7 @@ export async function fetchWinningCriteriaForGroup(groupId: string) {
     .eq("id", groupId)
     .single();
   if (error) {
+    reportSupabaseException("fetchWinningCriteriaForGroup", error);
     throw error;
   }
   if (!data.winning_criteria_id) {
@@ -143,6 +169,7 @@ export async function fetchGroupGallery(groupId: string) {
   });
 
   if (error) {
+    reportSupabaseException("fetchGroupGallery", error);
     throw new Error(`Error fetching group gallery: ${error.message}`);
   }
 

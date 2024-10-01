@@ -1,5 +1,6 @@
 "use server";
 
+import { reportLog, reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
@@ -26,6 +27,7 @@ export async function uploadAvatar(formData: FormData) {
       .webp({ quality: 80 })
       .toBuffer();
   } catch (error) {
+    reportLog("Error compressing image: " + JSON.stringify(error), "error");
     throw new Error("Error compressing image");
   }
   const fileName = `${userId}_${uuidv4()}.webp`;
@@ -37,6 +39,7 @@ export async function uploadAvatar(formData: FormData) {
       upsert: false,
     });
   if (error) {
+    reportLog("Error uploading avatar: " + error.message, "error");
     throw new Error("Error uploading avatar");
   }
   const { error: updateError } = await supabase
@@ -44,6 +47,7 @@ export async function uploadAvatar(formData: FormData) {
     .update({ avatar_url: fileName })
     .eq("id", userId);
   if (updateError) {
+    reportSupabaseException("uploadAvatar", updateError, { id: userId });
     throw new Error("Error updating user profile");
   }
 

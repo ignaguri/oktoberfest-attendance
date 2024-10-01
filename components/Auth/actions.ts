@@ -1,5 +1,6 @@
 "use server";
 
+import { reportLog } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -26,6 +27,10 @@ export async function login(
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
+    reportLog(
+      `Error trying to log in: email=${formData.email}; error=${error.message}`,
+      "error",
+    );
     throw new Error(error.message);
   }
 
@@ -44,6 +49,7 @@ export async function logout() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
+    reportLog(`Error trying to log out: ${error.message}`, "error");
     redirect("/error");
   }
 
@@ -62,6 +68,10 @@ export async function signUp(formData: { email: string; password: string }) {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
+    reportLog(
+      `Error trying to sign up: email=${formData.email}; error=${error.message}`,
+      "error",
+    );
     throw new Error(error.message);
   }
 }
@@ -74,6 +84,10 @@ export async function resetPassword(formData: {
   const { error } = await supabase.auth.resetPasswordForEmail(formData.email);
 
   if (error) {
+    reportLog(
+      `Error trying to reset password: email=${formData.email}; error=${error.message}`,
+      "error",
+    );
     return [false, error.message];
   } else {
     return [true, null];
@@ -88,6 +102,7 @@ export async function updatePassword(formData: { password: string }) {
   });
 
   if (error) {
+    reportLog(`Error trying to update password: ${error.message}`, "error");
     throw new Error(error.message);
   }
 

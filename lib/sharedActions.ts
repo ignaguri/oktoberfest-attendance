@@ -1,5 +1,6 @@
 "use server";
 
+import { reportLog, reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import * as Sentry from "@sentry/nextjs";
@@ -39,6 +40,10 @@ export async function getProfileShort() {
     .single();
 
   if (!profileData || profileError) {
+    reportSupabaseException("getProfileShort", profileError, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error("Error fetching profile");
   }
   return { ...profileData, email: user.email };
@@ -68,6 +73,7 @@ export async function fetchAttendancesFromDB(
     if (error.code === NO_ROWS_ERROR) {
       return null;
     }
+    reportSupabaseException("fetchAttendancesFromDB", error, { id: userId });
     throw new Error(`Error fetching attendances: ${error.message}`);
   }
   return data;
@@ -91,6 +97,10 @@ export async function fetchAttendanceByDate(
     .eq("user_id", user.id);
 
   if (tentVisitsError) {
+    reportSupabaseException("fetchAttendanceByDate", tentVisitsError, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error(`Error fetching tent visits: ${tentVisitsError.message}`);
   }
 
@@ -120,6 +130,10 @@ export async function fetchAttendanceByDate(
     .eq("attendance_id", attendance.id);
 
   if (beerPicturesError) {
+    reportSupabaseException("fetchAttendanceByDate", beerPicturesError, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error(
       `Error fetching beer pictures: ${beerPicturesError.message}`,
     );
@@ -150,7 +164,9 @@ export async function uploadBeerPicture(formData: FormData) {
       .webp({ quality: 80 })
       .toBuffer();
   } catch (error) {
-    throw new Error("Error compressing image: " + JSON.stringify(error));
+    const errorMessage = "Error compressing image: " + JSON.stringify(error);
+    reportLog(errorMessage, "error");
+    throw new Error(errorMessage);
   }
 
   const fileName = `${user.id}_${attendanceId}_${uuidv4()}.webp`;
@@ -163,7 +179,9 @@ export async function uploadBeerPicture(formData: FormData) {
     });
 
   if (error) {
-    throw new Error("Error uploading beer picture: " + error.message);
+    const errorMessage = "Error uploading beer picture: " + error.message;
+    reportLog(errorMessage, "error");
+    throw new Error(errorMessage);
   }
 
   const { error: beerPicturesError } = await supabase
@@ -174,8 +192,12 @@ export async function uploadBeerPicture(formData: FormData) {
       picture_url: fileName,
     });
   if (beerPicturesError) {
+    reportSupabaseException("uploadBeerPicture", beerPicturesError, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error(
-      "Error uploading beer picture: " + beerPicturesError.message,
+      "Error saving beer picture in DB: " + beerPicturesError.message,
     );
   }
 
@@ -206,6 +228,10 @@ export async function addAttendance(formData: {
   );
 
   if (error) {
+    reportSupabaseException("addAttendance", error, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error("Error adding/updating attendance: " + error.message);
   }
 
@@ -221,6 +247,7 @@ export async function fetchWinningCriterias() {
   const supabase = createClient();
   const { data, error } = await supabase.from("winning_criteria").select("*");
   if (error) {
+    reportSupabaseException("fetchWinningCriterias", error);
     throw error;
   }
 
@@ -231,6 +258,7 @@ export async function fetchTents() {
   const supabase = createClient();
   const { data, error } = await supabase.from("tents").select("*");
   if (error) {
+    reportSupabaseException("fetchTents", error);
     throw new Error("Error fetching tents: " + error.message);
   }
 

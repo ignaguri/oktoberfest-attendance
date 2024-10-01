@@ -1,7 +1,8 @@
 "use server";
 
-import { getProfileShort, getUser } from "@/lib/sharedActions";
 import { COST_PER_BEER } from "@/lib/constants";
+import { getProfileShort, getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 import "server-only";
@@ -36,6 +37,10 @@ export async function fetchHighlights() {
     .single();
 
   if (error) {
+    reportSupabaseException("fetchHighlights", error, {
+      id: user.id,
+      email: user.email,
+    });
     return {
       topPositions: [],
       totalBeers: 0,

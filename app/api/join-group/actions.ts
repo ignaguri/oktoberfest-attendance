@@ -1,6 +1,7 @@
 "use server";
 
 import { getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -16,6 +17,12 @@ export async function joinGroupWithToken(formData: { token: string }) {
   });
 
   if (error || !groupId) {
+    if (error) {
+      reportSupabaseException("joinGroupWithToken", error, {
+        id: user.id,
+        email: user.email,
+      });
+    }
     throw new Error("Error joining group with token");
   }
 

@@ -1,5 +1,6 @@
 "use server";
 
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -25,6 +26,7 @@ export async function updateProfile({
     updated_at: new Date().toISOString(),
   });
   if (error) {
+    reportSupabaseException("updateProfile", error, { id });
     throw new Error(error.message);
   }
 

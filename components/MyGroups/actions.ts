@@ -1,6 +1,7 @@
 "use server";
 
 import { getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 import type { Tables } from "@/lib/database.types";
@@ -17,6 +18,11 @@ export async function fetchGroups(): Promise<Tables<"groups">[]> {
     .eq("user_id", user.id);
 
   if (error) {
+    reportSupabaseException("fetchGroups", error, {
+      id: user.id,
+      email: user.email,
+    });
+
     throw new Error("Error fetching groups: " + error.message);
   }
 

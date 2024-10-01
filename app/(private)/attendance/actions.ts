@@ -1,7 +1,8 @@
 "use server";
 
-import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
 import { TIMEZONE } from "@/lib/constants";
+import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import { isSameDay } from "date-fns";
@@ -25,6 +26,10 @@ export async function fetchAttendances() {
     .eq("user_id", user.id);
 
   if (tentVisitsError) {
+    reportSupabaseException("fetchAttendances", tentVisitsError, {
+      id: user.id,
+      email: user.email,
+    });
     throw new Error(`Error fetching tent visits: ${tentVisitsError.message}`);
   }
 
@@ -63,6 +68,7 @@ export async function deleteAttendance(attendanceId: string) {
   });
 
   if (error) {
+    reportSupabaseException("deleteAttendance", error);
     throw new Error("Error deleting attendance: " + error.message);
   }
 

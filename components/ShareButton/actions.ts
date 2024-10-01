@@ -1,5 +1,6 @@
 "use server";
 
+import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 import "server-only";
@@ -12,6 +13,9 @@ export async function renewGroupToken(groupId: string) {
   });
 
   if (error || !newToken) {
+    if (error) {
+      reportSupabaseException("renewGroupToken", error);
+    }
     throw new Error("Error renewing group token");
   }
 
