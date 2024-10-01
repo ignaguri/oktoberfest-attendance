@@ -57,7 +57,7 @@ const PicturePreview = ({
   isUploaded?: boolean;
 }) => {
   return (
-    <div className="relative w-24 h-24">
+    <div className="relative w-24">
       <Image
         src={src}
         alt="Beer picture preview"
