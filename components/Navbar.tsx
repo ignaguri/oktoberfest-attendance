@@ -1,5 +1,5 @@
 import Avatar from "@/components/Avatar/Avatar";
-import { getProfileShortFailsafe } from "@/lib/actions";
+import { getProfileShortFailsafe } from "@/lib/sharedActions";
 import { Link } from "next-view-transitions";
 
 import SignOut from "./Auth/SignOut";

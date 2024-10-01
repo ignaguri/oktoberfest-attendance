@@ -12,12 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import {
-  fetchWinningCriterias,
-  getCurrentUserForGroup,
-  removeMember,
-  updateGroup,
-} from "@/lib/actions";
+import { fetchWinningCriterias } from "@/lib/sharedActions";
 import { winningCriteriaText } from "@/lib/constants";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
@@ -28,6 +23,8 @@ import * as Yup from "yup";
 
 import type { Tables } from "@/lib/database.types";
 import type { WinningCriteria } from "@/lib/types";
+
+import { getCurrentUserForGroup, updateGroup, removeMember } from "./actions";
 
 type Props = {
   group: Tables<"groups">;

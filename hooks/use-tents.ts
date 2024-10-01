@@ -1,5 +1,5 @@
 import { useToast } from "@/hooks/use-toast";
-import { fetchTents } from "@/lib/actions";
+import { fetchTents } from "@/lib/sharedActions";
 import { useState, useEffect } from "react";
 
 export interface TentOption {

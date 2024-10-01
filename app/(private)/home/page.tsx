@@ -1,5 +1,5 @@
 import InstallPWA from "@/components/InstallPWA";
-import MyGroups from "@/components/MyGroups";
+import MyGroups from "@/components/MyGroups/MyGroups";
 import ShareAppButton from "@/components/ShareAppButton";
 import {
   Accordion,

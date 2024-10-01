@@ -1,5 +1,5 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
-import MyGroups from "@/components/MyGroups";
+import MyGroups from "@/components/MyGroups/MyGroups";
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 

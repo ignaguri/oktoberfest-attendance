@@ -1,5 +1,4 @@
-import { fetchGroupDetails, fetchGroupMembers } from "@/lib/actions";
-
+import { fetchGroupDetails, fetchGroupMembers } from "./actions";
 import GroupSettingsClient from "./GroupSettingsClient";
 
 export default async function GroupSettingsPage({

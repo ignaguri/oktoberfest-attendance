@@ -6,10 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { fetchHighlights } from "@/lib/actions";
 import { COST_PER_BEER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
+
+import { fetchHighlights } from "./actions";
 
 import "server-only";
 

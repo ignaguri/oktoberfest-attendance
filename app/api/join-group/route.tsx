@@ -1,7 +1,8 @@
-import { joinGroupWithToken } from "@/lib/actions";
 import { NextResponse } from "next/server";
 
 import type { NextRequest } from "next/server";
+
+import { joinGroupWithToken } from "./actions";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

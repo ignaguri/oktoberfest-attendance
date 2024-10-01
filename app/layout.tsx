@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { Toaster } from "@/components/ui/toaster";
-import { getUser } from "@/lib/actions";
+import { getUser } from "@/lib/sharedActions";
 import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { APP_VERSION } from "@/version";
 import { GoogleAnalytics } from "@next/third-parties/google";

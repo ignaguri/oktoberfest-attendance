@@ -2,7 +2,7 @@
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { uploadBeerPicture } from "@/lib/actions";
+import { uploadBeerPicture } from "@/lib/sharedActions";
 import { Formik, Form, ErrorMessage, FieldArray } from "formik";
 import { Camera, X } from "lucide-react";
 import Image from "next/image";
@@ -57,7 +57,7 @@ const PicturePreview = ({
   isUploaded?: boolean;
 }) => {
   return (
-    <div className="relative w-24 h-24">
+    <div className="relative w-24">
       <Image
         src={src}
         alt="Beer picture preview"

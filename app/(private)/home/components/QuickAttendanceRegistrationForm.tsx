@@ -5,12 +5,12 @@ import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
-import { addAttendance, fetchAttendanceByDate } from "@/lib/actions";
+import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { Formik, Form, Field } from "formik";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import type { AttendanceByDate } from "@/lib/actions";
+import type { AttendanceByDate } from "@/lib/sharedActions";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
@@ -51,16 +51,20 @@ export const QuickAttendanceRegistrationForm = ({
   ) => {
     try {
       setSubmitting(true);
+      const allVisitedTents = [
+        ...(attendanceData?.tent_ids ?? []),
+        values.tentId,
+      ];
       const newAttendanceId = await addAttendance({
         amount: values.beerCount,
         date: new Date(),
-        tents: [values.tentId],
+        tents: allVisitedTents,
       });
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
         beer_count: values.beerCount,
-        tent_ids: [values.tentId],
+        tent_ids: allVisitedTents,
       };
       setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);
@@ -102,7 +106,8 @@ export const QuickAttendanceRegistrationForm = ({
   return (
     <Formik
       initialValues={{
-        tentId: attendanceData?.tent_ids[0] || "",
+        tentId:
+          attendanceData?.tent_ids[attendanceData.tent_ids.length - 1] || "",
         beerCount: attendanceData?.beer_count || 0,
       }}
       onSubmit={handleSubmit}
