@@ -51,10 +51,13 @@ export const QuickAttendanceRegistrationForm = ({
   ) => {
     try {
       setSubmitting(true);
-      const allVisitedTents = [
-        ...(attendanceData?.tent_ids ?? []),
-        values.tentId,
-      ];
+      const allVisitedTents = [...(attendanceData?.tent_ids ?? [])];
+
+      // Check if the last tent ID is the same as the new tent ID
+      if (allVisitedTents[allVisitedTents.length - 1] !== values.tentId) {
+        allVisitedTents.push(values.tentId);
+      }
+
       const newAttendanceId = await addAttendance({
         amount: values.beerCount,
         date: new Date(),
