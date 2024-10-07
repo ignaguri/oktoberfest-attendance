@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { WIESN_MAP_URL } from "@/lib/constants";
+import { END_OF_WIESN, WIESN_MAP_URL } from "@/lib/constants";
+import { isBefore } from "date-fns";
 import { ExternalLink } from "lucide-react";
 import { Link } from "next-view-transitions";
 
@@ -32,7 +33,7 @@ export default async function Home() {
 
       <div className="mb-4 flex flex-col gap-4">
         <OktoberfestStatus />
-        <QuickAttendanceRegistration />
+        {isBefore(new Date(), END_OF_WIESN) && <QuickAttendanceRegistration />}
       </div>
 
       <div className="flex flex-col gap-4">
