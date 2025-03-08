@@ -5,11 +5,12 @@ import { GalleryGrid } from "./GalleryGrid";
 import { fetchGroupGallery } from "../../actions";
 
 interface GalleryPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function GalleryPage({ params }: GalleryPageProps) {
-  const groupId = params.id;
+  const { id: groupId } = await params;
   const galleryData = await fetchGroupGallery(groupId);
 
   return (

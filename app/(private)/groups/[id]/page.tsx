@@ -20,9 +20,9 @@ import { JoinGroupForm } from "../JoinGroupForm";
 export default async function GroupPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const groupId = params.id;
+  const { id: groupId } = await params;
   const groupData = fetchGroupAndMembership(groupId);
   const leaderboardData = fetchLeaderboard(groupId);
   const winningCriteriaData = fetchWinningCriteriaForGroup(groupId);

@@ -3,13 +3,14 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
 import { Link } from "next-view-transitions";
 
+import type { ReactNode } from "react";
 import type { FC } from "react";
 
 import { getMissingProfileFields } from "./actions";
 
 interface MissingFieldProps {
   label: string;
-  icon: JSX.Element;
+  icon: ReactNode;
   link: string;
 }
 
