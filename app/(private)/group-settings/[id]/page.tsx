@@ -1,12 +1,13 @@
 import { fetchGroupDetails, fetchGroupMembers } from "./actions";
 import GroupSettingsClient from "./GroupSettingsClient";
 
-export default async function GroupSettingsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const groupId = params.id;
+interface Props {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function GroupSettingsPage({ params }: Props) {
+  const { id: groupId } = await params;
 
   const groupData = fetchGroupDetails(groupId);
   const membersData = fetchGroupMembers(groupId);

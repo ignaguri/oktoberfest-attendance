@@ -32,9 +32,10 @@ const getMimeType = (filename: string): string => {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const id = decodeURIComponent(params.id);
+  const { id } = await params;
+  const decodedId = decodeURIComponent(id);
   const { searchParams } = new URL(request.url);
   const bucketParam = searchParams.get("bucket") || "avatars";
 
@@ -48,19 +49,21 @@ export async function GET(
   const bucket = bucketParam as AllowedBucket;
 
   // Check if the image is cached
-  const cacheKey = `${bucket}:${id}`;
+  const cacheKey = `${bucket}:${decodedId}`;
   const cachedImage = imageCache.get<Buffer>(cacheKey);
   if (cachedImage) {
     return new NextResponse(cachedImage, {
       status: 200,
-      headers: { "Content-Type": getMimeType(id) },
+      headers: { "Content-Type": getMimeType(decodedId) },
     });
   }
 
   try {
     const supabase = createClient();
 
-    const { data, error } = await supabase.storage.from(bucket).download(id);
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .download(decodedId);
 
     if (error) {
       throw error;
@@ -73,7 +76,7 @@ export async function GET(
     imageCache.set(cacheKey, imageBuffer);
 
     const headers = new Headers();
-    headers.set("Content-Type", getMimeType(id));
+    headers.set("Content-Type", getMimeType(decodedId));
 
     return new NextResponse(imageBuffer, {
       status: 200,
