@@ -56,6 +56,16 @@ export const metadata: Metadata = {
     creator: "@ignaguri",
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ProstCounter",
+  },
+  applicationName: "ProstCounter",
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: "#ffffff",
 };
 
 export const viewport = {
