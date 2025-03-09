@@ -65,6 +65,15 @@
   }
 }
 
+@utility animate {
+  .accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+  .accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -81,71 +90,175 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
-}
 
-@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
   h2 {
-    @apply py-4 text-4xl font-black text-gray-800;
+    padding-block: 1rem;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 900;
+    color: rgb(31 41 55);
   }
 
   .button-base {
-    @apply custom-focus w-fit rounded-full border-2 px-8 py-2 font-bold disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200;
+    width: fit-content;
+    border-radius: 9999px;
+    border-width: 2px;
+    padding-inline: 2rem;
+    padding-block: 0.5rem;
+    font-weight: 700;
+
+    &:disabled {
+      cursor: not-allowed;
+      border-color: rgb(209 213 219);
+      background-color: rgb(229 231 235);
+      color: rgb(107 114 128);
+
+      &:hover {
+        background-color: rgb(229 231 235);
+      }
+    }
   }
 
   .button {
-    @apply button-base border-yellow-400 bg-white text-yellow-400 hover:bg-yellow-400 hover:text-white focus:bg-yellow-400 focus:text-white;
+    @extend .button-base;
+    border-color: rgb(250 204 21);
+    background-color: white;
+    color: rgb(250 204 21);
+
+    &:hover,
+    &:focus {
+      background-color: rgb(250 204 21);
+      color: white;
+    }
   }
 
   .button-inverse {
-    @apply button-base border-white bg-yellow-400 text-white hover:border-yellow-400 hover:bg-white hover:text-yellow-400 focus:border-yellow-400 focus:bg-white focus:text-yellow-400;
+    @extend .button-base;
+    border-color: white;
+    background-color: rgb(250 204 21);
+    color: white;
+
+    &:hover,
+    &:focus {
+      border-color: rgb(250 204 21);
+      background-color: white;
+      color: rgb(250 204 21);
+    }
   }
 
   .card {
-    @apply column min-w-[20rem] max-w-lg w-full items-center gap-8 rounded-2xl bg-white py-8 px-4 shadow-md sm:min-w-[24rem] sm:px-10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    min-width: 20rem;
+    max-width: 32rem;
+    width: 100%;
+    border-radius: 1rem;
+    background-color: white;
+    padding: 2rem 1rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+    @media (min-width: 640px) {
+      min-width: 24rem;
+      padding-inline: 2.5rem;
+    }
   }
 
   .card-transparent {
-    @apply card bg-transparent p-4;
+    @extend .card;
+    background-color: transparent;
+    padding: 1rem;
   }
 
   .column {
-    @apply flex flex-col items-start justify-center gap-4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
   }
 
   .custom-focus {
-    @apply focus:border-yellow-400 focus:outline-hidden focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2;
+    &:focus {
+      border-color: rgb(250 204 21);
+      outline: none;
+      ring-width: 2px;
+      ring-color: rgb(250 204 21);
+      ring-offset-width: 2px;
+    }
   }
 
   .heading {
-    @apply text-lg font-semibold text-gray-700;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+    color: rgb(55 65 81);
   }
 
   .highlight {
-    @apply ml-1 rounded-lg bg-gray-100 p-2 font-mono;
+    margin-left: 0.25rem;
+    border-radius: 0.5rem;
+    background-color: rgb(243 244 246);
+    padding: 0.5rem;
+    font-family: ui-monospace, monospace;
   }
 
   .error {
-    @apply w-full text-center text-red-600;
+    width: 100%;
+    text-align: center;
+    color: rgb(220 38 38);
   }
 
   .input {
-    @apply custom-focus w-full rounded-xl border border-slate-300 focus:shadow-none disabled:opacity-50;
+    @extend .custom-focus;
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(203 213 225);
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
   }
 
   .input-error {
-    @apply input border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500;
-  }
+    @extend .input;
+    border-color: rgb(239 68 68);
+    background-color: rgb(254 242 242);
+    color: rgb(127 29 29);
 
-  .error {
-    @apply text-red-600 text-sm mt-1;
+    &::placeholder {
+      color: rgb(185 28 28);
+    }
+
+    &:focus {
+      border-color: rgb(239 68 68);
+      ring-color: rgb(239 68 68);
+    }
   }
 
   .link {
-    @apply custom-focus rounded-md font-semibold text-yellow-400;
+    @extend .custom-focus;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    color: rgb(250 204 21);
   }
 
   .row {
-    @apply flex flex-row items-center justify-start gap-1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.25rem;
   }
 
   :root {
@@ -247,14 +360,5 @@
     --chart-4: 280 65% 60%;
 
     --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
