@@ -21,7 +21,7 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
         <span className="text-xl" role="img" aria-label={label}>
           {icon}
         </span>
-        <span className="flex-grow text-gray-700">{label}</span>
+        <span className="grow text-gray-700">{label}</span>
       </div>
       <Button asChild variant="ghost">
         <Link href={link} aria-label="Edit">

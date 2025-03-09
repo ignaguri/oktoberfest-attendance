@@ -4,8 +4,8 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { Toaster } from "@/components/ui/toaster";
-import { getUser } from "@/lib/sharedActions";
 import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
+import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -56,12 +56,22 @@ export const metadata: Metadata = {
     creator: "@ignaguri",
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ProstCounter",
+  },
+  applicationName: "ProstCounter",
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   width: "device-width",
+  themeColor: "#ffffff",
 };
 
 async function checkUser() {

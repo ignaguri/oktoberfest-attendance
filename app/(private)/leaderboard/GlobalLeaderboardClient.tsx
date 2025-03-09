@@ -5,8 +5,8 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { fetchWinningCriterias } from "@/lib/sharedActions";
 import { winningCriteriaText } from "@/lib/constants";
+import { fetchWinningCriterias } from "@/lib/sharedActions";
 import { WinningCriteria } from "@/lib/types";
 import { useState, useEffect, useCallback, useMemo } from "react";
 

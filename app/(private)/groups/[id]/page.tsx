@@ -49,7 +49,7 @@ export default async function GroupPage({
     <div className="w-full max-w-lg">
       <Suspense fallback={<LoadingSpinner />}>
         <div className="flex items-center justify-center mb-4">
-          <h2 className="text-3xl font-bold text-center flex-grow pr-2">
+          <h2 className="text-3xl font-bold text-center grow pr-2">
             Group &quot;{group.name}&quot;
           </h2>
           <ShareButton
