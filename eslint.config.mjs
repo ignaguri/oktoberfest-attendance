@@ -80,7 +80,7 @@ const config = [
   },
   ...patchedConfig,
   prettierConfigRecommended,
-  { ignores: [".next/*"] },
+  { ignores: [".next/*", "public/workbox-*"] },
 ];
 
 export default config;

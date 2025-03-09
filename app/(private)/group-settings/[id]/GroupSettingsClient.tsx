@@ -12,8 +12,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { fetchWinningCriterias } from "@/lib/sharedActions";
 import { winningCriteriaText } from "@/lib/constants";
+import { fetchWinningCriterias } from "@/lib/sharedActions";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import { Formik, Form, Field, ErrorMessage } from "formik";
