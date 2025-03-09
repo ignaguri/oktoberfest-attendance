@@ -65,13 +65,13 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: "#ffffff",
 };
 
 export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   width: "device-width",
+  themeColor: "#ffffff",
 };
 
 async function checkUser() {
