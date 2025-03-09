@@ -36,7 +36,7 @@ const Highlights = async () => {
       <CardContent>
         <div className={cn("grid gap-4", gridCols)}>
           {topPositions.length > 0 && (
-            <div className="bg-green-50 p-4 rounded-lg shadow">
+            <div className="bg-green-50 p-4 rounded-lg shadow-sm">
               <CardDescription className="font-semibold mb-2">
                 👑 You&apos;re in the top 3 of these groups:
               </CardDescription>
@@ -54,7 +54,7 @@ const Highlights = async () => {
             </div>
           )}
           {(totalBeers > 0 || daysAttended > 0) && (
-            <div className="bg-blue-50 p-4 rounded-lg shadow">
+            <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
               <CardDescription className="font-semibold mb-2">
                 🍻 Stats 📊
               </CardDescription>

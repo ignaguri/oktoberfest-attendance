@@ -8,7 +8,7 @@ export default async function Navbar() {
   const profileData = await getProfileShortFailsafe();
 
   return (
-    <nav className="w-full bg-gray-800 shadow">
+    <nav className="w-full bg-gray-800 shadow-sm">
       <div className="justify-between items-center flex px-4 sm:px-8 py-2 sm:py-4">
         <Link className="text-base sm:text-xl text-white font-bold" href="/">
           ProstCounter 🍻

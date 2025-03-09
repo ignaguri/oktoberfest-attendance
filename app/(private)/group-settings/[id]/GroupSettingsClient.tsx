@@ -130,7 +130,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   return (
     <div className="w-full max-w-lg">
       <h2 className="text-2xl font-semibold">Group Settings</h2>
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
             Group Details
@@ -158,7 +158,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     type="text"
                     id="name"
                     name="name"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                     disabled={!currentUser?.isCreator}
                   />
                   <ErrorMessage
@@ -180,7 +180,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                       type={showPassword ? "text" : "password"}
                       id="password"
                       name="password"
-                      className="block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      className="block w-full border border-gray-300 rounded-md shadow-xs p-2"
                       disabled={!currentUser?.isCreator}
                     />
                     <Button
@@ -216,7 +216,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     id="description"
                     name="description"
                     rows={3}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                     disabled={!currentUser?.isCreator}
                   />
                   <ErrorMessage
@@ -237,7 +237,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     as="select"
                     id="winning_criteria_id"
                     name="winning_criteria_id"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                     disabled={!currentUser?.isCreator}
                   >
                     {winningCriterias.map((criteria) => (
