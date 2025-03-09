@@ -47,6 +47,9 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
+  /* Brand Colors */
+  --color-brand: theme(colors.yellow.400);
+
   @keyframes accordion-down {
     from {
       height: 0;
@@ -101,7 +104,7 @@
     font-size: 2.25rem;
     line-height: 2.5rem;
     font-weight: 900;
-    color: rgb(31 41 55);
+    color: var(--color-gray-900);
   }
 
   .button-base {
@@ -114,25 +117,25 @@
 
     &:disabled {
       cursor: not-allowed;
-      border-color: rgb(209 213 219);
-      background-color: rgb(229 231 235);
-      color: rgb(107 114 128);
+      border-color: var(--color-gray-300);
+      background-color: var(--color-gray-200);
+      color: var(--color-gray-500);
 
       &:hover {
-        background-color: rgb(229 231 235);
+        background-color: var(--color-gray-200);
       }
     }
   }
 
   .button {
     @extend .button-base;
-    border-color: rgb(250 204 21);
+    border-color: var(--color-brand);
     background-color: white;
-    color: rgb(250 204 21);
+    color: var(--color-brand);
 
     &:hover,
     &:focus {
-      background-color: rgb(250 204 21);
+      background-color: var(--color-brand);
       color: white;
     }
   }
@@ -140,14 +143,14 @@
   .button-inverse {
     @extend .button-base;
     border-color: white;
-    background-color: rgb(250 204 21);
+    background-color: var(--color-brand);
     color: white;
 
     &:hover,
     &:focus {
-      border-color: rgb(250 204 21);
+      border-color: var(--color-brand);
       background-color: white;
-      color: rgb(250 204 21);
+      color: var(--color-brand);
     }
   }
 
@@ -186,10 +189,10 @@
 
   .custom-focus {
     &:focus {
-      border-color: rgb(250 204 21);
+      border-color: var(--color-brand);
       outline: none;
       ring-width: 2px;
-      ring-color: rgb(250 204 21);
+      ring-color: var(--color-brand);
       ring-offset-width: 2px;
     }
   }
@@ -198,13 +201,13 @@
     font-size: 1.125rem;
     line-height: 1.75rem;
     font-weight: 600;
-    color: rgb(55 65 81);
+    color: var(--color-gray-700);
   }
 
   .highlight {
     margin-left: 0.25rem;
     border-radius: 0.5rem;
-    background-color: rgb(243 244 246);
+    background-color: var(--color-gray-50);
     padding: 0.5rem;
     font-family: ui-monospace, monospace;
   }
@@ -212,14 +215,14 @@
   .error {
     width: 100%;
     text-align: center;
-    color: rgb(220 38 38);
+    color: theme(colors.red.600);
   }
 
   .input {
     @extend .custom-focus;
     width: 100%;
     border-radius: 0.75rem;
-    border: 1px solid rgb(203 213 225);
+    border: 1px solid var(--color-gray-400);
 
     &:focus {
       box-shadow: none;
@@ -232,17 +235,17 @@
 
   .input-error {
     @extend .input;
-    border-color: rgb(239 68 68);
-    background-color: rgb(254 242 242);
-    color: rgb(127 29 29);
+    border-color: theme(colors.red.500);
+    background-color: theme(colors.red.50);
+    color: theme(colors.red.900);
 
     &::placeholder {
-      color: rgb(185 28 28);
+      color: theme(colors.red.700);
     }
 
     &:focus {
-      border-color: rgb(239 68 68);
-      ring-color: rgb(239 68 68);
+      border-color: theme(colors.red.500);
+      ring-color: theme(colors.red.500);
     }
   }
 
@@ -250,7 +253,7 @@
     @extend .custom-focus;
     border-radius: 0.375rem;
     font-weight: 600;
-    color: rgb(250 204 21);
+    color: var(--color-brand);
   }
 
   .row {
