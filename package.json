@@ -92,5 +92,10 @@
   },
   "overrides": {
     "eslint": "$eslint"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@vercel/speed-insights"
+    ]
   }
 }
