@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr/dist/module/createServerClient.js";
 import { NextResponse } from "next/server";
 
 import type { NextRequest } from "next/server";
