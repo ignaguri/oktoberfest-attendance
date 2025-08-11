@@ -6,6 +6,9 @@ import type { NextRequest } from "next/server";
 
 const imageCache = new NodeCache({ stdTTL: 86400 }); // Cache images for 24 hours
 
+// Ensure Node.js runtime for Node-specific modules like NodeCache
+export const runtime = "nodejs";
+
 type AllowedBucket = "avatars" | "beer_pictures";
 
 const ALLOWED_BUCKETS: Record<AllowedBucket, true> = {
@@ -50,7 +53,7 @@ export async function GET(
 
   // Check if the image is cached
   const cacheKey = `${bucket}:${decodedId}`;
-  const cachedImage = imageCache.get<Buffer>(cacheKey);
+  const cachedImage = imageCache.get<ArrayBuffer>(cacheKey);
   if (cachedImage) {
     return new NextResponse(cachedImage, {
       status: 200,
@@ -69,16 +72,15 @@ export async function GET(
       throw error;
     }
 
-    const buffer = await data.arrayBuffer();
-    const imageBuffer = Buffer.from(buffer);
+    const arrayBuffer = await data.arrayBuffer();
 
     // Cache the image
-    imageCache.set(cacheKey, imageBuffer);
+    imageCache.set(cacheKey, arrayBuffer);
 
     const headers = new Headers();
     headers.set("Content-Type", getMimeType(decodedId));
 
-    return new NextResponse(imageBuffer, {
+    return new NextResponse(arrayBuffer, {
       status: 200,
       headers,
     });
