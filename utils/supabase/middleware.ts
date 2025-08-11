@@ -1,4 +1,3 @@
-// Import from SSR entry to avoid bundling browser client into Edge runtime
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
