@@ -3,6 +3,7 @@
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
 import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
@@ -48,6 +49,7 @@ export default function DetailedAttendanceForm({
   onAttendanceUpdate,
   selectedDate,
 }: DetailedAttendanceFormProps) {
+  const { currentFestival } = useFestival();
   const [existingAttendance, setExistingAttendance] =
     useState<AttendanceByDate | null>(null);
   const initialDate = useMemo(() => {
@@ -63,8 +65,13 @@ export default function DetailedAttendanceForm({
 
   const fetchAttendanceForDate = useCallback(
     async (date: Date) => {
+      if (!currentFestival) return;
+
       try {
-        const attendanceData = await fetchAttendanceByDate(date);
+        const attendanceData = await fetchAttendanceByDate(
+          date,
+          currentFestival.id,
+        );
         setExistingAttendance(attendanceData as AttendanceByDate);
       } catch (error) {
         toast({
@@ -74,7 +81,7 @@ export default function DetailedAttendanceForm({
         });
       }
     },
-    [toast],
+    [toast, currentFestival],
   );
 
   useEffect(() => {
@@ -97,7 +104,7 @@ export default function DetailedAttendanceForm({
   ) => {
     setSubmitting(true);
     try {
-      await addAttendance({ ...values });
+      await addAttendance({ ...values, festivalId: currentFestival!.id });
       toast({
         variant: "success",
         title: "Success",

@@ -59,11 +59,16 @@ export async function getProfileShortFailsafe() {
 
 export async function fetchAttendancesFromDB(
   userId: string,
+  festivalId?: string,
   date?: Date,
   single: boolean = false,
 ): Promise<Tables<"attendances"> | Tables<"attendances">[] | null> {
   const supabase = createClient();
   const query = supabase.from("attendances").select("*").eq("user_id", userId);
+
+  if (festivalId) {
+    query.eq("festival_id", festivalId);
+  }
   if (date) {
     query.eq("date", date.toISOString().split("T")[0]);
   }
@@ -85,17 +90,29 @@ export type AttendanceByDate = Tables<"attendances"> & {
 };
 export async function fetchAttendanceByDate(
   date: Date,
+  festivalId?: string,
 ): Promise<AttendanceByDate | null> {
   const user = await getUser();
 
   const zonedDate = new TZDate(date, TIMEZONE);
-  const attendanceData = await fetchAttendancesFromDB(user.id, zonedDate, true);
+  const attendanceData = await fetchAttendancesFromDB(
+    user.id,
+    festivalId,
+    zonedDate,
+    true,
+  );
 
   const supabase = createClient();
-  const { data: tentVisits, error: tentVisitsError } = await supabase
+  const tentVisitsQuery = supabase
     .from("tent_visits")
     .select("tent_id, visit_date")
     .eq("user_id", user.id);
+
+  if (festivalId) {
+    tentVisitsQuery.eq("festival_id", festivalId);
+  }
+
+  const { data: tentVisits, error: tentVisitsError } = await tentVisitsQuery;
 
   if (tentVisitsError) {
     reportSupabaseException("fetchAttendanceByDate", tentVisitsError, {
@@ -209,10 +226,11 @@ export async function addAttendance(formData: {
   amount: number;
   date: Date;
   tents: string[];
+  festivalId: string;
 }) {
   const supabase = createClient();
   const user = await getUser();
-  const { amount, date, tents } = formData;
+  const { amount, date, tents, festivalId } = formData;
 
   const dateWithTime = new TZDate(date, TIMEZONE);
   const now = new TZDate(new Date(), TIMEZONE);
@@ -222,6 +240,7 @@ export async function addAttendance(formData: {
     "add_or_update_attendance_with_tents",
     {
       p_user_id: user.id,
+      p_festival_id: festivalId,
       p_date: dateWithTime.toISOString(),
       p_beer_count: amount,
       p_tent_ids: tents,

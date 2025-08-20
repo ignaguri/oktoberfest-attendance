@@ -1,3 +1,4 @@
+import { FestivalSelector } from "@/components/FestivalSelector";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
 import ShareAppButton from "@/components/ShareAppButton";
@@ -9,14 +10,12 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { END_OF_WIESN, WIESN_MAP_URL } from "@/lib/constants";
-import { isBefore } from "date-fns";
-import { ExternalLink } from "lucide-react";
 import { Link } from "next-view-transitions";
 
+import FestivalStatus from "./FestivalStatus";
 import Highlights from "./Highlights";
+import MapButton from "./MapButton";
 import MissingFields from "./MissingFields";
-import OktoberfestStatus from "./OktoberfestStatus";
 import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 
 export default async function Home() {
@@ -32,8 +31,9 @@ export default async function Home() {
       </h1>
 
       <div className="mb-4 flex flex-col gap-4">
-        <OktoberfestStatus />
-        {isBefore(new Date(), END_OF_WIESN) && <QuickAttendanceRegistration />}
+        <FestivalSelector className="self-center" />
+        <FestivalStatus />
+        <QuickAttendanceRegistration />
       </div>
 
       <div className="flex flex-col gap-4">
@@ -53,12 +53,7 @@ export default async function Home() {
           <Button asChild variant="default">
             <Link href="/leaderboard">Global Leaderboard</Link>
           </Button>
-          <Button asChild variant="outline">
-            <Link href={WIESN_MAP_URL} target="_blank">
-              <span className="mr-1">Oktoberfest Map</span>
-              <ExternalLink size={20} />
-            </Link>
-          </Button>
+          <MapButton />
           <ShareAppButton />
         </div>
       </div>
