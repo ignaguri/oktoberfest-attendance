@@ -23,16 +23,9 @@ export type Views<
       : never
     : never;
 
-/* TODO: manually change the type in generated code for function:
-          create_group_with_member: {
-                  Args: {
-                    p_group_name: string
-                    p_password: string
-                    p_user_id: string
-                  }
-                  Returns: {
-                    group_id: string
-                    group_name: string
-                  }
-                }
-      */
+/* Manual type fixes applied:
+   ✅ create_group_with_member: Returns { group_id: string, group_name: string }
+   ✅ get_user_festival_stats: Returns single object (not array)
+   
+   NOTE: Re-apply these fixes after running `pnpm sup:db:types`
+*/
