@@ -10,10 +10,10 @@ import { revalidatePath } from "next/cache";
 
 import "server-only";
 
-export async function fetchAttendances() {
+export async function fetchAttendances(festivalId: string) {
   const user = await getUser();
 
-  const attendanceData = await fetchAttendancesFromDB(user.id);
+  const attendanceData = await fetchAttendancesFromDB(user.id, festivalId);
 
   if (!attendanceData) {
     return null;
@@ -23,7 +23,8 @@ export async function fetchAttendances() {
   const { data: tentVisits, error: tentVisitsError } = await supabase
     .from("tent_visits")
     .select("tent_id, visit_date, tents(name)")
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .eq("festival_id", festivalId);
 
   if (tentVisitsError) {
     reportSupabaseException("fetchAttendances", tentVisitsError, {
