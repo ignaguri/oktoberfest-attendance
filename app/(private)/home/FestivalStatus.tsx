@@ -7,7 +7,6 @@ import {
   getFestivalStatus,
 } from "@/lib/festivalConstants";
 import { differenceInDays, isWithinInterval, isBefore } from "date-fns";
-import { OctagonAlert } from "lucide-react";
 
 export default function FestivalStatus() {
   const { currentFestival, isLoading } = useFestival();
@@ -43,17 +42,18 @@ export default function FestivalStatus() {
   const festivalStatus = getFestivalStatus(currentFestival);
 
   return (
-    <>
-      <p className="text-center text-gray-900 font-semibold px-4">{status}</p>
-      {festivalStatus === "upcoming" && (
-        <Alert variant="warning" className="mt-4">
-          <OctagonAlert className="w-4 h-4" />
-          <AlertDescription>
-            All attendance data loaded now is just for testing and will be
-            deleted before {festivalName} starts.
-          </AlertDescription>
-        </Alert>
-      )}
-    </>
+    <Alert
+      variant={
+        festivalStatus === "active"
+          ? "success"
+          : festivalStatus === "upcoming"
+            ? "info"
+            : "warning"
+      }
+    >
+      <AlertDescription className="text-center font-semibold">
+        {status}
+      </AlertDescription>
+    </Alert>
   );
 }

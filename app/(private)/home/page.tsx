@@ -16,7 +16,7 @@ import FestivalStatus from "./FestivalStatus";
 import Highlights from "./Highlights";
 import MapButton from "./MapButton";
 import MissingFields from "./MissingFields";
-import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
+import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 
 export default async function Home() {
   return (
@@ -33,7 +33,7 @@ export default async function Home() {
       <div className="mb-4 flex flex-col gap-4">
         <FestivalSelector className="self-center" />
         <FestivalStatus />
-        <QuickAttendanceRegistration />
+        <QuickAttendanceWrapper />
       </div>
 
       <div className="flex flex-col gap-4">
