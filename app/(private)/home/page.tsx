@@ -66,10 +66,11 @@ export default async function Home() {
             </AccordionTrigger>
             <AccordionContent className="max-w-80 mx-auto">
               <p className="text-center text-gray-600">
-                Compete with friends in different groups to see who visits
+                Compete with friends in different groups to see who visits beer
                 festivals more often and drinks the most beers!
                 <br />
-                Track your progress and become the ultimate festival champion.
+                Track your progress and become the ultimate beer festival
+                champion.
               </p>
             </AccordionContent>
           </AccordionItem>

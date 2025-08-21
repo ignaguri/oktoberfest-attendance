@@ -33,11 +33,11 @@ const getRandomImage = () =>
 
 export const metadata: Metadata = {
   metadataBase: new URL(IS_PROD ? PROD_URL : DEV_URL),
-  description: "Track your Oktoberfest attendance and compete with friends!",
+  description: "Track your beer festival attendance and compete with friends!",
   title: "ProstCounter 🍻",
   openGraph: {
     title: "ProstCounter 🍻",
-    description: "Join your friends in tracking Oktoberfest attendance!",
+    description: "Join your friends in tracking beer festival attendance!",
     url: PROD_URL,
     images: [
       {
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ProstCounter 🍻",
-    description: "Join your friends in tracking Oktoberfest attendance!",
+    description: "Join your friends in tracking beer festival attendance!",
     images: [getRandomImage()],
     creator: "@ignaguri",
   },

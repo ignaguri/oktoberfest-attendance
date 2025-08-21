@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "ProstCounter 🍻",
     short_name: "ProstCounter",
-    description: "Track your Oktoberfest attendance and compete with friends!",
+    description:
+      "Track your beer festival attendance and compete with friends!",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
