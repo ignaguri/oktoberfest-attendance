@@ -4,10 +4,11 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
+import { useForm } from "@/hooks/use-form";
 import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
-import { Formik, Form, Field } from "formik";
+import { quickAttendanceSchema, QuickAttendanceFormData } from "@/lib/schemas/attendance";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -27,6 +28,21 @@ export const QuickAttendanceRegistrationForm = ({
     null,
   );
 
+  const {
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm(quickAttendanceSchema, {
+    defaultValues: {
+      tentId: "",
+      beerCount: 0,
+    },
+  });
+
+  const tentId = watch("tentId");
+  const beerCount = watch("beerCount");
+
   useEffect(() => {
     const loadAttendance = async () => {
       if (!currentFestival) return;
@@ -39,6 +55,8 @@ export const QuickAttendanceRegistrationForm = ({
         if (attendance) {
           setAttendanceData(attendance);
           onAttendanceIdReceived(attendance.id);
+          setValue("tentId", attendance.tent_ids[attendance.tent_ids.length - 1] || "");
+          setValue("beerCount", attendance.beer_count || 0);
         }
       } catch (error) {
         toast({
@@ -50,12 +68,9 @@ export const QuickAttendanceRegistrationForm = ({
     };
 
     loadAttendance();
-  }, [toast, onAttendanceIdReceived, currentFestival]);
+  }, [toast, onAttendanceIdReceived, currentFestival, setValue]);
 
-  const handleSubmit = async (
-    values: { tentId: string; beerCount: number },
-    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
-  ) => {
+  const onSubmit = async (data: QuickAttendanceFormData) => {
     if (!currentFestival) {
       toast({
         variant: "destructive",
@@ -66,16 +81,15 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
-      setSubmitting(true);
       const allVisitedTents = [...(attendanceData?.tent_ids ?? [])];
 
       // Check if the last tent ID is the same as the new tent ID
-      if (allVisitedTents[allVisitedTents.length - 1] !== values.tentId) {
-        allVisitedTents.push(values.tentId);
+      if (allVisitedTents[allVisitedTents.length - 1] !== data.tentId) {
+        allVisitedTents.push(data.tentId);
       }
 
       const newAttendanceId = await addAttendance({
-        amount: values.beerCount,
+        amount: data.beerCount,
         date: new Date(),
         tents: allVisitedTents,
         festivalId: currentFestival.id,
@@ -83,7 +97,7 @@ export const QuickAttendanceRegistrationForm = ({
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
-        beer_count: values.beerCount,
+        beer_count: data.beerCount,
         tent_ids: allVisitedTents,
       };
       setAttendanceData(updatedAttendance);
@@ -91,7 +105,7 @@ export const QuickAttendanceRegistrationForm = ({
 
       const tentName = tents
         ?.flatMap((tentGroup) => tentGroup.options)
-        .find((tent) => tent.value === values.tentId)?.label;
+        .find((tent) => tent.value === data.tentId)?.label;
 
       toast({
         variant: "success",
@@ -106,8 +120,6 @@ export const QuickAttendanceRegistrationForm = ({
         title: "Error",
         description: "Failed to update attendance. Please try again.",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -124,68 +136,52 @@ export const QuickAttendanceRegistrationForm = ({
   }
 
   return (
-    <Formik
-      initialValues={{
-        tentId:
-          attendanceData?.tent_ids[attendanceData.tent_ids.length - 1] || "",
-        beerCount: attendanceData?.beer_count || 0,
-      }}
-      onSubmit={handleSubmit}
-      enableReinitialize
-    >
-      {({ values, isSubmitting, setFieldValue, submitForm }) => (
-        <Form className="flex flex-col items-center gap-4">
-          {!attendanceData && <p>Are you at {currentFestival.name} today?</p>}
-          <div className="flex items-center gap-2">
-            <span>{attendanceData ? "You are at:" : "Which tent?"}</span>
-            <Field name="tentId">
-              {({ field }: { field: any }) => (
-                <SingleSelect
-                  {...field}
-                  buttonClassName="w-fit self-center"
-                  options={tents.map((tent) => ({
-                    title: tent.category,
-                    options: tent.options,
-                  }))}
-                  placeholder="Select your current tent"
-                  onSelect={(option) => {
-                    setFieldValue("tentId", option.value);
-                    submitForm();
-                  }}
-                  disabled={isSubmitting}
-                />
-              )}
-            </Field>
-          </div>
-          {attendanceData && (
-            <div className="flex items-center">
-              <Button
-                type="button"
-                variant="yellow"
-                onClick={() => {
-                  setFieldValue("beerCount", Math.max(0, values.beerCount - 1));
-                  submitForm();
-                }}
-                disabled={isSubmitting}
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <span className="mx-2">{values.beerCount} 🍺 drank today</span>
-              <Button
-                type="button"
-                variant="yellow"
-                onClick={() => {
-                  setFieldValue("beerCount", values.beerCount + 1);
-                  submitForm();
-                }}
-                disabled={isSubmitting}
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-        </Form>
+    <form className="flex flex-col items-center gap-4">
+      {!attendanceData && <p>Are you at {currentFestival.name} today?</p>}
+      <div className="flex items-center gap-2">
+        <span>{attendanceData ? "You are at:" : "Which tent?"}</span>
+        <SingleSelect
+          value={tentId}
+          buttonClassName="w-fit self-center"
+          options={tents.map((tent) => ({
+            title: tent.category,
+            options: tent.options,
+          }))}
+          placeholder="Select your current tent"
+          onSelect={(option) => {
+            setValue("tentId", option.value);
+            handleSubmit(onSubmit)();
+          }}
+          disabled={isSubmitting}
+        />
+      </div>
+      {attendanceData && (
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="yellow"
+            onClick={() => {
+              setValue("beerCount", Math.max(0, beerCount - 1));
+              handleSubmit(onSubmit)();
+            }}
+            disabled={isSubmitting}
+          >
+            <Minus className="w-4 h-4" />
+          </Button>
+          <span className="mx-2">{beerCount} 🍺 drank today</span>
+          <Button
+            type="button"
+            variant="yellow"
+            onClick={() => {
+              setValue("beerCount", beerCount + 1);
+              handleSubmit(onSubmit)();
+            }}
+            disabled={isSubmitting}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
       )}
-    </Formik>
+    </form>
   );
 };

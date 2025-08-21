@@ -1,35 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useForm } from "@/hooks/use-form";
 import { useToast } from "@/hooks/use-toast";
+import { signUpSchema, SignUpFormData } from "@/lib/schemas/auth";
 import cn from "classnames";
-import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Link } from "next-view-transitions";
 import React, { useState, useRef } from "react";
-import * as Yup from "yup";
 
 import { signUp } from "./actions";
 
-const SignUpSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Required"),
-});
-
 export default function SignUp() {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const handleSignUp = async (formData: {
-    email: string;
-    password: string;
-  }) => {
-    setIsSubmitting(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm(signUpSchema);
+
+  const onSubmit = async (data: SignUpFormData) => {
     try {
-      await signUp(formData);
+      await signUp({ email: data.email, password: data.password });
     } catch (error) {
       if (error instanceof Error) {
         toast({
@@ -48,7 +42,6 @@ export default function SignUp() {
         emailRef.current.focus();
       }
     } finally {
-      setIsSubmitting(false);
       setIsAccountCreated(true);
     }
   };
@@ -70,55 +63,56 @@ export default function SignUp() {
   return (
     <div className="card">
       <h2 className="w-full text-center">Create Account</h2>
-      <Formik
-        initialValues={{
-          email: "",
-          password: "",
-        }}
-        validationSchema={SignUpSchema}
-        onSubmit={handleSignUp}
-      >
-        {({ errors, touched }) => (
-          <Form className="column w-full">
-            <label htmlFor="email">Email</label>
-            <Field
-              className={cn(
-                "input",
-                errors.email && touched.email && "bg-red-50",
-              )}
-              id="email"
-              name="email"
-              placeholder="jane@acme.com"
-              type="email"
-              innerRef={emailRef}
-              disabled={isSubmitting}
-            />
-            <ErrorMessage name="email" component="span" className="error" />
+      <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
+        <label htmlFor="email">Email</label>
+        <input
+          className={cn(
+            "input",
+            errors.email && "bg-red-50",
+          )}
+          id="email"
+          placeholder="jane@acme.com"
+          type="email"
+          disabled={isSubmitting}
+          {...register("email")}
+        />
+        {errors.email && <span className="error">{errors.email.message}</span>}
 
-            <label htmlFor="password">Password</label>
-            <Field
-              className={cn(
-                "input",
-                errors.password && touched.password && "bg-red-50",
-              )}
-              id="password"
-              name="password"
-              type="password"
-              disabled={isSubmitting}
-            />
-            <ErrorMessage name="password" component="span" className="error" />
+        <label htmlFor="password">Password</label>
+        <input
+          className={cn(
+            "input",
+            errors.password && "bg-red-50",
+          )}
+          id="password"
+          type="password"
+          disabled={isSubmitting}
+          {...register("password")}
+        />
+        {errors.password && <span className="error">{errors.password.message}</span>}
 
-            <Button
-              className="self-center"
-              type="submit"
-              variant="yellow"
-              disabled={isSubmitting}
-            >
-              Submit
-            </Button>
-          </Form>
-        )}
-      </Formik>
+        <label htmlFor="confirmPassword">Confirm Password</label>
+        <input
+          className={cn(
+            "input",
+            errors.confirmPassword && "bg-red-50",
+          )}
+          id="confirmPassword"
+          type="password"
+          disabled={isSubmitting}
+          {...register("confirmPassword")}
+        />
+        {errors.confirmPassword && <span className="error">{errors.confirmPassword.message}</span>}
+
+        <Button
+          className="self-center"
+          type="submit"
+          variant="yellow"
+          disabled={isSubmitting}
+        >
+          Submit
+        </Button>
+      </form>
       <Button asChild variant="link">
         <Link href="/sign-in">Already have an account? Sign In.</Link>
       </Button>

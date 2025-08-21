@@ -198,8 +198,22 @@ export async function fetchWinningCriteriaForGroup(groupId: string) {
 
 export async function fetchGroupGallery(groupId: string) {
   const supabase = createClient();
+
+  // First get the group's festival_id
+  const { data: groupData, error: groupError } = await supabase
+    .from("groups")
+    .select("festival_id")
+    .eq("id", groupId)
+    .single();
+
+  if (groupError) {
+    reportSupabaseException("fetchGroupGallery - group", groupError);
+    throw new Error(`Error fetching group info: ${groupError.message}`);
+  }
+
   const { data, error } = await supabase.rpc("fetch_group_gallery", {
     p_group_id: groupId,
+    p_festival_id: groupData.festival_id,
   });
 
   if (error) {
