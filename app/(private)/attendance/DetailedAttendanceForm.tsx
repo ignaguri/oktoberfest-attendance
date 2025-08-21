@@ -154,7 +154,7 @@ export default function DetailedAttendanceForm({
           />
           {errors.date && <span className="error">{errors.date.message}</span>}
 
-          <label htmlFor="amount">How many Maße 🍻 did you have?</label>
+          <label htmlFor="amount">How many 🍻 Maß did you have?</label>
           <select
             className={cn(
               "input w-auto self-center",

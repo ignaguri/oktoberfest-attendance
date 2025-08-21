@@ -87,27 +87,42 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
-      const allVisitedTents = [...(attendanceData?.tent_ids ?? [])];
-
-      // Check if the last tent ID is the same as the new tent ID
-      if (allVisitedTents[allVisitedTents.length - 1] !== data.tentId) {
-        allVisitedTents.push(data.tentId);
-      }
+      // Only send the new tent ID if it's different from the last one
+      // This prevents duplicate tent visits in the database
+      const tentsToSend =
+        attendanceData?.tent_ids &&
+        attendanceData.tent_ids.length > 0 &&
+        attendanceData.tent_ids[attendanceData.tent_ids.length - 1] ===
+          data.tentId
+          ? [] // No new tent to add
+          : [data.tentId]; // Only the new tent
 
       const newAttendanceId = await addAttendance({
         amount: data.beerCount,
         date: new Date(),
-        tents: allVisitedTents,
+        tents: tentsToSend,
         festivalId: currentFestival.id,
       });
+      // Update the local state with the new tent ID if it was added
+      const updatedTentIds =
+        tentsToSend.length > 0
+          ? [...(attendanceData?.tent_ids ?? []), ...tentsToSend]
+          : (attendanceData?.tent_ids ?? []);
+
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
         beer_count: data.beerCount,
-        tent_ids: allVisitedTents,
+        tent_ids: updatedTentIds,
       };
       setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);
+
+      // Update the tent selection to show the current tent (last tent in the array)
+      if (updatedTentIds.length > 0) {
+        const currentTentId = updatedTentIds[updatedTentIds.length - 1];
+        setValue("tentId", currentTentId);
+      }
 
       const tentName = tents
         ?.flatMap((tentGroup) => tentGroup.options)
