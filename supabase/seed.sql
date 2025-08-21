@@ -107,5 +107,23 @@ WHERE
         (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 5)
     ));
 
+-- Insert current 2025 Oktoberfest data
+INSERT INTO festivals (
+  name, short_name, festival_type, location, 
+  start_date, end_date, map_url, 
+  is_active, status, description
+) VALUES (
+  'Oktoberfest 2025', 
+  'oktoberfest-2025',
+  'oktoberfest',
+  'Munich, Germany',
+  '2025-09-20',
+  '2025-10-05', 
+  'https://wiesnmap.muenchen.de/',
+  true,
+  'active',
+  'The 190th Oktoberfest in Munich'
+);
+
 -- Commit the transaction to save the changes
 COMMIT;

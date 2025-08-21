@@ -8,14 +8,23 @@ import type { Tables } from "@/lib/database.types";
 
 import "server-only";
 
-export async function fetchGroups(): Promise<Tables<"groups">[]> {
+export async function fetchGroups(
+  festivalId?: string,
+): Promise<Tables<"groups">[]> {
   const user = await getUser();
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("group_members")
-    .select("group_id, groups(id, name)")
+    .select("group_id, groups(id, name, festival_id)")
     .eq("user_id", user.id);
+
+  // Filter by festival if provided
+  if (festivalId) {
+    query = query.eq("groups.festival_id", festivalId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     reportSupabaseException("fetchGroups", error, {
@@ -26,7 +35,9 @@ export async function fetchGroups(): Promise<Tables<"groups">[]> {
     throw new Error("Error fetching groups: " + error.message);
   }
 
-  const groups = data.map((item) => item.groups) as Tables<"groups">[];
+  const groups = data
+    .map((item) => item.groups)
+    .filter((group): group is Tables<"groups"> => group !== null);
 
   return groups;
 }

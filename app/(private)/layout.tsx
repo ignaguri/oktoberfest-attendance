@@ -2,7 +2,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { VersionChecker } from "@/components/VersionChecker";
 import { WhatsNew } from "@/components/WhatsNew";
-import { FestivalProvider } from "@/contexts/FestivalContext";
 import { getUser } from "@/lib/sharedActions";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -26,11 +25,9 @@ export default function PrivateLayout({
     <ErrorBoundary>
       <Suspense fallback={<LoadingSpinner />}>
         <AuthCheck />
-        <FestivalProvider>
-          {children}
-          <WhatsNew />
-          <VersionChecker />
-        </FestivalProvider>
+        {children}
+        <WhatsNew />
+        <VersionChecker />
       </Suspense>
     </ErrorBoundary>
   );

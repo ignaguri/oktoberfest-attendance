@@ -39,7 +39,10 @@ export const CreateGroupForm = () => {
     }
 
     try {
-      const groupId = await createGroup({ ...values, festivalId: currentFestival.id });
+      const groupId = await createGroup({
+        ...values,
+        festivalId: currentFestival.id,
+      });
       if (groupId) {
         router.push(`/group-settings/${groupId}`);
         toast({

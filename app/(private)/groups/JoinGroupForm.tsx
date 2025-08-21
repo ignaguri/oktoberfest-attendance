@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { useFestival } from "@/contexts/FestivalContext";
+import { useToast } from "@/hooks/use-toast";
 import cn from "classnames";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
@@ -23,6 +24,7 @@ interface JoinGroupFormProps {
 }
 
 export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
+  const { currentFestival } = useFestival();
   const [showPassword, setShowPassword] = useState(false);
   const router = useTransitionRouter();
   const { toast } = useToast();
@@ -31,8 +33,21 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
     values: { groupName: string; password: string },
     { setSubmitting }: any,
   ) => {
+    if (!currentFestival) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No festival selected. Please select a festival.",
+      });
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const joinedGroupId = await joinGroup(values);
+      const joinedGroupId = await joinGroup({
+        ...values,
+        festivalId: currentFestival.id,
+      });
       toast({
         variant: "success",
         title: "Success",
@@ -44,7 +59,8 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Incorrect password or unable to join group.",
+        description:
+          "Incorrect password or unable to join group for this festival.",
       });
     } finally {
       setSubmitting(false);

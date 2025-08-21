@@ -1,7 +1,6 @@
 "use client";
 
 import { useFestival } from "@/contexts/FestivalContext";
-import { FestivalSelector } from "@/components/FestivalSelector";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useCallback } from "react";
 
@@ -29,13 +28,14 @@ export default function AttendancePage() {
 
   const fetchAttendanceData = useCallback(async () => {
     if (!currentFestival) return;
-    
+
     try {
       const data = await fetchAttendances(currentFestival.id);
       if (data) {
         setAttendances(data as AttendanceWithTentVisits[]);
       }
     } catch (error) {
+      console.error("Error fetching attendance data:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -64,7 +64,6 @@ export default function AttendancePage() {
   if (festivalLoading || !currentFestival) {
     return (
       <div className="w-full max-w-lg flex flex-col gap-6">
-        <FestivalSelector className="self-center" />
         <p className="text-center text-gray-600">Loading festival data...</p>
       </div>
     );
@@ -72,7 +71,6 @@ export default function AttendancePage() {
 
   return (
     <div className="w-full max-w-lg flex flex-col gap-6">
-      <FestivalSelector className="self-center" />
       <DetailedAttendanceForm
         onAttendanceUpdate={handleAttendanceUpdate}
         selectedDate={selectedDate}

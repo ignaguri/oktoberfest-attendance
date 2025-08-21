@@ -19,7 +19,7 @@ export async function getMissingProfileFields() {
   return missingFields;
 }
 
-export async function fetchHighlights() {
+export async function fetchHighlights(festivalId?: string) {
   const user = await getUser();
 
   const supabase = createClient();
@@ -27,9 +27,23 @@ export async function fetchHighlights() {
     group_id: string;
     group_name: string;
   };
-  const { data, error } = await supabase.rpc("get_user_stats", {
-    input_user_id: user.id,
-  });
+
+  if (!festivalId) {
+    return {
+      topPositions: [],
+      totalBeers: 0,
+      daysAttended: 0,
+      custom_beer_cost: COST_PER_BEER,
+    };
+  }
+
+  const { data, error } = await supabase.rpc(
+    "get_user_festival_stats_with_positions",
+    {
+      p_user_id: user.id,
+      p_festival_id: festivalId,
+    },
+  );
   const { data: profileData } = await supabase
     .from("profiles")
     .select("custom_beer_cost")

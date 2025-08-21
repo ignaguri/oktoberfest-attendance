@@ -1,4 +1,3 @@
-import { FestivalSelector } from "@/components/FestivalSelector";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
 import ShareAppButton from "@/components/ShareAppButton";
@@ -31,7 +30,6 @@ export default async function Home() {
       </h1>
 
       <div className="mb-4 flex flex-col gap-4">
-        <FestivalSelector className="self-center" />
         <FestivalStatus />
         <QuickAttendanceWrapper />
       </div>
