@@ -12,8 +12,9 @@ export const joinGroupSchema = z.object({
 
 export const groupSettingsSchema = z.object({
   name: z.string().min(1, "Group name is required").trim(),
+  password: z.string().min(1, "Password is required").trim(),
   description: z.string().optional(),
-  winning_criteria_id: z.number().min(1, "Please select winning criteria"),
+  winning_criteria_id: z.number().min(1, "Winning criteria is required"),
 });
 
 export type CreateGroupFormData = z.infer<typeof createGroupSchema>;

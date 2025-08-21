@@ -2,14 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { joinGroupSchema, JoinGroupFormData } from "@/lib/schemas/groups";
+import { joinGroupSchema } from "@/lib/schemas/groups";
+import { zodResolver } from "@hookform/resolvers/zod";
 import cn from "classnames";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import type { JoinGroupFormData } from "@/lib/schemas/groups";
 
 import { joinGroup } from "./actions";
 
@@ -69,28 +71,27 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 flex flex-col gap-2">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-2 flex flex-col gap-2"
+    >
       <h3 className="text-xl font-semibold">Join a Group</h3>
       <input
         type="text"
         placeholder="Group Name"
-        className={cn(
-          "input",
-          errors.groupName && "input-error",
-        )}
+        className={cn("input", errors.groupName && "input-error")}
         autoComplete="off"
         {...register("groupName")}
       />
-      {errors.groupName && <span className="error">{errors.groupName.message}</span>}
-      
+      {errors.groupName && (
+        <span className="error">{errors.groupName.message}</span>
+      )}
+
       <div className="relative">
         <input
           type={showPassword ? "text" : "password"}
           placeholder="Group Password"
-          className={cn(
-            "input pr-10",
-            errors.password && "input-error",
-          )}
+          className={cn("input pr-10", errors.password && "input-error")}
           autoComplete="off"
           {...register("password")}
         />
@@ -103,8 +104,10 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </Button>
       </div>
-      {errors.password && <span className="error">{errors.password.message}</span>}
-      
+      {errors.password && (
+        <span className="error">{errors.password.message}</span>
+      )}
+
       <Button
         type="submit"
         variant="yellow"

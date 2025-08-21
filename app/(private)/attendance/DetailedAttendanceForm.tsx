@@ -4,16 +4,17 @@ import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
-import { detailedAttendanceSchema, DetailedAttendanceFormData } from "@/lib/schemas/attendance";
+import { detailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useForm } from "react-hook-form";
 
+import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
 
 import { BeerPicturesUpload } from "./BeerPicturesUpload";
@@ -145,13 +146,14 @@ export default function DetailedAttendanceForm({
           <MyDatePicker
             name="date"
             disabled={isSubmitting}
+            value={watchedValues.date}
             onDateChange={(date) => {
               setValue("date", date!);
               handleDateChange(date);
             }}
           />
           {errors.date && <span className="error">{errors.date.message}</span>}
-          
+
           <label htmlFor="amount">How many Maße 🍻 did you have?</label>
           <select
             className={cn(
@@ -168,8 +170,10 @@ export default function DetailedAttendanceForm({
               </option>
             ))}
           </select>
-          {errors.amount && <span className="error">{errors.amount.message}</span>}
-          
+          {errors.amount && (
+            <span className="error">{errors.amount.message}</span>
+          )}
+
           <label htmlFor="tents">Which tents did you visit?</label>
           <TentSelector
             disabled={isSubmitting}

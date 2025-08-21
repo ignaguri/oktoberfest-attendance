@@ -1,13 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { signUpSchema, SignUpFormData } from "@/lib/schemas/auth";
+import { signUpSchema } from "@/lib/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import cn from "classnames";
 import { Link } from "next-view-transitions";
 import React, { useState, useRef } from "react";
+import { useForm } from "react-hook-form";
+
+import type { SignUpFormData } from "@/lib/schemas/auth";
 
 import { signUp } from "./actions";
 
@@ -69,10 +71,7 @@ export default function SignUp() {
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
         <label htmlFor="email">Email</label>
         <input
-          className={cn(
-            "input",
-            errors.email && "bg-red-50",
-          )}
+          className={cn("input", errors.email && "bg-red-50")}
           id="email"
           placeholder="jane@acme.com"
           type="email"
@@ -83,29 +82,27 @@ export default function SignUp() {
 
         <label htmlFor="password">Password</label>
         <input
-          className={cn(
-            "input",
-            errors.password && "bg-red-50",
-          )}
+          className={cn("input", errors.password && "bg-red-50")}
           id="password"
           type="password"
           disabled={isSubmitting}
           {...register("password")}
         />
-        {errors.password && <span className="error">{errors.password.message}</span>}
+        {errors.password && (
+          <span className="error">{errors.password.message}</span>
+        )}
 
         <label htmlFor="confirmPassword">Confirm Password</label>
         <input
-          className={cn(
-            "input",
-            errors.confirmPassword && "bg-red-50",
-          )}
+          className={cn("input", errors.confirmPassword && "bg-red-50")}
           id="confirmPassword"
           type="password"
           disabled={isSubmitting}
           {...register("confirmPassword")}
         />
-        {errors.confirmPassword && <span className="error">{errors.confirmPassword.message}</span>}
+        {errors.confirmPassword && (
+          <span className="error">{errors.confirmPassword.message}</span>
+        )}
 
         <Button
           className="self-center"

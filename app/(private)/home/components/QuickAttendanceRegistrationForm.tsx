@@ -4,15 +4,16 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
+import { quickAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
-import { quickAttendanceSchema, QuickAttendanceFormData } from "@/lib/schemas/attendance";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
+import type { QuickAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
 
 interface QuickAttendanceRegistrationFormProps {
@@ -57,7 +58,10 @@ export const QuickAttendanceRegistrationForm = ({
         if (attendance) {
           setAttendanceData(attendance);
           onAttendanceIdReceived(attendance.id);
-          setValue("tentId", attendance.tent_ids[attendance.tent_ids.length - 1] || "");
+          setValue(
+            "tentId",
+            attendance.tent_ids[attendance.tent_ids.length - 1] || "",
+          );
           setValue("beerCount", attendance.beer_count || 0);
         }
       } catch (error) {

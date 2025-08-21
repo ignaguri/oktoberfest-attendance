@@ -1,13 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { signInSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { signInSchema, SignInFormData } from "@/lib/schemas/auth";
 import { EyeOff, Eye } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import type { SignInFormData } from "@/lib/schemas/auth";
 
 import { login } from "./actions";
 
@@ -64,7 +66,9 @@ export default function SignIn() {
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>
         </div>
-        {errors.password && <span className="error">{errors.password.message}</span>}
+        {errors.password && (
+          <span className="error">{errors.password.message}</span>
+        )}
 
         <Button
           variant="yellow"

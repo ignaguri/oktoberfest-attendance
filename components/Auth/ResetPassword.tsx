@@ -1,12 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { resetPasswordSchema, ResetPasswordFormData } from "@/lib/schemas/auth";
+import { resetPasswordSchema } from "@/lib/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import cn from "classnames";
 import { Link } from "next-view-transitions";
+import { useForm } from "react-hook-form";
+
+import type { ResetPasswordFormData } from "@/lib/schemas/auth";
 
 import { resetPassword } from "./actions";
 
@@ -52,7 +54,12 @@ const ResetPassword = () => {
           {...register("email")}
         />
         {errors.email && <span className="error">{errors.email.message}</span>}
-        <Button type="submit" className="self-center" variant="yellow" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="self-center"
+          variant="yellow"
+          disabled={isSubmitting}
+        >
           Send Instructions
         </Button>
       </form>

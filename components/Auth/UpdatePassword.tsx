@@ -1,13 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { updatePasswordSchema, UpdatePasswordFormData } from "@/lib/schemas/auth";
+import { updatePasswordSchema } from "@/lib/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import cn from "classnames";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import type { UpdatePasswordFormData } from "@/lib/schemas/auth";
 
 import { updatePassword } from "./actions";
 
@@ -49,10 +51,7 @@ export default function UpdatePassword() {
         <label htmlFor="password">New Password</label>
         <div className="relative w-full">
           <input
-            className={cn(
-              "input",
-              errors.password && "bg-red-50",
-            )}
+            className={cn("input", errors.password && "bg-red-50")}
             id="password"
             type={showPassword ? "text" : "password"}
             disabled={isSubmitting}
@@ -67,15 +66,14 @@ export default function UpdatePassword() {
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>
         </div>
-        {errors.password && <span className="error">{errors.password.message}</span>}
+        {errors.password && (
+          <span className="error">{errors.password.message}</span>
+        )}
 
         <label htmlFor="confirmPassword">Confirm Password</label>
         <div className="relative w-full">
           <input
-            className={cn(
-              "input",
-              errors.confirmPassword && "bg-red-50",
-            )}
+            className={cn("input", errors.confirmPassword && "bg-red-50")}
             id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
             disabled={isSubmitting}
@@ -90,7 +88,9 @@ export default function UpdatePassword() {
             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>
         </div>
-        {errors.confirmPassword && <span className="error">{errors.confirmPassword.message}</span>}
+        {errors.confirmPassword && (
+          <span className="error">{errors.confirmPassword.message}</span>
+        )}
 
         <Button
           variant="yellow"

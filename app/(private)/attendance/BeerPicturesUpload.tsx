@@ -2,16 +2,15 @@
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { beerPicturesSchema } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
-import { Formik, Form, ErrorMessage, FieldArray } from "formik";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 
-interface PictureFormValues {
-  pictures: File[];
-}
+import type { BeerPicturesFormData } from "@/lib/schemas/uploads";
 
 interface BeerPicturesUploadProps {
   attendanceId: string | null;
@@ -22,30 +21,6 @@ interface BeerPicturesUploadProps {
 const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
 const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const MAX_PICTURES = 10;
-
-const validationSchema = Yup.object().shape({
-  pictures: Yup.array()
-    .of(
-      Yup.mixed()
-        .required("A beer picture is required")
-        .test("fileSize", "File is too large (max 12MB)", (value) => {
-          if (!value) return true;
-          return value instanceof File && value.size <= MAX_FILE_SIZE;
-        })
-        .test(
-          "fileType",
-          "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-          (value) => {
-            if (!value) return true;
-            return (
-              value instanceof File && VALID_FILE_TYPES.includes(value.type)
-            );
-          },
-        ),
-    )
-    .min(1, "At least one picture is required")
-    .max(MAX_PICTURES, `Maximum ${MAX_PICTURES} pictures allowed`),
-});
 
 const PicturePreview = ({
   src,
@@ -87,15 +62,28 @@ export function BeerPicturesUpload({
   const [allPictureUrls, setAllPictureUrls] =
     useState<string[]>(existingPictureUrls);
 
-  const handleSubmit = async (
-    values: PictureFormValues,
-    { setSubmitting, resetForm }: any,
-  ) => {
-    if (!values.pictures.length || !attendanceId) return;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+    watch,
+    reset,
+  } = useForm<BeerPicturesFormData>({
+    resolver: zodResolver(beerPicturesSchema),
+    defaultValues: {
+      pictures: [],
+    },
+  });
+
+  const watchedPictures = watch("pictures");
+
+  const onSubmit = async (data: BeerPicturesFormData) => {
+    if (!data.pictures.length || !attendanceId) return;
 
     try {
       const newUrls: string[] = [];
-      for (const picture of values.pictures) {
+      for (const picture of data.pictures) {
         const formData = new FormData();
         formData.append("picture", picture);
         formData.append("attendanceId", attendanceId);
@@ -112,15 +100,13 @@ export function BeerPicturesUpload({
         title: "Success",
         description: `${newUrls.length} beer picture(s) uploaded successfully!`,
       });
-      resetForm();
+      reset();
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to upload beer pictures. Please try again.",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -128,79 +114,75 @@ export function BeerPicturesUpload({
     return null;
   }
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.currentTarget.files || []);
+    const newPictures = [
+      ...watchedPictures,
+      ...files.slice(
+        0,
+        MAX_PICTURES - allPictureUrls.length - watchedPictures.length,
+      ),
+    ];
+    setValue("pictures", newPictures);
+  };
+
+  const removePicture = (index: number) => {
+    const newPictures = watchedPictures.filter((_, i) => i !== index);
+    setValue("pictures", newPictures);
+  };
+
   return (
-    <Formik
-      initialValues={{ pictures: [] }}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col items-center gap-4"
     >
-      {({ setFieldValue, isSubmitting, values, errors }) => (
-        <Form className="flex flex-col items-center gap-4">
-          <FieldArray name="pictures">
-            {({ remove }) => (
-              <>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(event) => {
-                    const files = Array.from(event.currentTarget.files || []);
-                    const newPictures = [
-                      ...values.pictures,
-                      ...files.slice(
-                        0,
-                        MAX_PICTURES -
-                          allPictureUrls.length -
-                          values.pictures.length,
-                      ),
-                    ];
-                    setFieldValue("pictures", newPictures);
-                  }}
-                  className="hidden"
-                  id="beer-pictures-upload"
-                />
-                <label
-                  htmlFor="beer-pictures-upload"
-                  className={buttonVariants({ variant: "outline" })}
-                >
-                  <div className="flex items-center gap-2">
-                    <Camera size={24} />
-                    <span>
-                      {allPictureUrls.length > 0 || values.pictures.length > 0
-                        ? "Add more pics"
-                        : "Add pictures"}
-                    </span>
-                  </div>
-                </label>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {allPictureUrls.map((url, index) => (
-                    <PicturePreview
-                      key={`existing-${index}`}
-                      src={`/api/image/${url}?bucket=beer_pictures`}
-                      isUploaded
-                    />
-                  ))}
-                  {values.pictures.map((file, index) => (
-                    <PicturePreview
-                      key={`new-${index}`}
-                      src={URL.createObjectURL(file)}
-                      onRemove={() => remove(index)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </FieldArray>
-          <ErrorMessage name="pictures" component="span" className="error" />
-          {values.pictures.length > 0 && !errors.pictures && (
-            <Button type="submit" disabled={isSubmitting} variant="darkYellow">
-              {isSubmitting
-                ? "Uploading..."
-                : `Upload ${values.pictures.length} picture(s)`}
-            </Button>
-          )}
-        </Form>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileChange}
+        className="hidden"
+        id="beer-pictures-upload"
+      />
+      <label
+        htmlFor="beer-pictures-upload"
+        className={buttonVariants({ variant: "outline" })}
+      >
+        <div className="flex items-center gap-2">
+          <Camera size={24} />
+          <span>
+            {allPictureUrls.length > 0 || watchedPictures.length > 0
+              ? "Add more pics"
+              : "Add pictures"}
+          </span>
+        </div>
+      </label>
+      <div className="flex flex-wrap gap-2 justify-center">
+        {allPictureUrls.map((url, index) => (
+          <PicturePreview
+            key={`existing-${index}`}
+            src={`/api/image/${url}?bucket=beer_pictures`}
+            isUploaded
+          />
+        ))}
+        {watchedPictures.map((file, index) => (
+          <PicturePreview
+            key={`new-${index}`}
+            src={URL.createObjectURL(file)}
+            onRemove={() => removePicture(index)}
+          />
+        ))}
+      </div>
+      {errors.pictures && (
+        <span className="error">{errors.pictures.message}</span>
       )}
-    </Formik>
+      {watchedPictures.length > 0 && !errors.pictures && (
+        <Button type="submit" disabled={isSubmitting} variant="darkYellow">
+          {isSubmitting
+            ? "Uploading..."
+            : `Upload ${watchedPictures.length} picture(s)`}
+        </Button>
+      )}
+    </form>
   );
 }

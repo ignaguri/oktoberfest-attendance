@@ -4,18 +4,63 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { groupSchema } from "@/lib/schemas/admin";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 
 import type { Tables } from "@/lib/database.types";
+import type { GroupFormData } from "@/lib/schemas/admin";
 
 import { getGroups, updateGroup, deleteGroup } from "../actions";
 
-const GroupSchema = Yup.object().shape({
-  name: Yup.string().required("Required"),
-  description: Yup.string(),
-});
+const GroupEditForm = ({
+  group,
+  onSubmit,
+}: {
+  group: Tables<"groups">;
+  onSubmit: (data: GroupFormData) => Promise<void>;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<GroupFormData>({
+    resolver: zodResolver(groupSchema),
+    defaultValues: {
+      name: group.name,
+      description: group.description || "",
+    },
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label htmlFor="name" className="block">
+          Group Name
+        </label>
+        <input type="text" id="name" className="input" {...register("name")} />
+        {errors.name && <span className="error">{errors.name.message}</span>}
+      </div>
+      <div>
+        <label htmlFor="description" className="block">
+          Description
+        </label>
+        <textarea
+          id="description"
+          className="input"
+          {...register("description")}
+        />
+        {errors.description && (
+          <span className="error">{errors.description.message}</span>
+        )}
+      </div>
+      <Button type="submit" disabled={isSubmitting}>
+        Update Group
+      </Button>
+    </form>
+  );
+};
 
 const GroupList = () => {
   const { toast } = useToast();
@@ -38,10 +83,10 @@ const GroupList = () => {
     }
   }
 
-  async function handleUpdateGroup(values: any, { setSubmitting }: any) {
+  async function handleUpdateGroup(data: GroupFormData) {
     if (!selectedGroup) return;
     try {
-      await updateGroup(selectedGroup.id, values);
+      await updateGroup(selectedGroup.id, data);
       fetchGroups();
       setSelectedGroup(null);
       toast({
@@ -49,6 +94,7 @@ const GroupList = () => {
         variant: "success",
         description: "Group updated successfully",
       });
+      setIsDialogOpen(false);
     } catch (error) {
       console.error("Error updating group:", error);
       toast({
@@ -57,8 +103,6 @@ const GroupList = () => {
         variant: "destructive",
       });
     }
-    setSubmitting(false);
-    setIsDialogOpen(false); // Close the dialog after update
   }
 
   async function handleDeleteGroup(groupId: string) {
@@ -130,50 +174,7 @@ const GroupList = () => {
         description="Update group details"
       >
         {selectedGroup && (
-          <Formik
-            initialValues={{
-              name: selectedGroup.name,
-              description: selectedGroup.description || "",
-            }}
-            validationSchema={GroupSchema}
-            onSubmit={handleUpdateGroup}
-            enableReinitialize
-          >
-            {({ isSubmitting }) => (
-              <Form className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block">
-                    Group Name
-                  </label>
-                  <Field type="text" id="name" name="name" className="input" />
-                  <ErrorMessage
-                    name="name"
-                    component="span"
-                    className="error"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="description" className="block">
-                    Description
-                  </label>
-                  <Field
-                    as="textarea"
-                    id="description"
-                    name="description"
-                    className="input"
-                  />
-                  <ErrorMessage
-                    name="description"
-                    component="span"
-                    className="error"
-                  />
-                </div>
-                <Button type="submit" disabled={isSubmitting}>
-                  Update Group
-                </Button>
-              </Form>
-            )}
-          </Formik>
+          <GroupEditForm group={selectedGroup} onSubmit={handleUpdateGroup} />
         )}
       </ResponsiveDialog>
     </div>
