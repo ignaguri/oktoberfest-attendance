@@ -142,7 +142,8 @@ const PersonalAttendanceTable = ({
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-2">
+      <p className="text-xs text-gray-500">Select any attendance to edit it</p>
       <DataTable
         columns={columns}
         data={data || []}

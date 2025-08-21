@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 
+/**
+ * @deprecated
+ */
 export default function BugReportLink({ className }: { className?: string }) {
   const [mailtoLink, setMailtoLink] = useState<string>("");
 

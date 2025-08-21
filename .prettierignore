@@ -1,0 +1,14 @@
+# Generated files
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+
+# Build outputs
+.next/
+dist/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env*
