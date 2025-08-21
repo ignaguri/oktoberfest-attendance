@@ -1,6 +1,6 @@
 "use server";
 
-import { COST_PER_BEER } from "@/lib/constants";
+import { getDefaultBeerCost } from "@/lib/festivalConstants";
 import { getProfileShort, getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
@@ -33,7 +33,7 @@ export async function fetchHighlights(festivalId?: string) {
       topPositions: [],
       totalBeers: 0,
       daysAttended: 0,
-      custom_beer_cost: COST_PER_BEER,
+      custom_beer_cost: getDefaultBeerCost(null),
     };
   }
 
@@ -59,7 +59,8 @@ export async function fetchHighlights(festivalId?: string) {
       topPositions: [],
       totalBeers: 0,
       daysAttended: 0,
-      custom_beer_cost: profileData?.custom_beer_cost ?? COST_PER_BEER,
+      custom_beer_cost:
+        profileData?.custom_beer_cost ?? getDefaultBeerCost(null),
     };
   }
   if (!data || !Array.isArray(data) || data.length === 0) {
@@ -67,7 +68,7 @@ export async function fetchHighlights(festivalId?: string) {
       topPositions: [],
       totalBeers: 0,
       daysAttended: 0,
-      custom_beer_cost: COST_PER_BEER,
+      custom_beer_cost: getDefaultBeerCost(null),
     };
   }
   const firstItem = data[0];
@@ -75,7 +76,7 @@ export async function fetchHighlights(festivalId?: string) {
     topPositions: (firstItem.top_positions as unknown as TopPosition[]) || [],
     totalBeers: firstItem.total_beers || 0,
     daysAttended: firstItem.days_attended || 0,
-    custom_beer_cost: profileData?.custom_beer_cost ?? COST_PER_BEER,
+    custom_beer_cost: profileData?.custom_beer_cost ?? getDefaultBeerCost(null),
   };
 
   return result;

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useFestival } from "@/contexts/FestivalContext";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
 import type { Festival } from "@/lib/types";
@@ -150,10 +150,10 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                         {status}
                       </span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(festival.start_date), "MMM d")} -{" "}
-                      {format(new Date(festival.end_date), "MMM d, yyyy")}
-                    </span>
+                    <div className="text-sm text-gray-600">
+                      {format(parseISO(festival.start_date), "MMM d")} -{" "}
+                      {format(parseISO(festival.end_date), "MMM d, yyyy")}
+                    </div>
                     <span className="text-xs text-muted-foreground">
                       {festival.location}
                     </span>

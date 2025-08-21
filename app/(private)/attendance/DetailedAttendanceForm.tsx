@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
-import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
-import { detailedAttendanceSchema } from "@/lib/schemas/attendance";
+import { getFestivalDates } from "@/lib/festivalConstants";
+import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,14 +32,34 @@ export default function DetailedAttendanceForm({
   const { currentFestival } = useFestival();
   const [existingAttendance, setExistingAttendance] =
     useState<AttendanceByDate | null>(null);
+
+  // Create dynamic schema based on current festival
+  const detailedAttendanceSchema = useMemo(() => {
+    if (!currentFestival) return null;
+
+    const festivalDates = getFestivalDates(currentFestival);
+    if (!festivalDates) return null;
+
+    return createDetailedAttendanceSchema(
+      festivalDates.startDate,
+      festivalDates.endDate,
+    );
+  }, [currentFestival]);
+
   const initialDate = useMemo(() => {
+    if (!currentFestival) return new Date();
+
+    const festivalDates = getFestivalDates(currentFestival);
+    if (!festivalDates) return new Date();
+
     return isWithinInterval(new Date(), {
-      start: BEGINNING_OF_WIESN,
-      end: END_OF_WIESN,
+      start: festivalDates.startDate,
+      end: festivalDates.endDate,
     })
       ? new Date()
-      : BEGINNING_OF_WIESN;
-  }, []);
+      : festivalDates.startDate;
+  }, [currentFestival]);
+
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const { toast } = useToast();
 
@@ -83,7 +103,7 @@ export default function DetailedAttendanceForm({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<DetailedAttendanceFormData>({
-    resolver: zodResolver(detailedAttendanceSchema),
+    resolver: zodResolver(detailedAttendanceSchema!),
     defaultValues: {
       amount: 0,
       date: currentDate,
@@ -133,6 +153,17 @@ export default function DetailedAttendanceForm({
     }
   };
 
+  // Don't render the form if we don't have festival data or schema
+  if (!currentFestival || !detailedAttendanceSchema) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <p>Loading festival data...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -151,6 +182,12 @@ export default function DetailedAttendanceForm({
               setValue("date", date!);
               handleDateChange(date);
             }}
+            festivalStartDate={
+              getFestivalDates(currentFestival)?.startDate || new Date()
+            }
+            festivalEndDate={
+              getFestivalDates(currentFestival)?.endDate || new Date()
+            }
           />
           {errors.date && <span className="error">{errors.date.message}</span>}
 

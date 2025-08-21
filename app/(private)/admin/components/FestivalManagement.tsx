@@ -14,7 +14,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -422,8 +422,8 @@ export default function FestivalManagement() {
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       <span>
-                        {format(new Date(festival.start_date), "MMM d, yyyy")} -{" "}
-                        {format(new Date(festival.end_date), "MMM d, yyyy")}
+                        {format(parseISO(festival.start_date), "MMM d, yyyy")} -{" "}
+                        {format(parseISO(festival.end_date), "MMM d, yyyy")}
                       </span>
                     </div>
                     <div>{festival.location}</div>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
+import { TIMEZONE } from "@/lib/constants";
 import { TZDate } from "@date-fns/tz";
 import { formatDate } from "date-fns/format";
 import { forwardRef } from "react";
@@ -12,6 +12,8 @@ interface MyDatePickerProps {
   name?: string;
   onDateChange: (date: Date | null) => void;
   value?: Date;
+  festivalStartDate: Date;
+  festivalEndDate: Date;
 }
 
 export function MyDatePicker({
@@ -19,6 +21,8 @@ export function MyDatePicker({
   name = "date",
   onDateChange,
   value = new Date(),
+  festivalStartDate,
+  festivalEndDate,
 }: MyDatePickerProps) {
   type ButtonProps = React.HTMLProps<HTMLButtonElement>;
   const CustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -43,8 +47,8 @@ export function MyDatePicker({
       <DatePicker
         name={name}
         dateFormat="dd/MM/yyyy"
-        maxDate={END_OF_WIESN}
-        minDate={BEGINNING_OF_WIESN}
+        maxDate={festivalEndDate}
+        minDate={festivalStartDate}
         customInput={<CustomInput />}
         onChange={onDateChange}
         selected={value}
