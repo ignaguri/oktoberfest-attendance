@@ -4,6 +4,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
+import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
 import { fetchWinningCriterias } from "@/lib/sharedActions";
@@ -15,6 +16,7 @@ import type { Tables } from "@/lib/database.types";
 import { fetchGlobalLeaderboard } from "./actions";
 
 export default function GlobalLeaderboardClient() {
+  const { currentFestival } = useFestival();
   const [winningCriteriaId, setWinningCriteriaId] = useState<number>(1);
   const [winningCriteria, setWinningCriteria] = useState<WinningCriteria>(
     WinningCriteria.days_attended,
@@ -28,9 +30,14 @@ export default function GlobalLeaderboardClient() {
 
   const fetchLeaderboardData = useCallback(
     async (criteriaId: number) => {
+      if (!currentFestival) return;
+
       setIsLoading(true);
       try {
-        const data = await fetchGlobalLeaderboard(criteriaId);
+        const data = await fetchGlobalLeaderboard(
+          criteriaId,
+          currentFestival.id,
+        );
         setLeaderboardData(data);
       } catch (error) {
         toast({
@@ -42,11 +49,13 @@ export default function GlobalLeaderboardClient() {
         setIsLoading(false);
       }
     },
-    [toast],
+    [toast, currentFestival],
   );
 
   useEffect(() => {
     const initializeData = async () => {
+      if (!currentFestival) return;
+
       try {
         const criterias = await fetchWinningCriterias();
         setWinningCriterias(criterias);
@@ -65,7 +74,7 @@ export default function GlobalLeaderboardClient() {
     };
 
     initializeData();
-  }, [fetchLeaderboardData, toast]);
+  }, [fetchLeaderboardData, toast, currentFestival]);
 
   useEffect(() => {
     if (winningCriteriaId) {

@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { useFestival } from "@/contexts/FestivalContext";
+import { useToast } from "@/hooks/use-toast";
 import cn from "classnames";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
@@ -18,16 +19,30 @@ const CreateGroupSchema = Yup.object().shape({
 });
 
 export const CreateGroupForm = () => {
+  const { currentFestival } = useFestival();
   const router = useTransitionRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast(); // Initialize toast
+  const { toast } = useToast();
 
   const handleSubmit = async (
     values: { groupName: string; password: string },
     { setSubmitting }: any,
   ) => {
+    if (!currentFestival) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No festival selected. Please select a festival.",
+      });
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const groupId = await createGroup(values);
+      const groupId = await createGroup({
+        ...values,
+        festivalId: currentFestival.id,
+      });
       if (groupId) {
         router.push(`/group-settings/${groupId}`);
         toast({

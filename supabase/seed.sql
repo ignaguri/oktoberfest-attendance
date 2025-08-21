@@ -60,22 +60,23 @@ SET
     avatar_url = EXCLUDED.avatar_url;
 
 -- Seed the attendances table with random attendances for the 10 users
--- Replace 'userX_id' with the actual user IDs from the profiles table
-
-INSERT INTO attendances (user_id, date, beer_count)
+-- The festival is already created by the migration, so we just reference it
+INSERT INTO attendances (user_id, festival_id, date, beer_count)
 SELECT
     p.id AS user_id,
+    (SELECT id FROM festivals LIMIT 1) AS festival_id,
     current_timestamp - (random() * 365)::integer * interval '1 day' AS date,
     (random() * 10)::integer AS beer_count
 FROM profiles p;
 
 -- Insert groups with created_by set to one of the user IDs
-INSERT INTO groups (id, name, password, winning_criteria_id, created_at, created_by)
+INSERT INTO groups (id, name, password, winning_criteria_id, festival_id, created_at, created_by)
 SELECT
     uuid_generate_v4(),
     'Group ' || chr(65 + (ROW_NUMBER() OVER ())::int - 1),
     crypt('password' || chr(65 + (ROW_NUMBER() OVER ())::int - 1), gen_salt('bf')),
     (SELECT id FROM winning_criteria ORDER BY RANDOM() LIMIT 1),
+    (SELECT id FROM festivals LIMIT 1),
     current_timestamp,
     u.id
 FROM
@@ -105,6 +106,24 @@ WHERE
         (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 4),
         (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 5)
     ));
+
+-- Insert current 2025 Oktoberfest data
+INSERT INTO festivals (
+  name, short_name, festival_type, location, 
+  start_date, end_date, map_url, 
+  is_active, status, description
+) VALUES (
+  'Oktoberfest 2025', 
+  'oktoberfest-2025',
+  'oktoberfest',
+  'Munich, Germany',
+  '2025-09-20',
+  '2025-10-05', 
+  'https://wiesnmap.muenchen.de/',
+  true,
+  'active',
+  'The 190th Oktoberfest in Munich'
+);
 
 -- Commit the transaction to save the changes
 COMMIT;

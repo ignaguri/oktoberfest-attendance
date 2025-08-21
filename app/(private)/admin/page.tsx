@@ -6,11 +6,12 @@ import { useTransitionRouter } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
 import CacheManagement from "./components/CacheManagement";
+import FestivalManagement from "./components/FestivalManagement";
 import GroupList from "./components/GroupList";
 import ImageConversion from "./components/ImageConversion";
 import UserList from "./components/UserList";
 
-const tabValues = ["users", "groups", "cache", "images"];
+const tabValues = ["users", "groups", "festivals", "cache", "images"];
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("users");
@@ -44,6 +45,7 @@ export default function AdminPage() {
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="groups">Groups</TabsTrigger>
+          <TabsTrigger value="festivals">Festivals</TabsTrigger>
           <TabsTrigger value="cache">Cache Management</TabsTrigger>
           <TabsTrigger value="images">Image Conversion</TabsTrigger>
         </TabsList>
@@ -54,6 +56,10 @@ export default function AdminPage() {
 
         <TabsContent value="groups">
           <GroupList />
+        </TabsContent>
+
+        <TabsContent value="festivals">
+          <FestivalManagement />
         </TabsContent>
 
         <TabsContent value="cache">

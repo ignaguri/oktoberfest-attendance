@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,17 +8,80 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useFestival } from "@/contexts/FestivalContext";
 import { COST_PER_BEER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
+import { useEffect, useState } from "react";
 
 import { fetchHighlights } from "./actions";
 
-import "server-only";
+type HighlightsData = {
+  topPositions: { group_id: string; group_name: string }[];
+  totalBeers: number;
+  daysAttended: number;
+  custom_beer_cost: number;
+};
 
-const Highlights = async () => {
+const Highlights = () => {
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const [highlightsData, setHighlightsData] = useState<HighlightsData>({
+    topPositions: [],
+    totalBeers: 0,
+    daysAttended: 0,
+    custom_beer_cost: COST_PER_BEER,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHighlights = async () => {
+      if (!currentFestival) {
+        setHighlightsData({
+          topPositions: [],
+          totalBeers: 0,
+          daysAttended: 0,
+          custom_beer_cost: COST_PER_BEER,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const data = await fetchHighlights(currentFestival.id);
+        setHighlightsData(data);
+      } catch (error) {
+        console.error("Error fetching highlights:", error);
+        setHighlightsData({
+          topPositions: [],
+          totalBeers: 0,
+          daysAttended: 0,
+          custom_beer_cost: COST_PER_BEER,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHighlights();
+  }, [currentFestival]);
+
+  if (festivalLoading || isLoading) {
+    return (
+      <Card className="shadow-lg rounded-lg border border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-center">
+            Highlights
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-600">Loading highlights...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const { topPositions, totalBeers, daysAttended, custom_beer_cost } =
-    await fetchHighlights();
+    highlightsData;
 
   if (topPositions.length === 0 && totalBeers === 0 && daysAttended === 0) {
     return null;

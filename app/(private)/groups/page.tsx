@@ -9,7 +9,9 @@ import { JoinGroupForm } from "./JoinGroupForm";
 export default async function GroupsPage() {
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Groups</h1>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Groups</h1>
+      </div>
 
       <Suspense fallback={<LoadingSpinner />}>
         <div className="flex flex-col gap-6">

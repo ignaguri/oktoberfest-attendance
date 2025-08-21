@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json;
           operationName?: string;
           query?: string;
           variables?: Json;
-          extensions?: Json;
         };
         Returns: Json;
       };
@@ -71,6 +71,7 @@ export type Database = {
           beer_count: number;
           created_at: string | null;
           date: string;
+          festival_id: string;
           id: string;
           updated_at: string | null;
           user_id: string | null;
@@ -79,6 +80,7 @@ export type Database = {
           beer_count?: number;
           created_at?: string | null;
           date: string;
+          festival_id: string;
           id?: string;
           updated_at?: string | null;
           user_id?: string | null;
@@ -87,24 +89,25 @@ export type Database = {
           beer_count?: number;
           created_at?: string | null;
           date?: string;
+          festival_id?: string;
           id?: string;
           updated_at?: string | null;
           user_id?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "attendances_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: "attendances_festival_id_fkey";
+            columns: ["festival_id"];
             isOneToOne: false;
-            referencedRelation: "leaderboard";
-            referencedColumns: ["user_id"];
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
           },
           {
             foreignKeyName: "attendances_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            referencedRelation: "leaderboard";
+            referencedColumns: ["user_id"];
           },
         ];
       };
@@ -145,14 +148,109 @@ export type Database = {
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
+        ];
+      };
+      festival_tent_pricing: {
+        Row: {
+          beer_price: number;
+          created_at: string;
+          currency: string;
+          festival_id: string;
+          id: string;
+          price_end_date: string | null;
+          price_start_date: string | null;
+          tent_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          beer_price: number;
+          created_at?: string;
+          currency?: string;
+          festival_id: string;
+          id?: string;
+          price_end_date?: string | null;
+          price_start_date?: string | null;
+          tent_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          beer_price?: number;
+          created_at?: string;
+          currency?: string;
+          festival_id?: string;
+          id?: string;
+          price_end_date?: string | null;
+          price_start_date?: string | null;
+          tent_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
           {
-            foreignKeyName: "beer_pictures_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: "festival_tent_pricing_festival_id_fkey";
+            columns: ["festival_id"];
             isOneToOne: false;
-            referencedRelation: "users";
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "festival_tent_pricing_tent_id_fkey";
+            columns: ["tent_id"];
+            isOneToOne: false;
+            referencedRelation: "tents";
             referencedColumns: ["id"];
           },
         ];
+      };
+      festivals: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          end_date: string;
+          festival_type: Database["public"]["Enums"]["festival_type_enum"];
+          id: string;
+          is_active: boolean;
+          location: string;
+          map_url: string | null;
+          name: string;
+          short_name: string;
+          start_date: string;
+          status: Database["public"]["Enums"]["festival_status_enum"];
+          timezone: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          end_date: string;
+          festival_type: Database["public"]["Enums"]["festival_type_enum"];
+          id?: string;
+          is_active?: boolean;
+          location: string;
+          map_url?: string | null;
+          name: string;
+          short_name: string;
+          start_date: string;
+          status: Database["public"]["Enums"]["festival_status_enum"];
+          timezone?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          end_date?: string;
+          festival_type?: Database["public"]["Enums"]["festival_type_enum"];
+          id?: string;
+          is_active?: boolean;
+          location?: string;
+          map_url?: string | null;
+          name?: string;
+          short_name?: string;
+          start_date?: string;
+          status?: Database["public"]["Enums"]["festival_status_enum"];
+          timezone?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       group_members: {
         Row: {
@@ -202,13 +300,6 @@ export type Database = {
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
-          {
-            foreignKeyName: "group_members_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
         ];
       };
       groups: {
@@ -216,6 +307,7 @@ export type Database = {
           created_at: string | null;
           created_by: string | null;
           description: string | null;
+          festival_id: string;
           id: string;
           invite_token: string | null;
           name: string;
@@ -227,6 +319,7 @@ export type Database = {
           created_at?: string | null;
           created_by?: string | null;
           description?: string | null;
+          festival_id: string;
           id?: string;
           invite_token?: string | null;
           name: string;
@@ -238,6 +331,7 @@ export type Database = {
           created_at?: string | null;
           created_by?: string | null;
           description?: string | null;
+          festival_id?: string;
           id?: string;
           invite_token?: string | null;
           name?: string;
@@ -254,10 +348,10 @@ export type Database = {
             referencedColumns: ["user_id"];
           },
           {
-            foreignKeyName: "groups_created_by_fkey";
-            columns: ["created_by"];
+            foreignKeyName: "groups_festival_id_fkey";
+            columns: ["festival_id"];
             isOneToOne: false;
-            referencedRelation: "users";
+            referencedRelation: "festivals";
             referencedColumns: ["id"];
           },
           {
@@ -308,35 +402,38 @@ export type Database = {
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
-          {
-            foreignKeyName: "profiles_id_fkey";
-            columns: ["id"];
-            isOneToOne: true;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
         ];
       };
       tent_visits: {
         Row: {
+          festival_id: string;
           id: string;
           tent_id: string;
           user_id: string;
           visit_date: string | null;
         };
         Insert: {
+          festival_id: string;
           id: string;
           tent_id: string;
           user_id: string;
           visit_date?: string | null;
         };
         Update: {
+          festival_id?: string;
           id?: string;
           tent_id?: string;
           user_id?: string;
           visit_date?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "tent_visits_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "tent_visits_tent_id_fkey";
             columns: ["tent_id"];
@@ -393,6 +490,8 @@ export type Database = {
           avatar_url: string | null;
           avg_beers: number | null;
           days_attended: number | null;
+          festival_id: string | null;
+          festival_name: string | null;
           full_name: string | null;
           group_id: string | null;
           group_name: string | null;
@@ -400,7 +499,15 @@ export type Database = {
           user_id: string | null;
           username: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "groups_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       results: {
         Row: {
@@ -418,42 +525,36 @@ export type Database = {
     Functions: {
       add_beer_picture: {
         Args: {
-          p_user_id: string;
           p_attendance_id: string;
           p_picture_url: string;
+          p_user_id: string;
         };
         Returns: string;
       };
       add_or_update_attendance_with_tents: {
         Args: {
-          p_user_id: string;
-          p_date: string;
           p_beer_count: number;
+          p_date: string;
+          p_festival_id: string;
           p_tent_ids: string[];
+          p_user_id: string;
         };
         Returns: string;
       };
+      calculate_attendance_cost: {
+        Args: { p_attendance_id: string };
+        Returns: number;
+      };
       create_group_with_member: {
-        Args: {
-          p_group_name: string;
-          p_password: string;
-          p_user_id: string;
-        };
-        Returns: {
-          group_id: string;
-          group_name: string;
-        };
+        Args: { p_group_name: string; p_password: string; p_user_id: string };
+        Returns: Record<string, unknown>;
       };
       delete_attendance: {
-        Args: {
-          p_attendance_id: string;
-        };
+        Args: { p_attendance_id: string };
         Returns: undefined;
       };
       fetch_group_gallery: {
-        Args: {
-          p_group_id: string;
-        };
+        Args: { p_festival_id?: string; p_group_id: string };
         Returns: {
           date: string;
           user_id: string;
@@ -463,9 +564,7 @@ export type Database = {
         }[];
       };
       get_global_leaderboard: {
-        Args: {
-          p_winning_criteria_id: number;
-        };
+        Args: { p_festival_id?: string; p_winning_criteria_id: number };
         Returns: {
           user_id: string;
           username: string;
@@ -477,14 +576,47 @@ export type Database = {
           group_count: number;
         }[];
       };
+      get_group_leaderboard: {
+        Args: { p_group_id: string; p_winning_criteria_id: number };
+        Returns: {
+          user_id: string;
+          username: string;
+          full_name: string;
+          avatar_url: string;
+          group_id: string;
+          group_name: string;
+          festival_id: string;
+          festival_name: string;
+          days_attended: number;
+          total_beers: number;
+          avg_beers: number;
+        }[];
+      };
+      get_user_festival_stats: {
+        Args: { p_festival_id: string; p_user_id: string };
+        Returns: {
+          total_beers: number;
+          days_attended: number;
+          avg_beers: number;
+          total_spent: number;
+          favorite_tent: string;
+          most_expensive_day: number;
+        }[];
+      };
+      get_user_festival_stats_with_positions: {
+        Args: { p_festival_id: string; p_user_id: string };
+        Returns: {
+          top_positions: Json;
+          total_beers: number;
+          days_attended: number;
+        }[];
+      };
       get_user_groups: {
         Args: Record<PropertyKey, never>;
         Returns: string[];
       };
       get_user_stats: {
-        Args: {
-          input_user_id: string;
-        };
+        Args: { input_user_id: string };
         Returns: {
           top_positions: Json;
           total_beers: number;
@@ -492,10 +624,7 @@ export type Database = {
         }[];
       };
       is_group_member: {
-        Args: {
-          group_id: string;
-          user_id: string;
-        };
+        Args: { group_id: string; user_id: string };
         Returns: boolean;
       };
       is_super_admin: {
@@ -504,343 +633,29 @@ export type Database = {
       };
       join_group: {
         Args: {
-          p_user_id: string;
+          p_festival_id?: string;
           p_group_name: string;
           p_password: string;
+          p_user_id: string;
         };
         Returns: string;
       };
       join_group_with_token: {
-        Args: {
-          p_user_id: string;
-          p_token: string;
-        };
+        Args: { p_token: string; p_user_id: string };
         Returns: string;
       };
       renew_group_token: {
-        Args: {
-          p_group_id: string;
-        };
+        Args: { p_group_id: string };
         Returns: string;
       };
     };
     Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null;
-          avif_autodetection: boolean | null;
-          created_at: string | null;
-          file_size_limit: number | null;
-          id: string;
-          name: string;
-          owner: string | null;
-          owner_id: string | null;
-          public: boolean | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          allowed_mime_types?: string[] | null;
-          avif_autodetection?: boolean | null;
-          created_at?: string | null;
-          file_size_limit?: number | null;
-          id: string;
-          name: string;
-          owner?: string | null;
-          owner_id?: string | null;
-          public?: boolean | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          allowed_mime_types?: string[] | null;
-          avif_autodetection?: boolean | null;
-          created_at?: string | null;
-          file_size_limit?: number | null;
-          id?: string;
-          name?: string;
-          owner?: string | null;
-          owner_id?: string | null;
-          public?: boolean | null;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
-      migrations: {
-        Row: {
-          executed_at: string | null;
-          hash: string;
-          id: number;
-          name: string;
-        };
-        Insert: {
-          executed_at?: string | null;
-          hash: string;
-          id: number;
-          name: string;
-        };
-        Update: {
-          executed_at?: string | null;
-          hash?: string;
-          id?: number;
-          name?: string;
-        };
-        Relationships: [];
-      };
-      objects: {
-        Row: {
-          bucket_id: string | null;
-          created_at: string | null;
-          id: string;
-          last_accessed_at: string | null;
-          metadata: Json | null;
-          name: string | null;
-          owner: string | null;
-          owner_id: string | null;
-          path_tokens: string[] | null;
-          updated_at: string | null;
-          user_metadata: Json | null;
-          version: string | null;
-        };
-        Insert: {
-          bucket_id?: string | null;
-          created_at?: string | null;
-          id?: string;
-          last_accessed_at?: string | null;
-          metadata?: Json | null;
-          name?: string | null;
-          owner?: string | null;
-          owner_id?: string | null;
-          path_tokens?: string[] | null;
-          updated_at?: string | null;
-          user_metadata?: Json | null;
-          version?: string | null;
-        };
-        Update: {
-          bucket_id?: string | null;
-          created_at?: string | null;
-          id?: string;
-          last_accessed_at?: string | null;
-          metadata?: Json | null;
-          name?: string | null;
-          owner?: string | null;
-          owner_id?: string | null;
-          path_tokens?: string[] | null;
-          updated_at?: string | null;
-          user_metadata?: Json | null;
-          version?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey";
-            columns: ["bucket_id"];
-            isOneToOne: false;
-            referencedRelation: "buckets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string;
-          created_at: string;
-          id: string;
-          in_progress_size: number;
-          key: string;
-          owner_id: string | null;
-          upload_signature: string;
-          user_metadata: Json | null;
-          version: string;
-        };
-        Insert: {
-          bucket_id: string;
-          created_at?: string;
-          id: string;
-          in_progress_size?: number;
-          key: string;
-          owner_id?: string | null;
-          upload_signature: string;
-          user_metadata?: Json | null;
-          version: string;
-        };
-        Update: {
-          bucket_id?: string;
-          created_at?: string;
-          id?: string;
-          in_progress_size?: number;
-          key?: string;
-          owner_id?: string | null;
-          upload_signature?: string;
-          user_metadata?: Json | null;
-          version?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey";
-            columns: ["bucket_id"];
-            isOneToOne: false;
-            referencedRelation: "buckets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string;
-          created_at: string;
-          etag: string;
-          id: string;
-          key: string;
-          owner_id: string | null;
-          part_number: number;
-          size: number;
-          upload_id: string;
-          version: string;
-        };
-        Insert: {
-          bucket_id: string;
-          created_at?: string;
-          etag: string;
-          id?: string;
-          key: string;
-          owner_id?: string | null;
-          part_number: number;
-          size?: number;
-          upload_id: string;
-          version: string;
-        };
-        Update: {
-          bucket_id?: string;
-          created_at?: string;
-          etag?: string;
-          id?: string;
-          key?: string;
-          owner_id?: string | null;
-          part_number?: number;
-          size?: number;
-          upload_id?: string;
-          version?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey";
-            columns: ["bucket_id"];
-            isOneToOne: false;
-            referencedRelation: "buckets";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey";
-            columns: ["upload_id"];
-            isOneToOne: false;
-            referencedRelation: "s3_multipart_uploads";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string;
-          name: string;
-          owner: string;
-          metadata: Json;
-        };
-        Returns: undefined;
-      };
-      extension: {
-        Args: {
-          name: string;
-        };
-        Returns: string;
-      };
-      filename: {
-        Args: {
-          name: string;
-        };
-        Returns: string;
-      };
-      foldername: {
-        Args: {
-          name: string;
-        };
-        Returns: string[];
-      };
-      get_size_by_bucket: {
-        Args: Record<PropertyKey, never>;
-        Returns: {
-          size: number;
-          bucket_id: string;
-        }[];
-      };
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string;
-          prefix_param: string;
-          delimiter_param: string;
-          max_keys?: number;
-          next_key_token?: string;
-          next_upload_token?: string;
-        };
-        Returns: {
-          key: string;
-          id: string;
-          created_at: string;
-        }[];
-      };
-      list_objects_with_delimiter: {
-        Args: {
-          bucket_id: string;
-          prefix_param: string;
-          delimiter_param: string;
-          max_keys?: number;
-          start_after?: string;
-          next_token?: string;
-        };
-        Returns: {
-          name: string;
-          id: string;
-          metadata: Json;
-          updated_at: string;
-        }[];
-      };
-      operation: {
-        Args: Record<PropertyKey, never>;
-        Returns: string;
-      };
-      search: {
-        Args: {
-          prefix: string;
-          bucketname: string;
-          limits?: number;
-          levels?: number;
-          offsets?: number;
-          search?: string;
-          sortcolumn?: string;
-          sortorder?: string;
-        };
-        Returns: {
-          name: string;
-          id: string;
-          updated_at: string;
-          created_at: string;
-          last_accessed_at: string;
-          metadata: Json;
-        }[];
-      };
-    };
-    Enums: {
-      [_ in never]: never;
+      festival_status_enum: "upcoming" | "active" | "ended";
+      festival_type_enum:
+        | "oktoberfest"
+        | "starkbierfest"
+        | "fruehlingsfest"
+        | "other";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -848,27 +663,36 @@ export type Database = {
   };
 };
 
-type PublicSchema = Database[Extract<keyof Database, "public">];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  "public"
+>];
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R;
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R;
       }
       ? R
@@ -876,20 +700,24 @@ export type Tables<
     : never;
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I;
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I;
       }
       ? I
@@ -897,20 +725,24 @@ export type TablesInsert<
     : never;
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U;
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U;
       }
       ? U
@@ -918,14 +750,52 @@ export type TablesUpdate<
     : never;
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
-    | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      festival_status_enum: ["upcoming", "active", "ended"],
+      festival_type_enum: [
+        "oktoberfest",
+        "starkbierfest",
+        "fruehlingsfest",
+        "other",
+      ],
+    },
+  },
+} as const;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useCallback } from "react";
 
@@ -18,6 +19,7 @@ export type AttendanceWithTentVisits = Tables<"attendances"> & {
 };
 
 export default function AttendancePage() {
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const [attendances, setAttendances] = useState<AttendanceWithTentVisits[]>(
     [],
   );
@@ -25,19 +27,22 @@ export default function AttendancePage() {
   const { toast } = useToast();
 
   const fetchAttendanceData = useCallback(async () => {
+    if (!currentFestival) return;
+
     try {
-      const data = await fetchAttendances();
+      const data = await fetchAttendances(currentFestival.id);
       if (data) {
         setAttendances(data as AttendanceWithTentVisits[]);
       }
     } catch (error) {
+      console.error("Error fetching attendance data:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to fetch attendance data. Please try again.",
       });
     }
-  }, [toast]);
+  }, [toast, currentFestival]);
 
   useEffect(() => {
     fetchAttendanceData();
@@ -55,6 +60,14 @@ export default function AttendancePage() {
     handleDateSelect(null);
     handleAttendanceUpdate();
   }, [handleAttendanceUpdate]);
+
+  if (festivalLoading || !currentFestival) {
+    return (
+      <div className="w-full max-w-lg flex flex-col gap-6">
+        <p className="text-center text-gray-600">Loading festival data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-lg flex flex-col gap-6">

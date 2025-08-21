@@ -3,6 +3,7 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
+import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
@@ -20,6 +21,7 @@ export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
 }: QuickAttendanceRegistrationFormProps) => {
   const { toast } = useToast();
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const { tents, isLoading: tentsLoading, error: tentsError } = useTents();
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
     null,
@@ -27,8 +29,13 @@ export const QuickAttendanceRegistrationForm = ({
 
   useEffect(() => {
     const loadAttendance = async () => {
+      if (!currentFestival) return;
+
       try {
-        const attendance = await fetchAttendanceByDate(new Date());
+        const attendance = await fetchAttendanceByDate(
+          new Date(),
+          currentFestival.id,
+        );
         if (attendance) {
           setAttendanceData(attendance);
           onAttendanceIdReceived(attendance.id);
@@ -43,12 +50,21 @@ export const QuickAttendanceRegistrationForm = ({
     };
 
     loadAttendance();
-  }, [toast, onAttendanceIdReceived]);
+  }, [toast, onAttendanceIdReceived, currentFestival]);
 
   const handleSubmit = async (
     values: { tentId: string; beerCount: number },
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
   ) => {
+    if (!currentFestival) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No festival selected. Please select a festival.",
+      });
+      return;
+    }
+
     try {
       setSubmitting(true);
       const allVisitedTents = [...(attendanceData?.tent_ids ?? [])];
@@ -62,6 +78,7 @@ export const QuickAttendanceRegistrationForm = ({
         amount: values.beerCount,
         date: new Date(),
         tents: allVisitedTents,
+        festivalId: currentFestival.id,
       });
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
@@ -81,7 +98,7 @@ export const QuickAttendanceRegistrationForm = ({
         title: "Attendance Updated",
         description: tentName
           ? `Updated attendance for ${tentName}!`
-          : "Updated attendance for the Wiesn!",
+          : `Updated attendance for ${currentFestival.name}!`,
       });
     } catch (error) {
       toast({
@@ -94,7 +111,7 @@ export const QuickAttendanceRegistrationForm = ({
     }
   };
 
-  if (tentsLoading) {
+  if (tentsLoading || festivalLoading || !currentFestival) {
     return (
       <Button className="w-fit self-center" variant="yellow" disabled>
         <LoadingSpinner size={24} />
@@ -118,7 +135,7 @@ export const QuickAttendanceRegistrationForm = ({
     >
       {({ values, isSubmitting, setFieldValue, submitForm }) => (
         <Form className="flex flex-col items-center gap-4">
-          {!attendanceData && <p>Are you at the Wiesn today?</p>}
+          {!attendanceData && <p>Are you at {currentFestival.name} today?</p>}
           <div className="flex items-center gap-2">
             <span>{attendanceData ? "You are at:" : "Which tent?"}</span>
             <Field name="tentId">

@@ -153,6 +153,7 @@ export async function updateAttendance(
     const tentVisits = tent_ids.map((tentId) => ({
       id: uuidv4(),
       user_id: attendanceData.user_id!,
+      festival_id: attendanceData.festival_id!,
       tent_id: tentId,
       visit_date: attendanceData.date!,
     }));

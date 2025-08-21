@@ -5,11 +5,15 @@ import { createClient } from "@/utils/supabase/server";
 
 import "server-only";
 
-export async function fetchGlobalLeaderboard(winningCriteriaId: number) {
+export async function fetchGlobalLeaderboard(
+  winningCriteriaId: number,
+  festivalId?: string,
+) {
   const supabase = createClient();
 
   const { data, error } = await supabase.rpc("get_global_leaderboard", {
     p_winning_criteria_id: winningCriteriaId,
+    p_festival_id: festivalId || undefined,
   });
 
   if (error) {

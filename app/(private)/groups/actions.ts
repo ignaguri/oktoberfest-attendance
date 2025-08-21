@@ -14,45 +14,67 @@ import "server-only";
 export async function createGroup(formData: {
   groupName: string;
   password: string;
+  festivalId: string;
 }) {
   const supabase = createClient();
-  const { groupName, password } = formData;
+  const { groupName, password, festivalId } = formData;
   const user = await getUser();
 
-  const { data, error } = await supabase.rpc("create_group_with_member", {
-    p_group_name: groupName.trim(),
-    p_password: password.trim(),
-    p_user_id: user.id,
-  });
+  // First create the group directly with festival_id
+  const { data: groupData, error: groupError } = await supabase
+    .from("groups")
+    .insert({
+      name: groupName.trim(),
+      password: password.trim(),
+      created_by: user.id,
+      festival_id: festivalId,
+      winning_criteria_id: 1, // Default to first criteria
+    })
+    .select("id, name")
+    .single();
 
-  if (error) {
-    reportSupabaseException("createGroup", error, {
+  if (groupError) {
+    reportSupabaseException("createGroup", groupError, {
       id: user.id,
       email: user.email,
     });
-    throw new Error("Error creating group: " + error.message);
+    throw new Error("Error creating group: " + groupError.message);
   }
 
-  if (data) {
-    revalidatePath("/groups");
-    revalidatePath(`/groups/${data.group_id}`);
-    revalidatePath("/home");
-    return data.group_id;
+  // Then add the user as a member
+  const { error: memberError } = await supabase.from("group_members").insert({
+    group_id: groupData.id,
+    user_id: user.id,
+  });
+
+  if (memberError) {
+    reportSupabaseException("createGroup - member", memberError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error adding user to group: " + memberError.message);
   }
+
+  revalidatePath("/groups");
+  revalidatePath(`/groups/${groupData.id}`);
+  revalidatePath("/home");
+  return groupData.id;
 }
 
 export async function joinGroup(formData: {
   groupName: string;
   password: string;
+  festivalId?: string;
 }) {
   const supabase = createClient();
-  const { groupName, password } = formData;
+  const { groupName, password, festivalId } = formData;
   const user = await getUser();
 
   const { data: groupId, error } = await supabase.rpc("join_group", {
     p_user_id: user.id,
     p_group_name: groupName.trim(),
     p_password: password.trim(),
+    p_festival_id: festivalId || undefined,
   });
 
   if (error || !groupId) {
@@ -111,11 +133,23 @@ export async function fetchGroupAndMembership(groupId: string) {
 export async function fetchLeaderboard(groupId: string) {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("leaderboard")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("total_beers", { ascending: false });
+  // Get group info to find the winning criteria
+  const { data: groupData, error: groupError } = await supabase
+    .from("groups")
+    .select("winning_criteria_id")
+    .eq("id", groupId)
+    .single();
+
+  if (groupError) {
+    reportSupabaseException("fetchLeaderboard", groupError);
+    throw new Error("Error fetching group info: " + groupError.message);
+  }
+
+  // Use the new festival-aware function
+  const { data, error } = await supabase.rpc("get_group_leaderboard", {
+    p_group_id: groupId,
+    p_winning_criteria_id: groupData.winning_criteria_id || 1,
+  });
 
   if (error) {
     reportSupabaseException("fetchLeaderboard", error);
