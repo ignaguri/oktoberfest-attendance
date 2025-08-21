@@ -1,6 +1,7 @@
 "use client";
 
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
+import { parseISO, isWithinInterval } from "date-fns";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import type { Festival } from "@/lib/types";
@@ -70,9 +71,12 @@ export function FestivalProvider({ children }: FestivalProviderProps) {
           const today = new Date();
           selectedFestival =
             festivalsData?.find((f: Festival) => {
-              const startDate = new Date(f.start_date);
-              const endDate = new Date(f.end_date);
-              return today >= startDate && today <= endDate;
+              const startDate = parseISO(f.start_date);
+              const endDate = parseISO(f.end_date);
+              return isWithinInterval(today, {
+                start: startDate,
+                end: endDate,
+              });
             }) || null;
         }
 

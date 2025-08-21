@@ -9,10 +9,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
-import { COST_PER_BEER } from "@/lib/constants";
+import { getDefaultBeerCost } from "@/lib/festivalConstants";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { fetchHighlights } from "./actions";
 
@@ -29,7 +29,7 @@ const Highlights = () => {
     topPositions: [],
     totalBeers: 0,
     daysAttended: 0,
-    custom_beer_cost: COST_PER_BEER,
+    custom_beer_cost: getDefaultBeerCost(currentFestival),
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,7 +40,7 @@ const Highlights = () => {
           topPositions: [],
           totalBeers: 0,
           daysAttended: 0,
-          custom_beer_cost: COST_PER_BEER,
+          custom_beer_cost: getDefaultBeerCost(currentFestival),
         });
         setIsLoading(false);
         return;
@@ -55,7 +55,7 @@ const Highlights = () => {
           topPositions: [],
           totalBeers: 0,
           daysAttended: 0,
-          custom_beer_cost: COST_PER_BEER,
+          custom_beer_cost: getDefaultBeerCost(currentFestival),
         });
       } finally {
         setIsLoading(false);
@@ -64,6 +64,16 @@ const Highlights = () => {
 
     loadHighlights();
   }, [currentFestival]);
+
+  const { topPositions, totalBeers, daysAttended, custom_beer_cost } =
+    highlightsData;
+
+  const spentOnBeers = useMemo(() => {
+    if (totalBeers > 0) {
+      const beerCost = custom_beer_cost || getDefaultBeerCost(currentFestival);
+      return (totalBeers * beerCost).toFixed(2);
+    }
+  }, [totalBeers, custom_beer_cost, currentFestival]);
 
   if (festivalLoading || isLoading) {
     return (
@@ -79,9 +89,6 @@ const Highlights = () => {
       </Card>
     );
   }
-
-  const { topPositions, totalBeers, daysAttended, custom_beer_cost } =
-    highlightsData;
 
   if (topPositions.length === 0 && totalBeers === 0 && daysAttended === 0) {
     return null;
@@ -136,14 +143,7 @@ const Highlights = () => {
                 )}
                 {totalBeers > 0 && (
                   <li>
-                    You&apos;ve spent{" "}
-                    <strong>
-                      ~€
-                      {(
-                        totalBeers * (custom_beer_cost || COST_PER_BEER)
-                      ).toFixed(2)}
-                    </strong>{" "}
-                    on beers
+                    You&apos;ve spent <strong>~€{spentOnBeers}</strong> on beers
                   </li>
                 )}
               </ul>
