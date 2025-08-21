@@ -28,10 +28,10 @@ export default async function Root() {
         </span>
       </h1>
       <p className="text-center text-gray-700 px-4">
-        Compete with friends in different groups to see who visits Oktoberfest
+        Compete with friends in different groups to see who visits festivals
         more often and drinks the most beers!
         <br />
-        Track your progress and become the ultimate Wiesnmeister.
+        Track your progress and become the ultimate festival champion.
       </p>
       <div>
         <Button variant="yellow" asChild>

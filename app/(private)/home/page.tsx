@@ -67,9 +67,9 @@ export default async function Home() {
             <AccordionContent className="max-w-80 mx-auto">
               <p className="text-center text-gray-600">
                 Compete with friends in different groups to see who visits
-                Oktoberfest more often and drinks the most beers!
+                festivals more often and drinks the most beers!
                 <br />
-                Track your progress and become the ultimate Wiesnmeister.
+                Track your progress and become the ultimate festival champion.
               </p>
             </AccordionContent>
           </AccordionItem>
