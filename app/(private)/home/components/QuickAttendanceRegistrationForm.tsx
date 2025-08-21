@@ -4,7 +4,8 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useForm } from "@/hooks/use-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
@@ -33,7 +34,8 @@ export const QuickAttendanceRegistrationForm = ({
     watch,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm(quickAttendanceSchema, {
+  } = useForm<QuickAttendanceFormData>({
+    resolver: zodResolver(quickAttendanceSchema),
     defaultValues: {
       tentId: "",
       beerCount: 0,

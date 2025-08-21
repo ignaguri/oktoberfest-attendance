@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useForm } from "@/hooks/use-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { createGroupSchema, CreateGroupFormData } from "@/lib/schemas/groups";
 import cn from "classnames";
@@ -22,7 +23,9 @@ export const CreateGroupForm = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm(createGroupSchema);
+  } = useForm<CreateGroupFormData>({
+    resolver: zodResolver(createGroupSchema),
+  });
 
   const onSubmit = async (data: CreateGroupFormData) => {
     if (!currentFestival) {

@@ -4,7 +4,8 @@ import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useForm } from "@/hooks/use-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
 import { detailedAttendanceSchema, DetailedAttendanceFormData } from "@/lib/schemas/attendance";
@@ -80,7 +81,8 @@ export default function DetailedAttendanceForm({
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm(detailedAttendanceSchema, {
+  } = useForm<DetailedAttendanceFormData>({
+    resolver: zodResolver(detailedAttendanceSchema),
     defaultValues: {
       amount: 0,
       date: currentDate,

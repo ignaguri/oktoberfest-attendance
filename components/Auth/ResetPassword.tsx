@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useForm } from "@/hooks/use-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { resetPasswordSchema, ResetPasswordFormData } from "@/lib/schemas/auth";
 import cn from "classnames";
@@ -16,7 +17,9 @@ const ResetPassword = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm(resetPasswordSchema);
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+  });
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     const [_, errorMessage] = await resetPassword(data);

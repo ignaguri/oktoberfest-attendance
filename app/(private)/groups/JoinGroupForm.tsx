@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useForm } from "@/hooks/use-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { joinGroupSchema, JoinGroupFormData } from "@/lib/schemas/groups";
 import cn from "classnames";
@@ -27,7 +28,8 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm(joinGroupSchema, {
+  } = useForm<JoinGroupFormData>({
+    resolver: zodResolver(joinGroupSchema),
     defaultValues: {
       groupName: groupName || "",
       password: "",

@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useForm } from "@/hooks/use-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { signUpSchema, SignUpFormData } from "@/lib/schemas/auth";
 import cn from "classnames";
@@ -19,7 +20,9 @@ export default function SignUp() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm(signUpSchema);
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+  });
 
   const onSubmit = async (data: SignUpFormData) => {
     try {
