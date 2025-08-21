@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
     "/error",
     "/manifest.json",
+    "/manifest.webmanifest",
     "/robots.txt",
     "/sitemap.xml",
   ];
@@ -42,8 +43,9 @@ export const config = {
      * - robots.txt (robots file)
      * - sitemap.xml (sitemap file)
      * - manifest.json (web app manifest file)
+     * - manifest.webmanifest (web app manifest file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

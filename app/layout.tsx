@@ -3,9 +3,10 @@ import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Toaster } from "@/components/ui/toaster";
 import { FestivalProvider } from "@/contexts/FestivalContext";
-import { GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
+import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -31,6 +32,7 @@ const getRandomImage = () =>
   ogImages[Math.floor(Math.random() * ogImages.length)];
 
 export const metadata: Metadata = {
+  metadataBase: new URL(IS_PROD ? PROD_URL : DEV_URL),
   description: "Track your Oktoberfest attendance and compete with friends!",
   title: "ProstCounter 🍻",
   openGraph: {
@@ -56,7 +58,6 @@ export const metadata: Metadata = {
     images: [getRandomImage()],
     creator: "@ignaguri",
   },
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -114,6 +115,7 @@ export default async function RootLayout({
           ) : (
             <AppContent />
           )}
+          <ServiceWorkerRegistration />
           <Toaster />
           <SpeedInsights />
           {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
