@@ -2,9 +2,12 @@
 
 import { buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Formik, Form, ErrorMessage, useFormikContext } from "formik";
+import { avatarSchema } from "@/lib/schemas/uploads";
+import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState, useRef } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+
+import type { AvatarFormData } from "@/lib/schemas/uploads";
 
 import { uploadAvatar } from "./actions";
 import { AvatarPreview } from "./Avatar";
@@ -15,67 +18,8 @@ export interface UploadAvatarFormProps {
   onUpload?: (url: string) => void;
 }
 
-interface FormValues {
-  avatar: File | null;
-}
-
 const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
 const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-
-const validationSchema = Yup.object().shape({
-  avatar: Yup.mixed()
-    .required("An avatar file is required")
-    .test("fileSize", "File is too large (max 12MB)", (value) => {
-      if (!value) return true;
-      return value instanceof File && value.size <= MAX_FILE_SIZE;
-    })
-    .test(
-      "fileType",
-      "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-      (value) => {
-        if (!value) return true;
-        return value instanceof File && VALID_FILE_TYPES.includes(value.type);
-      },
-    ),
-});
-
-function FileInput() {
-  const { setFieldValue, submitForm, errors } = useFormikContext<FormValues>();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.currentTarget.files?.[0];
-    if (file) {
-      await setFieldValue("avatar", file);
-      if (!errors.avatar) {
-        submitForm();
-      }
-    }
-  };
-
-  return (
-    <>
-      <label
-        htmlFor="avatar-upload"
-        className={buttonVariants({ variant: "outline" })}
-      >
-        Choose picture
-      </label>
-      <input
-        ref={fileInputRef}
-        id="avatar-upload"
-        name="avatar"
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="hidden"
-      />
-      <ErrorMessage name="avatar" component="span" className="error" />
-    </>
-  );
-}
 
 export default function UploadAvatarForm({
   className,
@@ -85,14 +29,22 @@ export default function UploadAvatarForm({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleUploadAvatar = async (
-    values: FormValues,
-    { setSubmitting, resetForm }: any,
-  ) => {
-    if (!values.avatar || !uid) return;
+  const {
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<AvatarFormData>({
+    resolver: zodResolver(avatarSchema),
+  });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const onSubmit = async (data: AvatarFormData) => {
+    if (!data.avatar || !uid) return;
 
     const formData = new FormData();
-    formData.append("avatar", values.avatar);
+    formData.append("avatar", data.avatar);
     formData.append("userId", uid);
 
     try {
@@ -103,7 +55,7 @@ export default function UploadAvatarForm({
         title: "Success",
         description: "Picture uploaded successfully!",
       });
-      resetForm();
+      reset();
       setPreviewUrl(null);
     } catch (error) {
       toast({
@@ -112,34 +64,56 @@ export default function UploadAvatarForm({
         description:
           error instanceof Error ? error.message : "An unknown error occurred",
       });
-    } finally {
-      setSubmitting(false);
+    }
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.currentTarget.files?.[0];
+    if (file) {
+      setValue("avatar", file);
+      if (!errors.avatar) {
+        handleSubmit(onSubmit)();
+      }
     }
   };
 
   return (
     <div className={className}>
-      <Formik
-        initialValues={{ avatar: null }}
-        validationSchema={validationSchema}
-        onSubmit={handleUploadAvatar}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col items-center gap-4"
       >
-        {() => (
-          <Form className="flex flex-col items-center gap-4">
-            <AvatarPreview
-              url={null}
-              previewUrl={previewUrl}
-              size="large"
-              fallback={{
-                username: null,
-                full_name: null,
-                email: "no.name@email.com",
-              }}
-            />
-            <FileInput />
-          </Form>
+        <AvatarPreview
+          url={null}
+          previewUrl={previewUrl}
+          size="large"
+          fallback={{
+            username: null,
+            full_name: null,
+            email: "no.name@email.com",
+          }}
+        />
+        <label
+          htmlFor="avatar-upload"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Choose picture
+        </label>
+        <input
+          ref={fileInputRef}
+          id="avatar-upload"
+          name="avatar"
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        {errors.avatar && (
+          <span className="error">{errors.avatar.message}</span>
         )}
-      </Formik>
+      </form>
     </div>
   );
 }

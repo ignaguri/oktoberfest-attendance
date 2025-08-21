@@ -5,40 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
-import { BEGINNING_OF_WIESN, END_OF_WIESN, TIMEZONE } from "@/lib/constants";
+import { BEGINNING_OF_WIESN, END_OF_WIESN } from "@/lib/constants";
+import { detailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { cn } from "@/lib/utils";
-import { TZDate } from "@date-fns/tz";
-import { add, isWithinInterval } from "date-fns";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isWithinInterval } from "date-fns";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 
+import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
-import type { FormikHelpers } from "formik";
 
 import { BeerPicturesUpload } from "./BeerPicturesUpload";
 import { MyDatePicker } from "./DatePicker";
-
-const DAY_AFTER_WIESN = add(new TZDate(END_OF_WIESN, TIMEZONE), { days: 1 });
-
-const AttendanceSchema = Yup.object().shape({
-  amount: Yup.number()
-    .min(0, "Beer count cannot be negative")
-    .required("Required")
-    .test(
-      "at-least-one-tent",
-      "Must select at least one tent if beer count is 0",
-      function (value) {
-        const { tents } = this.parent;
-        return value !== 0 || (value === 0 && tents.length > 0);
-      },
-    ),
-  date: Yup.date()
-    .min(BEGINNING_OF_WIESN, "Wrong date: Wiesn hadn't started")
-    .max(DAY_AFTER_WIESN, "Wrong date: Sadly it's over")
-    .required("Required"),
-});
 
 interface DetailedAttendanceFormProps {
   onAttendanceUpdate: () => void;
@@ -96,21 +76,39 @@ export default function DetailedAttendanceForm({
     }
   }, [initialDate, selectedDate]);
 
-  const handleSubmit = async (
-    values: { amount: number; date: Date; tents: string[] },
-    {
-      setSubmitting,
-    }: FormikHelpers<{ amount: number; date: Date; tents: string[] }>,
-  ) => {
-    setSubmitting(true);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<DetailedAttendanceFormData>({
+    resolver: zodResolver(detailedAttendanceSchema),
+    defaultValues: {
+      amount: 0,
+      date: currentDate,
+      tents: [],
+    },
+  });
+
+  const watchedValues = watch();
+
+  // Update form values when existingAttendance or currentDate changes
+  useEffect(() => {
+    setValue("amount", existingAttendance?.beer_count || 0);
+    setValue("date", currentDate);
+    setValue("tents", existingAttendance?.tent_ids || []);
+  }, [existingAttendance, currentDate, setValue]);
+
+  const onSubmit = async (data: DetailedAttendanceFormData) => {
     try {
-      await addAttendance({ ...values, festivalId: currentFestival!.id });
+      await addAttendance({ ...data, festivalId: currentFestival!.id });
       toast({
         variant: "success",
         title: "Success",
         description: "Attendance updated successfully.",
       });
-      await fetchAttendanceForDate(values.date);
+      await fetchAttendanceForDate(data.date);
       onAttendanceUpdate();
     } catch (error) {
       toast({
@@ -118,8 +116,6 @@ export default function DetailedAttendanceForm({
         title: "Error",
         description: "Failed to update attendance. Please try again.",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -145,66 +141,56 @@ export default function DetailedAttendanceForm({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Formik
-          initialValues={{
-            amount: existingAttendance?.beer_count || 0,
-            date: currentDate,
-            tents: existingAttendance?.tent_ids || [],
-          }}
-          validationSchema={AttendanceSchema}
-          onSubmit={handleSubmit}
-          enableReinitialize
-        >
-          {({ errors, isSubmitting, setFieldValue, values }) => (
-            <Form className="column w-full">
-              <label htmlFor="date">When did you visit the Wiesn?</label>
-              <MyDatePicker
-                name="date"
-                disabled={isSubmitting}
-                onDateChange={(date) => {
-                  setFieldValue("date", date);
-                  handleDateChange(date);
-                }}
-              />
-              <ErrorMessage name="date" component="span" className="error" />
-              <label htmlFor="amount">How many Maße 🍻 did you have?</label>
-              <Field
-                className={cn(
-                  "input w-auto self-center",
-                  errors.amount && "input-error",
-                )}
-                id="amount"
-                name="amount"
-                placeholder="At least how many do you remember?"
-                component="select"
-                autoComplete="off"
-              >
-                {[...Array(11)].map((_, i) => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage name="amount" component="span" className="error" />
-              <label htmlFor="tents">Which tents did you visit?</label>
-              <TentSelector
-                disabled={isSubmitting}
-                selectedTents={values.tents}
-                onTentsChange={(newTents) => {
-                  setFieldValue("tents", newTents);
-                }}
-              />
-              <Button
-                variant="yellowOutline"
-                className="self-center"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {existingAttendance ? "Update" : "Submit"}
-              </Button>
-            </Form>
+        <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
+          <label htmlFor="date">When did you visit the Wiesn?</label>
+          <MyDatePicker
+            name="date"
+            disabled={isSubmitting}
+            value={watchedValues.date}
+            onDateChange={(date) => {
+              setValue("date", date!);
+              handleDateChange(date);
+            }}
+          />
+          {errors.date && <span className="error">{errors.date.message}</span>}
+
+          <label htmlFor="amount">How many 🍻 Maß did you have?</label>
+          <select
+            className={cn(
+              "input w-auto self-center",
+              errors.amount && "input-error",
+            )}
+            id="amount"
+            autoComplete="off"
+            {...register("amount", { valueAsNumber: true })}
+          >
+            {[...Array(11)].map((_, i) => (
+              <option key={i} value={i}>
+                {i}
+              </option>
+            ))}
+          </select>
+          {errors.amount && (
+            <span className="error">{errors.amount.message}</span>
           )}
-        </Formik>
+
+          <label htmlFor="tents">Which tents did you visit?</label>
+          <TentSelector
+            disabled={isSubmitting}
+            selectedTents={watchedValues.tents}
+            onTentsChange={(newTents) => {
+              setValue("tents", newTents);
+            }}
+          />
+          <Button
+            variant="yellowOutline"
+            className="self-center"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {existingAttendance ? "Update" : "Submit"}
+          </Button>
+        </form>
 
         {existingAttendance && (
           <div className="mt-8">

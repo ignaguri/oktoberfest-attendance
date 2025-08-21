@@ -3,24 +3,17 @@
 import Avatar from "@/components/Avatar/Avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { profileSchema } from "@/lib/schemas/profile";
 import { getProfileShort } from "@/lib/sharedActions";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 
+import type { ProfileFormData } from "@/lib/schemas/profile";
 import type { User } from "@supabase/supabase-js";
 
 import { updateProfile } from "./actions";
-
-const ProfileSchema = Yup.object().shape({
-  fullname: Yup.string(),
-  username: Yup.string().required("Required"),
-  custom_beer_cost: Yup.number()
-    .min(0, "Cost must be positive")
-    .max(1000, "Cost is too high")
-    .nullable(),
-});
 
 interface ProfileShort {
   full_name: string | null;
@@ -42,18 +35,29 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
   const [profileData, setProfileData] = useState<ProfileShort>(profile);
   const { toast } = useToast();
 
-  const handleUpdateProfile = async (values: {
-    fullname: string | null;
-    username: string | null;
-    custom_beer_cost: number | null;
-  }) => {
-    const { fullname, username, custom_beer_cost } = values;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      fullname: profileData.full_name || "",
+      username: profileData.username || "",
+      custom_beer_cost: profileData.custom_beer_cost || 16.2,
+    },
+  });
+
+  const onSubmit = async (data: ProfileFormData) => {
     try {
       await updateProfile({
         id: user.id,
-        ...(username && { username: username }),
-        ...(fullname && { fullname: fullname }),
-        ...(custom_beer_cost !== null && { custom_beer_cost }),
+        ...(data.username && { username: data.username }),
+        ...(data.fullname && { fullname: data.fullname }),
+        ...(data.custom_beer_cost !== undefined && {
+          custom_beer_cost: data.custom_beer_cost,
+        }),
       });
       toast({
         variant: "success",
@@ -62,6 +66,11 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
       });
       const updatedProfile = await getProfileShort();
       setProfileData(updatedProfile);
+      reset({
+        fullname: updatedProfile.full_name || "",
+        username: updatedProfile.username || "",
+        custom_beer_cost: updatedProfile.custom_beer_cost || 16.2,
+      });
       setIsEditing(false);
     } catch (error) {
       toast({
@@ -91,120 +100,105 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
           email: user.email!,
         }}
       />
-      <Formik
-        initialValues={{
-          fullname: profileData.full_name || "",
-          username: profileData.username || "",
-          custom_beer_cost: profileData.custom_beer_cost || 16.2,
-        }}
-        enableReinitialize
-        validationSchema={ProfileSchema}
-        onSubmit={handleUpdateProfile}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        id="profile-data-form"
+        className="flex flex-col gap-4"
       >
-        {({ isSubmitting }) => (
-          <Form id="profile-data-form" className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <label htmlFor="fullname" className="font-semibold">
-                Email:
-              </label>
-              <div className="p-2">
-                <span className="text-gray-500">{user.email}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="fullname" className="font-semibold">
-                Full&nbsp;Name:
-              </label>
-              {isEditing ? (
-                <Field
-                  className="input"
-                  id="fullname"
-                  name="fullname"
-                  type="text"
-                  disabled={isSubmitting}
-                  autoComplete="off"
-                />
-              ) : (
-                <div className="p-2">
-                  {profileData.full_name || (
-                    <span className="text-gray-500">n/a</span>
-                  )}
-                </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="email" className="font-semibold">
+            Email:
+          </label>
+          <div className="p-2">
+            <span className="text-gray-500">{user.email}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="fullname" className="font-semibold">
+            Full&nbsp;Name:
+          </label>
+          {isEditing ? (
+            <input
+              className="input"
+              id="fullname"
+              type="text"
+              disabled={isSubmitting}
+              autoComplete="off"
+              {...register("fullname")}
+            />
+          ) : (
+            <div className="p-2">
+              {profileData.full_name || (
+                <span className="text-gray-500">n/a</span>
               )}
-              <ErrorMessage
-                name="fullname"
-                component="span"
-                className="error"
-              />
             </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="username" className="font-semibold">
-                Username:
-              </label>
-              {isEditing ? (
-                <Field
-                  className="input"
-                  id="username"
-                  name="username"
-                  type="text"
-                  disabled={isSubmitting}
-                  autoComplete="off"
-                />
-              ) : (
-                <div className="p-2">
-                  {profileData.username || (
-                    <span className="text-gray-500">n/a</span>
-                  )}
-                </div>
+          )}
+          {errors.fullname && (
+            <span className="error">{errors.fullname.message}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="username" className="font-semibold">
+            Username:
+          </label>
+          {isEditing ? (
+            <input
+              className="input"
+              id="username"
+              type="text"
+              disabled={isSubmitting}
+              autoComplete="off"
+              {...register("username")}
+            />
+          ) : (
+            <div className="p-2">
+              {profileData.username || (
+                <span className="text-gray-500">n/a</span>
               )}
-              <ErrorMessage
-                name="username"
-                component="span"
-                className="error"
-              />
             </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="custom_beer_cost" className="font-semibold">
-                Average cost of a beer (€):
-              </label>
-              {isEditing ? (
-                <Field
-                  className="input"
-                  id="custom_beer_cost"
-                  name="custom_beer_cost"
-                  type="number"
-                  step="0.1"
-                  disabled={isSubmitting}
-                />
-              ) : (
-                <div className="p-2">
-                  {profileData.custom_beer_cost?.toFixed(2) || "16.20"}
-                </div>
-              )}
-              <ErrorMessage
-                name="custom_beer_cost"
-                component="span"
-                className="error"
-              />
+          )}
+          {errors.username && (
+            <span className="error">{errors.username.message}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="custom_beer_cost" className="font-semibold">
+            Average cost of a beer (€):
+          </label>
+          {isEditing ? (
+            <input
+              className="input"
+              id="custom_beer_cost"
+              type="number"
+              step="0.1"
+              disabled={isSubmitting}
+              {...register("custom_beer_cost", { valueAsNumber: true })}
+            />
+          ) : (
+            <div className="p-2">
+              {profileData.custom_beer_cost?.toFixed(2) || "16.20"}
             </div>
-            {isEditing && (
-              <div className="flex flex-col gap-2 mt-4 items-center">
-                <Button variant="yellow" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Loading..." : "Update"}
-                </Button>
-                <Button
-                  variant="yellowOutline"
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </Form>
+          )}
+          {errors.custom_beer_cost && (
+            <span className="error">{errors.custom_beer_cost.message}</span>
+          )}
+        </div>
+        {isEditing && (
+          <div className="flex flex-col gap-2 mt-4 items-center">
+            <Button variant="yellow" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Loading..." : "Update"}
+            </Button>
+            <Button
+              variant="yellowOutline"
+              type="button"
+              onClick={() => setIsEditing(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+          </div>
         )}
-      </Formik>
+      </form>
       {!isEditing && (
         <div className="flex flex-col gap-4 items-center">
           <Button

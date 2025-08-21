@@ -1,92 +1,84 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { signInSchema } from "@/lib/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+
+import type { SignInFormData } from "@/lib/schemas/auth";
 
 import { login } from "./actions";
-
-const SignInSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().required("Required"),
-});
 
 export default function SignIn() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (
-    values: { email: string; password: string },
-    { setSubmitting, setErrors }: any,
-  ) => {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSubmit = async (data: SignInFormData) => {
     try {
-      await login(values, redirect);
+      await login(data, redirect);
     } catch (error) {
-      setErrors({ password: "Invalid email or password" });
-    } finally {
-      setSubmitting(false);
+      setError("password", { message: "Invalid email or password" });
     }
   };
 
   return (
     <div className="card">
       <h2 className="w-full text-center">Sign In</h2>
-      <Formik
-        initialValues={{ email: "", password: "" }}
-        validationSchema={SignInSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ errors, touched, isSubmitting }) => (
-          <Form className="column w-full">
-            <label htmlFor="email">Email</label>
-            <Field
-              className={
-                errors.email && touched.email ? "input-error" : "input"
-              }
-              id="email"
-              name="email"
-              placeholder="jane@acme.com"
-              type="email"
-            />
-            <ErrorMessage name="email" component="span" className="error" />
+      <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
+        <label htmlFor="email">Email</label>
+        <input
+          className={errors.email ? "input-error" : "input"}
+          id="email"
+          placeholder="jane@acme.com"
+          type="email"
+          {...register("email")}
+        />
+        {errors.email && <span className="error">{errors.email.message}</span>}
 
-            <label htmlFor="password">Password</label>
-            <div className="relative w-full">
-              <Field
-                className={
-                  errors.password && touched.password ? "input-error" : "input"
-                }
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </Button>
-            </div>
-            <ErrorMessage name="password" component="span" className="error" />
-
-            <Button
-              variant="yellow"
-              className="self-center"
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Signing In..." : "Sign In"}
-            </Button>
-          </Form>
+        <label htmlFor="password">Password</label>
+        <div className="relative w-full">
+          <input
+            className={errors.password ? "input-error" : "input"}
+            id="password"
+            type={showPassword ? "text" : "password"}
+            {...register("password")}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </Button>
+        </div>
+        {errors.password && (
+          <span className="error">{errors.password.message}</span>
         )}
-      </Formik>
+
+        <Button
+          variant="yellow"
+          className="self-center"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Signing In..." : "Sign In"}
+        </Button>
+      </form>
       <div className="flex flex-col gap-2">
         <Button variant="link" asChild>
           <Link href="/reset-password">Forgot your password?</Link>

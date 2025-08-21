@@ -534,7 +534,7 @@ export type Database = {
       add_or_update_attendance_with_tents: {
         Args: {
           p_beer_count: number;
-          p_date: string;
+          p_date?: string;
           p_festival_id: string;
           p_tent_ids: string[];
           p_user_id: string;

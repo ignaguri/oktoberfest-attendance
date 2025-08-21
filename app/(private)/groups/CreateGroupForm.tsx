@@ -3,20 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
+import { createGroupSchema } from "@/lib/schemas/groups";
+import { zodResolver } from "@hookform/resolvers/zod";
 import cn from "classnames";
-import { Formik, Field, Form, ErrorMessage } from "formik";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+
+import type { CreateGroupFormData } from "@/lib/schemas/groups";
 
 import { createGroup } from "./actions";
-
-// Define validation schema
-const CreateGroupSchema = Yup.object().shape({
-  groupName: Yup.string().required("Group Name is required"),
-  password: Yup.string().required("Password is required"),
-});
 
 export const CreateGroupForm = () => {
   const { currentFestival } = useFestival();
@@ -24,23 +21,27 @@ export const CreateGroupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (
-    values: { groupName: string; password: string },
-    { setSubmitting }: any,
-  ) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateGroupFormData>({
+    resolver: zodResolver(createGroupSchema),
+  });
+
+  const onSubmit = async (data: CreateGroupFormData) => {
     if (!currentFestival) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "No festival selected. Please select a festival.",
       });
-      setSubmitting(false);
       return;
     }
 
     try {
       const groupId = await createGroup({
-        ...values,
+        ...data,
         festivalId: currentFestival.id,
       });
       if (groupId) {
@@ -58,66 +59,55 @@ export const CreateGroupForm = () => {
         description:
           "There was an error creating the group. Maybe try a different name?",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
   return (
-    <Formik
-      initialValues={{ groupName: "", password: "" }}
-      validationSchema={CreateGroupSchema}
-      onSubmit={handleSubmit}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-2 flex flex-col gap-2"
     >
-      {({ errors, touched, isSubmitting }) => (
-        <Form className="space-y-2 flex flex-col gap-2">
-          <h3 className="text-xl font-semibold">Create a New Group</h3>
-          <Field
-            type="text"
-            name="groupName"
-            placeholder="Group Name"
-            className={cn(
-              "input",
-              errors.groupName && touched.groupName && "input-error",
-            )}
-            required
-            autoComplete="off"
-          />
-          <ErrorMessage name="groupName" component="span" className="error" />
-
-          <div className="relative">
-            <Field
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Group Password"
-              className={cn(
-                "input pr-10",
-                errors.password && touched.password && "input-error",
-              )}
-              required
-              autoComplete="off"
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </Button>
-          </div>
-          <ErrorMessage name="password" component="span" className="error" />
-
-          <Button
-            type="submit"
-            variant="yellow"
-            className="w-fit self-center"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Creating..." : "Create Group"}
-          </Button>
-        </Form>
+      <h3 className="text-xl font-semibold">Create a New Group</h3>
+      <input
+        type="text"
+        placeholder="Group Name"
+        className={cn("input", errors.groupName && "input-error")}
+        autoComplete="off"
+        {...register("groupName")}
+      />
+      {errors.groupName && (
+        <span className="error">{errors.groupName.message}</span>
       )}
-    </Formik>
+
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Group Password"
+          className={cn("input pr-10", errors.password && "input-error")}
+          autoComplete="off"
+          {...register("password")}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
+        >
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+        </Button>
+      </div>
+      {errors.password && (
+        <span className="error">{errors.password.message}</span>
+      )}
+
+      <Button
+        type="submit"
+        variant="yellow"
+        className="w-fit self-center"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Creating..." : "Create Group"}
+      </Button>
+    </form>
   );
 };

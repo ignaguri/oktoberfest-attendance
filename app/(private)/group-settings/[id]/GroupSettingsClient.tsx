@@ -13,15 +13,17 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
+import { groupSettingsSchema } from "@/lib/schemas/groups";
 import { fetchWinningCriterias } from "@/lib/sharedActions";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 
 import type { Tables } from "@/lib/database.types";
+import type { GroupSettingsFormData } from "@/lib/schemas/groups";
 import type { WinningCriteria } from "@/lib/types";
 
 import { getCurrentUserForGroup, updateGroup, removeMember } from "./actions";
@@ -30,13 +32,6 @@ type Props = {
   group: Tables<"groups">;
   members: Pick<Tables<"profiles">, "id" | "username" | "full_name">[];
 };
-
-const GroupSettingsSchema = Yup.object().shape({
-  name: Yup.string().required("Group name is required"),
-  password: Yup.string().required("Password is required"),
-  description: Yup.string(),
-  winning_criteria_id: Yup.number().required("Winning criteria is required"),
-});
 
 export default function GroupSettingsClient({ group, members }: Props) {
   const { toast } = useToast();
@@ -50,6 +45,20 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const [winningCriterias, setWinningCriterias] = useState<
     { id: number; name: string }[]
   >([]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<GroupSettingsFormData>({
+    resolver: zodResolver(groupSettingsSchema),
+    defaultValues: {
+      name: group.name,
+      password: group.password,
+      description: group.description || "",
+      winning_criteria_id: group.winning_criteria_id,
+    },
+  });
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -73,19 +82,15 @@ export default function GroupSettingsClient({ group, members }: Props) {
     fetchWinningCriteriasData();
   }, []);
 
-  const handleUpdateGroup = useCallback(
-    async (
-      values: Partial<Tables<"groups">>,
-      { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
-    ) => {
+  const onSubmit = useCallback(
+    async (data: GroupSettingsFormData) => {
       if (!currentUser?.isCreator) {
         alert("Only the group creator can update group details.");
-        setSubmitting(false);
         return;
       }
 
       try {
-        await updateGroup(group.id, values);
+        await updateGroup(group.id, data);
 
         toast({
           variant: "success",
@@ -98,8 +103,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
           title: "Error updating group",
           description: "An unexpected error occurred while updating the group.",
         });
-      } finally {
-        setSubmitting(false);
       }
     },
     [currentUser?.isCreator, group.id, toast],
@@ -135,138 +138,119 @@ export default function GroupSettingsClient({ group, members }: Props) {
           <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
             Group Details
           </h3>
-          <Formik
-            initialValues={{
-              name: group.name,
-              password: group.password,
-              description: group.description || "",
-              winning_criteria_id: group.winning_criteria_id,
-            }}
-            validationSchema={GroupSettingsSchema}
-            onSubmit={handleUpdateGroup}
-          >
-            {({ isSubmitting }) => (
-              <Form className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Group Name
-                  </label>
-                  <Field
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                    disabled={!currentUser?.isCreator}
-                  />
-                  <ErrorMessage
-                    name="name"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Group Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                disabled={!currentUser?.isCreator}
+                {...register("name")}
+              />
+              {errors.name && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
                 </div>
+              )}
+            </div>
 
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Group Password
-                  </label>
-                  <div className="relative mt-1">
-                    <Field
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      name="password"
-                      className="block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                      disabled={!currentUser?.isCreator}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      <Image
-                        src={showPassword ? EyeClosedIcon : EyeOpenIcon}
-                        alt={showPassword ? "Hide password" : "Show password"}
-                        width={20}
-                        height={20}
-                      />
-                    </Button>
-                  </div>
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Group Password
+              </label>
+              <div className="relative mt-1">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  className="block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                  disabled={!currentUser?.isCreator}
+                  {...register("password")}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <Image
+                    src={showPassword ? EyeClosedIcon : EyeOpenIcon}
+                    alt={showPassword ? "Hide password" : "Show password"}
+                    width={20}
+                    height={20}
                   />
+                </Button>
+              </div>
+              {errors.password && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
                 </div>
+              )}
+            </div>
 
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Group Description
-                  </label>
-                  <Field
-                    as="textarea"
-                    id="description"
-                    name="description"
-                    rows={3}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                    disabled={!currentUser?.isCreator}
-                  />
-                  <ErrorMessage
-                    name="description"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Group Description
+              </label>
+              <textarea
+                id="description"
+                rows={3}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                disabled={!currentUser?.isCreator}
+                {...register("description")}
+              />
+              {errors.description && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.description.message}
                 </div>
+              )}
+            </div>
 
-                <div>
-                  <label
-                    htmlFor="winning_criteria"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Winning Criteria
-                  </label>
-                  <Field
-                    as="select"
-                    id="winning_criteria_id"
-                    name="winning_criteria_id"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                    disabled={!currentUser?.isCreator}
-                  >
-                    {winningCriterias.map((criteria) => (
-                      <option key={criteria.id} value={criteria.id}>
-                        {winningCriteriaText[criteria.name as WinningCriteria]}
-                      </option>
-                    ))}
-                  </Field>
-                  <ErrorMessage
-                    name="winning_criteria_id"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
+            <div>
+              <label
+                htmlFor="winning_criteria"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Winning Criteria
+              </label>
+              <select
+                id="winning_criteria_id"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                disabled={!currentUser?.isCreator}
+                {...register("winning_criteria_id", { valueAsNumber: true })}
+              >
+                {winningCriterias.map((criteria) => (
+                  <option key={criteria.id} value={criteria.id}>
+                    {winningCriteriaText[criteria.name as WinningCriteria]}
+                  </option>
+                ))}
+              </select>
+              {errors.winning_criteria_id && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.winning_criteria_id.message}
                 </div>
+              )}
+            </div>
 
-                {currentUser?.isCreator && (
-                  <div>
-                    <Button
-                      type="submit"
-                      variant="yellow"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Updating..." : "Update Group"}
-                    </Button>
-                  </div>
-                )}
-              </Form>
+            {currentUser?.isCreator && (
+              <div>
+                <Button type="submit" variant="yellow" disabled={isSubmitting}>
+                  {isSubmitting ? "Updating..." : "Update Group"}
+                </Button>
+              </div>
             )}
-          </Formik>
+          </form>
         </div>
       </div>
       <div className="mt-4">

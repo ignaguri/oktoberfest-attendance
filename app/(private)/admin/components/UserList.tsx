@@ -5,11 +5,13 @@ import ResponsiveDialog from "@/components/ResponsiveDialog";
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 
 import type { Tables } from "@/lib/database.types";
+import type { UserFormData, AttendanceFormData } from "@/lib/schemas/admin";
 import type { User } from "@supabase/supabase-js";
 
 import {
@@ -22,26 +24,181 @@ import {
   updateUserProfile,
 } from "../actions";
 
+const UserEditForm = ({
+  user,
+  onSubmit,
+}: {
+  user: CombinedUser;
+  onSubmit: (data: UserFormData) => Promise<void>;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<UserFormData>({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      email: user.email,
+      password: "",
+      full_name: user.profile?.full_name || "",
+      username: user.profile?.username || "",
+      is_super_admin: user.profile?.is_super_admin || false,
+    },
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label htmlFor="email" className="block">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          className="input"
+          {...register("email")}
+        />
+        {errors.email && <span className="error">{errors.email.message}</span>}
+      </div>
+      <div>
+        <label htmlFor="password" className="block">
+          New Password (leave blank to keep unchanged)
+        </label>
+        <input
+          type="password"
+          id="password"
+          className="input"
+          {...register("password")}
+        />
+        {errors.password && (
+          <span className="error">{errors.password.message}</span>
+        )}
+      </div>
+      <div>
+        <label htmlFor="full_name" className="block">
+          Full Name
+        </label>
+        <input
+          type="text"
+          id="full_name"
+          className="input"
+          {...register("full_name")}
+        />
+        {errors.full_name && (
+          <span className="error">{errors.full_name.message}</span>
+        )}
+      </div>
+      <div>
+        <label htmlFor="username" className="block">
+          Username
+        </label>
+        <input
+          type="text"
+          id="username"
+          className="input"
+          {...register("username")}
+        />
+        {errors.username && (
+          <span className="error">{errors.username.message}</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="is_super_admin"
+          {...register("is_super_admin")}
+        />
+        <label htmlFor="is_super_admin" className="block">
+          Is Super Admin
+        </label>
+      </div>
+      <Button type="submit" disabled={isSubmitting}>
+        Update User
+      </Button>
+    </form>
+  );
+};
+
+const AttendanceEditForm = ({
+  attendance,
+  onSubmit,
+}: {
+  attendance: AttendanceWithTents;
+  onSubmit: (data: AttendanceFormData) => Promise<void>;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<AttendanceFormData>({
+    resolver: zodResolver(attendanceSchema),
+    defaultValues: {
+      date: new Date(attendance.date),
+      beer_count: attendance.beer_count,
+      tent_ids: attendance.tent_ids || [],
+    },
+  });
+
+  const watchedTentIds = watch("tent_ids");
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label htmlFor="date" className="block">
+          Date
+        </label>
+        <input
+          type="date"
+          id="date"
+          className="border p-1"
+          {...register("date", {
+            valueAsDate: true,
+            setValueAs: (value: string) => new Date(value),
+          })}
+        />
+        {errors.date && (
+          <div className="text-red-500">{errors.date.message}</div>
+        )}
+      </div>
+      <div>
+        <label htmlFor="beer_count" className="block">
+          Beer Count
+        </label>
+        <input
+          type="number"
+          id="beer_count"
+          className="border p-1"
+          {...register("beer_count", { valueAsNumber: true })}
+        />
+        {errors.beer_count && (
+          <div className="text-red-500">{errors.beer_count.message}</div>
+        )}
+      </div>
+      <div>
+        <label htmlFor="tents" className="block">
+          Tents
+        </label>
+        <TentSelector
+          selectedTents={watchedTentIds}
+          onTentsChange={(tents) => setValue("tent_ids", tents)}
+        />
+        {errors.tent_ids && (
+          <div className="text-red-500">{errors.tent_ids.message}</div>
+        )}
+      </div>
+      <Button type="submit" disabled={isSubmitting}>
+        Update Attendance
+      </Button>
+    </form>
+  );
+};
+
 type CombinedUser = User & { profile: Tables<"profiles"> };
 interface AttendanceWithTents extends Tables<"attendances"> {
   tent_ids?: string[];
 }
-
-const UserSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().min(8, "Password must be at least 8 characters"),
-  full_name: Yup.string(),
-  username: Yup.string(),
-  is_super_admin: Yup.boolean(),
-});
-
-const AttendanceSchema = Yup.object().shape({
-  date: Yup.date().required("Required"),
-  beer_count: Yup.number().min(0, "Must be at least 0").required("Required"),
-  tent_ids: Yup.array()
-    .of(Yup.string())
-    .required("At least one tent must be selected"),
-});
 
 const UserList = () => {
   const [users, setUsers] = useState<CombinedUser[]>([]);
@@ -85,16 +242,16 @@ const UserList = () => {
     setIsUserDialogOpen(true); // Open the dialog for user editing
   }
 
-  async function handleUpdateUser(values: any, { setSubmitting }: any) {
+  async function handleUpdateUser(data: UserFormData) {
     try {
       const authData: { email?: string; password?: string } = {};
-      if (values.email !== selectedUser?.email) authData.email = values.email;
-      if (values.password) authData.password = values.password;
+      if (data.email !== selectedUser?.email) authData.email = data.email;
+      if (data.password) authData.password = data.password;
 
       const profileData: Partial<Tables<"profiles">> = {
-        full_name: values.full_name,
-        username: values.username,
-        is_super_admin: values.is_super_admin,
+        full_name: data.full_name,
+        username: data.username,
+        is_super_admin: data.is_super_admin,
       };
 
       if (Object.keys(authData).length > 0) {
@@ -110,6 +267,7 @@ const UserList = () => {
         variant: "success",
         description: "User updated successfully",
       });
+      setIsUserDialogOpen(false);
     } catch (error) {
       console.error("Error updating user:", error);
       toast({
@@ -118,8 +276,6 @@ const UserList = () => {
         variant: "destructive",
       });
     }
-    setSubmitting(false);
-    setIsUserDialogOpen(false); // Close the dialog after update
   }
 
   async function handleDeleteUser(userId: string) {
@@ -141,22 +297,23 @@ const UserList = () => {
     }
   }
 
-  async function handleUpdateAttendance(values: any, { setSubmitting }: any) {
+  async function handleUpdateAttendance(data: AttendanceFormData) {
     try {
       if (!selectedAttendance || !selectedUser) return;
       await updateAttendance(selectedAttendance.id, {
-        date: values.date,
-        beer_count: values.beer_count,
-        user_id: selectedUser.id, // Pass user_id
-        tent_ids: values.tent_ids,
+        date: data.date.toISOString().split("T")[0], // Convert Date to string
+        beer_count: data.beer_count,
+        user_id: selectedUser.id,
+        tent_ids: data.tent_ids,
       });
-      fetchAttendances(selectedUser.id); // Refresh attendances
-      setSelectedAttendance(null); // Clear selection
+      fetchAttendances(selectedUser.id);
+      setSelectedAttendance(null);
       toast({
         title: "Success",
         variant: "success",
         description: "Attendance updated successfully",
       });
+      setIsAttendanceDialogOpen(false);
     } catch (error) {
       console.error("Error updating attendance:", error);
       toast({
@@ -165,8 +322,6 @@ const UserList = () => {
         variant: "destructive",
       });
     }
-    setSubmitting(false);
-    setIsAttendanceDialogOpen(false); // Close the dialog after update
   }
 
   async function handleDeleteAttendance(attendanceId: string) {
@@ -244,100 +399,7 @@ const UserList = () => {
         description="Update user details"
       >
         {selectedUser && (
-          <Formik
-            initialValues={{
-              email: selectedUser.email,
-              password: "",
-              full_name: selectedUser.profile?.full_name || "",
-              username: selectedUser.profile?.username || "",
-              is_super_admin: selectedUser.profile?.is_super_admin || false,
-            }}
-            validationSchema={UserSchema}
-            onSubmit={handleUpdateUser}
-            enableReinitialize
-          >
-            {({ isSubmitting }) => (
-              <Form className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block">
-                    Email
-                  </label>
-                  <Field
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="input"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="span"
-                    className="error"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="password" className="block">
-                    New Password (leave blank to keep unchanged)
-                  </label>
-                  <Field
-                    type="password"
-                    id="password"
-                    name="password"
-                    className="input"
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="span"
-                    className="error"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="full_name" className="block">
-                    Full Name
-                  </label>
-                  <Field
-                    type="text"
-                    id="full_name"
-                    name="full_name"
-                    className="input"
-                  />
-                  <ErrorMessage
-                    name="full_name"
-                    component="span"
-                    className="error"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="username" className="block">
-                    Username
-                  </label>
-                  <Field
-                    type="text"
-                    id="username"
-                    name="username"
-                    className="input"
-                  />
-                  <ErrorMessage
-                    name="username"
-                    component="span"
-                    className="error"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Field
-                    type="checkbox"
-                    id="is_super_admin"
-                    name="is_super_admin"
-                  />
-                  <label htmlFor="is_super_admin" className="block">
-                    Is Super Admin
-                  </label>
-                </div>
-                <Button type="submit" disabled={isSubmitting}>
-                  Update User
-                </Button>
-              </Form>
-            )}
-          </Formik>
+          <UserEditForm user={selectedUser} onSubmit={handleUpdateUser} />
         )}
       </ResponsiveDialog>
 
@@ -377,67 +439,10 @@ const UserList = () => {
               </div>
             ))}
             {selectedAttendance && (
-              <Formik
-                initialValues={{
-                  date: selectedAttendance.date,
-                  beer_count: selectedAttendance.beer_count,
-                  tent_ids: selectedAttendance.tent_ids || [],
-                }}
-                validationSchema={AttendanceSchema}
+              <AttendanceEditForm
+                attendance={selectedAttendance}
                 onSubmit={handleUpdateAttendance}
-                enableReinitialize
-              >
-                {({ isSubmitting, setFieldValue, values }) => (
-                  <Form className="space-y-4">
-                    <div>
-                      <label htmlFor="date" className="block">
-                        Date
-                      </label>
-                      <Field
-                        type="date"
-                        id="date"
-                        name="date"
-                        className="border p-1"
-                      />
-                      <ErrorMessage
-                        name="date"
-                        component="div"
-                        className="text-red-500"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="beer_count" className="block">
-                        Beer Count
-                      </label>
-                      <Field
-                        type="number"
-                        id="beer_count"
-                        name="beer_count"
-                        className="border p-1"
-                      />
-                      <ErrorMessage
-                        name="beer_count"
-                        component="div"
-                        className="text-red-500"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="tents" className="block">
-                        Tents
-                      </label>
-                      <TentSelector
-                        selectedTents={values.tent_ids}
-                        onTentsChange={(tents) =>
-                          setFieldValue("tent_ids", tents)
-                        }
-                      />
-                    </div>
-                    <Button type="submit" disabled={isSubmitting}>
-                      Update Attendance
-                    </Button>
-                  </Form>
-                )}
-              </Formik>
+              />
             )}
           </div>
         )}

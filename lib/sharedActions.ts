@@ -234,7 +234,12 @@ export async function addAttendance(formData: {
 
   const dateWithTime = new TZDate(date, TIMEZONE);
   const now = new TZDate(new Date(), TIMEZONE);
-  dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+  dateWithTime.setHours(
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds(),
+    now.getMilliseconds(),
+  );
 
   const { data: attendanceData, error } = await supabase.rpc(
     "add_or_update_attendance_with_tents",

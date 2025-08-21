@@ -2,22 +2,29 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { resetPasswordSchema } from "@/lib/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import cn from "classnames";
-import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Link } from "next-view-transitions";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+
+import type { ResetPasswordFormData } from "@/lib/schemas/auth";
 
 import { resetPassword } from "./actions";
-
-const ResetPasswordSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Required"),
-});
 
 const ResetPassword = () => {
   const { toast } = useToast();
 
-  const handleResetPassword = async (formData: { email: string }) => {
-    const [_, errorMessage] = await resetPassword(formData);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+  });
+
+  const onSubmit = async (data: ResetPasswordFormData) => {
+    const [_, errorMessage] = await resetPassword(data);
 
     if (errorMessage) {
       toast({
@@ -37,30 +44,25 @@ const ResetPassword = () => {
   return (
     <div className="card">
       <h2 className="w-full text-center">Reset Password</h2>
-      <Formik
-        initialValues={{
-          email: "",
-        }}
-        validationSchema={ResetPasswordSchema}
-        onSubmit={handleResetPassword}
-      >
-        {({ errors }) => (
-          <Form className="column w-full">
-            <label htmlFor="email">Email</label>
-            <Field
-              className={cn("input", errors.email && "input-error")}
-              id="email"
-              name="email"
-              placeholder="jane@acme.com"
-              type="email"
-            />
-            <ErrorMessage name="email" component="span" className="error" />
-            <Button type="submit" className="self-center" variant="yellow">
-              Send Instructions
-            </Button>
-          </Form>
-        )}
-      </Formik>
+      <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
+        <label htmlFor="email">Email</label>
+        <input
+          className={cn("input", errors.email && "input-error")}
+          id="email"
+          placeholder="jane@acme.com"
+          type="email"
+          {...register("email")}
+        />
+        {errors.email && <span className="error">{errors.email.message}</span>}
+        <Button
+          type="submit"
+          className="self-center"
+          variant="yellow"
+          disabled={isSubmitting}
+        >
+          Send Instructions
+        </Button>
+      </form>
       <Button asChild variant="link">
         <Link href="/sign-in">Remember your password? Sign In.</Link>
       </Button>
