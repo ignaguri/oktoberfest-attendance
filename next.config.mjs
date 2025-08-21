@@ -2,7 +2,6 @@ import { withSentryConfig } from "@sentry/nextjs";
 import withSerwistInit from "@serwist/next";
 
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
   reactStrictMode: true,
   eslint: {
