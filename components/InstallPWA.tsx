@@ -5,7 +5,78 @@ import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+type InstallPWAEvent =
+  | { type: "prompt_shown"; promptCount: number }
+  | { type: "install_clicked" }
+  | { type: "install_success" }
+  | { type: "install_dismissed" }
+  | { type: "install_error"; error: string }
+  | { type: "prompt_closed_manually" };
+
 const MAX_PROMPT_COUNT = 3;
+
+function trackInstallPWAEvent(event: InstallPWAEvent): void {
+  if (typeof window !== "undefined" && "gtag" in window) {
+    const gtag = (window as any).gtag;
+
+    switch (event.type) {
+      case "prompt_shown":
+        gtag("event", "pwa_prompt_shown", {
+          event_category: "PWA",
+          event_label: "Install Prompt Displayed",
+          value: event.promptCount,
+          custom_parameters: {
+            prompt_count: event.promptCount,
+          },
+        });
+        break;
+
+      case "install_clicked":
+        gtag("event", "pwa_install_clicked", {
+          event_category: "PWA",
+          event_label: "Install Button Clicked",
+        });
+        break;
+
+      case "install_success":
+        gtag("event", "pwa_install_success", {
+          event_category: "PWA",
+          event_label: "App Successfully Installed",
+          value: 1,
+        });
+        break;
+
+      case "install_dismissed":
+        gtag("event", "pwa_install_dismissed", {
+          event_category: "PWA",
+          event_label: "Install Prompt Dismissed",
+        });
+        break;
+
+      case "install_error":
+        gtag("event", "pwa_install_error", {
+          event_category: "PWA",
+          event_label: "Install Failed",
+          custom_parameters: {
+            error_message: event.error,
+          },
+        });
+        break;
+
+      case "prompt_closed_manually":
+        gtag("event", "pwa_prompt_closed", {
+          event_category: "PWA",
+          event_label: "Prompt Closed Manually",
+        });
+        break;
+    }
+  }
+}
 
 function isPWAInstalled(): boolean {
   if (typeof window !== "undefined") {
@@ -30,7 +101,8 @@ function isPWAInstalled(): boolean {
 
 export default function InstallPWA() {
   const [supportsPWA, setSupportsPWA] = useState(false);
-  const [promptInstall, setPromptInstall] = useState<any>(null);
+  const [promptInstall, setPromptInstall] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [hide, setHide] = useState(false);
@@ -45,12 +117,17 @@ export default function InstallPWA() {
   }, [hide, isInstalled]);
 
   useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
+    const handler = (e: Event) => {
+      const installEvent = e as BeforeInstallPromptEvent;
+      installEvent.preventDefault();
       setSupportsPWA(true);
       setIsOpen(true);
-      setPromptInstall(e);
+      setPromptInstall(installEvent);
+
+      const currentCount = getPromptCount() + 1;
       incrementPromptCount();
+
+      trackInstallPWAEvent({ type: "prompt_shown", promptCount: currentCount });
     };
 
     const checkInstalled = () => {
@@ -74,10 +151,48 @@ export default function InstallPWA() {
     };
   }, [incrementPromptCount]);
 
-  const installPWA = (evt: React.MouseEvent<HTMLButtonElement>) => {
+  const installPWA = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
-    if (promptInstall) {
-      promptInstall.prompt();
+
+    if (!promptInstall) {
+      trackInstallPWAEvent({
+        type: "install_error",
+        error: "No install prompt available",
+      });
+      return;
+    }
+
+    try {
+      trackInstallPWAEvent({ type: "install_clicked" });
+
+      // Trigger the install prompt
+      await promptInstall.prompt();
+
+      // Wait for user choice
+      const result = await promptInstall.userChoice;
+
+      if (result.outcome === "accepted") {
+        trackInstallPWAEvent({ type: "install_success" });
+        console.debug("PWA install accepted");
+      } else {
+        trackInstallPWAEvent({ type: "install_dismissed" });
+        console.debug("PWA install dismissed");
+      }
+
+      setIsOpen(false);
+      setTimeout(() => {
+        setHide(true);
+      }, 700);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      trackInstallPWAEvent({
+        type: "install_error",
+        error: errorMessage,
+      });
+      console.error("PWA install failed:", error);
+
+      // Still hide the prompt even if install failed
       setIsOpen(false);
       setTimeout(() => {
         setHide(true);
@@ -86,6 +201,7 @@ export default function InstallPWA() {
   };
 
   const closePrompt = () => {
+    trackInstallPWAEvent({ type: "prompt_closed_manually" });
     setIsOpen(false);
     setTimeout(() => {
       setHide(true);
