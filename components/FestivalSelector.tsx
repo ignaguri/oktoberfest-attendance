@@ -10,11 +10,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useFestival } from "@/contexts/FestivalContext";
+import { getFestivalStatus } from "@/lib/festivalConstants";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
+import type { BadgeProps } from "./ui/badge";
 import type { Festival } from "@/lib/types";
+
+import { Badge } from "./ui/badge";
 
 interface FestivalSelectorProps {
   className?: string;
@@ -28,17 +32,15 @@ const getFestivalDisplayInfo = (festival: Festival) => {
   return { firstLetter, lastTwoDigits };
 };
 
-const getFestivalStatus = (festival: Festival) => {
-  const now = new Date();
-  const startDate = new Date(festival.start_date);
-  const endDate = new Date(festival.end_date);
+const getFestivalStatusBadgeProps = (festival: Festival) => {
+  const status = getFestivalStatus(festival);
 
-  if (now < startDate) {
-    return { status: "upcoming", color: "text-blue-600" };
-  } else if (now >= startDate && now <= endDate) {
-    return { status: "active", color: "text-green-600" };
+  if (status === "upcoming") {
+    return { status, variant: "default" };
+  } else if (status === "active") {
+    return { status, variant: "success" };
   } else {
-    return { status: "ended", color: "text-gray-500" };
+    return { status, variant: "secondary" };
   }
 };
 
@@ -49,7 +51,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
 
   if (isLoading) {
     return (
-      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center animate-pulse">
+      <div className="h-10 w-10 rounded-md bg-gray-300 flex items-center justify-center animate-pulse">
         <span className="text-sm font-medium text-gray-600">...</span>
       </div>
     );
@@ -57,7 +59,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
 
   if (!currentFestival) {
     return (
-      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+      <div className="h-10 w-10 rounded-md bg-gray-300 flex items-center justify-center">
         <span className="text-sm font-medium text-gray-600">?</span>
       </div>
     );
@@ -70,13 +72,17 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
     return (
       <div
         className={cn(
-          "h-10 w-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-semibold",
+          "h-10 rounded-md bg-yellow-600 flex items-center justify-center text-white font-semibold",
+          "w-10 sm:w-auto sm:px-3 sm:gap-2",
           className,
         )}
       >
-        <span className="text-sm">
+        <span className="text-base sm:hidden">
           {firstLetter}
-          <sub className="text-xs">{lastTwoDigits}</sub>
+          <sub className="text-sm">{lastTwoDigits}</sub>
+        </span>
+        <span className="hidden sm:block text-sm font-medium">
+          {currentFestival.name}
         </span>
       </div>
     );
@@ -91,13 +97,17 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
         <Button
           variant="ghost"
           className={cn(
-            "h-10 w-10 rounded-full bg-yellow-500 hover:bg-yellow-400 text-white font-semibold p-0 transition-colors",
+            "h-10 rounded-md bg-yellow-600 hover:bg-yellow-400 text-white font-semibold transition-colors",
+            "w-10 sm:w-auto sm:px-3 sm:gap-2",
             className,
           )}
         >
-          <span className="text-sm">
+          <span className="text-base sm:hidden">
             {firstLetter}
-            <sub className="text-xs">{lastTwoDigits}</sub>
+            <sub className="text-sm">{lastTwoDigits}</sub>
+          </span>
+          <span className="hidden sm:block text-sm font-medium">
+            {currentFestival.name}
           </span>
         </Button>
       </DialogTrigger>
@@ -112,7 +122,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
           {festivals.map((festival) => {
             const { firstLetter: fLetter, lastTwoDigits: lDigits } =
               getFestivalDisplayInfo(festival);
-            const { status, color } = getFestivalStatus(festival);
+            const { status, variant } = getFestivalStatusBadgeProps(festival);
             const isSelected = festival.id === currentFestival?.id;
 
             return (
@@ -132,23 +142,26 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                 <div className="flex items-center gap-3 w-full">
                   <div
                     className={cn(
-                      "h-10 w-10 rounded-full flex items-center justify-center font-semibold flex-shrink-0",
+                      "h-10 w-10 rounded-md flex items-center justify-center font-semibold flex-shrink-0",
                       isSelected
-                        ? "bg-white text-yellow-600"
+                        ? "bg-white text-yellow-500"
                         : "bg-yellow-500 text-white",
                     )}
                   >
-                    <span className="text-sm">
+                    <span className="text-base">
                       {fLetter}
-                      <sub className="text-xs">{lDigits}</sub>
+                      <sub className="text-sm">{lDigits}</sub>
                     </span>
                   </div>
                   <div className="flex flex-col items-start text-left">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{festival.name}</span>
-                      <span className={`text-xs capitalize ${color}`}>
+                      <Badge
+                        className="capitalize"
+                        variant={variant as BadgeProps["variant"]}
+                      >
                         {status}
-                      </span>
+                      </Badge>
                     </div>
                     <div className="text-sm text-gray-600">
                       {format(parseISO(festival.start_date), "MMM d")} -{" "}
