@@ -1,4 +1,13 @@
 export const changelog: Record<string, string[]> = {
+  "0.3.0": [
+    // Changes omitted for brevity
+    // "📊 Festival-specific leaderboards and group competitions",
+    // "⚡ Migrated all forms to React Hook Form + Zod for better performance",
+    // "🔧 Admin panel for festival management",
+    "🎪 Multi-festival support - Switch between 2024 and 2025 Oktoberfest!",
+    "👤 New user menu with profile and pages access",
+    "🏆 Completely new achievements system!",
+  ],
   "0.2.5": [
     // Changes omitted for brevity
     // "Initials for avatar",
