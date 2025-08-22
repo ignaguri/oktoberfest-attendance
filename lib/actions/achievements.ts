@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 
+import type { FunctionReturns } from "@/lib/database-helpers.types";
 import type {
   AchievementWithProgress,
   AchievementStats,
@@ -32,7 +33,7 @@ export async function getUserAchievements(
   }
 
   return (
-    data?.map((achievement: any) => ({
+    data?.map((achievement: FunctionReturns<"get_user_achievements", 0>) => ({
       id: achievement.achievement_id,
       name: achievement.name,
       description: achievement.description,
@@ -48,9 +49,11 @@ export async function getUserAchievements(
       unlocked_at: achievement.unlocked_at,
       user_progress: achievement.current_progress
         ? {
-            current_value: achievement.current_progress.current_value || 0,
-            target_value: achievement.current_progress.target_value || 1,
-            percentage: achievement.current_progress.percentage || 0,
+            current_value:
+              (achievement.current_progress as any)?.current_value || 0,
+            target_value:
+              (achievement.current_progress as any)?.target_value || 1,
+            percentage: (achievement.current_progress as any)?.percentage || 0,
             last_updated: new Date().toISOString(),
           }
         : {
@@ -86,9 +89,16 @@ export async function evaluateAchievements(festivalId: string): Promise<void> {
   }
 }
 
-export async function getAchievementLeaderboard(
-  festivalId: string,
-): Promise<any[]> {
+export async function getAchievementLeaderboard(festivalId: string): Promise<
+  {
+    avatar_url: string;
+    full_name: string;
+    total_achievements: number;
+    total_points: number;
+    user_id: string;
+    username: string;
+  }[]
+> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("get_achievement_leaderboard", {

@@ -29,3 +29,20 @@ export type Views<
    
    NOTE: Re-apply these fixes after running `pnpm sup:db:types`
 */
+
+/**
+ * Helper type to extract return types from database functions
+ * Usage: FunctionReturns<"get_user_achievements"> or FunctionReturns<"get_user_achievements", 0> for array elements
+ */
+export type FunctionReturns<
+  FunctionName extends keyof PublicSchema["Functions"],
+  Index extends number = never,
+> = PublicSchema["Functions"][FunctionName] extends {
+  Returns: infer R;
+}
+  ? Index extends never
+    ? R
+    : R extends any[]
+      ? R[0]
+      : never
+  : never;

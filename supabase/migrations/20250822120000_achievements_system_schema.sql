@@ -1,6 +1,27 @@
 -- Achievements System Schema
 -- This migration creates the complete achievement system schema with tables, functions, triggers, and policies
 
+-- Create system settings table for configurable values
+CREATE TABLE system_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key text NOT NULL UNIQUE,
+  value text NOT NULL,
+  description text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Insert default system settings
+INSERT INTO system_settings (key, value, description) VALUES
+  ('default_beer_cost', '16.2', 'Default cost per beer in euros'),
+  ('achievement_evaluation_enabled', 'true', 'Whether automatic achievement evaluation is enabled'),
+  ('max_achievement_points_per_festival', '1000', 'Maximum achievement points a user can earn per festival');
+
+-- Add updated_at trigger for system_settings
+CREATE TRIGGER update_system_settings_updated_at 
+  BEFORE UPDATE ON system_settings 
+  FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
 -- Create enums for achievement system
 CREATE TYPE achievement_category_enum AS ENUM (
   'consumption',
@@ -176,7 +197,7 @@ BEGIN
             SELECT COALESCE(SUM(
               beer_count * COALESCE(
                 (SELECT custom_beer_cost FROM profiles WHERE id = p_user_id),
-                16.2
+                (SELECT value::numeric FROM system_settings WHERE key = 'default_beer_cost')
               )
             ), 0)::integer INTO current_value
             FROM attendances
@@ -391,7 +412,7 @@ BEGIN
               SELECT COALESCE(SUM(
                 beer_count * COALESCE(
                   (SELECT custom_beer_cost FROM profiles WHERE id = p_user_id),
-                  16.2
+                  (SELECT value::numeric FROM system_settings WHERE key = 'default_beer_cost')
                 )
               ), 0)::integer INTO current_value
               FROM attendances
@@ -700,8 +721,16 @@ CREATE TRIGGER achievements_on_group_member_change
   FOR EACH ROW EXECUTE FUNCTION trigger_evaluate_achievements();
 
 -- Enable RLS on tables
+ALTER TABLE system_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
+
+-- RLS policies for system_settings
+CREATE POLICY "System settings are viewable by everyone" ON system_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Only super admins can modify system settings" ON system_settings
+  FOR ALL USING (is_super_admin());
 
 -- RLS policies for achievements (readable by everyone)
 CREATE POLICY "Achievements are viewable by everyone" ON achievements
@@ -724,6 +753,7 @@ CREATE POLICY "Super admins can modify user achievements" ON user_achievements
   FOR ALL USING (is_super_admin());
 
 -- Add comments
+COMMENT ON TABLE system_settings IS 'System-wide configurable settings and parameters';
 COMMENT ON TABLE achievements IS 'Core achievement definitions and metadata';
 COMMENT ON TABLE user_achievements IS 'User-specific achievement unlocks per festival';
 COMMENT ON FUNCTION check_achievement_conditions IS 'Evaluates if specific achievement conditions are met for a user';

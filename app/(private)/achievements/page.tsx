@@ -1,9 +1,9 @@
 "use client";
 
 import { AchievementGrid } from "@/components/achievements/AchievementGrid";
+import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFestival } from "@/contexts/FestivalContext";
 import {
   getUserAchievements,
@@ -183,21 +183,31 @@ export default function AchievementsPage() {
         </div>
       )}
 
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) => setActiveTab(value as any)}
-      >
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="consumption">Beer</TabsTrigger>
-          <TabsTrigger value="attendance">Days</TabsTrigger>
-          <TabsTrigger value="explorer">Tents</TabsTrigger>
-          <TabsTrigger value="social">Social</TabsTrigger>
-          <TabsTrigger value="competitive">Compete</TabsTrigger>
-          <TabsTrigger value="special">Special</TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <SingleSelect
+            value={activeTab}
+            buttonClassName="w-full sm:w-[200px]"
+            options={[
+              {
+                title: "Achievement Categories",
+                options: [
+                  { value: "all", label: "All Achievements" },
+                  { value: "consumption", label: "Beer Achievements" },
+                  { value: "attendance", label: "Days Achievements" },
+                  { value: "explorer", label: "Tents Achievements" },
+                  { value: "social", label: "Social Achievements" },
+                  { value: "competitive", label: "Compete Achievements" },
+                  { value: "special", label: "Special Achievements" },
+                ],
+              },
+            ]}
+            placeholder="Select category"
+            onSelect={(option) => setActiveTab(option.value as any)}
+          />
+        </div>
 
-        <TabsContent value={activeTab} className="space-y-6 mt-6">
+        <div className="space-y-6">
           <div className="flex items-center gap-4">
             <h2 className="text-xl font-semibold">
               {activeTab === "all"
@@ -254,8 +264,8 @@ export default function AchievementsPage() {
               </p>
             </div>
           )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }

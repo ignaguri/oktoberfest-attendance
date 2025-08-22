@@ -62,4 +62,4 @@ INSERT INTO achievements (name, description, category, icon, points, rarity, con
 ('Closing Time', 'Attend the last day of the festival', 'special', 'closing', 75, 'rare', '{"type": "special", "date_specific": "last_day"}');
 
 -- Add comments about achievement counts
-COMMENT ON TABLE achievements IS 'Core achievement definitions and metadata - Contains 38 achievements across 6 categories, designed for 1-liter beer servings';
+COMMENT ON TABLE achievements IS 'Core achievement definitions and metadata';
