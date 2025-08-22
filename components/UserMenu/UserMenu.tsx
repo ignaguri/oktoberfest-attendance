@@ -1,6 +1,8 @@
 "use client";
 
+import { logout } from "@/components/Auth/actions";
 import Avatar from "@/components/Avatar/Avatar";
+import { ShareDialog } from "@/components/ShareDialog/ShareDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +20,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  menuItems,
+  menuSections,
+  getMenuItemsBySection,
+} from "@/components/UserMenu/menuConfig";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 import { cn } from "@/lib/utils";
@@ -28,9 +35,6 @@ import { useState } from "react";
 
 import type { BadgeProps } from "@/components/ui/badge";
 import type { Festival as FestivalType } from "@/lib/types";
-
-import { menuItems, menuSections, getMenuItemsBySection } from "./menuConfig";
-import { logout } from "../Auth/actions";
 
 interface UserMenuProps {
   profileData: {
@@ -66,6 +70,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
     useFestival();
   const [isOpen, setIsOpen] = useState(false);
   const [isFestivalModalOpen, setIsFestivalModalOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await logout();
@@ -79,15 +84,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
       if (item.id === "share") {
         return {
           ...item,
-          onClick: () => {
-            if (navigator.share) {
-              navigator.share({
-                title: "ProstCounter",
-                text: "Check out this awesome beer festival app!",
-                url: window.location.origin,
-              });
-            }
-          },
+          onClick: () => setIsShareDialogOpen(true),
         };
       }
       if (item.id === "changeFestival") {
@@ -154,12 +151,18 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
               <span className="text-sm font-medium truncate">
                 {currentFestival.name}
               </span>
-              <Badge
-                variant={variant as BadgeProps["variant"]}
-                className="text-xs capitalize w-fit"
-              >
-                {status}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={variant as BadgeProps["variant"]}
+                  className="text-xs capitalize w-fit"
+                >
+                  {status}
+                </Badge>
+                <div className="text-xs text-muted-foreground">
+                  {format(parseISO(currentFestival.start_date), "MMM d")} -{" "}
+                  {format(parseISO(currentFestival.end_date), "MMM d")}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -243,6 +246,15 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
     );
   };
 
+  const renderShareDialog = () => {
+    return (
+      <ShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
+      />
+    );
+  };
+
   const menuItemsWithHandlers = getMenuItemsWithHandlers();
 
   return (
@@ -311,6 +323,9 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
 
       {/* Festival Selection Modal */}
       {renderFestivalSelectionModal()}
+
+      {/* Share Dialog */}
+      {renderShareDialog()}
     </>
   );
 }

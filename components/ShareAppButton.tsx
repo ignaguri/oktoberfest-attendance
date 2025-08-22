@@ -2,7 +2,7 @@
 
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useShare } from "@/hooks/use-share";
 import { Share2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -11,50 +11,26 @@ const ICON_SIZE = 20;
 
 export default function ShareAppButton() {
   const [open, setOpen] = useState(false);
-  const [copyButtonText, setCopyButtonText] = useState("Copy share text");
-  const [showQRCode, setShowQRCode] = useState(false);
-  const { toast } = useToast();
-
-  const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
-
-  const shareText = `Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends. Click here to join: ${APP_URL}`;
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(shareText);
-      setCopyButtonText("Copied!");
-      setTimeout(() => {
-        setCopyButtonText("Copy share text");
-      }, 3000);
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to copy text to clipboard.",
-      });
-    }
-  };
+  const {
+    copyButtonText,
+    showQRCode,
+    copyToClipboard,
+    shareViaWhatsApp,
+    toggleQRCode,
+  } = useShare();
 
   const title = "Share ProstCounter App with friends!";
-  const description = "Choose how you’d like to share the app:";
+  const description = "Choose how you'd like to share the app:";
 
   const ButtonsGroup = () => (
     <div className="flex flex-col gap-2 items-center p-8">
-      <Button
-        variant="yellow"
-        onClick={() =>
-          window.open(
-            `https://wa.me/?text=${encodeURIComponent(shareText)}`,
-            "_blank",
-          )
-        }
-      >
+      <Button variant="yellow" onClick={shareViaWhatsApp}>
         Share via WhatsApp
       </Button>
       <Button variant="yellowOutline" onClick={copyToClipboard}>
         {copyButtonText}
       </Button>
-      <Button variant="secondary" onClick={() => setShowQRCode(!showQRCode)}>
+      <Button variant="secondary" onClick={toggleQRCode}>
         {showQRCode ? "Hide QR Code" : "Show QR Code"}
       </Button>
       {showQRCode && (
