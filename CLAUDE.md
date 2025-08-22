@@ -38,7 +38,7 @@ Seed data creates users `user1@example.com` through `user10@example.com` with pa
 - **Frontend**: Next.js 15.4.6, React 19.1.1, TypeScript 5.9.2
 - **Backend**: Supabase (auth, database, storage)
 - **UI**: Tailwind CSS, Radix UI, shadcn/ui components
-- **PWA**: next-pwa with service worker caching
+- **PWA**: serwist with service worker caching
 - **Monitoring**: Sentry error tracking
 - **Package Manager**: pnpm
 
@@ -204,7 +204,6 @@ interface UserAchievement {
 
 - Upload to Supabase storage in `beer_pictures` bucket
 - Multiple photos per attendance record
-- Optimized caching (30 days) via next-pwa
 
 ### State Management
 
@@ -241,6 +240,15 @@ interface UserAchievement {
 4. **✅ Festival Switching**: COMPLETED - Navbar UI with context-based festival navigation
 5. **✅ Form System Migration**: COMPLETED - All forms migrated from Formik+Yup to React Hook Form+Zod
 6. **✅ Hardcoded Constants Migration**: COMPLETED - All festival constants now dynamic from database
-7. **🚀 Achievement System**: NEXT - Design and implement gamification features with improved TypeScript integration
+7. **✅ Achievement System**: COMPLETED - Full gamification system with progress tracking and automatic evaluation
 
-Use `@CLAUDE_FEATURES_FLOWS.md` and `@CLAUDE_PROJECT_ANALYSIS.md` for detailed feature specifications when implementing gamification features.
+## Next Steps / Future Enhancements
+
+### UI/UX Improvements
+1. **📸 Photo Gallery Integration** - Add same preview functionality to pics from gallery in the attendance table
+2. **👤 Profile Quick Preview** - Quick preview of someone else's profile from group interface
+
+### Technical Improvements  
+3. **⚠️ Server Error Handling** - Properly handle server errors using Next.js error handling patterns
+   - Reference: https://nextjs.org/docs/app/building-your-application/routing/error-handling#handling-expected-errors-from-server-actions
+4. **📱 Push Notifications** - Add push notifications using Novu integration

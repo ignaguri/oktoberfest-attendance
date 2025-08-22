@@ -34,6 +34,48 @@ export type Database = {
   };
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          category: Database["public"]["Enums"]["achievement_category_enum"];
+          conditions: Json;
+          created_at: string;
+          description: string;
+          icon: string;
+          id: string;
+          is_active: boolean;
+          name: string;
+          points: number;
+          rarity: Database["public"]["Enums"]["achievement_rarity_enum"];
+          updated_at: string;
+        };
+        Insert: {
+          category: Database["public"]["Enums"]["achievement_category_enum"];
+          conditions?: Json;
+          created_at?: string;
+          description: string;
+          icon: string;
+          id?: string;
+          is_active?: boolean;
+          name: string;
+          points?: number;
+          rarity?: Database["public"]["Enums"]["achievement_rarity_enum"];
+          updated_at?: string;
+        };
+        Update: {
+          category?: Database["public"]["Enums"]["achievement_category_enum"];
+          conditions?: Json;
+          created_at?: string;
+          description?: string;
+          icon?: string;
+          id?: string;
+          is_active?: boolean;
+          name?: string;
+          points?: number;
+          rarity?: Database["public"]["Enums"]["achievement_rarity_enum"];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       attendance: {
         Row: {
           created_at: string;
@@ -468,6 +510,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_achievements: {
+        Row: {
+          achievement_id: string;
+          festival_id: string;
+          id: string;
+          progress: Json | null;
+          unlocked_at: string;
+          user_id: string;
+        };
+        Insert: {
+          achievement_id: string;
+          festival_id: string;
+          id?: string;
+          progress?: Json | null;
+          unlocked_at?: string;
+          user_id: string;
+        };
+        Update: {
+          achievement_id?: string;
+          festival_id?: string;
+          id?: string;
+          progress?: Json | null;
+          unlocked_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey";
+            columns: ["achievement_id"];
+            isOneToOne: false;
+            referencedRelation: "achievements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_achievements_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       winning_criteria: {
         Row: {
           id: number;
@@ -541,9 +625,25 @@ export type Database = {
         };
         Returns: string;
       };
+      calculate_achievement_progress: {
+        Args: {
+          p_achievement_id: string;
+          p_festival_id: string;
+          p_user_id: string;
+        };
+        Returns: Json;
+      };
       calculate_attendance_cost: {
         Args: { p_attendance_id: string };
         Returns: number;
+      };
+      check_achievement_conditions: {
+        Args: {
+          p_achievement_id: string;
+          p_festival_id: string;
+          p_user_id: string;
+        };
+        Returns: boolean;
       };
       create_group_with_member: {
         Args: { p_group_name: string; p_password: string; p_user_id: string };
@@ -553,62 +653,92 @@ export type Database = {
         Args: { p_attendance_id: string };
         Returns: undefined;
       };
+      evaluate_user_achievements: {
+        Args: { p_festival_id: string; p_user_id: string };
+        Returns: undefined;
+      };
       fetch_group_gallery: {
         Args: { p_festival_id?: string; p_group_id: string };
         Returns: {
           date: string;
-          user_id: string;
-          username: string;
           full_name: string;
           picture_data: Json;
+          user_id: string;
+          username: string;
+        }[];
+      };
+      get_achievement_leaderboard: {
+        Args: { p_festival_id: string };
+        Returns: {
+          avatar_url: string;
+          full_name: string;
+          total_achievements: number;
+          total_points: number;
+          user_id: string;
+          username: string;
         }[];
       };
       get_global_leaderboard: {
         Args: { p_festival_id?: string; p_winning_criteria_id: number };
         Returns: {
+          avatar_url: string;
+          avg_beers: number;
+          days_attended: number;
+          full_name: string;
+          group_count: number;
+          total_beers: number;
           user_id: string;
           username: string;
-          full_name: string;
-          avatar_url: string;
-          days_attended: number;
-          total_beers: number;
-          avg_beers: number;
-          group_count: number;
         }[];
       };
       get_group_leaderboard: {
         Args: { p_group_id: string; p_winning_criteria_id: number };
         Returns: {
-          user_id: string;
-          username: string;
-          full_name: string;
           avatar_url: string;
-          group_id: string;
-          group_name: string;
+          avg_beers: number;
+          days_attended: number;
           festival_id: string;
           festival_name: string;
-          days_attended: number;
+          full_name: string;
+          group_id: string;
+          group_name: string;
           total_beers: number;
-          avg_beers: number;
+          user_id: string;
+          username: string;
+        }[];
+      };
+      get_user_achievements: {
+        Args: { p_festival_id: string; p_user_id: string };
+        Returns: {
+          achievement_id: string;
+          category: Database["public"]["Enums"]["achievement_category_enum"];
+          current_progress: Json;
+          description: string;
+          icon: string;
+          is_unlocked: boolean;
+          name: string;
+          points: number;
+          rarity: Database["public"]["Enums"]["achievement_rarity_enum"];
+          unlocked_at: string;
         }[];
       };
       get_user_festival_stats: {
         Args: { p_festival_id: string; p_user_id: string };
         Returns: {
-          total_beers: number;
-          days_attended: number;
           avg_beers: number;
-          total_spent: number;
+          days_attended: number;
           favorite_tent: string;
           most_expensive_day: number;
+          total_beers: number;
+          total_spent: number;
         }[];
       };
       get_user_festival_stats_with_positions: {
         Args: { p_festival_id: string; p_user_id: string };
         Returns: {
+          days_attended: number;
           top_positions: Json;
           total_beers: number;
-          days_attended: number;
         }[];
       };
       get_user_groups: {
@@ -618,9 +748,9 @@ export type Database = {
       get_user_stats: {
         Args: { input_user_id: string };
         Returns: {
+          days_attended: number;
           top_positions: Json;
           total_beers: number;
-          days_attended: number;
         }[];
       };
       is_group_member: {
@@ -648,8 +778,24 @@ export type Database = {
         Args: { p_group_id: string };
         Returns: string;
       };
+      unlock_achievement: {
+        Args: {
+          p_achievement_id: string;
+          p_festival_id: string;
+          p_user_id: string;
+        };
+        Returns: boolean;
+      };
     };
     Enums: {
+      achievement_category_enum:
+        | "consumption"
+        | "attendance"
+        | "explorer"
+        | "social"
+        | "competitive"
+        | "special";
+      achievement_rarity_enum: "common" | "rare" | "epic" | "legendary";
       festival_status_enum: "upcoming" | "active" | "ended";
       festival_type_enum:
         | "oktoberfest"
@@ -789,6 +935,15 @@ export const Constants = {
   },
   public: {
     Enums: {
+      achievement_category_enum: [
+        "consumption",
+        "attendance",
+        "explorer",
+        "social",
+        "competitive",
+        "special",
+      ],
+      achievement_rarity_enum: ["common", "rare", "epic", "legendary"],
       festival_status_enum: ["upcoming", "active", "ended"],
       festival_type_enum: [
         "oktoberfest",

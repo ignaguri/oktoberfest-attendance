@@ -1,3 +1,4 @@
+import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
 import ShareAppButton from "@/components/ShareAppButton";
@@ -37,6 +38,7 @@ export default async function Home() {
       <div className="flex flex-col gap-4">
         <MissingFields />
         <Highlights />
+        <AchievementHighlight />
         <MyGroups />
 
         <Separator decorative />
@@ -50,6 +52,13 @@ export default async function Home() {
           </Button>
           <Button asChild variant="default">
             <Link href="/leaderboard">Global Leaderboard</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="border-yellow-400 text-yellow-700 hover:bg-yellow-50"
+          >
+            <Link href="/achievements">🏆 Achievements</Link>
           </Button>
           <MapButton />
           <ShareAppButton />
