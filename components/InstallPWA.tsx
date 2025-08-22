@@ -185,7 +185,9 @@ export default function InstallPWA() {
       }, 700);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "PWA installation failed with an unknown error";
+        error instanceof Error
+          ? error.message
+          : "PWA installation failed with an unknown error";
       trackInstallPWAEvent({
         type: "install_error",
         error: errorMessage,
