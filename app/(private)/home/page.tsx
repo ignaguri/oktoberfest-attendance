@@ -8,9 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "next-view-transitions";
 
 import FestivalStatus from "./FestivalStatus";
 import Highlights from "./Highlights";
@@ -43,23 +41,7 @@ export default async function Home() {
 
         <Separator decorative />
 
-        <div className="flex flex-col gap-2 items-center mt-4">
-          <Button asChild variant="yellow">
-            <Link href="/attendance">My attendances</Link>
-          </Button>
-          <Button asChild variant="darkYellow">
-            <Link href="/groups">Join or Create a group</Link>
-          </Button>
-          <Button asChild variant="default">
-            <Link href="/leaderboard">Global Leaderboard</Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="border-yellow-400 text-yellow-700 hover:bg-yellow-50"
-          >
-            <Link href="/achievements">🏆 Achievements</Link>
-          </Button>
+        <div className="flex flex-col gap-2 items-center">
           <MapButton />
           <ShareAppButton />
         </div>
