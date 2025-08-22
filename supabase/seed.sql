@@ -1,5 +1,11 @@
 BEGIN;
 
+-- Create storage buckets for avatars and beer pictures
+INSERT INTO storage.buckets (id, name, public)
+VALUES
+  ('avatars', 'avatars', true),
+  ('beer_pictures', 'beer_pictures', true);
+
 -- create test users
 INSERT INTO
     auth.users (
@@ -43,13 +49,13 @@ INSERT INTO
             generate_series(1, 10)
     );
 
--- Seed the profiles table using data from auth.users
+-- Seed the profiles table using data from auth.users with improved names
 INSERT INTO profiles (id, updated_at, username, full_name, avatar_url)
 SELECT
     u.id,
     current_timestamp AS updated_at,
     substring(u.email from 1 for position('@' in u.email) - 1) AS username,
-    '' AS full_name,
+    'User ' || (ROW_NUMBER() OVER (ORDER BY u.email) - 1) AS full_name,
     '' AS avatar_url
 FROM auth.users u
 ON CONFLICT (id) DO UPDATE
