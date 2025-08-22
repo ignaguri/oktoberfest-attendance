@@ -28,47 +28,34 @@ export interface MenuSection {
   items: string[];
 }
 
-// Icon components to be used in the menu
-export const menuIcons = {
-  calendar: Calendar,
-  calendarSync: CalendarSync,
-  logOut: LogOut,
-  mapPin: MapPin,
-  medal: Medal,
-  share: Share2,
-  trophy: Trophy,
-  user: User,
-  users: Users,
-};
-
 export const menuItems: MenuItem[] = [
   // Navigation Section
   {
     id: "attendance",
     label: "My Attendances",
     href: "/attendance",
-    icon: "calendar",
+    icon: <Calendar className="h-4 w-4" />,
     section: "navigation",
   },
   {
     id: "groups",
     label: "Groups",
     href: "/groups",
-    icon: "users",
+    icon: <Users className="h-4 w-4" />,
     section: "navigation",
   },
   {
     id: "leaderboard",
     label: "Global Leaderboard",
     href: "/leaderboard",
-    icon: "trophy",
+    icon: <Trophy className="h-4 w-4" />,
     section: "navigation",
   },
   {
     id: "achievements",
     label: "Achievements",
     href: "/achievements",
-    icon: "medal",
+    icon: <Medal className="h-4 w-4" />,
     section: "navigation",
   },
 
@@ -77,20 +64,20 @@ export const menuItems: MenuItem[] = [
     id: "profile",
     label: "Profile Settings",
     href: "/profile",
-    icon: "user",
+    icon: <User className="h-4 w-4" />,
     section: "settings",
   },
   {
     id: "changeFestival",
     label: "Change Festival",
-    icon: "calendarSync",
+    icon: <CalendarSync className="h-4 w-4" />,
     section: "settings",
   },
   {
     id: "map",
     label: "Festival Map",
     href: "https://wiesnmap.muenchen.de",
-    icon: "mapPin",
+    icon: <MapPin className="h-4 w-4" />,
     section: "settings",
   },
 
@@ -98,13 +85,13 @@ export const menuItems: MenuItem[] = [
   {
     id: "share",
     label: "Share App",
-    icon: "share",
+    icon: <Share2 className="h-4 w-4" />,
     section: "actions",
   },
   {
     id: "signout",
     label: "Sign Out",
-    icon: "logOut",
+    icon: <LogOut className="h-4 w-4" />,
     section: "actions",
   },
 ];

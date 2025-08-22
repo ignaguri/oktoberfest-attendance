@@ -29,12 +29,7 @@ import { useState } from "react";
 import type { BadgeProps } from "@/components/ui/badge";
 import type { Festival as FestivalType } from "@/lib/types";
 
-import {
-  menuItems,
-  menuSections,
-  getMenuItemsBySection,
-  menuIcons,
-} from "./menuConfig";
+import { menuItems, menuSections, getMenuItemsBySection } from "./menuConfig";
 import { logout } from "../Auth/actions";
 
 interface UserMenuProps {
@@ -108,13 +103,11 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   const renderMenuItem = (
     item: ReturnType<typeof getMenuItemsWithHandlers>[0],
   ) => {
-    const IconComponent = menuIcons[item.icon as keyof typeof menuIcons];
-
     if (item.href) {
       return (
         <DropdownMenuItem key={item.id} asChild>
           <Link href={item.href} className="flex items-center gap-2">
-            <IconComponent className="h-4 w-4" />
+            {item.icon}
             {item.label}
           </Link>
         </DropdownMenuItem>
@@ -132,7 +125,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
             "text-destructive focus:text-destructive",
         )}
       >
-        <IconComponent className="h-4 w-4" />
+        {item.icon}
         {item.label}
       </DropdownMenuItem>
     );
