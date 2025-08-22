@@ -1,9 +1,7 @@
-import Avatar from "@/components/Avatar/Avatar";
 import { getProfileShortFailsafe } from "@/lib/sharedActions";
 import { Link } from "next-view-transitions";
 
-import SignOut from "./Auth/SignOut";
-import { FestivalSelector } from "./FestivalSelector";
+import { UserMenu } from "./UserMenu/UserMenu";
 
 export default async function Navbar() {
   const profileData = await getProfileShortFailsafe();
@@ -15,32 +13,19 @@ export default async function Navbar() {
           ProstCounter 🍻
         </Link>
 
-        {/* Festival Selector - center area */}
         {profileData && (
-          <div className="hidden sm:block">
-            <FestivalSelector />
+          <div className="flex items-center">
+            <UserMenu
+              profileData={{
+                username: profileData.username,
+                full_name: profileData.full_name,
+                email: profileData.email || "no.name@user.com",
+                avatar_url: profileData.avatar_url,
+              }}
+            />
           </div>
         )}
 
-        {profileData && (
-          <div className="flex gap-2 items-center">
-            {/* Mobile festival selector */}
-            <div className="sm:hidden">
-              <FestivalSelector />
-            </div>
-            <Link href="/profile">
-              <Avatar
-                url={profileData.avatar_url}
-                fallback={{
-                  username: profileData.username,
-                  full_name: profileData.full_name,
-                  email: profileData.email || "no.name@user.com",
-                }}
-              />
-            </Link>
-            <SignOut />
-          </div>
-        )}
         {!profileData && (
           <div className="h-10 flex items-center">
             <Link href="/sign-in" className="text-white">
