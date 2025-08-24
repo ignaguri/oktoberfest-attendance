@@ -76,6 +76,7 @@ const sentryConfig = {
   automaticVercelMonitors: true,
 };
 
+const revision = crypto.randomUUID();
 // Initialize Serwist with configuration
 const withSerwist = withSerwistInit({
   swSrc: "app/sw.ts",
@@ -83,6 +84,7 @@ const withSerwist = withSerwistInit({
   cacheOnNavigation: true,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
+  additionalPrecacheEntries: [{ url: "/~offline", revision }],
 });
 
 // Export the config with Serwist and Sentry wrappers
