@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
     "/manifest.webmanifest",
     "/robots.txt",
     "/sitemap.xml",
+    "/~offline",
   ];
 
   if (request.nextUrl.search.startsWith("?redirectUrl=")) {
