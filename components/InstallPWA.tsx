@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
+import { X, Share, Plus } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -16,7 +16,8 @@ type InstallPWAEvent =
   | { type: "install_success" }
   | { type: "install_dismissed" }
   | { type: "install_error"; error: string }
-  | { type: "prompt_closed_manually" };
+  | { type: "prompt_closed_manually" }
+  | { type: "ios_instructions_shown" };
 
 const MAX_PROMPT_COUNT = 3;
 
@@ -74,6 +75,13 @@ function trackInstallPWAEvent(event: InstallPWAEvent): void {
           event_label: "Prompt Closed Manually",
         });
         break;
+
+      case "ios_instructions_shown":
+        gtag("event", "pwa_ios_instructions_shown", {
+          event_category: "PWA",
+          event_label: "iOS Install Instructions Shown",
+        });
+        break;
     }
   }
 }
@@ -81,22 +89,31 @@ function trackInstallPWAEvent(event: InstallPWAEvent): void {
 function isPWAInstalled(): boolean {
   if (typeof window !== "undefined") {
     if (window.matchMedia("(display-mode: standalone)").matches) {
-      console.debug("PWA already installed");
       return true;
     }
     if (
       "standalone" in window.navigator &&
       (window.navigator as any).standalone === true
     ) {
-      console.debug("PWA already installed");
       return true;
     }
     if (document.referrer.includes("android-app://")) {
-      console.debug("PWA already installed");
       return true;
     }
   }
   return false;
+}
+
+function isIOS(): boolean {
+  if (typeof window === "undefined") return false;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+
+function supportsBeforeInstallPrompt(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    "BeforeInstallPromptEvent" in window || "onbeforeinstallprompt" in window
+  );
 }
 
 export default function InstallPWA() {
@@ -106,17 +123,32 @@ export default function InstallPWA() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [hide, setHide] = useState(false);
+  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  const getPromptCount = useCallback(() => {
+    if (typeof window === "undefined") return 0;
+    const count = localStorage.getItem("pwaPromptCount");
+    return count ? parseInt(count, 10) : 0;
+  }, []);
 
   const incrementPromptCount = useCallback(() => {
-    if (hide || isInstalled) return;
+    if (hide || isInstalled || typeof window === "undefined") return;
 
     const currentCount = getPromptCount();
     if (currentCount < MAX_PROMPT_COUNT) {
       localStorage.setItem("pwaPromptCount", (currentCount + 1).toString());
     }
-  }, [hide, isInstalled]);
+  }, [hide, isInstalled, getPromptCount]);
+
+  // Client-side hydration effect
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
+    if (!isClient) return;
+
     const handler = (e: Event) => {
       const installEvent = e as BeforeInstallPromptEvent;
       installEvent.preventDefault();
@@ -136,20 +168,36 @@ export default function InstallPWA() {
       }
     };
 
-    const promptCount = getPromptCount();
-    if (promptCount < MAX_PROMPT_COUNT) {
-      window.addEventListener("beforeinstallprompt", handler);
-    }
-    console.debug("PWA prompt showed too many times");
+    const checkPWASupport = () => {
+      const promptCount = getPromptCount();
+
+      // Check for iOS devices that support PWA but don't have beforeinstallprompt
+      if (isIOS() && !isPWAInstalled() && promptCount < MAX_PROMPT_COUNT) {
+        setSupportsPWA(true);
+        setShowIOSInstructions(true);
+        setIsOpen(true);
+        incrementPromptCount();
+        trackInstallPWAEvent({ type: "ios_instructions_shown" });
+        return;
+      }
+
+      // Check for browsers that support beforeinstallprompt
+      if (supportsBeforeInstallPrompt() && promptCount < MAX_PROMPT_COUNT) {
+        window.addEventListener("beforeinstallprompt", handler);
+      } else if (promptCount >= MAX_PROMPT_COUNT) {
+        // PWA prompt showed too many times
+      }
+    };
 
     checkInstalled();
+    checkPWASupport();
     window.addEventListener("appinstalled", checkInstalled);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
       window.removeEventListener("appinstalled", checkInstalled);
     };
-  }, [incrementPromptCount]);
+  }, [isClient, incrementPromptCount, getPromptCount]);
 
   const installPWA = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
@@ -173,10 +221,10 @@ export default function InstallPWA() {
 
       if (result.outcome === "accepted") {
         trackInstallPWAEvent({ type: "install_success" });
-        console.debug("PWA install accepted");
+        // PWA install accepted
       } else {
         trackInstallPWAEvent({ type: "install_dismissed" });
-        console.debug("PWA install dismissed");
+        // PWA install dismissed
       }
 
       setIsOpen(false);
@@ -192,7 +240,7 @@ export default function InstallPWA() {
         type: "install_error",
         error: errorMessage,
       });
-      console.error("PWA install failed:", error);
+      // PWA install failed - error logged to analytics
 
       // Still hide the prompt even if install failed
       setIsOpen(false);
@@ -210,20 +258,17 @@ export default function InstallPWA() {
     }, 700);
   };
 
-  const getPromptCount = () => {
-    const count = localStorage.getItem("pwaPromptCount");
-    return count ? parseInt(count, 10) : 0;
-  };
-
   // Check if the prompt should be shown based on the count
   useEffect(() => {
+    if (!isClient) return;
     const currentCount = getPromptCount();
     if (currentCount >= MAX_PROMPT_COUNT) {
       setHide(true); // Hide the prompt if the count exceeds max
     }
-  }, []);
+  }, [isClient, getPromptCount]);
 
-  if (!supportsPWA || isInstalled || hide) {
+  // Don't render anything on server-side or if conditions aren't met
+  if (!isClient || !supportsPWA || isInstalled || hide) {
     return null;
   }
 
@@ -239,19 +284,46 @@ export default function InstallPWA() {
       <div className="m-3 dark:bg-card bg-background border border-border rounded-lg shadow-lg relative">
         <button
           onClick={closePrompt}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
           <X className="w-5 h-5" />
         </button>
         <div className="p-4">
           <h1 className="text-lg font-medium">Install the App</h1>
-          <p className="text-sm text-left text-muted-foreground">
-            You can install this app on your device for a better experience.
-            Click the button below to install.
-          </p>
+          {showIOSInstructions ? (
+            <div className="text-sm text-left text-muted-foreground space-y-3">
+              <p>
+                Install this app on your iOS device for a better experience:
+              </p>
+              <ol className="space-y-2 list-decimal list-inside">
+                <li className="flex items-center gap-2">
+                  <span>Tap the</span>
+                  <Share className="w-4 h-4 inline" />
+                  <span>Share button below</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span>Scroll down and tap</span>
+                  <Plus className="w-4 h-4 inline" />
+                  <span>&ldquo;Add to Home Screen&rdquo;</span>
+                </li>
+                <li>Tap &ldquo;Add&rdquo; to install the app</li>
+              </ol>
+            </div>
+          ) : (
+            <p className="text-sm text-left text-muted-foreground">
+              You can install this app on your device for a better experience.
+              Click the button below to install.
+            </p>
+          )}
         </div>
         <div className="p-4 flex items-center justify-center gap-2 border-t">
-          <Button onClick={installPWA}>Install</Button>
+          {showIOSInstructions ? (
+            <Button onClick={closePrompt} variant="outline">
+              Got it
+            </Button>
+          ) : (
+            <Button onClick={installPWA}>Install</Button>
+          )}
         </div>
       </div>
     </div>
