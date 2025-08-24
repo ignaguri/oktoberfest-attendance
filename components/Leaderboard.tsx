@@ -23,6 +23,7 @@ import type { WinningCriteria } from "@/lib/types";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 
 import Avatar from "./Avatar/Avatar";
+import { ProfilePreview } from "./ui/profile-preview";
 
 type LeaderboardEntry = Views<"leaderboard"> & {
   group_count?: number;
@@ -56,19 +57,31 @@ export const Leaderboard = ({
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Avatar
-            url={row.original.avatar_url}
-            fallback={{
-              username: row.original.username,
-              full_name: row.original.full_name,
-              email: "no.name@email.com",
-            }}
-          />
-          <span className="font-medium">{getDisplayName(row.original)}</span>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const entry = row.original;
+
+        return (
+          <ProfilePreview
+            username={entry.username || "Unknown"}
+            fullName={entry.full_name}
+            avatarUrl={entry.avatar_url}
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Avatar
+                url={entry.avatar_url}
+                fallback={{
+                  username: entry.username,
+                  full_name: entry.full_name,
+                  email: "no.name@email.com",
+                }}
+              />
+              <span className="font-medium line-clamp-2">
+                {getDisplayName(entry)}
+              </span>
+            </div>
+          </ProfilePreview>
+        );
+      },
     },
     {
       accessorKey: "days_attended",

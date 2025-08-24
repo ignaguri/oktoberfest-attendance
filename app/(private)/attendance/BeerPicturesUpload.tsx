@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { PhotoPreview } from "@/components/ui/photo-preview";
 import { useToast } from "@/hooks/use-toast";
 import { beerPicturesSchema } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
@@ -18,8 +19,6 @@ interface BeerPicturesUploadProps {
   onPicturesUpdate: (newUrls: string[]) => void;
 }
 
-const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
-const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const MAX_PICTURES = 10;
 
 const PicturePreview = ({
@@ -63,7 +62,6 @@ export function BeerPicturesUpload({
     useState<string[]>(existingPictureUrls);
 
   const {
-    register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
@@ -157,22 +155,45 @@ export function BeerPicturesUpload({
           </span>
         </div>
       </label>
-      <div className="flex flex-wrap gap-2 justify-center">
-        {allPictureUrls.map((url, index) => (
-          <PicturePreview
-            key={`existing-${index}`}
-            src={`/api/image/${url}?bucket=beer_pictures`}
-            isUploaded
-          />
-        ))}
-        {watchedPictures.map((file, index) => (
-          <PicturePreview
-            key={`new-${index}`}
-            src={URL.createObjectURL(file)}
-            onRemove={() => removePicture(index)}
-          />
-        ))}
-      </div>
+
+      {/* Existing uploaded pictures with preview functionality */}
+      {allPictureUrls.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {allPictureUrls.map((url, index) => (
+              <PhotoPreview
+                key={`existing-${index}`}
+                urls={[url]}
+                size="lg"
+                maxThumbnails={1}
+                className="cursor-pointer hover:scale-105 transition-transform"
+              />
+            ))}
+          </div>
+          <p className="text-xs text-gray-600 text-center">
+            Click on any picture to view full size
+          </p>
+        </div>
+      )}
+
+      {/* New pictures being uploaded */}
+      {watchedPictures.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-gray-600 text-center">
+            New pictures to upload
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {watchedPictures.map((file, index) => (
+              <PicturePreview
+                key={`new-${index}`}
+                src={URL.createObjectURL(file)}
+                onRemove={() => removePicture(index)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {errors.pictures && (
         <span className="error">{errors.pictures.message}</span>
       )}
