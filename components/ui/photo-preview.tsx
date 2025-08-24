@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -39,11 +40,14 @@ export function PhotoPreview({
 
   return (
     <>
-      <div className={`flex items-center gap-1 ${className}`}>
+      <div className={cn("flex items-center gap-1", className)}>
         {displayUrls.map((url, index) => (
           <div
             key={index}
-            className={`relative ${thumbnailSize} cursor-pointer rounded overflow-hidden border border-gray-200 hover:border-yellow-400 transition-colors`}
+            className={cn(
+              "relative cursor-pointer rounded overflow-hidden border border-gray-200 hover:border-yellow-400 transition-colors",
+              thumbnailSize,
+            )}
             onClick={() =>
               setSelectedImage(`/api/image/${url}?bucket=${bucket}`)
             }
@@ -62,7 +66,10 @@ export function PhotoPreview({
         ))}
         {remainingCount > 0 && (
           <div
-            className={`${thumbnailSize} flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-xs font-medium text-gray-600`}
+            className={cn(
+              "flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-xs font-medium text-gray-600",
+              thumbnailSize,
+            )}
           >
             +{remainingCount}
           </div>
