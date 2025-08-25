@@ -62,7 +62,7 @@ export async function GET(
   }
 
   try {
-    const supabase = createClient();
+    const supabase = createClient(true); // Use service role for storage access
 
     const { data, error } = await supabase.storage
       .from(bucket)

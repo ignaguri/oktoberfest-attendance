@@ -3,7 +3,11 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PhotoPreview } from "@/components/ui/photo-preview";
 import { useToast } from "@/hooks/use-toast";
-import { beerPicturesSchema } from "@/lib/schemas/uploads";
+import {
+  beerPicturesSchema,
+  MAX_FILE_SIZE,
+  MAX_PICTURES,
+} from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, X } from "lucide-react";
@@ -18,8 +22,6 @@ interface BeerPicturesUploadProps {
   existingPictureUrls: string[];
   onPicturesUpdate: (newUrls: string[]) => void;
 }
-
-const MAX_PICTURES = 10;
 
 const PicturePreview = ({
   src,
@@ -100,10 +102,14 @@ export function BeerPicturesUpload({
       });
       reset();
     } catch (error) {
+      const fileSizeError =
+        error instanceof Error && error.message.includes("exceeded")
+          ? `File size exceeded (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`
+          : "";
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to upload beer pictures. Please try again.",
+        description: `Failed to upload beer pictures${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
       });
     }
   };
