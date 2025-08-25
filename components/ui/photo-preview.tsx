@@ -48,9 +48,7 @@ export function PhotoPreview({
               "relative cursor-pointer rounded overflow-hidden border border-gray-200 hover:border-yellow-400 transition-colors",
               thumbnailSize,
             )}
-            onClick={() =>
-              setSelectedImage(`/api/image/${url}?bucket=${bucket}`)
-            }
+            onClick={() => setSelectedImage(url)}
           >
             <Image
               src={`/api/image/${url}?bucket=${bucket}`}
@@ -85,7 +83,7 @@ export function PhotoPreview({
           {selectedImage && (
             <div className="relative w-full h-full">
               <Image
-                src={selectedImage}
+                src={`/api/image/${selectedImage}?bucket=${bucket}`}
                 alt="Full size photo"
                 width={1200}
                 height={800}
