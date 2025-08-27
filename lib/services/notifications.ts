@@ -1,6 +1,11 @@
-import { DEFAULT_AVATAR_URL } from "@/lib/constants";
-import { createClient } from "@/utils/supabase/server";
+import {
+  DEFAULT_AVATAR_URL,
+  IS_PROD,
+  PROD_URL,
+  DEV_URL,
+} from "@/lib/constants";
 import { Novu } from "@novu/node";
+import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
 import type { Tables } from "@/lib/database.types";
 
@@ -26,8 +31,12 @@ export class NotificationService {
   private novu: Novu;
 
   constructor() {
-    // Use service role to access all user data for notifications
-    this.supabase = createClient(true);
+    // Use direct service role client to access all user data for notifications
+    // This bypasses any user session cookies that might interfere with service role access
+    this.supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
 
     // Initialize Novu with API key
     const novuApiKey = process.env.NOVU_API_KEY;
@@ -88,11 +97,20 @@ export class NotificationService {
 
       // Prepare notification payload
       const joinerName = newMember.username ?? newMember.full_name ?? "Someone";
-      // Use actual avatar URL if available, otherwise use a default
-      const joinerAvatar =
-        newMember.avatar_url && newMember.avatar_url.trim()
-          ? newMember.avatar_url
-          : DEFAULT_AVATAR_URL;
+      // Construct proper avatar URL - if avatar_url is just a filename, construct the full URL
+      let joinerAvatar = DEFAULT_AVATAR_URL;
+      if (newMember.avatar_url && newMember.avatar_url.trim()) {
+        // Check if it's already a full URL
+        if (
+          newMember.avatar_url.startsWith("http://") ||
+          newMember.avatar_url.startsWith("https://")
+        ) {
+          joinerAvatar = newMember.avatar_url;
+        } else {
+          // It's a filename, construct the full URL
+          joinerAvatar = `${IS_PROD ? PROD_URL : DEV_URL}/api/image/${newMember.avatar_url}`;
+        }
+      }
 
       const payload = {
         joinerName,
@@ -129,7 +147,7 @@ export class NotificationService {
       // Get user info
       const { data: user, error: userError } = await this.supabase
         .from("profiles")
-        .select("username, full_name")
+        .select("username, full_name, avatar_url")
         .eq("id", userId)
         .single();
 
@@ -171,7 +189,9 @@ export class NotificationService {
 
       // Get notification preferences for these members
       const memberIds = groupMembers.map((member) => member.user_id);
-      const { data: preferences, error: prefsError } = await this.supabase
+
+      // Query for members with checkin notifications enabled
+      const { data: membersToNotify, error: prefsError } = await this.supabase
         .from("user_notification_preferences")
         .select("user_id, checkin_enabled, push_enabled")
         .in("user_id", memberIds)
@@ -182,13 +202,26 @@ export class NotificationService {
         return;
       }
 
-      const membersToNotify = preferences || [];
-
-      if (membersToNotify.length === 0) {
+      if (!membersToNotify || membersToNotify.length === 0) {
         return;
       }
 
       const userName = user.username || user.full_name || "Someone";
+
+      // Construct proper avatar URL - if avatar_url is just a filename, construct the full URL
+      let userAvatar = DEFAULT_AVATAR_URL;
+      if (user.avatar_url && user.avatar_url.trim()) {
+        // Check if it's already a full URL
+        if (
+          user.avatar_url.startsWith("http://") ||
+          user.avatar_url.startsWith("https://")
+        ) {
+          userAvatar = user.avatar_url;
+        } else {
+          // It's a filename, construct the full URL
+          userAvatar = `${IS_PROD ? PROD_URL : DEV_URL}/api/image/${user.avatar_url}`;
+        }
+      }
 
       // Send notifications to all eligible members
       const notificationPromises = membersToNotify.map((member) =>
@@ -200,6 +233,7 @@ export class NotificationService {
             userName,
             tentName,
             groupName: groupNamesText,
+            userAvatar,
           },
         }),
       );
@@ -223,7 +257,6 @@ export class NotificationService {
       .single();
 
     if (error) {
-      console.error("Error fetching notification preferences:", error);
       return null;
     }
 
@@ -251,7 +284,6 @@ export class NotificationService {
       });
 
     if (error) {
-      console.error("Error updating notification preferences:", error);
       return false;
     }
 
@@ -269,14 +301,6 @@ export class NotificationService {
     avatar?: string,
   ): Promise<void> {
     try {
-      console.debug("🔗 NotificationService: Identifying user in Novu:", {
-        userId,
-        email: userEmail,
-        firstName,
-        lastName,
-        avatar,
-      });
-
       await this.novu.subscribers.identify(userId, {
         email: userEmail,
         firstName,
