@@ -1,9 +1,25 @@
+import { DEFAULT_AVATAR_URL } from "@/lib/constants";
 import { createClient } from "@/utils/supabase/server";
 import { Novu } from "@novu/node";
 
 import type { Tables } from "@/lib/database.types";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
+
+/**
+ * Notification workflow identifiers
+ * These should match the workflow IDs configured in Novu
+ */
+export const NOTIFICATION_WORKFLOWS = {
+  GROUP_JOIN: "group-join-notification",
+  TENT_CHECKIN: "tent-check-in-notification",
+} as const;
+
+/**
+ * Type for notification workflow IDs
+ */
+export type NotificationWorkflowId =
+  (typeof NOTIFICATION_WORKFLOWS)[keyof typeof NOTIFICATION_WORKFLOWS];
 
 export class NotificationService {
   private supabase;
@@ -76,17 +92,17 @@ export class NotificationService {
       const joinerAvatar =
         newMember.avatar_url && newMember.avatar_url.trim()
           ? newMember.avatar_url
-          : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face";
+          : DEFAULT_AVATAR_URL;
 
       const payload = {
         joinerName,
         groupName: group.name,
         joinerAvatar,
-        groupId: groupId,
+        groupId,
       };
 
       // Trigger Novu workflow
-      const result = await this.novu.trigger("group-join-notification", {
+      await this.novu.trigger(NOTIFICATION_WORKFLOWS.GROUP_JOIN, {
         to: {
           subscriberId: adminId,
         },
@@ -121,6 +137,21 @@ export class NotificationService {
         console.error("Error fetching user:", userError);
         return;
       }
+
+      // Get group names for better notification context
+      const { data: groups, error: groupsError } = await this.supabase
+        .from("groups")
+        .select("name")
+        .in("id", groupIds);
+
+      if (groupsError) {
+        console.error("Error fetching group names:", groupsError);
+        return;
+      }
+
+      const groupNames = groups?.map((g) => g.name).filter(Boolean) || [];
+      const groupNamesText =
+        groupNames.length > 0 ? groupNames.join(", ") : "Group";
 
       // Get all group members (excluding the user who checked in)
       const { data: groupMembers, error: membersError } = await this.supabase
@@ -161,14 +192,14 @@ export class NotificationService {
 
       // Send notifications to all eligible members
       const notificationPromises = membersToNotify.map((member) =>
-        this.novu.trigger("tent-checkin-notification", {
+        this.novu.trigger(NOTIFICATION_WORKFLOWS.TENT_CHECKIN, {
           to: {
             subscriberId: member.user_id!,
           },
           payload: {
             userName,
             tentName,
-            groupName: "Group", // We could fetch actual group names but this is simpler
+            groupName: groupNamesText,
           },
         }),
       );
@@ -238,7 +269,7 @@ export class NotificationService {
     avatar?: string,
   ): Promise<void> {
     try {
-      console.log("🔗 NotificationService: Identifying user in Novu:", {
+      console.debug("🔗 NotificationService: Identifying user in Novu:", {
         userId,
         email: userEmail,
         firstName,
@@ -253,7 +284,11 @@ export class NotificationService {
         avatar,
       });
     } catch (error) {
-      // Silent error handling for user identification
+      console.error(
+        "Error identifying user in Novu:",
+        { userId, email: userEmail, firstName, lastName, avatar },
+        error,
+      );
     }
   }
 

@@ -25,6 +25,8 @@ export function NotificationBell() {
           },
           popoverContent: {
             width: "90dvw",
+            height: "75dvh",
+            transform: "translateX(-8px)",
           },
         },
       }}

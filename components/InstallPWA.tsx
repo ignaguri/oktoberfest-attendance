@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { X, Share, Plus } from "lucide-react";
+import { X, Share, SquarePlus } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -286,25 +286,32 @@ export default function InstallPWA() {
           onClick={closePrompt}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
-          <X className="w-5 h-5" />
+          <X className="size-5" />
         </button>
         <div className="p-4">
           <h1 className="text-lg font-medium">Install the App</h1>
           {showIOSInstructions ? (
-            <div className="text-sm text-left text-muted-foreground space-y-3">
+            <div className="text-sm text-left text-muted-foreground flex flex-col gap-3">
               <p>
-                Install this app on your iOS device for a better experience:
+                Install this app on your iOS device for a better experience
+                (must be done in <span className="font-bold">Safari</span>):
               </p>
-              <ol className="space-y-2 list-decimal list-inside">
-                <li className="flex items-center gap-2">
-                  <span>Tap the</span>
-                  <Share className="w-4 h-4 inline" />
-                  <span>Share button below</span>
+              <ol className="flex flex-col gap-2 list-decimal pl-4">
+                <li>
+                  <div className="flex items-center gap-2">
+                    <span>Tap the</span>
+                    <Share className="size-4" />
+                    <span>Share button below</span>
+                  </div>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span>Scroll down and tap</span>
-                  <Plus className="w-4 h-4 inline" />
-                  <span>&ldquo;Add to Home Screen&rdquo;</span>
+                <li>
+                  <div className="flex flex-col gap-2">
+                    <span>Scroll down and tap</span>
+                    <span className="flex items-center gap-2">
+                      <span>&ldquo;Add to Home Screen&rdquo;</span>
+                      <SquarePlus className="size-4" />
+                    </span>
+                  </div>
                 </li>
                 <li>Tap &ldquo;Add&rdquo; to install the app</li>
               </ol>

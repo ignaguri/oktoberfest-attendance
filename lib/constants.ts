@@ -16,3 +16,7 @@ export const IS_PROD = process.env.NODE_ENV === "production";
 export const TIMEZONE = "Europe/Berlin";
 
 export const NO_ROWS_ERROR = "PGRST116";
+
+// Default avatar URL for users without profile pictures
+export const DEFAULT_AVATAR_URL =
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face";

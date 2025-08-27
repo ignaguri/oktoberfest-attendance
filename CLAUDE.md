@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ProstCounter is a Next.js PWA for tracking Oktoberfest attendance. Users log daily beer consumption, participate in group competitions, and view leaderboards. **✅ Multi-festival support** is now fully implemented (2024 + 2025 Oktoberfest). **Current focus**: Implement **gamification features** with achievements system.
+ProstCounter is a Next.js PWA for tracking Oktoberfest and other beer festivals attendance. Users log daily beer consumption, participate in group competitions, view leaderboards, and earn achievements.
 
 ## Development Commands
 
