@@ -27,20 +27,11 @@ export async function joinGroupWithToken(formData: { token: string }) {
     throw new Error("Error joining group with token");
   }
 
-  // Trigger notification to group admin
-  console.log(
-    "🚀 JoinGroupAPI: Attempting to send notification for group join",
-    { groupId, userId: user.id },
-  );
   try {
     const notificationService = createNotificationService();
     await notificationService.notifyGroupJoin(groupId, user.id);
-    console.log("✅ JoinGroupAPI: Notification service call completed");
   } catch (notificationError) {
-    console.error(
-      "💥 JoinGroupAPI: Failed to send join notification:",
-      notificationError,
-    );
+    console.error("Failed to send join notification:", notificationError);
     // Don't fail the join operation if notification fails
   }
 

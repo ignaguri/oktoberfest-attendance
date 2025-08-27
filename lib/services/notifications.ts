@@ -4,10 +4,15 @@ import {
   PROD_URL,
   DEV_URL,
 } from "@/lib/constants";
+import {
+  reportNotificationException,
+  reportSupabaseException,
+} from "@/utils/sentry";
 import { Novu } from "@novu/node";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
 import type { Tables } from "@/lib/database.types";
+import type { PostgrestError } from "@supabase/supabase-js";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
 
@@ -36,6 +41,13 @@ export class NotificationService {
     this.supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      },
     );
 
     // Initialize Novu with API key
@@ -127,7 +139,7 @@ export class NotificationService {
         payload,
       });
     } catch (error) {
-      console.error("Error sending group join notification:", error);
+      reportNotificationException("notifyGroupJoin", error as Error);
     }
   }
 
@@ -152,7 +164,10 @@ export class NotificationService {
         .single();
 
       if (userError || !user) {
-        console.error("Error fetching user:", userError);
+        reportSupabaseException(
+          "notifyTentCheckin",
+          userError as PostgrestError,
+        );
         return;
       }
 
@@ -163,7 +178,10 @@ export class NotificationService {
         .in("id", groupIds);
 
       if (groupsError) {
-        console.error("Error fetching group names:", groupsError);
+        reportSupabaseException(
+          "notifyTentCheckin",
+          groupsError as PostgrestError,
+        );
         return;
       }
 
@@ -179,7 +197,10 @@ export class NotificationService {
         .neq("user_id", userId);
 
       if (membersError) {
-        console.error("Error fetching group members:", membersError);
+        reportSupabaseException(
+          "notifyTentCheckin",
+          membersError as PostgrestError,
+        );
         return;
       }
 
@@ -198,7 +219,10 @@ export class NotificationService {
         .eq("checkin_enabled", true);
 
       if (prefsError) {
-        console.error("Error fetching member preferences:", prefsError);
+        reportSupabaseException(
+          "notifyTentCheckin",
+          prefsError as PostgrestError,
+        );
         return;
       }
 
@@ -240,7 +264,7 @@ export class NotificationService {
 
       await Promise.allSettled(notificationPromises);
     } catch (error) {
-      console.error("Error sending tent checkin notifications:", error);
+      reportNotificationException("notifyTentCheckin", error as Error);
     }
   }
 
@@ -308,11 +332,10 @@ export class NotificationService {
         avatar,
       });
     } catch (error) {
-      console.error(
-        "Error identifying user in Novu:",
-        { userId, email: userEmail, firstName, lastName, avatar },
-        error,
-      );
+      reportNotificationException("subscribeUser", error as Error, {
+        id: userId,
+        email: userEmail,
+      });
     }
   }
 
@@ -326,6 +349,9 @@ export class NotificationService {
       });
       return true;
     } catch (error) {
+      reportNotificationException("registerFCMToken", error as Error, {
+        id: userId,
+      });
       return false;
     }
   }
@@ -341,6 +367,9 @@ export class NotificationService {
       });
       return true;
     } catch (error) {
+      reportNotificationException("updateFCMTokens", error as Error, {
+        id: userId,
+      });
       return false;
     }
   }

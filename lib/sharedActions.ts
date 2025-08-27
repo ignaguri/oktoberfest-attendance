@@ -1,6 +1,10 @@
 "use server";
 
-import { reportLog, reportSupabaseException } from "@/utils/sentry";
+import {
+  reportLog,
+  reportNotificationException,
+  reportSupabaseException,
+} from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import * as Sentry from "@sentry/nextjs";
@@ -302,10 +306,10 @@ export async function addAttendance(formData: {
         );
       }
     } catch (notificationError) {
-      console.error(
-        "Failed to send tent check-in notification:",
-        notificationError,
-      );
+      reportNotificationException("addAttendance", notificationError as Error, {
+        id: user.id,
+        email: user.email,
+      });
       // Don't fail the attendance operation if notification fails
     }
   }

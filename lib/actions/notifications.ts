@@ -2,6 +2,7 @@
 
 import { createNotificationService } from "@/lib/services/notifications";
 import { getProfileShort, getUser } from "@/lib/sharedActions";
+import { reportNotificationException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 import "server-only";
@@ -13,8 +14,8 @@ export async function syncUserWithNovu(): Promise<{
   success: boolean;
   error?: string;
 }> {
+  const user = await getUser();
   try {
-    const user = await getUser();
     const profile = await getProfileShort();
 
     const notificationService = createNotificationService();
@@ -28,7 +29,10 @@ export async function syncUserWithNovu(): Promise<{
 
     return { success: true };
   } catch (error) {
-    console.error("Failed to sync user with Novu:", error);
+    reportNotificationException("syncUserWithNovu", error as Error, {
+      id: user.id,
+      email: user.email,
+    });
     return { success: false, error: "Failed to sync user" };
   }
 }
@@ -37,8 +41,8 @@ export async function syncUserWithNovu(): Promise<{
  * Get user notification preferences
  */
 export async function getUserNotificationPreferences() {
+  const user = await getUser();
   try {
-    const user = await getUser();
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -48,13 +52,27 @@ export async function getUserNotificationPreferences() {
       .single();
 
     if (error) {
-      console.error("Error loading notification preferences:", error);
+      reportNotificationException(
+        "getUserNotificationPreferences",
+        error as Error,
+        {
+          id: user.id,
+          email: user.email,
+        },
+      );
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error("Error loading preferences:", error);
+    reportNotificationException(
+      "getUserNotificationPreferences",
+      error as Error,
+      {
+        id: user.id,
+        email: user.email,
+      },
+    );
     return null;
   }
 }
@@ -67,8 +85,8 @@ export async function updateUserNotificationPreferences(updates: {
   checkin_enabled?: boolean | null;
   push_enabled?: boolean | null;
 }) {
+  const user = await getUser();
   try {
-    const user = await getUser();
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -87,13 +105,27 @@ export async function updateUserNotificationPreferences(updates: {
       .single();
 
     if (error) {
-      console.error("Error updating preferences:", error);
+      reportNotificationException(
+        "updateUserNotificationPreferences",
+        error as Error,
+        {
+          id: user.id,
+          email: user.email,
+        },
+      );
       throw new Error("Failed to update preferences");
     }
 
     return data;
   } catch (error) {
-    console.error("Failed to update preferences:", error);
+    reportNotificationException(
+      "updateUserNotificationPreferences",
+      error as Error,
+      {
+        id: user.id,
+        email: user.email,
+      },
+    );
     throw error;
   }
 }
@@ -102,13 +134,12 @@ export async function registerFCMToken(token: string): Promise<{
   success: boolean;
   error?: string;
 }> {
+  const user = await getUser();
+  if (!user || !user.id) {
+    return { success: false, error: "User not authenticated" };
+  }
+
   try {
-    const user = await getUser();
-
-    if (!user || !user.id) {
-      return { success: false, error: "User not authenticated" };
-    }
-
     const notificationService = createNotificationService();
     const success = await notificationService.registerFCMToken(user.id, token);
 
@@ -117,14 +148,20 @@ export async function registerFCMToken(token: string): Promise<{
       try {
         await updateUserNotificationPreferences({ push_enabled: true });
       } catch (error) {
-        console.error("Failed to update push preference:", error);
+        reportNotificationException("registerFCMToken", error as Error, {
+          id: user.id,
+          email: user.email,
+        });
         // Don't fail the entire operation if preference update fails
       }
     }
 
     return { success };
   } catch (error) {
-    console.error("Failed to register FCM token:", error);
+    reportNotificationException("registerFCMToken", error as Error, {
+      id: user.id,
+      email: user.email,
+    });
     return { success: false, error: "Failed to register token" };
   }
 }
@@ -133,19 +170,21 @@ export async function updateFCMTokens(tokens: string[]): Promise<{
   success: boolean;
   error?: string;
 }> {
+  const user = await getUser();
+  if (!user || !user.id) {
+    return { success: false, error: "User not authenticated" };
+  }
+
   try {
-    const user = await getUser();
-
-    if (!user || !user.id) {
-      return { success: false, error: "User not authenticated" };
-    }
-
     const notificationService = createNotificationService();
     const success = await notificationService.updateFCMTokens(user.id, tokens);
 
     return { success };
   } catch (error) {
-    console.error("Failed to update FCM tokens:", error);
+    reportNotificationException("updateFCMTokens", error as Error, {
+      id: user.id,
+      email: user.email,
+    });
     return { success: false, error: "Failed to update tokens" };
   }
 }

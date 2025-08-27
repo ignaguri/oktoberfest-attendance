@@ -7,7 +7,6 @@ import {
   registerFCMToken,
 } from "@/lib/actions/notifications";
 import { getFCMToken, onMessageListener } from "@/lib/firebase";
-import { getUser } from "@/lib/sharedActions";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import {
   createContext,
@@ -72,7 +71,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function getCurrentUser() {
       try {
-        const user = await getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
         console.error("Failed to get user:", error);
