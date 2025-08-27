@@ -1,5 +1,6 @@
 "use server";
 
+import { createNotificationService } from "@/lib/services/notifications";
 import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
@@ -24,6 +25,14 @@ export async function joinGroupWithToken(formData: { token: string }) {
       });
     }
     throw new Error("Error joining group with token");
+  }
+
+  try {
+    const notificationService = createNotificationService();
+    await notificationService.notifyGroupJoin(groupId, user.id);
+  } catch (notificationError) {
+    console.error("Failed to send join notification:", notificationError);
+    // Don't fail the join operation if notification fails
   }
 
   revalidatePath("/groups");

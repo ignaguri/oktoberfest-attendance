@@ -1,6 +1,10 @@
 "use server";
 
-import { reportLog, reportSupabaseException } from "@/utils/sentry";
+import {
+  reportLog,
+  reportNotificationException,
+  reportSupabaseException,
+} from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import * as Sentry from "@sentry/nextjs";
@@ -13,6 +17,7 @@ import type { Tables } from "@/lib/database.types";
 import type { User } from "@supabase/supabase-js";
 
 import { NO_ROWS_ERROR, TIMEZONE } from "./constants";
+import { createNotificationService } from "./services/notifications";
 
 import "server-only";
 
@@ -261,6 +266,53 @@ export async function addAttendance(formData: {
   }
 
   const attendanceId = attendanceData as string;
+
+  // Trigger tent check-in notifications if user visited tents
+  if (tents.length > 0) {
+    try {
+      // Get user's group memberships for this festival
+      const { data: groupMemberships, error: groupError } = await supabase
+        .from("group_members")
+        .select(
+          `
+          group_id,
+          groups!inner(festival_id)
+        `,
+        )
+        .eq("user_id", user.id)
+        .eq("groups.festival_id", festivalId);
+
+      if (!groupError && groupMemberships && groupMemberships.length > 0) {
+        // Get tent names for better notifications
+        const { data: tentData } = await supabase
+          .from("tents")
+          .select("id, name")
+          .in("id", tents);
+
+        const tentNames =
+          tentData
+            ?.map((tent) => tent.name)
+            .filter((name) => name)
+            .join(", ") || "Multiple tents";
+        const groupIds = groupMemberships
+          .map((membership) => membership.group_id)
+          .filter((id): id is string => id !== null);
+
+        const notificationService = createNotificationService();
+        await notificationService.notifyTentCheckin(
+          user.id,
+          tentNames,
+          groupIds,
+        );
+      }
+    } catch (notificationError) {
+      reportNotificationException("addAttendance", notificationError as Error, {
+        id: user.id,
+        email: user.email,
+      });
+      // Don't fail the attendance operation if notification fails
+    }
+  }
 
   revalidatePath("/attendance");
   revalidatePath("/home");

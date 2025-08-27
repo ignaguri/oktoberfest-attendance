@@ -49,3 +49,6 @@ WARP.md
 
 # Claude MCP configuration
 .mcp.json
+
+# Firebase certificates
+*firebase-*.json

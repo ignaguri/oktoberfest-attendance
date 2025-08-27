@@ -1,6 +1,7 @@
 "use client";
 
 import Avatar from "@/components/Avatar/Avatar";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { profileSchema } from "@/lib/schemas/profile";
@@ -82,8 +83,9 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
   };
 
   return (
-    <div className="card">
-      <h3 className="py-2 text-3xl font-black text-gray-800">Your Profile</h3>
+    <div className="flex flex-col gap-6">
+      <div className="card">
+        <h3 className="py-2 text-3xl font-black text-gray-800">Your Profile</h3>
       <Avatar
         className="flex flex-col items-center mb-4"
         isEditing={isEditing}
@@ -213,6 +215,9 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
           </Button>
         </div>
       )}
+      </div>
+      
+      <NotificationSettings />
     </div>
   );
 }
