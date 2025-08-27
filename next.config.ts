@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
       {
         pathname: "/api/image/**",
       },
+      {
+        pathname: "/**",
+      },
     ],
   },
   webpack: (config, { isServer }) => {

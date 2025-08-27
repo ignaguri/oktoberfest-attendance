@@ -102,9 +102,11 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@firebase/util",
       "@sentry/cli",
       "@tailwindcss/oxide",
       "@vercel/speed-insights",
+      "protobufjs",
       "sharp",
       "supabase",
       "unrs-resolver"

@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#ffffff",
-    theme_color: "#ffffff",
+    background_color: "#F59E0B",
+    theme_color: "#FBBF24",
     lang: "en-US",
     scope: "/",
     icons: [
@@ -29,6 +29,11 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         src: "/apple-touch-icon.png",
         sizes: "180x180",
+        type: "image/png",
+      },
+      {
+        src: "/favicon-96x96.png",
+        sizes: "96x96",
         type: "image/png",
       },
       {
