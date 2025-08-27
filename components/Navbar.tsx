@@ -1,6 +1,7 @@
 import { getProfileShortFailsafe } from "@/lib/sharedActions";
 import { Link } from "next-view-transitions";
 
+import { NotificationBell } from "./NotificationBell";
 import { UserMenu } from "./UserMenu/UserMenu";
 
 export default async function Navbar() {
@@ -14,7 +15,8 @@ export default async function Navbar() {
         </Link>
 
         {profileData && (
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <NotificationBell />
             <UserMenu
               profileData={{
                 username: profileData.username,

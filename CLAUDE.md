@@ -39,6 +39,7 @@ Seed data creates users `user1@example.com` through `user10@example.com` with pa
 - **Backend**: Supabase (auth, database, storage)
 - **UI**: Tailwind CSS, Radix UI, shadcn/ui components
 - **PWA**: serwist with service worker caching
+- **Push Notifications**: Novu + Firebase FCM integration
 - **Monitoring**: Sentry error tracking
 - **Package Manager**: pnpm
 
@@ -65,6 +66,7 @@ app/
 - **groups**: Competition groups with invite tokens
 - **group_members**: User-group relationships
 - **profiles**: User metadata (username, full_name, avatar)
+- **user_notification_preferences**: Push notification settings per user
 
 ### Key Business Logic
 
@@ -180,6 +182,20 @@ interface UserAchievement {
 - **Leaderboard integration** with achievement points
 - **Achievement gallery** showing locked/unlocked status
 
+## ✅ Push Notifications System (COMPLETED)
+
+### Novu + Firebase FCM Integration
+
+ProstCounter uses Novu for push notification orchestration with Firebase Cloud Messaging (FCM) for delivery. This provides cross-platform push notifications for group interactions and tent activities.
+
+### Architecture
+
+- **Novu**: Notification workflow orchestration and user management
+- **Firebase FCM**: Cross-platform push notification delivery
+- **Service Workers**: Background message handling (`/public/firebase-messaging-sw.js` + `/app/sw.ts`)
+- **NotificationContext**: React context for notification state and permission management
+- **Server Actions**: `lib/actions/notifications.ts` for FCM token registration
+
 ## Important Patterns
 
 ### Authentication Flow
@@ -241,15 +257,17 @@ interface UserAchievement {
 5. **✅ Form System Migration**: COMPLETED - All forms migrated from Formik+Yup to React Hook Form+Zod
 6. **✅ Hardcoded Constants Migration**: COMPLETED - All festival constants now dynamic from database
 7. **✅ Achievement System**: COMPLETED - Full gamification system with progress tracking and automatic evaluation
+8. **✅ Push Notifications**: COMPLETED - Novu integration with FCM for group join and tent check-in notifications
 
 ## Next Steps / Future Enhancements
 
 ### UI/UX Improvements
+
 1. **✅📸 Photo Gallery Integration**: COMPLETED - Same preview functionality added to pics from gallery in the attendance table
 2. **✅ Empty state for Photo gallery**: COMPLETED - Empty state for photo gallery implemented
 3. **✅👤 Profile Quick Preview**: COMPLETED - Quick preview of someone else's profile from group interface
 
-### Technical Improvements  
+### Technical Improvements
+
 1. **⚠️ Server Error Handling** - Properly handle server errors using Next.js error handling patterns
    - Reference: https://nextjs.org/docs/app/building-your-application/routing/error-handling#handling-expected-errors-from-server-actions
-2. **📱 Push Notifications** - Add push notifications using Novu integration

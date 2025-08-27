@@ -446,6 +446,33 @@ export type Database = {
           },
         ];
       };
+      system_settings: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          key: string;
+          updated_at: string;
+          value: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          key: string;
+          updated_at?: string;
+          value: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          key?: string;
+          updated_at?: string;
+          value?: string;
+        };
+        Relationships: [];
+      };
       tent_visits: {
         Row: {
           festival_id: string;
@@ -548,6 +575,44 @@ export type Database = {
             columns: ["festival_id"];
             isOneToOne: false;
             referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_notification_preferences: {
+        Row: {
+          checkin_enabled: boolean | null;
+          created_at: string | null;
+          group_join_enabled: boolean | null;
+          id: string;
+          push_enabled: boolean | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          checkin_enabled?: boolean | null;
+          created_at?: string | null;
+          group_join_enabled?: boolean | null;
+          id?: string;
+          push_enabled?: boolean | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          checkin_enabled?: boolean | null;
+          created_at?: string | null;
+          group_join_enabled?: boolean | null;
+          id?: string;
+          push_enabled?: boolean | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_notification_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -678,6 +743,14 @@ export type Database = {
           username: string;
         }[];
       };
+      get_active_schema: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
+      get_current_schema: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
       get_global_leaderboard: {
         Args: { p_festival_id?: string; p_winning_criteria_id: number };
         Returns: {
@@ -777,6 +850,14 @@ export type Database = {
       renew_group_token: {
         Args: { p_group_id: string };
         Returns: string;
+      };
+      switch_to_production_schema: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      switch_to_testing_schema: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
       unlock_achievement: {
         Args: {

@@ -6,6 +6,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Toaster } from "@/components/ui/toaster";
 import { FestivalProvider } from "@/contexts/FestivalContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/version";
@@ -110,7 +111,9 @@ export default async function RootLayout({
         <body className="bg-slate-50">
           {isLoggedIn ? (
             <FestivalProvider>
-              <AppContent />
+              <NotificationProvider>
+                <AppContent />
+              </NotificationProvider>
             </FestivalProvider>
           ) : (
             <AppContent />

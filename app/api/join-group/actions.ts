@@ -1,5 +1,6 @@
 "use server";
 
+import { createNotificationService } from "@/lib/services/notifications";
 import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
@@ -24,6 +25,23 @@ export async function joinGroupWithToken(formData: { token: string }) {
       });
     }
     throw new Error("Error joining group with token");
+  }
+
+  // Trigger notification to group admin
+  console.log(
+    "🚀 JoinGroupAPI: Attempting to send notification for group join",
+    { groupId, userId: user.id },
+  );
+  try {
+    const notificationService = createNotificationService();
+    await notificationService.notifyGroupJoin(groupId, user.id);
+    console.log("✅ JoinGroupAPI: Notification service call completed");
+  } catch (notificationError) {
+    console.error(
+      "💥 JoinGroupAPI: Failed to send join notification:",
+      notificationError,
+    );
+    // Don't fail the join operation if notification fails
   }
 
   revalidatePath("/groups");
