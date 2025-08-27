@@ -1,6 +1,6 @@
 -- Create user notification preferences table
 CREATE TABLE user_notification_preferences (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   group_join_enabled BOOLEAN DEFAULT true,
   checkin_enabled BOOLEAN DEFAULT true,

@@ -16,10 +16,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { APP_VERSION } from "@/version";
 import { useState, useEffect } from "react";
 
 export function WhatsNew() {
+  const { setWhatsNewVisible, canShowWhatsNew } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedVersions, setExpandedVersions] = useState<string[]>([]);
 
@@ -28,14 +30,43 @@ export function WhatsNew() {
     const currentVersion = localStorage.getItem("appVersion");
 
     if (currentVersion !== APP_VERSION || lastSeenVersion !== APP_VERSION) {
-      setIsOpen(true);
-      localStorage.setItem("lastSeenVersion", APP_VERSION);
-      localStorage.setItem("appVersion", APP_VERSION);
+      // Add a small delay to give InstallPWA priority on initial load
+      const timer = setTimeout(() => {
+        // Only show if we can show WhatsNew (not conflicting with InstallPWA)
+        if (canShowWhatsNew) {
+          setIsOpen(true);
+          setWhatsNewVisible(true);
+          localStorage.setItem("lastSeenVersion", APP_VERSION);
+          localStorage.setItem("appVersion", APP_VERSION);
+        } else {
+          // If we can't show now, set up a retry mechanism
+          const retryTimer = setInterval(() => {
+            if (canShowWhatsNew) {
+              setIsOpen(true);
+              setWhatsNewVisible(true);
+              localStorage.setItem("lastSeenVersion", APP_VERSION);
+              localStorage.setItem("appVersion", APP_VERSION);
+              clearInterval(retryTimer);
+            }
+          }, 500); // Check every 500ms
+
+          // Clean up retry timer after 10 seconds
+          setTimeout(() => clearInterval(retryTimer), 10000);
+        }
+      }, 1000); // 1 second delay
+
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [canShowWhatsNew, setWhatsNewVisible]);
 
   const handleClose = () => {
     setIsOpen(false);
+    setWhatsNewVisible(false);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    setWhatsNewVisible(open);
   };
 
   const toggleVersion = (version: string) => {
@@ -56,7 +87,7 @@ export function WhatsNew() {
     .slice(0, 2); // Only take the two versions before the current one
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>What&apos;s New in v{APP_VERSION}</DialogTitle>

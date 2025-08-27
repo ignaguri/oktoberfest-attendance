@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { APP_VERSION } from "../version";
 
+// TODO: evaluate, because it's not working as expected
 export function VersionChecker() {
   const [newVersionAvailable, setNewVersionAvailable] = useState(false);
   const { toast } = useToast();
