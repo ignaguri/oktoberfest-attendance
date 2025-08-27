@@ -244,7 +244,7 @@ export function NotificationSettings() {
                   variant="yellow"
                   size="sm"
                   onClick={testNotification}
-                  disabled={isUpdating || !(preferences.push_enabled ?? false)}
+                  disabled={isUpdating || !preferences.push_enabled}
                   className="text-xs"
                 >
                   Test notification
