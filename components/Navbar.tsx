@@ -11,7 +11,7 @@ export default async function Navbar() {
     <nav className="w-full bg-gray-800 shadow-sm">
       <div className="justify-between items-center flex px-4 sm:px-8 py-2 sm:py-4">
         <Link className="text-base sm:text-xl text-white font-bold" href="/">
-          ProstCounter 🍻
+          <span translate="no">ProstCounter</span> 🍻
         </Link>
 
         {profileData && (

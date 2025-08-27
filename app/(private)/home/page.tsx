@@ -28,8 +28,12 @@ export default async function Home() {
           className="inline-block size-20 sm:size-24"
         />
         <h1 className="mb-6 text-4xl font-bold sm:text-5xl">
-          <span className="font-extrabold text-yellow-600">Prost</span>
-          <span className="font-extrabold text-yellow-500">Counter</span>
+          <span className="font-extrabold text-yellow-600" translate="no">
+            Prost
+          </span>
+          <span className="font-extrabold text-yellow-500" translate="no">
+            Counter
+          </span>
         </h1>
       </header>
 
