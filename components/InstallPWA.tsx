@@ -2,7 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
-import { cn } from "@/lib/utils";
+import {
+  cn,
+  isPWAInstalled,
+  isIOS,
+  supportsBeforeInstallPrompt,
+} from "@/lib/utils";
 import { X, Share, SquarePlus } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
@@ -85,36 +90,6 @@ function trackInstallPWAEvent(event: InstallPWAEvent): void {
         break;
     }
   }
-}
-
-function isPWAInstalled(): boolean {
-  if (typeof window !== "undefined") {
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      return true;
-    }
-    if (
-      "standalone" in window.navigator &&
-      (window.navigator as any).standalone === true
-    ) {
-      return true;
-    }
-    if (document.referrer.includes("android-app://")) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isIOS(): boolean {
-  if (typeof window === "undefined") return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-
-function supportsBeforeInstallPrompt(): boolean {
-  if (typeof window === "undefined") return false;
-  return (
-    "BeforeInstallPromptEvent" in window || "onbeforeinstallprompt" in window
-  );
 }
 
 export default function InstallPWA() {

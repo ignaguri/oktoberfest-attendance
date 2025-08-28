@@ -1,6 +1,8 @@
 import { defaultCache } from "@serwist/next/worker";
 import { Serwist } from "serwist";
+import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from "serwist";
 
+import type { RuntimeCaching } from "serwist";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 
 // This declares the value of `injectionPoint` to TypeScript.
@@ -15,12 +17,73 @@ declare global {
 
 declare const self: WorkerGlobalScope;
 
+// Custom caching strategies optimized for PWA performance
+const customRuntimeCaching: RuntimeCaching[] = [
+  // Image API routes - Cache First for better iOS performance
+  {
+    matcher: ({ url }) => url.pathname.startsWith("/api/image/"),
+    handler: new CacheFirst({
+      cacheName: "user-uploaded-images",
+      plugins: [
+        {
+          cacheKeyWillBeUsed: async ({ request }) => {
+            // Include bucket parameter in cache key
+            return request.url;
+          },
+          cacheWillUpdate: async ({ response }) => {
+            // Only cache successful responses
+            return response && response.status === 200 ? response : null;
+          },
+        },
+      ],
+    }),
+  },
+  // Static images (avatars, icons) - Cache First with longer expiration
+  {
+    matcher: ({ request }) =>
+      request.destination === "image" &&
+      (request.url.includes("/images/") || request.url.includes("/icons/")),
+    handler: new CacheFirst({
+      cacheName: "static-image-assets",
+    }),
+  },
+  // Supabase storage images - Cache First for performance
+  {
+    matcher: ({ url }) => url.hostname.includes("supabase"),
+    handler: new CacheFirst({
+      cacheName: "supabase-storage",
+    }),
+  },
+  // API routes - Network First for fresh data
+  {
+    matcher: ({ url }) =>
+      url.pathname.startsWith("/api/") &&
+      !url.pathname.startsWith("/api/image/"),
+    handler: new NetworkFirst({
+      cacheName: "api-cache",
+      networkTimeoutSeconds: 3,
+    }),
+  },
+  // Static assets (CSS, JS) - Stale While Revalidate
+  {
+    matcher: ({ request }) =>
+      request.destination === "style" ||
+      request.destination === "script" ||
+      request.destination === "worker",
+    handler: new StaleWhileRevalidate({
+      cacheName: "static-assets",
+    }),
+  },
+  // Default cache strategy for other requests
+  ...defaultCache,
+];
+
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: customRuntimeCaching,
   fallbacks: {
     entries: [
       {
