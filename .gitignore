@@ -52,3 +52,7 @@ WARP.md
 
 # Firebase certificates
 *firebase-*.json
+
+# Performance testing generated files
+/performance-tests/dist/
+/performance-tests/reports/

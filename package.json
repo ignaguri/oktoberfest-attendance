@@ -16,7 +16,14 @@
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
     "sup:restart": "supabase stop && supabase start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "perf:build": "cd performance-tests && tsc",
+    "perf:test": "pnpm perf:build && node performance-tests/dist/run-tests.js",
+    "perf:public": "pnpm perf:build && node performance-tests/dist/run-tests.js public",
+    "perf:auth": "pnpm perf:build && node performance-tests/dist/run-tests.js auth",
+    "perf:mobile": "pnpm perf:build && node performance-tests/dist/run-tests.js mobile",
+    "perf:report": "open performance-tests/reports/index.html",
+    "perf:watch": "nodemon --ext ts --watch performance-tests --exec \"pnpm perf:test\""
   },
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
@@ -79,6 +86,7 @@
     "@next/eslint-plugin-next": "15.5.2",
     "@tailwindcss/forms": "0.5.10",
     "@tailwindcss/postcss": "^4.1.12",
+    "@types/puppeteer": "^7.0.4",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "8.41.0",
     "eslint": "9.34.0",
@@ -88,11 +96,15 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unused-imports": "4.2.0",
+    "lighthouse": "^12.8.2",
+    "nodemon": "^3.1.10",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
+    "puppeteer": "^24.17.1",
     "supabase": "2.39.2",
     "tailwindcss": "4.1.12",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.5",
     "typescript": "5.9.2",
     "typescript-eslint": "^8.41.0"
   },
@@ -109,6 +121,9 @@
       "sharp",
       "supabase",
       "unrs-resolver"
+    ],
+    "ignoredBuiltDependencies": [
+      "puppeteer"
     ]
   },
   "packageManager": "pnpm@10.14.0"
