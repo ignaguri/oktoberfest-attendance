@@ -1,56 +1,161 @@
-<html>
-  <body
-    style="
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-    "
-  >
-    <div
-      style="
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to ProstCounter</title>
+</head>
+
+<body style="
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+">
+  <div style="
         max-width: 600px;
         margin: 0 auto;
-        padding: 20px;
         background-color: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-      "
-    >
-      <div style="text-align: center; padding-bottom: 20px">
-        <h2 style="color: #333333">Thank you for joining ProstCounter! 🍻</h2>
-      </div>
-      <div style="font-size: 16px; line-height: 1.6; color: #333333">
-        <h3>Confirm your signup</h3>
-        <p>Follow the link below to confirm your user:</p>
-        <a
-          href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup"
-          style="
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #facc15;
-            color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    ">
+    <!-- Header with Logo -->
+    <div style="
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+            padding: 40px 20px;
             text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-          "
-          >Confirm your mail</a
-        >
+        ">
+      <img src="{{ .SiteURL }}/android-chrome-512x512.png" alt="ProstCounter Logo"
+        style="width: 80px; height: 80px; margin-bottom: 20px; border-radius: 16px;" />
+      <h1 style="
+                color: #ffffff;
+                margin: 0;
+                font-size: 28px;
+                font-weight: bold;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            ">
+        Welcome to ProstCounter!
+      </h1>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding: 40px 30px;">
+      <h2 style="
+                color: #1f2937;
+                margin: 0 0 20px 0;
+                font-size: 24px;
+                font-weight: 600;
+            ">
+        Confirm your signup
+      </h2>
+
+      <p style="
+                color: #4b5563;
+                margin: 0 0 15px 0;
+                font-size: 16px;
+                line-height: 1.6;
+            ">
+        Hi there! We're excited to have you join ProstCounter.
+      </p>
+
+      <p style="
+                color: #4b5563;
+                margin: 0 0 30px 0;
+                font-size: 16px;
+                line-height: 1.6;
+            ">
+        To get started, please confirm your email address by clicking the button below.
+      </p>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 40px 0;">
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup" style="
+                        display: inline-block;
+                        background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+                        color: #ffffff;
+                        text-decoration: none;
+                        padding: 16px 32px;
+                        border-radius: 12px;
+                        font-weight: 600;
+                        font-size: 16px;
+                        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+                        transition: all 0.2s ease;
+                    "
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(251, 191, 36, 0.4)'"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(251, 191, 36, 0.3)'">
+          Confirm Your Email
+        </a>
       </div>
-      <div
-        style="
-          text-align: center;
-          padding-top: 20px;
-          font-size: 14px;
-          color: #666666;
-        "
-      >
-        <p>
-          If you did not sign up for this account, please ignore this email.
-        </p>
+
+      <p style="
+                color: #6b7280;
+                margin: 0;
+                font-size: 14px;
+                text-align: center;
+                font-style: italic;
+            ">
+        If you didn't create this account, you can safely ignore this email.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="
+            background-color: #f9fafb;
+            padding: 30px;
+            border-top: 1px solid #e5e7eb;
+        ">
+      <div style="
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                align-items: center;
+                text-align: center;
+            ">
+        <!-- Links -->
+        <div style="
+                    display: flex;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                ">
+          <a href="https://prostcounter.canny.io/bugs" style="
+                            color: #6b7280;
+                            text-decoration: none;
+                            font-size: 14px;
+                            padding: 8px 12px;
+                            border-radius: 6px;
+                            transition: background-color 0.2s ease;
+                        " onmouseover="this.style.backgroundColor='#f3f4f6'"
+            onmouseout="this.style.backgroundColor='transparent'">
+            Report a bug
+          </a>
+          <a href="https://prostcounter.canny.io/feature-requests" style="
+                            color: #6b7280;
+                            text-decoration: none;
+                            font-size: 14px;
+                            padding: 8px 12px;
+                            border-radius: 6px;
+                            transition: background-color 0.2s ease;
+                        " onmouseover="this.style.backgroundColor='#f3f4f6'"
+            onmouseout="this.style.backgroundColor='transparent'">
+            Request a feature
+          </a>
+        </div>
+
+        <!-- Copyright -->
+        <div style="
+                    color: #9ca3af;
+                    font-size: 12px;
+                    margin-top: 8px;
+                ">
+          © ProstCounter 2025
+        </div>
       </div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

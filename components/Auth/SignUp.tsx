@@ -29,6 +29,7 @@ export default function SignUp() {
   const onSubmit = async (data: SignUpFormData) => {
     try {
       await signUp({ email: data.email, password: data.password });
+      setIsAccountCreated(true);
     } catch (error) {
       if (error instanceof Error) {
         toast({
@@ -46,8 +47,6 @@ export default function SignUp() {
       if (emailRef.current) {
         emailRef.current.focus();
       }
-    } finally {
-      setIsAccountCreated(true);
     }
   };
 
