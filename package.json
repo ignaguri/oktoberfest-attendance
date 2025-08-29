@@ -16,7 +16,16 @@
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
     "sup:restart": "supabase stop && supabase start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "version:show": "node scripts/version.js show",
+    "version:patch": "node scripts/version.js patch",
+    "version:minor": "node scripts/version.js minor",
+    "version:major": "node scripts/version.js major",
+    "version:set": "node scripts/version.js set",
+    "release:patch": "pnpm run version:patch && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && echo \"✅ Release ready! Run: git push && git push --tags\"",
+    "release:minor": "pnpm run version:minor && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && echo \"✅ Release ready! Run: git push && git push --tags\"",
+    "release:major": "pnpm run version:major && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && echo \"✅ Release ready! Run: git push && git push --tags\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
@@ -88,6 +97,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unused-imports": "4.2.0",
+    "husky": "^9.1.7",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
     "supabase": "2.39.2",

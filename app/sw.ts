@@ -9,6 +9,15 @@ import {
 import type { RuntimeCaching } from "serwist";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 
+// Type for version data
+interface VersionData {
+  version: string;
+  buildTime: string;
+  changelog: string[];
+  requiresUpdate: boolean;
+  lastChecked: string;
+}
+
 // This declares the value of `injectionPoint` to TypeScript.
 // `injectionPoint` is the string that will be replaced by the
 // actual precache manifest. By default, this string is set to
@@ -16,6 +25,7 @@ import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+    versionData?: VersionData; // Properly typed version data
   }
 }
 
@@ -101,6 +111,75 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// Version checking and update detection
+let updateCheckInterval: NodeJS.Timeout;
+
+// Check for updates every 30 minutes
+const startUpdateChecking = () => {
+  updateCheckInterval = setInterval(
+    async () => {
+      try {
+        const response = await fetch("/api/version", { cache: "no-cache" });
+        if (response.ok) {
+          const versionData: VersionData = await response.json();
+          // Store version data for comparison
+          self.versionData = versionData;
+        }
+      } catch (error) {
+        console.log("Version check failed:", error);
+      }
+    },
+    30 * 60 * 1000,
+  ); // 30 minutes
+};
+
+// Check for updates immediately and start interval
+startUpdateChecking();
+
+// Cleanup interval when service worker is uninstalled
+self.addEventListener("beforeuninstall", () => {
+  if (updateCheckInterval) {
+    clearInterval(updateCheckInterval);
+  }
+});
+
+// Handle app focus events for immediate update checks
+// Note: We use Event type and cast to MessageEvent because service workers
+// don't have built-in message event types in WorkerGlobalScopeEventMap
+self.addEventListener("message", (event: Event) => {
+  // Type guard for message data
+  const messageEvent = event as MessageEvent;
+  if (
+    messageEvent.data &&
+    typeof messageEvent.data === "object" &&
+    "type" in messageEvent.data &&
+    messageEvent.data.type === "CHECK_FOR_UPDATES"
+  ) {
+    // Immediate version check when app comes into focus
+    fetch("/api/version", { cache: "no-cache" })
+      .then((response) => response.json())
+      .then((versionData: VersionData) => {
+        self.versionData = versionData;
+        // Notify all clients about potential update
+        if (messageEvent.ports && messageEvent.ports[0]) {
+          messageEvent.ports[0].postMessage({
+            type: "VERSION_CHECK_RESULT",
+            data: versionData,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("Immediate version check failed:", error);
+        if (messageEvent.ports && messageEvent.ports[0]) {
+          messageEvent.ports[0].postMessage({
+            type: "VERSION_CHECK_ERROR",
+            error: error.message,
+          });
+        }
+      });
+  }
+});
 
 // Push notification event handler
 self.addEventListener("push", (event) => {

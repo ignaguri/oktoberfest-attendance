@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Validate commit message format
 commit_msg_file="$1"
 commit_msg=$(cat "$commit_msg_file")
@@ -17,6 +14,33 @@ if [ ${#first_line} -gt 72 ]; then
   echo "❌ First line of commit message is too long (max 72 characters)"
   echo "Current length: ${#first_line} characters"
   echo "Message: $first_line"
+  exit 1
+fi
+
+# Check conventional commit format
+# Format: <type>[optional scope]: <description>
+# Types: feat, fix, docs, style, refactor, perf, test, chore, breaking
+pattern="^(feat|fix|docs|style|refactor|perf|test|chore|breaking)(\([a-z-]+\))?: .+"
+
+if ! echo "$first_line" | grep -qE "$pattern"; then
+  echo "❌ Invalid commit message format!"
+  echo ""
+  echo "Please use conventional commit format:"
+  echo "  <type>[optional scope]: <description>"
+  echo ""
+  echo "Examples:"
+  echo "  feat: add new leaderboard feature"
+  echo "  fix(auth): resolve login issue"
+  echo "  docs: update README with new features"
+  echo "  style: format code with prettier"
+  echo "  refactor: restructure component logic"
+  echo "  perf: optimize image loading"
+  echo "  test: add unit tests for utils"
+  echo "  chore: update dependencies"
+  echo "  breaking: remove deprecated API"
+  echo ""
+  echo "Types: feat, fix, docs, style, refactor, perf, test, chore, breaking"
+  echo ""
   exit 1
 fi
 

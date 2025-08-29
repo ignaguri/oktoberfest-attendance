@@ -1,58 +1,80 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAppUpdate } from "@/hooks/use-app-update";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { RefreshCw, Info } from "lucide-react";
+import { useEffect } from "react";
 
-import { APP_VERSION } from "../version";
-
-// TODO: evaluate, because it's not working as expected
 export function VersionChecker() {
-  const [newVersionAvailable, setNewVersionAvailable] = useState(false);
+  const { updateAvailable, newVersion, changelog, applyUpdate, error } =
+    useAppUpdate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkVersion = () => {
-      const currentVersion = localStorage.getItem("appVersion");
-      if (currentVersion && currentVersion !== APP_VERSION) {
-        setNewVersionAvailable(true);
-      }
-    };
-
-    checkVersion();
-    window.addEventListener("focus", checkVersion);
-
-    return () => {
-      window.removeEventListener("focus", checkVersion);
-    };
-  }, []);
-
-  const handleUpdate = () => {
-    localStorage.setItem("appVersion", APP_VERSION);
-    window.location.reload();
-  };
-
-  useEffect(() => {
-    if (newVersionAvailable) {
+    if (updateAvailable) {
+      // Show persistent notification until user updates
       toast({
-        title: "New Version Available",
+        title: `Update Available - v${newVersion}`,
         description: (
-          <span className="text-sm line-clamp-3">
-            A new version of the app is available. Please update to get the
-            latest features and improvements.
-          </span>
+          <div className="space-y-2">
+            <span className="text-sm">
+              A new version of the app is available with the latest features and
+              improvements.
+            </span>
+            {changelog.length > 0 && (
+              <div className="mt-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <Info size={14} />
+                  What&apos;s new:
+                </div>
+                <ul className="mt-1 space-y-1 text-xs">
+                  {changelog.slice(0, 3).map((change, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-green-500 mt-1">•</span>
+                      <span className="line-clamp-2">{change}</span>
+                    </li>
+                  ))}
+                  {changelog.length > 3 && (
+                    <li className="text-xs text-muted-foreground italic">
+                      +{changelog.length - 3} more changes
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
         ),
         action: (
-          <Button size="sm" onClick={handleUpdate}>
-            <RefreshCw size={20} />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={applyUpdate}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <RefreshCw size={16} className="mr-1" />
+              Update Now
+            </Button>
+          </div>
         ),
-        variant: "info",
-        duration: 20000,
+        variant: "default",
+        duration: Infinity, // Persistent until dismissed
+        className: "border-green-200 bg-green-50",
       });
     }
-  }, [newVersionAvailable, toast]);
+  }, [updateAvailable, newVersion, changelog, applyUpdate, toast]);
+
+  // Show error toast if update check fails
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Update Check Failed",
+        description: error,
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  }, [error, toast]);
 
   return null;
 }
