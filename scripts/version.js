@@ -170,20 +170,15 @@ function generateInAppChangelog(newVersion) {
       .filter(Boolean);
 
     const filteredCommits = allCommits.filter((commit) =>
-      commit.match(/^(feat|fix):\s*(.*)/),
+      commit.match(/^feat:\s*(.*)/),
     );
 
     const changelogEntries = [];
     filteredCommits.forEach((commit) => {
-      const match = commit.match(/^(feat|fix):\s*(.*)/);
+      const match = commit.match(/^feat:\s*(.*)/);
       if (match) {
-        const type = match[1];
-        const description = match[2];
-
-        let emoji = "";
-        if (type === "feat") emoji = "✨";
-        if (type === "fix") emoji = "🐛";
-        changelogEntries.push(`${emoji} ${description}`);
+        const description = match[1];
+        changelogEntries.push(`✨ ${description}`);
       }
     });
 
