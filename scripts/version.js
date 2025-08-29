@@ -285,7 +285,7 @@ function main() {
       newVersion = version;
       break;
     case "show":
-      console.log(`Current version: ${currentVersion}`);
+      console.log(currentVersion);
       return;
     default:
       console.error(`❌ Unknown command: ${command}`);

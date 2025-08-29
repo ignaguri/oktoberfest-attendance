@@ -7,8 +7,7 @@ import { RefreshCw, X } from "lucide-react";
 import { useEffect } from "react";
 
 export function VersionChecker() {
-  const { hasUpdate, changelog, isChecking, applyUpdate, skipUpdate } =
-    useAppUpdate();
+  const { hasUpdate, applyUpdate, skipUpdate } = useAppUpdate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -18,19 +17,9 @@ export function VersionChecker() {
         description: (
           <div className="space-y-2">
             <p className="text-sm">
-              A new version of the app is available with the following
-              improvements:
+              A new version of the app is available. Please update to get the
+              latest features and improvements.
             </p>
-            {changelog.length > 0 && (
-              <ul className="text-xs space-y-1 text-muted-foreground">
-                {changelog.map((item: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span>•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         ),
         action: (
@@ -52,19 +41,7 @@ export function VersionChecker() {
         duration: Infinity, // Persistent until user acts
       });
     }
-  }, [hasUpdate, changelog, toast, applyUpdate, skipUpdate]);
-
-  // Show loading state while checking
-  useEffect(() => {
-    if (isChecking) {
-      toast({
-        title: "Checking for Updates",
-        description: "Looking for the latest version...",
-        variant: "default",
-        duration: 3000,
-      });
-    }
-  }, [isChecking, toast]);
+  }, [hasUpdate, toast, applyUpdate, skipUpdate]);
 
   return null;
 }

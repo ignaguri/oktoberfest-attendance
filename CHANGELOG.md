@@ -19,6 +19,12 @@
 - 👤 New user menu with profile and pages access
 - 🏆 Completely new achievements system!
 
+### 🔧 Infrastructure
+
+- 📊 Festival-specific leaderboards and group competitions
+- ⚡ Migrated all forms to React Hook Form + Zod for better performance
+- 🔧 Admin panel for festival management
+
 ## [0.2.5] - 2024-12-19
 
 ### ✨ Features
@@ -26,12 +32,21 @@
 - Added link to Oktoberfest map 🗺️
 - Smoother page transitions 🚀
 
+### 🔧 Infrastructure
+
+- Initials for avatar
+- Move "what can the app do" to the bottom
+
 ## [0.2.4] - 2024-12-19
 
 ### ✨ Features
 
 - You can now delete an attendance in My attendance page 🗑️
 - Added Share App button 📣
+
+### 🔧 Infrastructure
+
+- Added Invalidate cache tags
 
 ## [0.2.3] - 2024-12-19
 
@@ -45,6 +60,10 @@
 
 - New Global leaderboard! 🥇
 
+### 🔧 Infrastructure
+
+- Added Sentry
+
 ## [0.2.1] - 2024-12-19
 
 ### ✨ Features
@@ -52,6 +71,11 @@
 - Implemented 'What's New' feature 🎉
 - Now you can upload beer pictures! 📸
 - Introduced group photo galleries 🖼️
+
+### 🔧 Infrastructure
+
+- Added app version checking
+- Improved performance for image loading
 
 ## [0.2.0] - 2024-12-19
 

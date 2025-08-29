@@ -1,5 +1,9 @@
 export const changelog: Record<string, string[]> = {
-  "0.4.0": [],
+  "0.4.0": [
+    "🔔 Notifications system",
+    "📲 Installable app improvements",
+    "🎨 New logo",
+  ],
   "0.3.0": [
     "🎪 Multi-festival support - Switch between 2024 and 2025 Oktoberfest!",
     "👤 New user menu with profile and pages access",
