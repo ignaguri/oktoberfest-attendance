@@ -1,6 +1,6 @@
 {
   "name": "oktoberfest-attendance",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,14 +17,14 @@
     "sup:stop": "supabase stop",
     "sup:restart": "supabase stop && supabase start",
     "lint": "eslint .",
-    "version:show": "node scripts/version.js show",
-    "version:patch": "node scripts/version.js patch",
-    "version:minor": "node scripts/version.js minor",
-    "version:major": "node scripts/version.js major",
-    "version:set": "node scripts/version.js set",
-    "release:patch": "pnpm run version:patch && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && git push && git push --tags",
-    "release:minor": "pnpm run version:minor && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && git push && git push --tags",
-    "release:major": "pnpm run version:major && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && git push && git push --tags",
+    "version:show": "tsx scripts/version.ts show",
+    "version:patch": "tsx scripts/version.ts patch",
+    "version:minor": "tsx scripts/version.ts minor",
+    "version:major": "tsx scripts/version.ts major",
+    "version:set": "tsx scripts/version.ts set",
+    "release:patch": "pnpm run version:patch && git add . && git commit -m \"chore: bump version\" && git tag v$(pnpm run version:show) && git push && git push --tags",
+    "release:minor": "pnpm run version:minor && git add . && git commit -m \"chore: bump version\" && git tag v$(pnpm run version:show) && git push && git push --tags",
+    "release:major": "pnpm run version:major && git add . && git commit -m \"chore: bump version\" && git tag v$(pnpm run version:show) && git push && git push --tags",
     "prepare": "husky"
   },
   "dependencies": {
@@ -97,14 +97,15 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unused-imports": "4.2.0",
+    "husky": "^9.0.0",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
     "supabase": "2.39.2",
     "tailwindcss": "4.1.12",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.5",
     "typescript": "5.9.2",
-    "typescript-eslint": "^8.41.0",
-    "husky": "^9.0.0"
+    "typescript-eslint": "^8.41.0"
   },
   "overrides": {
     "eslint": "$eslint"

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.3] - 2025-08-31
+
+### 🐛 Bug Fixes
+
+- update GitHub Actions workflow pnpm version and lockfile handling
+
 ## [0.4.0] - 2025-08-29
 
 ### 🔧 Infrastructure

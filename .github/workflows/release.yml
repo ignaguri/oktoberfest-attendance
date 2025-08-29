@@ -22,7 +22,7 @@ jobs:
       - name: Setup PNPM
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10.14.0
 
       - name: Get cache directory
         id: pnpm-cache
@@ -41,6 +41,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install dependencies (fallback)
+        if: failure()
+        run: pnpm install
+
       - name: Extract version from tag
         id: extract_version
         run: |
@@ -50,7 +54,7 @@ jobs:
 
       - name: Generate changelog
         run: |
-          node scripts/version.js set ${{ env.NEW_VERSION }}
+          tsx scripts/version.ts set ${{ env.NEW_VERSION }}
 
       - name: Build application
         run: pnpm run build
