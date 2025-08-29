@@ -1,7 +1,8 @@
 "use client";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { TIMEZONE } from "@/lib/constants";
+import { TIMEZONE, IMAGE_PLACEHOLDER_BASE64 } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { TZDate } from "@date-fns/tz";
 import { format } from "date-fns";
 import { Camera } from "lucide-react";
@@ -18,11 +19,16 @@ interface GalleryGridProps {
 
 export function GalleryGrid({ galleryData }: GalleryGridProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
 
   // Check if there are any photos
   const hasPhotos = Object.values(galleryData).some((userImages) =>
     Object.values(userImages).some((images) => images.length > 0),
   );
+
+  const handleImageLoad = (imageId: string) => {
+    setLoadedImages((prev) => new Set(prev).add(imageId));
+  };
 
   if (!hasPhotos) {
     return (
@@ -50,30 +56,43 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                   {images[0].username}
                 </h4>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  {images.map((image) => (
-                    <div
-                      key={image.id}
-                      className="relative aspect-square cursor-pointer group"
-                      onClick={() =>
-                        setSelectedImage(
-                          `/api/image/${image.url}?bucket=beer_pictures`,
-                        )
-                      }
-                    >
-                      <Image
-                        src={`/api/image/${image.url}?bucket=beer_pictures`}
-                        alt={`Uploaded by ${image.username}`}
-                        layout="fill"
-                        objectFit="cover"
-                        className="rounded-lg transition-transform group-hover:scale-105"
-                        loading="lazy"
-                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 200px"
-                        placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg" />
-                    </div>
-                  ))}
+                  {images.map((image) => {
+                    const isLoaded = loadedImages.has(image.id);
+                    const imageUrl = `/api/image/${image.url}?bucket=beer_pictures`;
+
+                    return (
+                      <div
+                        key={image.id}
+                        className="relative aspect-square cursor-pointer group"
+                        onClick={() => setSelectedImage(imageUrl)}
+                      >
+                        {/* Skeleton placeholder while loading */}
+                        {!isLoaded && (
+                          <div className="absolute inset-0 bg-gray-200 rounded-lg animate-pulse" />
+                        )}
+
+                        <Image
+                          src={imageUrl}
+                          alt={`Uploaded by ${image.username}`}
+                          fill
+                          className={cn(
+                            "rounded-lg transition-all duration-300 object-cover",
+                            isLoaded
+                              ? "opacity-100 group-hover:scale-105"
+                              : "opacity-0",
+                          )}
+                          loading="lazy"
+                          sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 200px"
+                          placeholder="blur"
+                          blurDataURL={IMAGE_PLACEHOLDER_BASE64}
+                          onLoad={() => handleImageLoad(image.id)}
+                        />
+
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg" />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
