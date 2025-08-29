@@ -9,7 +9,11 @@ import type { Tables } from "@/lib/database.types";
 
 import { fetchGroups } from "./actions";
 
-export default function MyGroups() {
+interface MyGroupsProps {
+  showGroupsLink?: boolean;
+}
+
+export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
   const { currentFestival } = useFestival();
   const [groups, setGroups] = useState<Tables<"groups">[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,9 +51,16 @@ export default function MyGroups() {
       <h2 className="text-xl font-bold mb-2">Your Groups:</h2>
       <div className="flex flex-wrap gap-2 justify-center">
         {groups.length === 0 && (
-          <p className="text-sm text-gray-500">
-            You are not a member of any group yet for this festival.
-          </p>
+          <div className="px-2 text-center">
+            <p className="text-sm text-gray-500 mb-2">
+              You are not a member of any group yet for this festival.
+            </p>
+            {showGroupsLink && (
+              <Button asChild variant="yellow" size="sm">
+                <Link href="/groups">Join or Create a Group</Link>
+              </Button>
+            )}
+          </div>
         )}
         {groups
           .filter((group) => group && group.id)
