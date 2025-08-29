@@ -1,13 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAppUpdate } from "@/hooks/use-app-update";
 import { useToast } from "@/hooks/use-toast";
 import { RefreshCw, X } from "lucide-react";
 import { useEffect } from "react";
-import { useAppUpdate } from "@/hooks/use-app-update";
 
 export function VersionChecker() {
-  const { hasUpdate, changelog, isChecking, applyUpdate, skipUpdate } = useAppUpdate();
+  const { hasUpdate, changelog, isChecking, applyUpdate, skipUpdate } =
+    useAppUpdate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -17,7 +18,8 @@ export function VersionChecker() {
         description: (
           <div className="space-y-2">
             <p className="text-sm">
-              A new version of the app is available with the following improvements:
+              A new version of the app is available with the following
+              improvements:
             </p>
             {changelog.length > 0 && (
               <ul className="text-xs space-y-1 text-muted-foreground">
@@ -33,7 +35,11 @@ export function VersionChecker() {
         ),
         action: (
           <div className="flex gap-2">
-            <Button size="sm" onClick={applyUpdate} className="bg-green-600 hover:bg-green-700">
+            <Button
+              size="sm"
+              onClick={applyUpdate}
+              className="bg-green-600 hover:bg-green-700"
+            >
               <RefreshCw size={16} className="mr-1" />
               Update Now
             </Button>

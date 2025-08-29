@@ -30,7 +30,7 @@ export function useAppUpdate() {
   const checkForUpdates = useCallback(async () => {
     if (!("serviceWorker" in navigator)) return;
 
-    setUpdateState(prev => ({ ...prev, isChecking: true }));
+    setUpdateState((prev) => ({ ...prev, isChecking: true }));
 
     try {
       // Check with our API
@@ -45,7 +45,7 @@ export function useAppUpdate() {
         });
       }
 
-      setUpdateState(prev => ({
+      setUpdateState((prev) => ({
         ...prev,
         isChecking: false,
         currentVersion: versionData.version,
@@ -54,7 +54,7 @@ export function useAppUpdate() {
       }));
     } catch (error) {
       console.error("Failed to check for updates:", error);
-      setUpdateState(prev => ({ ...prev, isChecking: false }));
+      setUpdateState((prev) => ({ ...prev, isChecking: false }));
     }
   }, []);
 
@@ -73,7 +73,7 @@ export function useAppUpdate() {
   }, []);
 
   const skipUpdate = useCallback(() => {
-    setUpdateState(prev => ({ ...prev, hasUpdate: false }));
+    setUpdateState((prev) => ({ ...prev, hasUpdate: false }));
   }, []);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export function useAppUpdate() {
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "UPDATE_AVAILABLE") {
-        setUpdateState(prev => ({
+        setUpdateState((prev) => ({
           ...prev,
           hasUpdate: true,
           newVersion: event.data.newVersion,

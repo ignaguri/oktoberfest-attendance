@@ -114,30 +114,33 @@ let updateCheckInterval: NodeJS.Timeout | null = null;
 
 function startUpdateChecking() {
   // Check for updates every 30 minutes
-  updateCheckInterval = setInterval(async () => {
-    try {
-      const response = await fetch("/api/version");
-      const versionData: VersionData = await response.json();
-      
-      // Store version data for comparison
-      self.versionData = versionData;
-      
-      // Check if there's a new version available
-      if (versionData.requiresUpdate) {
-        // Notify all clients about the update
-        const clients = await self.clients.matchAll();
-        clients.forEach((client: Client) => {
-          client.postMessage({
-            type: "UPDATE_AVAILABLE",
-            newVersion: versionData.version,
-            changelog: versionData.changelog,
+  updateCheckInterval = setInterval(
+    async () => {
+      try {
+        const response = await fetch("/api/version");
+        const versionData: VersionData = await response.json();
+
+        // Store version data for comparison
+        self.versionData = versionData;
+
+        // Check if there's a new version available
+        if (versionData.requiresUpdate) {
+          // Notify all clients about the update
+          const clients = await self.clients.matchAll();
+          clients.forEach((client: Client) => {
+            client.postMessage({
+              type: "UPDATE_AVAILABLE",
+              newVersion: versionData.version,
+              changelog: versionData.changelog,
+            });
           });
-        });
+        }
+      } catch (error) {
+        console.error("Failed to check for updates:", error);
       }
-    } catch (error) {
-      console.error("Failed to check for updates:", error);
-    }
-  }, 30 * 60 * 1000); // 30 minutes
+    },
+    30 * 60 * 1000,
+  ); // 30 minutes
 }
 
 // Start update checking when service worker activates
@@ -148,14 +151,14 @@ self.addEventListener("activate", () => {
 // Handle messages from the main app
 self.addEventListener("message", (event: Event) => {
   const messageEvent = event as MessageEvent;
-  
+
   if (messageEvent.data?.type === "CHECK_FOR_UPDATES") {
     // Immediate update check requested by the app
     fetch("/api/version")
       .then((response) => response.json())
       .then((versionData: VersionData) => {
         self.versionData = versionData;
-        
+
         // Notify the client about the check result
         if (messageEvent.ports && messageEvent.ports[0]) {
           messageEvent.ports[0].postMessage({
