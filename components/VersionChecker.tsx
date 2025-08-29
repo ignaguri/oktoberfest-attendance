@@ -21,7 +21,7 @@ export function VersionChecker() {
             </p>
             {changelog.length > 0 && (
               <ul className="text-xs space-y-1 text-muted-foreground">
-                {changelog.map((item, index) => (
+                {changelog.map((item: string, index: number) => (
                   <li key={index} className="flex items-start gap-2">
                     <span>•</span>
                     <span>{item}</span>

@@ -13,6 +13,8 @@ declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
     versionData?: VersionData;
+    clients: Clients;
+    registration: ServiceWorkerRegistration;
   }
 }
 
@@ -124,7 +126,7 @@ function startUpdateChecking() {
       if (versionData.requiresUpdate) {
         // Notify all clients about the update
         const clients = await self.clients.matchAll();
-        clients.forEach((client) => {
+        clients.forEach((client: Client) => {
           client.postMessage({
             type: "UPDATE_AVAILABLE",
             newVersion: versionData.version,
