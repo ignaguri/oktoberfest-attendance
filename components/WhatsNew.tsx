@@ -20,12 +20,30 @@ import { useNotifications } from "@/contexts/NotificationContext";
 import { APP_VERSION } from "@/version";
 import { useState, useEffect } from "react";
 
-export function WhatsNew() {
+interface WhatsNewProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  isManualTrigger?: boolean;
+}
+
+export function WhatsNew({
+  open,
+  onOpenChange,
+  isManualTrigger = false,
+}: WhatsNewProps) {
   const { setWhatsNewVisible, canShowWhatsNew } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
-  const [expandedVersions, setExpandedVersions] = useState<string[]>([]);
+  // Start with current version expanded
+  const [expandedVersion, setExpandedVersion] = useState<string>(APP_VERSION);
+
+  // Use controlled state if props are provided, otherwise use internal state
+  const isDialogOpen = isManualTrigger ? open : isOpen;
+  const handleOpenChange = isManualTrigger ? onOpenChange : setIsOpen;
 
   useEffect(() => {
+    // Only run auto-show logic if not manually triggered
+    if (isManualTrigger) return;
+
     const lastSeenVersion = localStorage.getItem("lastSeenVersion");
     const currentVersion = localStorage.getItem("appVersion");
 
@@ -57,24 +75,28 @@ export function WhatsNew() {
 
       return () => clearTimeout(timer);
     }
-  }, [canShowWhatsNew, setWhatsNewVisible]);
+  }, [canShowWhatsNew, setWhatsNewVisible, isManualTrigger]);
 
   const handleClose = () => {
-    setIsOpen(false);
-    setWhatsNewVisible(false);
+    if (isManualTrigger) {
+      handleOpenChange?.(false);
+    } else {
+      setIsOpen(false);
+      setWhatsNewVisible(false);
+    }
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    setWhatsNewVisible(open);
+  const handleDialogOpenChange = (open: boolean) => {
+    if (isManualTrigger) {
+      handleOpenChange?.(open);
+    } else {
+      setIsOpen(open);
+      setWhatsNewVisible(open);
+    }
   };
 
   const toggleVersion = (version: string) => {
-    setExpandedVersions((prev) =>
-      prev.includes(version)
-        ? prev.filter((v) => v !== version)
-        : [...prev, version],
-    );
+    setExpandedVersion(expandedVersion === version ? "" : version);
   };
 
   const sortedVersions = Object.keys(changelog).sort((a, b) =>
@@ -87,7 +109,7 @@ export function WhatsNew() {
     .slice(0, 2); // Only take the two versions before the current one
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>What&apos;s New in v{APP_VERSION}</DialogTitle>
@@ -97,25 +119,24 @@ export function WhatsNew() {
         </DialogHeader>
         <ScrollArea className="mt-4 max-h-[60vh] pr-4">
           <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Current Version:</h3>
-              <ul className="space-y-2 list-disc pl-5">
-                {currentVersionChanges.map((change, index) => (
-                  <li key={index}>{change}</li>
-                ))}
-              </ul>
-            </div>
-            <Accordion
-              type="multiple"
-              value={expandedVersions}
-              className="w-full"
-            >
+            <Accordion type="single" value={expandedVersion} className="w-full">
+              {/* Current Version - Always first and expanded */}
+              <AccordionItem key={APP_VERSION} value={APP_VERSION}>
+                <AccordionTrigger onClick={() => toggleVersion(APP_VERSION)}>
+                  Version {APP_VERSION} - Current
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-2 list-disc pl-5">
+                    {currentVersionChanges.map((change, index) => (
+                      <li key={index}>{change}</li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Previous Versions */}
               {previousVersions.map((version) => (
-                <AccordionItem
-                  key={version}
-                  value={version}
-                  className="ring-transparent"
-                >
+                <AccordionItem key={version} value={version}>
                   <AccordionTrigger onClick={() => toggleVersion(version)}>
                     Version {version}
                   </AccordionTrigger>
