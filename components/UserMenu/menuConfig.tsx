@@ -8,6 +8,7 @@ import {
   Trophy,
   User,
   Users,
+  Sparkles,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -68,20 +69,26 @@ export const menuItems: MenuItem[] = [
     section: "settings",
   },
   {
-    id: "changeFestival",
-    label: "Change Festival",
-    icon: <CalendarSync className="h-4 w-4" />,
-    section: "settings",
-  },
-  {
     id: "map",
     label: "Festival Map",
     href: "https://wiesnmap.muenchen.de",
     icon: <MapPin className="h-4 w-4" />,
     section: "settings",
   },
+  {
+    id: "whatsNew",
+    label: "See What's New",
+    icon: <Sparkles className="h-4 w-4" />,
+    section: "settings",
+  },
 
   // Actions Section
+  {
+    id: "changeFestival",
+    label: "Change Festival",
+    icon: <CalendarSync className="h-4 w-4" />,
+    section: "actions",
+  },
   {
     id: "share",
     label: "Share App",
@@ -105,12 +112,12 @@ export const menuSections: MenuSection[] = [
   {
     id: "settings",
     label: "Settings & Tools",
-    items: ["profile", "changeFestival", "map"],
+    items: ["profile", "map", "whatsNew"],
   },
   {
     id: "actions",
     label: "Actions",
-    items: ["share", "signout"],
+    items: ["changeFestival", "share", "signout"],
   },
 ];
 

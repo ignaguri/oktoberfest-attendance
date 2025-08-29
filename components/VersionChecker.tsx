@@ -1,58 +1,47 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAppUpdate } from "@/hooks/use-app-update";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { RefreshCw, X } from "lucide-react";
+import { useEffect } from "react";
 
-import { APP_VERSION } from "../version";
-
-// TODO: evaluate, because it's not working as expected
 export function VersionChecker() {
-  const [newVersionAvailable, setNewVersionAvailable] = useState(false);
+  const { hasUpdate, applyUpdate, skipUpdate } = useAppUpdate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkVersion = () => {
-      const currentVersion = localStorage.getItem("appVersion");
-      if (currentVersion && currentVersion !== APP_VERSION) {
-        setNewVersionAvailable(true);
-      }
-    };
-
-    checkVersion();
-    window.addEventListener("focus", checkVersion);
-
-    return () => {
-      window.removeEventListener("focus", checkVersion);
-    };
-  }, []);
-
-  const handleUpdate = () => {
-    localStorage.setItem("appVersion", APP_VERSION);
-    window.location.reload();
-  };
-
-  useEffect(() => {
-    if (newVersionAvailable) {
+    if (hasUpdate) {
       toast({
-        title: "New Version Available",
+        title: "New Version Available! 🚀",
         description: (
-          <span className="text-sm line-clamp-3">
-            A new version of the app is available. Please update to get the
-            latest features and improvements.
-          </span>
+          <div className="space-y-2">
+            <p className="text-sm">
+              A new version of the app is available. Please update to get the
+              latest features and improvements.
+            </p>
+          </div>
         ),
         action: (
-          <Button size="sm" onClick={handleUpdate}>
-            <RefreshCw size={20} />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={applyUpdate}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <RefreshCw size={16} className="mr-1" />
+              Update Now
+            </Button>
+            <Button size="sm" variant="outline" onClick={skipUpdate}>
+              <X size={16} />
+            </Button>
+          </div>
         ),
-        variant: "info",
-        duration: 20000,
+        variant: "default",
+        duration: Infinity, // Persistent until user acts
       });
     }
-  }, [newVersionAvailable, toast]);
+  }, [hasUpdate, toast, applyUpdate, skipUpdate]);
 
   return null;
 }

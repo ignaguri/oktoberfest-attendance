@@ -25,6 +25,7 @@ import {
   menuSections,
   getMenuItemsBySection,
 } from "@/components/UserMenu/menuConfig";
+import { WhatsNew } from "@/components/WhatsNew";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 import { cn } from "@/lib/utils";
@@ -71,6 +72,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isFestivalModalOpen, setIsFestivalModalOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
 
   const handleSignOut = async () => {
     await logout();
@@ -91,6 +93,12 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
         return {
           ...item,
           onClick: () => setIsFestivalModalOpen(true),
+        };
+      }
+      if (item.id === "whatsNew") {
+        return {
+          ...item,
+          onClick: () => setIsWhatsNewOpen(true),
         };
       }
       return item;
@@ -255,6 +263,16 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
     );
   };
 
+  const renderWhatsNewDialog = () => {
+    return (
+      <WhatsNew
+        open={isWhatsNewOpen}
+        onOpenChange={setIsWhatsNewOpen}
+        isManualTrigger={true}
+      />
+    );
+  };
+
   const menuItemsWithHandlers = getMenuItemsWithHandlers();
 
   return (
@@ -308,9 +326,9 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
 
             return (
               <div key={section.id}>
-                <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+                {/* <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
                   {section.label}
-                </DropdownMenuLabel>
+                </DropdownMenuLabel> */}
                 {itemsWithHandlers.map(renderMenuItem)}
                 {section.id !== menuSections[menuSections.length - 1].id && (
                   <DropdownMenuSeparator />
@@ -326,6 +344,9 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
 
       {/* Share Dialog */}
       {renderShareDialog()}
+
+      {/* What's New Dialog */}
+      {renderWhatsNewDialog()}
     </>
   );
 }
