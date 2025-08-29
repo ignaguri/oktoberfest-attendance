@@ -93,7 +93,7 @@ const withSerwist = withSerwistInit({
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
   additionalPrecacheEntries: [
-    { url: "/~offline", revision },
+    { url: "/offline", revision },
     { url: "/", revision: revision + "-home" },
     { url: "/home", revision: revision + "-home-page" },
   ],

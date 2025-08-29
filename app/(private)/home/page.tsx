@@ -45,8 +45,6 @@ export default async function Home() {
       <div className="flex flex-col gap-4">
         <MissingFields />
 
-        <Separator decorative />
-
         <Highlights />
         <AchievementHighlight />
 

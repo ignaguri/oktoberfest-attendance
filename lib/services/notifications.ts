@@ -8,7 +8,8 @@ import {
   reportNotificationException,
   reportSupabaseException,
 } from "@/utils/sentry";
-import { Novu } from "@novu/node";
+import { Novu } from "@novu/api";
+import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
 import type { Tables } from "@/lib/database.types";
@@ -55,7 +56,9 @@ export class NotificationService {
     if (!novuApiKey) {
       throw new Error("NOVU_API_KEY environment variable is required");
     }
-    this.novu = new Novu(novuApiKey);
+    this.novu = new Novu({
+      secretKey: novuApiKey,
+    });
   }
 
   /**
@@ -132,10 +135,9 @@ export class NotificationService {
       };
 
       // Trigger Novu workflow
-      await this.novu.trigger(NOTIFICATION_WORKFLOWS.GROUP_JOIN, {
-        to: {
-          subscriberId: adminId,
-        },
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.GROUP_JOIN,
+        to: adminId,
         payload,
       });
     } catch (error) {
@@ -249,10 +251,9 @@ export class NotificationService {
 
       // Send notifications to all eligible members
       const notificationPromises = membersToNotify.map((member) =>
-        this.novu.trigger(NOTIFICATION_WORKFLOWS.TENT_CHECKIN, {
-          to: {
-            subscriberId: member.user_id!,
-          },
+        this.novu.trigger({
+          workflowId: NOTIFICATION_WORKFLOWS.TENT_CHECKIN,
+          to: member.user_id!,
           payload: {
             userName,
             tentName,
@@ -325,7 +326,8 @@ export class NotificationService {
     avatar?: string,
   ): Promise<void> {
     try {
-      await this.novu.subscribers.identify(userId, {
+      await this.novu.subscribers.create({
+        subscriberId: userId,
         email: userEmail,
         firstName,
         lastName,
@@ -344,9 +346,15 @@ export class NotificationService {
    */
   async registerFCMToken(userId: string, token: string): Promise<boolean> {
     try {
-      await this.novu.subscribers.setCredentials(userId, "fcm", {
-        deviceTokens: [token],
-      });
+      await this.novu.subscribers.credentials.update(
+        {
+          providerId: ChatOrPushProviderEnum.Fcm,
+          credentials: {
+            deviceTokens: [token],
+          },
+        },
+        userId,
+      );
       return true;
     } catch (error) {
       reportNotificationException("registerFCMToken", error as Error, {
@@ -362,9 +370,15 @@ export class NotificationService {
    */
   async updateFCMTokens(userId: string, tokens: string[]): Promise<boolean> {
     try {
-      await this.novu.subscribers.setCredentials(userId, "fcm", {
-        deviceTokens: tokens,
-      });
+      await this.novu.subscribers.credentials.update(
+        {
+          providerId: ChatOrPushProviderEnum.Fcm,
+          credentials: {
+            deviceTokens: tokens,
+          },
+        },
+        userId,
+      );
       return true;
     } catch (error) {
       reportNotificationException("updateFCMTokens", error as Error, {

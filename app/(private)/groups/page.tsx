@@ -15,7 +15,7 @@ export default async function GroupsPage() {
 
       <Suspense fallback={<LoadingSpinner />}>
         <div className="flex flex-col gap-6">
-          <MyGroups />
+          <MyGroups showGroupsLink={false} />
 
           <Separator />
 
