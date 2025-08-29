@@ -55,7 +55,7 @@ export function PhotoPreview({
               src={`/api/image/${url}?bucket=${bucket}`}
               alt="Photo preview"
               fill
-              className="object-cover"
+              className="object-cover transform-gpu will-change-transform"
               sizes={size === "sm" ? "32px" : size === "md" ? "48px" : "64px"}
               loading="lazy"
               placeholder="blur"

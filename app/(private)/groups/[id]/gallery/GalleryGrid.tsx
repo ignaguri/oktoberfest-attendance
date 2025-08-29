@@ -63,7 +63,7 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                     return (
                       <div
                         key={image.id}
-                        className="relative aspect-square cursor-pointer group"
+                        className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
                         onClick={() => setSelectedImage(imageUrl)}
                       >
                         {/* Skeleton placeholder while loading */}
@@ -76,7 +76,7 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                           alt={`Uploaded by ${image.username}`}
                           fill
                           className={cn(
-                            "rounded-lg transition-all duration-300 object-cover",
+                            "rounded-lg transition-all duration-300 object-cover transform-gpu will-change-transform",
                             isLoaded
                               ? "opacity-100 group-hover:scale-105"
                               : "opacity-0",
