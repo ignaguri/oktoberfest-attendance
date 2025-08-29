@@ -1,6 +1,5 @@
 "use server";
 
-import { getCacheKeys, deleteCache, clearAllCaches } from "@/lib/cache";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
@@ -193,19 +192,8 @@ export async function getTentVisitsForAttendance(userId: string, date: Date) {
   return tentVisits;
 }
 
-export async function listCacheKeys() {
-  return getCacheKeys(); // Return the list of cache keys
-}
-
-export async function deleteCacheKey(key: string) {
-  deleteCache(key); // Delete the specified cache key
-  revalidatePath("/admin"); // Revalidate the admin page
-}
-
-export async function deleteAllCaches() {
-  clearAllCaches(); // Clear all caches
-  revalidatePath("/admin"); // Revalidate the admin page
-}
+// Cache management functions removed - NodeCache system deprecated
+// Use Next.js unstable_cache and revalidateTag for cache management instead
 
 export async function listNonWebPImages() {
   const supabase = createClient(true);

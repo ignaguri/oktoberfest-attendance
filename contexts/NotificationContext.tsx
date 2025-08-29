@@ -48,6 +48,12 @@ interface NotificationContextType {
 
   // Loading states
   loading: boolean;
+  isWhatsNewVisible: boolean;
+  isInstallPWAVisible: boolean;
+  setWhatsNewVisible: (visible: boolean) => void;
+  setInstallPWAVisible: (visible: boolean) => void;
+  canShowInstallPWA: boolean;
+  canShowWhatsNew: boolean;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -65,7 +71,42 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [userSynced, setUserSynced] = useState<string | null>(null); // Track synced user ID
 
+  // New coordination state for WhatsNew and InstallPWA
+  const [isWhatsNewVisible, setIsWhatsNewVisible] = useState(false);
+  const [isInstallPWAVisible, setIsInstallPWAVisible] = useState(false);
+
   const supabase = createSupabaseBrowserClient();
+
+  // Coordination logic: only one can be visible at a time
+  const canShowInstallPWA = !isWhatsNewVisible;
+  const canShowWhatsNew = !isInstallPWAVisible;
+
+  const setWhatsNewVisible = (visible: boolean) => {
+    setIsWhatsNewVisible(visible);
+    // If WhatsNew becomes visible, ensure InstallPWA is hidden
+    if (visible) {
+      setIsInstallPWAVisible(false);
+    }
+  };
+
+  const setInstallPWAVisible = (visible: boolean) => {
+    setIsInstallPWAVisible(visible);
+    // If InstallPWA becomes visible, ensure WhatsNew is hidden
+    if (visible) {
+      setIsWhatsNewVisible(false);
+    }
+  };
+
+  // Additional coordination: auto-hide InstallPWA after a delay if WhatsNew is shown
+  useEffect(() => {
+    if (isWhatsNewVisible && isInstallPWAVisible) {
+      const timer = setTimeout(() => {
+        setIsInstallPWAVisible(false);
+      }, 300); // Small delay for smooth transition
+
+      return () => clearTimeout(timer);
+    }
+  }, [isWhatsNewVisible, isInstallPWAVisible]);
 
   // Get current user
   useEffect(() => {
@@ -278,6 +319,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     fcmToken,
     registerFCMTokenWithNovu,
     loading,
+    isWhatsNewVisible,
+    isInstallPWAVisible,
+    setWhatsNewVisible,
+    setInstallPWAVisible,
+    canShowInstallPWA,
+    canShowWhatsNew,
   };
 
   return (

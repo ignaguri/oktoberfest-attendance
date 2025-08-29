@@ -81,6 +81,18 @@ INSERT INTO festivals (
   true,
   'active',
   'The 190th Oktoberfest in Munich'
+),
+(
+  'OktoberTest 2025', 
+  'oktobertest-2025',
+  'oktoberfest',
+  'Munich, Germany',
+  '2025-08-01',
+  '2025-09-20', 
+  'https://wiesnmap.muenchen.de/',
+  false,
+  'active',
+  'Test festival for development and testing'
 );
 
 -- Seed the attendances table with random attendances for the 10 users

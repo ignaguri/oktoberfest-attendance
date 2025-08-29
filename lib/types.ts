@@ -1,5 +1,9 @@
 import type { Database } from "./database.types";
+import type { createServerClient } from "@supabase/ssr";
 import type { Session } from "@supabase/supabase-js";
+
+// Type for the Supabase client returned by createClient()
+export type SupabaseClient = ReturnType<typeof createServerClient<Database>>;
 
 export type MaybeSession = Session | null;
 

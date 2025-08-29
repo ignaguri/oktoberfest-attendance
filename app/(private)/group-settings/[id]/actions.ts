@@ -3,48 +3,68 @@
 import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 import type { Tables } from "@/lib/database.types";
+import type { SupabaseClient } from "@/lib/types";
 
 import "server-only";
 
+// Cache group details for 10 minutes since group settings change infrequently
+const getCachedGroupDetails = unstable_cache(
+  async (groupId: string, supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient
+      .from("groups")
+      .select("*")
+      .eq("id", groupId)
+      .single();
+    if (error) {
+      reportSupabaseException("fetchGroupDetails", error);
+      throw new Error("Error fetching group details: " + error.message);
+    }
+
+    return data;
+  },
+  ["group-details"],
+  { revalidate: 600, tags: ["groups"] }, // 10 minutes cache
+);
+
 export async function fetchGroupDetails(groupId: string) {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from("groups")
-    .select("*")
-    .eq("id", groupId)
-    .single();
-  if (error) {
-    reportSupabaseException("fetchGroupDetails", error);
-    throw new Error("Error fetching group details: " + error.message);
-  }
-
-  return data;
+  return getCachedGroupDetails(groupId, supabase);
 }
+
+// Cache group members for 5 minutes since membership changes occasionally
+const getCachedGroupMembers = unstable_cache(
+  async (groupId: string, supabaseClient: SupabaseClient) => {
+    type PartialProfile = Pick<
+      Tables<"profiles">,
+      "id" | "username" | "full_name"
+    >;
+
+    const { data, error } = await supabaseClient
+      .from("group_members")
+      .select("profiles:user_id(id, username, full_name)")
+      .eq("group_id", groupId);
+
+    if (error) {
+      reportSupabaseException("fetchGroupMembers", error);
+      throw new Error("Error fetching group members: " + error.message);
+    }
+
+    const groupMembers = data.map(
+      (item: any) => item.profiles as PartialProfile,
+    );
+
+    return groupMembers;
+  },
+  ["group-members"],
+  { revalidate: 300, tags: ["groups", "group-members"] }, // 5 minutes cache
+);
 
 export async function fetchGroupMembers(groupId: string) {
   const supabase = createClient();
-
-  type PartialProfile = Pick<
-    Tables<"profiles">,
-    "id" | "username" | "full_name"
-  >;
-
-  const { data, error } = await supabase
-    .from("group_members")
-    .select("profiles:user_id(id, username, full_name)")
-    .eq("group_id", groupId);
-
-  if (error) {
-    reportSupabaseException("fetchGroupMembers", error);
-    throw new Error("Error fetching group members: " + error.message);
-  }
-
-  const groupMembers = data.map((item: any) => item.profiles as PartialProfile);
-
-  return groupMembers;
+  return getCachedGroupMembers(groupId, supabase);
 }
 
 export async function updateGroup(
@@ -68,6 +88,10 @@ export async function updateGroup(
     throw error;
   }
 
+  // Invalidate cache tags for groups
+  revalidateTag("groups");
+  revalidateTag("user-groups");
+
   revalidatePath(`/groups/${groupId}`);
   revalidatePath(`/group-settings/${groupId}`);
   revalidatePath("/groups");
@@ -87,6 +111,11 @@ export async function removeMember(groupId: string, userId: string) {
     reportSupabaseException("removeMember", error);
     throw error;
   }
+
+  // Invalidate cache tags for groups and group members
+  revalidateTag("groups");
+  revalidateTag("group-members");
+  revalidateTag("user-groups");
 
   revalidatePath(`/groups/${groupId}`);
   revalidatePath(`/group-settings/${groupId}`);

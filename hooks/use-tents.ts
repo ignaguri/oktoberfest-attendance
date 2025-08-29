@@ -23,24 +23,29 @@ export function useTents() {
       try {
         setIsLoading(true);
         const fetchedTents = await fetchTents();
-        const groupedTents = fetchedTents.reduce((acc, tent) => {
-          const category = tent.category
-            ? tent.category.charAt(0).toUpperCase() + tent.category.slice(1)
-            : "Uncategorized";
-          const existingCategory = acc.find((g) => g.category === category);
-          if (existingCategory) {
-            existingCategory.options.push({
-              value: tent.id,
-              label: tent.name,
-            });
-          } else {
-            acc.push({
-              category,
-              options: [{ value: tent.id, label: tent.name }],
-            });
-          }
-          return acc;
-        }, [] as TentGroup[]);
+        const groupedTents = fetchedTents.reduce(
+          (acc: TentGroup[], tent: any) => {
+            const category = tent.category
+              ? tent.category.charAt(0).toUpperCase() + tent.category.slice(1)
+              : "Uncategorized";
+            const existingCategory = acc.find(
+              (g: TentGroup) => g.category === category,
+            );
+            if (existingCategory) {
+              existingCategory.options.push({
+                value: tent.id,
+                label: tent.name,
+              });
+            } else {
+              acc.push({
+                category,
+                options: [{ value: tent.id, label: tent.name }],
+              });
+            }
+            return acc;
+          },
+          [] as TentGroup[],
+        );
         setTents(groupedTents);
         setError(null);
       } catch (err) {

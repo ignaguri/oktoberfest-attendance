@@ -9,11 +9,12 @@ import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import * as Sentry from "@sentry/nextjs";
 import { isSameDay } from "date-fns/isSameDay";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Tables } from "@/lib/database.types";
+import type { SupabaseClient } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 
 import { NO_ROWS_ERROR, TIMEZONE } from "./constants";
@@ -314,30 +315,54 @@ export async function addAttendance(formData: {
     }
   }
 
+  // Invalidate cache tags for leaderboard since attendance affects rankings
+  revalidateTag("leaderboard");
+  revalidateTag("attendances");
+
   revalidatePath("/attendance");
   revalidatePath("/home");
 
   return attendanceId;
 }
 
+// Cache winning criteria for 4 hours since they rarely change
+const getCachedWinningCriterias = unstable_cache(
+  async (supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient
+      .from("winning_criteria")
+      .select("*");
+    if (error) {
+      reportSupabaseException("fetchWinningCriterias", error);
+      throw error;
+    }
+
+    return data;
+  },
+  ["winning-criteria"],
+  { revalidate: 14400, tags: ["winning-criteria"] }, // 4 hours cache
+);
+
 export async function fetchWinningCriterias() {
   const supabase = createClient();
-  const { data, error } = await supabase.from("winning_criteria").select("*");
-  if (error) {
-    reportSupabaseException("fetchWinningCriterias", error);
-    throw error;
-  }
-
-  return data;
+  return getCachedWinningCriterias(supabase);
 }
+
+// Cache tents for 2 hours since they rarely change
+const getCachedTents = unstable_cache(
+  async (supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient.from("tents").select("*");
+    if (error) {
+      reportSupabaseException("fetchTents", error);
+      throw new Error("Error fetching tents: " + error.message);
+    }
+
+    return data;
+  },
+  ["tents"],
+  { revalidate: 7200, tags: ["tents"] }, // 2 hours cache
+);
 
 export async function fetchTents() {
   const supabase = createClient();
-  const { data, error } = await supabase.from("tents").select("*");
-  if (error) {
-    reportSupabaseException("fetchTents", error);
-    throw new Error("Error fetching tents: " + error.message);
-  }
-
-  return data;
+  return getCachedTents(supabase);
 }

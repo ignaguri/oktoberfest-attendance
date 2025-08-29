@@ -85,14 +85,30 @@ const sentryConfig = {
 };
 
 const revision = crypto.randomUUID();
-// Initialize Serwist with configuration
+// Initialize Serwist with enhanced configuration for PWA optimization
 const withSerwist = withSerwistInit({
   swSrc: "app/sw.ts",
   swDest: "public/sw.js",
   cacheOnNavigation: true,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
-  additionalPrecacheEntries: [{ url: "/~offline", revision }],
+  additionalPrecacheEntries: [
+    { url: "/~offline", revision },
+    { url: "/", revision: revision + "-home" },
+    { url: "/home", revision: revision + "-home-page" },
+  ],
+  // Enhanced configuration for better performance
+  exclude: [
+    // Exclude non-essential files from precaching
+    /\.map$/,
+    /^manifest$/,
+    /\.DS_Store$/,
+    /^\.well-known\//,
+    // Exclude large files that should be cached on demand
+    /\.(mp4|webm|ogg|mp3|wav|flac|aac)$/,
+    /\.(zip|tar|gz|bz2)$/,
+  ],
+  maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
 });
 
 // Export the config with Serwist and Sentry wrappers

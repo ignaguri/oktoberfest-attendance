@@ -91,31 +91,6 @@ export function NotificationSettings() {
     }
   };
 
-  const testNotification = async () => {
-    if (!pushSupported || pushPermission !== "granted") return;
-
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification("ProstCounter Test", {
-        body: "Test notification from ProstCounter",
-        icon: "/android-chrome-192x192.png",
-        tag: "test-notification",
-      });
-
-      toast({
-        variant: "success",
-        title: "Test Notification Sent",
-        description: "Check if you received the test notification.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to send test notification.",
-      });
-    }
-  };
-
   return (
     <div className="card">
       <h3 className="py-2 text-xl font-black text-gray-800">
@@ -236,21 +211,6 @@ export function NotificationSettings() {
                 )}
               </div>
             </div>
-
-            {/* Test Button - Positioned at bottom of push notifications container */}
-            {pushSupported && pushPermission === "granted" && (
-              <div className="flex justify-end">
-                <Button
-                  variant="yellow"
-                  size="sm"
-                  onClick={testNotification}
-                  disabled={isUpdating || !preferences.push_enabled}
-                  className="text-xs"
-                >
-                  Test notification
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </div>

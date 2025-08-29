@@ -6,7 +6,7 @@ import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import type { GalleryData, GalleryItem, PictureData } from "@/lib/types";
 
@@ -56,6 +56,11 @@ export async function createGroup(formData: {
     throw new Error("Error adding user to group: " + memberError.message);
   }
 
+  // Invalidate cache tags for groups
+  revalidateTag("groups");
+  revalidateTag("user-groups");
+  revalidateTag("group-members");
+
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupData.id}`);
   revalidatePath("/home");
@@ -95,6 +100,11 @@ export async function joinGroup(formData: {
     console.error("Failed to send join notification:", notificationError);
     // Don't fail the join operation if notification fails
   }
+
+  // Invalidate cache tags for groups
+  revalidateTag("groups");
+  revalidateTag("user-groups");
+  revalidateTag("group-members");
 
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);

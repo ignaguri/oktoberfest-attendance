@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useNotifications } from "@/contexts/NotificationContext";
+import {
+  cn,
+  isPWAInstalled,
+  isIOS,
+  supportsBeforeInstallPrompt,
+} from "@/lib/utils";
 import { X, Share, SquarePlus } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
@@ -86,37 +92,8 @@ function trackInstallPWAEvent(event: InstallPWAEvent): void {
   }
 }
 
-function isPWAInstalled(): boolean {
-  if (typeof window !== "undefined") {
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      return true;
-    }
-    if (
-      "standalone" in window.navigator &&
-      (window.navigator as any).standalone === true
-    ) {
-      return true;
-    }
-    if (document.referrer.includes("android-app://")) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isIOS(): boolean {
-  if (typeof window === "undefined") return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-
-function supportsBeforeInstallPrompt(): boolean {
-  if (typeof window === "undefined") return false;
-  return (
-    "BeforeInstallPromptEvent" in window || "onbeforeinstallprompt" in window
-  );
-}
-
 export default function InstallPWA() {
+  const { setInstallPWAVisible, canShowInstallPWA } = useNotifications();
   const [supportsPWA, setSupportsPWA] = useState(false);
   const [promptInstall, setPromptInstall] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -152,14 +129,22 @@ export default function InstallPWA() {
     const handler = (e: Event) => {
       const installEvent = e as BeforeInstallPromptEvent;
       installEvent.preventDefault();
-      setSupportsPWA(true);
-      setIsOpen(true);
-      setPromptInstall(installEvent);
 
-      const currentCount = getPromptCount() + 1;
-      incrementPromptCount();
+      // InstallPWA has priority - show immediately if we can
+      if (canShowInstallPWA) {
+        setSupportsPWA(true);
+        setIsOpen(true);
+        setInstallPWAVisible(true);
+        setPromptInstall(installEvent);
 
-      trackInstallPWAEvent({ type: "prompt_shown", promptCount: currentCount });
+        const currentCount = getPromptCount() + 1;
+        incrementPromptCount();
+
+        trackInstallPWAEvent({
+          type: "prompt_shown",
+          promptCount: currentCount,
+        });
+      }
     };
 
     const checkInstalled = () => {
@@ -172,10 +157,16 @@ export default function InstallPWA() {
       const promptCount = getPromptCount();
 
       // Check for iOS devices that support PWA but don't have beforeinstallprompt
-      if (isIOS() && !isPWAInstalled() && promptCount < MAX_PROMPT_COUNT) {
+      if (
+        isIOS() &&
+        !isPWAInstalled() &&
+        promptCount < MAX_PROMPT_COUNT &&
+        canShowInstallPWA
+      ) {
         setSupportsPWA(true);
         setShowIOSInstructions(true);
         setIsOpen(true);
+        setInstallPWAVisible(true);
         incrementPromptCount();
         trackInstallPWAEvent({ type: "ios_instructions_shown" });
         return;
@@ -189,15 +180,29 @@ export default function InstallPWA() {
       }
     };
 
-    checkInstalled();
-    checkPWASupport();
+    // Give InstallPWA immediate priority on page load
+    const immediateCheck = () => {
+      checkInstalled();
+      checkPWASupport();
+    };
+
+    // Run immediately
+    immediateCheck();
+
+    // Also set up event listeners
     window.addEventListener("appinstalled", checkInstalled);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
       window.removeEventListener("appinstalled", checkInstalled);
     };
-  }, [isClient, incrementPromptCount, getPromptCount]);
+  }, [
+    isClient,
+    incrementPromptCount,
+    getPromptCount,
+    canShowInstallPWA,
+    setInstallPWAVisible,
+  ]);
 
   const installPWA = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
@@ -253,6 +258,7 @@ export default function InstallPWA() {
   const closePrompt = () => {
     trackInstallPWAEvent({ type: "prompt_closed_manually" });
     setIsOpen(false);
+    setInstallPWAVisible(false);
     setTimeout(() => {
       setHide(true);
     }, 700);
