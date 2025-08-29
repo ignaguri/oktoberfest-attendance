@@ -1,6 +1,6 @@
 {
   "name": "oktoberfest-attendance",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,7 +16,16 @@
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
     "sup:restart": "supabase stop && supabase start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "version:show": "node scripts/version.js show",
+    "version:patch": "node scripts/version.js patch",
+    "version:minor": "node scripts/version.js minor",
+    "version:major": "node scripts/version.js major",
+    "version:set": "node scripts/version.js set",
+    "release:patch": "pnpm run version:patch && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && git push && git push --tags",
+    "release:minor": "pnpm run version:minor && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && git push && git push --tags",
+    "release:major": "pnpm run version:major && git add . && git commit -m \"chore: bump version\" && git tag v$(node scripts/version.js show) && git push && git push --tags",
+    "prepare": "husky"
   },
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
@@ -94,7 +103,8 @@
     "tailwindcss": "4.1.12",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.9.2",
-    "typescript-eslint": "^8.41.0"
+    "typescript-eslint": "^8.41.0",
+    "husky": "^9.0.0"
   },
   "overrides": {
     "eslint": "$eslint"

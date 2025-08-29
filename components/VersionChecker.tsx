@@ -2,57 +2,63 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { RefreshCw, X } from "lucide-react";
+import { useEffect } from "react";
+import { useAppUpdate } from "@/hooks/use-app-update";
 
-import { APP_VERSION } from "../version";
-
-// TODO: evaluate, because it's not working as expected
 export function VersionChecker() {
-  const [newVersionAvailable, setNewVersionAvailable] = useState(false);
+  const { hasUpdate, changelog, isChecking, applyUpdate, skipUpdate } = useAppUpdate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkVersion = () => {
-      const currentVersion = localStorage.getItem("appVersion");
-      if (currentVersion && currentVersion !== APP_VERSION) {
-        setNewVersionAvailable(true);
-      }
-    };
-
-    checkVersion();
-    window.addEventListener("focus", checkVersion);
-
-    return () => {
-      window.removeEventListener("focus", checkVersion);
-    };
-  }, []);
-
-  const handleUpdate = () => {
-    localStorage.setItem("appVersion", APP_VERSION);
-    window.location.reload();
-  };
-
-  useEffect(() => {
-    if (newVersionAvailable) {
+    if (hasUpdate) {
       toast({
-        title: "New Version Available",
+        title: "New Version Available! 🚀",
         description: (
-          <span className="text-sm line-clamp-3">
-            A new version of the app is available. Please update to get the
-            latest features and improvements.
-          </span>
+          <div className="space-y-2">
+            <p className="text-sm">
+              A new version of the app is available with the following improvements:
+            </p>
+            {changelog.length > 0 && (
+              <ul className="text-xs space-y-1 text-muted-foreground">
+                {changelog.map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span>•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         ),
         action: (
-          <Button size="sm" onClick={handleUpdate}>
-            <RefreshCw size={20} />
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={applyUpdate} className="bg-green-600 hover:bg-green-700">
+              <RefreshCw size={16} className="mr-1" />
+              Update Now
+            </Button>
+            <Button size="sm" variant="outline" onClick={skipUpdate}>
+              <X size={16} />
+            </Button>
+          </div>
         ),
-        variant: "info",
-        duration: 20000,
+        variant: "default",
+        duration: Infinity, // Persistent until user acts
       });
     }
-  }, [newVersionAvailable, toast]);
+  }, [hasUpdate, changelog, toast, applyUpdate, skipUpdate]);
+
+  // Show loading state while checking
+  useEffect(() => {
+    if (isChecking) {
+      toast({
+        title: "Checking for Updates",
+        description: "Looking for the latest version...",
+        variant: "default",
+        duration: 3000,
+      });
+    }
+  }, [isChecking, toast]);
 
   return null;
 }

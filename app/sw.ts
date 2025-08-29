@@ -12,7 +12,16 @@ import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+    versionData?: VersionData;
   }
+}
+
+interface VersionData {
+  version: string;
+  buildTime: string;
+  changelog: string[];
+  requiresUpdate: boolean;
+  lastChecked: string;
 }
 
 declare const self: WorkerGlobalScope;
@@ -97,6 +106,85 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// App update detection
+let updateCheckInterval: NodeJS.Timeout | null = null;
+
+function startUpdateChecking() {
+  // Check for updates every 30 minutes
+  updateCheckInterval = setInterval(async () => {
+    try {
+      const response = await fetch("/api/version");
+      const versionData: VersionData = await response.json();
+      
+      // Store version data for comparison
+      self.versionData = versionData;
+      
+      // Check if there's a new version available
+      if (versionData.requiresUpdate) {
+        // Notify all clients about the update
+        const clients = await self.clients.matchAll();
+        clients.forEach((client) => {
+          client.postMessage({
+            type: "UPDATE_AVAILABLE",
+            newVersion: versionData.version,
+            changelog: versionData.changelog,
+          });
+        });
+      }
+    } catch (error) {
+      console.error("Failed to check for updates:", error);
+    }
+  }, 30 * 60 * 1000); // 30 minutes
+}
+
+// Start update checking when service worker activates
+self.addEventListener("activate", () => {
+  startUpdateChecking();
+});
+
+// Handle messages from the main app
+self.addEventListener("message", (event: Event) => {
+  const messageEvent = event as MessageEvent;
+  
+  if (messageEvent.data?.type === "CHECK_FOR_UPDATES") {
+    // Immediate update check requested by the app
+    fetch("/api/version")
+      .then((response) => response.json())
+      .then((versionData: VersionData) => {
+        self.versionData = versionData;
+        
+        // Notify the client about the check result
+        if (messageEvent.ports && messageEvent.ports[0]) {
+          messageEvent.ports[0].postMessage({
+            type: "VERSION_CHECK_RESULT",
+            data: versionData,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to check for updates:", error);
+        if (messageEvent.ports && messageEvent.ports[0]) {
+          messageEvent.ports[0].postMessage({
+            type: "VERSION_CHECK_ERROR",
+            error: error.message,
+          });
+        }
+      });
+  } else if (messageEvent.data?.type === "APPLY_UPDATE") {
+    // Apply update by skipping waiting and claiming clients
+    if (self.registration.waiting) {
+      self.registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    }
+  }
+});
+
+// Clean up interval when service worker is uninstalled
+self.addEventListener("beforeuninstall", () => {
+  if (updateCheckInterval) {
+    clearInterval(updateCheckInterval);
+  }
+});
 
 // Push notification event handler
 self.addEventListener("push", (event) => {
