@@ -139,8 +139,8 @@ function startUpdateChecking() {
         console.error("Failed to check for updates:", error);
       }
     },
-    30 * 60 * 1000,
-  ); // 30 minutes
+    4 * 60 * 60 * 1000,
+  ); // 4 hours
 }
 
 // Start update checking when service worker activates
