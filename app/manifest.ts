@@ -47,6 +47,47 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
     ],
+    shortcuts: [
+      {
+        name: "Track Attendance",
+        short_name: "Attendance",
+        description: "Track your beer festival attendance and consumption",
+        url: "/attendance",
+        icons: [
+          {
+            src: "/favicon-96x96.png",
+            sizes: "96x96",
+            type: "image/png",
+          },
+        ],
+      },
+      {
+        name: "My Groups",
+        short_name: "Groups",
+        description: "Manage your festival groups and competitions",
+        url: "/groups",
+        icons: [
+          {
+            src: "/favicon-96x96.png",
+            sizes: "96x96",
+            type: "image/png",
+          },
+        ],
+      },
+      {
+        name: "Achievements",
+        short_name: "Achievements",
+        description: "View your progress and unlock achievements",
+        url: "/achievements",
+        icons: [
+          {
+            src: "/favicon-96x96.png",
+            sizes: "96x96",
+            type: "image/png",
+          },
+        ],
+      },
+    ],
     categories: ["entertainment", "social", "lifestyle"],
   };
 }

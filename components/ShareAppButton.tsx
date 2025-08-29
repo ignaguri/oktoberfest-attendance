@@ -12,24 +12,29 @@ const ICON_SIZE = 20;
 export default function ShareAppButton() {
   const [open, setOpen] = useState(false);
   const {
-    copyButtonText,
     showQRCode,
-    copyToClipboard,
+    isWebShareSupported,
     shareViaWhatsApp,
+    shareViaNative,
     toggleQRCode,
-  } = useShare();
+  } = useShare({
+    title: "ProstCounter App",
+    text: "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends.",
+  });
 
   const title = "Share ProstCounter App with friends!";
   const description = "Choose how you'd like to share the app:";
 
   const ButtonsGroup = () => (
     <div className="flex flex-col gap-2 items-center p-8">
-      <Button variant="yellow" onClick={shareViaWhatsApp}>
-        Share via WhatsApp
+      <Button variant="yellow" onClick={shareViaNative}>
+        {isWebShareSupported ? "Share App" : "Copy to Clipboard"}
       </Button>
-      <Button variant="yellowOutline" onClick={copyToClipboard}>
-        {copyButtonText}
-      </Button>
+      {!isWebShareSupported && (
+        <Button variant="yellow" onClick={shareViaWhatsApp}>
+          Share via WhatsApp
+        </Button>
+      )}
       <Button variant="secondary" onClick={toggleQRCode}>
         {showQRCode ? "Hide QR Code" : "Show QR Code"}
       </Button>

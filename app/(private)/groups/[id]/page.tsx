@@ -52,11 +52,7 @@ export default async function GroupPage({
           <h2 className="text-3xl font-bold text-center grow pr-2">
             Group &quot;{group.name}&quot;
           </h2>
-          <ShareButton
-            groupName={group.name}
-            groupId={group.id}
-            groupPassword={group.password}
-          />
+          <ShareButton groupName={group.name} groupId={group.id} />
         </div>
 
         {group.description && (
@@ -85,12 +81,7 @@ export default async function GroupPage({
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
             </Button>
-            <ShareButton
-              groupName={group.name}
-              groupId={group.id}
-              groupPassword={group.password}
-              withText
-            />
+            <ShareButton groupName={group.name} groupId={group.id} withText />
             <Button asChild variant="yellowOutline">
               <Link href="/attendance">Register attendance</Link>
             </Button>

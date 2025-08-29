@@ -18,6 +18,36 @@ export function useShare(options: UseShareOptions = {}) {
     "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends. Click here to join:";
   const shareText = `${options.text || defaultText} ${options.url || APP_URL}`;
 
+  // Check if Web Share API is supported
+  const isWebShareSupported =
+    typeof navigator !== "undefined" && "share" in navigator;
+
+  const shareViaNative = async () => {
+    if (!isWebShareSupported) {
+      // Fallback to clipboard copy
+      await copyToClipboard();
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: options.title || "ProstCounter App",
+        text: options.text || defaultText,
+        url: options.url || APP_URL,
+      });
+    } catch (error) {
+      // User cancelled or error occurred, fallback to clipboard
+      if ((error as Error).name !== "AbortError") {
+        toast({
+          variant: "destructive",
+          title: "Share failed",
+          description: "Native sharing failed. Copied to clipboard instead.",
+        });
+      }
+      await copyToClipboard();
+    }
+  };
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareText);
@@ -53,8 +83,10 @@ export function useShare(options: UseShareOptions = {}) {
     shareText,
     copyButtonText,
     showQRCode,
+    isWebShareSupported,
     copyToClipboard,
     shareViaWhatsApp,
+    shareViaNative,
     toggleQRCode,
     resetCopyButton,
   };
