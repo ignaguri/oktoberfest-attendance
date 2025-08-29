@@ -1,6 +1,10 @@
 import { defaultCache } from "@serwist/next/worker";
-import { Serwist } from "serwist";
-import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from "serwist";
+import {
+  CacheFirst,
+  StaleWhileRevalidate,
+  NetworkFirst,
+  Serwist,
+} from "serwist";
 
 import type { RuntimeCaching } from "serwist";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
