@@ -6,12 +6,13 @@ import { createClient } from "@/utils/supabase/server";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 import type { Tables } from "@/lib/database.types";
+import type { SupabaseClient } from "@/lib/types";
 
 import "server-only";
 
 // Cache group details for 10 minutes since group settings change infrequently
 const getCachedGroupDetails = unstable_cache(
-  async (groupId: string, supabaseClient: any) => {
+  async (groupId: string, supabaseClient: SupabaseClient) => {
     const { data, error } = await supabaseClient
       .from("groups")
       .select("*")
@@ -35,7 +36,7 @@ export async function fetchGroupDetails(groupId: string) {
 
 // Cache group members for 5 minutes since membership changes occasionally
 const getCachedGroupMembers = unstable_cache(
-  async (groupId: string, supabaseClient: any) => {
+  async (groupId: string, supabaseClient: SupabaseClient) => {
     type PartialProfile = Pick<
       Tables<"profiles">,
       "id" | "username" | "full_name"

@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import { unstable_cache } from "next/cache";
 
 import type { Tables } from "@/lib/database.types";
+import type { SupabaseClient } from "@/lib/types";
 
 import "server-only";
 
@@ -14,7 +15,7 @@ const getCachedUserGroups = unstable_cache(
   async (
     userId: string,
     festivalId: string | undefined,
-    supabaseClient: any,
+    supabaseClient: SupabaseClient,
   ): Promise<Tables<"groups">[]> => {
     let query = supabaseClient
       .from("group_members")

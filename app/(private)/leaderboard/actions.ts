@@ -4,6 +4,8 @@ import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { unstable_cache } from "next/cache";
 
+import type { SupabaseClient } from "@/lib/types";
+
 import "server-only";
 
 // Cache leaderboard for 5 minutes since it updates frequently with new beer entries
@@ -11,7 +13,7 @@ const getCachedGlobalLeaderboard = unstable_cache(
   async (
     winningCriteriaId: number,
     festivalId: string | undefined,
-    supabaseClient: any,
+    supabaseClient: SupabaseClient,
   ) => {
     const { data, error } = await supabaseClient.rpc("get_global_leaderboard", {
       p_winning_criteria_id: winningCriteriaId,

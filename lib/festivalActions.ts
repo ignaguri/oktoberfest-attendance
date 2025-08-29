@@ -4,13 +4,17 @@ import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { unstable_cache } from "next/cache";
 
-import type { Festival, FestivalTentPricing } from "@/lib/types";
+import type {
+  Festival,
+  FestivalTentPricing,
+  SupabaseClient,
+} from "@/lib/types";
 
 import "server-only";
 
 // Cache festivals data for 1 hour since it changes infrequently
 const getCachedFestivals = unstable_cache(
-  async (supabaseClient: any): Promise<Festival[]> => {
+  async (supabaseClient: SupabaseClient): Promise<Festival[]> => {
     const { data, error } = await supabaseClient
       .from("festivals")
       .select("*")
@@ -34,7 +38,7 @@ export async function fetchFestivals(): Promise<Festival[]> {
 
 // Cache active festival for 30 minutes since it changes more frequently
 const getCachedActiveFestival = unstable_cache(
-  async (supabaseClient: any): Promise<Festival | null> => {
+  async (supabaseClient: SupabaseClient): Promise<Festival | null> => {
     const { data, error } = await supabaseClient
       .from("festivals")
       .select("*")
@@ -63,7 +67,10 @@ export async function fetchActiveFestival(): Promise<Festival | null> {
 
 // Cache individual festival for 1 hour with festival ID as part of cache key
 const getCachedFestivalById = unstable_cache(
-  async (festivalId: string, supabaseClient: any): Promise<Festival | null> => {
+  async (
+    festivalId: string,
+    supabaseClient: SupabaseClient,
+  ): Promise<Festival | null> => {
     const { data, error } = await supabaseClient
       .from("festivals")
       .select("*")
@@ -95,7 +102,7 @@ export async function fetchFestivalById(
 const getCachedFestivalTentPricing = unstable_cache(
   async (
     festivalId: string,
-    supabaseClient: any,
+    supabaseClient: SupabaseClient,
   ): Promise<FestivalTentPricing[]> => {
     const { data, error } = await supabaseClient
       .from("festival_tent_pricing")

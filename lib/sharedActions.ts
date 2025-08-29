@@ -14,6 +14,7 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Tables } from "@/lib/database.types";
+import type { SupabaseClient } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 
 import { NO_ROWS_ERROR, TIMEZONE } from "./constants";
@@ -326,7 +327,7 @@ export async function addAttendance(formData: {
 
 // Cache winning criteria for 4 hours since they rarely change
 const getCachedWinningCriterias = unstable_cache(
-  async (supabaseClient: any) => {
+  async (supabaseClient: SupabaseClient) => {
     const { data, error } = await supabaseClient
       .from("winning_criteria")
       .select("*");
@@ -348,7 +349,7 @@ export async function fetchWinningCriterias() {
 
 // Cache tents for 2 hours since they rarely change
 const getCachedTents = unstable_cache(
-  async (supabaseClient: any) => {
+  async (supabaseClient: SupabaseClient) => {
     const { data, error } = await supabaseClient.from("tents").select("*");
     if (error) {
       reportSupabaseException("fetchTents", error);
