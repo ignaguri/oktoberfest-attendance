@@ -39,7 +39,7 @@ export async function login(
   if (redirectTo) {
     redirect(redirectTo);
   } else {
-    redirect("/");
+    redirect("/home");
   }
 }
 

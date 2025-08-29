@@ -30,7 +30,14 @@ export default function SignIn() {
   const onSubmit = async (data: SignInFormData) => {
     try {
       await login(data, redirect);
-    } catch (error) {
+    } catch (error: any) {
+      // Check if this is a Next.js redirect response
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+        // This is a redirect response, let it pass through
+        throw error;
+      }
+
+      // Only show error for actual authentication failures
       setError("password", { message: "Invalid email or password" });
     }
   };
