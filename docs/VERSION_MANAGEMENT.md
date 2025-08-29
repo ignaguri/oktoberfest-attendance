@@ -106,7 +106,7 @@ Migration guide:
 The system generates two types of changelogs:
 
 ### 1. In-App Changelog (`changelog.ts`)
-- **Only includes `feat` and `fix` commits**
+- **Only includes `feat` commits**
 - Used by the `WhatsNew` component
 - Shows user-facing changes only
 - Automatically filtered and formatted

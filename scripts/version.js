@@ -8,6 +8,7 @@ const { execSync } = require("child_process");
 const PACKAGE_JSON_PATH = path.join(__dirname, "..", "package.json");
 const VERSION_TS_PATH = path.join(__dirname, "..", "version.ts");
 const CHANGELOG_TS_PATH = path.join(__dirname, "..", "changelog.ts");
+const CHANGELOG_MD_PATH = path.join(__dirname, "..", "CHANGELOG.md");
 
 // Get current version from package.json
 function getCurrentVersion() {
@@ -33,21 +34,75 @@ function updateVersionTs(newVersion) {
   console.log(`✅ Updated version.ts to version ${newVersion}`);
 }
 
-// Generate changelog from conventional commits
-function generateChangelog(newVersion) {
+// Helper function to safely parse existing changelog
+function parseExistingChangelog() {
   try {
-    // Get commits since last tag
-    const lastTag = execSync("git describe --tags --abbrev=0", {
-      encoding: "utf8",
-    }).trim();
-    const commits = execSync(`git log ${lastTag}..HEAD --pretty=format:"%s"`, {
-      encoding: "utf8",
-    })
-      .split("\n")
-      .filter(Boolean);
+    const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
+    const match = changelogContent.match(
+      /export const changelog: Record<string, string\[\]> = ({[\s\S]*});/,
+    );
+    if (match) {
+      // Replace eval with safer JSON parsing
+      const jsonString = match[1]
+        .replace(/([{,]\s*)(\w+):/g, '$1"$2":') // Quote unquoted keys
+        .replace(/'/g, '"'); // Replace single quotes with double quotes
+      return JSON.parse(jsonString);
+    }
+    return {};
+  } catch (error) {
+    console.log("⚠️  Could not read existing changelog, creating new one");
+    return {};
+  }
+}
 
-    const changelog = {
-      [newVersion]: [],
+// Helper function to write changelog file
+function writeChangelogFile(changelog) {
+  const changelogContent = `export const changelog: Record<string, string[]> = ${JSON.stringify(changelog, null, 2)};\n`;
+  fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
+}
+
+// Helper function to get commit type emoji
+function getCommitTypeEmoji(type) {
+  const emojiMap = {
+    feat: "✨",
+    fix: "🐛",
+    docs: "📚",
+    style: "🎨",
+    refactor: "♻️",
+    perf: "⚡",
+    test: "🧪",
+    chore: "🔧",
+    breaking: "💥",
+  };
+  return emojiMap[type] || "🔧";
+}
+
+// Helper function to get commits since last tag
+function getCommitsSinceLastTag() {
+  const lastTag = execSync("git describe --tags --abbrev=0", {
+    encoding: "utf8",
+  }).trim();
+  return execSync(`git log ${lastTag}..HEAD --pretty=format:"%s"`, {
+    encoding: "utf8",
+  })
+    .split("\n")
+    .filter(Boolean);
+}
+
+// Generate repository changelog (CHANGELOG.md) with all commit types
+function generateRepositoryChangelog(newVersion) {
+  try {
+    const commits = getCommitsSinceLastTag();
+    const commitsByType = {
+      feat: [],
+      fix: [],
+      docs: [],
+      style: [],
+      refactor: [],
+      perf: [],
+      test: [],
+      chore: [],
+      breaking: [],
     };
 
     commits.forEach((commit) => {
@@ -58,150 +113,84 @@ function generateChangelog(newVersion) {
       ) {
         const type = commit.match(/^(\w+):/)[1];
         const description = commit.replace(/^\w+:\s*/, "");
-
-        let emoji = "🔧";
-        switch (type) {
-          case "feat":
-            emoji = "✨";
-            break;
-          case "fix":
-            emoji = "🐛";
-            break;
-          case "docs":
-            emoji = "📚";
-            break;
-          case "style":
-            emoji = "🎨";
-            break;
-          case "refactor":
-            emoji = "♻️";
-            break;
-          case "perf":
-            emoji = "⚡";
-            break;
-          case "test":
-            emoji = "🧪";
-            break;
-          case "chore":
-            emoji = "🔧";
-            break;
-          case "breaking":
-            emoji = "💥";
-            break;
+        if (commitsByType[type]) {
+          commitsByType[type].push(description);
         }
-
-        changelog[newVersion].push(`${emoji} ${description}`);
       }
     });
 
-    // Read existing changelog
-    let existingChangelog = {};
-    try {
-      const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
-      // Extract the changelog object from the file
-      const match = changelogContent.match(
-        /export const changelog: Record<string, string\[\]> = ({[\s\S]*});/,
-      );
-      if (match) {
-        existingChangelog = eval(`(${match[1]})`);
-      }
-    } catch (error) {
-      console.log("⚠️  Could not read existing changelog, creating new one");
-    }
+    // Generate markdown content
+    let changelogContent = "";
+    const date = new Date().toISOString().split("T")[0];
+    changelogContent += `## [${newVersion}] - ${date}\n\n`;
 
-    // Merge with existing changelog
-    const mergedChangelog = { ...changelog, ...existingChangelog };
-
-    // Generate changelog.ts content
-    const changelogContent = `export const changelog: Record<string, string[]> = ${JSON.stringify(mergedChangelog, null, 2)};\n`;
-    fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
-    console.log(
-      `✅ Updated changelog.ts with ${changelog[newVersion].length} new entries`,
-    );
-
-    return changelog[newVersion];
-  } catch (error) {
-    console.log(
-      "⚠️  Could not generate changelog from commits:",
-      error.message,
-    );
-    // Create empty changelog entry
-    const changelog = {
-      [newVersion]: ["🔧 Version update"],
+    const typeLabels = {
+      feat: "✨ Features",
+      fix: "🐛 Bug Fixes",
+      docs: "📚 Documentation",
+      style: "🎨 Styles",
+      refactor: "♻️ Code Refactoring",
+      perf: "⚡ Performance Improvements",
+      test: "🧪 Tests",
+      chore: "🔧 Chores",
+      breaking: "💥 BREAKING CHANGES",
     };
 
-    // Read existing changelog
-    let existingChangelog = {};
-    try {
-      const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
-      const match = changelogContent.match(
-        /export const changelog: Record<string, string\[\]> = ({[\s\S]*});/,
-      );
-      if (match) {
-        existingChangelog = eval(`(${match[1]})`);
+    Object.entries(commitsByType).forEach(([type, commits]) => {
+      if (commits.length > 0) {
+        changelogContent += `### ${typeLabels[type]}\n\n`;
+        commits.forEach((commit) => {
+          changelogContent += `- ${commit}\n`;
+        });
+        changelogContent += "\n";
       }
+    });
+
+    // Read existing CHANGELOG.md or create header
+    let existingContent = "";
+    try {
+      existingContent = fs.readFileSync(CHANGELOG_MD_PATH, "utf8");
+      // Remove the header if it exists to avoid duplication
+      existingContent = existingContent.replace(/^# Changelog\n\n/, "");
     } catch (error) {
-      console.log("⚠️  Could not read existing changelog, creating new one");
+      // File doesn't exist, will create new one
     }
 
-    // Merge with existing changelog
-    const mergedChangelog = { ...changelog, ...existingChangelog };
-    const changelogContent = `export const changelog: Record<string, string[]> = ${JSON.stringify(mergedChangelog, null, 2)};\n`;
-    fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
-    console.log(`✅ Updated changelog.ts with default entry`);
+    // Combine new and existing content
+    const fullContent = `# Changelog\n\n${changelogContent}${existingContent}`;
+    fs.writeFileSync(CHANGELOG_MD_PATH, fullContent);
 
-    return changelog[newVersion];
+    const totalCommits = Object.values(commitsByType).flat().length;
+    console.log(`✅ Updated CHANGELOG.md with ${totalCommits} new entries`);
+
+    return totalCommits;
+  } catch (error) {
+    console.log("⚠️  Could not generate CHANGELOG.md:", error.message);
+    return 0;
   }
 }
 
+// Generate in-app changelog (only feature commits)
 function generateInAppChangelog(newVersion) {
   try {
-    const lastTag = execSync("git describe --tags --abbrev=0", {
-      encoding: "utf8",
-    }).trim();
-
-    const allCommits = execSync(
-      `git log ${lastTag}..HEAD --pretty=format:"%s"`,
-      {
-        encoding: "utf8",
-      },
-    )
-      .split("\n")
-      .filter(Boolean);
-
-    const filteredCommits = allCommits.filter((commit) =>
+    const commits = getCommitsSinceLastTag();
+    const featCommits = commits.filter((commit) =>
       commit.match(/^feat:\s*(.*)/),
     );
+    const changelogEntries = featCommits
+      .map((commit) => {
+        const match = commit.match(/^feat:\s*(.*)/);
+        return match ? `✨ ${match[1]}` : null;
+      })
+      .filter(Boolean);
 
-    const changelogEntries = [];
-    filteredCommits.forEach((commit) => {
-      const match = commit.match(/^feat:\s*(.*)/);
-      if (match) {
-        const description = match[1];
-        changelogEntries.push(`✨ ${description}`);
-      }
-    });
-
-    // Read existing changelog
-    let existingChangelog = {};
-    try {
-      const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
-      const match = changelogContent.match(
-        /export const changelog: Record<string, string\[\]> = ({[\s\S]*});/,
-      );
-      if (match) {
-        existingChangelog = eval(`(${match[1]})`);
-      }
-    } catch (error) {
-      console.log("⚠️  Could not read existing changelog.ts, creating new one");
-    }
-
+    const existingChangelog = parseExistingChangelog();
     const mergedChangelog = {
       [newVersion]: changelogEntries,
       ...existingChangelog,
     };
-    const changelogContent = `export const changelog: Record<string, string[]> = ${JSON.stringify(mergedChangelog, null, 2)};\n`;
-    fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
+
+    writeChangelogFile(mergedChangelog);
     console.log(
       `✅ Updated changelog.ts with ${changelogEntries.length} new entries`,
     );
@@ -212,25 +201,15 @@ function generateInAppChangelog(newVersion) {
       "⚠️  Could not generate changelog.ts from commits:",
       error.message,
     );
-    // Create empty changelog entry
+
     const defaultEntries = ["🔧 Version update"];
-    let existingChangelog = {};
-    try {
-      const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
-      const match = changelogContent.match(
-        /export const changelog: Record<string, string\[\]> = ({[\s\S]*});/,
-      );
-      if (match) {
-        existingChangelog = eval(`(${match[1]})`);
-      }
-    } catch (error) {
-      console.log("⚠️  Could not read existing changelog, creating new one");
-    }
+    const existingChangelog = parseExistingChangelog();
     const mergedChangelog = {
       [newVersion]: defaultEntries,
       ...existingChangelog,
     };
-    fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
+
+    writeChangelogFile(mergedChangelog);
     console.log(`✅ Updated changelog.ts with default entry`);
     return defaultEntries;
   }
@@ -297,18 +276,22 @@ function main() {
   // Update files
   updatePackageJson(newVersion);
   updateVersionTs(newVersion);
-  const changes = generateChangelog(newVersion);
+
+  // Generate both changelogs as per documentation requirements
+  const repoChanges = generateRepositoryChangelog(newVersion);
+  const inAppChanges = generateInAppChangelog(newVersion);
 
   console.log("");
   console.log(`🎉 Version updated to ${newVersion}!`);
-  console.log(`📝 Changelog entries: ${changes.length}`);
+  console.log(`📝 Repository changelog entries: ${repoChanges}`);
+  console.log(`📱 In-app changelog entries: ${inAppChanges.length}`);
   console.log("");
   console.log("Next steps:");
   console.log("1. Review the changes");
   console.log(
-    '2. Commit the changes: git add . && git commit -m "chore: bump version to ${newVersion}"',
+    `2. Commit the changes: git add . && git commit -m "chore: bump version to ${newVersion}"`,
   );
-  console.log("3. Create a tag: git tag v${newVersion}");
+  console.log(`3. Create a tag: git tag v${newVersion}`);
   console.log("4. Push: git push && git push --tags");
   console.log("");
   console.log("Or use the quick release command:");
@@ -328,5 +311,6 @@ module.exports = {
   getCurrentVersion,
   updatePackageJson,
   updateVersionTs,
-  generateChangelog,
+  generateRepositoryChangelog,
+  generateInAppChangelog,
 };
