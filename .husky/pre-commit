@@ -1,0 +1,8 @@
+# Pre-commit hook for code quality checks
+echo "🔍 Running pre-commit checks..."
+
+# Run type checking (less strict than linting)
+echo "🔍 Running TypeScript type check..."
+pnpm run type-check
+
+echo "✅ Pre-commit checks passed!"
