@@ -146,7 +146,7 @@ export const QuickAttendanceRegistrationForm = ({
 
   if (tentsLoading || festivalLoading || !currentFestival) {
     return (
-      <Button className="w-fit self-center" variant="yellow" disabled>
+      <Button className="w-fit self-center" variant="secondary" disabled>
         <LoadingSpinner size={24} />
       </Button>
     );
