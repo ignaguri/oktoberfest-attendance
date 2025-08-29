@@ -103,3 +103,4 @@ pnpm sup:db:types
 ### 3. Run the application
 
 Run the application: `pnpm dev`. Open your browser to `https://localhost:3000/` and you are ready to go 🚀.
+# test
