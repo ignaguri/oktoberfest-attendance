@@ -34,9 +34,8 @@ const getMimeType = (filename: string): string => {
 
 // Cache metadata retrieval for 24 hours
 const getCachedImageMetadata = unstable_cache(
-  async (bucket: string, fileName: string) => {
-    const supabase = createClient(true);
-    const { data, error } = await supabase.storage
+  async (bucket: string, fileName: string, supabaseClient: any) => {
+    const { data, error } = await supabaseClient.storage
       .from(bucket)
       .list("", { search: fileName });
 
@@ -44,7 +43,7 @@ const getCachedImageMetadata = unstable_cache(
       return null;
     }
 
-    const file = data.find((f) => f.name === fileName);
+    const file = data.find((f: any) => f.name === fileName);
     return file
       ? {
           size: file.metadata?.size || 0,
@@ -76,8 +75,11 @@ export async function GET(
   const bucket = bucketParam as AllowedBucket;
 
   try {
+    // Create Supabase client outside cache scope
+    const supabase = createClient(true);
+
     // Get image metadata for ETag generation
-    const metadata = await getCachedImageMetadata(bucket, decodedId);
+    const metadata = await getCachedImageMetadata(bucket, decodedId, supabase);
     if (!metadata) {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
@@ -103,7 +105,6 @@ export async function GET(
     }
 
     // Fetch the actual image data
-    const supabase = createClient(true);
     const { data, error } = await supabase.storage
       .from(bucket)
       .download(decodedId);
