@@ -149,6 +149,22 @@ function getCommitTypeEmoji(type: string): string {
   return emojiMap[type] || "🔧";
 }
 
+// Helper function to get proper commit type display label
+function getCommitTypeLabel(type: string): string {
+  const labelMap: Record<string, string> = {
+    feat: "Features",
+    fix: "Bug Fixes",
+    docs: "Documentation",
+    style: "Styling",
+    refactor: "Code Refactoring",
+    perf: "Performance Improvements",
+    test: "Testing",
+    chore: "Maintenance",
+    breaking: "Breaking Changes",
+  };
+  return labelMap[type] || "Other Changes";
+}
+
 // Helper function to get commits since last tag
 function getCommitsSinceLastTag(): string[] {
   const lastTag = execSync("git describe --tags --abbrev=0", {
@@ -199,8 +215,8 @@ function generateRepositoryChangelog(newVersion: string): number {
     Object.entries(commitsByType).forEach(([type, commits]) => {
       if (commits.length > 0) {
         const emoji = getCommitTypeEmoji(type);
-        const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-        changelogContent += `### ${emoji} ${typeLabel}s\n\n`;
+        const typeLabel = getCommitTypeLabel(type);
+        changelogContent += `### ${emoji} ${typeLabel}\n\n`;
         commits.forEach((commit) => {
           changelogContent += `- ${commit}\n`;
         });

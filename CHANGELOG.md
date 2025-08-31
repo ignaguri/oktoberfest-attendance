@@ -2,7 +2,7 @@
 
 ## [0.4.4] - 2025-08-31
 
-### 🐛 Fixs
+### 🐛 Bug Fixes
 
 - update GitHub Actions workflow pnpm version and lockfile handling
 
