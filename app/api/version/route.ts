@@ -1,5 +1,5 @@
 import { changelog } from "@/changelog";
-import { APP_VERSION } from "@/version";
+import { APP_VERSION } from "@/lib/version";
 import { unstable_cache } from "next/cache";
 import { NextResponse } from "next/server";
 

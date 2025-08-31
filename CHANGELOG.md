@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.4] - 2025-08-31
+
+### 🐛 Fixs
+
+- update GitHub Actions workflow pnpm version and lockfile handling
+
+### 🔧 Chores
+
+- convert version script to TypeScript with changelog preservation
+
 ## [0.4.3] - 2025-08-31
 
 ### 🐛 Bug Fixes

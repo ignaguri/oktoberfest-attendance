@@ -6,7 +6,6 @@ import path from "path";
 
 // Configuration
 const PACKAGE_JSON_PATH = path.join(__dirname, "..", "package.json");
-const VERSION_TS_PATH = path.join(__dirname, "..", "version.ts");
 const CHANGELOG_TS_PATH = path.join(__dirname, "..", "changelog.ts");
 const CHANGELOG_MD_PATH = path.join(__dirname, "..", "CHANGELOG.md");
 
@@ -121,11 +120,11 @@ function updatePackageJson(newVersion: string): void {
   console.log(`✅ Updated package.json to version ${newVersion}`);
 }
 
-// Update version.ts
+// Update version.ts is no longer needed - version comes from package.json
 function updateVersionTs(newVersion: string): void {
-  const content = `export const APP_VERSION = "${newVersion}";\n`;
-  fs.writeFileSync(VERSION_TS_PATH, content);
-  console.log(`✅ Updated version.ts to version ${newVersion}`);
+  console.log(
+    `ℹ️  Version ${newVersion} will be available at build time from package.json`,
+  );
 }
 
 // Helper function to write changelog file
@@ -264,21 +263,8 @@ function generateInAppChangelog(newVersion: string): string[] {
         `✅ Updated changelog.ts with ${changelogEntries.length} new entries`,
       );
     } else {
-      // No new features, preserve existing changelog without overwriting
-      console.log(
-        "ℹ️  No new feature commits found, preserving existing changelog",
-      );
-      if (Object.keys(existingChangelog).length === 0) {
-        // Only create new changelog if none exists
-        const defaultEntries = ["🔧 Version update"];
-        const mergedChangelog: Changelog = {
-          [newVersion]: defaultEntries,
-        };
-        writeChangelogFile(mergedChangelog);
-        console.log("✅ Created new changelog.ts with default entry");
-      } else {
-        console.log("✅ Existing changelog preserved");
-      }
+      // No new features, don't modify the changelog file at all
+      console.log("ℹ️  No new feature commits found, changelog.ts unchanged");
     }
 
     return changelogEntries;
@@ -291,7 +277,7 @@ function generateInAppChangelog(newVersion: string): string[] {
     // Read existing changelog from file
     const existingChangelog = readExistingChangelog();
 
-    // Only add default entry if no existing changelog
+    // Only add default entry if no existing changelog exists
     if (Object.keys(existingChangelog).length === 0) {
       const defaultEntries = ["🔧 Version update"];
       const mergedChangelog: Changelog = {

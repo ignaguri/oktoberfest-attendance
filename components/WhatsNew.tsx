@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from "@/contexts/NotificationContext";
-import { APP_VERSION } from "@/version";
+import { APP_VERSION } from "@/lib/version";
 import { useState, useEffect } from "react";
 
 interface WhatsNewProps {
