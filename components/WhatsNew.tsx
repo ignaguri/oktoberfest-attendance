@@ -33,8 +33,25 @@ export function WhatsNew({
 }: WhatsNewProps) {
   const { setWhatsNewVisible, canShowWhatsNew } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
-  // Start with current version expanded
-  const [expandedVersion, setExpandedVersion] = useState<string>(APP_VERSION);
+  // Start with current version expanded if there are changes, otherwise with the most recent version
+  const [expandedVersion, setExpandedVersion] = useState<string>(() => {
+    const sortedVersions = Object.keys(changelog).sort((a, b) =>
+      b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }),
+    );
+    const currentVersionChanges = changelog[APP_VERSION] || [];
+    return currentVersionChanges.length > 0
+      ? APP_VERSION
+      : sortedVersions[0] || "";
+  });
+  const currentVersionChanges = changelog[APP_VERSION] || [];
+  const sortedVersions = Object.keys(changelog).sort((a, b) =>
+    b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }),
+  );
+
+  const previousVersions = sortedVersions
+    .filter((v) => v !== APP_VERSION)
+    .slice(0, 2); // Only take the two versions before the current one
+  const shouldShowCurrentVersion = currentVersionChanges.length > 0;
 
   // Use controlled state if props are provided, otherwise use internal state
   const isDialogOpen = isManualTrigger ? open : isOpen;
@@ -47,7 +64,11 @@ export function WhatsNew({
     const lastSeenVersion = localStorage.getItem("lastSeenVersion");
     const currentVersion = localStorage.getItem("appVersion");
 
-    if (currentVersion !== APP_VERSION || lastSeenVersion !== APP_VERSION) {
+    // Only show automatically if there are actual changes for the current version
+    if (
+      (currentVersion !== APP_VERSION || lastSeenVersion !== APP_VERSION) &&
+      shouldShowCurrentVersion
+    ) {
       // Add a small delay to give InstallPWA priority on initial load
       const timer = setTimeout(() => {
         // Only show if we can show WhatsNew (not conflicting with InstallPWA)
@@ -75,7 +96,12 @@ export function WhatsNew({
 
       return () => clearTimeout(timer);
     }
-  }, [canShowWhatsNew, setWhatsNewVisible, isManualTrigger]);
+  }, [
+    canShowWhatsNew,
+    setWhatsNewVisible,
+    isManualTrigger,
+    shouldShowCurrentVersion,
+  ]);
 
   const handleClose = () => {
     if (isManualTrigger) {
@@ -99,40 +125,39 @@ export function WhatsNew({
     setExpandedVersion(expandedVersion === version ? "" : version);
   };
 
-  const sortedVersions = Object.keys(changelog).sort((a, b) =>
-    b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }),
-  );
-
-  const currentVersionChanges = changelog[APP_VERSION] || [];
-  const previousVersions = sortedVersions
-    .filter((v) => v !== APP_VERSION)
-    .slice(0, 2); // Only take the two versions before the current one
-
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>What&apos;s New in v{APP_VERSION}</DialogTitle>
+          <DialogTitle>
+            {shouldShowCurrentVersion
+              ? `What's New in v${APP_VERSION}`
+              : `Current version - v${APP_VERSION}`}
+          </DialogTitle>
           <DialogDescription>
-            Check out the latest updates and improvements!
+            {shouldShowCurrentVersion
+              ? "Check out the latest updates and improvements!"
+              : "Browse through previous versions and their changes."}
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="mt-4 max-h-[60vh] pr-4">
+        <ScrollArea className="max-h-[60vh] pr-4">
           <div className="space-y-4">
             <Accordion type="single" value={expandedVersion} className="w-full">
-              {/* Current Version - Always first and expanded */}
-              <AccordionItem key={APP_VERSION} value={APP_VERSION}>
-                <AccordionTrigger onClick={() => toggleVersion(APP_VERSION)}>
-                  Version {APP_VERSION} - Current
-                </AccordionTrigger>
-                <AccordionContent>
-                  <ul className="space-y-2 list-disc pl-5">
-                    {currentVersionChanges.map((change, index) => (
-                      <li key={index}>{change}</li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
+              {/* Current Version - Only show if there are changes */}
+              {shouldShowCurrentVersion && (
+                <AccordionItem key={APP_VERSION} value={APP_VERSION}>
+                  <AccordionTrigger onClick={() => toggleVersion(APP_VERSION)}>
+                    Version {APP_VERSION} - Current
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-2 list-disc pl-5">
+                      {currentVersionChanges.map((change, index) => (
+                        <li key={index}>{change}</li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
               {/* Previous Versions */}
               {previousVersions.map((version) => (
