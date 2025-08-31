@@ -1,5 +1,6 @@
 "use client";
 
+import QRCode from "@/components/QR/QRCode";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
@@ -75,13 +76,21 @@ export default function ShareButton({
   const description = "Choose how you'd like to share the group information:";
 
   const ButtonsGroup = () => (
-    <div className="flex flex-col gap-2 items-center p-8">
-      <Button variant="yellow" onClick={shareViaNative}>
-        {isWebShareSupported ? "Share Invite" : "Copy Invite Link"}
-      </Button>
-      <Button variant="yellow" onClick={shareViaWhatsApp}>
-        Share via WhatsApp
-      </Button>
+    <div className="flex flex-col gap-4 items-center p-6">
+      {groupLink && (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm text-muted-foreground">Scan QR code to join:</p>
+          <QRCode value={groupLink} size={180} />
+        </div>
+      )}
+      <div className="flex flex-col gap-2">
+        <Button variant="yellow" onClick={shareViaNative}>
+          {isWebShareSupported ? "Share Invite" : "Copy Invite Link"}
+        </Button>
+        <Button variant="darkYellow" onClick={shareViaWhatsApp}>
+          Share via WhatsApp
+        </Button>
+      </div>
     </div>
   );
 
