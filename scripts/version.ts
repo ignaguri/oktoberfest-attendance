@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
+import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
 
 // Configuration
 const PACKAGE_JSON_PATH = path.join(__dirname, "..", "package.json");
@@ -29,64 +29,90 @@ function readExistingChangelog(): Changelog {
       try {
         // Create a more robust JSON parsing approach
         let jsonString = match[1];
-        
+
         // Fix array syntax: replace [ with [ and ] with ]
-        jsonString = jsonString.replace(/\[/g, '[').replace(/\]/g, ']');
-        
+        jsonString = jsonString.replace(/\[/g, "[").replace(/\]/g, "]");
+
         // Quote unquoted keys
         jsonString = jsonString.replace(/([{,]\s*)(\w+):/g, '$1"$2":');
-        
+
         // Replace single quotes with double quotes
         jsonString = jsonString.replace(/'/g, '"');
-        
+
         // Handle trailing commas in arrays and objects
-        jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1');
-        
+        jsonString = jsonString.replace(/,(\s*[}\]])/g, "$1");
+
         const result = JSON.parse(jsonString);
-        console.log("✅ Successfully read existing changelog with", Object.keys(result).length, "versions");
+        console.debug(
+          "✅ Successfully read existing changelog with",
+          Object.keys(result).length,
+          "versions",
+        );
         return result;
       } catch (parseError) {
-        console.log("❌ JSON parse error:", parseError instanceof Error ? parseError.message : String(parseError));
-        console.log("🔍 Attempting manual parsing...");
-        
+        console.error(
+          "❌ JSON parse error:",
+          parseError instanceof Error ? parseError.message : String(parseError),
+        );
+        console.debug("🔍 Attempting manual parsing...");
+
         // Fallback: try to manually extract version entries
         try {
-          const versionMatches = changelogContent.matchAll(/"([^"]+)":\s*\[([^\]]+)\]/g);
+          const versionMatches = changelogContent.matchAll(
+            /"([^"]+)":\s*\[([^\]]+)\]/g,
+          );
           const result: Changelog = {};
           const matches = Array.from(versionMatches);
           for (const match of matches) {
             const version = match[1];
-            const entries = match[2].split(',').map((entry: string) => 
-              entry.trim().replace(/^["']|["']$/g, '')
-            ).filter((entry: string) => entry.length > 0);
+            const entries = match[2]
+              .split(",")
+              .map((entry: string) => entry.trim().replace(/^["']|["']$/g, ""))
+              .filter((entry: string) => entry.length > 0);
             result[version] = entries;
           }
-          console.log("✅ Manual parsing successful with", Object.keys(result).length, "versions");
+          console.debug(
+            "✅ Manual parsing successful with",
+            Object.keys(result).length,
+            "versions",
+          );
           return result;
         } catch (manualError) {
-          console.log("❌ Manual parsing also failed:", manualError instanceof Error ? manualError.message : String(manualError));
+          console.error(
+            "❌ Manual parsing also failed:",
+            manualError instanceof Error
+              ? manualError.message
+              : String(manualError),
+          );
           return {};
         }
       }
     } else {
-      console.log("❌ No regex match found");
+      console.error("❌ No regex match found");
       return {};
     }
   } catch (error) {
-    console.log("⚠️  Could not read existing changelog:", error instanceof Error ? error.message : String(error));
+    console.error(
+      "⚠️  Could not read existing changelog:",
+      error instanceof Error ? error.message : String(error),
+    );
     return {};
   }
 }
 
 // Get current version from package.json
 function getCurrentVersion(): string {
-  const packageJson: PackageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, "utf8"));
+  const packageJson: PackageJson = JSON.parse(
+    fs.readFileSync(PACKAGE_JSON_PATH, "utf8"),
+  );
   return packageJson.version;
 }
 
 // Update version in package.json
 function updatePackageJson(newVersion: string): void {
-  const packageJson: PackageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, "utf8"));
+  const packageJson: PackageJson = JSON.parse(
+    fs.readFileSync(PACKAGE_JSON_PATH, "utf8"),
+  );
   packageJson.version = newVersion;
   fs.writeFileSync(
     PACKAGE_JSON_PATH,
@@ -171,21 +197,11 @@ function generateRepositoryChangelog(newVersion: string): number {
     const date = new Date().toISOString().split("T")[0];
     changelogContent += `## [${newVersion}] - ${date}\n\n`;
 
-    const typeLabels: Record<string, string> = {
-      feat: "✨ Features",
-      fix: "🐛 Bug Fixes",
-      docs: "📚 Documentation",
-      style: "🎨 Styles",
-      refactor: "♻️ Code Refactoring",
-      perf: "⚡ Performance Improvements",
-      test: "🧪 Tests",
-      chore: "🔧 Chores",
-      breaking: "💥 BREAKING CHANGES",
-    };
-
     Object.entries(commitsByType).forEach(([type, commits]) => {
       if (commits.length > 0) {
-        changelogContent += `### ${typeLabels[type]}\n\n`;
+        const emoji = getCommitTypeEmoji(type);
+        const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+        changelogContent += `### ${emoji} ${typeLabel}s\n\n`;
         commits.forEach((commit) => {
           changelogContent += `- ${commit}\n`;
         });
@@ -212,7 +228,10 @@ function generateRepositoryChangelog(newVersion: string): number {
 
     return totalCommits;
   } catch (error) {
-    console.log("⚠️  Could not generate CHANGELOG.md:", error instanceof Error ? error.message : String(error));
+    console.log(
+      "⚠️  Could not generate CHANGELOG.md:",
+      error instanceof Error ? error.message : String(error),
+    );
     return 0;
   }
 }
@@ -233,7 +252,7 @@ function generateInAppChangelog(newVersion: string): string[] {
 
     // Read existing changelog from file instead of importing
     const existingChangelog = readExistingChangelog();
-    
+
     // Only add new version if there are actual feature commits
     if (changelogEntries.length > 0) {
       const mergedChangelog: Changelog = {
@@ -246,7 +265,9 @@ function generateInAppChangelog(newVersion: string): string[] {
       );
     } else {
       // No new features, preserve existing changelog without overwriting
-      console.log("ℹ️  No new feature commits found, preserving existing changelog");
+      console.log(
+        "ℹ️  No new feature commits found, preserving existing changelog",
+      );
       if (Object.keys(existingChangelog).length === 0) {
         // Only create new changelog if none exists
         const defaultEntries = ["🔧 Version update"];
@@ -269,7 +290,7 @@ function generateInAppChangelog(newVersion: string): string[] {
 
     // Read existing changelog from file
     const existingChangelog = readExistingChangelog();
-    
+
     // Only add default entry if no existing changelog
     if (Object.keys(existingChangelog).length === 0) {
       const defaultEntries = ["🔧 Version update"];
@@ -379,9 +400,9 @@ if (require.main === module) {
 }
 
 export {
+  generateInAppChangelog,
+  generateRepositoryChangelog,
   getCurrentVersion,
   updatePackageJson,
   updateVersionTs,
-  generateRepositoryChangelog,
-  generateInAppChangelog,
 };

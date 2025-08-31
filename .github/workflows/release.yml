@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate changelog
         run: |
-          tsx scripts/version.ts set ${{ env.NEW_VERSION }}
+          pnpm run version:set ${{ env.NEW_VERSION }}
 
       - name: Build application
         run: pnpm run build
