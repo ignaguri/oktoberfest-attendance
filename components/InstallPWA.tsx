@@ -2,279 +2,51 @@
 
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
-import {
-  cn,
-  isPWAInstalled,
-  isIOS,
-  supportsBeforeInstallPrompt,
-} from "@/lib/utils";
+import { useInstallPWA } from "@/hooks/use-install-pwa";
+import { cn } from "@/lib/utils";
 import { X, Share, SquarePlus } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
-
-type InstallPWAEvent =
-  | { type: "prompt_shown"; promptCount: number }
-  | { type: "install_clicked" }
-  | { type: "install_success" }
-  | { type: "install_dismissed" }
-  | { type: "install_error"; error: string }
-  | { type: "prompt_closed_manually" }
-  | { type: "ios_instructions_shown" };
-
-const MAX_PROMPT_COUNT = 3;
-
-function trackInstallPWAEvent(event: InstallPWAEvent): void {
-  if (typeof window !== "undefined" && "gtag" in window) {
-    const gtag = (window as any).gtag;
-
-    switch (event.type) {
-      case "prompt_shown":
-        gtag("event", "pwa_prompt_shown", {
-          event_category: "PWA",
-          event_label: "Install Prompt Displayed",
-          value: event.promptCount,
-          custom_parameters: {
-            prompt_count: event.promptCount,
-          },
-        });
-        break;
-
-      case "install_clicked":
-        gtag("event", "pwa_install_clicked", {
-          event_category: "PWA",
-          event_label: "Install Button Clicked",
-        });
-        break;
-
-      case "install_success":
-        gtag("event", "pwa_install_success", {
-          event_category: "PWA",
-          event_label: "App Successfully Installed",
-          value: 1,
-        });
-        break;
-
-      case "install_dismissed":
-        gtag("event", "pwa_install_dismissed", {
-          event_category: "PWA",
-          event_label: "Install Prompt Dismissed",
-        });
-        break;
-
-      case "install_error":
-        gtag("event", "pwa_install_error", {
-          event_category: "PWA",
-          event_label: "Install Failed",
-          custom_parameters: {
-            error_message: event.error,
-          },
-        });
-        break;
-
-      case "prompt_closed_manually":
-        gtag("event", "pwa_prompt_closed", {
-          event_category: "PWA",
-          event_label: "Prompt Closed Manually",
-        });
-        break;
-
-      case "ios_instructions_shown":
-        gtag("event", "pwa_ios_instructions_shown", {
-          event_category: "PWA",
-          event_label: "iOS Install Instructions Shown",
-        });
-        break;
-    }
-  }
-}
+import { useState } from "react";
 
 export default function InstallPWA() {
   const { setInstallPWAVisible, canShowInstallPWA } = useNotifications();
-  const [supportsPWA, setSupportsPWA] = useState(false);
-  const [promptInstall, setPromptInstall] =
-    useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [hide, setHide] = useState(false);
-  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
-  const [isClient, setIsClient] = useState(false);
 
-  const getPromptCount = useCallback(() => {
-    if (typeof window === "undefined") return 0;
-    const count = localStorage.getItem("pwaPromptCount");
-    return count ? parseInt(count, 10) : 0;
-  }, []);
-
-  const incrementPromptCount = useCallback(() => {
-    if (hide || isInstalled || typeof window === "undefined") return;
-
-    const currentCount = getPromptCount();
-    if (currentCount < MAX_PROMPT_COUNT) {
-      localStorage.setItem("pwaPromptCount", (currentCount + 1).toString());
-    }
-  }, [hide, isInstalled, getPromptCount]);
-
-  // Client-side hydration effect
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    const handler = (e: Event) => {
-      const installEvent = e as BeforeInstallPromptEvent;
-      installEvent.preventDefault();
-
-      // InstallPWA has priority - show immediately if we can
-      if (canShowInstallPWA) {
-        setSupportsPWA(true);
-        setIsOpen(true);
-        setInstallPWAVisible(true);
-        setPromptInstall(installEvent);
-
-        const currentCount = getPromptCount() + 1;
-        incrementPromptCount();
-
-        trackInstallPWAEvent({
-          type: "prompt_shown",
-          promptCount: currentCount,
-        });
-      }
-    };
-
-    const checkInstalled = () => {
-      if (isPWAInstalled()) {
-        setIsInstalled(true);
-      }
-    };
-
-    const checkPWASupport = () => {
-      const promptCount = getPromptCount();
-
-      // Check for iOS devices that support PWA but don't have beforeinstallprompt
-      if (
-        isIOS() &&
-        !isPWAInstalled() &&
-        promptCount < MAX_PROMPT_COUNT &&
-        canShowInstallPWA
-      ) {
-        setSupportsPWA(true);
-        setShowIOSInstructions(true);
-        setIsOpen(true);
-        setInstallPWAVisible(true);
-        incrementPromptCount();
-        trackInstallPWAEvent({ type: "ios_instructions_shown" });
-        return;
-      }
-
-      // Check for browsers that support beforeinstallprompt
-      if (supportsBeforeInstallPrompt() && promptCount < MAX_PROMPT_COUNT) {
-        window.addEventListener("beforeinstallprompt", handler);
-      } else if (promptCount >= MAX_PROMPT_COUNT) {
-        // PWA prompt showed too many times
-      }
-    };
-
-    // Give InstallPWA immediate priority on page load
-    const immediateCheck = () => {
-      checkInstalled();
-      checkPWASupport();
-    };
-
-    // Run immediately
-    immediateCheck();
-
-    // Also set up event listeners
-    window.addEventListener("appinstalled", checkInstalled);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-      window.removeEventListener("appinstalled", checkInstalled);
-    };
-  }, [
-    isClient,
-    incrementPromptCount,
-    getPromptCount,
-    canShowInstallPWA,
-    setInstallPWAVisible,
-  ]);
+  const {
+    canInstall,
+    installPWA: handleInstall,
+    showIOSInstructions,
+    shouldShow,
+    closePrompt: handleClose,
+    isInstalled,
+  } = useInstallPWA({
+    enableAutoShow: canShowInstallPWA,
+    onPromptShow: () => {
+      setIsOpen(true);
+      setInstallPWAVisible(true);
+    },
+    onPromptClose: () => {
+      setIsOpen(false);
+      setInstallPWAVisible(false);
+    },
+  });
 
   const installPWA = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
-
-    if (!promptInstall) {
-      trackInstallPWAEvent({
-        type: "install_error",
-        error: "No install prompt available",
-      });
-      return;
-    }
-
-    try {
-      trackInstallPWAEvent({ type: "install_clicked" });
-
-      // Trigger the install prompt
-      await promptInstall.prompt();
-
-      // Wait for user choice
-      const result = await promptInstall.userChoice;
-
-      if (result.outcome === "accepted") {
-        trackInstallPWAEvent({ type: "install_success" });
-        // PWA install accepted
-      } else {
-        trackInstallPWAEvent({ type: "install_dismissed" });
-        // PWA install dismissed
-      }
-
-      setIsOpen(false);
-      setTimeout(() => {
-        setHide(true);
-      }, 700);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "PWA installation failed with an unknown error";
-      trackInstallPWAEvent({
-        type: "install_error",
-        error: errorMessage,
-      });
-      // PWA install failed - error logged to analytics
-
-      // Still hide the prompt even if install failed
-      setIsOpen(false);
-      setTimeout(() => {
-        setHide(true);
-      }, 700);
-    }
-  };
-
-  const closePrompt = () => {
-    trackInstallPWAEvent({ type: "prompt_closed_manually" });
-    setIsOpen(false);
-    setInstallPWAVisible(false);
+    await handleInstall();
+    // Close after install attempt
     setTimeout(() => {
-      setHide(true);
+      setIsOpen(false);
+      handleClose();
     }, 700);
   };
 
-  // Check if the prompt should be shown based on the count
-  useEffect(() => {
-    if (!isClient) return;
-    const currentCount = getPromptCount();
-    if (currentCount >= MAX_PROMPT_COUNT) {
-      setHide(true); // Hide the prompt if the count exceeds max
-    }
-  }, [isClient, getPromptCount]);
+  const closePrompt = () => {
+    handleClose();
+    setIsOpen(false);
+  };
 
-  // Don't render anything on server-side or if conditions aren't met
-  if (!isClient || !supportsPWA || isInstalled || hide) {
+  // Don't render anything if conditions aren't met
+  if (!canInstall || isInstalled || (!shouldShow && !isOpen)) {
     return null;
   }
 
