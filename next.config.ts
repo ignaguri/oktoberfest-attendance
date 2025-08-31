@@ -1,9 +1,19 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import withSerwistInit from "@serwist/next";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 import type { NextConfig } from "next";
 
+// Read package.json to get version
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "package.json"), "utf8"),
+);
+
 const nextConfig: NextConfig = {
+  env: {
+    APP_VERSION: packageJson.version,
+  },
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,

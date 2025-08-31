@@ -9,7 +9,7 @@ import { FestivalProvider } from "@/contexts/FestivalContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
 import { getUser } from "@/lib/sharedActions";
-import { APP_VERSION } from "@/version";
+import { APP_VERSION } from "@/lib/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ViewTransitions } from "next-view-transitions";
