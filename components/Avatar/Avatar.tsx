@@ -28,9 +28,9 @@ interface AvatarProps {
 const avatarSizeVariants = cva("", {
   variants: {
     size: {
-      small: "h-10 w-10", // 40px
-      medium: "h-24 w-24", // 100px
-      large: "h-36 w-36", // 150px
+      small: "size-10", // 40px
+      medium: "size-24", // 96px
+      large: "size-36", // 144px
     },
   },
   defaultVariants: {
