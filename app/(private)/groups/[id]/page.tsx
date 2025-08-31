@@ -1,5 +1,6 @@
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
 import { winningCriteriaText } from "@/lib/constants";
@@ -81,7 +82,10 @@ export default async function GroupPage({
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
             </Button>
-            <ShareButton groupName={group.name} groupId={group.id} withText />
+            <div className="flex gap-2 items-center">
+              <QRButton groupName={group.name} groupId={group.id} withText />
+              <ShareButton groupName={group.name} groupId={group.id} withText />
+            </div>
             <Button asChild variant="yellowOutline">
               <Link href="/attendance">Register attendance</Link>
             </Button>
