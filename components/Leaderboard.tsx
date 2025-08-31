@@ -33,11 +33,11 @@ const getDisplayName = ({
   username,
   full_name,
 }: Pick<LeaderboardEntry, "full_name" | "username">) => {
-  if (full_name) {
-    return full_name;
-  }
   if (username) {
     return username;
+  }
+  if (full_name) {
+    return full_name;
   }
   return "No name";
 };

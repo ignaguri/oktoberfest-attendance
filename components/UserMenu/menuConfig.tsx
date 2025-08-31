@@ -1,6 +1,7 @@
 import {
   Calendar,
   CalendarSync,
+  Download,
   LogOut,
   MapPin,
   Medal,
@@ -84,6 +85,12 @@ export const menuItems: MenuItem[] = [
 
   // Actions Section
   {
+    id: "installApp",
+    label: "Install App",
+    icon: <Download className="h-4 w-4" />,
+    section: "settings",
+  },
+  {
     id: "changeFestival",
     label: "Change Festival",
     icon: <CalendarSync className="h-4 w-4" />,
@@ -117,7 +124,7 @@ export const menuSections: MenuSection[] = [
   {
     id: "actions",
     label: "Actions",
-    items: ["changeFestival", "share", "signout"],
+    items: ["installApp", "changeFestival", "share", "signout"],
   },
 ];
 
