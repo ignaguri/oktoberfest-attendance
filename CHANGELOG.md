@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.5] - 2025-08-31
+
+### 🔧 Maintenance
+
+- enhance logic to show current version only if changes exist
+- remove version.ts and use package.json version
+
 ## [0.4.4] - 2025-08-31
 
 ### 🐛 Bug Fixes
