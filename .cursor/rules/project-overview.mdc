@@ -1,0 +1,143 @@
+---
+alwaysApply: true
+---
+
+# Oktoberfest Attendance App - Project Overview
+
+## Project Context
+
+**ProstCounter** is a Next.js web application for tracking beer consumption and attendance at multiple festivals. It currently supports Oktoberfest and is designed to expand to other festivals with native mobile support.
+
+## Core Purpose
+
+- Track daily beer consumption and tent visits during festivals
+- Enable group competitions with different winning criteria
+- Provide leaderboards and social features for festival attendees
+- Serve as a PWA with offline capabilities
+
+## Tech Stack
+
+- **Frontend**: Next.js 15.4.6 + React 19.1.1 + TypeScript 5.9.2
+- **Backend**: Supabase (auth, database, storage)
+- **Styling**: Tailwind 4.1.11 + Radix UI + shadcn/ui
+- **PWA**: Serwist with caching strategies
+- **Monitoring**: Sentry
+- **Package Manager**: pnpm
+
+## Key Features
+
+### Authentication & User Management
+
+- Supabase Auth UI integration
+- User profiles with username, full_name, avatar_url
+- Admin panel for user/group management
+- Password reset and profile updates
+
+### Attendance Tracking
+
+- Daily beer_count logging per date
+- Tent visits with timestamps
+- Beer pictures linked to attendances
+- Quick registration from home page
+- Detailed forms with date picker
+
+### Group Competition System
+
+- Create/join groups via invite_token
+- Three winning criteria:
+  - `days_attended`: Most Days Attended
+  - `total_beers`: Most Beers Drank
+  - `avg_beers`: Best Average Beers per Day
+- Group settings and member management
+- Group galleries with photos by date/user
+
+### Social Features
+
+- Photo sharing in galleries
+- Share app functionality
+- Beer cost tracking (€16.2 constant)
+- Leaderboards (global, personal, group)
+- Highlights dashboard
+
+### Achievements System
+
+- Badge-based achievement system
+- Progress tracking for various milestones
+- Achievement cards and grids
+- Achievement highlights and progress indicators
+
+### Notifications
+
+- Push notifications via Novu integration
+- In-app notification system
+- Notification settings and preferences
+- Real-time updates for group activities
+
+## Database Schema (Supabase)
+
+Core tables include:
+
+- `attendances`: Daily beer consumption records
+- `tent_visits`: Location tracking linked to attendances
+- `beer_pictures`: Photo storage linked to attendances
+- `groups`: Competition groups with winning criteria
+- `group_members`: User-group relationships
+- `profiles`: User profile information
+
+## File Structure
+
+```
+app/(private)/     # Authenticated routes (home, attendance, groups, etc.)
+app/(public)/      # Public auth pages (sign-in, sign-up, etc.)
+components/ui/     # shadcn/ui components
+components/[Feature]/ # Feature-specific components
+utils/supabase/    # Supabase client setup
+supabase/migrations/ # Database migrations
+```
+
+## Design System
+
+- **Brand Colors**: Yellow theme (yellow-400, yellow-500, yellow-600)
+- **App Identity**: "ProstCounter" + 🍻 emoji
+- **Components**: Complete shadcn/ui library with custom yellow theming
+- **Responsive**: Mobile-first with max-width containers
+
+## Festival Support
+
+- Multi-festival support with dynamic festival selection
+- Each festival has its own constants (dates, costs, map URLs, timezones)
+- Festival-specific data and configurations
+- Dynamic festival switching throughout the application
+
+## Future Migration Path
+
+This project serves as the foundation for enhanced mobile support:
+
+- Native mobile versions
+- Enhanced mobile features (camera integration, push notifications)
+
+## Development Patterns
+
+- Form validation with React Hook Form + Zod
+- Data tables using @tanstack/react-table
+- Toast notification system
+- Error boundaries for robust error handling
+- Next.js's unstable_cache and proper headers
+- PWA with NetworkFirst + CacheFirst strategies
+
+## Database Management
+
+### Local Development
+- **Start/Stop**: `pnpm sup:start`, `pnpm sup:stop`, `pnpm sup:restart`
+- **Database Reset**: `pnpm sup:db:reset`
+- **Generate Types**: `pnpm sup:db:types`
+
+### Migration Management
+- **Create Migration**: `pnpm sup:mig:new` (creates timestamped migration files)
+- **Push Changes**: `pnpm sup:db:push`
+- **Pull Schema**: `pnpm sup:db:pull`
+
+### Available Scripts
+- **Version Management**: `pnpm version:show`, `pnpm version:patch/minor/major`
+- **Release Scripts**: `pnpm release:patch/minor/major` (version bump + git operations)
+- **Type Checking**: `pnpm type-check`, `pnpm type-check:watch`
