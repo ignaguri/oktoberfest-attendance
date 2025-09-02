@@ -18,6 +18,8 @@ interface PackageJson {
 type Changelog = Record<string, string[]>;
 
 // Helper function to read existing changelog from file
+// NOTE: This function is kept for potential future use but is no longer called
+// changelog.ts is now manually maintained
 function readExistingChangelog(): Changelog {
   try {
     const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
@@ -128,6 +130,8 @@ function updateVersionTs(newVersion: string): void {
 }
 
 // Helper function to write changelog file
+// NOTE: This function is kept for potential future use but is no longer called
+// changelog.ts is now manually maintained
 function writeChangelogFile(changelogData: Changelog): void {
   const changelogContent = `export const changelog: Record<string, string[]> = ${JSON.stringify(changelogData, null, 2)};\n`;
   fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
@@ -252,6 +256,8 @@ function generateRepositoryChangelog(newVersion: string): number {
 }
 
 // Generate in-app changelog (only feature commits)
+// NOTE: This function is kept for potential future use but is no longer called
+// changelog.ts is now manually maintained
 function generateInAppChangelog(newVersion: string): string[] {
   try {
     const commits = getCommitsSinceLastTag();
@@ -371,22 +377,22 @@ function main(): void {
   updatePackageJson(newVersion);
   updateVersionTs(newVersion);
 
-  // Generate both changelogs as per documentation requirements
+  // Generate repository changelog (markdown)
   const repoChanges = generateRepositoryChangelog(newVersion);
-  const inAppChanges = generateInAppChangelog(newVersion);
 
   console.log("");
   console.log(`🎉 Version updated to ${newVersion}!`);
   console.log(`📝 Repository changelog entries: ${repoChanges}`);
-  console.log(`📱 In-app changelog entries: ${inAppChanges.length}`);
+  console.log(`📱 In-app changelog (changelog.ts): Manual editing required`);
   console.log("");
   console.log("Next steps:");
-  console.log("1. Review the changes");
+  console.log("1. Manually update changelog.ts with new features for the app");
+  console.log("2. Review the changes");
   console.log(
-    `2. Commit the changes: git add . && git commit -m "chore: bump version to ${newVersion}"`,
+    `3. Commit the changes: git add . && git commit -m "chore: bump version to ${newVersion}"`,
   );
-  console.log(`3. Create a tag: git tag v${newVersion}`);
-  console.log("4. Push: git push && git push --tags");
+  console.log(`4. Create a tag: git tag v${newVersion}`);
+  console.log("5. Push: git push && git push --tags");
   console.log("");
   console.log("Or use the quick release command:");
   if (command === "set") {
@@ -402,7 +408,6 @@ if (require.main === module) {
 }
 
 export {
-  generateInAppChangelog,
   generateRepositoryChangelog,
   getCurrentVersion,
   updatePackageJson,
