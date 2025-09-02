@@ -1,12 +1,15 @@
 "use client";
 
+import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 
 import type { Tables } from "@/lib/database.types";
 
-import { fetchAttendances } from "./actions";
+import { fetchAttendances, checkInFromReservation } from "./actions";
+import { getReservationForCheckIn } from "./calendar/actions";
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
 
@@ -24,7 +27,9 @@ export default function AttendancePage() {
     [],
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [reservation, setReservation] = useState<any>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const fetchAttendanceData = useCallback(async () => {
     if (!currentFestival) return;
@@ -48,6 +53,32 @@ export default function AttendancePage() {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
 
+  // Handle check-in prompt
+  useEffect(() => {
+    const reservationId = searchParams.get("reservationId");
+    const prompt = searchParams.get("prompt");
+
+    if (prompt === "checkin" && reservationId) {
+      const fetchReservation = async () => {
+        try {
+          const reservationData = await getReservationForCheckIn(reservationId);
+          setReservation(reservationData);
+        } catch (error) {
+          console.error("Error fetching reservation:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Reservation not found or already processed.",
+          });
+        }
+      };
+
+      fetchReservation();
+    } else {
+      setReservation(null);
+    }
+  }, [searchParams, toast]);
+
   const handleAttendanceUpdate = useCallback(() => {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
@@ -60,6 +91,14 @@ export default function AttendancePage() {
     handleDateSelect(null);
     handleAttendanceUpdate();
   }, [handleAttendanceUpdate]);
+
+  const handleCheckIn = useCallback(
+    async (reservationId: string) => {
+      await checkInFromReservation(reservationId);
+      handleAttendanceUpdate();
+    },
+    [handleAttendanceUpdate],
+  );
 
   if (festivalLoading || !currentFestival) {
     return (
@@ -79,6 +118,10 @@ export default function AttendancePage() {
         data={attendances}
         onDateSelect={handleDateSelect}
         onAttendanceDelete={handleAttendanceDelete}
+      />
+      <CheckInPromptDialog
+        reservation={reservation}
+        onCheckIn={handleCheckIn}
       />
     </div>
   );
