@@ -81,8 +81,9 @@ export async function getUserNotificationPreferences() {
  * Update user notification preferences
  */
 export async function updateUserNotificationPreferences(updates: {
-  group_join_enabled?: boolean | null;
-  checkin_enabled?: boolean | null;
+  reminders_enabled?: boolean | null;
+  group_notifications_enabled?: boolean | null;
+  achievement_notifications_enabled?: boolean | null;
   push_enabled?: boolean | null;
 }) {
   const user = await getUser();

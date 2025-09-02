@@ -4,6 +4,12 @@ import {
   PROD_URL,
   DEV_URL,
 } from "@/lib/constants";
+import { ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/achievement-unlocked";
+import { GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/group-achievement-unlocked";
+import { GROUP_JOIN_WORKFLOW_ID } from "@/novu/workflows/group-join";
+import { RESERVATION_PROMPT_WORKFLOW_ID } from "@/novu/workflows/reservation-prompt";
+import { RESERVATION_REMINDER_WORKFLOW_ID } from "@/novu/workflows/reservation-reminder";
+import { TENT_CHECKIN_WORKFLOW_ID } from "@/novu/workflows/tent-check-in";
 import {
   reportNotificationException,
   reportSupabaseException,
@@ -22,8 +28,12 @@ type NotificationPreferences = Tables<"user_notification_preferences">;
  * These should match the workflow IDs configured in Novu
  */
 export const NOTIFICATION_WORKFLOWS = {
-  GROUP_JOIN: "group-join-notification",
-  TENT_CHECKIN: "tent-check-in-notification",
+  GROUP_JOIN: GROUP_JOIN_WORKFLOW_ID,
+  TENT_CHECKIN: TENT_CHECKIN_WORKFLOW_ID,
+  RESERVATION_REMINDER: RESERVATION_REMINDER_WORKFLOW_ID,
+  RESERVATION_CHECKIN_PROMPT: RESERVATION_PROMPT_WORKFLOW_ID,
+  ACHIEVEMENT_UNLOCKED: ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
+  GROUP_ACHIEVEMENT_UNLOCKED: GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
 } as const;
 
 /**
@@ -61,6 +71,156 @@ export class NotificationService {
     });
   }
 
+  /**
+   * Send reservation reminder to a user (respects reminders_enabled)
+   */
+  async notifyReservationReminder(
+    userId: string,
+    payload: {
+      reservationId: string;
+      tentName: string;
+      startAtISO: string;
+      festivalName?: string;
+    },
+  ): Promise<void> {
+    try {
+      const { data: prefs } = await this.supabase
+        .from("user_notification_preferences")
+        .select("reminders_enabled")
+        .eq("user_id", userId)
+        .single();
+
+      if (prefs && prefs.reminders_enabled === false) {
+        return;
+      }
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.RESERVATION_REMINDER,
+        to: userId,
+        payload,
+      });
+    } catch (error) {
+      reportNotificationException("notifyReservationReminder", error as Error);
+    }
+  }
+
+  /**
+   * Send reservation check-in prompt to a user at reservation start time
+   * (respects reminders_enabled)
+   */
+  async notifyReservationPrompt(
+    userId: string,
+    payload: {
+      reservationId: string;
+      tentName: string;
+      deepLinkUrl: string;
+    },
+  ): Promise<void> {
+    try {
+      const { data: prefs } = await this.supabase
+        .from("user_notification_preferences")
+        .select("reminders_enabled")
+        .eq("user_id", userId)
+        .single();
+
+      if (prefs && prefs.reminders_enabled === false) {
+        return;
+      }
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.RESERVATION_CHECKIN_PROMPT,
+        to: userId,
+        payload,
+      });
+    } catch (error) {
+      reportNotificationException("notifyReservationPrompt", error as Error);
+    }
+  }
+
+  /**
+   * Notify a user about their unlocked achievement
+   * (respects achievement_notifications_enabled)
+   */
+  async notifyAchievementUnlocked(
+    userId: string,
+    payload: {
+      achievementName: string;
+      description?: string;
+      rarity: "common" | "rare" | "epic";
+      achievementId: string;
+    },
+  ): Promise<void> {
+    try {
+      const { data: prefs } = await this.supabase
+        .from("user_notification_preferences")
+        .select("achievement_notifications_enabled")
+        .eq("user_id", userId)
+        .single();
+
+      if (prefs && prefs.achievement_notifications_enabled === false) {
+        return;
+      }
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.ACHIEVEMENT_UNLOCKED,
+        to: userId,
+        payload,
+      });
+    } catch (error) {
+      reportNotificationException("notifyAchievementUnlocked", error as Error);
+    }
+  }
+
+  /**
+   * Notify a list of recipients about someone else's rare/epic achievement
+   * (respects group_notifications_enabled)
+   */
+  async notifyGroupAchievement(
+    recipientIds: string[],
+    payload: {
+      achieverName: string;
+      achievementName: string;
+      rarity: "rare" | "epic";
+      groupName?: string;
+    },
+  ): Promise<void> {
+    try {
+      if (recipientIds.length === 0) return;
+
+      // Filter by group_notifications_enabled
+      const { data: prefsList, error } = await this.supabase
+        .from("user_notification_preferences")
+        .select("user_id, group_notifications_enabled")
+        .in("user_id", recipientIds);
+
+      if (error) {
+        reportSupabaseException(
+          "notifyGroupAchievement",
+          error as PostgrestError,
+        );
+        return;
+      }
+
+      const enabledRecipientIds = (prefsList || [])
+        .filter((p) => p.group_notifications_enabled !== false)
+        .map((p) => p.user_id)
+        .filter(Boolean) as string[];
+
+      if (enabledRecipientIds.length === 0) return;
+
+      await Promise.allSettled(
+        enabledRecipientIds.map((to) =>
+          this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.GROUP_ACHIEVEMENT_UNLOCKED,
+            to,
+            payload,
+          }),
+        ),
+      );
+    } catch (error) {
+      reportNotificationException("notifyGroupAchievement", error as Error);
+    }
+  }
   /**
    * Notify group admin when someone joins their group
    */
