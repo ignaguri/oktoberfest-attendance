@@ -1,0 +1,128 @@
+import type { Database } from "@/lib/database.types";
+import type { NotificationService } from "@/lib/services/notifications";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export async function processAchievementNotifications(
+  supabase: SupabaseClient<Database>,
+  notifications: NotificationService,
+) {
+  const { data: userEvents } = await supabase
+    .from("achievement_events")
+    .select(
+      "id, user_id, achievement_id, festival_id, rarity, user_notified_at",
+    )
+    .is("user_notified_at", null)
+    .limit(200);
+
+  if (Array.isArray(userEvents) && userEvents.length) {
+    const achievementIds = Array.from(
+      new Set(userEvents.map((e) => e.achievement_id)),
+    );
+    const { data: achievements } = await supabase
+      .from("achievements")
+      .select("id, name, description, rarity")
+      .in("id", achievementIds);
+    const achIdToMeta = new Map<string, any>(
+      (achievements || []).map((a) => [a.id, a]),
+    );
+
+    await Promise.allSettled(
+      userEvents.map((e) =>
+        notifications.notifyAchievementUnlocked(e.user_id, {
+          achievementId: e.achievement_id,
+          achievementName: achIdToMeta.get(e.achievement_id)?.name || "",
+          description:
+            achIdToMeta.get(e.achievement_id)?.description || undefined,
+          rarity:
+            (achIdToMeta.get(e.achievement_id)?.rarity as any) || "common",
+        }),
+      ),
+    );
+
+    await supabase
+      .from("achievement_events")
+      .update({ user_notified_at: new Date().toISOString() })
+      .in(
+        "id",
+        userEvents.map((e) => e.id),
+      );
+  }
+
+  const { data: groupEvents } = await supabase
+    .from("achievement_events")
+    .select(
+      "id, user_id, achievement_id, festival_id, rarity, group_notified_at",
+    )
+    .is("group_notified_at", null)
+    .in("rarity", ["rare", "epic"])
+    .limit(200);
+
+  if (Array.isArray(groupEvents) && groupEvents.length) {
+    const userIds = Array.from(new Set(groupEvents.map((e) => e.user_id)));
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, username, full_name")
+      .in("id", userIds);
+    const userIdToName = new Map<string, string>(
+      (profiles || []).map((p) => [
+        p.id,
+        p.username || p.full_name || "Someone",
+      ]),
+    );
+
+    const achievementIds = Array.from(
+      new Set(groupEvents.map((e) => e.achievement_id)),
+    );
+    const { data: achievements } = await supabase
+      .from("achievements")
+      .select("id, name, rarity")
+      .in("id", achievementIds);
+    const achIdToMeta = new Map<string, any>(
+      (achievements || []).map((a) => [a.id, a]),
+    );
+
+    for (const e of groupEvents) {
+      const { data: myGroups } = await supabase
+        .from("group_members")
+        .select("group_id")
+        .eq("user_id", e.user_id);
+
+      const groupIds = (myGroups || [])
+        .map((g) => g.group_id)
+        .filter(Boolean) as string[];
+      if (groupIds.length === 0) continue;
+
+      const { data: sameFestivalGroups } = await supabase
+        .from("groups")
+        .select("id")
+        .in("id", groupIds)
+        .eq("festival_id", e.festival_id);
+      const sfGroupIds = (sameFestivalGroups || []).map((g) => g.id);
+      if (sfGroupIds.length === 0) continue;
+
+      const { data: members } = await supabase
+        .from("group_members")
+        .select("user_id")
+        .in("group_id", sfGroupIds)
+        .neq("user_id", e.user_id);
+      const recipientIds = (members || [])
+        .map((m) => m.user_id)
+        .filter(Boolean) as string[];
+      if (recipientIds.length === 0) continue;
+
+      await notifications.notifyGroupAchievement(recipientIds, {
+        achieverName: userIdToName.get(e.user_id) || "Someone",
+        achievementName: achIdToMeta.get(e.achievement_id)?.name || "",
+        rarity: (achIdToMeta.get(e.achievement_id)?.rarity as any) || "rare",
+      });
+    }
+
+    await supabase
+      .from("achievement_events")
+      .update({ group_notified_at: new Date().toISOString() })
+      .in(
+        "id",
+        groupEvents.map((e) => e.id),
+      );
+  }
+}
