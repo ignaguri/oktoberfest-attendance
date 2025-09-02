@@ -98,47 +98,69 @@ export function NotificationSettings() {
       </h3>
 
       <div className="flex flex-col gap-6">
-        {/* In-App Notifications Section */}
+        {/* Consolidated Notification Preferences */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-lg font-semibold text-gray-700">
-            In-App Notifications
-          </h4>
+          <h4 className="text-lg font-semibold text-gray-700">Preferences</h4>
 
-          {/* Group Join Notifications */}
+          {/* Reminders */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">Group Join Notifications</span>
+                <span className="font-medium">Reminders</span>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                Get notified when someone joins your group
+                Reservation reminders and check-in prompts
               </p>
             </div>
             <Switch
-              checked={preferences.group_join_enabled ?? true}
+              aria-label="Reminders"
+              checked={preferences.reminders_enabled ?? true}
               onCheckedChange={(checked) =>
-                handleToggle("group_join_enabled", checked)
+                handleToggle("reminders_enabled", checked)
               }
               disabled={isUpdating}
             />
           </div>
 
-          {/* Tent Check-in Notifications */}
+          {/* Achievement Notifications */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">Tent Check-in Notifications</span>
+                <span className="font-medium">Achievement Notifications</span>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                Get notified when group members check into tents
+                Get notified when you unlock achievements
               </p>
             </div>
             <Switch
-              checked={preferences.checkin_enabled ?? true}
+              aria-label="Achievement Notifications"
+              checked={preferences.achievement_notifications_enabled ?? true}
               onCheckedChange={(checked) =>
-                handleToggle("checkin_enabled", checked)
+                handleToggle("achievement_notifications_enabled", checked)
+              }
+              disabled={isUpdating}
+            />
+          </div>
+
+          {/* Group Notifications */}
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="font-medium">Group Notifications</span>
+              </div>
+              <p className="text-sm text-gray-600 text-left">
+                Get notifications from your groups (check-ins, achievements,
+                etc.)
+              </p>
+            </div>
+            <Switch
+              aria-label="Group Notifications"
+              checked={preferences.group_notifications_enabled ?? true}
+              onCheckedChange={(checked) =>
+                handleToggle("group_notifications_enabled", checked)
               }
               disabled={isUpdating}
             />
@@ -190,6 +212,7 @@ export function NotificationSettings() {
 
                 {pushSupported && pushPermission === "granted" && (
                   <Switch
+                    aria-label="Push Notifications"
                     checked={preferences.push_enabled ?? false}
                     onCheckedChange={(checked) =>
                       handleToggle("push_enabled", checked)
