@@ -21,9 +21,9 @@ ProstCounter is a Next.js PWA for tracking Oktoberfest and other beer festivals 
 - `pnpm sup:start` - Start local Supabase (requires Docker)
 - `pnpm sup:stop` - Stop local Supabase
 - `pnpm sup:restart` - Restart Supabase services
-- `pnpm sup:db:reset` - Reset DB and run migrations
+- `pnpm sup:db:reset` - Reset DB and run migrations (use this to test migrations)
 - `pnpm sup:db:pull` - Pull remote DB changes
-- `pnpm sup:db:push` - Push local migrations to remote
+- **Note**: We don't push DB changes; we reset the local DB to test if migrations work properly
 - `pnpm sup:db:types` - Generate TypeScript types from DB schema
 - `pnpm sup:mig:new` - Create new migration file
 
