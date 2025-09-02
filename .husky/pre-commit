@@ -1,6 +1,21 @@
 # Pre-commit hook for code quality checks
 echo "🔍 Running pre-commit checks..."
 
+# Store the current state before lint:fix
+echo "📸 Capturing pre-lint state..."
+git diff --name-only > /tmp/pre-lint-changes.txt
+
+# Run lint fix to automatically fix any auto-fixable issues
+echo "🔧 Running lint fix..."
+pnpm run lint:fix
+
+# Add only files that were modified by lint:fix (new changes after pre-lint state)
+echo "�� Adding lint-fixed files..."
+git diff --name-only | grep -v -f /tmp/pre-lint-changes.txt | xargs -r git add
+
+# Clean up temp file
+rm -f /tmp/pre-lint-changes.txt
+
 # Run type checking (less strict than linting)
 echo "🔍 Running TypeScript type check..."
 pnpm run type-check
