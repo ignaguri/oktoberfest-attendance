@@ -144,5 +144,100 @@ WHERE
         (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 5)
     ));
 
+-- QA: Notification preferences toggles for a few users
+-- u0: reminders disabled; u1: group notifications disabled; u2: achievements disabled
+INSERT INTO user_notification_preferences (
+  user_id, reminders_enabled, group_notifications_enabled, achievement_notifications_enabled
+)
+VALUES
+  ((SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 0), false, true, true),
+  ((SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 1), true, false, true),
+  ((SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 2), true, true, false)
+ON CONFLICT (user_id) DO UPDATE SET
+  reminders_enabled = EXCLUDED.reminders_enabled,
+  group_notifications_enabled = EXCLUDED.group_notifications_enabled,
+  achievement_notifications_enabled = EXCLUDED.achievement_notifications_enabled,
+  updated_at = now();
+
+-- QA: Seed reservations to cover reminder-due, prompt-due, and early-checkin cases
+-- Common context
+DO $$
+DECLARE
+  v_festival_id uuid;
+  v_tent_id uuid;
+  v_user0 uuid;
+  v_user1 uuid;
+  v_user2 uuid;
+BEGIN
+  SELECT id INTO v_festival_id FROM festivals WHERE short_name = 'oktoberfest-2025' LIMIT 1;
+  SELECT id INTO v_tent_id FROM tents WHERE name = 'Hofbräu-Festzelt' LIMIT 1;
+  SELECT id INTO v_user0 FROM auth.users ORDER BY email LIMIT 1 OFFSET 0;
+  SELECT id INTO v_user1 FROM auth.users ORDER BY email LIMIT 1 OFFSET 1;
+  SELECT id INTO v_user2 FROM auth.users ORDER BY email LIMIT 1 OFFSET 2;
+
+  -- Due reminder soon: start_at in 55 minutes with a 60-minute offset => reminder due now
+  INSERT INTO reservations (
+    id, user_id, festival_id, tent_id, start_at, end_at, status,
+    reminder_offset_minutes, visible_to_groups, note
+  ) VALUES (
+    gen_random_uuid(), v_user0, v_festival_id, v_tent_id,
+    now() + interval '55 minutes', NULL, 'scheduled',
+    60, true, 'QA: reminder-due'
+  );
+
+  -- Due prompt: start_at in the past by 1 minute => prompt due now
+  INSERT INTO reservations (
+    id, user_id, festival_id, tent_id, start_at, end_at, status,
+    reminder_offset_minutes, visible_to_groups, note
+  ) VALUES (
+    gen_random_uuid(), v_user1, v_festival_id, v_tent_id,
+    now() - interval '1 minute', NULL, 'scheduled',
+    1440, true, 'QA: prompt-due'
+  );
+
+  -- Early check-in: attendance exists earlier today; reservation start_at now - 1 minute
+  -- Cron should treat as completed/skip prompt depending on RPC logic
+  INSERT INTO attendances (user_id, festival_id, date, beer_count)
+  VALUES (v_user2, v_festival_id, CURRENT_DATE, 0)
+  ON CONFLICT (user_id, date, festival_id) DO NOTHING;
+
+  INSERT INTO reservations (
+    id, user_id, festival_id, tent_id, start_at, end_at, status,
+    reminder_offset_minutes, visible_to_groups, note
+  ) VALUES (
+    gen_random_uuid(), v_user2, v_festival_id, v_tent_id,
+    now() - interval '1 minute', NULL, 'scheduled',
+    1440, true, 'QA: early-checkin-reservation'
+  );
+END $$;
+
+-- QA: Seed achievements to produce notification events (common + rare/epic)
+DO $$
+DECLARE
+  v_user3 uuid;
+  v_user4 uuid;
+  v_common_ach uuid;
+  v_epic_ach uuid;
+  v_festival_id uuid;
+BEGIN
+  SELECT id INTO v_user3 FROM auth.users ORDER BY email LIMIT 1 OFFSET 3;
+  SELECT id INTO v_user4 FROM auth.users ORDER BY email LIMIT 1 OFFSET 4;
+  SELECT id INTO v_common_ach FROM achievements WHERE rarity = 'common' LIMIT 1;
+  SELECT id INTO v_epic_ach FROM achievements WHERE rarity = 'epic' LIMIT 1;
+  SELECT id INTO v_festival_id FROM festivals WHERE short_name = 'oktoberfest-2025' LIMIT 1;
+
+  IF v_common_ach IS NOT NULL THEN
+    INSERT INTO user_achievements (user_id, festival_id, achievement_id, unlocked_at)
+    VALUES (v_user3, v_festival_id, v_common_ach, now())
+    ON CONFLICT (user_id, achievement_id, festival_id) DO NOTHING;
+  END IF;
+
+  IF v_epic_ach IS NOT NULL THEN
+    INSERT INTO user_achievements (user_id, festival_id, achievement_id, unlocked_at)
+    VALUES (v_user4, v_festival_id, v_epic_ach, now())
+    ON CONFLICT (user_id, achievement_id, festival_id) DO NOTHING;
+  END IF;
+END $$;
+
 -- Commit the transaction to save the changes
 COMMIT;
