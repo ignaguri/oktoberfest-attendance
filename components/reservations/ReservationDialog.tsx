@@ -132,7 +132,7 @@ export function ReservationDialog({
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label>Tent</Label>
+            <Label htmlFor="tent">Tent</Label>
             <Select value={tentId} onValueChange={(v) => setTentId(v)}>
               <option value="" disabled>
                 Select tent
@@ -145,16 +145,20 @@ export function ReservationDialog({
             </Select>
           </div>
           <div className="grid gap-2">
-            <Label>Start</Label>
+            <Label htmlFor="start">Start</Label>
             <Input
+              id="start"
+              name="start"
               type="datetime-local"
               value={startAtLocal}
               onChange={(e) => setStartAtLocal(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
-            <Label>Reminder (minutes before)</Label>
+            <Label htmlFor="reminder">Reminder (minutes before)</Label>
             <Input
+              id="reminder"
+              name="reminder"
               type="number"
               min={0}
               step={5}
@@ -162,14 +166,16 @@ export function ReservationDialog({
               onChange={(e) => setReminderOffsetMinutes(Number(e.target.value))}
             />
           </div>
-          <label className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="visibleToGroups">Share with groups</Label>
             <input
+              id="visibleToGroups"
+              name="visibleToGroups"
               type="checkbox"
               checked={visibleToGroups}
               onChange={(e) => setVisibleToGroups(e.target.checked)}
             />
-            <span>Share with groups</span>
-          </label>
+          </div>
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={submitting}>

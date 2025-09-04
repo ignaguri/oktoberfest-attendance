@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { signInSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
@@ -46,7 +47,7 @@ export default function SignIn() {
     <div className="card">
       <h2 className="w-full text-center">Sign In</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <label htmlFor="email">Email</label>
+        <Label htmlFor="email">Email</Label>
         <input
           className={errors.email ? "input-error" : "input"}
           id="email"
@@ -56,7 +57,7 @@ export default function SignIn() {
         />
         {errors.email && <span className="error">{errors.email.message}</span>}
 
-        <label htmlFor="password">Password</label>
+        <Label htmlFor="password">Password</Label>
         <div className="relative w-full">
           <input
             className={errors.password ? "input-error" : "input"}

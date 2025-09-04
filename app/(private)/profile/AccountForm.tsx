@@ -3,6 +3,7 @@
 import Avatar from "@/components/Avatar/Avatar";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { profileSchema } from "@/lib/schemas/profile";
 import { getProfileShort } from "@/lib/sharedActions";
@@ -108,17 +109,17 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
           className="flex flex-col gap-4"
         >
           <div className="flex items-center gap-2">
-            <label htmlFor="email" className="font-semibold">
+            <Label htmlFor="email" className="font-semibold">
               Email:
-            </label>
+            </Label>
             <div className="p-2">
               <span className="text-gray-500">{user.email}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="fullname" className="font-semibold">
+            <Label htmlFor="fullname" className="font-semibold">
               Full&nbsp;Name:
-            </label>
+            </Label>
             {isEditing ? (
               <input
                 className="input"
@@ -140,9 +141,9 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="username" className="font-semibold">
+            <Label htmlFor="username" className="font-semibold">
               Username:
-            </label>
+            </Label>
             {isEditing ? (
               <input
                 className="input"
@@ -164,9 +165,9 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="custom_beer_cost" className="font-semibold">
+            <Label htmlFor="custom_beer_cost" className="font-semibold">
               Average cost of a beer (€):
-            </label>
+            </Label>
             {isEditing ? (
               <input
                 className="input"

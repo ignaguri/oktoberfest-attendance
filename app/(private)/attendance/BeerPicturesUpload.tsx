@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { PhotoPreview } from "@/components/ui/photo-preview";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -148,7 +149,7 @@ export function BeerPicturesUpload({
         className="hidden"
         id="beer-pictures-upload"
       />
-      <label
+      <Label
         htmlFor="beer-pictures-upload"
         className={buttonVariants({ variant: "outline" })}
       >
@@ -160,7 +161,7 @@ export function BeerPicturesUpload({
               : "Add pictures"}
           </span>
         </div>
-      </label>
+      </Label>
 
       {/* Existing uploaded pictures with preview functionality */}
       {allPictureUrls.length > 0 && (

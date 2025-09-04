@@ -11,6 +11,7 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
@@ -140,12 +141,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label
+              <Label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
                 Group Name
-              </label>
+              </Label>
               <input
                 type="text"
                 id="name"
@@ -161,12 +162,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
             </div>
 
             <div>
-              <label
+              <Label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
               >
                 Group Password
-              </label>
+              </Label>
               <div className="relative mt-1">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -197,12 +198,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
             </div>
 
             <div>
-              <label
+              <Label
                 htmlFor="description"
                 className="block text-sm font-medium text-gray-700"
               >
                 Group Description
-              </label>
+              </Label>
               <textarea
                 id="description"
                 rows={3}
@@ -218,12 +219,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
             </div>
 
             <div>
-              <label
+              <Label
                 htmlFor="winning_criteria"
                 className="block text-sm font-medium text-gray-700"
               >
                 Winning Criteria
-              </label>
+              </Label>
               <select
                 id="winning_criteria_id"
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"

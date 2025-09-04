@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { resetPasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,7 +46,7 @@ const ResetPassword = () => {
     <div className="card">
       <h2 className="w-full text-center">Reset Password</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <label htmlFor="email">Email</label>
+        <Label htmlFor="email">Email</Label>
         <input
           className={cn("input", errors.email && "input-error")}
           id="email"
