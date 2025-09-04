@@ -8,6 +8,26 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   className?: string;
 };
 
+/**
+ * Calendar component built on top of react-day-picker
+ *
+ * Provides a styled calendar interface with customizable appearance and behavior.
+ * Supports single date selection, range selection, and various display modes.
+ *
+ * @param className - Optional CSS class name for custom styling
+ * @param props - All props from react-day-picker's DayPicker component
+ * @returns A styled calendar component
+ *
+ * @example
+ * ```tsx
+ * <Calendar
+ *   mode="single"
+ *   selected={selectedDate}
+ *   onSelect={setSelectedDate}
+ *   className="w-fit"
+ * />
+ * ```
+ */
 export function Calendar({ className, ...props }: CalendarProps) {
   return (
     <DayPicker

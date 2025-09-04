@@ -5,8 +5,7 @@ import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
-import { isSameDay } from "date-fns";
-import { format } from "date-fns";
+import { isSameDay, format } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 import "server-only";
@@ -116,7 +115,8 @@ export async function checkInFromReservation(reservationId: string) {
 
   // Convert start_at to festival timezone date
   const startDate = new Date(reservation.start_at);
-  const festivalDate = format(startDate, "yyyy-MM-dd");
+  const tzDate = new TZDate(startDate, festival.timezone);
+  const festivalDate = format(tzDate, "yyyy-MM-dd");
 
   // Check if user already has attendance for this date
   const { data: existingAttendance, error: attendanceError } = await supabase

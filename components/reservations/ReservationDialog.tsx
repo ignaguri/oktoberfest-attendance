@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { createDatetimeLocalString } from "@/lib/date-utils";
+import { createUrlWithParams } from "@/lib/url-utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -64,28 +66,23 @@ export function ReservationDialog({
           setVisibleToGroups(r.visible_to_groups);
           setReminderOffsetMinutes(r.reminder_offset_minutes ?? 1440);
           const d = new Date(r.start_at);
-          const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
+          const iso = createDatetimeLocalString(d);
           setStartAtLocal(iso);
           return;
         } catch {}
       }
-      const d = new Date(initialDate);
-      d.setHours(18, 0, 0, 0);
-      const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 16);
+      const iso = createDatetimeLocalString(initialDate, 18, 0);
       setStartAtLocal(iso);
     };
     init();
   }, [initialDate, reservationId]);
 
   const onClose = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("newReservation");
-    params.delete("reservationId");
-    router.replace(`?${params.toString()}`);
+    const url = createUrlWithParams("", searchParams, [
+      "newReservation",
+      "reservationId",
+    ]);
+    router.replace(url);
   }, [router, searchParams]);
 
   const onSubmit = useCallback(async () => {

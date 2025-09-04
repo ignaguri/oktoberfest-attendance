@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { createUrlWithParams } from "@/lib/url-utils";
 import { MapPin, Clock, Users } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -40,10 +41,11 @@ export function CheckInPromptDialog({
   const open = searchParams.get("prompt") === "checkin" && !!reservation;
 
   const handleClose = useCallback(() => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete("prompt");
-    newSearchParams.delete("reservationId");
-    router.replace(`/attendance?${newSearchParams.toString()}`);
+    const url = createUrlWithParams("/attendance", searchParams, [
+      "prompt",
+      "reservationId",
+    ]);
+    router.replace(url);
   }, [searchParams, router]);
 
   const handleCheckIn = useCallback(async () => {

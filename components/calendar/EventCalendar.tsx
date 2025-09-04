@@ -105,7 +105,7 @@ export function EventCalendar({
               variant="ghost"
               size="sm"
               className="h-7 px-2"
-              onClick={() => {
+              onClick={(event) => {
                 const params = new URLSearchParams(searchParams.toString());
                 if (date) {
                   params.set(
@@ -114,7 +114,7 @@ export function EventCalendar({
                   );
                 }
                 // Default to reservation flow if no modifier key, else attendance edit
-                if (window.event && (window.event as MouseEvent).altKey) {
+                if (event.altKey) {
                   params.delete("newReservation");
                   params.set("editAttendance", "1");
                 } else {

@@ -6,99 +6,12 @@ import path from "path";
 
 // Configuration
 const PACKAGE_JSON_PATH = path.join(__dirname, "..", "package.json");
-const CHANGELOG_TS_PATH = path.join(__dirname, "..", "changelog.ts");
 const CHANGELOG_MD_PATH = path.join(__dirname, "..", "CHANGELOG.md");
 
 // Types
 interface PackageJson {
   version: string;
   [key: string]: any;
-}
-
-type Changelog = Record<string, string[]>;
-
-// Helper function to read existing changelog from file
-// NOTE: This function is kept for potential future use but is no longer called
-// changelog.ts is now manually maintained
-function readExistingChangelog(): Changelog {
-  try {
-    const changelogContent = fs.readFileSync(CHANGELOG_TS_PATH, "utf8");
-    const match = changelogContent.match(
-      /export const changelog: Record<string, string\[\]> = ({[\s\S]*});/,
-    );
-    if (match) {
-      try {
-        // Create a more robust JSON parsing approach
-        let jsonString = match[1];
-
-        // Fix array syntax: replace [ with [ and ] with ]
-        jsonString = jsonString.replace(/\[/g, "[").replace(/\]/g, "]");
-
-        // Quote unquoted keys
-        jsonString = jsonString.replace(/([{,]\s*)(\w+):/g, '$1"$2":');
-
-        // Replace single quotes with double quotes
-        jsonString = jsonString.replace(/'/g, '"');
-
-        // Handle trailing commas in arrays and objects
-        jsonString = jsonString.replace(/,(\s*[}\]])/g, "$1");
-
-        const result = JSON.parse(jsonString);
-        console.debug(
-          "✅ Successfully read existing changelog with",
-          Object.keys(result).length,
-          "versions",
-        );
-        return result;
-      } catch (parseError) {
-        console.error(
-          "❌ JSON parse error:",
-          parseError instanceof Error ? parseError.message : String(parseError),
-        );
-        console.debug("🔍 Attempting manual parsing...");
-
-        // Fallback: try to manually extract version entries
-        try {
-          const versionMatches = changelogContent.matchAll(
-            /"([^"]+)":\s*\[([^\]]+)\]/g,
-          );
-          const result: Changelog = {};
-          const matches = Array.from(versionMatches);
-          for (const match of matches) {
-            const version = match[1];
-            const entries = match[2]
-              .split(",")
-              .map((entry: string) => entry.trim().replace(/^["']|["']$/g, ""))
-              .filter((entry: string) => entry.length > 0);
-            result[version] = entries;
-          }
-          console.debug(
-            "✅ Manual parsing successful with",
-            Object.keys(result).length,
-            "versions",
-          );
-          return result;
-        } catch (manualError) {
-          console.error(
-            "❌ Manual parsing also failed:",
-            manualError instanceof Error
-              ? manualError.message
-              : String(manualError),
-          );
-          return {};
-        }
-      }
-    } else {
-      console.error("❌ No regex match found");
-      return {};
-    }
-  } catch (error) {
-    console.error(
-      "⚠️  Could not read existing changelog:",
-      error instanceof Error ? error.message : String(error),
-    );
-    return {};
-  }
 }
 
 // Get current version from package.json
@@ -127,14 +40,6 @@ function updateVersionTs(newVersion: string): void {
   console.log(
     `ℹ️  Version ${newVersion} will be available at build time from package.json`,
   );
-}
-
-// Helper function to write changelog file
-// NOTE: This function is kept for potential future use but is no longer called
-// changelog.ts is now manually maintained
-function writeChangelogFile(changelogData: Changelog): void {
-  const changelogContent = `export const changelog: Record<string, string[]> = ${JSON.stringify(changelogData, null, 2)};\n`;
-  fs.writeFileSync(CHANGELOG_TS_PATH, changelogContent);
 }
 
 // Helper function to get commit type emoji
@@ -252,66 +157,6 @@ function generateRepositoryChangelog(newVersion: string): number {
       error instanceof Error ? error.message : String(error),
     );
     return 0;
-  }
-}
-
-// Generate in-app changelog (only feature commits)
-// NOTE: This function is kept for potential future use but is no longer called
-// changelog.ts is now manually maintained
-function generateInAppChangelog(newVersion: string): string[] {
-  try {
-    const commits = getCommitsSinceLastTag();
-    const featCommits = commits.filter((commit) =>
-      commit.match(/^feat:\s*(.*)/),
-    );
-    const changelogEntries = featCommits
-      .map((commit) => {
-        const match = commit.match(/^feat:\s*(.*)/);
-        return match ? `✨ ${match[1]}` : null;
-      })
-      .filter((entry): entry is string => entry !== null);
-
-    // Read existing changelog from file instead of importing
-    const existingChangelog = readExistingChangelog();
-
-    // Only add new version if there are actual feature commits
-    if (changelogEntries.length > 0) {
-      const mergedChangelog: Changelog = {
-        [newVersion]: changelogEntries,
-        ...existingChangelog,
-      };
-      writeChangelogFile(mergedChangelog);
-      console.log(
-        `✅ Updated changelog.ts with ${changelogEntries.length} new entries`,
-      );
-    } else {
-      // No new features, don't modify the changelog file at all
-      console.log("ℹ️  No new feature commits found, changelog.ts unchanged");
-    }
-
-    return changelogEntries;
-  } catch (error) {
-    console.log(
-      "⚠️  Could not generate changelog.ts from commits:",
-      error instanceof Error ? error.message : String(error),
-    );
-
-    // Read existing changelog from file
-    const existingChangelog = readExistingChangelog();
-
-    // Only add default entry if no existing changelog exists
-    if (Object.keys(existingChangelog).length === 0) {
-      const defaultEntries = ["🔧 Version update"];
-      const mergedChangelog: Changelog = {
-        [newVersion]: defaultEntries,
-      };
-      writeChangelogFile(mergedChangelog);
-      console.log("✅ Created new changelog.ts with default entry");
-      return defaultEntries;
-    } else {
-      console.log("✅ Existing changelog preserved");
-      return [];
-    }
   }
 }
 
