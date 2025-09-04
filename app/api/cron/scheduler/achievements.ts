@@ -81,34 +81,31 @@ export async function processAchievementNotifications(
       (achievements || []).map((a) => [a.id, a]),
     );
 
+    // Use RPC function to get all group achievement recipients in a single query
+    // This eliminates the N+1 query pattern
+    const { data: groupRecipients } = await supabase.rpc(
+      "get_group_achievement_recipients",
+      {
+        p_user_ids: userIds,
+        p_festival_ids: Array.from(
+          new Set(groupEvents.map((e) => e.festival_id)),
+        ),
+      },
+    );
+
+    // Create a map for quick lookup of recipients by user_id and festival_id
+    const recipientMap = new Map<string, string[]>();
+    (groupRecipients || []).forEach((recipient) => {
+      const key = `${recipient.user_id}:${recipient.festival_id}`;
+      recipientMap.set(key, recipient.recipient_ids);
+    });
+
+    // Process each group event and send notifications
     for (const e of groupEvents) {
-      const { data: myGroups } = await supabase
-        .from("group_members")
-        .select("group_id")
-        .eq("user_id", e.user_id);
+      const key = `${e.user_id}:${e.festival_id}`;
+      const recipientIds = recipientMap.get(key);
 
-      const groupIds = (myGroups || [])
-        .map((g) => g.group_id)
-        .filter(Boolean) as string[];
-      if (groupIds.length === 0) continue;
-
-      const { data: sameFestivalGroups } = await supabase
-        .from("groups")
-        .select("id")
-        .in("id", groupIds)
-        .eq("festival_id", e.festival_id);
-      const sfGroupIds = (sameFestivalGroups || []).map((g) => g.id);
-      if (sfGroupIds.length === 0) continue;
-
-      const { data: members } = await supabase
-        .from("group_members")
-        .select("user_id")
-        .in("group_id", sfGroupIds)
-        .neq("user_id", e.user_id);
-      const recipientIds = (members || [])
-        .map((m) => m.user_id)
-        .filter(Boolean) as string[];
-      if (recipientIds.length === 0) continue;
+      if (!recipientIds || recipientIds.length === 0) continue;
 
       await notifications.notifyGroupAchievement(recipientIds, {
         achieverName: userIdToName.get(e.user_id) || "Someone",

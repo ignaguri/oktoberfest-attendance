@@ -951,6 +951,14 @@ export type Database = {
           username: string;
         }[];
       };
+      get_group_achievement_recipients: {
+        Args: { p_festival_ids: string[]; p_user_ids: string[] };
+        Returns: {
+          festival_id: string;
+          recipient_ids: string[];
+          user_id: string;
+        }[];
+      };
       get_group_leaderboard: {
         Args: { p_group_id: string; p_winning_criteria_id: number };
         Returns: {

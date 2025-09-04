@@ -103,6 +103,21 @@ function createMockSupabase({ userEvents = [], groupEvents = [] }: Events) {
 
   return {
     from,
+    rpc: vi.fn((fnName: string, _params: any) => {
+      if (fnName === "get_group_achievement_recipients") {
+        // Mock the RPC function to return group recipients
+        return {
+          data: [
+            {
+              user_id: "u2",
+              festival_id: "f1",
+              recipient_ids: ["other1", "other2"],
+            },
+          ],
+        };
+      }
+      return { data: [] };
+    }),
     __updates: updates,
   } as unknown as SupabaseClient<Database> & { __updates: any[] };
 }
