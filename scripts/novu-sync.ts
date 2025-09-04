@@ -1,79 +1,40 @@
 #!/usr/bin/env tsx
-import { Novu } from "@novu/api";
+import { execSync } from "child_process";
+import { config } from "dotenv";
 
-import type {
-  CreateWorkflowDto,
-  UpdateWorkflowDto,
-} from "@novu/api/models/components";
-
-import { achievementUnlockedWorkflow } from "../novu/workflows/achievement-unlocked";
-import { groupAchievementUnlockedWorkflow } from "../novu/workflows/group-achievement-unlocked";
-import { groupJoinWorkflow } from "../novu/workflows/group-join";
-import { reservationPromptWorkflow } from "../novu/workflows/reservation-prompt";
-import { reservationReminderWorkflow } from "../novu/workflows/reservation-reminder";
-import { tentCheckinWorkflow } from "../novu/workflows/tent-check-in";
-
-const WORKFLOWS: CreateWorkflowDto[] = [
-  groupJoinWorkflow,
-  tentCheckinWorkflow,
-  reservationReminderWorkflow,
-  reservationPromptWorkflow,
-  achievementUnlockedWorkflow,
-  groupAchievementUnlockedWorkflow,
-];
-
-async function upsertWorkflow(novu: Novu, workflowData: CreateWorkflowDto) {
-  try {
-    // Check if workflow exists by trying to get it
-    const existingWorkflow = await novu.workflows.get(workflowData.workflowId);
-
-    // Update existing workflow - preserve existing preferences
-    const updateData: UpdateWorkflowDto = {
-      name: workflowData.name,
-      tags: workflowData.tags,
-      steps: workflowData.steps,
-      active: workflowData.active,
-      // Preserve existing preferences from the fetched workflow
-      preferences: existingWorkflow.result.preferences,
-      origin: "external",
-    };
-
-    await novu.workflows.update(updateData, workflowData.workflowId);
-  } catch {
-    // Create new workflow with default preferences
-    const createData: CreateWorkflowDto = {
-      ...workflowData,
-      preferences: {
-        user: {
-          all: { enabled: true },
-          channels: {
-            in_app: { enabled: true },
-            push: { enabled: true },
-          },
-        },
-      },
-    };
-
-    await novu.workflows.create(createData);
-  }
-}
+// Load environment variables from .env.local
+config({ path: ".env.local" });
 
 async function main() {
   const apiKey = process.env.NOVU_API_KEY;
-  if (!apiKey) throw new Error("NOVU_API_KEY is required");
-  const novu = new Novu({ secretKey: apiKey });
-
-  for (const wf of WORKFLOWS) {
-    // eslint-disable-next-line no-console
-    console.log(`Syncing workflow: ${wf.workflowId}`);
-    await upsertWorkflow(novu, wf);
+  if (!apiKey) {
+    throw new Error("NOVU_API_KEY is required in .env.local");
   }
-  // eslint-disable-next-line no-console
-  console.log("Novu workflows synced.");
+
+  // For production deployment, use the production URL
+  const bridgeUrl =
+    process.env.NOVU_BRIDGE_URL ||
+    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008"}/api/novu`;
+
+  console.log("🔄 Syncing Novu workflows...");
+  console.log(`📍 Bridge URL: ${bridgeUrl}`);
+
+  try {
+    // Use the Novu CLI to sync workflows
+    const command = `npx novu@latest sync --bridge-url ${bridgeUrl} --secret-key ${apiKey}`;
+
+    console.log("🚀 Running sync command...");
+    execSync(command, { stdio: "inherit" });
+
+    console.log("✅ Workflows synced successfully!");
+  } catch (error: any) {
+    console.error("❌ Failed to sync workflows:", error.message);
+    process.exit(1);
+  }
 }
 
 main().catch((err) => {
   // eslint-disable-next-line no-console
-  console.error(err);
+  console.error(`💥 Script failed:`, err.message);
   process.exit(1);
 });

@@ -1,46 +1,105 @@
-import { StepTypeEnum } from "@novu/api/models/components";
+import { workflow } from "@novu/framework";
 import { z } from "zod";
-
-import type { CreateWorkflowDto } from "@novu/api/models/components";
 
 export const RESERVATION_REMINDER_WORKFLOW_ID =
   "reservation-reminder-notification" as const;
 
 export const reservationReminderPayloadSchema = z.object({
-  userName: z.string().optional(),
-  tentName: z.string(),
-  startAtISO: z.string(),
-  reservationId: z.string(),
-  festivalName: z.string().optional(),
+  userName: z.string().describe("Name of the user with the reservation"),
+  tentName: z.string().describe("Name of the tent where reservation is"),
+  reservationTime: z.string().describe("Time of the reservation"),
+  tableNumber: z.string().optional().describe("Table number if assigned"),
+  partySize: z.number().describe("Number of people in the party"),
 });
 
 export type ReservationReminderPayload = z.infer<
   typeof reservationReminderPayloadSchema
 >;
 
-export const reservationReminderWorkflow: CreateWorkflowDto = {
-  workflowId: RESERVATION_REMINDER_WORKFLOW_ID,
-  name: "Reservation Reminder",
-  tags: ["reservations", "reminders", "oktoberfest"],
-  steps: [
-    {
-      id: `${RESERVATION_REMINDER_WORKFLOW_ID}-in-app`,
-      name: "In-App Reminder",
-      type: StepTypeEnum.InApp,
-      controlValues: {
-        subject: "Reminder: Your table at {{payload.tentName}} is coming up",
-        body: "You have a reservation at {{payload.tentName}} on {{payload.startAtISO}}. Don't forget!",
+export const reservationReminderWorkflow = workflow(
+  RESERVATION_REMINDER_WORKFLOW_ID,
+  async ({
+    step,
+    payload,
+  }: {
+    step: any;
+    payload: ReservationReminderPayload;
+  }) => {
+    await step.inApp(
+      "in-app-notification",
+      async (controls: any) => {
+        const urgency =
+          controls.urgencyLevel === "high"
+            ? "🚨 "
+            : controls.urgencyLevel === "medium"
+              ? "⚠️ "
+              : "";
+        return {
+          subject:
+            controls.subject ||
+            `${urgency}Reservation reminder for ${payload.tentName}`,
+          body:
+            controls.body ||
+            `${urgency}Don't forget! You have a reservation for ${payload.partySize} at ${payload.tentName} at ${payload.reservationTime}`,
+        };
       },
-    },
-    {
-      id: `${RESERVATION_REMINDER_WORKFLOW_ID}-push`,
-      name: "Push Reminder",
-      type: StepTypeEnum.Push,
-      controlValues: {
-        subject: "Reservation reminder",
-        body: "Reservation at {{payload.tentName}} on {{payload.startAtISO}}",
+      {
+        controlSchema: z.object({
+          subject: z
+            .string()
+            .default("Reservation reminder for {{tentName}}")
+            .describe("Reminder notification title"),
+          body: z
+            .string()
+            .default(
+              "Don't forget! You have a reservation for {{partySize}} at {{tentName}} at {{reservationTime}}",
+            )
+            .describe("Reminder notification message"),
+          urgencyLevel: z
+            .enum(["low", "medium", "high"])
+            .default("medium")
+            .describe("Urgency level for the reminder"),
+          showPartySize: z
+            .boolean()
+            .default(true)
+            .describe("Show party size in message"),
+        }),
       },
-    },
-  ],
-  active: true,
-};
+    );
+
+    await step.push(
+      "push-notification",
+      async (controls: any) => {
+        const timeLeft = controls.timeLeft || "30 minutes";
+        return {
+          subject: controls.pushSubject || `Reservation in ${timeLeft}`,
+          body:
+            controls.pushBody ||
+            `Your table at ${payload.tentName} is ready at ${payload.reservationTime}`,
+        };
+      },
+      {
+        controlSchema: z.object({
+          pushSubject: z
+            .string()
+            .default("Reservation in 30 minutes")
+            .describe("Push notification title"),
+          pushBody: z
+            .string()
+            .default(
+              "Your table at {{tentName}} is ready at {{reservationTime}}",
+            )
+            .describe("Push notification message"),
+          timeLeft: z
+            .string()
+            .default("30 minutes")
+            .describe("Time remaining until reservation"),
+        }),
+      },
+    );
+  },
+  {
+    payloadSchema: reservationReminderPayloadSchema,
+    tags: ["reservations", "reminders", "oktoberfest"],
+  },
+);

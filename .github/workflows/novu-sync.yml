@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - 'novu/workflows/**'
-      - 'scripts/novu-sync.ts'
+      - 'app/api/novu/route.ts'
 
 jobs:
   sync:
@@ -21,7 +21,8 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm novu:sync
+      - name: Deploy Novu Workflows
+        run: npx novu@latest sync --bridge-url ${{ secrets.NOVU_BRIDGE_URL }} --secret-key ${{ secrets.NOVU_API_KEY }}
         env:
           NOVU_API_KEY: ${{ secrets.NOVU_API_KEY }}
 

@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
     "/error",
     "/api/cron/scheduler",
+    "/api/novu",
     "/manifest.json",
     "/manifest.webmanifest",
     "/robots.txt",
