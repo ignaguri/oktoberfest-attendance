@@ -1,35 +1,33 @@
 import { EventCalendar } from "@/components/calendar/EventCalendar";
-import { fetchFestivalById } from "@/lib/festivalActions";
+import { ReservationDialog } from "@/components/reservations/ReservationDialog";
+import { fetchFestivalTentPricing } from "@/lib/festivalActions";
 
-import { getGroupCalendarEvents } from "./actions";
+import { getGroupCalendarData } from "./actions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ festivalId?: string }>;
 }
 
-export default async function GroupCalendarPage({
-  params,
-  searchParams,
-}: PageProps) {
-  const { id } = await params;
-  const { festivalId } = (searchParams ? await searchParams : {}) as {
-    festivalId?: string;
-  };
+export default async function GroupCalendarPage({ params }: PageProps) {
+  const { id: groupId } = await params;
 
-  // Try to load a specific festival if provided, otherwise fall back to active/recent
-  const festival = festivalId ? await fetchFestivalById(festivalId) : null;
-
-  const events = festival?.id
-    ? await getGroupCalendarEvents(festival.id, id)
-    : [];
-
-  const initialMonth = festival ? new Date(festival.start_date) : new Date();
+  const { events, initialMonth, festivalId } =
+    await getGroupCalendarData(groupId);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-xl font-semibold mb-4">Group Calendar</h1>
+    <div className="container flex flex-col items-center p-4">
+      <h1 className="text-lg font-semibold mb-4">Group Calendar</h1>
       <EventCalendar events={events} initialMonth={initialMonth} />
+      {/* Preload tents and mount a URL-driven reservation dialog */}
+      {festivalId && (
+        <ReservationDialog
+          festivalId={festivalId}
+          tents={(await fetchFestivalTentPricing(festivalId)).map((t) => ({
+            id: t.tent_id,
+            name: (t as any).tent?.name ?? "Tent",
+          }))}
+        />
+      )}
     </div>
   );
 }

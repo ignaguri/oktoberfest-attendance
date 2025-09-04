@@ -19,8 +19,8 @@ export default async function PersonalCalendarPage() {
     : new Date();
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-xl font-semibold mb-4">My Calendar</h1>
+    <div className="container flex flex-col items-center p-4">
+      <h1 className="text-lg font-semibold mb-4">My Calendar</h1>
       <EventCalendar events={events} initialMonth={initialMonth} />
       <AttendanceDialog />
       {/* Preload tents and mount a URL-driven reservation dialog */}

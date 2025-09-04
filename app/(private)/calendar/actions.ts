@@ -1,8 +1,13 @@
 "use server";
 
+import { TIMEZONE } from "@/lib/constants";
 import { getUser } from "@/lib/sharedActions";
 import { createClient } from "@/utils/supabase/server";
+import { TZDate } from "@date-fns/tz";
+import { isSameDay } from "date-fns";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+
+import type { CalendarEventType } from "@/lib/types";
 
 export async function getPersonalCalendarEvents(festivalId: string) {
   const user = await getUser();
@@ -20,14 +25,84 @@ export async function getPersonalCalendarEvents(festivalId: string) {
         throw new Error(error.message);
       }
 
-      const attendanceEvents = (data ?? []).map(
-        (a: { id: string; date: string; beer_count: number }) => ({
-          id: a.id,
-          title: `${a.beer_count} Maß`,
-          from: new Date(a.date),
-          type: "attendance" as const,
-        }),
-      );
+      // Fetch tent visits for the user in this festival
+      const { data: tentVisits, error: tentVisitsError } = await db
+        .from("tent_visits")
+        .select("tent_id, visit_date, tents(name)")
+        .eq("user_id", uId)
+        .eq("festival_id", festId);
+
+      if (tentVisitsError) {
+        throw new Error(tentVisitsError.message);
+      }
+
+      // Create individual events for each tent visit
+      const tentVisitEvents = (tentVisits ?? [])
+        .filter((tv) => tv.visit_date) // Filter out null visit dates
+        .map((tv) => {
+          const tentName = tv.tents?.name || "Unknown Tent";
+
+          return {
+            id: `tent-visit-${tv.tent_id}-${tv.visit_date}`,
+            title: tentName,
+            from: new TZDate(tv.visit_date!, TIMEZONE),
+            type: "tent_visit" as CalendarEventType,
+          };
+        });
+
+      // Create fallback events for attendances without tent visits
+      const attendanceEvents = (data ?? [])
+        .map((a: { id: string; date: string; beer_count: number }) => {
+          // Check if this attendance has any tent visits
+          const hasTentVisits = (tentVisits ?? []).some(
+            (tv) =>
+              tv.visit_date &&
+              isSameDay(
+                new TZDate(tv.visit_date, TIMEZONE),
+                new TZDate(a.date, TIMEZONE),
+              ),
+          );
+
+          // Only create a fallback event if there are no tent visits for this date
+          if (hasTentVisits) {
+            return null;
+          }
+
+          return {
+            id: a.id,
+            title: `${a.beer_count} Maß`,
+            from: new TZDate(a.date, TIMEZONE),
+            type: "attendance" as CalendarEventType,
+          };
+        })
+        .filter((event): event is NonNullable<typeof event> => event !== null);
+
+      // Create beer summary events for days with tent visits
+      const beerSummaryEvents = (data ?? [])
+        .map((a: { id: string; date: string; beer_count: number }) => {
+          // Check if this attendance has any tent visits
+          const hasTentVisits = (tentVisits ?? []).some(
+            (tv) =>
+              tv.visit_date &&
+              isSameDay(
+                new TZDate(tv.visit_date, TIMEZONE),
+                new TZDate(a.date, TIMEZONE),
+              ),
+          );
+
+          // Only create a beer summary if there are tent visits for this date
+          if (!hasTentVisits || a.beer_count === 0) {
+            return null;
+          }
+
+          return {
+            id: `beer-summary-${a.id}`,
+            title: `${a.beer_count} Maß`,
+            from: new TZDate(a.date, TIMEZONE),
+            type: "beer_summary" as CalendarEventType,
+          };
+        })
+        .filter((event): event is NonNullable<typeof event> => event !== null);
 
       // Reservations for the user in this festival (scheduled ones)
       const { data: reservations, error: resErr } = await db
@@ -51,18 +126,28 @@ export async function getPersonalCalendarEvents(festivalId: string) {
         }) => ({
           id: r.id,
           title: `Reservation${r.tent?.name ? ` · ${r.tent.name}` : ""}`,
-          from: new Date(r.start_at),
-          to: r.end_at ? new Date(r.end_at) : null,
-          type: "reservation" as const,
+          from: new TZDate(r.start_at, TIMEZONE),
+          to: r.end_at ? new TZDate(r.end_at, TIMEZONE) : null,
+          type: "reservation" as CalendarEventType,
         }),
       );
 
-      return [...attendanceEvents, ...reservationEvents];
+      return [
+        ...beerSummaryEvents,
+        ...tentVisitEvents,
+        ...attendanceEvents,
+        ...reservationEvents,
+      ];
     },
     ["personal-calendar"],
     {
       revalidate: 300,
-      tags: ["calendar", `calendar-${user.id}-${festivalId}`, "attendances"],
+      tags: [
+        "calendar",
+        `calendar-${user.id}-${festivalId}`,
+        "attendances",
+        "tent_visits",
+      ],
     },
   );
 
@@ -95,6 +180,7 @@ export async function createReservation(input: {
   if (error) throw new Error(error.message);
   revalidateTag("reservations");
   revalidateTag(`calendar-${user.id}-${input.festivalId}`);
+  revalidateTag("tent_visits");
   revalidatePath("/attendance/calendar");
 }
 
@@ -110,6 +196,7 @@ export async function cancelReservation(reservationId: string) {
 
   if (error) throw new Error(error.message);
   revalidateTag("reservations");
+  revalidateTag("tent_visits");
   revalidatePath("/attendance/calendar");
 }
 
@@ -146,6 +233,7 @@ export async function updateReservation(
 
   if (error) throw new Error(error.message);
   revalidateTag("reservations");
+  revalidateTag("tent_visits");
   revalidatePath("/attendance/calendar");
 }
 

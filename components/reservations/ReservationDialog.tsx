@@ -4,7 +4,7 @@ import {
   createReservation,
   getReservationForEdit,
   updateReservation,
-} from "@/app/(private)/attendance/calendar/actions";
+} from "@/app/(private)/calendar/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

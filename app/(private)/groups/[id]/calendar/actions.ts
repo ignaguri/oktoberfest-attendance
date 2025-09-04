@@ -1,11 +1,16 @@
 "use server";
 
+import { TIMEZONE } from "@/lib/constants";
 import { createClient } from "@/utils/supabase/server";
+import { TZDate } from "@date-fns/tz";
+import { isSameDay } from "date-fns";
 import { unstable_cache } from "next/cache";
 
+import type { CalendarEventType } from "@/lib/types";
+
 export async function getGroupCalendarEvents(
-  festivalId: string,
   groupId: string,
+  festivalId: string,
 ) {
   const db = createClient();
 
@@ -48,19 +53,105 @@ export async function getGroupCalendarEvents(
         throw new Error(attError.message);
       }
 
-      const attendanceEvents = (attendances ?? []).map(
-        (a: {
-          id: string;
-          date: string;
-          beer_count: number;
-          user_id: string | null;
-        }) => ({
-          id: a.id,
-          title: `${idToName.get(a.user_id ?? "") ?? "Member"}: ${a.beer_count} Maß`,
-          from: new Date(a.date),
-          type: "attendance" as const,
-        }),
-      );
+      // Get tent visits for those members in this festival
+      const { data: tentVisits, error: tentVisitsError } = await db
+        .from("tent_visits")
+        .select("tent_id, visit_date, user_id, tents(name)")
+        .eq("festival_id", festId)
+        .in("user_id", memberIds);
+
+      if (tentVisitsError) {
+        throw new Error(tentVisitsError.message);
+      }
+
+      // Create individual events for each tent visit
+      const tentVisitEvents = (tentVisits ?? [])
+        .filter((tv) => tv.visit_date) // Filter out null visit dates
+        .map((tv) => {
+          const tentName = tv.tents?.name || "Unknown Tent";
+          const memberName = idToName.get(tv.user_id ?? "") ?? "Member";
+
+          return {
+            id: `tent-visit-${tv.tent_id}-${tv.visit_date}-${tv.user_id}`,
+            title: `${memberName}: ${tentName}`,
+            from: new TZDate(tv.visit_date!, TIMEZONE),
+            type: "tent_visit" as CalendarEventType,
+          };
+        });
+
+      // Create beer summary events for days with tent visits
+      const beerSummaryEvents = (attendances ?? [])
+        .map(
+          (a: {
+            id: string;
+            date: string;
+            beer_count: number;
+            user_id: string | null;
+          }) => {
+            // Check if this attendance has any tent visits
+            const hasTentVisits = (tentVisits ?? []).some(
+              (tv) =>
+                tv.visit_date &&
+                tv.user_id === a.user_id &&
+                isSameDay(
+                  new TZDate(tv.visit_date, TIMEZONE),
+                  new TZDate(a.date, TIMEZONE),
+                ),
+            );
+
+            // Only create a beer summary if there are tent visits for this date
+            if (!hasTentVisits || a.beer_count === 0) {
+              return null;
+            }
+
+            const memberName = idToName.get(a.user_id ?? "") ?? "Member";
+
+            return {
+              id: `beer-summary-${a.id}`,
+              title: `${memberName}: ${a.beer_count} Maß`,
+              from: new TZDate(a.date, TIMEZONE),
+              type: "beer_summary" as CalendarEventType,
+            };
+          },
+        )
+        .filter((event): event is NonNullable<typeof event> => event !== null);
+
+      // Create fallback events for attendances without tent visits
+      const attendanceEvents = (attendances ?? [])
+        .map(
+          (a: {
+            id: string;
+            date: string;
+            beer_count: number;
+            user_id: string | null;
+          }) => {
+            // Check if this attendance has any tent visits
+            const hasTentVisits = (tentVisits ?? []).some(
+              (tv) =>
+                tv.visit_date &&
+                tv.user_id === a.user_id &&
+                isSameDay(
+                  new TZDate(tv.visit_date, TIMEZONE),
+                  new TZDate(a.date, TIMEZONE),
+                ),
+            );
+
+            // Only create a fallback event if there are no tent visits for this date
+            if (hasTentVisits) {
+              return null;
+            }
+
+            const memberName = idToName.get(a.user_id ?? "") ?? "Member";
+
+            return {
+              id: a.id,
+              title: `${memberName}: ${a.beer_count} Maß`,
+              from: new TZDate(a.date, TIMEZONE),
+              type: "attendance" as CalendarEventType,
+            };
+          },
+        )
+        .filter((event): event is NonNullable<typeof event> => event !== null);
 
       // Group-visible reservations for those members
       const { data: reservations, error: resErr } = await db
@@ -90,24 +181,52 @@ export async function getGroupCalendarEvents(
           title: `${idToName.get(r.user_id ?? "") ?? "Member"}: Reservation${
             r.tent?.name ? ` · ${r.tent.name}` : ""
           }`,
-          from: new Date(r.start_at),
-          to: r.end_at ? new Date(r.end_at) : null,
-          type: "reservation" as const,
+          from: new TZDate(r.start_at, TIMEZONE),
+          to: r.end_at ? new TZDate(r.end_at, TIMEZONE) : null,
+          type: "reservation" as CalendarEventType,
         }),
       );
 
-      return [...attendanceEvents, ...reservationEvents];
+      return [
+        ...beerSummaryEvents,
+        ...tentVisitEvents,
+        ...attendanceEvents,
+        ...reservationEvents,
+      ];
     },
     ["group-calendar"],
     {
       revalidate: 300,
       tags: [
         "calendar",
-        `calendar-group-${groupId}-${festivalId}`,
+        `calendar-group-${groupId}`,
         "attendances",
+        "tent_visits",
       ],
     },
   );
 
   return getCached(festivalId, groupId);
+}
+
+export async function getGroupCalendarData(groupId: string) {
+  const db = createClient();
+
+  // Get the group's festival_id and festival data
+  const { data: groupData, error: groupError } = await db
+    .from("groups")
+    .select("festival_id, festivals(start_date)")
+    .eq("id", groupId)
+    .single();
+
+  if (groupError) {
+    throw new Error(`Error fetching group info: ${groupError.message}`);
+  }
+
+  const events = await getGroupCalendarEvents(groupId, groupData.festival_id);
+  const initialMonth = groupData.festivals?.start_date
+    ? new Date(groupData.festivals.start_date)
+    : new Date();
+
+  return { events, initialMonth, festivalId: groupData.festival_id };
 }

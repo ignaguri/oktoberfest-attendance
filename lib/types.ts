@@ -82,3 +82,9 @@ export interface GalleryItem {
   full_name: string | null;
   picture_data: PictureData[];
 }
+
+export type CalendarEventType =
+  | "attendance"
+  | "reservation"
+  | "beer_summary"
+  | "tent_visit";

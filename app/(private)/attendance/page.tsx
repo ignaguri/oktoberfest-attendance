@@ -9,9 +9,9 @@ import { useState, useEffect, useCallback } from "react";
 import type { Tables } from "@/lib/database.types";
 
 import { fetchAttendances, checkInFromReservation } from "./actions";
-import { getReservationForCheckIn } from "./calendar/actions";
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
+import { getReservationForCheckIn } from "../calendar/actions";
 
 type TentVisit = Tables<"tent_visits"> & {
   tentName: string | undefined;
@@ -52,6 +52,17 @@ export default function AttendancePage() {
   useEffect(() => {
     fetchAttendanceData();
   }, [fetchAttendanceData]);
+
+  // Handle date parameter from URL
+  useEffect(() => {
+    const dateParam = searchParams.get("date");
+    if (dateParam) {
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        setSelectedDate(date);
+      }
+    }
+  }, [searchParams]);
 
   // Handle check-in prompt
   useEffect(() => {
