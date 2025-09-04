@@ -5,7 +5,7 @@ import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
-import { isSameDay } from "date-fns";
+import { isSameDay, format } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 import "server-only";
@@ -74,5 +74,128 @@ export async function deleteAttendance(attendanceId: string) {
   }
 
   revalidatePath("/attendance");
+  revalidatePath("/home");
+}
+
+export async function checkInFromReservation(reservationId: string) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  // Get the reservation details
+  const { data: reservation, error: reservationError } = await supabase
+    .from("reservations")
+    .select(
+      `
+      id,
+      festival_id,
+      tent_id,
+      start_at,
+      tents(name)
+    `,
+    )
+    .eq("id", reservationId)
+    .eq("user_id", user.id)
+    .eq("status", "scheduled")
+    .single();
+
+  if (reservationError || !reservation) {
+    throw new Error("Reservation not found or already processed");
+  }
+
+  // Get festival timezone
+  const { data: festival, error: festivalError } = await supabase
+    .from("festivals")
+    .select("timezone")
+    .eq("id", reservation.festival_id)
+    .single();
+
+  if (festivalError || !festival) {
+    throw new Error("Festival not found");
+  }
+
+  // Convert start_at to festival timezone date
+  const startDate = new Date(reservation.start_at);
+  const tzDate = new TZDate(startDate, festival.timezone);
+  const festivalDate = format(tzDate, "yyyy-MM-dd");
+
+  // Check if user already has attendance for this date
+  const { data: existingAttendance, error: attendanceError } = await supabase
+    .from("attendances")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("festival_id", reservation.festival_id)
+    .eq("date", festivalDate)
+    .single();
+
+  if (attendanceError && attendanceError.code !== "PGRST116") {
+    // PGRST116 is "not found" error, which is expected if no attendance exists
+    reportSupabaseException("checkInFromReservation", attendanceError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error checking existing attendance");
+  }
+
+  // If no existing attendance, create one
+  if (!existingAttendance) {
+    const { error: insertError } = await supabase.from("attendances").insert({
+      user_id: user.id,
+      festival_id: reservation.festival_id,
+      date: festivalDate,
+      beer_count: 0, // Start with 0 beers
+    });
+
+    if (insertError) {
+      reportSupabaseException("checkInFromReservation", insertError, {
+        id: user.id,
+        email: user.email,
+      });
+      throw new Error("Error creating attendance");
+    }
+  }
+
+  // Add tent visit if not already present
+  const { error: tentVisitError } = await supabase
+    .from("tent_visits")
+    .insert({
+      id: crypto.randomUUID(),
+      user_id: user.id,
+      festival_id: reservation.festival_id,
+      tent_id: reservation.tent_id,
+      visit_date: startDate.toISOString(),
+    })
+    .select()
+    .single();
+
+  if (tentVisitError && tentVisitError.code !== "23505") {
+    // 23505 is unique constraint violation, which is expected if visit already exists
+    reportSupabaseException("checkInFromReservation", tentVisitError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error creating tent visit");
+  }
+
+  // Mark reservation as completed
+  const { error: updateError } = await supabase
+    .from("reservations")
+    .update({
+      status: "completed",
+      processed_at: new Date().toISOString(),
+    })
+    .eq("id", reservationId)
+    .eq("user_id", user.id);
+
+  if (updateError) {
+    reportSupabaseException("checkInFromReservation", updateError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error updating reservation status");
+  }
+
+  // Revalidate relevant paths
+  revalidatePath("/attendance");
+  revalidatePath("/attendance/calendar");
   revalidatePath("/home");
 }

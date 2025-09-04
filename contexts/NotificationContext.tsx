@@ -32,7 +32,10 @@ interface NotificationContextType {
     updates: Partial<
       Pick<
         NotificationPreferences,
-        "group_join_enabled" | "checkin_enabled" | "push_enabled"
+        | "reminders_enabled"
+        | "group_notifications_enabled"
+        | "achievement_notifications_enabled"
+        | "push_enabled"
       >
     >,
   ) => Promise<void>;
@@ -251,7 +254,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     updates: Partial<
       Pick<
         NotificationPreferences,
-        "group_join_enabled" | "checkin_enabled" | "push_enabled"
+        | "reminders_enabled"
+        | "group_notifications_enabled"
+        | "achievement_notifications_enabled"
+        | "push_enabled"
       >
     >,
   ) => {

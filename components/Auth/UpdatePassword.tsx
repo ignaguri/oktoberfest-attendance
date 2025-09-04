@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { updatePasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,7 +49,7 @@ export default function UpdatePassword() {
     <div className="card">
       <h2 className="w-full text-center">Update Password</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <label htmlFor="password">New Password</label>
+        <Label htmlFor="password">New Password</Label>
         <div className="relative w-full">
           <input
             className={cn("input", errors.password && "bg-red-50")}
@@ -70,7 +71,7 @@ export default function UpdatePassword() {
           <span className="error">{errors.password.message}</span>
         )}
 
-        <label htmlFor="confirmPassword">Confirm Password</label>
+        <Label htmlFor="confirmPassword">Confirm Password</Label>
         <div className="relative w-full">
           <input
             className={cn("input", errors.confirmPassword && "bg-red-50")}

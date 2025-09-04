@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { signUpSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,7 +69,7 @@ export default function SignUp() {
     <div className="card">
       <h2 className="w-full text-center">Create Account</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <label htmlFor="email">Email</label>
+        <Label htmlFor="email">Email</Label>
         <input
           className={cn("input", errors.email && "bg-red-50")}
           id="email"
@@ -79,7 +80,7 @@ export default function SignUp() {
         />
         {errors.email && <span className="error">{errors.email.message}</span>}
 
-        <label htmlFor="password">Password</label>
+        <Label htmlFor="password">Password</Label>
         <input
           className={cn("input", errors.password && "bg-red-50")}
           id="password"
@@ -91,7 +92,7 @@ export default function SignUp() {
           <span className="error">{errors.password.message}</span>
         )}
 
-        <label htmlFor="confirmPassword">Confirm Password</label>
+        <Label htmlFor="confirmPassword">Confirm Password</Label>
         <input
           className={cn("input", errors.confirmPassword && "bg-red-50")}
           id="confirmPassword"

@@ -78,6 +78,16 @@ const config = [
       "simple-import-sort/exports": "warn",
     },
   },
+  // E2E override with its own TS project
+  {
+    files: ["e2e/**/*.ts", "e2e/**/*.tsx"],
+    languageOptions: {
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        project: "./tsconfig.eslint.json",
+      },
+    },
+  },
   ...patchedConfig,
   prettierConfigRecommended,
   { ignores: [".next/*", "public/workbox-*"] },

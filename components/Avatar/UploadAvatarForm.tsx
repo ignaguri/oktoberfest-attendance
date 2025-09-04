@@ -11,15 +11,13 @@ import type { AvatarFormData } from "@/lib/schemas/uploads";
 
 import { uploadAvatar } from "./actions";
 import { AvatarPreview } from "./Avatar";
+import { Label } from "../ui/label";
 
 export interface UploadAvatarFormProps {
   className?: string;
   uid: string;
   onUpload?: (url: string) => void;
 }
-
-const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
-const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export default function UploadAvatarForm({
   className,
@@ -32,7 +30,7 @@ export default function UploadAvatarForm({
   const {
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<AvatarFormData>({
     resolver: zodResolver(avatarSchema),
@@ -95,12 +93,12 @@ export default function UploadAvatarForm({
             email: "no.name@email.com",
           }}
         />
-        <label
+        <Label
           htmlFor="avatar-upload"
           className={buttonVariants({ variant: "outline" })}
         >
           Choose picture
-        </label>
+        </Label>
         <input
           ref={fileInputRef}
           id="avatar-upload"

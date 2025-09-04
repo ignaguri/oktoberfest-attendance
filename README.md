@@ -4,9 +4,9 @@
  <source media="(prefers-color-scheme: dark)" srcset="./docs/home-page-screenshot.png">
  <source media="(prefers-color-scheme: light)" srcset="./docs/home-page-screenshot.png">
  <img
-    alt="Screenshot of the home page of the app"
-    src="./docs/home-page-screenshot.png"
-    height="400"
+   alt="Screenshot of the home page of the app"
+   src="./docs/home-page-screenshot.png"
+   height="400"
  >
 </picture>
 
@@ -36,6 +36,26 @@ Copy `.env.example` or manually create a file in the root folder named `.env.loc
 NEXT_PUBLIC_SUPABASE_URL=<http://localhost:54321 provided when running supabase start>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<this one is provided when running supabase start>
 SUPA_ACCESS_TOKEN=<this one should be asked to the app owner>
+
+# Supabase service role
+SUPABASE_SERVICE_ROLE_KEY=<required for server routes/cron/notifications>
+
+# Novu
+NOVU_API_KEY=<required for notifications>
+NEXT_PUBLIC_NOVU_APP_ID=<frontend subscriber app id>
+
+# Cron
+CRON_SECRET=<used by /api/cron/scheduler>
+
+# Firebase (Push Notifications)
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=
+
+# App URLs
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 Populate this file with your URL and Key.

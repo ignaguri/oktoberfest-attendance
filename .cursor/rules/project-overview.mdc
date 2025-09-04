@@ -134,8 +134,9 @@ This project serves as the foundation for enhanced mobile support:
 
 ### Migration Management
 - **Create Migration**: `pnpm sup:mig:new` (creates timestamped migration files)
-- **Push Changes**: `pnpm sup:db:push`
+- **Reset Local DB**: `pnpm sup:db:reset` (reset and run all migrations for testing)
 - **Pull Schema**: `pnpm sup:db:pull`
+- **Note**: We don't push DB changes; we reset the local DB to test if migrations work properly
 
 ### Available Scripts
 - **Version Management**: `pnpm version:show`, `pnpm version:patch/minor/major`

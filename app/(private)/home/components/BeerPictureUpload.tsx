@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
@@ -108,7 +109,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
         className="hidden"
         id="beer-picture-upload"
       />
-      <label
+      <Label
         htmlFor="beer-picture-upload"
         className={buttonVariants({ variant: "outline" })}
       >
@@ -124,7 +125,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
             )}
           </div>
         )}
-      </label>
+      </Label>
       {errors.picture && (
         <span className="error">{errors.picture.message}</span>
       )}

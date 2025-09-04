@@ -3,6 +3,7 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { groupSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,16 +37,16 @@ const GroupEditForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block">
+        <Label htmlFor="name" className="block">
           Group Name
-        </label>
+        </Label>
         <input type="text" id="name" className="input" {...register("name")} />
         {errors.name && <span className="error">{errors.name.message}</span>}
       </div>
       <div>
-        <label htmlFor="description" className="block">
+        <Label htmlFor="description" className="block">
           Description
-        </label>
+        </Label>
         <textarea
           id="description"
           className="input"

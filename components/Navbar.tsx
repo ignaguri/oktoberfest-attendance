@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { getProfileShortFailsafe } from "@/lib/sharedActions";
+import { CalendarDays } from "lucide-react";
 import { Link } from "next-view-transitions";
 
 import { NotificationBell } from "./NotificationBell";
@@ -18,6 +20,16 @@ export default async function Navbar() {
         {profileData && (
           <div className="flex items-center gap-2">
             <PWAReloadButton />
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-white hover:text-gray-600 px-2"
+            >
+              <Link href="/calendar">
+                <CalendarDays size={20} />
+              </Link>
+            </Button>
             <NotificationBell />
             <UserMenu
               profileData={{

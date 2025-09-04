@@ -34,6 +34,61 @@ export type Database = {
   };
   public: {
     Tables: {
+      achievement_events: {
+        Row: {
+          achievement_id: string;
+          created_at: string;
+          festival_id: string;
+          group_notified_at: string | null;
+          id: string;
+          rarity: Database["public"]["Enums"]["achievement_rarity_enum"];
+          user_id: string;
+          user_notified_at: string | null;
+        };
+        Insert: {
+          achievement_id: string;
+          created_at?: string;
+          festival_id: string;
+          group_notified_at?: string | null;
+          id?: string;
+          rarity: Database["public"]["Enums"]["achievement_rarity_enum"];
+          user_id: string;
+          user_notified_at?: string | null;
+        };
+        Update: {
+          achievement_id?: string;
+          created_at?: string;
+          festival_id?: string;
+          group_notified_at?: string | null;
+          id?: string;
+          rarity?: Database["public"]["Enums"]["achievement_rarity_enum"];
+          user_id?: string;
+          user_notified_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "achievement_events_achievement_id_fkey";
+            columns: ["achievement_id"];
+            isOneToOne: false;
+            referencedRelation: "achievements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "achievement_events_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "achievement_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       achievements: {
         Row: {
           category: Database["public"]["Enums"]["achievement_category_enum"];
@@ -446,6 +501,85 @@ export type Database = {
           },
         ];
       };
+      reservations: {
+        Row: {
+          auto_checkin: boolean;
+          created_at: string | null;
+          end_at: string | null;
+          festival_id: string;
+          id: string;
+          note: string | null;
+          processed_at: string | null;
+          prompt_sent_at: string | null;
+          reminder_offset_minutes: number;
+          reminder_sent_at: string | null;
+          start_at: string;
+          status: string;
+          tent_id: string;
+          updated_at: string | null;
+          user_id: string;
+          visible_to_groups: boolean;
+        };
+        Insert: {
+          auto_checkin?: boolean;
+          created_at?: string | null;
+          end_at?: string | null;
+          festival_id: string;
+          id?: string;
+          note?: string | null;
+          processed_at?: string | null;
+          prompt_sent_at?: string | null;
+          reminder_offset_minutes?: number;
+          reminder_sent_at?: string | null;
+          start_at: string;
+          status?: string;
+          tent_id: string;
+          updated_at?: string | null;
+          user_id: string;
+          visible_to_groups?: boolean;
+        };
+        Update: {
+          auto_checkin?: boolean;
+          created_at?: string | null;
+          end_at?: string | null;
+          festival_id?: string;
+          id?: string;
+          note?: string | null;
+          processed_at?: string | null;
+          prompt_sent_at?: string | null;
+          reminder_offset_minutes?: number;
+          reminder_sent_at?: string | null;
+          start_at?: string;
+          status?: string;
+          tent_id?: string;
+          updated_at?: string | null;
+          user_id?: string;
+          visible_to_groups?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reservations_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reservations_tent_id_fkey";
+            columns: ["tent_id"];
+            isOneToOne: false;
+            referencedRelation: "tents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reservations_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       system_settings: {
         Row: {
           created_at: string;
@@ -581,29 +715,38 @@ export type Database = {
       };
       user_notification_preferences: {
         Row: {
+          achievement_notifications_enabled: boolean | null;
           checkin_enabled: boolean | null;
           created_at: string | null;
           group_join_enabled: boolean | null;
+          group_notifications_enabled: boolean | null;
           id: string;
           push_enabled: boolean | null;
+          reminders_enabled: boolean | null;
           updated_at: string | null;
           user_id: string | null;
         };
         Insert: {
+          achievement_notifications_enabled?: boolean | null;
           checkin_enabled?: boolean | null;
           created_at?: string | null;
           group_join_enabled?: boolean | null;
+          group_notifications_enabled?: boolean | null;
           id?: string;
           push_enabled?: boolean | null;
+          reminders_enabled?: boolean | null;
           updated_at?: string | null;
           user_id?: string | null;
         };
         Update: {
+          achievement_notifications_enabled?: boolean | null;
           checkin_enabled?: boolean | null;
           created_at?: string | null;
           group_join_enabled?: boolean | null;
+          group_notifications_enabled?: boolean | null;
           id?: string;
           push_enabled?: boolean | null;
+          reminders_enabled?: boolean | null;
           updated_at?: string | null;
           user_id?: string | null;
         };
@@ -669,6 +812,50 @@ export type Database = {
           username: string | null;
         };
         Relationships: [];
+      };
+      v_user_shared_group_members: {
+        Row: {
+          festival_id: string | null;
+          owner_id: string | null;
+          viewer_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "fk_user_id";
+            columns: ["viewer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "fk_user_id";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "group_members_user_id_fkey";
+            columns: ["viewer_id"];
+            isOneToOne: false;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "group_members_user_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "groups_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Functions: {
@@ -764,6 +951,14 @@ export type Database = {
           username: string;
         }[];
       };
+      get_group_achievement_recipients: {
+        Args: { p_festival_ids: string[]; p_user_ids: string[] };
+        Returns: {
+          festival_id: string;
+          recipient_ids: string[];
+          user_id: string;
+        }[];
+      };
       get_group_leaderboard: {
         Args: { p_group_id: string; p_winning_criteria_id: number };
         Returns: {
@@ -850,6 +1045,27 @@ export type Database = {
       renew_group_token: {
         Args: { p_group_id: string };
         Returns: string;
+      };
+      rpc_due_reservation_prompts: {
+        Args: { p_now: string };
+        Returns: {
+          festival_id: string;
+          id: string;
+          start_at: string;
+          tent_id: string;
+          user_id: string;
+        }[];
+      };
+      rpc_due_reservation_reminders: {
+        Args: { p_now: string };
+        Returns: {
+          festival_id: string;
+          id: string;
+          reminder_offset_minutes: number;
+          start_at: string;
+          tent_id: string;
+          user_id: string;
+        }[];
       };
       switch_to_production_schema: {
         Args: Record<PropertyKey, never>;

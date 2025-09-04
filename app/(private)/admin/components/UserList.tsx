@@ -4,6 +4,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,9 +50,9 @@ const UserEditForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block">
+        <Label htmlFor="email" className="block">
           Email
-        </label>
+        </Label>
         <input
           type="email"
           id="email"
@@ -61,9 +62,9 @@ const UserEditForm = ({
         {errors.email && <span className="error">{errors.email.message}</span>}
       </div>
       <div>
-        <label htmlFor="password" className="block">
+        <Label htmlFor="password" className="block">
           New Password (leave blank to keep unchanged)
-        </label>
+        </Label>
         <input
           type="password"
           id="password"
@@ -75,9 +76,9 @@ const UserEditForm = ({
         )}
       </div>
       <div>
-        <label htmlFor="full_name" className="block">
+        <Label htmlFor="full_name" className="block">
           Full Name
-        </label>
+        </Label>
         <input
           type="text"
           id="full_name"
@@ -89,9 +90,9 @@ const UserEditForm = ({
         )}
       </div>
       <div>
-        <label htmlFor="username" className="block">
+        <Label htmlFor="username" className="block">
           Username
-        </label>
+        </Label>
         <input
           type="text"
           id="username"
@@ -108,9 +109,9 @@ const UserEditForm = ({
           id="is_super_admin"
           {...register("is_super_admin")}
         />
-        <label htmlFor="is_super_admin" className="block">
+        <Label htmlFor="is_super_admin" className="block">
           Is Super Admin
-        </label>
+        </Label>
       </div>
       <Button type="submit" disabled={isSubmitting}>
         Update User
@@ -146,9 +147,9 @@ const AttendanceEditForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label htmlFor="date" className="block">
+        <Label htmlFor="date" className="block">
           Date
-        </label>
+        </Label>
         <input
           type="date"
           id="date"
@@ -163,9 +164,9 @@ const AttendanceEditForm = ({
         )}
       </div>
       <div>
-        <label htmlFor="beer_count" className="block">
+        <Label htmlFor="beer_count" className="block">
           Beer Count
-        </label>
+        </Label>
         <input
           type="number"
           id="beer_count"
@@ -177,9 +178,9 @@ const AttendanceEditForm = ({
         )}
       </div>
       <div>
-        <label htmlFor="tents" className="block">
+        <Label htmlFor="tents" className="block">
           Tents
-        </label>
+        </Label>
         <TentSelector
           selectedTents={watchedTentIds}
           onTentsChange={(tents) => setValue("tent_ids", tents)}

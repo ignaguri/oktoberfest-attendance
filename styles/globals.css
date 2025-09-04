@@ -365,3 +365,24 @@
     --chart-5: 340 75% 55%;
   }
 }
+
+/* Calendar Styles */
+@layer components {
+  /* Enhanced disabled day styling */
+  .rdp-day[aria-disabled="true"] {
+    @apply opacity-30 cursor-not-allowed;
+  }
+
+  .rdp-day[aria-disabled="true"]:hover {
+    @apply bg-transparent;
+  }
+
+  /* Hidden days (outside festival range) */
+  .rdp-day[aria-hidden="true"] {
+    @apply opacity-20 cursor-not-allowed;
+  }
+
+  .rdp-day[aria-hidden="true"]:hover {
+    @apply bg-transparent;
+  }
+}

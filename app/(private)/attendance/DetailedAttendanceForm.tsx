@@ -3,6 +3,7 @@
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
 import { getFestivalDates } from "@/lib/festivalConstants";
@@ -17,8 +18,8 @@ import { useForm } from "react-hook-form";
 import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
 
+import { AttendanceDatePicker } from "./AttendanceDatePicker";
 import { BeerPicturesUpload } from "./BeerPicturesUpload";
-import { MyDatePicker } from "./DatePicker";
 
 interface DetailedAttendanceFormProps {
   onAttendanceUpdate: () => void;
@@ -173,8 +174,8 @@ export default function DetailedAttendanceForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-          <label htmlFor="date">When did you visit the Wiesn?</label>
-          <MyDatePicker
+          <Label htmlFor="date">When did you visit the Wiesn?</Label>
+          <AttendanceDatePicker
             name="date"
             disabled={isSubmitting}
             value={watchedValues.date}
@@ -191,7 +192,7 @@ export default function DetailedAttendanceForm({
           />
           {errors.date && <span className="error">{errors.date.message}</span>}
 
-          <label htmlFor="amount">How many 🍻 Maß did you have?</label>
+          <Label htmlFor="amount">How many 🍻 Maß did you have?</Label>
           <select
             className={cn(
               "input w-auto self-center",
@@ -211,7 +212,7 @@ export default function DetailedAttendanceForm({
             <span className="error">{errors.amount.message}</span>
           )}
 
-          <label htmlFor="tents">Which tents did you visit?</label>
+          <Label htmlFor="tents">Which tents did you visit?</Label>
           <TentSelector
             disabled={isSubmitting}
             selectedTents={watchedValues.tents}

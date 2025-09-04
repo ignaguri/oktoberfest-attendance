@@ -1,0 +1,29 @@
+name: Novu Sync
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'novu/workflows/**'
+      - 'app/api/novu/route.ts'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Deploy Novu Workflows
+        run: npx novu@latest sync --bridge-url ${{ secrets.NOVU_BRIDGE_URL }} --secret-key ${{ secrets.NOVU_API_KEY }}
+        env:
+          NOVU_API_KEY: ${{ secrets.NOVU_API_KEY }}
+
+

@@ -4,7 +4,7 @@ import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
 import { winningCriteriaText } from "@/lib/constants";
-import { Images } from "lucide-react";
+import { CalendarDays, Images } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { Suspense } from "react";
@@ -73,12 +73,20 @@ export default async function GroupPage({
           />
 
           <div className="flex flex-col gap-4 items-center">
-            <Button asChild variant="default">
-              <Link href={`/groups/${groupId}/gallery`}>
-                <Images size={24} />
-                <span className="ml-2">Gallery</span>
-              </Link>
-            </Button>
+            <div className="flex gap-2 items-center">
+              <Button asChild variant="outline">
+                <Link href={`/groups/${groupId}/calendar`}>
+                  <CalendarDays size={24} />
+                  <span className="ml-2">Calendar</span>
+                </Link>
+              </Button>
+              <Button asChild variant="yellow">
+                <Link href={`/groups/${groupId}/gallery`}>
+                  <Images size={24} />
+                  <span className="ml-2">Gallery</span>
+                </Link>
+              </Button>
+            </div>
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
             </Button>
@@ -86,9 +94,6 @@ export default async function GroupPage({
               <QRButton groupName={group.name} groupId={group.id} withText />
               <ShareButton groupName={group.name} groupId={group.id} withText />
             </div>
-            <Button asChild variant="yellowOutline">
-              <Link href="/attendance">Register attendance</Link>
-            </Button>
           </div>
         </div>
       </Suspense>
