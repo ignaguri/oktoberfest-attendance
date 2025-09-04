@@ -2,8 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/scheduler",
-      "schedule": "0 9 * * *",
-      "comment": "Runs daily at 9:00 AM UTC for reservation reminders and achievement notifications"
+      "schedule": "0 9 * * *"
     }
   ]
 }
