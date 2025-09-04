@@ -101,18 +101,19 @@ export async function processAchievementNotifications(
     });
 
     // Process each group event and send notifications
-    for (const e of groupEvents) {
+    const notificationPromises = groupEvents.map((e) => {
       const key = `${e.user_id}:${e.festival_id}`;
       const recipientIds = recipientMap.get(key);
 
-      if (!recipientIds || recipientIds.length === 0) continue;
+      if (!recipientIds || recipientIds.length === 0) return Promise.resolve();
 
-      await notifications.notifyGroupAchievement(recipientIds, {
+      return notifications.notifyGroupAchievement(recipientIds, {
         achieverName: userIdToName.get(e.user_id) || "Someone",
         achievementName: achIdToMeta.get(e.achievement_id)?.name || "",
         rarity: (achIdToMeta.get(e.achievement_id)?.rarity as any) || "rare",
       });
-    }
+    });
+    await Promise.allSettled(notificationPromises);
 
     await supabase
       .from("achievement_events")
