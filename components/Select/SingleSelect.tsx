@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
 import type { Option, SelectBaseProps } from "./SelectBase";
 
 import { SelectBase } from "./SelectBase";
@@ -15,12 +13,12 @@ interface SingleSelectProps
     | "searchPlaceholder"
     | "emptyMessage"
     | "disabled"
+    | "errorMsg"
   > {
   id?: string;
   onSelect?: (option: Option) => void;
   onUnselect?: () => void;
   value?: string | null;
-  closeOnSelect?: boolean;
 }
 
 export function SingleSelect({
@@ -34,33 +32,19 @@ export function SingleSelect({
   onSelect,
   onUnselect,
   value,
-  closeOnSelect = true,
+  errorMsg,
 }: SingleSelectProps) {
-  const [selected, setSelected] = useState<Option | null>(null);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (value) {
-      const option = options
-        .flatMap((group) => group.options)
-        .find((opt) => opt.value === value);
-      if (option) {
-        setSelected(option);
-      }
-    } else {
-      setSelected(null);
-    }
-  }, [value, options]);
-
-  const handleSelect = (option: Option) => {
-    if (selected?.value === option.value) {
-      setSelected(null);
+  const handleValueChange = (newValue: string) => {
+    if (newValue === value) {
       onUnselect?.();
     } else {
-      setSelected(option);
-      onSelect?.(option);
+      const option = options
+        .flatMap((group) => group.options)
+        .find((opt) => opt.value === newValue);
+      if (option) {
+        onSelect?.(option);
+      }
     }
-    if (closeOnSelect) setOpen(false);
   };
 
   return (
@@ -72,14 +56,9 @@ export function SingleSelect({
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
       emptyMessage={emptyMessage}
-      value={selected || ({} as Option)}
-      onSelect={handleSelect}
-      renderValue={() => null}
-      renderTrigger={(value) =>
-        (value as Option)?.label || placeholder || "Select option"
-      }
-      open={open}
-      setOpen={setOpen}
+      value={value || ""}
+      onValueChange={handleValueChange}
+      errorMsg={errorMsg}
     />
   );
 }

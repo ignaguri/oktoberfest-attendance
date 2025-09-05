@@ -8,7 +8,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -36,13 +35,10 @@ export interface SelectBaseProps {
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
-  value: Option | Option[];
-  onSelect: (option: Option) => void;
-  renderValue: (value: Option | Option[]) => React.ReactNode;
-  renderTrigger: (value: Option | Option[]) => React.ReactNode;
+  value: string;
+  onValueChange: (value: string) => void;
   disabled?: boolean;
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  errorMsg?: string;
 }
 
 export function SelectBase({
@@ -50,91 +46,106 @@ export function SelectBase({
   buttonClassName,
   options,
   placeholder = "Select option",
+  searchPlaceholder = "Search...",
   emptyMessage = "No option found.",
   value,
-  onSelect,
-  renderValue,
-  renderTrigger,
+  onValueChange,
   disabled = false,
-  open,
-  setOpen,
+  errorMsg,
 }: SelectBaseProps) {
+  const [open, setOpen] = React.useState(false);
+
+  const allOptions = options.flatMap((group) => group.options);
+  const selectedOption = allOptions.find((option) => option.value === value);
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn("w-full justify-between", buttonClassName)}
-          disabled={disabled}
-        >
-          {renderTrigger(value)}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
-        <Command>
-          <CommandInput placeholder={placeholder} />
-          <CommandEmpty>{emptyMessage}</CommandEmpty>
-          <CommandList>
-            {options.map((group, groupIndex) => (
-              <React.Fragment key={group.title || `group-${groupIndex}`}>
-                {groupIndex > 0 && <CommandSeparator />}
-                {group.title ? (
-                  <CommandGroup heading={group.title}>
-                    {group.options.map((option) => (
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id={id}
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              "w-full justify-between",
+              errorMsg &&
+                "border-red-500 bg-red-50 text-red-900 placeholder:text-red-700 focus:ring-red-500",
+              buttonClassName,
+            )}
+            disabled={disabled}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[300px] p-0">
+          <Command>
+            <CommandInput placeholder={searchPlaceholder} />
+            <CommandEmpty>{emptyMessage}</CommandEmpty>
+            <CommandList>
+              {options.map((group, groupIndex) => (
+                <React.Fragment key={group.title || `group-${groupIndex}`}>
+                  {group.title ? (
+                    <CommandGroup heading={group.title}>
+                      {group.options.map((option) => (
+                        <CommandItem
+                          key={option.value}
+                          value={option.label}
+                          onSelect={() => {
+                            onValueChange(
+                              option.value === value ? "" : option.value,
+                            );
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              value === option.value
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          {option.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ) : (
+                    group.options.map((option) => (
                       <CommandItem
                         key={option.value}
-                        onSelect={() => onSelect(option)}
+                        value={option.label}
+                        onSelect={() => {
+                          onValueChange(
+                            option.value === value ? "" : option.value,
+                          );
+                          setOpen(false);
+                        }}
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            Array.isArray(value)
-                              ? value.some(
-                                  (item) => item.value === option.value,
-                                )
-                                ? "opacity-100"
-                                : "opacity-0"
-                              : value?.value === option.value
-                                ? "opacity-100"
-                                : "opacity-0",
+                            value === option.value
+                              ? "opacity-100"
+                              : "opacity-0",
                           )}
                         />
                         {option.label}
                       </CommandItem>
-                    ))}
-                  </CommandGroup>
-                ) : (
-                  group.options.map((option) => (
-                    <CommandItem
-                      key={option.value}
-                      onSelect={() => onSelect(option)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          Array.isArray(value)
-                            ? value.some((item) => item.value === option.value)
-                              ? "opacity-100"
-                              : "opacity-0"
-                            : value?.value === option.value
-                              ? "opacity-100"
-                              : "opacity-0",
-                        )}
-                      />
-                      {option.label}
-                    </CommandItem>
-                  ))
-                )}
-              </React.Fragment>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-      {renderValue(value)}
-    </Popover>
+                    ))
+                  )}
+                </React.Fragment>
+              ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      {errorMsg && (
+        <span className="w-full text-center text-sm text-red-600">
+          {errorMsg}
+        </span>
+      )}
+    </>
   );
 }
