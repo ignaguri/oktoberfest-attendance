@@ -3,7 +3,7 @@
   Usage:
     CRON_SECRET=your-secret pnpm cron:trigger
   Optional args:
-    --url http://localhost:3000 (defaults to localhost:3000)
+    --url http://localhost:3008 (defaults to localhost:3008)
 */
 
 const args = process.argv.slice(2);
@@ -11,7 +11,7 @@ const urlArgIndex = args.indexOf("--url");
 const baseUrl =
   urlArgIndex !== -1 && args[urlArgIndex + 1]
     ? args[urlArgIndex + 1]
-    : "http://localhost:3000";
+    : "http://localhost:3008";
 
 const cronSecret: string =
   process.env.CRON_SECRET ??

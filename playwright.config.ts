@@ -9,12 +9,12 @@ export default defineConfig({
   reporter: [["list"]],
   webServer: {
     command: 'bash -c "pnpm build && pnpm start -p 3000"',
-    url: process.env.BASE_URL || "http://localhost:3000",
+    url: process.env.BASE_URL || "http://localhost:3008",
     reuseExistingServer: true,
     timeout: 180_000,
   },
   use: {
-    baseURL: process.env.BASE_URL || "http://localhost:3000",
+    baseURL: process.env.BASE_URL || "http://localhost:3008",
     trace: "on-first-retry",
     video: "retain-on-failure",
     screenshot: "only-on-failure",

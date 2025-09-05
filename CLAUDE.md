@@ -10,7 +10,7 @@ ProstCounter is a Next.js PWA for tracking Oktoberfest and other beer festivals 
 
 ### Core Development
 
-- `pnpm dev` - Start development server at localhost:3000
+- `pnpm dev` - Start development server at localhost:3008
 - `pnpm build` - Production build
 - `pnpm start` - Start production server
 - `pnpm type-check` - Run TypeScript type checking

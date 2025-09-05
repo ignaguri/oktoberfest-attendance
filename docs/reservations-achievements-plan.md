@@ -217,7 +217,7 @@ Deployment notes:
 
 - Reservation reminder flow ⏳
   - Make a reservation due for reminder (adjust `start_at`/`reminder_offset_minutes`).
-  - Call cron: `curl -X POST -H "x-cron-secret: $CRON_SECRET" http://localhost:3000/api/cron/scheduler`.
+  - Call cron: `curl -X POST -H "x-cron-secret: $CRON_SECRET" http://localhost:3008/api/cron/scheduler`.
   - Verify Novu in-app/push delivery and DB `reminder_sent_at` set; confirm idempotency on repeated runs.
 
 - Reservation check-in prompt ⏳
