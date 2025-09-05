@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
 
     // Construct the callback URL with the code
     const callbackUrl = new URL("/auth/callback", request.url);
-    if (code) callbackUrl.searchParams.set("code", code);
+    callbackUrl.searchParams.set("code", code);
     if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
 
     return NextResponse.redirect(callbackUrl);
