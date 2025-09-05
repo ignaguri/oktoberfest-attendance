@@ -175,6 +175,7 @@ export async function fetchAttendanceByDate(
 export async function uploadBeerPicture(formData: FormData) {
   const picture = formData.get("picture") as File;
   const attendanceId = formData.get("attendanceId") as string;
+  const visibility = (formData.get("visibility") as string) || "public";
   const supabase = createClient();
   const user = await getUser();
 
@@ -208,13 +209,17 @@ export async function uploadBeerPicture(formData: FormData) {
     throw new Error(errorMessage);
   }
 
-  const { error: beerPicturesError } = await supabase
-    .from("beer_pictures")
-    .insert({
-      user_id: user.id,
-      attendance_id: attendanceId,
-      picture_url: fileName,
-    });
+  // Use the updated database function that supports visibility
+  const { data: pictureId, error: beerPicturesError } = await supabase.rpc(
+    "add_beer_picture",
+    {
+      p_user_id: user.id,
+      p_attendance_id: attendanceId,
+      p_picture_url: fileName,
+      p_visibility: visibility as "public" | "private",
+    },
+  );
+
   if (beerPicturesError) {
     reportSupabaseException("uploadBeerPicture", beerPicturesError, {
       id: user.id,

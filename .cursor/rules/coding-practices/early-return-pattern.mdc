@@ -1,0 +1,75 @@
+---
+description: Use early return pattern to avoid deep nesting and improve code readability
+alwaysApply: false
+---
+
+<cursor-rules>
+<title>Early Return Pattern</title>
+
+<description>
+Use the early return pattern in functions and components to handle special cases or invalid input as soon as possible, improving code readability and reducing nesting.
+</description>
+
+<rules>
+- Use the early return pattern in functions and components to handle special cases or invalid input as soon as possible
+- Avoid deep nesting by returning early when a condition is not met
+- Prefer flat, readable code over nested if/else blocks
+- Handle error conditions and edge cases early in the function
+- Return early from guards and validation checks
+</rules>
+
+<examples>
+<example type="bad">
+```tsx
+function Foo({ data }: { data: string | null }) {
+  if (isValid(data)) {
+    return <div>{data}</div>;
+  } else {
+    return null;
+  }
+}
+
+function process(items: string[]) {
+  if (items.length > 0) {
+    // long processing logic here
+    // many lines of code
+    // deeply nested
+  }
+}
+```
+</example>
+
+<example type="good">
+```tsx
+function Foo({ data }: { data: string | null }) {
+  if (!isValid(data)) return null;
+  return <div>{data}</div>;
+}
+
+function process(items: string[]) {
+  if (items.length === 0) return;
+  
+  // processing logic here
+  // flatter structure
+}
+
+function calculateDiscount(user: User, amount: number) {
+  if (!user) return 0;
+  if (amount <= 0) return 0;
+  if (!user.isEligible) return 0;
+  
+  return amount * user.discountRate;
+}
+```
+</example>
+</examples>
+
+<motivation>
+- Reduces cognitive complexity by handling edge cases early
+- Improves code readability by flattening nested structures
+- Makes the main logic path clearer and easier to follow
+- Reduces the likelihood of bugs in deeply nested code
+- Aligns with clean code principles and best practices
+</motivation>
+
+</cursor-rules>

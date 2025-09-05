@@ -5,6 +5,7 @@ import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import { useToast } from "@/hooks/use-toast";
 import { profileSchema } from "@/lib/schemas/profile";
 import { getProfileShort } from "@/lib/sharedActions";
@@ -237,6 +238,8 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
       </div>
 
       <NotificationSettings />
+
+      <PhotoPrivacySettings />
 
       {/* Delete Account Section */}
       <div className="card bg-red-500/20">

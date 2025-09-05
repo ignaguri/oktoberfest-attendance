@@ -1,0 +1,81 @@
+---
+description: JSDoc documentation required for hooks and utility functions
+alwaysApply: false
+---
+
+<cursor-rules>
+<title>JSDoc for Hooks and Utilities</title>
+
+<description>
+Every custom React hook and exported utility function must have JSDoc documentation to improve code readability and maintainability.
+</description>
+
+<rules>
+- Every custom React hook (functions starting with `use`) must have a JSDoc comment immediately above its definition
+- All exported utility functions and helpers must have a JSDoc comment describing their purpose and usage
+- JSDoc should include a concise summary, parameter types, and return type where applicable
+- Use standard JSDoc tags: `@param`, `@returns`, `@throws`, `@example` as needed
+- Keep descriptions clear and concise
+</rules>
+
+<examples>
+<example type="bad">
+```ts
+export function useFetchData() {
+  // ...
+}
+
+export const formatDate = (date: Date) => {
+  // ...
+}
+
+export const calculateDiscount = (price, rate) => {
+  // ...
+}
+```
+</example>
+
+<example type="good">
+```ts
+/**
+ * Fetches data from the API and returns the result.
+ * @param url - The endpoint to fetch data from.
+ * @returns The fetched data and loading state.
+ */
+export function useFetchData(url: string): [Data, boolean] {
+  // ...
+}
+
+/**
+ * Formats a date as YYYY-MM-DD.
+ * @param date - The date to format.
+ * @returns The formatted date string.
+ */
+export const formatDate = (date: Date): string => {
+  // ...
+}
+
+/**
+ * Calculates the discounted price based on rate.
+ * @param price - The original price.
+ * @param rate - The discount rate (0-1).
+ * @returns The discounted price.
+ * @throws Error if rate is not between 0 and 1.
+ */
+export const calculateDiscount = (price: number, rate: number): number => {
+  // ...
+}
+```
+</example>
+</examples>
+
+<motivation>
+- Improves code readability and maintainability
+- Helps other developers understand the purpose and usage of hooks and utilities
+- Provides better IDE support with parameter hints and documentation
+- Encourages consistent documentation across the codebase
+- Reduces onboarding time for new team members
+- Makes debugging and troubleshooting easier
+</motivation>
+
+</cursor-rules>

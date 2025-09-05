@@ -47,7 +47,6 @@ public/workbox-*
 
 # Coding agents
 WARP.md
-/.cursor/
 
 # Claude MCP configuration
 .mcp.json

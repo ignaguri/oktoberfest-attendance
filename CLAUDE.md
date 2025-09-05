@@ -227,6 +227,70 @@ ProstCounter uses Novu for push notification orchestration with Firebase Cloud M
 - Node-cache for performance optimizations
 - Real-time data via Supabase subscriptions where needed
 
+### Server-Side Caching Pattern ✅ IMPLEMENTED
+
+ProstCounter uses Next.js `unstable_cache` for server-side data caching to improve performance and reduce database load.
+
+#### Caching Architecture
+
+```typescript
+import { unstable_cache } from "next/cache";
+import type { SupabaseClient } from "@/lib/types";
+
+// Cache function pattern - always private
+const getCachedFunctionName = unstable_cache(
+  async (param1: string, param2: string, supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient
+      .from("table_name")
+      .select("*")
+      .eq("column", param1);
+    
+    if (error) {
+      reportSupabaseException("functionName", error, { id: param1 });
+      throw new Error("Error message");
+    }
+    
+    return data;
+  },
+  ["cache-key"], // Unique cache key
+  { revalidate: 300, tags: ["cache-tag"] }, // 5 minutes cache with tags
+);
+
+// Public function that uses cached version
+export async function publicFunction(param1: string) {
+  const user = await getUser();
+  const supabase = createClient();
+  return getCachedFunctionName(user.id, param1, supabase);
+}
+```
+
+#### Cache Configuration Guidelines
+
+- **Revalidate Time**: Based on data change frequency
+  - Static data (tents, winning criteria): 2-4 hours (7200-14400s)
+  - User settings: 5-10 minutes (300-600s)
+  - Dynamic data (attendances): No caching or very short (60s)
+- **Cache Tags**: For targeted invalidation via `revalidateTag()`
+- **Cache Keys**: Descriptive, unique identifiers
+- **Parameters**: Always pass `SupabaseClient` as last parameter
+
+#### Implementation Examples
+
+- `getCachedTents` - 2 hours, static tent data
+- `getCachedWinningCriterias` - 4 hours, rarely changing criteria
+- `getCachedUserGroups` - 10 minutes, user group memberships
+- `getCachedGlobalPhotoSettings` - 5 minutes, user photo settings
+
+#### Cache Invalidation
+
+```typescript
+// Update actions should invalidate relevant caches
+revalidateTag("cache-tag");
+revalidatePath("/path");
+```
+
+**Key Benefits**: Reduced database load, improved response times, scalable performance
+
 ### Group Competition System
 
 - Unique `invite_token` for sharing groups

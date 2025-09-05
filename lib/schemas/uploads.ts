@@ -18,6 +18,7 @@ export const beerPicturesSchema = z.object({
     )
     .min(1, "At least one picture is required")
     .max(MAX_PICTURES, `Maximum ${MAX_PICTURES} pictures allowed`),
+  visibility: z.enum(["public", "private"]),
 });
 
 export const singlePictureSchema = z.object({
@@ -29,6 +30,7 @@ export const singlePictureSchema = z.object({
     .refine((file) => VALID_FILE_TYPES.includes(file.type), {
       message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
     }),
+  visibility: z.enum(["public", "private"]),
 });
 
 export const avatarSchema = z.object({

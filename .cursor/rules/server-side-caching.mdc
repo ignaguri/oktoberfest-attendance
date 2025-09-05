@@ -1,0 +1,129 @@
+---
+description: Server-side caching patterns using Next.js unstable_cache for Supabase data fetching
+globs: *action*
+alwaysApply: false
+---
+# Server-Side Caching Rules for ProstCounter
+
+## Next.js unstable_cache Pattern
+
+When implementing server actions that fetch data from Supabase, always use the caching pattern to improve performance and reduce database load.
+
+### Required Implementation Pattern
+
+```typescript
+import { unstable_cache } from "next/cache";
+import { getUser } from "@/lib/sharedActions";
+import { reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
+import type { SupabaseClient } from "@/lib/types";
+
+// 1. Create private cached function (always starts with getCached)
+const getCachedDataName = unstable_cache(
+  async (userId: string, additionalParam: string, supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient
+      .from("table_name")
+      .select("*")
+      .eq("user_id", userId);
+    
+    if (error) {
+      reportSupabaseException("functionName", error, { id: userId });
+      throw new Error("Error fetching data");
+    }
+    
+    return data || defaultValue;
+  },
+  ["descriptive-cache-key"], // Unique cache identifier
+  { revalidate: cacheTimeInSeconds, tags: ["relevant-tag"] }
+);
+
+// 2. Create public function that uses cached version
+export async function getDataName(additionalParam?: string) {
+  const user = await getUser();
+  const supabase = createClient();
+  return getCachedDataName(user.id, additionalParam, supabase);
+}
+```
+
+### Cache Configuration Guidelines
+
+#### Revalidate Times (seconds)
+- **Static data** (tents, criteria): 7200-14400 (2-4 hours)
+- **User settings** (preferences, photo settings): 300-600 (5-10 minutes) 
+- **Semi-dynamic data** (group memberships): 600 (10 minutes)
+- **Dynamic data** (attendances, real-time): No caching or 60s max
+
+#### Cache Tags
+- Use for targeted invalidation with `revalidateTag()`
+- Common tags: `["groups"]`, `["user-settings"]`, `["leaderboard"]`, `["attendances"]`
+- Be specific: `["user-photo-settings"]` vs `["settings"]`
+
+#### Cache Keys
+- Descriptive and unique: `["user-groups"]`, `["global-leaderboard"]`
+- Include function purpose, not implementation details
+
+#### Required Parameters Order
+1. User ID or primary identifier
+2. Additional filtering parameters  
+3. SupabaseClient (always last)
+
+### Cache Invalidation Pattern
+
+```typescript
+// In update/mutate functions, invalidate relevant caches
+export async function updateUserSettings(formData: FormData) {
+  // ... update logic ...
+  
+  // Invalidate caches
+  revalidateTag("user-settings");
+  revalidatePath("/profile");
+  
+  return { success: true };
+}
+```
+
+### Examples from Codebase
+
+```typescript
+// Static data - long cache
+const getCachedTents = unstable_cache(
+  async (supabaseClient: SupabaseClient) => { /* ... */ },
+  ["tents"],
+  { revalidate: 7200, tags: ["tents"] }
+);
+
+// User data - medium cache
+const getCachedUserGroups = unstable_cache(
+  async (userId: string, festivalId: string, supabaseClient: SupabaseClient) => { /* ... */ },
+  ["user-groups"], 
+  { revalidate: 600, tags: ["groups", "user-groups"] }
+);
+
+// Settings - short cache
+const getCachedGlobalPhotoSettings = unstable_cache(
+  async (userId: string, supabaseClient: SupabaseClient) => { /* ... */ },
+  ["user-photo-global-settings"],
+  { revalidate: 300, tags: ["user-photo-settings"] }
+);
+```
+
+### When NOT to Cache
+
+- Real-time data that changes frequently (live scores, active sessions)
+- Data that must always be fresh (authentication checks, permissions)
+- One-time operations (file uploads, form submissions)
+- Small, infrequent queries where caching overhead > benefit
+
+### Checklist for Server Actions
+
+- [ ] Uses `unstable_cache` wrapper for read operations
+- [ ] Private cached function with `getCached` prefix
+- [ ] Public function calls cached version
+- [ ] Appropriate revalidate time for data frequency
+- [ ] Descriptive cache key and relevant tags
+- [ ] SupabaseClient passed as last parameter
+- [ ] Error handling with `reportSupabaseException`
+- [ ] Update functions invalidate related caches
+- [ ] TypeScript types properly imported
+
+This pattern ensures consistent performance optimization across the application while maintaining code readability and maintainability.
