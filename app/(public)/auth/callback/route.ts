@@ -8,14 +8,30 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const redirect = searchParams.get("redirect");
+  const error = searchParams.get("error");
+
+  // Handle OAuth error from provider
+  if (error) {
+    console.error("OAuth provider error:", error);
+    return NextResponse.redirect(
+      new URL(
+        `/sign-in?error=oauth_failed&details=${encodeURIComponent(error)}`,
+        req.url,
+      ),
+    );
+  }
 
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error: exchangeError } =
+      await supabase.auth.exchangeCodeForSession(code);
 
-    if (error) {
-      console.error("OAuth callback error:", error);
+    if (exchangeError) {
+      console.error("OAuth callback error:", exchangeError);
       return NextResponse.redirect(
-        new URL("/sign-in?error=oauth_failed", req.url),
+        new URL(
+          `/sign-in?error=oauth_failed&details=${encodeURIComponent(exchangeError.message)}`,
+          req.url,
+        ),
       );
     }
   }

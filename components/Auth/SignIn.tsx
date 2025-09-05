@@ -34,11 +34,16 @@ export default function SignIn() {
   // Show OAuth error if present
   useEffect(() => {
     if (error === "oauth_failed") {
+      const details = searchParams.get("details");
+      const errorMessage = details
+        ? `OAuth sign-in failed: ${decodeURIComponent(details)}`
+        : "OAuth sign-in failed. Please try again.";
+
       setError("password", {
-        message: "OAuth sign-in failed. Please try again.",
+        message: errorMessage,
       });
     }
-  }, [error, setError]);
+  }, [error, setError, searchParams]);
 
   const onSubmit = async (data: SignInFormData) => {
     try {
