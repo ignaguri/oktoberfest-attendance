@@ -1,6 +1,8 @@
 "use client";
 
 import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { avatarSchema } from "@/lib/schemas/uploads";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +13,6 @@ import type { AvatarFormData } from "@/lib/schemas/uploads";
 
 import { uploadAvatar } from "./actions";
 import { AvatarPreview } from "./Avatar";
-import { Label } from "../ui/label";
 
 export interface UploadAvatarFormProps {
   className?: string;
@@ -99,7 +100,7 @@ export default function UploadAvatarForm({
         >
           Choose picture
         </Label>
-        <input
+        <Input
           ref={fileInputRef}
           id="avatar-upload"
           name="avatar"
@@ -107,10 +108,8 @@ export default function UploadAvatarForm({
           accept="image/*"
           onChange={handleFileChange}
           className="hidden"
+          errorMsg={errors.avatar?.message}
         />
-        {errors.avatar && (
-          <span className="error">{errors.avatar.message}</span>
-        )}
       </form>
     </div>
   );
