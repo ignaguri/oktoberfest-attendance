@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { trackRedirect } from "./analytics";
+import RedirectTracker from "./RedirectTracker";
 
 // Predefined redirect mappings
 const REDIRECTS = {
@@ -25,10 +25,7 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
   if (slug in REDIRECTS) {
     const url = REDIRECTS[slug as RedirectSlug];
 
-    // Track the redirect event
-    trackRedirect(slug as RedirectSlug, url);
-
-    redirect(url);
+    return <RedirectTracker slug={slug as RedirectSlug} url={url} />;
   }
 
   // Fallback for invalid redirect slugs
