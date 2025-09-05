@@ -32,7 +32,7 @@ interface DateTimePickerProps {
 function generateTimePresets(
   startHour: number,
   endHour: number,
-  intervalMinutes: number
+  intervalMinutes: number,
 ) {
   const presets = [];
   for (
