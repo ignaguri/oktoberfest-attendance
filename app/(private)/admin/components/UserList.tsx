@@ -4,6 +4,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
@@ -53,10 +54,11 @@ const UserEditForm = ({
         <Label htmlFor="email" className="block">
           Email
         </Label>
-        <input
+        <Input
           type="email"
           id="email"
           className="input"
+          errorMsg={errors.email?.message}
           {...register("email")}
         />
         {errors.email && <span className="error">{errors.email.message}</span>}
@@ -65,10 +67,11 @@ const UserEditForm = ({
         <Label htmlFor="password" className="block">
           New Password (leave blank to keep unchanged)
         </Label>
-        <input
+        <Input
           type="password"
           id="password"
           className="input"
+          errorMsg={errors.password?.message}
           {...register("password")}
         />
         {errors.password && (
@@ -79,10 +82,11 @@ const UserEditForm = ({
         <Label htmlFor="full_name" className="block">
           Full Name
         </Label>
-        <input
+        <Input
           type="text"
           id="full_name"
           className="input"
+          errorMsg={errors.full_name?.message}
           {...register("full_name")}
         />
         {errors.full_name && (
@@ -93,10 +97,11 @@ const UserEditForm = ({
         <Label htmlFor="username" className="block">
           Username
         </Label>
-        <input
+        <Input
           type="text"
           id="username"
           className="input"
+          errorMsg={errors.username?.message}
           {...register("username")}
         />
         {errors.username && (
@@ -104,9 +109,10 @@ const UserEditForm = ({
         )}
       </div>
       <div className="flex items-center gap-2">
-        <input
+        <Input
           type="checkbox"
           id="is_super_admin"
+          errorMsg={errors.is_super_admin?.message}
           {...register("is_super_admin")}
         />
         <Label htmlFor="is_super_admin" className="block">
@@ -150,10 +156,11 @@ const AttendanceEditForm = ({
         <Label htmlFor="date" className="block">
           Date
         </Label>
-        <input
+        <Input
           type="date"
           id="date"
           className="border p-1"
+          errorMsg={errors.date?.message}
           {...register("date", {
             valueAsDate: true,
             setValueAs: (value: string) => new Date(value),
@@ -167,10 +174,11 @@ const AttendanceEditForm = ({
         <Label htmlFor="beer_count" className="block">
           Beer Count
         </Label>
-        <input
+        <Input
           type="number"
           id="beer_count"
           className="border p-1"
+          errorMsg={errors.beer_count?.message}
           {...register("beer_count", { valueAsNumber: true })}
         />
         {errors.beer_count && (
