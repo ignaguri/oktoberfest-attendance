@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0] - 2025-09-05
+
+### 🐛 Bug Fixes
+
+- reorder PNPM setup before Node.js setup and add proper pnpm caching
+
 ## [0.5.0] - 2025-09-05
 
 ### ✨ Features
