@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { resetPasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import cn from "classnames";
 import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 
@@ -47,14 +47,13 @@ const ResetPassword = () => {
       <h2 className="w-full text-center">Reset Password</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
         <Label htmlFor="email">Email</Label>
-        <input
-          className={cn("input", errors.email && "input-error")}
+        <Input
+          errorMsg={errors.email?.message}
           id="email"
           placeholder="jane@acme.com"
           type="email"
           {...register("email")}
         />
-        {errors.email && <span className="error">{errors.email.message}</span>}
         <Button
           type="submit"
           className="self-center"

@@ -13,6 +13,7 @@ export async function middleware(request: NextRequest) {
     "/sign-in",
     "/sign-up",
     "/reset-password",
+    "/privacy",
     "/error",
     "/api/cron/scheduler",
     "/api/novu",

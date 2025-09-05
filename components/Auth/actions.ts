@@ -108,3 +108,41 @@ export async function updatePassword(formData: { password: string }) {
 
   revalidateBase();
 }
+
+export async function signInWithOAuth(
+  provider: "google" | "facebook",
+  redirectTo?: string | null,
+) {
+  const supabase = createClient();
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
+      : "http://localhost:3008/auth/callback";
+
+  const finalRedirectUrl = redirectTo
+    ? `${baseUrl}?redirect=${encodeURIComponent(redirectTo)}`
+    : baseUrl;
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: finalRedirectUrl,
+    },
+  });
+
+  if (error) {
+    reportLog(
+      `Error trying to sign in with ${provider}: ${error.message}`,
+      "error",
+    );
+    throw new Error(error.message);
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+
+  return data;
+}

@@ -1,18 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { signUpSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import cn from "classnames";
 import { Link } from "next-view-transitions";
 import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 import type { SignUpFormData } from "@/lib/schemas/auth";
 
-import { signUp } from "./actions";
+import { signUp, signInWithOAuth } from "./actions";
+import { GoogleIcon, FacebookIcon } from "./SocialIcons";
 
 export default function SignUp() {
   const { toast } = useToast();
@@ -51,6 +52,24 @@ export default function SignUp() {
     }
   };
 
+  const handleOAuthSignIn = async (provider: "google" | "facebook") => {
+    try {
+      await signInWithOAuth(provider);
+    } catch (error: any) {
+      // Check if this is a Next.js redirect response
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+        // This is a redirect response, let it pass through
+        throw error;
+      }
+
+      toast({
+        title: "Sign up failed.",
+        description: `Failed to sign up with ${provider}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isAccountCreated) {
     return (
       <div className="card">
@@ -67,42 +86,40 @@ export default function SignUp() {
 
   return (
     <div className="card">
-      <h2 className="w-full text-center">Create Account</h2>
+      <h2 className="w-full text-2xl font-semibold text-center p-0">
+        Create Account
+      </h2>
+
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
         <Label htmlFor="email">Email</Label>
-        <input
-          className={cn("input", errors.email && "bg-red-50")}
+        <Input
+          errorMsg={errors.email?.message}
           id="email"
           placeholder="jane@acme.com"
           type="email"
+          autoComplete="email"
+          autoFocus
           disabled={isSubmitting}
           {...register("email")}
         />
-        {errors.email && <span className="error">{errors.email.message}</span>}
 
         <Label htmlFor="password">Password</Label>
-        <input
-          className={cn("input", errors.password && "bg-red-50")}
+        <Input
+          errorMsg={errors.password?.message}
           id="password"
           type="password"
           disabled={isSubmitting}
           {...register("password")}
         />
-        {errors.password && (
-          <span className="error">{errors.password.message}</span>
-        )}
 
         <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <input
-          className={cn("input", errors.confirmPassword && "bg-red-50")}
+        <Input
+          errorMsg={errors.confirmPassword?.message}
           id="confirmPassword"
           type="password"
           disabled={isSubmitting}
           {...register("confirmPassword")}
         />
-        {errors.confirmPassword && (
-          <span className="error">{errors.confirmPassword.message}</span>
-        )}
 
         <Button
           className="self-center"
@@ -113,6 +130,38 @@ export default function SignUp() {
           Submit
         </Button>
       </form>
+
+      <div className="flex items-center gap-4 w-full">
+        <div className="flex-1 h-px bg-gray-300"></div>
+        <span className="text-sm text-gray-500">or</span>
+        <div className="flex-1 h-px bg-gray-300"></div>
+      </div>
+
+      {/* Social Login Buttons */}
+      <div className="flex flex-col gap-3 w-full">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleOAuthSignIn("google")}
+          disabled={isSubmitting}
+          className="w-full flex items-center justify-center gap-2 bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
+        >
+          <GoogleIcon className="size-5" />
+          Continue with Google
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleOAuthSignIn("facebook")}
+          disabled={isSubmitting}
+          className="w-full flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white border-[#1877F2]"
+        >
+          <FacebookIcon className="size-5" />
+          Continue with Facebook
+        </Button>
+      </div>
+
       <Button asChild variant="link">
         <Link href="/sign-in">Already have an account? Sign In.</Link>
       </Button>
