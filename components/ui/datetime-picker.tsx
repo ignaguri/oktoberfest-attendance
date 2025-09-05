@@ -29,46 +29,28 @@ interface DateTimePickerProps {
   calendarClassName?: string;
 }
 
-const timePresets = [
-  { label: "09:00", hours: 9, minutes: 0 },
-  { label: "09:15", hours: 9, minutes: 15 },
-  { label: "09:30", hours: 9, minutes: 30 },
-  { label: "09:45", hours: 9, minutes: 45 },
-  { label: "10:00", hours: 10, minutes: 0 },
-  { label: "10:15", hours: 10, minutes: 15 },
-  { label: "10:30", hours: 10, minutes: 30 },
-  { label: "10:45", hours: 10, minutes: 45 },
-  { label: "11:00", hours: 11, minutes: 0 },
-  { label: "11:15", hours: 11, minutes: 15 },
-  { label: "11:30", hours: 11, minutes: 30 },
-  { label: "11:45", hours: 11, minutes: 45 },
-  { label: "12:00", hours: 12, minutes: 0 },
-  { label: "12:15", hours: 12, minutes: 15 },
-  { label: "12:30", hours: 12, minutes: 30 },
-  { label: "12:45", hours: 12, minutes: 45 },
-  { label: "13:00", hours: 13, minutes: 0 },
-  { label: "13:15", hours: 13, minutes: 15 },
-  { label: "13:30", hours: 13, minutes: 30 },
-  { label: "13:45", hours: 13, minutes: 45 },
-  { label: "14:00", hours: 14, minutes: 0 },
-  { label: "14:15", hours: 14, minutes: 15 },
-  { label: "14:30", hours: 14, minutes: 30 },
-  { label: "14:45", hours: 14, minutes: 45 },
-  { label: "15:00", hours: 15, minutes: 0 },
-  { label: "15:15", hours: 15, minutes: 15 },
-  { label: "15:30", hours: 15, minutes: 30 },
-  { label: "15:45", hours: 15, minutes: 45 },
-  { label: "16:00", hours: 16, minutes: 0 },
-  { label: "16:15", hours: 16, minutes: 15 },
-  { label: "16:30", hours: 16, minutes: 30 },
-  { label: "16:45", hours: 16, minutes: 45 },
-  { label: "17:00", hours: 17, minutes: 0 },
-  { label: "17:15", hours: 17, minutes: 15 },
-  { label: "17:30", hours: 17, minutes: 30 },
-  { label: "17:45", hours: 17, minutes: 45 },
-  { label: "18:00", hours: 18, minutes: 0 },
-];
+function generateTimePresets(
+  startHour: number,
+  endHour: number,
+  intervalMinutes: number
+) {
+  const presets = [];
+  for (
+    let minutes = startHour * 60;
+    minutes <= endHour * 60;
+    minutes += intervalMinutes
+  ) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const label = `${hours.toString().padStart(2, "0")}:${mins
+      .toString()
+      .padStart(2, "0")}`;
+    presets.push({ label, hours, minutes: mins });
+  }
+  return presets;
+}
 
+const timePresets = generateTimePresets(9, 18, 15);
 export function DateTimePicker({
   value,
   onChange,
