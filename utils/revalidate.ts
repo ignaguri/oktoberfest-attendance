@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 
 const clearCachesByServerAction = async (path: string) => {
@@ -10,7 +11,11 @@ const clearCachesByServerAction = async (path: string) => {
       revalidatePath("/");
     }
   } catch (error) {
-    console.error("clearCachesByServerAction=> ", error);
+    logger.error(
+      "Error in clearCachesByServerAction",
+      logger.serverAction("clearCachesByServerAction", { path }),
+      error as Error,
+    );
   }
 };
 

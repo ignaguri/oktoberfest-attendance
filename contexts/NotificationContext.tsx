@@ -7,6 +7,7 @@ import {
   registerFCMToken,
 } from "@/lib/actions/notifications";
 import { getFCMToken, onMessageListener } from "@/lib/firebase";
+import { logger } from "@/lib/logger";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import {
   createContext,
@@ -120,7 +121,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
-        console.error("Failed to get user:", error);
+        logger.error(
+          "Failed to get current user in NotificationContext",
+          logger.clientComponent("NotificationContext"),
+          error as Error,
+        );
         setUser(null);
       }
     }
@@ -164,7 +169,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setFcmToken(token);
       return token;
     } catch (error) {
-      console.error("Failed to get FCM token:", error);
+      logger.error(
+        "Failed to get FCM token",
+        logger.clientComponent("NotificationContext"),
+        error as Error,
+      );
       return null;
     }
   };

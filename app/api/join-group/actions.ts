@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { createNotificationService } from "@/lib/services/notifications";
 import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
@@ -31,7 +32,11 @@ export async function joinGroupWithToken(formData: { token: string }) {
     const notificationService = createNotificationService();
     await notificationService.notifyGroupJoin(groupId, user.id);
   } catch (notificationError) {
-    console.error("Failed to send join notification:", notificationError);
+    logger.warn(
+      "Failed to send join notification",
+      logger.serverAction("joinGroupWithToken", { userId: user.id, groupId }),
+      notificationError as Error,
+    );
     // Don't fail the join operation if notification fails
   }
 

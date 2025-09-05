@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
+import { logger } from "@/lib/logger";
 import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
@@ -25,7 +26,13 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
         const groupsData = await fetchGroups(currentFestival?.id);
         setGroups(groupsData);
       } catch (error) {
-        console.error("Error fetching groups:", error);
+        logger.error(
+          "Error fetching groups",
+          logger.clientComponent("MyGroups", {
+            festivalId: currentFestival?.id,
+          }),
+          error as Error,
+        );
         setGroups([]);
       } finally {
         setLoading(false);

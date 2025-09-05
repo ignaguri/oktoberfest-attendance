@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { groupSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -83,7 +84,11 @@ const GroupList = () => {
       const fetchedGroups = await getGroups();
       setGroups(fetchedGroups);
     } catch (error) {
-      console.error("Error fetching groups:", error);
+      logger.error(
+        "Error fetching groups",
+        logger.clientComponent("GroupList", { action: "fetchGroups" }),
+        error as Error,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +107,14 @@ const GroupList = () => {
       });
       setIsDialogOpen(false);
     } catch (error) {
-      console.error("Error updating group:", error);
+      logger.error(
+        "Error updating group",
+        logger.clientComponent("GroupList", {
+          action: "updateGroup",
+          groupId: selectedGroup?.id,
+        }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to update group",
@@ -121,7 +133,11 @@ const GroupList = () => {
         description: "Group deleted successfully",
       });
     } catch (error) {
-      console.error("Error deleting group:", error);
+      logger.error(
+        "Error deleting group",
+        logger.clientComponent("GroupList", { action: "deleteGroup", groupId }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to delete group",

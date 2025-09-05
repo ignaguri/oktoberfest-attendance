@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { logger } from "@/lib/logger";
 import { usePathname } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
@@ -65,7 +66,11 @@ export default function Breadcrumbs() {
               isLoading: false,
             };
           } catch (error) {
-            console.error(`Failed to fetch group name for ${segment}:`, error);
+            logger.error(
+              "Failed to fetch group name",
+              logger.clientComponent("Breadcrumbs", { segment }),
+              error as Error,
+            );
             newBreadcrumbs[newBreadcrumbs.length - 1] = {
               href,
               title: "Unknown Group",

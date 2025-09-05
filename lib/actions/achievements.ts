@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { createClient } from "@/utils/supabase/server";
 
 import type { FunctionReturns } from "@/lib/database-helpers.types";
@@ -28,7 +29,14 @@ export async function getUserAchievements(
   });
 
   if (error) {
-    console.error("Error fetching user achievements:", error);
+    logger.error(
+      "Failed to fetch user achievements",
+      logger.serverAction("getUserAchievements", {
+        userId: user.id,
+        festivalId,
+      }),
+      error,
+    );
     throw new Error("Failed to fetch achievements");
   }
 
@@ -84,7 +92,14 @@ export async function evaluateAchievements(festivalId: string): Promise<void> {
   });
 
   if (error) {
-    console.error("Error evaluating achievements:", error);
+    logger.error(
+      "Failed to evaluate achievements",
+      logger.serverAction("evaluateAchievements", {
+        userId: user.id,
+        festivalId,
+      }),
+      error,
+    );
     throw new Error("Failed to evaluate achievements");
   }
 }
@@ -106,7 +121,11 @@ export async function getAchievementLeaderboard(festivalId: string): Promise<
   });
 
   if (error) {
-    console.error("Error fetching achievement leaderboard:", error);
+    logger.error(
+      "Failed to fetch achievement leaderboard",
+      logger.serverAction("getAchievementLeaderboard", { festivalId }),
+      error,
+    );
     throw new Error("Failed to fetch achievement leaderboard");
   }
 

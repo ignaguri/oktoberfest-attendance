@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getUserAchievements } from "@/lib/actions/achievements";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
@@ -37,7 +38,13 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
         const data = await getUserAchievements(currentFestival.id);
         setAchievements(data);
       } catch (error) {
-        console.error("Error fetching achievements:", error);
+        logger.error(
+          "Error fetching achievements",
+          logger.clientComponent("AchievementHighlight", {
+            festivalId: currentFestival.id,
+          }),
+          error as Error,
+        );
       } finally {
         setIsLoading(false);
       }

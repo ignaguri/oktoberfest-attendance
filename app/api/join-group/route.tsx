@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 
 import type { NextRequest } from "next/server";
@@ -20,7 +21,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
   } catch (error) {
-    console.error("Error joining group with token:", error);
+    logger.error(
+      "Failed to join group with token",
+      logger.apiRoute("join-group", { token }),
+      error as Error,
+    );
     return NextResponse.json(
       { error: "Failed to join the group." },
       { status: 400 },

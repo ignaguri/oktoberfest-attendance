@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 import { isPWAInstalled } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -39,7 +40,11 @@ export function PWAReloadButton() {
       // Reload the page with cache bypass
       window.location.reload();
     } catch (error) {
-      console.error("Error during PWA reload:", error);
+      logger.error(
+        "Error during PWA reload",
+        logger.clientComponent("PWAReloadButton"),
+        error as Error,
+      );
       // Fallback to regular reload
       window.location.reload();
     }

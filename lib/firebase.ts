@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
@@ -26,7 +27,10 @@ if (typeof window !== "undefined") {
  */
 export async function getFCMToken(): Promise<string | null> {
   if (!messaging) {
-    console.warn("Firebase messaging not available (SSR or not initialized)");
+    logger.debug(
+      "Firebase messaging not available (SSR context)",
+      logger.clientComponent("firebase"),
+    );
     return null;
   }
 
@@ -42,7 +46,11 @@ export async function getFCMToken(): Promise<string | null> {
       return null;
     }
   } catch (err) {
-    console.error("An error occurred while retrieving token:", err);
+    logger.error(
+      "Failed to retrieve FCM token",
+      logger.clientComponent("firebase"),
+      err as Error,
+    );
     return null;
   }
 }
@@ -53,7 +61,10 @@ export async function getFCMToken(): Promise<string | null> {
 export function onMessageListener(): Promise<MessagePayload> {
   return new Promise((resolve) => {
     if (!messaging) {
-      console.warn("Firebase messaging not available");
+      logger.debug(
+        "Firebase messaging not available for onMessage listener",
+        logger.clientComponent("firebase"),
+      );
       return;
     }
 

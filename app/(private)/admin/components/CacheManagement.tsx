@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 const CacheManagement = () => {
   const { toast } = useToast();
@@ -33,7 +34,11 @@ const CacheManagement = () => {
         });
       }
     } catch (error) {
-      console.error("Error clearing service worker cache:", error);
+      logger.error(
+        "Error clearing service worker cache",
+        logger.clientComponent("CacheManagement"),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to clear service worker caches",

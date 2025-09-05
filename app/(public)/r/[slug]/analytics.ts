@@ -1,4 +1,5 @@
 import { IS_PROD } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 
 type RedirectSlug = "bugs" | "feedback" | "donate" | "github";
 
@@ -13,7 +14,11 @@ export function trackRedirect(
 ): void {
   // Only track in production
   if (!IS_PROD) {
-    console.log(`[Analytics] Redirect tracked: ${slug} -> ${destinationUrl}`);
+    logger.debug("Redirect tracked", {
+      slug,
+      destinationUrl,
+      source: "analytics",
+    });
     return;
   }
 

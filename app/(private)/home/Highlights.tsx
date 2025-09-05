@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getDefaultBeerCost } from "@/lib/festivalConstants";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
 import { useEffect, useMemo, useState } from "react";
@@ -50,7 +51,13 @@ const Highlights = () => {
         const data = await fetchHighlights(currentFestival.id);
         setHighlightsData(data);
       } catch (error) {
-        console.error("Error fetching highlights:", error);
+        logger.error(
+          "Error fetching highlights",
+          logger.clientComponent("Highlights", {
+            festivalId: currentFestival?.id,
+          }),
+          error as Error,
+        );
         setHighlightsData({
           topPositions: [],
           totalBeers: 0,

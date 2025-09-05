@@ -3,6 +3,7 @@
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 
@@ -40,7 +41,13 @@ export default function AttendancePage() {
         setAttendances(data as AttendanceWithTentVisits[]);
       }
     } catch (error) {
-      console.error("Error fetching attendance data:", error);
+      logger.error(
+        "Error fetching attendance data",
+        logger.clientComponent("AttendancePage", {
+          festivalId: currentFestival?.id,
+        }),
+        error as Error,
+      );
       toast({
         variant: "destructive",
         title: "Error",
@@ -75,7 +82,11 @@ export default function AttendancePage() {
           const reservationData = await getReservationForCheckIn(reservationId);
           setReservation(reservationData);
         } catch (error) {
-          console.error("Error fetching reservation:", error);
+          logger.error(
+            "Error fetching reservation",
+            logger.clientComponent("AttendancePage", { reservationId }),
+            error as Error,
+          );
           toast({
             variant: "destructive",
             title: "Error",

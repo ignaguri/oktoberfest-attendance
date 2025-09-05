@@ -1,3 +1,4 @@
+import { swLogger } from "@/lib/sw-logger";
 import { defaultCache } from "@serwist/next/worker";
 import { Serwist } from "serwist";
 import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from "serwist";
@@ -136,7 +137,11 @@ function startUpdateChecking() {
           });
         }
       } catch (error) {
-        console.error("Failed to check for updates:", error);
+        swLogger.error(
+          "Failed to check for updates",
+          swLogger.updateCheck(),
+          error as Error,
+        );
       }
     },
     4 * 60 * 60 * 1000,
@@ -168,7 +173,11 @@ self.addEventListener("message", (event: Event) => {
         }
       })
       .catch((error) => {
-        console.error("Failed to check for updates:", error);
+        swLogger.error(
+          "Failed to check for updates on message",
+          swLogger.updateCheck(),
+          error as Error,
+        );
         if (messageEvent.ports && messageEvent.ports[0]) {
           messageEvent.ports[0].postMessage({
             type: "VERSION_CHECK_ERROR",

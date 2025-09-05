@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { createNotificationService } from "@/lib/services/notifications";
 import { getUser } from "@/lib/sharedActions";
 import { NextResponse } from "next/server";
@@ -27,7 +28,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to identify user in Novu:", error);
+    logger.error(
+      "Failed to identify user in Novu",
+      logger.apiRoute("novu/identify"),
+      error as Error,
+    );
     return NextResponse.json(
       { error: "Failed to identify user" },
       { status: 500 },
