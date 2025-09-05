@@ -4,6 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhotoPreview } from "@/components/ui/photo-preview";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import {
   beerPicturesSchema,
@@ -12,7 +13,7 @@ import {
 } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, X } from "lucide-react";
+import { Camera, Eye, EyeOff, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -75,10 +76,12 @@ export function BeerPicturesUpload({
     resolver: zodResolver(beerPicturesSchema),
     defaultValues: {
       pictures: [],
+      visibility: "public",
     },
   });
 
   const watchedPictures = watch("pictures");
+  const watchedVisibility = watch("visibility");
 
   const onSubmit = async (data: BeerPicturesFormData) => {
     if (!data.pictures.length || !attendanceId) return;
@@ -89,6 +92,7 @@ export function BeerPicturesUpload({
         const formData = new FormData();
         formData.append("picture", picture);
         formData.append("attendanceId", attendanceId);
+        formData.append("visibility", data.visibility);
         const result = await uploadBeerPicture(formData);
         if (result) {
           newUrls.push(result);
@@ -199,6 +203,27 @@ export function BeerPicturesUpload({
                 onRemove={() => removePicture(index)}
               />
             ))}
+          </div>
+
+          {/* Visibility Control for all new photos */}
+          <div className="flex items-center justify-center gap-3 p-2 bg-gray-50 rounded-md">
+            {watchedVisibility === "public" ? (
+              <Eye size={16} className="text-green-600" />
+            ) : (
+              <EyeOff size={16} className="text-red-600" />
+            )}
+            <span className="text-sm font-medium">
+              {watchedVisibility === "public"
+                ? "Public photos"
+                : "Private photos"}
+            </span>
+            <Switch
+              checked={watchedVisibility === "public"}
+              onCheckedChange={(checked) =>
+                setValue("visibility", checked ? "public" : "private")
+              }
+              size="sm"
+            />
           </div>
         </div>
       )}

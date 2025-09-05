@@ -215,6 +215,7 @@ export type Database = {
           id: string;
           picture_url: string;
           user_id: string;
+          visibility: Database["public"]["Enums"]["photo_visibility_enum"];
         };
         Insert: {
           attendance_id: string;
@@ -222,6 +223,7 @@ export type Database = {
           id?: string;
           picture_url: string;
           user_id: string;
+          visibility?: Database["public"]["Enums"]["photo_visibility_enum"];
         };
         Update: {
           attendance_id?: string;
@@ -229,6 +231,7 @@ export type Database = {
           id?: string;
           picture_url?: string;
           user_id?: string;
+          visibility?: Database["public"]["Enums"]["photo_visibility_enum"];
         };
         Relationships: [
           {
@@ -713,6 +716,55 @@ export type Database = {
           },
         ];
       };
+      user_group_photo_settings: {
+        Row: {
+          created_at: string;
+          group_id: string;
+          hide_photos_from_group: boolean;
+          id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          group_id: string;
+          hide_photos_from_group?: boolean;
+          id?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          group_id?: string;
+          hide_photos_from_group?: boolean;
+          id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_group_photo_settings_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_group_photo_settings_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["group_id"];
+          },
+          {
+            foreignKeyName: "user_group_photo_settings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
       user_notification_preferences: {
         Row: {
           achievement_notifications_enabled: boolean | null;
@@ -757,6 +809,38 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_photo_global_settings: {
+        Row: {
+          created_at: string;
+          hide_photos_from_all_groups: boolean;
+          id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          hide_photos_from_all_groups?: boolean;
+          id?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          hide_photos_from_all_groups?: boolean;
+          id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_photo_global_settings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["user_id"];
           },
         ];
       };
@@ -864,6 +948,7 @@ export type Database = {
           p_attendance_id: string;
           p_picture_url: string;
           p_user_id: string;
+          p_visibility?: Database["public"]["Enums"]["photo_visibility_enum"];
         };
         Returns: string;
       };
@@ -910,7 +995,11 @@ export type Database = {
         Returns: undefined;
       };
       fetch_group_gallery: {
-        Args: { p_festival_id?: string; p_group_id: string };
+        Args: {
+          p_festival_id?: string;
+          p_group_id: string;
+          p_viewing_user_id?: string;
+        };
         Returns: {
           date: string;
           full_name: string;
@@ -990,6 +1079,14 @@ export type Database = {
           unlocked_at: string;
         }[];
       };
+      get_user_all_group_photo_settings: {
+        Args: { p_user_id: string };
+        Returns: {
+          group_id: string;
+          group_name: string;
+          hide_photos_from_group: boolean;
+        }[];
+      };
       get_user_festival_stats: {
         Args: { p_festival_id: string; p_user_id: string };
         Returns: {
@@ -1009,9 +1106,24 @@ export type Database = {
           total_beers: number;
         }[];
       };
+      get_user_group_photo_settings: {
+        Args: { p_group_id: string; p_user_id: string };
+        Returns: {
+          group_id: string;
+          hide_photos_from_group: boolean;
+          user_id: string;
+        }[];
+      };
       get_user_groups: {
         Args: Record<PropertyKey, never>;
         Returns: string[];
+      };
+      get_user_photo_global_settings: {
+        Args: { p_user_id: string };
+        Returns: {
+          hide_photos_from_all_groups: boolean;
+          user_id: string;
+        }[];
       };
       get_user_stats: {
         Args: { input_user_id: string };
@@ -1083,6 +1195,18 @@ export type Database = {
         };
         Returns: boolean;
       };
+      update_user_group_photo_settings: {
+        Args: {
+          p_group_id: string;
+          p_hide_photos_from_group: boolean;
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
+      update_user_photo_global_settings: {
+        Args: { p_hide_photos_from_all_groups: boolean; p_user_id: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       achievement_category_enum:
@@ -1099,6 +1223,7 @@ export type Database = {
         | "starkbierfest"
         | "fruehlingsfest"
         | "other";
+      photo_visibility_enum: "public" | "private";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -1248,6 +1373,7 @@ export const Constants = {
         "fruehlingsfest",
         "other",
       ],
+      photo_visibility_enum: ["public", "private"],
     },
   },
 } as const;

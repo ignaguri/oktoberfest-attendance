@@ -3,11 +3,12 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera } from "lucide-react";
+import { Camera, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -55,9 +56,13 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
     reset,
   } = useForm<SinglePictureFormData>({
     resolver: zodResolver(singlePictureSchema),
+    defaultValues: {
+      visibility: "public",
+    },
   });
 
   const watchedPicture = watch("picture");
+  const watchedVisibility = watch("visibility");
 
   const onSubmit = async (data: SinglePictureFormData) => {
     if (!data.picture || !attendanceId) return;
@@ -66,6 +71,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       const formData = new FormData();
       formData.append("picture", data.picture);
       formData.append("attendanceId", attendanceId);
+      formData.append("visibility", data.visibility);
       await uploadBeerPicture(formData);
       toast({
         variant: "success",
@@ -129,6 +135,28 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
         )}
       </Label>
       <PicturePreview picture={watchedPicture || null} />
+
+      {/* Visibility Control */}
+      {watchedPicture && (
+        <div className="flex items-center gap-3 bg-gray-50 rounded-md">
+          {watchedVisibility === "public" ? (
+            <Eye size={16} className="text-green-600" />
+          ) : (
+            <EyeOff size={16} className="text-red-600" />
+          )}
+          <span className="text-sm font-medium">
+            {watchedVisibility === "public" ? "Public photo" : "Private photo"}
+          </span>
+          <Switch
+            checked={watchedVisibility === "public"}
+            onCheckedChange={(checked) =>
+              setValue("visibility", checked ? "public" : "private")
+            }
+            size="sm"
+          />
+        </div>
+      )}
+
       {watchedPicture && !errors.picture && (
         <Button type="submit" disabled={isSubmitting} variant="darkYellow">
           {isSubmitting ? "Uploading..." : "Upload picture"}
