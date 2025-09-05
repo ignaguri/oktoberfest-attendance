@@ -15,7 +15,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             <span>by</span>
           </span>
           <Link
-            href="https://github.com/ignaguri"
+            href="/r/github"
             target="_blank"
             rel="noopener noreferrer"
             className="underline"
@@ -28,7 +28,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
           {isLoggedIn && (
             <>
               <Link
-                href="https://www.paypal.me/ignacioguri"
+                href="/r/donate"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Buy me a beer (opens PayPal)"
@@ -45,7 +45,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
           <div className="flex items-center gap-2 text-gray-500 flex-wrap">
             <Link
-              href="https://prostcounter.canny.io/bugs"
+              href="/r/bugs"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Report a bug (opens Canny)"
@@ -59,7 +59,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             </span>
 
             <Link
-              href="https://prostcounter.canny.io/feature-requests"
+              href="/r/feedback"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Request a feature (opens Canny)"
