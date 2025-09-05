@@ -1,4 +1,9 @@
 export const changelog: Record<string, string[]> = {
+  "0.5.0": [
+    "📅 New calendar page",
+    "⏰ Reservations' tracking and reminders",
+    "🥷🏻 Photos privacy configuration",
+  ],
   "0.4.1": [
     "🔔 Notifications system",
     "📲 Installable app improvements",

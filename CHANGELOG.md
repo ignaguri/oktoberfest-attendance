@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.0] - 2025-09-05
+
+### ✨ Features
+
+- complete console logging migration to structured logging
+- replace console calls in PWA and UI components
+- implement centralized logging system
+
+### 📚 Documentation
+
+- add reservations & achievements implementation plan
+- add comprehensive project overview Cursor rule
+
+### 🎨 Styling
+
+- proper redirect in logo click
+
+### ♻️ Code Refactoring
+
+- Improve date utils and component date handling
+
 ## [0.4.5] - 2025-08-31
 
 ### 🔧 Maintenance
