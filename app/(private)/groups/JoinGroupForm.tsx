@@ -84,23 +84,23 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
         {...register("groupName")}
       />
 
-      <div className="relative">
-        <Input
-          type={showPassword ? "text" : "password"}
-          placeholder="Group Password"
-          errorMsg={errors.password?.message}
-          autoComplete="off"
-          {...register("password")}
-        />
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-        >
-          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-        </Button>
-      </div>
+      <Input
+        type={showPassword ? "text" : "password"}
+        placeholder="Group Password"
+        errorMsg={errors.password?.message}
+        autoComplete="off"
+        rightElement={
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setShowPassword(!showPassword)}
+            className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </Button>
+        }
+        {...register("password")}
+      />
 
       <Button
         type="submit"

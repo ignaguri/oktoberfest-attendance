@@ -91,23 +91,23 @@ export default function SignIn() {
         />
 
         <Label htmlFor="password">Password</Label>
-        <div className="relative w-full">
-          <Input
-            id="password"
-            errorMsg={errors.password?.message}
-            type={showPassword ? "text" : "password"}
-            autoComplete="current-password"
-            {...register("password")}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </Button>
-        </div>
+        <Input
+          id="password"
+          errorMsg={errors.password?.message}
+          type={showPassword ? "text" : "password"}
+          autoComplete="current-password"
+          rightElement={
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowPassword(!showPassword)}
+              className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </Button>
+          }
+          {...register("password")}
+        />
 
         <Button
           variant="yellow"

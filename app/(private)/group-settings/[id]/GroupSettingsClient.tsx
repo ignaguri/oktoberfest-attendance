@@ -171,28 +171,30 @@ export default function GroupSettingsClient({ group, members }: Props) {
               >
                 Group Password
               </Label>
-              <div className="relative mt-1">
+              <div className="mt-1">
                 <Input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   className="block w-full border border-gray-300 rounded-md shadow-xs p-2"
                   disabled={!currentUser?.isCreator}
                   errorMsg={errors.password?.message}
+                  rightElement={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <Image
+                        src={showPassword ? EyeClosedIcon : EyeOpenIcon}
+                        alt={showPassword ? "Hide password" : "Show password"}
+                        width={20}
+                        height={20}
+                      />
+                    </Button>
+                  }
                   {...register("password")}
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  <Image
-                    src={showPassword ? EyeClosedIcon : EyeOpenIcon}
-                    alt={showPassword ? "Hide password" : "Show password"}
-                    width={20}
-                    height={20}
-                  />
-                </Button>
               </div>
             </div>
 

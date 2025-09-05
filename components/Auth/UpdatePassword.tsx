@@ -50,42 +50,42 @@ export default function UpdatePassword() {
       <h2 className="w-full text-center">Update Password</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
         <Label htmlFor="password">New Password</Label>
-        <div className="relative w-full">
-          <Input
-            errorMsg={errors.password?.message}
-            id="password"
-            type={showPassword ? "text" : "password"}
-            disabled={isSubmitting}
-            {...register("password")}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </Button>
-        </div>
+        <Input
+          errorMsg={errors.password?.message}
+          id="password"
+          type={showPassword ? "text" : "password"}
+          disabled={isSubmitting}
+          rightElement={
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowPassword(!showPassword)}
+              className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </Button>
+          }
+          {...register("password")}
+        />
 
         <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <div className="relative w-full">
-          <Input
-            errorMsg={errors.confirmPassword?.message}
-            id="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            disabled={isSubmitting}
-            {...register("confirmPassword")}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute h-full inset-y-0 right-0 flex items-center text-gray-400 cursor-pointer pr-2"
-          >
-            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </Button>
-        </div>
+        <Input
+          errorMsg={errors.confirmPassword?.message}
+          id="confirmPassword"
+          type={showConfirmPassword ? "text" : "password"}
+          disabled={isSubmitting}
+          rightElement={
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </Button>
+          }
+          {...register("confirmPassword")}
+        />
 
         <Button
           variant="yellow"
