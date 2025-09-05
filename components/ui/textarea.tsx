@@ -8,6 +8,8 @@ export interface TextareaProps
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, errorMsg, ...props }, ref) => {
+    const errorId = React.useId();
+
     return (
       <>
         <textarea
@@ -18,10 +20,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             className,
           )}
           ref={ref}
+          aria-describedby={errorMsg ? errorId : undefined}
           {...props}
         />
         {errorMsg && (
-          <span className="w-full text-center text-sm text-red-600">
+          <span
+            id={errorId}
+            className="w-full text-center text-sm text-red-600"
+          >
             {errorMsg}
           </span>
         )}

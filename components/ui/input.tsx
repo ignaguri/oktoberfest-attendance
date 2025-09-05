@@ -8,6 +8,8 @@ export interface InputProps
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, errorMsg, ...props }, ref) => {
+    const errorId = React.useId();
+
     return (
       <>
         <input
@@ -19,10 +21,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className,
           )}
           ref={ref}
+          aria-describedby={errorMsg ? errorId : undefined}
           {...props}
         />
         {errorMsg && (
-          <span className="w-full text-center text-sm text-red-600">
+          <span
+            id={errorId}
+            className="w-full text-center text-sm text-red-600"
+          >
             {errorMsg}
           </span>
         )}

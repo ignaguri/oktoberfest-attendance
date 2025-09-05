@@ -31,9 +31,25 @@ export async function GET(req: NextRequest) {
     "/groups",
     "/leaderboard",
   ];
-  const finalRedirect = validRedirects.includes(redirectUrl)
-    ? redirectUrl
-    : "/home";
+
+  // Only allow relative paths, and compare only the pathname
+  let finalRedirect = "/home";
+  try {
+    // Prevent absolute URLs (e.g., //evil.com or http://evil.com)
+    if (
+      redirectUrl.startsWith("/") &&
+      !redirectUrl.startsWith("//") &&
+      !/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(redirectUrl) // no scheme
+    ) {
+      // Use a dummy base to parse the path
+      const parsed = new URL(redirectUrl, "http://localhost");
+      if (validRedirects.includes(parsed.pathname)) {
+        finalRedirect = parsed.pathname;
+      }
+    }
+  } catch {
+    // keep finalRedirect as is
+  }
 
   return NextResponse.redirect(new URL(finalRedirect, req.url));
 }

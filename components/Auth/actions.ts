@@ -115,11 +115,16 @@ export async function signInWithOAuth(
 ) {
   const supabase = createClient();
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL ||
-    process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
-      : "http://localhost:3008/auth/callback";
+  let baseUrl: string | undefined;
+  if (process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL) {
+    baseUrl = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL;
+  } else if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    baseUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`;
+  } else {
+    throw new Error(
+      "OAuth redirect URL is not configured. Please set NEXT_PUBLIC_OAUTH_REDIRECT_URL or NEXT_PUBLIC_VERCEL_URL in your environment variables.",
+    );
+  }
 
   const finalRedirectUrl = redirectTo
     ? `${baseUrl}?redirect=${encodeURIComponent(redirectTo)}`
