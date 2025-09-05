@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
     "/robots.txt",
     "/sitemap.xml",
     "/offline",
+    "/r",
   ];
 
   if (request.nextUrl.search.startsWith("?redirectUrl=")) {
@@ -30,7 +31,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(unescapedUrl, request.url));
   }
 
-  if (publicPaths.includes(request.nextUrl.pathname)) {
+  if (
+    publicPaths.includes(request.nextUrl.pathname) ||
+    request.nextUrl.pathname.startsWith("/r/")
+  ) {
     return NextResponse.next();
   }
 
