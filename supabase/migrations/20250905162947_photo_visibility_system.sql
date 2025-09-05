@@ -10,7 +10,7 @@ CREATE INDEX idx_beer_pictures_visibility ON public.beer_pictures(visibility);
 
 -- Create table for user's global photo sharing preferences
 CREATE TABLE public.user_photo_global_settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     hide_photos_from_all_groups BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -23,7 +23,7 @@ CREATE INDEX idx_user_photo_global_settings_user_id ON public.user_photo_global_
 
 -- Create table for user's per-group photo sharing preferences
 CREATE TABLE public.user_group_photo_settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     group_id UUID NOT NULL REFERENCES public.groups(id) ON DELETE CASCADE,
     hide_photos_from_group BOOLEAN NOT NULL DEFAULT FALSE,

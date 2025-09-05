@@ -72,7 +72,7 @@ export async function getPersonalCalendarEvents(festivalId: string) {
             id: a.id,
             title: `${a.beer_count} Maß`,
             from: new TZDate(a.date, TIMEZONE),
-            type: "attendance" as CalendarEventType,
+            type: "beer_summary" as CalendarEventType,
           };
         })
         .filter((event): event is NonNullable<typeof event> => event !== null);
@@ -139,7 +139,7 @@ export async function getPersonalCalendarEvents(festivalId: string) {
         ...reservationEvents,
       ];
     },
-    ["personal-calendar"],
+    [user.id, festivalId],
     {
       revalidate: 300,
       tags: [

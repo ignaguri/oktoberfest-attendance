@@ -21,7 +21,8 @@ export function AttendanceDialog() {
         if (!o) {
           const params = new URLSearchParams(searchParams.toString());
           params.delete("editAttendance");
-          router.replace(`?${params.toString()}`);
+          const url = params.toString() ? `?${params.toString()}` : "/calendar";
+          router.replace(url);
         }
       }}
     >
@@ -30,7 +31,10 @@ export function AttendanceDialog() {
           onAttendanceUpdate={() => {
             const params = new URLSearchParams(searchParams.toString());
             params.delete("editAttendance");
-            router.replace(`?${params.toString()}`);
+            const url = params.toString()
+              ? `?${params.toString()}`
+              : "/calendar";
+            router.replace(url);
           }}
           selectedDate={selectedDate}
         />

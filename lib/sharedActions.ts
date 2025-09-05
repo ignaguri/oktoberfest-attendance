@@ -210,15 +210,12 @@ export async function uploadBeerPicture(formData: FormData) {
   }
 
   // Use the updated database function that supports visibility
-  const { data: pictureId, error: beerPicturesError } = await supabase.rpc(
-    "add_beer_picture",
-    {
-      p_user_id: user.id,
-      p_attendance_id: attendanceId,
-      p_picture_url: fileName,
-      p_visibility: visibility as "public" | "private",
-    },
-  );
+  const { error: beerPicturesError } = await supabase.rpc("add_beer_picture", {
+    p_user_id: user.id,
+    p_attendance_id: attendanceId,
+    p_picture_url: fileName,
+    p_visibility: visibility as "public" | "private",
+  });
 
   if (beerPicturesError) {
     reportSupabaseException("uploadBeerPicture", beerPicturesError, {
@@ -233,6 +230,7 @@ export async function uploadBeerPicture(formData: FormData) {
   return fileName;
 }
 
+// FIXME: when updating amount of beers, tents get duplicated
 export async function addAttendance(formData: {
   amount: number;
   date: Date;

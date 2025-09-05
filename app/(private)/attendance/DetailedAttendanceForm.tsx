@@ -176,7 +176,7 @@ export default function DetailedAttendanceForm({
         <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
           <Label htmlFor="date">When did you visit the Wiesn?</Label>
           <AttendanceDatePicker
-            name="date"
+            buttonClassName="w-auto self-center"
             disabled={isSubmitting}
             value={watchedValues.date}
             onDateChange={(date) => {
