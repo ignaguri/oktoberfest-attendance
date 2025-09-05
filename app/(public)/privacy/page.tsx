@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
       <div className="prose prose-lg max-w-none space-y-6">
         <p className="text-sm text-gray-600 mb-8">
           <strong>Last updated:</strong>{" "}
-          {new Date().toLocaleDateString("de-DE", {
+          {new Date("2025-09-05").toLocaleDateString("de-DE", {
             year: "numeric",
             month: "long",
             day: "numeric",
