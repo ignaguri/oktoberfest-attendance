@@ -82,6 +82,11 @@ export function EventCalendar({
     });
   }, [date, eventsByDay]);
 
+  // Check if selected date has any reservations
+  const hasReservations = useMemo(() => {
+    return dayEvents.some((event) => event.type === "reservation");
+  }, [dayEvents]);
+
   return (
     <Card className="w-fit py-4">
       <CardContent className="px-4">
@@ -138,8 +143,12 @@ export function EventCalendar({
                   params.set("newReservation", "1");
                   router.replace(`?${params.toString()}`);
                 }}
-                disabled={!date}
-                title="Add reservation"
+                disabled={!date || hasReservations}
+                title={
+                  hasReservations
+                    ? "Click on reservation to edit"
+                    : "Add reservation"
+                }
               >
                 +Reservation
               </Button>
@@ -175,7 +184,7 @@ export function EventCalendar({
                 case "beer_summary":
                   return {
                     container: cn(
-                      "bg-yellow-100 after:bg-yellow-500/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full",
+                      "bg-yellow-100 after:bg-yellow-500/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-yellow-200 transition-colors",
                     ),
                     title: cn("font-bold text-yellow-800"),
                     time: cn("text-yellow-600 text-xs"),
@@ -183,7 +192,7 @@ export function EventCalendar({
                 case "tent_visit":
                   return {
                     container: cn(
-                      "bg-blue-50 after:bg-blue-500/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full",
+                      "bg-blue-50 after:bg-blue-500/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-blue-100 transition-colors",
                     ),
                     title: cn("font-medium text-blue-900"),
                     time: cn("text-gray-600 text-xs"),
@@ -191,7 +200,7 @@ export function EventCalendar({
                 case "reservation":
                   return {
                     container: cn(
-                      "bg-green-50 after:bg-green-500/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full",
+                      "bg-green-50 after:bg-green-500/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-green-100 transition-colors",
                     ),
                     title: cn("font-medium text-green-900"),
                     time: cn("text-green-600 text-xs"),
@@ -199,7 +208,7 @@ export function EventCalendar({
                 default: // attendance
                   return {
                     container: cn(
-                      "bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full",
+                      "bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-muted/80 transition-colors",
                     ),
                     title: cn("font-medium"),
                     time: cn("text-muted-foreground text-xs"),
@@ -209,8 +218,30 @@ export function EventCalendar({
 
             const styles = getEventStyles();
 
+            const handleEventClick = () => {
+              if (ev.type === "reservation") {
+                // Navigate to edit reservation
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("reservationId", ev.id);
+                router.replace(`?${params.toString()}`);
+              } else {
+                // For attendance, tent_visit, and beer_summary events - go to attendance page
+                if (date) {
+                  const dateStr = formatDate(
+                    new TZDate(date, TIMEZONE),
+                    "yyyy-MM-dd",
+                  );
+                  router.push(`/attendance?date=${dateStr}`);
+                }
+              }
+            };
+
             return (
-              <div key={ev.id} className={styles.container}>
+              <div
+                key={ev.id}
+                className={styles.container}
+                onClick={handleEventClick}
+              >
                 <div className={styles.title}>{ev.title}</div>
                 <div className={styles.time}>
                   {ev.type === "beer_summary"

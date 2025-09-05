@@ -5,36 +5,32 @@ import {
   getReservationForEdit,
   updateReservation,
 } from "@/app/(private)/calendar/actions";
+import ResponsiveDialog from "@/components/ResponsiveDialog";
+import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import { ReminderSelect } from "@/components/ui/reminder-select";
+import { useTents } from "@/hooks/use-tents";
 import { useToast } from "@/hooks/use-toast";
-import { createDatetimeLocalString } from "@/lib/date-utils";
+import {
+  reservationSchema,
+  type ReservationFormData,
+} from "@/lib/schemas/reservation";
 import { createUrlWithParams } from "@/lib/url-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
 
-interface TentOption {
-  id: string;
-  name: string;
-}
+import { Checkbox } from "../ui/checkbox";
 
 interface ReservationDialogProps {
   festivalId: string;
-  tents: TentOption[];
 }
 
-export function ReservationDialog({
-  festivalId,
-  tents,
-}: ReservationDialogProps) {
+export function ReservationDialog({ festivalId }: ReservationDialogProps) {
+  const { tents, isLoading: tentsLoading } = useTents();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -50,32 +46,65 @@ export function ReservationDialog({
     return isNaN(d.getTime()) ? new Date() : d;
   }, [searchParams]);
 
-  const [tentId, setTentId] = useState<string>(tents[0]?.id ?? "");
-  const [startAtLocal, setStartAtLocal] = useState<string>("");
-  const [visibleToGroups, setVisibleToGroups] = useState(true);
-  const [reminderOffsetMinutes, setReminderOffsetMinutes] = useState(1440);
-  const [submitting, setSubmitting] = useState(false);
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { isSubmitting, errors },
+  } = useForm<ReservationFormData>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues: {
+      tentId: "",
+      startAt: undefined,
+      reminderOffsetMinutes: 1440,
+      visibleToGroups: true,
+    },
+  });
+
+  const tentId = watch("tentId");
+  const startAt = watch("startAt");
+  const reminderOffsetMinutes = watch("reminderOffsetMinutes");
+  const visibleToGroups = watch("visibleToGroups");
 
   useEffect(() => {
-    // Initialize datetime-local to the selected date at 18:00 local
+    if (!open) return; // Don't initialize if dialog is not open
+
+    // Initialize form data
     const init = async () => {
       if (reservationId) {
         try {
           const r = await getReservationForEdit(reservationId);
-          setTentId(r.tent_id);
-          setVisibleToGroups(r.visible_to_groups);
-          setReminderOffsetMinutes(r.reminder_offset_minutes ?? 1440);
-          const d = new Date(r.start_at);
-          const iso = createDatetimeLocalString(d);
-          setStartAtLocal(iso);
+          // Reset form with the reservation data
+          reset({
+            tentId: r.tent_id,
+            visibleToGroups: r.visible_to_groups,
+            reminderOffsetMinutes: r.reminder_offset_minutes ?? 1440,
+            startAt: new Date(r.start_at),
+          });
           return;
-        } catch {}
+        } catch {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load reservation data",
+          });
+        }
       }
-      const iso = createDatetimeLocalString(initialDate, 18, 0);
-      setStartAtLocal(iso);
+      // Set default time to 09:00 (9 AM) for the selected date for new reservations
+      const defaultDate = new Date(initialDate);
+      defaultDate.setHours(9, 0, 0, 0);
+      const defaultTentId =
+        tents.length > 0 ? tents[0]?.options[0]?.value || "" : "";
+      reset({
+        tentId: defaultTentId,
+        startAt: defaultDate,
+        reminderOffsetMinutes: 1440,
+        visibleToGroups: true,
+      });
     };
     init();
-  }, [initialDate, reservationId]);
+  }, [open, initialDate, reservationId, reset, toast, tents]);
 
   const onClose = useCallback(() => {
     const url = createUrlWithParams("", searchParams, [
@@ -85,110 +114,118 @@ export function ReservationDialog({
     router.replace(url);
   }, [router, searchParams]);
 
-  const onSubmit = useCallback(async () => {
-    if (!tentId || !startAtLocal) return;
-    setSubmitting(true);
-    try {
-      if (reservationId) {
-        await updateReservation(reservationId, {
-          startAt: new Date(startAtLocal),
-          reminderOffsetMinutes,
-          visibleToGroups,
-          tentId,
-        });
-        toast({ title: "Reservation updated" });
-      } else {
-        await createReservation({
-          festivalId,
-          tentId,
-          startAt: new Date(startAtLocal),
-          reminderOffsetMinutes,
-          visibleToGroups,
-        });
-        toast({ title: "Reservation created" });
+  const onSubmit = useCallback(
+    async (data: ReservationFormData) => {
+      try {
+        if (reservationId) {
+          await updateReservation(reservationId, {
+            startAt: data.startAt,
+            reminderOffsetMinutes: data.reminderOffsetMinutes,
+            visibleToGroups: data.visibleToGroups,
+            tentId: data.tentId,
+          });
+          toast({ title: "Reservation updated", variant: "success" });
+        } else {
+          await createReservation({
+            festivalId,
+            tentId: data.tentId,
+            startAt: data.startAt,
+            reminderOffsetMinutes: data.reminderOffsetMinutes,
+            visibleToGroups: data.visibleToGroups,
+          });
+          toast({ title: "Reservation created", variant: "success" });
+        }
+        onClose();
+      } catch {
+        toast({ title: "Failed to save reservation", variant: "destructive" });
       }
-      onClose();
-    } catch (e) {
-      toast({ title: "Failed to create reservation", variant: "destructive" });
-    } finally {
-      setSubmitting(false);
-    }
-  }, [
-    festivalId,
-    tentId,
-    startAtLocal,
-    reminderOffsetMinutes,
-    visibleToGroups,
-    onClose,
-    toast,
-    reservationId,
-  ]);
+    },
+    [festivalId, onClose, toast, reservationId],
+  );
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>New reservation</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-2">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+        }
+      }}
+      title={reservationId ? "Edit reservation" : "New reservation"}
+      description="Create or edit your tent reservation with date, time, and reminder preferences."
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid gap-4 p-4 pb-6">
           <div className="grid gap-2">
             <Label htmlFor="tent">Tent</Label>
-            <Select value={tentId} onValueChange={(v) => setTentId(v)}>
-              <option value="" disabled>
-                Select tent
-              </option>
-              {tents.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="start">Start</Label>
-            <Input
-              id="start"
-              name="start"
-              type="datetime-local"
-              value={startAtLocal}
-              onChange={(e) => setStartAtLocal(e.target.value)}
+            <SingleSelect
+              value={tentId}
+              options={tents.map((tent) => ({
+                title: tent.category,
+                options: tent.options,
+              }))}
+              placeholder="Select your tent"
+              onSelect={(option) => setValue("tentId", option.value)}
+              disabled={tentsLoading || isSubmitting}
             />
+            {errors.tentId && (
+              <p className="text-sm text-red-600">{errors.tentId.message}</p>
+            )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="reminder">Reminder (minutes before)</Label>
-            <Input
-              id="reminder"
-              name="reminder"
-              type="number"
-              min={0}
-              step={5}
+            <Label htmlFor="start">Date & Time</Label>
+            <DateTimePicker
+              value={startAt}
+              onChange={(date) => date && setValue("startAt", date)}
+              placeholder="Pick a date and time"
+              disabled={isSubmitting}
+              calendarClassName="[--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
+            />
+            {errors.startAt && (
+              <p className="text-sm text-red-600">{errors.startAt.message}</p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="reminder">Reminder</Label>
+            <ReminderSelect
               value={reminderOffsetMinutes}
-              onChange={(e) => setReminderOffsetMinutes(Number(e.target.value))}
+              onChange={(minutes) => setValue("reminderOffsetMinutes", minutes)}
+              disabled={isSubmitting}
             />
+            {errors.reminderOffsetMinutes && (
+              <p className="text-sm text-red-600">
+                {errors.reminderOffsetMinutes.message}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="visibleToGroups">Share with groups</Label>
-            <input
-              id="visibleToGroups"
-              name="visibleToGroups"
-              type="checkbox"
+            <Checkbox
               checked={visibleToGroups}
-              onChange={(e) => setVisibleToGroups(e.target.checked)}
+              onCheckedChange={(checked) =>
+                setValue(
+                  "visibleToGroups",
+                  checked === "indeterminate" ? false : checked,
+                )
+              }
+              disabled={isSubmitting}
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={submitting}>
+        <div className="flex justify-end gap-2 p-4 pt-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button
-            onClick={onSubmit}
-            disabled={submitting || !tentId || !startAtLocal}
-          >
+          <Button type="submit" disabled={isSubmitting || tentsLoading}>
             {reservationId ? "Save" : "Create"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </form>
+    </ResponsiveDialog>
   );
 }

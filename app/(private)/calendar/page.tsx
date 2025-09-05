@@ -1,10 +1,7 @@
 import { AttendanceDialog } from "@/components/attendance/AttendanceDialog";
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
-import {
-  getCurrentFestivalForUser,
-  fetchFestivalTentPricing,
-} from "@/lib/festivalActions";
+import { getCurrentFestivalForUser } from "@/lib/festivalActions";
 
 import { getPersonalCalendarEvents } from "./actions";
 
@@ -23,18 +20,8 @@ export default async function PersonalCalendarPage() {
       <h1 className="text-lg font-semibold mb-4">My Calendar</h1>
       <EventCalendar events={events} initialMonth={initialMonth} />
       <AttendanceDialog />
-      {/* Preload tents and mount a URL-driven reservation dialog */}
-      {currentFestival && (
-        <ReservationDialog
-          festivalId={currentFestival.id}
-          tents={(await fetchFestivalTentPricing(currentFestival.id)).map(
-            (t) => ({
-              id: t.tent_id,
-              name: (t as any).tent?.name ?? "Tent",
-            }),
-          )}
-        />
-      )}
+      {/* Mount a URL-driven reservation dialog */}
+      {currentFestival && <ReservationDialog festivalId={currentFestival.id} />}
     </div>
   );
 }
