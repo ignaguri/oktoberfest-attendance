@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhotoPreview } from "@/components/ui/photo-preview";
 import { useToast } from "@/hooks/use-toast";
@@ -141,13 +142,14 @@ export function BeerPicturesUpload({
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col items-center gap-4"
     >
-      <input
+      <Input
         type="file"
         accept="image/*"
         multiple
         onChange={handleFileChange}
         className="hidden"
         id="beer-pictures-upload"
+        errorMsg={errors.pictures?.message}
       />
       <Label
         htmlFor="beer-pictures-upload"
@@ -201,9 +203,6 @@ export function BeerPicturesUpload({
         </div>
       )}
 
-      {errors.pictures && (
-        <span className="error">{errors.pictures.message}</span>
-      )}
       {watchedPictures.length > 0 && !errors.pictures && (
         <Button type="submit" disabled={isSubmitting} variant="darkYellow">
           {isSubmitting

@@ -1,5 +1,6 @@
 "use client";
 
+import { SingleSelect } from "@/components/Select/SingleSelect";
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -98,7 +98,6 @@ export default function DetailedAttendanceForm({
   }, [initialDate, selectedDate]);
 
   const {
-    register,
     handleSubmit,
     setValue,
     watch,
@@ -113,6 +112,7 @@ export default function DetailedAttendanceForm({
   });
 
   const watchedValues = watch();
+  const amount = watch("amount");
 
   // Update form values when existingAttendance or currentDate changes
   useEffect(() => {
@@ -193,24 +193,24 @@ export default function DetailedAttendanceForm({
           {errors.date && <span className="error">{errors.date.message}</span>}
 
           <Label htmlFor="amount">How many 🍻 Maß did you have?</Label>
-          <select
-            className={cn(
-              "input w-auto self-center",
-              errors.amount && "input-error",
-            )}
+          <SingleSelect
             id="amount"
-            autoComplete="off"
-            {...register("amount", { valueAsNumber: true })}
-          >
-            {[...Array(11)].map((_, i) => (
-              <option key={i} value={i}>
-                {i}
-              </option>
-            ))}
-          </select>
-          {errors.amount && (
-            <span className="error">{errors.amount.message}</span>
-          )}
+            buttonClassName="w-auto self-center"
+            options={[
+              {
+                options: [...Array(10)].map((_, i) => ({
+                  value: i.toString(),
+                  label: i.toString(),
+                })),
+              },
+            ]}
+            placeholder="Select amount"
+            value={amount?.toString() || "0"}
+            onSelect={(option) => {
+              setValue("amount", parseInt(option.value));
+            }}
+            errorMsg={errors.amount?.message}
+          />
 
           <Label htmlFor="tents">Which tents did you visit?</Label>
           <TentSelector

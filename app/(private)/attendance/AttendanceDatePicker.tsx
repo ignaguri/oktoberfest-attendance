@@ -89,7 +89,6 @@ export function AttendanceDatePicker({
           />
         </DrawerContent>
       </Drawer>
-      <input type="hidden" name={name} value={clampedValue.toISOString()} />
     </div>
   );
 }
