@@ -3,7 +3,9 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { groupSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,21 +42,24 @@ const GroupEditForm = ({
         <Label htmlFor="name" className="block">
           Group Name
         </Label>
-        <input type="text" id="name" className="input" {...register("name")} />
-        {errors.name && <span className="error">{errors.name.message}</span>}
+        <Input
+          type="text"
+          id="name"
+          className="input"
+          errorMsg={errors.name?.message}
+          {...register("name")}
+        />
       </div>
       <div>
         <Label htmlFor="description" className="block">
           Description
         </Label>
-        <textarea
+        <Textarea
           id="description"
           className="input"
+          errorMsg={errors.description?.message}
           {...register("description")}
         />
-        {errors.description && (
-          <span className="error">{errors.description.message}</span>
-        )}
       </div>
       <Button type="submit" disabled={isSubmitting}>
         Update Group

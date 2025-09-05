@@ -3,6 +3,7 @@
 import Avatar from "@/components/Avatar/Avatar";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { profileSchema } from "@/lib/schemas/profile";
@@ -15,7 +16,7 @@ import { useForm } from "react-hook-form";
 import type { ProfileFormData } from "@/lib/schemas/profile";
 import type { User } from "@supabase/supabase-js";
 
-import { updateProfile } from "./actions";
+import { updateProfile, deleteAccount } from "./actions";
 
 interface ProfileShort {
   full_name: string | null;
@@ -31,6 +32,8 @@ interface AccountFormProps {
 
 export default function AccountForm({ user, profile }: AccountFormProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile.avatar_url || null,
   );
@@ -83,6 +86,27 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!showDeleteConfirm) {
+      setShowDeleteConfirm(true);
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteAccount();
+    } catch (error) {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          "Failed to delete account. Please try again or contact support.",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="card">
@@ -121,12 +145,13 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
               Full&nbsp;Name:
             </Label>
             {isEditing ? (
-              <input
+              <Input
                 className="input"
                 id="fullname"
                 type="text"
                 disabled={isSubmitting}
                 autoComplete="off"
+                errorMsg={errors.fullname?.message}
                 {...register("fullname")}
               />
             ) : (
@@ -136,21 +161,19 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 )}
               </div>
             )}
-            {errors.fullname && (
-              <span className="error">{errors.fullname.message}</span>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="username" className="font-semibold">
               Username:
             </Label>
             {isEditing ? (
-              <input
+              <Input
                 className="input"
                 id="username"
                 type="text"
                 disabled={isSubmitting}
                 autoComplete="off"
+                errorMsg={errors.username?.message}
                 {...register("username")}
               />
             ) : (
@@ -160,30 +183,25 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 )}
               </div>
             )}
-            {errors.username && (
-              <span className="error">{errors.username.message}</span>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="custom_beer_cost" className="font-semibold">
               Average cost of a beer (€):
             </Label>
             {isEditing ? (
-              <input
+              <Input
                 className="input"
                 id="custom_beer_cost"
                 type="number"
                 step="0.1"
                 disabled={isSubmitting}
+                errorMsg={errors.custom_beer_cost?.message}
                 {...register("custom_beer_cost", { valueAsNumber: true })}
               />
             ) : (
               <div className="p-2">
                 {profileData.custom_beer_cost?.toFixed(2) || "16.20"}
               </div>
-            )}
-            {errors.custom_beer_cost && (
-              <span className="error">{errors.custom_beer_cost.message}</span>
             )}
           </div>
           {isEditing && (
@@ -219,6 +237,58 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
       </div>
 
       <NotificationSettings />
+
+      {/* Delete Account Section */}
+      <div className="card bg-red-500/20">
+        <div className="flex flex-col items-center gap-4">
+          <h4 className="text-lg font-semibold text-gray-800">Danger Zone</h4>
+          <p className="text-sm text-gray-700 text-center">
+            Permanently delete your account and all associated data. This action
+            cannot be undone.
+          </p>
+          {showDeleteConfirm ? (
+            <div className="flex flex-col gap-2 items-center">
+              <p className="text-sm text-red-600 font-medium text-center">
+                Are you sure? This will permanently delete all your data
+                including:
+              </p>
+              <ul className="text-xs text-red-600 text-center list-disc list-inside">
+                <li>All your beer consumption records</li>
+                <li>Photos and tent visits</li>
+                <li>Group memberships and achievements</li>
+                <li>Profile information</li>
+              </ul>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Yes, Delete My Account"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+            >
+              Delete Account
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

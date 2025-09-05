@@ -1,5 +1,6 @@
 "use client";
 
+import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +12,9 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
@@ -50,6 +53,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<GroupSettingsFormData>({
     resolver: zodResolver(groupSettingsSchema),
@@ -60,6 +65,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
       winning_criteria_id: group.winning_criteria_id,
     },
   });
+
+  const winningCriteriaId = watch("winning_criteria_id");
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -147,18 +154,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
               >
                 Group Name
               </Label>
-              <input
+              <Input
                 type="text"
                 id="name"
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                 disabled={!currentUser?.isCreator}
+                errorMsg={errors.name?.message}
                 {...register("name")}
               />
-              {errors.name && (
-                <div className="text-red-500 text-sm mt-1">
-                  {errors.name.message}
-                </div>
-              )}
             </div>
 
             <div>
@@ -169,11 +172,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 Group Password
               </Label>
               <div className="relative mt-1">
-                <input
+                <Input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   className="block w-full border border-gray-300 rounded-md shadow-xs p-2"
                   disabled={!currentUser?.isCreator}
+                  errorMsg={errors.password?.message}
                   {...register("password")}
                 />
                 <Button
@@ -190,11 +194,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   />
                 </Button>
               </div>
-              {errors.password && (
-                <div className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </div>
-              )}
             </div>
 
             <div>
@@ -204,44 +203,42 @@ export default function GroupSettingsClient({ group, members }: Props) {
               >
                 Group Description
               </Label>
-              <textarea
+              <Textarea
                 id="description"
                 rows={3}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                 disabled={!currentUser?.isCreator}
+                errorMsg={errors.description?.message}
                 {...register("description")}
               />
-              {errors.description && (
-                <div className="text-red-500 text-sm mt-1">
-                  {errors.description.message}
-                </div>
-              )}
             </div>
 
             <div>
               <Label
-                htmlFor="winning_criteria"
+                htmlFor="winning_criteria_id"
                 className="block text-sm font-medium text-gray-700"
               >
                 Winning Criteria
               </Label>
-              <select
+              <SingleSelect
                 id="winning_criteria_id"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                options={[
+                  {
+                    options: winningCriterias.map((criteria) => ({
+                      value: criteria.id.toString(),
+                      label:
+                        winningCriteriaText[criteria.name as WinningCriteria],
+                    })),
+                  },
+                ]}
+                placeholder="Select winning criteria"
                 disabled={!currentUser?.isCreator}
-                {...register("winning_criteria_id", { valueAsNumber: true })}
-              >
-                {winningCriterias.map((criteria) => (
-                  <option key={criteria.id} value={criteria.id}>
-                    {winningCriteriaText[criteria.name as WinningCriteria]}
-                  </option>
-                ))}
-              </select>
-              {errors.winning_criteria_id && (
-                <div className="text-red-500 text-sm mt-1">
-                  {errors.winning_criteria_id.message}
-                </div>
-              )}
+                value={winningCriteriaId?.toString() || ""}
+                onSelect={(option) => {
+                  setValue("winning_criteria_id", parseInt(option.value));
+                }}
+                errorMsg={errors.winning_criteria_id?.message}
+              />
             </div>
 
             {currentUser?.isCreator && (

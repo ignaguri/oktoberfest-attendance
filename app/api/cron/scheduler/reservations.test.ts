@@ -68,7 +68,7 @@ describe("processReservationNotifications", () => {
     await processReservationNotifications(
       supabase as unknown as SupabaseClient<Database>,
       notifications,
-      "http://localhost:3000",
+      "http://localhost:3008",
       new Date().toISOString(),
     );
 
@@ -94,7 +94,7 @@ describe("processReservationNotifications", () => {
     await processReservationNotifications(
       supabase as unknown as SupabaseClient<Database>,
       notifications,
-      "http://localhost:3000",
+      "http://localhost:3008",
       new Date().toISOString(),
     );
 

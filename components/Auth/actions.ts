@@ -108,3 +108,46 @@ export async function updatePassword(formData: { password: string }) {
 
   revalidateBase();
 }
+
+export async function signInWithOAuth(
+  provider: "google" | "facebook",
+  redirectTo?: string | null,
+) {
+  const supabase = createClient();
+
+  let baseUrl: string | undefined;
+  if (process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL) {
+    baseUrl = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL;
+  } else if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    baseUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`;
+  } else {
+    throw new Error(
+      "OAuth redirect URL is not configured. Please set NEXT_PUBLIC_OAUTH_REDIRECT_URL or NEXT_PUBLIC_VERCEL_URL in your environment variables.",
+    );
+  }
+
+  const finalRedirectUrl = redirectTo
+    ? `${baseUrl}?redirect=${encodeURIComponent(redirectTo)}`
+    : baseUrl;
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: finalRedirectUrl,
+    },
+  });
+
+  if (error) {
+    reportLog(
+      `Error trying to sign in with ${provider}: ${error.message}`,
+      "error",
+    );
+    throw new Error(error.message);
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+
+  return data;
+}

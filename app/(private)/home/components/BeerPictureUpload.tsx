@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
@@ -102,12 +103,13 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col items-center gap-4"
     >
-      <input
+      <Input
         type="file"
         accept="image/*"
         onChange={handleFileChange}
         className="hidden"
         id="beer-picture-upload"
+        errorMsg={errors.picture?.message}
       />
       <Label
         htmlFor="beer-picture-upload"
@@ -126,9 +128,6 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
           </div>
         )}
       </Label>
-      {errors.picture && (
-        <span className="error">{errors.picture.message}</span>
-      )}
       <PicturePreview picture={watchedPicture || null} />
       {watchedPicture && !errors.picture && (
         <Button type="submit" disabled={isSubmitting} variant="darkYellow">

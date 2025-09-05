@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
 import { joinGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
-import cn from "classnames";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
@@ -76,22 +76,19 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
       className="space-y-2 flex flex-col gap-2"
     >
       <h3 className="text-xl font-semibold">Join a Group</h3>
-      <input
+      <Input
         type="text"
         placeholder="Group Name"
-        className={cn("input", errors.groupName && "input-error")}
+        errorMsg={errors.groupName?.message}
         autoComplete="off"
         {...register("groupName")}
       />
-      {errors.groupName && (
-        <span className="error">{errors.groupName.message}</span>
-      )}
 
       <div className="relative">
-        <input
+        <Input
           type={showPassword ? "text" : "password"}
           placeholder="Group Password"
-          className={cn("input pr-10", errors.password && "input-error")}
+          errorMsg={errors.password?.message}
           autoComplete="off"
           {...register("password")}
         />
@@ -104,9 +101,6 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </Button>
       </div>
-      {errors.password && (
-        <span className="error">{errors.password.message}</span>
-      )}
 
       <Button
         type="submit"

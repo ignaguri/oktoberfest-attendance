@@ -55,7 +55,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=
 NEXT_PUBLIC_FIREBASE_VAPID_KEY=
 
 # App URLs
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3008
 ```
 
 Populate this file with your URL and Key.
@@ -122,4 +122,4 @@ pnpm sup:db:types
 
 ### 3. Run the application
 
-Run the application: `pnpm dev`. Open your browser to `https://localhost:3000/` and you are ready to go 🚀.
+Run the application: `pnpm dev`. Open your browser to `https://localhost:3008/` and you are ready to go 🚀.
