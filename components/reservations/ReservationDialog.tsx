@@ -107,7 +107,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   }, [open, initialDate, reservationId, reset, toast, tents]);
 
   const onClose = useCallback(() => {
-    const url = createUrlWithParams("", searchParams, [
+    const url = createUrlWithParams("/calendar", searchParams, [
       "newReservation",
       "reservationId",
     ]);

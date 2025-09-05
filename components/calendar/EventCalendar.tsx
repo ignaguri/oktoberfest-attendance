@@ -158,11 +158,13 @@ export function EventCalendar({
                 className="h-7 px-1"
                 onClick={() => {
                   if (date) {
-                    const dateStr = formatDate(
-                      new TZDate(date, TIMEZONE),
-                      "yyyy-MM-dd",
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set(
+                      "date",
+                      formatDate(new TZDate(date, TIMEZONE), "yyyy-MM-dd"),
                     );
-                    router.push(`/attendance?date=${dateStr}`);
+                    params.set("editAttendance", "1");
+                    router.replace(`?${params.toString()}`);
                   }
                 }}
                 disabled={!date}

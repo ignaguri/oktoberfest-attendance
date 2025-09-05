@@ -252,6 +252,9 @@ importers:
       husky:
         specifier: ^9.0.0
         version: 9.1.7
+      import-in-the-middle:
+        specifier: ^1.14.2
+        version: 1.14.2
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
@@ -261,6 +264,9 @@ importers:
       prettier:
         specifier: 3.6.2
         version: 3.6.2
+      require-in-the-middle:
+        specifier: ^7.5.2
+        version: 7.5.2
       supabase:
         specifier: 2.39.2
         version: 2.39.2
@@ -10414,7 +10420,7 @@ snapshots:
     dependencies:
       debug: 4.4.1
       module-details-from-path: 1.0.4
-      resolve: 1.22.8
+      resolve: 1.22.10
     transitivePeerDependencies:
       - supports-color
 
