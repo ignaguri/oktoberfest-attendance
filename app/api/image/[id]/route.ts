@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { createClient } from "@/utils/supabase/server";
 import crypto from "crypto";
 import { unstable_cache } from "next/cache";
@@ -129,7 +130,11 @@ export async function GET(
       headers,
     });
   } catch (error) {
-    console.error("Error fetching image:", error);
+    logger.error(
+      "Error fetching image",
+      logger.apiRoute("image/[id]", { imageId: decodedId, bucket }),
+      error as Error,
+    );
     return NextResponse.json(
       { error: "Error fetching image" },
       { status: 500 },

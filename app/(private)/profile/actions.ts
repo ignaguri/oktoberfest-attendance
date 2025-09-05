@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -86,7 +87,13 @@ export async function deleteAccount() {
     // Check for any failures
     const failures = results.filter((result) => result.status === "rejected");
     if (failures.length > 0) {
-      console.error("Some delete operations failed:", failures);
+      logger.warn(
+        "Some delete operations failed during account deletion",
+        logger.serverAction("deleteAccount", {
+          userId: user.id,
+          failureCount: failures.length,
+        }),
+      );
       // Continue anyway - partial deletion is better than no deletion
     }
 
@@ -97,7 +104,11 @@ export async function deleteAccount() {
 
     if (deleteAuthError) {
       // Log the error but don't throw - data is already deleted
-      console.error("Failed to delete auth user:", deleteAuthError);
+      logger.error(
+        "Failed to delete auth user during account deletion",
+        logger.serverAction("deleteAccount", { userId: user.id }),
+        new Error(deleteAuthError.message),
+      );
       // Create a compatible error object for reporting
       const compatibleError = {
         message: deleteAuthError.message,
@@ -114,7 +125,11 @@ export async function deleteAccount() {
     // Sign out the user
     await supabase.auth.signOut();
   } catch (error) {
-    console.error("Account deletion error:", error);
+    logger.error(
+      "Account deletion failed",
+      logger.serverAction("deleteAccount", { userId: user.id }),
+      error as Error,
+    );
     // Create a compatible error object for reporting
     const compatibleError = {
       message: error instanceof Error ? error.message : String(error),

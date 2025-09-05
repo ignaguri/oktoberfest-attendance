@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useCallback, useEffect, useState } from "react";
 
 interface VersionData {
@@ -53,7 +54,11 @@ export function useAppUpdate() {
         lastChecked: versionData.lastChecked,
       }));
     } catch (error) {
-      console.error("Failed to check for updates:", error);
+      logger.error(
+        "Failed to check for updates",
+        logger.clientComponent("useAppUpdate"),
+        error as Error,
+      );
       setUpdateState((prev) => ({ ...prev, isChecking: false }));
     }
   }, []);

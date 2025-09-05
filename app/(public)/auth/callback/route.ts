@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -12,7 +13,10 @@ export async function GET(req: NextRequest) {
 
   // Handle OAuth error from provider
   if (error) {
-    console.error("OAuth provider error:", error);
+    logger.error(
+      "OAuth provider error",
+      logger.apiRoute("auth/callback", { error }),
+    );
     return NextResponse.redirect(
       new URL(
         `/sign-in?error=oauth_failed&details=${encodeURIComponent(error)}`,
@@ -26,7 +30,11 @@ export async function GET(req: NextRequest) {
       await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
-      console.error("OAuth callback error:", exchangeError);
+      logger.error(
+        "OAuth code exchange failed",
+        logger.apiRoute("auth/callback", { code: "***" }),
+        exchangeError,
+      );
       return NextResponse.redirect(
         new URL(
           `/sign-in?error=oauth_failed&details=${encodeURIComponent(exchangeError.message)}`,
