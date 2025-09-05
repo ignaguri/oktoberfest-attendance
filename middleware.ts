@@ -31,6 +31,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(unescapedUrl, request.url));
   }
 
+  // Handle OAuth code parameter at root level as fallback
+  if (
+    request.nextUrl.pathname === "/" &&
+    request.nextUrl.searchParams.has("code")
+  ) {
+    const code = request.nextUrl.searchParams.get("code");
+    const redirectParam = request.nextUrl.searchParams.get("redirect");
+
+    // Construct the callback URL with the code
+    const callbackUrl = new URL("/auth/callback", request.url);
+    if (code) callbackUrl.searchParams.set("code", code);
+    if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
+
+    return NextResponse.redirect(callbackUrl);
+  }
+
   if (
     publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/r/")

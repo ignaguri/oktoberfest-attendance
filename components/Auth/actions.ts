@@ -120,6 +120,8 @@ export async function signInWithOAuth(
     baseUrl = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL;
   } else if (process.env.NEXT_PUBLIC_VERCEL_URL) {
     baseUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`;
+  } else if (process.env.NODE_ENV === "development") {
+    baseUrl = "http://localhost:3000/auth/callback";
   } else {
     throw new Error(
       "OAuth redirect URL is not configured. Please set NEXT_PUBLIC_OAUTH_REDIRECT_URL or NEXT_PUBLIC_VERCEL_URL in your environment variables.",
