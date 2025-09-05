@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCallback } from "react";
@@ -54,7 +55,11 @@ export function ImageConversion() {
         variant: "default",
       });
     } catch (error) {
-      console.error("Error converting image:", error);
+      logger.error(
+        "Error converting image",
+        logger.clientComponent("ImageConversion", { path }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to convert image. Please try again.",

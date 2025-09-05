@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -226,7 +227,11 @@ const UserList = () => {
       const fetchedUsers = await getUsers();
       setUsers(fetchedUsers as CombinedUser[]);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      logger.error(
+        "Error fetching users",
+        logger.clientComponent("UserList", { action: "fetchUsers" }),
+        error as Error,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -238,7 +243,14 @@ const UserList = () => {
       const fetchedAttendances = await getUserAttendances(userId);
       setAttendances(fetchedAttendances);
     } catch (error) {
-      console.error("Error fetching attendances:", error);
+      logger.error(
+        "Error fetching attendances",
+        logger.clientComponent("UserList", {
+          action: "fetchAttendances",
+          userId,
+        }),
+        error as Error,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -278,7 +290,14 @@ const UserList = () => {
       });
       setIsUserDialogOpen(false);
     } catch (error) {
-      console.error("Error updating user:", error);
+      logger.error(
+        "Error updating user",
+        logger.clientComponent("UserList", {
+          action: "updateUser",
+          userId: selectedUser?.id,
+        }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to update user",
@@ -297,7 +316,11 @@ const UserList = () => {
         description: "User deleted successfully",
       });
     } catch (error) {
-      console.error("Error deleting user:", error);
+      logger.error(
+        "Error deleting user",
+        logger.clientComponent("UserList", { action: "deleteUser", userId }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to delete user",
@@ -324,7 +347,14 @@ const UserList = () => {
       });
       setIsAttendanceDialogOpen(false);
     } catch (error) {
-      console.error("Error updating attendance:", error);
+      logger.error(
+        "Error updating attendance",
+        logger.clientComponent("UserList", {
+          action: "updateAttendance",
+          attendanceId: selectedAttendance?.id,
+        }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to update attendance",
@@ -343,7 +373,14 @@ const UserList = () => {
         description: "Attendance deleted successfully",
       });
     } catch (error) {
-      console.error("Error deleting attendance:", error);
+      logger.error(
+        "Error deleting attendance",
+        logger.clientComponent("UserList", {
+          action: "deleteAttendance",
+          attendanceId,
+        }),
+        error as Error,
+      );
       toast({
         title: "Error",
         description: "Failed to delete attendance",

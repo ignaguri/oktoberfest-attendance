@@ -2,6 +2,7 @@
 
 import Avatar from "@/components/Avatar/Avatar";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { logger } from "@/lib/logger";
 import UpAndDownArrowIcon from "@/public/icons/up-down-arrows-fa.svg";
 import cn from "classnames";
 import Image from "next/image";
@@ -64,7 +65,11 @@ const AttendanceTable = ({ data }: AttendanceTableProps) => {
     try {
       return Number(avg.toFixed(2));
     } catch (error) {
-      console.error("Error parsing avg.", error);
+      logger.error(
+        "Error parsing avg",
+        logger.clientComponent("AttendanceTable"),
+        error as Error,
+      );
       return 0;
     }
   };

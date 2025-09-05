@@ -9,6 +9,7 @@ import {
   getUserAchievements,
   getUserAchievementStats,
 } from "@/lib/actions/achievements";
+import { logger } from "@/lib/logger";
 import { useState, useEffect } from "react";
 
 import type {
@@ -42,7 +43,13 @@ export default function AchievementsPage() {
         setAchievements(achievementsData);
         setStats(statsData);
       } catch (error) {
-        console.error("Error fetching achievements:", error);
+        logger.error(
+          "Error fetching achievements",
+          logger.clientComponent("AchievementsPage", {
+            festivalId: currentFestival?.id,
+          }),
+          error as Error,
+        );
       } finally {
         setIsLoading(false);
       }
