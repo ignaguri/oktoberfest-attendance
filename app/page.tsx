@@ -7,11 +7,34 @@ import { Link } from "next-view-transitions";
 
 import "server-only";
 
-export default async function Root() {
+export default async function Root({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Check for OAuth code parameter and handle it
+  const params = await searchParams;
+  if (params.code) {
+    const code = params.code as string;
+    const redirectParam = params.redirect as string;
+
+    // Construct the callback URL with the code
+    const callbackUrl = new URL(
+      "/auth/callback",
+      process.env.NEXT_PUBLIC_VERCEL_URL
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        : "http://localhost:3000",
+    );
+    callbackUrl.searchParams.set("code", code);
+    if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
+
+    redirect(callbackUrl.toString());
+  }
+
   let user;
   try {
     user = await getUser();
-  } catch (error) {
+  } catch {
     // do nothing
   }
 

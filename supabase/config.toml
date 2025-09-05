@@ -107,7 +107,7 @@ enabled = true
 # in emails.
 site_url = "http://localhost:3008"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://localhost:3008"]
+additional_redirect_urls = ["https://localhost:3008", "http://localhost:3000/auth/callback", "https://localhost:3000/auth/callback"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # If disabled, the refresh token will never expire.
@@ -238,13 +238,15 @@ client_id = ""
 enabled = true
 client_id = "142420261556-t0bmgg7q2hfs1la3vrmanc1g1acsteq0.apps.googleusercontent.com"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+# Overrides the default auth redirectUrl.
+redirect_uri = "http://localhost:3000/auth/callback"
 [auth.external.facebook]
 enabled = true
 client_id = "766907295952874"
 secret = "env(SUPABASE_AUTH_EXTERNAL_FACEBOOK_SECRET)"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
 # Overrides the default auth redirectUrl.
-redirect_uri = ""
+redirect_uri = "http://localhost:3000/auth/callback"
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
 # or any other third-party OIDC providers.
 url = ""
