@@ -230,7 +230,6 @@ export async function uploadBeerPicture(formData: FormData) {
   return fileName;
 }
 
-// FIXME: when updating amount of beers, tents get duplicated
 export async function addAttendance(formData: {
   amount: number;
   date: Date;
@@ -255,9 +254,9 @@ export async function addAttendance(formData: {
     {
       p_user_id: user.id,
       p_festival_id: festivalId,
-      p_date: dateWithTime.toISOString(),
       p_beer_count: amount,
       p_tent_ids: tents,
+      p_date: dateWithTime.toISOString(),
     },
   );
 
