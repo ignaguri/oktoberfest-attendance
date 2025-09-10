@@ -67,6 +67,18 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             >
               Request a feature
             </Link>
+
+            <span className="text-gray-400" aria-hidden>
+              ·
+            </span>
+
+            <Link
+              href="/privacy"
+              aria-label="Privacy Policy"
+              className="underline"
+            >
+              Privacy
+            </Link>
           </div>
         </div>
       </div>
