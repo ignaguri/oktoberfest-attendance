@@ -55,9 +55,9 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: isDevelopment
               ? // Development CSP - more permissive for local development
-                "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co http://localhost:* ws://localhost:* wss://localhost:*; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';"
+                "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co https://socket.novu.co http://localhost:* ws://localhost:* wss://localhost:* wss://socket.novu.co; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';"
               : // Production CSP - strict security
-                "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';",
+                "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co https://socket.novu.co wss://socket.novu.co; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },
