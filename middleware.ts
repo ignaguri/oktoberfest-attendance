@@ -4,6 +4,38 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Block .php file requests with 500 error to prevent automated scanning
+  if (request.nextUrl.pathname.endsWith(".php")) {
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+
+  // Block other common attack patterns
+  const suspiciousPatterns = [
+    ".asp",
+    ".aspx",
+    ".jsp",
+    ".cgi",
+    ".pl",
+    ".py",
+    ".sh",
+    ".bat",
+    ".cmd",
+    "wp-admin",
+    "wp-login",
+    "admin.php",
+    "config.php",
+    "phpmyadmin",
+    "xmlrpc.php",
+    "wp-json",
+    "wp-content",
+    "wp-includes",
+  ];
+
+  const pathname = request.nextUrl.pathname.toLowerCase();
+  if (suspiciousPatterns.some((pattern) => pathname.includes(pattern))) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
   const publicPaths = [
     "/",
     "/auth",
