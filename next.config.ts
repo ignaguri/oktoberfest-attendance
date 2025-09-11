@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
+    const isDevelopment = process.env.NODE_ENV === "development";
+
     return [
       {
         source: "/(.*)",
@@ -51,8 +53,11 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';",
+            value: isDevelopment
+              ? // Development CSP - more permissive for local development
+                "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co http://localhost:* ws://localhost:* wss://localhost:*; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';"
+              : // Production CSP - strict security
+                "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://api.novu.co; frame-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },
