@@ -470,6 +470,8 @@ export type Database = {
           full_name: string | null;
           id: string;
           is_super_admin: boolean | null;
+          tutorial_completed: boolean | null;
+          tutorial_completed_at: string | null;
           updated_at: string | null;
           username: string | null;
           website: string | null;
@@ -480,6 +482,8 @@ export type Database = {
           full_name?: string | null;
           id: string;
           is_super_admin?: boolean | null;
+          tutorial_completed?: boolean | null;
+          tutorial_completed_at?: string | null;
           updated_at?: string | null;
           username?: string | null;
           website?: string | null;
@@ -490,6 +494,8 @@ export type Database = {
           full_name?: string | null;
           id?: string;
           is_super_admin?: boolean | null;
+          tutorial_completed?: boolean | null;
+          tutorial_completed_at?: string | null;
           updated_at?: string | null;
           username?: string | null;
           website?: string | null;
@@ -906,28 +912,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "fk_user_id";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
