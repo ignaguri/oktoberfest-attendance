@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import { useToast } from "@/hooks/use-toast";
 import { profileSchema } from "@/lib/schemas/profile";
-import { getProfileShort } from "@/lib/sharedActions";
+import { getProfileShort, resetTutorial } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
@@ -35,6 +35,7 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isResettingTutorial, setIsResettingTutorial] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile.avatar_url || null,
   );
@@ -105,6 +106,27 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
         description:
           "Failed to delete account. Please try again or contact support.",
       });
+    }
+  };
+
+  const handleResetTutorial = async () => {
+    try {
+      setIsResettingTutorial(true);
+      await resetTutorial();
+      toast({
+        variant: "success",
+        title: "Tutorial Reset",
+        description:
+          "The tutorial has been reset. You'll see it again when you visit the home page.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to reset tutorial. Please try again.",
+      });
+    } finally {
+      setIsResettingTutorial(false);
     }
   };
 
@@ -240,6 +262,25 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
       <NotificationSettings />
 
       <PhotoPrivacySettings />
+
+      {/* Tutorial Reset Section */}
+      <div className="card bg-yellow-50">
+        <div className="flex flex-col items-center gap-4">
+          <h4 className="text-lg font-semibold text-gray-800">Tutorial</h4>
+          <p className="text-sm text-gray-700 text-center">
+            Reset the app tutorial to see it again on your next visit to the
+            home page.
+          </p>
+          <Button
+            variant="yellowOutline"
+            size="sm"
+            onClick={handleResetTutorial}
+            disabled={isResettingTutorial}
+          >
+            {isResettingTutorial ? "Resetting..." : "Reset Tutorial"}
+          </Button>
+        </div>
+      </div>
 
       {/* Delete Account Section */}
       <div className="card bg-red-500/20">
