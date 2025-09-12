@@ -1,5 +1,6 @@
 "use client";
 
+import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
 import { completeTutorial } from "@/lib/sharedActions";
 import { tutorialSteps, type TutorialStep } from "@/lib/tutorialSteps";
 import { createContext, useContext, useState, useEffect } from "react";
@@ -165,7 +166,7 @@ export function TutorialProvider({
       // Small delay to ensure page is loaded
       const timer = setTimeout(() => {
         startTutorial();
-      }, 1000);
+      }, TUTORIAL_CONSTANTS.AUTO_START_DELAY);
       return () => clearTimeout(timer);
     }
   }, [isCompleted, isActive]);

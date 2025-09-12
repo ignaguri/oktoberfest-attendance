@@ -3,6 +3,8 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 
+import { TUTORIAL_CONSTANTS } from "./constants";
+
 interface TutorialSpotlightProps {
   target: string;
   isActive: boolean;
@@ -64,7 +66,7 @@ export function TutorialSpotlight({
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         updatePosition();
-      }, 50);
+      }, TUTORIAL_CONSTANTS.SCROLL_DEBOUNCE);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -91,17 +93,19 @@ export function TutorialSpotlight({
         className,
       )}
       style={{
-        background: `radial-gradient(circle at ${position.x + position.width / 2}px ${position.y + position.height / 2}px, transparent 0px, transparent ${Math.max(position.width, position.height) / 2 + 8}px, rgba(0, 0, 0, 0.5) ${Math.max(position.width, position.height) / 2 + 12}px)`,
+        background: `radial-gradient(circle at ${position.x + position.width / 2}px ${position.y + position.height / 2}px, transparent 0px, transparent ${Math.max(position.width, position.height) / 2 + TUTORIAL_CONSTANTS.SPOTLIGHT_GRADIENT_OFFSET}px, rgba(0, 0, 0, 0.5) ${Math.max(position.width, position.height) / 2 + TUTORIAL_CONSTANTS.SPOTLIGHT_GRADIENT_FADE}px)`,
       }}
     >
       {/* Highlight border around the element */}
       <div
         className="absolute border-2 border-yellow-400 rounded-lg shadow-lg shadow-yellow-400/50 animate-pulse"
         style={{
-          left: position.x - 4,
-          top: position.y - 4,
-          width: position.width + 8,
-          height: position.height + 8,
+          left: position.x - TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET,
+          top: position.y - TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET,
+          width:
+            position.width + TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET * 2,
+          height:
+            position.height + TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET * 2,
         }}
       />
     </div>

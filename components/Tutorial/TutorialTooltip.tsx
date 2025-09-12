@@ -7,15 +7,7 @@ import { useEffect, useState, useRef } from "react";
 
 import type { TutorialStep } from "@/lib/tutorialSteps";
 
-// Configuration constants
-const TOOLTIP_CONFIG = {
-  DEFAULT_WIDTH: 320,
-  DEFAULT_HEIGHT: 200,
-  PADDING: 16,
-  OFFSET: 16, // Distance from target element
-  RENDER_DELAY: 50, // Delay before recalculating position after render
-  SCROLL_DEBOUNCE: 50, // Debounce time for scroll events
-} as const;
+import { TUTORIAL_CONSTANTS } from "./constants";
 
 interface TutorialTooltipProps {
   step: TutorialStep;
@@ -62,8 +54,8 @@ export function TutorialTooltip({
       const rect = element.getBoundingClientRect();
 
       // Use a more reliable width calculation
-      const tooltipWidth = TOOLTIP_CONFIG.DEFAULT_WIDTH;
-      const tooltipHeight = TOOLTIP_CONFIG.DEFAULT_HEIGHT;
+      const tooltipWidth = TUTORIAL_CONSTANTS.TOOLTIP_DEFAULT_WIDTH;
+      const tooltipHeight = TUTORIAL_CONSTANTS.TOOLTIP_DEFAULT_HEIGHT;
 
       let x = 0;
       let y = 0;
@@ -76,36 +68,41 @@ export function TutorialTooltip({
           break;
         case "top":
           x = rect.left + rect.width / 2 - tooltipWidth / 2;
-          y = rect.top - tooltipHeight - TOOLTIP_CONFIG.OFFSET;
+          y = rect.top - tooltipHeight - TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
           break;
         case "bottom":
           x = rect.left + rect.width / 2 - tooltipWidth / 2;
-          y = rect.bottom + TOOLTIP_CONFIG.OFFSET;
+          y = rect.bottom + TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
           break;
         case "left":
-          x = rect.left - tooltipWidth - TOOLTIP_CONFIG.OFFSET;
+          x = rect.left - tooltipWidth - TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
           y = rect.top + rect.height / 2 - tooltipHeight / 2;
           break;
         case "right":
-          x = rect.right + TOOLTIP_CONFIG.OFFSET;
+          x = rect.right + TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
           y = rect.top + rect.height / 2 - tooltipHeight / 2;
           break;
         default:
           // Default to top position with horizontal centering
           x = rect.left + rect.width / 2 - tooltipWidth / 2;
-          y = rect.top - tooltipHeight - TOOLTIP_CONFIG.OFFSET;
+          y = rect.top - tooltipHeight - TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
       }
 
       // Keep tooltip within viewport
       x = Math.max(
-        TOOLTIP_CONFIG.PADDING,
-        Math.min(x, window.innerWidth - tooltipWidth - TOOLTIP_CONFIG.PADDING),
+        TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
+        Math.min(
+          x,
+          window.innerWidth - tooltipWidth - TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
+        ),
       );
       y = Math.max(
-        TOOLTIP_CONFIG.PADDING,
+        TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
         Math.min(
           y,
-          window.innerHeight - tooltipHeight - TOOLTIP_CONFIG.PADDING,
+          window.innerHeight -
+            tooltipHeight -
+            TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
         ),
       );
 
@@ -137,38 +134,42 @@ export function TutorialTooltip({
               break;
             case "top":
               x = rect.left + rect.width / 2 - tooltipWidth / 2;
-              y = rect.top - tooltipHeight - TOOLTIP_CONFIG.OFFSET;
+              y = rect.top - tooltipHeight - TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
               break;
             case "bottom":
               x = rect.left + rect.width / 2 - tooltipWidth / 2;
-              y = rect.bottom + TOOLTIP_CONFIG.OFFSET;
+              y = rect.bottom + TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
               break;
             case "left":
-              x = rect.left - tooltipWidth - TOOLTIP_CONFIG.OFFSET;
+              x = rect.left - tooltipWidth - TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
               y = rect.top + rect.height / 2 - tooltipHeight / 2;
               break;
             case "right":
-              x = rect.right + TOOLTIP_CONFIG.OFFSET;
+              x = rect.right + TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
               y = rect.top + rect.height / 2 - tooltipHeight / 2;
               break;
             default:
               x = rect.left + rect.width / 2 - tooltipWidth / 2;
-              y = rect.top - tooltipHeight - TOOLTIP_CONFIG.OFFSET;
+              y = rect.top - tooltipHeight - TUTORIAL_CONSTANTS.TOOLTIP_OFFSET;
           }
 
           // Keep tooltip within viewport
           x = Math.max(
-            TOOLTIP_CONFIG.PADDING,
+            TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
             Math.min(
               x,
-              window.innerWidth - tooltipWidth - TOOLTIP_CONFIG.PADDING,
+              window.innerWidth -
+                tooltipWidth -
+                TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
             ),
           );
           y = Math.max(
-            TOOLTIP_CONFIG.PADDING,
+            TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
             Math.min(
               y,
-              window.innerHeight - tooltipHeight - TOOLTIP_CONFIG.PADDING,
+              window.innerHeight -
+                tooltipHeight -
+                TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
             ),
           );
 
@@ -180,7 +181,7 @@ export function TutorialTooltip({
     // Update position after a short delay to ensure tooltip is rendered
     const renderTimer = setTimeout(
       updateAfterRender,
-      TOOLTIP_CONFIG.RENDER_DELAY,
+      TUTORIAL_CONSTANTS.RENDER_DELAY,
     );
 
     // Update on scroll and resize
@@ -195,7 +196,7 @@ export function TutorialTooltip({
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         updatePosition();
-      }, TOOLTIP_CONFIG.SCROLL_DEBOUNCE);
+      }, TUTORIAL_CONSTANTS.SCROLL_DEBOUNCE);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
