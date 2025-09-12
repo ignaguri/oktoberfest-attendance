@@ -368,3 +368,93 @@ export async function fetchTents() {
   const supabase = createClient();
   return getCachedTents(supabase);
 }
+
+// Tutorial completion functions
+// Cache tutorial status for 5 minutes since it changes infrequently
+const getCachedTutorialStatus = unstable_cache(
+  async (userId: string, supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("tutorial_completed, tutorial_completed_at")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      reportSupabaseException("getTutorialStatus", error, {
+        id: userId,
+      });
+      throw new Error("Error fetching tutorial status");
+    }
+
+    return {
+      tutorial_completed: data?.tutorial_completed || false,
+      tutorial_completed_at: data?.tutorial_completed_at || null,
+    };
+  },
+  ["user-tutorial-status"],
+  { revalidate: 300, tags: ["user-profile", "tutorial-status"] }, // 5 minutes cache
+);
+
+export async function getTutorialStatus() {
+  const user = await getUser();
+  const supabase = createClient();
+  return getCachedTutorialStatus(user.id, supabase);
+}
+
+export async function completeTutorial() {
+  const user = await getUser();
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      tutorial_completed: true,
+      tutorial_completed_at: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    reportSupabaseException("completeTutorial", error, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error completing tutorial");
+  }
+
+  // Invalidate tutorial-related caches
+  revalidateTag("user-profile");
+  revalidateTag("tutorial-status");
+  revalidatePath("/profile");
+  revalidatePath("/home");
+
+  return { success: true };
+}
+
+export async function resetTutorial() {
+  const user = await getUser();
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      tutorial_completed: false,
+      tutorial_completed_at: null,
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    reportSupabaseException("resetTutorial", error, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error resetting tutorial");
+  }
+
+  // Invalidate tutorial-related caches
+  revalidateTag("user-profile");
+  revalidateTag("tutorial-status");
+  revalidatePath("/profile");
+  revalidatePath("/home");
+
+  return { success: true };
+}

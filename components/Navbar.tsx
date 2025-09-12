@@ -28,20 +28,23 @@ export default async function Navbar() {
               variant="ghost"
               size="sm"
               className="text-white hover:text-gray-600 px-2"
+              data-tutorial="calendar-nav"
             >
               <Link href="/calendar">
                 <CalendarDays size={20} />
               </Link>
             </Button>
             <NotificationBell />
-            <UserMenu
-              profileData={{
-                username: profileData.username,
-                full_name: profileData.full_name,
-                email: profileData.email || "no.name@user.com",
-                avatar_url: profileData.avatar_url,
-              }}
-            />
+            <div data-tutorial="user-menu">
+              <UserMenu
+                profileData={{
+                  username: profileData.username,
+                  full_name: profileData.full_name,
+                  email: profileData.email || "no.name@user.com",
+                  avatar_url: profileData.avatar_url,
+                }}
+              />
+            </div>
           </div>
         )}
 
