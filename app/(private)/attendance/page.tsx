@@ -3,13 +3,14 @@
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
+import { useAttendances } from "@/lib/data";
 import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 
 import type { Tables } from "@/lib/database.types";
 
-import { fetchAttendances, checkInFromReservation } from "./actions";
+import { checkInFromReservation } from "./actions";
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
 import { getReservationForCheckIn } from "../calendar/actions";
@@ -24,41 +25,28 @@ export type AttendanceWithTentVisits = Tables<"attendances"> & {
 
 export default function AttendancePage() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
-  const [attendances, setAttendances] = useState<AttendanceWithTentVisits[]>(
-    [],
-  );
+  const {
+    data: attendances,
+    loading: attendancesLoading,
+    error: attendancesError,
+    refetch: refetchAttendances,
+  } = useAttendances(currentFestival?.id || "");
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [reservation, setReservation] = useState<any>(null);
   const { toast } = useToast();
   const searchParams = useSearchParams();
 
-  const fetchAttendanceData = useCallback(async () => {
-    if (!currentFestival) return;
-
-    try {
-      const data = await fetchAttendances(currentFestival.id);
-      if (data) {
-        setAttendances(data as AttendanceWithTentVisits[]);
-      }
-    } catch (error) {
-      logger.error(
-        "Error fetching attendance data",
-        logger.clientComponent("AttendancePage", {
-          festivalId: currentFestival?.id,
-        }),
-        error as Error,
-      );
+  // Handle attendance errors
+  useEffect(() => {
+    if (attendancesError) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to fetch attendance data. Please try again.",
       });
     }
-  }, [toast, currentFestival]);
-
-  useEffect(() => {
-    fetchAttendanceData();
-  }, [fetchAttendanceData]);
+  }, [attendancesError, toast]);
 
   // Handle date parameter from URL
   useEffect(() => {
@@ -102,8 +90,8 @@ export default function AttendancePage() {
   }, [searchParams, toast]);
 
   const handleAttendanceUpdate = useCallback(() => {
-    fetchAttendanceData();
-  }, [fetchAttendanceData]);
+    refetchAttendances();
+  }, [refetchAttendances]);
 
   const handleDateSelect = (date: Date | null) => {
     setSelectedDate(date);
@@ -122,7 +110,7 @@ export default function AttendancePage() {
     [handleAttendanceUpdate],
   );
 
-  if (festivalLoading || !currentFestival) {
+  if (festivalLoading || attendancesLoading || !currentFestival) {
     return (
       <div className="w-full max-w-lg flex flex-col gap-6">
         <p className="text-center text-gray-600">Loading festival data...</p>
@@ -137,7 +125,7 @@ export default function AttendancePage() {
         selectedDate={selectedDate}
       />
       <PersonalAttendanceTable
-        data={attendances}
+        data={attendances as AttendanceWithTentVisits[] | undefined}
         onDateSelect={handleDateSelect}
         onAttendanceDelete={handleAttendanceDelete}
       />
