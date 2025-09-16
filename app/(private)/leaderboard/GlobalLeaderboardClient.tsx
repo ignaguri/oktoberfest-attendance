@@ -7,13 +7,9 @@ import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
-import { fetchWinningCriterias } from "@/lib/sharedActions";
+import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { WinningCriteria } from "@/lib/types";
-import { useState, useEffect, useCallback, useMemo } from "react";
-
-import type { Tables } from "@/lib/database.types";
-
-import { fetchGlobalLeaderboard } from "./actions";
+import { useState, useEffect, useMemo } from "react";
 
 export default function GlobalLeaderboardClient() {
   const { currentFestival } = useFestival();
@@ -21,85 +17,79 @@ export default function GlobalLeaderboardClient() {
   const [winningCriteria, setWinningCriteria] = useState<WinningCriteria>(
     WinningCriteria.days_attended,
   );
-  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
-  const [winningCriterias, setWinningCriterias] = useState<
-    Tables<"winning_criteria">[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchLeaderboardData = useCallback(
-    async (criteriaId: number) => {
-      if (!currentFestival) return;
+  // Use our abstraction layer hooks
+  const {
+    data: winningCriterias,
+    loading: criteriasLoading,
+    error: criteriasError,
+  } = useWinningCriterias();
 
-      setIsLoading(true);
-      try {
-        const data = await fetchGlobalLeaderboard(
-          criteriaId,
-          currentFestival.id,
-        );
-        setLeaderboardData(data);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch leaderboard data. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [toast, currentFestival],
-  );
+  const {
+    data: leaderboardData,
+    loading: leaderboardLoading,
+    error: leaderboardError,
+  } = useGlobalLeaderboard(winningCriteriaId, currentFestival?.id);
 
+  // Initialize winning criteria ID when data loads
   useEffect(() => {
-    const initializeData = async () => {
-      if (!currentFestival) return;
-
-      try {
-        const criterias = await fetchWinningCriterias();
-        setWinningCriterias(criterias);
-        if (criterias.length > 0) {
-          setWinningCriteriaId(criterias[0].id);
-          await fetchLeaderboardData(criterias[0].id);
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            "Failed to initialize leaderboard data. Please refresh the page.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    initializeData();
-  }, [fetchLeaderboardData, toast, currentFestival]);
-
-  useEffect(() => {
-    if (winningCriteriaId) {
-      fetchLeaderboardData(winningCriteriaId);
+    if (
+      winningCriterias &&
+      winningCriterias.length > 0 &&
+      winningCriteriaId === 1
+    ) {
+      setWinningCriteriaId(winningCriterias[0].id);
     }
-  }, [winningCriteriaId, fetchLeaderboardData]);
+  }, [winningCriterias, winningCriteriaId]);
+
+  // Handle errors with toast notifications
+  useEffect(() => {
+    if (criteriasError) {
+      toast({
+        title: "Error",
+        description:
+          "Failed to load winning criteria. Please refresh the page.",
+        variant: "destructive",
+      });
+    }
+  }, [criteriasError, toast]);
+
+  useEffect(() => {
+    if (leaderboardError) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch leaderboard data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [leaderboardError, toast]);
 
   const criteriaOptions = useMemo(
     () =>
-      winningCriterias.map((criteria) => ({
+      winningCriterias?.map((criteria) => ({
         value: criteria.id.toString(),
         label:
           winningCriteriaText[
             criteria.name as keyof typeof winningCriteriaText
           ],
-      })),
+      })) || [],
     [winningCriterias],
   );
 
-  const selectedCriteria = winningCriterias.find(
+  const selectedCriteria = winningCriterias?.find(
     (c) => c.id === winningCriteriaId,
   );
 
+  // Show loading state
+  const isLoading = criteriasLoading || leaderboardLoading;
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  // Don't render if no festival is selected
+  if (!currentFestival) {
+    return null;
   }
 
   return (
@@ -117,9 +107,10 @@ export default function GlobalLeaderboardClient() {
           value={winningCriteriaId.toString()}
           buttonClassName="w-fit"
           onSelect={(option) => {
-            setWinningCriteriaId(Number(option.value));
-            const criteria = winningCriterias.find(
-              (c) => c.id === Number(option.value),
+            const newCriteriaId = Number(option.value);
+            setWinningCriteriaId(newCriteriaId);
+            const criteria = winningCriterias?.find(
+              (c) => c.id === newCriteriaId,
             );
             if (criteria) {
               setWinningCriteria(criteria.name as WinningCriteria);
@@ -128,9 +119,9 @@ export default function GlobalLeaderboardClient() {
           placeholder="Select winning criteria"
         />
       </div>
-      {selectedCriteria && leaderboardData.length > 0 && (
+      {selectedCriteria && leaderboardData && leaderboardData.length > 0 && (
         <Leaderboard
-          entries={leaderboardData}
+          entries={leaderboardData as any} // TODO: Fix type mismatch between server action return and LeaderboardEntry
           showGroupCount
           winningCriteria={winningCriteria}
         />
