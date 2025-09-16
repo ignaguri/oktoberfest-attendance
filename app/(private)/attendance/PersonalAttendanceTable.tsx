@@ -15,14 +15,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useDeleteAttendance } from "@/lib/data";
 import { formatDate } from "date-fns/format";
 import { Beer, Tent, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
 import type { AttendanceWithTentVisits } from "./page";
 import type { ColumnDef } from "@tanstack/react-table";
-
-import { deleteAttendance } from "./actions";
 
 interface PersonalAttendanceTableProps {
   data?: AttendanceWithTentVisits[];
@@ -42,6 +41,8 @@ const PersonalAttendanceTable = ({
     null,
   );
   const { toast } = useToast();
+  const { mutate: deleteAttendanceMutation, loading: isDeleting } =
+    useDeleteAttendance();
 
   const tentVisitsForDate = useMemo(() => {
     return data?.find((attendance) => attendance.date === selectedAttendance)
@@ -64,8 +65,7 @@ const PersonalAttendanceTable = ({
   const handleDelete = useCallback(
     async (attendanceId: string) => {
       try {
-        await deleteAttendance(attendanceId);
-
+        await deleteAttendanceMutation(attendanceId);
         toast({
           variant: "success",
           title: "Success",
@@ -81,7 +81,7 @@ const PersonalAttendanceTable = ({
         });
       }
     },
-    [onAttendanceDelete, toast],
+    [deleteAttendanceMutation, onAttendanceDelete, toast],
   );
 
   const columns: ColumnDef<AttendanceWithTentVisits>[] = [
@@ -208,6 +208,7 @@ const PersonalAttendanceTable = ({
             </DialogClose>
             <Button
               variant="destructive"
+              disabled={isDeleting}
               onClick={async () => {
                 if (selectedAttendanceData) {
                   await handleDelete(selectedAttendanceData.id);
@@ -215,7 +216,7 @@ const PersonalAttendanceTable = ({
                 }
               }}
             >
-              Confirm
+              {isDeleting ? "Deleting..." : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>

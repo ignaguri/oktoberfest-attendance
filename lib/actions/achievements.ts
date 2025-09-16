@@ -177,3 +177,25 @@ export async function getUserAchievementStats(
 
   return stats;
 }
+
+export async function getAvailableAchievements() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("achievements")
+    .select("*")
+    .eq("is_active", true)
+    .order("category")
+    .order("points");
+
+  if (error) {
+    logger.error(
+      "Failed to fetch available achievements",
+      logger.serverAction("getAvailableAchievements"),
+      error,
+    );
+    throw new Error("Failed to fetch available achievements");
+  }
+
+  return data || [];
+}

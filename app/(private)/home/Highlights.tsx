@@ -9,71 +9,32 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
+import { useUserHighlights } from "@/lib/data";
 import { getDefaultBeerCost } from "@/lib/festivalConstants";
-import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
-import { useEffect, useMemo, useState } from "react";
-
-import { fetchHighlights } from "./actions";
-
-type HighlightsData = {
-  topPositions: { group_id: string; group_name: string }[];
-  totalBeers: number;
-  daysAttended: number;
-  custom_beer_cost: number;
-};
+import { useMemo } from "react";
 
 const Highlights = () => {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
-  const [highlightsData, setHighlightsData] = useState<HighlightsData>({
+  const {
+    data: highlightsData,
+    loading: highlightsLoading,
+    error: highlightsError,
+  } = useUserHighlights(currentFestival?.id);
+
+  // Provide default values when no data is available
+  const {
+    topPositions = [],
+    totalBeers = 0,
+    daysAttended = 0,
+    custom_beer_cost,
+  } = highlightsData || {
     topPositions: [],
     totalBeers: 0,
     daysAttended: 0,
     custom_beer_cost: getDefaultBeerCost(currentFestival),
-  });
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadHighlights = async () => {
-      if (!currentFestival) {
-        setHighlightsData({
-          topPositions: [],
-          totalBeers: 0,
-          daysAttended: 0,
-          custom_beer_cost: getDefaultBeerCost(currentFestival),
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const data = await fetchHighlights(currentFestival.id);
-        setHighlightsData(data);
-      } catch (error) {
-        logger.error(
-          "Error fetching highlights",
-          logger.clientComponent("Highlights", {
-            festivalId: currentFestival?.id,
-          }),
-          error as Error,
-        );
-        setHighlightsData({
-          topPositions: [],
-          totalBeers: 0,
-          daysAttended: 0,
-          custom_beer_cost: getDefaultBeerCost(currentFestival),
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadHighlights();
-  }, [currentFestival]);
-
-  const { topPositions, totalBeers, daysAttended, custom_beer_cost } =
-    highlightsData;
+  };
 
   const spentOnBeers = useMemo(() => {
     if (totalBeers > 0) {
@@ -82,7 +43,8 @@ const Highlights = () => {
     }
   }, [totalBeers, custom_beer_cost, currentFestival]);
 
-  if (festivalLoading || isLoading) {
+  // Show loading state
+  if (festivalLoading || highlightsLoading) {
     return (
       <Card className="shadow-lg rounded-lg border border-gray-200">
         <CardHeader>
@@ -97,7 +59,11 @@ const Highlights = () => {
     );
   }
 
-  if (topPositions.length === 0 && totalBeers === 0 && daysAttended === 0) {
+  // Handle error state silently - just show empty state
+  if (
+    highlightsError ||
+    (topPositions.length === 0 && totalBeers === 0 && daysAttended === 0)
+  ) {
     return null;
   }
 

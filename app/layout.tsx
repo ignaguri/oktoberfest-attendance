@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { FestivalProvider } from "@/contexts/FestivalContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
+import { DataProvider } from "@/lib/data/query-client";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/lib/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -109,15 +110,17 @@ export default async function RootLayout({
     <ViewTransitions>
       <html lang="en" data-version={APP_VERSION}>
         <body className="bg-slate-50">
-          {isLoggedIn ? (
-            <FestivalProvider>
-              <NotificationProvider>
-                <AppContent />
-              </NotificationProvider>
-            </FestivalProvider>
-          ) : (
-            <AppContent />
-          )}
+          <DataProvider>
+            {isLoggedIn ? (
+              <FestivalProvider>
+                <NotificationProvider>
+                  <AppContent />
+                </NotificationProvider>
+              </FestivalProvider>
+            ) : (
+              <AppContent />
+            )}
+          </DataProvider>
           <ServiceWorkerRegistration />
           <Toaster />
           <SpeedInsights />

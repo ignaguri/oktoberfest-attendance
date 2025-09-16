@@ -2,13 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
-import { logger } from "@/lib/logger";
+import { useUserGroups } from "@/lib/data";
 import { Link } from "next-view-transitions";
-import { useEffect, useState } from "react";
 
 import type { Tables } from "@/lib/database.types";
-
-import { fetchGroups } from "./actions";
 
 interface MyGroupsProps {
   showGroupsLink?: boolean;
@@ -16,33 +13,15 @@ interface MyGroupsProps {
 
 export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
   const { currentFestival } = useFestival();
-  const [groups, setGroups] = useState<Tables<"groups">[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadGroups = async () => {
-      try {
-        setLoading(true);
-        const groupsData = await fetchGroups(currentFestival?.id);
-        setGroups(groupsData);
-      } catch (error) {
-        logger.error(
-          "Error fetching groups",
-          logger.clientComponent("MyGroups", {
-            festivalId: currentFestival?.id,
-          }),
-          error as Error,
-        );
-        setGroups([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (currentFestival) {
-      loadGroups();
-    }
-  }, [currentFestival]);
+  const {
+    data: groups = [],
+    loading,
+    error,
+  } = useUserGroups(currentFestival?.id) as {
+    data: Tables<"groups">[];
+    loading: boolean;
+    error: Error | null;
+  };
 
   if (loading) {
     return (
@@ -57,7 +36,7 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
     <div>
       <h2 className="text-xl font-bold mb-2">Your Groups:</h2>
       <div className="flex flex-wrap gap-2 justify-center">
-        {groups.length === 0 && (
+        {(error || !groups || groups.length === 0) && (
           <div className="px-2 text-center">
             <p className="text-sm text-gray-500 mb-2">
               You are not a member of any group yet for this festival.
@@ -70,7 +49,7 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
           </div>
         )}
         {groups
-          .filter((group) => group && group.id)
+          ?.filter((group) => group && group.id)
           .map((group) => (
             <Button key={group.id} asChild variant="outline">
               <Link
