@@ -132,6 +132,13 @@ export async function getPersonalCalendarEvents(festivalId: string) {
         }),
       );
 
+      console.log("getPersonalCalendarEvents", {
+        beerSummaryEvents,
+        tentVisitEvents,
+        attendanceEvents,
+        reservationEvents,
+      });
+
       return [
         ...beerSummaryEvents,
         ...tentVisitEvents,
@@ -151,6 +158,7 @@ export async function getPersonalCalendarEvents(festivalId: string) {
     },
   );
 
+  console.log("getPersonalCalendarEvents", { userId: user.id, festivalId });
   return getCached(user.id, festivalId);
 }
 
