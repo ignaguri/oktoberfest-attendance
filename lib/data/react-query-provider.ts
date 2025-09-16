@@ -84,8 +84,8 @@ function useMutation<TData, TVariables>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options?: DataMutationOptions<TData, TVariables>,
 ): DataMutationResult<TData, TVariables> {
-  const mutation = useReactMutation({
-    mutationFn: mutationFn as any,
+  const mutation = useReactMutation<TData, Error, TVariables>({
+    mutationFn,
     ...mapMutationOptions<TData, TVariables>(options),
   });
 
@@ -165,17 +165,13 @@ export { useMutation, useQuery };
  * Utility hook to invalidate queries
  */
 export function useInvalidateQueries() {
-  const queryClient = useQueryClient();
+  const { invalidateQueries } = useDataProvider();
 
   return useCallback(
     (queryKey?: readonly unknown[]) => {
-      if (queryKey) {
-        queryClient.invalidateQueries({ queryKey });
-      } else {
-        queryClient.invalidateQueries();
-      }
+      invalidateQueries(queryKey);
     },
-    [queryClient],
+    [invalidateQueries],
   );
 }
 
@@ -183,13 +179,13 @@ export function useInvalidateQueries() {
  * Utility hook to set query data optimistically
  */
 export function useSetQueryData() {
-  const queryClient = useQueryClient();
+  const { setQueryData } = useDataProvider();
 
   return useCallback(
     <T>(queryKey: readonly unknown[], data: T) => {
-      queryClient.setQueryData(queryKey, data);
+      setQueryData(queryKey, data);
     },
-    [queryClient],
+    [setQueryData],
   );
 }
 
@@ -197,12 +193,12 @@ export function useSetQueryData() {
  * Utility hook to get cached query data
  */
 export function useGetQueryData() {
-  const queryClient = useQueryClient();
+  const { getQueryData } = useDataProvider();
 
   return useCallback(
     <T>(queryKey: readonly unknown[]) => {
-      return queryClient.getQueryData<T>(queryKey);
+      return getQueryData<T>(queryKey);
     },
-    [queryClient],
+    [getQueryData],
   );
 }

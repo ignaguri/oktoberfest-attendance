@@ -11,8 +11,6 @@ export default async function PersonalCalendarPage() {
 
   const events = festivalId ? await getPersonalCalendarEvents(festivalId) : [];
 
-  console.log("PersonalCalendarPage", events);
-
   const initialMonth = currentFestival
     ? new Date(currentFestival.start_date)
     : new Date();
