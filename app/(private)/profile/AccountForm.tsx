@@ -7,58 +7,78 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import { useToast } from "@/hooks/use-toast";
+import {
+  useCurrentProfile,
+  useCurrentUser,
+  useUpdateProfile,
+} from "@/lib/data";
 import { profileSchema } from "@/lib/schemas/profile";
-import { getProfileShort, resetTutorial } from "@/lib/sharedActions";
+import { resetTutorial } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import type { ProfileFormData } from "@/lib/schemas/profile";
-import type { User } from "@supabase/supabase-js";
 
-import { updateProfile, deleteAccount } from "./actions";
+import { deleteAccount } from "./actions";
 
-interface ProfileShort {
-  full_name: string | null;
-  username: string | null;
-  avatar_url: string | null;
-  custom_beer_cost: number | null;
-}
-
-interface AccountFormProps {
-  user: User;
-  profile: ProfileShort;
-}
-
-export default function AccountForm({ user, profile }: AccountFormProps) {
+export default function AccountForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isResettingTutorial, setIsResettingTutorial] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState<string | null>(
-    profile.avatar_url || null,
-  );
-  const [profileData, setProfileData] = useState<ProfileShort>(profile);
   const { toast } = useToast();
+
+  // Use React Query hooks
+  const { data: user, loading: userLoading } = useCurrentUser();
+  const { data: profile, loading: profileLoading } = useCurrentProfile();
+  const { mutate: updateProfileMutation, loading: isUpdating } =
+    useUpdateProfile();
+
+  const [avatar_url, setAvatarUrl] = useState<string | null>(
+    profile?.avatar_url || null,
+  );
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
+    formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullname: profileData.full_name || "",
-      username: profileData.username || "",
-      custom_beer_cost: profileData.custom_beer_cost || 16.2,
+      fullname: profile?.full_name || "",
+      username: profile?.username || "",
+      custom_beer_cost: profile?.custom_beer_cost || 16.2,
     },
   });
 
+  // Show loading state
+  if (userLoading || profileLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="card">
+          <p className="text-center text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="card">
+          <p className="text-center text-red-600">
+            Failed to load profile data.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const onSubmit = async (data: ProfileFormData) => {
     try {
-      await updateProfile({
+      await updateProfileMutation({
         id: user.id,
         ...(data.username && { username: data.username }),
         ...(data.fullname && { fullname: data.fullname }),
@@ -71,14 +91,8 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
         title: "Success",
         description: "Profile updated successfully!",
       });
-      const updatedProfile = await getProfileShort();
-      setProfileData(updatedProfile);
-      reset({
-        fullname: updatedProfile.full_name || "",
-        username: updatedProfile.username || "",
-        custom_beer_cost: updatedProfile.custom_beer_cost || 16.2,
-      });
       setIsEditing(false);
+      // Form will be automatically reset when profile data updates via React Query
     } catch (error) {
       toast({
         variant: "destructive",
@@ -145,8 +159,8 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
             setIsEditing(false);
           }}
           fallback={{
-            username: profileData.username,
-            full_name: profileData.full_name,
+            username: profile.username,
+            full_name: profile.full_name,
             email: user.email!,
           }}
         />
@@ -172,14 +186,14 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 className="input"
                 id="fullname"
                 type="text"
-                disabled={isSubmitting}
+                disabled={isUpdating}
                 autoComplete="off"
                 errorMsg={errors.fullname?.message}
                 {...register("fullname")}
               />
             ) : (
               <div className="p-2">
-                {profileData.full_name || (
+                {profile.full_name || (
                   <span className="text-gray-500">n/a</span>
                 )}
               </div>
@@ -194,16 +208,14 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 className="input"
                 id="username"
                 type="text"
-                disabled={isSubmitting}
+                disabled={isUpdating}
                 autoComplete="off"
                 errorMsg={errors.username?.message}
                 {...register("username")}
               />
             ) : (
               <div className="p-2">
-                {profileData.username || (
-                  <span className="text-gray-500">n/a</span>
-                )}
+                {profile.username || <span className="text-gray-500">n/a</span>}
               </div>
             )}
           </div>
@@ -217,26 +229,26 @@ export default function AccountForm({ user, profile }: AccountFormProps) {
                 id="custom_beer_cost"
                 type="number"
                 step="0.1"
-                disabled={isSubmitting}
+                disabled={isUpdating}
                 errorMsg={errors.custom_beer_cost?.message}
                 {...register("custom_beer_cost", { valueAsNumber: true })}
               />
             ) : (
               <div className="p-2">
-                {profileData.custom_beer_cost?.toFixed(2) || "16.20"}
+                {profile.custom_beer_cost?.toFixed(2) || "16.20"}
               </div>
             )}
           </div>
           {isEditing && (
             <div className="flex flex-col gap-2 mt-4 items-center">
-              <Button variant="yellow" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Loading..." : "Update"}
+              <Button variant="yellow" type="submit" disabled={isUpdating}>
+                {isUpdating ? "Updating..." : "Update"}
               </Button>
               <Button
                 variant="yellowOutline"
                 type="button"
                 onClick={() => setIsEditing(false)}
-                disabled={isSubmitting}
+                disabled={isUpdating}
               >
                 Cancel
               </Button>
