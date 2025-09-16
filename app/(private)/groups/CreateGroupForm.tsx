@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateGroup } from "@/lib/data";
 import { createGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
@@ -13,18 +14,17 @@ import { useForm } from "react-hook-form";
 
 import type { CreateGroupFormData } from "@/lib/schemas/groups";
 
-import { createGroup } from "./actions";
-
 export const CreateGroupForm = () => {
   const { currentFestival } = useFestival();
   const router = useTransitionRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const { mutate: createGroupMutation, loading: isCreating } = useCreateGroup();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<CreateGroupFormData>({
     resolver: zodResolver(createGroupSchema),
   });
@@ -40,7 +40,7 @@ export const CreateGroupForm = () => {
     }
 
     try {
-      const groupId = await createGroup({
+      const groupId = await createGroupMutation({
         ...data,
         festivalId: currentFestival.id,
       });
@@ -98,9 +98,9 @@ export const CreateGroupForm = () => {
         type="submit"
         variant="yellow"
         className="w-fit self-center"
-        disabled={isSubmitting}
+        disabled={isCreating}
       >
-        {isSubmitting ? "Creating..." : "Create Group"}
+        {isCreating ? "Creating..." : "Create Group"}
       </Button>
     </form>
   );

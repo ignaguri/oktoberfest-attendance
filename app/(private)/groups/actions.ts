@@ -271,3 +271,45 @@ export async function fetchGroupGallery(groupId: string) {
 
   return galleryData;
 }
+
+/**
+ * Fetch user's groups for a specific festival
+ */
+export async function fetchUserGroups(festivalId: string) {
+  const user = await getUser();
+  const supabase = createClient();
+
+  const { data: groupMemberships, error } = await supabase
+    .from("group_members")
+    .select(
+      `
+      groups (
+        id,
+        name,
+        description,
+        created_by,
+        festival_id,
+        winning_criteria_id,
+        created_at
+      )
+    `,
+    )
+    .eq("user_id", user.id)
+    .eq("groups.festival_id", festivalId);
+
+  if (error) {
+    reportSupabaseException("fetchUserGroups", error, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error(`Error fetching user groups: ${error.message}`);
+  }
+
+  // Extract the groups from the memberships
+  const groups =
+    groupMemberships
+      ?.map((membership: any) => membership.groups)
+      .filter((group: any) => group !== null) || [];
+
+  return groups;
+}
