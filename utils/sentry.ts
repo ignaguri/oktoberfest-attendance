@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 import type { SeverityLevel } from "@sentry/nextjs";
-import type { PostgrestError } from "@supabase/supabase-js";
+import type { AuthError, PostgrestError } from "@supabase/supabase-js";
 
 export const reportSupabaseException = (
   fnName: string,
@@ -21,6 +21,28 @@ export const reportSupabaseException = (
 
   Sentry.captureException(
     new Error(`Supabase Error in action "${fnName}": ${errorDetails}`),
+  );
+};
+
+export const reportSupabaseAuthException = (
+  fnName: string,
+  error: AuthError,
+  userData?: { email?: string; id?: string; provider?: string },
+) => {
+  const errorDetails = JSON.stringify({
+    code: error.code,
+    status: error.status,
+    name: error.name,
+    message: error.message,
+    userData,
+  });
+
+  if (userData) {
+    Sentry.setUser(userData);
+  }
+
+  Sentry.captureException(
+    new Error(`Supabase Auth Error in action "${fnName}": ${errorDetails}`),
   );
 };
 
