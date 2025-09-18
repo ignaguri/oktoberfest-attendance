@@ -9,11 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCallback } from "react";
+import { toast } from "sonner";
 
 import { listNonWebPImages, convertAndUpdateImage } from "../actions";
 
@@ -25,20 +25,15 @@ interface ImageInfo {
 export function ImageConversion() {
   const [images, setImages] = useState<ImageInfo[]>([]);
   const [converting, setConverting] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const fetchImages = useCallback(async () => {
     try {
       const imageList = await listNonWebPImages();
       setImages(imageList);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch images. Please try again.",
-        variant: "destructive",
-      });
+    } catch {
+      toast.error("Failed to fetch images. Please try again.");
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     fetchImages();
@@ -49,22 +44,14 @@ export function ImageConversion() {
     try {
       await convertAndUpdateImage(path);
       await fetchImages(); // Refresh the list
-      toast({
-        title: "Success",
-        description: "Image converted successfully.",
-        variant: "default",
-      });
+      toast.success("Image converted successfully.");
     } catch (error) {
       logger.error(
         "Error converting image",
         logger.clientComponent("ImageConversion", { path }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to convert image. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to convert image. Please try again.");
     } finally {
       setConverting(null);
     }

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useToast } from "@/hooks/use-toast";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
@@ -14,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
@@ -62,7 +62,6 @@ export default function DetailedAttendanceForm({
   }, [currentFestival]);
 
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
-  const { toast } = useToast();
 
   const fetchAttendanceForDate = useCallback(
     async (date: Date) => {
@@ -74,15 +73,11 @@ export default function DetailedAttendanceForm({
           currentFestival.id,
         );
         setExistingAttendance(attendanceData as AttendanceByDate);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch attendance data. Please try again.",
-        });
+      } catch {
+        toast.error("Failed to fetch attendance data. Please try again.");
       }
     },
-    [toast, currentFestival],
+    [currentFestival],
   );
 
   useEffect(() => {
@@ -124,19 +119,11 @@ export default function DetailedAttendanceForm({
   const onSubmit = async (data: DetailedAttendanceFormData) => {
     try {
       await addAttendance({ ...data, festivalId: currentFestival!.id });
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Attendance updated successfully.",
-      });
+      toast.success("Attendance updated successfully.");
       await fetchAttendanceForDate(data.date);
       onAttendanceUpdate();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update attendance. Please try again.",
-      });
+    } catch {
+      toast.error("Failed to update attendance. Please try again.");
     }
   };
 

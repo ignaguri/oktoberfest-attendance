@@ -1,11 +1,11 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import { toast } from "@/hooks/use-toast";
 import { updatePhotoVisibility } from "@/lib/actions/photo-visibility";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import type { Database } from "@/lib/database.types";
 
@@ -40,15 +40,11 @@ export function PhotoVisibilityToggle({
       await updatePhotoVisibility(photoId, newVisibility);
       setVisibility(newVisibility);
 
-      toast({
-        variant: "success",
-        title: "Photo visibility updated",
+      toast.success("Photo visibility updated", {
         description: `Photo is now ${newVisibility}`,
       });
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update photo visibility",
       });
     } finally {

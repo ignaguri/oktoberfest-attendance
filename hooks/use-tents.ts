@@ -1,6 +1,6 @@
-import { useToast } from "@/hooks/use-toast";
 import { fetchTents } from "@/lib/sharedActions";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export interface TentOption {
   value: string;
@@ -16,7 +16,6 @@ export function useTents() {
   const [tents, setTents] = useState<TentGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     const loadTents = async () => {
@@ -48,12 +47,10 @@ export function useTents() {
         );
         setTents(groupedTents);
         setError(null);
-      } catch (err) {
+      } catch {
         setError("Failed to load tents. Please try again later.");
-        toast({
-          title: "Error loading tents",
+        toast.error("Error loading tents", {
           description: "Please try again later",
-          variant: "destructive",
         });
       } finally {
         setIsLoading(false);
@@ -61,7 +58,7 @@ export function useTents() {
     };
 
     loadTents();
-  }, [toast]);
+  }, []);
 
   return { tents, isLoading, error };
 }

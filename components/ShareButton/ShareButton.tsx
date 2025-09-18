@@ -4,9 +4,9 @@ import QRCode from "@/components/QR/QRCode";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
-import { useToast } from "@/hooks/use-toast";
 import { Share2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 
 import { renewGroupToken } from "./actions";
 
@@ -26,7 +26,6 @@ export default function ShareButton({
   const [open, setOpen] = useState(false);
   const [groupLink, setGroupLink] = useState("");
   const [tokenGenerated, setTokenGenerated] = useState(false);
-  const { toast } = useToast();
 
   const { shareViaNative, isWebShareSupported, shareViaWhatsApp } = useShare({
     title: `Join ${groupName} on ProstCounter`,
@@ -42,13 +41,11 @@ export default function ShareButton({
       const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
       setGroupLink(newGroupLink);
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to generate share link. Please try again.",
       });
     }
-  }, [groupId, APP_URL, toast]);
+  }, [groupId, APP_URL]);
 
   const handleShareClick = async () => {
     if (!tokenGenerated) {

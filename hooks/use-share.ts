@@ -1,5 +1,5 @@
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export interface UseShareOptions {
   title?: string;
@@ -10,7 +10,6 @@ export interface UseShareOptions {
 export function useShare(options: UseShareOptions = {}) {
   const [copyButtonText, setCopyButtonText] = useState("Copy share text");
   const [showQRCode, setShowQRCode] = useState(false);
-  const { toast } = useToast();
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -38,9 +37,7 @@ export function useShare(options: UseShareOptions = {}) {
     } catch (error) {
       // User cancelled or error occurred, fallback to clipboard
       if ((error as Error).name !== "AbortError") {
-        toast({
-          variant: "destructive",
-          title: "Share failed",
+        toast.error("Share failed", {
           description: "Native sharing failed. Copied to clipboard instead.",
         });
       }
@@ -55,10 +52,8 @@ export function useShare(options: UseShareOptions = {}) {
       setTimeout(() => {
         setCopyButtonText("Copy share text");
       }, 3000);
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+    } catch {
+      toast.error("Error", {
         description: "Failed to copy text to clipboard.",
       });
     }

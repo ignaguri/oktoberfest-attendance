@@ -12,7 +12,6 @@ import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Label } from "@/components/ui/label";
 import { ReminderSelect } from "@/components/ui/reminder-select";
 import { useTents } from "@/hooks/use-tents";
-import { useToast } from "@/hooks/use-toast";
 import {
   reservationSchema,
   type ReservationFormData,
@@ -22,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Checkbox } from "../ui/checkbox";
 
@@ -33,7 +33,6 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   const { tents, isLoading: tentsLoading } = useTents();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { toast } = useToast();
   const open =
     searchParams.get("newReservation") === "1" ||
     !!searchParams.get("reservationId");
@@ -84,9 +83,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
           });
           return;
         } catch {
-          toast({
-            variant: "destructive",
-            title: "Error",
+          toast.error("Error", {
             description: "Failed to load reservation data",
           });
         }
@@ -104,7 +101,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
       });
     };
     init();
-  }, [open, initialDate, reservationId, reset, toast, tents]);
+  }, [open, initialDate, reservationId, reset, tents]);
 
   const onClose = useCallback(() => {
     const url = createUrlWithParams("/calendar", searchParams, [
@@ -124,7 +121,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             visibleToGroups: data.visibleToGroups,
             tentId: data.tentId,
           });
-          toast({ title: "Reservation updated", variant: "success" });
+          toast.success("Reservation updated");
         } else {
           await createReservation({
             festivalId,
@@ -133,14 +130,14 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             reminderOffsetMinutes: data.reminderOffsetMinutes,
             visibleToGroups: data.visibleToGroups,
           });
-          toast({ title: "Reservation created", variant: "success" });
+          toast.success("Reservation created");
         }
         onClose();
       } catch {
-        toast({ title: "Failed to save reservation", variant: "destructive" });
+        toast.error("Failed to save reservation");
       }
     },
-    [festivalId, onClose, toast, reservationId],
+    [festivalId, onClose, reservationId],
   );
 
   return (

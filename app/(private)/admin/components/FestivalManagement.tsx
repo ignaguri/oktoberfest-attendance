@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
 import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 import type { Festival, FestivalType, FestivalStatus } from "@/lib/types";
 
@@ -62,7 +62,6 @@ export default function FestivalManagement() {
   const [editingFestival, setEditingFestival] = useState<Festival | null>(null);
   const [formData, setFormData] = useState<FestivalFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     loadFestivals();
@@ -73,12 +72,8 @@ export default function FestivalManagement() {
       setIsLoading(true);
       const data = await fetchAllFestivals();
       setFestivals(data);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load festivals",
-      });
+    } catch {
+      toast.error("Failed to load festivals");
     } finally {
       setIsLoading(false);
     }
@@ -92,30 +87,20 @@ export default function FestivalManagement() {
     try {
       if (editingFestival) {
         await updateFestival(editingFestival.id, formData);
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Festival updated successfully",
-        });
+        toast.success("Festival updated successfully");
       } else {
         await createFestival(formData);
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Festival created successfully",
-        });
+        toast.success("Festival created successfully");
       }
 
       setIsFormOpen(false);
       setEditingFestival(null);
       setFormData(initialFormData);
       loadFestivals();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${editingFestival ? "update" : "create"} festival`,
-      });
+    } catch {
+      toast.error(
+        `Failed to ${editingFestival ? "update" : "create"} festival`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -150,18 +135,10 @@ export default function FestivalManagement() {
 
     try {
       await deleteFestival(festivalId);
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Festival deleted successfully",
-      });
+      toast.success("Festival deleted successfully");
       loadFestivals();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete festival",
-      });
+    } catch {
+      toast.error("Failed to delete festival");
     }
   };
 

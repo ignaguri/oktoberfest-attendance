@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
-import { useToast } from "@/hooks/use-toast";
 import {
   useCurrentProfile,
   useCurrentUser,
@@ -18,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { ProfileFormData } from "@/lib/schemas/profile";
 
@@ -28,7 +28,6 @@ export default function AccountForm() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isResettingTutorial, setIsResettingTutorial] = useState(false);
-  const { toast } = useToast();
 
   // Use React Query hooks
   const { data: user, loading: userLoading } = useCurrentUser();
@@ -86,19 +85,11 @@ export default function AccountForm() {
           custom_beer_cost: data.custom_beer_cost,
         }),
       });
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Profile updated successfully!",
-      });
+      toast.success("Profile updated successfully!");
       setIsEditing(false);
       // Form will be automatically reset when profile data updates via React Query
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-      });
+    } catch {
+      toast.error("Failed to update profile. Please try again.");
     }
   };
 
@@ -111,15 +102,12 @@ export default function AccountForm() {
     try {
       setIsDeleting(true);
       await deleteAccount();
-    } catch (error) {
+    } catch {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description:
-          "Failed to delete account. Please try again or contact support.",
-      });
+      toast.error(
+        "Failed to delete account. Please try again or contact support.",
+      );
     }
   };
 
@@ -127,18 +115,11 @@ export default function AccountForm() {
     try {
       setIsResettingTutorial(true);
       await resetTutorial();
-      toast({
-        variant: "success",
-        title: "Tutorial Reset",
-        description:
-          "The tutorial has been reset. You'll see it again when you visit the home page.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to reset tutorial. Please try again.",
-      });
+      toast.success(
+        "The tutorial has been reset. You'll see it again when you visit the home page.",
+      );
+    } catch {
+      toast.error("Failed to reset tutorial. Please try again.");
     } finally {
       setIsResettingTutorial(false);
     }

@@ -2,9 +2,9 @@
 
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { QrCode } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 
 import QRCode from "./QRCode";
 import { renewGroupToken } from "../ShareButton/actions";
@@ -25,7 +25,6 @@ export default function QRButton({
   const [open, setOpen] = useState(false);
   const [groupLink, setGroupLink] = useState("");
   const [tokenGenerated, setTokenGenerated] = useState(false);
-  const { toast } = useToast();
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -34,14 +33,12 @@ export default function QRButton({
       const token = await renewGroupToken(groupId);
       const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
       setGroupLink(newGroupLink);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+    } catch {
+      toast.error("Error", {
         description: "Failed to generate QR code. Please try again.",
       });
     }
-  }, [groupId, APP_URL, toast]);
+  }, [groupId, APP_URL]);
 
   const handleQRClick = async () => {
     if (!tokenGenerated) {

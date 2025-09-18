@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhotoPreview } from "@/components/ui/photo-preview";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
 import {
   beerPicturesSchema,
   MAX_FILE_SIZE,
@@ -17,6 +16,7 @@ import { Camera, Eye, EyeOff, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { BeerPicturesFormData } from "@/lib/schemas/uploads";
 
@@ -62,7 +62,6 @@ export function BeerPicturesUpload({
   existingPictureUrls,
   onPicturesUpdate,
 }: BeerPicturesUploadProps) {
-  const { toast } = useToast();
   const [allPictureUrls, setAllPictureUrls] =
     useState<string[]>(existingPictureUrls);
 
@@ -101,22 +100,16 @@ export function BeerPicturesUpload({
       const updatedUrls = [...allPictureUrls, ...newUrls];
       setAllPictureUrls(updatedUrls);
       onPicturesUpdate(updatedUrls);
-      toast({
-        variant: "success",
-        title: "Success",
-        description: `${newUrls.length} beer picture(s) uploaded successfully!`,
-      });
+      toast.success(`${newUrls.length} beer picture(s) uploaded successfully!`);
       reset();
     } catch (error) {
       const fileSizeError =
         error instanceof Error && error.message.includes("exceeded")
           ? `File size exceeded (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`
           : "";
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to upload beer pictures${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
-      });
+      toast.error(
+        `Failed to upload beer pictures${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
+      );
     }
   };
 

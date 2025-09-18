@@ -8,11 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { createUrlWithParams } from "@/lib/url-utils";
 import { MapPin, Clock, Users } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 interface Reservation {
   id: string;
@@ -35,7 +35,6 @@ export function CheckInPromptDialog({
 }: CheckInPromptDialogProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { toast } = useToast();
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
   const open = searchParams.get("prompt") === "checkin" && !!reservation;
@@ -54,22 +53,18 @@ export function CheckInPromptDialog({
     setIsCheckingIn(true);
     try {
       await onCheckIn(reservation.id);
-      toast({
-        variant: "success",
-        title: "Checked in!",
+      toast.success("Checked in!", {
         description: "Your attendance has been logged successfully.",
       });
       handleClose();
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Check-in failed",
+      toast.error("Check-in failed", {
         description: "Failed to check in. Please try again.",
       });
     } finally {
       setIsCheckingIn(false);
     }
-  }, [reservation, onCheckIn, toast, handleClose]);
+  }, [reservation, onCheckIn, handleClose]);
 
   const formatTime = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], {

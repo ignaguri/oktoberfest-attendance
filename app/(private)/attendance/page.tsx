@@ -2,11 +2,11 @@
 
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useToast } from "@/hooks/use-toast";
 import { useAttendances } from "@/lib/data";
 import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 
 import type { Tables } from "@/lib/database.types";
 
@@ -34,19 +34,14 @@ export default function AttendancePage() {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [reservation, setReservation] = useState<any>(null);
-  const { toast } = useToast();
   const searchParams = useSearchParams();
 
   // Handle attendance errors
   useEffect(() => {
     if (attendancesError) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch attendance data. Please try again.",
-      });
+      toast.error("Failed to fetch attendance data. Please try again.");
     }
-  }, [attendancesError, toast]);
+  }, [attendancesError]);
 
   // Handle date parameter from URL
   useEffect(() => {
@@ -75,11 +70,7 @@ export default function AttendancePage() {
             logger.clientComponent("AttendancePage", { reservationId }),
             error as Error,
           );
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Reservation not found or already processed.",
-          });
+          toast.error("Reservation not found or already processed.");
         }
       };
 
@@ -87,7 +78,7 @@ export default function AttendancePage() {
     } else {
       setReservation(null);
     }
-  }, [searchParams, toast]);
+  }, [searchParams]);
 
   const handleAttendanceUpdate = useCallback(() => {
     refetchAttendances();

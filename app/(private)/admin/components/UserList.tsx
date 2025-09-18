@@ -6,12 +6,12 @@ import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { Tables } from "@/lib/database.types";
 import type { UserFormData, AttendanceFormData } from "@/lib/schemas/admin";
@@ -219,7 +219,6 @@ const UserList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   async function fetchUsers() {
     try {
@@ -283,11 +282,7 @@ const UserList = () => {
       }
       fetchUsers();
       setSelectedUser(null);
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "User updated successfully",
-      });
+      toast.success("User updated successfully");
       setIsUserDialogOpen(false);
     } catch (error) {
       logger.error(
@@ -298,11 +293,7 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to update user",
-        variant: "destructive",
-      });
+      toast.error("Failed to update user");
     }
   }
 
@@ -310,22 +301,14 @@ const UserList = () => {
     try {
       await deleteUser(userId);
       fetchUsers();
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "User deleted successfully",
-      });
+      toast.success("User deleted successfully");
     } catch (error) {
       logger.error(
         "Error deleting user",
         logger.clientComponent("UserList", { action: "deleteUser", userId }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to delete user",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete user");
     }
   }
 
@@ -340,11 +323,7 @@ const UserList = () => {
       });
       fetchAttendances(selectedUser.id);
       setSelectedAttendance(null);
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "Attendance updated successfully",
-      });
+      toast.success("Attendance updated successfully");
       setIsAttendanceDialogOpen(false);
     } catch (error) {
       logger.error(
@@ -355,11 +334,7 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to update attendance",
-        variant: "destructive",
-      });
+      toast.error("Failed to update attendance");
     }
   }
 
@@ -367,11 +342,7 @@ const UserList = () => {
     try {
       await deleteAttendance(attendanceId);
       fetchAttendances(selectedUser!.id); // Refresh attendances
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "Attendance deleted successfully",
-      });
+      toast.success("Attendance deleted successfully");
     } catch (error) {
       logger.error(
         "Error deleting attendance",
@@ -381,11 +352,7 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to delete attendance",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete attendance");
     }
   }
 

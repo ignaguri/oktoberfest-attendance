@@ -1,12 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import { toast } from "sonner";
 
 const CacheManagement = () => {
-  const { toast } = useToast();
-
   const handleClearServiceWorkerCache = async () => {
     try {
       if ("serviceWorker" in navigator && "caches" in window) {
@@ -21,17 +19,9 @@ const CacheManagement = () => {
           registrations.map((registration) => registration.update()),
         );
 
-        toast({
-          title: "Success",
-          variant: "success",
-          description: "Service worker caches cleared successfully",
-        });
+        toast.success("Service worker caches cleared successfully");
       } else {
-        toast({
-          title: "Warning",
-          variant: "destructive",
-          description: "Service worker or caches not supported",
-        });
+        toast.error("Service worker or caches not supported");
       }
     } catch (error) {
       logger.error(
@@ -39,11 +29,7 @@ const CacheManagement = () => {
         logger.clientComponent("CacheManagement"),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to clear service worker caches",
-        variant: "destructive",
-      });
+      toast.error("Failed to clear service worker caches");
     }
   };
 
