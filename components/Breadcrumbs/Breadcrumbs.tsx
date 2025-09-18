@@ -8,12 +8,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { logger } from "@/lib/logger";
+import { useGroupName } from "@/hooks/useGroups";
 import { usePathname } from "next/navigation";
 import { Link } from "next-view-transitions";
-import { useEffect, useState } from "react";
-
-import { getGroupName } from "./actions";
+import React, { useMemo } from "react";
 
 function isUUID(str: string) {
   const uuidRegex =
@@ -32,79 +30,52 @@ interface BreadcrumbSegment {
   href: string;
   title: string;
   isLast: boolean;
-  isLoading: boolean;
+  isUUID: boolean;
+  groupId?: string;
 }
 
 export default function Breadcrumbs() {
   const pathname = usePathname();
-  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbSegment[]>([]);
 
-  useEffect(() => {
-    async function fetchGroupNames() {
-      const segments = pathname.split("/").filter((segment) => segment !== "");
-      const newBreadcrumbs: BreadcrumbSegment[] = [];
+  const breadcrumbs = useMemo(() => {
+    const segments = pathname.split("/").filter((segment) => segment !== "");
+    const newBreadcrumbs: BreadcrumbSegment[] = [];
 
-      for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i];
-        const href = `/${segments.slice(0, i + 1).join("/")}`;
-        let title = formatSegmentName(segment);
-        const isLast = i === segments.length - 1;
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const href = `/${segments.slice(0, i + 1).join("/")}`;
+      const title = formatSegmentName(segment);
+      const isLast = i === segments.length - 1;
+      const isUUIDSegment = isUUID(segment);
 
-        if (isUUID(segment)) {
-          newBreadcrumbs.push({
-            href,
-            title: "Loading...",
-            isLast,
-            isLoading: true,
-          });
-          try {
-            const name = await getGroupName(segment);
-            newBreadcrumbs[newBreadcrumbs.length - 1] = {
-              href,
-              title: name ?? "Unknown Group",
-              isLast,
-              isLoading: false,
-            };
-          } catch (error) {
-            logger.error(
-              "Failed to fetch group name",
-              logger.clientComponent("Breadcrumbs", { segment }),
-              error as Error,
-            );
-            newBreadcrumbs[newBreadcrumbs.length - 1] = {
-              href,
-              title: "Unknown Group",
-              isLast,
-              isLoading: false,
-            };
-          }
-        } else {
-          newBreadcrumbs.push({ href, title, isLast, isLoading: false });
-        }
-      }
-
-      // Apply the existing filtering logic
-      if (newBreadcrumbs.length > 0) {
-        if (newBreadcrumbs[0].title.toLowerCase() === "home") {
-          newBreadcrumbs.shift();
-        } else if (newBreadcrumbs[0].title.toLowerCase() === "group settings") {
-          const last = newBreadcrumbs.pop();
-          const secondLast = newBreadcrumbs.pop();
-          if (last && secondLast) {
-            last.isLast = false;
-            last.href = last.href.replace("group-settings", "groups");
-            newBreadcrumbs.push(last);
-            secondLast.isLast = true;
-            secondLast.title = "Settings";
-            newBreadcrumbs.push(secondLast);
-          }
-        }
-      }
-
-      setBreadcrumbs(newBreadcrumbs);
+      newBreadcrumbs.push({
+        href,
+        title,
+        isLast,
+        isUUID: isUUIDSegment,
+        groupId: isUUIDSegment ? segment : undefined,
+      });
     }
 
-    fetchGroupNames();
+    // Apply the existing filtering logic
+    if (newBreadcrumbs.length > 0) {
+      if (newBreadcrumbs[0].title.toLowerCase() === "home") {
+        newBreadcrumbs.shift();
+      } else if (newBreadcrumbs[0].title.toLowerCase() === "group settings") {
+        const last = newBreadcrumbs.pop();
+        const secondLast = newBreadcrumbs.pop();
+        if (last && secondLast) {
+          last.isLast = false;
+          last.href = last.href.replace("group-settings", "groups");
+          newBreadcrumbs.push(last);
+          secondLast.isLast = true;
+          secondLast.title = "Settings";
+          newBreadcrumbs.push(secondLast);
+        }
+      }
+    }
+
+    return newBreadcrumbs;
   }, [pathname]);
 
   if (breadcrumbs.length === 0) return null;
@@ -118,23 +89,52 @@ export default function Breadcrumbs() {
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
-        {breadcrumbs.map(({ href, title, isLast, isLoading }, index) => (
-          <BreadcrumbItem key={href}>
-            {isLast ? (
-              <BreadcrumbPage>
-                {isLoading ? "Loading..." : title}
-              </BreadcrumbPage>
-            ) : (
-              <>
-                <BreadcrumbLink asChild>
-                  <Link href={href}>{isLoading ? "Loading..." : title}</Link>
-                </BreadcrumbLink>
-                {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-              </>
-            )}
-          </BreadcrumbItem>
+        {breadcrumbs.map(({ href, title, isLast, isUUID, groupId }, index) => (
+          <BreadcrumbSegment
+            key={href}
+            href={href}
+            title={title}
+            isLast={isLast}
+            isUUID={isUUID}
+            groupId={groupId}
+            showSeparator={index < breadcrumbs.length - 1}
+          />
         ))}
       </BreadcrumbList>
     </Breadcrumb>
+  );
+}
+
+function BreadcrumbSegment({
+  href,
+  title,
+  isLast,
+  isUUID,
+  groupId,
+  showSeparator,
+}: BreadcrumbSegment & { showSeparator: boolean }) {
+  const { data: groupName, loading, error } = useGroupName(groupId || "");
+
+  const displayTitle = isUUID
+    ? loading
+      ? "Loading..."
+      : error
+        ? "Unknown Group"
+        : groupName || "Unknown Group"
+    : title;
+
+  return (
+    <React.Fragment>
+      <BreadcrumbItem>
+        {isLast ? (
+          <BreadcrumbPage>{displayTitle}</BreadcrumbPage>
+        ) : (
+          <BreadcrumbLink asChild>
+            <Link href={href}>{displayTitle}</Link>
+          </BreadcrumbLink>
+        )}
+      </BreadcrumbItem>
+      {showSeparator && <BreadcrumbSeparator />}
+    </React.Fragment>
   );
 }

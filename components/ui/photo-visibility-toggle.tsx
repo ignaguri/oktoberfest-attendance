@@ -74,7 +74,6 @@ export function PhotoVisibilityToggle({
         checked={isPublic}
         onCheckedChange={handleToggle}
         disabled={isLoading}
-        size={size}
       />
 
       {showLabel && (

@@ -222,7 +222,6 @@ export function BeerPicturesUpload({
               onCheckedChange={(checked) =>
                 setValue("visibility", checked ? "public" : "private")
               }
-              size="sm"
             />
           </div>
         </div>

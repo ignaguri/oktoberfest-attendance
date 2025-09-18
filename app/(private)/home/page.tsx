@@ -80,13 +80,13 @@ export default async function Home() {
         <Separator className="my-4" decorative />
 
         <div className="mb-4">
-          <Accordion type="single" collapsible>
+          <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
-              <AccordionTrigger>
+              <AccordionTrigger className="px-2">
                 What can I do with Prost Counter?
               </AccordionTrigger>
-              <AccordionContent className="max-w-80 mx-auto">
-                <p className="text-center text-gray-600">
+              <AccordionContent className="max-w-80">
+                <p className="text-center text-balance text-gray-600">
                   Compete with friends in different groups to see who visits
                   beer festivals more often and drinks the most beers!
                   <br />

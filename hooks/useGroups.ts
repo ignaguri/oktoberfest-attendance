@@ -146,3 +146,22 @@ export function useLeaveGroup() {
     },
   );
 }
+
+/**
+ * Hook to fetch just the group name (lightweight version of useGroupSettings)
+ * Useful for breadcrumbs and other components that only need the group name
+ */
+export function useGroupName(groupId: string) {
+  return useQuery(
+    QueryKeys.group(groupId),
+    async () => {
+      const group = await fetchGroupDetails(groupId);
+      return group.name;
+    },
+    {
+      enabled: !!groupId,
+      staleTime: 10 * 60 * 1000, // 10 minutes (same as group settings)
+      cacheTime: 30 * 60 * 1000, // 30 minutes cache
+    },
+  );
+}
