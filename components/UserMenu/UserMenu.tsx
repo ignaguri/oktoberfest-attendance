@@ -35,8 +35,8 @@ import { ChevronDown, CalendarDays } from "lucide-react";
 import { Link } from "next-view-transitions";
 import { useState } from "react";
 
-import type { BadgeProps } from "@/components/ui/badge";
-import type { Festival as FestivalType } from "@/lib/types";
+import type { BadgeVariants } from "@/components/ui/badge";
+import type { FestivalStatus, Festival as FestivalType } from "@/lib/types";
 
 interface UserMenuProps {
   profileData: {
@@ -55,7 +55,9 @@ const getFestivalDisplayInfo = (festival: FestivalType) => {
   return { firstLetter, lastTwoDigits };
 };
 
-const getFestivalStatusBadgeProps = (festival: FestivalType) => {
+const getFestivalStatusBadgeProps = (
+  festival: FestivalType,
+): { status: FestivalStatus; variant: BadgeVariants } => {
   const status = getFestivalStatus(festival);
 
   if (status === "upcoming") {
@@ -170,7 +172,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
               </span>
               <div className="flex items-center gap-2">
                 <Badge
-                  variant={variant as BadgeProps["variant"]}
+                  variant={variant as BadgeVariants}
                   className="text-xs capitalize w-fit"
                 >
                   {status}
@@ -238,10 +240,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                     <div className="flex flex-col items-start text-left">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{festival.name}</span>
-                        <Badge
-                          className="capitalize"
-                          variant={variant as BadgeProps["variant"]}
-                        >
+                        <Badge className="capitalize" variant={variant}>
                           {status}
                         </Badge>
                       </div>

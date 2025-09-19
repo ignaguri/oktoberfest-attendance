@@ -3,19 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { resetPasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { ResetPasswordFormData } from "@/lib/schemas/auth";
 
 import { resetPassword } from "./actions";
 
 const ResetPassword = () => {
-  const { toast } = useToast();
-
   const {
     register,
     handleSubmit,
@@ -28,17 +26,11 @@ const ResetPassword = () => {
     const [_, errorMessage] = await resetPassword(data);
 
     if (errorMessage) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: errorMessage,
       });
     } else {
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Instructions sent. Check your email.",
-      });
+      toast.success("Instructions sent. Check your email.");
     }
   };
 

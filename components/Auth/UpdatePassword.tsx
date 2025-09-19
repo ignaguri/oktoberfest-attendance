@@ -3,19 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { updatePasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { UpdatePasswordFormData } from "@/lib/schemas/auth";
 
 import { updatePassword } from "./actions";
 
 export default function UpdatePassword() {
-  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -30,18 +29,11 @@ export default function UpdatePassword() {
   const onSubmit = async (data: UpdatePasswordFormData) => {
     try {
       await updatePassword({ password: data.password });
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Password updated successfully.",
-      });
+      toast.success("Password updated successfully.");
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description:
-          error.message || "An error occurred while updating the password.",
-      });
+      toast.error(
+        error.message || "An error occurred while updating the password.",
+      );
     }
   };
 

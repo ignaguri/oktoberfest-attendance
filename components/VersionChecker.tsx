@@ -2,18 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppUpdate } from "@/hooks/use-app-update";
-import { useToast } from "@/hooks/use-toast";
 import { RefreshCw, X } from "lucide-react";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export function VersionChecker() {
   const { hasUpdate, applyUpdate, skipUpdate } = useAppUpdate();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (hasUpdate) {
-      toast({
-        title: "New Version Available! 🚀",
+      toast.info("New Version Available! 🚀", {
         description: (
           <div className="space-y-2">
             <p className="text-sm">
@@ -37,11 +35,10 @@ export function VersionChecker() {
             </Button>
           </div>
         ),
-        variant: "default",
         duration: Infinity, // Persistent until user acts
       });
     }
-  }, [hasUpdate, toast, applyUpdate, skipUpdate]);
+  }, [hasUpdate, applyUpdate, skipUpdate]);
 
   return null;
 }

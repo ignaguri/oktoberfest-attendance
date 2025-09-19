@@ -3,13 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useToast } from "@/hooks/use-toast";
 import { joinGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { JoinGroupFormData } from "@/lib/schemas/groups";
 
@@ -24,7 +24,6 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
   const { currentFestival } = useFestival();
   const [showPassword, setShowPassword] = useState(false);
   const router = useTransitionRouter();
-  const { toast } = useToast();
 
   const {
     register,
@@ -40,11 +39,7 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
 
   const onSubmit = async (data: JoinGroupFormData) => {
     if (!currentFestival) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No festival selected. Please select a festival.",
-      });
+      toast.error("No festival selected. Please select a festival.");
       return;
     }
 
@@ -53,20 +48,13 @@ export const JoinGroupForm = ({ groupName }: JoinGroupFormProps) => {
         ...data,
         festivalId: currentFestival.id,
       });
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Successfully joined the group!",
-      });
+      toast.success("Successfully joined the group!");
       router.push(`/groups/${joinedGroupId}`);
       window.location.reload();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description:
-          "Incorrect password or unable to join group for this festival.",
-      });
+    } catch {
+      toast.error(
+        "Incorrect password or unable to join group for this festival.",
+      );
     }
   };
 

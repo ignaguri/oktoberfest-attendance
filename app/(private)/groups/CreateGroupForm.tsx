@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useToast } from "@/hooks/use-toast";
 import { useCreateGroup } from "@/lib/data";
 import { createGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +10,7 @@ import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { CreateGroupFormData } from "@/lib/schemas/groups";
 
@@ -18,7 +18,6 @@ export const CreateGroupForm = () => {
   const { currentFestival } = useFestival();
   const router = useTransitionRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
   const { mutate: createGroupMutation, loading: isCreating } = useCreateGroup();
 
   const {
@@ -31,11 +30,7 @@ export const CreateGroupForm = () => {
 
   const onSubmit = async (data: CreateGroupFormData) => {
     if (!currentFestival) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No festival selected. Please select a festival.",
-      });
+      toast.error("No festival selected. Please select a festival.");
       return;
     }
 
@@ -46,19 +41,12 @@ export const CreateGroupForm = () => {
       });
       if (groupId) {
         router.push(`/group-settings/${groupId}`);
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Group created successfully!",
-        });
+        toast.success("Group created successfully!");
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description:
-          "There was an error creating the group. Maybe try a different name?",
-      });
+    } catch {
+      toast.error(
+        "There was an error creating the group. Maybe try a different name?",
+      );
     }
   };
 

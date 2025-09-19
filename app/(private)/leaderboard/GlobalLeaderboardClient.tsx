@@ -5,11 +5,11 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { WinningCriteria } from "@/lib/types";
 import { useState, useEffect, useMemo } from "react";
+import { toast } from "sonner";
 
 export default function GlobalLeaderboardClient() {
   const { currentFestival } = useFestival();
@@ -17,7 +17,6 @@ export default function GlobalLeaderboardClient() {
   const [winningCriteria, setWinningCriteria] = useState<WinningCriteria>(
     WinningCriteria.days_attended,
   );
-  const { toast } = useToast();
 
   // Use our abstraction layer hooks
   const {
@@ -46,24 +45,15 @@ export default function GlobalLeaderboardClient() {
   // Handle errors with toast notifications
   useEffect(() => {
     if (criteriasError) {
-      toast({
-        title: "Error",
-        description:
-          "Failed to load winning criteria. Please refresh the page.",
-        variant: "destructive",
-      });
+      toast.error("Failed to load winning criteria. Please refresh the page.");
     }
-  }, [criteriasError, toast]);
+  }, [criteriasError]);
 
   useEffect(() => {
     if (leaderboardError) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch leaderboard data. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to fetch leaderboard data. Please try again.");
     }
-  }, [leaderboardError, toast]);
+  }, [leaderboardError]);
 
   const criteriaOptions = useMemo(
     () =>

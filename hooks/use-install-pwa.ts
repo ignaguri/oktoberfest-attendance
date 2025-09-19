@@ -1,12 +1,12 @@
 "use client";
 
-import { useToast } from "@/hooks/use-toast";
 import {
   isPWAInstalled,
   isIOS,
   supportsBeforeInstallPrompt,
 } from "@/lib/utils";
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -103,7 +103,6 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
     onInstallSuccess,
     onPromptClose,
   } = options;
-  const { toast } = useToast();
   const [canInstall, setCanInstall] = useState(false);
   const [promptInstall, setPromptInstall] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -204,9 +203,7 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
 
   const installPWA = useCallback(async () => {
     if (!promptInstall && !showIOSInstructions) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Installation not available on this device.",
       });
       trackInstallPWAEvent({
@@ -217,8 +214,7 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
     }
 
     if (showIOSInstructions) {
-      toast({
-        title: "Install Instructions",
+      toast.info("Install Instructions", {
         description:
           "To install on iOS: Tap the Share button in Safari, then 'Add to Home Screen'.",
       });
@@ -236,17 +232,14 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
 
       if (result.outcome === "accepted") {
         trackInstallPWAEvent({ type: "install_success" });
-        toast({
-          variant: "success",
-          title: "Success",
+        toast.success("Success", {
           description: "App installed successfully!",
         });
         setCanInstall(false);
         onInstallSuccess?.();
       } else {
         trackInstallPWAEvent({ type: "install_dismissed" });
-        toast({
-          title: "Installation cancelled",
+        toast.info("Installation cancelled", {
           description: "You can install the app later from this menu.",
         });
       }
@@ -256,13 +249,11 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
         type: "install_error",
         error: errorMessage,
       });
-      toast({
-        variant: "destructive",
-        title: "Installation failed",
+      toast.error("Installation failed", {
         description: "Please try again later.",
       });
     }
-  }, [promptInstall, showIOSInstructions, toast, onInstallSuccess]);
+  }, [promptInstall, showIOSInstructions, onInstallSuccess]);
 
   const closePrompt = useCallback(() => {
     trackInstallPWAEvent({ type: "prompt_closed_manually" });

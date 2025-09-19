@@ -1,22 +1,23 @@
 "use client";
 
-import type { Option, SelectBaseProps } from "./SelectBase";
+import { Combobox } from "@/components/ui/combobox";
 
-import { SelectBase } from "./SelectBase";
+import type {
+  ComboboxOption,
+  ComboboxOptionGroup,
+} from "@/components/ui/combobox";
 
-interface SingleSelectProps
-  extends Pick<
-    SelectBaseProps,
-    | "buttonClassName"
-    | "options"
-    | "placeholder"
-    | "searchPlaceholder"
-    | "emptyMessage"
-    | "disabled"
-    | "errorMsg"
-  > {
+interface SingleSelectProps {
   id?: string;
-  onSelect?: (option: Option) => void;
+  buttonClassName?: string;
+  className?: string;
+  options: ComboboxOptionGroup[];
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+  disabled?: boolean;
+  errorMsg?: string;
+  onSelect?: (option: ComboboxOption) => void;
   onUnselect?: () => void;
   value?: string | null;
 }
@@ -24,6 +25,7 @@ interface SingleSelectProps
 export function SingleSelect({
   id,
   buttonClassName,
+  className,
   disabled,
   options,
   placeholder,
@@ -47,17 +49,27 @@ export function SingleSelect({
     }
   };
 
+  // Convert OptionGroup to ComboboxOptionGroup
+  const comboboxOptions: ComboboxOptionGroup[] = options.map((group) => ({
+    title: group.title,
+    options: group.options.map((option) => ({
+      value: option.value,
+      label: option.label,
+    })),
+  }));
+
   return (
-    <SelectBase
+    <Combobox
       id={id}
-      buttonClassName={buttonClassName}
-      options={options}
-      disabled={disabled}
+      options={comboboxOptions}
+      value={value || ""}
+      onValueChange={handleValueChange}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
       emptyMessage={emptyMessage}
-      value={value || ""}
-      onValueChange={handleValueChange}
+      disabled={disabled}
+      buttonClassName={buttonClassName}
+      className={className}
       errorMsg={errorMsg}
     />
   );

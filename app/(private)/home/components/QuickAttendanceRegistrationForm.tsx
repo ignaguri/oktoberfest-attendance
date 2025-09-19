@@ -5,13 +5,13 @@ import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
-import { useToast } from "@/hooks/use-toast";
 import { quickAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { QuickAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
@@ -23,7 +23,6 @@ interface QuickAttendanceRegistrationFormProps {
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
 }: QuickAttendanceRegistrationFormProps) => {
-  const { toast } = useToast();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const { tents, isLoading: tentsLoading, error: tentsError } = useTents();
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
@@ -64,25 +63,17 @@ export const QuickAttendanceRegistrationForm = ({
           );
           setValue("beerCount", attendance.beer_count || 0);
         }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load attendance data. Please try again.",
-        });
+      } catch {
+        toast.error("Failed to load attendance data. Please try again.");
       }
     };
 
     loadAttendance();
-  }, [toast, onAttendanceIdReceived, currentFestival, setValue]);
+  }, [onAttendanceIdReceived, currentFestival, setValue]);
 
   const onSubmit = async (data: QuickAttendanceFormData) => {
     if (!currentFestival) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No festival selected. Please select a festival.",
-      });
+      toast.error("No festival selected. Please select a festival.");
       return;
     }
 
@@ -128,19 +119,13 @@ export const QuickAttendanceRegistrationForm = ({
         ?.flatMap((tentGroup) => tentGroup.options)
         .find((tent) => tent.value === data.tentId)?.label;
 
-      toast({
-        variant: "success",
-        title: "Attendance Updated",
-        description: tentName
+      toast.success(
+        tentName
           ? `Updated attendance for ${tentName}!`
           : `Updated attendance for ${currentFestival.name}!`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update attendance. Please try again.",
-      });
+      );
+    } catch {
+      toast.error("Failed to update attendance. Please try again.");
     }
   };
 

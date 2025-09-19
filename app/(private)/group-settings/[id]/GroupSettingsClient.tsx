@@ -15,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { winningCriteriaText } from "@/lib/constants";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
 import { fetchWinningCriterias } from "@/lib/sharedActions";
@@ -25,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { Tables } from "@/lib/database.types";
 import type { GroupSettingsFormData } from "@/lib/schemas/groups";
@@ -38,7 +38,6 @@ type Props = {
 };
 
 export default function GroupSettingsClient({ group, members }: Props) {
-  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -100,20 +99,16 @@ export default function GroupSettingsClient({ group, members }: Props) {
       try {
         await updateGroup(group.id, data);
 
-        toast({
-          variant: "success",
-          title: "Group updated successfully!",
+        toast.success("Group updated successfully!", {
           description: "Your group details have been updated.",
         });
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error updating group",
+      } catch {
+        toast.error("Error updating group", {
           description: "An unexpected error occurred while updating the group.",
         });
       }
     },
-    [currentUser?.isCreator, group.id, toast],
+    [currentUser?.isCreator, group.id],
   );
 
   const handleRemoveMember = useCallback(async () => {
@@ -121,22 +116,18 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
     try {
       await removeMember(group.id, selectedUserId);
-      toast({
-        variant: "success",
-        title: "Member removed successfully!",
+      toast.success("Member removed successfully!", {
         description: "The member has been removed from the group.",
       });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error removing member",
+    } catch {
+      toast.error("Error removing member", {
         description: "An unexpected error occurred while removing the member.",
       });
     } finally {
       setIsDialogOpen(false);
       setSelectedUserId(null);
     }
-  }, [currentUser?.isCreator, group.id, selectedUserId, toast]);
+  }, [currentUser?.isCreator, group.id, selectedUserId]);
 
   return (
     <div className="w-full max-w-lg">

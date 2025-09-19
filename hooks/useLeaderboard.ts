@@ -21,7 +21,7 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
     {
       enabled: !!festivalId && criteriaId > 0,
       staleTime: 2 * 60 * 1000, // 2 minutes - leaderboard changes frequently
-      cacheTime: 5 * 60 * 1000, // 5 minutes cache
+      gcTime: 5 * 60 * 1000, // 5 minutes cache
     },
   );
 }
@@ -40,7 +40,7 @@ export function useGroupLeaderboard(
     {
       enabled: !!groupId && !!festivalId && criteriaId > 0,
       staleTime: 2 * 60 * 1000,
-      cacheTime: 5 * 60 * 1000,
+      gcTime: 5 * 60 * 1000,
     },
   );
 }
@@ -51,6 +51,6 @@ export function useGroupLeaderboard(
 export function useWinningCriterias() {
   return useQuery(QueryKeys.winningCriterias(), () => fetchWinningCriterias(), {
     staleTime: 30 * 60 * 1000, // 30 minutes - winning criteria rarely change
-    cacheTime: 60 * 60 * 1000, // 1 hour cache
+    gcTime: 60 * 60 * 1000, // 1 hour cache
   });
 }

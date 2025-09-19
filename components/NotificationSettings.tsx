@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useNotifications } from "@/contexts/NotificationContext";
-import { useToast } from "@/hooks/use-toast";
 import { Bell, BellOff, Smartphone } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function NotificationSettings() {
   const {
@@ -17,7 +17,6 @@ export function NotificationSettings() {
     loading,
   } = useNotifications();
 
-  const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
 
   if (loading || !preferences) {
@@ -42,15 +41,11 @@ export function NotificationSettings() {
     setIsUpdating(true);
     try {
       await updatePreferences({ [key]: value });
-      toast({
-        variant: "success",
-        title: "Settings Updated",
+      toast.success("Settings Updated", {
         description: "Your notification preferences have been saved.",
       });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+    } catch {
+      toast.error("Error", {
         description:
           "Failed to update notification settings. Please try again.",
       });
@@ -66,24 +61,18 @@ export function NotificationSettings() {
     try {
       const granted = await requestPushPermission();
       if (granted) {
-        toast({
-          variant: "success",
-          title: "Push Notifications Enabled",
+        toast.success("Push Notifications Enabled", {
           description:
             "You'll now receive push notifications when the app is closed.",
         });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Permission Denied",
+        toast.error("Permission Denied", {
           description:
             "Push notifications were blocked. You can enable them in your browser settings.",
         });
       }
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: error.message || "Failed to enable push notifications.",
       });
     } finally {

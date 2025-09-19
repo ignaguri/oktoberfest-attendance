@@ -4,7 +4,6 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
 import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +11,7 @@ import { Camera, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { SinglePictureFormData } from "@/lib/schemas/uploads";
 
@@ -45,7 +45,6 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
 };
 
 export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
-  const { toast } = useToast();
   const [pictureAlreadyUploaded, setPictureAlreadyUploaded] = useState(false);
 
   const {
@@ -73,11 +72,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       formData.append("attendanceId", attendanceId);
       formData.append("visibility", data.visibility);
       await uploadBeerPicture(formData);
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Beer picture uploaded successfully!",
-      });
+      toast.success("Beer picture uploaded successfully!");
       setPictureAlreadyUploaded(true);
       reset();
     } catch (error) {
@@ -85,11 +80,9 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
         error instanceof Error && error.message.includes("exceeded")
           ? `File size exceeded (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`
           : "";
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to upload beer picture${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
-      });
+      toast.error(
+        `Failed to upload beer picture${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
+      );
     }
   };
 
@@ -152,7 +145,6 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
             onCheckedChange={(checked) =>
               setValue("visibility", checked ? "public" : "private")
             }
-            size="sm"
           />
         </div>
       )}

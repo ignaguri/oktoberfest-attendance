@@ -19,7 +19,7 @@ import {
 export function useFestivals() {
   return useQuery(QueryKeys.festivals(), () => fetchFestivals(), {
     staleTime: 60 * 60 * 1000, // 1 hour - festivals don't change often
-    cacheTime: 2 * 60 * 60 * 1000, // 2 hours cache
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
   });
 }
 
@@ -29,7 +29,7 @@ export function useFestivals() {
 export function useActiveFestival() {
   return useQuery(QueryKeys.activeFestival(), () => fetchActiveFestival(), {
     staleTime: 30 * 60 * 1000, // 30 minutes
-    cacheTime: 60 * 60 * 1000, // 1 hour cache
+    gcTime: 60 * 60 * 1000, // 1 hour cache
   });
 }
 
@@ -43,7 +43,7 @@ export function useFestivalById(festivalId: string) {
     {
       enabled: !!festivalId,
       staleTime: 60 * 60 * 1000, // 1 hour
-      cacheTime: 2 * 60 * 60 * 1000, // 2 hours cache
+      gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
     },
   );
 }

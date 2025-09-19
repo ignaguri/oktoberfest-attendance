@@ -1,7 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Image from "next/image";
 

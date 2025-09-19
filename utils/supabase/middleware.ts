@@ -48,11 +48,12 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    const userId = user.id ?? user.sub;
     // Check if the user is a super admin
     const { data: profile } = await supabase
       .from("profiles")
       .select("is_super_admin")
-      .eq("id", user.id)
+      .eq("id", userId)
       .single();
 
     if (!profile?.is_super_admin) {

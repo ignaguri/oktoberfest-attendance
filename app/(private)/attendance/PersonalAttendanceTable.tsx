@@ -14,11 +14,11 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { useDeleteAttendance } from "@/lib/data";
 import { formatDate } from "date-fns/format";
 import { Beer, Tent, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import type { AttendanceWithTentVisits } from "./page";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -40,7 +40,6 @@ const PersonalAttendanceTable = ({
   const [selectedAttendance, setSelectedAttendance] = useState<string | null>(
     null,
   );
-  const { toast } = useToast();
   const { mutate: deleteAttendanceMutation, loading: isDeleting } =
     useDeleteAttendance();
 
@@ -66,22 +65,14 @@ const PersonalAttendanceTable = ({
     async (attendanceId: string) => {
       try {
         await deleteAttendanceMutation(attendanceId);
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Attendance deleted successfully.",
-        });
+        toast.success("Attendance deleted successfully.");
         setSelectedAttendance(null);
         onAttendanceDelete();
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to delete attendance. Please try again.",
-        });
+      } catch {
+        toast.error("Failed to delete attendance. Please try again.");
       }
     },
-    [deleteAttendanceMutation, onAttendanceDelete, toast],
+    [deleteAttendanceMutation, onAttendanceDelete],
   );
 
   const columns: ColumnDef<AttendanceWithTentVisits>[] = [

@@ -19,24 +19,29 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import type { Option, OptionGroup } from "./SelectBase";
+import type {
+  ComboboxOption,
+  ComboboxOptionGroup,
+} from "@/components/ui/combobox";
 
 interface MultiSelectProps {
   id?: string;
   buttonClassName?: string;
-  options: OptionGroup[];
+  className?: string;
+  options: ComboboxOptionGroup[];
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
   errorMsg?: string;
-  onSelect?: (option: Option) => void;
-  onUnselect?: (option: Option) => void;
-  value: Option["value"][];
+  onSelect?: (option: ComboboxOption) => void;
+  onUnselect?: (option: ComboboxOption) => void;
+  value: ComboboxOption["value"][];
 }
 
 export function MultiSelect({
   buttonClassName,
+  className,
   options,
   placeholder,
   searchPlaceholder = "Search...",
@@ -48,7 +53,7 @@ export function MultiSelect({
   value,
   errorMsg,
 }: MultiSelectProps) {
-  const [selected, setSelected] = useState<Option[]>([]);
+  const [selected, setSelected] = useState<ComboboxOption[]>([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -58,7 +63,7 @@ export function MultiSelect({
     setSelected(selectedOptions);
   }, [value, options]);
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: ComboboxOption) => {
     if (selected.some((item) => item.value === option.value)) {
       setSelected((prev) => prev.filter((item) => item.value !== option.value));
       onUnselect?.(option);
@@ -68,13 +73,13 @@ export function MultiSelect({
     }
   };
 
-  const handleUnselect = (option: Option) => {
+  const handleUnselect = (option: ComboboxOption) => {
     setSelected((prev) => prev.filter((item) => item.value !== option.value));
     onUnselect?.(option);
   };
 
   return (
-    <>
+    <div className={cn("space-y-2", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -96,55 +101,40 @@ export function MultiSelect({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0">
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0"
+          align="start"
+          side="bottom"
+          sideOffset={4}
+          collisionPadding={8}
+        >
           <Command>
-            <CommandInput placeholder={searchPlaceholder} />
+            <CommandInput placeholder={searchPlaceholder} className="h-8" />
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandList>
               {options.map((group, groupIndex) => (
-                <div key={group.title || `group-${groupIndex}`}>
-                  {group.title ? (
-                    <CommandGroup heading={group.title}>
-                      {group.options.map((option) => (
-                        <CommandItem
-                          key={option.value}
-                          value={option.label}
-                          onSelect={() => handleSelect(option)}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selected.some(
-                                (item) => item.value === option.value,
-                              )
-                                ? "opacity-100"
-                                : "opacity-0",
-                            )}
-                          />
-                          {option.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  ) : (
-                    group.options.map((option) => (
-                      <CommandItem
-                        key={option.value}
-                        value={option.label}
-                        onSelect={() => handleSelect(option)}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            selected.some((item) => item.value === option.value)
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                        {option.label}
-                      </CommandItem>
-                    ))
-                  )}
-                </div>
+                <CommandGroup
+                  key={group.title || `group-${groupIndex}`}
+                  heading={group.title}
+                >
+                  {group.options.map((option: ComboboxOption) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.label}
+                      onSelect={() => handleSelect(option)}
+                    >
+                      {option.label}
+                      <Check
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          selected.some((item) => item.value === option.value)
+                            ? "opacity-100"
+                            : "opacity-0",
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
               ))}
             </CommandList>
           </Command>
@@ -176,11 +166,7 @@ export function MultiSelect({
         </div>
       )}
 
-      {errorMsg && (
-        <span className="w-full text-center text-sm text-red-600">
-          {errorMsg}
-        </span>
-      )}
-    </>
+      {errorMsg && <span className="text-sm text-red-600">{errorMsg}</span>}
+    </div>
   );
 }

@@ -1,19 +1,25 @@
 "use client";
 
-import { SingleSelect } from "@/components/Select/SingleSelect";
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useToast } from "@/hooks/use-toast";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
 import type { AttendanceByDate } from "@/lib/sharedActions";
@@ -62,7 +68,6 @@ export default function DetailedAttendanceForm({
   }, [currentFestival]);
 
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
-  const { toast } = useToast();
 
   const fetchAttendanceForDate = useCallback(
     async (date: Date) => {
@@ -74,15 +79,11 @@ export default function DetailedAttendanceForm({
           currentFestival.id,
         );
         setExistingAttendance(attendanceData as AttendanceByDate);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch attendance data. Please try again.",
-        });
+      } catch {
+        toast.error("Failed to fetch attendance data. Please try again.");
       }
     },
-    [toast, currentFestival],
+    [currentFestival],
   );
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function DetailedAttendanceForm({
   const {
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<DetailedAttendanceFormData>({
     resolver: zodResolver(detailedAttendanceSchema!),
@@ -111,12 +112,9 @@ export default function DetailedAttendanceForm({
     },
   });
 
-  const watchedValues = watch();
-  const amount = watch("amount");
-
   // Update form values when existingAttendance or currentDate changes
   useEffect(() => {
-    setValue("amount", existingAttendance?.beer_count || 0);
+    setValue("amount", existingAttendance?.beer_count ?? 0);
     setValue("date", currentDate);
     setValue("tents", existingAttendance?.tent_ids || []);
   }, [existingAttendance, currentDate, setValue]);
@@ -124,19 +122,11 @@ export default function DetailedAttendanceForm({
   const onSubmit = async (data: DetailedAttendanceFormData) => {
     try {
       await addAttendance({ ...data, festivalId: currentFestival!.id });
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Attendance updated successfully.",
-      });
+      toast.success("Attendance updated successfully.");
       await fetchAttendanceForDate(data.date);
       onAttendanceUpdate();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update attendance. Please try again.",
-      });
+    } catch {
+      toast.error("Failed to update attendance. Please try again.");
     }
   };
 
@@ -175,50 +165,70 @@ export default function DetailedAttendanceForm({
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
           <Label htmlFor="date">When did you visit the Wiesn?</Label>
-          <AttendanceDatePicker
-            buttonClassName="w-auto self-center"
-            disabled={isSubmitting}
-            value={watchedValues.date}
-            onDateChange={(date) => {
-              setValue("date", date!);
-              handleDateChange(date);
-            }}
-            festivalStartDate={
-              getFestivalDates(currentFestival)?.startDate || new Date()
-            }
-            festivalEndDate={
-              getFestivalDates(currentFestival)?.endDate || new Date()
-            }
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <AttendanceDatePicker
+                buttonClassName="w-auto self-center"
+                disabled={isSubmitting}
+                value={field.value}
+                onDateChange={(date) => {
+                  field.onChange(date!);
+                  handleDateChange(date);
+                }}
+                festivalStartDate={
+                  getFestivalDates(currentFestival)?.startDate || new Date()
+                }
+                festivalEndDate={
+                  getFestivalDates(currentFestival)?.endDate || new Date()
+                }
+              />
+            )}
           />
           {errors.date && <span className="error">{errors.date.message}</span>}
 
           <Label htmlFor="amount">How many 🍻 Maß did you have?</Label>
-          <SingleSelect
-            id="amount"
-            buttonClassName="w-auto self-center"
-            options={[
-              {
-                options: [...Array(10)].map((_, i) => ({
-                  value: i.toString(),
-                  label: i.toString(),
-                })),
-              },
-            ]}
-            placeholder="Select amount"
-            value={amount?.toString() || "0"}
-            onSelect={(option) => {
-              setValue("amount", parseInt(option.value));
-            }}
-            errorMsg={errors.amount?.message}
+          <Controller
+            name="amount"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value?.toString() ?? "0"}
+                onValueChange={(value) => field.onChange(parseInt(value))}
+              >
+                <SelectTrigger id="amount" className="w-auto self-center">
+                  <SelectValue placeholder="Select amount" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[...Array(10)].map((_, i) => (
+                    <SelectItem key={i} value={i.toString()}>
+                      {i}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
+          {errors.amount && (
+            <span className="text-sm text-red-600">
+              {errors.amount.message}
+            </span>
+          )}
 
           <Label htmlFor="tents">Which tents did you visit?</Label>
-          <TentSelector
-            disabled={isSubmitting}
-            selectedTents={watchedValues.tents}
-            onTentsChange={(newTents) => {
-              setValue("tents", newTents);
-            }}
+          <Controller
+            name="tents"
+            control={control}
+            render={({ field }) => (
+              <TentSelector
+                disabled={isSubmitting}
+                selectedTents={field.value}
+                onTentsChange={(newTents) => {
+                  field.onChange(newTents);
+                }}
+              />
+            )}
           />
           <Button
             variant="yellowOutline"

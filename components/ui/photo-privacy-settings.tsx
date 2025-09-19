@@ -1,7 +1,6 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import { toast } from "@/hooks/use-toast";
 import {
   getAllUserGroupPhotoSettings,
   getUserGlobalPhotoSettings,
@@ -10,6 +9,7 @@ import {
 } from "@/lib/actions/photo-visibility";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import type {
   GlobalPhotoSettingsFormData,
@@ -48,9 +48,7 @@ export function PhotoPrivacySettings() {
       });
       setGroupSettings(groupData);
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to load photo privacy settings",
       });
     } finally {
@@ -72,17 +70,13 @@ export function PhotoPrivacySettings() {
         hide_photos_from_all_groups: newValue,
       }));
 
-      toast({
-        variant: "success",
-        title: "Settings updated",
+      toast.success("Settings updated", {
         description: newValue
           ? "Your photos are now hidden from all groups"
           : "Your photos are now visible to groups (subject to individual group settings)",
       });
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update global photo settings",
       });
     } finally {
@@ -113,17 +107,13 @@ export function PhotoPrivacySettings() {
       const groupName =
         groupSettings.find((g) => g.group_id === groupId)?.group_name ||
         "group";
-      toast({
-        variant: "success",
-        title: "Group settings updated",
+      toast.success("Group settings updated", {
         description: newValue
           ? `Your photos are now hidden from ${groupName}`
           : `Your photos are now visible to ${groupName}`,
       });
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update group photo settings",
       });
     } finally {

@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { FestivalProvider } from "@/contexts/FestivalContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
@@ -122,7 +122,7 @@ export default async function RootLayout({
             )}
           </DataProvider>
           <ServiceWorkerRegistration />
-          <Toaster />
+          <Toaster richColors closeButton />
           <SpeedInsights />
           {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
         </body>

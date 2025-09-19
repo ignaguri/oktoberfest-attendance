@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { signUpSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { SignUpFormData } from "@/lib/schemas/auth";
 
@@ -16,7 +16,6 @@ import { signUp, signInWithOAuth } from "./actions";
 import { GoogleIcon, FacebookIcon } from "./SocialIcons";
 
 export default function SignUp() {
-  const { toast } = useToast();
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -34,16 +33,12 @@ export default function SignUp() {
       setIsAccountCreated(true);
     } catch (error) {
       if (error instanceof Error) {
-        toast({
-          title: "Sign up failed.",
+        toast.error("Sign up failed.", {
           description: error.message,
-          variant: "destructive",
         });
       } else {
-        toast({
-          title: "Sign up failed.",
+        toast.error("Sign up failed.", {
           description: "An unexpected error occurred.",
-          variant: "destructive",
         });
       }
       if (emailRef.current) {
@@ -62,10 +57,8 @@ export default function SignUp() {
         throw error;
       }
 
-      toast({
-        title: "Sign up failed.",
+      toast.error("Sign up failed.", {
         description: `Failed to sign up with ${provider}`,
-        variant: "destructive",
       });
     }
   };

@@ -31,7 +31,7 @@ export function useUserGroups(festivalId?: string) {
     {
       enabled: !!festivalId,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes cache
+      gcTime: 10 * 60 * 1000, // 10 minutes cache
     },
   );
 }
@@ -43,7 +43,7 @@ export function useGroupSettings(groupId: string) {
   return useQuery(QueryKeys.group(groupId), () => fetchGroupDetails(groupId), {
     enabled: !!groupId,
     staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes cache
+    gcTime: 30 * 60 * 1000, // 30 minutes cache
   });
 }
 
@@ -143,6 +143,25 @@ export function useLeaveGroup() {
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
       },
+    },
+  );
+}
+
+/**
+ * Hook to fetch just the group name (lightweight version of useGroupSettings)
+ * Useful for breadcrumbs and other components that only need the group name
+ */
+export function useGroupName(groupId: string) {
+  return useQuery(
+    QueryKeys.group(groupId),
+    async () => {
+      const group = await fetchGroupDetails(groupId);
+      return group.name;
+    },
+    {
+      enabled: !!groupId,
+      staleTime: 10 * 60 * 1000, // 10 minutes (same as group settings)
+      gcTime: 30 * 60 * 1000, // 30 minutes cache
     },
   );
 }

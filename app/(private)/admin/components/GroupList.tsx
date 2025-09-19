@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { groupSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { Tables } from "@/lib/database.types";
 import type { GroupFormData } from "@/lib/schemas/admin";
@@ -70,7 +70,6 @@ const GroupEditForm = ({
 };
 
 const GroupList = () => {
-  const { toast } = useToast();
   const [groups, setGroups] = useState<Tables<"groups">[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Tables<"groups"> | null>(
     null,
@@ -100,11 +99,7 @@ const GroupList = () => {
       await updateGroup(selectedGroup.id, data);
       fetchGroups();
       setSelectedGroup(null);
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "Group updated successfully",
-      });
+      toast.success("Group updated successfully");
       setIsDialogOpen(false);
     } catch (error) {
       logger.error(
@@ -115,11 +110,7 @@ const GroupList = () => {
         }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to update group",
-        variant: "destructive",
-      });
+      toast.error("Failed to update group");
     }
   }
 
@@ -127,22 +118,14 @@ const GroupList = () => {
     try {
       await deleteGroup(groupId);
       fetchGroups();
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "Group deleted successfully",
-      });
+      toast.success("Group deleted successfully");
     } catch (error) {
       logger.error(
         "Error deleting group",
         logger.clientComponent("GroupList", { action: "deleteGroup", groupId }),
         error as Error,
       );
-      toast({
-        title: "Error",
-        description: "Failed to delete group",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete group");
     }
   }
 
