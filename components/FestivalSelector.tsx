@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,10 +16,8 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
-import type { BadgeProps } from "./ui/badge";
-import type { Festival } from "@/lib/types";
-
-import { Badge } from "./ui/badge";
+import type { BadgeVariants } from "@/components/ui/badge";
+import type { Festival, FestivalStatus } from "@/lib/types";
 
 interface FestivalSelectorProps {
   className?: string;
@@ -32,7 +31,9 @@ const getFestivalDisplayInfo = (festival: Festival) => {
   return { firstLetter, lastTwoDigits };
 };
 
-const getFestivalStatusBadgeProps = (festival: Festival) => {
+const getFestivalStatusBadgeProps = (
+  festival: Festival,
+): { status: FestivalStatus; variant: BadgeVariants } => {
   const status = getFestivalStatus(festival);
 
   if (status === "upcoming") {
@@ -156,10 +157,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                   <div className="flex flex-col items-start text-left">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{festival.name}</span>
-                      <Badge
-                        className="capitalize"
-                        variant={variant as BadgeProps["variant"]}
-                      >
+                      <Badge className="capitalize" variant={variant}>
                         {status}
                       </Badge>
                     </div>
