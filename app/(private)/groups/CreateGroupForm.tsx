@@ -60,7 +60,7 @@ export const CreateGroupForm = () => {
         type="text"
         placeholder="Group Name"
         errorMsg={errors.groupName?.message}
-        autoComplete="off"
+        autoComplete="new-password"
         {...register("groupName")}
       />
 
@@ -68,7 +68,7 @@ export const CreateGroupForm = () => {
         type={showPassword ? "text" : "password"}
         placeholder="Group Password"
         errorMsg={errors.password?.message}
-        autoComplete="off"
+        autoComplete="new-password"
         rightElement={
           <Button
             type="button"
