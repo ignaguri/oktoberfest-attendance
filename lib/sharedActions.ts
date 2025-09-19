@@ -349,7 +349,7 @@ export async function fetchWinningCriterias() {
   return getCachedWinningCriterias(supabase);
 }
 
-// Cache tents for 2 hours since they rarely change
+// Cache all tents for 2 hours since they rarely change
 const getCachedTents = unstable_cache(
   async (supabaseClient: SupabaseClient) => {
     const { data, error } = await supabaseClient.from("tents").select("*");
@@ -364,9 +364,45 @@ const getCachedTents = unstable_cache(
   { revalidate: 7200, tags: ["tents"] }, // 2 hours cache
 );
 
-export async function fetchTents() {
+// Cache festival-specific tents for 1 hour since they change more frequently
+const getCachedFestivalTents = unstable_cache(
+  async (festivalId: string, supabaseClient: SupabaseClient) => {
+    const { data, error } = await supabaseClient
+      .from("festival_tents")
+      .select(
+        `
+        tent:tents!inner (
+          id,
+          name,
+          category
+        )
+      `,
+      )
+      .eq("festival_id", festivalId)
+      .order("tent.name", { ascending: true });
+
+    if (error) {
+      reportSupabaseException("fetchFestivalTents", error);
+      throw new Error("Error fetching festival tents: " + error.message);
+    }
+
+    // Transform to match original tents structure for backward compatibility
+    return (data || []).map((item: any) => item.tent);
+  },
+  ["festival-tents"],
+  { revalidate: 3600, tags: ["tents", "festival-tents"] }, // 1 hour cache
+);
+
+export async function fetchTents(festivalId?: string) {
   const supabase = createClient();
-  return getCachedTents(supabase);
+
+  if (festivalId) {
+    // Return festival-specific tents
+    return getCachedFestivalTents(festivalId, supabase);
+  } else {
+    // Return all tents (backward compatibility)
+    return getCachedTents(supabase);
+  }
 }
 
 // Tutorial completion functions

@@ -27,6 +27,40 @@ export const attendanceSchema = z.object({
   tent_ids: z.array(z.string()).min(1, "At least one tent must be selected"),
 });
 
+// Tent management schemas
+export const tentSchema = z.object({
+  name: z.string().min(1, "Tent name is required").trim(),
+  category: z.string().optional(),
+});
+
+export const tentPriceSchema = z.object({
+  beer_price: z
+    .number()
+    .positive("Price must be greater than 0")
+    .max(50, "Price seems too high")
+    .optional()
+    .nullable(),
+});
+
+export const addTentToFestivalSchema = tentSchema.merge(tentPriceSchema);
+
+export const copyTentsSchema = z.object({
+  sourceFestivalId: z.string().min(1, "Source festival is required"),
+  targetFestivalId: z.string().min(1, "Target festival is required"),
+  tentIds: z.array(z.string()).min(1, "At least one tent must be selected"),
+  copyPrices: z.boolean(),
+  overridePrice: z
+    .number()
+    .positive("Price must be greater than 0")
+    .max(50, "Price seems too high")
+    .optional()
+    .nullable(),
+});
+
 export type GroupFormData = z.infer<typeof groupSchema>;
 export type UserFormData = z.infer<typeof userSchema>;
 export type AttendanceFormData = z.infer<typeof attendanceSchema>;
+export type TentFormData = z.infer<typeof tentSchema>;
+export type TentPriceFormData = z.infer<typeof tentPriceSchema>;
+export type AddTentToFestivalFormData = z.infer<typeof addTentToFestivalSchema>;
+export type CopyTentsFormData = z.infer<typeof copyTentsSchema>;

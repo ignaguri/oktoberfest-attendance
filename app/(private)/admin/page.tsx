@@ -9,9 +9,10 @@ import CacheManagement from "./components/CacheManagement";
 import FestivalManagement from "./components/FestivalManagement";
 import GroupList from "./components/GroupList";
 import ImageConversion from "./components/ImageConversion";
+import TentManagement from "./components/TentManagement";
 import UserList from "./components/UserList";
 
-const tabValues = ["users", "groups", "festivals", "cache", "images"];
+const tabValues = ["users", "groups", "festivals", "tents", "cache", "images"];
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("users");
@@ -46,6 +47,7 @@ export default function AdminPage() {
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="groups">Groups</TabsTrigger>
           <TabsTrigger value="festivals">Festivals</TabsTrigger>
+          <TabsTrigger value="tents">Tents</TabsTrigger>
           <TabsTrigger value="cache">Cache Management</TabsTrigger>
           <TabsTrigger value="images">Image Conversion</TabsTrigger>
         </TabsList>
@@ -60,6 +62,10 @@ export default function AdminPage() {
 
         <TabsContent value="festivals">
           <FestivalManagement />
+        </TabsContent>
+
+        <TabsContent value="tents">
+          <TentManagement />
         </TabsContent>
 
         <TabsContent value="cache">

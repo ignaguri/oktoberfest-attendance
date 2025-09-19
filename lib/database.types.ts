@@ -250,50 +250,41 @@ export type Database = {
           },
         ];
       };
-      festival_tent_pricing: {
+      festival_tents: {
         Row: {
-          beer_price: number;
-          created_at: string;
-          currency: string;
+          beer_price: number | null;
+          created_at: string | null;
           festival_id: string;
           id: string;
-          price_end_date: string | null;
-          price_start_date: string | null;
           tent_id: string;
-          updated_at: string;
+          updated_at: string | null;
         };
         Insert: {
-          beer_price: number;
-          created_at?: string;
-          currency?: string;
+          beer_price?: number | null;
+          created_at?: string | null;
           festival_id: string;
           id?: string;
-          price_end_date?: string | null;
-          price_start_date?: string | null;
           tent_id: string;
-          updated_at?: string;
+          updated_at?: string | null;
         };
         Update: {
-          beer_price?: number;
-          created_at?: string;
-          currency?: string;
+          beer_price?: number | null;
+          created_at?: string | null;
           festival_id?: string;
           id?: string;
-          price_end_date?: string | null;
-          price_start_date?: string | null;
           tent_id?: string;
-          updated_at?: string;
+          updated_at?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "festival_tent_pricing_festival_id_fkey";
+            foreignKeyName: "festival_tents_festival_id_fkey";
             columns: ["festival_id"];
             isOneToOne: false;
             referencedRelation: "festivals";
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "festival_tent_pricing_tent_id_fkey";
+            foreignKeyName: "festival_tents_tent_id_fkey";
             columns: ["tent_id"];
             isOneToOne: false;
             referencedRelation: "tents";
@@ -303,6 +294,7 @@ export type Database = {
       };
       festivals: {
         Row: {
+          beer_cost: number | null;
           created_at: string;
           description: string | null;
           end_date: string;
@@ -319,6 +311,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          beer_cost?: number | null;
           created_at?: string;
           description?: string | null;
           end_date: string;
@@ -335,6 +328,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          beer_cost?: number | null;
           created_at?: string;
           description?: string | null;
           end_date?: string;

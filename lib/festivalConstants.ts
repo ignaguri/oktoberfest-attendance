@@ -1,6 +1,6 @@
 import { parseISO, isBefore, isWithinInterval } from "date-fns";
 
-import type { Festival, FestivalTentPricing } from "./types";
+import type { Festival, FestivalTent } from "./types";
 
 // Default fallback values for when festival data is not available
 const DEFAULT_BEER_COST = 16.2;
@@ -50,12 +50,12 @@ export function getFestivalStatus(
 
 // Helper function to get beer cost for a specific tent at a specific festival
 export function getTentBeerCost(
-  tentPricing: FestivalTentPricing[],
+  festivalTents: FestivalTent[],
   tentId: string,
 ): number {
-  const tentPrice = tentPricing.find((tp) => tp.tent_id === tentId);
+  const tentPrice = festivalTents.find((ft) => ft.tent_id === tentId);
 
-  if (!tentPrice) {
+  if (!tentPrice || !tentPrice.beer_price) {
     return DEFAULT_BEER_COST;
   }
 
@@ -68,9 +68,8 @@ export function getDefaultBeerCost(festival: Festival | null): number {
     return DEFAULT_BEER_COST;
   }
 
-  // This could be enhanced to get the average beer cost across all tents
-  // For now, return the default
-  return DEFAULT_BEER_COST;
+  // Use festival's beer cost or default fallback
+  return festival.beer_cost || DEFAULT_BEER_COST;
 }
 
 // Helper function to get festival dates as Date objects

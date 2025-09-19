@@ -18,10 +18,10 @@ export type FestivalType = Database["public"]["Enums"]["festival_type_enum"];
 export type FestivalStatus =
   Database["public"]["Enums"]["festival_status_enum"];
 
-export type FestivalTentPricing =
-  Database["public"]["Tables"]["festival_tent_pricing"]["Row"];
-export type FestivalTentPricingInsert =
-  Database["public"]["Tables"]["festival_tent_pricing"]["Insert"];
+export type FestivalTent =
+  Database["public"]["Tables"]["festival_tents"]["Row"];
+export type FestivalTentInsert =
+  Database["public"]["Tables"]["festival_tents"]["Insert"];
 
 // Updated core types with festival_id
 export type Attendance = Database["public"]["Tables"]["attendances"]["Row"];
