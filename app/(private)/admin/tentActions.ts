@@ -47,7 +47,7 @@ export async function getFestivalTents(
     `,
     )
     .eq("festival_id", festivalId)
-    .order("tent.name", { ascending: true });
+    .order("tent(name)", { ascending: true });
 
   if (error) {
     reportSupabaseException("getFestivalTents", error);
@@ -72,19 +72,26 @@ export async function getAvailableTents(
 ): Promise<Tables<"tents">[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("tents")
-    .select("*")
-    .not(
+  // Get tent IDs that are already assigned to this festival
+  const { data: assignedTents } = await supabase
+    .from("festival_tents")
+    .select("tent_id")
+    .eq("festival_id", festivalId);
+
+  const assignedTentIds = assignedTents?.map((ft) => ft.tent_id) || [];
+
+  let query = supabase.from("tents").select("*");
+
+  // Only apply the filter if there are assigned tents
+  if (assignedTentIds.length > 0) {
+    query = query.not(
       "id",
       "in",
-      `(
-      SELECT tent_id
-      FROM festival_tents
-      WHERE festival_id = '${festivalId}'
-    )`,
-    )
-    .order("name", { ascending: true });
+      `(${assignedTentIds.map((id) => `'${id}'`).join(",")})`,
+    );
+  }
+
+  const { data, error } = await query.order("name", { ascending: true });
 
   if (error) {
     reportSupabaseException("getAvailableTents", error);
