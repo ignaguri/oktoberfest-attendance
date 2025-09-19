@@ -15,7 +15,7 @@ import { profileSchema } from "@/lib/schemas/profile";
 import { resetTutorial } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -42,15 +42,27 @@ export default function AccountForm() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullname: profile?.full_name || "",
-      username: profile?.username || "",
-      custom_beer_cost: profile?.custom_beer_cost || 16.2,
+      fullname: "",
+      username: "",
+      custom_beer_cost: 16.2,
     },
   });
+
+  // Reset form values when profile data becomes available
+  useEffect(() => {
+    if (profile) {
+      reset({
+        fullname: profile.full_name || "",
+        username: profile.username || "",
+        custom_beer_cost: profile.custom_beer_cost || 16.2,
+      });
+    }
+  }, [profile, reset]);
 
   // Show loading state
   if (userLoading || profileLoading) {
