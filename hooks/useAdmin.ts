@@ -23,7 +23,7 @@ import { QueryKeys } from "@/lib/data/types";
 export function useAllUsers() {
   return useQuery(["admin", "users"], () => getUsers(), {
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes cache
+    gcTime: 10 * 60 * 1000, // 10 minutes cache
   });
 }
 
@@ -33,7 +33,7 @@ export function useAllUsers() {
 export function useAllGroups() {
   return useQuery(["admin", "groups"], () => getGroups(), {
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes cache
+    gcTime: 10 * 60 * 1000, // 10 minutes cache
   });
 }
 

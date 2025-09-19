@@ -21,7 +21,7 @@ export function useUserAchievements(festivalId?: string) {
     {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes - achievements can change based on activity
-      cacheTime: 10 * 60 * 1000, // 10 minutes cache
+      gcTime: 10 * 60 * 1000, // 10 minutes cache
     },
   );
 }
@@ -32,6 +32,6 @@ export function useUserAchievements(festivalId?: string) {
 export function useAvailableAchievements() {
   return useQuery(QueryKeys.achievements(), () => getAvailableAchievements(), {
     staleTime: 60 * 60 * 1000, // 1 hour - available achievements rarely change
-    cacheTime: 2 * 60 * 60 * 1000, // 2 hours cache
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
   });
 }

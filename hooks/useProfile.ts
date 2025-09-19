@@ -20,7 +20,7 @@ import { getProfileShort, getUser } from "@/lib/sharedActions";
 export function useCurrentUser() {
   return useQuery(QueryKeys.user(), () => getUser(), {
     staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes cache
+    gcTime: 30 * 60 * 1000, // 30 minutes cache
   });
 }
 
@@ -30,7 +30,7 @@ export function useCurrentUser() {
 export function useCurrentProfile() {
   return useQuery(QueryKeys.profile(), () => getProfileShort(), {
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 15 * 60 * 1000, // 15 minutes cache
+    gcTime: 15 * 60 * 1000, // 15 minutes cache
   });
 }
 

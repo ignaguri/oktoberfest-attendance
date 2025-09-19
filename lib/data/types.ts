@@ -43,8 +43,8 @@ export interface DataMutationResult<TData = unknown, TVariables = unknown> {
 export interface DataQueryOptions {
   /** Whether the query should run automatically */
   enabled?: boolean;
-  /** Cache time in milliseconds */
-  cacheTime?: number;
+  /** Garbage collection time in milliseconds */
+  gcTime?: number;
   /** Stale time in milliseconds */
   staleTime?: number;
   /** Retry failed queries */

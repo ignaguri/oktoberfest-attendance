@@ -26,7 +26,7 @@ export function useAttendances(festivalId: string) {
     {
       enabled: !!festivalId,
       staleTime: 60 * 1000, // 1 minute - attendance changes frequently
-      cacheTime: 5 * 60 * 1000, // 5 minutes cache
+      gcTime: 5 * 60 * 1000, // 5 minutes cache
     },
   );
 }
@@ -41,7 +41,7 @@ export function useUserHighlights(festivalId?: string) {
     {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes cache
+      gcTime: 10 * 60 * 1000, // 10 minutes cache
     },
   );
 }

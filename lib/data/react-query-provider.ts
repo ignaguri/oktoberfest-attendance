@@ -31,7 +31,7 @@ function mapQueryOptions(
 
   return {
     enabled: options.enabled,
-    gcTime: options.cacheTime,
+    gcTime: options.gcTime,
     staleTime: options.staleTime,
     retry: options.retry,
     refetchOnWindowFocus: options.refetchOnWindowFocus,
