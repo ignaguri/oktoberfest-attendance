@@ -27,7 +27,7 @@ export default function FestivalStatus() {
   if (isBefore(today, festivalStartDate)) {
     const daysRemaining = differenceInDays(festivalStartDate, today);
     status = `${festivalName} starts in ${
-      daysRemaining === 1 ? "a day" : `${daysRemaining} days`
+      daysRemaining <= 1 ? "a day" : `${daysRemaining} days`
     }!`;
   } else if (
     isWithinInterval(today, { start: festivalStartDate, end: festivalEndDate })
