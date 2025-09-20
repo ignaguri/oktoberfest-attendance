@@ -4,7 +4,7 @@
 
 -- Create the new festival_tents junction table
 CREATE TABLE festival_tents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
   festival_id UUID NOT NULL REFERENCES festivals(id) ON DELETE CASCADE,
   tent_id UUID NOT NULL REFERENCES tents(id) ON DELETE CASCADE,
   beer_price DECIMAL(5,2) NULL CHECK (beer_price IS NULL OR beer_price > 0), -- Optional tent-specific price
