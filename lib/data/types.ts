@@ -115,8 +115,15 @@ export class QueryKeys {
   static userAchievements = (userId: string, festivalId: string) =>
     ["achievements", "user", userId, festivalId] as const;
 
-  // Miscellaneous
+  // Tent queries
   static tents = (festivalId: string) => ["tents", festivalId] as const;
+  static allTents = () => ["tents", "all"] as const;
+  static festivalTents = (festivalId: string) =>
+    ["festival-tents", festivalId] as const;
+  static tentStats = (festivalId: string) =>
+    ["tent-stats", festivalId] as const;
+
+  // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }
 

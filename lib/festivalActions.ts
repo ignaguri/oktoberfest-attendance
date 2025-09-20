@@ -4,11 +4,7 @@ import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { unstable_cache } from "next/cache";
 
-import type {
-  Festival,
-  FestivalTentPricing,
-  SupabaseClient,
-} from "@/lib/types";
+import type { Festival, FestivalTent, SupabaseClient } from "@/lib/types";
 
 import "server-only";
 
@@ -98,14 +94,14 @@ export async function fetchFestivalById(
   return getCachedFestivalById(festivalId, supabase);
 }
 
-// Cache festival tent pricing for 2 hours since pricing rarely changes
-const getCachedFestivalTentPricing = unstable_cache(
+// Cache festival tents for 2 hours since they rarely change
+const getCachedFestivalTents = unstable_cache(
   async (
     festivalId: string,
     supabaseClient: SupabaseClient,
-  ): Promise<FestivalTentPricing[]> => {
+  ): Promise<FestivalTent[]> => {
     const { data, error } = await supabaseClient
-      .from("festival_tent_pricing")
+      .from("festival_tents")
       .select(
         `
         *,
@@ -119,21 +115,21 @@ const getCachedFestivalTentPricing = unstable_cache(
       .eq("festival_id", festivalId);
 
     if (error) {
-      reportSupabaseException("fetchFestivalTentPricing", error);
-      throw new Error(`Error fetching festival tent pricing: ${error.message}`);
+      reportSupabaseException("fetchFestivalTents", error);
+      throw new Error(`Error fetching festival tents: ${error.message}`);
     }
 
     return data || [];
   },
-  ["festival-tent-pricing"],
-  { revalidate: 7200, tags: ["festivals", "tents", "pricing"] }, // 2 hours cache
+  ["festival-tents"],
+  { revalidate: 7200, tags: ["festivals", "tents", "festival-tents"] }, // 2 hours cache
 );
 
-export async function fetchFestivalTentPricing(
+export async function fetchFestivalTents(
   festivalId: string,
-): Promise<FestivalTentPricing[]> {
+): Promise<FestivalTent[]> {
   const supabase = createClient();
-  return getCachedFestivalTentPricing(festivalId, supabase);
+  return getCachedFestivalTents(festivalId, supabase);
 }
 
 export async function getCurrentFestivalForUser(): Promise<Festival | null> {
