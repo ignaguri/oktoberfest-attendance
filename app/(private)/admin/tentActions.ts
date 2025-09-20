@@ -84,7 +84,11 @@ export async function getAvailableTents(
 
   // Only apply the filter if there are assigned tents
   if (assignedTentIds.length > 0) {
-    query = query.not("id", "in", assignedTentIds);
+    query = query.not(
+      "id",
+      "in",
+      `(${assignedTentIds.map((id) => `'${id}'`).join(",")})`,
+    );
   }
 
   const { data, error } = await query.order("name", { ascending: true });
