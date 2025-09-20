@@ -387,7 +387,7 @@ const getCachedFestivalTents = unstable_cache(
     }
 
     // Transform to match original tents structure for backward compatibility
-    return (data || []).map((item: any) => item.tent);
+    return (data || []).map((item: { tent: Tables<"tents"> }) => item.tent);
   },
   ["festival-tents"],
   { revalidate: 3600, tags: ["tents", "festival-tents"] }, // 1 hour cache

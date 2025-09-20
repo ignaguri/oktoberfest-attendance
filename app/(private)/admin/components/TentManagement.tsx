@@ -605,7 +605,7 @@ function CopyTentsDialog({
   festivals,
   onSubmit,
 }: {
-  form: any;
+  form: ReturnType<typeof useForm<CopyTentsFormData>>;
   festivals: Festival[];
   onSubmit: (data: CopyTentsFormData) => void;
 }) {
@@ -704,7 +704,12 @@ function CopyTentsDialog({
         <Checkbox
           id="copyPrices"
           checked={form.watch("copyPrices")}
-          onCheckedChange={(checked) => form.setValue("copyPrices", checked)}
+          onCheckedChange={(checked) =>
+            form.setValue(
+              "copyPrices",
+              checked === "indeterminate" ? false : checked,
+            )
+          }
         />
         <Label htmlFor="copyPrices">Copy tent-specific prices</Label>
       </div>
