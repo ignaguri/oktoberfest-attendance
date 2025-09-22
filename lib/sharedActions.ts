@@ -1,6 +1,10 @@
 "use server";
 
 import {
+  formatDateForDatabase,
+  formatTimestampForDatabase,
+} from "@/lib/date-utils";
+import {
   reportLog,
   reportNotificationException,
   reportSupabaseException,
@@ -8,6 +12,7 @@ import {
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import * as Sentry from "@sentry/nextjs";
+import { addDays } from "date-fns";
 import { isSameDay } from "date-fns/isSameDay";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import sharp from "sharp";
@@ -76,7 +81,7 @@ export async function fetchAttendancesFromDB(
     query.eq("festival_id", festivalId);
   }
   if (date) {
-    query.eq("date", date.toISOString().split("T")[0]);
+    query.eq("date", formatDateForDatabase(date));
   }
   query.order("date", { ascending: true });
   const { data, error } = await (single ? query.single() : query);
@@ -348,7 +353,7 @@ export async function addPersonalAttendance(formData: {
     "upsert_attendance_record",
     {
       p_user_id: user.id,
-      p_date: formData.date.toISOString().split("T")[0],
+      p_date: formatTimestampForDatabase(formData.date),
       p_beer_count: formData.amount,
       p_festival_id: formData.festivalId,
     },
@@ -371,13 +376,8 @@ export async function addPersonalAttendance(formData: {
     .delete()
     .eq("user_id", user.id)
     .eq("festival_id", formData.festivalId)
-    .gte("visit_date", formData.date.toISOString().split("T")[0])
-    .lt(
-      "visit_date",
-      new Date(formData.date.getTime() + 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0],
-    );
+    .gte("visit_date", formatTimestampForDatabase(formData.date))
+    .lt("visit_date", formatTimestampForDatabase(addDays(formData.date, 1)));
 
   if (deleteError) {
     reportSupabaseException("addPersonalAttendance", deleteError, {
@@ -396,7 +396,7 @@ export async function addPersonalAttendance(formData: {
       user_id: user.id,
       festival_id: formData.festivalId,
       tent_id: tentId,
-      visit_date: formData.date.toISOString(),
+      visit_date: formatTimestampForDatabase(formData.date),
     }));
 
     const { error: tentVisitError } = await supabase
