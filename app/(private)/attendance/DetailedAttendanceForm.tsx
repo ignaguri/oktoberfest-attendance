@@ -14,7 +14,10 @@ import {
 import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
-import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
+import {
+  addPersonalAttendance,
+  fetchAttendanceByDate,
+} from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -121,7 +124,7 @@ export default function DetailedAttendanceForm({
 
   const onSubmit = async (data: DetailedAttendanceFormData) => {
     try {
-      await addAttendance({ ...data, festivalId: currentFestival!.id });
+      await addPersonalAttendance({ ...data, festivalId: currentFestival!.id });
       toast.success("Attendance updated successfully.");
       await fetchAttendanceForDate(data.date);
       onAttendanceUpdate();

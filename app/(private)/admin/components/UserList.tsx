@@ -6,6 +6,7 @@ import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatDateForDatabase } from "@/lib/date-utils";
 import { logger } from "@/lib/logger";
 import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -316,7 +317,7 @@ const UserList = () => {
     try {
       if (!selectedAttendance || !selectedUser) return;
       await updateAttendance(selectedAttendance.id, {
-        date: data.date.toISOString().split("T")[0], // Convert Date to string
+        date: formatDateForDatabase(data.date), // Convert Date to string with timezone handling
         beer_count: data.beer_count,
         user_id: selectedUser.id,
         tent_ids: data.tent_ids,

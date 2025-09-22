@@ -1,6 +1,10 @@
 "use server";
 
 import {
+  formatDateForDatabase,
+  formatTimestampForDatabase,
+} from "@/lib/date-utils";
+import {
   reportLog,
   reportNotificationException,
   reportSupabaseException,
@@ -76,7 +80,7 @@ export async function fetchAttendancesFromDB(
     query.eq("festival_id", festivalId);
   }
   if (date) {
-    query.eq("date", date.toISOString().split("T")[0]);
+    query.eq("date", formatDateForDatabase(date));
   }
   query.order("date", { ascending: true });
   const { data, error } = await (single ? query.single() : query);
@@ -240,6 +244,20 @@ export async function addAttendance(formData: {
   const user = await getUser();
   const { amount, date, tents, festivalId } = formData;
 
+  // Validate that festivalId exists in the database
+  const { data: festivalExists, error: festivalCheckError } = await supabase
+    .from("festivals")
+    .select("id")
+    .eq("id", festivalId)
+    .single();
+
+  if (festivalCheckError || !festivalExists) {
+    reportLog(`Invalid festivalId: ${festivalId}`, "error");
+    throw new Error(
+      `Invalid festival ID: ${festivalId}. Please refresh the page and try again.`,
+    );
+  }
+
   const dateWithTime = new TZDate(date, TIMEZONE);
   const now = new TZDate(new Date(), TIMEZONE);
   dateWithTime.setHours(
@@ -250,13 +268,13 @@ export async function addAttendance(formData: {
   );
 
   const { data: attendanceData, error } = await supabase.rpc(
-    "add_or_update_attendance_with_tents",
+    "add_or_update_attendance_with_tents_v3",
     {
       p_user_id: user.id,
-      p_festival_id: festivalId,
       p_beer_count: amount,
       p_tent_ids: tents,
       p_date: dateWithTime.toISOString(),
+      p_festival_id: festivalId,
     },
   );
 
@@ -268,10 +286,11 @@ export async function addAttendance(formData: {
     throw new Error("Error adding/updating attendance: " + error.message);
   }
 
-  const attendanceId = attendanceData as string;
+  const attendanceId = attendanceData?.[0]?.attendance_id;
+  const tentsChanged = attendanceData?.[0]?.tents_changed;
 
-  // Trigger tent check-in notifications if user visited tents
-  if (tents.length > 0) {
+  // Trigger tent check-in notifications only if tents were actually changed
+  if (tents.length > 0 && tentsChanged) {
     try {
       // Get user's group memberships for this festival
       const { data: groupMemberships, error: groupError } = await supabase
@@ -306,6 +325,7 @@ export async function addAttendance(formData: {
           user.id,
           tentNames,
           groupIds,
+          festivalId,
         );
       }
     } catch (notificationError) {
@@ -315,6 +335,60 @@ export async function addAttendance(formData: {
       });
       // Don't fail the attendance operation if notification fails
     }
+  }
+
+  // Invalidate cache tags for leaderboard since attendance affects rankings
+  revalidateTag("leaderboard");
+  revalidateTag("attendances");
+
+  revalidatePath("/attendance");
+  revalidatePath("/home");
+
+  return attendanceId;
+}
+
+/**
+ * Add personal attendance without triggering group notifications
+ * Used for My attendances page where users manage their own data
+ * This function preserves existing tent visit timestamps while allowing modifications
+ */
+export async function addPersonalAttendance(formData: {
+  amount: number;
+  date: Date;
+  tents: string[];
+  festivalId: string;
+}) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  // Use new function that preserves existing tent visit timestamps
+  const { data: result, error: attendanceError } = await supabase.rpc(
+    "update_personal_attendance_with_tents",
+    {
+      p_user_id: user.id,
+      p_date: formatTimestampForDatabase(formData.date),
+      p_beer_count: formData.amount,
+      p_tent_ids: formData.tents.length > 0 ? formData.tents : [],
+      p_festival_id: formData.festivalId,
+    },
+  );
+
+  if (attendanceError) {
+    reportSupabaseException("addPersonalAttendance", attendanceError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error updating attendance: " + attendanceError.message);
+  }
+
+  const attendanceId = result?.[0]?.attendance_id;
+  const tentsAdded = result?.[0]?.tents_added || [];
+  const tentsRemoved = result?.[0]?.tents_removed || [];
+
+  // Only trigger notifications if tents were actually changed
+  if (tentsAdded.length > 0 || tentsRemoved.length > 0) {
+    // Note: We could add notifications here if needed for personal attendance changes
+    // For now, keeping it simple as personal attendance is private
   }
 
   // Invalidate cache tags for leaderboard since attendance affects rankings

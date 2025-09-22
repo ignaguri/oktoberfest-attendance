@@ -41,6 +41,7 @@ import {
   getFestivalTents,
   getAvailableTents,
   addTentToFestival,
+  addAllAvailableTentsToFestival,
   removeTentFromFestival,
   updateTentPrice,
   createTent,
@@ -65,7 +66,6 @@ export default function TentManagement() {
   const [availableTents, setAvailableTents] = useState<any[]>([]);
   const [tentStats, setTentStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [editingTent, setEditingTent] = useState<TentWithPrice | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCopyDialog, setShowCopyDialog] = useState(false);
 
@@ -164,6 +164,16 @@ export default function TentManagement() {
       await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || "Failed to add tent");
+    }
+  };
+
+  const handleAddAllAvailableTents = async () => {
+    try {
+      const result = await addAllAvailableTentsToFestival(selectedFestival);
+      toast.success(`Added ${result.added} tent(s) to festival`);
+      await loadFestivalData();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to add all tents");
     }
   };
 
@@ -466,10 +476,22 @@ export default function TentManagement() {
           {availableTents.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Available Tents</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Tents not yet added to this festival
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Available Tents</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Tents not yet added to this festival
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleAddAllAvailableTents}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add All ({availableTents.length})
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

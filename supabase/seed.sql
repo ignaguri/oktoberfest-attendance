@@ -91,7 +91,7 @@ INSERT INTO festivals (
   '2025-09-20', 
   'https://wiesnmap.muenchen.de/',
   false,
-  'active',
+  'ended',
   'Test festival for development and testing'
 );
 

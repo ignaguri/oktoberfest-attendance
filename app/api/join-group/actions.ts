@@ -3,7 +3,10 @@
 import { logger } from "@/lib/logger";
 import { createNotificationService } from "@/lib/services/notifications";
 import { getUser } from "@/lib/sharedActions";
-import { reportSupabaseException } from "@/utils/sentry";
+import {
+  reportNotificationException,
+  reportSupabaseException,
+} from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -32,6 +35,14 @@ export async function joinGroupWithToken(formData: { token: string }) {
     const notificationService = createNotificationService();
     await notificationService.notifyGroupJoin(groupId, user.id);
   } catch (notificationError) {
+    reportNotificationException(
+      "joinGroupWithToken",
+      notificationError as Error,
+      {
+        id: user.id,
+        email: user.email,
+      },
+    );
     logger.warn(
       "Failed to send join notification",
       logger.serverAction("joinGroupWithToken", { userId: user.id, groupId }),
