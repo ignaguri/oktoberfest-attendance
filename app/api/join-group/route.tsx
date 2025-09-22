@@ -1,4 +1,5 @@
 import { logger } from "@/lib/logger";
+import { reportApiException } from "@/utils/sentry";
 import { NextResponse } from "next/server";
 
 import type { NextRequest } from "next/server";
@@ -21,6 +22,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
   } catch (error) {
+    reportApiException("join-group", error as Error);
     logger.error(
       "Failed to join group with token",
       logger.apiRoute("join-group", { token }),

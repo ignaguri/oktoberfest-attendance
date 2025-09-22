@@ -60,6 +60,20 @@ export const reportNotificationException = (
   );
 };
 
+export const reportApiException = (
+  fnName: string,
+  error: Error,
+  userData?: { email?: string; id: string },
+) => {
+  if (userData) {
+    Sentry.setUser(userData);
+  }
+
+  Sentry.captureException(
+    new Error(`API Error in action "${fnName}": ${error.message}`),
+  );
+};
+
 export const reportLog = (message: string, level: SeverityLevel) => {
   Sentry.captureMessage(message, level);
 };
