@@ -312,6 +312,7 @@ export class NotificationService {
     userId: string,
     tentName: string,
     groupIds: string[],
+    festivalId: string,
   ): Promise<void> {
     try {
       if (groupIds.length === 0) {
@@ -333,29 +334,18 @@ export class NotificationService {
         return;
       }
 
-      // Get group names for better notification context
-      const { data: groups, error: groupsError } = await this.supabase
-        .from("groups")
-        .select("name")
-        .in("id", groupIds);
-
-      if (groupsError) {
-        reportSupabaseException(
-          "notifyTentCheckin",
-          groupsError as PostgrestError,
-        );
-        return;
-      }
-
-      const groupNames = groups?.map((g) => g.name).filter(Boolean) || [];
-      const groupNamesText =
-        groupNames.length > 0 ? groupNames.join(", ") : "Group";
-
-      // Get all group members (excluding the user who checked in)
+      // Get all group members (excluding the user who checked in) for this festival
       const { data: groupMembers, error: membersError } = await this.supabase
         .from("group_members")
-        .select("user_id")
+        .select(
+          `
+          user_id,
+          group_id,
+          groups!inner(name, festival_id)
+        `,
+        )
         .in("group_id", groupIds)
+        .eq("groups.festival_id", festivalId)
         .neq("user_id", userId);
 
       if (membersError) {
@@ -409,9 +399,18 @@ export class NotificationService {
         }
       }
 
-      // Send notifications to all eligible members
-      const notificationPromises = membersToNotify.map((member) =>
-        this.novu.trigger({
+      // Send notifications to all eligible members with their specific group context
+      const notificationPromises = membersToNotify.map((member) => {
+        // Find groups this specific member shares with the check-in user
+        const memberGroups = groupMembers
+          .filter((gm) => gm.user_id === member.user_id)
+          .map((gm) => (gm.groups as any)?.name)
+          .filter(Boolean);
+
+        const groupNamesText =
+          memberGroups.length > 0 ? memberGroups.join(", ") : "Group";
+
+        return this.novu.trigger({
           workflowId: NOTIFICATION_WORKFLOWS.TENT_CHECKIN,
           to: member.user_id!,
           payload: {
@@ -420,8 +419,8 @@ export class NotificationService {
             groupName: groupNamesText,
             userAvatar,
           },
-        }),
-      );
+        });
+      });
 
       await Promise.allSettled(notificationPromises);
     } catch (error) {
