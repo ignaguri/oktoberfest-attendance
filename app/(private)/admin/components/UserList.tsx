@@ -10,7 +10,7 @@ import { formatDateForDatabase } from "@/lib/date-utils";
 import { logger } from "@/lib/logger";
 import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -220,12 +220,22 @@ const UserList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  async function fetchUsers() {
+  const USERS_PER_PAGE = 50;
+
+  async function fetchUsers(page: number = 1, searchTerm: string = "") {
     try {
       setIsLoading(true);
-      const fetchedUsers = await getUsers();
-      setUsers(fetchedUsers as CombinedUser[]);
+      const result = await getUsers(searchTerm, page, USERS_PER_PAGE);
+      setUsers(result.users as CombinedUser[]);
+      setTotalCount(result.totalCount);
+      setTotalPages(result.totalPages);
+      setCurrentPage(result.currentPage);
     } catch (error) {
       logger.error(
         "Error fetching users",
@@ -281,7 +291,7 @@ const UserList = () => {
       if (Object.keys(profileData).length > 0) {
         await updateUserProfile(selectedUser!.id, profileData);
       }
-      fetchUsers();
+      fetchUsers(currentPage, debouncedSearch);
       setSelectedUser(null);
       toast.success("User updated successfully");
       setIsUserDialogOpen(false);
@@ -301,7 +311,7 @@ const UserList = () => {
   async function handleDeleteUser(userId: string) {
     try {
       await deleteUser(userId);
-      fetchUsers();
+      fetchUsers(currentPage, debouncedSearch);
       toast.success("User deleted successfully");
     } catch (error) {
       logger.error(
@@ -357,8 +367,36 @@ const UserList = () => {
     }
   }
 
+  // Debounced search effect
   useEffect(() => {
-    fetchUsers();
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Fetch users when search or page changes
+  useEffect(() => {
+    fetchUsers(currentPage, debouncedSearch);
+  }, [currentPage, debouncedSearch]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    if (debouncedSearch !== search) {
+      setCurrentPage(1);
+    }
+  }, [debouncedSearch, search]);
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(e.target.value);
+    },
+    [],
+  );
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
   }, []);
 
   if (isLoading) {
@@ -374,36 +412,125 @@ const UserList = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-2">User List</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id} className="mb-2">
-            <span>{user.profile?.full_name || "N/A"}</span>
-            <span> · </span>
-            <span>[{user.email}]</span>
-            <Button onClick={() => handleUserSelect(user)} className="ml-2">
-              Edit
-            </Button>
-            <Button
-              onClick={() => handleDeleteUser(user.id)}
-              className="ml-2"
-              variant="destructive"
+      <h2 className="text-xl font-semibold mb-4">User List</h2>
+
+      {/* Search Input */}
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search by name, username, or email..."
+          value={search}
+          onChange={handleSearchChange}
+          className="max-w-sm"
+        />
+      </div>
+
+      {/* Results Info */}
+      <div className="mb-4 text-sm text-gray-600">
+        {debouncedSearch && (
+          <p>
+            Showing {users.length} of {totalCount} users for &ldquo;
+            {debouncedSearch}&rdquo;
+          </p>
+        )}
+        {!debouncedSearch && (
+          <p>
+            Showing {users.length} of {totalCount} users
+          </p>
+        )}
+      </div>
+
+      {/* User List */}
+      {users.length === 0 && !isLoading ? (
+        <div className="text-center py-8 text-gray-500">
+          {debouncedSearch
+            ? "No users found matching your search."
+            : "No users found."}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {users.map((user) => (
+            <li
+              key={user.id}
+              className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border"
             >
-              Delete
-            </Button>
+              <div className="flex-1">
+                <div className="font-medium">
+                  {user.profile?.full_name || "N/A"}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {user.profile?.username && (
+                    <span className="mr-2">@{user.profile.username}</span>
+                  )}
+                  <span>[{user.email}]</span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => handleUserSelect(user)} size="sm">
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleDeleteUser(user.id)}
+                  size="sm"
+                  variant="destructive"
+                >
+                  Delete
+                </Button>
+                <Button
+                  onClick={() => {
+                    setSelectedUser(user);
+                    fetchAttendances(user.id);
+                    setIsAttendanceDialogOpen(true);
+                  }}
+                  size="sm"
+                >
+                  Edit Attendances
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="flex gap-2">
             <Button
-              onClick={() => {
-                setSelectedUser(user);
-                fetchAttendances(user.id);
-                setIsAttendanceDialogOpen(true);
-              }}
-              className="ml-2"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              size="sm"
             >
-              Edit Attendances
+              Previous
             </Button>
-          </li>
-        ))}
-      </ul>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const page =
+                Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+              if (page > totalPages) return null;
+              return (
+                <Button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  variant={page === currentPage ? "default" : "outline"}
+                  size="sm"
+                >
+                  {page}
+                </Button>
+              );
+            })}
+            <Button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              size="sm"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* User Edit Dialog */}
       <ResponsiveDialog

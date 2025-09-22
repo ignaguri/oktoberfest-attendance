@@ -10,25 +10,90 @@ import type { Tables } from "@/lib/database.types";
 
 import "server-only";
 
-export async function getUsers() {
+export async function getUsers(
+  search?: string,
+  page: number = 1,
+  limit: number = 50,
+) {
   const supabase = createClient(true);
-  const { data: users, error } = await supabase.auth.admin.listUsers();
+
+  // Get total count for pagination
+  let totalCount = 0;
+  let profileIds: string[] = [];
+
+  if (search) {
+    // If searching, get matching profile IDs first
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles")
+      .select("id")
+      .or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
+
+    if (profileError)
+      throw new Error("Error fetching profiles: " + profileError.message);
+
+    profileIds = profiles?.map((p) => p.id) || [];
+
+    // Also include users whose email matches the search
+    const { data: emailUsers, error: emailError } =
+      await supabase.auth.admin.listUsers();
+    if (!emailError) {
+      const emailMatchingIds = emailUsers.users
+        .filter((user) =>
+          user.email?.toLowerCase().includes(search.toLowerCase()),
+        )
+        .map((user) => user.id);
+      profileIds = Array.from(new Set([...profileIds, ...emailMatchingIds]));
+    }
+
+    totalCount = profileIds.length;
+  } else {
+    // If no search, get total user count
+    const { data: usersData } = await supabase.auth.admin.listUsers();
+    totalCount = usersData?.users?.length || 0;
+  }
+
+  // If no matches found, return empty result
+  if (search && profileIds.length === 0) {
+    return { users: [], totalCount: 0, totalPages: 0, currentPage: page };
+  }
+
+  // Fetch users with pagination
+  let usersQuery = supabase.auth.admin.listUsers();
+  const { data: users, error } = await usersQuery;
   if (error) throw new Error("Error fetching users: " + error.message);
 
-  // Fetch corresponding profile data
+  // Filter users based on search if needed
+  let filteredUsers = users.users;
+  if (search) {
+    filteredUsers = users.users.filter((user) => profileIds.includes(user.id));
+  }
+
+  // Apply pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Fetch corresponding profile data for paginated users
+  const userIds = paginatedUsers.map((user) => user.id);
   const { data: profiles, error: profileError } = await supabase
     .from("profiles")
-    .select("*");
+    .select("*")
+    .in("id", userIds);
   if (profileError)
     throw new Error("Error fetching profiles: " + profileError.message);
 
   // Combine auth and profile data
-  const combinedUsers = users.users.map((user) => ({
+  const combinedUsers = paginatedUsers.map((user) => ({
     ...user,
-    profile: profiles.find((profile) => profile.id === user.id),
+    profile: profiles?.find((profile) => profile.id === user.id),
   }));
 
-  return combinedUsers;
+  return {
+    users: combinedUsers,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
+  };
 }
 
 export async function updateUserAuth(
@@ -267,7 +332,7 @@ async function convertToWebP(imageBuffer: ArrayBuffer): Promise<Buffer> {
       .webp({ quality: 80 })
       .toBuffer();
     return webpBuffer;
-  } catch (error) {
+  } catch {
     throw new Error("Error converting image to WebP");
   }
 }
