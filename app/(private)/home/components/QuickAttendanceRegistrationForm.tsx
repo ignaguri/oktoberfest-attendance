@@ -78,15 +78,16 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
-      // Only send the new tent ID if it's different from the last one
+      // Only send the new tent ID if it's different from the last one and not empty
       // This prevents duplicate tent visits in the database
       const tentsToSend =
-        attendanceData?.tent_ids &&
-        attendanceData.tent_ids.length > 0 &&
-        attendanceData.tent_ids[attendanceData.tent_ids.length - 1] ===
-          data.tentId
-          ? [] // No new tent to add
-          : [data.tentId]; // Only the new tent
+        data.tentId && // Only if tent is selected (not empty)
+        (!attendanceData?.tent_ids ||
+          attendanceData.tent_ids.length === 0 ||
+          attendanceData.tent_ids[attendanceData.tent_ids.length - 1] !==
+            data.tentId)
+          ? [data.tentId] // Only the new tent
+          : []; // No new tent to add
 
       const newAttendanceId = await addAttendance({
         amount: data.beerCount,
@@ -115,12 +116,14 @@ export const QuickAttendanceRegistrationForm = ({
         setValue("tentId", currentTentId);
       }
 
-      const tentName = tents
-        ?.flatMap((tentGroup) => tentGroup.options)
-        .find((tent) => tent.value === data.tentId)?.label;
+      const tentName = data.tentId
+        ? tents
+            ?.flatMap((tentGroup) => tentGroup.options)
+            .find((tent) => tent.value === data.tentId)?.label
+        : "Outside/No tent";
 
       toast.success(
-        tentName
+        data.tentId && tentName && tentName !== "Outside/No tent"
           ? `Updated attendance for ${tentName}!`
           : `Updated attendance for ${currentFestival.name}!`,
       );
@@ -161,7 +164,7 @@ export const QuickAttendanceRegistrationForm = ({
           disabled={isSubmitting}
         />
       </div>
-      {attendanceData && (
+      {(attendanceData || beerCount > 0) && (
         <div className="flex items-center">
           <Button
             type="button"

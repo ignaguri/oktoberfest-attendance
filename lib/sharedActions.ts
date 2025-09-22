@@ -250,7 +250,7 @@ export async function addAttendance(formData: {
   );
 
   const { data: attendanceData, error } = await supabase.rpc(
-    "add_or_update_attendance_with_tents_v2",
+    "add_or_update_attendance_with_tents_v3",
     {
       p_user_id: user.id,
       p_beer_count: amount,
@@ -268,8 +268,8 @@ export async function addAttendance(formData: {
     throw new Error("Error adding/updating attendance: " + error.message);
   }
 
-  const attendanceId = attendanceData[0]?.attendance_id;
-  const tentsChanged = attendanceData[0]?.tents_changed;
+  const attendanceId = attendanceData?.[0]?.attendance_id;
+  const tentsChanged = attendanceData?.[0]?.tents_changed;
 
   // Trigger tent check-in notifications only if tents were actually changed
   if (tents.length > 0 && tentsChanged) {
@@ -332,6 +332,7 @@ export async function addAttendance(formData: {
 /**
  * Add personal attendance without triggering group notifications
  * Used for My attendances page where users manage their own data
+ * This function replaces all tent visits for the date (not append-only like addAttendance)
  */
 export async function addPersonalAttendance(formData: {
   amount: number;
@@ -342,17 +343,16 @@ export async function addPersonalAttendance(formData: {
   const supabase = createClient();
   const user = await getUser();
 
-  // Insert attendance record
-  const { data: attendanceData, error: attendanceError } = await supabase
-    .from("attendances")
-    .insert({
-      user_id: user.id,
-      festival_id: formData.festivalId,
-      date: formData.date.toISOString().split("T")[0],
-      beer_count: formData.amount,
-    })
-    .select("id")
-    .single();
+  // Use shared function for attendance record upsert
+  const { data: attendanceId, error: attendanceError } = await supabase.rpc(
+    "upsert_attendance_record",
+    {
+      p_user_id: user.id,
+      p_date: formData.date.toISOString().split("T")[0],
+      p_beer_count: formData.amount,
+      p_festival_id: formData.festivalId,
+    },
+  );
 
   if (attendanceError) {
     reportSupabaseException("addPersonalAttendance", attendanceError, {
@@ -362,12 +362,37 @@ export async function addPersonalAttendance(formData: {
     throw new Error("Error adding attendance: " + attendanceError.message);
   }
 
-  const attendanceId = attendanceData.id;
+  // attendanceId is returned directly from the RPC function
 
-  // Add tent visits if tents were provided (no notifications)
+  // Replace tent visits for this date (delete existing, then insert new)
+  // First, delete existing tent visits for this date (using cast to date for comparison)
+  const { error: deleteError } = await supabase
+    .from("tent_visits")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("festival_id", formData.festivalId)
+    .gte("visit_date", formData.date.toISOString().split("T")[0])
+    .lt(
+      "visit_date",
+      new Date(formData.date.getTime() + 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+    );
+
+  if (deleteError) {
+    reportSupabaseException("addPersonalAttendance", deleteError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error(
+      "Error clearing existing tent visits: " + deleteError.message,
+    );
+  }
+
+  // Add new tent visits if tents were provided
   if (formData.tents.length > 0) {
     const tentVisits = formData.tents.map((tentId) => ({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       user_id: user.id,
       festival_id: formData.festivalId,
       tent_id: tentId,

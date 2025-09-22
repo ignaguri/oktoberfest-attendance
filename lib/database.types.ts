@@ -975,6 +975,19 @@ export type Database = {
           tents_changed: boolean;
         }[];
       };
+      add_or_update_attendance_with_tents_v3: {
+        Args: {
+          p_beer_count: number;
+          p_date: string;
+          p_festival_id: string;
+          p_tent_ids: string[];
+          p_user_id: string;
+        };
+        Returns: {
+          attendance_id: string;
+          tents_changed: boolean;
+        }[];
+      };
       calculate_achievement_progress: {
         Args: {
           p_achievement_id: string;
@@ -1219,6 +1232,15 @@ export type Database = {
       update_user_photo_global_settings: {
         Args: { p_hide_photos_from_all_groups: boolean; p_user_id: string };
         Returns: undefined;
+      };
+      upsert_attendance_record: {
+        Args: {
+          p_beer_count: number;
+          p_date: string;
+          p_festival_id: string;
+          p_user_id: string;
+        };
+        Returns: string;
       };
     };
     Enums: {
