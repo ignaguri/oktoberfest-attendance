@@ -1221,6 +1221,20 @@ export type Database = {
         };
         Returns: boolean;
       };
+      update_personal_attendance_with_tents: {
+        Args: {
+          p_beer_count: number;
+          p_date: string;
+          p_festival_id: string;
+          p_tent_ids: string[];
+          p_user_id: string;
+        };
+        Returns: {
+          attendance_id: string;
+          tents_added: string[];
+          tents_removed: string[];
+        }[];
+      };
       update_user_group_photo_settings: {
         Args: {
           p_group_id: string;

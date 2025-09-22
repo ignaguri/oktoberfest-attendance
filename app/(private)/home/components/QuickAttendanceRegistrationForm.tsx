@@ -47,7 +47,9 @@ export const QuickAttendanceRegistrationForm = ({
 
   useEffect(() => {
     const loadAttendance = async () => {
-      if (!currentFestival) return;
+      if (!currentFestival || !currentFestival.id) {
+        return;
+      }
 
       try {
         const attendance = await fetchAttendanceByDate(
