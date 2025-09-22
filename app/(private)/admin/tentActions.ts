@@ -84,11 +84,8 @@ export async function getAvailableTents(
 
   // Only apply the filter if there are assigned tents
   if (assignedTentIds.length > 0) {
-    query = query.not(
-      "id",
-      "in",
-      `(${assignedTentIds.map((id) => `'${id}'`).join(",")})`,
-    );
+    // Use .not() with proper PostgREST syntax for NOT IN
+    query = query.not("id", "in", `(${assignedTentIds.join(",")})`);
   }
 
   const { data, error } = await query.order("name", { ascending: true });
@@ -128,6 +125,45 @@ export async function addTentToFestival(
   revalidatePath("/admin");
   revalidateTag("tents");
   revalidateTag(`festival-tents-${festivalId}`);
+}
+
+/**
+ * Add all available tents to a festival with optional default pricing
+ */
+export async function addAllAvailableTentsToFestival(
+  festivalId: string,
+  defaultBeerPrice?: number | null,
+): Promise<{ added: number; skipped: number }> {
+  const supabase = createClient();
+
+  // Get all available tents for this festival
+  const availableTents = await getAvailableTents(festivalId);
+
+  if (availableTents.length === 0) {
+    return { added: 0, skipped: 0 };
+  }
+
+  // Prepare insert data for all available tents
+  const insertData: FestivalTentInsert[] = availableTents.map((tent) => ({
+    festival_id: festivalId,
+    tent_id: tent.id,
+    beer_price: defaultBeerPrice,
+  }));
+
+  // Insert all tents at once
+  const { error } = await supabase.from("festival_tents").insert(insertData);
+
+  if (error) {
+    reportSupabaseException("addAllAvailableTentsToFestival", error);
+    throw new Error(`Error adding all tents to festival: ${error.message}`);
+  }
+
+  // Invalidate caches
+  revalidatePath("/admin");
+  revalidateTag("tents");
+  revalidateTag(`festival-tents-${festivalId}`);
+
+  return { added: availableTents.length, skipped: 0 };
 }
 
 /**
