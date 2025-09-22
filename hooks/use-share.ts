@@ -15,7 +15,14 @@ export function useShare(options: UseShareOptions = {}) {
 
   const defaultText =
     "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends. Click here to join:";
-  const shareText = `${options.text || defaultText} ${options.url || APP_URL}`;
+
+  // Only append URL if the text doesn't already contain a URL
+  const textContainsUrl =
+    options.text &&
+    (options.text.includes("http") || options.text.includes("www."));
+  const shareText = textContainsUrl
+    ? options.text || defaultText
+    : `${options.text || defaultText} ${options.url || APP_URL}`;
 
   // Check if Web Share API is supported
   const isWebShareSupported =
@@ -31,8 +38,8 @@ export function useShare(options: UseShareOptions = {}) {
     try {
       await navigator.share({
         title: options.title || "ProstCounter App",
-        text: options.text || defaultText,
-        url: options.url || APP_URL,
+        text: textContainsUrl ? options.text : options.text || defaultText,
+        url: textContainsUrl ? undefined : options.url || APP_URL,
       });
     } catch (error) {
       // User cancelled or error occurred, fallback to clipboard
