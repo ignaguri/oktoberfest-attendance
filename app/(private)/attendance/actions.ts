@@ -1,6 +1,7 @@
 "use server";
 
 import { TIMEZONE } from "@/lib/constants";
+import { formatTimestampForDatabase } from "@/lib/date-utils";
 import { createNotificationService } from "@/lib/services/notifications";
 import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
 import {
@@ -11,6 +12,7 @@ import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import { isSameDay, format } from "date-fns";
 import { revalidatePath } from "next/cache";
+import { v4 as uuidv4 } from "uuid";
 
 import "server-only";
 
@@ -162,11 +164,11 @@ export async function checkInFromReservation(reservationId: string) {
   const { error: tentVisitError } = await supabase
     .from("tent_visits")
     .insert({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       user_id: user.id,
       festival_id: reservation.festival_id,
       tent_id: reservation.tent_id,
-      visit_date: startDate.toISOString(),
+      visit_date: formatTimestampForDatabase(startDate),
     })
     .select()
     .single();

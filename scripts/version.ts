@@ -4,6 +4,8 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
+import { formatDateForDatabase } from "../lib/date-utils";
+
 // Configuration
 const PACKAGE_JSON_PATH = path.join(__dirname, "..", "package.json");
 const CHANGELOG_MD_PATH = path.join(__dirname, "..", "CHANGELOG.md");
@@ -118,7 +120,7 @@ function generateRepositoryChangelog(newVersion: string): number {
 
     // Generate markdown content
     let changelogContent = "";
-    const date = new Date().toISOString().split("T")[0];
+    const date = formatDateForDatabase(new Date());
     changelogContent += `## [${newVersion}] - ${date}\n\n`;
 
     Object.entries(commitsByType).forEach(([type, commits]) => {
