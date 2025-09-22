@@ -1,5 +1,6 @@
 "use server";
 
+import { formatTimestampForDatabase } from "@/lib/date-utils";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
@@ -182,11 +183,19 @@ export async function deleteAttendance(attendanceId: string) {
 
 export async function getTentVisitsForAttendance(userId: string, date: Date) {
   const supabase = createClient(true);
+
+  // Create start and end of day timestamps for the given date
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
   const { data: tentVisits, error } = await supabase
     .from("tent_visits")
     .select("tent_id")
     .eq("user_id", userId)
-    .eq("visit_date", date.toISOString().split("T")[0]); // Use the date for filtering
+    .gte("visit_date", formatTimestampForDatabase(startOfDay))
+    .lte("visit_date", formatTimestampForDatabase(endOfDay));
 
   if (error) throw new Error("Error fetching tent visits: " + error.message);
   return tentVisits;
