@@ -256,6 +256,7 @@ export async function addAttendance(formData: {
       p_beer_count: amount,
       p_tent_ids: tents,
       p_date: dateWithTime.toISOString(),
+      p_festival_id: festivalId,
     },
   );
 
