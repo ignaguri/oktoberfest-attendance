@@ -906,28 +906,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "fk_user_id";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
@@ -961,6 +961,18 @@ export type Database = {
           p_user_id: string;
         };
         Returns: string;
+      };
+      add_or_update_attendance_with_tents_v2: {
+        Args: {
+          p_beer_count: number;
+          p_date: string;
+          p_tent_ids: string[];
+          p_user_id: string;
+        };
+        Returns: {
+          attendance_id: string;
+          tents_changed: boolean;
+        }[];
       };
       calculate_achievement_progress: {
         Args: {
