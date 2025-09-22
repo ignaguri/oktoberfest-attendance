@@ -250,10 +250,9 @@ export async function addAttendance(formData: {
   );
 
   const { data: attendanceData, error } = await supabase.rpc(
-    "add_or_update_attendance_with_tents",
+    "add_or_update_attendance_with_tents_v2",
     {
       p_user_id: user.id,
-      p_festival_id: festivalId,
       p_beer_count: amount,
       p_tent_ids: tents,
       p_date: dateWithTime.toISOString(),
@@ -268,10 +267,11 @@ export async function addAttendance(formData: {
     throw new Error("Error adding/updating attendance: " + error.message);
   }
 
-  const attendanceId = attendanceData as string;
+  const attendanceId = attendanceData[0]?.attendance_id;
+  const tentsChanged = attendanceData[0]?.tents_changed;
 
-  // Trigger tent check-in notifications if user visited tents
-  if (tents.length > 0) {
+  // Trigger tent check-in notifications only if tents were actually changed
+  if (tents.length > 0 && tentsChanged) {
     try {
       // Get user's group memberships for this festival
       const { data: groupMemberships, error: groupError } = await supabase
@@ -306,6 +306,7 @@ export async function addAttendance(formData: {
           user.id,
           tentNames,
           groupIds,
+          festivalId,
         );
       }
     } catch (notificationError) {
@@ -314,6 +315,74 @@ export async function addAttendance(formData: {
         email: user.email,
       });
       // Don't fail the attendance operation if notification fails
+    }
+  }
+
+  // Invalidate cache tags for leaderboard since attendance affects rankings
+  revalidateTag("leaderboard");
+  revalidateTag("attendances");
+
+  revalidatePath("/attendance");
+  revalidatePath("/home");
+
+  return attendanceId;
+}
+
+/**
+ * Add personal attendance without triggering group notifications
+ * Used for My attendances page where users manage their own data
+ */
+export async function addPersonalAttendance(formData: {
+  amount: number;
+  date: Date;
+  tents: string[];
+  festivalId: string;
+}) {
+  const supabase = createClient();
+  const user = await getUser();
+
+  // Insert attendance record
+  const { data: attendanceData, error: attendanceError } = await supabase
+    .from("attendances")
+    .insert({
+      user_id: user.id,
+      festival_id: formData.festivalId,
+      date: formData.date.toISOString().split("T")[0],
+      beer_count: formData.amount,
+    })
+    .select("id")
+    .single();
+
+  if (attendanceError) {
+    reportSupabaseException("addPersonalAttendance", attendanceError, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error adding attendance: " + attendanceError.message);
+  }
+
+  const attendanceId = attendanceData.id;
+
+  // Add tent visits if tents were provided (no notifications)
+  if (formData.tents.length > 0) {
+    const tentVisits = formData.tents.map((tentId) => ({
+      id: crypto.randomUUID(),
+      user_id: user.id,
+      festival_id: formData.festivalId,
+      tent_id: tentId,
+      visit_date: formData.date.toISOString(),
+    }));
+
+    const { error: tentVisitError } = await supabase
+      .from("tent_visits")
+      .insert(tentVisits);
+
+    if (tentVisitError) {
+      reportSupabaseException("addPersonalAttendance", tentVisitError, {
+        id: user.id,
+        email: user.email,
+      });
+      throw new Error("Error adding tent visits: " + tentVisitError.message);
     }
   }
 

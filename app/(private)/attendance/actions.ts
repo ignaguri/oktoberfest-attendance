@@ -1,8 +1,12 @@
 "use server";
 
 import { TIMEZONE } from "@/lib/constants";
+import { createNotificationService } from "@/lib/services/notifications";
 import { fetchAttendancesFromDB, getUser } from "@/lib/sharedActions";
-import { reportSupabaseException } from "@/utils/sentry";
+import {
+  reportNotificationException,
+  reportSupabaseException,
+} from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { TZDate } from "@date-fns/tz";
 import { isSameDay, format } from "date-fns";
@@ -192,6 +196,46 @@ export async function checkInFromReservation(reservationId: string) {
       email: user.email,
     });
     throw new Error("Error updating reservation status");
+  }
+
+  // Trigger tent check-in notifications
+  try {
+    // Get user's group memberships for this festival
+    const { data: groupMemberships, error: groupError } = await supabase
+      .from("group_members")
+      .select(
+        `
+        group_id,
+        groups!inner(festival_id)
+      `,
+      )
+      .eq("user_id", user.id)
+      .eq("groups.festival_id", reservation.festival_id);
+
+    if (!groupError && groupMemberships && groupMemberships.length > 0) {
+      const tentName = (reservation.tents as any)?.name || "Tent";
+      const groupIds = groupMemberships
+        .map((membership) => membership.group_id)
+        .filter((id): id is string => id !== null);
+
+      const notificationService = createNotificationService();
+      await notificationService.notifyTentCheckin(
+        user.id,
+        tentName,
+        groupIds,
+        reservation.festival_id,
+      );
+    }
+  } catch (notificationError) {
+    reportNotificationException(
+      "checkInFromReservation",
+      notificationError as Error,
+      {
+        id: user.id,
+        email: user.email,
+      },
+    );
+    // Don't fail the check-in operation if notification fails
   }
 
   // Revalidate relevant paths
