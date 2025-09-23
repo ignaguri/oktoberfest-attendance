@@ -149,3 +149,36 @@ export async function getCurrentUserForGroup(groupId: string) {
 
   return currentUserForGroup;
 }
+
+export async function regenerateInviteToken(groupId: string) {
+  const user = await getUser();
+
+  // Verify user is the group creator
+  const isCreator = await getCurrentUserForGroup(groupId);
+  if (!isCreator.isCreator) {
+    throw new Error("Only the group creator can regenerate invite tokens");
+  }
+
+  const supabase = createClient();
+
+  // Use the existing RPC function to regenerate token
+  const { data: newToken, error } = await supabase.rpc("renew_group_token", {
+    p_group_id: groupId,
+  });
+
+  if (error) {
+    reportSupabaseException("regenerateInviteToken", error, {
+      id: user.id,
+      email: user.email,
+    });
+    throw new Error("Error regenerating invite token: " + error.message);
+  }
+
+  // Invalidate cache tags for groups
+  revalidateTag("groups");
+
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/group-settings/${groupId}`);
+
+  return newToken;
+}

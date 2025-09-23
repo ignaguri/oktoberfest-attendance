@@ -21,6 +21,7 @@ import { fetchWinningCriterias } from "@/lib/sharedActions";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, Copy, Check } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,7 +31,12 @@ import type { Tables } from "@/lib/database.types";
 import type { GroupSettingsFormData } from "@/lib/schemas/groups";
 import type { WinningCriteria } from "@/lib/types";
 
-import { getCurrentUserForGroup, updateGroup, removeMember } from "./actions";
+import {
+  getCurrentUserForGroup,
+  updateGroup,
+  removeMember,
+  regenerateInviteToken,
+} from "./actions";
 
 type Props = {
   group: Tables<"groups">;
@@ -48,6 +54,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const [winningCriterias, setWinningCriterias] = useState<
     { id: number; name: string }[]
   >([]);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [isGeneratingToken, setIsGeneratingToken] = useState(false);
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   const {
     register,
@@ -128,6 +137,44 @@ export default function GroupSettingsClient({ group, members }: Props) {
       setSelectedUserId(null);
     }
   }, [currentUser?.isCreator, group.id, selectedUserId]);
+
+  const handleRegenerateToken = useCallback(async () => {
+    if (!currentUser?.isCreator) return;
+
+    setIsGeneratingToken(true);
+    try {
+      const newToken = await regenerateInviteToken(group.id);
+      setInviteToken(newToken);
+      toast.success("Invite token regenerated!", {
+        description: "A new invitation link has been generated for your group.",
+      });
+    } catch (error) {
+      toast.error("Error regenerating token", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred.",
+      });
+    } finally {
+      setIsGeneratingToken(false);
+    }
+  }, [currentUser?.isCreator, group.id]);
+
+  const handleCopyToClipboard = useCallback(async () => {
+    if (!inviteToken) return;
+
+    try {
+      const inviteUrl = `${window.location.origin}/join-group?token=${inviteToken}`;
+      await navigator.clipboard.writeText(inviteUrl);
+      setCopiedToClipboard(true);
+      toast.success("Invite link copied to clipboard!");
+
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setCopiedToClipboard(false), 2000);
+    } catch {
+      toast.error("Failed to copy to clipboard");
+    }
+  }, [inviteToken]);
 
   return (
     <div className="w-full max-w-lg">
@@ -244,6 +291,72 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </form>
         </div>
       </div>
+
+      {/* Invite Token Section */}
+      {currentUser?.isCreator && (
+        <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg mt-4">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              Invite Link
+            </h3>
+            <div className="space-y-2 mb-4">
+              <p className="text-sm text-gray-600">
+                Share this link with people you want to invite to your group.
+              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm text-yellow-800">
+                <p className="font-medium">⏰ Token expires in 7 days</p>
+                <p>
+                  Generate a new link when the current one expires to ensure
+                  your invites remain active.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex space-x-2">
+                <Input
+                  type="text"
+                  value={
+                    inviteToken
+                      ? `${window.location.origin}/join-group?token=${inviteToken}`
+                      : "Generate a new invite link"
+                  }
+                  readOnly
+                  className="flex-1"
+                  placeholder="Generate a new invite link"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCopyToClipboard}
+                  disabled={!inviteToken}
+                  className="px-3"
+                >
+                  {copiedToClipboard ? (
+                    <Check className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+
+              <Button
+                type="button"
+                variant="yellow"
+                onClick={handleRegenerateToken}
+                disabled={isGeneratingToken}
+                className="flex items-center"
+              >
+                <Link className="w-4 h-4 mr-2" />
+                {isGeneratingToken
+                  ? "Generating..."
+                  : "Generate New Invite Link"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mt-4">
         <h3 className="text-xl font-semibold mb-2">Group Members</h3>
         <table className="min-w-full divide-y divide-gray-200">
