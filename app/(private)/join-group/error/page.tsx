@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { format } from "date-fns";
-import { AlertCircle, Clock, Users, Home, RefreshCw } from "lucide-react";
+import { AlertCircle, Clock, Users, Home, RefreshCw, Info } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function JoinGroupErrorPage() {
@@ -170,22 +170,14 @@ export default function JoinGroupErrorPage() {
 
             {type === "expired" && (
               <div className="flex flex-col gap-3">
-                <Alert variant="info">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert variant="warning">
+                  <AlertTitle className="flex items-center justify-center gap-2">
+                    <Info className="size-4" />
+                    <span>Need a new invitation?</span>
+                  </AlertTitle>
                   <AlertDescription>
-                    <strong>Token Expiration Info</strong>
-                    <br />
+                    Ask a group member to generate a new invite link for you.
                     Invitation links expire after 7 days for security reasons.
-                  </AlertDescription>
-                </Alert>
-
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>What to do next</strong>
-                    <br />
-                    Need a new invitation? Ask a group member to generate a new
-                    invite link for you.
                   </AlertDescription>
                 </Alert>
               </div>
