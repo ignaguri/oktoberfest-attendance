@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,22 +11,19 @@ import {
 } from "@/components/ui/card";
 import { format } from "date-fns";
 import { AlertCircle, Clock, Users, Home, RefreshCw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
 
-interface ErrorPageProps {
-  searchParams: {
-    type?: string;
-    group?: string;
-    expired_at?: string;
-  };
-}
-
-export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
+export default function JoinGroupErrorPage() {
   const router = useRouter();
-  const { type, group, expired_at } = searchParams;
-  const [isRetrying, setIsRetrying] = useState(false);
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
+  const group = searchParams.get("group");
+  const group_id = searchParams.get("group_id");
+  const expired_at = searchParams.get("expired_at");
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+  };
 
   const getErrorContent = () => {
     switch (type) {
@@ -42,13 +39,13 @@ export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
             {
               label: "Go to Groups",
               variant: "default" as const,
-              onClick: () => router.push("/groups"),
+              path: "/groups",
               icon: Users,
             },
             {
               label: "Go Home",
               variant: "outline" as const,
-              onClick: () => router.push("/home"),
+              path: "/home",
               icon: Home,
             },
           ],
@@ -64,13 +61,13 @@ export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
             {
               label: "View Group",
               variant: "default" as const,
-              onClick: () => router.push(`/groups/${group}`),
+              path: `/groups/${group_id}`,
               icon: Users,
             },
             {
               label: "Go to Groups",
               variant: "outline" as const,
-              onClick: () => router.push("/groups"),
+              path: "/groups",
               icon: Users,
             },
           ],
@@ -86,13 +83,13 @@ export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
             {
               label: "Go to Groups",
               variant: "default" as const,
-              onClick: () => router.push("/groups"),
+              path: "/groups",
               icon: Users,
             },
             {
               label: "Go Home",
               variant: "outline" as const,
-              onClick: () => router.push("/home"),
+              path: "/home",
               icon: Home,
             },
           ],
@@ -108,13 +105,13 @@ export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
             {
               label: "Try Again",
               variant: "default" as const,
-              onClick: () => router.back(),
+              path: "back",
               icon: RefreshCw,
             },
             {
               label: "Go to Groups",
               variant: "outline" as const,
-              onClick: () => router.push("/groups"),
+              path: "/groups",
               icon: Users,
             },
           ],
@@ -125,19 +122,8 @@ export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
   const errorContent = getErrorContent();
   const Icon = errorContent.icon;
 
-  const handleAction = (action: (typeof errorContent.actions)[0]) => {
-    setIsRetrying(true);
-    try {
-      action.onClick();
-    } catch (error) {
-      toast.error("Error navigating to page");
-    } finally {
-      setIsRetrying(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center">
       <div className="max-w-md w-full">
         <Card>
           <CardHeader className="text-center">
@@ -151,58 +137,74 @@ export default function JoinGroupErrorPage({ searchParams }: ErrorPageProps) {
               {errorContent.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="flex flex-col gap-6">
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{errorContent.message}</AlertDescription>
             </Alert>
 
-            <div className="space-y-3">
+            <div className="flex flex-col items-center gap-3">
               {errorContent.actions.map((action, index) => {
                 const IconComponent = action.icon;
                 return (
                   <Button
                     key={index}
-                    variant={action.variant}
-                    className="w-full justify-center"
-                    onClick={() => handleAction(action)}
-                    disabled={isRetrying}
+                    variant={
+                      action.variant === "default" ? "darkYellow" : "outline"
+                    }
+                    className="w-fit justify-center"
+                    onClick={() => {
+                      if (action.path === "back") {
+                        window.history.back();
+                      } else {
+                        handleNavigation(action.path);
+                      }
+                    }}
                   >
-                    <IconComponent className="w-4 h-4 mr-2" />
-                    {isRetrying ? "Loading..." : action.label}
+                    <IconComponent className="size-4 mr-2" />
+                    {action.label}
                   </Button>
                 );
               })}
             </div>
 
             {type === "expired" && (
-              <div className="text-center space-y-2">
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
-                  <p className="font-medium">ℹ️ Token Expiration Info</p>
-                  <p>
+              <div className="flex flex-col gap-3">
+                <Alert variant="info">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Token Expiration Info</strong>
+                    <br />
                     Invitation links expire after 7 days for security reasons.
-                  </p>
-                </div>
-                <div className="text-gray-500">
-                  <p>Need a new invitation?</p>
-                  <p>
-                    Ask a group member to generate a new invite link for you.
-                  </p>
-                </div>
+                  </AlertDescription>
+                </Alert>
+
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>What to do next</strong>
+                    <br />
+                    Need a new invitation? Ask a group member to generate a new
+                    invite link for you.
+                  </AlertDescription>
+                </Alert>
               </div>
             )}
 
             {type === "invalid" && (
-              <div className="text-center space-y-2">
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
-                  <p className="font-medium">ℹ️ Possible Reasons</p>
-                  <ul className="text-left mt-2 space-y-1">
+              <Alert variant="destructive">
+                <AlertTitle className="flex items-center justify-center gap-2">
+                  <AlertCircle className="size-4" />
+                  <span>Possible Reasons</span>
+                </AlertTitle>
+                <AlertDescription>
+                  <ul className="mt-2 flex flex-col gap-1 text-left items-start">
                     <li>• The invitation link was incorrect or mistyped</li>
                     <li>• The group no longer exists</li>
                     <li>• The invitation was cancelled by the group admin</li>
                   </ul>
-                </div>
-              </div>
+                </AlertDescription>
+              </Alert>
             )}
           </CardContent>
         </Card>

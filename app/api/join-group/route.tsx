@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 
 import { joinGroupWithToken } from "./actions";
 
-export async function GET(request: NextRequest) {
+async function handleJoinGroupRequest(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
 
@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
     const err = error as Error & {
       code?: string;
       groupName?: string;
+      groupId?: string;
       expiredAt?: string;
     };
 
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
       const errorUrl = new URL(`/join-group/error`, request.nextUrl.origin);
       errorUrl.searchParams.set("type", "expired");
       errorUrl.searchParams.set("group", err.groupName || "Unknown Group");
+      errorUrl.searchParams.set("group_id", err.groupId || "");
       errorUrl.searchParams.set("expired_at", err.expiredAt || "");
 
       return NextResponse.redirect(errorUrl);
@@ -61,6 +63,7 @@ export async function GET(request: NextRequest) {
       const errorUrl = new URL(`/join-group/error`, request.nextUrl.origin);
       errorUrl.searchParams.set("type", "already_member");
       errorUrl.searchParams.set("group", err.groupName || "Unknown Group");
+      errorUrl.searchParams.set("group_id", err.groupId || "");
 
       return NextResponse.redirect(errorUrl);
     } else if (err.code === "TOKEN_NOT_FOUND" || err.code === "TOKEN_INVALID") {
@@ -78,4 +81,12 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({ error: "Invalid token." }, { status: 400 });
+}
+
+export async function GET(request: NextRequest) {
+  return handleJoinGroupRequest(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handleJoinGroupRequest(request);
 }

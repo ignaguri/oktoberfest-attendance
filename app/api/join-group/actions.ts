@@ -25,6 +25,7 @@ type JoinGroupTokenResponse =
       error_code: "TOKEN_NOT_FOUND" | "TOKEN_EXPIRED" | "ALREADY_MEMBER";
       message: string;
       group_name?: string;
+      group_id?: string;
       expired_at?: string;
     };
 
@@ -56,19 +57,23 @@ export async function joinGroupWithToken(formData: { token: string }) {
       const error = new Error(errorMessage) as Error & {
         code: string;
         groupName?: string;
+        groupId?: string;
         expiredAt?: string;
       };
       error.code = "TOKEN_EXPIRED";
       error.groupName = result.group_name;
+      error.groupId = result.group_id;
       error.expiredAt = result.expired_at;
       throw error;
     } else if (result.error_code === "ALREADY_MEMBER") {
       const error = new Error(errorMessage) as Error & {
         code: string;
         groupName?: string;
+        groupId?: string;
       };
       error.code = "ALREADY_MEMBER";
       error.groupName = result.group_name;
+      error.groupId = result.group_id;
       throw error;
     } else {
       const error = new Error(errorMessage) as Error & {

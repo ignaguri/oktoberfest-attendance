@@ -74,7 +74,8 @@ BEGIN
       'error_code', 'TOKEN_EXPIRED',
       'message', 'This invitation token has expired',
       'expired_at', v_token_expires_at,
-      'group_name', v_group_name
+      'group_name', v_group_name,
+      'group_id', v_group_id
     );
   END IF;
 
@@ -84,7 +85,8 @@ BEGIN
       'success', false,
       'error_code', 'ALREADY_MEMBER',
       'message', 'You are already a member of this group',
-      'group_name', v_group_name
+      'group_name', v_group_name,
+      'group_id', v_group_id
     );
   END IF;
 
