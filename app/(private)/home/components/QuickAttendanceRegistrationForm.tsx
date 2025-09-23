@@ -79,6 +79,7 @@ export const QuickAttendanceRegistrationForm = ({
       return;
     }
 
+    console.log("onSubmit", data);
     try {
       // Only send the new tent ID if it's different from the last one and not empty
       // This prevents duplicate tent visits in the database
@@ -90,6 +91,8 @@ export const QuickAttendanceRegistrationForm = ({
             data.tentId)
           ? [data.tentId] // Only the new tent
           : []; // No new tent to add
+
+      console.log("tentsToSend", tentsToSend);
 
       const newAttendanceId = await addAttendance({
         amount: data.beerCount,
@@ -103,12 +106,15 @@ export const QuickAttendanceRegistrationForm = ({
           ? [...(attendanceData?.tent_ids ?? []), ...tentsToSend]
           : (attendanceData?.tent_ids ?? []);
 
+      console.log("newAttendanceId", newAttendanceId);
+
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
         beer_count: data.beerCount,
         tent_ids: updatedTentIds,
       };
+      console.log("updatedAttendance", updatedAttendance);
       setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);
 
@@ -148,51 +154,49 @@ export const QuickAttendanceRegistrationForm = ({
 
   return (
     <form className="flex flex-col items-center gap-4">
-      {!attendanceData && <p>Are you at {currentFestival.name} today?</p>}
-      <div className="flex items-center gap-2">
-        <span>{attendanceData ? "You are at:" : "Which tent?"}</span>
-        <SingleSelect
-          value={tentId}
-          buttonClassName="w-fit self-center"
-          options={tents.map((tent) => ({
-            title: tent.category,
-            options: tent.options,
-          }))}
-          placeholder="Select your current tent"
-          onSelect={(option) => {
-            setValue("tentId", option.value);
+      <p className="text-sm font-semibold">
+        {tentId ? "You are at:" : "Are you there today?"}
+      </p>
+      <SingleSelect
+        value={tentId}
+        className="w-3/4"
+        buttonClassName="self-center"
+        options={tents.map((tent) => ({
+          title: tent.category,
+          options: tent.options,
+        }))}
+        placeholder="Select your current tent"
+        onSelect={(option) => {
+          setValue("tentId", option.value);
+          handleSubmit(onSubmit)();
+        }}
+        disabled={isSubmitting}
+      />
+      <div className="flex items-center">
+        <Button
+          type="button"
+          variant="yellow"
+          onClick={() => {
+            setValue("beerCount", Math.max(0, beerCount - 1));
             handleSubmit(onSubmit)();
           }}
           disabled={isSubmitting}
-        />
+        >
+          <Minus className="w-4 h-4" />
+        </Button>
+        <span className="mx-2">{beerCount} 🍺 drank today</span>
+        <Button
+          type="button"
+          variant="yellow"
+          onClick={() => {
+            setValue("beerCount", beerCount + 1);
+            handleSubmit(onSubmit)();
+          }}
+          disabled={isSubmitting}
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
       </div>
-      {(attendanceData || beerCount > 0) && (
-        <div className="flex items-center">
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", Math.max(0, beerCount - 1));
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <span className="mx-2">{beerCount} 🍺 drank today</span>
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", beerCount + 1);
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
     </form>
   );
 };

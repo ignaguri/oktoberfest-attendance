@@ -4,7 +4,7 @@ import { add } from "date-fns";
 import { z } from "zod";
 
 export const quickAttendanceSchema = z.object({
-  tentId: z.string().min(1, "Please select a tent"),
+  tentId: z.string(),
   beerCount: z.number().min(0, "Beer count cannot be negative"),
 });
 
