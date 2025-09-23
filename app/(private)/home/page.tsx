@@ -51,7 +51,7 @@ export default async function Home() {
         <div className="flex flex-col gap-4">
           <MissingFields />
 
-          <div data-tutorial="highlights">
+          <div data-tutorial="highlights" className="flex flex-col gap-4">
             <Highlights />
             <AchievementHighlight />
           </div>
