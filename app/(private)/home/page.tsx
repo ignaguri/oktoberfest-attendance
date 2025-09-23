@@ -27,19 +27,15 @@ export default async function Home() {
   return (
     <TutorialProvider tutorialCompleted={tutorialStatus.tutorial_completed}>
       <div className="max-w-lg flex flex-col">
-        <header className="flex flex-col items-center gap-2">
+        <header className="flex flex-row items-center gap-4 mb-4">
           <Image
             src={LogoImage}
             alt="Prost Counter Logo"
             className="inline-block size-20 sm:size-24"
           />
-          <h1 className="mb-6 text-4xl font-bold sm:text-5xl">
-            <span className="font-extrabold text-yellow-600" translate="no">
-              Prost
-            </span>
-            <span className="font-extrabold text-yellow-500" translate="no">
-              Counter
-            </span>
+          <h1 className="text-4xl font-extrabold sm:text-5xl" translate="no">
+            <span className="text-yellow-600">Prost</span>
+            <span className="text-yellow-500">Counter</span>
           </h1>
         </header>
 
