@@ -121,7 +121,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   ) => {
     if (item.href) {
       return (
-        <DropdownMenuItem key={item.id} asChild>
+        <DropdownMenuItem key={item.id} asChild className="py-2 cursor-pointer">
           <Link href={item.href} className="flex items-center gap-2">
             {item.icon}
             {item.label}
@@ -136,7 +136,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
         onClick={item.onClick}
         disabled={item.disabled}
         className={cn(
-          "flex items-center gap-2",
+          "flex items-center gap-2 py-2 cursor-pointer",
           item.variant === "destructive" &&
             "text-destructive focus:text-destructive",
         )}
@@ -157,11 +157,14 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
     return (
       <>
         <DropdownMenuLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <CalendarDays className="h-3 w-3" />
+          <CalendarDays className="size-3" />
           Current Festival
         </DropdownMenuLabel>
-        <div className="px-2 py-1.5">
-          <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
+        <div className="px-2">
+          <div
+            className="flex items-center gap-2 p-2 rounded-md bg-muted/50 hover:bg-muted/70 cursor-pointer transition-colors"
+            onClick={() => setIsFestivalModalOpen(true)}
+          >
             <div className="h-8 w-8 rounded-md bg-yellow-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
               {firstLetter}
               <sub className="text-xs">{lastTwoDigits}</sub>
@@ -183,6 +186,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                 </div>
               </div>
             </div>
+            <ChevronDown className="size-4 text-muted-foreground" />
           </div>
         </div>
         <DropdownMenuSeparator />
@@ -226,7 +230,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                   <div className="flex items-center gap-3 w-full">
                     <div
                       className={cn(
-                        "h-10 w-10 rounded-md flex items-center justify-center font-semibold flex-shrink-0",
+                        "size-10 rounded-md flex items-center justify-center font-semibold flex-shrink-0",
                         isSelected
                           ? "bg-white text-yellow-500"
                           : "bg-yellow-500 text-white",
