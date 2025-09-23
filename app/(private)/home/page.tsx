@@ -40,7 +40,7 @@ export default async function Home() {
         </header>
 
         <div className="mb-4 flex flex-col gap-4">
-          <div data-tutorial="festival-status">
+          <div data-tutorial="festival-status" className="self-center">
             <FestivalStatus />
           </div>
           <div data-tutorial="quick-attendance">

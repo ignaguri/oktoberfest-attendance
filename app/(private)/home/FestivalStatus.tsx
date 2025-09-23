@@ -50,6 +50,7 @@ export default function FestivalStatus() {
             ? "info"
             : "warning"
       }
+      className="w-fit"
     >
       <AlertDescription className="text-center font-semibold">
         {status}
