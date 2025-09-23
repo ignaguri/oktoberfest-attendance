@@ -40,7 +40,7 @@ export default function ShareButton({
       const token = await renewGroupToken(groupId);
       const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
       setGroupLink(newGroupLink);
-    } catch (error) {
+    } catch {
       toast.error("Error", {
         description: "Failed to generate share link. Please try again.",
       });

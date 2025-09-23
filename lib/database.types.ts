@@ -906,28 +906,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "fk_user_id";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
@@ -1178,7 +1178,7 @@ export type Database = {
       };
       join_group_with_token: {
         Args: { p_token: string; p_user_id: string };
-        Returns: string;
+        Returns: Json;
       };
       renew_group_token: {
         Args: { p_group_id: string };
