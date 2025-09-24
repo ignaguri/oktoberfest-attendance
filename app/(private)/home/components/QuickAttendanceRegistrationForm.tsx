@@ -79,7 +79,6 @@ export const QuickAttendanceRegistrationForm = ({
       return;
     }
 
-    console.log("onSubmit", data);
     try {
       // Only send the new tent ID if it's different from the last one and not empty
       // This prevents duplicate tent visits in the database
@@ -91,8 +90,6 @@ export const QuickAttendanceRegistrationForm = ({
             data.tentId)
           ? [data.tentId] // Only the new tent
           : []; // No new tent to add
-
-      console.log("tentsToSend", tentsToSend);
 
       const newAttendanceId = await addAttendance({
         amount: data.beerCount,
@@ -106,15 +103,12 @@ export const QuickAttendanceRegistrationForm = ({
           ? [...(attendanceData?.tent_ids ?? []), ...tentsToSend]
           : (attendanceData?.tent_ids ?? []);
 
-      console.log("newAttendanceId", newAttendanceId);
-
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
         beer_count: data.beerCount,
         tent_ids: updatedTentIds,
       };
-      console.log("updatedAttendance", updatedAttendance);
       setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);
 
