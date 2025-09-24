@@ -233,13 +233,8 @@ export function TutorialTooltip({
         <div className="text-sm text-gray-500">
           Step {currentStepIndex + 1} of {totalSteps}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="size-6 p-0"
-        >
-          <X className="h-4 w-4" />
+        <Button variant="ghost" size="sm" onClick={onClose} className="p-0">
+          <X className="size-4" />
         </Button>
       </div>
 
