@@ -7,6 +7,7 @@ import {
   getFestivalStatus,
 } from "@/lib/festivalConstants";
 import { differenceInDays, isWithinInterval, isBefore } from "date-fns";
+import { CalendarCheck } from "lucide-react";
 
 export default function FestivalStatus() {
   const { currentFestival, isLoading } = useFestival();
@@ -45,15 +46,16 @@ export default function FestivalStatus() {
     <Alert
       variant={
         festivalStatus === "active"
-          ? "success"
+          ? "successLight"
           : festivalStatus === "upcoming"
             ? "info"
             : "warning"
       }
       className="w-fit"
     >
-      <AlertDescription className="text-center font-semibold">
-        {status}
+      <AlertDescription className="flex items-center gap-2">
+        <CalendarCheck className="size-5" />
+        <span className="font-semibold">{status}</span>
       </AlertDescription>
     </Alert>
   );
