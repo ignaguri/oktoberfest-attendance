@@ -17,6 +17,7 @@ import Image from "next/image";
 
 import FestivalStatus from "./FestivalStatus";
 import Highlights from "./Highlights";
+import LeaderboardPreview from "./LeaderboardPreview";
 import MapButton from "./MapButton";
 import MissingFields from "./MissingFields";
 import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
@@ -53,6 +54,7 @@ export default async function Home() {
 
           <div data-tutorial="highlights" className="flex flex-col gap-4">
             <Highlights />
+            <LeaderboardPreview />
             <AchievementHighlight />
           </div>
 
