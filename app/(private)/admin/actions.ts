@@ -2,13 +2,158 @@
 
 import { formatTimestampForDatabase } from "@/lib/date-utils";
 import { createClient } from "@/utils/supabase/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Tables } from "@/lib/database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import "server-only";
+
+// Cached version of getUsers for better performance
+const getCachedUsers = unstable_cache(
+  async (
+    search: string | undefined,
+    page: number,
+    limit: number,
+    supabaseClient: SupabaseClient,
+  ) => {
+    const supabase = supabaseClient;
+
+    // If searching, use a more efficient approach with proper pagination
+    if (search) {
+      // First, get all users from auth to search by email
+      const { data: allUsers, error: usersError } =
+        await supabase.auth.admin.listUsers();
+      if (usersError) {
+        throw new Error("Error fetching users: " + usersError.message);
+      }
+
+      // Filter users by email match
+      const emailMatchingUsers = allUsers.users.filter((user) =>
+        user.email?.toLowerCase().includes(search.toLowerCase()),
+      );
+
+      // Get profile IDs for email matches
+      const emailMatchingUserIds = emailMatchingUsers.map((user) => user.id);
+
+      // Search profiles table for name/username matches
+      const {
+        data: profiles,
+        error: profileError,
+        count: profileCount,
+      } = await supabase
+        .from("profiles")
+        .select("id, full_name, username", { count: "exact" })
+        .or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
+
+      if (profileError) {
+        throw new Error("Error fetching profiles: " + profileError.message);
+      }
+
+      // Get profile IDs for name/username matches
+      const profileMatchingUserIds = profiles?.map((p) => p.id) || [];
+
+      // Combine both sets of user IDs (remove duplicates)
+      const allMatchingUserIds = Array.from(
+        new Set([...emailMatchingUserIds, ...profileMatchingUserIds]),
+      );
+
+      if (allMatchingUserIds.length === 0) {
+        return { users: [], totalCount: 0, totalPages: 0, currentPage: page };
+      }
+
+      // Get total count for pagination (email matches + profile matches)
+      const totalCount =
+        emailMatchingUserIds.length +
+        (profileCount || 0) -
+        allMatchingUserIds.filter(
+          (id) =>
+            emailMatchingUserIds.includes(id) &&
+            profileMatchingUserIds.includes(id),
+        ).length;
+
+      // Apply pagination to the combined results
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedUserIds = allMatchingUserIds.slice(startIndex, endIndex);
+
+      // Get the paginated users
+      const paginatedUsers = allUsers.users.filter((user) =>
+        paginatedUserIds.includes(user.id),
+      );
+
+      // Get profiles for the paginated users
+      const { data: userProfiles, error: profileFetchError } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", paginatedUserIds);
+
+      if (profileFetchError) {
+        throw new Error(
+          "Error fetching user profiles: " + profileFetchError.message,
+        );
+      }
+
+      // Combine users with their profiles
+      const combinedUsers = paginatedUsers.map((user) => ({
+        ...user,
+        profile: userProfiles?.find((profile) => profile.id === user.id),
+      }));
+
+      const totalPages = Math.ceil(totalCount / limit);
+
+      return {
+        users: combinedUsers,
+        totalCount,
+        totalPages,
+        currentPage: page,
+      };
+    }
+
+    // No search - get all users with pagination
+    const { data: users, error: usersError } =
+      await supabase.auth.admin.listUsers();
+    if (usersError)
+      throw new Error("Error fetching users: " + usersError.message);
+
+    const totalCount = users.users.length;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedUsers = users.users.slice(startIndex, endIndex);
+
+    // Fetch corresponding profile data for paginated users
+    const userIds = paginatedUsers.map((user) => user.id);
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .in("id", userIds);
+    if (profileError)
+      throw new Error("Error fetching profiles: " + profileError.message);
+
+    // Combine auth and profile data
+    const combinedUsers = paginatedUsers.map((user) => ({
+      ...user,
+      profile: profiles?.find((profile) => profile.id === user.id),
+    }));
+
+    return {
+      users: combinedUsers,
+      totalCount,
+      totalPages,
+      currentPage: page,
+    };
+  },
+  ["admin-users-search"],
+  {
+    revalidate: 300, // 5 minutes cache
+    tags: ["admin-users", "users-search"],
+  },
+);
 
 export async function getUsers(
   search?: string,
@@ -16,90 +161,15 @@ export async function getUsers(
   limit: number = 50,
 ) {
   const supabase = createClient(true);
-
-  // Get total count for pagination
-  let totalCount = 0;
-  let profileIds: string[] = [];
-
-  if (search) {
-    // If searching, get matching profile IDs first
-    const { data: profiles, error: profileError } = await supabase
-      .from("profiles")
-      .select("id")
-      .or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
-
-    if (profileError)
-      throw new Error("Error fetching profiles: " + profileError.message);
-
-    profileIds = profiles?.map((p) => p.id) || [];
-
-    // Also include users whose email matches the search
-    const { data: emailUsers, error: emailError } =
-      await supabase.auth.admin.listUsers();
-    if (!emailError) {
-      const emailMatchingIds = emailUsers.users
-        .filter((user) =>
-          user.email?.toLowerCase().includes(search.toLowerCase()),
-        )
-        .map((user) => user.id);
-      profileIds = Array.from(new Set([...profileIds, ...emailMatchingIds]));
-    }
-
-    totalCount = profileIds.length;
-  } else {
-    // If no search, get total user count
-    const { data: usersData } = await supabase.auth.admin.listUsers();
-    totalCount = usersData?.users?.length || 0;
-  }
-
-  // If no matches found, return empty result
-  if (search && profileIds.length === 0) {
-    return { users: [], totalCount: 0, totalPages: 0, currentPage: page };
-  }
-
-  // Fetch users with pagination
-  let usersQuery = supabase.auth.admin.listUsers();
-  const { data: users, error } = await usersQuery;
-  if (error) throw new Error("Error fetching users: " + error.message);
-
-  // Filter users based on search if needed
-  let filteredUsers = users.users;
-  if (search) {
-    filteredUsers = users.users.filter((user) => profileIds.includes(user.id));
-  }
-
-  // Apply pagination
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-  // Fetch corresponding profile data for paginated users
-  const userIds = paginatedUsers.map((user) => user.id);
-  const { data: profiles, error: profileError } = await supabase
-    .from("profiles")
-    .select("*")
-    .in("id", userIds);
-  if (profileError)
-    throw new Error("Error fetching profiles: " + profileError.message);
-
-  // Combine auth and profile data
-  const combinedUsers = paginatedUsers.map((user) => ({
-    ...user,
-    profile: profiles?.find((profile) => profile.id === user.id),
-  }));
-
-  return {
-    users: combinedUsers,
-    totalCount,
-    totalPages: Math.ceil(totalCount / limit),
-    currentPage: page,
-  };
+  return getCachedUsers(search, page, limit, supabase);
 }
 
 export async function updateUserAuth(
   userId: string,
   userData: { email?: string; password?: string },
 ) {
+  // Invalidate cache when user is updated
+  revalidatePath("/admin");
   const supabase = createClient(true);
   const { data, error } = await supabase.auth.admin.updateUserById(
     userId,
@@ -135,9 +205,17 @@ export async function deleteUser(userId: string) {
 
 export async function getGroups() {
   const supabase = createClient(true);
-  const { data: groups, error } = await supabase.from("groups").select("*");
+  const { data: groups, error } = await supabase.from("groups").select(`
+      *,
+      group_members(count)
+    `);
   if (error) throw new Error("Error fetching groups: " + error.message);
-  return groups;
+
+  // Transform the data to include member_count
+  return groups.map((group) => ({
+    ...group,
+    member_count: group.group_members?.[0]?.count || 0,
+  }));
 }
 
 export async function updateGroup(
@@ -161,6 +239,42 @@ export async function deleteGroup(groupId: string) {
   const { error } = await supabase.from("groups").delete().eq("id", groupId);
   if (error) throw new Error("Error deleting group: " + error.message);
   revalidatePath("/admin");
+}
+
+export async function getGroupMembers(groupId: string) {
+  const supabase = createClient(true);
+  const { data: members, error } = await supabase
+    .from("group_members")
+    .select(
+      `
+      id,
+      user_id,
+      joined_at,
+      profiles!inner(
+        id,
+        full_name,
+        username,
+        avatar_url
+      )
+    `,
+    )
+    .eq("group_id", groupId)
+    .order("joined_at", { ascending: false });
+
+  if (error) throw new Error("Error fetching group members: " + error.message);
+  return members;
+}
+
+export async function getWinningCriteria() {
+  const supabase = createClient(true);
+  const { data: criteria, error } = await supabase
+    .from("winning_criteria")
+    .select("*")
+    .order("id");
+
+  if (error)
+    throw new Error("Error fetching winning criteria: " + error.message);
+  return criteria;
 }
 
 export async function getUserAttendances(userId: string) {

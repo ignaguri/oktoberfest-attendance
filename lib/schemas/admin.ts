@@ -3,13 +3,30 @@ import { z } from "zod";
 export const groupSchema = z.object({
   name: z.string().min(1, "Required").trim(),
   description: z.string().optional(),
+  winning_criteria_id: z.number().min(1, "Required"),
 });
 
 export const userSchema = z.object({
   email: z.string().email("Invalid email").min(1, "Required"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
+    .refine((val) => val === "" || val.length >= 8, {
+      message:
+        "Password must be at least 8 characters or leave blank to keep unchanged",
+    })
+    .optional(),
+  full_name: z.string().optional(),
+  username: z.string().optional(),
+  is_super_admin: z.boolean().optional(),
+});
+
+export const userUpdateSchema = z.object({
+  password: z
+    .string()
+    .refine((val) => val === "" || val.length >= 8, {
+      message:
+        "Password must be at least 8 characters or leave blank to keep unchanged",
+    })
     .optional(),
   full_name: z.string().optional(),
   username: z.string().optional(),
@@ -59,6 +76,7 @@ export const copyTentsSchema = z.object({
 
 export type GroupFormData = z.infer<typeof groupSchema>;
 export type UserFormData = z.infer<typeof userSchema>;
+export type UserUpdateFormData = z.infer<typeof userUpdateSchema>;
 export type AttendanceFormData = z.infer<typeof attendanceSchema>;
 export type TentFormData = z.infer<typeof tentSchema>;
 export type TentPriceFormData = z.infer<typeof tentPriceSchema>;

@@ -1,28 +1,53 @@
 "use client";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { UserSearch } from "@/components/admin/search/UserSearch";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
+import { DataTable } from "@/components/Table/DataTable";
+import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
 import TentSelector from "@/components/TentSelector";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { searchKeys } from "@/lib/data/search-query-keys";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { logger } from "@/lib/logger";
-import { userSchema, attendanceSchema } from "@/lib/schemas/admin";
+import { userUpdateSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { formatDate } from "date-fns/format";
+import { Beer, Tent, Trash } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { Tables } from "@/lib/database.types";
-import type { UserFormData, AttendanceFormData } from "@/lib/schemas/admin";
+import type {
+  UserUpdateFormData,
+  AttendanceFormData,
+} from "@/lib/schemas/admin";
 import type { User } from "@supabase/supabase-js";
 
 import {
   deleteAttendance,
   deleteUser,
   getUserAttendances,
-  getUsers,
   updateAttendance,
   updateUserAuth,
   updateUserProfile,
@@ -31,18 +56,26 @@ import {
 const UserEditForm = ({
   user,
   onSubmit,
+  attendances,
+  onDeleteAttendance,
+  onFetchAttendances,
+  isFetchingAttendances,
 }: {
   user: CombinedUser;
-  onSubmit: (data: UserFormData) => Promise<void>;
+  onSubmit: (data: UserUpdateFormData) => Promise<void>;
+  attendances?: AttendanceWithTents[];
+  onDeleteAttendance?: (attendanceId: string) => void;
+  onFetchAttendances?: () => void;
+  isFetchingAttendances?: boolean;
 }) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm<UserFormData>({
-    resolver: zodResolver(userSchema),
+  } = useForm<UserUpdateFormData>({
+    resolver: zodResolver(userUpdateSchema),
     defaultValues: {
-      email: user.email,
       password: "",
       full_name: user.profile?.full_name || "",
       username: user.profile?.username || "",
@@ -51,80 +84,124 @@ const UserEditForm = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label htmlFor="email" className="block">
-          Email
-        </Label>
-        <Input
-          type="email"
-          id="email"
-          className="input"
-          errorMsg={errors.email?.message}
-          {...register("email")}
-        />
-        {errors.email && <span className="error">{errors.email.message}</span>}
+    <>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Email display (read-only) */}
+        <div>
+          <Label htmlFor="email" className="block">
+            Email
+          </Label>
+          <Input
+            type="email"
+            id="email"
+            className="input bg-muted"
+            value={user.email}
+            disabled
+            readOnly
+          />
+          <p className="text-sm text-muted-foreground mt-1">
+            Email cannot be changed
+          </p>
+        </div>
+
+        <div>
+          <Label htmlFor="password" className="block">
+            New Password (leave blank to keep unchanged)
+          </Label>
+          <Input
+            type="password"
+            id="password"
+            className="input"
+            errorMsg={errors.password?.message}
+            {...register("password")}
+          />
+          {errors.password && (
+            <span className="error">{errors.password.message}</span>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="full_name" className="block">
+            Full Name
+          </Label>
+          <Input
+            type="text"
+            id="full_name"
+            className="input"
+            errorMsg={errors.full_name?.message}
+            {...register("full_name")}
+          />
+          {errors.full_name && (
+            <span className="error">{errors.full_name.message}</span>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="username" className="block">
+            Username
+          </Label>
+          <Input
+            type="text"
+            id="username"
+            className="input"
+            errorMsg={errors.username?.message}
+            {...register("username")}
+          />
+          {errors.username && (
+            <span className="error">{errors.username.message}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Controller
+            name="is_super_admin"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="is_super_admin"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
+          />
+          <Label
+            htmlFor="is_super_admin"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Is Super Admin
+          </Label>
+        </div>
+        <Button type="submit" disabled={isSubmitting}>
+          Update User
+        </Button>
+      </form>
+
+      <div className="mt-6">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="attendances">
+            <AccordionTrigger
+              onClick={onFetchAttendances}
+              className="text-left"
+            >
+              User Attendances ({attendances?.length || "Not loaded yet"})
+            </AccordionTrigger>
+            <AccordionContent>
+              {isFetchingAttendances ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  Loading attendances...
+                </div>
+              ) : attendances && onDeleteAttendance ? (
+                <AttendanceTable
+                  attendances={attendances}
+                  onDeleteAttendance={onDeleteAttendance}
+                />
+              ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  Click to load attendances
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
-      <div>
-        <Label htmlFor="password" className="block">
-          New Password (leave blank to keep unchanged)
-        </Label>
-        <Input
-          type="password"
-          id="password"
-          className="input"
-          errorMsg={errors.password?.message}
-          {...register("password")}
-        />
-        {errors.password && (
-          <span className="error">{errors.password.message}</span>
-        )}
-      </div>
-      <div>
-        <Label htmlFor="full_name" className="block">
-          Full Name
-        </Label>
-        <Input
-          type="text"
-          id="full_name"
-          className="input"
-          errorMsg={errors.full_name?.message}
-          {...register("full_name")}
-        />
-        {errors.full_name && (
-          <span className="error">{errors.full_name.message}</span>
-        )}
-      </div>
-      <div>
-        <Label htmlFor="username" className="block">
-          Username
-        </Label>
-        <Input
-          type="text"
-          id="username"
-          className="input"
-          errorMsg={errors.username?.message}
-          {...register("username")}
-        />
-        {errors.username && (
-          <span className="error">{errors.username.message}</span>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        <Input
-          type="checkbox"
-          id="is_super_admin"
-          errorMsg={errors.is_super_admin?.message}
-          {...register("is_super_admin")}
-        />
-        <Label htmlFor="is_super_admin" className="block">
-          Is Super Admin
-        </Label>
-      </div>
-      <Button type="submit" disabled={isSubmitting}>
-        Update User
-      </Button>
-    </form>
+    </>
   );
 };
 
@@ -206,52 +283,156 @@ const AttendanceEditForm = ({
   );
 };
 
+const AttendanceTable = ({
+  attendances,
+  onDeleteAttendance,
+}: {
+  attendances: AttendanceWithTents[];
+  onDeleteAttendance: (attendanceId: string) => void;
+}) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedAttendanceId, setSelectedAttendanceId] = useState<
+    string | null
+  >(null);
+
+  const handleDelete = useCallback((attendanceId: string) => {
+    setSelectedAttendanceId(attendanceId);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (selectedAttendanceId) {
+      await onDeleteAttendance(selectedAttendanceId);
+      setIsDeleteDialogOpen(false);
+      setSelectedAttendanceId(null);
+    }
+  }, [selectedAttendanceId, onDeleteAttendance]);
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "date",
+        header: ({ column }: any) => (
+          <DataTableColumnHeader column={column} title="Date" />
+        ),
+        cell: ({ row }: any) =>
+          formatDate(new Date(row.original.date), "dd/MM/yyyy"),
+      },
+      {
+        accessorKey: "beer_count",
+        header: ({ column }: any) => (
+          <DataTableColumnHeader column={column} title="Beers" />
+        ),
+        cell: ({ row }: any) => (
+          <div className="flex items-center justify-center gap-1">
+            <span>{row.original.beer_count}</span>
+            <Beer size={16} />
+          </div>
+        ),
+      },
+      {
+        accessorKey: "tent_ids",
+        header: ({ column }: any) => (
+          <DataTableColumnHeader column={column} title="Tents" />
+        ),
+        cell: ({ row }: any) => (
+          <div className="flex items-center justify-center gap-1">
+            <span>{row.original.tent_ids?.length || 0}</span>
+            <Tent size={16} />
+          </div>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }: any) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDelete(row.original.id)}
+            className="h-8 w-8 p-0"
+          >
+            <Trash size={14} />
+          </Button>
+        ),
+      },
+    ],
+    [handleDelete],
+  );
+
+  if (attendances.length === 0) {
+    return (
+      <div className="text-center py-4 text-muted-foreground">
+        No attendances found for this user.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <DataTable columns={columns} data={attendances} />
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Attendance</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this attendance? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
 type CombinedUser = User & { profile: Tables<"profiles"> };
 interface AttendanceWithTents extends Tables<"attendances"> {
   tent_ids?: string[];
 }
 
 const UserList = () => {
-  const [users, setUsers] = useState<CombinedUser[]>([]);
-  const [attendances, setAttendances] = useState<Tables<"attendances">[]>([]);
+  const queryClient = useQueryClient();
+  const [attendances, setAttendances] = useState<AttendanceWithTents[]>([]);
   const [selectedUser, setSelectedUser] = useState<CombinedUser | null>(null);
   const [selectedAttendance, setSelectedAttendance] =
     useState<AttendanceWithTents | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isFetchingAttendances, setIsFetchingAttendances] = useState(false);
+  const [attendancesLoaded, setAttendancesLoaded] = useState(false);
 
-  const USERS_PER_PAGE = 50;
-
-  async function fetchUsers(page: number = 1, searchTerm: string = "") {
-    try {
-      setIsLoading(true);
-      const result = await getUsers(searchTerm, page, USERS_PER_PAGE);
-      setUsers(result.users as CombinedUser[]);
-      setTotalCount(result.totalCount);
-      setTotalPages(result.totalPages);
-      setCurrentPage(result.currentPage);
-    } catch (error) {
-      logger.error(
-        "Error fetching users",
-        logger.clientComponent("UserList", { action: "fetchUsers" }),
-        error as Error,
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const handleRefresh = () => {
+    // Invalidate all user search queries to trigger a refresh
+    queryClient.invalidateQueries({
+      queryKey: searchKeys.users(),
+    });
+  };
 
   async function fetchAttendances(userId: string) {
+    if (attendancesLoaded) return; // Don't fetch if already loaded
+
+    setIsFetchingAttendances(true);
     try {
-      setIsLoading(true);
       const fetchedAttendances = await getUserAttendances(userId);
       setAttendances(fetchedAttendances);
+      setAttendancesLoaded(true);
     } catch (error) {
       logger.error(
         "Error fetching attendances",
@@ -261,23 +442,26 @@ const UserList = () => {
         }),
         error as Error,
       );
+      toast.error("Failed to load attendances");
     } finally {
-      setIsLoading(false);
+      setIsFetchingAttendances(false);
     }
   }
 
   async function handleUserSelect(user: CombinedUser) {
     setSelectedAttendance(null);
     setSelectedUser(user);
-    await fetchAttendances(user.id);
+    setAttendances([]);
+    setAttendancesLoaded(false);
     setIsUserDialogOpen(true); // Open the dialog for user editing
   }
 
-  async function handleUpdateUser(data: UserFormData) {
+  async function handleUpdateUser(data: UserUpdateFormData) {
     try {
-      const authData: { email?: string; password?: string } = {};
-      if (data.email !== selectedUser?.email) authData.email = data.email;
-      if (data.password) authData.password = data.password;
+      const authData: { password?: string } = {};
+      if (data.password && data.password.trim() !== "") {
+        authData.password = data.password;
+      }
 
       const profileData: Partial<Tables<"profiles">> = {
         full_name: data.full_name,
@@ -291,10 +475,10 @@ const UserList = () => {
       if (Object.keys(profileData).length > 0) {
         await updateUserProfile(selectedUser!.id, profileData);
       }
-      fetchUsers(currentPage, debouncedSearch);
       setSelectedUser(null);
       toast.success("User updated successfully");
       setIsUserDialogOpen(false);
+      handleRefresh();
     } catch (error) {
       logger.error(
         "Error updating user",
@@ -311,8 +495,8 @@ const UserList = () => {
   async function handleDeleteUser(userId: string) {
     try {
       await deleteUser(userId);
-      fetchUsers(currentPage, debouncedSearch);
       toast.success("User deleted successfully");
+      handleRefresh();
     } catch (error) {
       logger.error(
         "Error deleting user",
@@ -320,6 +504,28 @@ const UserList = () => {
         error as Error,
       );
       toast.error("Failed to delete user");
+    }
+  }
+
+  async function handleDeleteAttendance(attendanceId: string) {
+    try {
+      await deleteAttendance(attendanceId);
+      toast.success("Attendance deleted successfully");
+      // Refresh attendances list
+      if (selectedUser) {
+        const updatedAttendances = await getUserAttendances(selectedUser.id);
+        setAttendances(updatedAttendances);
+      }
+    } catch (error) {
+      logger.error(
+        "Error deleting attendance",
+        logger.clientComponent("UserList", {
+          action: "deleteAttendance",
+          attendanceId,
+        }),
+        error as Error,
+      );
+      toast.error("Failed to delete attendance");
     }
   }
 
@@ -349,188 +555,19 @@ const UserList = () => {
     }
   }
 
-  async function handleDeleteAttendance(attendanceId: string) {
-    try {
-      await deleteAttendance(attendanceId);
-      fetchAttendances(selectedUser!.id); // Refresh attendances
-      toast.success("Attendance deleted successfully");
-    } catch (error) {
-      logger.error(
-        "Error deleting attendance",
-        logger.clientComponent("UserList", {
-          action: "deleteAttendance",
-          attendanceId,
-        }),
-        error as Error,
-      );
-      toast.error("Failed to delete attendance");
-    }
-  }
-
-  // Debounced search effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  // Fetch users when search or page changes
-  useEffect(() => {
-    fetchUsers(currentPage, debouncedSearch);
-  }, [currentPage, debouncedSearch]);
-
-  // Reset to page 1 when search changes
-  useEffect(() => {
-    if (debouncedSearch !== search) {
-      setCurrentPage(1);
-    }
-  }, [debouncedSearch, search]);
-
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearch(e.target.value);
-    },
-    [],
-  );
-
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div>
-        <h2 className="text-xl font-semibold mb-2">User List</h2>
-        <div className="flex items-center justify-center h-screen">
-          <LoadingSpinner />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">User List</h2>
 
-      {/* Search Input */}
-      <div className="mb-4">
-        <Input
-          type="text"
-          placeholder="Search by name, username, or email..."
-          value={search}
-          onChange={handleSearchChange}
-          className="max-w-sm"
-        />
-      </div>
-
-      {/* Results Info */}
-      <div className="mb-4 text-sm text-gray-600">
-        {debouncedSearch && (
-          <p>
-            Showing {users.length} of {totalCount} users for &ldquo;
-            {debouncedSearch}&rdquo;
-          </p>
-        )}
-        {!debouncedSearch && (
-          <p>
-            Showing {users.length} of {totalCount} users
-          </p>
-        )}
-      </div>
-
-      {/* User List */}
-      {users.length === 0 && !isLoading ? (
-        <div className="text-center py-8 text-gray-500">
-          {debouncedSearch
-            ? "No users found matching your search."
-            : "No users found."}
-        </div>
-      ) : (
-        <ul className="space-y-2">
-          {users.map((user) => (
-            <li
-              key={user.id}
-              className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border"
-            >
-              <div className="flex-1">
-                <div className="font-medium">
-                  {user.profile?.full_name || "N/A"}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {user.profile?.username && (
-                    <span className="mr-2">@{user.profile.username}</span>
-                  )}
-                  <span>[{user.email}]</span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={() => handleUserSelect(user)} size="sm">
-                  Edit
-                </Button>
-                <Button
-                  onClick={() => handleDeleteUser(user.id)}
-                  size="sm"
-                  variant="destructive"
-                >
-                  Delete
-                </Button>
-                <Button
-                  onClick={() => {
-                    setSelectedUser(user);
-                    fetchAttendances(user.id);
-                    setIsAttendanceDialogOpen(true);
-                  }}
-                  size="sm"
-                >
-                  Edit Attendances
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Page {currentPage} of {totalPages}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              size="sm"
-            >
-              Previous
-            </Button>
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const page =
-                Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-              if (page > totalPages) return null;
-              return (
-                <Button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  variant={page === currentPage ? "default" : "outline"}
-                  size="sm"
-                >
-                  {page}
-                </Button>
-              );
-            })}
-            <Button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              size="sm"
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* New Search System */}
+      <UserSearch
+        onUserEdit={handleUserSelect}
+        onUserDelete={handleDeleteUser}
+        onRefresh={handleRefresh}
+        showFilters={true}
+        showSorting={true}
+        showRefresh={true}
+      />
 
       {/* User Edit Dialog */}
       <ResponsiveDialog
@@ -540,7 +577,16 @@ const UserList = () => {
         description="Update user details"
       >
         {selectedUser && (
-          <UserEditForm user={selectedUser} onSubmit={handleUpdateUser} />
+          <UserEditForm
+            user={selectedUser}
+            onSubmit={handleUpdateUser}
+            attendances={attendances}
+            onDeleteAttendance={handleDeleteAttendance}
+            onFetchAttendances={() =>
+              selectedUser && fetchAttendances(selectedUser.id)
+            }
+            isFetchingAttendances={isFetchingAttendances}
+          />
         )}
       </ResponsiveDialog>
 
