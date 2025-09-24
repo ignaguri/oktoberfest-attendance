@@ -26,7 +26,7 @@ export default async function Home() {
 
   return (
     <TutorialProvider tutorialCompleted={tutorialStatus.tutorial_completed}>
-      <div className="max-w-lg flex flex-col">
+      <div className="max-w-lg flex flex-col items-center">
         <header className="flex flex-row items-center gap-4 mb-4">
           <Image
             src={LogoImage}
