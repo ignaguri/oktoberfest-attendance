@@ -81,7 +81,7 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
     >
       <CardHeader>
         <CardTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
-          🏆 Achievements
+          🎖️ Achievements
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -126,7 +126,7 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
             </div>
           )}
 
-          <Button asChild variant="outline" className="w-full">
+          <Button asChild variant="outline" className="w-fit">
             <Link href="/achievements">View All Achievements</Link>
           </Button>
         </div>

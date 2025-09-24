@@ -95,7 +95,7 @@ export default function AchievementsPage() {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">🏆 Achievements</h1>
+        <h1 className="text-3xl font-bold mb-2">🎖️ Achievements</h1>
         <p className="text-gray-600">
           Track your progress and unlock achievements at {currentFestival.name}
         </p>
