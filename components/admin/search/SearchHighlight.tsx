@@ -29,7 +29,7 @@ export function SearchHighlight({
   return (
     <span className={className}>
       {parts.map((part, index) => {
-        const isMatch = regex.test(part);
+        const isMatch = part.match(regex) !== null;
         return (
           <span
             key={index}

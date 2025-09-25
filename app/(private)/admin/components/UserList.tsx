@@ -416,7 +416,6 @@ const UserList = () => {
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
   const [isFetchingAttendances, setIsFetchingAttendances] = useState(false);
-  const [attendancesLoaded, setAttendancesLoaded] = useState(false);
 
   const handleRefresh = () => {
     // Invalidate all user search queries to trigger a refresh
@@ -426,13 +425,10 @@ const UserList = () => {
   };
 
   async function fetchAttendances(userId: string) {
-    if (attendancesLoaded) return; // Don't fetch if already loaded
-
     setIsFetchingAttendances(true);
     try {
       const fetchedAttendances = await getUserAttendances(userId);
       setAttendances(fetchedAttendances);
-      setAttendancesLoaded(true);
     } catch (error) {
       logger.error(
         "Error fetching attendances",
@@ -452,7 +448,6 @@ const UserList = () => {
     setSelectedAttendance(null);
     setSelectedUser(user);
     setAttendances([]);
-    setAttendancesLoaded(false);
     setIsUserDialogOpen(true); // Open the dialog for user editing
   }
 
