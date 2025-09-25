@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SkeletonAchievements } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getUserAchievements } from "@/lib/actions/achievements";
 import { logger } from "@/lib/logger";
@@ -54,7 +55,7 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
   }, [currentFestival]);
 
   if (!currentFestival || isLoading) {
-    return null;
+    return <SkeletonAchievements />;
   }
 
   const unlockedAchievements = achievements.filter((a) => a.is_unlocked);
@@ -77,7 +78,10 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
 
   return (
     <Card
-      className={cn("shadow-lg rounded-lg border border-gray-200", className)}
+      className={cn(
+        "shadow-lg rounded-lg border border-gray-200 min-h-[200px]",
+        className,
+      )}
     >
       <CardHeader>
         <CardTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">

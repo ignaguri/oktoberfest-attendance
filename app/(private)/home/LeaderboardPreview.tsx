@@ -1,7 +1,6 @@
 "use client";
 
 import Avatar from "@/components/Avatar/Avatar";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ProfilePreview } from "@/components/ui/profile-preview";
+import { SkeletonLeaderboard } from "@/components/ui/skeleton-cards";
 import {
   Table,
   TableBody,
@@ -56,19 +56,7 @@ const LeaderboardPreview = () => {
 
   // Show loading state
   if (festivalLoading || leaderboardLoading) {
-    return (
-      <Card className="shadow-lg rounded-lg border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-center">
-            🏆 Global Leaderboard
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <LoadingSpinner />
-          <p className="text-center text-gray-600">Loading leaderboard...</p>
-        </CardContent>
-      </Card>
-    );
+    return <SkeletonLeaderboard />;
   }
 
   // Handle error state silently - just show empty state
@@ -80,7 +68,7 @@ const LeaderboardPreview = () => {
   const topUsers = leaderboardData.slice(0, LEADERBOARD_PREVIEW_LIMIT);
 
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200">
+    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[280px]">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-center">
           🏆 Global Leaderboard

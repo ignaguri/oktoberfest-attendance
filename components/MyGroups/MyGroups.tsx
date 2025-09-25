@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { SkeletonGroups } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useUserGroups } from "@/lib/data";
 import { Link } from "next-view-transitions";
@@ -24,16 +25,11 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
   };
 
   if (loading) {
-    return (
-      <div>
-        <h2 className="text-xl font-bold mb-2">Your Groups:</h2>
-        <p className="text-sm text-gray-500">Loading groups...</p>
-      </div>
-    );
+    return <SkeletonGroups />;
   }
 
   return (
-    <div>
+    <div className="min-h-[120px]">
       <h2 className="text-xl font-bold mb-2">Your Groups:</h2>
       <div className="flex flex-wrap gap-2 justify-center">
         {(error || !groups || groups.length === 0) && (

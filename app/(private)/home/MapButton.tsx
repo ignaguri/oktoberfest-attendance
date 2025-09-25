@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalConstants } from "@/lib/festivalConstants";
 import { ExternalLink } from "lucide-react";
@@ -10,12 +11,7 @@ export default function MapButton() {
   const { currentFestival, isLoading } = useFestival();
 
   if (isLoading || !currentFestival) {
-    return (
-      <Button variant="outline" disabled>
-        <span className="mr-1">Loading Map...</span>
-        <ExternalLink size={20} />
-      </Button>
-    );
+    return <Skeleton className="h-10 w-32 rounded" />;
   }
 
   const { festivalMapUrl, festivalName } =

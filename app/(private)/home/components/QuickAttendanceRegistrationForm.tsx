@@ -1,8 +1,8 @@
 "use client";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
+import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 import { quickAttendanceSchema } from "@/lib/schemas/attendance";
@@ -135,11 +135,7 @@ export const QuickAttendanceRegistrationForm = ({
   };
 
   if (tentsLoading || festivalLoading || !currentFestival) {
-    return (
-      <Button className="w-fit self-center" variant="secondary" disabled>
-        <LoadingSpinner size={24} />
-      </Button>
-    );
+    return <SkeletonQuickAttendance />;
   }
 
   if (tentsError) {

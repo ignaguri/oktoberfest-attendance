@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { SkeletonFestivalStatus } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import {
   getFestivalConstants,
@@ -13,11 +14,7 @@ export default function FestivalStatus() {
   const { currentFestival, isLoading } = useFestival();
 
   if (isLoading || !currentFestival) {
-    return (
-      <p className="text-center text-gray-900 font-semibold px-4">
-        Loading festival status...
-      </p>
-    );
+    return <SkeletonFestivalStatus />;
   }
 
   const { festivalStartDate, festivalEndDate, festivalName } =
