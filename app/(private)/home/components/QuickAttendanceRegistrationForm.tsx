@@ -1,8 +1,8 @@
 "use client";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
+import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 import { quickAttendanceSchema } from "@/lib/schemas/attendance";
@@ -135,11 +135,7 @@ export const QuickAttendanceRegistrationForm = ({
   };
 
   if (tentsLoading || festivalLoading || !currentFestival) {
-    return (
-      <Button className="w-fit self-center" variant="secondary" disabled>
-        <LoadingSpinner size={24} />
-      </Button>
-    );
+    return <SkeletonQuickAttendance />;
   }
 
   if (tentsError) {
@@ -148,51 +144,49 @@ export const QuickAttendanceRegistrationForm = ({
 
   return (
     <form className="flex flex-col items-center gap-4">
-      {!attendanceData && <p>Are you at {currentFestival.name} today?</p>}
-      <div className="flex items-center gap-2">
-        <span>{attendanceData ? "You are at:" : "Which tent?"}</span>
-        <SingleSelect
-          value={tentId}
-          buttonClassName="w-fit self-center"
-          options={tents.map((tent) => ({
-            title: tent.category,
-            options: tent.options,
-          }))}
-          placeholder="Select your current tent"
-          onSelect={(option) => {
-            setValue("tentId", option.value);
+      <p className="text-sm font-semibold">
+        {tentId ? "You are at:" : "Are you there today?"}
+      </p>
+      <SingleSelect
+        value={tentId}
+        className="w-3/4"
+        buttonClassName="self-center"
+        options={tents.map((tent) => ({
+          title: tent.category,
+          options: tent.options,
+        }))}
+        placeholder="Select your current tent"
+        onSelect={(option) => {
+          setValue("tentId", option.value);
+          handleSubmit(onSubmit)();
+        }}
+        disabled={isSubmitting}
+      />
+      <div className="flex items-center">
+        <Button
+          type="button"
+          variant="yellow"
+          onClick={() => {
+            setValue("beerCount", Math.max(0, beerCount - 1));
             handleSubmit(onSubmit)();
           }}
           disabled={isSubmitting}
-        />
+        >
+          <Minus className="w-4 h-4" />
+        </Button>
+        <span className="mx-2">{beerCount} 🍺 drank today</span>
+        <Button
+          type="button"
+          variant="yellow"
+          onClick={() => {
+            setValue("beerCount", beerCount + 1);
+            handleSubmit(onSubmit)();
+          }}
+          disabled={isSubmitting}
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
       </div>
-      {(attendanceData || beerCount > 0) && (
-        <div className="flex items-center">
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", Math.max(0, beerCount - 1));
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <span className="mx-2">{beerCount} 🍺 drank today</span>
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", beerCount + 1);
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
     </form>
   );
 };

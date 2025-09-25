@@ -40,9 +40,9 @@ export const tutorialSteps: TutorialStep[] = [
   {
     id: "highlights",
     target: '[data-tutorial="highlights"]',
-    title: "Your Stats",
+    title: "Your Stats & Leaderboard",
     description:
-      "View your personal statistics, achievements, and highlights here.",
+      "View your personal statistics, achievements, highlights, and see how you rank against other users in the global leaderboard.",
     position: "top",
     delay: 300,
   },

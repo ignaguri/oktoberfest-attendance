@@ -1,5 +1,6 @@
 "use client";
 
+import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 
@@ -8,9 +9,9 @@ import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 export function QuickAttendanceWrapper() {
   const { currentFestival, isLoading } = useFestival();
 
-  // Don't show the component if still loading or no festival selected
+  // Show skeleton while loading or no festival selected
   if (isLoading || !currentFestival) {
-    return null;
+    return <SkeletonQuickAttendance />;
   }
 
   // Only show QuickAttendanceRegistration for active festivals

@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SkeletonHighlights } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useUserHighlights } from "@/lib/data";
 import { getDefaultBeerCost } from "@/lib/festivalConstants";
@@ -45,18 +46,7 @@ const Highlights = () => {
 
   // Show loading state
   if (festivalLoading || highlightsLoading) {
-    return (
-      <Card className="shadow-lg rounded-lg border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-center">
-            Highlights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-600">Loading highlights...</p>
-        </CardContent>
-      </Card>
-    );
+    return <SkeletonHighlights />;
   }
 
   // Handle error state silently - just show empty state
@@ -72,7 +62,7 @@ const Highlights = () => {
     topPositions.length > 0 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1";
 
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200">
+    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[140px]">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-center">
           Highlights

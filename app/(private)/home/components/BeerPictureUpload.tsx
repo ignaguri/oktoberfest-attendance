@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
+import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,6 +48,7 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
 
 export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
   const [pictureAlreadyUploaded, setPictureAlreadyUploaded] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const {
     handleSubmit,
@@ -74,6 +77,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       await uploadBeerPicture(formData);
       toast.success("Beer picture uploaded successfully!");
       setPictureAlreadyUploaded(true);
+      setShowSuccessMessage(true);
       reset();
     } catch (error) {
       const fileSizeError =
@@ -94,6 +98,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
     const file = event.currentTarget.files?.[0];
     if (file) {
       setValue("picture", file);
+      setShowSuccessMessage(false); // Hide success message when selecting a new file
     }
   };
 
@@ -153,6 +158,15 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
         <Button type="submit" disabled={isSubmitting} variant="darkYellow">
           {isSubmitting ? "Uploading..." : "Upload picture"}
         </Button>
+      )}
+
+      {showSuccessMessage && (
+        <Alert className="text-center max-w-xs">
+          You can view all your pictures in your group&apos;s gallery or in{" "}
+          <Link className="underline" href="/attendance">
+            My Attendances
+          </Link>
+        </Alert>
       )}
     </form>
   );
