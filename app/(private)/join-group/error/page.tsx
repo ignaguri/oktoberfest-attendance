@@ -78,7 +78,7 @@ export default function JoinGroupErrorPage() {
           title: "Invalid Invitation",
           description: "The invitation link you used is not valid.",
           message:
-            "This could happen if the link was incorrect, the group no longer exists, or the invitation was cancelled.",
+            "This could happen if the link was incorrect or expired, the group no longer exists, or the invitation was cancelled.",
           actions: [
             {
               label: "Go to Groups",
@@ -194,6 +194,7 @@ export default function JoinGroupErrorPage() {
                     <li>• The invitation link was incorrect or mistyped</li>
                     <li>• The group no longer exists</li>
                     <li>• The invitation was cancelled by the group admin</li>
+                    <li>• The invitation link has expired</li>
                   </ul>
                 </AlertDescription>
               </Alert>
