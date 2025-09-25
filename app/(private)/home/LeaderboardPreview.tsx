@@ -109,7 +109,7 @@ const LeaderboardPreview = () => {
                       {index === 1 && "🥈"}
                       {index === 2 && "🥉"}
                     </TableCell>
-                    <TableCell className="max-w-30">
+                    <TableCell className="w-full max-w-[min(200px,35vw)]">
                       <ProfilePreview
                         username={user.username || "Unknown"}
                         fullName={user.full_name}
