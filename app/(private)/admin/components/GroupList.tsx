@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { logger } from "@/lib/logger";
 import { groupSchema } from "@/lib/schemas/admin";
+import { getAvatarUrl } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Copy, Check, Link } from "lucide-react";
@@ -142,7 +143,7 @@ const GroupEditForm = ({
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                     {member.profiles.avatar_url ? (
                       <Image
-                        src={`/api/image/${member.profiles.avatar_url}`}
+                        src={getAvatarUrl(member.profiles.avatar_url) || ""}
                         alt={
                           member.profiles.full_name || member.profiles.username
                         }

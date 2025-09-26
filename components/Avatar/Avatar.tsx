@@ -5,6 +5,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import React from "react";
 
@@ -67,7 +68,7 @@ export function AvatarPreview({
   size = "small",
   fallback,
 }: Pick<AvatarProps, "url" | "previewUrl" | "size" | "fallback">) {
-  const imageUrl = previewUrl || (url ? `/api/image/${url}` : undefined);
+  const imageUrl = previewUrl || getAvatarUrl(url);
   const { initials, full } = extractName(fallback);
 
   return (

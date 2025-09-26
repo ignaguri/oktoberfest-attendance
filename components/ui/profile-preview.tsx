@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Card, CardHeader, CardTitle } from "./card";
@@ -38,10 +38,7 @@ export function ProfilePreview({
           <CardHeader className="pb-4 text-center">
             <div className="flex flex-col items-center gap-3">
               <Avatar className="w-20 h-20">
-                <AvatarImage
-                  src={`/api/image/${avatarUrl}` || undefined}
-                  alt={username}
-                />
+                <AvatarImage src={getAvatarUrl(avatarUrl)} alt={username} />
                 <AvatarFallback className="bg-yellow-100 text-yellow-800 text-2xl">
                   {username.charAt(0).toUpperCase()}
                 </AvatarFallback>
