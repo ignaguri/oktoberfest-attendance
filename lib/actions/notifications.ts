@@ -189,3 +189,125 @@ export async function updateFCMTokens(tokens: string[]): Promise<{
     return { success: false, error: "Failed to update tokens" };
   }
 }
+
+/**
+ * Send location sharing notification with rate limiting
+ * Only sends notifications for "started" actions and limits to once every 5 minutes per user
+ */
+export async function sendLocationSharingNotification(
+  groupId: string,
+  action: "started" | "stopped",
+): Promise<{ success: boolean; error?: string }> {
+  // Skip all stopped notifications
+  if (action === "stopped") {
+    return { success: true };
+  }
+
+  const user = await getUser();
+  const supabase = createClient();
+
+  try {
+    // Check rate limiting - look for recent notifications from this user
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+    // Use raw query since the table might not be in generated types yet
+    const { data: recentNotifications, error: rateLimitError } =
+      await supabase.rpc("check_notification_rate_limit", {
+        p_user_id: user.id,
+        p_notification_type: "location_sharing",
+        p_group_id: groupId,
+        p_minutes_ago: 5,
+      });
+
+    if (rateLimitError) {
+      console.warn("Rate limit check failed:", rateLimitError);
+    }
+
+    // If we found a recent notification, skip sending
+    if (recentNotifications && recentNotifications > 0) {
+      console.log(
+        `Rate limiting location sharing notification for user ${user.id} in group ${groupId}`,
+      );
+      return { success: true }; // Return success but don't send
+    }
+
+    // Get user profile and group details
+    const profile = await getProfileShort();
+    const { data: group, error: groupError } = await supabase
+      .from("groups")
+      .select("id, name, festival_id")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError || !group) {
+      throw new Error("Group not found");
+    }
+
+    // Get group members to notify (excluding the sharer)
+    const { data: groupMembers, error: membersError } = await supabase
+      .from("group_members")
+      .select("user_id, profiles(username, full_name)")
+      .eq("group_id", groupId)
+      .neq("user_id", user.id);
+
+    if (membersError) {
+      throw new Error("Failed to get group members");
+    }
+
+    if (!groupMembers || groupMembers.length === 0) {
+      return { success: true }; // No one to notify
+    }
+
+    // Send notification to each group member
+    const notificationService = createNotificationService();
+    const sharerName = profile.full_name || profile.username || "Someone";
+
+    for (const member of groupMembers) {
+      if (!member.user_id) continue; // Skip members without user_id
+
+      try {
+        await notificationService.novu.trigger({
+          workflowId: "location-sharing-notification",
+          to: member.user_id,
+          payload: {
+            sharerName,
+            groupName: group.name,
+            action,
+            festivalId: group.festival_id,
+            groupId: group.id,
+          },
+        });
+      } catch (error) {
+        console.warn(
+          `Failed to send notification to user ${member.user_id}:`,
+          error,
+        );
+        // Continue with other members even if one fails
+      }
+    }
+
+    // Record the notification in rate limiting table using RPC
+    try {
+      await supabase.rpc("record_notification_rate_limit", {
+        p_user_id: user.id,
+        p_group_id: groupId,
+        p_notification_type: "location_sharing",
+      });
+    } catch (error) {
+      console.warn("Failed to record rate limit entry:", error);
+      // Don't fail the whole operation if rate limit recording fails
+    }
+
+    return { success: true };
+  } catch (error) {
+    reportNotificationException(
+      "sendLocationSharingNotification",
+      error as Error,
+      {
+        id: user.id,
+        email: user.email,
+      },
+    );
+    return { success: false, error: "Failed to send notification" };
+  }
+}

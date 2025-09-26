@@ -1,6 +1,7 @@
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
+import { NewsFeed } from "@/components/NewsFeed";
 import ShareAppButton from "@/components/ShareAppButton";
 import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 import { TutorialProvider } from "@/components/Tutorial/TutorialProvider";
@@ -47,6 +48,10 @@ export default async function Home() {
           <div data-tutorial="quick-attendance">
             <QuickAttendanceWrapper />
           </div>
+        </div>
+
+        <div className="mb-4">
+          <NewsFeed />
         </div>
 
         <div className="flex flex-col gap-4">

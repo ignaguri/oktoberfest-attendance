@@ -457,6 +457,117 @@ export type Database = {
           },
         ];
       };
+      location_sharing_preferences: {
+        Row: {
+          auto_enable_on_checkin: boolean;
+          created_at: string;
+          festival_id: string;
+          group_id: string;
+          id: string;
+          notification_enabled: boolean;
+          sharing_enabled: boolean;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          auto_enable_on_checkin?: boolean;
+          created_at?: string;
+          festival_id: string;
+          group_id: string;
+          id?: string;
+          notification_enabled?: boolean;
+          sharing_enabled?: boolean;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          auto_enable_on_checkin?: boolean;
+          created_at?: string;
+          festival_id?: string;
+          group_id?: string;
+          id?: string;
+          notification_enabled?: boolean;
+          sharing_enabled?: boolean;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "location_sharing_preferences_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "location_sharing_preferences_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "location_sharing_preferences_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["group_id"];
+          },
+          {
+            foreignKeyName: "location_sharing_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      notification_rate_limit: {
+        Row: {
+          created_at: string;
+          group_id: string | null;
+          id: string;
+          notification_type: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          group_id?: string | null;
+          id?: string;
+          notification_type: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          group_id?: string | null;
+          id?: string;
+          notification_type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_rate_limit_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notification_rate_limit_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "leaderboard";
+            referencedColumns: ["group_id"];
+          },
+          {
+            foreignKeyName: "notification_rate_limit_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -765,6 +876,72 @@ export type Database = {
           },
         ];
       };
+      user_locations: {
+        Row: {
+          accuracy: number | null;
+          altitude: number | null;
+          created_at: string;
+          expires_at: string;
+          festival_id: string;
+          heading: number | null;
+          id: string;
+          last_updated: string;
+          latitude: number;
+          longitude: number;
+          speed: number | null;
+          status: Database["public"]["Enums"]["location_sharing_status_enum"];
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          accuracy?: number | null;
+          altitude?: number | null;
+          created_at?: string;
+          expires_at?: string;
+          festival_id: string;
+          heading?: number | null;
+          id?: string;
+          last_updated?: string;
+          latitude: number;
+          longitude: number;
+          speed?: number | null;
+          status?: Database["public"]["Enums"]["location_sharing_status_enum"];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          accuracy?: number | null;
+          altitude?: number | null;
+          created_at?: string;
+          expires_at?: string;
+          festival_id?: string;
+          heading?: number | null;
+          id?: string;
+          last_updated?: string;
+          latitude?: number;
+          longitude?: number;
+          speed?: number | null;
+          status?: Database["public"]["Enums"]["location_sharing_status_enum"];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_locations_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_locations_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_notification_preferences: {
         Row: {
           achievement_notifications_enabled: boolean | null;
@@ -861,6 +1038,21 @@ export type Database = {
       };
     };
     Views: {
+      activity_feed: {
+        Row: {
+          activity_data: Json | null;
+          activity_time: string | null;
+          activity_type:
+            | Database["public"]["Enums"]["activity_type_enum"]
+            | null;
+          avatar_url: string | null;
+          festival_id: string | null;
+          full_name: string | null;
+          user_id: string | null;
+          username: string | null;
+        };
+        Relationships: [];
+      };
       leaderboard: {
         Row: {
           avatar_url: string | null;
@@ -906,28 +1098,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "fk_user_id";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["viewer_id"];
+            columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
           },
           {
             foreignKeyName: "group_members_user_id_fkey";
-            columns: ["owner_id"];
+            columns: ["viewer_id"];
             isOneToOne: false;
             referencedRelation: "leaderboard";
             referencedColumns: ["user_id"];
@@ -1008,6 +1200,19 @@ export type Database = {
         };
         Returns: boolean;
       };
+      check_notification_rate_limit: {
+        Args: {
+          p_group_id: string;
+          p_minutes_ago: number;
+          p_notification_type: string;
+          p_user_id: string;
+        };
+        Returns: number;
+      };
+      cleanup_old_rate_limit_records: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
       create_group_with_member: {
         Args: { p_group_name: string; p_password: string; p_user_id: string };
         Returns: Record<string, unknown>;
@@ -1018,6 +1223,10 @@ export type Database = {
       };
       evaluate_user_achievements: {
         Args: { p_festival_id: string; p_user_id: string };
+        Returns: undefined;
+      };
+      expire_old_locations: {
+        Args: Record<PropertyKey, never>;
         Returns: undefined;
       };
       fetch_group_gallery: {
@@ -1086,6 +1295,24 @@ export type Database = {
           group_id: string;
           group_name: string;
           total_beers: number;
+          user_id: string;
+          username: string;
+        }[];
+      };
+      get_nearby_group_members: {
+        Args: {
+          input_festival_id: string;
+          input_user_id: string;
+          radius_meters?: number;
+        };
+        Returns: {
+          avatar_url: string;
+          distance_meters: number;
+          full_name: string;
+          group_names: string[];
+          last_updated: string;
+          latitude: number;
+          longitude: number;
           user_id: string;
           username: string;
         }[];
@@ -1180,6 +1407,14 @@ export type Database = {
         Args: { p_token: string; p_user_id: string };
         Returns: Json;
       };
+      record_notification_rate_limit: {
+        Args: {
+          p_group_id: string;
+          p_notification_type: string;
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
       renew_group_token: {
         Args: { p_group_id: string };
         Returns: string;
@@ -1266,12 +1501,19 @@ export type Database = {
         | "competitive"
         | "special";
       achievement_rarity_enum: "common" | "rare" | "epic" | "legendary";
+      activity_type_enum:
+        | "beer_count_update"
+        | "tent_checkin"
+        | "photo_upload"
+        | "group_join"
+        | "achievement_unlock";
       festival_status_enum: "upcoming" | "active" | "ended";
       festival_type_enum:
         | "oktoberfest"
         | "starkbierfest"
         | "fruehlingsfest"
         | "other";
+      location_sharing_status_enum: "active" | "paused" | "expired";
       photo_visibility_enum: "public" | "private";
     };
     CompositeTypes: {
@@ -1415,6 +1657,13 @@ export const Constants = {
         "special",
       ],
       achievement_rarity_enum: ["common", "rare", "epic", "legendary"],
+      activity_type_enum: [
+        "beer_count_update",
+        "tent_checkin",
+        "photo_upload",
+        "group_join",
+        "achievement_unlock",
+      ],
       festival_status_enum: ["upcoming", "active", "ended"],
       festival_type_enum: [
         "oktoberfest",
@@ -1422,6 +1671,7 @@ export const Constants = {
         "fruehlingsfest",
         "other",
       ],
+      location_sharing_status_enum: ["active", "paused", "expired"],
       photo_visibility_enum: ["public", "private"],
     },
   },

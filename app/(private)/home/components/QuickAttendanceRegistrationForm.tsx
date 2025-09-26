@@ -1,5 +1,6 @@
 "use client";
 
+import { LocationSharingToggle } from "@/components/LocationSharing";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
@@ -147,21 +148,27 @@ export const QuickAttendanceRegistrationForm = ({
       <p className="text-sm font-semibold">
         {tentId ? "You are at:" : "Are you there today?"}
       </p>
-      <SingleSelect
-        value={tentId}
-        className="w-3/4"
-        buttonClassName="self-center"
-        options={tents.map((tent) => ({
-          title: tent.category,
-          options: tent.options,
-        }))}
-        placeholder="Select your current tent"
-        onSelect={(option) => {
-          setValue("tentId", option.value);
-          handleSubmit(onSubmit)();
-        }}
-        disabled={isSubmitting}
-      />
+      <div className="flex items-center gap-2 w-full justify-center">
+        <SingleSelect
+          value={tentId}
+          className="flex-1 max-w-64"
+          buttonClassName="self-center"
+          options={tents.map((tent) => ({
+            title: tent.category,
+            options: tent.options,
+          }))}
+          placeholder="Select your current tent"
+          onSelect={(option) => {
+            setValue("tentId", option.value);
+            handleSubmit(onSubmit)();
+          }}
+          disabled={isSubmitting}
+        />
+        <LocationSharingToggle
+          disabled={isSubmitting}
+          className="flex-shrink-0"
+        />
+      </div>
       <div className="flex items-center">
         <Button
           type="button"

@@ -68,6 +68,10 @@ app/
 - **group_members**: User-group relationships
 - **profiles**: User metadata (username, full_name, avatar)
 - **user_notification_preferences**: Push notification settings per user
+- **activity_feed**: View aggregating recent user activities (news feed)
+- **user_locations**: Live location sharing data with expiration
+- **location_sharing_preferences**: Group-based location sharing settings
+- **notification_rate_limit**: Rate limiting for notification spam prevention
 
 ### Key Business Logic
 
@@ -380,6 +384,7 @@ revalidatePath("/path");
 7. **✅ Achievement System**: COMPLETED - Full gamification system with progress tracking and automatic evaluation
 8. **✅ Push Notifications**: COMPLETED - Novu integration with FCM for group join and tent check-in notifications
 9. **✅ TanStack React Query Migration**: COMPLETED - Client-side state management with provider-agnostic architecture
+10. **✅ News Feed & Live Location**: COMPLETED - Activity feed showing group member activities and real-time location sharing
 
 ## Next Steps / Future Enhancements
 
@@ -388,8 +393,11 @@ revalidatePath("/path");
 1. **✅📸 Photo Gallery Integration**: COMPLETED - Same preview functionality added to pics from gallery in the attendance table
 2. **✅ Empty state for Photo gallery**: COMPLETED - Empty state for photo gallery implemented
 3. **✅👤 Profile Quick Preview**: COMPLETED - Quick preview of someone else's profile from group interface
+4. **✅🗞️ News Feed**: COMPLETED - Activity feed displaying group member activities (beer updates, tent check-ins, photos, achievements) from last 48 hours
+5. **✅📍 Live Location Sharing**: COMPLETED - Real-time location sharing between group members with privacy controls and smart notifications
 
 ### Technical Improvements
 
 1. **⚠️ Server Error Handling** - Properly handle server errors using Next.js error handling patterns
    - Reference: https://nextjs.org/docs/app/building-your-application/routing/error-handling#handling-expected-errors-from-server-actions
+- always use extensions. prefix for migration files

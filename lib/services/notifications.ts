@@ -7,6 +7,7 @@ import {
 import { ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/achievement-unlocked";
 import { GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/group-achievement-unlocked";
 import { GROUP_JOIN_WORKFLOW_ID } from "@/novu/workflows/group-join";
+import { LOCATION_SHARING_WORKFLOW_ID } from "@/novu/workflows/location-sharing";
 import { RESERVATION_PROMPT_WORKFLOW_ID } from "@/novu/workflows/reservation-prompt";
 import { RESERVATION_REMINDER_WORKFLOW_ID } from "@/novu/workflows/reservation-reminder";
 import { TENT_CHECKIN_WORKFLOW_ID } from "@/novu/workflows/tent-check-in";
@@ -29,6 +30,7 @@ type NotificationPreferences = Tables<"user_notification_preferences">;
  */
 export const NOTIFICATION_WORKFLOWS = {
   GROUP_JOIN: GROUP_JOIN_WORKFLOW_ID,
+  LOCATION_SHARING: LOCATION_SHARING_WORKFLOW_ID,
   TENT_CHECKIN: TENT_CHECKIN_WORKFLOW_ID,
   RESERVATION_REMINDER: RESERVATION_REMINDER_WORKFLOW_ID,
   RESERVATION_CHECKIN_PROMPT: RESERVATION_PROMPT_WORKFLOW_ID,
@@ -44,7 +46,7 @@ export type NotificationWorkflowId =
 
 export class NotificationService {
   private supabase;
-  private novu: Novu;
+  public novu: Novu; // Make novu public so it can be accessed
 
   constructor() {
     // Use direct service role client to access all user data for notifications
