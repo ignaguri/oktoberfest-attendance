@@ -12,7 +12,7 @@ import type {
 export async function getActivityFeed(
   festivalId: string,
   cursor?: string,
-  limit: number = 20,
+  limit: number = 5,
 ): Promise<ActivityFeedResponse> {
   const supabase = await createClient();
 
@@ -58,7 +58,7 @@ export async function getActivityFeed(
         ? resultActivities[resultActivities.length - 1].activity_time
         : null;
 
-    logger.info("Fetched activity feed", {
+    logger.debug("Fetched activity feed", {
       userId: user.id,
       count: resultActivities.length,
       hasMore,

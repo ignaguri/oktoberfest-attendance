@@ -2,9 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SkeletonNewsFeed } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useActivityFeedItems } from "@/hooks/useActivityFeed";
-import { Loader2, MessageCircle } from "lucide-react";
+import { Loader2, RadioTower } from "lucide-react";
 import { useCallback } from "react";
 
 import { ActivityItem } from "./ActivityItem";
@@ -26,23 +27,8 @@ const NewsFeed = () => {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (loading && activities.length === 0) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Group Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Loading activity feed...</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
+  if (loading) {
+    return <SkeletonNewsFeed />;
   }
 
   if (error) {
@@ -50,8 +36,8 @@ const NewsFeed = () => {
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Group Activity
+            <RadioTower className="size-5" />
+            Latest activities
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -70,13 +56,13 @@ const NewsFeed = () => {
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Group Activity
+            <RadioTower className="size-5" />
+            Latest activities
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <RadioTower className="size-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-sm text-muted-foreground">
               No recent activity from your group members.
               <br />
@@ -92,16 +78,16 @@ const NewsFeed = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          Group Activity
-          <span className="text-sm font-normal text-muted-foreground ml-1">
+        <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
+          <RadioTower className="size-5" />
+          Latest activities
+          <span className="text-sm font-normal text-muted-foreground">
             ({activities.length})
           </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {activities.map((activity: any, index: number) => (
             <ActivityItem
               key={`${activity.user_id}-${activity.activity_time}-${index}`}

@@ -460,6 +460,24 @@ const getCachedFestivalTents = unstable_cache(
       throw new Error("Error fetching festival tents: " + error.message);
     }
 
+    // If no festival-specific tents found, fall back to all tents
+    // This ensures the app works even when festival_tents table is not populated
+    if (!data || data.length === 0) {
+      const { data: allTentsData, error: allTentsError } = await supabaseClient
+        .from("tents")
+        .select("*")
+        .order("name", { ascending: true });
+
+      if (allTentsError) {
+        reportSupabaseException("fetchAllTentsFallback", allTentsError);
+        throw new Error(
+          "Error fetching fallback tents: " + allTentsError.message,
+        );
+      }
+
+      return allTentsData || [];
+    }
+
     // Transform to match original tents structure for backward compatibility
     return (data || []).map((item: { tent: Tables<"tents"> }) => item.tent);
   },

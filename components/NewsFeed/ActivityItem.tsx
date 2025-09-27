@@ -1,12 +1,14 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ImageModal } from "@/app/(private)/groups/[id]/gallery/ImageModal";
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
+import Avatar from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/ui/badge";
-import { DEFAULT_AVATAR_URL } from "@/lib/constants";
-import { formatDistanceToNow } from "date-fns";
-import { Beer, MapPin, Camera, Users, Trophy, Clock } from "lucide-react";
-import { Link } from "next-view-transitions";
-import { useMemo } from "react";
+import { ProfilePreview } from "@/components/ui/profile-preview";
+import { formatRelativeTime } from "@/lib/date-utils";
+import { Beer, MapPin, Camera, Users, Clock, Medal } from "lucide-react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 
 import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
 
@@ -17,67 +19,51 @@ interface ActivityItemProps {
 const getActivityIcon = (type: ActivityFeedItem["activity_type"]) => {
   switch (type) {
     case "beer_count_update":
-      return <Beer className="h-4 w-4" />;
+      return <Beer className="size-4" />;
     case "tent_checkin":
-      return <MapPin className="h-4 w-4" />;
+      return <MapPin className="size-4" />;
     case "photo_upload":
-      return <Camera className="h-4 w-4" />;
+      return <Camera className="size-4" />;
     case "group_join":
-      return <Users className="h-4 w-4" />;
+      return <Users className="size-4" />;
     case "achievement_unlock":
-      return <Trophy className="h-4 w-4" />;
+      return <Medal className="size-4" />;
     default:
-      return <Clock className="h-4 w-4" />;
+      return <Clock className="size-4" />;
   }
 };
 
 const getActivityDescription = (activity: ActivityFeedItem) => {
-  const { activity_type, activity_data, username } = activity;
+  const { activity_type, activity_data } = activity;
 
   switch (activity_type) {
     case "beer_count_update":
       const beerCount = activity_data.beer_count || 0;
-      const date = activity_data.date;
-      return `drank ${beerCount} beer${beerCount !== 1 ? "s" : ""} ${date ? `on ${new Date(date).toLocaleDateString()}` : ""}`;
+      return `drank ${beerCount} beer${beerCount !== 1 ? "s" : ""}`;
 
     case "tent_checkin":
       const tentName = activity_data.tent_name || "a tent";
       return `checked into ${tentName}`;
 
     case "photo_upload":
-      const photoDate = activity_data.date;
-      return `uploaded a photo${photoDate ? ` from ${new Date(photoDate).toLocaleDateString()}` : ""}`;
+      return `uploaded a photo`;
 
     case "group_join":
       const groupName = activity_data.group_name || "a group";
       return `joined ${groupName}`;
 
     case "achievement_unlock":
-      const achievementName =
-        activity_data.achievement_name || "an achievement";
       const rarity = activity_data.rarity;
-      return `unlocked ${achievementName}${rarity ? ` (${rarity})` : ""}`;
+      return `unlocked an achievement${rarity ? ` (${rarity})` : ""}`;
 
     default:
       return "had some activity";
   }
 };
 
-const getRarityColor = (rarity?: string) => {
-  switch (rarity) {
-    case "legendary":
-      return "bg-purple-100 text-purple-800 border-purple-300";
-    case "epic":
-      return "bg-orange-100 text-orange-800 border-orange-300";
-    case "rare":
-      return "bg-blue-100 text-blue-800 border-blue-300";
-    case "common":
-    default:
-      return "bg-gray-100 text-gray-800 border-gray-300";
-  }
-};
-
 export const ActivityItem = ({ activity }: ActivityItemProps) => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const {
     username,
     full_name,
@@ -89,58 +75,66 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
 
   const timeAgo = useMemo(() => {
     try {
-      return formatDistanceToNow(new Date(activity_time), { addSuffix: true });
+      return formatRelativeTime(new Date(activity_time));
     } catch {
       return "recently";
     }
   }, [activity_time]);
 
   const displayName = full_name || username || "Unknown User";
-  const avatarSrc = avatar_url || DEFAULT_AVATAR_URL;
+  const imageUrl = `/api/image/${activity_data.picture_url}?bucket=beer_pictures`;
 
   return (
-    <div className="flex items-start space-x-3 py-3 border-b border-border/50 last:border-b-0">
+    <div className="flex items-start gap-3 py-2 border-b border-border/50 last:border-b-0">
       {/* User Avatar */}
-      <Link href={`/profile/${username}`} className="flex-shrink-0">
-        <Avatar className="h-10 w-10 hover:ring-2 hover:ring-yellow-400 transition-all">
-          <AvatarImage src={avatarSrc} alt={displayName} />
-          <AvatarFallback className="bg-yellow-100 text-yellow-700">
-            {displayName.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-      </Link>
+      <ProfilePreview
+        username={username}
+        fullName={full_name}
+        avatarUrl={avatar_url}
+        className="flex-shrink-0"
+      >
+        <Avatar
+          url={avatar_url}
+          fallback={{
+            username: username,
+            full_name: full_name,
+            email: "no.name@user.com",
+          }}
+        />
+      </ProfilePreview>
 
       {/* Activity Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center space-x-2 mb-1">
-          <span className="text-yellow-600">
-            {getActivityIcon(activity_type)}
-          </span>
-          <Link
-            href={`/profile/${username}`}
-            className="font-medium text-sm hover:text-yellow-600 transition-colors truncate"
-          >
-            {displayName}
-          </Link>
-          <span className="text-xs text-muted-foreground flex-shrink-0">
-            {timeAgo}
-          </span>
+        <div className="flex justify-between items-center mb-1">
+          <div className="flex items-center gap-2">
+            <span className="text-yellow-600">
+              {getActivityIcon(activity_type)}
+            </span>
+            <span className="text-sm font-medium hover:text-yellow-600 transition-colors truncate">
+              {displayName}
+            </span>
+          </div>
+          <span className="text-xs text-muted-foreground">{timeAgo}</span>
         </div>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground text-left">
           {getActivityDescription(activity)}
         </p>
 
         {/* Additional badges for special activities */}
-        <div className="flex items-center gap-2 mt-2">
-          {activity_type === "achievement_unlock" && activity_data.rarity && (
-            <Badge
-              variant="outline"
-              className={`text-xs ${getRarityColor(activity_data.rarity)}`}
-            >
-              {activity_data.achievement_icon} {activity_data.rarity}
-            </Badge>
-          )}
+        <div className="flex items-center gap-2 mt-1">
+          {activity_type === "achievement_unlock" &&
+            activity_data.achievement_name && (
+              <AchievementBadge
+                name={activity_data.achievement_name}
+                icon={activity_data.achievement_icon || "trophy"}
+                rarity={activity_data.rarity || "common"}
+                points={activity_data.achievement_points || 0}
+                isUnlocked={true}
+                size="sm"
+                showPoints={false}
+              />
+            )}
 
           {activity_type === "beer_count_update" &&
             activity_data.beer_count > 5 && (
@@ -156,16 +150,26 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         {/* Photo preview for photo uploads */}
         {activity_type === "photo_upload" && activity_data.picture_url && (
           <div className="mt-2">
-            <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
-              <img
-                src={activity_data.picture_url}
+            <div
+              className="size-16 rounded-lg overflow-hidden bg-muted relative cursor-pointer"
+              onClick={() => setSelectedImage(imageUrl)}
+            >
+              <Image
+                src={imageUrl}
                 alt="Activity photo"
-                className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
+                fill
+                className="object-cover hover:scale-110 transition-transform"
+                sizes="64px"
               />
             </div>
           </div>
         )}
       </div>
+
+      <ImageModal
+        imageUrl={selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
     </div>
   );
 };
