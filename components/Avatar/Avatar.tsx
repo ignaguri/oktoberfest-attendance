@@ -18,6 +18,7 @@ interface AvatarProps {
   url: string | null;
   size?: "small" | "medium" | "large";
   onUpload?: (url: string) => void;
+  onEdit?: () => void;
   previewUrl?: string | null;
   fallback: {
     username: string | null;
@@ -67,12 +68,26 @@ export function AvatarPreview({
   previewUrl,
   size = "small",
   fallback,
-}: Pick<AvatarProps, "url" | "previewUrl" | "size" | "fallback">) {
+  onEdit,
+}: Pick<AvatarProps, "url" | "previewUrl" | "size" | "fallback"> & {
+  onEdit?: () => void;
+}) {
   const imageUrl = previewUrl || getAvatarUrl(url);
   const { initials, full } = extractName(fallback);
 
   return (
-    <AvatarUI className={avatarSizeVariants({ size })}>
+    <AvatarUI
+      className={`${avatarSizeVariants({ size })} ${onEdit ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`}
+      onClick={onEdit}
+      role={onEdit ? "button" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onEdit && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onEdit();
+        }
+      }}
+    >
       <AvatarImage src={imageUrl} alt={`${full} avatar`} />
       <AvatarFallback>{initials}</AvatarFallback>
     </AvatarUI>
@@ -86,6 +101,7 @@ export default function Avatar({
   url,
   size = "small",
   onUpload,
+  onEdit,
   previewUrl,
   fallback,
 }: AvatarProps) {
@@ -97,6 +113,7 @@ export default function Avatar({
           previewUrl={previewUrl}
           size={size}
           fallback={fallback}
+          onEdit={onEdit}
         />
       )}
       {isEditing && uid && <UploadAvatarForm onUpload={onUpload} uid={uid} />}

@@ -147,6 +147,7 @@ export default function AccountForm() {
           size="large"
           uid={user.id}
           url={avatar_url}
+          onEdit={() => setIsEditing(true)}
           onUpload={(url) => {
             setAvatarUrl(url);
             setIsEditing(false);
