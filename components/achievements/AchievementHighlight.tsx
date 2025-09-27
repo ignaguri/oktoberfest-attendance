@@ -113,7 +113,7 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
                 {recentAchievements.map((achievement) => (
                   <div
                     key={achievement.id}
-                    className="flex items-center justify-between"
+                    className="flex flex-col items-center gap-2"
                   >
                     <AchievementBadge
                       name={achievement.name}

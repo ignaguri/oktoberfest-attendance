@@ -11,7 +11,7 @@ import { useCallback } from "react";
 import { ActivityItem } from "./ActivityItem";
 
 const NewsFeed = () => {
-  const { currentFestival } = useFestival();
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const {
     activities,
     loading,
@@ -27,7 +27,7 @@ const NewsFeed = () => {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (loading) {
+  if (loading || festivalLoading) {
     return <SkeletonNewsFeed />;
   }
 
@@ -35,7 +35,7 @@ const NewsFeed = () => {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
             <RadioTower className="size-5" />
             Latest activities
           </CardTitle>
@@ -55,7 +55,7 @@ const NewsFeed = () => {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
             <RadioTower className="size-5" />
             Latest activities
           </CardTitle>
