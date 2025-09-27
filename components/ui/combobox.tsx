@@ -100,10 +100,16 @@ export function Combobox({
                   {group.options.map((option) => (
                     <CommandItem
                       key={option.value}
-                      value={option.value}
+                      value={option.label}
                       onSelect={(currentValue) => {
+                        // Find the option that matches the selected label
+                        const selectedOption = allOptions.find(
+                          (opt) => opt.label === currentValue,
+                        );
                         onValueChange?.(
-                          currentValue === value ? "" : currentValue,
+                          selectedOption?.value === value
+                            ? ""
+                            : selectedOption?.value || "",
                         );
                         setOpen(false);
                       }}
