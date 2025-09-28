@@ -115,6 +115,18 @@ export class QueryKeys {
   static userAchievements = (userId: string, festivalId: string) =>
     ["achievements", "user", userId, festivalId] as const;
 
+  // Activity feed queries
+  static activityFeed = (festivalId: string) =>
+    ["activity-feed", festivalId] as const;
+
+  // Location sharing queries
+  static locationSharingPreferences = (festivalId: string) =>
+    ["location-sharing", "preferences", festivalId] as const;
+  static nearbyGroupMembers = (festivalId: string, radiusMeters: number) =>
+    ["location-sharing", "nearby", festivalId, radiusMeters] as const;
+  static activeLocation = (festivalId: string) =>
+    ["location-sharing", "active", festivalId] as const;
+
   // Tent queries
   static tents = (festivalId: string) => ["tents", festivalId] as const;
   static allTents = () => ["tents", "all"] as const;

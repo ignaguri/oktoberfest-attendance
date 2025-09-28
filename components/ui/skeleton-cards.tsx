@@ -171,7 +171,10 @@ export function SkeletonQuickAttendance() {
   return (
     <div className="flex flex-col items-center gap-4 min-h-[120px]">
       <Skeleton className="h-4 w-32" />
-      <Skeleton className="h-10 w-3/4" />
+      <div className="flex items-center gap-2 w-full justify-center">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-10 w-10 rounded-sm flex-shrink-0" />
+      </div>
       <div className="flex items-center gap-4">
         <Skeleton className="h-8 w-8 rounded" />
         <Skeleton className="h-4 w-24" />
@@ -193,5 +196,48 @@ export function SkeletonFestivalStatus() {
         <Skeleton className="h-5 w-48" />
       </div>
     </div>
+  );
+}
+
+/**
+ * Skeleton for the news feed/activity feed
+ * Matches the activity feed with avatar + content layout
+ */
+export function SkeletonNewsFeed() {
+  return (
+    <Card className="w-full shadow-lg rounded-lg border border-gray-200 min-h-[320px]">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Skeleton className="h-5 w-5" />
+            <Skeleton className="h-6 w-32" />
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-4">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex items-start gap-3 py-2 border-b border-border/50 last:border-b-0"
+            >
+              {/* Avatar skeleton */}
+              <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+
+              {/* Content skeleton */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -20,6 +20,33 @@ interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
 }
 
+// const LocationSharingStatus = ({
+//   isSharing,
+//   hasGroupSharingEnabled,
+// }: {
+//   isSharing: boolean;
+//   hasGroupSharingEnabled: boolean;
+// }) => {
+//   const getStatusMessage = () => {
+//     if (isSharing && !hasGroupSharingEnabled) {
+//       return "Location tracking active, but no groups are enabled to see your location. Configure sharing in your profile settings.";
+//     }
+//     if (isSharing && hasGroupSharingEnabled) {
+//       return null;
+//     }
+//     return null;
+//   };
+
+//   const message = getStatusMessage();
+//   if (!message) return null;
+
+//   return (
+//     <div className="text-center mt-2">
+//       <p className="text-sm text-muted-foreground">{message}</p>
+//     </div>
+//   );
+// };
+
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
 }: QuickAttendanceRegistrationFormProps) => {
@@ -28,6 +55,87 @@ export const QuickAttendanceRegistrationForm = ({
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
     null,
   );
+
+  // Location sharing hooks
+  // const {
+  //   startLocationSharing,
+  //   stopLocationSharing,
+  //   isUpdatingLocation,
+  //   isStoppingSharing,
+  //   isSharing,
+  // } = useLocationSharing(currentFestival?.id);
+
+  // const { data: preferences } = useLocationSharingPreferences(
+  //   currentFestival?.id,
+  // );
+  // const hasGroupSharingEnabled = useMemo(() => {
+  //   return preferences?.some((pref) => pref.sharing_enabled) ?? false;
+  // }, [preferences]);
+
+  // const isActuallySharing = isSharing && hasGroupSharingEnabled;
+
+  // const handleToggle = async () => {
+  //   if (isUpdatingLocation || isStoppingSharing || !currentFestival) return;
+
+  //   try {
+  //     if (!isActuallySharing) {
+  //       // Request location permission and start sharing
+  //       if (!navigator.geolocation) {
+  //         toast.error("Geolocation is not supported by this browser");
+  //         return;
+  //       }
+
+  //       await startLocationSharing();
+
+  //       // Show appropriate message based on group sharing status
+  //       if (hasGroupSharingEnabled) {
+  //         toast.success(
+  //           "Location sharing enabled! Group members can now see your location.",
+  //         );
+  //       } else {
+  //         toast.success(
+  //           "Location tracking started! Enable location sharing for specific groups in your profile settings.",
+  //         );
+  //       }
+  //     } else {
+  //       // Stop sharing
+  //       await stopLocationSharing();
+  //       toast.success("Location sharing disabled.");
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof GeolocationPositionError) {
+  //       switch (error.code) {
+  //         case error.PERMISSION_DENIED:
+  //           toast.error(
+  //             "Location access denied. Please enable location permissions in your browser settings.",
+  //           );
+  //           break;
+  //         case error.POSITION_UNAVAILABLE:
+  //           toast.error("Location information is unavailable.");
+  //           break;
+  //         case error.TIMEOUT:
+  //           toast.error("Location request timed out. Please try again.");
+  //           break;
+  //       }
+  //     } else {
+  //       const errorMessage =
+  //         error instanceof Error
+  //           ? error.message
+  //           : "Failed to toggle location sharing. Please try again.";
+
+  //       // Handle specific API errors
+  //       if (
+  //         errorMessage.includes("Location sharing not enabled for any groups")
+  //       ) {
+  //         toast.error(
+  //           "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first.",
+  //         );
+  //       } else {
+  //         toast.error(errorMessage);
+  //       }
+  //     }
+  //   }
+  // };
 
   const {
     setValue,
@@ -147,21 +255,36 @@ export const QuickAttendanceRegistrationForm = ({
       <p className="text-sm font-semibold">
         {tentId ? "You are at:" : "Are you there today?"}
       </p>
-      <SingleSelect
-        value={tentId}
-        className="w-3/4"
-        buttonClassName="self-center"
-        options={tents.map((tent) => ({
-          title: tent.category,
-          options: tent.options,
-        }))}
-        placeholder="Select your current tent"
-        onSelect={(option) => {
-          setValue("tentId", option.value);
-          handleSubmit(onSubmit)();
-        }}
-        disabled={isSubmitting}
-      />
+      <div className="flex items-center gap-2 w-full justify-center">
+        <SingleSelect
+          value={tentId}
+          className="flex-1 max-w-64"
+          buttonClassName="self-center"
+          options={tents.map((tent) => ({
+            title: tent.category,
+            options: tent.options,
+          }))}
+          placeholder="Select your current tent"
+          onSelect={(option) => {
+            setValue("tentId", option.value);
+            handleSubmit(onSubmit)();
+          }}
+          disabled={isSubmitting}
+        />
+        {/* TODO: enable this when location sharing works
+         <LocationSharingToggle
+          disabled={isSubmitting}
+          className="flex-shrink-0"
+          isSharing={isSharing}
+          hasGroupSharingEnabled={hasGroupSharingEnabled}
+          onToggle={handleToggle}
+        /> */}
+      </div>
+      {/* TODO: enable this when location sharing works
+       <LocationSharingStatus
+        isSharing={isSharing}
+        hasGroupSharingEnabled={hasGroupSharingEnabled}
+      /> */}
       <div className="flex items-center">
         <Button
           type="button"

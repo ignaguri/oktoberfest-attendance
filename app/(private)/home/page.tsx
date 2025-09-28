@@ -1,6 +1,7 @@
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
+import { NewsFeed } from "@/components/NewsFeed";
 import ShareAppButton from "@/components/ShareAppButton";
 import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 import { TutorialProvider } from "@/components/Tutorial/TutorialProvider";
@@ -27,8 +28,8 @@ export default async function Home() {
 
   return (
     <TutorialProvider tutorialCompleted={tutorialStatus.tutorial_completed}>
-      <div className="max-w-lg flex flex-col items-center">
-        <header className="flex flex-row items-center gap-4 mb-4">
+      <div className="max-w-lg flex flex-col items-center gap-4">
+        <header className="flex flex-row items-center gap-4">
           <Image
             src={LogoImage}
             alt="Prost Counter Logo"
@@ -40,7 +41,7 @@ export default async function Home() {
           </h1>
         </header>
 
-        <div className="mb-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <div data-tutorial="festival-status" className="self-center">
             <FestivalStatus />
           </div>
@@ -48,6 +49,8 @@ export default async function Home() {
             <QuickAttendanceWrapper />
           </div>
         </div>
+
+        <NewsFeed />
 
         <div className="flex flex-col gap-4">
           <MissingFields />
@@ -75,26 +78,25 @@ export default async function Home() {
           </div>
         </div>
 
-        <Separator className="my-4" decorative />
+        <Separator decorative />
 
-        <div className="mb-4">
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="px-2">
-                What can I do with Prost Counter?
-              </AccordionTrigger>
-              <AccordionContent className="max-w-80">
-                <p className="text-center text-balance text-gray-600">
-                  Compete with friends in different groups to see who visits
-                  beer festivals more often and drinks the most beers!
-                  <br />
-                  Track your progress and become the ultimate beer festival
-                  champion.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="item-1">
+            <AccordionTrigger className="px-2">
+              What can I do with Prost Counter?
+            </AccordionTrigger>
+            <AccordionContent className="max-w-80">
+              <p className="text-center text-balance text-gray-600">
+                Compete with friends in different groups to see who visits beer
+                festivals more often and drinks the most beers!
+                <br />
+                Track your progress and become the ultimate beer festival
+                champion.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
         <InstallPWA />
         <TutorialOverlay />
       </div>

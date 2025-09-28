@@ -86,6 +86,13 @@ export default async function GroupPage({
                   <span className="ml-2">Gallery</span>
                 </Link>
               </Button>
+              {/* TODO: enable this when location sharing works
+               <Button asChild variant="outline">
+                <Link href={`/groups/${groupId}/location`}>
+                  <MapPin size={24} />
+                  <span className="ml-2">Location</span>
+                </Link>
+              </Button> */}
             </div>
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>

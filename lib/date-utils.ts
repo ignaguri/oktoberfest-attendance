@@ -139,3 +139,33 @@ export function formatTimestampForDatabase(
   const tzDate = new TZDate(date, timezone);
   return tzDate.toISOString();
 }
+
+/**
+ * Formats a date for relative time using Intl.RelativeTimeFormat
+ *
+ * @param date - The date to format
+ * @param timezone - Optional timezone (defaults to festival timezone)
+ * @returns Relative time string (e.g., "2 minutes ago", "1 hour ago", "2 days ago", "1 week ago")
+ */
+export function formatRelativeTime(
+  date: Date,
+  timezone: string = TIMEZONE,
+): string {
+  const now = new TZDate(new Date(), timezone);
+  const tzDate = new TZDate(date, timezone);
+  const diffInSeconds = Math.floor((now.getTime() - tzDate.getTime()) / 1000);
+
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+  if (diffInSeconds < 60) {
+    return rtf.format(-diffInSeconds, "second");
+  } else if (diffInSeconds < 3600) {
+    return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
+  } else if (diffInSeconds < 86400) {
+    return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
+  } else if (diffInSeconds < 604800) {
+    return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
+  } else {
+    return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
+  }
+}
