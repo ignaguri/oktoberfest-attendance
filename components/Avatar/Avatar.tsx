@@ -6,6 +6,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import React from "react";
 
@@ -77,7 +78,10 @@ export function AvatarPreview({
 
   return (
     <AvatarUI
-      className={`${avatarSizeVariants({ size })} ${onEdit ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`}
+      className={cn(
+        avatarSizeVariants({ size }),
+        onEdit && "cursor-pointer hover:opacity-80 transition-opacity",
+      )}
       onClick={onEdit}
       role={onEdit ? "button" : undefined}
       tabIndex={onEdit ? 0 : undefined}
