@@ -1,4 +1,8 @@
 export const changelog: Record<string, string[]> = {
+  "0.7.0": [
+    "📰 News feed component",
+    "🏆 Global leaderboard preview in Home page",
+  ],
   "0.5.0": [
     "📅 New calendar page",
     "⏰ Reservations' tracking and reminders",

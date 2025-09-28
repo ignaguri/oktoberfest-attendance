@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.7.0] - 2025-09-28
+
+### 🐛 Bug Fixes
+
+- copilot comments
+- correct date assignment in addAttendance function
+
+### 📚 Documentation
+
+- update documentation and achievements actions
+
+### ♻️ Code Refactoring
+
+- remove console logs
+
+### 🔧 Maintenance
+
+- adjust pr comments
+- update .gitignore to include cursor/mcp.json
+- add security.txt endpoint for security policy
+
 ## [0.6.1] - 2025-09-05
 
 ## [0.6.0] - 2025-09-05
