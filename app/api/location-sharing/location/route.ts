@@ -3,6 +3,8 @@ import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import type { TablesInsert } from "@/lib/database.types";
+import type { PostgrestError } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 
 const updateLocationSchema = z.object({
@@ -56,12 +58,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has any groups with location sharing enabled for this festival
-    const { data: enabledGroups, error: groupsError } = await supabase
+    const {
+      data: preferences,
+      error: groupsError,
+      count,
+    } = await supabase
       .from("location_sharing_preferences")
-      .select("group_id, groups:group_id(name)")
+      .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("festival_id", festivalId)
       .eq("sharing_enabled", true);
+
+    console.log("Location sharing check:", {
+      userId: user.id,
+      festivalId,
+      count,
+      preferencesCount: preferences?.length || 0,
+      error: groupsError,
+    });
 
     if (groupsError) {
       reportSupabaseException("checkLocationSharingGroups", groupsError, {
@@ -73,40 +87,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!enabledGroups || enabledGroups.length === 0) {
+    if (!count || count === 0) {
       return NextResponse.json(
         { error: "Location sharing not enabled for any groups" },
         { status: 403 },
       );
     }
 
-    // First, expire any existing active locations
-    await supabase
-      .from("user_locations")
-      .update({ status: "expired" })
-      .eq("user_id", user.id)
-      .eq("festival_id", festivalId)
-      .eq("status", "active");
+    const locationData: TablesInsert<"user_locations"> = {
+      user_id: user.id,
+      festival_id: festivalId,
+      latitude,
+      longitude,
+      status: "active",
+      accuracy,
+      heading,
+      speed,
+      altitude,
+      last_updated: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours
+    };
 
-    // Insert new location
+    console.log("Upserting location:", locationData);
+
     const { data: location, error: locationError } = await supabase
       .from("user_locations")
-      .insert({
-        user_id: user.id,
-        festival_id: festivalId,
-        latitude,
-        longitude,
-        accuracy,
-        heading,
-        speed,
-        altitude,
-        status: "active",
-        expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours
-      })
+      .upsert(locationData, { onConflict: "user_id,festival_id" })
       .select()
       .single();
 
     if (locationError) {
+      console.error("Failed to insert location:", locationError);
       reportSupabaseException("updateUserLocation", locationError, {
         id: user.id,
       });
@@ -116,11 +127,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("Location upserted successfully:", location.id);
+
     return NextResponse.json({
       location,
-      sharingWithGroups: enabledGroups
-        .map((g) => g.groups?.name)
-        .filter(Boolean),
+      sharingEnabled: true,
     });
   } catch (error) {
     console.error("Error in POST /api/location-sharing/location:", error);
@@ -137,7 +148,6 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
 
-    // Validate query parameters
     const result = getLocationsSchema.safeParse({
       festivalId: searchParams.get("festivalId"),
       radiusMeters: searchParams.get("radiusMeters")
@@ -154,7 +164,6 @@ export async function GET(request: NextRequest) {
 
     const { festivalId, radiusMeters } = result.data;
 
-    // Check authentication
     const {
       data: { user },
       error: authError,
@@ -163,25 +172,61 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Call the database function to get nearby group members
-    const { data: nearbyMembers, error } = await supabase.rpc(
-      "get_nearby_group_members",
-      {
+    const { data: locationRows, error: locationError } = await supabase
+      .from("user_locations")
+      .select("id, last_updated, expires_at")
+      .eq("user_id", user.id)
+      .eq("festival_id", festivalId)
+      .eq("status", "active")
+      .limit(1);
+
+    if (locationError) {
+      reportSupabaseException("getCurrentLocation", locationError, {
+        id: user.id,
+      });
+      return NextResponse.json(
+        { error: "Failed to fetch current location" },
+        { status: 500 },
+      );
+    }
+
+    const hasActiveLocation = (locationRows?.length ?? 0) > 0;
+
+    let nearbyMembers: unknown[] = [];
+    let nearbyError: Error | null = null;
+
+    if (hasActiveLocation) {
+      const { data, error } = await supabase.rpc("get_nearby_group_members", {
         input_user_id: user.id,
         input_festival_id: festivalId,
         radius_meters: radiusMeters,
-      },
-    );
+      });
 
-    if (error) {
-      reportSupabaseException("getNearbyGroupMembers", error, { id: user.id });
+      nearbyMembers = data || [];
+      nearbyError = error;
+    }
+
+    if (nearbyError) {
+      reportSupabaseException(
+        "getNearbyGroupMembers",
+        nearbyError as PostgrestError,
+        {
+          id: user.id,
+        },
+      );
       return NextResponse.json(
         { error: "Failed to fetch nearby members" },
         { status: 500 },
       );
     }
 
-    return NextResponse.json({ nearbyMembers: nearbyMembers || [] });
+    const currentLocation = locationRows?.[0] ?? null;
+
+    return NextResponse.json({
+      activeSharing: hasActiveLocation,
+      currentLocation,
+      nearbyMembers,
+    });
   } catch (error) {
     console.error("Error in GET /api/location-sharing/location:", error);
     return NextResponse.json(

@@ -2,7 +2,11 @@
  * Business logic hooks for location sharing functionality
  */
 
-import { useQuery, useMutation } from "@/lib/data/react-query-provider";
+import {
+  useQuery,
+  useMutation,
+  useInvalidateQueries,
+} from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -80,6 +84,8 @@ export function useLocationSharingPreferences(festivalId?: string) {
  * Hook to update location sharing preferences
  */
 export function useUpdateLocationSharingPreferences() {
+  const invalidateQueries = useInvalidateQueries();
+
   return useMutation(
     async (preferences: {
       groupId: string;
@@ -105,8 +111,10 @@ export function useUpdateLocationSharingPreferences() {
     },
     {
       onSuccess: (_, variables) => {
-        // Invalidate preferences cache
-        // TODO: Implement cache invalidation
+        // Invalidate preferences cache for the specific festival
+        invalidateQueries(
+          QueryKeys.locationSharingPreferences(variables.festivalId),
+        );
         toast.success(
           variables.sharingEnabled
             ? "Location sharing enabled"
@@ -139,7 +147,10 @@ export function useNearbyGroupMembers(
       }
 
       const data = await response.json();
-      return data.nearbyMembers as NearbyGroupMember[];
+      return {
+        nearbyMembers: data.nearbyMembers ?? [],
+        activeSharing: data.activeSharing ?? false,
+      };
     },
     {
       enabled: !!festivalId,
@@ -155,6 +166,29 @@ export function useNearbyGroupMembers(
 export function useLocationSharing(festivalId?: string) {
   const watchIdRef = useRef<number | null>(null);
 
+  // Check if user has active location sharing in the database
+  const { data: activeLocationData } = useQuery(
+    QueryKeys.activeLocation(festivalId || ""),
+    async () => {
+      if (!festivalId) return null;
+
+      const response = await fetch(
+        `/api/location-sharing/location?festivalId=${festivalId}&radiusMeters=1`,
+      );
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return response.json();
+    },
+    {
+      enabled: !!festivalId,
+      staleTime: 10 * 1000, // 10 seconds - check frequently
+      gcTime: 30 * 1000, // 30 seconds cache
+    },
+  );
+
   const updateLocationMutation = useMutation(
     async (location: {
       festivalId: string;
@@ -165,6 +199,8 @@ export function useLocationSharing(festivalId?: string) {
       speed?: number;
       altitude?: number;
     }) => {
+      console.log("Updating location for festival:", location.festivalId);
+
       const response = await fetch("/api/location-sharing/location", {
         method: "POST",
         headers: {
@@ -175,6 +211,7 @@ export function useLocationSharing(festivalId?: string) {
 
       if (!response.ok) {
         const error = await response.json();
+        console.error("Location update failed:", error);
         throw new Error(error.error || "Failed to update location");
       }
 
@@ -203,10 +240,18 @@ export function useLocationSharing(festivalId?: string) {
       throw new Error("Location services not available");
     }
 
+    console.log("Starting location sharing for festival:", festivalId);
+
     return new Promise<void>((resolve, reject) => {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { coords } = position;
+
+          console.log("Sending location update:", {
+            festivalId,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+          });
 
           updateLocationMutation.mutate({
             festivalId,
@@ -263,6 +308,7 @@ export function useLocationSharing(festivalId?: string) {
     isStoppingSharing: stopSharingMutation.loading,
     updateError: updateLocationMutation.error,
     stopError: stopSharingMutation.error,
-    isSharing: watchIdRef.current !== null,
+    isSharing:
+      watchIdRef.current !== null || activeLocationData?.activeSharing === true,
   };
 }

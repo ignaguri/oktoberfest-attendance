@@ -171,7 +171,10 @@ export function SkeletonQuickAttendance() {
   return (
     <div className="flex flex-col items-center gap-4 min-h-[120px]">
       <Skeleton className="h-4 w-32" />
-      <Skeleton className="h-10 w-3/4" />
+      <div className="flex items-center gap-2 w-full justify-center">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-10 w-10 rounded-sm flex-shrink-0" />
+      </div>
       <div className="flex items-center gap-4">
         <Skeleton className="h-8 w-8 rounded" />
         <Skeleton className="h-4 w-24" />

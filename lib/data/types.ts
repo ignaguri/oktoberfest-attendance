@@ -124,6 +124,8 @@ export class QueryKeys {
     ["location-sharing", "preferences", festivalId] as const;
   static nearbyGroupMembers = (festivalId: string, radiusMeters: number) =>
     ["location-sharing", "nearby", festivalId, radiusMeters] as const;
+  static activeLocation = (festivalId: string) =>
+    ["location-sharing", "active", festivalId] as const;
 
   // Tent queries
   static tents = (festivalId: string) => ["tents", festivalId] as const;

@@ -5,6 +5,7 @@ import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LocationPrivacySettings } from "@/components/ui/location-privacy-settings";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import {
   useCurrentProfile,
@@ -266,6 +267,8 @@ export default function AccountForm() {
       </div>
 
       <NotificationSettings />
+
+      <LocationPrivacySettings />
 
       <PhotoPrivacySettings />
 

@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { createNotificationService } from "@/lib/services/notifications";
 import { getProfileShort, getUser } from "@/lib/sharedActions";
 import { reportNotificationException } from "@/utils/sentry";
@@ -220,14 +221,20 @@ export async function sendLocationSharingNotification(
       });
 
     if (rateLimitError) {
-      console.warn("Rate limit check failed:", rateLimitError);
+      logger.warn("Rate limit check failed", {
+        error: rateLimitError,
+        userId: user.id,
+        groupId,
+      });
     }
 
     // If we found a recent notification, skip sending
     if (recentNotifications && recentNotifications > 0) {
-      console.log(
-        `Rate limiting location sharing notification for user ${user.id} in group ${groupId}`,
-      );
+      logger.info("Rate limiting location sharing notification", {
+        userId: user.id,
+        groupId,
+        recentNotifications,
+      });
       return { success: true }; // Return success but don't send
     }
 
@@ -278,10 +285,11 @@ export async function sendLocationSharingNotification(
           },
         });
       } catch (error) {
-        console.warn(
-          `Failed to send notification to user ${member.user_id}:`,
-          error,
-        );
+        logger.warn("Failed to send notification to group member", {
+          memberId: member.user_id,
+          groupId,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
         // Continue with other members even if one fails
       }
     }
@@ -294,7 +302,11 @@ export async function sendLocationSharingNotification(
         p_notification_type: "location_sharing",
       });
     } catch (error) {
-      console.warn("Failed to record rate limit entry:", error);
+      logger.warn("Failed to record rate limit entry", {
+        userId: user.id,
+        groupId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       // Don't fail the whole operation if rate limit recording fails
     }
 

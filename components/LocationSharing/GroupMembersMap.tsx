@@ -44,11 +44,13 @@ export const GroupMembersMap = ({
   radiusMeters = 500,
 }: GroupMembersMapProps) => {
   const { currentFestival } = useFestival();
-  const {
-    data: nearbyMembers,
-    loading,
-    error,
-  } = useNearbyGroupMembers(currentFestival?.id, radiusMeters);
+  const { data, loading, error } = useNearbyGroupMembers(
+    currentFestival?.id,
+    radiusMeters,
+  );
+
+  const nearbyMembers = data?.nearbyMembers ?? [];
+  const activeSharing = data?.activeSharing ?? false;
 
   const sortedMembers = useMemo(() => {
     if (!nearbyMembers) return [];
@@ -113,7 +115,9 @@ export const GroupMembersMap = ({
           <div className="text-center py-8">
             <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-sm text-muted-foreground">
-              No group members are sharing their location nearby.
+              {activeSharing
+                ? "No group members are sharing their location nearby."
+                : "Enable location sharing to see nearby group members."}
               <br />
               Members within {formatDistance(radiusMeters)} will appear here.
             </p>
@@ -167,7 +171,7 @@ export const GroupMembersMap = ({
 
                   <div className="flex items-center justify-between mt-1">
                     <div className="flex flex-wrap gap-1">
-                      {member.group_names.map((groupName) => (
+                      {member.group_names.map((groupName: string) => (
                         <span
                           key={groupName}
                           className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full"

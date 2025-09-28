@@ -138,6 +138,22 @@ export default function GroupSettingsClient({ group, members }: Props) {
     }
   }, [currentUser?.isCreator, group.id, selectedUserId]);
 
+  const handleCopyToClipboard = useCallback(async () => {
+    if (!inviteToken) return;
+
+    try {
+      const inviteUrl = `${window.location.origin}/join-group?token=${inviteToken}`;
+      await navigator.clipboard.writeText(inviteUrl);
+      setCopiedToClipboard(true);
+      toast.success("Invite link copied to clipboard!");
+
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setCopiedToClipboard(false), 2000);
+    } catch {
+      toast.error("Failed to copy to clipboard");
+    }
+  }, [inviteToken]);
+
   const handleRegenerateToken = useCallback(async () => {
     if (!currentUser?.isCreator) return;
 
@@ -157,24 +173,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
       });
     } finally {
       setIsGeneratingToken(false);
+      handleCopyToClipboard();
     }
-  }, [currentUser?.isCreator, group.id]);
-
-  const handleCopyToClipboard = useCallback(async () => {
-    if (!inviteToken) return;
-
-    try {
-      const inviteUrl = `${window.location.origin}/join-group?token=${inviteToken}`;
-      await navigator.clipboard.writeText(inviteUrl);
-      setCopiedToClipboard(true);
-      toast.success("Invite link copied to clipboard!");
-
-      // Reset the copied state after 2 seconds
-      setTimeout(() => setCopiedToClipboard(false), 2000);
-    } catch {
-      toast.error("Failed to copy to clipboard");
-    }
-  }, [inviteToken]);
+  }, [currentUser?.isCreator, group.id, handleCopyToClipboard]);
 
   return (
     <div className="w-full max-w-lg">
@@ -312,17 +313,17 @@ export default function GroupSettingsClient({ group, members }: Props) {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="flex flex-col gap-2">
               <div className="flex space-x-2">
                 <Input
                   type="text"
                   value={
                     inviteToken
                       ? `${window.location.origin}/join-group?token=${inviteToken}`
-                      : "Generate a new invite link"
+                      : "Generate a new invite link ↓"
                   }
                   readOnly
-                  className="flex-1"
+                  className="flex-1 text-muted-foreground"
                   placeholder="Generate a new invite link"
                 />
                 <Button
@@ -345,7 +346,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 variant="yellow"
                 onClick={handleRegenerateToken}
                 disabled={isGeneratingToken}
-                className="flex items-center"
+                className="flex items-center w-fit self-center"
               >
                 <Link className="w-4 h-4 mr-2" />
                 {isGeneratingToken
