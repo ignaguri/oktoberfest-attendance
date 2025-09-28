@@ -93,11 +93,6 @@ export function FestivalProvider({ children }: FestivalProviderProps) {
 
         if (selectedFestival) {
           setCurrentFestivalState(selectedFestival);
-          console.log(
-            "FestivalContext - Selected festival:",
-            selectedFestival.id,
-            selectedFestival.name,
-          );
         }
       } catch (err) {
         setError(
