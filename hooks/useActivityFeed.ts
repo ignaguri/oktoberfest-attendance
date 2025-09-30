@@ -53,6 +53,7 @@ export function useActivityFeedItems(festivalId?: string) {
   const [allActivities, setAllActivities] = useState<ActivityFeedItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const query = useQuery(
     [...QueryKeys.activityFeed(festivalId || ""), cursor || "initial"],
@@ -84,12 +85,27 @@ export function useActivityFeedItems(festivalId?: string) {
     }
   }, [query.data?.hasMore, query.data?.nextCursor, query.loading]);
 
+  const refresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      // Reset to initial state and refetch
+      setCursor(null);
+      setAllActivities([]);
+      setHasLoadedMore(false);
+      await query.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [query]);
+
   return {
     ...query,
     activities: allActivities,
     hasNextPage: query.data?.hasMore || false,
     fetchNextPage,
     isFetchingNextPage: hasLoadedMore && query.loading,
+    isRefreshing,
+    refresh,
     totalCount: allActivities.length,
   };
 }

@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SkeletonNewsFeed } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useActivityFeedItems } from "@/hooks/useActivityFeed";
-import { Loader2, RadioTower } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Loader2, RadioTower, RefreshCw } from "lucide-react";
 import { useCallback } from "react";
 
 import { ActivityItem } from "./ActivityItem";
@@ -19,6 +20,8 @@ const NewsFeed = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isRefreshing,
+    refresh,
   } = useActivityFeedItems(currentFestival?.id);
 
   const handleLoadMore = useCallback(() => {
@@ -26,6 +29,11 @@ const NewsFeed = () => {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    await refresh();
+  }, [isRefreshing, refresh]);
 
   if (loading || festivalLoading) {
     return <SkeletonNewsFeed />;
@@ -84,6 +92,18 @@ const NewsFeed = () => {
           <span className="text-sm font-normal text-muted-foreground">
             ({activities.length})
           </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="size-8"
+            title="Refresh activity feed"
+          >
+            <RefreshCw
+              className={cn("size-4", isRefreshing && "animate-spin")}
+            />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
