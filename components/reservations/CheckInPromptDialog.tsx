@@ -8,10 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useConfetti } from "@/hooks/useConfetti";
 import { createUrlWithParams } from "@/lib/url-utils";
 import { MapPin, Clock, Users } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import ConfettiExplosion from "react-confetti-explosion";
 import { toast } from "sonner";
 
 interface Reservation {
@@ -35,6 +37,7 @@ export function CheckInPromptDialog({
 }: CheckInPromptDialogProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isExploding, triggerConfetti } = useConfetti();
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
   const open = searchParams.get("prompt") === "checkin" && !!reservation;
@@ -53,6 +56,7 @@ export function CheckInPromptDialog({
     setIsCheckingIn(true);
     try {
       await onCheckIn(reservation.id);
+      triggerConfetti();
       toast.success("Checked in!", {
         description: "Your attendance has been logged successfully.",
       });
@@ -64,7 +68,7 @@ export function CheckInPromptDialog({
     } finally {
       setIsCheckingIn(false);
     }
-  }, [reservation, onCheckIn, handleClose]);
+  }, [reservation, onCheckIn, handleClose, triggerConfetti]);
 
   const formatTime = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], {
@@ -77,6 +81,16 @@ export function CheckInPromptDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
+      {isExploding && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+          <ConfettiExplosion
+            force={0.4}
+            duration={2200}
+            particleCount={30}
+            width={400}
+          />
+        </div>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
