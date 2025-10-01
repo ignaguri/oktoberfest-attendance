@@ -1386,6 +1386,10 @@ export type Database = {
           total_beers: number;
         }[];
       };
+      get_wrapped_data: {
+        Args: { p_festival_id: string; p_user_id: string };
+        Returns: Json;
+      };
       is_group_member: {
         Args: { group_id: string; user_id: string };
         Returns: boolean;

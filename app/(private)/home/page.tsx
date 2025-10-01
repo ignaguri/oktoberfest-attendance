@@ -22,6 +22,7 @@ import LeaderboardPreview from "./LeaderboardPreview";
 import MapButton from "./MapButton";
 import MissingFields from "./MissingFields";
 import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
+import { WrappedCTA } from "./WrappedCTA";
 
 export default async function Home() {
   const tutorialStatus = await getTutorialStatus();
@@ -54,6 +55,8 @@ export default async function Home() {
 
         <div className="flex flex-col gap-4">
           <MissingFields />
+
+          <WrappedCTA />
 
           <div data-tutorial="highlights" className="flex flex-col gap-4">
             <Highlights />

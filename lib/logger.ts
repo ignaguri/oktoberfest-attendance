@@ -118,15 +118,19 @@ class Logger {
     switch (level) {
       case "TRACE":
       case "DEBUG":
+        // eslint-disable-next-line no-console
         console.debug(formattedMessage);
         break;
       case "INFO":
+        // eslint-disable-next-line no-console
         console.info(formattedMessage);
         break;
       case "WARN":
+        // eslint-disable-next-line no-console
         console.warn(formattedMessage);
         break;
       case "ERROR":
+        // eslint-disable-next-line no-console
         console.error(formattedMessage);
         // In production, you might want to send to external logging service
         if (!this.isDevelopment && error) {
