@@ -68,15 +68,15 @@ export function useActivityFeedItems(festivalId?: string) {
   // Update activities when new data arrives
   useEffect(() => {
     if (query.data?.activities) {
-      if (cursor === null) {
-        // First load
+      if (cursor === null || isRefreshing) {
+        // First load or refresh - replace all activities
         setAllActivities(query.data.activities);
       } else {
         // Append new activities for pagination
         setAllActivities((prev) => [...prev, ...query.data!.activities]);
       }
     }
-  }, [query.data?.activities, cursor]);
+  }, [query.data?.activities, cursor, isRefreshing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchNextPage = useCallback(() => {
     if (query.data?.hasMore && query.data?.nextCursor && !query.loading) {
@@ -87,12 +87,23 @@ export function useActivityFeedItems(festivalId?: string) {
 
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
+
     try {
-      // Reset to initial state and refetch
+      // Reset cursor to get fresh data from the beginning
       setCursor(null);
-      setAllActivities([]);
       setHasLoadedMore(false);
+
+      // Trigger refetch
       await query.refetch();
+
+      // Add a small delay to ensure the refresh animation is visible
+      // even if the query completes quickly
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    } catch {
+      // If refresh fails, we keep existing activities
+      // Reset cursor to maintain current pagination state
+      setCursor(null);
+      setHasLoadedMore(false);
     } finally {
       setIsRefreshing(false);
     }
