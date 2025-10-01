@@ -1,4 +1,3 @@
-import { AttendanceDialog } from "@/components/attendance/AttendanceDialog";
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
 import { getCurrentFestivalForUser } from "@/lib/festivalActions";
@@ -19,7 +18,6 @@ export default async function PersonalCalendarPage() {
     <div className="container flex flex-col items-center p-4">
       <h1 className="text-lg font-semibold mb-4">My Calendar</h1>
       <EventCalendar events={events} initialMonth={initialMonth} />
-      <AttendanceDialog />
       {/* Mount a URL-driven reservation dialog */}
       {currentFestival && <ReservationDialog festivalId={currentFestival.id} />}
     </div>

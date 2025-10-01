@@ -1,7 +1,7 @@
 "use client";
 
 import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 
@@ -14,31 +14,23 @@ export function AttendanceDialog() {
     return d ? new Date(d) : null;
   }, [searchParams]);
 
+  const handleClose = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("editAttendance");
+    const url = params.toString() ? `?${params.toString()}` : "/calendar";
+    router.replace(url);
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        if (!o) {
-          const params = new URLSearchParams(searchParams.toString());
-          params.delete("editAttendance");
-          const url = params.toString() ? `?${params.toString()}` : "/calendar";
-          router.replace(url);
-        }
-      }}
-    >
-      <DialogContent className="max-w-lg w-full p-0">
-        <DetailedAttendanceForm
-          onAttendanceUpdate={() => {
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete("editAttendance");
-            const url = params.toString()
-              ? `?${params.toString()}`
-              : "/calendar";
-            router.replace(url);
-          }}
-          selectedDate={selectedDate}
-        />
-      </DialogContent>
-    </Dialog>
+    <Drawer open={open} onOpenChange={(o) => !o && handleClose()}>
+      <DrawerContent className="max-h-[96vh] overflow-y-auto">
+        <div className="max-w-lg w-full mx-auto p-4">
+          <DetailedAttendanceForm
+            onAttendanceUpdate={handleClose}
+            selectedDate={selectedDate}
+          />
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

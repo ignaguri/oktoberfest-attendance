@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
+import { useConfetti } from "@/hooks/useConfetti";
 import { quickAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
+import ConfettiExplosion from "react-confetti-explosion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -52,6 +54,7 @@ export const QuickAttendanceRegistrationForm = ({
 }: QuickAttendanceRegistrationFormProps) => {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const { tents, isLoading: tentsLoading, error: tentsError } = useTents();
+  const { isExploding, triggerConfetti } = useConfetti();
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
     null,
   );
@@ -188,6 +191,8 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
+      const previousBeerCount = attendanceData?.beer_count ?? 0;
+
       // Only send the new tent ID if it's different from the last one and not empty
       // This prevents duplicate tent visits in the database
       const tentsToSend =
@@ -205,6 +210,12 @@ export const QuickAttendanceRegistrationForm = ({
         tents: tentsToSend,
         festivalId: currentFestival.id,
       });
+
+      // Trigger confetti only if beer count increased
+      if (data.beerCount > previousBeerCount) {
+        triggerConfetti();
+      }
+
       // Update the local state with the new tent ID if it was added
       const updatedTentIds =
         tentsToSend.length > 0
@@ -251,27 +262,38 @@ export const QuickAttendanceRegistrationForm = ({
   }
 
   return (
-    <form className="flex flex-col items-center gap-4">
-      <p className="text-sm font-semibold">
-        {tentId ? "You are at:" : "Are you there today?"}
-      </p>
-      <div className="flex items-center gap-2 w-full justify-center">
-        <SingleSelect
-          value={tentId}
-          className="flex-1 max-w-64"
-          buttonClassName="self-center"
-          options={tents.map((tent) => ({
-            title: tent.category,
-            options: tent.options,
-          }))}
-          placeholder="Select your current tent"
-          onSelect={(option) => {
-            setValue("tentId", option.value);
-            handleSubmit(onSubmit)();
-          }}
-          disabled={isSubmitting}
-        />
-        {/* TODO: enable this when location sharing works
+    <>
+      {isExploding && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+          <ConfettiExplosion
+            force={0.4}
+            duration={2200}
+            particleCount={30}
+            width={400}
+          />
+        </div>
+      )}
+      <form className="flex flex-col items-center gap-4">
+        <p className="text-sm font-semibold">
+          {tentId ? "You are at:" : "Are you there today?"}
+        </p>
+        <div className="flex items-center gap-2 w-full justify-center">
+          <SingleSelect
+            value={tentId}
+            className="flex-1 max-w-64"
+            buttonClassName="self-center"
+            options={tents.map((tent) => ({
+              title: tent.category,
+              options: tent.options,
+            }))}
+            placeholder="Select your current tent"
+            onSelect={(option) => {
+              setValue("tentId", option.value);
+              handleSubmit(onSubmit)();
+            }}
+            disabled={isSubmitting}
+          />
+          {/* TODO: enable this when location sharing works
          <LocationSharingToggle
           disabled={isSubmitting}
           className="flex-shrink-0"
@@ -279,37 +301,38 @@ export const QuickAttendanceRegistrationForm = ({
           hasGroupSharingEnabled={hasGroupSharingEnabled}
           onToggle={handleToggle}
         /> */}
-      </div>
-      {/* TODO: enable this when location sharing works
+        </div>
+        {/* TODO: enable this when location sharing works
        <LocationSharingStatus
         isSharing={isSharing}
         hasGroupSharingEnabled={hasGroupSharingEnabled}
       /> */}
-      <div className="flex items-center">
-        <Button
-          type="button"
-          variant="yellow"
-          onClick={() => {
-            setValue("beerCount", Math.max(0, beerCount - 1));
-            handleSubmit(onSubmit)();
-          }}
-          disabled={isSubmitting}
-        >
-          <Minus className="w-4 h-4" />
-        </Button>
-        <span className="mx-2">{beerCount} 🍺 drank today</span>
-        <Button
-          type="button"
-          variant="yellow"
-          onClick={() => {
-            setValue("beerCount", beerCount + 1);
-            handleSubmit(onSubmit)();
-          }}
-          disabled={isSubmitting}
-        >
-          <Plus className="w-4 h-4" />
-        </Button>
-      </div>
-    </form>
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="yellow"
+            onClick={() => {
+              setValue("beerCount", Math.max(0, beerCount - 1));
+              handleSubmit(onSubmit)();
+            }}
+            disabled={isSubmitting}
+          >
+            <Minus className="w-4 h-4" />
+          </Button>
+          <span className="mx-2">{beerCount} 🍺 drank today</span>
+          <Button
+            type="button"
+            variant="yellow"
+            onClick={() => {
+              setValue("beerCount", beerCount + 1);
+              handleSubmit(onSubmit)();
+            }}
+            disabled={isSubmitting}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </form>
+    </>
   );
 };

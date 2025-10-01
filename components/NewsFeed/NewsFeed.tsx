@@ -5,10 +5,49 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SkeletonNewsFeed } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useActivityFeedItems } from "@/hooks/useActivityFeed";
-import { Loader2, RadioTower } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Loader2, RadioTower, RefreshCw } from "lucide-react";
 import { useCallback } from "react";
 
 import { ActivityItem } from "./ActivityItem";
+
+const NewsFeedHeader = ({
+  activitiesCount,
+  onRefresh,
+  isRefreshing,
+  _isError = false,
+  _isEmpty = false,
+}: {
+  activitiesCount?: number;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
+  _isError?: boolean;
+  _isEmpty?: boolean;
+}) => (
+  <CardHeader>
+    <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
+      <RadioTower className="size-5" />
+      Latest activities
+      {activitiesCount !== undefined && (
+        <span className="text-sm font-normal text-muted-foreground">
+          ({activitiesCount})
+        </span>
+      )}
+      {onRefresh && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          className="size-8"
+          title="Refresh activity feed"
+        >
+          <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
+        </Button>
+      )}
+    </CardTitle>
+  </CardHeader>
+);
 
 const NewsFeed = () => {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
@@ -19,6 +58,8 @@ const NewsFeed = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isRefreshing,
+    refresh,
   } = useActivityFeedItems(currentFestival?.id);
 
   const handleLoadMore = useCallback(() => {
@@ -27,6 +68,11 @@ const NewsFeed = () => {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    await refresh();
+  }, [isRefreshing, refresh]);
+
   if (loading || festivalLoading) {
     return <SkeletonNewsFeed />;
   }
@@ -34,12 +80,11 @@ const NewsFeed = () => {
   if (error) {
     return (
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
-            <RadioTower className="size-5" />
-            Latest activities
-          </CardTitle>
-        </CardHeader>
+        <NewsFeedHeader
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          _isError={true}
+        />
         <CardContent>
           <div className="text-center py-8">
             <p className="text-sm text-muted-foreground">
@@ -54,12 +99,11 @@ const NewsFeed = () => {
   if (activities.length === 0) {
     return (
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
-            <RadioTower className="size-5" />
-            Latest activities
-          </CardTitle>
-        </CardHeader>
+        <NewsFeedHeader
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          _isEmpty={true}
+        />
         <CardContent>
           <div className="text-center py-8">
             <RadioTower className="size-12 mx-auto text-muted-foreground mb-4" />
@@ -77,15 +121,11 @@ const NewsFeed = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
-          <RadioTower className="size-5" />
-          Latest activities
-          <span className="text-sm font-normal text-muted-foreground">
-            ({activities.length})
-          </span>
-        </CardTitle>
-      </CardHeader>
+      <NewsFeedHeader
+        activitiesCount={activities.length}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
+      />
       <CardContent>
         <div className="flex flex-col gap-4">
           {activities.map((activity: any, index: number) => (
@@ -121,3 +161,4 @@ const NewsFeed = () => {
 };
 
 export default NewsFeed;
+export { NewsFeedHeader };

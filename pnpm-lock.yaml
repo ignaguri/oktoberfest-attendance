@@ -116,6 +116,9 @@ importers:
       react:
         specifier: 19.1.1
         version: 19.1.1
+      react-confetti-explosion:
+        specifier: ^3.0.3
+        version: 3.0.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react-datepicker:
         specifier: 8.7.0
         version: 8.7.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -4971,6 +4974,12 @@ packages:
 
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
+
+  react-confetti-explosion@3.0.3:
+    resolution: {integrity: sha512-ow5ns/1ttzXsIlbbfJmWJNiyQK8lTHBL6lRSUXGaK44K/3NIMngR57Ja96l+D6txTeFhfe0BfXGvORMxhtRDng==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   react-datepicker@8.7.0:
     resolution: {integrity: sha512-r5OJbiLWc3YiVNy69Kau07/aVgVGsFVMA6+nlqCV7vyQ8q0FUOnJ+wAI4CgVxHejG3i5djAEiebrF8/Eip4rIw==}
@@ -11019,6 +11028,11 @@ snapshots:
   randombytes@2.1.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  react-confetti-explosion@3.0.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+    dependencies:
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
 
   react-datepicker@8.7.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
