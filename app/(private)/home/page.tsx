@@ -51,12 +51,12 @@ export default async function Home() {
           </div>
         </div>
 
+        <WrappedCTA />
+
         <NewsFeed />
 
         <div className="flex flex-col gap-4">
           <MissingFields />
-
-          <WrappedCTA />
 
           <div data-tutorial="highlights" className="flex flex-col gap-4">
             <Highlights />

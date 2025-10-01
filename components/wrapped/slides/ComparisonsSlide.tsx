@@ -12,8 +12,13 @@ interface ComparisonsSlideProps {
 }
 
 export function ComparisonsSlide({ data }: ComparisonsSlideProps) {
+  // Handle case where comparisons data might be null
+  if (!data.comparisons) {
+    return null;
+  }
+
   const { vs_festival_avg, vs_last_year } = data.comparisons;
-  const improvement = isImprovement(vs_last_year);
+  const improvement = vs_last_year ? isImprovement(vs_last_year) : null;
 
   const getIcon = (diff: number) => {
     if (diff > 0) return <ArrowUp className="h-5 w-5 text-green-500" />;
@@ -28,60 +33,72 @@ export function ComparisonsSlide({ data }: ComparisonsSlideProps) {
 
       <div className="w-full max-w-2xl space-y-6">
         {/* vs Festival Average */}
-        <div className="rounded-xl bg-white p-6 shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
-            vs Festival Average
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-700">Beers</span>
-              <div className="flex items-center gap-2">
-                {getIcon(vs_festival_avg.beers_diff_pct)}
-                <span className="font-bold text-gray-800">
-                  {formatPercentage(vs_festival_avg.beers_diff_pct)}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-700">Days</span>
-              <div className="flex items-center gap-2">
-                {getIcon(vs_festival_avg.days_diff_pct)}
-                <span className="font-bold text-gray-800">
-                  {formatPercentage(vs_festival_avg.days_diff_pct)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* vs Last Year */}
-        {vs_last_year && improvement && (
+        {vs_festival_avg && (
           <div className="rounded-xl bg-white p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
-              vs Last Year
+              vs Festival Average
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700">Beers</span>
                 <div className="flex items-center gap-2">
-                  {getIcon(vs_last_year.beers_diff)}
+                  {getIcon(vs_festival_avg.beers_diff_pct || 0)}
                   <span className="font-bold text-gray-800">
-                    {vs_last_year.beers_diff > 0 ? "+" : ""}
-                    {vs_last_year.beers_diff}
+                    {formatPercentage(vs_festival_avg.beers_diff_pct || 0)}
                   </span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700">Days</span>
                 <div className="flex items-center gap-2">
-                  {getIcon(vs_last_year.days_diff)}
+                  {getIcon(vs_festival_avg.days_diff_pct || 0)}
                   <span className="font-bold text-gray-800">
-                    {vs_last_year.days_diff > 0 ? "+" : ""}
-                    {vs_last_year.days_diff}
+                    {formatPercentage(vs_festival_avg.days_diff_pct || 0)}
                   </span>
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* vs Last Year */}
+        {vs_last_year && improvement && (
+          <div className="rounded-xl bg-white p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+              vs Last Year (
+              {vs_last_year.prev_festival_name || "Previous Festival"})
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-700">Beers</span>
+                <div className="flex items-center gap-2">
+                  {getIcon(vs_last_year.beers_diff || 0)}
+                  <span className="font-bold text-gray-800">
+                    {(vs_last_year.beers_diff || 0) > 0 ? "+" : ""}
+                    {vs_last_year.beers_diff || 0}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-700">Days</span>
+                <div className="flex items-center gap-2">
+                  {getIcon(vs_last_year.days_diff || 0)}
+                  <span className="font-bold text-gray-800">
+                    {(vs_last_year.days_diff || 0) > 0 ? "+" : ""}
+                    {vs_last_year.days_diff || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* No data message */}
+        {!vs_festival_avg && !vs_last_year && (
+          <div className="rounded-xl bg-white p-6 shadow-lg text-center">
+            <p className="text-gray-600">
+              No comparison data available for this festival
+            </p>
           </div>
         )}
       </div>

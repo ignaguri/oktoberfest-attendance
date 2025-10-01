@@ -33,13 +33,8 @@ BEGIN
     RAISE EXCEPTION 'User not found';
   END IF;
 
-  -- Get beer cost (use festival pricing or default)
-  SELECT COALESCE(
-    (SELECT beer_price FROM festival_tent_pricing
-     WHERE festival_id = p_festival_id
-     LIMIT 1),
-    16.20
-  ) INTO v_beer_cost;
+  -- Get default beer cost from festival or use global default
+  v_beer_cost := COALESCE(v_festival.beer_cost, 16.20);
 
   -- Build user_info
   v_result := jsonb_build_object(
@@ -57,6 +52,7 @@ BEGIN
   );
 
   -- Calculate basic stats
+  -- Using festival beer cost for simplified calculation (fallback: festival -> global default)
   WITH attendance_agg AS (
     SELECT
       COUNT(DISTINCT a.date) AS days_attended,
@@ -89,8 +85,8 @@ BEGIN
         FROM tent_visits tv2
         JOIN tents t ON tv2.tent_id = t.id
         WHERE tv2.user_id = p_user_id
-          AND tv2.date >= v_festival.start_date
-          AND tv2.date <= v_festival.end_date
+          AND tv2.visit_date >= v_festival.start_date
+          AND tv2.visit_date <= v_festival.end_date
         GROUP BY t.name, t.id
         ORDER BY COUNT(*) DESC
         LIMIT 1
@@ -101,16 +97,17 @@ BEGIN
           'visit_count', visit_count
         ) ORDER BY visit_count DESC
       ) AS tent_breakdown
-    FROM (
+    FROM tent_visits tv
+    JOIN (
       SELECT
-        tv.tent_id,
+        tv2.tent_id,
         COUNT(*) AS visit_count
-      FROM tent_visits tv
-      WHERE tv.user_id = p_user_id
-        AND tv.date >= v_festival.start_date
-        AND tv.date <= v_festival.end_date
-      GROUP BY tv.tent_id
-    ) tent_counts
+      FROM tent_visits tv2
+      WHERE tv2.user_id = p_user_id
+        AND tv2.visit_date >= v_festival.start_date
+        AND tv2.visit_date <= v_festival.end_date
+      GROUP BY tv2.tent_id
+    ) tent_counts ON tv.tent_id = tent_counts.tent_id
     JOIN tents t ON tent_counts.tent_id = t.id
   ),
   tent_total AS (
@@ -230,9 +227,11 @@ BEGIN
   photo_count AS (
     SELECT COUNT(*) AS photos_uploaded
     FROM beer_pictures bp
+    JOIN attendances a ON bp.attendance_id = a.id
     WHERE bp.user_id = p_user_id
-      AND bp.date >= v_festival.start_date
-      AND bp.date <= v_festival.end_date
+      AND a.date >= v_festival.start_date
+      AND a.date <= v_festival.end_date
+      AND a.festival_id = p_festival_id
   )
   SELECT jsonb_build_object(
     'groups_joined', ug.groups_joined,
@@ -275,7 +274,7 @@ BEGIN
         'tents_visited', (
           SELECT COUNT(DISTINCT tent_id)
           FROM tent_visits tv
-          WHERE tv.user_id = p_user_id AND tv.date = a.date
+          WHERE tv.user_id = p_user_id AND tv.visit_date = a.date
         )
       ) ORDER BY a.date ASC
     ),
@@ -308,6 +307,8 @@ BEGIN
   ),
   previous_festival AS (
     SELECT
+      f.id as festival_id,
+      f.name as festival_name,
       COUNT(DISTINCT a.date) AS prev_days,
       COALESCE(SUM(a.beer_count), 0) AS prev_beers,
       COALESCE(SUM(a.beer_count) * v_beer_cost, 0) AS prev_spent
@@ -317,6 +318,7 @@ BEGIN
       AND f.festival_type = v_festival.festival_type
       AND f.start_date < v_festival.start_date
       AND f.id != p_festival_id
+    GROUP BY f.id, f.name, f.start_date
     ORDER BY f.start_date DESC
     LIMIT 1
   )
@@ -340,7 +342,8 @@ BEGIN
           'days_diff', uc.user_days - pf.prev_days,
           'spent_diff', ROUND((uc.user_beers * v_beer_cost) - pf.prev_spent, 2),
           'prev_beers', pf.prev_beers,
-          'prev_days', pf.prev_days
+          'prev_days', pf.prev_days,
+          'prev_festival_name', pf.festival_name
         )
       ELSE NULL
     END

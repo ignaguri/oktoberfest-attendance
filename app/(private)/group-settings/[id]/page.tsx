@@ -1,4 +1,6 @@
-import { fetchGroupDetails, fetchGroupMembers } from "./actions";
+import { notFound } from "next/navigation";
+
+import { fetchGroupDetailsSafe, fetchGroupMembersSafe } from "./actions";
 import GroupSettingsClient from "./GroupSettingsClient";
 
 interface Props {
@@ -9,10 +11,14 @@ interface Props {
 export default async function GroupSettingsPage({ params }: Props) {
   const { id: groupId } = await params;
 
-  const groupData = fetchGroupDetails(groupId);
-  const membersData = fetchGroupMembers(groupId);
+  const groupData = fetchGroupDetailsSafe(groupId);
+  const membersData = fetchGroupMembersSafe(groupId);
 
   const [group, members] = await Promise.all([groupData, membersData]);
+
+  if (!group) {
+    notFound();
+  }
 
   return <GroupSettingsClient group={group} members={members} />;
 }

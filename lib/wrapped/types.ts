@@ -153,6 +153,7 @@ export interface WrappedData {
       spent_diff: number;
       prev_beers: number;
       prev_days: number;
+      prev_festival_name: string;
     } | null;
   };
   personality: {
