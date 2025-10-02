@@ -2,14 +2,11 @@
 
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { hasWrappedData } from "@/lib/wrapped/utils";
+import { useEffect, useRef } from "react";
 import { Keyboard, Mousewheel, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
-
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/pagination";
 
 // Import slides
 import {
@@ -26,11 +23,28 @@ import {
   OutroSlide,
 } from "../slides";
 
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/pagination";
+
 interface WrappedContainerProps {
   data: WrappedData;
 }
 
 export function WrappedContainer({ data }: WrappedContainerProps) {
+  const swiperRef = useRef<any>(null);
+
+  // Scroll to Swiper container when component mounts
+  useEffect(() => {
+    if (swiperRef.current?.swiper?.el) {
+      // Scroll the Swiper container to the top of the viewport
+      swiperRef.current.swiper.el.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, []);
+
   // Check if user has data
   if (!hasWrappedData(data)) {
     return (
@@ -65,9 +79,21 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     { key: "outro", component: OutroSlide },
   ];
 
+  // Handle slide change to scroll to Swiper container
+  const handleSlideChange = () => {
+    if (swiperRef.current?.swiper?.el) {
+      // Scroll the Swiper container to the top of the viewport
+      swiperRef.current.swiper.el.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden">
       <Swiper
+        ref={swiperRef}
         modules={[Keyboard, Mousewheel, Pagination]}
         direction="horizontal"
         slidesPerView={1}
@@ -85,6 +111,7 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
         }}
         speed={500}
         noSwipingClass="recharts-responsive-container" // Prevents Swiper from swiping on Recharts charts
+        onSlideChange={handleSlideChange}
       >
         {slides.map((slide) => {
           const SlideComponent = slide.component;
