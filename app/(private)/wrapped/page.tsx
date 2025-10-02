@@ -1,29 +1,14 @@
 import {
   WrappedContainer,
-  WrappedLoading,
   WrappedError,
 } from "@/components/wrapped/core/WrappedContainer";
 import { getWrappedData, canAccessWrapped } from "@/lib/actions/wrapped";
 
-interface WrappedPageProps {
-  params: Promise<{
-    festivalId: string;
-  }>;
-}
-
-export default async function WrappedPage({ params }: WrappedPageProps) {
-  const { festivalId } = await params;
-
-  // Fetch data on the server
+export default async function WrappedPage() {
   const [wrappedData, accessResult] = await Promise.all([
-    getWrappedData(festivalId),
-    canAccessWrapped(festivalId),
+    getWrappedData(),
+    canAccessWrapped(),
   ]);
-
-  // Loading state (this shouldn't happen in server component, but keeping for consistency)
-  if (!accessResult) {
-    return <WrappedLoading />;
-  }
 
   // Access denied
   if (!accessResult.allowed) {

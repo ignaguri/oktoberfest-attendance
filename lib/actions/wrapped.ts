@@ -1,5 +1,6 @@
 "use server";
 
+import { getCurrentFestivalForUser } from "@/lib/festivalActions";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/sharedActions";
 import { ACCESS_CONFIG } from "@/lib/wrapped/config";
@@ -11,16 +12,30 @@ import type { WrappedData, WrappedAccessResult } from "@/lib/wrapped/types";
  * Get wrapped data for a user and festival (uses cache when available)
  */
 export async function getWrappedData(
-  festivalId: string,
+  festivalId?: string,
 ): Promise<WrappedData | null> {
   try {
     const user = await getUser();
     const supabase = await createClient();
 
+    // If no festivalId provided, get the current festival
+    let targetFestivalId = festivalId;
+    if (!targetFestivalId) {
+      const currentFestival = await getCurrentFestivalForUser();
+      if (!currentFestival) {
+        logger.error(
+          "No current festival found for wrapped data",
+          logger.serverAction("getWrappedData", { userId: user.id }),
+        );
+        return null;
+      }
+      targetFestivalId = currentFestival.id;
+    }
+
     // Call the cached database function (checks cache first, calculates if needed)
     const { data, error } = await supabase.rpc("get_wrapped_data_cached", {
       p_user_id: user.id,
-      p_festival_id: festivalId,
+      p_festival_id: targetFestivalId,
     });
 
     if (error) {
@@ -61,18 +76,36 @@ export async function getWrappedData(
  * Check if user can access wrapped for a festival
  */
 export async function canAccessWrapped(
-  festivalId: string,
+  festivalId?: string,
 ): Promise<WrappedAccessResult> {
   try {
     const user = await getUser();
     const supabase = await createClient();
+
+    // If no festivalId provided, get the current festival
+    let targetFestivalId = festivalId;
+    if (!targetFestivalId) {
+      const currentFestival = await getCurrentFestivalForUser();
+      if (!currentFestival) {
+        logger.error(
+          "No current festival found for wrapped access check",
+          logger.serverAction("canAccessWrapped", { userId: user.id }),
+        );
+        return {
+          allowed: false,
+          reason: "error",
+          message: "Could not determine current festival",
+        };
+      }
+      targetFestivalId = currentFestival.id;
+    }
 
     // Allow in development environment
     if (ACCESS_CONFIG.allowInDev && process.env.NODE_ENV === "development") {
       logger.info(
         "Allowing wrapped access in development mode",
         logger.serverAction("canAccessWrapped", {
-          festivalId,
+          festivalId: targetFestivalId,
           userId: user.id,
         }),
       );
@@ -83,13 +116,15 @@ export async function canAccessWrapped(
     const { data: festival, error: festivalError } = await supabase
       .from("festivals")
       .select("id, name, status, start_date, end_date")
-      .eq("id", festivalId)
+      .eq("id", targetFestivalId)
       .single();
 
     if (festivalError || !festival) {
       logger.error(
         "Failed to fetch festival for wrapped access check",
-        logger.serverAction("canAccessWrapped", { festivalId }),
+        logger.serverAction("canAccessWrapped", {
+          festivalId: targetFestivalId,
+        }),
         festivalError,
       );
       return {
@@ -113,13 +148,13 @@ export async function canAccessWrapped(
       .from("attendances")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
-      .eq("festival_id", festivalId);
+      .eq("festival_id", targetFestivalId);
 
     if (attendanceError) {
       logger.error(
         "Failed to check user attendance for wrapped",
         logger.serverAction("canAccessWrapped", {
-          festivalId,
+          festivalId: targetFestivalId,
           userId: user.id,
         }),
         attendanceError,

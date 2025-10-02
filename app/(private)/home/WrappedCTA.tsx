@@ -55,7 +55,7 @@ export function WrappedCTA() {
               size="lg"
               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md hover:shadow-lg transition-all"
             >
-              <Link href={`/wrapped/${currentFestival.id}`}>
+              <Link href="/wrapped">
                 <Sparkles className="mr-2 size-5" />
                 View Your Wrapped
               </Link>
