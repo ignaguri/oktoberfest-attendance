@@ -19,7 +19,12 @@ export default async function Navbar() {
           className="text-base sm:text-xl text-white font-bold flex items-center gap-2"
           href={profileData ? "/home" : "/"}
         >
-          <Image src={AppLogo} alt="ProstCounter Logo" className="size-6" />
+          <Image
+            src={AppLogo}
+            alt="ProstCounter Logo"
+            className="size-6"
+            priority
+          />
           <span translate="no">ProstCounter</span>
         </Link>
 
