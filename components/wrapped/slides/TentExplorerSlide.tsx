@@ -14,15 +14,22 @@ import {
 
 interface TentExplorerSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function TentExplorerSlide({ data }: TentExplorerSlideProps) {
+export function TentExplorerSlide({
+  data,
+  isActive = false,
+}: TentExplorerSlideProps) {
   const { unique_tents, favorite_tent, tent_diversity_pct, tent_breakdown } =
     data.tent_stats;
   const topTents = getTopTents(tent_breakdown, 3);
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-green-50 to-emerald-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-green-50 to-emerald-50"
+    >
       <SlideTitle>Tent explorer</SlideTitle>
       <SlideSubtitle>Your favorite spots</SlideSubtitle>
 
@@ -64,7 +71,7 @@ export function TentExplorerSlide({ data }: TentExplorerSlideProps) {
                   }}
                   transition={{ delay: 0.4 + index * 0.1 }}
                   initial="hidden"
-                  animate="visible"
+                  animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-3 shadow"
                 >
                   <span className="font-medium text-gray-700">

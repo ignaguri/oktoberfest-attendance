@@ -11,15 +11,22 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface AchievementsSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function AchievementsSlide({ data }: AchievementsSlideProps) {
+export function AchievementsSlide({
+  data,
+  isActive = false,
+}: AchievementsSlideProps) {
   const achievements = sortAchievements(data.achievements);
   const totalPoints = calculateTotalPoints(data.achievements);
 
   if (achievements.length === 0) {
     return (
-      <BaseSlide className="bg-gradient-to-br from-violet-50 to-purple-50">
+      <BaseSlide
+        isActive={isActive}
+        className="bg-gradient-to-br from-violet-50 to-purple-50"
+      >
         <SlideTitle>Achievements</SlideTitle>
         <p className="text-gray-600">No achievements unlocked yet</p>
       </BaseSlide>
@@ -27,7 +34,10 @@ export function AchievementsSlide({ data }: AchievementsSlideProps) {
   }
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-violet-50 to-purple-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-violet-50 to-purple-50"
+    >
       <SlideTitle>Achievements unlocked</SlideTitle>
       <SlideSubtitle>{achievements.length} badges earned</SlideSubtitle>
 
@@ -47,7 +57,7 @@ export function AchievementsSlide({ data }: AchievementsSlideProps) {
               }}
               transition={{ delay: 0.3 + index * 0.05, type: "spring" }}
               initial="hidden"
-              animate="visible"
+              animate={isActive ? "visible" : "hidden"}
               className="flex justify-center"
             >
               <AchievementBadge

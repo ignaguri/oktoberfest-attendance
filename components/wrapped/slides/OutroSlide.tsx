@@ -12,9 +12,10 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface OutroSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function OutroSlide({ data }: OutroSlideProps) {
+export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
   const handleShare = useCallback(async () => {
     const shareText = generateShareText(data);
 
@@ -41,7 +42,10 @@ export function OutroSlide({ data }: OutroSlideProps) {
   }, [data]);
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-yellow-50 to-orange-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-yellow-50 to-orange-50"
+    >
       <div className="flex flex-col items-center gap-4">
         <HeartHandshake className="size-16" />
 

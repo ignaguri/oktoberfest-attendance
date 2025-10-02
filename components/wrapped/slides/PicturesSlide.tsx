@@ -17,9 +17,10 @@ import {
 
 interface PicturesSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function PicturesSlide({ data }: PicturesSlideProps) {
+export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
   const { pictures } = data.social_stats;
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
@@ -86,7 +87,10 @@ export function PicturesSlide({ data }: PicturesSlideProps) {
   };
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-green-50 to-emerald-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-green-50 to-emerald-50"
+    >
       <SlideTitle>Your festival memories</SlideTitle>
       <SlideSubtitle>Your captured moments</SlideSubtitle>
 

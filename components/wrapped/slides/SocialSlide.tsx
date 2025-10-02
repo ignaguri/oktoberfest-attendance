@@ -14,14 +14,18 @@ import {
 
 interface SocialSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function SocialSlide({ data }: SocialSlideProps) {
+export function SocialSlide({ data, isActive = false }: SocialSlideProps) {
   const { groups_joined, photos_uploaded, total_group_members } =
     data.social_stats;
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-indigo-50 to-purple-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-indigo-50 to-purple-50"
+    >
       <SlideTitle>Social butterfly</SlideTitle>
       <SlideSubtitle>Your social impact</SlideSubtitle>
 

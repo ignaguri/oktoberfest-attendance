@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { WRAPPED_THEME } from "@/lib/wrapped/config";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
+import { Children, cloneElement, isValidElement, useEffect } from "react";
 
 import type { AnimationConfig } from "@/lib/wrapped/types";
 import type { ReactNode } from "react";
@@ -12,6 +13,7 @@ interface BaseSlideProps {
   className?: string;
   animation?: AnimationConfig;
   backgroundColor?: string;
+  isActive?: boolean;
 }
 
 /**
@@ -23,7 +25,10 @@ export function BaseSlide({
   className,
   animation,
   backgroundColor = WRAPPED_THEME.backgroundColor,
+  isActive = false,
 }: BaseSlideProps) {
+  const controls = useAnimation();
+
   const entranceAnimation = {
     fade: { opacity: 0 },
     slide: { x: 100, opacity: 0 },
@@ -31,16 +36,38 @@ export function BaseSlide({
     none: {},
   };
 
-  const exitAnimation = {
-    fade: { opacity: 0 },
-    slide: { x: -100, opacity: 0 },
-    zoom: { scale: 1.2, opacity: 0 },
-    none: {},
-  };
-
   const entrance = animation?.entrance || "fade";
-  const exit = animation?.exit || "fade";
   const duration = (animation?.duration || 500) / 1000; // Convert to seconds
+
+  useEffect(() => {
+    if (isActive) {
+      // When slide becomes active, immediately animate from entrance to final state
+      controls.start({
+        x: 0,
+        scale: 1,
+        opacity: 1,
+        transition: {
+          duration,
+          ease: "easeInOut",
+          type: entrance === "zoom" ? "spring" : "tween",
+        },
+      });
+    } else {
+      // When slide becomes inactive, immediately hide it
+      controls.set({
+        ...entranceAnimation[entrance],
+        opacity: 0,
+      });
+    }
+  }, [isActive, controls, entrance, duration]);
+
+  // Inject isActive prop into SlideContent components
+  const childrenWithProps = Children.map(children, (child) => {
+    if (isValidElement(child) && child.type === SlideContent) {
+      return cloneElement(child, { isActive } as any);
+    }
+    return child;
+  });
 
   return (
     <div
@@ -52,17 +79,18 @@ export function BaseSlide({
       style={{ backgroundColor }}
     >
       <motion.div
-        initial={entranceAnimation[entrance]}
-        animate={{ x: 0, scale: 1, opacity: 1 }}
-        exit={exitAnimation[exit]}
-        transition={{
-          duration,
-          ease: "easeInOut",
-          type: entrance === "zoom" ? "spring" : "tween",
+        initial={{
+          ...entranceAnimation[entrance],
+          opacity: 0,
         }}
+        animate={controls}
         className="size-full flex flex-col items-center justify-center"
+        style={{
+          // Only control pointer events via style to avoid CSS conflicts
+          pointerEvents: isActive ? "auto" : "none",
+        }}
       >
-        {children}
+        {childrenWithProps}
       </motion.div>
     </div>
   );
@@ -123,10 +151,12 @@ export function SlideContent({
   children,
   className,
   stagger = true,
+  isActive = false,
 }: {
   children: ReactNode;
   className?: string;
   stagger?: boolean;
+  isActive?: boolean;
 }) {
   if (!stagger) {
     return <div className={cn("w-full max-w-2xl", className)}>{children}</div>;
@@ -135,7 +165,7 @@ export function SlideContent({
   return (
     <motion.div
       initial="hidden"
-      animate="visible"
+      animate={isActive ? "visible" : "hidden"}
       variants={{
         visible: {
           transition: {
@@ -143,6 +173,7 @@ export function SlideContent({
             delayChildren: 0.4,
           },
         },
+        hidden: {},
       }}
       className={cn("w-full max-w-2xl", className)}
     >

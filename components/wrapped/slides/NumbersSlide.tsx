@@ -22,9 +22,10 @@ import {
 
 interface NumbersSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function NumbersSlide({ data }: NumbersSlideProps) {
+export function NumbersSlide({ data, isActive = false }: NumbersSlideProps) {
   const { total_beers, days_attended, total_spent, avg_beers } =
     data.basic_stats;
 
@@ -53,7 +54,10 @@ export function NumbersSlide({ data }: NumbersSlideProps) {
   }, [avg_beers, days_attended, total_beers]);
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-blue-50 to-cyan-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-blue-50 to-cyan-50"
+    >
       <SlideTitle>Your festival in numbers</SlideTitle>
       <SlideSubtitle>Here&apos;s what you did</SlideSubtitle>
 

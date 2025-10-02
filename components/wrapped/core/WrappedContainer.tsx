@@ -148,7 +148,9 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
           const SlideComponent = slide.component;
           return (
             <SwiperSlide key={slide.key} virtualIndex={index}>
-              <SlideComponent data={data} />
+              {({ isActive }) => (
+                <SlideComponent data={data} isActive={isActive} />
+              )}
             </SwiperSlide>
           );
         })}

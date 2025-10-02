@@ -18,14 +18,18 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface JourneySlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function JourneySlide({ data }: JourneySlideProps) {
+export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
   const timelineData = prepareTimelineData(data.timeline);
 
   if (timelineData.length === 0) {
     return (
-      <BaseSlide className="bg-gradient-to-br from-purple-50 to-pink-50">
+      <BaseSlide
+        isActive={isActive}
+        className="bg-gradient-to-br from-purple-50 to-pink-50"
+      >
         <SlideTitle>Your beer journey</SlideTitle>
         <p className="text-gray-600">No timeline data available</p>
       </BaseSlide>
@@ -33,7 +37,10 @@ export function JourneySlide({ data }: JourneySlideProps) {
   }
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-purple-50 to-pink-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-purple-50 to-pink-50"
+    >
       <SlideTitle>Your beer journey</SlideTitle>
       <SlideSubtitle>Day by day progression</SlideSubtitle>
 

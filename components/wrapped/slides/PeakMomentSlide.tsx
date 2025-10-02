@@ -13,24 +13,31 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface PeakMomentSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function PeakMomentSlide({ data }: PeakMomentSlideProps) {
+export function PeakMomentSlide({
+  data,
+  isActive = false,
+}: PeakMomentSlideProps) {
   const { isExploding, triggerConfetti } = useConfetti();
   const { best_day, max_single_session } = data.peak_moments;
 
   useEffect(() => {
-    if (best_day) {
+    if (isActive && best_day) {
       const timer = setTimeout(
         triggerConfetti,
         ANIMATION_DELAYS.confettiTriggerPeak,
       );
       return () => clearTimeout(timer);
     }
-  }, [triggerConfetti, best_day]);
+  }, [isActive, triggerConfetti, best_day]);
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-amber-50 to-yellow-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-amber-50 to-yellow-50"
+    >
       {isExploding && best_day && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <ConfettiExplosion

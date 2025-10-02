@@ -13,20 +13,27 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface IntroSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function IntroSlide({ data }: IntroSlideProps) {
+export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
   const { isExploding, triggerConfetti } = useConfetti();
   const username = data.user_info.username || data.user_info.full_name || "You";
 
-  // Trigger confetti after delay
+  // Trigger confetti after delay when slide becomes active
   useEffect(() => {
-    const timer = setTimeout(triggerConfetti, ANIMATION_DELAYS.confettiTrigger);
-    return () => clearTimeout(timer);
-  }, [triggerConfetti]);
+    if (isActive) {
+      const timer = setTimeout(
+        triggerConfetti,
+        ANIMATION_DELAYS.confettiTrigger,
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, triggerConfetti]);
 
   return (
     <BaseSlide
+      isActive={isActive}
       animation={{
         ...CELEBRATION_ANIMATION,
         confetti: false, // We'll handle confetti separately

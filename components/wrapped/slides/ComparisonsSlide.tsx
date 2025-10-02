@@ -9,21 +9,27 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface ComparisonsSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function ComparisonsSlide({ data }: ComparisonsSlideProps) {
+export function ComparisonsSlide({
+  data,
+  isActive = false,
+}: ComparisonsSlideProps) {
   // Handle case where comparisons data might be null
   if (!data.comparisons) {
-    // return (
-    //   <BaseSlide className="bg-gradient-to-br from-teal-50 to-cyan-50">
-    //     <SlideTitle>How You Compare</SlideTitle>
-    //     <SlideSubtitle>vs Average & Last Year</SlideSubtitle>
-    //     <div className="text-center text-gray-600">
-    //       <p>No comparison data available for this festival</p>
-    //     </div>
-    //   </BaseSlide>
-    // );
-    return null;
+    return (
+      <BaseSlide
+        isActive={isActive}
+        className="bg-gradient-to-br from-teal-50 to-cyan-50"
+      >
+        <SlideTitle>How You Compare</SlideTitle>
+        <SlideSubtitle>vs Average & Last Year</SlideSubtitle>
+        <div className="text-center text-gray-600">
+          <p>No comparison data available for this festival</p>
+        </div>
+      </BaseSlide>
+    );
   }
 
   const { vs_festival_avg, vs_last_year } = data.comparisons;
@@ -36,7 +42,10 @@ export function ComparisonsSlide({ data }: ComparisonsSlideProps) {
   };
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-teal-50 to-cyan-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-teal-50 to-cyan-50"
+    >
       <SlideTitle>How You Compare</SlideTitle>
       <SlideSubtitle>vs Average & Last Year</SlideSubtitle>
 

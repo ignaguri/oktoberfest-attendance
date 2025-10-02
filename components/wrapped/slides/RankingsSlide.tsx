@@ -9,9 +9,10 @@ import { BaseSlide, SlideTitle } from "./BaseSlide";
 
 interface RankingsSlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function RankingsSlide({ data }: RankingsSlideProps) {
+export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
   const { top_3_rankings } = data.social_stats;
   const { days_attended, total_beers, avg_beers } =
     data.global_leaderboard_positions;
@@ -22,7 +23,10 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
 
   if (!hasGroupRankings && !hasGlobalPositions) {
     return (
-      <BaseSlide className="bg-gradient-to-br from-orange-50 to-red-50">
+      <BaseSlide
+        isActive={isActive}
+        className="bg-gradient-to-br from-orange-50 to-red-50"
+      >
         <SlideTitle>Your rankings</SlideTitle>
         <p className="text-gray-600">No rankings available yet</p>
       </BaseSlide>
@@ -37,7 +41,10 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
   };
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-orange-50 to-red-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-orange-50 to-red-50"
+    >
       <SlideTitle>Your rankings</SlideTitle>
 
       <div className="w-full max-w-2xl flex flex-col gap-6">
@@ -58,7 +65,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   }}
                   transition={{ delay: 0.3 + index * 0.15 }}
                   initial="hidden"
-                  animate="visible"
+                  animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-3 shadow-lg"
                 >
                   <span className="text-4xl">
@@ -92,7 +99,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   }}
                   transition={{ delay: 0.6 }}
                   initial="hidden"
-                  animate="visible"
+                  animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
                 >
                   <CalendarDays className="size-8" />
@@ -116,7 +123,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   }}
                   transition={{ delay: 0.7 }}
                   initial="hidden"
-                  animate="visible"
+                  animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
                 >
                   <Beer className="size-8" />
@@ -140,7 +147,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   }}
                   transition={{ delay: 0.8 }}
                   initial="hidden"
-                  animate="visible"
+                  animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
                 >
                   <DiamondPercent className="size-8" />

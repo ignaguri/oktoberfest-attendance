@@ -15,15 +15,22 @@ import {
 
 interface PersonalitySlideProps {
   data: WrappedData;
+  isActive?: boolean;
 }
 
-export function PersonalitySlide({ data }: PersonalitySlideProps) {
+export function PersonalitySlide({
+  data,
+  isActive = false,
+}: PersonalitySlideProps) {
   const { type, traits } = data.personality;
   const description = getPersonalityDescription(type, traits);
   const emoji = getPersonalityEmoji(type);
 
   return (
-    <BaseSlide className="bg-gradient-to-br from-pink-50 to-rose-50">
+    <BaseSlide
+      isActive={isActive}
+      className="bg-gradient-to-br from-pink-50 to-rose-50"
+    >
       <SlideTitle>Your festival personality</SlideTitle>
       <SlideSubtitle>Based on your behavior</SlideSubtitle>
 
@@ -31,7 +38,7 @@ export function PersonalitySlide({ data }: PersonalitySlideProps) {
         {/* Personality Type */}
         <motion.div
           initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
+          animate={isActive ? { scale: 1 } : { scale: 0 }}
           transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
           className="flex flex-col items-center gap-2 rounded-xl bg-white p-6 shadow-lg"
         >
@@ -58,7 +65,7 @@ export function PersonalitySlide({ data }: PersonalitySlideProps) {
                   }}
                   transition={{ delay: 0.5 + index * 0.1 }}
                   initial="hidden"
-                  animate="visible"
+                  animate={isActive ? "visible" : "hidden"}
                   className="flex items-center gap-2 rounded-lg bg-white p-2 shadow"
                 >
                   <span className="text-2xl">{getTraitEmoji(trait)}</span>
