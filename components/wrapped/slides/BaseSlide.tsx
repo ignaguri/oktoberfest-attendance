@@ -162,7 +162,7 @@ export function StatItem({
 }: {
   label: string;
   value: string | number;
-  icon?: string;
+  icon?: React.ReactNode;
   className?: string;
 }) {
   return (
@@ -177,7 +177,7 @@ export function StatItem({
       )}
     >
       <div className="flex items-center gap-3">
-        {icon && <span className="text-3xl">{icon}</span>}
+        {icon && <div className="flex-shrink-0">{icon}</div>}
         <span className="text-lg font-medium text-gray-700">{label}</span>
       </div>
       <span className="text-2xl font-bold text-yellow-600">{value}</span>

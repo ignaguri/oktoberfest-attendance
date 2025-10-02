@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Users, Globe, CalendarDays, Beer, DiamondPercent } from "lucide-react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 
@@ -44,7 +45,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
         {hasGroupRankings && (
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
-              <span className="text-xl">👥</span>
+              <Users className="size-5" />
               Group rankings
             </h3>
             <div className="flex flex-col gap-2">
@@ -79,7 +80,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
         {hasGlobalPositions && (
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
-              <span className="text-xl">🌍</span>
+              <Globe className="size-5" />
               Global rankings
             </h3>
             <div className="flex flex-col gap-2">
@@ -94,7 +95,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   animate="visible"
                   className="flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
                 >
-                  <span className="text-4xl">📅</span>
+                  <CalendarDays className="size-8" />
                   <div className="flex flex-col gap-1">
                     <p className="font-semibold text-gray-800">Days attended</p>
                     <p className="text-sm text-gray-500">
@@ -118,7 +119,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   animate="visible"
                   className="flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
                 >
-                  <span className="text-4xl">🍺</span>
+                  <Beer className="size-8" />
                   <div>
                     <p className="font-semibold text-gray-800">Total beers</p>
                     <p className="text-sm text-gray-500">
@@ -142,7 +143,7 @@ export function RankingsSlide({ data }: RankingsSlideProps) {
                   animate="visible"
                   className="flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
                 >
-                  <span className="text-4xl">⚡</span>
+                  <DiamondPercent className="size-8" />
                   <div>
                     <p className="font-semibold text-gray-800">Average beers</p>
                     <p className="text-sm text-gray-500">

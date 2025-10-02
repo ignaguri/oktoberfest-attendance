@@ -1,6 +1,13 @@
 "use client";
 
 import { formatCurrency, formatNumber } from "@/lib/wrapped/utils";
+import {
+  Beer,
+  CalendarDays,
+  TrendingUp,
+  DollarSign,
+  PartyPopper,
+} from "lucide-react";
 import { useMemo } from "react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
@@ -23,14 +30,26 @@ export function NumbersSlide({ data }: NumbersSlideProps) {
 
   const finalMessage = useMemo(() => {
     if (total_beers > 10 || avg_beers > 2.1) {
-      return "That's a lot of Prost! 🎉";
+      return (
+        <span className="flex items-center gap-1">
+          That&apos;s a lot of Prost! <PartyPopper className="size-4" />
+        </span>
+      );
     }
 
     if (days_attended > 3) {
-      return "That's a lot of days! 🎉";
+      return (
+        <span className="flex items-center gap-1">
+          That&apos;s a lot of days! <PartyPopper className="size-4" />
+        </span>
+      );
     }
 
-    return "That's not too bad! 🎉";
+    return (
+      <span className="flex items-center gap-1">
+        That&apos;s not too bad! <PartyPopper className="size-4" />
+      </span>
+    );
   }, [avg_beers, days_attended, total_beers]);
 
   return (
@@ -40,21 +59,25 @@ export function NumbersSlide({ data }: NumbersSlideProps) {
 
       <SlideContent className="flex flex-col gap-4">
         <StatItem
-          icon="🍺"
+          icon={<Beer className="size-5" />}
           label="Total beers"
           value={formatNumber(total_beers)}
         />
 
-        <StatItem icon="📅" label="Days attended" value={days_attended} />
+        <StatItem
+          icon={<CalendarDays className="size-5" />}
+          label="Days attended"
+          value={days_attended}
+        />
 
         <StatItem
-          icon="📊"
+          icon={<TrendingUp className="size-5" />}
           label="Average per day"
           value={formatNumber(avg_beers)}
         />
 
         <StatItem
-          icon="💰"
+          icon={<DollarSign className="size-5" />}
           label="Total spent"
           value={formatCurrency(total_spent)}
         />

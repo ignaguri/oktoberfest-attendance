@@ -3,6 +3,7 @@
 import { useConfetti } from "@/hooks/useConfetti";
 import { ANIMATION_DELAYS } from "@/lib/wrapped/config";
 import { formatWrappedDate, formatCurrency } from "@/lib/wrapped/utils";
+import { BicepsFlexed, Tent, Beer } from "lucide-react";
 import { useEffect } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 
@@ -47,12 +48,13 @@ export function PeakMomentSlide({ data }: PeakMomentSlideProps) {
 
       <div className="z-10 w-full max-w-2xl flex flex-col gap-4">
         {best_day && (
-          <div className="rounded-xl bg-white p-6 shadow-lg text-center">
-            <div className="text-5xl mb-3">🏆</div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Best day
-            </h3>
-            <div className="flex items-center justify-center gap-4 mb-2">
+          <div className="rounded-xl bg-white p-6 shadow-lg flex flex-col items-center gap-2">
+            <div className="flex items-center justify-center gap-4">
+              <Beer className="size-10" />
+              <Tent className="size-10" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700">Best day</h3>
+            <div className="flex items-center justify-center gap-4">
               <div className="text-center">
                 <p className="text-3xl font-bold text-yellow-600">
                   {best_day.beer_count}
@@ -68,23 +70,21 @@ export function PeakMomentSlide({ data }: PeakMomentSlideProps) {
               </div>
             </div>
             <p className="text-gray-600">{formatWrappedDate(best_day.date)}</p>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500">
               {formatCurrency(best_day.spent)} spent
             </p>
           </div>
         )}
 
-        <div className="rounded-xl bg-white p-6 shadow-lg text-center">
-          <div className="text-5xl mb-3">🥴</div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+        <div className="rounded-xl bg-white p-6 shadow-lg flex flex-col items-center gap-2">
+          <BicepsFlexed className="size-10" />
+          <h3 className="text-lg font-semibold text-gray-700">
             Biggest session
           </h3>
           <p className="text-4xl font-bold text-yellow-600">
             {max_single_session} beers
           </p>
-          <p className="text-sm text-gray-500 mt-2">
-            most beers in a single day
-          </p>
+          <p className="text-sm text-gray-500">most beers in a single day</p>
         </div>
       </div>
     </BaseSlide>

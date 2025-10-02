@@ -30,9 +30,9 @@ export function ComparisonsSlide({ data }: ComparisonsSlideProps) {
   const improvement = vs_last_year ? isImprovement(vs_last_year) : null;
 
   const getIcon = (diff: number) => {
-    if (diff > 0) return <ArrowUp className="h-5 w-5 text-green-500" />;
-    if (diff < 0) return <ArrowDown className="h-5 w-5 text-red-500" />;
-    return <Minus className="h-5 w-5 text-gray-400" />;
+    if (diff > 0) return <ArrowUp className="size-5 text-green-500" />;
+    if (diff < 0) return <ArrowDown className="size-5 text-red-500" />;
+    return <Minus className="size-5 text-gray-400" />;
   };
 
   return (

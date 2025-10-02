@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { generateShareText } from "@/lib/wrapped/utils";
-import { Share2 } from "lucide-react";
+import { Share2, Beer, HeartHandshake, Heart } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
@@ -43,7 +43,7 @@ export function OutroSlide({ data }: OutroSlideProps) {
   return (
     <BaseSlide className="bg-gradient-to-br from-yellow-50 to-orange-50">
       <div className="flex flex-col items-center gap-4">
-        <div className="text-7xl">👋🏻</div>
+        <HeartHandshake className="size-16" />
 
         <SlideTitle className="text-5xl">See you next festival!</SlideTitle>
 
@@ -51,7 +51,8 @@ export function OutroSlide({ data }: OutroSlideProps) {
 
         <div className="mt-4 rounded-lg bg-white p-6 shadow-lg text-center max-w-md">
           <p className="text-lg font-semibold text-gray-800 mb-2">
-            {data.basic_stats.total_beers} beers
+            {data.basic_stats.total_beers} beers &{" "}
+            {data.tent_stats.unique_tents} tents
           </p>
           <p className="text-gray-600">
             across {data.basic_stats.days_attended} unforgettable days at{" "}
@@ -69,7 +70,10 @@ export function OutroSlide({ data }: OutroSlideProps) {
         </Button>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Made with 🍺 by ProstCounter</p>
+          <p className="flex items-center gap-1">
+            Made with <Heart className="size-4" /> and some{" "}
+            <Beer className="size-4" /> by ProstCounter
+          </p>
         </div>
       </div>
     </BaseSlide>

@@ -1,5 +1,7 @@
 "use client";
 
+import { Users, Camera, UserSearch } from "lucide-react";
+
 import type { WrappedData } from "@/lib/wrapped/types";
 
 import {
@@ -24,12 +26,20 @@ export function SocialSlide({ data }: SocialSlideProps) {
       <SlideSubtitle>Your social impact</SlideSubtitle>
 
       <SlideContent className="flex flex-col gap-4">
-        <StatItem icon="👥" label="Groups joined" value={groups_joined} />
-
-        <StatItem icon="📸" label="Photos uploaded" value={photos_uploaded} />
+        <StatItem
+          icon={<UserSearch className="size-5" />}
+          label="Groups joined"
+          value={groups_joined}
+        />
 
         <StatItem
-          icon="🤝"
+          icon={<Camera className="size-5" />}
+          label="Photos uploaded"
+          value={photos_uploaded}
+        />
+
+        <StatItem
+          icon={<Users className="size-5" />}
           label="Festival friends"
           value={total_group_members}
         />

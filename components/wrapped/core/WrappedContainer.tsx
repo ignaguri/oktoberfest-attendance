@@ -65,8 +65,6 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     { key: "outro", component: OutroSlide },
   ];
 
-  console.log("data", data);
-
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden">
       <Swiper
