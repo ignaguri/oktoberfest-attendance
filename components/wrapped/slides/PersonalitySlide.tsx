@@ -24,46 +24,49 @@ export function PersonalitySlide({ data }: PersonalitySlideProps) {
 
   return (
     <BaseSlide className="bg-gradient-to-br from-pink-50 to-rose-50">
-      <SlideTitle>Your Festival Personality</SlideTitle>
+      <SlideTitle>Your festival personality</SlideTitle>
       <SlideSubtitle>Based on your behavior</SlideSubtitle>
 
-      <SlideContent className="space-y-6">
+      <SlideContent className="flex flex-col gap-4">
         {/* Personality Type */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-          className="flex flex-col items-center gap-4 rounded-xl bg-white p-8 shadow-lg"
+          className="flex flex-col items-center gap-2 rounded-xl bg-white p-6 shadow-lg"
         >
-          <div className="text-7xl">{emoji}</div>
+          <div className="text-5xl">{emoji}</div>
           <h2 className="text-3xl font-bold text-yellow-600">{type}</h2>
           <p className="text-center text-gray-700">{description}</p>
         </motion.div>
 
         {/* Traits */}
         <div>
-          <h3 className="mb-3 text-center text-lg font-semibold text-gray-700">
-            Your Traits
+          <h3 className="mb-2 text-center text-lg font-semibold text-gray-700">
+            Your traits
           </h3>
           <div className="grid grid-cols-2 gap-3">
-            {traits.map((trait, index) => (
-              <motion.div
-                key={trait}
-                variants={{
-                  hidden: { y: 20, opacity: 0 },
-                  visible: { y: 0, opacity: 1 },
-                }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                initial="hidden"
-                animate="visible"
-                className="flex items-center gap-2 rounded-lg bg-white p-3 shadow"
-              >
-                <span className="text-2xl">{getTraitEmoji(trait)}</span>
-                <span className="text-sm font-medium text-gray-700">
-                  {trait}
-                </span>
-              </motion.div>
-            ))}
+            {traits
+              .filter((trait) => trait)
+              .slice(0, 4)
+              .map((trait, index) => (
+                <motion.div
+                  key={trait}
+                  variants={{
+                    hidden: { y: 20, opacity: 0 },
+                    visible: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex items-center gap-2 rounded-lg bg-white p-2 shadow"
+                >
+                  <span className="text-2xl">{getTraitEmoji(trait)}</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {trait}
+                  </span>
+                </motion.div>
+              ))}
           </div>
         </div>
       </SlideContent>

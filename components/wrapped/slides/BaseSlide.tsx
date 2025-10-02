@@ -12,7 +12,6 @@ interface BaseSlideProps {
   className?: string;
   animation?: AnimationConfig;
   backgroundColor?: string;
-  showConfetti?: boolean;
 }
 
 /**
@@ -44,20 +43,28 @@ export function BaseSlide({
   const duration = (animation?.duration || 500) / 1000; // Convert to seconds
 
   return (
-    <motion.div
-      initial={entranceAnimation[entrance]}
-      animate={{ x: 0, scale: 1, opacity: 1 }}
-      exit={exitAnimation[exit]}
-      transition={{ duration, ease: "easeInOut" }}
+    <div
       className={cn(
-        "relative flex h-full w-full flex-col items-center justify-center p-8",
+        "flex size-full flex-col items-center justify-center p-8",
         "overflow-hidden",
         className,
       )}
       style={{ backgroundColor }}
     >
-      {children}
-    </motion.div>
+      <motion.div
+        initial={entranceAnimation[entrance]}
+        animate={{ x: 0, scale: 1, opacity: 1 }}
+        exit={exitAnimation[exit]}
+        transition={{
+          duration,
+          ease: "easeInOut",
+          type: entrance === "zoom" ? "spring" : "tween",
+        }}
+        className="size-full flex flex-col items-center justify-center"
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }
 

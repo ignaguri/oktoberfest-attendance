@@ -14,6 +14,15 @@ interface ComparisonsSlideProps {
 export function ComparisonsSlide({ data }: ComparisonsSlideProps) {
   // Handle case where comparisons data might be null
   if (!data.comparisons) {
+    // return (
+    //   <BaseSlide className="bg-gradient-to-br from-teal-50 to-cyan-50">
+    //     <SlideTitle>How You Compare</SlideTitle>
+    //     <SlideSubtitle>vs Average & Last Year</SlideSubtitle>
+    //     <div className="text-center text-gray-600">
+    //       <p>No comparison data available for this festival</p>
+    //     </div>
+    //   </BaseSlide>
+    // );
     return null;
   }
 

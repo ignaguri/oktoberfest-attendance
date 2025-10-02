@@ -1,9 +1,10 @@
 "use client";
 
-import { RARITY_COLORS } from "@/lib/wrapped/config";
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
 import { sortAchievements, calculateTotalPoints } from "@/lib/wrapped/utils";
 import { motion } from "framer-motion";
 
+import type { AchievementRarity } from "@/lib/types/achievements";
 import type { WrappedData } from "@/lib/wrapped/types";
 
 import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
@@ -27,16 +28,16 @@ export function AchievementsSlide({ data }: AchievementsSlideProps) {
 
   return (
     <BaseSlide className="bg-gradient-to-br from-violet-50 to-purple-50">
-      <SlideTitle>Achievement Unlocked</SlideTitle>
+      <SlideTitle>Achievements unlocked</SlideTitle>
       <SlideSubtitle>{achievements.length} badges earned</SlideSubtitle>
 
-      <div className="w-full max-w-2xl space-y-6">
+      <div className="w-full max-w-2xl flex flex-col gap-4">
         <div className="rounded-lg bg-white p-4 shadow text-center">
           <p className="text-3xl font-bold text-yellow-600">{totalPoints}</p>
-          <p className="text-sm text-gray-600">Total Points</p>
+          <p className="text-sm text-gray-600">Total points</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+        <div className="flex flex-col gap-2 max-h-[50dvh] overflow-y-auto">
           {achievements.map((achievement, index) => (
             <motion.div
               key={achievement.id}
@@ -47,18 +48,18 @@ export function AchievementsSlide({ data }: AchievementsSlideProps) {
               transition={{ delay: 0.3 + index * 0.05, type: "spring" }}
               initial="hidden"
               animate="visible"
-              className="rounded-lg bg-white p-4 shadow flex flex-col items-center gap-2"
-              style={{
-                borderTop: `3px solid ${RARITY_COLORS[achievement.rarity] || RARITY_COLORS.common}`,
-              }}
+              className="flex justify-center"
             >
-              <span className="text-3xl">{achievement.icon}</span>
-              <span className="text-sm font-semibold text-center text-gray-700">
-                {achievement.name}
-              </span>
-              <span className="text-xs text-gray-500">
-                {achievement.points} pts
-              </span>
+              <AchievementBadge
+                name={achievement.name}
+                icon={achievement.icon}
+                rarity={achievement.rarity as AchievementRarity}
+                points={achievement.points}
+                isUnlocked={true}
+                size="md"
+                showPoints={true}
+                className="w-full justify-center text-center"
+              />
             </motion.div>
           ))}
         </div>

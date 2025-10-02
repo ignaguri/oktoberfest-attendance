@@ -19,18 +19,18 @@ interface TentExplorerSlideProps {
 export function TentExplorerSlide({ data }: TentExplorerSlideProps) {
   const { unique_tents, favorite_tent, tent_diversity_pct, tent_breakdown } =
     data.tent_stats;
-  const topTents = getTopTents(tent_breakdown, 5);
+  const topTents = getTopTents(tent_breakdown, 3);
 
   return (
     <BaseSlide className="bg-gradient-to-br from-green-50 to-emerald-50">
-      <SlideTitle>Tent Explorer</SlideTitle>
+      <SlideTitle>Tent explorer</SlideTitle>
       <SlideSubtitle>Your favorite spots</SlideSubtitle>
 
-      <SlideContent className="space-y-6">
+      <SlideContent className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-white p-4 shadow text-center">
             <p className="text-3xl font-bold text-yellow-600">{unique_tents}</p>
-            <p className="text-sm text-gray-600">Tents Visited</p>
+            <p className="text-sm text-gray-600">Tents visited</p>
           </div>
           <div className="rounded-lg bg-white p-4 shadow text-center">
             <p className="text-3xl font-bold text-yellow-600">
@@ -42,7 +42,7 @@ export function TentExplorerSlide({ data }: TentExplorerSlideProps) {
 
         {favorite_tent && (
           <div className="rounded-lg bg-white p-4 shadow text-center">
-            <p className="text-sm text-gray-600 mb-1">Favorite Tent</p>
+            <p className="text-sm text-gray-600 mb-1">Favorite tent</p>
             <p className="text-2xl font-bold text-yellow-600">
               {favorite_tent}
             </p>
@@ -52,12 +52,12 @@ export function TentExplorerSlide({ data }: TentExplorerSlideProps) {
         {topTents.length > 0 && (
           <div>
             <h3 className="mb-3 text-center text-lg font-semibold text-gray-700">
-              Most Visited
+              Most visited
             </h3>
             <div className="space-y-2">
               {topTents.map((tent, index) => (
                 <motion.div
-                  key={tent.tent_name}
+                  key={`tent-${tent.tent_name}-${index}`}
                   variants={{
                     hidden: { x: -20, opacity: 0 },
                     visible: { x: 0, opacity: 1 },

@@ -1036,6 +1036,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      wrapped_data_cache: {
+        Row: {
+          created_at: string;
+          festival_id: string;
+          generated_by: string;
+          id: string;
+          updated_at: string;
+          user_id: string;
+          wrapped_data: Json;
+        };
+        Insert: {
+          created_at?: string;
+          festival_id: string;
+          generated_by?: string;
+          id?: string;
+          updated_at?: string;
+          user_id: string;
+          wrapped_data: Json;
+        };
+        Update: {
+          created_at?: string;
+          festival_id?: string;
+          generated_by?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string;
+          wrapped_data?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wrapped_data_cache_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "wrapped_data_cache_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       activity_feed: {
@@ -1390,6 +1435,18 @@ export type Database = {
         Args: { p_festival_id: string; p_user_id: string };
         Returns: Json;
       };
+      get_wrapped_data_cached: {
+        Args: { p_festival_id: string; p_user_id: string };
+        Returns: Json;
+      };
+      invalidate_festival_wrapped_cache: {
+        Args: { p_festival_id: string };
+        Returns: number;
+      };
+      invalidate_wrapped_cache: {
+        Args: { p_festival_id?: string; p_user_id: string };
+        Returns: number;
+      };
       is_group_member: {
         Args: { group_id: string; user_id: string };
         Returns: boolean;
@@ -1418,6 +1475,14 @@ export type Database = {
           p_user_id: string;
         };
         Returns: undefined;
+      };
+      regenerate_wrapped_data_cache: {
+        Args: {
+          p_admin_user_id?: string;
+          p_festival_id?: string;
+          p_user_id?: string;
+        };
+        Returns: number;
       };
       renew_group_token: {
         Args: { p_group_id: string };

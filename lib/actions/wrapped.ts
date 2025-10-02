@@ -8,7 +8,7 @@ import { createClient } from "@/utils/supabase/server";
 import type { WrappedData, WrappedAccessResult } from "@/lib/wrapped/types";
 
 /**
- * Get wrapped data for a user and festival
+ * Get wrapped data for a user and festival (uses cache when available)
  */
 export async function getWrappedData(
   festivalId: string,
@@ -17,15 +17,15 @@ export async function getWrappedData(
     const user = await getUser();
     const supabase = await createClient();
 
-    // Call the database function
-    const { data, error } = await supabase.rpc("get_wrapped_data", {
+    // Call the cached database function (checks cache first, calculates if needed)
+    const { data, error } = await supabase.rpc("get_wrapped_data_cached", {
       p_user_id: user.id,
       p_festival_id: festivalId,
     });
 
     if (error) {
       logger.error(
-        "Failed to fetch wrapped data from database",
+        "Failed to fetch wrapped data from database (cached)",
         logger.serverAction("getWrappedData", {
           userId: user.id,
           festivalId,
@@ -232,5 +232,85 @@ export async function getAvailableWrappedFestivals(): Promise<
       error instanceof Error ? error : undefined,
     );
     return [];
+  }
+}
+
+/**
+ * Admin function to regenerate cached wrapped data
+ * @param festivalId - Optional: regenerate cache for specific festival only
+ * @param userId - Optional: regenerate cache for specific user only
+ */
+export async function regenerateWrappedCache(
+  festivalId?: string,
+  userId?: string,
+): Promise<{ success: boolean; regeneratedCount?: number; error?: string }> {
+  try {
+    const currentUser = await getUser();
+    const supabase = await createClient();
+
+    // Verify admin permissions using the same method as middleware.ts
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_super_admin")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (!profile?.is_super_admin) {
+      return {
+        success: false,
+        error: "Insufficient permissions to regenerate cache",
+      };
+    }
+
+    // Call the database function to regenerate cache
+    const { data: regeneratedCount, error } = await supabase.rpc(
+      "regenerate_wrapped_data_cache",
+      {
+        p_user_id: userId || undefined,
+        p_festival_id: festivalId || undefined,
+        p_admin_user_id: currentUser.id,
+      },
+    );
+
+    if (error) {
+      logger.error(
+        "Failed to regenerate wrapped cache",
+        logger.serverAction("regenerateWrappedCache", {
+          festivalId,
+          userId,
+          adminUserId: currentUser.id,
+        }),
+        error,
+      );
+      return {
+        success: false,
+        error: error.message || "Failed to regenerate cache",
+      };
+    }
+
+    logger.info(
+      "Successfully regenerated wrapped cache",
+      logger.serverAction("regenerateWrappedCache", {
+        festivalId,
+        userId,
+        regeneratedCount,
+        adminUserId: currentUser.id,
+      }),
+    );
+
+    return {
+      success: true,
+      regeneratedCount,
+    };
+  } catch (error) {
+    logger.error(
+      "Unexpected error regenerating wrapped cache",
+      logger.serverAction("regenerateWrappedCache", { festivalId, userId }),
+      error instanceof Error ? error : undefined,
+    );
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unexpected error",
+    };
   }
 }

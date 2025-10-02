@@ -108,6 +108,7 @@ export interface WrappedData {
     best_day: {
       date: string;
       beer_count: number;
+      tents_visited: number;
       spent: number;
     } | null;
     max_single_session: number;
@@ -124,6 +125,11 @@ export interface WrappedData {
     }[];
     photos_uploaded: number;
     total_group_members: number;
+  };
+  global_leaderboard_positions: {
+    days_attended: number | null;
+    total_beers: number | null;
+    avg_beers: number | null;
   };
   achievements: {
     id: string;

@@ -1,10 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { regenerateWrappedCache } from "@/lib/actions/wrapped";
 import { logger } from "@/lib/logger";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const CacheManagement = () => {
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [festivalId, setFestivalId] = useState("");
+
   const handleClearServiceWorkerCache = async () => {
     try {
       if ("serviceWorker" in navigator && "caches" in window) {
@@ -30,6 +38,35 @@ const CacheManagement = () => {
         error as Error,
       );
       toast.error("Failed to clear service worker caches");
+    }
+  };
+
+  const handleRegenerateWrappedCache = async () => {
+    setIsRegenerating(true);
+    try {
+      const result = await regenerateWrappedCache(
+        festivalId || undefined,
+        userId || undefined,
+      );
+
+      if (result.success) {
+        toast.success(
+          `Successfully regenerated ${result.regeneratedCount || 0} wrapped cache entries`,
+        );
+        setUserId("");
+        setFestivalId("");
+      } else {
+        toast.error(result.error || "Failed to regenerate wrapped cache");
+      }
+    } catch (error) {
+      logger.error(
+        "Error regenerating wrapped cache",
+        logger.clientComponent("CacheManagement"),
+        error as Error,
+      );
+      toast.error("Failed to regenerate wrapped cache");
+    } finally {
+      setIsRegenerating(false);
     }
   };
 
@@ -65,6 +102,59 @@ const CacheManagement = () => {
             This will clear all PWA service worker caches and update the service
             worker.
           </p>
+        </div>
+
+        <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">
+            Wrapped Data Cache
+          </h3>
+          <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+            Wrapped data is automatically cached after first calculation. Use
+            this tool to manually regenerate cached data for specific users or
+            festivals.
+          </p>
+
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="userId" className="text-sm font-medium">
+                User ID (optional)
+              </Label>
+              <Input
+                id="userId"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                placeholder="Leave empty to regenerate all users"
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="festivalId" className="text-sm font-medium">
+                Festival ID (optional)
+              </Label>
+              <Input
+                id="festivalId"
+                value={festivalId}
+                onChange={(e) => setFestivalId(e.target.value)}
+                placeholder="Leave empty to regenerate all festivals"
+                className="mt-1"
+              />
+            </div>
+
+            <Button
+              onClick={handleRegenerateWrappedCache}
+              disabled={isRegenerating}
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+            >
+              {isRegenerating ? "Regenerating..." : "Regenerate Wrapped Cache"}
+            </Button>
+
+            <p className="text-sm text-muted-foreground">
+              This will recalculate and cache wrapped data for the specified
+              user(s) and festival(s). Leave both fields empty to regenerate all
+              cached data.
+            </p>
+          </div>
         </div>
       </div>
     </div>

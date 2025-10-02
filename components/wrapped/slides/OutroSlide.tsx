@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { generateShareText } from "@/lib/wrapped/utils";
 import { Share2 } from "lucide-react";
+import { useCallback } from "react";
+import { toast } from "sonner";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 
@@ -9,16 +12,40 @@ import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
 
 interface OutroSlideProps {
   data: WrappedData;
-  onShare?: () => void;
 }
 
-export function OutroSlide({ data, onShare }: OutroSlideProps) {
+export function OutroSlide({ data }: OutroSlideProps) {
+  const handleShare = useCallback(async () => {
+    const shareText = generateShareText(data);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `My ${data.festival_info.name} Wrapped`,
+          text: shareText,
+        });
+      } catch (error) {
+        // User cancelled or error occurred
+        console.debug("Share failed:", error);
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast.success("Copied to clipboard!");
+      } catch (error) {
+        console.debug("Failed to copy:", error);
+        toast.error("Failed to copy to clipboard");
+      }
+    }
+  }, [data]);
+
   return (
     <BaseSlide className="bg-gradient-to-br from-yellow-50 to-orange-50">
-      <div className="flex flex-col items-center gap-6">
-        <div className="text-7xl">🎉</div>
+      <div className="flex flex-col items-center gap-4">
+        <div className="text-7xl">👋🏻</div>
 
-        <SlideTitle className="text-5xl">See You Next Year!</SlideTitle>
+        <SlideTitle className="text-5xl">See you next festival!</SlideTitle>
 
         <SlideSubtitle>Thanks for using ProstCounter</SlideSubtitle>
 
@@ -32,16 +59,14 @@ export function OutroSlide({ data, onShare }: OutroSlideProps) {
           </p>
         </div>
 
-        {onShare && (
-          <Button
-            onClick={onShare}
-            size="lg"
-            className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8"
-          >
-            <Share2 className="mr-2 h-5 w-5" />
-            Share Your Wrapped
-          </Button>
-        )}
+        <Button
+          onClick={handleShare}
+          size="lg"
+          className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8"
+        >
+          <Share2 className="mr-2 h-5 w-5" />
+          Share Your Wrapped
+        </Button>
 
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>Made with 🍺 by ProstCounter</p>

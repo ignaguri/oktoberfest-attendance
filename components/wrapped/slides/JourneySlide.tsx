@@ -26,7 +26,7 @@ export function JourneySlide({ data }: JourneySlideProps) {
   if (timelineData.length === 0) {
     return (
       <BaseSlide className="bg-gradient-to-br from-purple-50 to-pink-50">
-        <SlideTitle>Your Beer Journey</SlideTitle>
+        <SlideTitle>Your beer journey</SlideTitle>
         <p className="text-gray-600">No timeline data available</p>
       </BaseSlide>
     );
@@ -34,7 +34,7 @@ export function JourneySlide({ data }: JourneySlideProps) {
 
   return (
     <BaseSlide className="bg-gradient-to-br from-purple-50 to-pink-50">
-      <SlideTitle>Your Beer Journey</SlideTitle>
+      <SlideTitle>Your beer journey</SlideTitle>
       <SlideSubtitle>Day by day progression</SlideSubtitle>
 
       <div className="w-full max-w-3xl">
@@ -78,13 +78,13 @@ export function JourneySlide({ data }: JourneySlideProps) {
 
         <div className="mt-6 grid grid-cols-2 gap-4 text-center">
           <div className="rounded-lg bg-white p-3 shadow">
-            <p className="text-sm text-gray-600">Peak Day</p>
+            <p className="text-sm text-gray-600">Peak day</p>
             <p className="text-xl font-bold text-yellow-600">
               {Math.max(...timelineData.map((d) => d.beers))} beers
             </p>
           </div>
           <div className="rounded-lg bg-white p-3 shadow">
-            <p className="text-sm text-gray-600">Total Days</p>
+            <p className="text-sm text-gray-600">Total days</p>
             <p className="text-xl font-bold text-yellow-600">
               {timelineData.length}
             </p>

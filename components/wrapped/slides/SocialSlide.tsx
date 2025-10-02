@@ -20,17 +20,17 @@ export function SocialSlide({ data }: SocialSlideProps) {
 
   return (
     <BaseSlide className="bg-gradient-to-br from-indigo-50 to-purple-50">
-      <SlideTitle>Social Butterfly</SlideTitle>
+      <SlideTitle>Social butterfly</SlideTitle>
       <SlideSubtitle>Your social impact</SlideSubtitle>
 
-      <SlideContent className="space-y-4">
-        <StatItem icon="👥" label="Groups Joined" value={groups_joined} />
+      <SlideContent className="flex flex-col gap-4">
+        <StatItem icon="👥" label="Groups joined" value={groups_joined} />
 
-        <StatItem icon="📸" label="Photos Uploaded" value={photos_uploaded} />
+        <StatItem icon="📸" label="Photos uploaded" value={photos_uploaded} />
 
         <StatItem
           icon="🤝"
-          label="Festival Friends"
+          label="Festival friends"
           value={total_group_members}
         />
       </SlideContent>

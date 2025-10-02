@@ -2,6 +2,8 @@
 
 import { useConfetti } from "@/hooks/useConfetti";
 import { CELEBRATION_ANIMATION, ANIMATION_DELAYS } from "@/lib/wrapped/config";
+import LogoImage from "@/public/android-chrome-512x512.png";
+import Image from "next/image";
 import { useEffect } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 
@@ -25,7 +27,10 @@ export function IntroSlide({ data }: IntroSlideProps) {
 
   return (
     <BaseSlide
-      animation={CELEBRATION_ANIMATION}
+      animation={{
+        ...CELEBRATION_ANIMATION,
+        confetti: false, // We'll handle confetti separately
+      }}
       className="bg-gradient-to-br from-yellow-50 to-orange-50"
     >
       {isExploding && (
@@ -35,30 +40,34 @@ export function IntroSlide({ data }: IntroSlideProps) {
             duration={3000}
             particleCount={150}
             width={1600}
+            zIndex={100}
           />
         </div>
       )}
 
       <div className="z-10 flex flex-col items-center gap-6">
-        <div className="text-8xl">🍻</div>
+        <Image
+          src={LogoImage}
+          alt="Prost Counter Logo"
+          className="inline-block size-20 sm:size-24"
+        />
 
-        <SlideTitle className="text-5xl md:text-6xl">
-          <span className="text-yellow-600">Your</span>{" "}
-          <span className="text-yellow-500">Wrapped</span>
+        <SlideTitle className="text-5xl md:text-6xl bg-gradient-to-b from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+          {data.festival_info.name}
         </SlideTitle>
 
         <SlideSubtitle className="text-2xl font-semibold">
-          {data.festival_info.name}
+          Festival Wrap
         </SlideSubtitle>
 
-        <div className="mt-4 rounded-lg bg-white px-6 py-3 shadow-lg">
+        <div className="mt-4 rounded-lg bg-white px-6 py-3 shadow-md">
           <p className="text-xl font-medium text-gray-700">
-            {username}&apos;s Festival Story
+            {username}&apos;s festival highlights
           </p>
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Swipe to see your stats →</p>
+          <p>Swipe to see your wrap →</p>
         </div>
       </div>
     </BaseSlide>

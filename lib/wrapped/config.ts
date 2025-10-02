@@ -165,7 +165,7 @@ export const CHART_CONFIG = {
     text: "#6B7280", // gray-500
   },
   dimensions: {
-    height: 250,
+    height: 300,
     margin: { top: 20, right: 30, left: 20, bottom: 50 },
   },
 };

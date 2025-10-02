@@ -19,12 +19,14 @@ export function PeakMomentSlide({ data }: PeakMomentSlideProps) {
   const { best_day, max_single_session } = data.peak_moments;
 
   useEffect(() => {
-    const timer = setTimeout(
-      triggerConfetti,
-      ANIMATION_DELAYS.confettiTriggerPeak,
-    );
-    return () => clearTimeout(timer);
-  }, [triggerConfetti]);
+    if (best_day) {
+      const timer = setTimeout(
+        triggerConfetti,
+        ANIMATION_DELAYS.confettiTriggerPeak,
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [triggerConfetti, best_day]);
 
   return (
     <BaseSlide className="bg-gradient-to-br from-amber-50 to-yellow-50">
@@ -33,25 +35,38 @@ export function PeakMomentSlide({ data }: PeakMomentSlideProps) {
           <ConfettiExplosion
             force={0.6}
             duration={2500}
-            particleCount={100}
+            particleCount={150}
             width={1200}
+            zIndex={100}
           />
         </div>
       )}
 
-      <SlideTitle>Peak Moments</SlideTitle>
+      <SlideTitle>Peak moments</SlideTitle>
       <SlideSubtitle>Your best performances</SlideSubtitle>
 
-      <div className="z-10 w-full max-w-2xl space-y-6">
+      <div className="z-10 w-full max-w-2xl flex flex-col gap-4">
         {best_day && (
           <div className="rounded-xl bg-white p-6 shadow-lg text-center">
             <div className="text-5xl mb-3">🏆</div>
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Best Day
+              Best day
             </h3>
-            <p className="text-4xl font-bold text-yellow-600 mb-2">
-              {best_day.beer_count} beers
-            </p>
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-yellow-600">
+                  {best_day.beer_count}
+                </p>
+                <p className="text-xs text-gray-500">beers</p>
+              </div>
+              <div className="text-2xl text-gray-400">+</div>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-green-700">
+                  {best_day.tents_visited}
+                </p>
+                <p className="text-xs text-gray-500">tents</p>
+              </div>
+            </div>
             <p className="text-gray-600">{formatWrappedDate(best_day.date)}</p>
             <p className="text-sm text-gray-500 mt-2">
               {formatCurrency(best_day.spent)} spent
@@ -60,14 +75,16 @@ export function PeakMomentSlide({ data }: PeakMomentSlideProps) {
         )}
 
         <div className="rounded-xl bg-white p-6 shadow-lg text-center">
-          <div className="text-5xl mb-3">⚡</div>
+          <div className="text-5xl mb-3">🥴</div>
           <h3 className="text-lg font-semibold text-gray-700 mb-2">
-            Biggest Session
+            Biggest session
           </h3>
           <p className="text-4xl font-bold text-yellow-600">
             {max_single_session} beers
           </p>
-          <p className="text-sm text-gray-500 mt-2">in a single day</p>
+          <p className="text-sm text-gray-500 mt-2">
+            most beers in a single day
+          </p>
         </div>
       </div>
     </BaseSlide>

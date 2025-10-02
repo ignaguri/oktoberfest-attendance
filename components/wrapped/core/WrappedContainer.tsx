@@ -1,14 +1,11 @@
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { hasWrappedData } from "@/lib/wrapped/utils";
-import { AnimatePresence } from "framer-motion";
-import { Loader2 } from "lucide-react";
-import { useState, useCallback } from "react";
 import { Keyboard, Mousewheel, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
-import type { Swiper as SwiperType } from "swiper";
 
 // Import Swiper styles
 import "swiper/css";
@@ -31,17 +28,9 @@ import {
 
 interface WrappedContainerProps {
   data: WrappedData;
-  onShare?: () => void;
 }
 
-export function WrappedContainer({ data, onShare }: WrappedContainerProps) {
-  const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleSlideChange = useCallback((swiper: SwiperType) => {
-    setActiveIndex(swiper.activeIndex);
-  }, []);
-
+export function WrappedContainer({ data }: WrappedContainerProps) {
   // Check if user has data
   if (!hasWrappedData(data)) {
     return (
@@ -55,8 +44,31 @@ export function WrappedContainer({ data, onShare }: WrappedContainerProps) {
     );
   }
 
+  // Define slide configurations with keys
+  const slides = [
+    { key: "intro", component: IntroSlide },
+    { key: "numbers", component: NumbersSlide },
+    { key: "journey", component: JourneySlide },
+    { key: "tent_explorer", component: TentExplorerSlide },
+    { key: "peak_moment", component: PeakMomentSlide },
+    { key: "social", component: SocialSlide },
+    ...(data.achievements.length > 0
+      ? [{ key: "achievements", component: AchievementsSlide }]
+      : []),
+    { key: "personality", component: PersonalitySlide },
+    ...(data.social_stats.top_3_rankings.length > 0
+      ? [{ key: "rankings", component: RankingsSlide }]
+      : []),
+    ...(data.comparisons
+      ? [{ key: "comparisons", component: ComparisonsSlide }]
+      : []),
+    { key: "outro", component: OutroSlide },
+  ];
+
+  console.log("data", data);
+
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="relative h-[100dvh] w-full overflow-hidden">
       <Swiper
         modules={[Keyboard, Mousewheel, Pagination]}
         direction="horizontal"
@@ -74,85 +86,17 @@ export function WrappedContainer({ data, onShare }: WrappedContainerProps) {
           dynamicBullets: true,
         }}
         speed={500}
-        onSwiper={setSwiper}
-        onSlideChange={handleSlideChange}
-        className="h-full w-full"
+        noSwipingClass="recharts-responsive-container" // Prevents Swiper from swiping on Recharts charts
       >
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <IntroSlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <NumbersSlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <JourneySlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <TentExplorerSlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <PeakMomentSlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <SocialSlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        {data.achievements.length > 0 && (
-          <SwiperSlide>
-            <AnimatePresence mode="wait">
-              <AchievementsSlide data={data} />
-            </AnimatePresence>
-          </SwiperSlide>
-        )}
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <PersonalitySlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        {data.social_stats.top_3_rankings.length > 0 && (
-          <SwiperSlide>
-            <AnimatePresence mode="wait">
-              <RankingsSlide data={data} />
-            </AnimatePresence>
-          </SwiperSlide>
-        )}
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <ComparisonsSlide data={data} />
-          </AnimatePresence>
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <AnimatePresence mode="wait">
-            <OutroSlide data={data} onShare={onShare} />
-          </AnimatePresence>
-        </SwiperSlide>
+        {slides.map((slide) => {
+          const SlideComponent = slide.component;
+          return (
+            <SwiperSlide key={slide.key} className="h-full">
+              <SlideComponent data={data} />
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
-
-      {/* Slide counter */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
-        {activeIndex + 1} / {swiper?.slides.length || 0}
-      </div>
     </div>
   );
 }
@@ -164,7 +108,7 @@ export function WrappedLoading() {
   return (
     <div className="flex h-screen items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50">
       <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-12 w-12 animate-spin text-yellow-600" />
+        <LoadingSpinner size={48} />
         <p className="text-xl font-semibold text-gray-700">
           Preparing your wrapped...
         </p>
