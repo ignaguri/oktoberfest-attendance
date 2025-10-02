@@ -125,6 +125,12 @@ export interface WrappedData {
     }[];
     photos_uploaded: number;
     total_group_members: number;
+    pictures: {
+      id: string;
+      picture_url: string;
+      created_at: string;
+      attendance_date: string;
+    }[];
   };
   global_leaderboard_positions: {
     days_attended: number | null;
@@ -218,6 +224,12 @@ export interface SocialSlideContent {
   topRankings: {
     group_name: string;
     position: number;
+  }[];
+  pictures: {
+    id: string;
+    picture_url: string;
+    created_at: string;
+    attendance_date: string;
   }[];
 }
 

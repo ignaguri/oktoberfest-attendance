@@ -294,12 +294,38 @@ BEGIN
       AND a.date >= v_festival.start_date
       AND a.date <= v_festival.end_date
       AND a.festival_id = p_festival_id
+  ),
+  user_pictures AS (
+    SELECT
+      bp.id,
+      bp.picture_url,
+      bp.created_at,
+      a.date as attendance_date
+    FROM beer_pictures bp
+    JOIN attendances a ON bp.attendance_id = a.id
+    WHERE bp.user_id = p_user_id
+      AND a.date >= v_festival.start_date
+      AND a.date <= v_festival.end_date
+      AND a.festival_id = p_festival_id
+    ORDER BY bp.created_at DESC
+    LIMIT 20 -- Limit to prevent excessive data
   )
   SELECT jsonb_build_object(
     'groups_joined', ug.groups_joined,
     'top_3_rankings', COALESCE(tr.rankings, '[]'::JSONB),
     'photos_uploaded', pc.photos_uploaded,
-    'total_group_members', ug.total_group_members
+    'total_group_members', ug.total_group_members,
+    'pictures', COALESCE(
+      (SELECT jsonb_agg(
+        jsonb_build_object(
+          'id', up.id,
+          'picture_url', up.picture_url,
+          'created_at', up.created_at,
+          'attendance_date', up.attendance_date
+        )
+      ) FROM user_pictures up),
+      '[]'::JSONB
+    )
   ) INTO v_social_stats
   FROM user_groups ug, top_rankings tr, photo_count pc;
 

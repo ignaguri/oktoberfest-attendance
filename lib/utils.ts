@@ -76,3 +76,27 @@ export function getAvatarUrl(
   // If it's a filename, construct the API URL
   return `/api/image/${avatarUrl}`;
 }
+
+/**
+ * Returns a new array shuffled using the Fisher-Yates algorithm.
+ *
+ * @template T
+ * @param {T[]} array - The array to shuffle.
+ * @returns {T[]} A new shuffled array (original array is not mutated).
+ *
+ * @example
+ * ```ts
+ * const arr = [1, 2, 3, 4];
+ * const shuffled = shuffleArray(arr);
+ * // shuffled is a permutation of arr, arr is unchanged
+ * ```
+ */
+export function shuffleArray<T>(array: T[]): T[] {
+  const result = array.slice();
+  const length = result.length;
+  for (let i = length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
