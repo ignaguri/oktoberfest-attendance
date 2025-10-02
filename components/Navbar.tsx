@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { getProfileShortFailsafe } from "@/lib/sharedActions";
+import AppLogo from "@/public/android-chrome-512x512.png";
 import { CalendarDays } from "lucide-react";
+import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { NotificationBell } from "./NotificationBell";
@@ -14,10 +16,11 @@ export default async function Navbar() {
     <nav className="w-full bg-gray-800 shadow-sm">
       <div className="justify-between items-center flex px-4 sm:px-8 py-2 sm:py-4">
         <Link
-          className="text-base sm:text-xl text-white font-bold"
+          className="text-base sm:text-xl text-white font-bold flex items-center gap-2"
           href={profileData ? "/home" : "/"}
         >
-          <span translate="no">ProstCounter</span> 🍻
+          <Image src={AppLogo} alt="ProstCounter Logo" className="size-6" />
+          <span translate="no">ProstCounter</span>
         </Link>
 
         {profileData && (
