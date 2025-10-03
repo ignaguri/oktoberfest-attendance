@@ -135,6 +135,12 @@ export class QueryKeys {
   static tentStats = (festivalId: string) =>
     ["tent-stats", festivalId] as const;
 
+  // Wrapped queries
+  static wrapped = (festivalId: string) => ["wrapped", festivalId] as const;
+  static wrappedAccess = (festivalId: string) =>
+    ["wrapped", "access", festivalId] as const;
+  static availableWrapped = () => ["wrapped", "available"] as const;
+
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { NO_ROWS_ERROR } from "@/lib/constants";
 import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
@@ -12,13 +13,26 @@ import "server-only";
 
 // Cache group details for 10 minutes since group settings change infrequently
 const getCachedGroupDetails = unstable_cache(
-  async (groupId: string, supabaseClient: SupabaseClient) => {
+  async (
+    groupId: string,
+    supabaseClient: SupabaseClient,
+  ): Promise<Tables<"groups"> | null> => {
+    // First check if groupId is a valid UUID format
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("Invalid group ID format");
+    }
+
     const { data, error } = await supabaseClient
       .from("groups")
       .select("*")
       .eq("id", groupId)
       .single();
+
     if (error) {
+      // If no rows found, return null instead of throwing
+      if (error.code === NO_ROWS_ERROR) {
+        return null;
+      }
       reportSupabaseException("fetchGroupDetails", error);
       throw new Error("Error fetching group details: " + error.message);
     }
@@ -34,9 +48,34 @@ export async function fetchGroupDetails(groupId: string) {
   return getCachedGroupDetails(groupId, supabase);
 }
 
+/**
+ * Type-safe version that returns group data or null
+ */
+export async function fetchGroupDetailsSafe(
+  groupId: string,
+): Promise<Tables<"groups"> | null> {
+  try {
+    return await fetchGroupDetails(groupId);
+  } catch (error) {
+    // If group not found, return null instead of throwing
+    if (
+      error instanceof Error &&
+      error.message.includes("Invalid group ID format")
+    ) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 // Cache group members for 5 minutes since membership changes occasionally
 const getCachedGroupMembers = unstable_cache(
-  async (groupId: string, supabaseClient: SupabaseClient) => {
+  async (groupId: string, supabaseClient: SupabaseClient): Promise<any[]> => {
+    // First check if groupId is a valid UUID format
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("Invalid group ID format");
+    }
+
     type PartialProfile = Pick<
       Tables<"profiles">,
       "id" | "username" | "full_name"
@@ -52,9 +91,8 @@ const getCachedGroupMembers = unstable_cache(
       throw new Error("Error fetching group members: " + error.message);
     }
 
-    const groupMembers = data.map(
-      (item: any) => item.profiles as PartialProfile,
-    );
+    const groupMembers =
+      data?.map((item: any) => item.profiles as PartialProfile) || [];
 
     return groupMembers;
   },
@@ -65,6 +103,24 @@ const getCachedGroupMembers = unstable_cache(
 export async function fetchGroupMembers(groupId: string) {
   const supabase = createClient();
   return getCachedGroupMembers(groupId, supabase);
+}
+
+/**
+ * Type-safe version that returns group members or empty array
+ */
+export async function fetchGroupMembersSafe(groupId: string) {
+  try {
+    return await fetchGroupMembers(groupId);
+  } catch (error) {
+    // If group not found or invalid, return empty array instead of throwing
+    if (
+      error instanceof Error &&
+      error.message.includes("Invalid group ID format")
+    ) {
+      return [];
+    }
+    throw error;
+  }
 }
 
 export async function updateGroup(

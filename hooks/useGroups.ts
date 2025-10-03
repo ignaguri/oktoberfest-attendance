@@ -5,7 +5,7 @@
  */
 
 import {
-  fetchGroupDetails,
+  fetchGroupDetailsSafe,
   updateGroup,
   removeMember,
 } from "@/app/(private)/group-settings/[id]/actions";
@@ -40,11 +40,16 @@ export function useUserGroups(festivalId?: string) {
  * Hook to fetch group settings/details
  */
 export function useGroupSettings(groupId: string) {
-  return useQuery(QueryKeys.group(groupId), () => fetchGroupDetails(groupId), {
-    enabled: !!groupId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes cache
-  });
+  return useQuery(
+    QueryKeys.group(groupId),
+    () => fetchGroupDetailsSafe(groupId),
+    {
+      enabled: !!groupId,
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      gcTime: 30 * 60 * 1000, // 30 minutes cache
+      retry: 2,
+    },
+  );
 }
 
 /**
@@ -155,13 +160,14 @@ export function useGroupName(groupId: string) {
   return useQuery(
     QueryKeys.group(groupId),
     async () => {
-      const group = await fetchGroupDetails(groupId);
-      return group.name;
+      const group = await fetchGroupDetailsSafe(groupId);
+      return group?.name || "Unknown Group";
     },
     {
       enabled: !!groupId,
       staleTime: 10 * 60 * 1000, // 10 minutes (same as group settings)
       gcTime: 30 * 60 * 1000, // 30 minutes cache
+      retry: 2,
     },
   );
 }
