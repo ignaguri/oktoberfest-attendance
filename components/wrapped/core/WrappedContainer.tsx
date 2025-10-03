@@ -74,6 +74,16 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     }
   }, [slides]);
 
+  // Handle initial scroll on mount
+  useEffect(() => {
+    if (swiperRef.current?.swiper?.el) {
+      swiperRef.current.swiper.el.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, []);
+
   // Listen for browser back/forward
   useEffect(() => {
     const handleHashChange = () => {

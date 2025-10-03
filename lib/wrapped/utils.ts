@@ -204,3 +204,70 @@ export function isImprovement(
     overall: vsLastYear.beers_diff > 0 && vsLastYear.days_diff >= 0,
   };
 }
+
+/**
+ * Calculate number of groups where user ranked in podium (1st, 2nd, 3rd place)
+ */
+export function calculatePodiumGroupsCount(data: WrappedData): number {
+  return data.social_stats.top_3_rankings.filter(
+    (ranking) => ranking.position <= 3,
+  ).length;
+}
+
+/**
+ * Get the best (highest) global leaderboard position across all criteria
+ * Prefers days_attended if there's a tie
+ */
+export function getBestGlobalPosition(data: WrappedData): {
+  position: number;
+  criteria: string;
+} | null {
+  const positions = [];
+
+  if (data.global_leaderboard_positions.days_attended !== null) {
+    positions.push({
+      position: data.global_leaderboard_positions.days_attended,
+      criteria: "days_attended",
+    });
+  }
+
+  if (data.global_leaderboard_positions.total_beers !== null) {
+    positions.push({
+      position: data.global_leaderboard_positions.total_beers,
+      criteria: "total_beers",
+    });
+  }
+
+  if (data.global_leaderboard_positions.avg_beers !== null) {
+    positions.push({
+      position: data.global_leaderboard_positions.avg_beers,
+      criteria: "avg_beers",
+    });
+  }
+
+  if (positions.length === 0) return null;
+
+  // Find the best (lowest number) position
+  const bestPosition = positions.reduce((best, current) => {
+    return current.position < best.position ? current : best;
+  });
+
+  return bestPosition;
+}
+
+/**
+ * Prepare data for share image generation
+ */
+export function prepareShareImageData(data: WrappedData) {
+  const podiumGroupsCount = calculatePodiumGroupsCount(data);
+  const bestGlobalPosition = getBestGlobalPosition(data);
+
+  return {
+    festivalName: data.festival_info.name,
+    daysAttended: data.basic_stats.days_attended,
+    beersDrunk: data.basic_stats.total_beers,
+    tentsVisited: data.tent_stats.unique_tents,
+    podiumGroupsCount,
+    bestGlobalPosition,
+  };
+}
