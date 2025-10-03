@@ -20,7 +20,7 @@ export function analyzePersonality(data: WrappedData): PersonalityAnalysis {
 
   // Calculate behavioral metrics
   const uniqueTents = tent_stats.unique_tents;
-  const totalTentsInFestival = 14; // Approximate, could be dynamic TODO: adjust
+  const totalTentsInFestival = 14; // TODO: adjust to make it dynamic. We have 14 big ones and 21 small ones. but that would make the diversity too high.
   const tentDiversityPct = (uniqueTents / totalTentsInFestival) * 100;
 
   const avgBeers = basic_stats.avg_beers;
