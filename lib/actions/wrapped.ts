@@ -100,6 +100,11 @@ export async function canAccessWrapped(
       targetFestivalId = currentFestival.id;
     }
 
+    const isAllowedUser = ACCESS_CONFIG.allowedUsers.includes(user.id);
+    if (isAllowedUser) {
+      return { allowed: true };
+    }
+
     // Allow in development environment
     if (ACCESS_CONFIG.allowInDev && process.env.NODE_ENV === "development") {
       logger.info(

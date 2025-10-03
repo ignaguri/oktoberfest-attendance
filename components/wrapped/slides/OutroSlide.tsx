@@ -86,6 +86,9 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
           <Download className="mr-2 h-5 w-5" />
           {isGenerating ? "Generating..." : "Download & Share"}
         </Button>
+        <p className="text-xs text-muted-foreground">
+          Click to generate a shareable summary of your festival experience
+        </p>
 
         <div className="mt-2 text-center text-sm text-gray-500">
           <p className="flex items-center gap-1">

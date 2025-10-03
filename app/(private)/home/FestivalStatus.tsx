@@ -10,6 +10,8 @@ import {
 import { differenceInDays, isWithinInterval, isBefore } from "date-fns";
 import { CalendarCheck } from "lucide-react";
 
+import { WrappedCTA } from "./WrappedCTA";
+
 export default function FestivalStatus() {
   const { currentFestival, isLoading } = useFestival();
 
@@ -40,20 +42,23 @@ export default function FestivalStatus() {
   const festivalStatus = getFestivalStatus(currentFestival);
 
   return (
-    <Alert
-      variant={
-        festivalStatus === "active"
-          ? "successLight"
-          : festivalStatus === "upcoming"
-            ? "info"
-            : "warning"
-      }
-      className="w-fit"
-    >
-      <AlertDescription className="flex items-center gap-2">
-        <CalendarCheck className="size-5" />
-        <span className="font-semibold">{status}</span>
-      </AlertDescription>
-    </Alert>
+    <>
+      <Alert
+        variant={
+          festivalStatus === "active"
+            ? "successLight"
+            : festivalStatus === "upcoming"
+              ? "info"
+              : "warning"
+        }
+        className="w-fit"
+      >
+        <AlertDescription className="flex items-center gap-2">
+          <CalendarCheck className="size-5" />
+          <span className="font-semibold">{status}</span>
+        </AlertDescription>
+      </Alert>
+      {festivalStatus === "ended" && <WrappedCTA />}
+    </>
   );
 }
