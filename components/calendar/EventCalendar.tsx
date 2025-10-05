@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { TIMEZONE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { TZDate } from "@date-fns/tz";
-import { format as formatDate } from "date-fns";
+import { format as formatDate, subMonths, addMonths } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -28,6 +28,8 @@ interface EventCalendarProps {
   selected?: Date | undefined;
   onSelect?: (date: Date | undefined) => void;
   renderAddButton?: (date: Date | undefined) => ReactNode;
+  festivalStartDate?: Date;
+  festivalEndDate?: Date;
 }
 
 export function EventCalendar({
@@ -36,6 +38,8 @@ export function EventCalendar({
   selected,
   onSelect,
   renderAddButton,
+  festivalStartDate,
+  festivalEndDate,
 }: EventCalendarProps) {
   const [date, setDate] = useState<Date | undefined>(selected ?? new Date());
   const router = useRouter();
@@ -106,6 +110,15 @@ export function EventCalendar({
               "after:bg-primary/70 relative after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full",
             ),
           }}
+          startMonth={
+            festivalStartDate ? subMonths(festivalStartDate, 1) : undefined
+          }
+          endMonth={festivalEndDate ? addMonths(festivalEndDate, 1) : undefined}
+          disabled={
+            festivalStartDate && festivalEndDate
+              ? [{ before: festivalStartDate }, { after: festivalEndDate }]
+              : undefined
+          }
         />
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-3 border-t px-4 !pt-4 w-full">
