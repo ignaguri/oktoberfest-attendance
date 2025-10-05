@@ -10,13 +10,23 @@ interface PageProps {
 export default async function GroupCalendarPage({ params }: PageProps) {
   const { id: groupId } = await params;
 
-  const { events, initialMonth, festivalId } =
-    await getGroupCalendarData(groupId);
+  const {
+    events,
+    initialMonth,
+    festivalId,
+    festivalStartDate,
+    festivalEndDate,
+  } = await getGroupCalendarData(groupId);
 
   return (
     <div className="container flex flex-col items-center p-4">
       <h1 className="text-lg font-semibold mb-4">Group Calendar</h1>
-      <EventCalendar events={events} initialMonth={initialMonth} />
+      <EventCalendar
+        events={events}
+        initialMonth={initialMonth}
+        festivalStartDate={festivalStartDate}
+        festivalEndDate={festivalEndDate}
+      />
       {/* Mount a URL-driven reservation dialog */}
       {festivalId && <ReservationDialog festivalId={festivalId} />}
     </div>

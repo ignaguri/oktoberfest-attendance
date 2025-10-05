@@ -7,10 +7,13 @@ import {
   getFestivalConstants,
   getFestivalStatus,
 } from "@/lib/festivalConstants";
-import { differenceInDays, isWithinInterval, isBefore } from "date-fns";
+import {
+  differenceInDays,
+  isWithinInterval,
+  isBefore,
+  endOfDay,
+} from "date-fns";
 import { CalendarCheck } from "lucide-react";
-
-import { WrappedCTA } from "./WrappedCTA";
 
 export default function FestivalStatus() {
   const { currentFestival, isLoading } = useFestival();
@@ -30,7 +33,10 @@ export default function FestivalStatus() {
       daysRemaining <= 1 ? "a day" : `${daysRemaining} days`
     }!`;
   } else if (
-    isWithinInterval(today, { start: festivalStartDate, end: festivalEndDate })
+    isWithinInterval(today, {
+      start: festivalStartDate,
+      end: endOfDay(festivalEndDate),
+    })
   ) {
     const currentDay = differenceInDays(today, festivalStartDate) + 1;
     const totalDays = differenceInDays(festivalEndDate, festivalStartDate) + 1;
@@ -42,7 +48,7 @@ export default function FestivalStatus() {
   const festivalStatus = getFestivalStatus(currentFestival);
 
   return (
-    <>
+    <div className="flex flex-col gap-2 items-center">
       <Alert
         variant={
           festivalStatus === "active"
@@ -58,7 +64,6 @@ export default function FestivalStatus() {
           <span className="font-semibold">{status}</span>
         </AlertDescription>
       </Alert>
-      {festivalStatus === "ended" && <WrappedCTA />}
-    </>
+    </div>
   );
 }

@@ -215,7 +215,7 @@ export async function getGroupCalendarData(groupId: string) {
   // Get the group's festival_id and festival data
   const { data: groupData, error: groupError } = await db
     .from("groups")
-    .select("festival_id, festivals(start_date)")
+    .select("festival_id, festivals(start_date, end_date)")
     .eq("id", groupId)
     .single();
 
@@ -228,5 +228,19 @@ export async function getGroupCalendarData(groupId: string) {
     ? new Date(groupData.festivals.start_date)
     : new Date();
 
-  return { events, initialMonth, festivalId: groupData.festival_id };
+  const festivalStartDate = groupData.festivals?.start_date
+    ? new Date(groupData.festivals.start_date)
+    : undefined;
+
+  const festivalEndDate = groupData.festivals?.end_date
+    ? new Date(groupData.festivals.end_date)
+    : undefined;
+
+  return {
+    events,
+    initialMonth,
+    festivalId: groupData.festival_id,
+    festivalStartDate,
+    festivalEndDate,
+  };
 }

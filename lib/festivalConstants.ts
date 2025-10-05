@@ -1,4 +1,4 @@
-import { parseISO, isBefore, isWithinInterval } from "date-fns";
+import { parseISO, isBefore, isWithinInterval, endOfDay } from "date-fns";
 
 import type { Festival, FestivalTent } from "./types";
 
@@ -28,7 +28,7 @@ export function getFestivalConstants(festival: Festival): FestivalConstants {
 function isFestivalActive(festival: Festival): boolean {
   const now = new Date();
   const startDate = parseISO(festival.start_date);
-  const endDate = parseISO(festival.end_date);
+  const endDate = endOfDay(parseISO(festival.end_date));
 
   return isWithinInterval(now, { start: startDate, end: endDate });
 }
