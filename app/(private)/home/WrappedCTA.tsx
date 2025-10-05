@@ -8,12 +8,21 @@ import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Link } from "next-view-transitions";
 
-export function WrappedCTA() {
+export function WrappedCTA({
+  isLastDayOfFestival,
+}: {
+  isLastDayOfFestival: boolean;
+}) {
   const { currentFestival } = useFestival();
   const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
 
-  // Don't show if loading or access not allowed
-  if (loading || !accessResult || !accessResult.allowed || !currentFestival) {
+  // Don't show if loading or no current festival
+  if (loading || !currentFestival) {
+    return null;
+  }
+
+  // Don't show if not last day and access not allowed
+  if (!isLastDayOfFestival && (!accessResult || !accessResult.allowed)) {
     return null;
   }
 
@@ -23,8 +32,8 @@ export function WrappedCTA() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="overflow-hidden border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 shadow-lg">
-        <CardContent className="p-6">
+      <Card className="overflow-hidden border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 shadow-lg p-2">
+        <CardContent>
           <div className="flex flex-col items-center gap-4 text-center">
             <motion.div
               animate={{
@@ -33,36 +42,42 @@ export function WrappedCTA() {
               }}
               transition={{
                 duration: 2,
-                repeat: Infinity,
+                repeat: 3,
                 repeatDelay: 3,
               }}
-              className="text-5xl"
             >
-              🍻
+              <h3 className="text-xl font-bold text-gray-800">
+                {isLastDayOfFestival
+                  ? "Wrapping up your festival!"
+                  : "Your Wrapped is ready!"}
+              </h3>
             </motion.div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-1">
-                Your Wrapped is Ready!
-              </h3>
-              <p className="text-gray-600">
-                See your personalized {currentFestival.name} story
+              <p className="text-gray-600 text-sm">
+                {isLastDayOfFestival
+                  ? `We're preparing your personalized ${currentFestival.name} story. Upload your final attendance info - it will be available tomorrow!`
+                  : `See your personalized ${currentFestival.name} story`}
               </p>
             </div>
 
-            <Button
-              asChild
-              size="lg"
-              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              <Link href="/wrapped">
-                <Sparkles className="mr-2 size-5" />
-                View Your Wrapped
-              </Link>
-            </Button>
+            {!isLastDayOfFestival && (
+              <Button
+                asChild
+                size="lg"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md hover:shadow-lg transition-all"
+              >
+                <Link href="/wrapped">
+                  <Sparkles className="mr-2 size-5" />
+                  View Your Wrapped
+                </Link>
+              </Button>
+            )}
 
             <p className="text-xs text-gray-500">
-              Your festival highlights, stats, and personality 🎉
+              {isLastDayOfFestival
+                ? "Don't forget to log your final attendance! 📝"
+                : "Your festival highlights, stats, and personality 🎉"}
             </p>
           </div>
         </CardContent>
