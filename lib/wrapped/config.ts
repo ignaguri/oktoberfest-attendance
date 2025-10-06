@@ -3,7 +3,7 @@
  * Centralized configuration for slides, themes, and animations
  */
 
-import type { SlideConfig, ThemeConfig, AnimationConfig } from "./types";
+import type { ThemeConfig, AnimationConfig } from "./types";
 
 /**
  * Brand theme configuration (yellow theme)
@@ -31,100 +31,6 @@ export const CELEBRATION_ANIMATION: AnimationConfig = {
   duration: 700,
   confetti: true,
 };
-
-/**
- * Slide configurations
- * Defines the order and settings for all wrapped slides
- */
-export const SLIDE_CONFIGS: SlideConfig[] = [
-  {
-    id: "intro",
-    type: "intro",
-    title: "Your Festival Wrapped",
-    showNavigation: true,
-    allowSkip: false,
-  },
-  {
-    id: "numbers",
-    type: "numbers",
-    title: "Your Festival in Numbers",
-    subtitle: "Let's break down your experience",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "journey",
-    type: "journey",
-    title: "Your Beer Journey",
-    subtitle: "Day by day progression",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "tent_explorer",
-    type: "tent_explorer",
-    title: "Tent Explorer",
-    subtitle: "Where did you drink?",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "peak_moment",
-    type: "peak_moment",
-    title: "Peak Moments",
-    subtitle: "Your best day at the festival",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "social",
-    type: "social",
-    title: "Social Butterfly",
-    subtitle: "Groups and photos",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "achievements",
-    type: "achievements",
-    title: "Achievement Unlocked",
-    subtitle: "Badges you've earned",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "personality",
-    type: "personality",
-    title: "Your Festival Personality",
-    subtitle: "Based on your patterns",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "rankings",
-    type: "rankings",
-    title: "Group Rankings",
-    subtitle: "Where you placed",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "comparisons",
-    type: "comparisons",
-    title: "How You Compare",
-    subtitle: "vs Average & Last Year",
-    showNavigation: true,
-    allowSkip: true,
-  },
-  {
-    id: "outro",
-    type: "outro",
-    title: "See You Next Year",
-    subtitle: "Share your wrapped!",
-    showNavigation: true,
-    allowSkip: false,
-  },
-];
 
 /**
  * Personality type descriptions

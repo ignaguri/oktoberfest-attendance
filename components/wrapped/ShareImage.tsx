@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { prepareShareImageData } from "@/lib/wrapped/utils";
 import LogoImage from "@/public/android-chrome-512x512.png";
 import { Beer, CalendarDays, Trophy, Award, Tent } from "lucide-react";
-import Image from "next/image";
 import { forwardRef } from "react";
 
 import type { WinningCriteria } from "@/lib/types";
@@ -30,7 +29,14 @@ function StatCard({ icon: Icon, value, label, className }: StatCardProps) {
         "flex items-center justify-center",
         className,
       )}
-      style={{ minHeight: "160px" }}
+      style={{
+        minHeight: "160px",
+        // Safari-specific fixes for backdrop-blur
+        WebkitBackdropFilter: "blur(8px)",
+        backdropFilter: "blur(8px)",
+        // Ensure proper rendering
+        transform: "translateZ(0)",
+      }}
     >
       <div className="grid grid-cols-4 items-center gap-6 w-full">
         <Icon className="size-20 text-yellow-600 justify-self-center" />
@@ -86,6 +92,12 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
           height: "1920px",
           boxSizing: "border-box",
           padding: "80px 48px",
+          // Safari-specific fixes
+          WebkitFontSmoothing: "antialiased",
+          MozOsxFontSmoothing: "grayscale",
+          // Ensure proper rendering
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
         }}
       >
         {/* Header */}
@@ -134,11 +146,25 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
         {/* Footer */}
         <footer className="text-center">
           <div className="text-3xl text-gray-600 mb-3">Made with</div>
-          <div className="flex flex-row items-center gap-4">
-            <Image
-              src={LogoImage}
+          <div className="flex flex-row items-center justify-center gap-4">
+            <img
+              src={LogoImage.src}
               alt="Prost Counter Logo"
-              className="inline-block size-20 sm:size-24"
+              className="inline-block"
+              style={{
+                width: "80px",
+                height: "80px",
+                display: "block",
+                flexShrink: 0,
+                // Safari-specific fixes
+                objectFit: "contain",
+                maxWidth: "100%",
+              }}
+              onLoad={() => {
+                // Ensure image is loaded for Safari
+              }}
+              onError={() => {
+              }}
             />
             <h1 className="text-6xl font-extrabold" translate="no">
               <span className="text-yellow-600">Prost</span>

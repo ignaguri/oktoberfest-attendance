@@ -27,6 +27,28 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
     toast.loading("Generating your wrapped image...");
 
     try {
+      // Preload fonts for better Safari compatibility
+      await document.fonts.ready;
+
+      // Wait for all images to load, especially important for Safari
+      const images = shareImageRef.current?.querySelectorAll("img");
+      if (images && images.length > 0) {
+        await Promise.all(
+          Array.from(images).map((img) => {
+            if (img.complete) return Promise.resolve();
+            return new Promise((resolve) => {
+              img.onload = () => resolve(undefined);
+              img.onerror = () => resolve(undefined);
+              // Fallback timeout
+              setTimeout(() => resolve(undefined), 2000);
+            });
+          }),
+        );
+      }
+
+      // Additional wait for Safari rendering
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const blob = await generateShareImageFromElement(shareImageRef.current);
 
       if (!blob) {
