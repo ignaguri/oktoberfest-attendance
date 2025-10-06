@@ -11,7 +11,7 @@ import { Link } from "next-view-transitions";
 export function WrappedCTA({
   isLastDayOfFestival,
 }: {
-  isLastDayOfFestival: boolean;
+  isLastDayOfFestival?: boolean;
 }) {
   const { currentFestival } = useFestival();
   const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
