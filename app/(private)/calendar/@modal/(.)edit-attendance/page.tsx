@@ -1,6 +1,8 @@
 "use client";
 
 import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useEffect } from "react";
 
@@ -44,6 +46,17 @@ export default function InterceptedAttendanceModal() {
           className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Close Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-2 top-2 z-10 h-8 w-8 p-0 hover:bg-muted"
+            onClick={handleClose}
+            aria-label="Close modal"
+          >
+            <X className="size-4" />
+          </Button>
+
           <DetailedAttendanceForm
             onAttendanceUpdate={handleClose}
             selectedDate={selectedDate}
