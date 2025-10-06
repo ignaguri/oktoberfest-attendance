@@ -1,11 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ShareImage } from "@/components/wrapped/ShareImage";
-import { generateShareImageFromElement } from "@/lib/wrapped/preview-utils";
 import { Beer, HeartHandshake, Heart, Download } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 
@@ -17,64 +15,15 @@ interface OutroSlideProps {
 }
 
 export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
-  const shareImageRef = useRef<HTMLDivElement>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const router = useRouter();
 
-  const handleDownload = useCallback(async () => {
-    if (!shareImageRef.current) return;
+  const handleDownload = useCallback(() => {
+    // Store wrapped data in localStorage for the share page
+    localStorage.setItem("wrapped-share-data", JSON.stringify(data));
 
-    setIsGenerating(true);
-    toast.loading("Generating your wrapped image...");
-
-    try {
-      // Preload fonts for better Safari compatibility
-      await document.fonts.ready;
-
-      // Wait for all images to load, especially important for Safari
-      const images = shareImageRef.current?.querySelectorAll("img");
-      if (images && images.length > 0) {
-        await Promise.all(
-          Array.from(images).map((img) => {
-            if (img.complete) return Promise.resolve();
-            return new Promise((resolve) => {
-              img.onload = () => resolve(undefined);
-              img.onerror = () => resolve(undefined);
-              // Fallback timeout
-              setTimeout(() => resolve(undefined), 2000);
-            });
-          }),
-        );
-      }
-
-      // Additional wait for Safari rendering
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const blob = await generateShareImageFromElement(shareImageRef.current);
-
-      if (!blob) {
-        throw new Error("Failed to generate image");
-      }
-
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${data.festival_info.name}-wrapped.png`;
-      link.click();
-
-      // Cleanup
-      URL.revokeObjectURL(url);
-
-      toast.dismiss();
-      toast.success("Image downloaded successfully!");
-    } catch (error) {
-      console.error("Failed to generate image:", error);
-      toast.dismiss();
-      toast.error("Failed to generate image. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [data.festival_info.name]);
+    // Navigate to dedicated share page
+    router.push("/wrapped/share");
+  }, [data, router]);
 
   return (
     <BaseSlide
@@ -102,11 +51,10 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
         <Button
           onClick={handleDownload}
           size="lg"
-          disabled={isGenerating}
           className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8"
         >
           <Download className="mr-2 h-5 w-5" />
-          {isGenerating ? "Generating..." : "Download & Share"}
+          Download & Share
         </Button>
         <p className="text-xs text-muted-foreground">
           Click to generate a shareable summary of your festival experience
@@ -118,11 +66,6 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
             <Beer className="size-4" /> by ProstCounter
           </p>
         </div>
-      </div>
-
-      {/* Hidden ShareImage for generation */}
-      <div className="absolute -left-[9999px] top-0">
-        <ShareImage ref={shareImageRef} data={data} />
       </div>
     </BaseSlide>
   );

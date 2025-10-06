@@ -160,10 +160,6 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
                 objectFit: "contain",
                 maxWidth: "100%",
               }}
-              onLoad={() => {
-                // Ensure image is loaded for Safari
-              }}
-              onError={() => {}}
             />
             <h1 className="text-6xl font-extrabold" translate="no">
               <span className="text-yellow-600">Prost</span>
