@@ -162,10 +162,8 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
               }}
               onLoad={() => {
                 // Ensure image is loaded for Safari
-                console.log("Footer logo loaded successfully");
               }}
               onError={() => {
-                console.error("Footer logo failed to load");
               }}
             />
             <h1 className="text-6xl font-extrabold" translate="no">
