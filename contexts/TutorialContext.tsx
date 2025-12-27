@@ -3,7 +3,13 @@
 import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
 import { completeTutorial } from "@/lib/sharedActions";
 import { tutorialSteps, type TutorialStep } from "@/lib/tutorialSteps";
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  startTransition,
+} from "react";
 
 import type { ReactNode } from "react";
 
@@ -103,8 +109,10 @@ export function TutorialProvider({
   useEffect(() => {
     if (isActive) {
       const steps = getVisibleSteps();
-      setVisibleSteps(steps);
-      setCurrentStepIndex(0); // Reset to first visible step
+      startTransition(() => {
+        setVisibleSteps(steps);
+        setCurrentStepIndex(0); // Reset to first visible step
+      });
     }
   }, [isActive]);
 

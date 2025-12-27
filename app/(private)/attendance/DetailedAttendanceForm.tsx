@@ -20,7 +20,13 @@ import {
 } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  startTransition,
+} from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -81,7 +87,9 @@ export default function DetailedAttendanceForm({
           date,
           currentFestival.id,
         );
-        setExistingAttendance(attendanceData as AttendanceByDate);
+        startTransition(() => {
+          setExistingAttendance(attendanceData as AttendanceByDate);
+        });
       } catch {
         toast.error("Failed to fetch attendance data. Please try again.");
       }
@@ -95,9 +103,13 @@ export default function DetailedAttendanceForm({
 
   useEffect(() => {
     if (selectedDate === null) {
-      setCurrentDate(initialDate);
+      startTransition(() => {
+        setCurrentDate(initialDate);
+      });
     } else {
-      setCurrentDate(selectedDate);
+      startTransition(() => {
+        setCurrentDate(selectedDate);
+      });
     }
   }, [initialDate, selectedDate]);
 

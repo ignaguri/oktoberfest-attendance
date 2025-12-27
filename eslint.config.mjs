@@ -1,30 +1,18 @@
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import tseslint from "typescript-eslint";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
+import nextVitals from "eslint-config-next/core-web-vitals";
+// import nextTs from "eslint-config-next/typescript";
 import prettierConfigRecommended from "eslint-plugin-prettier/recommended";
-import { FlatCompat } from "@eslint/eslintrc";
-import { fixupConfigRules } from "@eslint/compat";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
-const patchedConfig = fixupConfigRules([
-  ...compat.extends("next/core-web-vitals"),
-]);
 
 const config = [
+  ...nextVitals,
+  // ...nextTs, // Commented out because it's too strict for this project
   {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
-      parser: "@typescript-eslint/parser",
+      parser: tseslint.parser,
       parserOptions: {
         project: "./tsconfig.json",
       },
@@ -82,15 +70,23 @@ const config = [
   {
     files: ["e2e/**/*.ts", "e2e/**/*.tsx"],
     languageOptions: {
-      parser: "@typescript-eslint/parser",
+      parser: tseslint.parser,
       parserOptions: {
         project: "./tsconfig.eslint.json",
       },
     },
   },
-  ...patchedConfig,
   prettierConfigRecommended,
-  { ignores: [".next/*", "public/workbox-*"] },
+  {
+    ignores: [
+      ".next/**",
+      "out/**",
+      "build/**",
+      "next-env.d.ts",
+      "public/workbox-*",
+      "types/**",
+    ],
+  },
 ];
 
 export default config;

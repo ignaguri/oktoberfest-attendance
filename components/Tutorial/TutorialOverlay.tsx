@@ -1,7 +1,7 @@
 "use client";
 
 import { useTutorial } from "@/contexts/TutorialContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 
 import { TUTORIAL_CONSTANTS } from "./constants";
 import { TutorialSpotlight } from "./TutorialSpotlight";
@@ -25,7 +25,9 @@ export function TutorialOverlay() {
 
   useEffect(() => {
     if (!isActive || !currentStep) {
-      setShowStep(false);
+      startTransition(() => {
+        setShowStep(false);
+      });
       return;
     }
 

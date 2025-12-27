@@ -18,7 +18,7 @@ export async function createGroup(formData: {
   password: string;
   festivalId: string;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { groupName, password, festivalId } = formData;
   const user = await getUser();
 
@@ -58,9 +58,9 @@ export async function createGroup(formData: {
   }
 
   // Invalidate cache tags for groups
-  revalidateTag("groups");
-  revalidateTag("user-groups");
-  revalidateTag("group-members");
+  revalidateTag("groups", "max");
+  revalidateTag("user-groups", "max");
+  revalidateTag("group-members", "max");
 
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupData.id}`);
@@ -73,7 +73,7 @@ export async function joinGroup(formData: {
   password: string;
   festivalId?: string;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { groupName, password, festivalId } = formData;
   const user = await getUser();
 
@@ -107,9 +107,9 @@ export async function joinGroup(formData: {
   }
 
   // Invalidate cache tags for groups
-  revalidateTag("groups");
-  revalidateTag("user-groups");
-  revalidateTag("group-members");
+  revalidateTag("groups", "max");
+  revalidateTag("user-groups", "max");
+  revalidateTag("group-members", "max");
 
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
@@ -120,7 +120,7 @@ export async function joinGroup(formData: {
 export async function fetchGroupAndMembership(groupId: string) {
   const user = await getUser();
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: group, error: groupError } = await supabase
     .from("groups")
     .select("*")
@@ -155,7 +155,7 @@ export async function fetchGroupAndMembership(groupId: string) {
 }
 
 export async function fetchLeaderboard(groupId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get group info to find the winning criteria
   const { data: groupData, error: groupError } = await supabase
@@ -184,7 +184,7 @@ export async function fetchLeaderboard(groupId: string) {
 }
 
 export async function fetchWinningCriteriaById(id: number) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("winning_criteria")
     .select("*")
@@ -200,7 +200,7 @@ export async function fetchWinningCriteriaById(id: number) {
 }
 
 export async function fetchWinningCriteriaForGroup(groupId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("groups")
     .select("winning_criteria_id")
@@ -221,7 +221,7 @@ export async function fetchWinningCriteriaForGroup(groupId: string) {
 }
 
 export async function fetchGroupGallery(groupId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // First get the group's festival_id
   const { data: groupData, error: groupError } = await supabase
@@ -277,7 +277,7 @@ export async function fetchGroupGallery(groupId: string) {
  */
 export async function fetchUserGroups(festivalId: string) {
   const user = await getUser();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: groupMemberships, error } = await supabase
     .from("group_members")

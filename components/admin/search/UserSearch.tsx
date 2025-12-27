@@ -77,13 +77,11 @@ export function UserSearch({
     onRefresh?.();
   }, [invalidateUserQueries, refetch, onRefresh]);
 
-  // Memoize suggestions to prevent infinite re-renders
-  const suggestions = useMemo(() => {
-    const recent = searchHistory.getRecentQueries(3);
-    const popular = searchHistory.getPopularQueries(2);
-    const suggestions = searchHistory.getSuggestions(searchState.search, 3);
-    return [...recent, ...popular, ...suggestions];
-  }, [searchState.search]);
+  // Compute suggestions (computation is cheap, no need for memoization)
+  const recent = searchHistory.getRecentQueries(3);
+  const popular = searchHistory.getPopularQueries(2);
+  const suggestionsList = searchHistory.getSuggestions(searchState.search, 3);
+  const suggestions = [...recent, ...popular, ...suggestionsList];
 
   // Add search to history when search completes
   useEffect(() => {

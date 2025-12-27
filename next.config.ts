@@ -15,9 +15,6 @@ const nextConfig: NextConfig = {
     APP_VERSION: packageJson.version,
   },
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   async headers() {
     return [
       {

@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -27,7 +27,9 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
   useEffect(() => {
     if (picture) {
       const newPreviewUrl = URL.createObjectURL(picture);
-      setPreviewUrl(newPreviewUrl);
+      startTransition(() => {
+        setPreviewUrl(newPreviewUrl);
+      });
       return () => URL.revokeObjectURL(newPreviewUrl);
     }
   }, [picture]);

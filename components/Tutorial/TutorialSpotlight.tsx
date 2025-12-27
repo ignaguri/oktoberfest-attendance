@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 
 import { TUTORIAL_CONSTANTS } from "./constants";
 
@@ -22,7 +22,9 @@ export function TutorialSpotlight({
 
   useEffect(() => {
     if (!isActive) {
-      setIsVisible(false);
+      startTransition(() => {
+        setIsVisible(false);
+      });
       return;
     }
 

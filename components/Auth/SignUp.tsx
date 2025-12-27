@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { signUpSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -63,6 +63,20 @@ export default function SignUp() {
     }
   };
 
+  // Extract error messages before render to avoid ref access during render
+  const emailError = errors.email?.message;
+  const passwordError = errors.password?.message;
+  const confirmPasswordError = errors.confirmPassword?.message;
+
+  // Memoize form submission handler to avoid ref access during render
+  const onSubmitHandler = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      handleSubmit(onSubmit)(e);
+    },
+    [handleSubmit, onSubmit],
+  );
+
   if (isAccountCreated) {
     return (
       <div className="card">
@@ -83,10 +97,10 @@ export default function SignUp() {
         Create Account
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
+      <form onSubmit={onSubmitHandler} className="column w-full">
         <Label htmlFor="email">Email</Label>
         <Input
-          errorMsg={errors.email?.message}
+          errorMsg={emailError}
           id="email"
           placeholder="jane@acme.com"
           type="email"
@@ -98,7 +112,7 @@ export default function SignUp() {
 
         <Label htmlFor="password">Password</Label>
         <Input
-          errorMsg={errors.password?.message}
+          errorMsg={passwordError}
           id="password"
           type="password"
           disabled={isSubmitting}
@@ -107,7 +121,7 @@ export default function SignUp() {
 
         <Label htmlFor="confirmPassword">Confirm Password</Label>
         <Input
-          errorMsg={errors.confirmPassword?.message}
+          errorMsg={confirmPasswordError}
           id="confirmPassword"
           type="password"
           disabled={isSubmitting}

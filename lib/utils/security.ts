@@ -64,7 +64,7 @@ export function sanitizeSearchTerm(
   }
 
   // Remove SQL wildcards and escape characters that could be used for injection
-  let sanitized = search
+  const sanitized = search
     .trim()
     .replace(/[%_\\]/g, "") // Remove SQL wildcards and backslashes
     .slice(0, maxLength);

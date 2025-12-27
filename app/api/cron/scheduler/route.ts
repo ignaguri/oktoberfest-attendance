@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const notifications = createNotificationService();
 
   const nowIso = new Date().toISOString();

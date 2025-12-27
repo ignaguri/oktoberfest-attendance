@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import "server-only";
 
 export async function uploadAvatar(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const file = formData.get("avatar") as File;
   const userId = formData.get("userId") as string;
   if (!file) {

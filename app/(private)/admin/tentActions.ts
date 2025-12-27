@@ -31,7 +31,7 @@ export type FestivalTentInsert = {
 export async function getFestivalTents(
   festivalId: string,
 ): Promise<TentWithPrice[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("festival_tents")
@@ -70,7 +70,7 @@ export async function getFestivalTents(
 export async function getAvailableTents(
   festivalId: string,
 ): Promise<Tables<"tents">[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get tent IDs that are already assigned to this festival
   const { data: assignedTents } = await supabase
@@ -106,7 +106,7 @@ export async function addTentToFestival(
   tentId: string,
   beerPrice?: number | null,
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const insertData: FestivalTentInsert = {
     festival_id: festivalId,
@@ -123,8 +123,8 @@ export async function addTentToFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents");
-  revalidateTag(`festival-tents-${festivalId}`);
+  revalidateTag("tents", "max");
+  revalidateTag(`festival-tents-${festivalId}`, "max");
 }
 
 /**
@@ -134,7 +134,7 @@ export async function addAllAvailableTentsToFestival(
   festivalId: string,
   defaultBeerPrice?: number | null,
 ): Promise<{ added: number; skipped: number }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get all available tents for this festival
   const availableTents = await getAvailableTents(festivalId);
@@ -160,8 +160,8 @@ export async function addAllAvailableTentsToFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents");
-  revalidateTag(`festival-tents-${festivalId}`);
+  revalidateTag("tents", "max");
+  revalidateTag(`festival-tents-${festivalId}`, "max");
 
   return { added: availableTents.length, skipped: 0 };
 }
@@ -173,7 +173,7 @@ export async function removeTentFromFestival(
   festivalId: string,
   tentId: string,
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Check if tent has any attendance records first
   const { count: attendanceCount } = await supabase
@@ -201,8 +201,8 @@ export async function removeTentFromFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents");
-  revalidateTag(`festival-tents-${festivalId}`);
+  revalidateTag("tents", "max");
+  revalidateTag(`festival-tents-${festivalId}`, "max");
 }
 
 /**
@@ -213,7 +213,7 @@ export async function updateTentPrice(
   tentId: string,
   beerPrice: number | null,
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from("festival_tents")
@@ -228,7 +228,7 @@ export async function updateTentPrice(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag(`festival-tents-${festivalId}`);
+  revalidateTag(`festival-tents-${festivalId}`, "max");
 }
 
 /**
@@ -239,7 +239,7 @@ export async function createTent(
   festivalId?: string,
   beerPrice?: number | null,
 ): Promise<Tables<"tents">> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Create the tent with generated ID
   const tentWithId = { ...tentData, id: uuidv4() };
@@ -261,9 +261,9 @@ export async function createTent(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents");
+  revalidateTag("tents", "max");
   if (festivalId) {
-    revalidateTag(`festival-tents-${festivalId}`);
+    revalidateTag(`festival-tents-${festivalId}`, "max");
   }
 
   return tent;
@@ -276,7 +276,7 @@ export async function updateTent(
   tentId: string,
   tentData: Partial<TentInsert>,
 ): Promise<Tables<"tents">> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: tent, error } = await supabase
     .from("tents")
@@ -292,7 +292,7 @@ export async function updateTent(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents");
+  revalidateTag("tents", "max");
 
   return tent;
 }
@@ -309,7 +309,7 @@ export async function copyTentsToFestival(
     overridePrice?: number | null;
   } = {},
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get source festival tents
   const { data: sourceTents, error: fetchError } = await supabase
@@ -354,15 +354,15 @@ export async function copyTentsToFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents");
-  revalidateTag(`festival-tents-${targetFestivalId}`);
+  revalidateTag("tents", "max");
+  revalidateTag(`festival-tents-${targetFestivalId}`, "max");
 }
 
 /**
  * Get festival tent statistics
  */
 export async function getFestivalTentStats(festivalId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("festival_tents")

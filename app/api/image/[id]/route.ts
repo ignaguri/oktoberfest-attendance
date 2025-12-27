@@ -4,7 +4,6 @@ import crypto from "crypto";
 import { unstable_cache } from "next/cache";
 import { NextResponse } from "next/server";
 
-import type { SupabaseClient } from "@/lib/types";
 import type { NextRequest } from "next/server";
 
 // Use Node.js runtime for crypto and other Node-specific modules
@@ -36,8 +35,10 @@ const getMimeType = (filename: string): string => {
 
 // Cache metadata retrieval for 24 hours
 const getCachedImageMetadata = unstable_cache(
-  async (bucket: string, fileName: string, supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient.storage
+  async (bucket: string, fileName: string) => {
+    // Use service role client - image metadata is public
+    const supabase = await createClient(true);
+    const { data, error } = await supabase.storage
       .from(bucket)
       .list("", { search: fileName });
 
@@ -78,10 +79,10 @@ export async function GET(
 
   try {
     // Create Supabase client outside cache scope
-    const supabase = createClient(true);
+    const supabase = await createClient(true);
 
     // Get image metadata for ETag generation
-    const metadata = await getCachedImageMetadata(bucket, decodedId, supabase);
+    const metadata = await getCachedImageMetadata(bucket, decodedId);
     if (!metadata) {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }

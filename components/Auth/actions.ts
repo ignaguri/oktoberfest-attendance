@@ -17,7 +17,7 @@ export async function login(
   formData: { email: string; password: string },
   redirectTo?: string | null,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const data = {
     email: formData.email,
@@ -42,7 +42,7 @@ export async function login(
 }
 
 export async function logout() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.signOut();
 
@@ -56,7 +56,7 @@ export async function logout() {
 }
 
 export async function signUp(formData: { email: string; password: string }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const data = {
     email: formData.email,
@@ -74,7 +74,7 @@ export async function signUp(formData: { email: string; password: string }) {
 export async function resetPassword(formData: {
   email: string;
 }): Promise<[boolean, string | null]> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(formData.email);
 
@@ -89,7 +89,7 @@ export async function resetPassword(formData: {
 }
 
 export async function updatePassword(formData: { password: string }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.updateUser({
     password: formData.password,
@@ -107,7 +107,7 @@ export async function signInWithOAuth(
   provider: "google" | "facebook",
   redirectTo?: string | null,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   let baseUrl: string | undefined;
   if (process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL) {

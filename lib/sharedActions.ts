@@ -18,7 +18,6 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Tables } from "@/lib/database.types";
-import type { SupabaseClient } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 
 import { NO_ROWS_ERROR, TIMEZONE } from "./constants";
@@ -27,7 +26,7 @@ import { createNotificationService } from "./services/notifications";
 import "server-only";
 
 export async function getUser(): Promise<User> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -42,7 +41,7 @@ export async function getUser(): Promise<User> {
 export async function getProfileShort() {
   const user = await getUser();
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
     .select("full_name, username, avatar_url, custom_beer_cost")
@@ -73,7 +72,7 @@ export async function fetchAttendancesFromDB(
   date?: Date,
   single: boolean = false,
 ): Promise<Tables<"attendances"> | Tables<"attendances">[] | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const query = supabase.from("attendances").select("*").eq("user_id", userId);
 
   if (festivalId) {
@@ -112,7 +111,7 @@ export async function fetchAttendanceByDate(
     true,
   );
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const tentVisitsQuery = supabase
     .from("tent_visits")
     .select("tent_id, visit_date")
@@ -180,7 +179,7 @@ export async function uploadBeerPicture(formData: FormData) {
   const picture = formData.get("picture") as File;
   const attendanceId = formData.get("attendanceId") as string;
   const visibility = (formData.get("visibility") as string) || "public";
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const buffer = await picture.arrayBuffer();
@@ -240,7 +239,7 @@ export async function addAttendance(formData: {
   tents: string[];
   festivalId: string;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
   const { amount, date, tents, festivalId } = formData;
 
@@ -338,8 +337,8 @@ export async function addAttendance(formData: {
   }
 
   // Invalidate cache tags for leaderboard since attendance affects rankings
-  revalidateTag("leaderboard");
-  revalidateTag("attendances");
+  revalidateTag("leaderboard", "max");
+  revalidateTag("attendances", "max");
 
   revalidatePath("/attendance");
   revalidatePath("/home");
@@ -358,7 +357,7 @@ export async function addPersonalAttendance(formData: {
   tents: string[];
   festivalId: string;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   // Use new function that preserves existing tent visit timestamps
@@ -392,8 +391,8 @@ export async function addPersonalAttendance(formData: {
   }
 
   // Invalidate cache tags for leaderboard since attendance affects rankings
-  revalidateTag("leaderboard");
-  revalidateTag("attendances");
+  revalidateTag("leaderboard", "max");
+  revalidateTag("attendances", "max");
 
   revalidatePath("/attendance");
   revalidatePath("/home");
@@ -403,10 +402,10 @@ export async function addPersonalAttendance(formData: {
 
 // Cache winning criteria for 4 hours since they rarely change
 const getCachedWinningCriterias = unstable_cache(
-  async (supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient
-      .from("winning_criteria")
-      .select("*");
+  async () => {
+    // Use service role client - this is public data, no user auth needed
+    const supabase = await createClient(true);
+    const { data, error } = await supabase.from("winning_criteria").select("*");
     if (error) {
       reportSupabaseException("fetchWinningCriterias", error);
       throw error;
@@ -419,14 +418,15 @@ const getCachedWinningCriterias = unstable_cache(
 );
 
 export async function fetchWinningCriterias() {
-  const supabase = createClient();
-  return getCachedWinningCriterias(supabase);
+  return getCachedWinningCriterias();
 }
 
 // Cache all tents for 2 hours since they rarely change
 const getCachedTents = unstable_cache(
-  async (supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient.from("tents").select("*");
+  async () => {
+    // Use service role client - this is public data, no user auth needed
+    const supabase = await createClient(true);
+    const { data, error } = await supabase.from("tents").select("*");
     if (error) {
       reportSupabaseException("fetchTents", error);
       throw new Error("Error fetching tents: " + error.message);
@@ -440,8 +440,10 @@ const getCachedTents = unstable_cache(
 
 // Cache festival-specific tents for 1 hour since they change more frequently
 const getCachedFestivalTents = unstable_cache(
-  async (festivalId: string, supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient
+  async (festivalId: string) => {
+    // Use service role client - this is public data, no user auth needed
+    const supabase = await createClient(true);
+    const { data, error } = await supabase
       .from("festival_tents")
       .select(
         `
@@ -463,7 +465,7 @@ const getCachedFestivalTents = unstable_cache(
     // If no festival-specific tents found, fall back to all tents
     // This ensures the app works even when festival_tents table is not populated
     if (!data || data.length === 0) {
-      const { data: allTentsData, error: allTentsError } = await supabaseClient
+      const { data: allTentsData, error: allTentsError } = await supabase
         .from("tents")
         .select("*")
         .order("name", { ascending: true });
@@ -486,52 +488,43 @@ const getCachedFestivalTents = unstable_cache(
 );
 
 export async function fetchTents(festivalId?: string) {
-  const supabase = createClient();
-
   if (festivalId) {
     // Return festival-specific tents
-    return getCachedFestivalTents(festivalId, supabase);
+    return getCachedFestivalTents(festivalId);
   } else {
     // Return all tents (backward compatibility)
-    return getCachedTents(supabase);
+    return getCachedTents();
   }
 }
 
 // Tutorial completion functions
-// Cache tutorial status for 5 minutes since it changes infrequently
-const getCachedTutorialStatus = unstable_cache(
-  async (userId: string, supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient
-      .from("profiles")
-      .select("tutorial_completed, tutorial_completed_at")
-      .eq("id", userId)
-      .single();
-
-    if (error) {
-      reportSupabaseException("getTutorialStatus", error, {
-        id: userId,
-      });
-      throw new Error("Error fetching tutorial status");
-    }
-
-    return {
-      tutorial_completed: data?.tutorial_completed || false,
-      tutorial_completed_at: data?.tutorial_completed_at || null,
-    };
-  },
-  ["user-tutorial-status"],
-  { revalidate: 300, tags: ["user-profile", "tutorial-status"] }, // 5 minutes cache
-);
-
+// No caching - user-specific data, RLS must be enforced
 export async function getTutorialStatus() {
   const user = await getUser();
-  const supabase = createClient();
-  return getCachedTutorialStatus(user.id, supabase);
+  const supabase = await createClient(); // Use authenticated client for RLS
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("tutorial_completed, tutorial_completed_at")
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    reportSupabaseException("getTutorialStatus", error, {
+      id: user.id,
+    });
+    throw new Error("Error fetching tutorial status");
+  }
+
+  return {
+    tutorial_completed: data?.tutorial_completed || false,
+    tutorial_completed_at: data?.tutorial_completed_at || null,
+  };
 }
 
 export async function completeTutorial() {
   const user = await getUser();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from("profiles")
@@ -550,8 +543,8 @@ export async function completeTutorial() {
   }
 
   // Invalidate tutorial-related caches
-  revalidateTag("user-profile");
-  revalidateTag("tutorial-status");
+  revalidateTag("user-profile", "max");
+  revalidateTag("tutorial-status", "max");
   revalidatePath("/profile");
   revalidatePath("/home");
 
@@ -560,7 +553,7 @@ export async function completeTutorial() {
 
 export async function resetTutorial() {
   const user = await getUser();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from("profiles")
@@ -579,8 +572,8 @@ export async function resetTutorial() {
   }
 
   // Invalidate tutorial-related caches
-  revalidateTag("user-profile");
-  revalidateTag("tutorial-status");
+  revalidateTag("user-profile", "max");
+  revalidateTag("tutorial-status", "max");
   revalidatePath("/profile");
   revalidatePath("/home");
 

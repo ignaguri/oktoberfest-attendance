@@ -12,7 +12,7 @@ export async function getGroupCalendarEvents(
   groupId: string,
   festivalId: string,
 ) {
-  const db = createClient();
+  const db = await createClient();
 
   const getCached = unstable_cache(
     async (festId: string, grpId: string) => {
@@ -210,7 +210,7 @@ export async function getGroupCalendarEvents(
 }
 
 export async function getGroupCalendarData(groupId: string) {
-  const db = createClient();
+  const db = await createClient();
 
   // Get the group's festival_id and festival data
   const { data: groupData, error: groupError } = await db

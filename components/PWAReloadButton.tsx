@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logger";
 import { isPWAInstalled } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 
 export function PWAReloadButton() {
   const [isPWA, setIsPWA] = useState(false);
@@ -12,7 +12,9 @@ export function PWAReloadButton() {
 
   useEffect(() => {
     // Check if running as PWA
-    setIsPWA(isPWAInstalled());
+    startTransition(() => {
+      setIsPWA(isPWAInstalled());
+    });
   }, []);
 
   const handleReload = async () => {
