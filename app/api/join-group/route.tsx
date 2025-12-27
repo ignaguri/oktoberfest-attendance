@@ -19,7 +19,7 @@ async function handleJoinGroupRequest(request: NextRequest) {
     const groupId = await joinGroupWithToken({ token });
     if (groupId) {
       // Get group name for the success page
-      const supabase = createClient();
+      const supabase = await createClient();
       const { data: group } = await supabase
         .from("groups")
         .select("name")

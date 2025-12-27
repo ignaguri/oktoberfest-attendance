@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import "server-only";
 
 export async function renewGroupToken(groupId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: newToken, error } = await supabase.rpc("renew_group_token", {
     p_group_id: groupId,

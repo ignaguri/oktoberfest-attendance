@@ -8,7 +8,7 @@ import {
   useInvalidateQueries,
 } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export interface LocationSharingPreference {
@@ -165,6 +165,7 @@ export function useNearbyGroupMembers(
  */
 export function useLocationSharing(festivalId?: string) {
   const watchIdRef = useRef<number | null>(null);
+  const [isWatching, setIsWatching] = useState(false);
 
   // Check if user has active location sharing in the database
   const { data: activeLocationData } = useQuery(
@@ -266,6 +267,7 @@ export function useLocationSharing(festivalId?: string) {
           // Resolve on first successful position
           if (watchIdRef.current === null) {
             watchIdRef.current = watchId;
+            setIsWatching(true);
             resolve();
           }
         },
@@ -285,6 +287,7 @@ export function useLocationSharing(festivalId?: string) {
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
+      setIsWatching(false);
     }
 
     if (festivalId) {
@@ -308,7 +311,6 @@ export function useLocationSharing(festivalId?: string) {
     isStoppingSharing: stopSharingMutation.loading,
     updateError: updateLocationMutation.error,
     stopError: stopSharingMutation.error,
-    isSharing:
-      watchIdRef.current !== null || activeLocationData?.activeSharing === true,
+    isSharing: isWatching || activeLocationData?.activeSharing === true,
   };
 }

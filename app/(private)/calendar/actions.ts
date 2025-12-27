@@ -11,7 +11,7 @@ import type { CalendarEventType } from "@/lib/types";
 
 export async function getPersonalCalendarEvents(festivalId: string) {
   const user = await getUser();
-  const db = createClient();
+  const db = await createClient();
 
   const getCached = unstable_cache(
     async (uId: string, festId: string) => {
@@ -163,7 +163,7 @@ export async function createReservation(input: {
   visibleToGroups?: boolean;
   note?: string | null;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { error } = await supabase.from("reservations").insert({
@@ -178,14 +178,14 @@ export async function createReservation(input: {
   });
 
   if (error) throw new Error(error.message);
-  revalidateTag("reservations");
-  revalidateTag(`calendar-${user.id}-${input.festivalId}`);
-  revalidateTag("tent_visits");
+  revalidateTag("reservations", "max");
+  revalidateTag(`calendar-${user.id}-${input.festivalId}`, "max");
+  revalidateTag("tent_visits", "max");
   revalidatePath("/attendance/calendar");
 }
 
 export async function cancelReservation(reservationId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { error } = await supabase
@@ -195,8 +195,8 @@ export async function cancelReservation(reservationId: string) {
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
-  revalidateTag("reservations");
-  revalidateTag("tent_visits");
+  revalidateTag("reservations", "max");
+  revalidateTag("tent_visits", "max");
   revalidatePath("/attendance/calendar");
 }
 
@@ -211,7 +211,7 @@ export async function updateReservation(
     tentId: string;
   }>,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const payload: Record<string, any> = {};
@@ -232,13 +232,13 @@ export async function updateReservation(
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
-  revalidateTag("reservations");
-  revalidateTag("tent_visits");
+  revalidateTag("reservations", "max");
+  revalidateTag("tent_visits", "max");
   revalidatePath("/attendance/calendar");
 }
 
 export async function getReservationForEdit(reservationId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { data, error } = await supabase
@@ -256,7 +256,7 @@ export async function getReservationForEdit(reservationId: string) {
 }
 
 export async function getReservationForCheckIn(reservationId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { data, error } = await supabase

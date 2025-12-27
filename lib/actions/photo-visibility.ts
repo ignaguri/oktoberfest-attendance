@@ -3,7 +3,7 @@
 import { getUser } from "@/lib/sharedActions";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import type { Database } from "@/lib/database.types";
 import type {
@@ -11,46 +11,35 @@ import type {
   GroupPhotoSettingsFormData,
   BulkPhotoVisibilityFormData,
 } from "@/lib/schemas/photo-visibility";
-import type { SupabaseClient } from "@/lib/types";
 
 import "server-only";
 
 type PhotoVisibility = Database["public"]["Enums"]["photo_visibility_enum"];
 
-// Cache global photo settings for 5 minutes since they don't change frequently
-const getCachedGlobalPhotoSettings = unstable_cache(
-  async (userId: string, supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient.rpc(
-      "get_user_photo_global_settings",
-      {
-        p_user_id: userId,
-      },
-    );
-
-    if (error) {
-      reportSupabaseException("getUserGlobalPhotoSettings", error, {
-        id: userId,
-      });
-      throw new Error("Error fetching global photo settings");
-    }
-
-    return data?.[0] || { user_id: userId, hide_photos_from_all_groups: false };
-  },
-  ["user-photo-global-settings"],
-  { revalidate: 300, tags: ["user-photo-settings"] }, // 5 minutes cache
-);
-
 // Global photo settings actions
+// No caching - user-specific data, RLS must be enforced
 export async function getUserGlobalPhotoSettings() {
   const user = await getUser();
-  const supabase = createClient();
-  return getCachedGlobalPhotoSettings(user.id, supabase);
+  const supabase = await createClient(); // Use authenticated client for RLS
+
+  const { data, error } = await supabase.rpc("get_user_photo_global_settings", {
+    p_user_id: user.id,
+  });
+
+  if (error) {
+    reportSupabaseException("getUserGlobalPhotoSettings", error, {
+      id: user.id,
+    });
+    throw new Error("Error fetching global photo settings");
+  }
+
+  return data?.[0] || { user_id: user.id, hide_photos_from_all_groups: false };
 }
 
 export async function updateGlobalPhotoSettings(
   formData: GlobalPhotoSettingsFormData,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { error } = await supabase.rpc("update_user_photo_global_settings", {
@@ -67,53 +56,43 @@ export async function updateGlobalPhotoSettings(
   }
 
   // Invalidate relevant caches
-  revalidateTag("user-photo-settings");
+  revalidateTag("user-photo-settings", "max");
   revalidatePath("/profile");
 
   return { success: true };
 }
 
-// Cache group photo settings for 5 minutes since they don't change frequently
-const getCachedGroupPhotoSettings = unstable_cache(
-  async (userId: string, groupId: string, supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient.rpc(
-      "get_user_group_photo_settings",
-      {
-        p_user_id: userId,
-        p_group_id: groupId,
-      },
-    );
-
-    if (error) {
-      reportSupabaseException("getUserGroupPhotoSettings", error, {
-        id: userId,
-      });
-      throw new Error("Error fetching group photo settings");
-    }
-
-    return (
-      data?.[0] || {
-        user_id: userId,
-        group_id: groupId,
-        hide_photos_from_group: false,
-      }
-    );
-  },
-  ["user-group-photo-settings"],
-  { revalidate: 300, tags: ["user-photo-settings"] }, // 5 minutes cache
-);
-
 // Group-specific photo settings actions
+// No caching - user-specific data, RLS must be enforced
 export async function getUserGroupPhotoSettings(groupId: string) {
   const user = await getUser();
-  const supabase = createClient();
-  return getCachedGroupPhotoSettings(user.id, groupId, supabase);
+  const supabase = await createClient(); // Use authenticated client for RLS
+
+  const { data, error } = await supabase.rpc("get_user_group_photo_settings", {
+    p_user_id: user.id,
+    p_group_id: groupId,
+  });
+
+  if (error) {
+    reportSupabaseException("getUserGroupPhotoSettings", error, {
+      id: user.id,
+    });
+    throw new Error("Error fetching group photo settings");
+  }
+
+  return (
+    data?.[0] || {
+      user_id: user.id,
+      group_id: groupId,
+      hide_photos_from_group: false,
+    }
+  );
 }
 
 export async function updateGroupPhotoSettings(
   formData: GroupPhotoSettingsFormData,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { error } = await supabase.rpc("update_user_group_photo_settings", {
@@ -131,41 +110,34 @@ export async function updateGroupPhotoSettings(
   }
 
   // Invalidate relevant caches
-  revalidateTag("user-photo-settings");
-  revalidateTag("group-gallery");
+  revalidateTag("user-photo-settings", "max");
+  revalidateTag("group-gallery", "max");
   revalidatePath("/profile");
   revalidatePath(`/groups/${formData.group_id}`);
 
   return { success: true };
 }
 
-// Cache all user group photo settings for 5 minutes since they don't change frequently
-const getCachedAllUserGroupPhotoSettings = unstable_cache(
-  async (userId: string, supabaseClient: SupabaseClient) => {
-    const { data, error } = await supabaseClient.rpc(
-      "get_user_all_group_photo_settings",
-      {
-        p_user_id: userId,
-      },
-    );
-
-    if (error) {
-      reportSupabaseException("getAllUserGroupPhotoSettings", error, {
-        id: userId,
-      });
-      throw new Error("Error fetching all group photo settings");
-    }
-
-    return data || [];
-  },
-  ["user-all-group-photo-settings"],
-  { revalidate: 300, tags: ["user-photo-settings"] }, // 5 minutes cache
-);
-
+// No caching - user-specific data, RLS must be enforced
 export async function getAllUserGroupPhotoSettings() {
   const user = await getUser();
-  const supabase = createClient();
-  return getCachedAllUserGroupPhotoSettings(user.id, supabase);
+  const supabase = await createClient(); // Use authenticated client for RLS
+
+  const { data, error } = await supabase.rpc(
+    "get_user_all_group_photo_settings",
+    {
+      p_user_id: user.id,
+    },
+  );
+
+  if (error) {
+    reportSupabaseException("getAllUserGroupPhotoSettings", error, {
+      id: user.id,
+    });
+    throw new Error("Error fetching all group photo settings");
+  }
+
+  return data || [];
 }
 
 // Individual photo visibility actions
@@ -173,7 +145,7 @@ export async function updatePhotoVisibility(
   photoId: string,
   visibility: PhotoVisibility,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   // First verify the photo belongs to the user
@@ -201,7 +173,7 @@ export async function updatePhotoVisibility(
   }
 
   // Invalidate relevant caches
-  revalidateTag("group-gallery");
+  revalidateTag("group-gallery", "max");
   revalidatePath("/attendance");
 
   return { success: true };
@@ -210,7 +182,7 @@ export async function updatePhotoVisibility(
 export async function updateMultiplePhotosVisibility(
   formData: BulkPhotoVisibilityFormData,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   // First verify all photos belong to the user
@@ -252,7 +224,7 @@ export async function updateMultiplePhotosVisibility(
   }
 
   // Invalidate relevant caches
-  revalidateTag("group-gallery");
+  revalidateTag("group-gallery", "max");
   revalidatePath("/attendance");
 
   return { success: true, updatedCount: formData.photo_ids.length };

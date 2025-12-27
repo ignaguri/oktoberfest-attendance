@@ -5,7 +5,7 @@ import { useFestival } from "@/contexts/FestivalContext";
 import { useAttendances } from "@/lib/data";
 import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, startTransition } from "react";
 import { toast } from "sonner";
 
 import type { Tables } from "@/lib/database.types";
@@ -49,7 +49,9 @@ export default function AttendancePage() {
     if (dateParam) {
       const date = new Date(dateParam);
       if (!isNaN(date.getTime())) {
-        setSelectedDate(date);
+        startTransition(() => {
+          setSelectedDate(date);
+        });
       }
     }
   }, [searchParams]);
@@ -76,7 +78,9 @@ export default function AttendancePage() {
 
       fetchReservation();
     } else {
-      setReservation(null);
+      startTransition(() => {
+        setReservation(null);
+      });
     }
   }, [searchParams]);
 

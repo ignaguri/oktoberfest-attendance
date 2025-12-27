@@ -19,7 +19,7 @@ export async function updateProfile({
   username?: string;
   custom_beer_cost?: number;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from("profiles").upsert({
     id,
     full_name: fullname,
@@ -38,7 +38,7 @@ export async function updateProfile({
 }
 
 export async function deleteAccount() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get the current user
   const {

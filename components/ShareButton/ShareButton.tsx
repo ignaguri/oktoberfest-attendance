@@ -5,7 +5,13 @@ import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
 import { Share2 } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  startTransition,
+} from "react";
 import { toast } from "sonner";
 
 import { renewGroupToken } from "./actions";
@@ -39,7 +45,9 @@ export default function ShareButton({
     try {
       const token = await renewGroupToken(groupId);
       const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
-      setGroupLink(newGroupLink);
+      startTransition(() => {
+        setGroupLink(newGroupLink);
+      });
     } catch {
       toast.error("Error", {
         description: "Failed to generate share link. Please try again.",
@@ -65,30 +73,37 @@ export default function ShareButton({
   useEffect(() => {
     if (open && !tokenGenerated) {
       generateShareLink();
-      setTokenGenerated(true); // Set to true after generating the token
+      startTransition(() => {
+        setTokenGenerated(true); // Set to true after generating the token
+      });
     }
   }, [generateShareLink, open, tokenGenerated]);
 
   const title = "Invite to join";
   const description = "Choose how you'd like to share the group information:";
 
-  const ButtonsGroup = () => (
-    <div className="flex flex-col gap-4 items-center p-6">
-      {groupLink && (
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm text-muted-foreground">Scan QR code to join:</p>
-          <QRCode value={groupLink} size={180} />
+  const ButtonsGroup = useMemo(
+    () => (
+      <div className="flex flex-col gap-4 items-center p-6">
+        {groupLink && (
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-sm text-muted-foreground">
+              Scan QR code to join:
+            </p>
+            <QRCode value={groupLink} size={180} />
+          </div>
+        )}
+        <div className="flex flex-col gap-2">
+          <Button variant="yellow" onClick={shareViaNative}>
+            {isWebShareSupported ? "Share Invite" : "Copy Invite Link"}
+          </Button>
+          <Button variant="darkYellow" onClick={shareViaWhatsApp}>
+            Share via WhatsApp
+          </Button>
         </div>
-      )}
-      <div className="flex flex-col gap-2">
-        <Button variant="yellow" onClick={shareViaNative}>
-          {isWebShareSupported ? "Share Invite" : "Copy Invite Link"}
-        </Button>
-        <Button variant="darkYellow" onClick={shareViaWhatsApp}>
-          Share via WhatsApp
-        </Button>
       </div>
-    </div>
+    ),
+    [groupLink, shareViaNative, shareViaWhatsApp, isWebShareSupported],
   );
 
   return (
@@ -109,7 +124,7 @@ export default function ShareButton({
         description={description}
         className="sm:max-w-[425px]"
       >
-        <ButtonsGroup />
+        {ButtonsGroup}
       </ResponsiveDialog>
     </>
   );

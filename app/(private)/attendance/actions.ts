@@ -25,7 +25,7 @@ export async function fetchAttendances(festivalId: string) {
     return null;
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: tentVisits, error: tentVisitsError } = await supabase
     .from("tent_visits")
     .select("tent_id, visit_date, tents(name)")
@@ -68,7 +68,7 @@ export async function fetchAttendances(festivalId: string) {
 }
 
 export async function deleteAttendance(attendanceId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.rpc("delete_attendance", {
     p_attendance_id: attendanceId,
@@ -84,7 +84,7 @@ export async function deleteAttendance(attendanceId: string) {
 }
 
 export async function checkInFromReservation(reservationId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   // Get the reservation details

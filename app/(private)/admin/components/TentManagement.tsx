@@ -30,7 +30,7 @@ import {
 } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Copy, Edit, Plus, Trash2, Euro, Tent } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -636,23 +636,25 @@ function CopyTentsDialog({
 
   const sourceFestivalId = form.watch("sourceFestivalId");
 
-  useEffect(() => {
-    if (sourceFestivalId) {
-      loadSourceTents();
-    }
-  }, [sourceFestivalId]);
-
-  const loadSourceTents = async () => {
+  const loadSourceTents = useCallback(async () => {
     if (!sourceFestivalId) return;
 
     try {
       const tents = await getFestivalTents(sourceFestivalId);
-      setSourceTents(tents);
-      setSelectedTents([]);
-    } catch (error) {
+      startTransition(() => {
+        setSourceTents(tents);
+        setSelectedTents([]);
+      });
+    } catch {
       toast.error("Failed to load source tents");
     }
-  };
+  }, [sourceFestivalId]);
+
+  useEffect(() => {
+    if (sourceFestivalId) {
+      loadSourceTents();
+    }
+  }, [sourceFestivalId, loadSourceTents]);
 
   const handleSubmit = (data: CopyTentsFormData) => {
     onSubmit({

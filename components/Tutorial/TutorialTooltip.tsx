@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, X, SkipForward } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 
 import type { TutorialStep } from "@/lib/tutorialSteps";
 
@@ -40,7 +40,9 @@ export function TutorialTooltip({
 
   useEffect(() => {
     if (!isActive) {
-      setIsVisible(false);
+      startTransition(() => {
+        setIsVisible(false);
+      });
       return;
     }
 

@@ -44,7 +44,7 @@ export async function syncUserWithNovu(): Promise<{
 export async function getUserNotificationPreferences() {
   const user = await getUser();
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from("user_notification_preferences")
@@ -89,7 +89,7 @@ export async function updateUserNotificationPreferences(updates: {
 }) {
   const user = await getUser();
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from("user_notification_preferences")
@@ -205,12 +205,9 @@ export async function sendLocationSharingNotification(
   }
 
   const user = await getUser();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
-    // Check rate limiting - look for recent notifications from this user
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-
     // Use raw query since the table might not be in generated types yet
     const { data: recentNotifications, error: rateLimitError } =
       await supabase.rpc("check_notification_rate_limit", {

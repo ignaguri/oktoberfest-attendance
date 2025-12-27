@@ -5,7 +5,7 @@ import type { AttendanceResult } from "./AttendanceTable";
 import AttendanceTable from "./AttendanceTable";
 
 export default async function Results() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const retrieveAttendance = async () => {
     const { data } = await supabase

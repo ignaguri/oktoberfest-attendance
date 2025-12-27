@@ -5,27 +5,42 @@ import type { Database } from "@/lib/database.types";
 
 import "server-only";
 
-export function createClient(withServiceRole: boolean = false) {
-  const cookieStore = cookies();
+export async function createClient(withServiceRole: boolean = false) {
+  // Service role client doesn't need cookies - it bypasses RLS
+  if (withServiceRole) {
+    return createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return [];
+          },
+          setAll() {
+            // Service role doesn't need to set cookies
+          },
+        },
+      },
+    );
+  }
+
+  // Regular client needs cookies for user session
+  const cookieStore = await cookies();
 
   // Create a server's supabase client with newly configured cookie,
   // which could be used to maintain user's session
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    withServiceRole
-      ? process.env.SUPABASE_SERVICE_ROLE_KEY!
-      : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        async getAll() {
-          return (await cookieStore).getAll();
+        getAll() {
+          return cookieStore.getAll();
         },
-        async setAll(cookiesToSet) {
+        setAll(cookiesToSet) {
           try {
-            await Promise.all(
-              cookiesToSet.map(async ({ name, value, options }) =>
-                (await cookieStore).set(name, value, options),
-              ),
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
             );
           } catch {
             // Do nothing if cookies cannot be set

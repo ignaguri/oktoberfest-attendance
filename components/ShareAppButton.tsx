@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
 import { Share2 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const ICON_SIZE = 20;
 
@@ -25,31 +25,40 @@ export default function ShareAppButton() {
   const title = "Share ProstCounter App with friends!";
   const description = "Choose how you'd like to share the app:";
 
-  const ButtonsGroup = () => (
-    <div className="flex flex-col gap-2 items-center p-8">
-      <Button variant="yellow" onClick={shareViaNative}>
-        {isWebShareSupported ? "Share App" : "Copy to Clipboard"}
-      </Button>
-      {!isWebShareSupported && (
-        <Button variant="yellow" onClick={shareViaWhatsApp}>
-          Share via WhatsApp
+  const ButtonsGroup = useMemo(
+    () => (
+      <div className="flex flex-col gap-2 items-center p-8">
+        <Button variant="yellow" onClick={shareViaNative}>
+          {isWebShareSupported ? "Share App" : "Copy to Clipboard"}
         </Button>
-      )}
-      <Button variant="secondary" onClick={toggleQRCode}>
-        {showQRCode ? "Hide QR Code" : "Show QR Code"}
-      </Button>
-      {showQRCode && (
-        <div className="mt-4">
-          <Image
-            src="/images/qrcode.svg"
-            alt="QR Code"
-            className="object-fill"
-            width={270}
-            height={270}
-          />
-        </div>
-      )}
-    </div>
+        {!isWebShareSupported && (
+          <Button variant="yellow" onClick={shareViaWhatsApp}>
+            Share via WhatsApp
+          </Button>
+        )}
+        <Button variant="secondary" onClick={toggleQRCode}>
+          {showQRCode ? "Hide QR Code" : "Show QR Code"}
+        </Button>
+        {showQRCode && (
+          <div className="mt-4">
+            <Image
+              src="/images/qrcode.svg"
+              alt="QR Code"
+              className="object-fill"
+              width={270}
+              height={270}
+            />
+          </div>
+        )}
+      </div>
+    ),
+    [
+      shareViaNative,
+      shareViaWhatsApp,
+      toggleQRCode,
+      isWebShareSupported,
+      showQRCode,
+    ],
   );
 
   return (
@@ -66,7 +75,7 @@ export default function ShareAppButton() {
       }
       className="sm:max-w-[425px]"
     >
-      <ButtonsGroup />
+      {ButtonsGroup}
     </ResponsiveDialog>
   );
 }

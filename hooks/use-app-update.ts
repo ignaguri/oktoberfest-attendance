@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, startTransition } from "react";
 
 interface VersionData {
   version: string;
@@ -46,20 +46,24 @@ export function useAppUpdate() {
         });
       }
 
-      setUpdateState((prev) => ({
-        ...prev,
-        isChecking: false,
-        currentVersion: versionData.version,
-        changelog: versionData.changelog,
-        lastChecked: versionData.lastChecked,
-      }));
+      startTransition(() => {
+        setUpdateState((prev) => ({
+          ...prev,
+          isChecking: false,
+          currentVersion: versionData.version,
+          changelog: versionData.changelog,
+          lastChecked: versionData.lastChecked,
+        }));
+      });
     } catch (error) {
       logger.error(
         "Failed to check for updates",
         logger.clientComponent("useAppUpdate"),
         error as Error,
       );
-      setUpdateState((prev) => ({ ...prev, isChecking: false }));
+      startTransition(() => {
+        setUpdateState((prev) => ({ ...prev, isChecking: false }));
+      });
     }
   }, []);
 
@@ -86,11 +90,13 @@ export function useAppUpdate() {
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "UPDATE_AVAILABLE") {
-        setUpdateState((prev) => ({
-          ...prev,
-          hasUpdate: true,
-          newVersion: event.data.newVersion,
-        }));
+        startTransition(() => {
+          setUpdateState((prev) => ({
+            ...prev,
+            hasUpdate: true,
+            newVersion: event.data.newVersion,
+          }));
+        });
       }
     };
 
@@ -98,7 +104,10 @@ export function useAppUpdate() {
     navigator.serviceWorker.addEventListener("message", handleMessage);
 
     // Check for updates when component mounts
-    checkForUpdates();
+    // Wrap in setTimeout to avoid synchronous setState in effect
+    setTimeout(() => {
+      checkForUpdates();
+    }, 0);
 
     // Check for updates when app comes into focus
     const handleFocus = () => {

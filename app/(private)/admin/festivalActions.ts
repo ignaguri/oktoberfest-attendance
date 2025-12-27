@@ -9,7 +9,7 @@ import type { Festival, FestivalInsert, FestivalUpdate } from "@/lib/types";
 import "server-only";
 
 export async function fetchAllFestivals(): Promise<Festival[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("festivals")
@@ -27,7 +27,7 @@ export async function fetchAllFestivals(): Promise<Festival[]> {
 export async function createFestival(
   festivalData: Omit<FestivalInsert, "id" | "created_at" | "updated_at">,
 ): Promise<Festival> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("festivals")
@@ -50,7 +50,7 @@ export async function updateFestival(
   festivalId: string,
   festivalData: Omit<FestivalUpdate, "id" | "created_at" | "updated_at">,
 ): Promise<Festival> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const updateData = {
     ...festivalData,
@@ -76,7 +76,7 @@ export async function updateFestival(
 }
 
 export async function deleteFestival(festivalId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // First check if this festival has any associated data
   const { data: attendances, error: attendancesError } = await supabase

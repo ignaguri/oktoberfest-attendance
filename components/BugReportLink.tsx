@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 
 /**
  * @deprecated
@@ -28,9 +28,11 @@ ${info}
 ----- End Environment Information -----
 `;
 
-    setMailtoLink(
-      `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-    );
+    startTransition(() => {
+      setMailtoLink(
+        `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      );
+    });
   }, []);
 
   return (

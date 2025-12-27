@@ -30,7 +30,7 @@ type JoinGroupTokenResponse =
     };
 
 export async function joinGroupWithToken(formData: { token: string }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser();
 
   const { data, error } = await supabase.rpc("join_group_with_token", {
@@ -107,9 +107,9 @@ export async function joinGroupWithToken(formData: { token: string }) {
   }
 
   // Invalidate relevant caches for group membership changes
-  revalidateTag("groups");
-  revalidateTag("user-groups");
-  revalidateTag("group-members");
+  revalidateTag("groups", "max");
+  revalidateTag("user-groups", "max");
+  revalidateTag("group-members", "max");
 
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);

@@ -87,14 +87,14 @@ async function checkUser() {
   }
 }
 
-export default async function RootLayout({
+function AppContent({
   children,
+  isLoggedIn,
 }: {
   children: React.ReactNode;
+  isLoggedIn: boolean;
 }) {
-  const isLoggedIn = await checkUser();
-
-  const AppContent = () => (
+  return (
     <div className="flex min-h-screen flex-col items-center justify-center pb-2">
       <Navbar />
       <OfflineBanner />
@@ -105,6 +105,14 @@ export default async function RootLayout({
       <Footer isLoggedIn={isLoggedIn} />
     </div>
   );
+}
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const isLoggedIn = await checkUser();
 
   return (
     <ViewTransitions>
@@ -114,11 +122,11 @@ export default async function RootLayout({
             {isLoggedIn ? (
               <FestivalProvider>
                 <NotificationProvider>
-                  <AppContent />
+                  <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
                 </NotificationProvider>
               </FestivalProvider>
             ) : (
-              <AppContent />
+              <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
             )}
           </DataProvider>
           <ServiceWorkerRegistration />

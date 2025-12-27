@@ -5,7 +5,7 @@ import {
   isIOS,
   supportsBeforeInstallPrompt,
 } from "@/lib/utils";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, startTransition } from "react";
 import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -127,7 +127,9 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
 
   // Client-side hydration effect
   useEffect(() => {
-    setIsClient(true);
+    startTransition(() => {
+      setIsClient(true);
+    });
   }, []);
 
   useEffect(() => {

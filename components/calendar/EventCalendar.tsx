@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { TZDate } from "@date-fns/tz";
 import { format as formatDate, subMonths, addMonths } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, startTransition } from "react";
 
 import type { CalendarEventType } from "@/lib/types";
 import type { ReactNode } from "react";
@@ -45,7 +45,11 @@ export function EventCalendar({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  useEffect(() => setDate(selected), [selected]);
+  useEffect(() => {
+    startTransition(() => {
+      setDate(selected);
+    });
+  }, [selected]);
 
   // Build a lookup of dates that have events
   const eventsByDay = useMemo(() => {

@@ -10,7 +10,7 @@ import "server-only";
 export async function getMissingProfileFields() {
   const profileData = await getProfileShort();
 
-  let missingFields = {
+  const missingFields = {
     fullName: !profileData.full_name,
     username: !profileData.username,
     avatarUrl: !profileData.avatar_url,
@@ -22,7 +22,7 @@ export async function getMissingProfileFields() {
 export async function fetchHighlights(festivalId?: string) {
   const user = await getUser();
 
-  const supabase = createClient();
+  const supabase = await createClient();
   type TopPosition = {
     group_id: string;
     group_name: string;

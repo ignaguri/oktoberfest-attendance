@@ -7,22 +7,20 @@ import { createClient } from "@/utils/supabase/server";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 import type { Tables } from "@/lib/database.types";
-import type { SupabaseClient } from "@/lib/types";
 
 import "server-only";
 
 // Cache group details for 10 minutes since group settings change infrequently
 const getCachedGroupDetails = unstable_cache(
-  async (
-    groupId: string,
-    supabaseClient: SupabaseClient,
-  ): Promise<Tables<"groups"> | null> => {
+  async (groupId: string): Promise<Tables<"groups"> | null> => {
     // First check if groupId is a valid UUID format
     if (!groupId || typeof groupId !== "string") {
       throw new Error("Invalid group ID format");
     }
 
-    const { data, error } = await supabaseClient
+    // Use service role client - group details are accessible to members
+    const supabase = await createClient(true);
+    const { data, error } = await supabase
       .from("groups")
       .select("*")
       .eq("id", groupId)
@@ -44,8 +42,7 @@ const getCachedGroupDetails = unstable_cache(
 );
 
 export async function fetchGroupDetails(groupId: string) {
-  const supabase = createClient();
-  return getCachedGroupDetails(groupId, supabase);
+  return getCachedGroupDetails(groupId);
 }
 
 /**
@@ -70,7 +67,7 @@ export async function fetchGroupDetailsSafe(
 
 // Cache group members for 5 minutes since membership changes occasionally
 const getCachedGroupMembers = unstable_cache(
-  async (groupId: string, supabaseClient: SupabaseClient): Promise<any[]> => {
+  async (groupId: string): Promise<any[]> => {
     // First check if groupId is a valid UUID format
     if (!groupId || typeof groupId !== "string") {
       throw new Error("Invalid group ID format");
@@ -81,7 +78,9 @@ const getCachedGroupMembers = unstable_cache(
       "id" | "username" | "full_name"
     >;
 
-    const { data, error } = await supabaseClient
+    // Use service role client - group members are accessible to group members
+    const supabase = await createClient(true);
+    const { data, error } = await supabase
       .from("group_members")
       .select("profiles:user_id(id, username, full_name)")
       .eq("group_id", groupId);
@@ -101,8 +100,7 @@ const getCachedGroupMembers = unstable_cache(
 );
 
 export async function fetchGroupMembers(groupId: string) {
-  const supabase = createClient();
-  return getCachedGroupMembers(groupId, supabase);
+  return getCachedGroupMembers(groupId);
 }
 
 /**
@@ -127,7 +125,7 @@ export async function updateGroup(
   groupId: string,
   values: Partial<Tables<"groups">>,
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from("groups")
@@ -145,8 +143,8 @@ export async function updateGroup(
   }
 
   // Invalidate cache tags for groups
-  revalidateTag("groups");
-  revalidateTag("user-groups");
+  revalidateTag("groups", "max");
+  revalidateTag("user-groups", "max");
 
   revalidatePath(`/groups/${groupId}`);
   revalidatePath(`/group-settings/${groupId}`);
@@ -157,7 +155,7 @@ export async function updateGroup(
 }
 
 export async function removeMember(groupId: string, userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase
     .from("group_members")
     .delete()
@@ -169,9 +167,9 @@ export async function removeMember(groupId: string, userId: string) {
   }
 
   // Invalidate cache tags for groups and group members
-  revalidateTag("groups");
-  revalidateTag("group-members");
-  revalidateTag("user-groups");
+  revalidateTag("groups", "max");
+  revalidateTag("group-members", "max");
+  revalidateTag("user-groups", "max");
 
   revalidatePath(`/groups/${groupId}`);
   revalidatePath(`/group-settings/${groupId}`);
@@ -183,7 +181,7 @@ export async function removeMember(groupId: string, userId: string) {
 export async function getCurrentUserForGroup(groupId: string) {
   const user = await getUser();
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("groups")
     .select("created_by")
@@ -215,7 +213,7 @@ export async function regenerateInviteToken(groupId: string) {
     throw new Error("Only the group creator can regenerate invite tokens");
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Use the existing RPC function to regenerate token
   const { data: newToken, error } = await supabase.rpc("renew_group_token", {
@@ -231,7 +229,7 @@ export async function regenerateInviteToken(groupId: string) {
   }
 
   // Invalidate cache tags for groups
-  revalidateTag("groups");
+  revalidateTag("groups", "max");
 
   revalidatePath(`/groups/${groupId}`);
   revalidatePath(`/group-settings/${groupId}`);

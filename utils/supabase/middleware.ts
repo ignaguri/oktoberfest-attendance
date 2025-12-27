@@ -1,3 +1,4 @@
+import { logAdminAction } from "@/lib/utils/security";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
@@ -40,6 +41,14 @@ export async function updateSession(request: NextRequest) {
 
   // Check if the request is for the admin page
   if (request.nextUrl.pathname.startsWith("/admin")) {
+    const userAgent = request.headers.get("user-agent") || "unknown";
+
+    // Log admin access attempt
+    logAdminAction(user?.id || "anonymous", "admin_access_attempt", {
+      userAgent,
+      path: request.nextUrl.pathname,
+    });
+
     if (!user) {
       // If there's no user, redirect to the login page
       const url = request.nextUrl.clone();
@@ -49,6 +58,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     const userId = user.id ?? user.sub;
+
     // Check if the user is a super admin
     const { data: profile } = await supabase
       .from("profiles")
@@ -58,10 +68,19 @@ export async function updateSession(request: NextRequest) {
 
     if (!profile?.is_super_admin) {
       // If the user is not a super admin, redirect to the unauthorized page
+      logAdminAction(userId, "admin_unauthorized_access", {
+        path: request.nextUrl.pathname,
+      });
+
       const url = request.nextUrl.clone();
       url.pathname = "/unauthorized";
       return NextResponse.redirect(url);
     }
+
+    // Log successful admin access
+    logAdminAction(userId, "admin_access_granted", {
+      path: request.nextUrl.pathname,
+    });
   } else if (
     !user &&
     !["/auth", "/sign-in", "/sign-up", "/reset-password", "/error"].includes(

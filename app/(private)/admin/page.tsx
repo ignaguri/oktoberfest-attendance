@@ -3,7 +3,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useSearchParams } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 
 import CacheManagement from "./components/CacheManagement";
 import FestivalManagement from "./components/FestivalManagement";
@@ -22,11 +22,15 @@ export default function AdminPage() {
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     if (tabValues.includes(hash)) {
-      setActiveTab(hash);
+      startTransition(() => {
+        setActiveTab(hash);
+      });
     } else {
       const tab = searchParams.get("tab");
       if (tab && tabValues.includes(tab)) {
-        setActiveTab(tab);
+        startTransition(() => {
+          setActiveTab(tab);
+        });
         // Update URL hash if tab is set via query parameter
         router.push(`/admin?tab=${tab}`);
       }

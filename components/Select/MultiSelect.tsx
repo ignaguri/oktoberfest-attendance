@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 
 import type {
   ComboboxOption,
@@ -60,7 +60,9 @@ export function MultiSelect({
     const selectedOptions = options
       .flatMap((group) => group.options)
       .filter((opt) => value.includes(opt.value));
-    setSelected(selectedOptions);
+    startTransition(() => {
+      setSelected(selectedOptions);
+    });
   }, [value, options]);
 
   const handleSelect = (option: ComboboxOption) => {

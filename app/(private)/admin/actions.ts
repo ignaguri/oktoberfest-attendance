@@ -1,25 +1,21 @@
 "use server";
 
 import { formatTimestampForDatabase } from "@/lib/date-utils";
+import { sanitizeSearchTerm, logAdminAction } from "@/lib/utils/security";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath, unstable_cache } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Tables } from "@/lib/database.types";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 import "server-only";
 
 // Cached version of getUsers for better performance
 const getCachedUsers = unstable_cache(
-  async (
-    search: string | undefined,
-    page: number,
-    limit: number,
-    supabaseClient: SupabaseClient,
-  ) => {
-    const supabase = supabaseClient;
+  async (search: string | undefined, page: number, limit: number) => {
+    // Use service role client - admin function needs full access
+    const supabase = await createClient(true);
 
     // If searching, use a more efficient approach with proper pagination
     if (search) {
@@ -39,18 +35,45 @@ const getCachedUsers = unstable_cache(
       const emailMatchingUserIds = emailMatchingUsers.map((user) => user.id);
 
       // Search profiles table for name/username matches
-      const {
-        data: profiles,
-        error: profileError,
-        count: profileCount,
-      } = await supabase
-        .from("profiles")
-        .select("id, full_name, username", { count: "exact" })
-        .or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
+      // Sanitize search term to prevent SQL injection
+      const sanitizedSearch = sanitizeSearchTerm(search, 100);
+      const searchPattern = `%${sanitizedSearch}%`;
 
-      if (profileError) {
-        throw new Error("Error fetching profiles: " + profileError.message);
+      // Use separate queries and combine results to avoid SQL injection
+      // This is safer than string interpolation in .or() filters
+      const [nameResults, usernameResults] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, username")
+          .ilike("full_name", searchPattern),
+        supabase
+          .from("profiles")
+          .select("id, full_name, username")
+          .ilike("username", searchPattern),
+      ]);
+
+      if (nameResults.error) {
+        throw new Error(
+          "Error fetching profiles: " + nameResults.error.message,
+        );
       }
+      if (usernameResults.error) {
+        throw new Error(
+          "Error fetching profiles: " + usernameResults.error.message,
+        );
+      }
+
+      // Combine and deduplicate results
+      const allProfiles = [
+        ...(nameResults.data || []),
+        ...(usernameResults.data || []),
+      ];
+      const uniqueProfiles = Array.from(
+        new Map(allProfiles.map((p) => [p.id, p])).values(),
+      );
+
+      const profileCount = uniqueProfiles.length;
+      const profiles = uniqueProfiles;
 
       // Get profile IDs for name/username matches
       const profileMatchingUserIds = profiles?.map((p) => p.id) || [];
@@ -160,8 +183,7 @@ export async function getUsers(
   page: number = 1,
   limit: number = 50,
 ) {
-  const supabase = createClient(true);
-  return getCachedUsers(search, page, limit, supabase);
+  return getCachedUsers(search, page, limit);
 }
 
 export async function updateUserAuth(
@@ -170,7 +192,19 @@ export async function updateUserAuth(
 ) {
   // Invalidate cache when user is updated
   revalidatePath("/admin");
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
+
+  // Get current user for logging
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminUserId = user?.id || "unknown";
+
+  logAdminAction(adminUserId, "update_user_auth", {
+    targetUserId: userId,
+    updatedFields: Object.keys(userData),
+  });
+
   const { data, error } = await supabase.auth.admin.updateUserById(
     userId,
     userData,
@@ -184,7 +218,7 @@ export async function updateUserProfile(
   userId: string,
   profileData: Partial<Tables<"profiles">>,
 ) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data, error } = await supabase
     .from("profiles")
     .update(profileData)
@@ -197,14 +231,25 @@ export async function updateUserProfile(
 }
 
 export async function deleteUser(userId: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
+
+  // Get current user for logging
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminUserId = user?.id || "unknown";
+
+  logAdminAction(adminUserId, "delete_user", {
+    targetUserId: userId,
+  });
+
   const { error } = await supabase.auth.admin.deleteUser(userId);
   if (error) throw new Error("Error deleting user: " + error.message);
   revalidatePath("/admin");
 }
 
 export async function getGroups() {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data: groups, error } = await supabase.from("groups").select(`
       *,
       group_members(count)
@@ -222,7 +267,7 @@ export async function updateGroup(
   groupId: string,
   groupData: Partial<Tables<"groups">>,
 ) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data, error } = await supabase
     .from("groups")
     .update(groupData)
@@ -235,14 +280,25 @@ export async function updateGroup(
 }
 
 export async function deleteGroup(groupId: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
+
+  // Get current user for logging
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminUserId = user?.id || "unknown";
+
+  logAdminAction(adminUserId, "delete_group", {
+    groupId,
+  });
+
   const { error } = await supabase.from("groups").delete().eq("id", groupId);
   if (error) throw new Error("Error deleting group: " + error.message);
   revalidatePath("/admin");
 }
 
 export async function getGroupMembers(groupId: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data: members, error } = await supabase
     .from("group_members")
     .select(
@@ -266,7 +322,7 @@ export async function getGroupMembers(groupId: string) {
 }
 
 export async function getWinningCriteria() {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data: criteria, error } = await supabase
     .from("winning_criteria")
     .select("*")
@@ -278,7 +334,7 @@ export async function getWinningCriteria() {
 }
 
 export async function getUserAttendances(userId: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data: attendances, error } = await supabase
     .from("attendances")
     .select("*")
@@ -307,7 +363,7 @@ export async function updateAttendance(
   attendanceId: string,
   attendanceData: Partial<Tables<"attendances">> & { tent_ids?: string[] },
 ) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
 
   const { tent_ids, ...attendanceDataWithoutTentIds } = attendanceData;
   // Update the attendance record
@@ -351,7 +407,7 @@ export async function updateAttendance(
 }
 
 export async function deleteAttendance(attendanceId: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { error } = await supabase
     .from("attendances")
     .delete()
@@ -361,7 +417,7 @@ export async function deleteAttendance(attendanceId: string) {
 }
 
 export async function getTentVisitsForAttendance(userId: string, date: Date) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
 
   // Create start and end of day timestamps for the given date
   const startOfDay = new Date(date);
@@ -384,7 +440,7 @@ export async function getTentVisitsForAttendance(userId: string, date: Date) {
 // Use Next.js unstable_cache and revalidateTag for cache management instead
 
 export async function listNonWebPImages() {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { data, error } = await supabase.storage.from("avatars").list();
 
   if (error) throw new Error("Error listing images: " + error.message);
@@ -400,7 +456,7 @@ export async function listNonWebPImages() {
 }
 
 export async function convertAndUpdateImage(path: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
 
   // Download the image
   const { data, error } = await supabase.storage.from("avatars").download(path);
@@ -452,7 +508,7 @@ async function convertToWebP(imageBuffer: ArrayBuffer): Promise<Buffer> {
 }
 
 async function deleteImage(path: string) {
-  const supabase = createClient(true);
+  const supabase = await createClient(true);
   const { error } = await supabase.storage.from("avatars").remove([path]);
   if (error) throw new Error("Error deleting image: " + error.message);
   revalidatePath("/admin");

@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import "server-only";
 
 export async function getGroupName(groupId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("groups")
     .select("name")

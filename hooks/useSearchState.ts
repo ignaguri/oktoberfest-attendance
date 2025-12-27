@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, startTransition } from "react";
 
 export interface SearchState {
   search: string;
@@ -153,7 +153,9 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
   // Reset page when search changes
   useEffect(() => {
     if (debouncedSearch !== state.search) {
-      setState((prev) => ({ ...prev, page: 1 }));
+      startTransition(() => {
+        setState((prev) => ({ ...prev, page: 1 }));
+      });
     }
   }, [debouncedSearch, state.search]);
 

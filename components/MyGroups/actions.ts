@@ -51,6 +51,6 @@ export async function fetchGroups(
   festivalId?: string,
 ): Promise<Tables<"groups">[]> {
   const user = await getUser();
-  const supabase = createClient();
+  const supabase = await createClient();
   return getCachedUserGroups(user.id, festivalId, supabase);
 }

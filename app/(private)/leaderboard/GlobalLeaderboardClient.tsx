@@ -8,7 +8,7 @@ import { useFestival } from "@/contexts/FestivalContext";
 import { winningCriteriaText } from "@/lib/constants";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { WinningCriteria } from "@/lib/types";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, startTransition } from "react";
 import { toast } from "sonner";
 
 export default function GlobalLeaderboardClient() {
@@ -38,7 +38,9 @@ export default function GlobalLeaderboardClient() {
       winningCriterias.length > 0 &&
       winningCriteriaId === 1
     ) {
-      setWinningCriteriaId(winningCriterias[0].id);
+      startTransition(() => {
+        setWinningCriteriaId(winningCriterias[0].id);
+      });
     }
   }, [winningCriterias, winningCriteriaId]);
 
