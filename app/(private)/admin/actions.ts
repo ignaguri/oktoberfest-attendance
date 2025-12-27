@@ -1,6 +1,7 @@
 "use server";
 
 import { formatTimestampForDatabase } from "@/lib/date-utils";
+import { sanitizeSearchTerm, logAdminAction } from "@/lib/utils/security";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath, unstable_cache } from "next/cache";
 import sharp from "sharp";
@@ -39,18 +40,45 @@ const getCachedUsers = unstable_cache(
       const emailMatchingUserIds = emailMatchingUsers.map((user) => user.id);
 
       // Search profiles table for name/username matches
-      const {
-        data: profiles,
-        error: profileError,
-        count: profileCount,
-      } = await supabase
-        .from("profiles")
-        .select("id, full_name, username", { count: "exact" })
-        .or(`full_name.ilike.%${search}%,username.ilike.%${search}%`);
+      // Sanitize search term to prevent SQL injection
+      const sanitizedSearch = sanitizeSearchTerm(search, 100);
+      const searchPattern = `%${sanitizedSearch}%`;
 
-      if (profileError) {
-        throw new Error("Error fetching profiles: " + profileError.message);
+      // Use separate queries and combine results to avoid SQL injection
+      // This is safer than string interpolation in .or() filters
+      const [nameResults, usernameResults] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, username")
+          .ilike("full_name", searchPattern),
+        supabase
+          .from("profiles")
+          .select("id, full_name, username")
+          .ilike("username", searchPattern),
+      ]);
+
+      if (nameResults.error) {
+        throw new Error(
+          "Error fetching profiles: " + nameResults.error.message,
+        );
       }
+      if (usernameResults.error) {
+        throw new Error(
+          "Error fetching profiles: " + usernameResults.error.message,
+        );
+      }
+
+      // Combine and deduplicate results
+      const allProfiles = [
+        ...(nameResults.data || []),
+        ...(usernameResults.data || []),
+      ];
+      const uniqueProfiles = Array.from(
+        new Map(allProfiles.map((p) => [p.id, p])).values(),
+      );
+
+      const profileCount = uniqueProfiles.length;
+      const profiles = uniqueProfiles;
 
       // Get profile IDs for name/username matches
       const profileMatchingUserIds = profiles?.map((p) => p.id) || [];
@@ -171,6 +199,18 @@ export async function updateUserAuth(
   // Invalidate cache when user is updated
   revalidatePath("/admin");
   const supabase = createClient(true);
+
+  // Get current user for logging
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminUserId = user?.id || "unknown";
+
+  logAdminAction(adminUserId, "update_user_auth", {
+    targetUserId: userId,
+    updatedFields: Object.keys(userData),
+  });
+
   const { data, error } = await supabase.auth.admin.updateUserById(
     userId,
     userData,
@@ -198,6 +238,17 @@ export async function updateUserProfile(
 
 export async function deleteUser(userId: string) {
   const supabase = createClient(true);
+
+  // Get current user for logging
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminUserId = user?.id || "unknown";
+
+  logAdminAction(adminUserId, "delete_user", {
+    targetUserId: userId,
+  });
+
   const { error } = await supabase.auth.admin.deleteUser(userId);
   if (error) throw new Error("Error deleting user: " + error.message);
   revalidatePath("/admin");
@@ -236,6 +287,17 @@ export async function updateGroup(
 
 export async function deleteGroup(groupId: string) {
   const supabase = createClient(true);
+
+  // Get current user for logging
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminUserId = user?.id || "unknown";
+
+  logAdminAction(adminUserId, "delete_group", {
+    groupId,
+  });
+
   const { error } = await supabase.from("groups").delete().eq("id", groupId);
   if (error) throw new Error("Error deleting group: " + error.message);
   revalidatePath("/admin");

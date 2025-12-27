@@ -28,7 +28,8 @@ export async function login(
 
   if (error) {
     reportSupabaseAuthException("login", error, { email: formData.email });
-    throw new Error(error.message);
+    // Don't reveal if email exists - use generic message
+    throw new Error("Invalid email or password");
   }
 
   revalidateBase();
