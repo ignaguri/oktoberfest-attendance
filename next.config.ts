@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
     APP_VERSION: packageJson.version,
   },
   reactStrictMode: true,
+  // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
+  // isomorphic-dompurify depends on jsdom, but jsdom should not be bundled
+  serverExternalPackages: ["jsdom", "html-encoding-sniffer", "@exodus/bytes"],
   async headers() {
     return [
       {

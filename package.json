@@ -131,7 +131,10 @@
     "vitest": "^4.0.16"
   },
   "overrides": {
-    "eslint": "$eslint"
+    "eslint": "$eslint",
+    "html-encoding-sniffer": {
+      "@exodus/bytes": "npm:encoding@0.1.13"
+    }
   },
   "pnpm": {
     "onlyBuiltDependencies": [
