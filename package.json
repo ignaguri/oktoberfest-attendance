@@ -69,8 +69,6 @@
     "firebase": "^12.7.0",
     "framer-motion": "^12.23.26",
     "html-to-image": "^1.11.13",
-    "isomorphic-dompurify": "^2.35.0",
-    "jsdom": "^27.4.0",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "next-themes": "^0.4.6",
@@ -84,6 +82,7 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.69.0",
     "recharts": "^3.6.0",
+    "sanitize-html": "^2.17.0",
     "serwist": "^9.4.2",
     "sharp": "^0.34.5",
     "sonner": "^2.0.7",
@@ -106,6 +105,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/sanitize-html": "^2.16.0",
     "@typescript-eslint/eslint-plugin": "8.50.1",
     "@vitest/coverage-v8": "^4.0.16",
     "eslint": "9.39.2",
@@ -131,8 +131,7 @@
     "vitest": "^4.0.16"
   },
   "overrides": {
-    "eslint": "$eslint",
-    "@exodus/bytes": "npm:encoding@0.1.13"
+    "eslint": "$eslint"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

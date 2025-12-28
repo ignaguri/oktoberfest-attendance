@@ -16,8 +16,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
-  // isomorphic-dompurify depends on jsdom, but jsdom should not be bundled
-  serverExternalPackages: ["jsdom", "html-encoding-sniffer", "@exodus/bytes"],
+  serverExternalPackages: [],
   async headers() {
     return [
       {
@@ -61,15 +60,6 @@ const nextConfig: NextConfig = {
         use: ["babel-loader"],
         sideEffects: false,
       });
-    }
-
-    // Replace @exodus/bytes (ESM-only) with encoding (CommonJS) for server-side
-    // This fixes the ESM/CommonJS issue with jsdom dependencies
-    if (isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        "@exodus/bytes": require.resolve("encoding"),
-      };
     }
 
     return config;
