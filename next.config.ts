@@ -63,6 +63,15 @@ const nextConfig: NextConfig = {
       });
     }
 
+    // Replace @exodus/bytes (ESM-only) with encoding (CommonJS) for server-side
+    // This fixes the ESM/CommonJS issue with jsdom dependencies
+    if (isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "@exodus/bytes": require.resolve("encoding"),
+      };
+    }
+
     return config;
   },
 };
