@@ -1,5 +1,7 @@
 import { serve } from "@novu/framework/next";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+
+import type { NextRequest } from "next/server";
 
 import {
   groupJoinWorkflow,
@@ -30,14 +32,20 @@ try {
   });
 } catch (error) {
   // During build, Novu might not be configured - this is expected
-  console.warn("Novu initialization skipped (likely during build):", error instanceof Error ? error.message : error);
+  console.warn(
+    "Novu initialization skipped (likely during build):",
+    error instanceof Error ? error.message : error,
+  );
 }
 
 // Fallback handlers when Novu is not configured
 const fallbackHandler = (req: NextRequest) => {
   return NextResponse.json(
-    { error: "Novu is not configured. Set NOVU_SECRET_KEY environment variable." },
-    { status: 503 }
+    {
+      error:
+        "Novu is not configured. Set NOVU_SECRET_KEY environment variable.",
+    },
+    { status: 503 },
   );
 };
 

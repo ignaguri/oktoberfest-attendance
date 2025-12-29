@@ -7,6 +7,24 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import prettierConfigRecommended from "eslint-plugin-prettier/recommended";
 
 const config = [
+  // Ignore patterns must come first in flat config
+  {
+    ignores: [
+      ".next/**",
+      "out/**",
+      "build/**",
+      "dist/**",
+      "node_modules/**",
+      "next-env.d.ts",
+      "public/workbox-*",
+      "types/**",
+      "**/.next/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.config.js",
+      "**/*.config.mjs",
+    ],
+  },
   ...nextVitals,
   // ...nextTs, // Commented out because it's too strict for this project
   {
@@ -77,16 +95,6 @@ const config = [
     },
   },
   prettierConfigRecommended,
-  {
-    ignores: [
-      ".next/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts",
-      "public/workbox-*",
-      "types/**",
-    ],
-  },
 ];
 
 export default config;
