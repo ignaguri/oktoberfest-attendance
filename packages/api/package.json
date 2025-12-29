@@ -10,7 +10,11 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "generate-spec": "tsx src/scripts/generate-openapi.ts"
+    "generate-spec": "tsx src/scripts/generate-openapi.ts",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.0",
@@ -23,7 +27,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.8",
     "tsx": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
   }
 }
