@@ -1,5 +1,12 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { errorHandler } from "./middleware/error";
+import { authMiddleware } from "./middleware/auth";
+
+// Import routes
+import consumptionRoute from "./routes/consumption.route";
+import attendanceRoute from "./routes/attendance.route";
+import festivalRoute from "./routes/festival.route";
+import tentRoute from "./routes/tent.route";
 
 // Create the main Hono app with OpenAPI support
 export const app = new OpenAPIHono();
@@ -7,10 +14,25 @@ export const app = new OpenAPIHono();
 // Register global error handler
 app.onError(errorHandler);
 
-// Health check endpoint
+// Health check endpoint (public)
 app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// Mount API v1 routes with authentication
+const apiV1 = new OpenAPIHono();
+
+// Apply authentication middleware to all v1 routes
+apiV1.use("*", authMiddleware);
+
+// Mount route handlers
+apiV1.route("/", consumptionRoute);
+apiV1.route("/", attendanceRoute);
+apiV1.route("/", festivalRoute);
+apiV1.route("/", tentRoute);
+
+// Mount v1 routes under /v1 prefix
+app.route("/v1", apiV1);
 
 // OpenAPI documentation endpoint
 app.doc("/openapi.json", {
