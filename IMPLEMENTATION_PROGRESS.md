@@ -203,7 +203,7 @@
 **Status**: ✅ Complete
 **Started**: 2025-12-29
 **Completed**: 2025-12-29
-**Commit**: TBD
+**Commit**: `653b81e` - feat(db): implement consumption tracking and location sessions (Phase 3)
 
 ### 3.1 Create New Database Tables
 
