@@ -35,7 +35,7 @@ export const LocationPrivacySettings = () => {
   const groupsWithPreferences = useMemo(() => {
     if (!groups) return [];
 
-    return groups.map((group) => {
+    return groups.map((group: { id: string; name: string }) => {
       const preference = preferences?.find((p) => p.group_id === group.id);
       return {
         groupId: group.id,

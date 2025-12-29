@@ -1,14 +1,11 @@
 /**
  * Business logic hooks for attendance data
  *
- * These hooks handle all attendance-related data operations
+ * Migrated to use Hono API client instead of server actions
  */
 
-import {
-  fetchAttendances,
-  deleteAttendance,
-} from "@/app/(private)/attendance/actions";
-import { fetchHighlights } from "@/app/(private)/home/actions";
+import { fetchHighlights } from "@/app/(private)/home/actions"; // TODO: Create /v1/stats endpoint
+import { apiClient } from "@/lib/api-client";
 import {
   useQuery,
   useMutation,
@@ -22,7 +19,12 @@ import { QueryKeys } from "@/lib/data/types";
 export function useAttendances(festivalId: string) {
   return useQuery(
     QueryKeys.attendances(festivalId),
-    () => fetchAttendances(festivalId),
+    async () => {
+      const response = await apiClient.attendance.list({ festivalId });
+      // API returns { data, total, limit, offset }
+      // Return the data array, or empty array if undefined
+      return response.data || [];
+    },
     {
       enabled: !!festivalId,
       staleTime: 60 * 1000, // 1 minute - attendance changes frequently
@@ -52,19 +54,24 @@ export function useUserHighlights(festivalId?: string) {
 export function useDeleteAttendance() {
   const invalidateQueries = useInvalidateQueries();
 
-  return useMutation((attendanceId: string) => deleteAttendance(attendanceId), {
-    onSuccess: () => {
-      // Invalidate all attendances (will match any festival)
-      invalidateQueries(["attendances"]);
-      // Invalidate user stats
-      invalidateQueries(["user"]);
-      // Also invalidate leaderboards since attendance affects rankings
-      invalidateQueries(["leaderboard"]);
-      // Invalidate highlights as they depend on attendance
-      invalidateQueries(["highlights"]);
+  return useMutation(
+    async (attendanceId: string) => {
+      return await apiClient.attendance.delete(attendanceId);
     },
-    onError: () => {
-      // Error handling is done in the component via the mutation result
+    {
+      onSuccess: () => {
+        // Invalidate all attendances (will match any festival)
+        invalidateQueries(["attendances"]);
+        // Invalidate user stats
+        invalidateQueries(["user"]);
+        // Also invalidate leaderboards since attendance affects rankings
+        invalidateQueries(["leaderboard"]);
+        // Invalidate highlights as they depend on attendance
+        invalidateQueries(["highlights"]);
+      },
+      onError: () => {
+        // Error handling is done in the component via the mutation result
+      },
     },
-  });
+  );
 }
