@@ -7,3 +7,7 @@ export * from "./group.schema";
 export * from "./leaderboard.schema";
 export * from "./achievement.schema";
 export * from "./notification.schema";
+export * from "./wrapped.schema";
+export * from "./reservation.schema";
+export * from "./location.schema";
+export * from "./photo.schema";

@@ -6,3 +6,8 @@ export * from "./tent.repository";
 export * from "./group.repository";
 export * from "./leaderboard.repository";
 export * from "./achievement.repository";
+export * from "./wrapped.repository";
+export * from "./reservation.repository";
+export * from "./location.repository";
+export * from "./notification.repository";
+export * from "./photo.repository";
