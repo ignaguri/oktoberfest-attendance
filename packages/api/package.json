@@ -1,0 +1,28 @@
+{
+  "name": "@prostcounter/api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate-spec": "tsx scripts/generate-openapi.ts"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^0.18.0",
+    "@supabase/supabase-js": "^2.48.0",
+    "hono": "^4.6.0",
+    "zod": "^3.24.0",
+    "@prostcounter/shared": "workspace:*",
+    "@prostcounter/db": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0"
+  }
+}

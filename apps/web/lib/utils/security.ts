@@ -1,10 +1,10 @@
 import { logger } from "@/lib/logger";
 import * as Sentry from "@sentry/nextjs";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 /**
  * Sanitize HTML input to prevent XSS attacks
- * Uses DOMPurify library for robust HTML sanitization
+ * Uses sanitize-html library for robust HTML sanitization
  */
 export function sanitizeInput(input: string, maxLength: number = 1000): string {
   if (!input || typeof input !== "string") {
@@ -14,12 +14,11 @@ export function sanitizeInput(input: string, maxLength: number = 1000): string {
   // Limit length first
   let sanitized = input.slice(0, maxLength);
 
-  // Use DOMPurify to sanitize HTML and prevent XSS
+  // Use sanitize-html to strip all HTML tags (plain text only)
   // This removes dangerous HTML tags, attributes, and scripts
-  sanitized = DOMPurify.sanitize(sanitized, {
-    ALLOWED_TAGS: [], // Strip all HTML tags by default for plain text
-    ALLOWED_ATTR: [],
-    KEEP_CONTENT: true, // Keep text content but remove tags
+  sanitized = sanitizeHtml(sanitized, {
+    allowedTags: [], // Strip all HTML tags by default for plain text
+    allowedAttributes: {},
   });
 
   // Remove null bytes and control characters
@@ -43,10 +42,10 @@ export function sanitizeHTML(html: string, maxLength: number = 10000): string {
   // Limit length first
   let sanitized = html.slice(0, maxLength);
 
-  // Use DOMPurify with default settings to allow safe HTML
+  // Use sanitize-html with default settings to allow safe HTML
   // This preserves safe tags like <p>, <b>, <i>, <strong>, <em>, etc.
   // while removing dangerous scripts, event handlers, and unsafe attributes
-  sanitized = DOMPurify.sanitize(sanitized);
+  sanitized = sanitizeHtml(sanitized);
 
   return sanitized;
 }

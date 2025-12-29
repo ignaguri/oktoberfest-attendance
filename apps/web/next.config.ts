@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
     APP_VERSION: packageJson.version,
   },
   reactStrictMode: true,
+  // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
+  serverExternalPackages: [],
   async headers() {
     return [
       {
