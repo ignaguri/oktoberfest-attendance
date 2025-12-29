@@ -54,6 +54,17 @@ export const ConsumptionSchema = z.object({
 export type Consumption = z.infer<typeof ConsumptionSchema>;
 
 /**
+ * Schema for tent visit (simplified for attendance response)
+ */
+export const TentVisitSchema = z.object({
+  tent_id: z.string().uuid(),
+  visit_date: z.string().datetime(),
+  tentName: z.string().nullable(),
+});
+
+export type TentVisit = z.infer<typeof TentVisitSchema>;
+
+/**
  * Schema for attendance with computed totals
  */
 export const AttendanceWithTotalsSchema = z.object({
@@ -69,6 +80,8 @@ export const AttendanceWithTotalsSchema = z.object({
   totalSpentCents: z.number().int(),
   totalTipCents: z.number().int(),
   avgPriceCents: z.number().int(),
+  // Enriched tent visits for this attendance date
+  tentVisits: z.array(TentVisitSchema),
 });
 
 export type AttendanceWithTotals = z.infer<typeof AttendanceWithTotalsSchema>;

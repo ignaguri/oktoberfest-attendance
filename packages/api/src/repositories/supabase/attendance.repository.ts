@@ -104,8 +104,47 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError(`Failed to list attendances: ${error.message}`);
     }
 
+    // Fetch all tent visits for this festival
+    const { data: tentVisits, error: tentVisitsError } = await this.supabase
+      .from("tent_visits")
+      .select("tent_id, visit_date, tents(name)")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId);
+
+    if (tentVisitsError) {
+      throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
+    }
+
+    // Map attendances and enrich with tent visits
+    const enrichedData = data.map((item) => {
+      const attendance = this.mapToAttendanceWithTotals(item);
+      const attendanceDate = new Date(attendance.date);
+
+      // Filter tent visits for this attendance date
+      const visitsForDate = (tentVisits || [])
+        .filter((visit) => {
+          if (!visit.visit_date) return false;
+          const visitDate = new Date(visit.visit_date);
+          return (
+            visitDate.getFullYear() === attendanceDate.getFullYear() &&
+            visitDate.getMonth() === attendanceDate.getMonth() &&
+            visitDate.getDate() === attendanceDate.getDate()
+          );
+        })
+        .map((visit) => ({
+          tent_id: visit.tent_id,
+          visit_date: visit.visit_date!,
+          tentName: (visit.tents as any)?.name || null,
+        }));
+
+      return {
+        ...attendance,
+        tentVisits: visitsForDate,
+      };
+    });
+
     return {
-      data: data.map((item) => this.mapToAttendanceWithTotals(item)),
+      data: enrichedData,
       total: count || 0,
     };
   }
@@ -150,6 +189,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       totalSpentCents: data.total_spent_cents || 0,
       totalTipCents: data.total_tip_cents || 0,
       avgPriceCents: data.avg_price_cents || 0,
+      tentVisits: [], // Will be enriched in list() method
     };
   }
 }
