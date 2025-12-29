@@ -2,11 +2,9 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   GetPhotoUploadUrlQuerySchema,
   GetPhotoUploadUrlResponseSchema,
-  ConfirmPhotoUploadSchema,
   ConfirmPhotoUploadResponseSchema,
   GetPhotosQuerySchema,
   GetPhotosResponseSchema,
-  BeerPictureSchema,
 } from "@prostcounter/shared";
 import { PhotoService } from "../services/photo.service";
 import { SupabasePhotoRepository } from "../repositories/supabase";
