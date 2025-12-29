@@ -11,6 +11,10 @@ import groupRoute from "./routes/group.route";
 import leaderboardRoute from "./routes/leaderboard.route";
 import achievementRoute from "./routes/achievement.route";
 import notificationRoute from "./routes/notification.route";
+import wrappedRoute from "./routes/wrapped.route";
+import reservationRoute from "./routes/reservation.route";
+import locationRoute from "./routes/location.route";
+import photoRoute from "./routes/photo.route";
 
 // Create the main Hono app with OpenAPI support
 export const app = new OpenAPIHono();
@@ -38,6 +42,10 @@ apiV1.route("/", groupRoute);
 apiV1.route("/", leaderboardRoute);
 apiV1.route("/", achievementRoute);
 apiV1.route("/", notificationRoute);
+apiV1.route("/", wrappedRoute);
+apiV1.route("/", reservationRoute);
+apiV1.route("/", locationRoute);
+apiV1.route("/", photoRoute);
 
 // Mount v1 routes under /v1 prefix
 app.route("/v1", apiV1);
