@@ -9,6 +9,16 @@ import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 import { fetchWinningCriterias } from "@/lib/sharedActions";
 
+// Map winning criteria IDs to API enum values
+const CRITERIA_ID_TO_SORT_BY: Record<
+  number,
+  "days_attended" | "total_beers" | "avg_beers"
+> = {
+  1: "days_attended",
+  2: "total_beers",
+  3: "avg_beers",
+};
+
 /**
  * Hook to fetch global leaderboard data
  */
@@ -16,9 +26,10 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
   return useQuery(
     QueryKeys.globalLeaderboard(criteriaId, festivalId || ""),
     async () => {
+      const sortBy = CRITERIA_ID_TO_SORT_BY[criteriaId] || "total_beers";
       const response = await apiClient.leaderboard.global({
         festivalId,
-        sortBy: criteriaId.toString(),
+        sortBy,
       });
       return response.entries || [];
     },
