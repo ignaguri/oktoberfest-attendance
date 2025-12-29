@@ -295,7 +295,7 @@ importers:
   packages/api:
     dependencies:
       '@hono/zod-openapi':
-        specifier: ^0.18.0
+        specifier: ^0.18.4
         version: 0.18.4(hono@4.11.3)(zod@3.25.76)
       '@prostcounter/db':
         specifier: workspace:*
@@ -307,10 +307,10 @@ importers:
         specifier: ^2.48.0
         version: 2.89.0
       hono:
-        specifier: ^4.6.0
+        specifier: ^4.11.3
         version: 4.11.3
       zod:
-        specifier: ^3.24.0
+        specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
       '@types/node':
@@ -330,7 +330,7 @@ importers:
         version: 0.12.5
     devDependencies:
       openapi-typescript:
-        specifier: ^7.0.0
+        specifier: ^7.10.1
         version: 7.10.1(typescript@5.9.3)
       typescript:
         specifier: ^5.7.0
@@ -10824,7 +10824,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 22.19.3
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

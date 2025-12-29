@@ -1,0 +1,23 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ProstCounter API",
+    "version": "0.1.0",
+    "description": "API for ProstCounter - Oktoberfest attendance tracking"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3008/api",
+      "description": "Local development"
+    },
+    {
+      "url": "https://prostcounter.vercel.app/api",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "parameters": {}
+  },
+  "paths": {}
+}

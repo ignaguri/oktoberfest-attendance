@@ -10,13 +10,13 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "generate": "openapi-typescript ../../packages/api/openapi.json -o src/generated.ts"
+    "generate": "openapi-typescript ../api/openapi.json -o src/generated.ts"
   },
   "dependencies": {
     "openapi-fetch": "^0.12.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
-    "openapi-typescript": "^7.0.0"
+    "openapi-typescript": "^7.10.1",
+    "typescript": "^5.7.0"
   }
 }
