@@ -1,13 +1,12 @@
 /**
  * Business logic hooks for tent-related data
  *
- * This hook provides access to tent data through the TanStack Query abstraction layer
- * with proper caching, error handling, and background updates
+ * Migrated to use Hono API client instead of server actions
  */
 
+import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
-import { fetchTents } from "@/lib/sharedActions";
 import { useMemo } from "react";
 
 import type { Tables } from "@/lib/database.types";
@@ -34,11 +33,18 @@ export function useTents(festivalId?: string) {
     ? QueryKeys.tents(festivalId)
     : QueryKeys.allTents();
 
-  const query = useQuery(queryKey, () => fetchTents(festivalId), {
-    staleTime: 30 * 60 * 1000, // 30 minutes - tents don't change frequently
-    gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
-    enabled: true, // Always enabled since fetchTents handles undefined festivalId
-  });
+  const query = useQuery(
+    queryKey,
+    async () => {
+      const response = await apiClient.tents.list({ festivalId });
+      return response.tents || [];
+    },
+    {
+      staleTime: 30 * 60 * 1000, // 30 minutes - tents don't change frequently
+      gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
+      enabled: true, // Always enabled since API handles undefined festivalId
+    },
+  );
 
   // Transform raw tent data into grouped structure
   const groupedTents: TentGroup[] = useMemo(() => {

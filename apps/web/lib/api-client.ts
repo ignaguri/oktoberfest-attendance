@@ -173,5 +173,153 @@ export const apiClient = {
       }
       return response.json();
     },
+
+    /**
+     * Get group leaderboard
+     */
+    async leaderboard(groupId: string) {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/groups/${groupId}/leaderboard`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch group leaderboard: ${response.statusText}`,
+        );
+      }
+      return response.json();
+    },
+  },
+
+  /**
+   * Leaderboard API
+   */
+  leaderboard: {
+    /**
+     * Get global leaderboard
+     */
+    async global(query?: {
+      festivalId?: string;
+      sortBy?: string;
+      limit?: number;
+      offset?: number;
+    }) {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams();
+      if (query?.festivalId) params.set("festivalId", query.festivalId);
+      if (query?.sortBy) params.set("sortBy", query.sortBy);
+      if (query?.limit) params.set("limit", query.limit.toString());
+      if (query?.offset) params.set("offset", query.offset.toString());
+      const url = `${API_BASE_URL}/v1/leaderboard?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch global leaderboard: ${response.statusText}`,
+        );
+      }
+      return response.json();
+    },
+  },
+
+  /**
+   * Achievements API
+   */
+  achievements: {
+    /**
+     * Get user's achievements
+     */
+    async list(query?: { festivalId?: string; category?: string }) {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams();
+      if (query?.festivalId) params.set("festivalId", query.festivalId);
+      if (query?.category) params.set("category", query.category);
+      const url = `${API_BASE_URL}/v1/achievements?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch achievements: ${response.statusText}`);
+      }
+      return response.json();
+    },
+
+    /**
+     * Trigger achievement evaluation
+     */
+    async evaluate(festivalId?: string) {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/achievements/evaluate`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ festivalId }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || "Failed to evaluate achievements");
+      }
+      return response.json();
+    },
+  },
+
+  /**
+   * Tents API
+   */
+  tents: {
+    /**
+     * List tents
+     */
+    async list(query?: { festivalId?: string }) {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams();
+      if (query?.festivalId) params.set("festivalId", query.festivalId);
+      const url = `${API_BASE_URL}/v1/tents?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tents: ${response.statusText}`);
+      }
+      return response.json();
+    },
+  },
+
+  /**
+   * Festivals API
+   */
+  festivals: {
+    /**
+     * List festivals
+     */
+    async list(query?: { status?: string; isActive?: boolean }) {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams();
+      if (query?.status) params.set("status", query.status);
+      if (query?.isActive !== undefined)
+        params.set("isActive", query.isActive.toString());
+      const url = `${API_BASE_URL}/v1/festivals?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch festivals: ${response.statusText}`);
+      }
+      return response.json();
+    },
+
+    /**
+     * Get festival by ID
+     */
+    async get(festivalId: string) {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/festivals/${festivalId}`,
+        {
+          headers,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch festival: ${response.statusText}`);
+      }
+      return response.json();
+    },
   },
 };

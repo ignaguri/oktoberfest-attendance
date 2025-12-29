@@ -1,13 +1,10 @@
 /**
  * Business logic hooks for achievement data
  *
- * These hooks handle all achievement-related functionality
+ * Migrated to use Hono API client instead of server actions
  */
 
-import {
-  getUserAchievements,
-  getAvailableAchievements,
-} from "@/lib/actions/achievements";
+import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 
@@ -17,7 +14,10 @@ import { QueryKeys } from "@/lib/data/types";
 export function useUserAchievements(festivalId?: string) {
   return useQuery(
     QueryKeys.userAchievements("current", festivalId || ""),
-    () => getUserAchievements(festivalId!),
+    async () => {
+      const response = await apiClient.achievements.list({ festivalId });
+      return response.achievements || [];
+    },
     {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes - achievements can change based on activity
@@ -28,10 +28,19 @@ export function useUserAchievements(festivalId?: string) {
 
 /**
  * Hook to fetch all available achievements
+ * Note: API endpoint returns all achievements, filtering can be done on client
  */
 export function useAvailableAchievements() {
-  return useQuery(QueryKeys.achievements(), () => getAvailableAchievements(), {
-    staleTime: 60 * 60 * 1000, // 1 hour - available achievements rarely change
-    gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
-  });
+  return useQuery(
+    QueryKeys.achievements(),
+    async () => {
+      // Fetch without festival filter to get all available achievements
+      const response = await apiClient.achievements.list({});
+      return response.achievements || [];
+    },
+    {
+      staleTime: 60 * 60 * 1000, // 1 hour - available achievements rarely change
+      gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
+    },
+  );
 }

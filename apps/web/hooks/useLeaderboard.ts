@@ -1,12 +1,10 @@
 /**
  * Business logic hooks for leaderboard data
  *
- * These hooks provide a clean API for components to access leaderboard data
- * without knowing about the underlying state management implementation
+ * Migrated to use Hono API client instead of server actions
  */
 
-import { fetchLeaderboard } from "@/app/(private)/groups/actions";
-import { fetchGlobalLeaderboard } from "@/app/(private)/leaderboard/actions";
+import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 import { fetchWinningCriterias } from "@/lib/sharedActions";
@@ -17,7 +15,13 @@ import { fetchWinningCriterias } from "@/lib/sharedActions";
 export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
   return useQuery(
     QueryKeys.globalLeaderboard(criteriaId, festivalId || ""),
-    () => fetchGlobalLeaderboard(criteriaId, festivalId),
+    async () => {
+      const response = await apiClient.leaderboard.global({
+        festivalId,
+        sortBy: criteriaId.toString(),
+      });
+      return response.entries || [];
+    },
     {
       enabled: !!festivalId && criteriaId > 0,
       staleTime: 2 * 60 * 1000, // 2 minutes - leaderboard changes frequently
@@ -36,7 +40,10 @@ export function useGroupLeaderboard(
 ) {
   return useQuery(
     QueryKeys.groupLeaderboard(groupId, criteriaId, festivalId),
-    () => fetchLeaderboard(groupId), // Uses existing fetchLeaderboard function
+    async () => {
+      const response = await apiClient.groups.leaderboard(groupId);
+      return response.entries || [];
+    },
     {
       enabled: !!groupId && !!festivalId && criteriaId > 0,
       staleTime: 2 * 60 * 1000,
@@ -47,6 +54,8 @@ export function useGroupLeaderboard(
 
 /**
  * Hook to fetch winning criteria options
+ * Note: Still using server action as this is not yet available in API
+ * TODO: Migrate to API endpoint when available
  */
 export function useWinningCriterias() {
   return useQuery(QueryKeys.winningCriterias(), () => fetchWinningCriterias(), {

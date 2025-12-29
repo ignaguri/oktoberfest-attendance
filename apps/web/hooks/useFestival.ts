@@ -1,36 +1,46 @@
 /**
  * Business logic hooks for festival data
  *
- * These hooks provide access to festival data through the abstraction layer
- * They can eventually replace or complement the FestivalContext
+ * Migrated to use Hono API client instead of server actions
  */
 
+import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
-import {
-  fetchFestivals,
-  fetchActiveFestival,
-  fetchFestivalById,
-} from "@/lib/festivalActions";
 
 /**
  * Hook to fetch all festivals
  */
 export function useFestivals() {
-  return useQuery(QueryKeys.festivals(), () => fetchFestivals(), {
-    staleTime: 60 * 60 * 1000, // 1 hour - festivals don't change often
-    gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
-  });
+  return useQuery(
+    QueryKeys.festivals(),
+    async () => {
+      const response = await apiClient.festivals.list({});
+      return response.festivals || [];
+    },
+    {
+      staleTime: 60 * 60 * 1000, // 1 hour - festivals don't change often
+      gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
+    },
+  );
 }
 
 /**
  * Hook to fetch the active festival
  */
 export function useActiveFestival() {
-  return useQuery(QueryKeys.activeFestival(), () => fetchActiveFestival(), {
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    gcTime: 60 * 60 * 1000, // 1 hour cache
-  });
+  return useQuery(
+    QueryKeys.activeFestival(),
+    async () => {
+      const response = await apiClient.festivals.list({ isActive: true });
+      // Return first active festival or null
+      return response.festivals?.[0] || null;
+    },
+    {
+      staleTime: 30 * 60 * 1000, // 30 minutes
+      gcTime: 60 * 60 * 1000, // 1 hour cache
+    },
+  );
 }
 
 /**
@@ -39,7 +49,9 @@ export function useActiveFestival() {
 export function useFestivalById(festivalId: string) {
   return useQuery(
     QueryKeys.festival(festivalId),
-    () => fetchFestivalById(festivalId),
+    async () => {
+      return await apiClient.festivals.get(festivalId);
+    },
     {
       enabled: !!festivalId,
       staleTime: 60 * 60 * 1000, // 1 hour

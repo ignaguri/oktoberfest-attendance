@@ -25,6 +25,8 @@ import { cn } from "@/lib/utils";
 import { Crown } from "lucide-react";
 import { Link } from "next-view-transitions";
 
+import type { LeaderboardEntry } from "@prostcounter/shared";
+
 // Configurable constant for easy modification
 const LEADERBOARD_PREVIEW_LIMIT = 3;
 
@@ -96,9 +98,9 @@ const LeaderboardPreview = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {topUsers.map((user, index) => (
+                {topUsers.map((user: LeaderboardEntry, index: number) => (
                   <TableRow
-                    key={user.user_id}
+                    key={user.userId}
                     className={cn(
                       index % 2 === 0 ? "bg-white" : "bg-gray-50",
                       index === 0 && "bg-yellow-50", // Highlight first place
@@ -112,33 +114,36 @@ const LeaderboardPreview = () => {
                     <TableCell className="w-full max-w-[min(200px,35vw)]">
                       <ProfilePreview
                         username={user.username || "Unknown"}
-                        fullName={user.full_name}
-                        avatarUrl={user.avatar_url}
+                        fullName={user.fullName}
+                        avatarUrl={user.avatarUrl}
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           <Avatar
-                            url={user.avatar_url}
+                            url={user.avatarUrl}
                             fallback={{
                               username: user.username,
-                              full_name: user.full_name,
+                              full_name: user.fullName,
                               email: "no.name@email.com",
                             }}
                             size="small"
                           />
                           <span className="font-medium truncate">
-                            {getDisplayName(user)}
+                            {getDisplayName({
+                              username: user.username,
+                              full_name: user.fullName,
+                            })}
                           </span>
                         </div>
                       </ProfilePreview>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {user.days_attended}
+                      {user.daysAttended}
                     </TableCell>
                     <TableCell className="font-medium">
-                      {user.total_beers} 🍺
+                      {user.totalBeers} 🍺
                     </TableCell>
                     <TableCell className="font-medium">
-                      {user.avg_beers?.toFixed(2)}
+                      {user.avgBeers?.toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
