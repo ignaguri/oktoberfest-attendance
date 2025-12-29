@@ -7,7 +7,12 @@ import { DatabaseError } from "../../middleware/error";
 export class SupabaseTentRepository implements ITentRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
-  async listByFestival(festivalId: string): Promise<FestivalTent[]> {
+  async listByFestival(festivalId?: string): Promise<FestivalTent[]> {
+    // If no festivalId provided, return empty array
+    if (!festivalId) {
+      return [];
+    }
+
     const { data, error } = await this.supabase
       .from("festival_tents")
       .select(
@@ -15,15 +20,10 @@ export class SupabaseTentRepository implements ITentRepository {
         festival_id,
         tent_id,
         beer_price,
-        is_open,
         tents (
           id,
           name,
-          description,
-          capacity,
-          website,
-          created_at,
-          updated_at
+          category
         )
       `
       )
@@ -48,15 +48,10 @@ export class SupabaseTentRepository implements ITentRepository {
         festival_id,
         tent_id,
         beer_price,
-        is_open,
         tents (
           id,
           name,
-          description,
-          capacity,
-          website,
-          created_at,
-          updated_at
+          category
         )
       `
       )
@@ -80,15 +75,10 @@ export class SupabaseTentRepository implements ITentRepository {
       festivalId: data.festival_id,
       tentId: data.tent_id,
       beerPrice: data.beer_price,
-      isOpen: data.is_open,
       tent: {
         id: tent.id,
         name: tent.name,
-        description: tent.description,
-        capacity: tent.capacity,
-        website: tent.website,
-        createdAt: tent.created_at,
-        updatedAt: tent.updated_at,
+        category: tent.category,
       },
     };
   }

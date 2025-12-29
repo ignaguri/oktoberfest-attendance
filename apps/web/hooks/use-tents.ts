@@ -9,8 +9,6 @@ import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 import { useMemo } from "react";
 
-import type { Tables } from "@/lib/database.types";
-
 export interface TentOption {
   value: string;
   label: string;
@@ -37,7 +35,7 @@ export function useTents(festivalId?: string) {
     queryKey,
     async () => {
       const response = await apiClient.tents.list({ festivalId });
-      return response.tents || [];
+      return response.data || [];
     },
     {
       staleTime: 30 * 60 * 1000, // 30 minutes - tents don't change frequently
@@ -50,7 +48,9 @@ export function useTents(festivalId?: string) {
   const groupedTents: TentGroup[] = useMemo(() => {
     if (!query.data) return [];
 
-    return query.data.reduce((acc: TentGroup[], tent: Tables<"tents">) => {
+    return query.data.reduce((acc: TentGroup[], festivalTent: any) => {
+      // Extract tent data from FestivalTent structure
+      const tent = festivalTent.tent || festivalTent;
       const category = tent.category
         ? tent.category.charAt(0).toUpperCase() + tent.category.slice(1)
         : "Uncategorized";
@@ -95,7 +95,11 @@ export function useTentById(tentId: string, festivalId?: string) {
   const { rawTents, isLoading, error } = useTents(festivalId);
 
   const tent = useMemo(() => {
-    return rawTents.find((t: Tables<"tents">) => t.id === tentId) || null;
+    const festivalTent: any = rawTents.find((ft: any) => {
+      const tent = ft.tent || ft;
+      return tent.id === tentId;
+    });
+    return festivalTent?.tent || festivalTent || null;
   }, [rawTents, tentId]);
 
   return {
@@ -113,10 +117,10 @@ export function useTentsByCategory(category: string, festivalId?: string) {
   const { rawTents, isLoading, error } = useTents(festivalId);
 
   const tents = useMemo(() => {
-    return rawTents.filter(
-      (t: Tables<"tents">) =>
-        t.category?.toLowerCase() === category.toLowerCase(),
-    );
+    return rawTents.filter((ft: any) => {
+      const tent = ft.tent || ft;
+      return tent.category?.toLowerCase() === category.toLowerCase();
+    });
   }, [rawTents, category]);
 
   return {

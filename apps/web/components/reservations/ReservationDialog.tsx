@@ -30,7 +30,7 @@ interface ReservationDialogProps {
 }
 
 export function ReservationDialog({ festivalId }: ReservationDialogProps) {
-  const { tents, isLoading: tentsLoading } = useTents();
+  const { tents, isLoading: tentsLoading } = useTents(festivalId);
   const searchParams = useSearchParams();
   const router = useRouter();
   const open =

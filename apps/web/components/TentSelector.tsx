@@ -2,6 +2,7 @@
 
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { MultiSelect } from "@/components/Select/MultiSelect";
+import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 
 interface TentSelectorProps {
@@ -15,7 +16,8 @@ export default function TentSelector({
   onTentsChange,
   disabled = false,
 }: TentSelectorProps) {
-  const { tents, isLoading, error } = useTents();
+  const { currentFestival } = useFestival();
+  const { tents, isLoading, error } = useTents(currentFestival?.id);
 
   const handleSelect = (option: { value: string; label: string }) => {
     onTentsChange([...selectedTents, option.value]);

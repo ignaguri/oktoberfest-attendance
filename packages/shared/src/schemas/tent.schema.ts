@@ -6,11 +6,7 @@ import { z } from "zod";
 export const TentSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  description: z.string().nullable(),
-  capacity: z.number().int().nullable(),
-  website: z.string().url().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  category: z.string().nullable(),
 });
 
 export type Tent = z.infer<typeof TentSchema>;
@@ -21,8 +17,7 @@ export type Tent = z.infer<typeof TentSchema>;
 export const FestivalTentSchema = z.object({
   festivalId: z.string().uuid(),
   tentId: z.string().uuid(),
-  beerPrice: z.number().int().nullable(),
-  isOpen: z.boolean(),
+  beerPrice: z.number().nullable(),
   tent: TentSchema,
 });
 
@@ -33,7 +28,7 @@ export type FestivalTent = z.infer<typeof FestivalTentSchema>;
  * GET /api/v1/tents
  */
 export const ListTentsQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.string().uuid("Invalid festival ID").optional(),
 });
 
 export type ListTentsQuery = z.infer<typeof ListTentsQuerySchema>;

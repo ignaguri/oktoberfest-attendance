@@ -53,7 +53,11 @@ export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
 }: QuickAttendanceRegistrationFormProps) => {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
-  const { tents, isLoading: tentsLoading, error: tentsError } = useTents();
+  const {
+    tents,
+    isLoading: tentsLoading,
+    error: tentsError,
+  } = useTents(currentFestival?.id);
   const { isExploding, triggerConfetti } = useConfetti();
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
     null,
