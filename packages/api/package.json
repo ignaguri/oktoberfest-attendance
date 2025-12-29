@@ -13,12 +13,12 @@
     "generate-spec": "tsx src/scripts/generate-openapi.ts"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^0.18.4",
+    "@hono/zod-openapi": "^1.2.0",
     "@prostcounter/db": "workspace:*",
     "@prostcounter/shared": "workspace:*",
     "@supabase/supabase-js": "^2.48.0",
     "hono": "^4.11.3",
-    "zod": "^3.25.76"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

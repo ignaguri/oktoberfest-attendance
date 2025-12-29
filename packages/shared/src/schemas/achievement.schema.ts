@@ -37,7 +37,7 @@ export const AchievementSchema = z.object({
   icon: z.string(),
   points: z.number().int(),
   rarity: AchievementRaritySchema,
-  condition: z.record(z.unknown()),
+  condition: z.record(z.string(), z.unknown()), // Zod v4: requires key and value schema
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

@@ -59,7 +59,11 @@ export const tentPriceSchema = z.object({
     .nullable(),
 });
 
-export const addTentToFestivalSchema = tentSchema.merge(tentPriceSchema);
+// Zod v4: Use object destructuring instead of deprecated .merge()
+export const addTentToFestivalSchema = z.object({
+  ...tentSchema.shape,
+  ...tentPriceSchema.shape,
+});
 
 export const copyTentsSchema = z.object({
   sourceFestivalId: z.string().min(1, "Source festival is required"),
