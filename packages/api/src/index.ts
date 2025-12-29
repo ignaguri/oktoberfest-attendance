@@ -10,6 +10,7 @@ import tentRoute from "./routes/tent.route";
 import groupRoute from "./routes/group.route";
 import leaderboardRoute from "./routes/leaderboard.route";
 import achievementRoute from "./routes/achievement.route";
+import notificationRoute from "./routes/notification.route";
 
 // Create the main Hono app with OpenAPI support
 export const app = new OpenAPIHono();
@@ -36,6 +37,7 @@ apiV1.route("/", tentRoute);
 apiV1.route("/", groupRoute);
 apiV1.route("/", leaderboardRoute);
 apiV1.route("/", achievementRoute);
+apiV1.route("/", notificationRoute);
 
 // Mount v1 routes under /v1 prefix
 app.route("/v1", apiV1);

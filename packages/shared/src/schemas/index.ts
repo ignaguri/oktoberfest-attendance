@@ -6,3 +6,4 @@ export * from "./tent.schema";
 export * from "./group.schema";
 export * from "./leaderboard.schema";
 export * from "./achievement.schema";
+export * from "./notification.schema";
