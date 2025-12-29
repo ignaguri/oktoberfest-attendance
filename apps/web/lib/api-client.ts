@@ -1,5 +1,31 @@
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
+import type {
+  FestivalTent,
+  ListAttendancesResponse,
+  DeleteAttendanceResponse,
+  ListGroupsResponse,
+  Group,
+  GroupActionResponse,
+  LeaderboardResponse,
+  ListAchievementsResponse,
+  EvaluateAchievementsResponse,
+  ListFestivalsResponse,
+  GetFestivalResponse,
+} from "@prostcounter/shared/schemas";
+
+/**
+ * API response wrapper type
+ */
+export interface ApiResponse<T> {
+  data: T;
+  meta?: {
+    total?: number;
+    limit?: number;
+    offset?: number;
+  };
+}
+
 /**
  * Get auth headers for API requests
  */
@@ -19,6 +45,19 @@ async function getAuthHeaders(): Promise<HeadersInit> {
   return {
     "Content-Type": "application/json",
   };
+}
+
+/**
+ * Parse JSON response with error handling and type safety
+ */
+async function parseJsonResponse<T>(response: Response): Promise<T> {
+  try {
+    return await response.json();
+  } catch (error) {
+    throw new Error(
+      `Failed to parse JSON response: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
 }
 
 /**
@@ -43,7 +82,7 @@ export const apiClient = {
       festivalId?: string;
       limit?: number;
       offset?: number;
-    }) {
+    }): Promise<ListAttendancesResponse> {
       const headers = await getAuthHeaders();
       const params = new URLSearchParams();
       if (query?.festivalId) params.set("festivalId", query.festivalId);
@@ -56,13 +95,13 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch attendances: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<ListAttendancesResponse>(response);
     },
 
     /**
      * Delete an attendance record
      */
-    async delete(attendanceId: string) {
+    async delete(attendanceId: string): Promise<DeleteAttendanceResponse> {
       const headers = await getAuthHeaders();
       const response = await fetch(
         `${API_BASE_URL}/v1/attendance/${attendanceId}`,
@@ -72,10 +111,12 @@ export const apiClient = {
         },
       );
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
         throw new Error(error.message || "Failed to delete attendance");
       }
-      return response.json();
+      return parseJsonResponse<DeleteAttendanceResponse>(response);
     },
   },
 
@@ -86,7 +127,7 @@ export const apiClient = {
     /**
      * List user's groups
      */
-    async list(query?: { festivalId?: string }) {
+    async list(query?: { festivalId?: string }): Promise<ListGroupsResponse> {
       const headers = await getAuthHeaders();
       const params = new URLSearchParams(
         query?.festivalId ? { festivalId: query.festivalId } : {},
@@ -97,13 +138,13 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch groups: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<ListGroupsResponse>(response);
     },
 
     /**
      * Get group details
      */
-    async get(groupId: string) {
+    async get(groupId: string): Promise<ApiResponse<Group>> {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/v1/groups/${groupId}`, {
         headers,
@@ -111,7 +152,7 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch group: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<ApiResponse<Group>>(response);
     },
 
     /**
@@ -121,7 +162,7 @@ export const apiClient = {
       name: string;
       festivalId: string;
       winningCriteria?: string;
-    }) {
+    }): Promise<ApiResponse<Group>> {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/v1/groups`, {
         method: "POST",
@@ -129,16 +170,23 @@ export const apiClient = {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
         throw new Error(error.message || "Failed to create group");
       }
-      return response.json();
+      // API returns Group directly, wrap it in ApiResponse format for consistency
+      const group = await parseJsonResponse<Group>(response);
+      return { data: group };
     },
 
     /**
      * Join a group
      */
-    async join(groupId: string, inviteToken?: string) {
+    async join(
+      groupId: string,
+      inviteToken?: string,
+    ): Promise<GroupActionResponse> {
       const headers = await getAuthHeaders();
       const response = await fetch(
         `${API_BASE_URL}/v1/groups/${groupId}/join`,
@@ -149,16 +197,18 @@ export const apiClient = {
         },
       );
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
         throw new Error(error.message || "Failed to join group");
       }
-      return response.json();
+      return parseJsonResponse<GroupActionResponse>(response);
     },
 
     /**
      * Leave a group
      */
-    async leave(groupId: string) {
+    async leave(groupId: string): Promise<GroupActionResponse> {
       const headers = await getAuthHeaders();
       const response = await fetch(
         `${API_BASE_URL}/v1/groups/${groupId}/leave`,
@@ -168,16 +218,18 @@ export const apiClient = {
         },
       );
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
         throw new Error(error.message || "Failed to leave group");
       }
-      return response.json();
+      return parseJsonResponse<GroupActionResponse>(response);
     },
 
     /**
      * Get group leaderboard
      */
-    async leaderboard(groupId: string) {
+    async leaderboard(groupId: string): Promise<LeaderboardResponse> {
       const headers = await getAuthHeaders();
       const response = await fetch(
         `${API_BASE_URL}/v1/groups/${groupId}/leaderboard`,
@@ -188,7 +240,7 @@ export const apiClient = {
           `Failed to fetch group leaderboard: ${response.statusText}`,
         );
       }
-      return response.json();
+      return parseJsonResponse<LeaderboardResponse>(response);
     },
   },
 
@@ -204,7 +256,7 @@ export const apiClient = {
       sortBy?: string;
       limit?: number;
       offset?: number;
-    }) {
+    }): Promise<LeaderboardResponse> {
       const headers = await getAuthHeaders();
       const params = new URLSearchParams();
       if (query?.festivalId) params.set("festivalId", query.festivalId);
@@ -219,7 +271,7 @@ export const apiClient = {
           `Failed to fetch global leaderboard: ${response.statusText}`,
         );
       }
-      return response.json();
+      return parseJsonResponse<LeaderboardResponse>(response);
     },
   },
 
@@ -230,7 +282,10 @@ export const apiClient = {
     /**
      * Get user's achievements
      */
-    async list(query?: { festivalId?: string; category?: string }) {
+    async list(query?: {
+      festivalId?: string;
+      category?: string;
+    }): Promise<ListAchievementsResponse> {
       const headers = await getAuthHeaders();
       const params = new URLSearchParams();
       if (query?.festivalId) params.set("festivalId", query.festivalId);
@@ -241,13 +296,13 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch achievements: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<ListAchievementsResponse>(response);
     },
 
     /**
      * Trigger achievement evaluation
      */
-    async evaluate(festivalId?: string) {
+    async evaluate(festivalId?: string): Promise<EvaluateAchievementsResponse> {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/v1/achievements/evaluate`, {
         method: "POST",
@@ -255,10 +310,12 @@ export const apiClient = {
         body: JSON.stringify({ festivalId }),
       });
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
         throw new Error(error.message || "Failed to evaluate achievements");
       }
-      return response.json();
+      return parseJsonResponse<EvaluateAchievementsResponse>(response);
     },
   },
 
@@ -269,7 +326,9 @@ export const apiClient = {
     /**
      * List tents
      */
-    async list(query?: { festivalId?: string }) {
+    async list(query?: {
+      festivalId?: string;
+    }): Promise<ApiResponse<FestivalTent[]>> {
       const headers = await getAuthHeaders();
       const params = new URLSearchParams();
       if (query?.festivalId) params.set("festivalId", query.festivalId);
@@ -279,7 +338,7 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch tents: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<ApiResponse<FestivalTent[]>>(response);
     },
   },
 
@@ -290,7 +349,10 @@ export const apiClient = {
     /**
      * List festivals
      */
-    async list(query?: { status?: string; isActive?: boolean }) {
+    async list(query?: {
+      status?: string;
+      isActive?: boolean;
+    }): Promise<ListFestivalsResponse> {
       const headers = await getAuthHeaders();
       const params = new URLSearchParams();
       if (query?.status) params.set("status", query.status);
@@ -302,13 +364,13 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch festivals: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<ListFestivalsResponse>(response);
     },
 
     /**
      * Get festival by ID
      */
-    async get(festivalId: string) {
+    async get(festivalId: string): Promise<GetFestivalResponse> {
       const headers = await getAuthHeaders();
       const response = await fetch(
         `${API_BASE_URL}/v1/festivals/${festivalId}`,
@@ -319,7 +381,7 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch festival: ${response.statusText}`);
       }
-      return response.json();
+      return parseJsonResponse<GetFestivalResponse>(response);
     },
   },
 };

@@ -84,13 +84,13 @@ const PersonalAttendanceTable = ({
       cell: ({ row }) => formatDate(new Date(row.original.date), "dd/MM/yyyy"),
     },
     {
-      accessorKey: "beer_count",
+      accessorKey: "beerCount",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Amount" />
       ),
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <span>{row.original.beer_count}</span>
+          <span>{row.original.beerCount}</span>
           <Beer size={24} />
         </div>
       ),

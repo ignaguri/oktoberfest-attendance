@@ -31,7 +31,7 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
         festivalId,
         sortBy,
       });
-      return response.entries || [];
+      return response.data || [];
     },
     {
       enabled: !!festivalId && criteriaId > 0,
@@ -53,7 +53,7 @@ export function useGroupLeaderboard(
     QueryKeys.groupLeaderboard(groupId, criteriaId, festivalId),
     async () => {
       const response = await apiClient.groups.leaderboard(groupId);
-      return response.entries || [];
+      return response.data || [];
     },
     {
       enabled: !!groupId && !!festivalId && criteriaId > 0,

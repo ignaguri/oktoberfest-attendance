@@ -6,7 +6,7 @@ import { useFestival } from "@/contexts/FestivalContext";
 import { useUserGroups } from "@/lib/data";
 import { Link } from "next-view-transitions";
 
-import type { Tables } from "@/lib/database.types";
+import type { GroupWithMembers } from "@prostcounter/shared/schemas";
 
 interface MyGroupsProps {
   showGroupsLink?: boolean;
@@ -19,7 +19,7 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
     loading,
     error,
   } = useUserGroups(currentFestival?.id) as {
-    data: Tables<"groups">[];
+    data: GroupWithMembers[];
     loading: boolean;
     error: Error | null;
   };

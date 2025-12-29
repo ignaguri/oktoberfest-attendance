@@ -16,7 +16,7 @@ export function useUserAchievements(festivalId?: string) {
     QueryKeys.userAchievements("current", festivalId || ""),
     async () => {
       const response = await apiClient.achievements.list({ festivalId });
-      return response.achievements || [];
+      return response.data || [];
     },
     {
       enabled: !!festivalId,
@@ -36,7 +36,7 @@ export function useAvailableAchievements() {
     async () => {
       // Fetch without festival filter to get all available achievements
       const response = await apiClient.achievements.list({});
-      return response.achievements || [];
+      return response.data || [];
     },
     {
       staleTime: 60 * 60 * 1000, // 1 hour - available achievements rarely change

@@ -66,13 +66,13 @@ export function useCreateGroup() {
       festivalId: string;
     }) => {
       // Transform old schema to new API schema
-      const group = await apiClient.groups.create({
+      const response = await apiClient.groups.create({
         name: formData.groupName,
         festivalId: formData.festivalId,
         winningCriteria: "total_beers", // Default value since form doesn't provide it
       });
 
-      return group.id; // Return just the ID to match old behavior
+      return response.data.id; // Return just the ID to match old behavior
     },
     {
       onSuccess: (data, variables) => {
@@ -187,8 +187,8 @@ export function useGroupName(groupId: string) {
     QueryKeys.group(groupId),
     async () => {
       try {
-        const group = await apiClient.groups.get(groupId);
-        return group.name || "Unknown Group";
+        const response = await apiClient.groups.get(groupId);
+        return response.data.name || "Unknown Group";
       } catch {
         return "Unknown Group";
       }

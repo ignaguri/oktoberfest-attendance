@@ -16,7 +16,7 @@ export function useFestivals() {
     QueryKeys.festivals(),
     async () => {
       const response = await apiClient.festivals.list({});
-      return response.festivals || [];
+      return response.data || [];
     },
     {
       staleTime: 60 * 60 * 1000, // 1 hour - festivals don't change often
@@ -34,7 +34,7 @@ export function useActiveFestival() {
     async () => {
       const response = await apiClient.festivals.list({ isActive: true });
       // Return first active festival or null
-      return response.festivals?.[0] || null;
+      return response.data?.[0] || null;
     },
     {
       staleTime: 30 * 60 * 1000, // 30 minutes

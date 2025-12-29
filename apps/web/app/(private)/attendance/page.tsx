@@ -8,20 +8,15 @@ import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback, startTransition } from "react";
 import { toast } from "sonner";
 
-import type { Tables } from "@/lib/database.types";
+import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
 import { checkInFromReservation } from "./actions";
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
 import { getReservationForCheckIn } from "../calendar/actions";
 
-type TentVisit = Tables<"tent_visits"> & {
-  tentName: string | undefined;
-};
-
-export type AttendanceWithTentVisits = Tables<"attendances"> & {
-  tentVisits: TentVisit[];
-};
+// Re-export API type for component use
+export type AttendanceWithTentVisits = AttendanceWithTotals;
 
 export default function AttendancePage() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
