@@ -161,6 +161,9 @@ importers:
       framer-motion:
         specifier: ^12.23.26
         version: 12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      hono:
+        specifier: ^4.11.3
+        version: 4.11.3
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
