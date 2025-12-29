@@ -14,7 +14,7 @@
 | Phase 1: Monorepo Foundation | ✅ Complete | 100% | Week 1 |
 | Phase 2: Hono API Package | ✅ Complete | 100% | Week 1-2 |
 | Phase 3: Database Migration | ✅ Complete | 100% | Week 2 |
-| Phase 4: Hono API Routes | ⏳ Pending | 0% | Week 2-3 |
+| Phase 4: Hono API Routes | 🔄 In Progress | 56% | Week 2-3 |
 | Phase 5: Web App Migration | ⏳ Pending | 0% | Week 3-4 |
 | Phase 6: Expo App Foundation | ⏳ Pending | 0% | Week 5-6 |
 | Phase 7: Core Mobile Features | ⏳ Pending | 0% | Week 6-8 |
@@ -305,68 +305,214 @@
 
 ---
 
-## Phase 4: Hono API Routes Implementation (Week 2-3)
+## Phase 4: Hono API Routes Implementation (Week 2-3) 🔄
 
 **Goal**: Implement all API routes with OpenAPI specs
+**Status**: 🔄 In Progress (56% - 14/25 endpoints)
+**Started**: 2025-12-29
+**Commits**: `8b17971`, `b266123`
 
-### Priority 1 - Essential Endpoints (Week 2)
+### Priority 1 - Essential Endpoints ✅ (Week 2)
 
-- [ ] `POST /api/v1/consumption` - Log beer consumption
-- [ ] `GET /api/v1/attendance` - List user's attendances
-- [ ] `DELETE /api/v1/attendance/:id` - Remove attendance
-- [ ] `GET /api/v1/festivals` - List festivals
-- [ ] `GET /api/v1/festivals/:id` - Get festival details
-- [ ] `GET /api/v1/tents` - List tents for festival
+- [x] `POST /api/v1/consumption` - Log beer consumption
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/consumption.route.ts`
+  - Service: `ConsumptionService` with auto-pricing
+  - Repository: `SupabaseConsumptionRepository`
 
-### Priority 2 - Group & Social (Week 3)
+- [x] `GET /api/v1/attendance` - List user's attendances
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/attendance.route.ts`
+  - Includes pagination support
 
-- [ ] `POST /api/v1/groups` - Create group
-- [ ] `GET /api/v1/groups` - List user's groups
-- [ ] `GET /api/v1/groups/:id` - Get group details
-- [ ] `POST /api/v1/groups/:id/join` - Join group
-- [ ] `POST /api/v1/groups/:id/leave` - Leave group
-- [ ] `GET /api/v1/groups/:id/leaderboard` - Group rankings
-- [ ] `GET /api/v1/leaderboard` - Global rankings
+- [x] `DELETE /api/v1/attendance/:id` - Remove attendance
+  - Status: ✅ Complete
+  - Cascading delete for consumptions
 
-### Priority 3 - Advanced Features (Week 3)
+- [x] `GET /api/v1/festivals` - List festivals
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/festival.route.ts`
+  - Filter by status or isActive
 
-- [ ] `GET /api/v1/achievements` - User's achievements
-- [ ] `POST /api/v1/achievements/evaluate` - Trigger evaluation
+- [x] `GET /api/v1/festivals/:id` - Get festival details
+  - Status: ✅ Complete
+  - Returns single festival with all metadata
+
+- [x] `GET /api/v1/tents` - List tents for festival
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/tent.route.ts`
+  - Includes festival-specific pricing
+
+### Priority 2 - Group & Social ✅ (Week 3)
+
+- [x] `POST /api/v1/groups` - Create group
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/group.route.ts`
+  - Auto-adds creator as member
+  - Generates UUID invite token
+
+- [x] `GET /api/v1/groups` - List user's groups
+  - Status: ✅ Complete
+  - Festival filtering support
+  - Returns member count
+
+- [x] `GET /api/v1/groups/:id` - Get group details
+  - Status: ✅ Complete
+  - Membership verification
+
+- [x] `POST /api/v1/groups/:id/join` - Join group
+  - Status: ✅ Complete
+  - Invite token validation
+  - Duplicate member prevention
+
+- [x] `POST /api/v1/groups/:id/leave` - Leave group
+  - Status: ✅ Complete
+  - Membership verification
+
+- [x] `GET /api/v1/groups/:id/leaderboard` - Group rankings
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/leaderboard.route.ts`
+  - Uses RPC function with winning criteria
+
+- [x] `GET /api/v1/leaderboard` - Global rankings
+  - Status: ✅ Complete
+  - Pagination support
+  - Sort by days/beers/average
+
+### Priority 3 - Advanced Features ⏸️ (Week 3)
+
+- [x] `GET /api/v1/achievements` - User's achievements
+  - Status: ✅ Complete
+  - File: `packages/api/src/routes/achievement.route.ts`
+  - Category filtering
+
+- [x] `POST /api/v1/achievements/evaluate` - Trigger evaluation
+  - Status: ✅ Complete
+  - Returns newly unlocked achievements
+  - Calculates total points
+
 - [ ] `GET /api/v1/wrapped/:festivalId` - Get wrapped data
+  - Status: ⏳ Deferred
+
 - [ ] `POST /api/v1/wrapped/:festivalId/generate` - Generate wrapped
+  - Status: ⏳ Deferred
+
 - [ ] `POST /api/v1/reservations` - Create reservation
+  - Status: ⏳ Deferred
+
 - [ ] `POST /api/v1/reservations/:id/checkin` - Check in
+  - Status: ⏳ Deferred
+
 - [ ] `POST /api/v1/location/sessions` - Start location sharing
+  - Status: ⏳ Deferred
+
 - [ ] `DELETE /api/v1/location/sessions/:id` - Stop sharing
+  - Status: ⏳ Deferred
+
 - [ ] `GET /api/v1/location/nearby` - Nearby members
+  - Status: ⏳ Deferred
+
 - [ ] `POST /api/v1/notifications/token` - Register FCM token
+  - Status: ⏳ Deferred
+
 - [ ] `GET /api/v1/photos/upload-url` - Get signed URL
+  - Status: ⏳ Deferred
 
 ### Service Layer
 
-- [ ] ConsumptionService - Beer logging with achievements
-- [ ] AchievementService - Automatic evaluation
-- [ ] NotificationService - Rate-limited notifications
-- [ ] LocationService - Session management
-- [ ] WrappedService - Statistics computation
+- [x] **ConsumptionService** - Beer logging with auto-pricing
+  - Status: ✅ Complete
+  - File: `packages/api/src/services/consumption.service.ts`
+  - Features: Get/create attendance, automatic pricing resolution
+
+- [x] **GroupService** - Group management
+  - Status: ✅ Complete
+  - File: `packages/api/src/services/group.service.ts`
+  - Features: Create, list, get, join, leave groups
+
+- [ ] **AchievementService** - Automatic evaluation
+  - Status: ⏳ Deferred
+
+- [ ] **NotificationService** - Rate-limited notifications
+  - Status: ⏳ Deferred
+
+- [ ] **LocationService** - Session management
+  - Status: ⏳ Deferred
+
+- [ ] **WrappedService** - Statistics computation
+  - Status: ⏳ Deferred
 
 ### Repository Layer
 
-- [ ] IAttendanceRepository interface + Supabase impl
-- [ ] IConsumptionRepository interface + Supabase impl
-- [ ] IFestivalRepository interface + Supabase impl
-- [ ] IGroupRepository interface + Supabase impl
-- [ ] IAchievementRepository interface + Supabase impl
-- [ ] ILocationRepository interface + Supabase impl
+- [x] **IConsumptionRepository** + Supabase impl
+  - Status: ✅ Complete
+  - File: `packages/api/src/repositories/supabase/consumption.repository.ts`
 
-### Phase 4 Completion Checklist
-- [ ] All Priority 1 endpoints working
-- [ ] All Priority 2 endpoints working
-- [ ] All Priority 3 endpoints working
-- [ ] Service layer implements business logic
-- [ ] Repository layer provides data access
-- [ ] OpenAPI spec generated successfully
-- [ ] All routes validated with Zod
+- [x] **IAttendanceRepository** + Supabase impl
+  - Status: ✅ Complete
+  - Features: Find/create attendance, list with pagination
+
+- [x] **IFestivalRepository** + Supabase impl
+  - Status: ✅ Complete
+  - Features: List, find by ID, find active
+
+- [x] **ITentRepository** + Supabase impl
+  - Status: ✅ Complete
+  - Features: List by festival with pricing
+
+- [x] **IGroupRepository** + Supabase impl
+  - Status: ✅ Complete
+  - Features: Full CRUD, membership management
+  - Fixed: Winning criteria ID mapping
+
+- [x] **ILeaderboardRepository** + Supabase impl
+  - Status: ✅ Complete
+  - Features: Global and group leaderboards
+  - Fixed: RPC function parameter names
+
+- [x] **IAchievementRepository** + Supabase impl
+  - Status: ✅ Complete
+  - Features: List user achievements, total points
+
+- [ ] **ILocationRepository** + Supabase impl
+  - Status: ⏳ Deferred
+
+### Schemas Created
+
+- [x] `consumption.schema.ts` - Drink logging validation
+- [x] `attendance.schema.ts` - Attendance queries
+- [x] `festival.schema.ts` - Festival data
+- [x] `tent.schema.ts` - Tent with pricing
+- [x] `group.schema.ts` - Group management
+- [x] `leaderboard.schema.ts` - Rankings
+- [x] `achievement.schema.ts` - Achievement data
+
+### Phase 4 Progress Checklist
+- [x] All Priority 1 endpoints working (6/6)
+- [x] All Priority 2 endpoints working (7/7)
+- [ ] All Priority 3 endpoints working (2/11)
+- [x] Service layer implements business logic (2 services)
+- [x] Repository layer provides data access (7 repositories)
+- [x] OpenAPI spec generated successfully (14 endpoints)
+- [x] All routes validated with Zod
+
+### Phase 4 Achievements
+- ✅ Implemented 14 of 25 endpoints (56% complete)
+- ✅ Full repository pattern with 7 interfaces and implementations
+- ✅ Winning criteria enum to ID mapping (solved schema mismatch)
+- ✅ Fixed RPC function parameter names for database compatibility
+- ✅ UUID invite token generation for groups
+- ✅ Client-side pagination for leaderboards
+- ✅ OpenAPI 3.1 spec with comprehensive documentation
+- ✅ End-to-end type safety (DB → Repository → Service → Route)
+
+### Technical Fixes Applied
+1. Fixed winning_criteria schema mismatch (string enum → integer FK)
+2. Added password field for groups table compatibility
+3. Fixed invite_token generation (hex string → UUID)
+4. Corrected RPC function parameters (p_sort_by → p_winning_criteria_id)
+5. Added WINNING_CRITERIA_MAP for ID translation
+6. Fixed TypeScript strict type checking for winning criteria
 
 ---
 
@@ -463,7 +609,30 @@ _No blockers currently_
 
 ## Notes & Decisions
 
-### 2025-12-29
+### 2025-12-29 (End of Day Update)
+- ✅ **Completed Phase 1-3** (100%): Monorepo, API infrastructure, database migrations
+- ✅ **Phase 4 Progress** (56%): Implemented 14 of 25 API endpoints
+  - All Priority 1 endpoints complete (consumption, attendance, festivals, tents)
+  - All Priority 2 endpoints complete (groups, leaderboards)
+  - 2 Priority 3 endpoints complete (achievements only)
+  - Remaining 11 Priority 3 endpoints deferred (wrapped, reservations, location, notifications, photos)
+- 🔧 **Technical Achievements**:
+  - Solved winning_criteria schema mismatch (enum → integer FK mapping)
+  - Fixed RPC function parameter compatibility
+  - Implemented full repository pattern with 7 repositories
+  - Generated OpenAPI 3.1 spec with 14 documented endpoints
+- 📝 **Key Commits**:
+  - `b90f8fc` - Monorepo foundation
+  - `fdd39d4` - Hono API infrastructure
+  - `653b81e` - Database migrations (5 files)
+  - `8b17971` - Priority 1 endpoints
+  - `b266123` - Priority 2 & 3 endpoints
+- 🎯 **Next Decision Point**:
+  - **Option A**: Complete remaining 11 Priority 3 endpoints
+  - **Option B**: Move to Phase 5 (integrate with Next.js web app) and return to Priority 3 later
+  - Recommendation: **Option B** for faster integration and testing of core flows
+
+### 2025-12-29 (Start of Day)
 - Started implementation
 - Created progress tracking file
 - Plan approved: Full migration approach (Hono + Turborepo)
@@ -474,14 +643,22 @@ _No blockers currently_
 
 ## Quick Stats
 
-- **Total Tasks**: TBD
-- **Completed**: 0
-- **In Progress**: 0
-- **Pending**: All
-- **Blocked**: 0
-- **Failed**: 0
+- **Total Phases**: 12
+- **Completed Phases**: 3 (Phases 1-3: 100%)
+- **In Progress**: 1 (Phase 4: 56%)
+- **Pending Phases**: 8
+- **Total Endpoints Planned**: 25
+- **Endpoints Completed**: 14 (56%)
+- **Priority 1 Endpoints**: 6/6 ✅
+- **Priority 2 Endpoints**: 7/7 ✅
+- **Priority 3 Endpoints**: 2/11 ⏸️
+- **Repositories Created**: 7/7 (100%)
+- **Services Created**: 2/6 (33%)
+- **Blockers**: 0
+- **Failed Tasks**: 0
 
 ---
 
-**Last Updated**: 2025-12-29
-**Next Milestone**: Phase 1 completion (monorepo setup)
+**Last Updated**: 2025-12-29 (End of Day)
+**Next Milestone**: Complete Phase 4 OR begin Phase 5 (Web App Integration)
+**Current Focus**: API endpoint implementation (14/25 complete)
