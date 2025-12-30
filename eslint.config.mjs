@@ -23,6 +23,7 @@ const config = [
       "**/build/**",
       "**/*.config.js",
       "**/*.config.mjs",
+      "**/*.config.ts",
     ],
   },
   ...nextVitals,
