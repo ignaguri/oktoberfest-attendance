@@ -22,7 +22,7 @@ const getWrappedRoute = createRoute({
     "Returns cached wrapped statistics for a user and festival. Returns null if not yet generated.",
   request: {
     params: z.object({
-      festivalId: z.string().uuid("Invalid festival ID"),
+      festivalId: z.uuid({ error: "Invalid festival ID" }),
     }),
   },
   responses: {
@@ -81,7 +81,7 @@ const generateWrappedRoute = createRoute({
     "Generates or regenerates wrapped statistics for a user and festival. Set force=true to regenerate even if cached.",
   request: {
     params: z.object({
-      festivalId: z.string().uuid("Invalid festival ID"),
+      festivalId: z.uuid({ error: "Invalid festival ID" }),
     }),
     body: {
       content: {

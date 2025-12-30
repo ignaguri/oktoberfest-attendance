@@ -9,12 +9,12 @@ export const globalPhotoSettingsSchema = z.object({
 });
 
 export const groupPhotoSettingsSchema = z.object({
-  group_id: z.string().uuid(),
+  group_id: z.uuid(),
   hide_photos_from_group: z.boolean().default(false),
 });
 
 export const bulkPhotoVisibilitySchema = z.object({
-  photo_ids: z.array(z.string().uuid()).min(1, "Select at least one photo"),
+  photo_ids: z.array(z.uuid()).min(1, "Select at least one photo"),
   visibility: z.enum(["public", "private"]),
 });
 

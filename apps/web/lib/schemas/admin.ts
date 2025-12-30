@@ -34,9 +34,7 @@ export const userUpdateSchema = z.object({
 });
 
 export const attendanceSchema = z.object({
-  date: z.date({
-    message: "Required",
-  }),
+  date: z.date({ error: "Required" }),
   beer_count: z
     .number()
     .min(0, "Must be at least 0")

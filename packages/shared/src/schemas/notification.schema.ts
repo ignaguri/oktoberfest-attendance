@@ -26,10 +26,10 @@ export type RegisterFCMTokenResponse = z.infer<
  * POST /api/v1/notifications/subscribe
  */
 export const SubscribeUserSchema = z.object({
-  email: z.string().email().optional(),
+  email: z.email().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  avatar: z.string().url().optional(),
+  avatar: z.url().optional(),
 });
 
 export type SubscribeUserInput = z.infer<typeof SubscribeUserSchema>;
@@ -47,15 +47,15 @@ export type SubscribeUserResponse = z.infer<typeof SubscribeUserResponseSchema>;
  * User notification preferences
  */
 export const NotificationPreferencesSchema = z.object({
-  userId: z.string().uuid().nullable(),
+  userId: z.uuid().nullable(),
   pushEnabled: z.boolean().nullable(),
   groupJoinEnabled: z.boolean().nullable(),
   checkinEnabled: z.boolean().nullable(),
   remindersEnabled: z.boolean().nullable(),
   achievementNotificationsEnabled: z.boolean().nullable(),
   groupNotificationsEnabled: z.boolean().nullable(),
-  createdAt: z.string().datetime().nullable(),
-  updatedAt: z.string().datetime().nullable(),
+  createdAt: z.iso.datetime().nullable(),
+  updatedAt: z.iso.datetime().nullable(),
 });
 
 export type NotificationPreferences = z.infer<

@@ -8,7 +8,7 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 
 const updateLocationSchema = z.object({
-  festivalId: z.string().uuid(),
+  festivalId: z.uuid(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   accuracy: z.number().min(0).optional(),
@@ -18,7 +18,7 @@ const updateLocationSchema = z.object({
 });
 
 const getLocationsSchema = z.object({
-  festivalId: z.string().uuid(),
+  festivalId: z.uuid(),
   radiusMeters: z.number().min(1).max(10000).optional().default(500),
 });
 

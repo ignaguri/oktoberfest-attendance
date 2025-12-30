@@ -89,7 +89,7 @@ const checkinReservationRoute = createRoute({
     "Marks a reservation as checked in. Optionally creates an attendance record if auto_checkin is enabled.",
   request: {
     params: z.object({
-      id: z.string().uuid("Invalid reservation ID"),
+      id: z.uuid({ error: "Invalid reservation ID" }),
     }),
   },
   responses: {
@@ -221,7 +221,7 @@ const cancelReservationRoute = createRoute({
   description: "Cancels an existing reservation",
   request: {
     params: z.object({
-      id: z.string().uuid("Invalid reservation ID"),
+      id: z.uuid({ error: "Invalid reservation ID" }),
     }),
   },
   responses: {

@@ -30,16 +30,19 @@ export type AchievementRarity = z.infer<typeof AchievementRaritySchema>;
  * Achievement schema
  */
 export const AchievementSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string(),
   description: z.string(),
   category: AchievementCategorySchema,
   icon: z.string(),
   points: z.number().int(),
   rarity: AchievementRaritySchema,
-  condition: z.record(z.string(), z.unknown()), // Zod v4: requires key and value schema
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  condition: z.record(
+    z.string(),
+    z.union([z.string(), z.number(), z.boolean(), z.null()]),
+  ),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type Achievement = z.infer<typeof AchievementSchema>;
@@ -48,14 +51,14 @@ export type Achievement = z.infer<typeof AchievementSchema>;
  * User achievement (unlocked)
  */
 export const UserAchievementSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
-  achievementId: z.string().uuid(),
-  festivalId: z.string().uuid(),
+  id: z.uuid(),
+  userId: z.uuid(),
+  achievementId: z.uuid(),
+  festivalId: z.uuid(),
   rarity: AchievementRaritySchema,
-  unlockedAt: z.string().datetime(),
-  userNotifiedAt: z.string().datetime().nullable(),
-  groupNotifiedAt: z.string().datetime().nullable(),
+  unlockedAt: z.iso.datetime(),
+  userNotifiedAt: z.iso.datetime().nullable(),
+  groupNotifiedAt: z.iso.datetime().nullable(),
   achievement: AchievementSchema,
 });
 
@@ -66,7 +69,7 @@ export type UserAchievement = z.infer<typeof UserAchievementSchema>;
  * GET /api/v1/achievements
  */
 export const ListAchievementsQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
   category: AchievementCategorySchema.optional(),
 });
 
@@ -79,17 +82,21 @@ export const ListAchievementsResponseSchema = z.object({
   data: z.array(UserAchievementSchema),
 });
 
-export type ListAchievementsResponse = z.infer<typeof ListAchievementsResponseSchema>;
+export type ListAchievementsResponse = z.infer<
+  typeof ListAchievementsResponseSchema
+>;
 
 /**
  * Evaluate achievements request
  * POST /api/v1/achievements/evaluate
  */
 export const EvaluateAchievementsSchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
 });
 
-export type EvaluateAchievementsInput = z.infer<typeof EvaluateAchievementsSchema>;
+export type EvaluateAchievementsInput = z.infer<
+  typeof EvaluateAchievementsSchema
+>;
 
 /**
  * Evaluate achievements response
@@ -99,4 +106,6 @@ export const EvaluateAchievementsResponseSchema = z.object({
   totalPoints: z.number().int(),
 });
 
-export type EvaluateAchievementsResponse = z.infer<typeof EvaluateAchievementsResponseSchema>;
+export type EvaluateAchievementsResponse = z.infer<
+  typeof EvaluateAchievementsResponseSchema
+>;

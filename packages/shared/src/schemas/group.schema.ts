@@ -15,14 +15,14 @@ export type WinningCriteria = z.infer<typeof WinningCriteriaSchema>;
  * Group schema
  */
 export const GroupSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string(),
-  festivalId: z.string().uuid(),
+  festivalId: z.uuid(),
   winningCriteria: WinningCriteriaSchema,
   inviteToken: z.string(),
-  createdBy: z.string().uuid(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdBy: z.uuid(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type Group = z.infer<typeof GroupSchema>;
@@ -42,7 +42,7 @@ export type GroupWithMembers = z.infer<typeof GroupWithMembersSchema>;
  */
 export const CreateGroupSchema = z.object({
   name: z.string().min(1).max(100, "Group name must be 100 characters or less"),
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
   winningCriteria: WinningCriteriaSchema.default("total_beers"),
 });
 
@@ -53,7 +53,7 @@ export type CreateGroupInput = z.infer<typeof CreateGroupSchema>;
  * GET /api/v1/groups
  */
 export const ListGroupsQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID").optional(),
+  festivalId: z.uuid({ error: "Invalid festival ID" }).optional(),
 });
 
 export type ListGroupsQuery = z.infer<typeof ListGroupsQuerySchema>;
@@ -81,7 +81,7 @@ export type JoinGroupInput = z.infer<typeof JoinGroupSchema>;
  * Group ID parameter
  */
 export const GroupIdParamSchema = z.object({
-  id: z.string().uuid("Invalid group ID"),
+  id: z.uuid({ error: "Invalid group ID" }),
 });
 
 export type GroupIdParam = z.infer<typeof GroupIdParamSchema>;

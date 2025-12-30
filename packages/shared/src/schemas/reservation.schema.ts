@@ -17,23 +17,23 @@ export type ReservationStatus = z.infer<typeof ReservationStatusSchema>;
  * Reservation data schema
  */
 export const ReservationSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
-  festivalId: z.string().uuid(),
-  tentId: z.string().uuid(),
+  id: z.uuid(),
+  userId: z.uuid(),
+  festivalId: z.uuid(),
+  tentId: z.uuid(),
   tentName: z.string().optional(), // Enriched from tent data
-  startAt: z.string().datetime(),
-  endAt: z.string().datetime().nullable(),
+  startAt: z.iso.datetime(),
+  endAt: z.iso.datetime().nullable(),
   status: ReservationStatusSchema,
   note: z.string().nullable(),
   visibleToGroups: z.boolean(),
   autoCheckin: z.boolean(),
   reminderOffsetMinutes: z.number().int(),
-  reminderSentAt: z.string().datetime().nullable(),
-  promptSentAt: z.string().datetime().nullable(),
-  processedAt: z.string().datetime().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime().nullable(),
+  reminderSentAt: z.iso.datetime().nullable(),
+  promptSentAt: z.iso.datetime().nullable(),
+  processedAt: z.iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime().nullable(),
 });
 
 export type Reservation = z.infer<typeof ReservationSchema>;
@@ -43,10 +43,10 @@ export type Reservation = z.infer<typeof ReservationSchema>;
  * POST /api/v1/reservations
  */
 export const CreateReservationSchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
-  tentId: z.string().uuid("Invalid tent ID"),
-  startAt: z.string().datetime("Invalid start time"),
-  endAt: z.string().datetime("Invalid end time").optional(),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+  tentId: z.uuid({ error: "Invalid tent ID" }),
+  startAt: z.iso.datetime({ error: "Invalid start time" }),
+  endAt: z.iso.datetime({ error: "Invalid end time" }).optional(),
   note: z.string().max(500).optional(),
   visibleToGroups: z.boolean().optional().default(true),
   autoCheckin: z.boolean().optional().default(false),
@@ -69,7 +69,7 @@ export type CreateReservationResponse = z.infer<typeof CreateReservationResponse
  * POST /api/v1/reservations/:id/checkin
  */
 export const CheckinReservationSchema = z.object({
-  reservationId: z.string().uuid("Invalid reservation ID"),
+  reservationId: z.uuid({ error: "Invalid reservation ID" }),
 });
 
 export type CheckinReservationInput = z.infer<typeof CheckinReservationSchema>;
@@ -80,8 +80,8 @@ export type CheckinReservationInput = z.infer<typeof CheckinReservationSchema>;
 export const CheckinReservationResponseSchema = z.object({
   reservation: ReservationSchema,
   attendance: z.object({
-    id: z.string().uuid(),
-    date: z.string().date(),
+    id: z.uuid(),
+    date: z.iso.date(),
   }).optional(), // Created attendance if check-in creates one
 });
 
@@ -92,7 +92,7 @@ export type CheckinReservationResponse = z.infer<typeof CheckinReservationRespon
  * GET /api/v1/reservations
  */
 export const GetReservationsQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID").optional(),
+  festivalId: z.uuid({ error: "Invalid festival ID" }).optional(),
   status: ReservationStatusSchema.optional(),
   upcoming: z.coerce.boolean().optional(), // Only future reservations
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),

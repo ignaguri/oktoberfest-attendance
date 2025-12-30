@@ -4,7 +4,7 @@ import { z } from "zod";
  * Tent schema
  */
 export const TentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string(),
   category: z.string().nullable(),
 });
@@ -15,8 +15,8 @@ export type Tent = z.infer<typeof TentSchema>;
  * Festival-specific tent pricing
  */
 export const FestivalTentSchema = z.object({
-  festivalId: z.string().uuid(),
-  tentId: z.string().uuid(),
+  festivalId: z.uuid(),
+  tentId: z.uuid(),
   beerPrice: z.number().nullable(),
   tent: TentSchema,
 });
@@ -28,7 +28,7 @@ export type FestivalTent = z.infer<typeof FestivalTentSchema>;
  * GET /api/v1/tents
  */
 export const ListTentsQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID").optional(),
+  festivalId: z.uuid({ error: "Invalid festival ID" }).optional(),
 });
 
 export type ListTentsQuery = z.infer<typeof ListTentsQuerySchema>;

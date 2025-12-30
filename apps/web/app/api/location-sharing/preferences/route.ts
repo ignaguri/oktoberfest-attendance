@@ -7,15 +7,15 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 const updatePreferencesSchema = z.object({
-  groupId: z.string().uuid(),
-  festivalId: z.string().uuid(),
+  groupId: z.uuid(),
+  festivalId: z.uuid(),
   sharingEnabled: z.boolean(),
   autoEnableOnCheckin: z.boolean().optional().default(false),
   notificationEnabled: z.boolean().optional().default(true),
 });
 
 const getPreferencesSchema = z.object({
-  festivalId: z.string().uuid(),
+  festivalId: z.uuid(),
 });
 
 // GET /api/location-sharing/preferences - Get user's location sharing preferences

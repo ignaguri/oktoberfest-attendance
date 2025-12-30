@@ -4,10 +4,10 @@ import { z } from "zod";
  * Leaderboard entry
  */
 export const LeaderboardEntrySchema = z.object({
-  userId: z.string().uuid(),
+  userId: z.uuid(),
   username: z.string(),
   fullName: z.string().nullable(),
-  avatarUrl: z.string().url().nullable(),
+  avatarUrl: z.url().nullable(),
   daysAttended: z.number().int(),
   totalBeers: z.number().int(),
   avgBeers: z.number(),
@@ -21,7 +21,7 @@ export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>;
  * GET /api/v1/leaderboard
  */
 export const GlobalLeaderboardQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
   sortBy: z.enum(["days_attended", "total_beers", "avg_beers"]).default("total_beers"),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),

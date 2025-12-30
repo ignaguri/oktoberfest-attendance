@@ -101,7 +101,7 @@ const stopSessionRoute = createRoute({
   description: "Stops an active location sharing session",
   request: {
     params: z.object({
-      id: z.string().uuid("Invalid session ID"),
+      id: z.uuid({ error: "Invalid session ID" }),
     }),
   },
   responses: {
@@ -161,7 +161,7 @@ const updateLocationRoute = createRoute({
     "Updates the current location for an active location sharing session",
   request: {
     params: z.object({
-      id: z.string().uuid("Invalid session ID"),
+      id: z.uuid({ error: "Invalid session ID" }),
     }),
     body: {
       content: {

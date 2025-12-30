@@ -5,33 +5,33 @@ import { z } from "zod";
  * Represents the personalized year-in-review statistics
  */
 export const WrappedDataSchema = z.object({
-  userId: z.string().uuid(),
-  festivalId: z.string().uuid(),
+  userId: z.uuid(),
+  festivalId: z.uuid(),
   totalDays: z.number().int(),
   totalBeers: z.number().int(),
   totalSpent: z.number(),
   avgBeersPerDay: z.number(),
   favoriteTent: z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
     visitCount: z.number().int(),
   }).nullable(),
   topDrinkType: z.string().nullable(),
   achievements: z.array(z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
-    unlockedAt: z.string().datetime(),
+    unlockedAt: z.iso.datetime(),
   })),
   globalRank: z.number().int().nullable(),
   groupRanks: z.array(z.object({
-    groupId: z.string().uuid(),
+    groupId: z.uuid(),
     groupName: z.string(),
     rank: z.number().int(),
   })),
-  firstVisitDate: z.string().date().nullable(),
-  lastVisitDate: z.string().date().nullable(),
+  firstVisitDate: z.iso.date().nullable(),
+  lastVisitDate: z.iso.date().nullable(),
   longestStreak: z.number().int(),
-  generatedAt: z.string().datetime(),
+  generatedAt: z.iso.datetime(),
 });
 
 export type WrappedData = z.infer<typeof WrappedDataSchema>;
@@ -41,7 +41,7 @@ export type WrappedData = z.infer<typeof WrappedDataSchema>;
  * GET /api/v1/wrapped/:festivalId
  */
 export const GetWrappedQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
 });
 
 export type GetWrappedQuery = z.infer<typeof GetWrappedQuerySchema>;
@@ -61,7 +61,7 @@ export type GetWrappedResponse = z.infer<typeof GetWrappedResponseSchema>;
  * POST /api/v1/wrapped/:festivalId/generate
  */
 export const GenerateWrappedBodySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
   force: z.boolean().optional().default(false), // Force regeneration even if cached
 });
 

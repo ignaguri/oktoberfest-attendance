@@ -19,15 +19,15 @@ export type DrinkType = z.infer<typeof DrinkTypeSchema>;
  * POST /api/v1/consumption
  */
 export const LogConsumptionSchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
-  tentId: z.string().uuid("Invalid tent ID").optional(),
+  tentId: z.uuid({ error: "Invalid tent ID" }).optional(),
   drinkType: DrinkTypeSchema.default("beer"),
   drinkName: z.string().max(255).optional(),
   basePriceCents: z.number().int().min(0, "Price must be non-negative").optional(),
   pricePaidCents: z.number().int().min(0, "Price must be non-negative"),
   volumeMl: z.number().int().min(1, "Volume must be positive").default(1000),
-  recordedAt: z.string().datetime().optional(),
+  recordedAt: z.iso.datetime().optional(),
   idempotencyKey: z.string().max(255).optional(),
 });
 
@@ -37,18 +37,18 @@ export type LogConsumptionInput = z.infer<typeof LogConsumptionSchema>;
  * Schema for consumption response
  */
 export const ConsumptionSchema = z.object({
-  id: z.string().uuid(),
-  attendanceId: z.string().uuid(),
-  tentId: z.string().uuid().nullable(),
+  id: z.uuid(),
+  attendanceId: z.uuid(),
+  tentId: z.uuid().nullable(),
   drinkType: DrinkTypeSchema,
   drinkName: z.string().nullable(),
   basePriceCents: z.number().int(),
   pricePaidCents: z.number().int(),
   tipCents: z.number().int().nullable(),
   volumeMl: z.number().int().nullable(),
-  recordedAt: z.string().datetime(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  recordedAt: z.iso.datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type Consumption = z.infer<typeof ConsumptionSchema>;
@@ -57,8 +57,8 @@ export type Consumption = z.infer<typeof ConsumptionSchema>;
  * Schema for tent visit (simplified for attendance response)
  */
 export const TentVisitSchema = z.object({
-  tent_id: z.string().uuid(),
-  visit_date: z.string().datetime(),
+  tent_id: z.uuid(),
+  visit_date: z.iso.datetime(),
   tentName: z.string().nullable(),
 });
 
@@ -68,12 +68,12 @@ export type TentVisit = z.infer<typeof TentVisitSchema>;
  * Schema for attendance with computed totals
  */
 export const AttendanceWithTotalsSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
-  festivalId: z.string().uuid(),
+  id: z.uuid(),
+  userId: z.uuid(),
+  festivalId: z.uuid(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
   // Computed fields from consumptions
   drinkCount: z.number().int(),
   beerCount: z.number().int(),

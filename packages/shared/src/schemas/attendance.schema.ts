@@ -6,7 +6,7 @@ import { AttendanceWithTotalsSchema } from "./consumption.schema";
  * GET /api/v1/attendance
  */
 export const ListAttendancesQuerySchema = z.object({
-  festivalId: z.string().uuid("Invalid festival ID"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -30,7 +30,7 @@ export type ListAttendancesResponse = z.infer<typeof ListAttendancesResponseSche
  * DELETE /api/v1/attendance/:id
  */
 export const AttendanceIdParamSchema = z.object({
-  id: z.string().uuid("Invalid attendance ID"),
+  id: z.uuid({ error: "Invalid attendance ID" }),
 });
 
 export type AttendanceIdParam = z.infer<typeof AttendanceIdParamSchema>;

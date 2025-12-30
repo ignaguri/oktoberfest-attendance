@@ -94,7 +94,7 @@ const confirmUploadRoute = createRoute({
     "Confirms that a photo was successfully uploaded to storage and marks it as confirmed in the database.",
   request: {
     params: z.object({
-      id: z.string().uuid("Invalid picture ID"),
+      id: z.uuid({ error: "Invalid picture ID" }),
     }),
   },
   responses: {
@@ -235,7 +235,7 @@ const deletePhotoRoute = createRoute({
   description: "Deletes a beer picture from both storage and database",
   request: {
     params: z.object({
-      id: z.string().uuid("Invalid picture ID"),
+      id: z.uuid({ error: "Invalid picture ID" }),
     }),
   },
   responses: {
