@@ -85,6 +85,7 @@ export function createMockChain(finalResult: {
 export function createMockSupabase(): SupabaseClient<Database> {
   return {
     from: vi.fn().mockImplementation(() => createMockQueryBuilder()),
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     auth: {
       getUser: vi.fn().mockResolvedValue({
         data: { user: createMockUser() },
