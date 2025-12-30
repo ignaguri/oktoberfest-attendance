@@ -1,12 +1,17 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+
 import type { AuthContext } from "../../middleware/auth";
 import type { User } from "@supabase/supabase-js";
 
+import { errorHandler } from "../../middleware/error";
+
 /**
- * Create test Hono app instance
+ * Create test Hono app instance with error handling
  */
 export function createTestApp() {
-  return new OpenAPIHono<AuthContext>();
+  const app = new OpenAPIHono<AuthContext>();
+  app.onError(errorHandler);
+  return app;
 }
 
 /**

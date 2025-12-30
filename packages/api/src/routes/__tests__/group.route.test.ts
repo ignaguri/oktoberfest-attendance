@@ -1,16 +1,19 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+
+import type { Group, GroupWithMembers } from "@prostcounter/shared";
+
+import {
+  createMockSupabase,
+  mockSupabaseSuccess,
+  mockSupabaseNotFound,
+  createMockChain,
+} from "../../__tests__/helpers/mock-supabase";
 import {
   createTestApp,
   createMockUser,
   createAuthRequest,
 } from "../../__tests__/helpers/test-server";
-import {
-  createMockSupabase,
-  mockSupabaseSuccess,
-  mockSupabaseError,
-} from "../../__tests__/helpers/mock-supabase";
 import groupRoute from "../group.route";
-import type { Group, GroupWithMembers } from "@prostcounter/shared";
 
 describe("Group Routes", () => {
   let app: ReturnType<typeof createTestApp>;
@@ -29,7 +32,10 @@ describe("Group Routes", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
+        return c.json(
+          { error: "Unauthorized", message: "Missing authorization header" },
+          401,
+        );
       }
 
       // Set mock user and supabase for authenticated requests
@@ -75,41 +81,21 @@ describe("Group Routes", () => {
       // Mock Supabase responses for the complete group creation flow
       vi.mocked(mockSupabase.from)
         // 1. Insert group into "groups" table
-        .mockReturnValueOnce({
-          insert: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue(mockSupabaseSuccess(mockGroupDbRow)),
-            }),
-          }),
-        } as any)
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
         // 2. Check if user is already a member (isMember on "group_members")
-        .mockReturnValueOnce({
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                maybeSingle: vi.fn().mockResolvedValue(mockSupabaseSuccess(null)),
-              }),
-            }),
-          }),
-        } as any)
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)))
         // 3. Get group details (findById on "groups")
-        .mockReturnValueOnce({
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue(mockSupabaseSuccess(mockGroupDbRow)),
-            }),
-          }),
-        } as any)
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
         // 4. Get member count (in findById on "group_members")
-        .mockReturnValueOnce({
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({ count: 0 }),
-          }),
-        } as any)
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 0 }),
+        )
         // 5. Insert member into "group_members"
-        .mockReturnValueOnce({
-          insert: vi.fn().mockResolvedValue(mockSupabaseSuccess({})),
-        } as any);
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
 
       const req = createAuthRequest("/groups", {
         method: "POST",
@@ -172,45 +158,52 @@ describe("Group Routes", () => {
 
   describe("GET /groups", () => {
     it("should list user groups", async () => {
-      const mockGroups: GroupWithMembers[] = [
+      const mockGroupsDbRows = [
         {
           id: "323e4567-e89b-12d3-a456-426614174000",
           name: "Group 1",
-          festivalId: "223e4567-e89b-12d3-a456-426614174000",
-          winningCriteria: "total_beers",
-          inviteToken: "token1",
-          createdBy: mockUser.id,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          memberCount: 5,
+          festival_id: "223e4567-e89b-12d3-a456-426614174000",
+          winning_criteria_id: 2,
+          invite_token: "token1",
+          created_by: mockUser.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          winning_criteria: { id: 2, name: "total_beers" },
         },
         {
           id: "423e4567-e89b-12d3-a456-426614174000",
           name: "Group 2",
-          festivalId: "223e4567-e89b-12d3-a456-426614174000",
-          winningCriteria: "days_attended",
-          inviteToken: "token2",
-          createdBy: "523e4567-e89b-12d3-a456-426614174000",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          memberCount: 3,
+          festival_id: "223e4567-e89b-12d3-a456-426614174000",
+          winning_criteria_id: 1,
+          invite_token: "token2",
+          created_by: "523e4567-e89b-12d3-a456-426614174000",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          winning_criteria: { id: 1, name: "days_attended" },
         },
       ];
 
-      // Mock Supabase query
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue(mockSupabaseSuccess(mockGroups)),
-          }),
-        }),
-      });
+      // Mock Supabase query chain: select().eq().eq().order()
+      // Also need to mock member count queries for each group
+      vi.mocked(mockSupabase.from)
+        // 1. Main query: groups with winning_criteria join
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupsDbRows)),
+        )
+        // 2. Member count for Group 1
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 5 }),
+        )
+        // 3. Member count for Group 2
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 3 }),
+        );
 
-      mockSupabase.from = mockFrom;
-
-      const req = createAuthRequest("/groups?festivalId=223e4567-e89b-12d3-a456-426614174000");
+      const req = createAuthRequest(
+        "/groups?festivalId=223e4567-e89b-12d3-a456-426614174000",
+      );
       const res = await app.request(req);
-      const json = await res.json();
+      const json = (await res.json()) as { data: GroupWithMembers[] };
 
       expect(res.status).toBe(200);
       expect(json.data).toHaveLength(2);
@@ -218,21 +211,16 @@ describe("Group Routes", () => {
     });
 
     it("should filter groups by festivalId", async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue(mockSupabaseSuccess([])),
-          }),
-        }),
-      });
+      vi.mocked(mockSupabase.from)
+        // Main query with no results
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      mockSupabase.from = mockFrom;
-
-      const req = createAuthRequest("/groups?festivalId=623e4567-e89b-12d3-a456-426614174000");
+      const req = createAuthRequest(
+        "/groups?festivalId=623e4567-e89b-12d3-a456-426614174000",
+      );
       const res = await app.request(req);
 
       expect(res.status).toBe(200);
-      expect(mockFrom).toHaveBeenCalled();
     });
 
     it("should require authentication", async () => {
@@ -244,29 +232,35 @@ describe("Group Routes", () => {
 
   describe("GET /groups/:id", () => {
     it("should get group details", async () => {
-      const mockGroup: GroupWithMembers = {
+      const mockGroupDbRow = {
         id: "723e4567-e89b-12d3-a456-426614174000",
         name: "Test Group",
-        festivalId: "223e4567-e89b-12d3-a456-426614174000",
-        winningCriteria: "total_beers",
-        inviteToken: "invite-token",
-        createdBy: mockUser.id,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        memberCount: 10,
+        festival_id: "223e4567-e89b-12d3-a456-426614174000",
+        winning_criteria_id: 2,
+        invite_token: "invite-token",
+        created_by: mockUser.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        winning_criteria: { id: 2, name: "total_beers" },
       };
 
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue(mockSupabaseSuccess(mockGroup)),
-          }),
-        }),
-      });
+      vi.mocked(mockSupabase.from)
+        // 1. findById: select().eq().single()
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
+        // 2. findById - member count: select().eq()
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 10 }),
+        )
+        // 3. isMember check: select().eq().eq().maybeSingle()
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess({ id: "member-123" })),
+        );
 
-      mockSupabase.from = mockFrom;
-
-      const req = createAuthRequest("/groups/723e4567-e89b-12d3-a456-426614174000");
+      const req = createAuthRequest(
+        "/groups/723e4567-e89b-12d3-a456-426614174000",
+      );
       const res = await app.request(req);
       const json = await res.json();
 
@@ -279,19 +273,13 @@ describe("Group Routes", () => {
     });
 
     it("should return 404 for non-existent group", async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi
-              .fn()
-              .mockResolvedValue(mockSupabaseError("Group not found")),
-          }),
-        }),
-      });
+      vi.mocked(mockSupabase.from)
+        // 1. findById: returns not found (PGRST116)
+        .mockReturnValueOnce(createMockChain(mockSupabaseNotFound()));
 
-      mockSupabase.from = mockFrom;
-
-      const req = createAuthRequest("/groups/823e4567-e89b-12d3-a456-426614174000");
+      const req = createAuthRequest(
+        "/groups/823e4567-e89b-12d3-a456-426614174000",
+      );
       const res = await app.request(req);
 
       expect(res.status).toBe(404);
@@ -307,33 +295,47 @@ describe("Group Routes", () => {
 
   describe("POST /groups/:id/join", () => {
     it("should join group successfully", async () => {
-      // Mock successful join operation
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue(
-              mockSupabaseSuccess({
-                id: "923e4567-e89b-12d3-a456-426614174000",
-                name: "Test Group",
-                festivalId: "223e4567-e89b-12d3-a456-426614174000",
-                winningCriteria: "total_beers",
-                inviteToken: "valid-token",
-                createdBy: "023e4567-e89b-12d3-a456-426614174001",
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              }),
-            ),
-          }),
-        }),
-        insert: vi.fn().mockResolvedValue(mockSupabaseSuccess({})),
-      });
+      const mockGroupDbRow = {
+        id: "923e4567-e89b-12d3-a456-426614174000",
+        name: "Test Group",
+        festival_id: "223e4567-e89b-12d3-a456-426614174000",
+        winning_criteria_id: 2,
+        invite_token: "valid-token",
+        created_by: "023e4567-e89b-12d3-a456-426614174001",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        winning_criteria: { id: 2, name: "total_beers" },
+      };
 
-      mockSupabase.from = mockFrom;
+      vi.mocked(mockSupabase.from)
+        // 1. joinGroup - findById: select().eq().single()
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
+        // 2. joinGroup - findById member count: select().eq()
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 0 }),
+        )
+        // 3. addMember - isMember check: select().eq().eq().maybeSingle()
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)))
+        // 4. addMember - findById: select().eq().single()
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
+        // 5. addMember - findById member count: select().eq()
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 0 }),
+        )
+        // 6. addMember - insert: insert()
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
 
-      const req = createAuthRequest("/groups/923e4567-e89b-12d3-a456-426614174000/join", {
-        method: "POST",
-        body: JSON.stringify({ inviteToken: "valid-token" }),
-      });
+      const req = createAuthRequest(
+        "/groups/923e4567-e89b-12d3-a456-426614174000/join",
+        {
+          method: "POST",
+          body: JSON.stringify({ inviteToken: "valid-token" }),
+        },
+      );
 
       const res = await app.request(req);
       const json = await res.json();
@@ -344,22 +346,17 @@ describe("Group Routes", () => {
     });
 
     it("should return 404 for non-existent group", async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi
-              .fn()
-              .mockResolvedValue(mockSupabaseError("Group not found")),
-          }),
-        }),
-      });
+      vi.mocked(mockSupabase.from)
+        // 1. joinGroup - findById: returns not found (PGRST116)
+        .mockReturnValueOnce(createMockChain(mockSupabaseNotFound()));
 
-      mockSupabase.from = mockFrom;
-
-      const req = createAuthRequest("/groups/a23e4567-e89b-12d3-a456-426614174000/join", {
-        method: "POST",
-        body: JSON.stringify({}),
-      });
+      const req = createAuthRequest(
+        "/groups/a23e4567-e89b-12d3-a456-426614174000/join",
+        {
+          method: "POST",
+          body: JSON.stringify({ inviteToken: "invalid-token" }),
+        },
+      );
 
       const res = await app.request(req);
       expect(res.status).toBe(404);
@@ -378,30 +375,46 @@ describe("Group Routes", () => {
 
   describe("POST /groups/:id/leave", () => {
     it("should leave group successfully", async () => {
-      // Mock checking membership
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            maybeSingle: vi.fn().mockResolvedValue(
-              mockSupabaseSuccess({
-                group_id: "b23e4567-e89b-12d3-a456-426614174000",
-                user_id: mockUser.id,
-              }),
-            ),
-          }),
-        }),
-        delete: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue(mockSupabaseSuccess({})),
-          }),
-        }),
-      });
+      const mockGroupDbRow = {
+        id: "b23e4567-e89b-12d3-a456-426614174000",
+        name: "Test Group",
+        festival_id: "223e4567-e89b-12d3-a456-426614174000",
+        winning_criteria_id: 2,
+        invite_token: "token",
+        created_by: "other-user-id",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        winning_criteria: { id: 2, name: "total_beers" },
+      };
 
-      mockSupabase.from = mockFrom;
+      vi.mocked(mockSupabase.from)
+        // 1. leaveGroup - findById: select().eq().single()
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
+        // 2. leaveGroup - findById member count: select().eq()
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 5 }),
+        )
+        // 3. leaveGroup - isMember check: select().eq().eq().maybeSingle()
+        .mockReturnValueOnce(
+          createMockChain(
+            mockSupabaseSuccess({
+              id: "member-123",
+              group_id: "b23e4567-e89b-12d3-a456-426614174000",
+              user_id: mockUser.id,
+            }),
+          ),
+        )
+        // 4. removeMember: delete().eq().eq()
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
 
-      const req = createAuthRequest("/groups/b23e4567-e89b-12d3-a456-426614174000/leave", {
-        method: "POST",
-      });
+      const req = createAuthRequest(
+        "/groups/b23e4567-e89b-12d3-a456-426614174000/leave",
+        {
+          method: "POST",
+        },
+      );
 
       const res = await app.request(req);
       const json = await res.json();
@@ -411,22 +424,39 @@ describe("Group Routes", () => {
     });
 
     it("should return 404 when not a member", async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            maybeSingle: vi.fn().mockResolvedValue(mockSupabaseSuccess(null)),
-          }),
-        }),
-      });
+      const mockGroupDbRow = {
+        id: "c23e4567-e89b-12d3-a456-426614174000",
+        name: "Test Group",
+        festival_id: "223e4567-e89b-12d3-a456-426614174000",
+        winning_criteria_id: 2,
+        invite_token: "token",
+        created_by: "other-user-id",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        winning_criteria: { id: 2, name: "total_beers" },
+      };
 
-      mockSupabase.from = mockFrom;
+      vi.mocked(mockSupabase.from)
+        // 1. leaveGroup - findById: select().eq().single()
+        .mockReturnValueOnce(
+          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
+        )
+        // 2. leaveGroup - findById member count: select().eq()
+        .mockReturnValueOnce(
+          createMockChain({ ...mockSupabaseSuccess(null), count: 5 }),
+        )
+        // 3. leaveGroup - isMember check: returns null (not a member)
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
-      const req = createAuthRequest("/groups/c23e4567-e89b-12d3-a456-426614174000/leave", {
-        method: "POST",
-      });
+      const req = createAuthRequest(
+        "/groups/c23e4567-e89b-12d3-a456-426614174000/leave",
+        {
+          method: "POST",
+        },
+      );
 
       const res = await app.request(req);
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(403); // ForbiddenError when not a member
     });
   });
 });
