@@ -1,9 +1,9 @@
 import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@prostcounter/db";
 import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type NotificationPreferences =
   Database["public"]["Tables"]["user_notification_preferences"]["Row"];
@@ -250,7 +250,10 @@ export class NotificationService {
         .in("user_id", recipientIds);
 
       if (error) {
-        console.error("Error fetching preferences for group achievement:", error);
+        console.error(
+          "Error fetching preferences for group achievement:",
+          error,
+        );
         return;
       }
 
@@ -413,7 +416,7 @@ export class NotificationService {
         // Find groups this specific member shares with the check-in user
         const memberGroups = groupMembers
           .filter((gm) => gm.user_id === member.user_id)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
           .map((gm) => (gm.groups as any)?.name)
           .filter(Boolean);
 

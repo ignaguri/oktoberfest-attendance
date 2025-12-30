@@ -15,7 +15,7 @@ export interface IConsumptionRepository {
   create(
     userId: string,
     attendanceId: string,
-    data: Omit<LogConsumptionInput, "festivalId" | "date">
+    data: Omit<LogConsumptionInput, "festivalId" | "date">,
   ): Promise<Consumption>;
 
   /**

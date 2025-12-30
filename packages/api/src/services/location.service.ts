@@ -1,11 +1,12 @@
+import type { ILocationRepository } from "../repositories/interfaces";
 import type {
   LocationSession,
   LocationPoint,
   LocationSessionMember,
   StartLocationSessionInput,
 } from "@prostcounter/shared";
-import type { ILocationRepository } from "../repositories/interfaces";
-import { ConflictError, NotFoundError, ValidationError } from "../middleware/error";
+
+import { ConflictError, ValidationError } from "../middleware/error";
 
 /**
  * Location Service
@@ -29,7 +30,7 @@ export class LocationService {
    */
   async startSession(
     userId: string,
-    data: StartLocationSessionInput
+    data: StartLocationSessionInput,
   ): Promise<LocationSession> {
     // Validate duration
     const duration = data.durationMinutes || 120;
@@ -40,12 +41,12 @@ export class LocationService {
     // Check for existing active session
     const existing = await this.locationRepo.getActiveSession(
       userId,
-      data.festivalId
+      data.festivalId,
     );
 
     if (existing) {
       throw new ConflictError(
-        "User already has an active location session for this festival"
+        "User already has an active location session for this festival",
       );
     }
 
@@ -69,7 +70,7 @@ export class LocationService {
    */
   async stopSession(
     sessionId: string,
-    userId: string
+    userId: string,
   ): Promise<LocationSession> {
     const session = await this.locationRepo.stopSession(sessionId, userId);
 
@@ -88,7 +89,7 @@ export class LocationService {
    */
   async getActiveSession(
     userId: string,
-    festivalId: string
+    festivalId: string,
   ): Promise<LocationSession | null> {
     return this.locationRepo.getActiveSession(userId, festivalId);
   }
@@ -119,7 +120,7 @@ export class LocationService {
   async updateLocation(
     sessionId: string,
     userId: string,
-    location: LocationPoint
+    location: LocationPoint,
   ): Promise<void> {
     // Validate latitude/longitude
     if (
@@ -163,7 +164,7 @@ export class LocationService {
     latitude: number,
     longitude: number,
     radiusMeters: number,
-    groupId?: string
+    groupId?: string,
   ): Promise<LocationSessionMember[]> {
     // Validate radius
     if (radiusMeters < 100 || radiusMeters > 5000) {
@@ -187,7 +188,7 @@ export class LocationService {
       latitude,
       longitude,
       radiusMeters,
-      groupId
+      groupId,
     );
 
     // Filter out user's own location (shouldn't be in results, but defensive)

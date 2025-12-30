@@ -1,26 +1,27 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { INotificationRepository } from "../interfaces/notification.repository";
 import type { Database } from "@prostcounter/db";
 import type {
   NotificationPreferences,
   UpdateNotificationPreferencesInput,
 } from "@prostcounter/shared";
-import type { INotificationRepository } from "../interfaces/notification.repository";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError } from "../../middleware/error";
 
-export class SupabaseNotificationRepository
-  implements INotificationRepository
-{
+export class SupabaseNotificationRepository implements INotificationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async registerFCMToken(userId: string, token: string): Promise<void> {
     // TODO: Implement FCM token storage once fcm_tokens table is added to schema
     // For now, FCM tokens are stored client-side
     // Future schema: CREATE TABLE fcm_tokens (id, user_id, token, last_used_at, is_active)
-    console.log(`FCM token registration for user ${userId}: ${token.substring(0, 20)}...`);
+    console.log(
+      `FCM token registration for user ${userId}: ${token.substring(0, 20)}...`,
+    );
   }
 
   async getPreferences(
-    userId: string
+    userId: string,
   ): Promise<NotificationPreferences | null> {
     const { data, error } = await this.supabase
       .from("user_notification_preferences")
@@ -31,7 +32,7 @@ export class SupabaseNotificationRepository
     if (error && error.code !== "PGRST116") {
       // PGRST116 = no rows returned
       throw new DatabaseError(
-        `Failed to fetch notification preferences: ${error.message}`
+        `Failed to fetch notification preferences: ${error.message}`,
       );
     }
 
@@ -52,7 +53,7 @@ export class SupabaseNotificationRepository
 
   async updatePreferences(
     userId: string,
-    preferences: UpdateNotificationPreferencesInput
+    preferences: UpdateNotificationPreferencesInput,
   ): Promise<NotificationPreferences> {
     const { data, error } = await this.supabase
       .from("user_notification_preferences")
@@ -68,14 +69,14 @@ export class SupabaseNotificationRepository
           group_notifications_enabled: preferences.groupNotificationsEnabled,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "user_id" }
+        { onConflict: "user_id" },
       )
       .select()
       .single();
 
     if (error) {
       throw new DatabaseError(
-        `Failed to update notification preferences: ${error.message}`
+        `Failed to update notification preferences: ${error.message}`,
       );
     }
 
@@ -100,12 +101,14 @@ export class SupabaseNotificationRepository
 
   async removeFCMToken(userId: string, token: string): Promise<void> {
     // TODO: Implement once fcm_tokens table is added
-    console.log(`FCM token removal for user ${userId}: ${token.substring(0, 20)}...`);
+    console.log(
+      `FCM token removal for user ${userId}: ${token.substring(0, 20)}...`,
+    );
   }
 
   async canSendNotification(
     userId: string,
-    notificationType: string
+    notificationType: string,
   ): Promise<boolean> {
     // Simple rate limiting using notification_rate_limit table
     // Check if user has been notified recently (within last hour)
@@ -121,7 +124,7 @@ export class SupabaseNotificationRepository
 
     if (error && error.code !== "PGRST116") {
       throw new DatabaseError(
-        `Failed to check notification rate limit: ${error.message}`
+        `Failed to check notification rate limit: ${error.message}`,
       );
     }
 
@@ -131,7 +134,7 @@ export class SupabaseNotificationRepository
 
   async recordNotificationSent(
     userId: string,
-    notificationType: string
+    notificationType: string,
   ): Promise<void> {
     const { error } = await this.supabase
       .from("notification_rate_limit")
@@ -142,7 +145,7 @@ export class SupabaseNotificationRepository
 
     if (error) {
       throw new DatabaseError(
-        `Failed to record notification: ${error.message}`
+        `Failed to record notification: ${error.message}`,
       );
     }
   }

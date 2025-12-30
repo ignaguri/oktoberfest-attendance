@@ -9,10 +9,11 @@ import {
   JoinGroupSchema,
   GroupActionResponseSchema,
 } from "@prostcounter/shared";
-import { GroupService } from "../services/group.service";
-import { SupabaseGroupRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
-import { NotFoundError } from "../middleware/error";
+
+import { SupabaseGroupRepository } from "../repositories/supabase";
+import { GroupService } from "../services/group.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -23,7 +24,8 @@ const createGroupRoute = createRoute({
   path: "/groups",
   tags: ["groups"],
   summary: "Create a new group",
-  description: "Creates a group and automatically adds the creator as the first member",
+  description:
+    "Creates a group and automatically adds the creator as the first member",
   request: {
     body: {
       content: {
@@ -276,7 +278,7 @@ app.openapi(joinGroupRoute, async (c) => {
       success: true,
       message: "Successfully joined group",
     },
-    200
+    200,
   );
 });
 
@@ -351,7 +353,7 @@ app.openapi(leaveGroupRoute, async (c) => {
       success: true,
       message: "Successfully left group",
     },
-    200
+    200,
   );
 });
 

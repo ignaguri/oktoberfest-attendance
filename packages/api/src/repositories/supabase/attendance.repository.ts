@@ -1,10 +1,11 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IAttendanceRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
   AttendanceWithTotals,
   ListAttendancesQuery,
 } from "@prostcounter/shared";
-import type { IAttendanceRepository } from "../interfaces";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError, NotFoundError } from "../../middleware/error";
 
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
@@ -13,7 +14,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
   async findOrCreate(
     userId: string,
     festivalId: string,
-    date: string
+    date: string,
   ): Promise<AttendanceWithTotals> {
     // First try to find existing attendance
     const { data: existing } = await this.supabase
@@ -51,7 +52,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .single();
 
     if (fetchError) {
-      throw new DatabaseError(`Failed to fetch attendance totals: ${fetchError.message}`);
+      throw new DatabaseError(
+        `Failed to fetch attendance totals: ${fetchError.message}`,
+      );
     }
 
     return this.mapToAttendanceWithTotals(withTotals);
@@ -76,7 +79,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
 
   async list(
     userId: string,
-    query: ListAttendancesQuery
+    query: ListAttendancesQuery,
   ): Promise<{ data: AttendanceWithTotals[]; total: number }> {
     const { festivalId, limit, offset } = query;
 
@@ -88,7 +91,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("festival_id", festivalId);
 
     if (countError) {
-      throw new DatabaseError(`Failed to count attendances: ${countError.message}`);
+      throw new DatabaseError(
+        `Failed to count attendances: ${countError.message}`,
+      );
     }
 
     // Get paginated data
@@ -112,7 +117,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("festival_id", festivalId);
 
     if (tentVisitsError) {
-      throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
+      throw new DatabaseError(
+        `Failed to fetch tent visits: ${tentVisitsError.message}`,
+      );
     }
 
     // Map attendances and enrich with tent visits
@@ -161,7 +168,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       if (fetchError.code === "PGRST116") {
         throw new NotFoundError("Attendance not found");
       }
-      throw new DatabaseError(`Failed to fetch attendance: ${fetchError.message}`);
+      throw new DatabaseError(
+        `Failed to fetch attendance: ${fetchError.message}`,
+      );
     }
 
     if (attendance.user_id !== userId) {
@@ -169,7 +178,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     }
 
     // Delete the attendance (consumptions will cascade delete)
-    const { error } = await this.supabase.from("attendances").delete().eq("id", id);
+    const { error } = await this.supabase
+      .from("attendances")
+      .delete()
+      .eq("id", id);
 
     if (error) {
       throw new DatabaseError(`Failed to delete attendance: ${error.message}`);

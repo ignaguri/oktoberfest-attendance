@@ -6,9 +6,11 @@ import {
   GetReservationsQuerySchema,
   GetReservationsResponseSchema,
 } from "@prostcounter/shared";
-import { ReservationService } from "../services/reservation.service";
-import { SupabaseReservationRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
+import { SupabaseReservationRepository } from "../repositories/supabase";
+import { ReservationService } from "../services/reservation.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -154,7 +156,8 @@ const listReservationsRoute = createRoute({
   path: "/reservations",
   tags: ["reservations"],
   summary: "List user reservations",
-  description: "Retrieves all reservations for the authenticated user with optional filters",
+  description:
+    "Retrieves all reservations for the authenticated user with optional filters",
   request: {
     query: GetReservationsQuerySchema,
   },
@@ -195,7 +198,7 @@ app.openapi(listReservationsRoute, async (c) => {
     query.status,
     query.upcoming,
     query.limit,
-    query.offset
+    query.offset,
   );
 
   return c.json(
@@ -205,7 +208,7 @@ app.openapi(listReservationsRoute, async (c) => {
       limit: query.limit || 50,
       offset: query.offset || 0,
     },
-    200
+    200,
   );
 });
 

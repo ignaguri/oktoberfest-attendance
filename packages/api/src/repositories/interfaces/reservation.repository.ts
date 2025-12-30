@@ -41,7 +41,7 @@ export interface IReservationRepository {
     status?: ReservationStatus,
     upcoming?: boolean,
     limit?: number,
-    offset?: number
+    offset?: number,
   ): Promise<{ data: Reservation[]; total: number }>;
 
   /**

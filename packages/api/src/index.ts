@@ -1,20 +1,20 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { errorHandler } from "./middleware/error";
-import { authMiddleware } from "./middleware/auth";
 
+import { authMiddleware } from "./middleware/auth";
+import { errorHandler } from "./middleware/error";
 // Import routes
-import consumptionRoute from "./routes/consumption.route";
+import achievementRoute from "./routes/achievement.route";
 import attendanceRoute from "./routes/attendance.route";
+import consumptionRoute from "./routes/consumption.route";
 import festivalRoute from "./routes/festival.route";
-import tentRoute from "./routes/tent.route";
 import groupRoute from "./routes/group.route";
 import leaderboardRoute from "./routes/leaderboard.route";
-import achievementRoute from "./routes/achievement.route";
-import notificationRoute from "./routes/notification.route";
-import wrappedRoute from "./routes/wrapped.route";
-import reservationRoute from "./routes/reservation.route";
 import locationRoute from "./routes/location.route";
+import notificationRoute from "./routes/notification.route";
 import photoRoute from "./routes/photo.route";
+import reservationRoute from "./routes/reservation.route";
+import tentRoute from "./routes/tent.route";
+import wrappedRoute from "./routes/wrapped.route";
 
 // Create the main Hono app with OpenAPI support
 export const app = new OpenAPIHono();

@@ -1,4 +1,6 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { randomUUID, randomBytes } from "crypto";
+
+import type { IGroupRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
   Group,
@@ -6,9 +8,13 @@ import type {
   CreateGroupInput,
   ListGroupsQuery,
 } from "@prostcounter/shared";
-import type { IGroupRepository } from "../interfaces";
-import { DatabaseError, NotFoundError, ConflictError } from "../../middleware/error";
-import { randomUUID, randomBytes } from "crypto";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import {
+  DatabaseError,
+  NotFoundError,
+  ConflictError,
+} from "../../middleware/error";
 
 // Mapping between winning criteria strings and database IDs
 const WINNING_CRITERIA_MAP: Record<string, number> = {
@@ -17,7 +23,10 @@ const WINNING_CRITERIA_MAP: Record<string, number> = {
   avg_beers: 3,
 };
 
-const WINNING_CRITERIA_REVERSE_MAP: Record<number, "days_attended" | "total_beers" | "avg_beers"> = {
+const WINNING_CRITERIA_REVERSE_MAP: Record<
+  number,
+  "days_attended" | "total_beers" | "avg_beers"
+> = {
   1: "days_attended",
   2: "total_beers",
   3: "avg_beers",
@@ -38,7 +47,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     const winningCriteriaId = WINNING_CRITERIA_MAP[data.winningCriteria];
     if (!winningCriteriaId) {
       throw new DatabaseError(
-        `Invalid winning criteria: ${data.winningCriteria}`
+        `Invalid winning criteria: ${data.winningCriteria}`,
       );
     }
 
@@ -56,7 +65,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
         `
         *,
         winning_criteria:winning_criteria_id (id, name)
-      `
+      `,
       )
       .single();
 
@@ -72,7 +81,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
 
   async listUserGroups(
     userId: string,
-    query?: ListGroupsQuery
+    query?: ListGroupsQuery,
   ): Promise<GroupWithMembers[]> {
     let supabaseQuery = this.supabase
       .from("groups")
@@ -81,7 +90,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
         *,
         winning_criteria:winning_criteria_id (id, name),
         group_members!inner(user_id)
-      `
+      `,
       )
       .eq("group_members.user_id", userId);
 
@@ -109,7 +118,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
           ...this.mapToGroup(group),
           memberCount: count || 0,
         };
-      })
+      }),
     );
 
     return groupsWithCounts;
@@ -122,7 +131,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
         `
         *,
         winning_criteria:winning_criteria_id (id, name)
-      `
+      `,
       )
       .eq("id", id)
       .single();
@@ -153,7 +162,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
         `
         *,
         winning_criteria:winning_criteria_id (id, name)
-      `
+      `,
       )
       .eq("invite_token", inviteToken)
       .single();
@@ -222,7 +231,10 @@ export class SupabaseGroupRepository implements IGroupRepository {
     // Extract winning criteria name from joined table or use reverse map
     let winningCriteria: "days_attended" | "total_beers" | "avg_beers";
     if (data.winning_criteria && typeof data.winning_criteria === "object") {
-      winningCriteria = data.winning_criteria.name as "days_attended" | "total_beers" | "avg_beers";
+      winningCriteria = data.winning_criteria.name as
+        | "days_attended"
+        | "total_beers"
+        | "avg_beers";
     } else if (data.winning_criteria_id) {
       winningCriteria =
         WINNING_CRITERIA_REVERSE_MAP[data.winning_criteria_id] || "total_beers";

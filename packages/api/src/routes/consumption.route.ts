@@ -1,11 +1,16 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { LogConsumptionSchema, LogConsumptionResponseSchema } from "@prostcounter/shared";
-import { ConsumptionService } from "../services/consumption.service";
+import {
+  LogConsumptionSchema,
+  LogConsumptionResponseSchema,
+} from "@prostcounter/shared";
+
+import type { AuthContext } from "../middleware/auth";
+
 import {
   SupabaseConsumptionRepository,
   SupabaseAttendanceRepository,
 } from "../repositories/supabase";
-import type { AuthContext } from "../middleware/auth";
+import { ConsumptionService } from "../services/consumption.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();

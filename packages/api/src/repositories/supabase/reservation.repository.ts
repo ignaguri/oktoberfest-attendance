@@ -1,19 +1,24 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IReservationRepository } from "../interfaces/reservation.repository";
 import type { Database } from "@prostcounter/db";
 import type {
   Reservation,
   CreateReservationInput,
   ReservationStatus,
 } from "@prostcounter/shared";
-import type { IReservationRepository } from "../interfaces/reservation.repository";
-import { DatabaseError, NotFoundError, ForbiddenError } from "../../middleware/error";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import {
+  DatabaseError,
+  NotFoundError,
+  ForbiddenError,
+} from "../../middleware/error";
 
 export class SupabaseReservationRepository implements IReservationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async create(
     userId: string,
-    input: CreateReservationInput
+    input: CreateReservationInput,
   ): Promise<Reservation> {
     const { data, error } = await this.supabase
       .from("reservations")
@@ -48,9 +53,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .single();
 
     if (error && error.code !== "PGRST116") {
-      throw new DatabaseError(
-        `Failed to fetch reservation: ${error.message}`
-      );
+      throw new DatabaseError(`Failed to fetch reservation: ${error.message}`);
     }
 
     if (!data) return null;
@@ -64,7 +67,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
     status?: ReservationStatus,
     upcoming?: boolean,
     limit = 50,
-    offset = 0
+    offset = 0,
   ): Promise<{ data: Reservation[]; total: number }> {
     let query = this.supabase
       .from("reservations")
@@ -84,7 +87,10 @@ export class SupabaseReservationRepository implements IReservationRepository {
       query = query.gte("start_at", new Date().toISOString());
     }
 
-    const { data, error, count } = await query.range(offset, offset + limit - 1);
+    const { data, error, count } = await query.range(
+      offset,
+      offset + limit - 1,
+    );
 
     if (error) {
       throw new DatabaseError(`Failed to list reservations: ${error.message}`);
@@ -107,8 +113,13 @@ export class SupabaseReservationRepository implements IReservationRepository {
       return reservation; // Already checked in, return as-is
     }
 
-    if (reservation.status === "cancelled" || reservation.status === "expired") {
-      throw new ForbiddenError("Cannot check in to a cancelled or expired reservation");
+    if (
+      reservation.status === "cancelled" ||
+      reservation.status === "expired"
+    ) {
+      throw new ForbiddenError(
+        "Cannot check in to a cancelled or expired reservation",
+      );
     }
 
     const { data, error } = await this.supabase
@@ -148,9 +159,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
     return this.mapToReservation(data);
   }
 
-  async getUpcomingForReminders(
-    beforeMinutes: number
-  ): Promise<Reservation[]> {
+  async getUpcomingForReminders(beforeMinutes: number): Promise<Reservation[]> {
     const now = new Date();
     const futureTime = new Date(now.getTime() + beforeMinutes * 60 * 1000);
 
@@ -164,7 +173,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
 
     if (error) {
       throw new DatabaseError(
-        `Failed to fetch upcoming reservations: ${error.message}`
+        `Failed to fetch upcoming reservations: ${error.message}`,
       );
     }
 

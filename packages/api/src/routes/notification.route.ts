@@ -7,8 +7,10 @@ import {
   NotificationPreferencesSchema,
   UpdateNotificationPreferencesSchema,
 } from "@prostcounter/shared";
-import { NotificationService } from "../services/notification.service";
+
 import type { AuthContext } from "../middleware/auth";
+
+import { NotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -165,8 +167,9 @@ app.openapi(getPreferencesRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const preferences =
-    await notificationService.getUserNotificationPreferences(user.id);
+  const preferences = await notificationService.getUserNotificationPreferences(
+    user.id,
+  );
 
   if (!preferences) {
     return c.json(null, 200);

@@ -5,9 +5,14 @@ import {
   GroupIdParamSchema,
   LeaderboardResponseSchema,
 } from "@prostcounter/shared";
-import { SupabaseLeaderboardRepository, SupabaseGroupRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
 import { NotFoundError, ForbiddenError } from "../middleware/error";
+import {
+  SupabaseLeaderboardRepository,
+  SupabaseGroupRepository,
+} from "../repositories/supabase";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -18,7 +23,8 @@ const globalLeaderboardRoute = createRoute({
   path: "/leaderboard",
   tags: ["leaderboard"],
   summary: "Get global leaderboard",
-  description: "Returns ranked list of all users for a festival with pagination",
+  description:
+    "Returns ranked list of all users for a festival with pagination",
   request: {
     query: GlobalLeaderboardQuerySchema,
   },
@@ -60,7 +66,7 @@ app.openapi(globalLeaderboardRoute, async (c) => {
       limit: query.limit,
       offset: query.offset,
     },
-    200
+    200,
   );
 });
 

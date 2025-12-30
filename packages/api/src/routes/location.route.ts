@@ -7,9 +7,11 @@ import {
   GetNearbyMembersResponseSchema,
   UpdateLocationSchema,
 } from "@prostcounter/shared";
-import { LocationService } from "../services/location.service";
-import { SupabaseLocationRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
+import { SupabaseLocationRepository } from "../repositories/supabase";
+import { LocationService } from "../services/location.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -63,7 +65,8 @@ const startSessionRoute = createRoute({
       },
     },
     409: {
-      description: "Conflict - User already has active session for this festival",
+      description:
+        "Conflict - User already has active session for this festival",
       content: {
         "application/json": {
           schema: z.object({
@@ -154,7 +157,8 @@ const updateLocationRoute = createRoute({
   path: "/location/sessions/{id}",
   tags: ["location"],
   summary: "Update location for session",
-  description: "Updates the current location for an active location sharing session",
+  description:
+    "Updates the current location for an active location sharing session",
   request: {
     params: z.object({
       id: z.string().uuid("Invalid session ID"),
@@ -287,7 +291,7 @@ app.openapi(getNearbyMembersRoute, async (c) => {
     query.latitude,
     query.longitude,
     query.radiusMeters,
-    query.groupId
+    query.groupId,
   );
 
   return c.json(
@@ -300,7 +304,7 @@ app.openapi(getNearbyMembersRoute, async (c) => {
       },
       radiusMeters: query.radiusMeters,
     },
-    200
+    200,
   );
 });
 

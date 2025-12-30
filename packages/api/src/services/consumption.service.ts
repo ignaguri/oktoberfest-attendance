@@ -1,8 +1,12 @@
-import type { AttendanceWithTotals, LogConsumptionInput } from "@prostcounter/shared";
 import type {
   IConsumptionRepository,
   IAttendanceRepository,
 } from "../repositories/interfaces";
+import type {
+  AttendanceWithTotals,
+  LogConsumptionInput,
+} from "@prostcounter/shared";
+
 import { ValidationError } from "../middleware/error";
 
 /**
@@ -12,7 +16,7 @@ import { ValidationError } from "../middleware/error";
 export class ConsumptionService {
   constructor(
     private consumptionRepo: IConsumptionRepository,
-    private attendanceRepo: IAttendanceRepository
+    private attendanceRepo: IAttendanceRepository,
   ) {}
 
   /**
@@ -28,7 +32,7 @@ export class ConsumptionService {
    */
   async logConsumption(
     userId: string,
-    data: LogConsumptionInput
+    data: LogConsumptionInput,
   ): Promise<AttendanceWithTotals> {
     const { festivalId, date, ...consumptionData } = data;
 
@@ -49,7 +53,7 @@ export class ConsumptionService {
     const attendance = await this.attendanceRepo.findOrCreate(
       userId,
       festivalId,
-      date
+      date,
     );
 
     // 2. Create consumption record (pricing logic handled in repository)

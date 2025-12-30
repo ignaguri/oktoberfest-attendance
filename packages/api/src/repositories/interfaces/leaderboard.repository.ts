@@ -15,7 +15,7 @@ export interface ILeaderboardRepository {
    * @returns Array of leaderboard entries and total count
    */
   getGlobal(
-    query: GlobalLeaderboardQuery
+    query: GlobalLeaderboardQuery,
   ): Promise<{ data: LeaderboardEntry[]; total: number }>;
 
   /**
@@ -26,6 +26,6 @@ export interface ILeaderboardRepository {
    */
   getForGroup(
     groupId: string,
-    query?: GroupLeaderboardQuery
+    query?: GroupLeaderboardQuery,
   ): Promise<LeaderboardEntry[]>;
 }

@@ -1,9 +1,10 @@
+import type { IReservationRepository } from "../repositories/interfaces";
 import type {
   Reservation,
   CreateReservationInput,
   ReservationStatus,
 } from "@prostcounter/shared";
-import type { IReservationRepository } from "../repositories/interfaces";
+
 import { ValidationError, NotFoundError } from "../middleware/error";
 
 /**
@@ -28,7 +29,7 @@ export class ReservationService {
    */
   async createReservation(
     userId: string,
-    data: CreateReservationInput
+    data: CreateReservationInput,
   ): Promise<Reservation> {
     // Validate reservation is in the future
     const startAt = new Date(data.startAt);
@@ -91,7 +92,7 @@ export class ReservationService {
     status?: ReservationStatus,
     upcoming?: boolean,
     limit = 50,
-    offset = 0
+    offset = 0,
   ): Promise<{ data: Reservation[]; total: number }> {
     return this.reservationRepo.list(
       userId,
@@ -99,7 +100,7 @@ export class ReservationService {
       status,
       upcoming,
       limit,
-      offset
+      offset,
     );
   }
 
@@ -119,7 +120,7 @@ export class ReservationService {
    */
   async checkin(
     id: string,
-    userId: string
+    userId: string,
   ): Promise<{
     reservation: Reservation;
     attendance?: { id: string; date: string };
@@ -170,9 +171,7 @@ export class ReservationService {
    * @param beforeMinutes - Get reservations starting within this many minutes
    * @returns Reservations needing reminders
    */
-  async getUpcomingForReminders(
-    beforeMinutes: number
-  ): Promise<Reservation[]> {
+  async getUpcomingForReminders(beforeMinutes: number): Promise<Reservation[]> {
     return this.reservationRepo.getUpcomingForReminders(beforeMinutes);
   }
 }

@@ -1,11 +1,12 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IPhotoRepository } from "../interfaces/photo.repository";
 import type { Database } from "@prostcounter/db";
 import type {
   BeerPicture,
   GetPhotoUploadUrlQuery,
   GetPhotoUploadUrlResponse,
 } from "@prostcounter/shared";
-import type { IPhotoRepository } from "../interfaces/photo.repository";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import {
   DatabaseError,
   NotFoundError,
@@ -20,7 +21,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
 
   async getUploadUrl(
     userId: string,
-    query: GetPhotoUploadUrlQuery
+    query: GetPhotoUploadUrlQuery,
   ): Promise<GetPhotoUploadUrlResponse> {
     // Verify attendance belongs to user
     const { data: attendance, error: attError } = await this.supabase
@@ -40,8 +41,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     const filePath = `${userId}/${query.festivalId}/${timestamp}_${sanitizedFileName}`;
 
     // Create signed upload URL
-    const { data: uploadData, error: uploadError } = await this.supabase
-      .storage
+    const { data: uploadData, error: uploadError } = await this.supabase.storage
       .from(this.BUCKET_NAME)
       .createSignedUploadUrl(filePath, {
         upsert: false,
@@ -49,13 +49,12 @@ export class SupabasePhotoRepository implements IPhotoRepository {
 
     if (uploadError || !uploadData) {
       throw new DatabaseError(
-        `Failed to generate upload URL: ${uploadError?.message || "Unknown error"}`
+        `Failed to generate upload URL: ${uploadError?.message || "Unknown error"}`,
       );
     }
 
     // Get public URL for the file
-    const { data: publicUrlData } = this.supabase
-      .storage
+    const { data: publicUrlData } = this.supabase.storage
       .from(this.BUCKET_NAME)
       .getPublicUrl(filePath);
 
@@ -73,7 +72,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
 
     if (pictureError) {
       throw new DatabaseError(
-        `Failed to create picture record: ${pictureError.message}`
+        `Failed to create picture record: ${pictureError.message}`,
       );
     }
 
@@ -85,10 +84,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     };
   }
 
-  async confirmUpload(
-    pictureId: string,
-    userId: string
-  ): Promise<BeerPicture> {
+  async confirmUpload(pictureId: string, userId: string): Promise<BeerPicture> {
     // Verify ownership
     const { data, error } = await this.supabase
       .from("beer_pictures")
@@ -107,7 +103,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
 
   async findByAttendance(
     attendanceId: string,
-    userId: string
+    userId: string,
   ): Promise<BeerPicture[]> {
     // Verify attendance ownership
     const { data: attendance, error: attError } = await this.supabase
@@ -129,9 +125,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .order("created_at", { ascending: false });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch pictures: ${error.message}`
-      );
+      throw new DatabaseError(`Failed to fetch pictures: ${error.message}`);
     }
 
     return data.map((p) => this.mapToBeerPicture(p));
@@ -141,7 +135,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     userId: string,
     festivalId?: string,
     limit = 50,
-    offset = 0
+    offset = 0,
   ): Promise<{ data: BeerPicture[]; total: number }> {
     let query = this.supabase
       .from("beer_pictures")
@@ -153,7 +147,10 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       query = query.eq("attendances.festival_id", festivalId);
     }
 
-    const { data, error, count } = await query.range(offset, offset + limit - 1);
+    const { data, error, count } = await query.range(
+      offset,
+      offset + limit - 1,
+    );
 
     if (error) {
       throw new DatabaseError(`Failed to list pictures: ${error.message}`);
@@ -181,17 +178,20 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     // Extract file path from URL
     const url = new URL(data.picture_url);
     const pathParts = url.pathname.split("/");
-    const filePath = pathParts.slice(pathParts.indexOf(this.BUCKET_NAME) + 1).join("/");
+    const filePath = pathParts
+      .slice(pathParts.indexOf(this.BUCKET_NAME) + 1)
+      .join("/");
 
     // Delete from storage
-    const { error: storageError } = await this.supabase
-      .storage
+    const { error: storageError } = await this.supabase.storage
       .from(this.BUCKET_NAME)
       .remove([filePath]);
 
     if (storageError) {
       // Log but don't fail - database record is more important
-      console.warn(`Failed to delete file from storage: ${storageError.message}`);
+      console.warn(
+        `Failed to delete file from storage: ${storageError.message}`,
+      );
     }
 
     // Delete database record
@@ -209,12 +209,14 @@ export class SupabasePhotoRepository implements IPhotoRepository {
   async updateCaption(
     pictureId: string,
     userId: string,
-    caption: string
+    caption: string,
   ): Promise<BeerPicture> {
     // Note: Current schema doesn't have caption field
     // This is a stub for future enhancement
     // TODO: Add caption field to beer_pictures table
-    throw new DatabaseError("Caption feature not yet implemented - schema needs update");
+    throw new DatabaseError(
+      "Caption feature not yet implemented - schema needs update",
+    );
   }
 
   private mapToBeerPicture(data: any): BeerPicture {

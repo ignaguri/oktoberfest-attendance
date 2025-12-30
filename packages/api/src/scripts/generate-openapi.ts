@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 import { writeFileSync } from "fs";
 import { resolve } from "path";
+
 import { app } from "../index";
 
 /**

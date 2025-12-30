@@ -17,7 +17,7 @@ export interface IPhotoRepository {
    */
   getUploadUrl(
     userId: string,
-    query: GetPhotoUploadUrlQuery
+    query: GetPhotoUploadUrlQuery,
   ): Promise<GetPhotoUploadUrlResponse>;
 
   /**
@@ -26,10 +26,7 @@ export interface IPhotoRepository {
    * @param userId - User ID (for authorization)
    * @returns Confirmed picture data
    */
-  confirmUpload(
-    pictureId: string,
-    userId: string
-  ): Promise<BeerPicture>;
+  confirmUpload(pictureId: string, userId: string): Promise<BeerPicture>;
 
   /**
    * Get photos for an attendance
@@ -39,7 +36,7 @@ export interface IPhotoRepository {
    */
   findByAttendance(
     attendanceId: string,
-    userId: string
+    userId: string,
   ): Promise<BeerPicture[]>;
 
   /**
@@ -54,7 +51,7 @@ export interface IPhotoRepository {
     userId: string,
     festivalId?: string,
     limit?: number,
-    offset?: number
+    offset?: number,
   ): Promise<{ data: BeerPicture[]; total: number }>;
 
   /**
@@ -74,6 +71,6 @@ export interface IPhotoRepository {
   updateCaption(
     pictureId: string,
     userId: string,
-    caption: string
+    caption: string,
   ): Promise<BeerPicture>;
 }

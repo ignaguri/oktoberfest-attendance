@@ -1,5 +1,5 @@
-import type { WrappedData } from "@prostcounter/shared";
 import type { IWrappedRepository } from "../repositories/interfaces";
+import type { WrappedData } from "@prostcounter/shared";
 
 /**
  * Wrapped Service
@@ -18,7 +18,7 @@ export class WrappedService {
    */
   async getWrapped(
     userId: string,
-    festivalId: string
+    festivalId: string,
   ): Promise<{ wrapped: WrappedData | null; cached: boolean }> {
     // Try to get cached data first
     const cached = await this.wrappedRepo.getCached(userId, festivalId);
@@ -43,7 +43,7 @@ export class WrappedService {
   async generateWrapped(
     userId: string,
     festivalId: string,
-    force = false
+    force = false,
   ): Promise<{ wrapped: WrappedData; regenerated: boolean }> {
     // Check if we need to regenerate
     const isCached = await this.wrappedRepo.isCached(userId, festivalId);

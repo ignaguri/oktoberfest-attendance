@@ -1,9 +1,10 @@
+import type { IPhotoRepository } from "../repositories/interfaces";
 import type {
   BeerPicture,
   GetPhotoUploadUrlQuery,
   GetPhotoUploadUrlResponse,
 } from "@prostcounter/shared";
-import type { IPhotoRepository } from "../repositories/interfaces";
+
 import { ValidationError } from "../middleware/error";
 
 /**
@@ -41,19 +42,19 @@ export class PhotoService {
    */
   async getUploadUrl(
     userId: string,
-    query: GetPhotoUploadUrlQuery
+    query: GetPhotoUploadUrlQuery,
   ): Promise<GetPhotoUploadUrlResponse> {
     // Validate file type
     if (!this.ALLOWED_TYPES.includes(query.fileType)) {
       throw new ValidationError(
-        `Invalid file type. Allowed types: ${this.ALLOWED_TYPES.join(", ")}`
+        `Invalid file type. Allowed types: ${this.ALLOWED_TYPES.join(", ")}`,
       );
     }
 
     // Validate file size
     if (query.fileSize > this.MAX_FILE_SIZE) {
       throw new ValidationError(
-        `File size exceeds maximum of ${this.MAX_FILE_SIZE / 1024 / 1024}MB`
+        `File size exceeds maximum of ${this.MAX_FILE_SIZE / 1024 / 1024}MB`,
       );
     }
 
@@ -73,10 +74,7 @@ export class PhotoService {
    * @param userId - User ID (for authorization)
    * @returns Confirmed picture data
    */
-  async confirmUpload(
-    pictureId: string,
-    userId: string
-  ): Promise<BeerPicture> {
+  async confirmUpload(pictureId: string, userId: string): Promise<BeerPicture> {
     return this.photoRepo.confirmUpload(pictureId, userId);
   }
 
@@ -89,7 +87,7 @@ export class PhotoService {
    */
   async getPhotosForAttendance(
     attendanceId: string,
-    userId: string
+    userId: string,
   ): Promise<BeerPicture[]> {
     return this.photoRepo.findByAttendance(attendanceId, userId);
   }
@@ -107,7 +105,7 @@ export class PhotoService {
     userId: string,
     festivalId?: string,
     limit = 50,
-    offset = 0
+    offset = 0,
   ): Promise<{ data: BeerPicture[]; total: number }> {
     // Validate pagination
     if (limit < 1 || limit > 100) {
@@ -151,7 +149,7 @@ export class PhotoService {
   async updateCaption(
     pictureId: string,
     userId: string,
-    caption: string
+    caption: string,
   ): Promise<BeerPicture> {
     // Validate caption length
     if (caption.length > 500) {

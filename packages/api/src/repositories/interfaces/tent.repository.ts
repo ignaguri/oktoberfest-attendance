@@ -20,6 +20,6 @@ export interface ITentRepository {
    */
   findFestivalTent(
     festivalId: string,
-    tentId: string
+    tentId: string,
   ): Promise<FestivalTent | null>;
 }

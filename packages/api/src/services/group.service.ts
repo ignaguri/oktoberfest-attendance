@@ -1,10 +1,11 @@
+import type { IGroupRepository } from "../repositories/interfaces";
 import type {
   Group,
   GroupWithMembers,
   CreateGroupInput,
   ListGroupsQuery,
 } from "@prostcounter/shared";
-import type { IGroupRepository } from "../repositories/interfaces";
+
 import { NotFoundError, ForbiddenError } from "../middleware/error";
 
 /**
@@ -28,7 +29,7 @@ export class GroupService {
    */
   async listUserGroups(
     userId: string,
-    query?: ListGroupsQuery
+    query?: ListGroupsQuery,
   ): Promise<GroupWithMembers[]> {
     return await this.groupRepo.listUserGroups(userId, query);
   }
@@ -60,7 +61,7 @@ export class GroupService {
   async joinGroup(
     groupId: string,
     userId: string,
-    inviteToken?: string
+    inviteToken?: string,
   ): Promise<void> {
     const group = await this.groupRepo.findById(groupId);
 

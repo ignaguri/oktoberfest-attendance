@@ -18,7 +18,7 @@ export interface IAttendanceRepository {
   findOrCreate(
     userId: string,
     festivalId: string,
-    date: string
+    date: string,
   ): Promise<AttendanceWithTotals>;
 
   /**
@@ -36,7 +36,7 @@ export interface IAttendanceRepository {
    */
   list(
     userId: string,
-    query: ListAttendancesQuery
+    query: ListAttendancesQuery,
   ): Promise<{ data: AttendanceWithTotals[]; total: number }>;
 
   /**

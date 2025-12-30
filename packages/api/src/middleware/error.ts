@@ -1,11 +1,12 @@
-import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
+
+import type { Context } from "hono";
 
 export class ApiError extends Error {
   constructor(
     public statusCode: number,
     message: string,
-    public code?: string
+    public code?: string,
   ) {
     super(message);
     this.name = "ApiError";
@@ -13,7 +14,10 @@ export class ApiError extends Error {
 }
 
 export class ValidationError extends ApiError {
-  constructor(message: string, public errors?: unknown) {
+  constructor(
+    message: string,
+    public errors?: unknown,
+  ) {
     super(400, message, "VALIDATION_ERROR");
     this.name = "ValidationError";
   }
@@ -71,7 +75,7 @@ export function errorHandler(err: Error, c: Context) {
           statusCode: err.status,
         },
       },
-      err.status
+      err.status,
     );
   }
 
@@ -88,7 +92,7 @@ export function errorHandler(err: Error, c: Context) {
             : {}),
         },
       },
-      err.statusCode as any
+      err.statusCode as any,
     );
   }
 
@@ -101,6 +105,6 @@ export function errorHandler(err: Error, c: Context) {
         statusCode: 500,
       },
     },
-    500 as any
+    500 as any,
   );
 }

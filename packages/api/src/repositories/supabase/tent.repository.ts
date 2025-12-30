@@ -1,7 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@prostcounter/db";
-import type { FestivalTent, Tent } from "@prostcounter/shared";
 import type { ITentRepository } from "../interfaces";
+import type { Database } from "@prostcounter/db";
+import type { FestivalTent } from "@prostcounter/shared";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError } from "../../middleware/error";
 
 export class SupabaseTentRepository implements ITentRepository {
@@ -25,7 +26,7 @@ export class SupabaseTentRepository implements ITentRepository {
           name,
           category
         )
-      `
+      `,
       )
       .eq("festival_id", festivalId)
       .order("tents(name)", { ascending: true });
@@ -39,7 +40,7 @@ export class SupabaseTentRepository implements ITentRepository {
 
   async findFestivalTent(
     festivalId: string,
-    tentId: string
+    tentId: string,
   ): Promise<FestivalTent | null> {
     const { data, error } = await this.supabase
       .from("festival_tents")
@@ -53,7 +54,7 @@ export class SupabaseTentRepository implements ITentRepository {
           name,
           category
         )
-      `
+      `,
       )
       .eq("festival_id", festivalId)
       .eq("tent_id", tentId)
@@ -63,7 +64,9 @@ export class SupabaseTentRepository implements ITentRepository {
       if (error.code === "PGRST116") {
         return null; // Not found
       }
-      throw new DatabaseError(`Failed to fetch festival tent: ${error.message}`);
+      throw new DatabaseError(
+        `Failed to fetch festival tent: ${error.message}`,
+      );
     }
 
     return this.mapToFestivalTent(data);

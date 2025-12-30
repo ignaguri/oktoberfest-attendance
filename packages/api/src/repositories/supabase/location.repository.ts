@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ILocationRepository } from "../interfaces/location.repository";
 import type { Database } from "@prostcounter/db";
 import type {
   LocationSession,
@@ -6,7 +6,8 @@ import type {
   LocationSessionMember,
   StartLocationSessionInput,
 } from "@prostcounter/shared";
-import type { ILocationRepository } from "../interfaces/location.repository";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import {
   DatabaseError,
   NotFoundError,
@@ -18,21 +19,21 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
   async startSession(
     userId: string,
-    input: StartLocationSessionInput
+    input: StartLocationSessionInput,
   ): Promise<LocationSession> {
     // Check if user already has an active session for this festival
     const existingSession = await this.getActiveSession(
       userId,
-      input.festivalId
+      input.festivalId,
     );
     if (existingSession) {
       throw new ConflictError(
-        "User already has an active location session for this festival"
+        "User already has an active location session for this festival",
       );
     }
 
     const expiresAt = new Date(
-      Date.now() + (input.durationMinutes || 120) * 60 * 1000
+      Date.now() + (input.durationMinutes || 120) * 60 * 1000,
     );
 
     const { data: session, error: sessionError } = await this.supabase
@@ -49,7 +50,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
     if (sessionError) {
       throw new DatabaseError(
-        `Failed to create location session: ${sessionError.message}`
+        `Failed to create location session: ${sessionError.message}`,
       );
     }
 
@@ -63,7 +64,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
   async stopSession(
     sessionId: string,
-    userId: string
+    userId: string,
   ): Promise<LocationSession> {
     const { data, error } = await this.supabase
       .from("location_sessions")
@@ -81,7 +82,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
         throw new NotFoundError("Location session not found");
       }
       throw new DatabaseError(
-        `Failed to stop location session: ${error.message}`
+        `Failed to stop location session: ${error.message}`,
       );
     }
 
@@ -90,7 +91,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
   async getActiveSession(
     userId: string,
-    festivalId: string
+    festivalId: string,
   ): Promise<LocationSession | null> {
     const { data, error } = await this.supabase
       .from("location_sessions")
@@ -103,7 +104,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
     if (error && error.code !== "PGRST116") {
       throw new DatabaseError(
-        `Failed to fetch active session: ${error.message}`
+        `Failed to fetch active session: ${error.message}`,
       );
     }
 
@@ -122,7 +123,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
     if (error) {
       throw new DatabaseError(
-        `Failed to fetch active sessions: ${error.message}`
+        `Failed to fetch active sessions: ${error.message}`,
       );
     }
 
@@ -132,7 +133,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
   async updateLocation(
     sessionId: string,
     userId: string,
-    location: LocationPoint
+    location: LocationPoint,
   ): Promise<void> {
     // Verify session belongs to user and is active
     const { data: session, error: sessionError } = await this.supabase
@@ -160,7 +161,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
     if (locationError) {
       throw new DatabaseError(
-        `Failed to update location: ${locationError.message}`
+        `Failed to update location: ${locationError.message}`,
       );
     }
 
@@ -177,7 +178,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
     latitude: number,
     longitude: number,
     radiusMeters: number,
-    groupId?: string
+    groupId?: string,
   ): Promise<LocationSessionMember[]> {
     // Use the database RPC function for proximity search
     const { data, error } = await this.supabase.rpc(
@@ -186,12 +187,12 @@ export class SupabaseLocationRepository implements ILocationRepository {
         input_user_id: userId,
         input_festival_id: festivalId,
         radius_meters: radiusMeters,
-      }
+      },
     );
 
     if (error) {
       throw new DatabaseError(
-        `Failed to fetch nearby members: ${error.message}`
+        `Failed to fetch nearby members: ${error.message}`,
       );
     }
 
@@ -209,14 +210,15 @@ export class SupabaseLocationRepository implements ILocationRepository {
       avatarUrl: m.avatar_url,
       groupId: m.group_id,
       groupName: m.group_name,
-      lastLocation: m.latitude && m.longitude
-        ? {
-            latitude: m.latitude,
-            longitude: m.longitude,
-            accuracy: m.accuracy,
-            timestamp: m.last_updated,
-          }
-        : null,
+      lastLocation:
+        m.latitude && m.longitude
+          ? {
+              latitude: m.latitude,
+              longitude: m.longitude,
+              accuracy: m.accuracy,
+              timestamp: m.last_updated,
+            }
+          : null,
       distance: m.distance_meters,
     }));
   }
@@ -226,7 +228,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
     if (error) {
       throw new DatabaseError(
-        `Failed to expire old sessions: ${error.message}`
+        `Failed to expire old sessions: ${error.message}`,
       );
     }
   }

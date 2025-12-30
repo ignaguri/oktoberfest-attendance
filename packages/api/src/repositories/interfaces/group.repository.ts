@@ -24,7 +24,10 @@ export interface IGroupRepository {
    * @param query - Query parameters (festivalId filter)
    * @returns Array of groups with member counts
    */
-  listUserGroups(userId: string, query?: ListGroupsQuery): Promise<GroupWithMembers[]>;
+  listUserGroups(
+    userId: string,
+    query?: ListGroupsQuery,
+  ): Promise<GroupWithMembers[]>;
 
   /**
    * Get a group by ID

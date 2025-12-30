@@ -16,7 +16,7 @@ export interface IAchievementRepository {
    */
   listUserAchievements(
     userId: string,
-    query: ListAchievementsQuery
+    query: ListAchievementsQuery,
   ): Promise<UserAchievement[]>;
 
   /**

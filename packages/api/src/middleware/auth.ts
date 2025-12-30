@@ -1,8 +1,9 @@
-import { createMiddleware } from "hono/factory";
-import type { Context } from "hono";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { UnauthorizedError } from "./error";
+import { createMiddleware } from "hono/factory";
+
 import type { User } from "@supabase/supabase-js";
+
+import { UnauthorizedError } from "./error";
 
 // Extend Hono context to include user
 export type AuthContext = {

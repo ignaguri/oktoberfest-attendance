@@ -1,10 +1,11 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IAchievementRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
   UserAchievement,
   ListAchievementsQuery,
 } from "@prostcounter/shared";
-import type { IAchievementRepository } from "../interfaces";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError } from "../../middleware/error";
 
 export class SupabaseAchievementRepository implements IAchievementRepository {
@@ -12,7 +13,7 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
 
   async listUserAchievements(
     userId: string,
-    query: ListAchievementsQuery
+    query: ListAchievementsQuery,
   ): Promise<UserAchievement[]> {
     let supabaseQuery = this.supabase
       .from("achievement_events")
@@ -31,7 +32,7 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
           created_at,
           updated_at
         )
-      `
+      `,
       )
       .eq("user_id", userId)
       .eq("festival_id", query.festivalId);

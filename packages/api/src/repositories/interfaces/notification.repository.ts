@@ -30,7 +30,7 @@ export interface INotificationRepository {
    */
   updatePreferences(
     userId: string,
-    preferences: UpdateNotificationPreferencesInput
+    preferences: UpdateNotificationPreferencesInput,
   ): Promise<NotificationPreferences>;
 
   /**
@@ -55,7 +55,7 @@ export interface INotificationRepository {
    */
   canSendNotification(
     userId: string,
-    notificationType: string
+    notificationType: string,
   ): Promise<boolean>;
 
   /**
@@ -65,6 +65,6 @@ export interface INotificationRepository {
    */
   recordNotificationSent(
     userId: string,
-    notificationType: string
+    notificationType: string,
   ): Promise<void>;
 }

@@ -1,7 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IConsumptionRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type { Consumption, LogConsumptionInput } from "@prostcounter/shared";
-import type { IConsumptionRepository } from "../interfaces";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError } from "../../middleware/error";
 
 export class SupabaseConsumptionRepository implements IConsumptionRepository {
@@ -10,7 +11,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
   async create(
     userId: string,
     attendanceId: string,
-    input: Omit<LogConsumptionInput, "festivalId" | "date">
+    input: Omit<LogConsumptionInput, "festivalId" | "date">,
   ): Promise<Consumption> {
     const {
       tentId,
@@ -36,7 +37,9 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
         .single();
 
       if (attError) {
-        throw new DatabaseError(`Failed to fetch attendance: ${attError.message}`);
+        throw new DatabaseError(
+          `Failed to fetch attendance: ${attError.message}`,
+        );
       }
 
       // Try to get tent-specific pricing if tent provided
@@ -103,14 +106,19 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       .single();
 
     if (fetchError) {
-      throw new DatabaseError(`Failed to fetch consumption: ${fetchError.message}`);
+      throw new DatabaseError(
+        `Failed to fetch consumption: ${fetchError.message}`,
+      );
     }
 
     if ((consumption.attendances as any)?.user_id !== userId) {
       throw new DatabaseError("Unauthorized to delete this consumption");
     }
 
-    const { error } = await this.supabase.from("consumptions").delete().eq("id", id);
+    const { error } = await this.supabase
+      .from("consumptions")
+      .delete()
+      .eq("id", id);
 
     if (error) {
       throw new DatabaseError(`Failed to delete consumption: ${error.message}`);

@@ -1,13 +1,13 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  GetWrappedQuerySchema,
   GetWrappedResponseSchema,
-  GenerateWrappedBodySchema,
   GenerateWrappedResponseSchema,
 } from "@prostcounter/shared";
-import { WrappedService } from "../services/wrapped.service";
-import { SupabaseWrappedRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
+import { SupabaseWrappedRepository } from "../repositories/supabase";
+import { WrappedService } from "../services/wrapped.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -137,7 +137,11 @@ app.openapi(generateWrappedRoute, async (c) => {
   const wrappedRepo = new SupabaseWrappedRepository(supabase);
   const wrappedService = new WrappedService(wrappedRepo);
 
-  const result = await wrappedService.generateWrapped(user.id, festivalId, force);
+  const result = await wrappedService.generateWrapped(
+    user.id,
+    festivalId,
+    force,
+  );
 
   return c.json(result, 200);
 });

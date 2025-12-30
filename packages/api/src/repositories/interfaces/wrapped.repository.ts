@@ -23,7 +23,7 @@ export interface IWrappedRepository {
   generate(
     userId: string,
     festivalId: string,
-    force?: boolean
+    force?: boolean,
   ): Promise<WrappedData>;
 
   /**

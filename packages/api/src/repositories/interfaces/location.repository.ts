@@ -18,7 +18,7 @@ export interface ILocationRepository {
    */
   startSession(
     userId: string,
-    data: StartLocationSessionInput
+    data: StartLocationSessionInput,
   ): Promise<LocationSession>;
 
   /**
@@ -37,7 +37,7 @@ export interface ILocationRepository {
    */
   getActiveSession(
     userId: string,
-    festivalId: string
+    festivalId: string,
   ): Promise<LocationSession | null>;
 
   /**
@@ -56,7 +56,7 @@ export interface ILocationRepository {
   updateLocation(
     sessionId: string,
     userId: string,
-    location: LocationPoint
+    location: LocationPoint,
   ): Promise<void>;
 
   /**
@@ -75,7 +75,7 @@ export interface ILocationRepository {
     latitude: number,
     longitude: number,
     radiusMeters: number,
-    groupId?: string
+    groupId?: string,
   ): Promise<LocationSessionMember[]>;
 
   /**

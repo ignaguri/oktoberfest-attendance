@@ -6,9 +6,11 @@ import {
   GetPhotosQuerySchema,
   GetPhotosResponseSchema,
 } from "@prostcounter/shared";
-import { PhotoService } from "../services/photo.service";
-import { SupabasePhotoRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
+import { SupabasePhotoRepository } from "../repositories/supabase";
+import { PhotoService } from "../services/photo.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -149,7 +151,7 @@ app.openapi(confirmUploadRoute, async (c) => {
         uploadedAt: picture.createdAt,
       },
     },
-    200
+    200,
   );
 });
 
@@ -159,7 +161,8 @@ const listPhotosRoute = createRoute({
   path: "/photos",
   tags: ["photos"],
   summary: "List user photos",
-  description: "Retrieves all beer pictures for the authenticated user with optional filters",
+  description:
+    "Retrieves all beer pictures for the authenticated user with optional filters",
   request: {
     query: GetPhotosQuerySchema,
   },
@@ -209,7 +212,7 @@ app.openapi(listPhotosRoute, async (c) => {
     user.id,
     query.festivalId,
     query.limit,
-    query.offset
+    query.offset,
   );
 
   return c.json(
@@ -219,7 +222,7 @@ app.openapi(listPhotosRoute, async (c) => {
       limit: query.limit || 50,
       offset: query.offset || 0,
     },
-    200
+    200,
   );
 });
 

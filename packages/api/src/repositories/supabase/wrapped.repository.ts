@@ -1,7 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IWrappedRepository } from "../interfaces/wrapped.repository";
 import type { Database } from "@prostcounter/db";
 import type { WrappedData } from "@prostcounter/shared";
-import type { IWrappedRepository } from "../interfaces/wrapped.repository";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError, NotFoundError } from "../../middleware/error";
 
 export class SupabaseWrappedRepository implements IWrappedRepository {
@@ -9,7 +10,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
 
   async getCached(
     userId: string,
-    festivalId: string
+    festivalId: string,
   ): Promise<WrappedData | null> {
     const { data, error } = await this.supabase.rpc("get_wrapped_data_cached", {
       p_user_id: userId,
@@ -18,7 +19,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
 
     if (error) {
       throw new DatabaseError(
-        `Failed to fetch cached wrapped data: ${error.message}`
+        `Failed to fetch cached wrapped data: ${error.message}`,
       );
     }
 
@@ -30,7 +31,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
   async generate(
     userId: string,
     festivalId: string,
-    force = false
+    force = false,
   ): Promise<WrappedData> {
     // If force regeneration, invalidate cache first
     if (force) {
@@ -45,7 +46,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
 
     if (error) {
       throw new DatabaseError(
-        `Failed to generate wrapped data: ${error.message}`
+        `Failed to generate wrapped data: ${error.message}`,
       );
     }
 
@@ -64,7 +65,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
 
     if (error) {
       throw new DatabaseError(
-        `Failed to invalidate wrapped cache: ${error.message}`
+        `Failed to invalidate wrapped cache: ${error.message}`,
       );
     }
   }
@@ -75,13 +76,16 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       .select("id")
       .eq("user_id", userId)
       .eq("festival_id", festivalId)
-      .gte("updated_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Within last 24 hours
+      .gte(
+        "updated_at",
+        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      ) // Within last 24 hours
       .single();
 
     if (error && error.code !== "PGRST116") {
       // Ignore "no rows" error
       throw new DatabaseError(
-        `Failed to check wrapped cache: ${error.message}`
+        `Failed to check wrapped cache: ${error.message}`,
       );
     }
 
@@ -94,7 +98,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
   private mapToWrappedData(
     data: any,
     userId: string,
-    festivalId: string
+    festivalId: string,
   ): WrappedData {
     return {
       userId,

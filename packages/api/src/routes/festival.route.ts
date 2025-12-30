@@ -5,9 +5,11 @@ import {
   FestivalIdParamSchema,
   GetFestivalResponseSchema,
 } from "@prostcounter/shared";
-import { SupabaseFestivalRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
 import { NotFoundError } from "../middleware/error";
+import { SupabaseFestivalRepository } from "../repositories/supabase";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -18,7 +20,8 @@ const listFestivalsRoute = createRoute({
   path: "/festivals",
   tags: ["festivals"],
   summary: "List all festivals",
-  description: "Returns list of festivals with optional filtering by status or active state",
+  description:
+    "Returns list of festivals with optional filtering by status or active state",
   request: {
     query: ListFestivalsQuerySchema,
   },

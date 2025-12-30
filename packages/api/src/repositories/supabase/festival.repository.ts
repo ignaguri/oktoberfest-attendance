@@ -1,7 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { IFestivalRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type { Festival, ListFestivalsQuery } from "@prostcounter/shared";
-import type { IFestivalRepository } from "../interfaces";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError } from "../../middleware/error";
 
 export class SupabaseFestivalRepository implements IFestivalRepository {
@@ -57,7 +58,9 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       if (error.code === "PGRST116") {
         return null; // No active festival
       }
-      throw new DatabaseError(`Failed to fetch active festival: ${error.message}`);
+      throw new DatabaseError(
+        `Failed to fetch active festival: ${error.message}`,
+      );
     }
 
     return this.mapToFestival(data);

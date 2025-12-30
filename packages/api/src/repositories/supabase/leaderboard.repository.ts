@@ -1,11 +1,12 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ILeaderboardRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
   LeaderboardEntry,
   GlobalLeaderboardQuery,
   GroupLeaderboardQuery,
 } from "@prostcounter/shared";
-import type { ILeaderboardRepository } from "../interfaces";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { DatabaseError } from "../../middleware/error";
 
 // Mapping between winning criteria strings and database IDs
@@ -19,7 +20,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async getGlobal(
-    query: GlobalLeaderboardQuery
+    query: GlobalLeaderboardQuery,
   ): Promise<{ data: LeaderboardEntry[]; total: number }> {
     const { festivalId, sortBy, limit, offset } = query;
 
@@ -34,7 +35,9 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     });
 
     if (error) {
-      throw new DatabaseError(`Failed to fetch global leaderboard: ${error.message}`);
+      throw new DatabaseError(
+        `Failed to fetch global leaderboard: ${error.message}`,
+      );
     }
 
     // Apply pagination client-side since DB function doesn't support it
@@ -52,7 +55,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
 
   async getForGroup(
     groupId: string,
-    query?: GroupLeaderboardQuery
+    query?: GroupLeaderboardQuery,
   ): Promise<LeaderboardEntry[]> {
     // Get group to determine winning criteria (default sort)
     const { data: group, error: groupError } = await this.supabase
@@ -68,7 +71,8 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     // Use query sortBy if provided, otherwise use group's winning criteria
     let winningCriteriaId = group.winning_criteria_id;
     if (query?.sortBy) {
-      winningCriteriaId = WINNING_CRITERIA_MAP[query.sortBy] || group.winning_criteria_id;
+      winningCriteriaId =
+        WINNING_CRITERIA_MAP[query.sortBy] || group.winning_criteria_id;
     }
 
     // Call database function for group leaderboard
@@ -78,7 +82,9 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     });
 
     if (error) {
-      throw new DatabaseError(`Failed to fetch group leaderboard: ${error.message}`);
+      throw new DatabaseError(
+        `Failed to fetch group leaderboard: ${error.message}`,
+      );
     }
 
     return data.map((item: any, index: number) => ({

@@ -5,8 +5,10 @@ import {
   EvaluateAchievementsSchema,
   EvaluateAchievementsResponseSchema,
 } from "@prostcounter/shared";
-import { SupabaseAchievementRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
+import { SupabaseAchievementRepository } from "../repositories/supabase";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -51,7 +53,10 @@ app.openapi(listAchievementsRoute, async (c) => {
   const query = c.req.valid("query");
 
   const achievementRepo = new SupabaseAchievementRepository(supabase);
-  const achievements = await achievementRepo.listUserAchievements(user.id, query);
+  const achievements = await achievementRepo.listUserAchievements(
+    user.id,
+    query,
+  );
 
   return c.json({ data: achievements }, 200);
 });
@@ -134,7 +139,7 @@ app.openapi(evaluateAchievementsRoute, async (c) => {
       newAchievements,
       totalPoints,
     },
-    200
+    200,
   );
 });
 

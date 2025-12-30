@@ -5,9 +5,11 @@ import {
   AttendanceIdParamSchema,
   DeleteAttendanceResponseSchema,
 } from "@prostcounter/shared";
-import { SupabaseAttendanceRepository } from "../repositories/supabase";
+
 import type { AuthContext } from "../middleware/auth";
+
 import { NotFoundError } from "../middleware/error";
+import { SupabaseAttendanceRepository } from "../repositories/supabase";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -18,7 +20,8 @@ const listAttendancesRoute = createRoute({
   path: "/attendance",
   tags: ["attendance"],
   summary: "List user's attendance records",
-  description: "Returns paginated list of attendance records with computed totals",
+  description:
+    "Returns paginated list of attendance records with computed totals",
   request: {
     query: ListAttendancesQuerySchema,
   },
@@ -61,7 +64,7 @@ app.openapi(listAttendancesRoute, async (c) => {
       limit: query.limit,
       offset: query.offset,
     },
-    200
+    200,
   );
 });
 
@@ -132,7 +135,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
       success: true,
       message: "Attendance deleted successfully",
     },
-    200
+    200,
   );
 });
 
