@@ -33,7 +33,8 @@ const config = [
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        project: "./tsconfig.json",
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
       },
       globals: {
         React: true,
