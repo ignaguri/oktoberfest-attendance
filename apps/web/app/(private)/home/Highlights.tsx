@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { SkeletonHighlights } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
-import { useUserHighlights } from "@/lib/data";
+import { useHighlights } from "@/hooks/useProfile";
 import { getDefaultBeerCost } from "@/lib/festivalConstants";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
@@ -22,27 +22,33 @@ const Highlights = () => {
     data: highlightsData,
     loading: highlightsLoading,
     error: highlightsError,
-  } = useUserHighlights(currentFestival?.id);
+  } = useHighlights(currentFestival?.id);
 
   // Provide default values when no data is available
   const {
-    topPositions = [],
+    groupPositions = [],
     totalBeers = 0,
-    daysAttended = 0,
-    custom_beer_cost,
+    totalDays = 0,
+    totalSpent = 0,
   } = highlightsData || {
-    topPositions: [],
+    groupPositions: [],
     totalBeers: 0,
-    daysAttended: 0,
-    custom_beer_cost: getDefaultBeerCost(currentFestival),
+    totalDays: 0,
+    totalSpent: 0,
   };
 
+  // Convert totalSpent from cents to euros
   const spentOnBeers = useMemo(() => {
+    if (totalSpent > 0) {
+      return (totalSpent / 100).toFixed(2);
+    }
+    // Fallback: calculate from beers if totalSpent is 0
     if (totalBeers > 0) {
-      const beerCost = custom_beer_cost || getDefaultBeerCost(currentFestival);
+      const beerCost = getDefaultBeerCost(currentFestival);
       return (totalBeers * beerCost).toFixed(2);
     }
-  }, [totalBeers, custom_beer_cost, currentFestival]);
+    return null;
+  }, [totalBeers, totalSpent, currentFestival]);
 
   // Show loading state
   if (festivalLoading || highlightsLoading) {
@@ -52,14 +58,14 @@ const Highlights = () => {
   // Handle error state silently - just show empty state
   if (
     highlightsError ||
-    (topPositions.length === 0 && totalBeers === 0 && daysAttended === 0)
+    (groupPositions.length === 0 && totalBeers === 0 && totalDays === 0)
   ) {
     return null;
   }
 
   // Determine grid columns based on user stats
   const gridCols =
-    topPositions.length > 0 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1";
+    groupPositions.length > 0 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1";
 
   return (
     <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[140px]">
@@ -70,33 +76,35 @@ const Highlights = () => {
       </CardHeader>
       <CardContent>
         <div className={cn("grid gap-4", gridCols)}>
-          {topPositions.length > 0 && (
+          {groupPositions.length > 0 && (
             <div className="bg-green-50 p-4 rounded-lg shadow-sm">
               <CardDescription className="font-semibold mb-2">
                 👑 You&apos;re in the top 3 of these groups:
               </CardDescription>
               <ul>
-                {topPositions.map((group) => (
-                  <li key={group.group_id}>
-                    <Button asChild variant="link" className="underline">
-                      <Link href={`/groups/${group.group_id}`}>
-                        {group.group_name}
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
+                {groupPositions.map(
+                  (group: { groupId: string; groupName: string }) => (
+                    <li key={group.groupId}>
+                      <Button asChild variant="link" className="underline">
+                        <Link href={`/groups/${group.groupId}`}>
+                          {group.groupName}
+                        </Link>
+                      </Button>
+                    </li>
+                  ),
+                )}
               </ul>
             </div>
           )}
-          {(totalBeers > 0 || daysAttended > 0) && (
+          {(totalBeers > 0 || totalDays > 0) && (
             <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
               <CardDescription className="font-semibold mb-2">
                 🍻 Stats 📊
               </CardDescription>
               <ul className="text-sm">
-                {daysAttended > 0 && (
+                {totalDays > 0 && (
                   <li className="mb-2">
-                    You went <strong>{daysAttended}</strong> times
+                    You went <strong>{totalDays}</strong> times
                   </li>
                 )}
                 {totalBeers > 0 && (
@@ -104,7 +112,7 @@ const Highlights = () => {
                     You had <strong>{totalBeers}</strong> beers
                   </li>
                 )}
-                {totalBeers > 0 && (
+                {spentOnBeers && (
                   <li>
                     You&apos;ve spent <strong>~€{spentOnBeers}</strong> on beers
                   </li>

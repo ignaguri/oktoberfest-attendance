@@ -1,7 +1,7 @@
 "use client";
 
 import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
-import { completeTutorial } from "@/lib/sharedActions";
+import { apiClient } from "@/lib/api-client";
 import { tutorialSteps, type TutorialStep } from "@/lib/tutorialSteps";
 import {
   createContext,
@@ -135,9 +135,9 @@ export function TutorialProvider({
     setCurrentStepIndex(0);
     setIsCompleted(true);
 
-    // Save completion to database
+    // Save completion to database via API
     try {
-      await completeTutorial();
+      await apiClient.profile.completeTutorial();
     } catch (error) {
       console.error("Failed to save tutorial completion:", error);
     }

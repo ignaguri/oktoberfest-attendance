@@ -12,6 +12,12 @@ import type {
   EvaluateAchievementsResponse,
   ListFestivalsResponse,
   GetFestivalResponse,
+  GetCalendarEventsResponse,
+  ProfileShort,
+  Profile,
+  TutorialStatus,
+  MissingProfileFields,
+  Highlights,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -382,6 +388,196 @@ export const apiClient = {
         throw new Error(`Failed to fetch festival: ${response.statusText}`);
       }
       return parseJsonResponse<GetFestivalResponse>(response);
+    },
+  },
+
+  /**
+   * Calendar API
+   */
+  calendar: {
+    /**
+     * Get personal calendar events
+     */
+    async personal(festivalId: string): Promise<GetCalendarEventsResponse> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({ festivalId });
+      const url = `${API_BASE_URL}/v1/calendar/personal?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch personal calendar: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<GetCalendarEventsResponse>(response);
+    },
+
+    /**
+     * Get group calendar events
+     */
+    async group(groupId: string): Promise<GetCalendarEventsResponse> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/calendar/group/${groupId}`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch group calendar: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<GetCalendarEventsResponse>(response);
+    },
+  },
+
+  /**
+   * Profile API
+   */
+  profile: {
+    /**
+     * Get current user's profile
+     */
+    async get(): Promise<{ profile: ProfileShort }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/profile`, { headers });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch profile: ${response.statusText}`);
+      }
+      return parseJsonResponse<{ profile: ProfileShort }>(response);
+    },
+
+    /**
+     * Update current user's profile
+     */
+    async update(data: {
+      username?: string;
+      full_name?: string;
+      custom_beer_cost?: number | null;
+    }): Promise<{ profile: Profile }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/profile`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update profile");
+      }
+      return parseJsonResponse<{ profile: Profile }>(response);
+    },
+
+    /**
+     * Delete current user's account
+     */
+    async delete(): Promise<{ success: boolean; message: string }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/profile`, {
+        method: "DELETE",
+        headers,
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to delete account");
+      }
+      return parseJsonResponse<{ success: boolean; message: string }>(response);
+    },
+
+    /**
+     * Get tutorial status
+     */
+    async getTutorialStatus(): Promise<{ status: TutorialStatus }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/profile/tutorial`, {
+        headers,
+      });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch tutorial status: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<{ status: TutorialStatus }>(response);
+    },
+
+    /**
+     * Complete tutorial
+     */
+    async completeTutorial(): Promise<{ success: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/profile/tutorial/complete`,
+        {
+          method: "POST",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to complete tutorial: ${response.statusText}`);
+      }
+      return parseJsonResponse<{ success: boolean }>(response);
+    },
+
+    /**
+     * Reset tutorial
+     */
+    async resetTutorial(): Promise<{ success: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/profile/tutorial/reset`,
+        {
+          method: "POST",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to reset tutorial: ${response.statusText}`);
+      }
+      return parseJsonResponse<{ success: boolean }>(response);
+    },
+
+    /**
+     * Get missing profile fields
+     */
+    async getMissingFields(): Promise<{
+      missingFields: MissingProfileFields;
+      hasMissingFields: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/profile/missing-fields`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch missing fields: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<{
+        missingFields: MissingProfileFields;
+        hasMissingFields: boolean;
+      }>(response);
+    },
+
+    /**
+     * Get user highlights
+     */
+    async getHighlights(
+      festivalId: string,
+    ): Promise<{ highlights: Highlights }> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({ festivalId });
+      const response = await fetch(
+        `${API_BASE_URL}/v1/profile/highlights?${params}`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch highlights: ${response.statusText}`);
+      }
+      return parseJsonResponse<{ highlights: Highlights }>(response);
     },
   },
 };

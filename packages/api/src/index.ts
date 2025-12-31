@@ -5,6 +5,7 @@ import { errorHandler } from "./middleware/error";
 // Import routes
 import achievementRoute from "./routes/achievement.route";
 import attendanceRoute from "./routes/attendance.route";
+import calendarRoute from "./routes/calendar.route";
 import consumptionRoute from "./routes/consumption.route";
 import festivalRoute from "./routes/festival.route";
 import groupRoute from "./routes/group.route";
@@ -12,6 +13,7 @@ import leaderboardRoute from "./routes/leaderboard.route";
 import locationRoute from "./routes/location.route";
 import notificationRoute from "./routes/notification.route";
 import photoRoute from "./routes/photo.route";
+import profileRoute from "./routes/profile.route";
 import reservationRoute from "./routes/reservation.route";
 import tentRoute from "./routes/tent.route";
 import wrappedRoute from "./routes/wrapped.route";
@@ -36,6 +38,7 @@ apiV1.use("*", authMiddleware);
 // Mount route handlers
 apiV1.route("/", consumptionRoute);
 apiV1.route("/", attendanceRoute);
+apiV1.route("/", calendarRoute);
 apiV1.route("/", festivalRoute);
 apiV1.route("/", tentRoute);
 apiV1.route("/", groupRoute);
@@ -46,6 +49,7 @@ apiV1.route("/", wrappedRoute);
 apiV1.route("/", reservationRoute);
 apiV1.route("/", locationRoute);
 apiV1.route("/", photoRoute);
+apiV1.route("/", profileRoute);
 
 // Mount v1 routes under /v1 prefix
 app.route("/v1", apiV1);

@@ -62,11 +62,20 @@ export {
 
 // Profile hooks
 export {
+  useCompleteTutorial,
   useCurrentProfile,
   useCurrentUser,
+  useDeleteProfile,
+  useHighlights,
+  useMissingProfileFields,
+  useResetTutorial,
+  useTutorialStatus,
   useUpdateProfile,
   useUploadAvatar,
 } from "../../hooks/useProfile";
+
+// Calendar hooks
+export { useGroupCalendar, usePersonalCalendar } from "../../hooks/useCalendar";
 
 // Achievement hooks
 export {

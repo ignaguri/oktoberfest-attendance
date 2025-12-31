@@ -141,6 +141,18 @@ export class QueryKeys {
     ["wrapped", "access", festivalId] as const;
   static availableWrapped = () => ["wrapped", "available"] as const;
 
+  // Calendar queries
+  static personalCalendar = (festivalId: string) =>
+    ["calendar", "personal", festivalId] as const;
+  static groupCalendar = (groupId: string) =>
+    ["calendar", "group", groupId] as const;
+
+  // Profile queries
+  static tutorialStatus = () => ["tutorial-status"] as const;
+  static missingProfileFields = () => ["missing-profile-fields"] as const;
+  static highlights = (festivalId: string) =>
+    ["highlights", festivalId] as const;
+
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }

@@ -4,7 +4,6 @@
  * Migrated to use Hono API client instead of server actions
  */
 
-import { fetchHighlights } from "@/app/(private)/home/actions"; // TODO: Create /v1/stats endpoint
 import { apiClient } from "@/lib/api-client";
 import {
   useQuery,
@@ -35,11 +34,16 @@ export function useAttendances(festivalId: string) {
 
 /**
  * Hook to fetch user highlights (stats) for a festival
+ * @deprecated Use useHighlights from useProfile.ts instead
  */
 export function useUserHighlights(festivalId?: string) {
   return useQuery(
-    QueryKeys.userStats("current", festivalId || ""),
-    () => fetchHighlights(festivalId),
+    QueryKeys.highlights(festivalId || ""),
+    async () => {
+      if (!festivalId) return null;
+      const response = await apiClient.profile.getHighlights(festivalId);
+      return response.highlights;
+    },
     {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes

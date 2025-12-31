@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // import { LocationPrivacySettings } from "@/components/ui/location-privacy-settings";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
+import { useResetTutorial } from "@/hooks/useProfile";
 import {
   useCurrentProfile,
   useCurrentUser,
   useUpdateProfile,
 } from "@/lib/data";
 import { profileSchema } from "@/lib/schemas/profile";
-import { resetTutorial } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
@@ -28,13 +28,14 @@ export default function AccountForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isResettingTutorial, setIsResettingTutorial] = useState(false);
 
   // Use React Query hooks
   const { data: user, loading: userLoading } = useCurrentUser();
   const { data: profile, loading: profileLoading } = useCurrentProfile();
   const { mutate: updateProfileMutation, loading: isUpdating } =
     useUpdateProfile();
+  const { mutate: resetTutorialMutation, loading: isResettingTutorial } =
+    useResetTutorial();
 
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile?.avatar_url || null,
@@ -91,9 +92,8 @@ export default function AccountForm() {
   const onSubmit = async (data: ProfileFormData) => {
     try {
       await updateProfileMutation({
-        id: user.id,
         ...(data.username && { username: data.username }),
-        ...(data.fullname && { fullname: data.fullname }),
+        ...(data.fullname && { full_name: data.fullname }),
         ...(data.custom_beer_cost !== undefined && {
           custom_beer_cost: data.custom_beer_cost,
         }),
@@ -126,15 +126,12 @@ export default function AccountForm() {
 
   const handleResetTutorial = async () => {
     try {
-      setIsResettingTutorial(true);
-      await resetTutorial();
+      await resetTutorialMutation({});
       toast.success(
         "The tutorial has been reset. You'll see it again when you visit the home page.",
       );
     } catch {
       toast.error("Failed to reset tutorial. Please try again.");
-    } finally {
-      setIsResettingTutorial(false);
     }
   };
 
