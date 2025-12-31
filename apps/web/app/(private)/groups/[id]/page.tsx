@@ -18,6 +18,22 @@ import {
 } from "../actions";
 import { JoinGroupForm } from "../JoinGroupForm";
 
+// Transform snake_case DB response to camelCase for Leaderboard component
+function transformLeaderboardEntries(
+  entries: Awaited<ReturnType<typeof fetchLeaderboard>>,
+) {
+  return entries.map((entry, index) => ({
+    userId: entry.user_id,
+    username: entry.username,
+    fullName: entry.full_name,
+    avatarUrl: entry.avatar_url,
+    daysAttended: entry.days_attended,
+    totalBeers: entry.total_beers,
+    avgBeers: entry.avg_beers,
+    position: index + 1,
+  }));
+}
+
 export default async function GroupPage({
   params,
 }: {
@@ -67,7 +83,7 @@ export default async function GroupPage({
 
         <div className="flex flex-col gap-4">
           <Leaderboard
-            entries={leaderboardEntries ?? []}
+            entries={transformLeaderboardEntries(leaderboardEntries ?? [])}
             winningCriteria={winningCriteria?.name as WinningCriteria}
             showGroupCount={false}
           />

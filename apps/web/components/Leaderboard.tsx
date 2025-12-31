@@ -18,26 +18,34 @@ import {
 import { Crown } from "lucide-react";
 import { useState } from "react";
 
-import type { Views } from "@/lib/database-helpers.types";
 import type { WinningCriteria } from "@/lib/types";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 
 import Avatar from "./Avatar/Avatar";
 import { ProfilePreview } from "./ui/profile-preview";
 
-type LeaderboardEntry = Views<"leaderboard"> & {
+// API response uses camelCase
+type LeaderboardEntry = {
+  userId: string;
+  username: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  daysAttended: number;
+  totalBeers: number;
+  avgBeers: number;
+  position: number;
   group_count?: number;
 };
 
 const getDisplayName = ({
   username,
-  full_name,
-}: Pick<LeaderboardEntry, "full_name" | "username">) => {
+  fullName,
+}: Pick<LeaderboardEntry, "fullName" | "username">) => {
   if (username) {
     return username;
   }
-  if (full_name) {
-    return full_name;
+  if (fullName) {
+    return fullName;
   }
   return "No name";
 };
@@ -63,15 +71,15 @@ export const Leaderboard = ({
         return (
           <ProfilePreview
             username={entry.username || "Unknown"}
-            fullName={entry.full_name}
-            avatarUrl={entry.avatar_url}
+            fullName={entry.fullName}
+            avatarUrl={entry.avatarUrl}
           >
             <div className="flex items-center gap-2 min-w-0">
               <Avatar
-                url={entry.avatar_url}
+                url={entry.avatarUrl}
                 fallback={{
                   username: entry.username,
-                  full_name: entry.full_name,
+                  full_name: entry.fullName,
                   email: "no.name@email.com",
                 }}
               />
@@ -84,7 +92,7 @@ export const Leaderboard = ({
       },
     },
     {
-      accessorKey: "days_attended",
+      accessorKey: "daysAttended",
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
@@ -100,7 +108,7 @@ export const Leaderboard = ({
       ),
     },
     {
-      accessorKey: "total_beers",
+      accessorKey: "totalBeers",
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
@@ -114,10 +122,10 @@ export const Leaderboard = ({
           }
         />
       ),
-      cell: ({ row }) => `${row.original.total_beers} 🍺`,
+      cell: ({ row }) => `${row.original.totalBeers} 🍺`,
     },
     {
-      accessorKey: "avg_beers",
+      accessorKey: "avgBeers",
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
@@ -131,7 +139,7 @@ export const Leaderboard = ({
           }
         />
       ),
-      cell: ({ row }) => row.original.avg_beers?.toFixed(2),
+      cell: ({ row }) => row.original.avgBeers?.toFixed(2),
     },
   ];
 

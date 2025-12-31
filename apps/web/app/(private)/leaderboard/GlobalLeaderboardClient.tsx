@@ -113,7 +113,7 @@ export default function GlobalLeaderboardClient() {
       </div>
       {selectedCriteria && leaderboardData && leaderboardData.length > 0 && (
         <Leaderboard
-          entries={leaderboardData as any} // TODO: Fix type mismatch between server action return and LeaderboardEntry
+          entries={leaderboardData}
           showGroupCount
           winningCriteria={winningCriteria}
         />
