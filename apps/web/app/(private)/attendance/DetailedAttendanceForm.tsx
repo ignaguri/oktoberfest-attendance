@@ -129,7 +129,8 @@ export default function DetailedAttendanceForm({
 
   // Update form values when existingAttendance or currentDate changes
   useEffect(() => {
-    setValue("amount", existingAttendance?.beer_count ?? 0);
+    // Convert beer_count to number since the view returns bigint as string
+    setValue("amount", Number(existingAttendance?.beer_count) || 0);
     setValue("date", currentDate);
     setValue("tents", existingAttendance?.tent_ids || []);
   }, [existingAttendance, currentDate, setValue]);

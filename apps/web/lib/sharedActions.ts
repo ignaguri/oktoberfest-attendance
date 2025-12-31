@@ -73,7 +73,12 @@ export async function fetchAttendancesFromDB(
   single: boolean = false,
 ): Promise<Tables<"attendances"> | Tables<"attendances">[] | null> {
   const supabase = await createClient();
-  const query = supabase.from("attendances").select("*").eq("user_id", userId);
+  // Use attendance_with_totals view to get consistent beer_count calculated from consumptions
+  // The view includes the same fields as attendances table plus computed totals
+  // Type assertion needed as the view is not in the generated types
+  const query = (supabase.from as any)("attendance_with_totals")
+    .select("*")
+    .eq("user_id", userId);
 
   if (festivalId) {
     query.eq("festival_id", festivalId);
@@ -90,7 +95,7 @@ export async function fetchAttendancesFromDB(
     reportSupabaseException("fetchAttendancesFromDB", error, { id: userId });
     throw new Error(`Error fetching attendances: ${error.message}`);
   }
-  return data;
+  return data as Tables<"attendances"> | Tables<"attendances">[] | null;
 }
 
 export type AttendanceByDate = Tables<"attendances"> & {
