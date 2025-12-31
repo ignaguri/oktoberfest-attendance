@@ -43,8 +43,10 @@ export async function getGroupCalendarEvents(
       );
 
       // Get attendances for those members in this festival
-      const { data: attendances, error: attError } = await db
-        .from("attendances")
+      // Use attendance_with_totals view for consistent beer_count from consumptions
+      const { data: attendances, error: attError } = await (db.from as any)(
+        "attendance_with_totals",
+      )
         .select("id, date, beer_count, user_id")
         .eq("festival_id", festId)
         .in("user_id", memberIds);
@@ -85,7 +87,7 @@ export async function getGroupCalendarEvents(
           (a: {
             id: string;
             date: string;
-            beer_count: number;
+            beer_count: number | string; // View returns bigint as string
             user_id: string | null;
           }) => {
             // Check if this attendance has any tent visits
@@ -99,8 +101,11 @@ export async function getGroupCalendarEvents(
                 ),
             );
 
+            // Convert beer_count to number since view returns bigint as string
+            const beerCount = Number(a.beer_count) || 0;
+
             // Only create a beer summary if there are tent visits for this date
-            if (!hasTentVisits || a.beer_count === 0) {
+            if (!hasTentVisits || beerCount === 0) {
               return null;
             }
 
@@ -108,13 +113,18 @@ export async function getGroupCalendarEvents(
 
             return {
               id: `beer-summary-${a.id}`,
-              title: `${memberName}: ${a.beer_count} Maß`,
+              title: `${memberName}: ${beerCount} Maß`,
               from: new TZDate(a.date, TIMEZONE),
               type: "beer_summary" as CalendarEventType,
             };
           },
         )
-        .filter((event): event is NonNullable<typeof event> => event !== null);
+        .filter(Boolean) as {
+        id: string;
+        title: string;
+        from: TZDate;
+        type: CalendarEventType;
+      }[];
 
       // Create fallback events for attendances without tent visits
       const attendanceEvents = (attendances ?? [])
@@ -122,7 +132,7 @@ export async function getGroupCalendarEvents(
           (a: {
             id: string;
             date: string;
-            beer_count: number;
+            beer_count: number | string; // View returns bigint as string
             user_id: string | null;
           }) => {
             // Check if this attendance has any tent visits
@@ -142,16 +152,23 @@ export async function getGroupCalendarEvents(
             }
 
             const memberName = idToName.get(a.user_id ?? "") ?? "Member";
+            // Convert beer_count to number since view returns bigint as string
+            const beerCount = Number(a.beer_count) || 0;
 
             return {
               id: a.id,
-              title: `${memberName}: ${a.beer_count} Maß`,
+              title: `${memberName}: ${beerCount} Maß`,
               from: new TZDate(a.date, TIMEZONE),
               type: "attendance" as CalendarEventType,
             };
           },
         )
-        .filter((event): event is NonNullable<typeof event> => event !== null);
+        .filter(Boolean) as {
+        id: string;
+        title: string;
+        from: TZDate;
+        type: CalendarEventType;
+      }[];
 
       // Group-visible reservations for those members
       const { data: reservations, error: resErr } = await db

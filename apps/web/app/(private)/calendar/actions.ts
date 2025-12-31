@@ -15,8 +15,8 @@ export async function getPersonalCalendarEvents(festivalId: string) {
 
   const getCached = unstable_cache(
     async (uId: string, festId: string) => {
-      const { data, error } = await db
-        .from("attendances")
+      // Use attendance_with_totals view for consistent beer_count from consumptions
+      const { data, error } = await (db.from as any)("attendance_with_totals")
         .select("id, date, beer_count")
         .eq("festival_id", festId)
         .eq("user_id", uId);
@@ -52,7 +52,7 @@ export async function getPersonalCalendarEvents(festivalId: string) {
 
       // Create fallback events for attendances without tent visits
       const attendanceEvents = (data ?? [])
-        .map((a: { id: string; date: string; beer_count: number }) => {
+        .map((a: { id: string; date: string; beer_count: number | string }) => {
           // Check if this attendance has any tent visits
           const hasTentVisits = (tentVisits ?? []).some(
             (tv) =>
@@ -68,18 +68,26 @@ export async function getPersonalCalendarEvents(festivalId: string) {
             return null;
           }
 
+          // Convert beer_count to number since view returns bigint as string
+          const beerCount = Number(a.beer_count) || 0;
+
           return {
             id: a.id,
-            title: `${a.beer_count} Maß`,
+            title: `${beerCount} Maß`,
             from: new TZDate(a.date, TIMEZONE),
             type: "beer_summary" as CalendarEventType,
           };
         })
-        .filter((event): event is NonNullable<typeof event> => event !== null);
+        .filter(Boolean) as {
+        id: string;
+        title: string;
+        from: TZDate;
+        type: CalendarEventType;
+      }[];
 
       // Create beer summary events for days with tent visits
       const beerSummaryEvents = (data ?? [])
-        .map((a: { id: string; date: string; beer_count: number }) => {
+        .map((a: { id: string; date: string; beer_count: number | string }) => {
           // Check if this attendance has any tent visits
           const hasTentVisits = (tentVisits ?? []).some(
             (tv) =>
@@ -90,19 +98,27 @@ export async function getPersonalCalendarEvents(festivalId: string) {
               ),
           );
 
+          // Convert beer_count to number since view returns bigint as string
+          const beerCount = Number(a.beer_count) || 0;
+
           // Only create a beer summary if there are tent visits for this date
-          if (!hasTentVisits || a.beer_count === 0) {
+          if (!hasTentVisits || beerCount === 0) {
             return null;
           }
 
           return {
             id: `beer-summary-${a.id}`,
-            title: `${a.beer_count} Maß`,
+            title: `${beerCount} Maß`,
             from: new TZDate(a.date, TIMEZONE),
             type: "beer_summary" as CalendarEventType,
           };
         })
-        .filter((event): event is NonNullable<typeof event> => event !== null);
+        .filter(Boolean) as {
+        id: string;
+        title: string;
+        from: TZDate;
+        type: CalendarEventType;
+      }[];
 
       // Reservations for the user in this festival (scheduled ones)
       const { data: reservations, error: resErr } = await db
