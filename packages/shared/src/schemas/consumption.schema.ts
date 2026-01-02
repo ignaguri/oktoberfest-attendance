@@ -57,8 +57,8 @@ export type Consumption = z.infer<typeof ConsumptionSchema>;
  * Schema for tent visit (simplified for attendance response)
  */
 export const TentVisitSchema = z.object({
-  tent_id: z.uuid(),
-  visit_date: z.iso.datetime(),
+  tentId: z.uuid(),
+  visitDate: z.iso.datetime(),
   tentName: z.string().nullable(),
 });
 

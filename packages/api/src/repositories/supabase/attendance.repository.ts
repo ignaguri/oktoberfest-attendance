@@ -139,8 +139,8 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
           );
         })
         .map((visit) => ({
-          tent_id: visit.tent_id,
-          visit_date: visit.visit_date!,
+          tentId: visit.tent_id,
+          visitDate: visit.visit_date!,
           tentName: (visit.tents as any)?.name || null,
         }));
 

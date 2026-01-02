@@ -157,15 +157,15 @@ const PersonalAttendanceTable = ({
               <ul className="space-y-2">
                 {tentVisitsForDate?.map((tentVisit) => (
                   <li
-                    key={`${tentVisit.tent_id}-${tentVisit.visit_date}`}
+                    key={`${tentVisit.tentId}-${tentVisit.visitDate}`}
                     className="text-base text-gray-700 list-disc list-inside"
                   >
                     <span className="font-semibold">{tentVisit.tentName}</span>
-                    {tentVisit.visit_date ? (
+                    {tentVisit.visitDate ? (
                       <>
                         <span> - Check-in: </span>
                         <span className="font-semibold">
-                          {formatDate(new Date(tentVisit.visit_date), "p")}
+                          {formatDate(new Date(tentVisit.visitDate), "p")}
                         </span>
                       </>
                     ) : null}

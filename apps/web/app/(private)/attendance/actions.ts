@@ -55,13 +55,11 @@ export async function fetchAttendances(festivalId: string) {
             new TZDate(attendance.date, TIMEZONE),
           ),
       )
-      .map((tentVisit) => {
-        const { tents, ...tentVisitWithoutTent } = tentVisit;
-        return {
-          ...tentVisitWithoutTent,
-          tentName: tents?.name,
-        };
-      }),
+      .map((tentVisit) => ({
+        tentId: tentVisit.tent_id,
+        visitDate: tentVisit.visit_date!,
+        tentName: tentVisit.tents?.name || null,
+      })),
   }));
 
   return attendancesWithTentVisits;
