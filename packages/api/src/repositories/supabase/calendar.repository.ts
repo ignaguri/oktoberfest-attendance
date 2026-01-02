@@ -2,8 +2,6 @@ import type { Database } from "@prostcounter/db";
 import type { CalendarEvent, CalendarEventType } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-const TIMEZONE = "Europe/Berlin";
-
 export class SupabaseCalendarRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
@@ -23,9 +21,8 @@ export class SupabaseCalendarRepository {
       .single();
 
     // Get attendances using the view for consistent beer_count
-    const { data: attendances, error: attError } = await (
-      this.supabase.from as any
-    )("attendance_with_totals")
+    const { data: attendances, error: attError } = await this.supabase
+      .from("attendance_with_totals")
       .select("id, date, beer_count")
       .eq("festival_id", festivalId)
       .eq("user_id", userId);
@@ -73,8 +70,12 @@ export class SupabaseCalendarRepository {
       });
 
     // Create attendance/beer summary events
-    (attendances ?? []).forEach(
-      (a: { id: string; date: string; beer_count: number | string }) => {
+    (attendances ?? [])
+      .filter(
+        (a): a is { id: string; date: string; beer_count: number | null } =>
+          a.id !== null && a.date !== null,
+      )
+      .forEach((a) => {
         const beerCount = Number(a.beer_count) || 0;
         const hasTentVisits = (tentVisits ?? []).some(
           (tv) =>
@@ -97,8 +98,7 @@ export class SupabaseCalendarRepository {
             type: "attendance" as CalendarEventType,
           });
         }
-      },
-    );
+      });
 
     // Create reservation events
     (reservations ?? []).forEach((r) => {
@@ -173,9 +173,8 @@ export class SupabaseCalendarRepository {
     );
 
     // Get attendances using the view
-    const { data: attendances, error: attError } = await (
-      this.supabase.from as any
-    )("attendance_with_totals")
+    const { data: attendances, error: attError } = await this.supabase
+      .from("attendance_with_totals")
       .select("id, date, beer_count, user_id")
       .eq("festival_id", festivalId)
       .in("user_id", memberIds);
@@ -226,13 +225,18 @@ export class SupabaseCalendarRepository {
       });
 
     // Create attendance/beer summary events
-    (attendances ?? []).forEach(
-      (a: {
-        id: string;
-        date: string;
-        beer_count: number | string;
-        user_id: string | null;
-      }) => {
+    (attendances ?? [])
+      .filter(
+        (
+          a,
+        ): a is {
+          id: string;
+          date: string;
+          beer_count: number | null;
+          user_id: string | null;
+        } => a.id !== null && a.date !== null,
+      )
+      .forEach((a) => {
         const beerCount = Number(a.beer_count) || 0;
         const memberName = idToName.get(a.user_id ?? "") ?? "Member";
         const hasTentVisits = (tentVisits ?? []).some(
@@ -257,8 +261,7 @@ export class SupabaseCalendarRepository {
             type: "attendance" as CalendarEventType,
           });
         }
-      },
-    );
+      });
 
     // Create reservation events
     (reservations ?? []).forEach((r) => {
