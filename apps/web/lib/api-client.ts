@@ -69,9 +69,10 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
 
 /**
  * Base URL for API requests
+ * Uses relative URL by default, which works for any deployment (local, preview, production)
+ * Set NEXT_PUBLIC_API_URL for explicit override (e.g., external API server)
  */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3008/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 /**
  * Type-safe API client
