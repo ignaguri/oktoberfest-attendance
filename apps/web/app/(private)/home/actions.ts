@@ -1,9 +1,6 @@
 "use server";
 
-import { getDefaultBeerCost } from "@/lib/festivalConstants";
-import { getProfileShort, getUser } from "@/lib/sharedActions";
-import { reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import { getProfileShort } from "@/lib/sharedActions";
 
 import "server-only";
 
@@ -17,67 +14,4 @@ export async function getMissingProfileFields() {
   };
 
   return missingFields;
-}
-
-export async function fetchHighlights(festivalId?: string) {
-  const user = await getUser();
-
-  const supabase = await createClient();
-  type TopPosition = {
-    group_id: string;
-    group_name: string;
-  };
-
-  if (!festivalId) {
-    return {
-      topPositions: [],
-      totalBeers: 0,
-      daysAttended: 0,
-      custom_beer_cost: getDefaultBeerCost(null),
-    };
-  }
-
-  const { data, error } = await supabase.rpc(
-    "get_user_festival_stats_with_positions",
-    {
-      p_user_id: user.id,
-      p_festival_id: festivalId,
-    },
-  );
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("custom_beer_cost")
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    reportSupabaseException("fetchHighlights", error, {
-      id: user.id,
-      email: user.email,
-    });
-    return {
-      topPositions: [],
-      totalBeers: 0,
-      daysAttended: 0,
-      custom_beer_cost:
-        profileData?.custom_beer_cost ?? getDefaultBeerCost(null),
-    };
-  }
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    return {
-      topPositions: [],
-      totalBeers: 0,
-      daysAttended: 0,
-      custom_beer_cost: getDefaultBeerCost(null),
-    };
-  }
-  const firstItem = data[0];
-  const result = {
-    topPositions: (firstItem.top_positions as unknown as TopPosition[]) || [],
-    totalBeers: firstItem.total_beers || 0,
-    daysAttended: firstItem.days_attended || 0,
-    custom_beer_cost: profileData?.custom_beer_cost ?? getDefaultBeerCost(null),
-  };
-
-  return result;
 }

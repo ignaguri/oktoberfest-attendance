@@ -502,7 +502,7 @@ export async function fetchTents(festivalId?: string) {
   }
 }
 
-// Tutorial completion functions
+// Tutorial status function
 // No caching - user-specific data, RLS must be enforced
 export async function getTutorialStatus() {
   const user = await getUser();
@@ -525,62 +525,4 @@ export async function getTutorialStatus() {
     tutorial_completed: data?.tutorial_completed || false,
     tutorial_completed_at: data?.tutorial_completed_at || null,
   };
-}
-
-export async function completeTutorial() {
-  const user = await getUser();
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({
-      tutorial_completed: true,
-      tutorial_completed_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
-
-  if (error) {
-    reportSupabaseException("completeTutorial", error, {
-      id: user.id,
-      email: user.email,
-    });
-    throw new Error("Error completing tutorial");
-  }
-
-  // Invalidate tutorial-related caches
-  revalidateTag("user-profile", "max");
-  revalidateTag("tutorial-status", "max");
-  revalidatePath("/profile");
-  revalidatePath("/home");
-
-  return { success: true };
-}
-
-export async function resetTutorial() {
-  const user = await getUser();
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({
-      tutorial_completed: false,
-      tutorial_completed_at: null,
-    })
-    .eq("id", user.id);
-
-  if (error) {
-    reportSupabaseException("resetTutorial", error, {
-      id: user.id,
-      email: user.email,
-    });
-    throw new Error("Error resetting tutorial");
-  }
-
-  // Invalidate tutorial-related caches
-  revalidateTag("user-profile", "max");
-  revalidateTag("tutorial-status", "max");
-  revalidatePath("/profile");
-  revalidatePath("/home");
-
-  return { success: true };
 }
