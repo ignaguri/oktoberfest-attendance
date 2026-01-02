@@ -12,6 +12,7 @@ export const LeaderboardEntrySchema = z.object({
   totalBeers: z.number().int(),
   avgBeers: z.number(),
   position: z.number().int(),
+  groupCount: z.number().int().optional(),
 });
 
 export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>;

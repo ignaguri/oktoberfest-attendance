@@ -34,7 +34,7 @@ type LeaderboardEntry = {
   totalBeers: number;
   avgBeers: number;
   position: number;
-  group_count?: number;
+  groupCount?: number;
 };
 
 const getDisplayName = ({
@@ -145,7 +145,7 @@ export const Leaderboard = ({
 
   if (showGroupCount) {
     columns.push({
-      accessorKey: "group_count",
+      accessorKey: "groupCount",
       header: "Groups",
     });
   }

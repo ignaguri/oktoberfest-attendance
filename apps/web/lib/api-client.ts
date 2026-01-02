@@ -194,7 +194,9 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch group: ${response.statusText}`);
       }
-      return parseJsonResponse<ApiResponse<Group>>(response);
+      // API returns Group directly, wrap it for consistency
+      const group = await parseJsonResponse<Group>(response);
+      return { data: group };
     },
 
     /**
