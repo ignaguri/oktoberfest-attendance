@@ -19,7 +19,7 @@ import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
-import type { Tables } from "@/lib/database.types";
+import type { Tables } from "@prostcounter/db";
 import type { PostgrestError } from "@supabase/supabase-js";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;

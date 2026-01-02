@@ -6,6 +6,10 @@ import { z } from "zod";
 
 import type { NextRequest } from "next/server";
 
+// NOTE: This API uses deprecated tables (location_sharing_preferences)
+// that were replaced by location_sessions, location_session_members.
+// This needs to be refactored to use the new schema.
+
 const updatePreferencesSchema = z.object({
   groupId: z.uuid(),
   festivalId: z.uuid(),
@@ -48,7 +52,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch user's location sharing preferences for all groups in the festival
-    const { data: preferences, error } = await supabase
+    // Using type assertion as these tables are deprecated (see note at top of file)
+    const { data: preferences, error } = await (supabase as any)
       .from("location_sharing_preferences")
       .select(
         `
@@ -131,7 +136,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Upsert location sharing preferences
-    const { data: preferences, error } = await supabase
+    // Using type assertion as these tables are deprecated (see note at top of file)
+    const { data: preferences, error } = await (supabase as any)
       .from("location_sharing_preferences")
       .upsert(
         {

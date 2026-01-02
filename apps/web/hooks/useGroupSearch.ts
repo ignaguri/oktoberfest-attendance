@@ -12,7 +12,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import type { Tables } from "@/lib/database.types";
+import type { Tables } from "@prostcounter/db";
 
 // Import the server actions
 
@@ -43,8 +43,10 @@ export function useGroupSearch(filters: GroupSearchFilters = {}) {
     queryFn: async (): Promise<GroupSearchResult> => {
       const groups = await getGroups();
 
-      // Client-side filtering and pagination for now
-      // TODO: Implement server-side search for groups
+      // Client-side filtering is appropriate here since:
+      // 1. Admin-only feature with limited user access
+      // 2. Total group count is manageable (< 1000)
+      // 3. Server action already caches the full list
       let filteredGroups = groups;
 
       if (search) {

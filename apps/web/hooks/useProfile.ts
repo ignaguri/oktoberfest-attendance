@@ -49,11 +49,7 @@ export function useUpdateProfile() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async (profileData: {
-      username?: string;
-      full_name?: string;
-      custom_beer_cost?: number | null;
-    }) => {
+    async (profileData: { username?: string; full_name?: string }) => {
       const response = await apiClient.profile.update(profileData);
       return response.profile;
     },
@@ -62,7 +58,6 @@ export function useUpdateProfile() {
         // Invalidate profile and user queries
         invalidateQueries(QueryKeys.profile());
         invalidateQueries(QueryKeys.user());
-        // Also invalidate highlights since custom_beer_cost affects it
         invalidateQueries(["highlights"]);
       },
     },

@@ -2,7 +2,10 @@ import type {
   Group,
   GroupWithMembers,
   CreateGroupInput,
+  UpdateGroupInput,
   ListGroupsQuery,
+  SearchGroupsQuery,
+  SearchGroupResult,
 } from "@prostcounter/shared";
 
 /**
@@ -64,4 +67,27 @@ export interface IGroupRepository {
    * @returns True if user is a member
    */
   isMember(groupId: string, userId: string): Promise<boolean>;
+
+  /**
+   * Update group settings
+   * @param groupId - Group ID
+   * @param data - Update data
+   * @returns Updated group
+   */
+  update(groupId: string, data: UpdateGroupInput): Promise<Group>;
+
+  /**
+   * Check if user is the creator of a group
+   * @param groupId - Group ID
+   * @param userId - User ID
+   * @returns True if user is the creator
+   */
+  isCreator(groupId: string, userId: string): Promise<boolean>;
+
+  /**
+   * Search groups by name
+   * @param query - Search query parameters
+   * @returns Array of matching groups (public info only)
+   */
+  search(query: SearchGroupsQuery): Promise<SearchGroupResult[]>;
 }

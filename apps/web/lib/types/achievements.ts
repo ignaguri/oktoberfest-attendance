@@ -1,4 +1,4 @@
-import type { Database, Tables } from "@/lib/database.types";
+import type { Database, Tables } from "@prostcounter/db";
 
 export type Achievement = Tables<"achievements">;
 export type UserAchievement = Tables<"user_achievements">;

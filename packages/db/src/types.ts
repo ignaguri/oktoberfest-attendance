@@ -712,7 +712,6 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
-          custom_beer_cost: number | null
           full_name: string | null
           id: string
           is_super_admin: boolean | null
@@ -724,7 +723,6 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
-          custom_beer_cost?: number | null
           full_name?: string | null
           id: string
           is_super_admin?: boolean | null
@@ -736,7 +734,6 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
-          custom_beer_cost?: number | null
           full_name?: string | null
           id?: string
           is_super_admin?: boolean | null
@@ -1337,7 +1334,7 @@ export type Database = {
           p_festival_id: string
           p_user_id: string
         }
-        Returns: Json
+        Returns: boolean
       }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
@@ -1369,6 +1366,14 @@ export type Database = {
       delete_attendance: {
         Args: { p_attendance_id: string }
         Returns: undefined
+      }
+      evaluate_achievement_progress: {
+        Args: {
+          p_achievement_id: string
+          p_festival_id: string
+          p_user_id: string
+        }
+        Returns: Json
       }
       evaluate_user_achievements: {
         Args: { p_festival_id: string; p_user_id: string }
@@ -1403,6 +1408,10 @@ export type Database = {
       }
       get_active_schema: { Args: never; Returns: string }
       get_current_schema: { Args: never; Returns: string }
+      get_festival_beer_cost: {
+        Args: { p_festival_id: string }
+        Returns: number
+      }
       get_global_leaderboard: {
         Args: { p_festival_id?: string; p_winning_criteria_id: number }
         Returns: {

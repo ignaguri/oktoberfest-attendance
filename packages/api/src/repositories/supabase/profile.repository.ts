@@ -29,7 +29,7 @@ export class SupabaseProfileRepository {
   async getProfileShort(userId: string, email?: string): Promise<ProfileShort> {
     const { data, error } = await this.supabase
       .from("profiles")
-      .select("full_name, username, avatar_url, custom_beer_cost")
+      .select("full_name, username, avatar_url")
       .eq("id", userId)
       .single();
 
@@ -52,7 +52,6 @@ export class SupabaseProfileRepository {
       .update({
         username: input.username,
         full_name: input.full_name,
-        custom_beer_cost: input.custom_beer_cost,
         updated_at: new Date().toISOString(),
       })
       .eq("id", userId)

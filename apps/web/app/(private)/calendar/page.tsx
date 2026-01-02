@@ -1,14 +1,39 @@
+"use client";
+
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
-import { getCurrentFestivalForUser } from "@/lib/festivalActions";
+import { useFestival } from "@/contexts/FestivalContext";
+import { usePersonalCalendar } from "@/hooks/useCalendar";
+import { Loader2 } from "lucide-react";
 
-import { getPersonalCalendarEvents } from "./actions";
-
-export default async function PersonalCalendarPage() {
-  const currentFestival = await getCurrentFestivalForUser();
+export default function PersonalCalendarPage() {
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const festivalId = currentFestival?.id;
 
-  const events = festivalId ? await getPersonalCalendarEvents(festivalId) : [];
+  const {
+    data: events,
+    loading: eventsLoading,
+    error,
+  } = usePersonalCalendar(festivalId || "");
+
+  const isLoading = festivalLoading || eventsLoading;
+
+  if (isLoading) {
+    return (
+      <div className="container flex flex-col items-center justify-center p-4 min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+        <p className="mt-2 text-muted-foreground">Loading calendar...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container flex flex-col items-center p-4">
+        <p className="text-red-500">Failed to load calendar events</p>
+      </div>
+    );
+  }
 
   const initialMonth = currentFestival
     ? new Date(currentFestival.start_date)
@@ -26,7 +51,7 @@ export default async function PersonalCalendarPage() {
     <div className="container flex flex-col items-center p-4">
       <h1 className="text-lg font-semibold mb-4">My Calendar</h1>
       <EventCalendar
-        events={events}
+        events={events || []}
         initialMonth={initialMonth}
         festivalStartDate={festivalStartDate}
         festivalEndDate={festivalEndDate}

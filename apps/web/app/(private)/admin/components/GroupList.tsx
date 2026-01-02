@@ -25,8 +25,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { Tables } from "@/lib/database.types";
 import type { GroupFormData } from "@/lib/schemas/admin";
+import type { Tables } from "@prostcounter/db";
 
 import { regenerateInviteToken } from "../../group-settings/[id]/actions";
 import {

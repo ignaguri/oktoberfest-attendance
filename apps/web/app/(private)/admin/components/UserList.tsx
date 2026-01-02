@@ -37,11 +37,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { Tables } from "@/lib/database.types";
 import type {
   UserUpdateFormData,
   AttendanceFormData,
 } from "@/lib/schemas/admin";
+import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 
 import {

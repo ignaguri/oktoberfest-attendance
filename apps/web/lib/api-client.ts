@@ -8,6 +8,7 @@ import type {
   Group,
   GroupActionResponse,
   LeaderboardResponse,
+  WinningCriteriaListResponse,
   ListAchievementsResponse,
   EvaluateAchievementsResponse,
   ListFestivalsResponse,
@@ -148,6 +149,41 @@ export const apiClient = {
     },
 
     /**
+     * Search groups by name
+     */
+    async search(query: {
+      name: string;
+      festivalId?: string;
+      limit?: number;
+    }): Promise<{
+      data: Array<{
+        id: string;
+        name: string;
+        festivalId: string;
+        memberCount: number;
+      }>;
+    }> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({ name: query.name });
+      if (query.festivalId) params.set("festivalId", query.festivalId);
+      if (query.limit) params.set("limit", query.limit.toString());
+      const url = `${API_BASE_URL}/v1/groups/search?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(`Failed to search groups: ${response.statusText}`);
+      }
+      return parseJsonResponse<{
+        data: Array<{
+          id: string;
+          name: string;
+          festivalId: string;
+          memberCount: number;
+        }>;
+      }>(response);
+    },
+
+    /**
      * Get group details
      */
     async get(groupId: string): Promise<ApiResponse<Group>> {
@@ -248,6 +284,32 @@ export const apiClient = {
       }
       return parseJsonResponse<LeaderboardResponse>(response);
     },
+
+    /**
+     * Update group settings
+     */
+    async update(
+      groupId: string,
+      data: {
+        name?: string;
+        winningCriteriaId?: number;
+        description?: string | null;
+      },
+    ): Promise<Group> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/groups/${groupId}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update group");
+      }
+      return parseJsonResponse<Group>(response);
+    },
   },
 
   /**
@@ -278,6 +340,23 @@ export const apiClient = {
         );
       }
       return parseJsonResponse<LeaderboardResponse>(response);
+    },
+
+    /**
+     * Get winning criteria options
+     */
+    async winningCriteria(): Promise<WinningCriteriaListResponse> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/leaderboard/winning-criteria`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch winning criteria: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<WinningCriteriaListResponse>(response);
     },
   },
 
@@ -452,7 +531,6 @@ export const apiClient = {
     async update(data: {
       username?: string;
       full_name?: string;
-      custom_beer_cost?: number | null;
     }): Promise<{ profile: Profile }> {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/v1/profile`, {

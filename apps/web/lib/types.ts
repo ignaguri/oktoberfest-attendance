@@ -1,4 +1,4 @@
-import type { Database } from "./database.types";
+import type { Database } from "@prostcounter/db";
 import type { createServerClient } from "@supabase/ssr";
 import type { Session } from "@supabase/supabase-js";
 

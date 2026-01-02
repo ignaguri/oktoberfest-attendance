@@ -1,5 +1,5 @@
-import type { Database } from "@/lib/database.types";
 import type { NotificationService } from "@/lib/services/notifications";
+import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export async function processAchievementNotifications(

@@ -15,9 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useWinningCriterias } from "@/hooks/useLeaderboard";
 import { winningCriteriaText } from "@/lib/constants";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
-import { fetchWinningCriterias } from "@/lib/sharedActions";
 import EyeClosedIcon from "@/public/icons/eye-closed.svg";
 import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,9 +27,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { Tables } from "@/lib/database.types";
 import type { GroupSettingsFormData } from "@/lib/schemas/groups";
 import type { WinningCriteria } from "@/lib/types";
+import type { Tables } from "@prostcounter/db";
 
 import {
   getCurrentUserForGroup,
@@ -51,12 +51,11 @@ export default function GroupSettingsClient({ group, members }: Props) {
     userId: string;
     isCreator: boolean;
   } | null>(null);
-  const [winningCriterias, setWinningCriterias] = useState<
-    { id: number; name: string }[]
-  >([]);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+
+  const { data: winningCriterias = [] } = useWinningCriterias();
 
   const {
     register,
@@ -86,17 +85,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
     fetchCurrentUser();
   }, [group.id]);
-
-  useEffect(() => {
-    const fetchWinningCriteriasData = async () => {
-      const result = await fetchWinningCriterias();
-      if (result) {
-        setWinningCriterias(result);
-      }
-    };
-
-    fetchWinningCriteriasData();
-  }, []);
 
   const onSubmit = useCallback(
     async (data: GroupSettingsFormData) => {
@@ -265,7 +253,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 id="winning_criteria_id"
                 options={[
                   {
-                    options: winningCriterias.map((criteria) => ({
+                    options: (winningCriterias ?? []).map((criteria) => ({
                       value: criteria.id.toString(),
                       label:
                         winningCriteriaText[criteria.name as WinningCriteria],

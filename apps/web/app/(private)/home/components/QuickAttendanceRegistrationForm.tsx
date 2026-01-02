@@ -297,20 +297,10 @@ export const QuickAttendanceRegistrationForm = ({
             }}
             disabled={isSubmitting}
           />
-          {/* TODO: enable this when location sharing works
-         <LocationSharingToggle
-          disabled={isSubmitting}
-          className="flex-shrink-0"
-          isSharing={isSharing}
-          hasGroupSharingEnabled={hasGroupSharingEnabled}
-          onToggle={handleToggle}
-        /> */}
+          {/* Location sharing toggle disabled - requires migration from deprecated tables
+              to session-based model. See: app/api/location-sharing/ for details */}
         </div>
-        {/* TODO: enable this when location sharing works
-       <LocationSharingStatus
-        isSharing={isSharing}
-        hasGroupSharingEnabled={hasGroupSharingEnabled}
-      /> */}
+        {/* Location sharing status disabled - pending database migration */}
         <div className="flex items-center">
           <Button
             type="button"

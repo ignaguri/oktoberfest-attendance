@@ -51,7 +51,6 @@ export default function AccountForm() {
     defaultValues: {
       fullname: "",
       username: "",
-      custom_beer_cost: 16.2,
     },
   });
 
@@ -61,7 +60,6 @@ export default function AccountForm() {
       reset({
         fullname: profile.full_name || "",
         username: profile.username || "",
-        custom_beer_cost: profile.custom_beer_cost || 16.2,
       });
     }
   }, [profile, reset]);
@@ -94,9 +92,6 @@ export default function AccountForm() {
       await updateProfileMutation({
         ...(data.username && { username: data.username }),
         ...(data.fullname && { full_name: data.fullname }),
-        ...(data.custom_beer_cost !== undefined && {
-          custom_beer_cost: data.custom_beer_cost,
-        }),
       });
       toast.success("Profile updated successfully!");
       setIsEditing(false);
@@ -211,26 +206,6 @@ export default function AccountForm() {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <Label htmlFor="custom_beer_cost" className="font-semibold">
-              Average cost of a beer (€):
-            </Label>
-            {isEditing ? (
-              <Input
-                className="input"
-                id="custom_beer_cost"
-                type="number"
-                step="0.1"
-                disabled={isUpdating}
-                errorMsg={errors.custom_beer_cost?.message}
-                {...register("custom_beer_cost", { valueAsNumber: true })}
-              />
-            ) : (
-              <div className="p-2">
-                {profile.custom_beer_cost?.toFixed(2) || "16.20"}
-              </div>
-            )}
-          </div>
           {isEditing && (
             <div className="flex flex-col gap-2 mt-4 items-center">
               <Button variant="yellow" type="submit" disabled={isUpdating}>
@@ -265,7 +240,9 @@ export default function AccountForm() {
 
       <NotificationSettings />
 
-      {/* TODO: enable this when location sharing works <LocationPrivacySettings /> */}
+      {/* Location sharing disabled - requires migration from deprecated location_sharing_preferences
+          table to new session-based model (location_sessions, location_session_members).
+          See: app/api/location-sharing/preferences/route.ts for migration notes */}
 
       <PhotoPrivacySettings />
 

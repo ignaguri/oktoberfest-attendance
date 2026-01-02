@@ -1,6 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-import type { Database } from "@/lib/database.types";
+import type { Database } from "@prostcounter/db";
 
 export function createSupabaseBrowserClient() {
   return createBrowserClient<Database>(

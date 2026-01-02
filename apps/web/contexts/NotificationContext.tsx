@@ -17,7 +17,7 @@ import {
   useState,
 } from "react";
 
-import type { Tables } from "@/lib/database.types";
+import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
 

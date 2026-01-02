@@ -17,7 +17,7 @@ import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
-import type { Tables } from "@/lib/database.types";
+import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 
 import { NO_ROWS_ERROR, TIMEZONE } from "./constants";
@@ -44,7 +44,7 @@ export async function getProfileShort() {
   const supabase = await createClient();
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
-    .select("full_name, username, avatar_url, custom_beer_cost")
+    .select("full_name, username, avatar_url")
     .eq("id", user.id)
     .single();
 

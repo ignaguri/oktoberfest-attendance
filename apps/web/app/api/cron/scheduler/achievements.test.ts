@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
-import type { Database } from "@/lib/database.types";
 import type { NotificationService } from "@/lib/services/notifications";
+import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { processAchievementNotifications } from "./achievements";

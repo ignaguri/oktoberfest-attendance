@@ -1,4 +1,4 @@
-import type { Database } from "./database.types";
+import type { Database } from "@prostcounter/db";
 
 type PublicSchema = Database[Extract<keyof Database, "public">];
 

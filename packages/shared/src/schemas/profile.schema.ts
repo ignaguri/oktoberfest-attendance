@@ -6,7 +6,6 @@ export const ProfileSchema = z.object({
   username: z.string().nullable(),
   full_name: z.string().nullable(),
   avatar_url: z.string().nullable(),
-  custom_beer_cost: z.number().nullable(),
   tutorial_completed: z.boolean().nullable(),
   tutorial_completed_at: z.string().nullable(),
   updated_at: z.string().nullable(),
@@ -18,7 +17,6 @@ export const ProfileShortSchema = z.object({
   full_name: z.string().nullable(),
   username: z.string().nullable(),
   avatar_url: z.string().nullable(),
-  custom_beer_cost: z.number().nullable(),
   email: z.string().nullable().optional(),
 });
 
@@ -28,7 +26,6 @@ export type ProfileShort = z.infer<typeof ProfileShortSchema>;
 export const UpdateProfileSchema = z.object({
   username: z.string().min(3).max(30).optional(),
   full_name: z.string().min(1).max(100).optional(),
-  custom_beer_cost: z.number().min(0).max(100).nullable().optional(),
 });
 
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;

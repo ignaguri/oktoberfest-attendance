@@ -102,13 +102,9 @@ export default async function GroupPage({
                   <span className="ml-2">Gallery</span>
                 </Link>
               </Button>
-              {/* TODO: enable this when location sharing works
-               <Button asChild variant="outline">
-                <Link href={`/groups/${groupId}/location`}>
-                  <MapPin size={24} />
-                  <span className="ml-2">Location</span>
-                </Link>
-              </Button> */}
+              {/* Location sharing feature disabled - requires migration from deprecated tables
+                  (user_locations, location_sharing_preferences) to session-based model.
+                  See: app/api/location-sharing/ for migration notes */}
             </div>
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>

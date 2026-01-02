@@ -18,10 +18,9 @@ export interface PersonalityAnalysis {
 export function analyzePersonality(data: WrappedData): PersonalityAnalysis {
   const { basic_stats, tent_stats, timeline } = data;
 
-  // Calculate behavioral metrics
-  const uniqueTents = tent_stats.unique_tents;
-  const totalTentsInFestival = 14; // TODO: adjust to make it dynamic. We have 14 big ones and 21 small ones. but that would make the diversity too high.
-  const tentDiversityPct = (uniqueTents / totalTentsInFestival) * 100;
+  // Use pre-calculated tent diversity percentage from database
+  // This is calculated server-side based on the festival's actual tent count
+  const tentDiversityPct = tent_stats.tent_diversity_pct;
 
   const avgBeers = basic_stats.avg_beers;
   const daysAttended = basic_stats.days_attended;

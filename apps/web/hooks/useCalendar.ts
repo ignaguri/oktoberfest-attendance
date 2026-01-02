@@ -8,6 +8,27 @@ import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 
+import type { CalendarEvent } from "@/components/calendar/EventCalendar";
+
+/**
+ * Transform API calendar events (string dates) to component format (Date objects)
+ */
+function transformEvents(
+  events: Array<{
+    id: string;
+    title: string;
+    from: string;
+    to?: string | null;
+    type: "attendance" | "tent_visit" | "beer_summary" | "reservation";
+  }>,
+): CalendarEvent[] {
+  return events.map((event) => ({
+    ...event,
+    from: new Date(event.from),
+    to: event.to ? new Date(event.to) : null,
+  }));
+}
+
 /**
  * Hook to fetch personal calendar events for a festival
  */
@@ -16,7 +37,7 @@ export function usePersonalCalendar(festivalId: string) {
     QueryKeys.personalCalendar(festivalId),
     async () => {
       const response = await apiClient.calendar.personal(festivalId);
-      return response.events || [];
+      return transformEvents(response.events || []);
     },
     {
       enabled: !!festivalId,
@@ -34,7 +55,7 @@ export function useGroupCalendar(groupId: string) {
     QueryKeys.groupCalendar(groupId),
     async () => {
       const response = await apiClient.calendar.group(groupId);
-      return response.events || [];
+      return transformEvents(response.events || []);
     },
     {
       enabled: !!groupId,

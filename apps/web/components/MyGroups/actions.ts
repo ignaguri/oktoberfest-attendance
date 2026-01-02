@@ -5,8 +5,8 @@ import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { unstable_cache } from "next/cache";
 
-import type { Tables } from "@/lib/database.types";
 import type { SupabaseClient } from "@/lib/types";
+import type { Tables } from "@prostcounter/db";
 
 import "server-only";
 

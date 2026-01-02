@@ -4,6 +4,7 @@ import type {
   LeaderboardEntry,
   GlobalLeaderboardQuery,
   GroupLeaderboardQuery,
+  WinningCriteriaOption,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -91,6 +92,21 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
       ...this.mapToLeaderboardEntry(item),
       position: index + 1,
     }));
+  }
+
+  async getWinningCriteria(): Promise<WinningCriteriaOption[]> {
+    const { data, error } = await this.supabase
+      .from("winning_criteria")
+      .select("id, name")
+      .order("id");
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to fetch winning criteria: ${error.message}`,
+      );
+    }
+
+    return data || [];
   }
 
   private mapToLeaderboardEntry(data: any): LeaderboardEntry {

@@ -7,7 +7,6 @@
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
-import { fetchWinningCriterias } from "@/lib/sharedActions";
 
 // Map winning criteria IDs to API enum values
 const CRITERIA_ID_TO_SORT_BY: Record<
@@ -65,12 +64,17 @@ export function useGroupLeaderboard(
 
 /**
  * Hook to fetch winning criteria options
- * Note: Still using server action as this is not yet available in API
- * TODO: Migrate to API endpoint when available
  */
 export function useWinningCriterias() {
-  return useQuery(QueryKeys.winningCriterias(), () => fetchWinningCriterias(), {
-    staleTime: 30 * 60 * 1000, // 30 minutes - winning criteria rarely change
-    gcTime: 60 * 60 * 1000, // 1 hour cache
-  });
+  return useQuery(
+    QueryKeys.winningCriterias(),
+    async () => {
+      const response = await apiClient.leaderboard.winningCriteria();
+      return response.data || [];
+    },
+    {
+      staleTime: 30 * 60 * 1000, // 30 minutes - winning criteria rarely change
+      gcTime: 60 * 60 * 1000, // 1 hour cache
+    },
+  );
 }

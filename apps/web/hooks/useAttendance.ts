@@ -33,26 +33,6 @@ export function useAttendances(festivalId: string) {
 }
 
 /**
- * Hook to fetch user highlights (stats) for a festival
- * @deprecated Use useHighlights from useProfile.ts instead
- */
-export function useUserHighlights(festivalId?: string) {
-  return useQuery(
-    QueryKeys.highlights(festivalId || ""),
-    async () => {
-      if (!festivalId) return null;
-      const response = await apiClient.profile.getHighlights(festivalId);
-      return response.highlights;
-    },
-    {
-      enabled: !!festivalId,
-      staleTime: 2 * 60 * 1000, // 2 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes cache
-    },
-  );
-}
-
-/**
  * Hook to delete attendance with optimistic updates
  */
 export function useDeleteAttendance() {

@@ -7,7 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { Database } from "@/lib/database.types";
+import type { Database } from "@prostcounter/db";
 
 type PhotoVisibility = Database["public"]["Enums"]["photo_visibility_enum"];
 

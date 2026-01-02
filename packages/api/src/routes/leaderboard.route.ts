@@ -4,6 +4,7 @@ import {
   GroupLeaderboardQuerySchema,
   GroupIdParamSchema,
   LeaderboardResponseSchema,
+  WinningCriteriaListResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
@@ -16,6 +17,46 @@ import {
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
+
+// GET /leaderboard/winning-criteria - List winning criteria options
+const winningCriteriaRoute = createRoute({
+  method: "get",
+  path: "/leaderboard/winning-criteria",
+  tags: ["leaderboard"],
+  summary: "List winning criteria options",
+  description: "Returns all available winning criteria for group competitions",
+  responses: {
+    200: {
+      description: "Winning criteria retrieved successfully",
+      content: {
+        "application/json": {
+          schema: WinningCriteriaListResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(winningCriteriaRoute, async (c) => {
+  const supabase = c.var.supabase;
+
+  const leaderboardRepo = new SupabaseLeaderboardRepository(supabase);
+  const data = await leaderboardRepo.getWinningCriteria();
+
+  return c.json({ data }, 200);
+});
 
 // GET /leaderboard - Global leaderboard
 const globalLeaderboardRoute = createRoute({

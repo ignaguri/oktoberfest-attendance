@@ -3,6 +3,7 @@ import type {
   Group,
   GroupWithMembers,
   CreateGroupInput,
+  UpdateGroupInput,
   ListGroupsQuery,
 } from "@prostcounter/shared";
 
@@ -97,5 +98,29 @@ export class GroupService {
 
     // Remove member
     await this.groupRepo.removeMember(groupId, userId);
+  }
+
+  /**
+   * Update group settings
+   * Only the group creator can update
+   */
+  async updateGroup(
+    groupId: string,
+    userId: string,
+    data: UpdateGroupInput,
+  ): Promise<Group> {
+    const group = await this.groupRepo.findById(groupId);
+
+    if (!group) {
+      throw new NotFoundError("Group not found");
+    }
+
+    // Verify user is the creator
+    const isCreator = await this.groupRepo.isCreator(groupId, userId);
+    if (!isCreator) {
+      throw new ForbiddenError("Only the group creator can update settings");
+    }
+
+    return await this.groupRepo.update(groupId, data);
   }
 }

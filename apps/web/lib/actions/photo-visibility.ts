@@ -5,12 +5,12 @@ import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-import type { Database } from "@/lib/database.types";
 import type {
   GlobalPhotoSettingsFormData,
   GroupPhotoSettingsFormData,
   BulkPhotoVisibilityFormData,
 } from "@/lib/schemas/photo-visibility";
+import type { Database } from "@prostcounter/db";
 
 import "server-only";
 

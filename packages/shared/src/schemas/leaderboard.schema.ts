@@ -50,3 +50,22 @@ export const LeaderboardResponseSchema = z.object({
 });
 
 export type LeaderboardResponse = z.infer<typeof LeaderboardResponseSchema>;
+
+/**
+ * Winning criteria option (database record for group competitions)
+ * Different from WinningCriteria enum in group.schema.ts which is the string type
+ */
+export const WinningCriteriaOptionSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+});
+
+export type WinningCriteriaOption = z.infer<typeof WinningCriteriaOptionSchema>;
+
+export const WinningCriteriaListResponseSchema = z.object({
+  data: z.array(WinningCriteriaOptionSchema),
+});
+
+export type WinningCriteriaListResponse = z.infer<
+  typeof WinningCriteriaListResponseSchema
+>;

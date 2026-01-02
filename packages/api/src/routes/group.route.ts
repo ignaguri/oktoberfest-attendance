@@ -1,6 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   CreateGroupSchema,
+  UpdateGroupSchema,
   GroupSchema,
   ListGroupsQuerySchema,
   ListGroupsResponseSchema,
@@ -8,6 +9,8 @@ import {
   GroupWithMembersSchema,
   JoinGroupSchema,
   GroupActionResponseSchema,
+  SearchGroupsQuerySchema,
+  SearchGroupsResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
@@ -70,6 +73,51 @@ app.openapi(createGroupRoute, async (c) => {
   const group = await service.createGroup(user.id, data);
 
   return c.json(group, 200);
+});
+
+// GET /groups/search - Search groups by name
+const searchGroupsRoute = createRoute({
+  method: "get",
+  path: "/groups/search",
+  tags: ["groups"],
+  summary: "Search groups by name",
+  description:
+    "Search for groups by name. Returns public group info (no invite tokens).",
+  request: {
+    query: SearchGroupsQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Groups found",
+      content: {
+        "application/json": {
+          schema: SearchGroupsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(searchGroupsRoute, async (c) => {
+  const supabase = c.var.supabase;
+  const query = c.req.valid("query");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const groups = await groupRepo.search(query);
+
+  return c.json({ data: groups }, 200);
 });
 
 // GET /groups - List user's groups
@@ -184,6 +232,84 @@ app.openapi(getGroupRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.getGroup(id, user.id);
+
+  return c.json(group, 200);
+});
+
+// PUT /groups/:id - Update group settings
+const updateGroupRoute = createRoute({
+  method: "put",
+  path: "/groups/{id}",
+  tags: ["groups"],
+  summary: "Update group settings",
+  description:
+    "Update group name, winning criteria, or description. Only the group creator can update.",
+  request: {
+    params: GroupIdParamSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: UpdateGroupSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Group updated successfully",
+      content: {
+        "application/json": {
+          schema: GroupSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not the group creator",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateGroupRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+  const data = c.req.valid("json");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const group = await service.updateGroup(id, user.id, data);
 
   return c.json(group, 200);
 });

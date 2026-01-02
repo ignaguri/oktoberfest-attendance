@@ -6,7 +6,10 @@ import type {
   Group,
   GroupWithMembers,
   CreateGroupInput,
+  UpdateGroupInput,
   ListGroupsQuery,
+  SearchGroupsQuery,
+  SearchGroupResult,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -212,6 +215,55 @@ export class SupabaseGroupRepository implements IGroupRepository {
     }
   }
 
+  async update(groupId: string, data: UpdateGroupInput): Promise<Group> {
+    // Build update object
+    const updateData: Record<string, unknown> = {};
+
+    if (data.name !== undefined) {
+      updateData.name = data.name;
+    }
+
+    if (data.winningCriteriaId !== undefined) {
+      updateData.winning_criteria_id = data.winningCriteriaId;
+    }
+
+    if (data.description !== undefined) {
+      updateData.description = data.description;
+    }
+
+    const { data: group, error } = await this.supabase
+      .from("groups")
+      .update(updateData)
+      .eq("id", groupId)
+      .select(
+        `
+        *,
+        winning_criteria:winning_criteria_id (id, name)
+      `,
+      )
+      .single();
+
+    if (error) {
+      throw new DatabaseError(`Failed to update group: ${error.message}`);
+    }
+
+    return this.mapToGroup(group);
+  }
+
+  async isCreator(groupId: string, userId: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select("created_by")
+      .eq("id", groupId)
+      .single();
+
+    if (error) {
+      throw new DatabaseError(`Failed to check creator: ${error.message}`);
+    }
+
+    return data?.created_by === userId;
+  }
+
   async isMember(groupId: string, userId: string): Promise<boolean> {
     const { data, error } = await this.supabase
       .from("group_members")
@@ -225,6 +277,40 @@ export class SupabaseGroupRepository implements IGroupRepository {
     }
 
     return data !== null;
+  }
+
+  async search(query: SearchGroupsQuery): Promise<SearchGroupResult[]> {
+    let supabaseQuery = this.supabase
+      .from("groups")
+      .select(
+        `
+        id,
+        name,
+        festival_id,
+        group_members(count)
+      `,
+      )
+      .ilike("name", `%${query.name}%`)
+      .limit(query.limit);
+
+    if (query.festivalId) {
+      supabaseQuery = supabaseQuery.eq("festival_id", query.festivalId);
+    }
+
+    supabaseQuery = supabaseQuery.order("name", { ascending: true });
+
+    const { data, error } = await supabaseQuery;
+
+    if (error) {
+      throw new DatabaseError(`Failed to search groups: ${error.message}`);
+    }
+
+    return (data || []).map((group: any) => ({
+      id: group.id,
+      name: group.name,
+      festivalId: group.festival_id,
+      memberCount: group.group_members?.[0]?.count || 0,
+    }));
   }
 
   private mapToGroup(data: any): Group {

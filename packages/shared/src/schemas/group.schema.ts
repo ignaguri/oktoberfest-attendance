@@ -49,6 +49,22 @@ export const CreateGroupSchema = z.object({
 export type CreateGroupInput = z.infer<typeof CreateGroupSchema>;
 
 /**
+ * Update group request
+ * PUT /api/v1/groups/:id
+ */
+export const UpdateGroupSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(100, "Group name must be 100 characters or less")
+    .optional(),
+  winningCriteriaId: z.number().int().min(1).max(3).optional(),
+  description: z.string().max(500).nullable().optional(),
+});
+
+export type UpdateGroupInput = z.infer<typeof UpdateGroupSchema>;
+
+/**
  * List groups query
  * GET /api/v1/groups
  */
@@ -57,6 +73,36 @@ export const ListGroupsQuerySchema = z.object({
 });
 
 export type ListGroupsQuery = z.infer<typeof ListGroupsQuerySchema>;
+
+/**
+ * Search groups query
+ * GET /api/v1/groups/search
+ */
+export const SearchGroupsQuerySchema = z.object({
+  name: z.string().min(1, "Search query is required"),
+  festivalId: z.uuid({ error: "Invalid festival ID" }).optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+
+export type SearchGroupsQuery = z.infer<typeof SearchGroupsQuerySchema>;
+
+/**
+ * Search groups response - public group info (no invite token exposed)
+ */
+export const SearchGroupResultSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  festivalId: z.uuid(),
+  memberCount: z.number().int(),
+});
+
+export type SearchGroupResult = z.infer<typeof SearchGroupResultSchema>;
+
+export const SearchGroupsResponseSchema = z.object({
+  data: z.array(SearchGroupResultSchema),
+});
+
+export type SearchGroupsResponse = z.infer<typeof SearchGroupsResponseSchema>;
 
 /**
  * List groups response

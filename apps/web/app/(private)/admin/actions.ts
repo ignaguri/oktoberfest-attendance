@@ -7,7 +7,7 @@ import { revalidatePath, unstable_cache } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
-import type { Tables } from "@/lib/database.types";
+import type { Tables } from "@prostcounter/db";
 
 import "server-only";
 

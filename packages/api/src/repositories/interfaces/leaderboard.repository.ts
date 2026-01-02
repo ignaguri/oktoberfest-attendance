@@ -2,6 +2,7 @@ import type {
   LeaderboardEntry,
   GlobalLeaderboardQuery,
   GroupLeaderboardQuery,
+  WinningCriteriaOption,
 } from "@prostcounter/shared";
 
 /**
@@ -28,4 +29,10 @@ export interface ILeaderboardRepository {
     groupId: string,
     query?: GroupLeaderboardQuery,
   ): Promise<LeaderboardEntry[]>;
+
+  /**
+   * Get winning criteria options
+   * @returns Array of winning criteria options for group competitions
+   */
+  getWinningCriteria(): Promise<WinningCriteriaOption[]>;
 }

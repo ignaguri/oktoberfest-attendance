@@ -91,14 +91,32 @@ export function useCreateGroup() {
 }
 
 /**
+ * Hook to search for groups by name
+ * Use this to find groups before joining
+ */
+export function useGroupSearch(name: string, festivalId?: string) {
+  return useQuery(
+    QueryKeys.groupSearch(name, festivalId || ""),
+    async () => {
+      if (!name || name.length < 2) return [];
+
+      const { data } = await apiClient.groups.search({
+        name,
+        festivalId,
+        limit: 10,
+      });
+      return data;
+    },
+    {
+      enabled: name.length >= 2,
+      staleTime: 30 * 1000, // 30 seconds
+      gcTime: 60 * 1000, // 1 minute cache
+    },
+  );
+}
+
+/**
  * Hook to join a group by invite token
- *
- * NOTE: API compatibility issue - old implementation used groupName/password,
- * new API uses groupId/inviteToken. Frontend flow needs to be updated to:
- * 1. Find group by name first (not yet implemented in API), OR
- * 2. Use QR code/link that includes groupId
- *
- * For now, keeping this as a placeholder that expects groupId to be known
  */
 export function useJoinGroup() {
   const invalidateQueries = useInvalidateQueries();
@@ -122,8 +140,6 @@ export function useJoinGroup() {
 
 /**
  * Hook to update group settings
- * NOTE: This endpoint is not yet implemented in the API
- * Keeping old implementation for now
  */
 export function useUpdateGroup() {
   const invalidateQueries = useInvalidateQueries();
@@ -134,13 +150,16 @@ export function useUpdateGroup() {
       updates,
     }: {
       groupId: string;
-      updates: { name?: string; winningCriteriaId?: number };
+      updates: {
+        name?: string;
+        winningCriteriaId?: number;
+        description?: string | null;
+      };
     }) => {
-      // TODO: Implement PUT /v1/groups/:id endpoint
-      throw new Error("Update group endpoint not yet implemented");
+      return await apiClient.groups.update(groupId, updates);
     },
     {
-      onSuccess: (data, { groupId }) => {
+      onSuccess: (_data, { groupId }) => {
         // Invalidate specific group
         invalidateQueries(["group", groupId]);
         // Invalidate user groups

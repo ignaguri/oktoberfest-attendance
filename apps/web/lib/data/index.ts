@@ -30,11 +30,7 @@ export { DataProvider as QueryProvider } from "./query-client";
 // Business logic hooks - these are the main API for components
 
 // Attendance hooks
-export {
-  useAttendances,
-  useDeleteAttendance,
-  useUserHighlights,
-} from "../../hooks/useAttendance";
+export { useAttendances, useDeleteAttendance } from "../../hooks/useAttendance";
 
 // Festival hooks
 export {

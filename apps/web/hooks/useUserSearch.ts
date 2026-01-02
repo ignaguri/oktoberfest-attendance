@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import type { Tables } from "@/lib/database.types";
+import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 
 // Import the server actions
