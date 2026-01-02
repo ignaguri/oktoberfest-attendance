@@ -1,4 +1,9 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "turbo build --filter=@prostcounter/web",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/cron/scheduler",
@@ -6,5 +11,3 @@
     }
   ]
 }
-
-
