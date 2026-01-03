@@ -1,5 +1,3 @@
-import { randomUUID, randomBytes } from "crypto";
-
 import type { IGroupRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
@@ -39,13 +37,6 @@ export class SupabaseGroupRepository implements IGroupRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async create(userId: string, data: CreateGroupInput): Promise<Group> {
-    // Generate unique invite token as UUID
-    const inviteToken = randomUUID();
-
-    // Generate a secure random password (required by database schema)
-    // Note: We use invite tokens for sharing, but DB requires password
-    const password = randomBytes(32).toString("hex");
-
     // Map winning criteria string to ID
     const winningCriteriaId = WINNING_CRITERIA_MAP[data.winningCriteria];
     if (!winningCriteriaId) {
@@ -54,32 +45,40 @@ export class SupabaseGroupRepository implements IGroupRepository {
       );
     }
 
-    const { data: group, error } = await this.supabase
-      .from("groups")
-      .insert({
-        name: data.name,
-        password: password,
-        festival_id: data.festivalId,
-        winning_criteria_id: winningCriteriaId,
-        invite_token: inviteToken,
-        created_by: userId,
-      })
-      .select(
-        `
-        *,
-        winning_criteria:winning_criteria_id (id, name)
-      `,
-      )
-      .single();
+    // Use SECURITY DEFINER function to bypass RLS
+    // This function creates the group AND adds the creator as a member atomically
+    const { data: result, error } = await this.supabase.rpc(
+      "create_group_with_member",
+      {
+        p_group_name: data.name,
+        p_user_id: userId,
+        p_festival_id: data.festivalId,
+        p_winning_criteria_id: winningCriteriaId,
+      },
+    );
 
     if (error) {
       throw new DatabaseError(`Failed to create group: ${error.message}`);
     }
 
-    // Automatically add creator as member
-    await this.addMember(group.id, userId);
+    if (!result || result.length === 0) {
+      throw new DatabaseError("Failed to create group: no data returned");
+    }
 
-    return this.mapToGroup(group);
+    const group = result[0];
+
+    return {
+      id: group.group_id,
+      name: group.group_name,
+      festivalId: group.festival_id,
+      winningCriteria:
+        WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] ||
+        "total_beers",
+      inviteToken: group.invite_token,
+      createdBy: group.created_by,
+      createdAt: group.created_at,
+      updatedAt: group.created_at, // Same as createdAt for new groups
+    };
   }
 
   async listUserGroups(

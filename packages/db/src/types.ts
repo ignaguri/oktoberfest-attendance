@@ -84,6 +84,13 @@ export type Database = {
             foreignKeyName: "achievement_events_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "achievement_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -167,13 +174,6 @@ export type Database = {
             referencedRelation: "festivals"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "attendances_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       beer_pictures: {
@@ -215,13 +215,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "attendances"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "beer_pictures_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -415,6 +408,13 @@ export type Database = {
             foreignKeyName: "fk_user_id"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -431,13 +431,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard"
             referencedColumns: ["group_id"]
-          },
-          {
-            foreignKeyName: "group_members_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -479,13 +472,6 @@ export type Database = {
           winning_criteria_id?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "groups_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "groups_festival_id_fkey"
             columns: ["festival_id"]
@@ -622,13 +608,6 @@ export type Database = {
             referencedRelation: "festivals"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "location_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       notification_rate_limit: {
@@ -667,6 +646,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard"
             referencedColumns: ["group_id"]
+          },
+          {
+            foreignKeyName: "notification_rate_limit_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "notification_rate_limit_user_id_fkey"
@@ -711,15 +697,7 @@ export type Database = {
           username?: string | null
           website?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       reservations: {
         Row: {
@@ -795,6 +773,13 @@ export type Database = {
             foreignKeyName: "reservations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "reservations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -863,6 +848,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tents"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tent_visits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "tent_visits_user_id_fkey"
@@ -973,13 +965,6 @@ export type Database = {
             referencedRelation: "leaderboard"
             referencedColumns: ["group_id"]
           },
-          {
-            foreignKeyName: "user_group_photo_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       user_notification_preferences: {
@@ -1024,6 +1009,13 @@ export type Database = {
             foreignKeyName: "user_notification_preferences_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1051,15 +1043,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_photo_global_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       winning_criteria: {
         Row: {
@@ -1116,6 +1100,13 @@ export type Database = {
             foreignKeyName: "wrapped_data_cache_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "wrapped_data_cache_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1160,13 +1151,6 @@ export type Database = {
             referencedRelation: "festivals"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "attendances_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       leaderboard: {
@@ -1174,8 +1158,6 @@ export type Database = {
           avatar_url: string | null
           avg_beers: number | null
           days_attended: number | null
-          festival_id: string | null
-          festival_name: string | null
           full_name: string | null
           group_id: string | null
           group_name: string | null
@@ -1183,15 +1165,7 @@ export type Database = {
           user_id: string | null
           username: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "groups_festival_id_fkey"
-            columns: ["festival_id"]
-            isOneToOne: false
-            referencedRelation: "festivals"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       v_user_shared_group_members: {
         Row: {
@@ -1202,10 +1176,17 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_user_id"
             columns: ["viewer_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "fk_user_id"
@@ -1215,18 +1196,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "group_members_user_id_fkey"
+            foreignKeyName: "fk_user_id"
             columns: ["viewer_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "group_members_user_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "groups_festival_id_fkey"
@@ -1293,8 +1267,23 @@ export type Database = {
       cleanup_old_location_points: { Args: never; Returns: undefined }
       cleanup_old_rate_limit_records: { Args: never; Returns: undefined }
       create_group_with_member: {
-        Args: { p_group_name: string; p_password: string; p_user_id: string }
-        Returns: Record<string, unknown>
+        Args: {
+          p_festival_id: string
+          p_group_name: string
+          p_invite_token?: string
+          p_password?: string
+          p_user_id: string
+          p_winning_criteria_id?: number
+        }
+        Returns: {
+          created_at: string
+          created_by: string
+          festival_id: string
+          group_id: string
+          group_name: string
+          invite_token: string
+          winning_criteria_id: number
+        }[]
       }
       delete_attendance: {
         Args: { p_attendance_id: string }
