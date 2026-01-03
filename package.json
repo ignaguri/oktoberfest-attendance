@@ -40,12 +40,13 @@
     "e2e:install-browsers": "playwright install --with-deps"
   },
   "devDependencies": {
-    "next": "16.1.1",
     "@eslint/compat": "^2.0.0",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.3",
     "@typescript-eslint/eslint-plugin": "8.50.1",
+    "date-fns": "4.1.0",
     "eslint": "9.39.2",
     "eslint-config-next": "16.1.1",
     "eslint-config-prettier": "10.1.8",
@@ -54,6 +55,7 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unused-imports": "4.3.0",
     "husky": "^9.1.7",
+    "next": "16.1.1",
     "prettier": "3.7.4",
     "supabase": "2.70.5",
     "ts-node": "^10.9.2",
