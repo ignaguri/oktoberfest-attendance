@@ -1,2 +1,0 @@
--- This migration was already applied but failed due to trigger already existing
--- The actual fix is in the next migration: 20250828223044_add_missing_auth_triggers.sql

@@ -272,7 +272,7 @@ export async function addAttendance(formData: {
   );
 
   const { data: attendanceData, error } = await supabase.rpc(
-    "add_or_update_attendance_with_tents_v3",
+    "add_or_update_attendance_with_tents",
     {
       p_user_id: user.id,
       p_beer_count: amount,

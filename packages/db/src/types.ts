@@ -131,38 +131,6 @@ export type Database = {
         }
         Relationships: []
       }
-      attendance: {
-        Row: {
-          created_at: string
-          date: string
-          id: number
-          liters: number | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          date: string
-          id?: number
-          liters?: number | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          date?: string
-          id?: number
-          liters?: number | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "attendance_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       attendances: {
         Row: {
           beer_count: number
@@ -1225,18 +1193,6 @@ export type Database = {
           },
         ]
       }
-      results: {
-        Row: {
-          avatar_url: string | null
-          average_liters: number | null
-          email: string | null
-          full_name: string | null
-          total_days: number | null
-          total_liters: number | null
-          username: string | null
-        }
-        Relationships: []
-      }
       v_user_shared_group_members: {
         Row: {
           festival_id: string | null
@@ -1246,28 +1202,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id"
-            columns: ["owner_id"]
+            columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fk_user_id"
-            columns: ["viewer_id"]
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "group_members_user_id_fkey"
-            columns: ["owner_id"]
+            columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "leaderboard"
             referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "group_members_user_id_fkey"
-            columns: ["viewer_id"]
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "leaderboard"
             referencedColumns: ["user_id"]
@@ -1293,29 +1249,6 @@ export type Database = {
         Returns: string
       }
       add_or_update_attendance_with_tents: {
-        Args: {
-          p_beer_count: number
-          p_date?: string
-          p_festival_id: string
-          p_tent_ids: string[]
-          p_user_id: string
-        }
-        Returns: string
-      }
-      add_or_update_attendance_with_tents_v2: {
-        Args: {
-          p_beer_count: number
-          p_date: string
-          p_festival_id: string
-          p_tent_ids: string[]
-          p_user_id: string
-        }
-        Returns: {
-          attendance_id: string
-          tents_changed: boolean
-        }[]
-      }
-      add_or_update_attendance_with_tents_v3: {
         Args: {
           p_beer_count: number
           p_date: string
@@ -1406,8 +1339,6 @@ export type Database = {
           username: string
         }[]
       }
-      get_active_schema: { Args: never; Returns: string }
-      get_current_schema: { Args: never; Returns: string }
       get_festival_beer_cost: {
         Args: { p_festival_id: string }
         Returns: number
@@ -1605,8 +1536,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      switch_to_production_schema: { Args: never; Returns: undefined }
-      switch_to_testing_schema: { Args: never; Returns: undefined }
       unlock_achievement: {
         Args: {
           p_achievement_id: string
