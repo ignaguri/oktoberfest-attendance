@@ -6,7 +6,8 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts"],
-    exclude: ["**/node_modules/**", "**/*.d.ts"],
+    // Exclude integration tests by default (they require local Supabase)
+    exclude: ["**/node_modules/**", "**/*.d.ts", "**/*.integration.test.ts"],
     coverage: {
       provider: "v8",
       reportsDirectory: "./coverage",
