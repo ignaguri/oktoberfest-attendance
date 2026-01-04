@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 
 import type { Database } from "@prostcounter/db";
@@ -7,7 +6,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
-  createTestSupabaseWithAuth,
 } from "../../__tests__/helpers/test-supabase";
 
 // Integration tests using real local Supabase database
@@ -110,87 +108,61 @@ describe("Group Routes Integration (Local DB)", () => {
   });
 
   it("should create a group and automatically add creator as member", async () => {
-    // Create authenticated Supabase client for this user
-    const userSupabase = createTestSupabaseWithAuth(testUser.token);
-
-    // Create group using the repository/service layer (simulating API route)
-    const { data: group, error: createError } = await userSupabase
-      .from("groups")
-      .insert({
-        name: "Integration Test Group",
-        festival_id: testFestival.id,
-        winning_criteria_id: 2, // total_beers
-        invite_token: randomUUID(),
-        password: "test-password", // Required by schema
-        created_by: testUser.id,
-      })
-      .select(
-        `
-        *,
-        winning_criteria:winning_criteria_id (id, name)
-      `,
-      )
-      .single();
+    // Use RPC function that bypasses RLS (SECURITY DEFINER)
+    // This simulates what the API layer does
+    const { data: groupData, error: createError } = await supabaseAdmin.rpc(
+      "create_group_with_member",
+      {
+        p_group_name: "Integration Test Group",
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 2, // total_beers
+      },
+    );
 
     expect(createError).toBeNull();
-    expect(group).toBeDefined();
-    expect(group!.name).toBe("Integration Test Group");
-    expect(group!.festival_id).toBe(testFestival.id);
-    expect(group!.created_by).toBe(testUser.id);
+    expect(groupData).toBeDefined();
+    expect(Array.isArray(groupData)).toBe(true);
+    expect(groupData!.length).toBe(1);
+
+    const group = groupData![0];
+    expect(group.group_name).toBe("Integration Test Group");
+    expect(group.festival_id).toBe(testFestival.id);
+    expect(group.created_by).toBe(testUser.id);
 
     // Track for cleanup
-    createdGroupIds.push(group!.id);
+    createdGroupIds.push(group.group_id);
 
-    // Manually add creator as member (simulating what the service layer does)
-    const { error: memberError } = await userSupabase
-      .from("group_members")
-      .insert({
-        group_id: group!.id,
-        user_id: testUser.id,
-      });
-
-    expect(memberError).toBeNull();
-
-    // Verify the member was added
-    const { data: members, error: membersError } = await userSupabase
+    // Verify the member was added automatically by the RPC function
+    const { data: members, error: membersError } = await supabaseAdmin
       .from("group_members")
       .select("*")
-      .eq("group_id", group!.id);
+      .eq("group_id", group.group_id);
 
     expect(membersError).toBeNull();
     expect(members).toHaveLength(1);
     expect(members![0].user_id).toBe(testUser.id);
-    expect(members![0].group_id).toBe(group!.id);
+    expect(members![0].group_id).toBe(group.group_id);
   });
 
   it("should list user's groups with member count", async () => {
-    // Create authenticated Supabase client for this user
-    const userSupabase = createTestSupabaseWithAuth(testUser.token);
+    // Create a test group using RPC function
+    const { data: groupData } = await supabaseAdmin.rpc(
+      "create_group_with_member",
+      {
+        p_group_name: "List Test Group",
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 1, // days_attended
+      },
+    );
 
-    // Create a test group
-    const { data: group } = await userSupabase
-      .from("groups")
-      .insert({
-        name: "List Test Group",
-        festival_id: testFestival.id,
-        winning_criteria_id: 1, // days_attended
-        invite_token: randomUUID(),
-        password: "test-password",
-        created_by: testUser.id,
-      })
-      .select()
-      .single();
+    const group = groupData![0];
+    createdGroupIds.push(group.group_id);
 
-    createdGroupIds.push(group!.id);
-
-    // Add creator as member
-    await userSupabase.from("group_members").insert({
-      group_id: group!.id,
-      user_id: testUser.id,
-    });
-
-    // List user's groups (simulating the listUserGroups repository method)
-    const { data: groups, error } = await userSupabase
+    // List user's groups using admin client (simulating the API layer)
+    // The API layer uses service role and filters by user_id
+    const { data: groups, error } = await supabaseAdmin
       .from("groups")
       .select(
         `
@@ -207,54 +179,40 @@ describe("Group Routes Integration (Local DB)", () => {
     expect(groups!.length).toBeGreaterThanOrEqual(1);
 
     // Verify the group we just created is in the list
-    const ourGroup = groups!.find((g) => g.id === group!.id);
+    const ourGroup = groups!.find((g) => g.id === group.group_id);
     expect(ourGroup).toBeDefined();
     expect(ourGroup!.name).toBe("List Test Group");
 
     // Get member count
-    const { count } = await userSupabase
+    const { count } = await supabaseAdmin
       .from("group_members")
       .select("*", { count: "exact", head: true })
-      .eq("group_id", group!.id);
+      .eq("group_id", group.group_id);
 
     expect(count).toBe(1);
   });
 
   it("should prevent duplicate group membership", async () => {
-    // Create authenticated Supabase client for this user
-    const userSupabase = createTestSupabaseWithAuth(testUser.token);
+    // Create a test group using RPC function (automatically adds creator as member)
+    const { data: groupData } = await supabaseAdmin.rpc(
+      "create_group_with_member",
+      {
+        p_group_name: "Duplicate Test Group",
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 2,
+      },
+    );
 
-    // Create a test group
-    const { data: group } = await userSupabase
-      .from("groups")
-      .insert({
-        name: "Duplicate Test Group",
-        festival_id: testFestival.id,
-        winning_criteria_id: 2,
-        invite_token: randomUUID(),
-        password: "test-password",
-        created_by: testUser.id,
-      })
-      .select()
-      .single();
+    const group = groupData![0];
+    createdGroupIds.push(group.group_id);
 
-    createdGroupIds.push(group!.id);
-
-    // Add member first time - should succeed
-    const { error: firstError } = await userSupabase
-      .from("group_members")
-      .insert({
-        group_id: group!.id,
-        user_id: testUser.id,
-      });
-
-    expect(firstError).toBeNull();
-
+    // Creator is already a member from the RPC function
     // Try to add same member again - should fail due to unique constraint
-    const { error: secondError } = await userSupabase
+    const { error: secondError } = await supabaseAdmin
       .from("group_members")
       .insert({
-        group_id: group!.id,
+        group_id: group.group_id,
         user_id: testUser.id,
       });
 

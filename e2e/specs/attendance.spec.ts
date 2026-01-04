@@ -37,7 +37,19 @@ test.describe("Attendance Flows", () => {
       // Wait for the form to be ready
       await page.waitForLoadState("networkidle");
 
-      // Verify the attendance form is visible
+      // Check if festival is active (quick attendance shown) or ended (wrapped shown)
+      const festivalEndedMessage = page.getByText(/is over|has ended/i);
+      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+
+      if (isFestivalEnded) {
+        // Festival is over - verify the ended state UI is shown instead
+        await expect(festivalEndedMessage).toBeVisible();
+        // Skip the rest of this test since quick attendance isn't available
+        test.skip();
+        return;
+      }
+
+      // Verify the attendance form is visible when festival is active
       await expect(homePage.tentSelector).toBeVisible({ timeout: 10000 });
       await expect(homePage.beerCountDisplay).toBeVisible({ timeout: 10000 });
     });
@@ -47,6 +59,14 @@ test.describe("Attendance Flows", () => {
 
       // Wait for the form to be ready
       await page.waitForLoadState("networkidle");
+
+      // Check if festival is active
+      const festivalEndedMessage = page.getByText(/is over|has ended/i);
+      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      if (isFestivalEnded) {
+        test.skip();
+        return;
+      }
 
       // Click the tent selector
       await expect(homePage.tentSelector).toBeVisible({ timeout: 10000 });
@@ -73,6 +93,14 @@ test.describe("Attendance Flows", () => {
     test("should increment beer count", async ({ page }) => {
       const homePage = new HomePage(page);
 
+      // Check if festival is active
+      const festivalEndedMessage = page.getByText(/is over|has ended/i);
+      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      if (isFestivalEnded) {
+        test.skip();
+        return;
+      }
+
       // Get initial beer count
       const initialCount = await homePage.getBeerCount();
 
@@ -90,6 +118,14 @@ test.describe("Attendance Flows", () => {
     test("should show toast after incrementing", async ({ page }) => {
       const homePage = new HomePage(page);
 
+      // Check if festival is active
+      const festivalEndedMessage = page.getByText(/is over|has ended/i);
+      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      if (isFestivalEnded) {
+        test.skip();
+        return;
+      }
+
       // Click increment button
       await homePage.incrementBeerCount();
 
@@ -104,6 +140,14 @@ test.describe("Attendance Flows", () => {
       page,
     }) => {
       const homePage = new HomePage(page);
+
+      // Check if festival is active
+      const festivalEndedMessage = page.getByText(/is over|has ended/i);
+      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      if (isFestivalEnded) {
+        test.skip();
+        return;
+      }
 
       // Get current count
       const initialCount = await homePage.getBeerCount();
@@ -127,6 +171,14 @@ test.describe("Attendance Flows", () => {
 
     test("should not go below 0 when decrementing", async ({ page }) => {
       const homePage = new HomePage(page);
+
+      // Check if festival is active
+      const festivalEndedMessage = page.getByText(/is over|has ended/i);
+      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      if (isFestivalEnded) {
+        test.skip();
+        return;
+      }
 
       // Get current count
       const initialCount = await homePage.getBeerCount();

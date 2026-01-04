@@ -18,6 +18,16 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     setupFiles: ["./src/__tests__/setup.ts"],
+    // Run integration tests sequentially to avoid race conditions
+    // with Supabase auth user creation triggers
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+    // Run test files sequentially (not just tests within files)
+    fileParallelism: false,
   },
   resolve: {
     alias: {

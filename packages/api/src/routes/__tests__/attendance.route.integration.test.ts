@@ -382,13 +382,20 @@ describe("Attendance Routes Integration (Local DB)", () => {
     const user2Supabase = createTestSupabaseWithAuth(testUser2.token);
 
     // Try to delete user 1's attendance as user 2 - should fail due to RLS
-    const { error: deleteError } = await user2Supabase
+    // Note: Supabase/PostgREST doesn't return an error when RLS filters out rows.
+    // It returns an empty result instead (no rows affected).
+    const { data: deleteResult, error: deleteError } = await user2Supabase
       .from("attendances")
       .delete()
-      .eq("id", attendance!.id);
+      .eq("id", attendance!.id)
+      .select();
 
-    expect(deleteError).not.toBeNull();
-    // RLS policy prevents deletion, no rows affected
+    // RLS should either:
+    // 1. Return an error, OR
+    // 2. Return no rows affected (empty array)
+    const rlsBlocked =
+      deleteError !== null || (deleteResult && deleteResult.length === 0);
+    expect(rlsBlocked).toBe(true);
 
     // Verify attendance still exists (using admin client)
     const { data: stillExists } = await supabaseAdmin
