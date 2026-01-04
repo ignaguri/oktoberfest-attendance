@@ -3,7 +3,7 @@
 **Start Date**: 2025-12-29
 **Timeline**: 16 weeks
 **Current Phase**: Phase 6 - Expo App Foundation (All API endpoints complete!)
-**Last Updated**: 2025-12-29
+**Last Updated**: 2026-01-04
 
 ---
 
@@ -16,7 +16,7 @@
 | Phase 3: Database Migration | ✅ Complete | 100% | Week 2 |
 | Phase 4: Hono API Routes | ✅ Complete | 100% | Week 2-3 |
 | Phase 5: Web App Migration | ✅ Complete | 100% | Week 3-4 |
-| Phase 6: Expo App Foundation | ⏳ Pending | 0% | Week 5-6 |
+| Phase 6: Expo App Foundation | ⏳ Pending | 0% | Week 5-6 (Current) |
 | Phase 7: Core Mobile Features | ⏳ Pending | 0% | Week 6-8 |
 | Phase 8: Advanced Features | ⏳ Pending | 0% | Week 9-11 |
 | Phase 9: Native Enhancements | ⏳ Pending | 0% | Week 12-14 |
@@ -305,12 +305,13 @@
 
 ---
 
-## Phase 4: Hono API Routes Implementation (Week 2-3) 🔄
+## Phase 4: Hono API Routes Implementation (Week 2-3) ✅
 
 **Goal**: Implement all API routes with OpenAPI specs
-**Status**: 🔄 In Progress (56% - 14/25 endpoints)
+**Status**: ✅ Complete (100% - All endpoints implemented)
 **Started**: 2025-12-29
-**Commits**: `8b17971`, `b266123`
+**Completed**: 2026-01-04
+**Commits**: `8b17971`, `b266123`, multiple fixes through 2026-01-04
 
 ### Priority 1 - Essential Endpoints ✅ (Week 2)
 
@@ -379,7 +380,7 @@
   - Pagination support
   - Sort by days/beers/average
 
-### Priority 3 - Advanced Features ⏸️ (Week 3)
+### Priority 3 - Advanced Features ✅ (Week 3)
 
 - [x] `GET /api/v1/achievements` - User's achievements
   - Status: ✅ Complete
@@ -844,21 +845,27 @@ _No blockers currently_
 
 - **Total Phases**: 12
 - **Completed Phases**: 5 (Phases 1-5: 100%)
-- **In Progress**: 0
-- **Pending Phases**: 7
-- **Total Endpoints Planned**: 25
-- **Endpoints Completed**: 14 (56%)
+- **In Progress**: Phase 6 (Expo App Foundation)
+- **Pending Phases**: 6
+- **Total Route Files**: 14
+- **Total Endpoints**: 50+ (all complete)
 - **Priority 1 Endpoints**: 6/6 ✅
 - **Priority 2 Endpoints**: 7/7 ✅
-- **Priority 3 Endpoints**: 2/11 ⏸️
-- **Repositories Created**: 7/7 (100%)
-- **Services Created**: 2/6 (33%)
+- **Priority 3 Endpoints**: 15/15 ✅
+- **Repositories Created**: 12/12 (100%)
+- **Services Created**: 9/9 (100%)
 - **Hooks Migrated to API**: 10/10 (100%)
 - **Blockers**: 0
 - **Failed Tasks**: 0
 
 ---
 
-**Last Updated**: 2025-12-29 (Final)
+**Last Updated**: 2026-01-04
 **Next Milestone**: Begin Phase 6 (Expo Mobile App Foundation)
-**Current Focus**: Phase 5 complete - All React Query hooks migrated to API client
+**Current Focus**: Production bug fixes complete, ready for mobile app development
+
+### Recent Production Fixes (2026-01-04)
+- ✅ Fixed `tent_visits` RLS policies (INSERT/UPDATE/DELETE for own records)
+- ✅ Fixed `groups` RLS policy (SELECT by invite_token for joining)
+- ✅ Fixed reservation status bug (`pending` → `scheduled` on creation)
+- ✅ Fixed invite_token truncation (now using full UUID)

@@ -1,6 +1,6 @@
 # ProstCounter Architecture Overview
 
-> **Current State Documentation** - Last updated: 2025-12-30
+> **Current State Documentation** - Last updated: 2026-01-04
 > This document describes the *implemented* architecture. For future mobile migration plans, see [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md).
 
 ## Table of Contents
@@ -78,19 +78,21 @@ prostcounter/
 │   ├── api/                          # Shared Hono API logic ✅ IMPLEMENTED
 │   │   ├── src/
 │   │   │   ├── index.ts              # Main Hono app export
-│   │   │   ├── routes/               # 12 route handlers (✅ complete)
-│   │   │   │   ├── attendance.route.ts
-│   │   │   │   ├── consumption.route.ts
-│   │   │   │   ├── group.route.ts
+│   │   │   ├── routes/               # 14 route handlers (✅ complete)
 │   │   │   │   ├── achievement.route.ts
-│   │   │   │   ├── leaderboard.route.ts
+│   │   │   │   ├── attendance.route.ts
+│   │   │   │   ├── calendar.route.ts
+│   │   │   │   ├── consumption.route.ts
 │   │   │   │   ├── festival.route.ts
-│   │   │   │   ├── tent.route.ts
-│   │   │   │   ├── photo.route.ts
-│   │   │   │   ├── wrapped.route.ts
-│   │   │   │   ├── reservation.route.ts
+│   │   │   │   ├── group.route.ts
+│   │   │   │   ├── leaderboard.route.ts
 │   │   │   │   ├── location.route.ts
-│   │   │   │   └── notification.route.ts
+│   │   │   │   ├── notification.route.ts
+│   │   │   │   ├── photo.route.ts
+│   │   │   │   ├── profile.route.ts
+│   │   │   │   ├── reservation.route.ts
+│   │   │   │   ├── tent.route.ts
+│   │   │   │   └── wrapped.route.ts
 │   │   │   ├── services/             # Business logic layer
 │   │   │   │   ├── attendance.service.ts
 │   │   │   │   ├── achievement.service.ts
@@ -113,8 +115,8 @@ prostcounter/
 │   │   ├── vitest.config.ts          # ✅ NEW: Vitest configuration
 │   │   └── package.json
 │   │
-│   ├── api-client/                   # 🔄 PLANNED: Generated TypeScript client
-│   │   └── (not yet generated)
+│   ├── api-client/                   # ✅ TypeScript API client
+│   │   └── src/index.ts              # Fetch-based client with auth
 │   │
 │   ├── shared/                       # Shared utilities & types
 │   │   ├── src/
@@ -208,26 +210,29 @@ The API follows a strict layered architecture for maintainability and testabilit
 └─────────────────────────────────────────────────┘
 ```
 
-### Implemented Routes (12 total)
+### Implemented Routes (14 route files, 50+ endpoints)
 
 | Route | Methods | Description | Status |
 |-------|---------|-------------|--------|
+| **`/achievements`** | GET, POST | User achievements & evaluation | ✅ Complete |
 | **`/attendance`** | GET, POST, PUT, DELETE | Daily attendance records | ✅ Complete |
+| **`/calendar`** | GET | Calendar events (personal & group) | ✅ Complete |
 | **`/consumption`** | POST | Log individual drinks | ✅ Complete |
-| **`/groups`** | GET, POST | Create/list groups | ✅ Complete |
-| **`/groups/:id`** | GET | Group details | ✅ Complete |
+| **`/festivals`** | GET, POST, PUT | Festival management | ✅ Complete |
+| **`/groups`** | GET, POST, PUT | Create/list/update groups | ✅ Complete |
 | **`/groups/:id/join`** | POST | Join group with token | ✅ Complete |
 | **`/groups/:id/leave`** | POST | Leave group | ✅ Complete |
 | **`/groups/:id/leaderboard`** | GET | Group rankings | ✅ Complete |
+| **`/groups/:id/members`** | GET, DELETE | Group member management | ✅ Complete |
+| **`/groups/:id/gallery`** | GET | Group photo gallery | ✅ Complete |
 | **`/leaderboard`** | GET | Global leaderboard | ✅ Complete |
-| **`/achievements`** | GET, POST | User achievements | ✅ Complete |
-| **`/festivals`** | GET, POST, PUT | Festival management | ✅ Complete |
+| **`/location`** | GET, POST, DELETE | Location sharing sessions | ✅ Complete |
+| **`/notifications`** | GET, POST | Push notifications & tokens | ✅ Complete |
+| **`/photos`** | GET, POST, DELETE | Photo uploads with signed URLs | ✅ Complete |
+| **`/profile`** | GET, PUT, DELETE | User profile management | ✅ Complete |
+| **`/reservations`** | GET, POST, PUT, DELETE | Tent reservations & check-in | ✅ Complete |
 | **`/tents`** | GET, POST, PUT | Tent management | ✅ Complete |
-| **`/photos`** | GET, POST, DELETE | Photo uploads | ✅ Complete |
-| **`/wrapped/:festivalId`** | GET | Year-end summary | ✅ Complete |
-| **`/reservations`** | GET, POST, PUT, DELETE | Tent reservations | ✅ Complete |
-| **`/location`** | GET, POST, DELETE | Location sharing | ✅ Complete |
-| **`/notifications`** | GET, POST | Push notifications | ✅ Complete |
+| **`/wrapped/:festivalId`** | GET, POST | Year-end summary | ✅ Complete |
 
 ### Repository Pattern Example
 
@@ -687,21 +692,22 @@ LOG_FORMAT=json
 ### ✅ Completed Features
 
 - **Multi-Festival Architecture**: Dynamic festivals from database
-- **API Layer**: 12 route handlers with full CRUD operations
+- **API Layer**: 14 route files with 50+ endpoints, full CRUD operations
+- **API Client**: Type-safe fetch-based client with Supabase auth integration
 - **Testing Infrastructure**: Vitest setup with unit & integration tests
-- **Group Competitions**: Create, join, leaderboards with winning criteria
+- **Group Competitions**: Create, join, leaderboards, galleries, member management
 - **Achievement System**: Gamification with categories and rarity
-- **Photo Gallery**: Upload with privacy controls
+- **Photo Gallery**: Upload with signed URLs and privacy controls
 - **Location Sharing**: Real-time location with session management
 - **Push Notifications**: Novu + FCM integration
 - **Wrapped**: Year-end summary with 11 slides
+- **Calendar & Reservations**: Tent reservations with check-in functionality
 - **Admin Panel**: Super admin management interface
 
 ### 🔄 In Progress
 
-- **Test Coverage**: Expanding tests to all routes
-- **OpenAPI Spec**: Auto-generation for API documentation
-- **API Client**: Type-safe client generation from OpenAPI
+- **Test Coverage**: Expanding tests to all routes (group routes complete)
+- **Mobile App**: Expo app foundation (Phase 6 of migration plan)
 
 ### 📋 Planned (Mobile Migration)
 
@@ -734,5 +740,5 @@ See [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md) fo
 
 ---
 
-*Last updated: 2025-12-30*
-*Document version: 1.0*
+*Last updated: 2026-01-04*
+*Document version: 1.1*
