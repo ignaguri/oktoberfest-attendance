@@ -1,0 +1,232 @@
+"use client";
+
+import ResponsiveDialog from "@/components/ResponsiveDialog";
+import { SingleSelect } from "@/components/Select/SingleSelect";
+import { Button } from "@/components/ui/button";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { Label } from "@/components/ui/label";
+import { ReminderSelect } from "@/components/ui/reminder-select";
+import { useTents } from "@/hooks/use-tents";
+import {
+  useReservation,
+  useCreateReservation,
+  useUpdateReservation,
+} from "@/hooks/useReservations";
+import {
+  reservationSchema,
+  type ReservationFormData,
+} from "@/lib/schemas/reservation";
+import { createUrlWithParams } from "@/lib/url-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { Checkbox } from "../ui/checkbox";
+
+interface ReservationDialogProps {
+  festivalId: string;
+}
+
+export function ReservationDialog({ festivalId }: ReservationDialogProps) {
+  const { tents, isLoading: tentsLoading } = useTents(festivalId);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const open =
+    searchParams.get("newReservation") === "1" ||
+    !!searchParams.get("reservationId");
+  const reservationId = searchParams.get("reservationId");
+
+  // Use React Query for fetching reservation data
+  const { data: reservation, loading: reservationLoading } =
+    useReservation(reservationId);
+
+  // Mutations for create/update
+  const { mutateAsync: createReservation, loading: isCreating } =
+    useCreateReservation();
+  const { mutateAsync: updateReservation, loading: isUpdating } =
+    useUpdateReservation();
+
+  const isMutating = isCreating || isUpdating;
+
+  const initialDate = useMemo(() => {
+    const dateStr = searchParams.get("date");
+    if (!dateStr) return new Date();
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date() : d;
+  }, [searchParams]);
+
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<ReservationFormData>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues: {
+      tentId: "",
+      startAt: undefined,
+      reminderOffsetMinutes: 1440,
+      visibleToGroups: true,
+    },
+  });
+
+  const tentId = watch("tentId");
+  const startAt = watch("startAt");
+  const reminderOffsetMinutes = watch("reminderOffsetMinutes");
+  const visibleToGroups = watch("visibleToGroups");
+
+  // Initialize form when dialog opens or reservation data loads
+  useEffect(() => {
+    if (!open) return;
+
+    if (reservationId && reservation) {
+      // Editing existing reservation - populate form with fetched data
+      reset({
+        tentId: reservation.tentId,
+        visibleToGroups: reservation.visibleToGroups,
+        reminderOffsetMinutes: reservation.reminderOffsetMinutes ?? 1440,
+        startAt: new Date(reservation.startAt),
+      });
+    } else if (!reservationId) {
+      // Creating new reservation - set defaults
+      const defaultDate = new Date(initialDate);
+      defaultDate.setHours(9, 0, 0, 0);
+      const defaultTentId =
+        tents.length > 0 ? tents[0]?.options[0]?.value || "" : "";
+      reset({
+        tentId: defaultTentId,
+        startAt: defaultDate,
+        reminderOffsetMinutes: 1440,
+        visibleToGroups: true,
+      });
+    }
+  }, [open, initialDate, reservationId, reservation, reset, tents]);
+
+  const onClose = useCallback(() => {
+    const url = createUrlWithParams("/calendar", searchParams, [
+      "newReservation",
+      "reservationId",
+    ]);
+    router.replace(url);
+  }, [router, searchParams]);
+
+  const onSubmit = useCallback(
+    async (data: ReservationFormData) => {
+      try {
+        if (reservationId) {
+          await updateReservation({
+            reservationId,
+            data: {
+              startAt: data.startAt.toISOString(),
+              reminderOffsetMinutes: data.reminderOffsetMinutes,
+              visibleToGroups: data.visibleToGroups,
+            },
+          });
+          toast.success("Reservation updated");
+        } else {
+          await createReservation({
+            festivalId,
+            tentId: data.tentId,
+            startAt: data.startAt.toISOString(),
+            reminderOffsetMinutes: data.reminderOffsetMinutes,
+            visibleToGroups: data.visibleToGroups,
+          });
+          toast.success("Reservation created");
+        }
+        onClose();
+      } catch {
+        toast.error("Failed to save reservation");
+      }
+    },
+    [festivalId, onClose, reservationId, createReservation, updateReservation],
+  );
+
+  return (
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+        }
+      }}
+      title={reservationId ? "Edit reservation" : "New reservation"}
+      description="Create or edit your tent reservation with date, time, and reminder preferences."
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid gap-4 p-4 pb-6">
+          <div className="grid gap-2">
+            <Label htmlFor="tent">Tent</Label>
+            <SingleSelect
+              value={tentId}
+              options={tents.map((tent) => ({
+                title: tent.category,
+                options: tent.options,
+              }))}
+              placeholder="Select your tent"
+              onSelect={(option) => setValue("tentId", option.value)}
+              disabled={tentsLoading || isMutating}
+            />
+            {errors.tentId && (
+              <p className="text-sm text-red-600">{errors.tentId.message}</p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="start">Date & Time</Label>
+            <DateTimePicker
+              value={startAt}
+              onChange={(date) => date && setValue("startAt", date)}
+              placeholder="Pick a date and time"
+              disabled={isMutating}
+              calendarClassName="[--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
+            />
+            {errors.startAt && (
+              <p className="text-sm text-red-600">{errors.startAt.message}</p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="reminder">Reminder</Label>
+            <ReminderSelect
+              value={reminderOffsetMinutes}
+              onChange={(minutes) => setValue("reminderOffsetMinutes", minutes)}
+              disabled={isMutating}
+            />
+            {errors.reminderOffsetMinutes && (
+              <p className="text-sm text-red-600">
+                {errors.reminderOffsetMinutes.message}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="visibleToGroups">Share with groups</Label>
+            <Checkbox
+              checked={visibleToGroups}
+              onCheckedChange={(checked) =>
+                setValue(
+                  "visibleToGroups",
+                  checked === "indeterminate" ? false : checked,
+                )
+              }
+              disabled={isMutating}
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 p-4 pt-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isMutating}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isMutating || tentsLoading}>
+            {reservationId ? "Save" : "Create"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
+  );
+}

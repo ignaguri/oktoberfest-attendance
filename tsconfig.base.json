@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "target": "ES2022",
+    "jsx": "react-jsx"
+  },
+  "exclude": ["node_modules", "dist", ".next", ".turbo"]
+}
