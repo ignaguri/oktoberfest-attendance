@@ -345,8 +345,8 @@ export class SupabaseGroupRepository implements IGroupRepository {
   }
 
   async renewInviteToken(groupId: string): Promise<string> {
-    // Generate new token using crypto
-    const newToken = crypto.randomUUID().replace(/-/g, "").substring(0, 12);
+    // Generate new token using crypto - must be a valid UUID for the database column
+    const newToken = crypto.randomUUID();
 
     const { data, error } = await this.supabase
       .from("groups")
