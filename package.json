@@ -40,6 +40,7 @@
     "e2e:install-browsers": "playwright install --with-deps"
   },
   "devDependencies": {
+    "next": "16.1.1",
     "@eslint/compat": "^2.0.0",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
@@ -80,6 +81,6 @@
   },
   "packageManager": "pnpm@10.14.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=20 <25"
   }
 }
