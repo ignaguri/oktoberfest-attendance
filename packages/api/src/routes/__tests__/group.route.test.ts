@@ -65,37 +65,27 @@ describe("Group Routes", () => {
         updatedAt: new Date().toISOString(),
       };
 
-      // Database row format (snake_case keys)
-      const mockGroupDbRow = {
-        id: mockGroup.id,
-        name: mockGroup.name,
-        festival_id: mockGroup.festivalId,
-        winning_criteria_id: 2, // total_beers = 2
-        invite_token: mockGroup.inviteToken,
-        created_by: mockGroup.createdBy,
-        created_at: mockGroup.createdAt,
-        updated_at: mockGroup.updatedAt,
-        winning_criteria: { id: 2, name: "total_beers" },
-      };
+      // RPC response format (from create_group_with_member function)
+      const mockRpcResponse = [
+        {
+          group_id: mockGroup.id,
+          group_name: mockGroup.name,
+          festival_id: mockGroup.festivalId,
+          winning_criteria_id: 2, // total_beers = 2
+          invite_token: mockGroup.inviteToken,
+          created_by: mockGroup.createdBy,
+          created_at: mockGroup.createdAt,
+        },
+      ];
 
-      // Mock Supabase responses for the complete group creation flow
-      vi.mocked(mockSupabase.from)
-        // 1. Insert group into "groups" table
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
-        // 2. Check if user is already a member (isMember on "group_members")
-        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)))
-        // 3. Get group details (findById on "groups")
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
-        // 4. Get member count (in findById on "group_members")
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 0 }),
-        )
-        // 5. Insert member into "group_members"
-        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
+      // Mock the RPC call for group creation
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: mockRpcResponse,
+        error: null,
+        count: null,
+        status: 200,
+        statusText: "OK",
+      });
 
       const req = createAuthRequest("/groups", {
         method: "POST",
