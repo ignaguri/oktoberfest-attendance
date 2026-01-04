@@ -5,6 +5,10 @@ import {
   CheckinReservationResponseSchema,
   GetReservationsQuerySchema,
   GetReservationsResponseSchema,
+  ReservationIdParamSchema,
+  GetReservationResponseSchema,
+  UpdateReservationSchema,
+  UpdateReservationResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
@@ -267,6 +271,144 @@ app.openapi(cancelReservationRoute, async (c) => {
   const reservationService = new ReservationService(reservationRepo);
 
   const reservation = await reservationService.cancelReservation(id, user.id);
+
+  return c.json({ reservation }, 200);
+});
+
+// GET /reservations/:id - Get single reservation
+const getReservationRoute = createRoute({
+  method: "get",
+  path: "/reservations/{id}",
+  tags: ["reservations"],
+  summary: "Get a reservation by ID",
+  description: "Retrieves a single reservation by its ID",
+  request: {
+    params: ReservationIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Reservation retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GetReservationResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Reservation not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getReservationRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const { id } = c.req.valid("param");
+
+  const reservationRepo = new SupabaseReservationRepository(supabase);
+  const reservationService = new ReservationService(reservationRepo);
+
+  const reservation = await reservationService.getReservation(id, user.id);
+
+  return c.json({ reservation }, 200);
+});
+
+// PUT /reservations/:id - Update reservation
+const updateReservationRoute = createRoute({
+  method: "put",
+  path: "/reservations/{id}",
+  tags: ["reservations"],
+  summary: "Update a reservation",
+  description:
+    "Updates an existing reservation. Only provided fields will be updated.",
+  request: {
+    params: ReservationIdParamSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: UpdateReservationSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Reservation updated successfully",
+      content: {
+        "application/json": {
+          schema: UpdateReservationResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Reservation not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateReservationRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const { id } = c.req.valid("param");
+  const data = c.req.valid("json");
+
+  const reservationRepo = new SupabaseReservationRepository(supabase);
+  const reservationService = new ReservationService(reservationRepo);
+
+  const reservation = await reservationService.updateReservation(
+    id,
+    user.id,
+    data,
+  );
 
   return c.json({ reservation }, 200);
 });

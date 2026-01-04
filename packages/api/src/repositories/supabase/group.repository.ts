@@ -8,6 +8,8 @@ import type {
   ListGroupsQuery,
   SearchGroupsQuery,
   SearchGroupResult,
+  GroupMember,
+  GroupGalleryPhoto,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -309,6 +311,130 @@ export class SupabaseGroupRepository implements IGroupRepository {
       name: group.name,
       festivalId: group.festival_id,
       memberCount: group.group_members?.[0]?.count || 0,
+    }));
+  }
+
+  async getMembers(groupId: string): Promise<GroupMember[]> {
+    const { data, error } = await this.supabase
+      .from("group_members")
+      .select(
+        `
+        user_id,
+        joined_at,
+        profiles!inner (
+          username,
+          full_name,
+          avatar_url
+        )
+      `,
+      )
+      .eq("group_id", groupId)
+      .order("joined_at", { ascending: true });
+
+    if (error) {
+      throw new DatabaseError(`Failed to get group members: ${error.message}`);
+    }
+
+    return (data || []).map((member: any) => ({
+      userId: member.user_id,
+      username: member.profiles?.username || "Unknown",
+      fullName: member.profiles?.full_name || null,
+      avatarUrl: member.profiles?.avatar_url || null,
+      joinedAt: member.joined_at,
+    }));
+  }
+
+  async renewInviteToken(groupId: string): Promise<string> {
+    // Generate new token using crypto
+    const newToken = crypto.randomUUID().replace(/-/g, "").substring(0, 12);
+
+    const { data, error } = await this.supabase
+      .from("groups")
+      .update({ invite_token: newToken })
+      .eq("id", groupId)
+      .select("invite_token")
+      .single();
+
+    if (error) {
+      throw new DatabaseError(`Failed to renew invite token: ${error.message}`);
+    }
+
+    if (!data.invite_token) {
+      throw new DatabaseError(
+        "Failed to renew invite token: no token returned",
+      );
+    }
+
+    return data.invite_token;
+  }
+
+  async getGallery(groupId: string): Promise<GroupGalleryPhoto[]> {
+    // Get group to verify it exists and get festival_id
+    const group = await this.findById(groupId);
+    if (!group) {
+      throw new NotFoundError("Group not found");
+    }
+
+    // Get all group member user IDs
+    const { data: members, error: membersError } = await this.supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", groupId);
+
+    if (membersError) {
+      throw new DatabaseError(
+        `Failed to get group members: ${membersError.message}`,
+      );
+    }
+
+    const memberIds = (members || [])
+      .map((m) => m.user_id)
+      .filter((id): id is string => id !== null);
+
+    if (memberIds.length === 0) {
+      return [];
+    }
+
+    // Get photos from beer_pictures for all members in this festival
+    const { data: photos, error: photosError } = await this.supabase
+      .from("beer_pictures")
+      .select(
+        `
+        id,
+        user_id,
+        picture_url,
+        created_at,
+        attendances!inner (
+          date,
+          festival_id
+        ),
+        profiles!inner (
+          username,
+          full_name,
+          avatar_url
+        )
+      `,
+      )
+      .in("user_id", memberIds)
+      .eq("attendances.festival_id", group.festivalId)
+      .eq("visibility", "public")
+      .order("created_at", { ascending: false });
+
+    if (photosError) {
+      throw new DatabaseError(
+        `Failed to get group gallery: ${photosError.message}`,
+      );
+    }
+
+    return (photos || []).map((photo: any) => ({
+      id: photo.id,
+      userId: photo.user_id,
+      username: photo.profiles?.username || "Unknown",
+      fullName: photo.profiles?.full_name || null,
+      avatarUrl: photo.profiles?.avatar_url || null,
+      pictureUrl: photo.picture_url,
+      date: photo.attendances?.date || "",
+      createdAt: photo.created_at,
     }));
   }
 

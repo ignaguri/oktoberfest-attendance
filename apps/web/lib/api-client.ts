@@ -6,6 +6,7 @@ import type {
   DeleteAttendanceResponse,
   ListGroupsResponse,
   Group,
+  GroupWithMembers,
   GroupActionResponse,
   LeaderboardResponse,
   WinningCriteriaListResponse,
@@ -126,6 +127,91 @@ export const apiClient = {
       }
       return parseJsonResponse<DeleteAttendanceResponse>(response);
     },
+
+    /**
+     * Create or update attendance with tents
+     */
+    async create(data: {
+      festivalId: string;
+      date: string;
+      tents?: string[];
+      amount?: number;
+    }): Promise<{ attendanceId: string; tentsChanged: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/attendance`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to create attendance");
+      }
+      return parseJsonResponse<{ attendanceId: string; tentsChanged: boolean }>(
+        response,
+      );
+    },
+
+    /**
+     * Update personal attendance without triggering notifications
+     */
+    async updatePersonal(data: {
+      festivalId: string;
+      date: string;
+      tents?: string[];
+      amount?: number;
+    }): Promise<{
+      attendanceId: string;
+      tentsAdded: string[];
+      tentsRemoved: string[];
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/attendance/personal`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update attendance");
+      }
+      return parseJsonResponse<{
+        attendanceId: string;
+        tentsAdded: string[];
+        tentsRemoved: string[];
+      }>(response);
+    },
+
+    /**
+     * Check in from a reservation
+     */
+    async checkInFromReservation(
+      reservationId: string,
+    ): Promise<{ success: boolean; message: string; attendanceId?: string }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/attendance/check-in/${reservationId}`,
+        {
+          method: "POST",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to check in");
+      }
+      return parseJsonResponse<{
+        success: boolean;
+        message: string;
+        attendanceId?: string;
+      }>(response);
+    },
   },
 
   /**
@@ -187,7 +273,7 @@ export const apiClient = {
     /**
      * Get group details
      */
-    async get(groupId: string): Promise<ApiResponse<Group>> {
+    async get(groupId: string): Promise<ApiResponse<GroupWithMembers>> {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/v1/groups/${groupId}`, {
         headers,
@@ -195,8 +281,8 @@ export const apiClient = {
       if (!response.ok) {
         throw new Error(`Failed to fetch group: ${response.statusText}`);
       }
-      // API returns Group directly, wrap it for consistency
-      const group = await parseJsonResponse<Group>(response);
+      // API returns GroupWithMembers directly, wrap it for consistency
+      const group = await parseJsonResponse<GroupWithMembers>(response);
       return { data: group };
     },
 
@@ -312,6 +398,154 @@ export const apiClient = {
         throw new Error(error.message || "Failed to update group");
       }
       return parseJsonResponse<Group>(response);
+    },
+
+    /**
+     * Get group members
+     */
+    async getMembers(groupId: string): Promise<{
+      data: Array<{
+        userId: string;
+        username: string;
+        fullName: string | null;
+        avatarUrl: string | null;
+        joinedAt: string;
+      }>;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/groups/${groupId}/members`,
+        { headers },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to fetch group members");
+      }
+      return parseJsonResponse<{
+        data: Array<{
+          userId: string;
+          username: string;
+          fullName: string | null;
+          avatarUrl: string | null;
+          joinedAt: string;
+        }>;
+      }>(response);
+    },
+
+    /**
+     * Remove a member from group
+     */
+    async removeMember(
+      groupId: string,
+      userId: string,
+    ): Promise<{ success: boolean; message: string }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/groups/${groupId}/members/${userId}`,
+        {
+          method: "DELETE",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to remove member");
+      }
+      return parseJsonResponse<{ success: boolean; message: string }>(response);
+    },
+
+    /**
+     * Regenerate group invite token
+     */
+    async renewToken(groupId: string): Promise<{ inviteToken: string }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/groups/${groupId}/token/renew`,
+        {
+          method: "POST",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to regenerate invite token");
+      }
+      return parseJsonResponse<{ inviteToken: string }>(response);
+    },
+
+    /**
+     * Get group photo gallery
+     */
+    async getGallery(groupId: string): Promise<{
+      data: Array<{
+        id: string;
+        userId: string;
+        username: string;
+        fullName: string | null;
+        avatarUrl: string | null;
+        pictureUrl: string;
+        date: string;
+        createdAt: string;
+      }>;
+      total: number;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/groups/${groupId}/gallery`,
+        { headers },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to fetch group gallery");
+      }
+      return parseJsonResponse<{
+        data: Array<{
+          id: string;
+          userId: string;
+          username: string;
+          fullName: string | null;
+          avatarUrl: string | null;
+          pictureUrl: string;
+          date: string;
+          createdAt: string;
+        }>;
+        total: number;
+      }>(response);
+    },
+
+    /**
+     * Join a group by invite token only
+     */
+    async joinByToken(inviteToken: string): Promise<{
+      success: boolean;
+      message: string;
+      group: Group;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/groups/join-by-token`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ inviteToken }),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to join group");
+      }
+      return parseJsonResponse<{
+        success: boolean;
+        message: string;
+        group: Group;
+      }>(response);
     },
   },
 
@@ -659,6 +893,340 @@ export const apiClient = {
         throw new Error(`Failed to fetch highlights: ${response.statusText}`);
       }
       return parseJsonResponse<{ highlights: Highlights }>(response);
+    },
+
+    /**
+     * Get signed URL for avatar upload
+     */
+    async getAvatarUploadUrl(query: {
+      fileName: string;
+      fileType: string;
+      fileSize: number;
+    }): Promise<{
+      uploadUrl: string;
+      publicUrl: string;
+      expiresIn: number;
+    }> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({
+        fileName: query.fileName,
+        fileType: query.fileType,
+        fileSize: query.fileSize.toString(),
+      });
+      const response = await fetch(
+        `${API_BASE_URL}/v1/profile/avatar/upload-url?${params}`,
+        { headers },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to get avatar upload URL");
+      }
+      return parseJsonResponse<{
+        uploadUrl: string;
+        publicUrl: string;
+        expiresIn: number;
+      }>(response);
+    },
+
+    /**
+     * Confirm avatar upload
+     */
+    async confirmAvatarUpload(avatarUrl: string): Promise<{
+      success: boolean;
+      avatarUrl: string;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/profile/avatar/confirm`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ avatarUrl }),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to confirm avatar upload");
+      }
+      return parseJsonResponse<{
+        success: boolean;
+        avatarUrl: string;
+      }>(response);
+    },
+  },
+
+  /**
+   * Reservations API
+   */
+  reservations: {
+    /**
+     * List user reservations
+     */
+    async list(query?: {
+      festivalId?: string;
+      status?: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+      upcoming?: boolean;
+      limit?: number;
+      offset?: number;
+    }): Promise<{
+      reservations: Array<{
+        id: string;
+        userId: string;
+        festivalId: string;
+        tentId: string;
+        tentName?: string;
+        startAt: string;
+        endAt: string | null;
+        status:
+          | "pending"
+          | "confirmed"
+          | "checked_in"
+          | "cancelled"
+          | "expired";
+        note: string | null;
+        visibleToGroups: boolean;
+        autoCheckin: boolean;
+        reminderOffsetMinutes: number;
+        reminderSentAt: string | null;
+        promptSentAt: string | null;
+        processedAt: string | null;
+        createdAt: string;
+        updatedAt: string | null;
+      }>;
+      total: number;
+      limit: number;
+      offset: number;
+    }> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams();
+      if (query?.festivalId) params.set("festivalId", query.festivalId);
+      if (query?.status) params.set("status", query.status);
+      if (query?.upcoming !== undefined)
+        params.set("upcoming", query.upcoming.toString());
+      if (query?.limit) params.set("limit", query.limit.toString());
+      if (query?.offset) params.set("offset", query.offset.toString());
+
+      const response = await fetch(
+        `${API_BASE_URL}/v1/reservations?${params}`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch reservations: ${response.statusText}`);
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Get a single reservation
+     */
+    async get(reservationId: string): Promise<{
+      reservation: {
+        id: string;
+        userId: string;
+        festivalId: string;
+        tentId: string;
+        tentName?: string;
+        startAt: string;
+        endAt: string | null;
+        status:
+          | "pending"
+          | "confirmed"
+          | "checked_in"
+          | "cancelled"
+          | "expired";
+        note: string | null;
+        visibleToGroups: boolean;
+        autoCheckin: boolean;
+        reminderOffsetMinutes: number;
+        reminderSentAt: string | null;
+        promptSentAt: string | null;
+        processedAt: string | null;
+        createdAt: string;
+        updatedAt: string | null;
+      };
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/reservations/${reservationId}`,
+        { headers },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to fetch reservation");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Create a new reservation
+     */
+    async create(data: {
+      festivalId: string;
+      tentId: string;
+      startAt: string;
+      endAt?: string;
+      note?: string;
+      visibleToGroups?: boolean;
+      autoCheckin?: boolean;
+      reminderOffsetMinutes?: number;
+    }): Promise<{
+      reservation: {
+        id: string;
+        userId: string;
+        festivalId: string;
+        tentId: string;
+        tentName?: string;
+        startAt: string;
+        endAt: string | null;
+        status:
+          | "pending"
+          | "confirmed"
+          | "checked_in"
+          | "cancelled"
+          | "expired";
+        note: string | null;
+        visibleToGroups: boolean;
+        autoCheckin: boolean;
+        reminderOffsetMinutes: number;
+        reminderSentAt: string | null;
+        promptSentAt: string | null;
+        processedAt: string | null;
+        createdAt: string;
+        updatedAt: string | null;
+      };
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/reservations`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to create reservation");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Update a reservation
+     */
+    async update(
+      reservationId: string,
+      data: {
+        startAt?: string;
+        endAt?: string | null;
+        note?: string | null;
+        visibleToGroups?: boolean;
+        autoCheckin?: boolean;
+        reminderOffsetMinutes?: number;
+      },
+    ): Promise<{
+      reservation: {
+        id: string;
+        userId: string;
+        festivalId: string;
+        tentId: string;
+        tentName?: string;
+        startAt: string;
+        endAt: string | null;
+        status:
+          | "pending"
+          | "confirmed"
+          | "checked_in"
+          | "cancelled"
+          | "expired";
+        note: string | null;
+        visibleToGroups: boolean;
+        autoCheckin: boolean;
+        reminderOffsetMinutes: number;
+        reminderSentAt: string | null;
+        promptSentAt: string | null;
+        processedAt: string | null;
+        createdAt: string;
+        updatedAt: string | null;
+      };
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/reservations/${reservationId}`,
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify(data),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update reservation");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Cancel a reservation
+     */
+    async cancel(reservationId: string): Promise<{
+      reservation: {
+        id: string;
+        status: "cancelled";
+      };
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/reservations/${reservationId}`,
+        {
+          method: "DELETE",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to cancel reservation");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Check in to a reservation
+     */
+    async checkIn(reservationId: string): Promise<{
+      reservation: {
+        id: string;
+        status: "checked_in";
+      };
+      attendance?: {
+        id: string;
+        date: string;
+      };
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/reservations/${reservationId}/checkin`,
+        {
+          method: "POST",
+          headers,
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to check in");
+      }
+      return parseJsonResponse(response);
     },
   },
 };

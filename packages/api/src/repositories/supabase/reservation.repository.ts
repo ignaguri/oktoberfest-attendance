@@ -3,6 +3,7 @@ import type { Database } from "@prostcounter/db";
 import type {
   Reservation,
   CreateReservationInput,
+  UpdateReservationInput,
   ReservationStatus,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -154,6 +155,60 @@ export class SupabaseReservationRepository implements IReservationRepository {
 
     if (error) {
       throw new DatabaseError(`Failed to cancel reservation: ${error.message}`);
+    }
+
+    return this.mapToReservation(data);
+  }
+
+  async update(
+    id: string,
+    userId: string,
+    input: UpdateReservationInput,
+  ): Promise<Reservation> {
+    // Build update object with only provided fields
+    const updateData: Record<string, unknown> = {};
+
+    if (input.startAt !== undefined) {
+      updateData.start_at = input.startAt;
+    }
+    if (input.endAt !== undefined) {
+      updateData.end_at = input.endAt;
+    }
+    if (input.note !== undefined) {
+      updateData.note = input.note;
+    }
+    if (input.visibleToGroups !== undefined) {
+      updateData.visible_to_groups = input.visibleToGroups;
+    }
+    if (input.autoCheckin !== undefined) {
+      updateData.auto_checkin = input.autoCheckin;
+    }
+    if (input.reminderOffsetMinutes !== undefined) {
+      updateData.reminder_offset_minutes = input.reminderOffsetMinutes;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      // Nothing to update, just return current reservation
+      const existing = await this.findById(id, userId);
+      if (!existing) {
+        throw new NotFoundError("Reservation not found");
+      }
+      return existing;
+    }
+
+    const { data, error } = await this.supabase
+      .from("reservations")
+      .update(updateData)
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select("*, tents(name)")
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        throw new NotFoundError("Reservation not found");
+      }
+      throw new DatabaseError(`Failed to update reservation: ${error.message}`);
     }
 
     return this.mapToReservation(data);

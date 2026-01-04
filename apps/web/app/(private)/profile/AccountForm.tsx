@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 // import { LocationPrivacySettings } from "@/components/ui/location-privacy-settings";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import { useResetTutorial } from "@/hooks/useProfile";
+import { apiClient } from "@/lib/api-client";
 import {
   useCurrentProfile,
   useCurrentUser,
@@ -21,8 +22,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { ProfileFormData } from "@/lib/schemas/profile";
-
-import { deleteAccount } from "./actions";
 
 export default function AccountForm() {
   const [isEditing, setIsEditing] = useState(false);
@@ -109,7 +108,9 @@ export default function AccountForm() {
 
     try {
       setIsDeleting(true);
-      await deleteAccount();
+      await apiClient.profile.delete();
+      // The API doesn't redirect, so we need to navigate manually
+      window.location.href = "/";
     } catch {
       setIsDeleting(false);
       setShowDeleteConfirm(false);

@@ -101,3 +101,31 @@ export type Highlights = z.infer<typeof HighlightsSchema>;
 export const GetHighlightsResponseSchema = z.object({
   highlights: HighlightsSchema,
 });
+
+// Avatar upload schemas
+export const GetAvatarUploadUrlQuerySchema = z.object({
+  fileName: z.string().min(1),
+  fileType: z.string().regex(/^image\/(jpeg|png|webp|gif)$/, "Invalid image type"),
+  fileSize: z.coerce.number().int().min(1).max(10 * 1024 * 1024), // Max 10MB
+});
+
+export type GetAvatarUploadUrlQuery = z.infer<typeof GetAvatarUploadUrlQuerySchema>;
+
+export const GetAvatarUploadUrlResponseSchema = z.object({
+  uploadUrl: z.url(),
+  publicUrl: z.url(),
+  expiresIn: z.number().int(),
+});
+
+export type GetAvatarUploadUrlResponse = z.infer<typeof GetAvatarUploadUrlResponseSchema>;
+
+export const ConfirmAvatarUploadSchema = z.object({
+  avatarUrl: z.string().min(1),
+});
+
+export type ConfirmAvatarUploadInput = z.infer<typeof ConfirmAvatarUploadSchema>;
+
+export const ConfirmAvatarUploadResponseSchema = z.object({
+  success: z.boolean(),
+  avatarUrl: z.url(),
+});

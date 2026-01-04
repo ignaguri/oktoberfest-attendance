@@ -2,12 +2,12 @@
 
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
+import { apiClient } from "@/lib/api-client";
 import { QrCode } from "lucide-react";
 import { useState, useEffect, useCallback, startTransition } from "react";
 import { toast } from "sonner";
 
 import QRCode from "./QRCode";
-import { renewGroupToken } from "../ShareButton/actions";
 
 interface QRButtonProps {
   groupName: string;
@@ -30,8 +30,8 @@ export default function QRButton({
 
   const generateShareLink = useCallback(async () => {
     try {
-      const token = await renewGroupToken(groupId);
-      const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
+      const { inviteToken } = await apiClient.groups.renewToken(groupId);
+      const newGroupLink = `${APP_URL}/api/join-group?token=${inviteToken}`;
       startTransition(() => {
         setGroupLink(newGroupLink);
       });

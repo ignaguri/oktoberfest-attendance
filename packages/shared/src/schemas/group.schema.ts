@@ -32,6 +32,7 @@ export type Group = z.infer<typeof GroupSchema>;
  */
 export const GroupWithMembersSchema = GroupSchema.extend({
   memberCount: z.number().int(),
+  isMember: z.boolean().optional(), // Added when fetching a single group
 });
 
 export type GroupWithMembers = z.infer<typeof GroupWithMembersSchema>;
@@ -141,3 +142,97 @@ export const GroupActionResponseSchema = z.object({
 });
 
 export type GroupActionResponse = z.infer<typeof GroupActionResponseSchema>;
+
+/**
+ * Group member schema
+ */
+export const GroupMemberSchema = z.object({
+  userId: z.uuid(),
+  username: z.string(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.url().nullable(),
+  joinedAt: z.iso.datetime(),
+});
+
+export type GroupMember = z.infer<typeof GroupMemberSchema>;
+
+/**
+ * List group members response
+ * GET /api/v1/groups/:id/members
+ */
+export const ListGroupMembersResponseSchema = z.object({
+  data: z.array(GroupMemberSchema),
+});
+
+export type ListGroupMembersResponse = z.infer<
+  typeof ListGroupMembersResponseSchema
+>;
+
+/**
+ * User ID parameter for member removal
+ * DELETE /api/v1/groups/:id/members/:userId
+ */
+export const GroupMemberParamSchema = z.object({
+  id: z.uuid({ error: "Invalid group ID" }),
+  userId: z.uuid({ error: "Invalid user ID" }),
+});
+
+export type GroupMemberParam = z.infer<typeof GroupMemberParamSchema>;
+
+/**
+ * Renew invite token response
+ * POST /api/v1/groups/:id/token/renew
+ */
+export const RenewTokenResponseSchema = z.object({
+  inviteToken: z.string(),
+});
+
+export type RenewTokenResponse = z.infer<typeof RenewTokenResponseSchema>;
+
+/**
+ * Join by token request
+ * POST /api/v1/groups/join-by-token
+ */
+export const JoinByTokenSchema = z.object({
+  inviteToken: z.string().min(1, "Invite token is required"),
+});
+
+export type JoinByTokenInput = z.infer<typeof JoinByTokenSchema>;
+
+/**
+ * Join by token response
+ */
+export const JoinByTokenResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  group: GroupSchema,
+});
+
+export type JoinByTokenResponse = z.infer<typeof JoinByTokenResponseSchema>;
+
+/**
+ * Group gallery photo schema
+ */
+export const GroupGalleryPhotoSchema = z.object({
+  id: z.uuid(),
+  userId: z.uuid(),
+  username: z.string(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.url().nullable(),
+  pictureUrl: z.url(),
+  date: z.string(), // Attendance date
+  createdAt: z.iso.datetime(),
+});
+
+export type GroupGalleryPhoto = z.infer<typeof GroupGalleryPhotoSchema>;
+
+/**
+ * Group gallery response
+ * GET /api/v1/groups/:id/gallery
+ */
+export const GroupGalleryResponseSchema = z.object({
+  data: z.array(GroupGalleryPhotoSchema),
+  total: z.number().int(),
+});
+
+export type GroupGalleryResponse = z.infer<typeof GroupGalleryResponseSchema>;

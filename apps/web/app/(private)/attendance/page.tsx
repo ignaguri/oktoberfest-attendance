@@ -2,6 +2,7 @@
 
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
 import { useFestival } from "@/contexts/FestivalContext";
+import { apiClient } from "@/lib/api-client";
 import { useAttendances } from "@/lib/data";
 import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
@@ -10,10 +11,8 @@ import { toast } from "sonner";
 
 import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
-import { checkInFromReservation } from "./actions";
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";
-import { getReservationForCheckIn } from "../calendar/actions";
 
 // Re-export API type for component use
 export type AttendanceWithTentVisits = AttendanceWithTotals;
@@ -59,8 +58,9 @@ export default function AttendancePage() {
     if (prompt === "checkin" && reservationId) {
       const fetchReservation = async () => {
         try {
-          const reservationData = await getReservationForCheckIn(reservationId);
-          setReservation(reservationData);
+          const { reservation } =
+            await apiClient.reservations.get(reservationId);
+          setReservation(reservation);
         } catch (error) {
           logger.error(
             "Error fetching reservation",
@@ -94,7 +94,7 @@ export default function AttendancePage() {
 
   const handleCheckIn = useCallback(
     async (reservationId: string) => {
-      await checkInFromReservation(reservationId);
+      await apiClient.attendance.checkInFromReservation(reservationId);
       handleAttendanceUpdate();
     },
     [handleAttendanceUpdate],

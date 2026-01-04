@@ -1,6 +1,7 @@
 import type {
   Reservation,
   CreateReservationInput,
+  UpdateReservationInput,
   ReservationStatus,
 } from "@prostcounter/shared";
 
@@ -59,6 +60,19 @@ export interface IReservationRepository {
    * @returns Updated reservation
    */
   cancel(id: string, userId: string): Promise<Reservation>;
+
+  /**
+   * Update a reservation
+   * @param id - Reservation ID
+   * @param userId - User ID (for authorization)
+   * @param data - Fields to update
+   * @returns Updated reservation
+   */
+  update(
+    id: string,
+    userId: string,
+    data: UpdateReservationInput,
+  ): Promise<Reservation>;
 
   /**
    * Get upcoming reservations that need reminders

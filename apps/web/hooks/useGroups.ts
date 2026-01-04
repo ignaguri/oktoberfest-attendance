@@ -203,7 +203,7 @@ export function useLeaveGroup() {
  */
 export function useGroupName(groupId: string) {
   return useQuery(
-    QueryKeys.group(groupId),
+    ["group", groupId, "name"] as const, // Unique key to avoid collision with full group data
     async () => {
       try {
         const response = await apiClient.groups.get(groupId);

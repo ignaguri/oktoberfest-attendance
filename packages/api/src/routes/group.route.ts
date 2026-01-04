@@ -11,6 +11,12 @@ import {
   GroupActionResponseSchema,
   SearchGroupsQuerySchema,
   SearchGroupsResponseSchema,
+  ListGroupMembersResponseSchema,
+  GroupMemberParamSchema,
+  RenewTokenResponseSchema,
+  JoinByTokenSchema,
+  JoinByTokenResponseSchema,
+  GroupGalleryResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
@@ -233,7 +239,8 @@ app.openapi(getGroupRoute, async (c) => {
 
   const group = await service.getGroup(id, user.id);
 
-  return c.json(group, 200);
+  // If we get here, the user is a member (service throws if not)
+  return c.json({ ...group, isMember: true }, 200);
 });
 
 // PUT /groups/:id - Update group settings
@@ -478,6 +485,374 @@ app.openapi(leaveGroupRoute, async (c) => {
     {
       success: true,
       message: "Successfully left group",
+    },
+    200,
+  );
+});
+
+// GET /groups/:id/members - List group members
+const listMembersRoute = createRoute({
+  method: "get",
+  path: "/groups/{id}/members",
+  tags: ["groups"],
+  summary: "List group members",
+  description: "Returns all members of a group with their profile information",
+  request: {
+    params: GroupIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Members retrieved successfully",
+      content: {
+        "application/json": {
+          schema: ListGroupMembersResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not a group member",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listMembersRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const members = await service.getMembers(id, user.id);
+
+  return c.json({ data: members }, 200);
+});
+
+// DELETE /groups/:id/members/:userId - Remove a member from group
+const removeMemberRoute = createRoute({
+  method: "delete",
+  path: "/groups/{id}/members/{userId}",
+  tags: ["groups"],
+  summary: "Remove a member from group",
+  description:
+    "Remove a user from the group. Only the group creator can do this.",
+  request: {
+    params: GroupMemberParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Member removed successfully",
+      content: {
+        "application/json": {
+          schema: GroupActionResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not the group creator",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group or member not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(removeMemberRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id, userId } = c.req.valid("param");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  await service.removeMember(id, user.id, userId);
+
+  return c.json(
+    {
+      success: true,
+      message: "Member removed successfully",
+    },
+    200,
+  );
+});
+
+// POST /groups/:id/token/renew - Regenerate invite token
+const renewTokenRoute = createRoute({
+  method: "post",
+  path: "/groups/{id}/token/renew",
+  tags: ["groups"],
+  summary: "Regenerate invite token",
+  description:
+    "Generate a new invite token for the group. Only the group creator can do this.",
+  request: {
+    params: GroupIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Token renewed successfully",
+      content: {
+        "application/json": {
+          schema: RenewTokenResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not the group creator",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(renewTokenRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const inviteToken = await service.renewInviteToken(id, user.id);
+
+  return c.json({ inviteToken }, 200);
+});
+
+// GET /groups/:id/gallery - Get group photo gallery
+const getGalleryRoute = createRoute({
+  method: "get",
+  path: "/groups/{id}/gallery",
+  tags: ["groups"],
+  summary: "Get group photo gallery",
+  description:
+    "Returns all public photos shared by group members for the group's festival",
+  request: {
+    params: GroupIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Gallery retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GroupGalleryResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not a group member",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getGalleryRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const photos = await service.getGallery(id, user.id);
+
+  return c.json({ data: photos, total: photos.length }, 200);
+});
+
+// POST /groups/join-by-token - Join a group using invite token
+const joinByTokenRoute = createRoute({
+  method: "post",
+  path: "/groups/join-by-token",
+  tags: ["groups"],
+  summary: "Join a group by invite token",
+  description:
+    "Join a group using only the invite token, without knowing the group ID",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: JoinByTokenSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Successfully joined group",
+      content: {
+        "application/json": {
+          schema: JoinByTokenResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Invalid invite token",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    409: {
+      description: "Conflict - Already a member",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(joinByTokenRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { inviteToken } = c.req.valid("json");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const group = await service.joinByToken(inviteToken, user.id);
+
+  return c.json(
+    {
+      success: true,
+      message: "Successfully joined group",
+      group,
     },
     200,
   );

@@ -44,3 +44,69 @@ export const DeleteAttendanceResponseSchema = z.object({
 });
 
 export type DeleteAttendanceResponse = z.infer<typeof DeleteAttendanceResponseSchema>;
+
+/**
+ * Create/update attendance request
+ * POST /api/v1/attendance
+ */
+export const CreateAttendanceSchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  tents: z.array(z.uuid()).default([]),
+  amount: z.number().int().min(0).default(0),
+});
+
+export type CreateAttendanceInput = z.infer<typeof CreateAttendanceSchema>;
+
+/**
+ * Create attendance response
+ */
+export const CreateAttendanceResponseSchema = z.object({
+  attendanceId: z.uuid(),
+  tentsChanged: z.boolean(),
+});
+
+export type CreateAttendanceResponse = z.infer<typeof CreateAttendanceResponseSchema>;
+
+/**
+ * Update personal attendance request (no notifications)
+ * POST /api/v1/attendance/personal
+ */
+export const UpdatePersonalAttendanceSchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  tents: z.array(z.uuid()).default([]),
+  amount: z.number().int().min(0).default(0),
+});
+
+export type UpdatePersonalAttendanceInput = z.infer<typeof UpdatePersonalAttendanceSchema>;
+
+/**
+ * Update personal attendance response
+ */
+export const UpdatePersonalAttendanceResponseSchema = z.object({
+  attendanceId: z.uuid(),
+  tentsAdded: z.array(z.uuid()),
+  tentsRemoved: z.array(z.uuid()),
+});
+
+export type UpdatePersonalAttendanceResponse = z.infer<typeof UpdatePersonalAttendanceResponseSchema>;
+
+/**
+ * Check-in from reservation path param
+ * POST /api/v1/attendance/check-in/{reservationId}
+ */
+export const CheckInFromReservationParamSchema = z.object({
+  reservationId: z.uuid({ error: "Invalid reservation ID" }),
+});
+
+export type CheckInFromReservationParam = z.infer<typeof CheckInFromReservationParamSchema>;
+
+/**
+ * Check-in from reservation response
+ */
+export const CheckInFromReservationResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  attendanceId: z.uuid().optional(),
+});

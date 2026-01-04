@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  createReservation,
-  getReservationForEdit,
-  updateReservation,
-} from "@/app/(private)/calendar/actions";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
@@ -12,6 +7,7 @@ import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Label } from "@/components/ui/label";
 import { ReminderSelect } from "@/components/ui/reminder-select";
 import { useTents } from "@/hooks/use-tents";
+import { apiClient } from "@/lib/api-client";
 import {
   reservationSchema,
   type ReservationFormData,
@@ -73,13 +69,14 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
     const init = async () => {
       if (reservationId) {
         try {
-          const r = await getReservationForEdit(reservationId);
+          const { reservation: r } =
+            await apiClient.reservations.get(reservationId);
           // Reset form with the reservation data
           reset({
-            tentId: r.tent_id,
-            visibleToGroups: r.visible_to_groups,
-            reminderOffsetMinutes: r.reminder_offset_minutes ?? 1440,
-            startAt: new Date(r.start_at),
+            tentId: r.tentId,
+            visibleToGroups: r.visibleToGroups,
+            reminderOffsetMinutes: r.reminderOffsetMinutes ?? 1440,
+            startAt: new Date(r.startAt),
           });
           return;
         } catch {
@@ -115,18 +112,17 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
     async (data: ReservationFormData) => {
       try {
         if (reservationId) {
-          await updateReservation(reservationId, {
-            startAt: data.startAt,
+          await apiClient.reservations.update(reservationId, {
+            startAt: data.startAt.toISOString(),
             reminderOffsetMinutes: data.reminderOffsetMinutes,
             visibleToGroups: data.visibleToGroups,
-            tentId: data.tentId,
           });
           toast.success("Reservation updated");
         } else {
-          await createReservation({
+          await apiClient.reservations.create({
             festivalId,
             tentId: data.tentId,
-            startAt: data.startAt,
+            startAt: data.startAt.toISOString(),
             reminderOffsetMinutes: data.reminderOffsetMinutes,
             visibleToGroups: data.visibleToGroups,
           });

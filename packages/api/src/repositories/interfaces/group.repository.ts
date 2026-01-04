@@ -6,6 +6,8 @@ import type {
   ListGroupsQuery,
   SearchGroupsQuery,
   SearchGroupResult,
+  GroupMember,
+  GroupGalleryPhoto,
 } from "@prostcounter/shared";
 
 /**
@@ -90,4 +92,25 @@ export interface IGroupRepository {
    * @returns Array of matching groups (public info only)
    */
   search(query: SearchGroupsQuery): Promise<SearchGroupResult[]>;
+
+  /**
+   * Get all members of a group with profile info
+   * @param groupId - Group ID
+   * @returns Array of group members
+   */
+  getMembers(groupId: string): Promise<GroupMember[]>;
+
+  /**
+   * Regenerate the invite token for a group
+   * @param groupId - Group ID
+   * @returns New invite token
+   */
+  renewInviteToken(groupId: string): Promise<string>;
+
+  /**
+   * Get gallery photos from all members in a group
+   * @param groupId - Group ID
+   * @returns Array of photos with user info
+   */
+  getGallery(groupId: string): Promise<GroupGalleryPhoto[]>;
 }

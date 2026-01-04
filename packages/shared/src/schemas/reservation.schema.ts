@@ -112,3 +112,46 @@ export const GetReservationsResponseSchema = z.object({
 });
 
 export type GetReservationsResponse = z.infer<typeof GetReservationsResponseSchema>;
+
+/**
+ * Get single reservation param
+ * GET /api/v1/reservations/:id
+ */
+export const ReservationIdParamSchema = z.object({
+  id: z.uuid({ error: "Invalid reservation ID" }),
+});
+
+export type ReservationIdParam = z.infer<typeof ReservationIdParamSchema>;
+
+/**
+ * Get single reservation response
+ */
+export const GetReservationResponseSchema = z.object({
+  reservation: ReservationSchema,
+});
+
+export type GetReservationResponse = z.infer<typeof GetReservationResponseSchema>;
+
+/**
+ * Update reservation request
+ * PUT /api/v1/reservations/:id
+ */
+export const UpdateReservationSchema = z.object({
+  startAt: z.iso.datetime({ error: "Invalid start time" }).optional(),
+  endAt: z.iso.datetime({ error: "Invalid end time" }).nullable().optional(),
+  note: z.string().max(500).nullable().optional(),
+  visibleToGroups: z.boolean().optional(),
+  autoCheckin: z.boolean().optional(),
+  reminderOffsetMinutes: z.number().int().min(0).max(1440).optional(),
+});
+
+export type UpdateReservationInput = z.infer<typeof UpdateReservationSchema>;
+
+/**
+ * Update reservation response
+ */
+export const UpdateReservationResponseSchema = z.object({
+  reservation: ReservationSchema,
+});
+
+export type UpdateReservationResponse = z.infer<typeof UpdateReservationResponseSchema>;

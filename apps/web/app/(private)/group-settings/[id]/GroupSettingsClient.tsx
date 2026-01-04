@@ -16,44 +16,57 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
+import { apiClient } from "@/lib/api-client";
 import { winningCriteriaText } from "@/lib/constants";
+import { useCurrentUser } from "@/lib/data";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
-import EyeClosedIcon from "@/public/icons/eye-closed.svg";
-import EyeOpenIcon from "@/public/icons/eye-open.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, Copy, Check } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { GroupSettingsFormData } from "@/lib/schemas/groups";
 import type { WinningCriteria } from "@/lib/types";
-import type { Tables } from "@prostcounter/db";
 
-import {
-  getCurrentUserForGroup,
-  updateGroup,
-  removeMember,
-  regenerateInviteToken,
-} from "./actions";
+// Winning criteria as string literals (matching API response)
+type WinningCriteriaString = "days_attended" | "total_beers" | "avg_beers";
+
+// Type matching the API response for group data
+type GroupData = {
+  id: string;
+  name: string;
+  description: string | null;
+  created_by: string;
+  festival_id: string;
+  winning_criteria: WinningCriteriaString;
+  invite_token: string;
+  created_at: string;
+};
+
+// Map winning criteria string to ID
+const WINNING_CRITERIA_TO_ID: Record<WinningCriteriaString, number> = {
+  days_attended: 1,
+  total_beers: 2,
+  avg_beers: 3,
+};
 
 type Props = {
-  group: Tables<"groups">;
-  members: Pick<Tables<"profiles">, "id" | "username" | "full_name">[];
+  group: GroupData;
+  members: { id: string; username: string | null; full_name: string | null }[];
 };
 
 export default function GroupSettingsClient({ group, members }: Props) {
-  const [showPassword, setShowPassword] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<{
-    userId: string;
-    isCreator: boolean;
-  } | null>(null);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+
+  // Get current user from session
+  const { data: currentUserData } = useCurrentUser();
+  const userId = currentUserData?.id;
+  const isCreator = userId === group.created_by;
 
   const { data: winningCriterias = [] } = useWinningCriterias();
 
@@ -67,34 +80,26 @@ export default function GroupSettingsClient({ group, members }: Props) {
     resolver: zodResolver(groupSettingsSchema),
     defaultValues: {
       name: group.name,
-      password: group.password,
       description: group.description || "",
-      winning_criteria_id: group.winning_criteria_id,
+      winning_criteria_id: WINNING_CRITERIA_TO_ID[group.winning_criteria] || 2,
     },
   });
 
   const winningCriteriaId = watch("winning_criteria_id");
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      const result = await getCurrentUserForGroup(group.id);
-      if (result) {
-        setCurrentUser(result);
-      }
-    };
-
-    fetchCurrentUser();
-  }, [group.id]);
-
   const onSubmit = useCallback(
     async (data: GroupSettingsFormData) => {
-      if (!currentUser?.isCreator) {
+      if (!isCreator) {
         alert("Only the group creator can update group details.");
         return;
       }
 
       try {
-        await updateGroup(group.id, data);
+        await apiClient.groups.update(group.id, {
+          name: data.name,
+          winningCriteriaId: data.winning_criteria_id,
+          description: data.description || null,
+        });
 
         toast.success("Group updated successfully!", {
           description: "Your group details have been updated.",
@@ -105,14 +110,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
         });
       }
     },
-    [currentUser?.isCreator, group.id],
+    [isCreator, group.id],
   );
 
   const handleRemoveMember = useCallback(async () => {
-    if (!currentUser?.isCreator || !selectedUserId) return;
+    if (!isCreator || !selectedUserId) return;
 
     try {
-      await removeMember(group.id, selectedUserId);
+      await apiClient.groups.removeMember(group.id, selectedUserId);
       toast.success("Member removed successfully!", {
         description: "The member has been removed from the group.",
       });
@@ -124,7 +129,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       setIsDialogOpen(false);
       setSelectedUserId(null);
     }
-  }, [currentUser?.isCreator, group.id, selectedUserId]);
+  }, [isCreator, group.id, selectedUserId]);
 
   const handleCopyToClipboard = useCallback(async () => {
     if (!inviteToken) return;
@@ -143,11 +148,13 @@ export default function GroupSettingsClient({ group, members }: Props) {
   }, [inviteToken]);
 
   const handleRegenerateToken = useCallback(async () => {
-    if (!currentUser?.isCreator) return;
+    if (!isCreator) return;
 
     setIsGeneratingToken(true);
     try {
-      const newToken = await regenerateInviteToken(group.id);
+      const { inviteToken: newToken } = await apiClient.groups.renewToken(
+        group.id,
+      );
       setInviteToken(newToken);
       toast.success("Invite token regenerated!", {
         description: "A new invitation link has been generated for your group.",
@@ -163,7 +170,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       setIsGeneratingToken(false);
       handleCopyToClipboard();
     }
-  }, [currentUser?.isCreator, group.id, handleCopyToClipboard]);
+  }, [isCreator, group.id, handleCopyToClipboard]);
 
   return (
     <div className="w-full max-w-lg">
@@ -185,44 +192,10 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 type="text"
                 id="name"
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                disabled={!currentUser?.isCreator}
+                disabled={!isCreator}
                 errorMsg={errors.name?.message}
                 {...register("name")}
               />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Group Password
-              </Label>
-              <div className="mt-1">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  className="block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                  disabled={!currentUser?.isCreator}
-                  errorMsg={errors.password?.message}
-                  rightElement={
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      <Image
-                        src={showPassword ? EyeClosedIcon : EyeOpenIcon}
-                        alt={showPassword ? "Hide password" : "Show password"}
-                        width={20}
-                        height={20}
-                      />
-                    </Button>
-                  }
-                  {...register("password")}
-                />
-              </div>
             </div>
 
             <div>
@@ -236,7 +209,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 id="description"
                 rows={3}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
-                disabled={!currentUser?.isCreator}
+                disabled={!isCreator}
                 errorMsg={errors.description?.message}
                 {...register("description")}
               />
@@ -261,7 +234,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   },
                 ]}
                 placeholder="Select winning criteria"
-                disabled={!currentUser?.isCreator}
+                disabled={!isCreator}
                 value={winningCriteriaId?.toString() || ""}
                 onSelect={(option) => {
                   setValue("winning_criteria_id", parseInt(option.value));
@@ -270,7 +243,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               />
             </div>
 
-            {currentUser?.isCreator && (
+            {isCreator && (
               <div>
                 <Button type="submit" variant="yellow" disabled={isSubmitting}>
                   {isSubmitting ? "Updating..." : "Update Group"}
@@ -282,7 +255,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       </div>
 
       {/* Invite Token Section */}
-      {currentUser?.isCreator && (
+      {isCreator && (
         <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg mt-4">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
@@ -357,7 +330,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              {currentUser?.isCreator && (
+              {isCreator && (
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -373,12 +346,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {member.full_name || "–"}
                 </td>
-                {currentUser?.isCreator && (
+                {isCreator && (
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Button
                       variant="ghost"
                       className="text-red-600 hover:text-red-900 underline disabled:text-gray-400 disabled:no-underline"
-                      disabled={member.id === currentUser?.userId}
+                      disabled={member.id === userId}
                       onClick={() => {
                         setSelectedUserId(member.id);
                         setIsDialogOpen(true);

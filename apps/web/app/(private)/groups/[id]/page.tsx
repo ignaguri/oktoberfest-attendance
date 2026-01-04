@@ -4,34 +4,34 @@ import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
 import { winningCriteriaText } from "@/lib/constants";
+import { createClient } from "@/utils/supabase/server";
 import { CalendarDays, Images } from "lucide-react";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { Suspense } from "react";
 
 import type { WinningCriteria } from "@/lib/types";
 
-import {
-  fetchGroupAndMembership,
-  fetchLeaderboard,
-  fetchWinningCriteriaForGroup,
-} from "../actions";
 import { JoinGroupForm } from "../JoinGroupForm";
 
-// Transform snake_case DB response to camelCase for Leaderboard component
-function transformLeaderboardEntries(
-  entries: Awaited<ReturnType<typeof fetchLeaderboard>>,
-) {
-  return entries.map((entry, index) => ({
-    userId: entry.user_id,
-    username: entry.username,
-    fullName: entry.full_name,
-    avatarUrl: entry.avatar_url,
-    daysAttended: entry.days_attended,
-    totalBeers: entry.total_beers,
-    avgBeers: entry.avg_beers,
-    position: index + 1,
-  }));
+async function getAuthHeaders() {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return {
+    Authorization: `Bearer ${session?.access_token}`,
+    "Content-Type": "application/json",
+  };
+}
+
+// Get the full API URL for server-side fetch
+async function getServerApiUrl() {
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3008";
+  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+  return `${protocol}://${host}/api`;
 }
 
 export default async function GroupPage({
@@ -40,16 +40,28 @@ export default async function GroupPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: groupId } = await params;
-  const groupData = fetchGroupAndMembership(groupId);
-  const leaderboardData = fetchLeaderboard(groupId);
-  const winningCriteriaData = fetchWinningCriteriaForGroup(groupId);
+  const authHeaders = await getAuthHeaders();
+  const apiBase = await getServerApiUrl();
 
-  const [{ group, isMember }, leaderboardEntries, winningCriteria] =
-    await Promise.all([groupData, leaderboardData, winningCriteriaData]);
+  // Fetch group and leaderboard in parallel
+  const [groupRes, leaderboardRes] = await Promise.all([
+    fetch(`${apiBase}/v1/groups/${groupId}`, {
+      headers: authHeaders,
+      cache: "no-store",
+    }),
+    fetch(`${apiBase}/v1/groups/${groupId}/leaderboard`, {
+      headers: authHeaders,
+      cache: "no-store",
+    }),
+  ]);
 
-  if (!group) {
+  if (!groupRes.ok) {
     redirect("/groups");
   }
+
+  const group = await groupRes.json();
+  const leaderboardResponse = await leaderboardRes.json();
+  const isMember = group.isMember ?? false;
 
   if (!isMember) {
     return (
@@ -61,6 +73,31 @@ export default async function GroupPage({
       </div>
     );
   }
+
+  // Transform API response to match Leaderboard component expectations
+  type LeaderboardEntry = {
+    userId: string;
+    username: string | null;
+    fullName: string | null;
+    avatarUrl: string | null;
+    daysAttended: number;
+    totalBeers: number;
+    avgBeers: number;
+  };
+  const leaderboardEntries = leaderboardResponse.data.map(
+    (entry: LeaderboardEntry, index: number) => ({
+      userId: entry.userId,
+      username: entry.username,
+      fullName: entry.fullName,
+      avatarUrl: entry.avatarUrl,
+      daysAttended: entry.daysAttended,
+      totalBeers: entry.totalBeers,
+      avgBeers: entry.avgBeers,
+      position: index + 1,
+    }),
+  );
+
+  const winningCriteriaName = leaderboardResponse.winningCriteria?.name;
 
   return (
     <div className="w-full max-w-lg">
@@ -78,13 +115,13 @@ export default async function GroupPage({
 
         <p className="text-sm font-medium text-gray-500 mb-4">
           Winning Criteria:{" "}
-          {winningCriteriaText[winningCriteria?.name as WinningCriteria]}
+          {winningCriteriaText[winningCriteriaName as WinningCriteria]}
         </p>
 
         <div className="flex flex-col gap-4">
           <Leaderboard
-            entries={transformLeaderboardEntries(leaderboardEntries ?? [])}
-            winningCriteria={winningCriteria?.name as WinningCriteria}
+            entries={leaderboardEntries}
+            winningCriteria={winningCriteriaName as WinningCriteria}
             showGroupCount={false}
           />
 

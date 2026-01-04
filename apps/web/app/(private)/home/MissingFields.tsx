@@ -1,12 +1,14 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { apiClient } from "@/lib/api-client";
+import { useQuery } from "@/lib/data/react-query-provider";
 import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
 import { Link } from "next-view-transitions";
 
 import type { ReactNode } from "react";
 import type { FC } from "react";
-
-import { getMissingProfileFields } from "./actions";
 
 interface MissingFieldProps {
   label: string;
@@ -32,16 +34,19 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
   );
 };
 
-export default async function MissingFields() {
-  const missingFields = await getMissingProfileFields();
+export default function MissingFields() {
+  const { data, loading } = useQuery(
+    ["profile", "missing-fields"],
+    () => apiClient.profile.getMissingFields(),
+    { staleTime: 5 * 60 * 1000 }, // 5 minutes
+  );
 
-  if (
-    !missingFields.fullName &&
-    !missingFields.username &&
-    !missingFields.avatarUrl
-  ) {
+  // Don't render anything while loading or if no missing fields
+  if (loading || !data?.hasMissingFields) {
     return null;
   }
+
+  const { missingFields } = data;
 
   return (
     <Card>
@@ -50,7 +55,7 @@ export default async function MissingFields() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-2">
-          {missingFields.fullName && (
+          {missingFields.full_name && (
             <MissingField
               label="Name"
               icon={<User className="w-4 h-4" />}
@@ -64,7 +69,7 @@ export default async function MissingFields() {
               link="/profile"
             />
           )}
-          {missingFields.avatarUrl && (
+          {missingFields.avatar_url && (
             <MissingField
               label="Profile picture"
               icon={<ImageIcon className="w-4 h-4" />}

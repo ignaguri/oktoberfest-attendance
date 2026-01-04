@@ -92,7 +92,9 @@ prostcounter/
 │   ├── db/                   # Database schema & types
 │   │   └── src/types.ts      # Generated from Supabase
 │   │
-│   └── api-client/           # 🔄 PLANNED: Generated TypeScript client
+│   └── api-client/           # ✅ Type-safe API client (auto-generated)
+│       ├── src/index.ts      # Main client with auth injection
+│       └── src/generated.ts  # Auto-generated from OpenAPI spec
 │
 ├── supabase/                 # Supabase configuration
 │   ├── migrations/           # Database migrations
@@ -497,6 +499,7 @@ revalidatePath("/path");
 9. **✅ TanStack React Query Migration**: COMPLETED - Client-side state management with provider-agnostic architecture
 10. **✅ News Feed & Live Location**: COMPLETED - Activity feed showing group member activities and real-time location sharing
 11. **✅ Testing Infrastructure**: COMPLETED - Vitest setup with unit & integration tests (18/18 passing for group routes)
+12. **✅ API-First Architecture**: COMPLETED - Hono API with auto-generated TypeScript client for Expo mobile compatibility
 
 ## Next Steps / Future Enhancements
 
@@ -513,28 +516,79 @@ revalidatePath("/path");
 1. **⚠️ Server Error Handling** - Properly handle server errors using Next.js error handling patterns
    - Reference: https://nextjs.org/docs/app/building-your-application/routing/error-handling#handling-expected-errors-from-server-actions
 2. **🔄 Expand Test Coverage** - Add tests for remaining API routes (attendance, consumption, achievements, etc.)
-3. **📚 API Documentation** - Auto-generate OpenAPI spec from Hono routes for API documentation
+3. **✅ API Documentation** - COMPLETED - OpenAPI spec auto-generated from Hono routes (`pnpm --filter=@prostcounter/api generate-spec`)
+4. **📱 Expo Mobile App** - React Native mobile app using `@prostcounter/api-client` for API access
 
 ## API Layer Architecture ✅ IMPLEMENTED
 
-ProstCounter uses a **layered architecture** with clear separation of concerns:
+ProstCounter uses an **API-first architecture** with Hono REST API and auto-generated TypeScript client for full Expo mobile app compatibility.
 
-### Route Handlers (12 total - all implemented)
+### API Client (`packages/api-client`) ✅ COMPLETED
+
+```typescript
+// Usage in client components
+import { apiClient } from "@/lib/api-client";
+
+// Type-safe API calls with auth token injection
+const groups = await apiClient.groups.list(festivalId);
+const { group } = await apiClient.groups.get(groupId);
+await apiClient.attendance.create({ festivalId, date, beers, tentVisits });
+```
+
+**Key Features**:
+- Auto-generated from OpenAPI spec (`pnpm --filter=@prostcounter/api generate-spec`)
+- Auth token automatically injected from Supabase session
+- Full TypeScript type safety with request/response types
+- Works in both web (Next.js) and mobile (Expo) contexts
+
+**Regenerating the Client**:
+```bash
+cd packages/api
+pnpm generate-spec        # Creates openapi.json
+
+cd packages/api-client
+pnpm generate             # Creates src/generated.ts
+```
+
+### Server Actions vs API Client
+
+| Use Case | Solution | Location |
+|----------|----------|----------|
+| Client component data fetching | `apiClient` | `@/lib/api-client` |
+| Client component mutations | `apiClient` | `@/lib/api-client` |
+| Server component data fetching | Server Actions | `actions.ts` files |
+| Image processing (Sharp) | Server Actions | `Avatar/actions.ts` |
+| OAuth flows | Server Actions | `Auth/actions.ts` |
+| Novu notifications | Server Actions | `api/join-group/actions.ts` |
+| Admin-only operations | Server Actions | `admin/actions.ts` |
+
+### Route Handlers (14 total - all implemented)
 
 | Route | Methods | Description | Status |
 |-------|---------|-------------|--------|
 | `/attendance` | GET, POST, PUT, DELETE | Daily attendance records | ✅ Complete |
+| `/attendance/check-in/:id` | POST | Check in from reservation | ✅ Complete |
 | `/consumption` | POST | Log individual drinks | ✅ Complete |
 | `/groups` | GET, POST | Create/list groups | ✅ Complete |
-| `/groups/:id` | GET | Group details | ✅ Complete |
+| `/groups/:id` | GET, PUT, DELETE | Group CRUD operations | ✅ Complete |
 | `/groups/:id/join` | POST | Join group with token | ✅ Complete |
 | `/groups/:id/leave` | POST | Leave group | ✅ Complete |
 | `/groups/:id/leaderboard` | GET | Group rankings | ✅ Complete |
+| `/groups/:id/members` | GET | List group members | ✅ Complete |
+| `/groups/:id/members/:userId` | DELETE | Remove member | ✅ Complete |
+| `/groups/:id/token/renew` | POST | Regenerate invite token | ✅ Complete |
+| `/groups/:id/gallery` | GET | Group photo gallery | ✅ Complete |
+| `/groups/join-by-token` | POST | Join with invite token | ✅ Complete |
 | `/leaderboard` | GET | Global leaderboard | ✅ Complete |
 | `/achievements` | GET, POST | User achievements | ✅ Complete |
 | `/festivals` | GET, POST, PUT | Festival management | ✅ Complete |
 | `/tents` | GET, POST, PUT | Tent management | ✅ Complete |
 | `/photos` | GET, POST, DELETE | Photo uploads | ✅ Complete |
+| `/reservations` | GET, POST | User reservations | ✅ Complete |
+| `/reservations/:id` | GET, PUT, DELETE | Reservation CRUD | ✅ Complete |
+| `/profile` | GET, PUT, DELETE | User profile management | ✅ Complete |
+| `/calendar` | GET | Personal calendar events | ✅ Complete |
+| `/calendar/group/:id` | GET | Group calendar events | ✅ Complete |
 
 ### Architecture Layers
 

@@ -1,6 +1,10 @@
 import type {
   AttendanceWithTotals,
   ListAttendancesQuery,
+  CreateAttendanceInput,
+  CreateAttendanceResponse,
+  UpdatePersonalAttendanceInput,
+  UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
 
 /**
@@ -46,4 +50,37 @@ export interface IAttendanceRepository {
    * @param userId - User ID (for authorization)
    */
   delete(id: string, userId: string): Promise<void>;
+
+  /**
+   * Create or update attendance with tent visits
+   * Uses RPC function for atomic operation
+   * @param userId - User ID
+   * @param input - Attendance data including tents
+   * @returns Attendance ID and whether tents changed
+   */
+  createWithTents(
+    userId: string,
+    input: CreateAttendanceInput,
+  ): Promise<CreateAttendanceResponse>;
+
+  /**
+   * Update personal attendance without triggering notifications
+   * Preserves existing tent visit timestamps
+   * @param userId - User ID
+   * @param input - Attendance data including tents
+   * @returns Attendance ID and tent changes
+   */
+  updatePersonal(
+    userId: string,
+    input: UpdatePersonalAttendanceInput,
+  ): Promise<UpdatePersonalAttendanceResponse>;
+
+  /**
+   * Check if a festival exists
+   * @param festivalId - Festival ID
+   * @returns Festival data or null
+   */
+  festivalExists(
+    festivalId: string,
+  ): Promise<{ id: string; timezone: string | null } | null>;
 }

@@ -8,11 +8,16 @@ import {
   UpdateTutorialStatusResponseSchema,
   GetMissingProfileFieldsResponseSchema,
   GetHighlightsResponseSchema,
+  GetAvatarUploadUrlQuerySchema,
+  GetAvatarUploadUrlResponseSchema,
+  ConfirmAvatarUploadSchema,
+  ConfirmAvatarUploadResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
 
 import { SupabaseProfileRepository } from "../repositories/supabase";
+import { deleteAuthUser } from "../utils/admin-client";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -141,8 +146,12 @@ const deleteProfileRoute = createRoute({
 app.openapi(deleteProfileRoute, async (c) => {
   const { user, supabase } = c.var;
 
+  // First delete all user data from the database
   const profileRepo = new SupabaseProfileRepository(supabase);
   await profileRepo.deleteProfile(user.id);
+
+  // Then delete the auth user using service role
+  await deleteAuthUser(user.id);
 
   return c.json(
     { success: true, message: "Account deleted successfully" },
@@ -355,6 +364,116 @@ app.openapi(getHighlightsRoute, async (c) => {
   const highlights = await profileRepo.getHighlights(user.id, festivalId);
 
   return c.json({ highlights }, 200);
+});
+
+// GET /profile/avatar/upload-url - Get signed upload URL for avatar
+const getAvatarUploadUrlRoute = createRoute({
+  method: "get",
+  path: "/profile/avatar/upload-url",
+  tags: ["profile"],
+  summary: "Get signed upload URL for avatar",
+  description:
+    "Returns a signed upload URL for uploading a user avatar. Client uploads directly to storage.",
+  request: {
+    query: GetAvatarUploadUrlQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Upload URL generated successfully",
+      content: {
+        "application/json": {
+          schema: GetAvatarUploadUrlResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getAvatarUploadUrlRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const query = c.req.valid("query");
+
+  const profileRepo = new SupabaseProfileRepository(supabase);
+  const result = await profileRepo.getAvatarUploadUrl(user.id, query);
+
+  return c.json(result, 200);
+});
+
+// POST /profile/avatar/confirm - Confirm avatar upload
+const confirmAvatarUploadRoute = createRoute({
+  method: "post",
+  path: "/profile/avatar/confirm",
+  tags: ["profile"],
+  summary: "Confirm avatar upload",
+  description:
+    "Confirms that an avatar was successfully uploaded to storage and updates the user's profile.",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: ConfirmAvatarUploadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Avatar confirmed successfully",
+      content: {
+        "application/json": {
+          schema: ConfirmAvatarUploadResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(confirmAvatarUploadRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const { avatarUrl } = c.req.valid("json");
+
+  const profileRepo = new SupabaseProfileRepository(supabase);
+  const confirmedUrl = await profileRepo.confirmAvatarUpload(
+    user.id,
+    avatarUrl,
+  );
+
+  return c.json({ success: true, avatarUrl: confirmedUrl }, 200);
 });
 
 export default app;

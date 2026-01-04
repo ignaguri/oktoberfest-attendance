@@ -6,6 +6,8 @@ import type {
   TutorialStatus,
   MissingProfileFields,
   Highlights,
+  GetAvatarUploadUrlQuery,
+  GetAvatarUploadUrlResponse,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -295,5 +297,51 @@ export class SupabaseProfileRepository {
     }
 
     return publicUrl;
+  }
+
+  async getAvatarUploadUrl(
+    userId: string,
+    query: GetAvatarUploadUrlQuery,
+  ): Promise<GetAvatarUploadUrlResponse> {
+    // Generate unique file name
+    const extension = query.fileName.split(".").pop() || "jpg";
+    const uniqueFileName = `${userId}_${Date.now()}.${extension}`;
+
+    // Create signed upload URL
+    const { data, error } = await this.supabase.storage
+      .from("avatars")
+      .createSignedUploadUrl(uniqueFileName);
+
+    if (error || !data) {
+      throw new Error(`Failed to create upload URL: ${error?.message}`);
+    }
+
+    // Get public URL for the file
+    const {
+      data: { publicUrl },
+    } = this.supabase.storage.from("avatars").getPublicUrl(uniqueFileName);
+
+    return {
+      uploadUrl: data.signedUrl,
+      publicUrl,
+      expiresIn: 3600, // 1 hour
+    };
+  }
+
+  async confirmAvatarUpload(
+    userId: string,
+    avatarUrl: string,
+  ): Promise<string> {
+    // Update profile with new avatar URL
+    const { error } = await this.supabase
+      .from("profiles")
+      .update({ avatar_url: avatarUrl })
+      .eq("id", userId);
+
+    if (error) {
+      throw new Error(`Failed to update avatar URL: ${error.message}`);
+    }
+
+    return avatarUrl;
   }
 }

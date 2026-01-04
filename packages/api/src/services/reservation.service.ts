@@ -2,6 +2,7 @@ import type { IReservationRepository } from "../repositories/interfaces";
 import type {
   Reservation,
   CreateReservationInput,
+  UpdateReservationInput,
   ReservationStatus,
 } from "@prostcounter/shared";
 
@@ -162,6 +163,58 @@ export class ReservationService {
     }
 
     return this.reservationRepo.cancel(id, userId);
+  }
+
+  /**
+   * Update a reservation
+   *
+   * Business Logic:
+   * 1. Verify reservation exists and belongs to user
+   * 2. Validate start time if being updated (must be in future)
+   * 3. Validate end time if being updated (must be after start time)
+   * 4. Update reservation fields
+   *
+   * @param id - Reservation ID
+   * @param userId - User ID (for authorization)
+   * @param data - Fields to update
+   * @returns Updated reservation
+   */
+  async updateReservation(
+    id: string,
+    userId: string,
+    data: UpdateReservationInput,
+  ): Promise<Reservation> {
+    // Verify reservation exists
+    const existing = await this.reservationRepo.findById(id, userId);
+    if (!existing) {
+      throw new NotFoundError("Reservation not found");
+    }
+
+    // Validate start time if provided
+    if (data.startAt) {
+      const startAt = new Date(data.startAt);
+      const now = new Date();
+
+      if (startAt <= now) {
+        throw new ValidationError(
+          "Reservation start time must be in the future",
+        );
+      }
+    }
+
+    // Validate end time if provided
+    if (data.endAt) {
+      const startAt = data.startAt
+        ? new Date(data.startAt)
+        : new Date(existing.startAt);
+      const endAt = new Date(data.endAt);
+
+      if (endAt <= startAt) {
+        throw new ValidationError("End time must be after start time");
+      }
+    }
+
+    return this.reservationRepo.update(id, userId, data);
   }
 
   /**

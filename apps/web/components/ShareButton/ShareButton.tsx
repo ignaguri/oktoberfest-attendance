@@ -4,6 +4,7 @@ import QRCode from "@/components/QR/QRCode";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
+import { apiClient } from "@/lib/api-client";
 import { Share2 } from "lucide-react";
 import {
   useState,
@@ -13,8 +14,6 @@ import {
   startTransition,
 } from "react";
 import { toast } from "sonner";
-
-import { renewGroupToken } from "./actions";
 
 interface ShareButtonProps {
   groupName: string;
@@ -43,8 +42,8 @@ export default function ShareButton({
 
   const generateShareLink = useCallback(async () => {
     try {
-      const token = await renewGroupToken(groupId);
-      const newGroupLink = `${APP_URL}/api/join-group?token=${token}`;
+      const { inviteToken } = await apiClient.groups.renewToken(groupId);
+      const newGroupLink = `${APP_URL}/api/join-group?token=${inviteToken}`;
       startTransition(() => {
         setGroupLink(newGroupLink);
       });

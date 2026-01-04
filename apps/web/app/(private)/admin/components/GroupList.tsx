@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { apiClient } from "@/lib/api-client";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { logger } from "@/lib/logger";
 import { groupSchema } from "@/lib/schemas/admin";
@@ -28,7 +29,6 @@ import { toast } from "sonner";
 import type { GroupFormData } from "@/lib/schemas/admin";
 import type { Tables } from "@prostcounter/db";
 
-import { regenerateInviteToken } from "../../group-settings/[id]/actions";
 import {
   updateGroup,
   deleteGroup,
@@ -287,7 +287,9 @@ const GroupList = () => {
 
     setIsGeneratingToken(true);
     try {
-      const newToken = await regenerateInviteToken(selectedGroup.id);
+      const { inviteToken: newToken } = await apiClient.groups.renewToken(
+        selectedGroup.id,
+      );
       setInviteToken(newToken);
       toast.success("Invite token regenerated!", {
         description: "A new invitation link has been generated for the group.",

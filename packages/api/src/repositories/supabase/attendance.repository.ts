@@ -3,6 +3,10 @@ import type { Database } from "@prostcounter/db";
 import type {
   AttendanceWithTotals,
   ListAttendancesQuery,
+  CreateAttendanceInput,
+  CreateAttendanceResponse,
+  UpdatePersonalAttendanceInput,
+  UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -186,6 +190,108 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     if (error) {
       throw new DatabaseError(`Failed to delete attendance: ${error.message}`);
     }
+  }
+
+  async createWithTents(
+    userId: string,
+    input: CreateAttendanceInput,
+  ): Promise<CreateAttendanceResponse> {
+    // Convert date string to ISO timestamp for the RPC function
+    const dateWithTime = new Date(input.date);
+    const now = new Date();
+    dateWithTime.setHours(
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds(),
+    );
+
+    const { data, error } = await this.supabase.rpc(
+      "add_or_update_attendance_with_tents",
+      {
+        p_user_id: userId,
+        p_beer_count: input.amount,
+        p_tent_ids: input.tents,
+        p_date: dateWithTime.toISOString(),
+        p_festival_id: input.festivalId,
+      },
+    );
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to create/update attendance: ${error.message}`,
+      );
+    }
+
+    if (!data || data.length === 0) {
+      throw new DatabaseError("No data returned from attendance creation");
+    }
+
+    return {
+      attendanceId: data[0].attendance_id,
+      tentsChanged: data[0].tents_changed || false,
+    };
+  }
+
+  async updatePersonal(
+    userId: string,
+    input: UpdatePersonalAttendanceInput,
+  ): Promise<UpdatePersonalAttendanceResponse> {
+    // Convert date string to ISO timestamp for the RPC function
+    const dateWithTime = new Date(input.date);
+    const now = new Date();
+    dateWithTime.setHours(
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds(),
+    );
+
+    const { data, error } = await this.supabase.rpc(
+      "update_personal_attendance_with_tents",
+      {
+        p_user_id: userId,
+        p_date: dateWithTime.toISOString(),
+        p_beer_count: input.amount,
+        p_tent_ids: input.tents.length > 0 ? input.tents : [],
+        p_festival_id: input.festivalId,
+      },
+    );
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to update personal attendance: ${error.message}`,
+      );
+    }
+
+    if (!data || data.length === 0) {
+      throw new DatabaseError("No data returned from attendance update");
+    }
+
+    return {
+      attendanceId: data[0].attendance_id,
+      tentsAdded: data[0].tents_added || [],
+      tentsRemoved: data[0].tents_removed || [],
+    };
+  }
+
+  async festivalExists(
+    festivalId: string,
+  ): Promise<{ id: string; timezone: string | null } | null> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("id, timezone")
+      .eq("id", festivalId)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return null;
+      }
+      throw new DatabaseError(`Failed to check festival: ${error.message}`);
+    }
+
+    return data;
   }
 
   private mapToAttendanceWithTotals(data: any): AttendanceWithTotals {
