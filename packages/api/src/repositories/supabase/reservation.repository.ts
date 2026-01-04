@@ -33,7 +33,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
         visible_to_groups: input.visibleToGroups ?? true,
         auto_checkin: input.autoCheckin ?? false,
         reminder_offset_minutes: input.reminderOffsetMinutes ?? 30,
-        status: "pending",
+        status: "scheduled",
       })
       .select("*, tents(name)")
       .single();
