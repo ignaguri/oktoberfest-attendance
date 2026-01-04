@@ -7,7 +7,11 @@ import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Label } from "@/components/ui/label";
 import { ReminderSelect } from "@/components/ui/reminder-select";
 import { useTents } from "@/hooks/use-tents";
-import { apiClient } from "@/lib/api-client";
+import {
+  useReservation,
+  useCreateReservation,
+  useUpdateReservation,
+} from "@/hooks/useReservations";
 import {
   reservationSchema,
   type ReservationFormData,
@@ -34,6 +38,18 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
     !!searchParams.get("reservationId");
   const reservationId = searchParams.get("reservationId");
 
+  // Use React Query for fetching reservation data
+  const { data: reservation, loading: reservationLoading } =
+    useReservation(reservationId);
+
+  // Mutations for create/update
+  const { mutateAsync: createReservation, loading: isCreating } =
+    useCreateReservation();
+  const { mutateAsync: updateReservation, loading: isUpdating } =
+    useUpdateReservation();
+
+  const isMutating = isCreating || isUpdating;
+
   const initialDate = useMemo(() => {
     const dateStr = searchParams.get("date");
     if (!dateStr) return new Date();
@@ -46,7 +62,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
     setValue,
     watch,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm<ReservationFormData>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
@@ -62,30 +78,20 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   const reminderOffsetMinutes = watch("reminderOffsetMinutes");
   const visibleToGroups = watch("visibleToGroups");
 
+  // Initialize form when dialog opens or reservation data loads
   useEffect(() => {
-    if (!open) return; // Don't initialize if dialog is not open
+    if (!open) return;
 
-    // Initialize form data
-    const init = async () => {
-      if (reservationId) {
-        try {
-          const { reservation: r } =
-            await apiClient.reservations.get(reservationId);
-          // Reset form with the reservation data
-          reset({
-            tentId: r.tentId,
-            visibleToGroups: r.visibleToGroups,
-            reminderOffsetMinutes: r.reminderOffsetMinutes ?? 1440,
-            startAt: new Date(r.startAt),
-          });
-          return;
-        } catch {
-          toast.error("Error", {
-            description: "Failed to load reservation data",
-          });
-        }
-      }
-      // Set default time to 09:00 (9 AM) for the selected date for new reservations
+    if (reservationId && reservation) {
+      // Editing existing reservation - populate form with fetched data
+      reset({
+        tentId: reservation.tentId,
+        visibleToGroups: reservation.visibleToGroups,
+        reminderOffsetMinutes: reservation.reminderOffsetMinutes ?? 1440,
+        startAt: new Date(reservation.startAt),
+      });
+    } else if (!reservationId) {
+      // Creating new reservation - set defaults
       const defaultDate = new Date(initialDate);
       defaultDate.setHours(9, 0, 0, 0);
       const defaultTentId =
@@ -96,9 +102,8 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
         reminderOffsetMinutes: 1440,
         visibleToGroups: true,
       });
-    };
-    init();
-  }, [open, initialDate, reservationId, reset, tents]);
+    }
+  }, [open, initialDate, reservationId, reservation, reset, tents]);
 
   const onClose = useCallback(() => {
     const url = createUrlWithParams("/calendar", searchParams, [
@@ -112,14 +117,17 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
     async (data: ReservationFormData) => {
       try {
         if (reservationId) {
-          await apiClient.reservations.update(reservationId, {
-            startAt: data.startAt.toISOString(),
-            reminderOffsetMinutes: data.reminderOffsetMinutes,
-            visibleToGroups: data.visibleToGroups,
+          await updateReservation({
+            reservationId,
+            data: {
+              startAt: data.startAt.toISOString(),
+              reminderOffsetMinutes: data.reminderOffsetMinutes,
+              visibleToGroups: data.visibleToGroups,
+            },
           });
           toast.success("Reservation updated");
         } else {
-          await apiClient.reservations.create({
+          await createReservation({
             festivalId,
             tentId: data.tentId,
             startAt: data.startAt.toISOString(),
@@ -133,7 +141,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
         toast.error("Failed to save reservation");
       }
     },
-    [festivalId, onClose, reservationId],
+    [festivalId, onClose, reservationId, createReservation, updateReservation],
   );
 
   return (
@@ -159,7 +167,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
               }))}
               placeholder="Select your tent"
               onSelect={(option) => setValue("tentId", option.value)}
-              disabled={tentsLoading || isSubmitting}
+              disabled={tentsLoading || isMutating}
             />
             {errors.tentId && (
               <p className="text-sm text-red-600">{errors.tentId.message}</p>
@@ -171,7 +179,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
               value={startAt}
               onChange={(date) => date && setValue("startAt", date)}
               placeholder="Pick a date and time"
-              disabled={isSubmitting}
+              disabled={isMutating}
               calendarClassName="[--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
             />
             {errors.startAt && (
@@ -183,7 +191,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             <ReminderSelect
               value={reminderOffsetMinutes}
               onChange={(minutes) => setValue("reminderOffsetMinutes", minutes)}
-              disabled={isSubmitting}
+              disabled={isMutating}
             />
             {errors.reminderOffsetMinutes && (
               <p className="text-sm text-red-600">
@@ -201,7 +209,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
                   checked === "indeterminate" ? false : checked,
                 )
               }
-              disabled={isSubmitting}
+              disabled={isMutating}
             />
           </div>
         </div>
@@ -210,11 +218,11 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             type="button"
             variant="outline"
             onClick={onClose}
-            disabled={isSubmitting}
+            disabled={isMutating}
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting || tentsLoading}>
+          <Button type="submit" disabled={isMutating || tentsLoading}>
             {reservationId ? "Save" : "Create"}
           </Button>
         </div>

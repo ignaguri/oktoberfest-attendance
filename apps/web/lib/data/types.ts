@@ -149,6 +149,11 @@ export class QueryKeys {
   static groupCalendar = (groupId: string) =>
     ["calendar", "group", groupId] as const;
 
+  // Reservation queries
+  static reservations = (festivalId: string) =>
+    ["reservations", festivalId] as const;
+  static reservation = (id: string) => ["reservation", id] as const;
+
   // Profile queries
   static tutorialStatus = () => ["tutorial-status"] as const;
   static missingProfileFields = () => ["missing-profile-fields"] as const;

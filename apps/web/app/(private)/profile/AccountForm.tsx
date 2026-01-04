@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // import { LocationPrivacySettings } from "@/components/ui/location-privacy-settings";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
-import { useResetTutorial } from "@/hooks/useProfile";
-import { apiClient } from "@/lib/api-client";
+import { useDeleteProfile, useResetTutorial } from "@/hooks/useProfile";
 import {
   useCurrentProfile,
   useCurrentUser,
@@ -25,7 +24,6 @@ import type { ProfileFormData } from "@/lib/schemas/profile";
 
 export default function AccountForm() {
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Use React Query hooks
@@ -35,6 +33,8 @@ export default function AccountForm() {
     useUpdateProfile();
   const { mutate: resetTutorialMutation, loading: isResettingTutorial } =
     useResetTutorial();
+  const { mutateAsync: deleteProfile, loading: isDeleting } =
+    useDeleteProfile();
 
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile?.avatar_url || null,
@@ -107,12 +107,10 @@ export default function AccountForm() {
     }
 
     try {
-      setIsDeleting(true);
-      await apiClient.profile.delete();
+      await deleteProfile(undefined);
       // The API doesn't redirect, so we need to navigate manually
       window.location.href = "/";
     } catch {
-      setIsDeleting(false);
       setShowDeleteConfirm(false);
       toast.error(
         "Failed to delete account. Please try again or contact support.",

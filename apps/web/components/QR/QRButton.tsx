@@ -2,7 +2,7 @@
 
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
-import { apiClient } from "@/lib/api-client";
+import { useRenewInviteToken } from "@/hooks/useGroups";
 import { QrCode } from "lucide-react";
 import { useState, useEffect, useCallback, startTransition } from "react";
 import { toast } from "sonner";
@@ -28,9 +28,11 @@ export default function QRButton({
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
+  const { mutateAsync: renewToken } = useRenewInviteToken();
+
   const generateShareLink = useCallback(async () => {
     try {
-      const { inviteToken } = await apiClient.groups.renewToken(groupId);
+      const { inviteToken } = await renewToken({ groupId });
       const newGroupLink = `${APP_URL}/api/join-group?token=${inviteToken}`;
       startTransition(() => {
         setGroupLink(newGroupLink);
@@ -40,7 +42,7 @@ export default function QRButton({
         description: "Failed to generate QR code. Please try again.",
       });
     }
-  }, [groupId, APP_URL]);
+  }, [groupId, APP_URL, renewToken]);
 
   const handleQRClick = async () => {
     if (!tokenGenerated) {

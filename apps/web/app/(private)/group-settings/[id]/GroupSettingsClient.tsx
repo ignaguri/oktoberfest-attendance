@@ -15,8 +15,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  useUpdateGroup,
+  useRemoveMember,
+  useRenewInviteToken,
+} from "@/hooks/useGroups";
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
-import { apiClient } from "@/lib/api-client";
 import { winningCriteriaText } from "@/lib/constants";
 import { useCurrentUser } from "@/lib/data";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
@@ -60,7 +64,6 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
-  const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   // Get current user from session
@@ -70,12 +73,18 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
   const { data: winningCriterias = [] } = useWinningCriterias();
 
+  // Mutations
+  const { mutateAsync: updateGroup, loading: isUpdating } = useUpdateGroup();
+  const { mutateAsync: removeMember, loading: isRemoving } = useRemoveMember();
+  const { mutateAsync: renewToken, loading: isGeneratingToken } =
+    useRenewInviteToken();
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<GroupSettingsFormData>({
     resolver: zodResolver(groupSettingsSchema),
     defaultValues: {
@@ -95,10 +104,13 @@ export default function GroupSettingsClient({ group, members }: Props) {
       }
 
       try {
-        await apiClient.groups.update(group.id, {
-          name: data.name,
-          winningCriteriaId: data.winning_criteria_id,
-          description: data.description || null,
+        await updateGroup({
+          groupId: group.id,
+          updates: {
+            name: data.name,
+            winningCriteriaId: data.winning_criteria_id,
+            description: data.description || null,
+          },
         });
 
         toast.success("Group updated successfully!", {
@@ -110,14 +122,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
         });
       }
     },
-    [isCreator, group.id],
+    [isCreator, group.id, updateGroup],
   );
 
   const handleRemoveMember = useCallback(async () => {
     if (!isCreator || !selectedUserId) return;
 
     try {
-      await apiClient.groups.removeMember(group.id, selectedUserId);
+      await removeMember({ groupId: group.id, userId: selectedUserId });
       toast.success("Member removed successfully!", {
         description: "The member has been removed from the group.",
       });
@@ -129,36 +141,39 @@ export default function GroupSettingsClient({ group, members }: Props) {
       setIsDialogOpen(false);
       setSelectedUserId(null);
     }
-  }, [isCreator, group.id, selectedUserId]);
+  }, [isCreator, group.id, selectedUserId, removeMember]);
 
-  const handleCopyToClipboard = useCallback(async () => {
-    if (!inviteToken) return;
+  const handleCopyToClipboard = useCallback(
+    async (token?: string) => {
+      const tokenToCopy = token || inviteToken;
+      if (!tokenToCopy) return;
 
-    try {
-      const inviteUrl = `${window.location.origin}/join-group?token=${inviteToken}`;
-      await navigator.clipboard.writeText(inviteUrl);
-      setCopiedToClipboard(true);
-      toast.success("Invite link copied to clipboard!");
+      try {
+        const inviteUrl = `${window.location.origin}/join-group?token=${tokenToCopy}`;
+        await navigator.clipboard.writeText(inviteUrl);
+        setCopiedToClipboard(true);
+        toast.success("Invite link copied to clipboard!");
 
-      // Reset the copied state after 2 seconds
-      setTimeout(() => setCopiedToClipboard(false), 2000);
-    } catch {
-      toast.error("Failed to copy to clipboard");
-    }
-  }, [inviteToken]);
+        // Reset the copied state after 2 seconds
+        setTimeout(() => setCopiedToClipboard(false), 2000);
+      } catch {
+        toast.error("Failed to copy to clipboard");
+      }
+    },
+    [inviteToken],
+  );
 
   const handleRegenerateToken = useCallback(async () => {
     if (!isCreator) return;
 
-    setIsGeneratingToken(true);
     try {
-      const { inviteToken: newToken } = await apiClient.groups.renewToken(
-        group.id,
-      );
+      const { inviteToken: newToken } = await renewToken({ groupId: group.id });
       setInviteToken(newToken);
       toast.success("Invite token regenerated!", {
         description: "A new invitation link has been generated for your group.",
       });
+      // Copy the new token to clipboard
+      handleCopyToClipboard(newToken);
     } catch (error) {
       toast.error("Error regenerating token", {
         description:
@@ -166,11 +181,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
             ? error.message
             : "An unexpected error occurred.",
       });
-    } finally {
-      setIsGeneratingToken(false);
-      handleCopyToClipboard();
     }
-  }, [isCreator, group.id, handleCopyToClipboard]);
+  }, [isCreator, group.id, renewToken, handleCopyToClipboard]);
 
   return (
     <div className="w-full max-w-lg">
@@ -245,8 +257,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
             {isCreator && (
               <div>
-                <Button type="submit" variant="yellow" disabled={isSubmitting}>
-                  {isSubmitting ? "Updating..." : "Update Group"}
+                <Button type="submit" variant="yellow" disabled={isUpdating}>
+                  {isUpdating ? "Updating..." : "Update Group"}
                 </Button>
               </div>
             )}
@@ -290,7 +302,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleCopyToClipboard}
+                  onClick={() => handleCopyToClipboard()}
                   disabled={!inviteToken}
                   className="px-3"
                 >
@@ -378,12 +390,20 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+                disabled={isRemoving}
+              >
                 Cancel
               </Button>
             </DialogClose>
-            <Button variant="destructive" onClick={handleRemoveMember}>
-              Confirm
+            <Button
+              variant="destructive"
+              onClick={handleRemoveMember}
+              disabled={isRemoving}
+            >
+              {isRemoving ? "Removing..." : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -2,11 +2,16 @@
 
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
 import { useFestival } from "@/contexts/FestivalContext";
-import { apiClient } from "@/lib/api-client";
+import { useReservation, useCheckInReservation } from "@/hooks/useReservations";
 import { useAttendances } from "@/lib/data";
-import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useCallback, startTransition } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  startTransition,
+} from "react";
 import { toast } from "sonner";
 
 import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
@@ -27,8 +32,37 @@ export default function AttendancePage() {
   } = useAttendances(currentFestival?.id || "");
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [reservation, setReservation] = useState<any>(null);
   const searchParams = useSearchParams();
+
+  // Get reservation ID from URL for check-in prompt
+  const reservationId = searchParams.get("reservationId");
+  const prompt = searchParams.get("prompt");
+  const shouldShowCheckIn = prompt === "checkin" && !!reservationId;
+
+  // Use React Query hook for reservation data
+  const { data: reservationData, error: reservationError } = useReservation(
+    shouldShowCheckIn ? reservationId : null,
+  );
+
+  // Use mutation hook for check-in
+  const { mutateAsync: checkIn } = useCheckInReservation();
+
+  // Extract festivalId for check-in mutation (separate from transformed reservation)
+  const reservationFestivalId = reservationData?.festivalId;
+
+  // Transform API response to match CheckInPromptDialog interface
+  const reservation = useMemo(() => {
+    if (!reservationData) return null;
+    return {
+      id: reservationData.id,
+      tent: reservationData.tentName
+        ? { name: reservationData.tentName }
+        : null,
+      start_at: reservationData.startAt,
+      visible_to_groups: reservationData.visibleToGroups,
+      note: reservationData.note,
+    };
+  }, [reservationData]);
 
   // Handle attendance errors
   useEffect(() => {
@@ -36,6 +70,13 @@ export default function AttendancePage() {
       toast.error("Failed to fetch attendance data. Please try again.");
     }
   }, [attendancesError]);
+
+  // Handle reservation fetch errors
+  useEffect(() => {
+    if (reservationError) {
+      toast.error("Reservation not found or already processed.");
+    }
+  }, [reservationError]);
 
   // Handle date parameter from URL
   useEffect(() => {
@@ -47,35 +88,6 @@ export default function AttendancePage() {
           setSelectedDate(date);
         });
       }
-    }
-  }, [searchParams]);
-
-  // Handle check-in prompt
-  useEffect(() => {
-    const reservationId = searchParams.get("reservationId");
-    const prompt = searchParams.get("prompt");
-
-    if (prompt === "checkin" && reservationId) {
-      const fetchReservation = async () => {
-        try {
-          const { reservation } =
-            await apiClient.reservations.get(reservationId);
-          setReservation(reservation);
-        } catch (error) {
-          logger.error(
-            "Error fetching reservation",
-            logger.clientComponent("AttendancePage", { reservationId }),
-            error as Error,
-          );
-          toast.error("Reservation not found or already processed.");
-        }
-      };
-
-      fetchReservation();
-    } else {
-      startTransition(() => {
-        setReservation(null);
-      });
     }
   }, [searchParams]);
 
@@ -93,11 +105,15 @@ export default function AttendancePage() {
   }, [handleAttendanceUpdate]);
 
   const handleCheckIn = useCallback(
-    async (reservationId: string) => {
-      await apiClient.attendance.checkInFromReservation(reservationId);
+    async (resId: string) => {
+      if (!reservationFestivalId) return;
+      await checkIn({
+        reservationId: resId,
+        festivalId: reservationFestivalId,
+      });
       handleAttendanceUpdate();
     },
-    [handleAttendanceUpdate],
+    [checkIn, handleAttendanceUpdate, reservationFestivalId],
   );
 
   if (festivalLoading || attendancesLoading || !currentFestival) {

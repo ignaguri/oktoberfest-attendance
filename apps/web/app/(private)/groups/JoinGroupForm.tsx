@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
+import { useJoinGroup } from "@/hooks/useGroups";
 import { apiClient } from "@/lib/api-client";
 import { joinGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,8 +23,10 @@ interface JoinGroupFormProps {
 export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   const { currentFestival } = useFestival();
   const router = useTransitionRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Use mutation hook for joining groups
+  const { mutateAsync: joinGroup, loading: isJoining } = useJoinGroup();
 
   const {
     register,
@@ -44,9 +47,8 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       return;
     }
 
-    setIsSubmitting(true);
     try {
-      await apiClient.groups.join(groupId);
+      await joinGroup({ groupId });
       toast.success("Successfully joined the group!");
       router.push(`/groups/${groupId}`);
       window.location.reload();
@@ -54,8 +56,6 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       toast.error(
         error instanceof Error ? error.message : "Unable to join group.",
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -67,7 +67,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     }
 
     try {
-      // Search for the group by name
+      // Search for the group by name (one-time search as part of join flow)
       const searchResult = await apiClient.groups.search({
         name: data.groupName,
         festivalId: currentFestival.id,
@@ -84,7 +84,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       // Try to join the group (password validation happens server-side)
       // Note: The API uses invite tokens, not passwords. For password-based join,
       // we'll attempt to join and let the server validate.
-      await apiClient.groups.join(foundGroup.id, data.password);
+      await joinGroup({ groupId: foundGroup.id, inviteToken: data.password });
       toast.success("Successfully joined the group!");
       router.push(`/groups/${foundGroup.id}`);
       window.location.reload();
@@ -108,10 +108,10 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
           type="button"
           variant="yellow"
           className="w-fit"
-          disabled={isSubmitting}
+          disabled={isJoining}
           onClick={handleDirectJoin}
         >
-          {isSubmitting ? "Joining..." : "Join Group"}
+          {isJoining ? "Joining..." : "Join Group"}
         </Button>
       </div>
     );
@@ -154,9 +154,9 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
         type="submit"
         variant="yellow"
         className="w-fit self-center"
-        disabled={formSubmitting}
+        disabled={formSubmitting || isJoining}
       >
-        {formSubmitting ? "Joining..." : "Join Group"}
+        {formSubmitting || isJoining ? "Joining..." : "Join Group"}
       </Button>
     </form>
   );

@@ -220,3 +220,63 @@ export function useGroupName(groupId: string) {
     },
   );
 }
+
+/**
+ * Hook to fetch group members
+ */
+export function useGroupMembers(groupId: string) {
+  return useQuery(
+    QueryKeys.groupMembers(groupId),
+    async () => {
+      const response = await apiClient.groups.getMembers(groupId);
+      return response.data;
+    },
+    {
+      enabled: !!groupId,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 15 * 60 * 1000, // 15 minutes cache
+    },
+  );
+}
+
+/**
+ * Hook to remove a member from a group
+ */
+export function useRemoveMember() {
+  const invalidateQueries = useInvalidateQueries();
+
+  return useMutation(
+    async ({ groupId, userId }: { groupId: string; userId: string }) => {
+      return await apiClient.groups.removeMember(groupId, userId);
+    },
+    {
+      onSuccess: (_data, { groupId }) => {
+        // Invalidate group members
+        invalidateQueries(QueryKeys.groupMembers(groupId));
+        // Invalidate group details
+        invalidateQueries(QueryKeys.group(groupId));
+        // Invalidate leaderboards that might be affected
+        invalidateQueries(["leaderboard"]);
+      },
+    },
+  );
+}
+
+/**
+ * Hook to regenerate group invite token
+ */
+export function useRenewInviteToken() {
+  const invalidateQueries = useInvalidateQueries();
+
+  return useMutation(
+    async ({ groupId }: { groupId: string }) => {
+      return await apiClient.groups.renewToken(groupId);
+    },
+    {
+      onSuccess: (_data, { groupId }) => {
+        // Invalidate group details to refresh the invite token
+        invalidateQueries(QueryKeys.group(groupId));
+      },
+    },
+  );
+}
