@@ -77,7 +77,7 @@ prostcounter/
 │
 ├── packages/
 │   ├── api/                  # ✅ Hono API routes & business logic
-│   │   ├── src/routes/       # 12 route handlers (all implemented)
+│   │   ├── src/routes/       # 14 route handlers (all implemented)
 │   │   ├── src/services/     # Business logic layer
 │   │   ├── src/repositories/ # Data access layer (provider-agnostic)
 │   │   ├── src/middleware/   # Auth, error handling
