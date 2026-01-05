@@ -277,6 +277,7 @@
     "pageTitle": "Leaderboard",
     "global": "Global",
     "group": "Group",
+    "groups": "Groups",
     "rank": "Rank",
     "player": "Player",
     "days": "Days",
@@ -286,7 +287,8 @@
     "notRanked": "Not ranked yet",
     "viewAll": "View All",
     "empty": "No rankings yet",
-    "emptyDescription": "Be the first to track your attendance!"
+    "emptyDescription": "Be the first to track your attendance!",
+    "noName": "No name"
   },
   "profile": {
     "pageTitle": "Profile Settings",
