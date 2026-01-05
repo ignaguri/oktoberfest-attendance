@@ -15,6 +15,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { apiClient } from "@/lib/api-client";
 import { searchKeys } from "@/lib/data/search-query-keys";
+import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import { groupSchema } from "@/lib/schemas/admin";
 import { getAvatarUrl } from "@/lib/utils";
@@ -229,6 +230,7 @@ const GroupEditForm = ({
 };
 
 const GroupList = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedGroup, setSelectedGroup] = useState<Tables<"groups"> | null>(
     null,
@@ -268,7 +270,7 @@ const GroupList = () => {
         }),
         error as Error,
       );
-      toast.error("Failed to load group data");
+      toast.error(t("notifications.error.groupLoadFailed"));
     } finally {
       setIsLoadingMembers(false);
     }
@@ -291,8 +293,8 @@ const GroupList = () => {
         selectedGroup.id,
       );
       setInviteToken(newToken);
-      toast.success("Invite token regenerated!", {
-        description: "A new invitation link has been generated for the group.",
+      toast.success(t("notifications.success.tokenRegenerated"), {
+        description: t("notifications.descriptions.tokenRegenerated"),
       });
     } catch (error) {
       logger.error(
@@ -303,10 +305,7 @@ const GroupList = () => {
         }),
         error as Error,
       );
-      toast.error("Error regenerating token", {
-        description:
-          "An unexpected error occurred while regenerating the token.",
-      });
+      toast.error(t("notifications.error.tokenRegenFailed"));
     } finally {
       setIsGeneratingToken(false);
     }
@@ -319,12 +318,12 @@ const GroupList = () => {
       const inviteUrl = `${window.location.origin}/join-group?token=${inviteToken}`;
       await navigator.clipboard.writeText(inviteUrl);
       setCopiedToClipboard(true);
-      toast.success("Invite link copied to clipboard!");
+      toast.success(t("notifications.success.linkCopied"));
 
       // Reset the copied state after 2 seconds
       setTimeout(() => setCopiedToClipboard(false), 2000);
     } catch {
-      toast.error("Failed to copy to clipboard");
+      toast.error(t("notifications.error.copyFailed"));
     }
   };
 
@@ -333,7 +332,7 @@ const GroupList = () => {
     try {
       await updateGroup(selectedGroup.id, data);
       setSelectedGroup(null);
-      toast.success("Group updated successfully");
+      toast.success(t("notifications.success.groupUpdated"));
       setIsDialogOpen(false);
       handleRefresh();
     } catch (error) {
@@ -345,14 +344,14 @@ const GroupList = () => {
         }),
         error as Error,
       );
-      toast.error("Failed to update group");
+      toast.error(t("notifications.error.groupUpdateFailed"));
     }
   }
 
   async function handleDeleteGroup(groupId: string) {
     try {
       await deleteGroup(groupId);
-      toast.success("Group deleted successfully");
+      toast.success(t("notifications.success.groupDeleted"));
       handleRefresh();
     } catch (error) {
       logger.error(
@@ -360,7 +359,7 @@ const GroupList = () => {
         logger.clientComponent("GroupList", { action: "deleteGroup", groupId }),
         error as Error,
       );
-      toast.error("Failed to delete group");
+      toast.error(t("notifications.error.groupDeleteFailed"));
     }
   }
 

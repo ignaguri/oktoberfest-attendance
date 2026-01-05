@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   addTentToFestivalSchema,
   copyTentsSchema,
@@ -60,6 +61,7 @@ const TENT_CATEGORIES = [
 ];
 
 export default function TentManagement() {
+  const { t } = useTranslation();
   const [festivals, setFestivals] = useState<Festival[]>([]);
   const [selectedFestival, setSelectedFestival] = useState<string>("");
   const [festivalTents, setFestivalTents] = useState<TentWithPrice[]>([]);
@@ -103,7 +105,7 @@ export default function TentManagement() {
         }
       } catch (error) {
         console.error("Error loading festivals:", error);
-        toast.error("Failed to load festivals");
+        toast.error(t("notifications.error.festivalLoadFailed"));
       }
     };
     loadFestivals();
@@ -132,7 +134,7 @@ export default function TentManagement() {
       setTentStats(statsData);
     } catch (error) {
       console.error("Error loading festival data:", error);
-      toast.error("Failed to load tent data");
+      toast.error(t("notifications.error.tentLoadFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -145,12 +147,12 @@ export default function TentManagement() {
         selectedFestival,
         data.beer_price,
       );
-      toast.success("Tent created successfully");
+      toast.success(t("notifications.success.tentCreated"));
       createTentForm.reset();
       setShowAddDialog(false);
       await loadFestivalData();
     } catch (error: any) {
-      toast.error(error.message || "Failed to create tent");
+      toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
@@ -160,40 +162,44 @@ export default function TentManagement() {
   ) => {
     try {
       await addTentToFestival(selectedFestival, tentId, beerPrice);
-      toast.success("Tent added to festival");
+      toast.success(t("notifications.success.tentAddedToFestival"));
       await loadFestivalData();
     } catch (error: any) {
-      toast.error(error.message || "Failed to add tent");
+      toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
   const handleAddAllAvailableTents = async () => {
     try {
       const result = await addAllAvailableTentsToFestival(selectedFestival);
-      toast.success(`Added ${result.added} tent(s) to festival`);
+      toast.success(
+        t("notifications.success.tentsAddedToFestival", {
+          count: result.added,
+        }),
+      );
       await loadFestivalData();
     } catch (error: any) {
-      toast.error(error.message || "Failed to add all tents");
+      toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
   const handleRemoveTent = async (tentId: string) => {
     try {
       await removeTentFromFestival(selectedFestival, tentId);
-      toast.success("Tent removed from festival");
+      toast.success(t("notifications.success.tentRemovedFromFestival"));
       await loadFestivalData();
     } catch (error: any) {
-      toast.error(error.message || "Failed to remove tent");
+      toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
   const handleUpdatePrice = async (tentId: string, price: number | null) => {
     try {
       await updateTentPrice(selectedFestival, tentId, price);
-      toast.success("Price updated successfully");
+      toast.success(t("notifications.success.priceUpdated"));
       await loadFestivalData();
     } catch (error: any) {
-      toast.error(error.message || "Failed to update price");
+      toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
@@ -208,12 +214,14 @@ export default function TentManagement() {
           overridePrice: data.overridePrice,
         },
       );
-      toast.success(`Copied ${data.tentIds.length} tent(s) successfully`);
+      toast.success(
+        t("notifications.success.tentsCopied", { count: data.tentIds.length }),
+      );
       copyTentsForm.reset();
       setShowCopyDialog(false);
       await loadFestivalData();
     } catch (error: any) {
-      toast.error(error.message || "Failed to copy tents");
+      toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
@@ -542,13 +550,14 @@ function TentCard({
   onUpdatePrice: (price: number | null) => void;
   onRemove: () => void;
 }) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editPrice, setEditPrice] = useState(tent.beer_price?.toString() || "");
 
   const handleSavePrice = () => {
     const price = editPrice === "" ? null : parseFloat(editPrice);
     if (price !== null && (isNaN(price) || price <= 0 || price > 50)) {
-      toast.error("Please enter a valid price between 0 and 50");
+      toast.error(t("notifications.error.invalidPrice"));
       return;
     }
     onUpdatePrice(price);
@@ -631,6 +640,7 @@ function CopyTentsDialog({
   festivals: Festival[];
   onSubmit: (data: CopyTentsFormData) => void;
 }) {
+  const { t } = useTranslation();
   const [sourceTents, setSourceTents] = useState<TentWithPrice[]>([]);
   const [selectedTents, setSelectedTents] = useState<string[]>([]);
 
@@ -646,9 +656,9 @@ function CopyTentsDialog({
         setSelectedTents([]);
       });
     } catch {
-      toast.error("Failed to load source tents");
+      toast.error(t("notifications.error.tentSourceLoadFailed"));
     }
-  }, [sourceFestivalId]);
+  }, [sourceFestivalId, t]);
 
   useEffect(() => {
     if (sourceFestivalId) {

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ShareImage } from "@/components/wrapped/ShareImage";
+import { useTranslation } from "@/lib/i18n/client";
 import { generateShareImageFromElement } from "@/lib/wrapped/preview-utils";
 import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 import type { WrappedData } from "@/lib/wrapped/types";
 
 export default function ShareImagePage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const shareImageRef = useRef<HTMLDivElement>(null);
   const [wrappedData, setWrappedData] = useState<WrappedData | null>(null);
@@ -26,14 +28,14 @@ export default function ShareImagePage() {
         setWrappedData(data);
       } catch (error) {
         console.error("Failed to parse wrapped data:", error);
-        toast.error("Failed to load wrapped data");
+        toast.error(t("notifications.error.wrappedLoadFailed"));
         router.push("/wrapped");
       }
     } else {
-      toast.error("No wrapped data found");
+      toast.error(t("notifications.error.wrappedNotFound"));
       router.push("/wrapped");
     }
-  }, [router]);
+  }, [router, t]);
 
   const handleDownload = async () => {
     if (!shareImageRef.current || !wrappedData) return;
@@ -81,11 +83,11 @@ export default function ShareImagePage() {
       URL.revokeObjectURL(url);
 
       toast.dismiss();
-      toast.success("Image downloaded successfully!");
+      toast.success(t("notifications.success.imageDownloaded"));
     } catch (error) {
       console.error("Failed to generate image:", error);
       toast.dismiss();
-      toast.error("Failed to generate image. Please try again.");
+      toast.error(t("notifications.error.imageGenerateFailed"));
     } finally {
       setIsGenerating(false);
     }

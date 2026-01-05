@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { formatDateForDatabase } from "@/lib/date-utils";
+import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import { userUpdateSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -408,6 +409,7 @@ interface AttendanceWithTents extends Tables<"attendances"> {
 }
 
 const UserList = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [attendances, setAttendances] = useState<AttendanceWithTents[]>([]);
   const [selectedUser, setSelectedUser] = useState<CombinedUser | null>(null);
@@ -438,7 +440,7 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast.error("Failed to load attendances");
+      toast.error(t("notifications.error.userLoadFailed"));
     } finally {
       setIsFetchingAttendances(false);
     }
@@ -471,7 +473,7 @@ const UserList = () => {
         await updateUserProfile(selectedUser!.id, profileData);
       }
       setSelectedUser(null);
-      toast.success("User updated successfully");
+      toast.success(t("notifications.success.userUpdated"));
       setIsUserDialogOpen(false);
       handleRefresh();
     } catch (error) {
@@ -483,14 +485,14 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast.error("Failed to update user");
+      toast.error(t("notifications.error.userUpdateFailed"));
     }
   }
 
   async function handleDeleteUser(userId: string) {
     try {
       await deleteUser(userId);
-      toast.success("User deleted successfully");
+      toast.success(t("notifications.success.userDeleted"));
       handleRefresh();
     } catch (error) {
       logger.error(
@@ -498,14 +500,14 @@ const UserList = () => {
         logger.clientComponent("UserList", { action: "deleteUser", userId }),
         error as Error,
       );
-      toast.error("Failed to delete user");
+      toast.error(t("notifications.error.userDeleteFailed"));
     }
   }
 
   async function handleDeleteAttendance(attendanceId: string) {
     try {
       await deleteAttendance(attendanceId);
-      toast.success("Attendance deleted successfully");
+      toast.success(t("notifications.success.attendanceDeleted"));
       // Refresh attendances list
       if (selectedUser) {
         const updatedAttendances = await getUserAttendances(selectedUser.id);
@@ -520,7 +522,7 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast.error("Failed to delete attendance");
+      toast.error(t("notifications.error.attendanceDeleteAdminFailed"));
     }
   }
 
@@ -535,7 +537,7 @@ const UserList = () => {
       });
       fetchAttendances(selectedUser.id);
       setSelectedAttendance(null);
-      toast.success("Attendance updated successfully");
+      toast.success(t("notifications.success.attendanceUpdated"));
       setIsAttendanceDialogOpen(false);
     } catch (error) {
       logger.error(
@@ -546,7 +548,7 @@ const UserList = () => {
         }),
         error as Error,
       );
-      toast.error("Failed to update attendance");
+      toast.error(t("notifications.error.attendanceUpdateAdminFailed"));
     }
   }
 

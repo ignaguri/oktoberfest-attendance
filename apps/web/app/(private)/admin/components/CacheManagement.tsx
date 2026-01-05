@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { regenerateWrappedCache } from "@/lib/actions/wrapped";
+import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const CacheManagement = () => {
+  const { t } = useTranslation();
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [userId, setUserId] = useState("");
   const [festivalId, setFestivalId] = useState("");
@@ -27,9 +29,9 @@ const CacheManagement = () => {
           registrations.map((registration) => registration.update()),
         );
 
-        toast.success("Service worker caches cleared successfully");
+        toast.success(t("notifications.success.swCacheCleared"));
       } else {
-        toast.error("Service worker or caches not supported");
+        toast.error(t("notifications.error.swNotSupported"));
       }
     } catch (error) {
       logger.error(
@@ -37,7 +39,7 @@ const CacheManagement = () => {
         logger.clientComponent("CacheManagement"),
         error as Error,
       );
-      toast.error("Failed to clear service worker caches");
+      toast.error(t("notifications.error.swClearFailed"));
     }
   };
 
@@ -56,7 +58,9 @@ const CacheManagement = () => {
         setUserId("");
         setFestivalId("");
       } else {
-        toast.error(result.error || "Failed to regenerate wrapped cache");
+        toast.error(
+          result.error || t("notifications.error.wrappedCacheRegenerateFailed"),
+        );
       }
     } catch (error) {
       logger.error(
@@ -64,7 +68,7 @@ const CacheManagement = () => {
         logger.clientComponent("CacheManagement"),
         error as Error,
       );
-      toast.error("Failed to regenerate wrapped cache");
+      toast.error(t("notifications.error.wrappedCacheRegenerateFailed"));
     } finally {
       setIsRegenerating(false);
     }

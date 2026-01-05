@@ -483,7 +483,10 @@
       "starting": "Starting...",
       "stopping": "Stopping...",
       "enableTooltip": "Start sharing your location with group members",
-      "disableTooltip": "Stop sharing your location"
+      "disableTooltip": "Stop sharing your location",
+      "enabled": "Location sharing enabled! Group members can now see your location.",
+      "trackingStarted": "Location tracking started! Enable location sharing for specific groups in your profile settings.",
+      "noGroupsEnabled": "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first."
     },
     "privacy": {
       "title": "Location Sharing Preferences",

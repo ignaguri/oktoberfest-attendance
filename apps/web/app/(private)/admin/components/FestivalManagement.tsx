@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/lib/i18n/client";
 import { format, parseISO } from "date-fns";
 import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -56,6 +57,7 @@ const initialFormData: FestivalFormData = {
 };
 
 export default function FestivalManagement() {
+  const { t } = useTranslation();
   const [festivals, setFestivals] = useState<Festival[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -73,7 +75,7 @@ export default function FestivalManagement() {
       const data = await fetchAllFestivals();
       setFestivals(data);
     } catch {
-      toast.error("Failed to load festivals");
+      toast.error(t("notifications.error.festivalLoadFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -87,10 +89,10 @@ export default function FestivalManagement() {
     try {
       if (editingFestival) {
         await updateFestival(editingFestival.id, formData);
-        toast.success("Festival updated successfully");
+        toast.success(t("notifications.success.festivalUpdated"));
       } else {
         await createFestival(formData);
-        toast.success("Festival created successfully");
+        toast.success(t("notifications.success.festivalCreated"));
       }
 
       setIsFormOpen(false);
@@ -98,9 +100,7 @@ export default function FestivalManagement() {
       setFormData(initialFormData);
       loadFestivals();
     } catch {
-      toast.error(
-        `Failed to ${editingFestival ? "update" : "create"} festival`,
-      );
+      toast.error(t("notifications.error.generic"));
     } finally {
       setIsSubmitting(false);
     }
@@ -135,10 +135,10 @@ export default function FestivalManagement() {
 
     try {
       await deleteFestival(festivalId);
-      toast.success("Festival deleted successfully");
+      toast.success(t("notifications.success.festivalDeleted"));
       loadFestivals();
     } catch {
-      toast.error("Failed to delete festival");
+      toast.error(t("notifications.error.festivalDeleteFailed"));
     }
   };
 

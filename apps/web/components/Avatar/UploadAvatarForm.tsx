@@ -3,6 +3,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n/client";
 import { avatarSchema } from "@/lib/schemas/uploads";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState, useRef } from "react";
@@ -25,6 +26,7 @@ export default function UploadAvatarForm({
   uid,
   onUpload,
 }: UploadAvatarFormProps) {
+  const { t } = useTranslation();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
@@ -48,12 +50,12 @@ export default function UploadAvatarForm({
     try {
       const url = await uploadAvatar(formData);
       onUpload?.(url);
-      toast.success("Picture uploaded successfully!");
+      toast.success(t("notifications.success.avatarUploaded"));
       reset();
       setPreviewUrl(null);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "An unknown error occurred",
+        error instanceof Error ? error.message : t("common.errors.generic"),
       );
     }
   };

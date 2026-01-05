@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -23,6 +24,7 @@ interface ImageInfo {
 }
 
 export function ImageConversion() {
+  const { t } = useTranslation();
   const [images, setImages] = useState<ImageInfo[]>([]);
   const [converting, setConverting] = useState<string | null>(null);
 
@@ -31,9 +33,9 @@ export function ImageConversion() {
       const imageList = await listNonWebPImages();
       setImages(imageList);
     } catch {
-      toast.error("Failed to fetch images. Please try again.");
+      toast.error(t("notifications.error.imageLoadFailed"));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchImages();
@@ -44,14 +46,14 @@ export function ImageConversion() {
     try {
       await convertAndUpdateImage(path);
       await fetchImages(); // Refresh the list
-      toast.success("Image converted successfully.");
+      toast.success(t("notifications.success.imageConverted"));
     } catch (error) {
       logger.error(
         "Error converting image",
         logger.clientComponent("ImageConversion", { path }),
         error as Error,
       );
-      toast.error("Failed to convert image. Please try again.");
+      toast.error(t("notifications.error.imageConvertFailed"));
     } finally {
       setConverting(null);
     }
