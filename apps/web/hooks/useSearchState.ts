@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, startTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  startTransition,
+  useRef,
+} from "react";
 
 export interface SearchState {
   search: string;
@@ -39,6 +45,9 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Track the last URL we set to prevent infinite loops
+  const lastUrlRef = useRef<string | null>(null);
 
   // Initialize state from URL or defaults
   const [state, setState] = useState<SearchState>(() => {
@@ -83,50 +92,45 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
   // Update URL when state changes
   useEffect(() => {
     if (syncWithUrl) {
-      const params = new URLSearchParams(searchParams);
+      const params = new URLSearchParams();
 
-      // Update search params
+      // Build params from state (not from current searchParams to avoid circular dependency)
       if (state.search) {
         params.set(`${urlParamPrefix}search`, state.search);
-      } else {
-        params.delete(`${urlParamPrefix}search`);
       }
 
       if (state.page > 1) {
         params.set(`${urlParamPrefix}page`, state.page.toString());
-      } else {
-        params.delete(`${urlParamPrefix}page`);
       }
 
       if (state.limit !== defaultLimit) {
         params.set(`${urlParamPrefix}limit`, state.limit.toString());
-      } else {
-        params.delete(`${urlParamPrefix}limit`);
       }
 
       if (state.sortBy !== defaultSortBy) {
         params.set(`${urlParamPrefix}sortBy`, state.sortBy);
-      } else {
-        params.delete(`${urlParamPrefix}sortBy`);
       }
 
       if (state.sortOrder !== defaultSortOrder) {
         params.set(`${urlParamPrefix}sortOrder`, state.sortOrder);
-      } else {
-        params.delete(`${urlParamPrefix}sortOrder`);
       }
 
       // Update filter params
       Object.entries(state.filters).forEach(([key, value]) => {
         if (value !== "" && value != null) {
           params.set(`${urlParamPrefix}filter_${key}`, String(value));
-        } else {
-          params.delete(`${urlParamPrefix}filter_${key}`);
         }
       });
 
-      const newUrl = `${window.location.pathname}?${params.toString()}`;
-      if (newUrl !== window.location.href) {
+      const paramsString = params.toString();
+      const newUrl = paramsString
+        ? `${window.location.pathname}?${paramsString}`
+        : window.location.pathname;
+
+      // Only update URL if it's different from what we last set
+      // This prevents infinite loops when router.replace triggers searchParams update
+      if (newUrl !== lastUrlRef.current) {
+        lastUrlRef.current = newUrl;
         router.replace(newUrl, { scroll: false });
       }
     }
@@ -137,7 +141,6 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     defaultLimit,
     defaultSortBy,
     defaultSortOrder,
-    searchParams,
     router,
   ]);
 

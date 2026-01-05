@@ -658,7 +658,8 @@ function CopyTentsDialog({
     } catch {
       toast.error(t("notifications.error.tentSourceLoadFailed"));
     }
-  }, [sourceFestivalId, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceFestivalId]);
 
   useEffect(() => {
     if (sourceFestivalId) {

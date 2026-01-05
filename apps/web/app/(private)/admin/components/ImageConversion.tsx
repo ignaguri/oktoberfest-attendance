@@ -35,7 +35,8 @@ export function ImageConversion() {
     } catch {
       toast.error(t("notifications.error.imageLoadFailed"));
     }
-  }, [t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchImages();

@@ -92,7 +92,8 @@ export function UserSearch({
         searchState.filters,
       );
     }
-  }, [searchResult, searchState.debouncedSearch, searchState.filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchResult?.totalCount, searchState.debouncedSearch]);
 
   const handleSort = useCallback(
     (sortBy: string) => {
