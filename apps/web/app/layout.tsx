@@ -119,8 +119,8 @@ export default async function RootLayout({
     <ViewTransitions>
       <html lang="en" data-version={APP_VERSION}>
         <body className="bg-slate-50">
-          <I18nProvider>
-            <DataProvider>
+          <DataProvider>
+            <I18nProvider>
               {isLoggedIn ? (
                 <FestivalProvider>
                   <NotificationProvider>
@@ -130,8 +130,8 @@ export default async function RootLayout({
               ) : (
                 <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
               )}
-            </DataProvider>
-          </I18nProvider>
+            </I18nProvider>
+          </DataProvider>
           <ServiceWorkerRegistration />
           <Toaster richColors closeButton />
           <SpeedInsights />

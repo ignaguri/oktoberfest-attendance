@@ -3,6 +3,14 @@ import { z } from "zod";
 export const profileSchema = z.object({
   fullname: z.string().optional(),
   username: z.string().min(4, "Required").trim(),
+  preferred_language: z
+    .string()
+    .nullable()
+    .refine(
+      (val) => val === null || ["en", "de", "es", "fr"].includes(val),
+      "Invalid language code",
+    )
+    .optional(),
 });
 
 export const uploadAvatarSchema = z.object({

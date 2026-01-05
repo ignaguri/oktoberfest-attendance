@@ -340,6 +340,20 @@
       "resetButton": "Reset Tutorial",
       "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page."
     },
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the app",
+      "autoDetect": "Auto-detect from browser",
+      "autoDetectCurrent": "Auto-detect (currently: {{language}})",
+      "languages": {
+        "en": "🇬🇧 English",
+        "de": "🇩🇪 Deutsch",
+        "es": "🇦🇷 Español",
+        "fr": "🇫🇷 Français"
+      },
+      "updateSuccess": "Language preference updated",
+      "updateError": "Failed to update language preference"
+    },
     "deleteAccount": {
       "title": "Delete Account",
       "warning": "Permanently delete your account and all associated data. This action cannot be undone.",

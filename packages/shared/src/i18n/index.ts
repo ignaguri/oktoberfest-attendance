@@ -36,6 +36,27 @@ export function initI18n(locale = "en") {
   return i18n;
 }
 
+/**
+ * Change the current language
+ */
+export function changeLanguage(locale: string) {
+  return i18n.changeLanguage(locale);
+}
+
+/**
+ * Get the current language code
+ */
+export function getCurrentLanguage(): string {
+  return i18n.language || "en";
+}
+
+/**
+ * Supported languages
+ * TODO: Add more languages when translations are available (de, es, fr)
+ */
+export const SUPPORTED_LANGUAGES = ["en"] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
 // Re-export react-i18next hooks and components
 export { useTranslation, Trans, I18nextProvider } from "react-i18next";
 export { i18n };

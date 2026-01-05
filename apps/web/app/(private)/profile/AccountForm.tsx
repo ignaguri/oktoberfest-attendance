@@ -1,6 +1,7 @@
 "use client";
 
 import Avatar from "@/components/Avatar/Avatar";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import { profileSchema } from "@/lib/schemas/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { changeLanguage } from "@prostcounter/shared/i18n";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -126,6 +128,32 @@ export default function AccountForm() {
       toast.success(t("profile.tutorial.resetSuccess"));
     } catch {
       toast.error(t("notifications.error.tutorialResetFailed"));
+    }
+  };
+
+  const handleLanguageChange = async (language: string | null) => {
+    try {
+      // Update the profile in the database
+      await updateProfileMutation({ preferred_language: language });
+
+      // Change the language immediately in i18n
+      if (language) {
+        await changeLanguage(language);
+      } else {
+        // Auto-detect and apply
+        const { detectBrowserLanguage } =
+          await import("@/lib/utils/detectLanguage");
+        const { SUPPORTED_LANGUAGES } =
+          await import("@prostcounter/shared/i18n");
+        const detected = detectBrowserLanguage([
+          ...SUPPORTED_LANGUAGES,
+        ] as string[]);
+        await changeLanguage(detected);
+      }
+
+      toast.success(t("profile.language.updateSuccess"));
+    } catch {
+      toast.error(t("profile.language.updateError"));
     }
   };
 
@@ -244,6 +272,15 @@ export default function AccountForm() {
       </div>
 
       <NotificationSettings />
+
+      {/* Language Settings */}
+      <div className="card">
+        <LanguageSelector
+          currentLanguage={profile.preferred_language}
+          onLanguageChange={handleLanguageChange}
+          disabled={isUpdating}
+        />
+      </div>
 
       {/* Location sharing disabled - requires migration from deprecated location_sharing_preferences
           table to new session-based model (location_sessions, location_session_members).
