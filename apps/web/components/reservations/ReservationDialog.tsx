@@ -12,6 +12,7 @@ import {
   useCreateReservation,
   useUpdateReservation,
 } from "@/hooks/useReservations";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   reservationSchema,
   type ReservationFormData,
@@ -30,6 +31,7 @@ interface ReservationDialogProps {
 }
 
 export function ReservationDialog({ festivalId }: ReservationDialogProps) {
+  const { t } = useTranslation();
   const { tents, isLoading: tentsLoading } = useTents(festivalId);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -125,7 +127,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
               visibleToGroups: data.visibleToGroups,
             },
           });
-          toast.success("Reservation updated");
+          toast.success(t("notifications.success.reservationUpdated"));
         } else {
           await createReservation({
             festivalId,
@@ -134,14 +136,21 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             reminderOffsetMinutes: data.reminderOffsetMinutes,
             visibleToGroups: data.visibleToGroups,
           });
-          toast.success("Reservation created");
+          toast.success(t("notifications.success.reservationCreated"));
         }
         onClose();
       } catch {
-        toast.error("Failed to save reservation");
+        toast.error(t("notifications.error.reservationSaveFailed"));
       }
     },
-    [festivalId, onClose, reservationId, createReservation, updateReservation],
+    [
+      festivalId,
+      onClose,
+      reservationId,
+      createReservation,
+      updateReservation,
+      t,
+    ],
   );
 
   return (
@@ -152,20 +161,24 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
           onClose();
         }
       }}
-      title={reservationId ? "Edit reservation" : "New reservation"}
-      description="Create or edit your tent reservation with date, time, and reminder preferences."
+      title={
+        reservationId
+          ? t("reservation.dialog.editTitle")
+          : t("reservation.dialog.createTitle")
+      }
+      description={t("reservation.dialog.description")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid gap-4 p-4 pb-6">
           <div className="grid gap-2">
-            <Label htmlFor="tent">Tent</Label>
+            <Label htmlFor="tent">{t("reservation.dialog.tent")}</Label>
             <SingleSelect
               value={tentId}
               options={tents.map((tent) => ({
                 title: tent.category,
                 options: tent.options,
               }))}
-              placeholder="Select your tent"
+              placeholder={t("reservation.dialog.selectTent")}
               onSelect={(option) => setValue("tentId", option.value)}
               disabled={tentsLoading || isMutating}
             />
@@ -174,11 +187,11 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="start">Date & Time</Label>
+            <Label htmlFor="start">{t("reservation.dialog.dateTime")}</Label>
             <DateTimePicker
               value={startAt}
               onChange={(date) => date && setValue("startAt", date)}
-              placeholder="Pick a date and time"
+              placeholder={t("reservation.dialog.pickDateTime")}
               disabled={isMutating}
               calendarClassName="[--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
             />
@@ -187,7 +200,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="reminder">Reminder</Label>
+            <Label htmlFor="reminder">{t("reservation.dialog.reminder")}</Label>
             <ReminderSelect
               value={reminderOffsetMinutes}
               onChange={(minutes) => setValue("reminderOffsetMinutes", minutes)}
@@ -200,7 +213,9 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Label htmlFor="visibleToGroups">Share with groups</Label>
+            <Label htmlFor="visibleToGroups">
+              {t("reservation.dialog.shareWithGroups")}
+            </Label>
             <Checkbox
               checked={visibleToGroups}
               onCheckedChange={(checked) =>
@@ -220,10 +235,12 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
             onClick={onClose}
             disabled={isMutating}
           >
-            Cancel
+            {t("reservation.dialog.cancel")}
           </Button>
           <Button type="submit" disabled={isMutating || tentsLoading}>
-            {reservationId ? "Save" : "Create"}
+            {reservationId
+              ? t("reservation.dialog.save")
+              : t("reservation.dialog.create")}
           </Button>
         </div>
       </form>
