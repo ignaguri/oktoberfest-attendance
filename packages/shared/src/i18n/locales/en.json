@@ -1,0 +1,798 @@
+{
+  "common": {
+    "buttons": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "confirm": "Confirm",
+      "retry": "Retry",
+      "loading": "Loading...",
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "signOut": "Sign Out",
+      "continue": "Continue",
+      "gotIt": "Got it",
+      "share": "Share",
+      "copy": "Copy",
+      "install": "Install"
+    },
+    "labels": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "description": "Description"
+    },
+    "status": {
+      "loading": "Loading...",
+      "offline": "You are offline",
+      "online": "Online",
+      "error": "An error occurred",
+      "success": "Success"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "notFound": "Not found",
+      "unauthorized": "Please sign in to continue",
+      "forbidden": "You don't have permission to do that",
+      "networkError": "Network error. Please check your connection."
+    },
+    "empty": {
+      "noResults": "No results found",
+      "noData": "No data available"
+    },
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} minute ago",
+      "minutesAgo_other": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hour ago",
+      "hoursAgo_other": "{{count}} hours ago",
+      "daysAgo": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago"
+    },
+    "menu": {
+      "attendance": "My Attendances",
+      "groups": "Groups",
+      "leaderboard": "Global Leaderboard",
+      "achievements": "Achievements",
+      "profile": "Profile Settings",
+      "map": "Festival Map",
+      "whatsNew": "See What's New",
+      "installApp": "Install App",
+      "changeFestival": "Change Festival",
+      "share": "Share App",
+      "signOut": "Sign Out",
+      "navigation": "Navigation",
+      "settingsTools": "Settings & Tools",
+      "actions": "Actions"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign In",
+      "subtitle": "Welcome back!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "jane@acme.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign In",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign Up.",
+      "orContinueWith": "or",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithFacebook": "Continue with Facebook",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "failed": "Sign in failed. Please try again.",
+        "providerFailed": "Failed to sign in with {{provider}}"
+      }
+    },
+    "signUp": {
+      "title": "Create Account",
+      "subtitle": "Join the festival fun!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "jane@acme.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign In.",
+      "orContinueWith": "Or continue with",
+      "accountCreated": "Account created",
+      "errors": {
+        "failed": "Sign up failed. Please try again.",
+        "emailInUse": "This email is already in use"
+      },
+      "success": {
+        "checkEmail": "Please check your email for verification."
+      }
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive reset instructions",
+      "emailLabel": "Email",
+      "emailPlaceholder": "jane@acme.com",
+      "submit": "Send Reset Instructions",
+      "backToSignIn": "Back to sign in",
+      "success": "Instructions sent. Check your email.",
+      "errors": {
+        "failed": "Failed to send reset instructions"
+      }
+    },
+    "updatePassword": {
+      "title": "Update Password",
+      "subtitle": "Enter your new password",
+      "passwordLabel": "New Password",
+      "passwordPlaceholder": "Enter new password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "submit": "Update Password",
+      "success": "Password updated successfully",
+      "errors": {
+        "failed": "Failed to update password"
+      }
+    }
+  },
+  "groups": {
+    "pageTitle": "Groups",
+    "yourGroups": "Your Groups:",
+    "noGroupsYet": "You are not a member of any group yet for this festival.",
+    "joinOrCreate": "Join or Create a Group",
+    "create": {
+      "title": "Create Group",
+      "nameLabel": "Group Name",
+      "namePlaceholder": "Enter group name",
+      "passwordLabel": "Group Password (optional)",
+      "passwordPlaceholder": "Enter password",
+      "winningCriteria": "Winning Criteria",
+      "submit": "Create Group",
+      "success": "Group created successfully!",
+      "errors": {
+        "failed": "Failed to create group"
+      }
+    },
+    "join": {
+      "title": "Join a Group",
+      "tokenLabel": "Invite Token",
+      "tokenPlaceholder": "Paste invite token",
+      "namePlaceholder": "Group Name",
+      "passwordPlaceholder": "Group Password",
+      "clickToJoin": "Click below to join <strong>{{groupName}}</strong>",
+      "joining": "Joining...",
+      "submit": "Join Group",
+      "success": "Successfully joined group!",
+      "errors": {
+        "failed": "Failed to join group",
+        "invalidToken": "Invalid invite token"
+      }
+    },
+    "settings": {
+      "title": "Group Settings",
+      "members": "Members",
+      "gallery": "Gallery",
+      "leaderboard": "Leaderboard",
+      "inviteLink": "Invite Link",
+      "copyLink": "Copy Link",
+      "linkCopied": "Link copied!",
+      "renewToken": "Regenerate Invite Link",
+      "renewTokenSuccess": "Invite link regenerated",
+      "leave": "Leave Group",
+      "confirmLeave": "Are you sure you want to leave this group?",
+      "leaveSuccess": "You have left the group",
+      "removeMember": "Remove Member",
+      "confirmRemove": "Are you sure you want to remove {{name}} from the group?",
+      "removeSuccess": "Member removed successfully"
+    },
+    "winningCriteria": {
+      "days_attended": "Most Days Attended",
+      "total_beers": "Most Beers Drank",
+      "avg_beers": "Best Average Beers per Day"
+    },
+    "gallery": {
+      "title": "Group Gallery",
+      "empty": "No photos yet",
+      "emptyDescription": "Upload photos from your attendance to see them here"
+    }
+  },
+  "attendance": {
+    "pageTitle": "My Attendances",
+    "addNew": "Add Attendance",
+    "beerCount": "{{count}} beer",
+    "beerCount_other": "{{count}} beers",
+    "daysAttended": "{{count}} day attended",
+    "daysAttended_other": "{{count}} days attended",
+    "totalSpent": "Total Spent",
+    "noAttendances": "No attendances recorded yet",
+    "noAttendancesDescription": "Start tracking your festival visits!",
+    "form": {
+      "dateLabel": "Date",
+      "datePlaceholder": "Select date",
+      "beerCountLabel": "Beer Count",
+      "tentLabel": "Tent",
+      "tentPlaceholder": "Select tent",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Optional notes",
+      "submit": "Save Attendance",
+      "update": "Update Attendance"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete this attendance?",
+      "success": "Attendance deleted",
+      "error": "Failed to delete attendance"
+    },
+    "errors": {
+      "invalidDate": "Please select a valid date",
+      "dateOutsideFestival": "Date must be within the festival dates"
+    }
+  },
+  "achievements": {
+    "pageTitle": "Achievements",
+    "totalPoints": "Total Points",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "unlockedOn": "Unlocked on {{date}}",
+    "progress": "{{current}} / {{target}}",
+    "categories": {
+      "attendance": "Attendance",
+      "social": "Social",
+      "explorer": "Explorer",
+      "veteran": "Veteran",
+      "special": "Special"
+    },
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    }
+  },
+  "leaderboard": {
+    "pageTitle": "Leaderboard",
+    "global": "Global",
+    "group": "Group",
+    "rank": "Rank",
+    "player": "Player",
+    "days": "Days",
+    "beers": "Beers",
+    "average": "Avg",
+    "yourPosition": "Your Position",
+    "notRanked": "Not ranked yet",
+    "viewAll": "View All",
+    "empty": "No rankings yet",
+    "emptyDescription": "Be the first to track your attendance!"
+  },
+  "profile": {
+    "pageTitle": "Profile Settings",
+    "sections": {
+      "account": "Account",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
+      "danger": "Danger Zone"
+    },
+    "account": {
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Choose a username",
+      "fullNameLabel": "Full Name",
+      "fullNamePlaceholder": "Your name",
+      "avatarLabel": "Profile Picture",
+      "changeAvatar": "Change Photo",
+      "removeAvatar": "Remove Photo",
+      "saveChanges": "Save Changes",
+      "success": "Profile updated successfully"
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "push": "Push Notifications",
+      "achievements": "Achievement Notifications",
+      "groupActivity": "Group Activity",
+      "reminders": "Reminders"
+    },
+    "privacy": {
+      "title": "Privacy Settings",
+      "locationSharing": "Location Sharing",
+      "profileVisibility": "Profile Visibility"
+    },
+    "deleteAccount": {
+      "title": "Delete Account",
+      "warning": "This action cannot be undone. All your data will be permanently deleted.",
+      "confirm": "Type DELETE to confirm",
+      "button": "Delete My Account"
+    }
+  },
+  "admin": {
+    "pageTitle": "Admin Panel",
+    "festivals": {
+      "title": "Festival Management",
+      "create": "Create Festival",
+      "edit": "Edit Festival",
+      "delete": "Delete Festival"
+    },
+    "tents": {
+      "title": "Tent Management",
+      "create": "Create Tent",
+      "edit": "Edit Tent",
+      "delete": "Delete Tent"
+    },
+    "users": {
+      "title": "User Management",
+      "search": "Search users",
+      "makeAdmin": "Make Admin",
+      "removeAdmin": "Remove Admin"
+    }
+  },
+  "tutorial": {
+    "welcome": {
+      "title": "Welcome to ProstCounter!",
+      "description": "Track your beer festival attendance and compete with friends!"
+    },
+    "step1": {
+      "title": "Track Your Visits",
+      "description": "Log each day you attend and how many beers you enjoy."
+    },
+    "step2": {
+      "title": "Join Groups",
+      "description": "Create or join groups to compete with friends."
+    },
+    "step3": {
+      "title": "Earn Achievements",
+      "description": "Unlock badges and climb the leaderboard!"
+    },
+    "step4": {
+      "title": "Share Photos",
+      "description": "Capture memories with your group gallery."
+    },
+    "skip": "Skip Tutorial",
+    "finish": "Get Started"
+  },
+  "wrapped": {
+    "title": "Your Year in Review",
+    "generating": "Generating your wrapped...",
+    "notReady": "Your wrapped isn't ready yet. Check back after the festival!",
+    "share": "Share My Wrapped",
+    "downloadImage": "Download Image",
+    "slides": {
+      "totalBeers": "Total Beers",
+      "daysAttended": "Days Attended",
+      "favoriteTent": "Favorite Tent",
+      "topAchievement": "Top Achievement",
+      "groupRank": "Group Rank"
+    },
+    "personality": {
+      "explorer": {
+        "title": "The Explorer",
+        "description": "You visited the most different tents!"
+      },
+      "champion": {
+        "title": "The Champion",
+        "description": "Top of the leaderboard!"
+      },
+      "loyalist": {
+        "title": "The Loyalist",
+        "description": "You have a favorite tent!"
+      },
+      "social": {
+        "title": "The Social Butterfly",
+        "description": "Always with friends!"
+      }
+    },
+    "numbers": {
+      "title": "Your festival in numbers",
+      "subtitle": "Here's what you did",
+      "totalBeers": "Total beers",
+      "daysAttended": "Days attended",
+      "avgPerDay": "Average per day",
+      "totalSpent": "Total spent"
+    }
+  },
+  "reservation": {
+    "dialog": {
+      "createTitle": "New reservation",
+      "editTitle": "Edit reservation",
+      "description": "Create or edit your tent reservation with date, time, and reminder preferences.",
+      "tent": "Tent",
+      "selectTent": "Select your tent",
+      "dateTime": "Date & Time",
+      "pickDateTime": "Pick a date and time",
+      "reminder": "Reminder",
+      "noReminder": "No reminder",
+      "minutesBefore": "{{count}} minutes before",
+      "hourBefore": "1 hour before",
+      "hoursBefore": "{{count}} hours before",
+      "shareWithGroups": "Share with groups",
+      "visibleToGroups": "Visible to your groups",
+      "cancel": "Cancel",
+      "create": "Create",
+      "save": "Save"
+    },
+    "checkIn": {
+      "prompt": "Are you there yet?",
+      "timeForReservation": "It's time for your reservation at {{tentName}}.",
+      "theTent": "the tent",
+      "unknownTent": "Unknown Tent",
+      "note": "Note",
+      "notYet": "Not yet",
+      "checkInNow": "Check in now",
+      "checking": "Checking in...",
+      "failedDescription": "Failed to check in. Please try again."
+    }
+  },
+  "location": {
+    "sharing": {
+      "title": "Location Sharing",
+      "enable": "Enable",
+      "disable": "Disable",
+      "sharing": "Sharing",
+      "notSharing": "Not Sharing",
+      "starting": "Starting...",
+      "stopping": "Stopping...",
+      "enableTooltip": "Start sharing your location with group members",
+      "disableTooltip": "Stop sharing your location"
+    },
+    "privacy": {
+      "title": "Location Sharing Preferences",
+      "description": "Control who can see your location during the festival",
+      "enableForGroup": "Enable location sharing for {{group}}",
+      "disableForGroup": "Disable location sharing for {{group}}"
+    }
+  },
+  "photo": {
+    "privacy": {
+      "title": "Photo Privacy Settings",
+      "globalSettings": "Global Settings",
+      "perGroupSettings": "Per-Group Settings",
+      "hideFromAll": "Hide photos from all groups",
+      "showToAll": "Show photos to all groups",
+      "hideFromGroup": "Hide photos from {{group}}",
+      "showToGroup": "Show photos to {{group}}",
+      "description": "Control who can see your photos in group galleries"
+    },
+    "visibility": {
+      "public": "Public",
+      "private": "Private",
+      "toggle": "Toggle visibility"
+    }
+  },
+  "notificationSettings": {
+    "title": "Notification Settings",
+    "preferences": "Preferences",
+    "reminders": "Reminders",
+    "achievementNotifications": "Achievement Notifications",
+    "groupNotifications": "Group Notifications",
+    "pushNotifications": "Push Notifications",
+    "enablePush": "Enable Push",
+    "description": {
+      "achievements": "Get notified when you unlock achievements",
+      "groups": "Get notifications from your groups (check-ins, achievements, etc.)",
+      "reminders": "Reservation reminders and check-in prompts",
+      "push": "Receive notifications even when the app is closed"
+    },
+    "status": {
+      "notSupported": "Not supported in this browser",
+      "blocked": "Blocked - Enable in browser settings"
+    },
+    "errors": {
+      "updateFailed": "Failed to update notification settings. Please try again.",
+      "pushFailed": "Failed to enable push notifications."
+    }
+  },
+  "calendar": {
+    "selectDate": "Select a date",
+    "clickToEdit": "Click on reservation to edit",
+    "addReservation": "Add reservation",
+    "addAttendance": "Add attendance",
+    "noEvents": "No events",
+    "dailyTotal": "Daily Total"
+  },
+  "home": {
+    "festivalOver": "Sadly, {{name}} is over. See you next time!",
+    "wrappedReady": {
+      "title": "Your Wrapped is ready!",
+      "subtitle": "See your personalized {{name}} story",
+      "viewButton": "View Your Wrapped",
+      "footer": "Your festival highlights, stats, and personality 🎉"
+    },
+    "latestActivities": "Latest activities",
+    "refreshFeed": "Refresh activity feed",
+    "completeProfile": "Complete Your Profile",
+    "profilePicture": "Profile picture",
+    "highlights": "Highlights",
+    "topGroups": "👑 You're in the top 3 of these groups:",
+    "stats": "🍻 Stats 📊",
+    "wentTimes": "You went {{count}} times",
+    "hadBeers": "You had {{count}} beers",
+    "spentOnBeers": "You've spent ~€{{amount}} on beers",
+    "globalLeaderboard": "🏆 Global Leaderboard",
+    "topPerformers": "Top {{count}} performers",
+    "yourGroups": "Your Groups:",
+    "festivalMap": "{{name}} Map",
+    "shareApp": "Share this app",
+    "whatCanIDo": "What can I do with Prost Counter?"
+  },
+  "search": {
+    "users": {
+      "placeholder": "Search users by name, username, or email...",
+      "superAdmin": "Super Admin",
+      "hasCompleteProfile": "Has Complete Profile",
+      "sortByName": "Sort by name",
+      "sortByCreated": "Sort by created",
+      "sortByBeers": "Sort by beers"
+    },
+    "groups": {
+      "placeholder": "Search groups by name or description...",
+      "hasMembers": "Has Members",
+      "sortByName": "Sort by name",
+      "sortByCreated": "Sort by created",
+      "sortByMembers": "Sort by members"
+    }
+  },
+  "festival": {
+    "selector": {
+      "title": "Select Festival",
+      "description": "Choose which festival you want to view and participate in.",
+      "currentFestival": "Current Festival",
+      "noFestival": "No festival selected"
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "active": "Active",
+      "ended": "Ended"
+    }
+  },
+  "install": {
+    "error": "Installation Error",
+    "instructions": "Install Instructions",
+    "cancelled": "Installation cancelled",
+    "success": "Success",
+    "successMessage": "The app has been installed on your device.",
+    "failed": "Installation failed"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": {
+      "invalid": "Please enter a valid email address",
+      "required": "Email is required"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords don't match",
+      "confirm": "Please confirm your password",
+      "adminHint": "Password must be at least 8 characters or leave blank to keep unchanged"
+    },
+    "username": {
+      "required": "Username is required",
+      "minLength": "Username must be at least {{min}} characters",
+      "maxLength": "Username must be {{max}} characters or less",
+      "invalid": "Username can only contain letters, numbers, and underscores"
+    },
+    "groupName": {
+      "required": "Group name is required",
+      "maxLength": "Group name must be {{max}} characters or less"
+    },
+    "groupPassword": {
+      "required": "Password is required"
+    },
+    "winningCriteria": {
+      "required": "Winning criteria is required"
+    },
+    "date": {
+      "required": "Please select a date",
+      "invalid": "Invalid date",
+      "festivalNotStarted": "Wrong date: Festival hasn't started yet",
+      "festivalEnded": "Wrong date: Sadly it's over"
+    },
+    "beerCount": {
+      "required": "Please enter the number of beers",
+      "min": "Beer count must be at least {{min}}",
+      "max": "That's a lot of beers! Are you sure?",
+      "negative": "Beer count cannot be negative",
+      "wholeNumber": "Must be a whole number",
+      "tentRequired": "Must select at least one tent if beer count is 0"
+    },
+    "photo": {
+      "required": "Select at least one photo",
+      "maxPhotos": "Maximum {{max}} pictures allowed"
+    },
+    "file": {
+      "tooLarge": "File is too large (max {{max}}MB)",
+      "invalidFormat": "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+      "required": "At least one picture is required",
+      "avatarTooLarge": "File size must be less than 5MB",
+      "avatarInvalidFormat": "File must be a JPEG, PNG, or WebP image"
+    },
+    "reservation": {
+      "tentRequired": "Please select a tent",
+      "dateTimeRequired": "Please select a date and time",
+      "reminderNegative": "Reminder offset cannot be negative"
+    },
+    "tent": {
+      "nameRequired": "Tent name is required",
+      "selected": "At least one tent must be selected"
+    },
+    "festival": {
+      "sourceRequired": "Source festival is required",
+      "targetRequired": "Target festival is required"
+    },
+    "price": {
+      "positive": "Price must be greater than 0",
+      "tooHigh": "Price seems too high"
+    }
+  },
+  "notifications": {
+    "success": {
+      "saved": "Changes saved successfully",
+      "deleted": "Deleted successfully",
+      "copied": "Copied to clipboard",
+      "shared": "Shared successfully",
+      "profileUpdated": "Profile updated successfully!",
+      "groupCreated": "Group created successfully!",
+      "groupUpdated": "Group updated successfully!",
+      "groupDeleted": "Group deleted successfully",
+      "joinedGroup": "Successfully joined the group!",
+      "leftGroup": "You have left the group",
+      "memberRemoved": "Member removed successfully!",
+      "tokenRegenerated": "Invite token regenerated!",
+      "linkCopied": "Invite link copied to clipboard!",
+      "attendanceUpdated": "Attendance updated successfully.",
+      "attendanceDeleted": "Attendance deleted successfully.",
+      "pictureUploaded": "Beer picture uploaded successfully!",
+      "picturesUploaded": "{{count}} beer picture(s) uploaded successfully!",
+      "avatarUploaded": "Picture uploaded successfully!",
+      "passwordUpdated": "Password updated successfully.",
+      "reservationCreated": "Reservation created",
+      "reservationUpdated": "Reservation updated",
+      "checkedIn": "Checked in!",
+      "settingsUpdated": "Settings Updated",
+      "pushEnabled": "Push Notifications Enabled",
+      "photoVisibilityUpdated": "Photo visibility updated",
+      "locationSharingDisabled": "Location sharing disabled.",
+      "imageDownloaded": "Image downloaded successfully!",
+      "imageConverted": "Image converted successfully.",
+      "swCacheCleared": "Service worker caches cleared successfully",
+      "festivalCreated": "Festival created successfully",
+      "festivalUpdated": "Festival updated successfully",
+      "festivalDeleted": "Festival deleted successfully",
+      "tentCreated": "Tent created successfully",
+      "tentAddedToFestival": "Tent added to festival",
+      "tentsAddedToFestival": "Added {{count}} tent(s) to festival",
+      "tentRemovedFromFestival": "Tent removed from festival",
+      "priceUpdated": "Price updated successfully",
+      "tentsCopied": "Copied {{count}} tent(s) successfully",
+      "userUpdated": "User updated successfully",
+      "userDeleted": "User deleted successfully"
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again.",
+      "network": "Network error. Please check your connection.",
+      "saveFailed": "Failed to save changes",
+      "deleteFailed": "Failed to delete",
+      "profileUpdateFailed": "Failed to update profile. Please try again.",
+      "tutorialResetFailed": "Failed to reset tutorial. Please try again.",
+      "attendanceLoadFailed": "Failed to fetch attendance data. Please try again.",
+      "attendanceUpdateFailed": "Failed to update attendance. Please try again.",
+      "attendanceDeleteFailed": "Failed to delete attendance. Please try again.",
+      "leaderboardLoadFailed": "Failed to load winning criteria. Please refresh the page.",
+      "leaderboardFetchFailed": "Failed to fetch leaderboard data. Please try again.",
+      "groupNotFound": "Group not found. Please check the group name.",
+      "invalidGroup": "Invalid group.",
+      "noFestivalSelected": "No festival selected. Please select a festival.",
+      "reservationSaveFailed": "Failed to save reservation",
+      "reservationNotFound": "Reservation not found or already processed.",
+      "checkInFailed": "Check-in failed",
+      "signUpFailed": "Sign up failed.",
+      "resetPasswordFailed": "Failed to send reset instructions",
+      "shareFailed": "Share failed",
+      "copyFailed": "Failed to copy to clipboard",
+      "qrError": "Failed to generate QR code",
+      "permissionDenied": "Permission Denied",
+      "geolocationNotSupported": "Geolocation is not supported by this browser",
+      "locationUnavailable": "Location information is unavailable.",
+      "locationTimeout": "Location request timed out. Please try again.",
+      "imageLoadFailed": "Failed to fetch images. Please try again.",
+      "imageConvertFailed": "Failed to convert image. Please try again.",
+      "imageGenerateFailed": "Failed to generate image. Please try again.",
+      "wrappedLoadFailed": "Failed to load wrapped data",
+      "wrappedNotFound": "No wrapped data found",
+      "wrappedCacheRegenerateFailed": "Failed to regenerate wrapped cache",
+      "festivalLoadFailed": "Failed to load festivals",
+      "festivalDeleteFailed": "Failed to delete festival",
+      "tentLoadFailed": "Failed to load tent data",
+      "tentSourceLoadFailed": "Failed to load source tents",
+      "invalidPrice": "Please enter a valid price between 0 and 50",
+      "groupLoadFailed": "Failed to load group data",
+      "tokenRegenFailed": "Error regenerating token",
+      "groupUpdateFailed": "Error updating group",
+      "groupDeleteFailed": "Failed to delete group",
+      "memberRemoveFailed": "Error removing member",
+      "userLoadFailed": "Failed to load attendances",
+      "userUpdateFailed": "Failed to update user",
+      "userDeleteFailed": "Failed to delete user",
+      "attendanceUpdateAdminFailed": "Failed to update attendance",
+      "attendanceDeleteAdminFailed": "Failed to delete attendance",
+      "swNotSupported": "Service worker or caches not supported",
+      "swClearFailed": "Failed to clear service worker caches"
+    },
+    "info": {
+      "loading": "Loading...",
+      "processing": "Processing...",
+      "installInstructions": "Install Instructions",
+      "installCancelled": "Installation cancelled",
+      "newVersionAvailable": "New Version Available! 🚀"
+    },
+    "descriptions": {
+      "settingsUpdated": "Your notification preferences have been saved.",
+      "pushEnabled": "You will now receive push notifications.",
+      "permissionDenied": "Please enable notifications in your browser settings.",
+      "checkYourEmail": "Please check your email for further instructions.",
+      "copySuccess": "The link has been copied to your clipboard.",
+      "tokenRegenerated": "Share the new link with others.",
+      "checkedIn": "Enjoy your visit!",
+      "installComplete": "The app has been installed on your device.",
+      "photoVisibilityPublic": "Your photo is now visible to group members.",
+      "photoVisibilityPrivate": "Your photo is now private.",
+      "newVersionRefresh": "Click to refresh and get the latest features."
+    }
+  },
+  "apiErrors": {
+    "INTERNAL_ERROR": "An internal error occurred. Please try again.",
+    "VALIDATION_ERROR": "Please check your input and try again.",
+    "UNAUTHORIZED": "Please sign in to continue.",
+    "FORBIDDEN": "You don't have permission to do that.",
+    "NOT_FOUND": "The requested resource was not found.",
+    "CONFLICT": "A conflict occurred. Please refresh and try again.",
+    "DATABASE_ERROR": "A database error occurred. Please try again.",
+    "INVALID_CREDENTIALS": "Invalid email or password.",
+    "SESSION_EXPIRED": "Your session has expired. Please sign in again.",
+    "EMAIL_NOT_VERIFIED": "Please verify your email address.",
+    "GROUP_NOT_FOUND": "Group not found.",
+    "NOT_GROUP_MEMBER": "You are not a member of this group.",
+    "NOT_GROUP_CREATOR": "Only the group creator can do this.",
+    "ALREADY_GROUP_MEMBER": "You are already a member of this group.",
+    "INVALID_INVITE_TOKEN": "Invalid invite token.",
+    "CANNOT_REMOVE_SELF": "You cannot remove yourself. Use leave group instead.",
+    "USER_NOT_GROUP_MEMBER": "User is not a member of this group.",
+    "ATTENDANCE_NOT_FOUND": "Attendance record not found.",
+    "DUPLICATE_ATTENDANCE": "You already have an attendance for this date.",
+    "INVALID_DATE": "Invalid date.",
+    "INVALID_DATE_FORMAT": "Date must be in YYYY-MM-DD format.",
+    "DATE_OUTSIDE_FESTIVAL": "Date must be within the festival dates.",
+    "PRICE_BELOW_BASE": "Price paid cannot be less than base price.",
+    "FESTIVAL_NOT_FOUND": "Festival not found.",
+    "NO_ACTIVE_FESTIVAL": "No active festival found.",
+    "TENT_NOT_FOUND": "Tent not found.",
+    "RESERVATION_NOT_FOUND": "Reservation not found.",
+    "RESERVATION_ALREADY_CHECKED_IN": "You have already checked in.",
+    "RESERVATION_CANCELLED": "This reservation has been cancelled.",
+    "RESERVATION_START_IN_PAST": "Reservation start time must be in the future.",
+    "RESERVATION_END_BEFORE_START": "End time must be after start time.",
+    "PHOTO_NOT_FOUND": "Photo not found.",
+    "PHOTO_UPLOAD_FAILED": "Failed to upload photo.",
+    "INVALID_FILE_TYPE": "Invalid file type.",
+    "FILE_TOO_LARGE": "File size exceeds maximum limit.",
+    "FILE_NAME_TOO_LONG": "File name too long (max 255 characters).",
+    "CAPTION_TOO_LONG": "Caption too long (max 500 characters).",
+    "ACHIEVEMENT_NOT_FOUND": "Achievement not found.",
+    "LOCATION_SESSION_NOT_FOUND": "Location session not found.",
+    "LOCATION_SESSION_EXPIRED": "Location session has expired.",
+    "LOCATION_SESSION_ALREADY_ACTIVE": "You already have an active location session for this festival.",
+    "INVALID_DURATION": "Duration must be between 5 and 480 minutes.",
+    "INVALID_COORDINATES": "Invalid latitude or longitude.",
+    "INVALID_RADIUS": "Radius must be between 100 and 5000 meters.",
+    "INVALID_PAGINATION": "Invalid pagination parameters.",
+    "PROFILE_NOT_FOUND": "Profile not found.",
+    "USERNAME_TAKEN": "This username is already taken.",
+    "WRAPPED_NOT_FOUND": "Wrapped data not found.",
+    "WRAPPED_NOT_READY": "Your wrapped isn't ready yet."
+  }
+}
