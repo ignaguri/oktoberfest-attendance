@@ -1,3 +1,5 @@
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import type { IGroupRepository } from "../repositories/interfaces";
 import type {
   Group,
@@ -45,13 +47,13 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify user is a member
     const isMember = await this.groupRepo.isMember(groupId, userId);
     if (!isMember) {
-      throw new ForbiddenError("You are not a member of this group");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_MEMBER);
     }
 
     return group;
@@ -69,12 +71,12 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // If invite token provided, verify it matches
     if (inviteToken && group.inviteToken !== inviteToken) {
-      throw new ForbiddenError("Invalid invite token");
+      throw new ForbiddenError(ErrorCodes.INVALID_INVITE_TOKEN);
     }
 
     // Add member (will throw if already a member)
@@ -89,13 +91,13 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify user is a member
     const isMember = await this.groupRepo.isMember(groupId, userId);
     if (!isMember) {
-      throw new ForbiddenError("You are not a member of this group");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_MEMBER);
     }
 
     // Remove member
@@ -114,13 +116,13 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify user is the creator
     const isCreator = await this.groupRepo.isCreator(groupId, userId);
     if (!isCreator) {
-      throw new ForbiddenError("Only the group creator can update settings");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
     }
 
     return await this.groupRepo.update(groupId, data);
@@ -134,13 +136,13 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify user is a member
     const isMember = await this.groupRepo.isMember(groupId, userId);
     if (!isMember) {
-      throw new ForbiddenError("You are not a member of this group");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_MEMBER);
     }
 
     return await this.groupRepo.getMembers(groupId);
@@ -158,26 +160,24 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify requester is the creator
     const isCreator = await this.groupRepo.isCreator(groupId, requesterId);
     if (!isCreator) {
-      throw new ForbiddenError("Only the group creator can remove members");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
     }
 
     // Cannot remove the creator
     if (targetUserId === requesterId) {
-      throw new ForbiddenError(
-        "Cannot remove yourself. Use leave group instead.",
-      );
+      throw new ForbiddenError(ErrorCodes.CANNOT_REMOVE_SELF);
     }
 
     // Verify target is a member
     const isMember = await this.groupRepo.isMember(groupId, targetUserId);
     if (!isMember) {
-      throw new NotFoundError("User is not a member of this group");
+      throw new NotFoundError(ErrorCodes.USER_NOT_GROUP_MEMBER);
     }
 
     await this.groupRepo.removeMember(groupId, targetUserId);
@@ -191,13 +191,13 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify user is the creator
     const isCreator = await this.groupRepo.isCreator(groupId, userId);
     if (!isCreator) {
-      throw new ForbiddenError("Only the group creator can renew the token");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
     }
 
     return await this.groupRepo.renewInviteToken(groupId);
@@ -214,13 +214,13 @@ export class GroupService {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found");
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     // Verify user is a member
     const isMember = await this.groupRepo.isMember(groupId, userId);
     if (!isMember) {
-      throw new ForbiddenError("You are not a member of this group");
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_MEMBER);
     }
 
     return await this.groupRepo.getGallery(groupId);
@@ -234,7 +234,7 @@ export class GroupService {
     const group = await this.groupRepo.findByInviteToken(inviteToken);
 
     if (!group) {
-      throw new NotFoundError("Invalid invite token");
+      throw new NotFoundError(ErrorCodes.INVALID_INVITE_TOKEN);
     }
 
     // Add member (will throw if already a member)

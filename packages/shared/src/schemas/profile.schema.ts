@@ -17,6 +17,7 @@ export const ProfileShortSchema = z.object({
   full_name: z.string().nullable(),
   username: z.string().nullable(),
   avatar_url: z.string().nullable(),
+  preferred_language: z.string().nullable(),
   email: z.string().nullable().optional(),
 });
 
@@ -26,6 +27,14 @@ export type ProfileShort = z.infer<typeof ProfileShortSchema>;
 export const UpdateProfileSchema = z.object({
   username: z.string().min(3).max(30).optional(),
   full_name: z.string().min(1).max(100).optional(),
+  preferred_language: z
+    .string()
+    .nullable()
+    .refine(
+      (val) => val === null || ["en"].includes(val),
+      "Invalid language code",
+    )
+    .optional(),
 });
 
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;

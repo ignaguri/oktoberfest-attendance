@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   flexRender,
   getCoreRowModel,
@@ -37,17 +38,17 @@ type LeaderboardEntry = {
   groupCount?: number;
 };
 
-const getDisplayName = ({
-  username,
-  fullName,
-}: Pick<LeaderboardEntry, "fullName" | "username">) => {
+const getDisplayName = (
+  { username, fullName }: Pick<LeaderboardEntry, "fullName" | "username">,
+  noNameLabel: string,
+) => {
   if (username) {
     return username;
   }
   if (fullName) {
     return fullName;
   }
-  return "No name";
+  return noNameLabel;
 };
 
 export const Leaderboard = ({
@@ -59,18 +60,19 @@ export const Leaderboard = ({
   winningCriteria: WinningCriteria;
   showGroupCount?: boolean;
 }) => {
+  const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const columns: ColumnDef<LeaderboardEntry>[] = [
     {
       accessorKey: "name",
-      header: "Name",
+      header: t("common.labels.name"),
       cell: ({ row }) => {
         const entry = row.original;
 
         return (
           <ProfilePreview
-            username={entry.username || "Unknown"}
+            username={entry.username || t("common.empty.noData")}
             fullName={entry.fullName}
             avatarUrl={entry.avatarUrl}
           >
@@ -84,7 +86,7 @@ export const Leaderboard = ({
                 }}
               />
               <span className="font-medium line-clamp-2">
-                {getDisplayName(entry)}
+                {getDisplayName(entry, t("leaderboard.noName"))}
               </span>
             </div>
           </ProfilePreview>
@@ -101,7 +103,7 @@ export const Leaderboard = ({
               {winningCriteria === "days_attended" && (
                 <Crown className="text-yellow-500" size={16} />
               )}
-              <span>Days</span>
+              <span>{t("leaderboard.days")}</span>
             </div>
           }
         />
@@ -117,7 +119,7 @@ export const Leaderboard = ({
               {winningCriteria === "total_beers" && (
                 <Crown className="text-yellow-500" size={16} />
               )}
-              <span>Liters</span>
+              <span>{t("leaderboard.beers")}</span>
             </div>
           }
         />
@@ -134,7 +136,7 @@ export const Leaderboard = ({
               {winningCriteria === "avg_beers" && (
                 <Crown className="text-yellow-500" size={16} />
               )}
-              <span>Avg.</span>
+              <span>{t("leaderboard.average")}</span>
             </div>
           }
         />
@@ -146,7 +148,7 @@ export const Leaderboard = ({
   if (showGroupCount) {
     columns.push({
       accessorKey: "groupCount",
-      header: "Groups",
+      header: t("leaderboard.groups"),
     });
   }
 
@@ -200,7 +202,7 @@ export const Leaderboard = ({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                {t("common.empty.noResults")}
               </TableCell>
             </TableRow>
           )}

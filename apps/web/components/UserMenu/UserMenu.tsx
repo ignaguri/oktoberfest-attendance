@@ -21,19 +21,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  menuItems,
-  menuSections,
+  getMenuItems,
+  getMenuSections,
   getMenuItemsBySection,
 } from "@/components/UserMenu/menuConfig";
 import { WhatsNew } from "@/components/WhatsNew";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useInstallPWA } from "@/hooks/use-install-pwa";
 import { getFestivalStatus } from "@/lib/festivalConstants";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { ChevronDown, CalendarDays } from "lucide-react";
 import { Link } from "next-view-transitions";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import type { BadgeVariants } from "@/components/ui/badge";
 import type { FestivalStatus, Festival as FestivalType } from "@/lib/types";
@@ -70,6 +71,7 @@ const getFestivalStatusBadgeProps = (
 };
 
 export function UserMenu({ profileData, className }: UserMenuProps) {
+  const { t } = useTranslation();
   const { currentFestival, festivals, setCurrentFestival, isLoading } =
     useFestival();
   const { canInstall, installPWA } = useInstallPWA();
@@ -81,6 +83,10 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   const handleSignOut = async () => {
     await logout();
   };
+
+  // Memoize menu items and sections to avoid recalculating on every render
+  const menuItems = useMemo(() => getMenuItems(t), [t]);
+  const menuSections = useMemo(() => getMenuSections(t), [t]);
 
   const getMenuItemsWithHandlers = () => {
     return menuItems.map((item) => {
@@ -158,7 +164,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
       <>
         <DropdownMenuLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <CalendarDays className="size-3" />
-          Current Festival
+          {t("festival.selector.currentFestival")}
         </DropdownMenuLabel>
         <div className="px-2">
           <div
@@ -178,7 +184,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                   variant={variant as BadgeVariants}
                   className="text-xs capitalize w-fit"
                 >
-                  {status}
+                  {t(`festival.status.${status}`)}
                 </Badge>
                 <div className="text-xs text-muted-foreground">
                   {format(parseISO(currentFestival.start_date), "MMM d")} -{" "}
@@ -201,9 +207,9 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
       <Dialog open={isFestivalModalOpen} onOpenChange={setIsFestivalModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Select Festival</DialogTitle>
+            <DialogTitle>{t("festival.selector.title")}</DialogTitle>
             <DialogDescription>
-              Choose which festival you want to view and participate in.
+              {t("festival.selector.description")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 max-h-96 overflow-y-auto">
@@ -245,7 +251,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{festival.name}</span>
                         <Badge className="capitalize" variant={variant}>
-                          {status}
+                          {t(`festival.status.${status}`)}
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-600">
@@ -311,7 +317,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                 {profileData.full_name || profileData.username || "User"}
               </span>
               <span className="text-xs text-gray-300">
-                {currentFestival?.name || "No festival selected"}
+                {currentFestival?.name || t("festival.selector.noFestival")}
               </span>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-300" />
@@ -328,7 +334,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
 
           {/* Render each section */}
           {menuSections.map((section) => {
-            const sectionItems = getMenuItemsBySection(section.id);
+            const sectionItems = getMenuItemsBySection(t, section.id);
             const itemsWithHandlers = sectionItems.map(
               (item) =>
                 menuItemsWithHandlers.find(

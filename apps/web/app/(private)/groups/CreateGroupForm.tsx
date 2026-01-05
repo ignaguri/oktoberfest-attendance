@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useCreateGroup } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { createGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 import type { CreateGroupFormData } from "@/lib/schemas/groups";
 
 export const CreateGroupForm = () => {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const router = useTransitionRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +32,7 @@ export const CreateGroupForm = () => {
 
   const onSubmit = async (data: CreateGroupFormData) => {
     if (!currentFestival) {
-      toast.error("No festival selected. Please select a festival.");
+      toast.error(t("notifications.error.noFestivalSelected"));
       return;
     }
 
@@ -41,12 +43,10 @@ export const CreateGroupForm = () => {
       });
       if (groupId) {
         router.push(`/group-settings/${groupId}`);
-        toast.success("Group created successfully!");
+        toast.success(t("notifications.success.groupCreated"));
       }
     } catch {
-      toast.error(
-        "There was an error creating the group. Maybe try a different name?",
-      );
+      toast.error(t("groups.create.errors.failed"));
     }
   };
 
@@ -55,10 +55,10 @@ export const CreateGroupForm = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-2 flex flex-col gap-2"
     >
-      <h3 className="text-xl font-semibold">Create a New Group</h3>
+      <h3 className="text-xl font-semibold">{t("groups.create.title")}</h3>
       <Input
         type="text"
-        placeholder="Group Name"
+        placeholder={t("groups.create.namePlaceholder")}
         errorMsg={errors.groupName?.message}
         autoComplete="new-password"
         {...register("groupName")}
@@ -66,7 +66,7 @@ export const CreateGroupForm = () => {
 
       <Input
         type={showPassword ? "text" : "password"}
-        placeholder="Group Password"
+        placeholder={t("groups.create.passwordPlaceholder")}
         errorMsg={errors.password?.message}
         autoComplete="new-password"
         rightElement={
@@ -88,7 +88,7 @@ export const CreateGroupForm = () => {
         className="w-fit self-center"
         disabled={isCreating}
       >
-        {isCreating ? "Creating..." : "Create Group"}
+        {isCreating ? t("common.status.loading") : t("groups.create.submit")}
       </Button>
     </form>
   );

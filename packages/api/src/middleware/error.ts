@@ -1,59 +1,98 @@
+import {
+  ErrorCodes,
+  isErrorCode,
+  type ErrorCode,
+} from "@prostcounter/shared/errors";
 import { HTTPException } from "hono/http-exception";
 
 import type { Context } from "hono";
 
 export class ApiError extends Error {
+  public code: ErrorCode;
+
   constructor(
     public statusCode: number,
-    message: string,
-    public code?: string,
+    codeOrMessage: ErrorCode | string,
+    message?: string,
   ) {
-    super(message);
+    // If codeOrMessage is a valid ErrorCode, use it as code
+    // Otherwise, use the default code and codeOrMessage as message
+    if (isErrorCode(codeOrMessage)) {
+      super(message || codeOrMessage);
+      this.code = codeOrMessage;
+    } else {
+      super(codeOrMessage);
+      this.code = ErrorCodes.INTERNAL_ERROR;
+    }
     this.name = "ApiError";
   }
 }
 
 export class ValidationError extends ApiError {
   constructor(
-    message: string,
+    codeOrMessage: ErrorCode | string = ErrorCodes.VALIDATION_ERROR,
     public errors?: unknown,
   ) {
-    super(400, message, "VALIDATION_ERROR");
+    if (isErrorCode(codeOrMessage)) {
+      super(400, codeOrMessage);
+    } else {
+      super(400, ErrorCodes.VALIDATION_ERROR, codeOrMessage);
+    }
     this.name = "ValidationError";
   }
 }
 
 export class UnauthorizedError extends ApiError {
-  constructor(message = "Unauthorized") {
-    super(401, message, "UNAUTHORIZED");
+  constructor(codeOrMessage: ErrorCode | string = ErrorCodes.UNAUTHORIZED) {
+    if (isErrorCode(codeOrMessage)) {
+      super(401, codeOrMessage);
+    } else {
+      super(401, ErrorCodes.UNAUTHORIZED, codeOrMessage);
+    }
     this.name = "UnauthorizedError";
   }
 }
 
 export class ForbiddenError extends ApiError {
-  constructor(message = "Forbidden") {
-    super(403, message, "FORBIDDEN");
+  constructor(codeOrMessage: ErrorCode | string = ErrorCodes.FORBIDDEN) {
+    if (isErrorCode(codeOrMessage)) {
+      super(403, codeOrMessage);
+    } else {
+      super(403, ErrorCodes.FORBIDDEN, codeOrMessage);
+    }
     this.name = "ForbiddenError";
   }
 }
 
 export class NotFoundError extends ApiError {
-  constructor(message = "Resource not found") {
-    super(404, message, "NOT_FOUND");
+  constructor(codeOrMessage: ErrorCode | string = ErrorCodes.NOT_FOUND) {
+    if (isErrorCode(codeOrMessage)) {
+      super(404, codeOrMessage);
+    } else {
+      super(404, ErrorCodes.NOT_FOUND, codeOrMessage);
+    }
     this.name = "NotFoundError";
   }
 }
 
 export class ConflictError extends ApiError {
-  constructor(message: string) {
-    super(409, message, "CONFLICT");
+  constructor(codeOrMessage: ErrorCode | string = ErrorCodes.CONFLICT) {
+    if (isErrorCode(codeOrMessage)) {
+      super(409, codeOrMessage);
+    } else {
+      super(409, ErrorCodes.CONFLICT, codeOrMessage);
+    }
     this.name = "ConflictError";
   }
 }
 
 export class DatabaseError extends ApiError {
-  constructor(message: string) {
-    super(500, message, "DATABASE_ERROR");
+  constructor(codeOrMessage: ErrorCode | string = ErrorCodes.DATABASE_ERROR) {
+    if (isErrorCode(codeOrMessage)) {
+      super(500, codeOrMessage);
+    } else {
+      super(500, ErrorCodes.DATABASE_ERROR, codeOrMessage);
+    }
     this.name = "DatabaseError";
   }
 }

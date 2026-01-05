@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalDates } from "@/lib/festivalConstants";
+import { useTranslation } from "@/lib/i18n/client";
 import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
 import {
   addPersonalAttendance,
@@ -45,6 +46,7 @@ export default function DetailedAttendanceForm({
   onAttendanceUpdate,
   selectedDate,
 }: DetailedAttendanceFormProps) {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const [existingAttendance, setExistingAttendance] =
     useState<AttendanceByDate | null>(null);
@@ -91,10 +93,10 @@ export default function DetailedAttendanceForm({
           setExistingAttendance(attendanceData as AttendanceByDate);
         });
       } catch {
-        toast.error("Failed to fetch attendance data. Please try again.");
+        toast.error(t("notifications.error.attendanceLoadFailed"));
       }
     },
-    [currentFestival],
+    [currentFestival, t],
   );
 
   useEffect(() => {
@@ -138,11 +140,11 @@ export default function DetailedAttendanceForm({
   const onSubmit = async (data: DetailedAttendanceFormData) => {
     try {
       await addPersonalAttendance({ ...data, festivalId: currentFestival!.id });
-      toast.success("Attendance updated successfully.");
+      toast.success(t("notifications.success.attendanceUpdated"));
       await fetchAttendanceForDate(data.date);
       onAttendanceUpdate();
     } catch {
-      toast.error("Failed to update attendance. Please try again.");
+      toast.error(t("notifications.error.attendanceUpdateFailed"));
     }
   };
 
@@ -165,7 +167,7 @@ export default function DetailedAttendanceForm({
     return (
       <Card>
         <CardContent className="text-center py-8">
-          <p>Loading festival data...</p>
+          <p>{t("common.status.loading")}</p>
         </CardContent>
       </Card>
     );
@@ -175,12 +177,12 @@ export default function DetailedAttendanceForm({
     <Card>
       <CardHeader>
         <CardTitle className="text-center">
-          Register or update your attendance
+          {t("attendance.registerOrUpdate")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-          <Label htmlFor="date">When did you visit the Wiesn?</Label>
+          <Label htmlFor="date">{t("attendance.whenDidYouVisit")}</Label>
           <Controller
             name="date"
             control={control}
@@ -204,7 +206,7 @@ export default function DetailedAttendanceForm({
           />
           {errors.date && <span className="error">{errors.date.message}</span>}
 
-          <Label htmlFor="amount">How many 🍻 Maß did you have?</Label>
+          <Label htmlFor="amount">{t("attendance.howManyBeers")}</Label>
           <Controller
             name="amount"
             control={control}
@@ -214,7 +216,7 @@ export default function DetailedAttendanceForm({
                 onValueChange={(value) => field.onChange(parseInt(value))}
               >
                 <SelectTrigger id="amount" className="w-auto self-center">
-                  <SelectValue placeholder="Select amount" />
+                  <SelectValue placeholder={t("attendance.selectAmount")} />
                 </SelectTrigger>
                 <SelectContent>
                   {[...Array(10)].map((_, i) => (
@@ -232,7 +234,7 @@ export default function DetailedAttendanceForm({
             </span>
           )}
 
-          <Label htmlFor="tents">Which tents did you visit?</Label>
+          <Label htmlFor="tents">{t("attendance.whichTents")}</Label>
           <Controller
             name="tents"
             control={control}
@@ -252,7 +254,9 @@ export default function DetailedAttendanceForm({
             type="submit"
             disabled={isSubmitting}
           >
-            {existingAttendance ? "Update" : "Submit"}
+            {existingAttendance
+              ? t("attendance.form.update")
+              : t("attendance.form.submit")}
           </Button>
         </form>
 

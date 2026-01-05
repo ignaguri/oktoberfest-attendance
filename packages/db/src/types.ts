@@ -216,6 +216,20 @@ export type Database = {
             referencedRelation: "attendances"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "beer_pictures_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "beer_pictures_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       consumptions: {
@@ -669,6 +683,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_super_admin: boolean | null
+          preferred_language: string | null
           tutorial_completed: boolean | null
           tutorial_completed_at: string | null
           updated_at: string | null
@@ -680,6 +695,7 @@ export type Database = {
           full_name?: string | null
           id: string
           is_super_admin?: boolean | null
+          preferred_language?: string | null
           tutorial_completed?: boolean | null
           tutorial_completed_at?: string | null
           updated_at?: string | null
@@ -691,6 +707,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_super_admin?: boolean | null
+          preferred_language?: string | null
           tutorial_completed?: boolean | null
           tutorial_completed_at?: string | null
           updated_at?: string | null

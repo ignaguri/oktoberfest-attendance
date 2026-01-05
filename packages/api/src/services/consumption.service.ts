@@ -1,3 +1,5 @@
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import type {
   IConsumptionRepository,
   IAttendanceRepository,
@@ -38,7 +40,7 @@ export class ConsumptionService {
 
     // Validate date format
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      throw new ValidationError("Date must be in YYYY-MM-DD format");
+      throw new ValidationError(ErrorCodes.INVALID_DATE_FORMAT);
     }
 
     // Validate price paid >= base price (if base price provided)
@@ -46,7 +48,7 @@ export class ConsumptionService {
       consumptionData.basePriceCents !== undefined &&
       consumptionData.pricePaidCents < consumptionData.basePriceCents
     ) {
-      throw new ValidationError("Price paid cannot be less than base price");
+      throw new ValidationError(ErrorCodes.PRICE_BELOW_BASE);
     }
 
     // 1. Get or create attendance for this date

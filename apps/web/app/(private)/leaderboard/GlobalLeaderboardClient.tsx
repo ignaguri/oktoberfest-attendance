@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
 import { winningCriteriaText } from "@/lib/constants";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { WinningCriteria } from "@/lib/types";
 import { useState, useEffect, useMemo, startTransition } from "react";
 import { toast } from "sonner";
 
 export default function GlobalLeaderboardClient() {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const [winningCriteriaId, setWinningCriteriaId] = useState<number>(1);
   const [winningCriteria, setWinningCriteria] = useState<WinningCriteria>(
@@ -47,15 +49,15 @@ export default function GlobalLeaderboardClient() {
   // Handle errors with toast notifications
   useEffect(() => {
     if (criteriasError) {
-      toast.error("Failed to load winning criteria. Please refresh the page.");
+      toast.error(t("notifications.error.leaderboardLoadFailed"));
     }
-  }, [criteriasError]);
+  }, [criteriasError, t]);
 
   useEffect(() => {
     if (leaderboardError) {
-      toast.error("Failed to fetch leaderboard data. Please try again.");
+      toast.error(t("notifications.error.leaderboardFetchFailed"));
     }
-  }, [leaderboardError]);
+  }, [leaderboardError, t]);
 
   const criteriaOptions = useMemo(
     () =>
@@ -91,7 +93,7 @@ export default function GlobalLeaderboardClient() {
           htmlFor="winning-criteria-select"
           className="text-sm font-medium text-gray-700"
         >
-          Winning Criteria:
+          {t("groups.create.winningCriteria")}:
         </Label>
         <SingleSelect
           id="winning-criteria-select"

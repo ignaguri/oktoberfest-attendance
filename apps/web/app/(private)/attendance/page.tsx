@@ -4,6 +4,7 @@ import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDial
 import { useFestival } from "@/contexts/FestivalContext";
 import { useReservation, useCheckInReservation } from "@/hooks/useReservations";
 import { useAttendances } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { useSearchParams } from "next/navigation";
 import {
   useState,
@@ -23,6 +24,7 @@ import PersonalAttendanceTable from "./PersonalAttendanceTable";
 export type AttendanceWithTentVisits = AttendanceWithTotals;
 
 export default function AttendancePage() {
+  const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const {
     data: attendances,
@@ -67,16 +69,16 @@ export default function AttendancePage() {
   // Handle attendance errors
   useEffect(() => {
     if (attendancesError) {
-      toast.error("Failed to fetch attendance data. Please try again.");
+      toast.error(t("notifications.error.attendanceLoadFailed"));
     }
-  }, [attendancesError]);
+  }, [attendancesError, t]);
 
   // Handle reservation fetch errors
   useEffect(() => {
     if (reservationError) {
-      toast.error("Reservation not found or already processed.");
+      toast.error(t("notifications.error.reservationNotFound"));
     }
-  }, [reservationError]);
+  }, [reservationError, t]);
 
   // Handle date parameter from URL
   useEffect(() => {
@@ -119,7 +121,9 @@ export default function AttendancePage() {
   if (festivalLoading || attendancesLoading || !currentFestival) {
     return (
       <div className="w-full max-w-lg flex flex-col gap-6">
-        <p className="text-center text-gray-600">Loading festival data...</p>
+        <p className="text-center text-gray-600">
+          {t("common.status.loading")}
+        </p>
       </div>
     );
   }

@@ -9,6 +9,7 @@
     "./types": "./src/types/index.ts",
     "./schemas": "./src/schemas/index.ts",
     "./utils": "./src/utils/index.ts",
+    "./errors": "./src/errors/index.ts",
     "./i18n": "./src/i18n/index.ts"
   },
   "scripts": {
@@ -16,8 +17,8 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "i18next": "^24.0.0",
-    "react-i18next": "^15.0.0",
+    "i18next": "^25.7.3",
+    "react-i18next": "^16.5.1",
     "zod": "^4.2.1"
   },
   "devDependencies": {

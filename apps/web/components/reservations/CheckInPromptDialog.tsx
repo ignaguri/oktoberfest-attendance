@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useConfetti } from "@/hooks/useConfetti";
+import { useTranslation } from "@/lib/i18n/client";
 import { createUrlWithParams } from "@/lib/url-utils";
 import { MapPin, Clock, Users } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,6 +36,7 @@ export function CheckInPromptDialog({
   reservation,
   onCheckIn,
 }: CheckInPromptDialogProps) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isExploding, triggerConfetti } = useConfetti();
@@ -57,18 +59,18 @@ export function CheckInPromptDialog({
     try {
       await onCheckIn(reservation.id);
       triggerConfetti();
-      toast.success("Checked in!", {
-        description: "Your attendance has been logged successfully.",
+      toast.success(t("notifications.success.checkedIn"), {
+        description: t("notifications.descriptions.checkedIn"),
       });
       handleClose();
     } catch {
-      toast.error("Check-in failed", {
-        description: "Failed to check in. Please try again.",
+      toast.error(t("notifications.error.checkInFailed"), {
+        description: t("reservation.checkIn.failedDescription"),
       });
     } finally {
       setIsCheckingIn(false);
     }
-  }, [reservation, onCheckIn, handleClose, triggerConfetti]);
+  }, [reservation, onCheckIn, handleClose, triggerConfetti, t]);
 
   const formatTime = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], {
@@ -95,11 +97,13 @@ export function CheckInPromptDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-yellow-600" />
-            Are you there yet?
+            {t("reservation.checkIn.prompt")}
           </DialogTitle>
           <DialogDescription>
-            It&apos;s time for your reservation at{" "}
-            {reservation.tent?.name || "the tent"}.
+            {t("reservation.checkIn.timeForReservation", {
+              tentName:
+                reservation.tent?.name || t("reservation.checkIn.theTent"),
+            })}
           </DialogDescription>
         </DialogHeader>
 
@@ -110,7 +114,8 @@ export function CheckInPromptDialog({
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">
-                  {reservation.tent?.name || "Unknown Tent"}
+                  {reservation.tent?.name ||
+                    t("reservation.checkIn.unknownTent")}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -120,12 +125,15 @@ export function CheckInPromptDialog({
               {reservation.visible_to_groups && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Users className="h-4 w-4" />
-                  <span>Visible to your groups</span>
+                  <span>{t("reservation.dialog.visibleToGroups")}</span>
                 </div>
               )}
               {reservation.note && (
                 <div className="text-sm text-gray-600">
-                  <span className="font-medium">Note:</span> {reservation.note}
+                  <span className="font-medium">
+                    {t("reservation.checkIn.note")}:
+                  </span>{" "}
+                  {reservation.note}
                 </div>
               )}
             </div>
@@ -139,14 +147,16 @@ export function CheckInPromptDialog({
               disabled={isCheckingIn}
               className="flex-1"
             >
-              Not yet
+              {t("reservation.checkIn.notYet")}
             </Button>
             <Button
               onClick={handleCheckIn}
               disabled={isCheckingIn}
               className="flex-1 bg-yellow-600 hover:bg-yellow-700"
             >
-              {isCheckingIn ? "Checking in..." : "Check in now"}
+              {isCheckingIn
+                ? t("reservation.checkIn.checking")
+                : t("reservation.checkIn.checkInNow")}
             </Button>
           </div>
         </div>

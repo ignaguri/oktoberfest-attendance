@@ -1,3 +1,5 @@
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import type { IReservationRepository } from "../repositories/interfaces";
 import type {
   Reservation,
@@ -37,14 +39,14 @@ export class ReservationService {
     const now = new Date();
 
     if (startAt <= now) {
-      throw new ValidationError("Reservation start time must be in the future");
+      throw new ValidationError(ErrorCodes.RESERVATION_START_IN_PAST);
     }
 
     // Validate end time if provided
     if (data.endAt) {
       const endAt = new Date(data.endAt);
       if (endAt <= startAt) {
-        throw new ValidationError("End time must be after start time");
+        throw new ValidationError(ErrorCodes.RESERVATION_END_BEFORE_START);
       }
     }
 
@@ -70,7 +72,7 @@ export class ReservationService {
     const reservation = await this.reservationRepo.findById(id, userId);
 
     if (!reservation) {
-      throw new NotFoundError("Reservation not found");
+      throw new NotFoundError(ErrorCodes.RESERVATION_NOT_FOUND);
     }
 
     return reservation;
@@ -129,7 +131,7 @@ export class ReservationService {
     // Verify reservation exists
     const existing = await this.reservationRepo.findById(id, userId);
     if (!existing) {
-      throw new NotFoundError("Reservation not found");
+      throw new NotFoundError(ErrorCodes.RESERVATION_NOT_FOUND);
     }
 
     // Check in
@@ -159,7 +161,7 @@ export class ReservationService {
   async cancelReservation(id: string, userId: string): Promise<Reservation> {
     const existing = await this.reservationRepo.findById(id, userId);
     if (!existing) {
-      throw new NotFoundError("Reservation not found");
+      throw new NotFoundError(ErrorCodes.RESERVATION_NOT_FOUND);
     }
 
     return this.reservationRepo.cancel(id, userId);
@@ -187,7 +189,7 @@ export class ReservationService {
     // Verify reservation exists
     const existing = await this.reservationRepo.findById(id, userId);
     if (!existing) {
-      throw new NotFoundError("Reservation not found");
+      throw new NotFoundError(ErrorCodes.RESERVATION_NOT_FOUND);
     }
 
     // Validate start time if provided
@@ -196,9 +198,7 @@ export class ReservationService {
       const now = new Date();
 
       if (startAt <= now) {
-        throw new ValidationError(
-          "Reservation start time must be in the future",
-        );
+        throw new ValidationError(ErrorCodes.RESERVATION_START_IN_PAST);
       }
     }
 
@@ -210,7 +210,7 @@ export class ReservationService {
       const endAt = new Date(data.endAt);
 
       if (endAt <= startAt) {
-        throw new ValidationError("End time must be after start time");
+        throw new ValidationError(ErrorCodes.RESERVATION_END_BEFORE_START);
       }
     }
 

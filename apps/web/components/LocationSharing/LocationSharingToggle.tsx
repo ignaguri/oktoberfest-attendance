@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useLocationSharing } from "@/hooks/useLocationSharing";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { MapPin, MapPinOff } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -23,6 +24,7 @@ export const LocationSharingToggle = ({
   hasGroupSharingEnabled = false,
   onToggle,
 }: LocationSharingToggleProps) => {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const {
     startLocationSharing,
@@ -84,7 +86,7 @@ export const LocationSharingToggle = ({
       if (!isActuallySharing) {
         // Request location permission and start sharing
         if (!navigator.geolocation) {
-          toast.error("Geolocation is not supported by this browser");
+          toast.error(t("notifications.error.geolocationNotSupported"));
           return;
         }
 
@@ -93,48 +95,42 @@ export const LocationSharingToggle = ({
 
         // Show appropriate message based on group sharing status
         if (hasGroupSharingEnabled) {
-          toast.success(
-            "Location sharing enabled! Group members can now see your location.",
-          );
+          toast.success(t("location.sharing.enabled"));
         } else {
-          toast.success(
-            "Location tracking started! Enable location sharing for specific groups in your profile settings.",
-          );
+          toast.success(t("location.sharing.trackingStarted"));
         }
       } else {
         // Stop sharing
         await stopLocationSharing();
-        toast.success("Location sharing disabled.");
+        toast.success(t("notifications.success.locationSharingDisabled"));
       }
     } catch (error) {
       if (error instanceof GeolocationPositionError) {
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            toast.error(
-              "Location access denied. Please enable location permissions in your browser settings.",
-            );
+            toast.error(t("notifications.error.permissionDenied"), {
+              description: t("notifications.descriptions.permissionDenied"),
+            });
             setHasPermission(false);
             break;
           case error.POSITION_UNAVAILABLE:
-            toast.error("Location information is unavailable.");
+            toast.error(t("notifications.error.locationUnavailable"));
             break;
           case error.TIMEOUT:
-            toast.error("Location request timed out. Please try again.");
+            toast.error(t("notifications.error.locationTimeout"));
             break;
         }
       } else {
         const errorMessage =
           error instanceof Error
             ? error.message
-            : "Failed to toggle location sharing. Please try again.";
+            : t("notifications.error.generic");
 
         // Handle specific API errors
         if (
           errorMessage.includes("Location sharing not enabled for any groups")
         ) {
-          toast.error(
-            "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first.",
-          );
+          toast.error(t("location.sharing.noGroupsEnabled"));
         } else {
           toast.error(errorMessage);
         }

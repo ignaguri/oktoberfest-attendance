@@ -1,6 +1,7 @@
 "use client";
 
 import Avatar from "@/components/Avatar/Avatar";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +14,10 @@ import {
   useCurrentUser,
   useUpdateProfile,
 } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { profileSchema } from "@/lib/schemas/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { changeLanguage } from "@prostcounter/shared/i18n";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -23,6 +26,7 @@ import { toast } from "sonner";
 import type { ProfileFormData } from "@/lib/schemas/profile";
 
 export default function AccountForm() {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -68,7 +72,9 @@ export default function AccountForm() {
     return (
       <div className="flex flex-col gap-6">
         <div className="card">
-          <p className="text-center text-gray-600">Loading profile...</p>
+          <p className="text-center text-gray-600">
+            {t("common.status.loading")}
+          </p>
         </div>
       </div>
     );
@@ -79,7 +85,7 @@ export default function AccountForm() {
       <div className="flex flex-col gap-6">
         <div className="card">
           <p className="text-center text-red-600">
-            Failed to load profile data.
+            {t("notifications.error.profileUpdateFailed")}
           </p>
         </div>
       </div>
@@ -92,11 +98,11 @@ export default function AccountForm() {
         ...(data.username && { username: data.username }),
         ...(data.fullname && { full_name: data.fullname }),
       });
-      toast.success("Profile updated successfully!");
+      toast.success(t("notifications.success.profileUpdated"));
       setIsEditing(false);
       // Form will be automatically reset when profile data updates via React Query
     } catch {
-      toast.error("Failed to update profile. Please try again.");
+      toast.error(t("notifications.error.profileUpdateFailed"));
     }
   };
 
@@ -112,27 +118,51 @@ export default function AccountForm() {
       window.location.href = "/";
     } catch {
       setShowDeleteConfirm(false);
-      toast.error(
-        "Failed to delete account. Please try again or contact support.",
-      );
+      toast.error(t("profile.deleteAccount.error"));
     }
   };
 
   const handleResetTutorial = async () => {
     try {
       await resetTutorialMutation({});
-      toast.success(
-        "The tutorial has been reset. You'll see it again when you visit the home page.",
-      );
+      toast.success(t("profile.tutorial.resetSuccess"));
     } catch {
-      toast.error("Failed to reset tutorial. Please try again.");
+      toast.error(t("notifications.error.tutorialResetFailed"));
+    }
+  };
+
+  const handleLanguageChange = async (language: string | null) => {
+    try {
+      // Update the profile in the database
+      await updateProfileMutation({ preferred_language: language });
+
+      // Change the language immediately in i18n
+      if (language) {
+        await changeLanguage(language);
+      } else {
+        // Auto-detect and apply
+        const { detectBrowserLanguage } =
+          await import("@/lib/utils/detectLanguage");
+        const { SUPPORTED_LANGUAGES } =
+          await import("@prostcounter/shared/i18n");
+        const detected = detectBrowserLanguage([
+          ...SUPPORTED_LANGUAGES,
+        ] as string[]);
+        await changeLanguage(detected);
+      }
+
+      toast.success(t("profile.language.updateSuccess"));
+    } catch {
+      toast.error(t("profile.language.updateError"));
     }
   };
 
   return (
     <div className="flex flex-col gap-6">
       <div className="card">
-        <h3 className="py-2 text-3xl font-black text-gray-800">Your Profile</h3>
+        <h3 className="py-2 text-3xl font-black text-gray-800">
+          {t("profile.pageTitle")}
+        </h3>
         <Avatar
           className="flex flex-col items-center mb-4"
           isEditing={isEditing}
@@ -157,7 +187,7 @@ export default function AccountForm() {
         >
           <div className="flex items-center gap-2">
             <Label htmlFor="email" className="font-semibold">
-              Email:
+              {t("common.labels.email")}:
             </Label>
             <div className="p-2">
               <span className="text-gray-500">{user.email}</span>
@@ -165,7 +195,7 @@ export default function AccountForm() {
           </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="fullname" className="font-semibold">
-              Full&nbsp;Name:
+              {t("profile.account.fullNameLabel")}:
             </Label>
             {isEditing ? (
               <Input
@@ -187,7 +217,7 @@ export default function AccountForm() {
           </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="username" className="font-semibold">
-              Username:
+              {t("profile.account.usernameLabel")}:
             </Label>
             {isEditing ? (
               <Input
@@ -208,7 +238,9 @@ export default function AccountForm() {
           {isEditing && (
             <div className="flex flex-col gap-2 mt-4 items-center">
               <Button variant="yellow" type="submit" disabled={isUpdating}>
-                {isUpdating ? "Updating..." : "Update"}
+                {isUpdating
+                  ? t("common.buttons.loading")
+                  : t("common.buttons.save")}
               </Button>
               <Button
                 variant="yellowOutline"
@@ -216,7 +248,7 @@ export default function AccountForm() {
                 onClick={() => setIsEditing(false)}
                 disabled={isUpdating}
               >
-                Cancel
+                {t("common.buttons.cancel")}
               </Button>
             </div>
           )}
@@ -228,16 +260,27 @@ export default function AccountForm() {
               type="button"
               onClick={() => setIsEditing(true)}
             >
-              Edit
+              {t("common.buttons.edit")}
             </Button>
             <Button variant="yellowOutline" type="button" asChild>
-              <Link href="/update-password">Change Password</Link>
+              <Link href="/update-password">
+                {t("profile.account.changePassword")}
+              </Link>
             </Button>
           </div>
         )}
       </div>
 
       <NotificationSettings />
+
+      {/* Language Settings */}
+      <div className="card">
+        <LanguageSelector
+          currentLanguage={profile.preferred_language}
+          onLanguageChange={handleLanguageChange}
+          disabled={isUpdating}
+        />
+      </div>
 
       {/* Location sharing disabled - requires migration from deprecated location_sharing_preferences
           table to new session-based model (location_sessions, location_session_members).
@@ -248,10 +291,11 @@ export default function AccountForm() {
       {/* Tutorial Reset Section */}
       <div className="card bg-yellow-50">
         <div className="flex flex-col items-center gap-4">
-          <h4 className="text-lg font-semibold text-gray-800">Tutorial</h4>
+          <h4 className="text-lg font-semibold text-gray-800">
+            {t("profile.tutorial.title")}
+          </h4>
           <p className="text-sm text-gray-700 text-center">
-            Reset the app tutorial to see it again on your next visit to the
-            home page.
+            {t("profile.tutorial.description")}
           </p>
           <Button
             variant="yellowOutline"
@@ -259,7 +303,9 @@ export default function AccountForm() {
             onClick={handleResetTutorial}
             disabled={isResettingTutorial}
           >
-            {isResettingTutorial ? "Resetting..." : "Reset Tutorial"}
+            {isResettingTutorial
+              ? t("common.buttons.loading")
+              : t("profile.tutorial.resetButton")}
           </Button>
         </div>
       </div>
@@ -267,22 +313,22 @@ export default function AccountForm() {
       {/* Delete Account Section */}
       <div className="card bg-red-500/20">
         <div className="flex flex-col items-center gap-4">
-          <h4 className="text-lg font-semibold text-gray-800">Danger Zone</h4>
+          <h4 className="text-lg font-semibold text-gray-800">
+            {t("profile.sections.danger")}
+          </h4>
           <p className="text-sm text-gray-700 text-center">
-            Permanently delete your account and all associated data. This action
-            cannot be undone.
+            {t("profile.deleteAccount.warning")}
           </p>
           {showDeleteConfirm ? (
             <div className="flex flex-col gap-2 items-center">
               <p className="text-sm text-red-600 font-medium text-center">
-                Are you sure? This will permanently delete all your data
-                including:
+                {t("profile.deleteAccount.confirmPrompt")}
               </p>
               <ul className="text-xs text-red-600 text-center list-disc list-inside">
-                <li>All your beer consumption records</li>
-                <li>Photos and tent visits</li>
-                <li>Group memberships and achievements</li>
-                <li>Profile information</li>
+                <li>{t("profile.deleteAccount.dataList.consumption")}</li>
+                <li>{t("profile.deleteAccount.dataList.photos")}</li>
+                <li>{t("profile.deleteAccount.dataList.groups")}</li>
+                <li>{t("profile.deleteAccount.dataList.profile")}</li>
               </ul>
               <div className="flex gap-2 mt-2">
                 <Button
@@ -291,7 +337,9 @@ export default function AccountForm() {
                   onClick={handleDeleteAccount}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? "Deleting..." : "Yes, Delete My Account"}
+                  {isDeleting
+                    ? t("common.buttons.loading")
+                    : t("profile.deleteAccount.confirmButton")}
                 </Button>
                 <Button
                   variant="outline"
@@ -299,7 +347,7 @@ export default function AccountForm() {
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
                 >
-                  Cancel
+                  {t("common.buttons.cancel")}
                 </Button>
               </div>
             </div>
@@ -310,7 +358,7 @@ export default function AccountForm() {
               onClick={handleDeleteAccount}
               disabled={isDeleting}
             >
-              Delete Account
+              {t("profile.deleteAccount.button")}
             </Button>
           )}
         </div>

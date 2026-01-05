@@ -49,7 +49,11 @@ export function useUpdateProfile() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async (profileData: { username?: string; full_name?: string }) => {
+    async (profileData: {
+      username?: string;
+      full_name?: string;
+      preferred_language?: string | null;
+    }) => {
       const response = await apiClient.profile.update(profileData);
       return response.profile;
     },

@@ -7,6 +7,7 @@ import {
   updateGlobalPhotoSettings,
   updateGroupPhotoSettings,
 } from "@/lib/actions/photo-visibility";
+import { useTranslation } from "@/lib/i18n/client";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ interface GroupPhotoSetting {
 }
 
 export function PhotoPrivacySettings() {
+  const { t } = useTranslation();
   const [globalSettings, setGlobalSettings] =
     useState<GlobalPhotoSettingsFormData>({
       hide_photos_from_all_groups: false,
@@ -48,8 +50,8 @@ export function PhotoPrivacySettings() {
       });
       setGroupSettings(groupData);
     } catch {
-      toast.error("Error", {
-        description: "Failed to load photo privacy settings",
+      toast.error(t("common.status.error"), {
+        description: t("photo.privacy.loadError"),
       });
     } finally {
       setIsLoading(false);
@@ -70,14 +72,14 @@ export function PhotoPrivacySettings() {
         hide_photos_from_all_groups: newValue,
       }));
 
-      toast.success("Settings updated", {
+      toast.success(t("notifications.success.settingsUpdated"), {
         description: newValue
-          ? "Your photos are now hidden from all groups"
-          : "Your photos are now visible to groups (subject to individual group settings)",
+          ? t("photo.privacy.hiddenFromAll")
+          : t("photo.privacy.visibleToGroups"),
       });
     } catch {
-      toast.error("Error", {
-        description: "Failed to update global photo settings",
+      toast.error(t("common.status.error"), {
+        description: t("photo.privacy.updateError"),
       });
     } finally {
       setSavingGlobal(false);
@@ -106,15 +108,15 @@ export function PhotoPrivacySettings() {
 
       const groupName =
         groupSettings.find((g) => g.group_id === groupId)?.group_name ||
-        "group";
-      toast.success("Group settings updated", {
+        t("photo.privacy.defaultGroupName");
+      toast.success(t("photo.privacy.groupSettingsUpdated"), {
         description: newValue
-          ? `Your photos are now hidden from ${groupName}`
-          : `Your photos are now visible to ${groupName}`,
+          ? t("photo.privacy.hiddenFromGroup", { group: groupName })
+          : t("photo.privacy.visibleToGroup", { group: groupName }),
       });
     } catch {
-      toast.error("Error", {
-        description: "Failed to update group photo settings",
+      toast.error(t("common.status.error"), {
+        description: t("photo.privacy.updateGroupError"),
       });
     } finally {
       setSavingGroups((prev) => {
@@ -129,10 +131,10 @@ export function PhotoPrivacySettings() {
     return (
       <div className="card">
         <h3 className="py-2 text-2xl font-black text-gray-800">
-          Photo Privacy Settings
+          {t("photo.privacy.title")}
         </h3>
         <div className="flex justify-center py-4">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-500">{t("common.status.loading")}</div>
         </div>
       </div>
     );
@@ -141,18 +143,17 @@ export function PhotoPrivacySettings() {
   return (
     <div className="card">
       <h3 className="py-2 text-xl font-black text-gray-800">
-        Photo Privacy Settings
+        {t("photo.privacy.title")}
       </h3>
       <p className="text-sm text-gray-600 mb-6">
-        Control who can see your photos in group galleries. Individual photos
-        can also be set as private.
+        {t("photo.privacy.description")}
       </p>
 
       <div className="flex flex-col gap-6">
         {/* Global Setting */}
         <div className="flex flex-col gap-4">
           <h4 className="text-lg font-semibold text-gray-700">
-            Global Settings
+            {t("photo.privacy.globalSettings")}
           </h4>
 
           <div className="flex items-center justify-between">
@@ -163,10 +164,12 @@ export function PhotoPrivacySettings() {
                 ) : (
                   <Eye className="h-4 w-4 text-green-600" />
                 )}
-                <span className="font-medium">Hide photos from all groups</span>
+                <span className="font-medium">
+                  {t("photo.privacy.hideFromAll")}
+                </span>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                When enabled, your photos won&apos;t appear in any group gallery
+                {t("photo.privacy.hideFromAllDescription")}
               </p>
             </div>
             <Switch
@@ -183,11 +186,10 @@ export function PhotoPrivacySettings() {
             <div className="border-t border-gray-200" />
             <div className="flex flex-col gap-4">
               <h4 className="text-lg font-semibold text-gray-700">
-                Per-Group Settings
+                {t("photo.privacy.perGroupSettings")}
               </h4>
               <p className="text-sm text-gray-600">
-                Choose which groups can see your photos. These settings only
-                apply when global hiding is disabled.
+                {t("photo.privacy.perGroupDescription")}
               </p>
 
               <div className="space-y-4">
@@ -204,12 +206,13 @@ export function PhotoPrivacySettings() {
                           <Eye className="h-4 w-4 text-green-600" />
                         )}
                         <span className="font-medium">
-                          Hide photos from {group.group_name}
+                          {t("photo.privacy.hideFromGroup", {
+                            group: group.group_name,
+                          })}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 text-left">
-                        When enabled, your photos won&apos;t appear in this
-                        group&apos;s gallery
+                        {t("photo.privacy.hideFromGroupDescription")}
                       </p>
                     </div>
                     <Switch
@@ -231,8 +234,7 @@ export function PhotoPrivacySettings() {
 
               {globalSettings.hide_photos_from_all_groups && (
                 <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-md">
-                  ⚠️ Global photo hiding is enabled. Per-group settings are
-                  currently disabled.
+                  {t("photo.privacy.globalHidingWarning")}
                 </div>
               )}
             </div>
@@ -241,8 +243,7 @@ export function PhotoPrivacySettings() {
 
         {groupSettings.length === 0 && (
           <div className="text-center text-gray-500 py-4">
-            You&apos;re not a member of any groups yet. Join a group to see
-            per-group photo visibility settings.
+            {t("photo.privacy.noGroupsYet")}
           </div>
         )}
       </div>

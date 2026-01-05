@@ -5,6 +5,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "@/lib/i18n/client";
 import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
 import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,6 +50,7 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
 };
 
 export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
+  const { t } = useTranslation();
   const [pictureAlreadyUploaded, setPictureAlreadyUploaded] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -77,18 +79,18 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       formData.append("attendanceId", attendanceId);
       formData.append("visibility", data.visibility);
       await uploadBeerPicture(formData);
-      toast.success("Beer picture uploaded successfully!");
+      toast.success(t("notifications.success.pictureUploaded"));
       setPictureAlreadyUploaded(true);
       setShowSuccessMessage(true);
       reset();
     } catch (error) {
       const fileSizeError =
         error instanceof Error && error.message.includes("exceeded")
-          ? `File size exceeded (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`
+          ? t("validation.file.tooLarge", {
+              max: MAX_FILE_SIZE / 1024 / 1024,
+            })
           : "";
-      toast.error(
-        `Failed to upload beer picture${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
-      );
+      toast.error(fileSizeError || t("notifications.error.generic"));
     }
   };
 

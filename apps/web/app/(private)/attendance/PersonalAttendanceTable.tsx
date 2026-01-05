@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useDeleteAttendance } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { formatDate } from "date-fns/format";
 import { Beer, Tent, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -34,6 +35,7 @@ const PersonalAttendanceTable = ({
   onDateSelect,
   onAttendanceDelete,
 }: PersonalAttendanceTableProps) => {
+  const { t } = useTranslation();
   const [isVisitedTentsDialogOpen, setVisitedTentsDialogOpen] = useState(false);
   const [isDeleteAttendanceDialogOpen, setDeleteAttendanceDialogOpen] =
     useState(false);
@@ -65,28 +67,34 @@ const PersonalAttendanceTable = ({
     async (attendanceId: string) => {
       try {
         await deleteAttendanceMutation(attendanceId);
-        toast.success("Attendance deleted successfully.");
+        toast.success(t("notifications.success.attendanceDeleted"));
         setSelectedAttendance(null);
         onAttendanceDelete();
       } catch {
-        toast.error("Failed to delete attendance. Please try again.");
+        toast.error(t("notifications.error.attendanceDeleteFailed"));
       }
     },
-    [deleteAttendanceMutation, onAttendanceDelete],
+    [deleteAttendanceMutation, onAttendanceDelete, t],
   );
 
   const columns: ColumnDef<AttendanceWithTentVisits>[] = [
     {
       accessorKey: "date",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Date" />
+        <DataTableColumnHeader
+          column={column}
+          title={t("attendance.table.date")}
+        />
       ),
       cell: ({ row }) => formatDate(new Date(row.original.date), "dd/MM/yyyy"),
     },
     {
       accessorKey: "beerCount",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Amount" />
+        <DataTableColumnHeader
+          column={column}
+          title={t("attendance.table.amount")}
+        />
       ),
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
@@ -98,7 +106,10 @@ const PersonalAttendanceTable = ({
     {
       accessorKey: "tentVisits",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Tents" />
+        <DataTableColumnHeader
+          column={column}
+          title={t("attendance.table.tents")}
+        />
       ),
       cell: ({ row }) => (
         <Button
@@ -134,7 +145,7 @@ const PersonalAttendanceTable = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs text-gray-500">Select any attendance to edit it</p>
+      <p className="text-xs text-gray-500">{t("attendance.selectToEdit")}</p>
       <DataTable
         columns={columns}
         data={data || []}
@@ -144,13 +155,13 @@ const PersonalAttendanceTable = ({
       <ResponsiveDialog
         open={isVisitedTentsDialogOpen}
         onOpenChange={setVisitedTentsDialogOpen}
-        title="Visited Tents"
-        description="Details of the tents you visited."
+        title={t("attendance.table.visitedTents")}
+        description={t("attendance.table.visitedTentsDescription")}
       >
         {selectedAttendance &&
           (tentVisitsForDate?.length === 0 ? (
             <div className="flex justify-center mb-4">
-              <p>No tents registered on this date.</p>
+              <p>{t("attendance.table.noTentsRegistered")}</p>
             </div>
           ) : (
             <div className="p-4 mb-8">
@@ -163,7 +174,7 @@ const PersonalAttendanceTable = ({
                     <span className="font-semibold">{tentVisit.tentName}</span>
                     {tentVisit.visitDate ? (
                       <>
-                        <span> - Check-in: </span>
+                        <span> - {t("attendance.table.checkIn")}: </span>
                         <span className="font-semibold">
                           {formatDate(new Date(tentVisit.visitDate), "p")}
                         </span>
@@ -182,10 +193,9 @@ const PersonalAttendanceTable = ({
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>{t("attendance.delete.title")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this attendance? This action
-              cannot be undone.
+              {t("attendance.delete.confirm")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -194,7 +204,7 @@ const PersonalAttendanceTable = ({
                 variant="outline"
                 onClick={() => setDeleteAttendanceDialogOpen(false)}
               >
-                Cancel
+                {t("common.buttons.cancel")}
               </Button>
             </DialogClose>
             <Button
@@ -207,7 +217,9 @@ const PersonalAttendanceTable = ({
                 }
               }}
             >
-              {isDeleting ? "Deleting..." : "Confirm"}
+              {isDeleting
+                ? t("common.buttons.loading")
+                : t("common.buttons.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

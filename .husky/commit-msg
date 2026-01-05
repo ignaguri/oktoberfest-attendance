@@ -17,8 +17,8 @@ if [ ${#first_line} -gt 72 ]; then
   exit 1
 fi
 
-# Check conventional commit format
-pattern="^(feat|fix|docs|style|refactor|perf|test|chore|breaking)(\([a-z-]+\))?: .+"
+# Check conventional commit format (scope allows letters, digits, and hyphens)
+pattern="^(feat|fix|docs|style|refactor|perf|test|chore|breaking)(\([a-z0-9-]+\))?: .+"
 
 if ! echo "$first_line" | grep -qE "$pattern"; then
   echo "❌ Invalid commit message format!"

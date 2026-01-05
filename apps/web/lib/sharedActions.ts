@@ -44,7 +44,7 @@ export async function getProfileShort() {
   const supabase = await createClient();
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
-    .select("full_name, username, avatar_url")
+    .select("full_name, username, avatar_url, preferred_language")
     .eq("id", user.id)
     .single();
 

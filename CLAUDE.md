@@ -48,6 +48,7 @@ Seed data creates users `user1@example.com` through `user10@example.com` with pa
 - **Backend**: Supabase (auth, database, storage)
 - **API**: Hono 4.11 + OpenAPI (type-safe REST API in packages/api)
 - **State Management**: TanStack React Query v5 for server state with provider-agnostic abstraction
+- **i18n**: i18next + react-i18next (shared across web and future mobile app)
 - **Testing**: Vitest 2.1.8 (unit & integration tests)
 - **UI**: Tailwind CSS, Radix UI, shadcn/ui components
 - **PWA**: serwist with service worker caching
@@ -333,6 +334,91 @@ ProstCounter uses Novu for push notification orchestration with Firebase Cloud M
   - `lib/schemas/admin.ts` - Admin panel form validation
   - `lib/schemas/uploads.ts` - File upload validation
 - Real-time client-side validation with server-side RLS backup
+
+### Internationalization (i18n) ✅ IMPLEMENTED
+
+ProstCounter uses i18next with react-i18next for internationalization, shared between web and future mobile apps.
+
+#### Structure
+
+```
+packages/shared/src/
+├── i18n/
+│   ├── index.ts              # i18n initialization and exports
+│   ├── types.ts              # TypeScript type augmentation
+│   └── locales/
+│       └── en.json           # Single translation file with nested keys
+├── errors/
+│   ├── index.ts              # Error exports
+│   └── codes.ts              # Standardized API error codes
+
+apps/web/lib/i18n/
+├── client.tsx                # Client-side provider & hooks
+└── server.ts                 # Server component utilities
+```
+
+#### Client Components (use hook)
+
+```typescript
+import { useTranslation } from "@/lib/i18n/client";
+
+function MyComponent() {
+  const { t } = useTranslation();
+  return <Button>{t("common.buttons.submit")}</Button>;
+}
+```
+
+#### Server Components (use getTranslations)
+
+```typescript
+import { getTranslations } from "@/lib/i18n/server";
+
+export default async function Page() {
+  const t = getTranslations();
+  return <h1>{t("groups.pageTitle")}</h1>;
+}
+```
+
+#### Config Files (pass t function)
+
+```typescript
+// For config files that need translations
+import type { TFunction } from "i18next";
+
+const items = [
+  { id: "home", labelKey: "common.menu.home" },
+];
+
+export const getItems = (t: TFunction) =>
+  items.map((item) => ({ ...item, label: t(item.labelKey) }));
+```
+
+#### API Error Codes
+
+```typescript
+// API services use error codes instead of strings
+import { ErrorCodes } from "@prostcounter/shared/errors";
+throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
+
+// Frontend translates error codes
+import { translateError } from "@/lib/i18n/client";
+const message = translateError(t, error.code, error.message);
+```
+
+#### Translation Keys Structure
+
+| Top-level Key | Content |
+|---------------|---------|
+| `common` | Buttons, labels, status, errors, menu items |
+| `auth` | Sign in/up, password reset |
+| `groups` | Group CRUD, invites, gallery |
+| `attendance` | Beer logging, tent visits |
+| `achievements` | Badge names, descriptions |
+| `leaderboard` | Rankings, stats |
+| `profile` | Settings, account |
+| `validation` | Zod schema messages |
+| `notifications` | Toast messages |
+| `apiErrors` | API error code translations |
 
 ### Image Handling
 
