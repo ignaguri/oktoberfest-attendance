@@ -1,4 +1,5 @@
 import { updateSession } from "@/utils/supabase/middleware";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
 import type { NextRequest } from "next/server";
@@ -26,6 +27,9 @@ export async function proxy(request: NextRequest) {
     "/sitemap.xml",
   ];
 
+  // Auth pages that logged-in users should be redirected away from
+  const authPages = ["/sign-in", "/sign-up", "/reset-password"];
+
   if (request.nextUrl.search.startsWith("?redirectUrl=")) {
     const redirectUrl = request.nextUrl.search.split("redirectUrl=")[1];
     const unescapedUrl = decodeURIComponent(redirectUrl);
@@ -46,6 +50,32 @@ export async function proxy(request: NextRequest) {
     if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
 
     return NextResponse.redirect(callbackUrl);
+  }
+
+  // For auth pages, check if user is already logged in and redirect to home
+  if (authPages.includes(request.nextUrl.pathname)) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll() {
+            // No-op for read-only check
+          },
+        },
+      },
+    );
+
+    const { data } = await supabase.auth.getClaims();
+    if (data?.claims) {
+      // User is logged in, redirect to home
+      return NextResponse.redirect(new URL("/home", request.url));
+    }
+
+    return NextResponse.next();
   }
 
   if (
