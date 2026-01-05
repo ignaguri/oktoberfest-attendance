@@ -215,6 +215,12 @@
     "totalSpent": "Total Spent",
     "noAttendances": "No attendances recorded yet",
     "noAttendancesDescription": "Start tracking your festival visits!",
+    "registerOrUpdate": "Register or update your attendance",
+    "whenDidYouVisit": "When did you visit the Wiesn?",
+    "howManyBeers": "How many 🍻 Maß did you have?",
+    "selectAmount": "Select amount",
+    "whichTents": "Which tents did you visit?",
+    "selectToEdit": "Select any attendance to edit it",
     "form": {
       "dateLabel": "Date",
       "datePlaceholder": "Select date",
@@ -223,13 +229,23 @@
       "tentPlaceholder": "Select tent",
       "notesLabel": "Notes",
       "notesPlaceholder": "Optional notes",
-      "submit": "Save Attendance",
-      "update": "Update Attendance"
+      "submit": "Submit",
+      "update": "Update"
     },
     "delete": {
-      "confirm": "Are you sure you want to delete this attendance?",
+      "title": "Confirm Deletion",
+      "confirm": "Are you sure you want to delete this attendance? This action cannot be undone.",
       "success": "Attendance deleted",
       "error": "Failed to delete attendance"
+    },
+    "table": {
+      "date": "Date",
+      "amount": "Amount",
+      "tents": "Tents",
+      "visitedTents": "Visited Tents",
+      "visitedTentsDescription": "Details of the tents you visited.",
+      "noTentsRegistered": "No tents registered on this date.",
+      "checkIn": "Check-in"
     },
     "errors": {
       "invalidDate": "Please select a valid date",
