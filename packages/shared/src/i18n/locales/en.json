@@ -291,7 +291,7 @@
     "noName": "No name"
   },
   "profile": {
-    "pageTitle": "Profile Settings",
+    "pageTitle": "Your Profile",
     "sections": {
       "account": "Account",
       "notifications": "Notifications",
@@ -306,6 +306,7 @@
       "avatarLabel": "Profile Picture",
       "changeAvatar": "Change Photo",
       "removeAvatar": "Remove Photo",
+      "changePassword": "Change Password",
       "saveChanges": "Save Changes",
       "success": "Profile updated successfully"
     },
@@ -321,11 +322,26 @@
       "locationSharing": "Location Sharing",
       "profileVisibility": "Profile Visibility"
     },
+    "tutorial": {
+      "title": "Tutorial",
+      "description": "Reset the app tutorial to see it again on your next visit to the home page.",
+      "resetButton": "Reset Tutorial",
+      "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page."
+    },
     "deleteAccount": {
       "title": "Delete Account",
-      "warning": "This action cannot be undone. All your data will be permanently deleted.",
+      "warning": "Permanently delete your account and all associated data. This action cannot be undone.",
       "confirm": "Type DELETE to confirm",
-      "button": "Delete My Account"
+      "confirmPrompt": "Are you sure? This will permanently delete all your data including:",
+      "confirmButton": "Yes, Delete My Account",
+      "button": "Delete Account",
+      "error": "Failed to delete account. Please try again or contact support.",
+      "dataList": {
+        "consumption": "All your beer consumption records",
+        "photos": "Photos and tent visits",
+        "groups": "Group memberships and achievements",
+        "profile": "Profile information"
+      }
     }
   },
   "admin": {
@@ -470,10 +486,24 @@
       "globalSettings": "Global Settings",
       "perGroupSettings": "Per-Group Settings",
       "hideFromAll": "Hide photos from all groups",
+      "hideFromAllDescription": "When enabled, your photos won't appear in any group gallery",
       "showToAll": "Show photos to all groups",
       "hideFromGroup": "Hide photos from {{group}}",
+      "hideFromGroupDescription": "When enabled, your photos won't appear in this group's gallery",
       "showToGroup": "Show photos to {{group}}",
-      "description": "Control who can see your photos in group galleries"
+      "visibleToGroup": "Your photos are now visible to {{group}}",
+      "hiddenFromGroup": "Your photos are now hidden from {{group}}",
+      "hiddenFromAll": "Your photos are now hidden from all groups",
+      "visibleToGroups": "Your photos are now visible to groups (subject to individual group settings)",
+      "description": "Control who can see your photos in group galleries. Individual photos can also be set as private.",
+      "perGroupDescription": "Choose which groups can see your photos. These settings only apply when global hiding is disabled.",
+      "globalHidingWarning": "⚠️ Global photo hiding is enabled. Per-group settings are currently disabled.",
+      "noGroupsYet": "You're not a member of any groups yet. Join a group to see per-group photo visibility settings.",
+      "defaultGroupName": "group",
+      "groupSettingsUpdated": "Group settings updated",
+      "loadError": "Failed to load photo privacy settings",
+      "updateError": "Failed to update global photo settings",
+      "updateGroupError": "Failed to update group photo settings"
     },
     "visibility": {
       "public": "Public",
