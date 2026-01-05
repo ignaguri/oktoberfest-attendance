@@ -36,7 +36,7 @@ export function useTranslation() {
 /**
  * Trans component for complex translations with embedded JSX
  */
-export const Trans = TransBase;
+export { TransBase as Trans };
 
 /**
  * Get the current i18n instance

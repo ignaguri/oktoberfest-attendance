@@ -6,6 +6,7 @@ import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 import { useConfetti } from "@/hooks/useConfetti";
+import { useTranslation } from "@/lib/i18n/client";
 import { quickAttendanceSchema } from "@/lib/schemas/attendance";
 import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,6 +53,7 @@ interface QuickAttendanceRegistrationFormProps {
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
 }: QuickAttendanceRegistrationFormProps) => {
+  const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const {
     tents,
@@ -181,7 +183,7 @@ export const QuickAttendanceRegistrationForm = ({
           setValue("beerCount", attendance.beer_count || 0);
         }
       } catch {
-        toast.error("Failed to load attendance data. Please try again.");
+        toast.error(t("notifications.error.attendanceLoadFailed"));
       }
     };
 
@@ -190,7 +192,7 @@ export const QuickAttendanceRegistrationForm = ({
 
   const onSubmit = async (data: QuickAttendanceFormData) => {
     if (!currentFestival) {
-      toast.error("No festival selected. Please select a festival.");
+      toast.error(t("notifications.error.noFestivalSelected"));
       return;
     }
 
@@ -241,19 +243,9 @@ export const QuickAttendanceRegistrationForm = ({
         setValue("tentId", currentTentId);
       }
 
-      const tentName = data.tentId
-        ? tents
-            ?.flatMap((tentGroup) => tentGroup.options)
-            .find((tent) => tent.value === data.tentId)?.label
-        : "Outside/No tent";
-
-      toast.success(
-        data.tentId && tentName && tentName !== "Outside/No tent"
-          ? `Updated attendance for ${tentName}!`
-          : `Updated attendance for ${currentFestival.name}!`,
-      );
+      toast.success(t("notifications.success.attendanceUpdated"));
     } catch {
-      toast.error("Failed to update attendance. Please try again.");
+      toast.error(t("notifications.error.attendanceUpdateFailed"));
     }
   };
 
