@@ -3,11 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useTranslation } from "@/lib/i18n/client";
 import { Bell, BellOff, Smartphone } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export function NotificationSettings() {
+  const { t } = useTranslation();
   const {
     preferences,
     updatePreferences,
@@ -23,10 +25,10 @@ export function NotificationSettings() {
     return (
       <div className="card">
         <h3 className="py-2 text-2xl font-black text-gray-800">
-          Notification Settings
+          {t("notificationSettings.title")}
         </h3>
         <div className="flex justify-center py-4">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-500">{t("common.status.loading")}</div>
         </div>
       </div>
     );
@@ -41,13 +43,12 @@ export function NotificationSettings() {
     setIsUpdating(true);
     try {
       await updatePreferences({ [key]: value });
-      toast.success("Settings Updated", {
-        description: "Your notification preferences have been saved.",
+      toast.success(t("notifications.success.settingsUpdated"), {
+        description: t("notifications.descriptions.settingsUpdated"),
       });
     } catch {
-      toast.error("Error", {
-        description:
-          "Failed to update notification settings. Please try again.",
+      toast.error(t("common.status.error"), {
+        description: t("notificationSettings.errors.updateFailed"),
       });
     } finally {
       setIsUpdating(false);
@@ -61,19 +62,18 @@ export function NotificationSettings() {
     try {
       const granted = await requestPushPermission();
       if (granted) {
-        toast.success("Push Notifications Enabled", {
-          description:
-            "You'll now receive push notifications when the app is closed.",
+        toast.success(t("notifications.success.pushEnabled"), {
+          description: t("notifications.descriptions.pushEnabled"),
         });
       } else {
-        toast.error("Permission Denied", {
-          description:
-            "Push notifications were blocked. You can enable them in your browser settings.",
+        toast.error(t("notifications.error.permissionDenied"), {
+          description: t("notifications.descriptions.permissionDenied"),
         });
       }
     } catch (error: any) {
-      toast.error("Error", {
-        description: error.message || "Failed to enable push notifications.",
+      toast.error(t("common.status.error"), {
+        description:
+          error.message || t("notificationSettings.errors.pushFailed"),
       });
     } finally {
       setIsUpdating(false);
@@ -83,27 +83,31 @@ export function NotificationSettings() {
   return (
     <div className="card">
       <h3 className="py-2 text-xl font-black text-gray-800">
-        Notification Settings
+        {t("notificationSettings.title")}
       </h3>
 
       <div className="flex flex-col gap-6">
         {/* Consolidated Notification Preferences */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-lg font-semibold text-gray-700">Preferences</h4>
+          <h4 className="text-lg font-semibold text-gray-700">
+            {t("notificationSettings.preferences")}
+          </h4>
 
           {/* Reminders */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">Reminders</span>
+                <span className="font-medium">
+                  {t("notificationSettings.reminders")}
+                </span>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                Reservation reminders and check-in prompts
+                {t("notificationSettings.description.reminders")}
               </p>
             </div>
             <Switch
-              aria-label="Reminders"
+              aria-label={t("notificationSettings.reminders")}
               checked={preferences.reminders_enabled ?? true}
               onCheckedChange={(checked) =>
                 handleToggle("reminders_enabled", checked)
@@ -117,14 +121,16 @@ export function NotificationSettings() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">Achievement Notifications</span>
+                <span className="font-medium">
+                  {t("notificationSettings.achievementNotifications")}
+                </span>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                Get notified when you unlock achievements
+                {t("notificationSettings.description.achievements")}
               </p>
             </div>
             <Switch
-              aria-label="Achievement Notifications"
+              aria-label={t("notificationSettings.achievementNotifications")}
               checked={preferences.achievement_notifications_enabled ?? true}
               onCheckedChange={(checked) =>
                 handleToggle("achievement_notifications_enabled", checked)
@@ -138,15 +144,16 @@ export function NotificationSettings() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">Group Notifications</span>
+                <span className="font-medium">
+                  {t("notificationSettings.groupNotifications")}
+                </span>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                Get notifications from your groups (check-ins, achievements,
-                etc.)
+                {t("notificationSettings.description.groups")}
               </p>
             </div>
             <Switch
-              aria-label="Group Notifications"
+              aria-label={t("notificationSettings.groupNotifications")}
               checked={preferences.group_notifications_enabled ?? true}
               onCheckedChange={(checked) =>
                 handleToggle("group_notifications_enabled", checked)
@@ -162,7 +169,7 @@ export function NotificationSettings() {
         {/* Push Notifications Section */}
         <div className="flex flex-col gap-4">
           <h4 className="text-lg font-semibold text-gray-700">
-            Push Notifications
+            {t("notificationSettings.pushNotifications")}
           </h4>
 
           <div className="flex flex-col gap-4">
@@ -170,19 +177,21 @@ export function NotificationSettings() {
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <Smartphone className="h-4 w-4" />
-                  <span className="font-medium">Push Notifications</span>
+                  <span className="font-medium">
+                    {t("notificationSettings.pushNotifications")}
+                  </span>
                 </div>
                 <p className="text-sm text-gray-600 text-left">
-                  Receive notifications even when the app is closed
+                  {t("notificationSettings.description.push")}
                 </p>
                 {!pushSupported && (
                   <p className="text-sm text-amber-600">
-                    Not supported in this browser
+                    {t("notificationSettings.status.notSupported")}
                   </p>
                 )}
                 {pushSupported && pushPermission === "denied" && (
                   <p className="text-sm text-red-600">
-                    Blocked - Enable in browser settings
+                    {t("notificationSettings.status.blocked")}
                   </p>
                 )}
               </div>
@@ -195,13 +204,13 @@ export function NotificationSettings() {
                     onClick={handleRequestPushPermission}
                     disabled={isUpdating}
                   >
-                    Enable Push
+                    {t("notificationSettings.enablePush")}
                   </Button>
                 )}
 
                 {pushSupported && pushPermission === "granted" && (
                   <Switch
-                    aria-label="Push Notifications"
+                    aria-label={t("notificationSettings.pushNotifications")}
                     checked={preferences.push_enabled ?? false}
                     onCheckedChange={(checked) =>
                       handleToggle("push_enabled", checked)
