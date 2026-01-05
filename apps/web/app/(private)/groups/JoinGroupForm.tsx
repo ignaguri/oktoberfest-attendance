@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useJoinGroup } from "@/hooks/useGroups";
 import { apiClient } from "@/lib/api-client";
+import { useTranslation } from "@/lib/i18n/client";
 import { joinGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
@@ -21,6 +22,7 @@ interface JoinGroupFormProps {
 }
 
 export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const router = useTransitionRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -43,18 +45,18 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   // Direct join when groupId is provided (from group detail page)
   const handleDirectJoin = async () => {
     if (!groupId) {
-      toast.error("Invalid group.");
+      toast.error(t("notifications.error.invalidGroup"));
       return;
     }
 
     try {
       await joinGroup({ groupId });
-      toast.success("Successfully joined the group!");
+      toast.success(t("notifications.success.joinedGroup"));
       router.push(`/groups/${groupId}`);
       window.location.reload();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Unable to join group.",
+        error instanceof Error ? error.message : t("groups.join.errors.failed"),
       );
     }
   };
@@ -62,7 +64,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   // Search and join by name+password (from groups list page)
   const onSubmit = async (data: JoinGroupFormData) => {
     if (!currentFestival) {
-      toast.error("No festival selected. Please select a festival.");
+      toast.error(t("notifications.error.noFestivalSelected"));
       return;
     }
 
@@ -75,7 +77,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       });
 
       if (!searchResult.data || searchResult.data.length === 0) {
-        toast.error("Group not found. Please check the group name.");
+        toast.error(t("notifications.error.groupNotFound"));
         return;
       }
 
@@ -85,14 +87,12 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       // Note: The API uses invite tokens, not passwords. For password-based join,
       // we'll attempt to join and let the server validate.
       await joinGroup({ groupId: foundGroup.id, inviteToken: data.password });
-      toast.success("Successfully joined the group!");
+      toast.success(t("notifications.success.joinedGroup"));
       router.push(`/groups/${foundGroup.id}`);
       window.location.reload();
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "Incorrect password or unable to join group.",
+        error instanceof Error ? error.message : t("groups.join.errors.failed"),
       );
     }
   };
@@ -102,7 +102,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     return (
       <div className="space-y-4 flex flex-col gap-2 items-center">
         <p className="text-gray-600">
-          Click below to join <strong>{groupName}</strong>
+          {t("groups.join.clickToJoin", { groupName })}
         </p>
         <Button
           type="button"
@@ -111,7 +111,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
           disabled={isJoining}
           onClick={handleDirectJoin}
         >
-          {isJoining ? "Joining..." : "Join Group"}
+          {isJoining ? t("groups.join.joining") : t("groups.join.submit")}
         </Button>
       </div>
     );
@@ -123,10 +123,10 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-2 flex flex-col gap-2"
     >
-      <h3 className="text-xl font-semibold">Join a Group</h3>
+      <h3 className="text-xl font-semibold">{t("groups.join.title")}</h3>
       <Input
         type="text"
-        placeholder="Group Name"
+        placeholder={t("groups.join.namePlaceholder")}
         errorMsg={errors.groupName?.message}
         autoComplete="new-password"
         {...register("groupName")}
@@ -134,7 +134,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
 
       <Input
         type={showPassword ? "text" : "password"}
-        placeholder="Group Password"
+        placeholder={t("groups.join.passwordPlaceholder")}
         errorMsg={errors.password?.message}
         autoComplete="new-password"
         rightElement={
@@ -156,7 +156,9 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
         className="w-fit self-center"
         disabled={formSubmitting || isJoining}
       >
-        {formSubmitting || isJoining ? "Joining..." : "Join Group"}
+        {formSubmitting || isJoining
+          ? t("groups.join.joining")
+          : t("groups.join.submit")}
       </Button>
     </form>
   );
