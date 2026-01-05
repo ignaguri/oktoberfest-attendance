@@ -1,3 +1,5 @@
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import type { IPhotoRepository } from "../repositories/interfaces";
 import type {
   BeerPicture,
@@ -46,21 +48,17 @@ export class PhotoService {
   ): Promise<GetPhotoUploadUrlResponse> {
     // Validate file type
     if (!this.ALLOWED_TYPES.includes(query.fileType)) {
-      throw new ValidationError(
-        `Invalid file type. Allowed types: ${this.ALLOWED_TYPES.join(", ")}`,
-      );
+      throw new ValidationError(ErrorCodes.INVALID_FILE_TYPE);
     }
 
     // Validate file size
     if (query.fileSize > this.MAX_FILE_SIZE) {
-      throw new ValidationError(
-        `File size exceeds maximum of ${this.MAX_FILE_SIZE / 1024 / 1024}MB`,
-      );
+      throw new ValidationError(ErrorCodes.FILE_TOO_LARGE);
     }
 
     // Validate file name
     if (query.fileName.length > 255) {
-      throw new ValidationError("File name too long (max 255 characters)");
+      throw new ValidationError(ErrorCodes.FILE_NAME_TOO_LONG);
     }
 
     // Generate upload URL (repository handles attendance verification)
@@ -109,11 +107,11 @@ export class PhotoService {
   ): Promise<{ data: BeerPicture[]; total: number }> {
     // Validate pagination
     if (limit < 1 || limit > 100) {
-      throw new ValidationError("Limit must be between 1 and 100");
+      throw new ValidationError(ErrorCodes.INVALID_PAGINATION);
     }
 
     if (offset < 0) {
-      throw new ValidationError("Offset must be non-negative");
+      throw new ValidationError(ErrorCodes.INVALID_PAGINATION);
     }
 
     return this.photoRepo.list(userId, festivalId, limit, offset);
@@ -153,7 +151,7 @@ export class PhotoService {
   ): Promise<BeerPicture> {
     // Validate caption length
     if (caption.length > 500) {
-      throw new ValidationError("Caption too long (max 500 characters)");
+      throw new ValidationError(ErrorCodes.CAPTION_TOO_LONG);
     }
 
     return this.photoRepo.updateCaption(pictureId, userId, caption);

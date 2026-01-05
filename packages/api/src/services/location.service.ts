@@ -1,3 +1,5 @@
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import type { ILocationRepository } from "../repositories/interfaces";
 import type {
   LocationSession,
@@ -35,7 +37,7 @@ export class LocationService {
     // Validate duration
     const duration = data.durationMinutes || 120;
     if (duration < 5 || duration > 480) {
-      throw new ValidationError("Duration must be between 5 and 480 minutes");
+      throw new ValidationError(ErrorCodes.INVALID_DURATION);
     }
 
     // Check for existing active session
@@ -45,9 +47,7 @@ export class LocationService {
     );
 
     if (existing) {
-      throw new ConflictError(
-        "User already has an active location session for this festival",
-      );
+      throw new ConflictError(ErrorCodes.LOCATION_SESSION_ALREADY_ACTIVE);
     }
 
     // Create session
@@ -129,7 +129,7 @@ export class LocationService {
       location.longitude < -180 ||
       location.longitude > 180
     ) {
-      throw new ValidationError("Invalid latitude or longitude");
+      throw new ValidationError(ErrorCodes.INVALID_COORDINATES);
     }
 
     await this.locationRepo.updateLocation(sessionId, userId, location);
@@ -168,7 +168,7 @@ export class LocationService {
   ): Promise<LocationSessionMember[]> {
     // Validate radius
     if (radiusMeters < 100 || radiusMeters > 5000) {
-      throw new ValidationError("Radius must be between 100 and 5000 meters");
+      throw new ValidationError(ErrorCodes.INVALID_RADIUS);
     }
 
     // Validate coordinates
@@ -178,7 +178,7 @@ export class LocationService {
       longitude < -180 ||
       longitude > 180
     ) {
-      throw new ValidationError("Invalid latitude or longitude");
+      throw new ValidationError(ErrorCodes.INVALID_COORDINATES);
     }
 
     // Get nearby members
