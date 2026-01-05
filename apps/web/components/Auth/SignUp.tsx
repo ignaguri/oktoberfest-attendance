@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n/client";
 import { signUpSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
@@ -16,6 +17,7 @@ import { signUp, signInWithOAuth } from "./actions";
 import { GoogleIcon, FacebookIcon } from "./SocialIcons";
 
 export default function SignUp() {
+  const { t } = useTranslation();
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -33,12 +35,12 @@ export default function SignUp() {
       setIsAccountCreated(true);
     } catch (error) {
       if (error instanceof Error) {
-        toast.error("Sign up failed.", {
+        toast.error(t("notifications.error.signUpFailed"), {
           description: error.message,
         });
       } else {
-        toast.error("Sign up failed.", {
-          description: "An unexpected error occurred.",
+        toast.error(t("notifications.error.signUpFailed"), {
+          description: t("notifications.error.generic"),
         });
       }
       if (emailRef.current) {
@@ -57,8 +59,8 @@ export default function SignUp() {
         throw error;
       }
 
-      toast.error("Sign up failed.", {
-        description: `Failed to sign up with ${provider}`,
+      toast.error(t("notifications.error.signUpFailed"), {
+        description: t("auth.signIn.errors.providerFailed", { provider }),
       });
     }
   };
@@ -80,11 +82,13 @@ export default function SignUp() {
   if (isAccountCreated) {
     return (
       <div className="card">
-        <h2 className="w-full text-center">Account created</h2>
+        <h2 className="w-full text-center">
+          {t("auth.signUp.accountCreated", { defaultValue: "Account created" })}
+        </h2>
         <div className="flex flex-col items-center gap-6">
-          <p>Please check your email for verification.</p>
+          <p>{t("auth.signUp.success.checkEmail")}</p>
           <Button asChild variant="yellow">
-            <Link href="/sign-in">Sign In</Link>
+            <Link href="/sign-in">{t("auth.signIn.title")}</Link>
           </Button>
         </div>
       </div>
@@ -94,15 +98,15 @@ export default function SignUp() {
   return (
     <div className="card">
       <h2 className="w-full text-2xl font-semibold text-center p-0">
-        Create Account
+        {t("auth.signUp.title")}
       </h2>
 
       <form onSubmit={onSubmitHandler} className="column w-full">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t("auth.signUp.emailLabel")}</Label>
         <Input
           errorMsg={emailError}
           id="email"
-          placeholder="jane@acme.com"
+          placeholder={t("auth.signUp.emailPlaceholder")}
           type="email"
           autoComplete="email"
           autoFocus
@@ -110,7 +114,7 @@ export default function SignUp() {
           {...register("email")}
         />
 
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t("auth.signUp.passwordLabel")}</Label>
         <Input
           errorMsg={passwordError}
           id="password"
@@ -119,7 +123,9 @@ export default function SignUp() {
           {...register("password")}
         />
 
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <Label htmlFor="confirmPassword">
+          {t("auth.signUp.confirmPasswordLabel")}
+        </Label>
         <Input
           errorMsg={confirmPasswordError}
           id="confirmPassword"
@@ -134,13 +140,15 @@ export default function SignUp() {
           variant="yellow"
           disabled={isSubmitting}
         >
-          Submit
+          {t("auth.signUp.submit")}
         </Button>
       </form>
 
       <div className="flex items-center gap-4 w-full">
         <div className="flex-1 h-px bg-gray-300"></div>
-        <span className="text-sm text-gray-500">or</span>
+        <span className="text-sm text-gray-500">
+          {t("auth.signIn.orContinueWith")}
+        </span>
         <div className="flex-1 h-px bg-gray-300"></div>
       </div>
 
@@ -154,7 +162,7 @@ export default function SignUp() {
           className="w-full flex items-center justify-center gap-2 bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
         >
           <GoogleIcon className="size-5" />
-          Continue with Google
+          {t("auth.signIn.continueWithGoogle")}
         </Button>
 
         <Button
@@ -165,12 +173,14 @@ export default function SignUp() {
           className="w-full flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white border-[#1877F2]"
         >
           <FacebookIcon className="size-5" />
-          Continue with Facebook
+          {t("auth.signIn.continueWithFacebook")}
         </Button>
       </div>
 
       <Button asChild variant="link">
-        <Link href="/sign-in">Already have an account? Sign In.</Link>
+        <Link href="/sign-in">
+          {t("auth.signUp.hasAccount")} {t("auth.signUp.signInLink")}
+        </Link>
       </Button>
     </div>
   );

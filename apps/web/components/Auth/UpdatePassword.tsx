@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n/client";
 import { updatePasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
@@ -15,6 +16,7 @@ import type { UpdatePasswordFormData } from "@/lib/schemas/auth";
 import { updatePassword } from "./actions";
 
 export default function UpdatePassword() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -29,19 +31,19 @@ export default function UpdatePassword() {
   const onSubmit = async (data: UpdatePasswordFormData) => {
     try {
       await updatePassword({ password: data.password });
-      toast.success("Password updated successfully.");
+      toast.success(t("notifications.success.passwordUpdated"));
     } catch (error: any) {
-      toast.error(
-        error.message || "An error occurred while updating the password.",
-      );
+      toast.error(error.message || t("auth.updatePassword.errors.failed"));
     }
   };
 
   return (
     <div className="card">
-      <h2 className="w-full text-center">Update Password</h2>
+      <h2 className="w-full text-center">{t("auth.updatePassword.title")}</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <Label htmlFor="password">New Password</Label>
+        <Label htmlFor="password">
+          {t("auth.updatePassword.passwordLabel")}
+        </Label>
         <Input
           errorMsg={errors.password?.message}
           id="password"
@@ -60,7 +62,9 @@ export default function UpdatePassword() {
           {...register("password")}
         />
 
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <Label htmlFor="confirmPassword">
+          {t("auth.updatePassword.confirmPasswordLabel")}
+        </Label>
         <Input
           errorMsg={errors.confirmPassword?.message}
           id="confirmPassword"
@@ -85,7 +89,9 @@ export default function UpdatePassword() {
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Updating..." : "Update Password"}
+          {isSubmitting
+            ? t("common.status.loading")
+            : t("auth.updatePassword.submit")}
         </Button>
       </form>
     </div>

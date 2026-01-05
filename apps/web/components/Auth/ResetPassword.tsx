@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n/client";
 import { resetPasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "next-view-transitions";
@@ -14,6 +15,7 @@ import type { ResetPasswordFormData } from "@/lib/schemas/auth";
 import { resetPassword } from "./actions";
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -26,23 +28,23 @@ const ResetPassword = () => {
     const [_, errorMessage] = await resetPassword(data);
 
     if (errorMessage) {
-      toast.error("Error", {
+      toast.error(t("common.status.error"), {
         description: errorMessage,
       });
     } else {
-      toast.success("Instructions sent. Check your email.");
+      toast.success(t("auth.resetPassword.success"));
     }
   };
 
   return (
     <div className="card">
-      <h2 className="w-full text-center">Reset Password</h2>
+      <h2 className="w-full text-center">{t("auth.resetPassword.title")}</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t("auth.resetPassword.emailLabel")}</Label>
         <Input
           errorMsg={errors.email?.message}
           id="email"
-          placeholder="jane@acme.com"
+          placeholder={t("auth.resetPassword.emailPlaceholder")}
           type="email"
           {...register("email")}
         />
@@ -52,11 +54,11 @@ const ResetPassword = () => {
           variant="yellow"
           disabled={isSubmitting}
         >
-          Send Instructions
+          {t("auth.resetPassword.submit")}
         </Button>
       </form>
       <Button asChild variant="link">
-        <Link href="/sign-in">Remember your password? Sign In.</Link>
+        <Link href="/sign-in">{t("auth.resetPassword.backToSignIn")}</Link>
       </Button>
     </div>
   );
