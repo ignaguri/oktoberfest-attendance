@@ -23,6 +23,7 @@ import {
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
 import { winningCriteriaText } from "@/lib/constants";
 import { useCurrentUser } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { groupSettingsSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, Copy, Check } from "lucide-react";
@@ -61,6 +62,7 @@ type Props = {
 };
 
 export default function GroupSettingsClient({ group, members }: Props) {
+  const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
@@ -99,7 +101,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const onSubmit = useCallback(
     async (data: GroupSettingsFormData) => {
       if (!isCreator) {
-        alert("Only the group creator can update group details.");
+        alert(t("apiErrors.NOT_GROUP_CREATOR"));
         return;
       }
 
@@ -113,16 +115,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
           },
         });
 
-        toast.success("Group updated successfully!", {
-          description: "Your group details have been updated.",
-        });
+        toast.success(t("notifications.success.groupUpdated"));
       } catch {
-        toast.error("Error updating group", {
-          description: "An unexpected error occurred while updating the group.",
-        });
+        toast.error(t("notifications.error.groupUpdateFailed"));
       }
     },
-    [isCreator, group.id, updateGroup],
+    [isCreator, group.id, updateGroup, t],
   );
 
   const handleRemoveMember = useCallback(async () => {
@@ -130,18 +128,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
     try {
       await removeMember({ groupId: group.id, userId: selectedUserId });
-      toast.success("Member removed successfully!", {
-        description: "The member has been removed from the group.",
-      });
+      toast.success(t("notifications.success.memberRemoved"));
     } catch {
-      toast.error("Error removing member", {
-        description: "An unexpected error occurred while removing the member.",
-      });
+      toast.error(t("notifications.error.memberRemoveFailed"));
     } finally {
       setIsDialogOpen(false);
       setSelectedUserId(null);
     }
-  }, [isCreator, group.id, selectedUserId, removeMember]);
+  }, [isCreator, group.id, selectedUserId, removeMember, t]);
 
   const handleCopyToClipboard = useCallback(
     async (token?: string) => {
@@ -152,15 +146,15 @@ export default function GroupSettingsClient({ group, members }: Props) {
         const inviteUrl = `${window.location.origin}/join-group?token=${tokenToCopy}`;
         await navigator.clipboard.writeText(inviteUrl);
         setCopiedToClipboard(true);
-        toast.success("Invite link copied to clipboard!");
+        toast.success(t("notifications.success.linkCopied"));
 
         // Reset the copied state after 2 seconds
         setTimeout(() => setCopiedToClipboard(false), 2000);
       } catch {
-        toast.error("Failed to copy to clipboard");
+        toast.error(t("notifications.error.copyFailed"));
       }
     },
-    [inviteToken],
+    [inviteToken, t],
   );
 
   const handleRegenerateToken = useCallback(async () => {
@@ -169,28 +163,26 @@ export default function GroupSettingsClient({ group, members }: Props) {
     try {
       const { inviteToken: newToken } = await renewToken({ groupId: group.id });
       setInviteToken(newToken);
-      toast.success("Invite token regenerated!", {
-        description: "A new invitation link has been generated for your group.",
+      toast.success(t("notifications.success.tokenRegenerated"), {
+        description: t("notifications.descriptions.tokenRegenerated"),
       });
       // Copy the new token to clipboard
       handleCopyToClipboard(newToken);
     } catch (error) {
-      toast.error("Error regenerating token", {
+      toast.error(t("notifications.error.tokenRegenFailed"), {
         description:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred.",
+          error instanceof Error ? error.message : t("common.errors.generic"),
       });
     }
-  }, [isCreator, group.id, renewToken, handleCopyToClipboard]);
+  }, [isCreator, group.id, renewToken, handleCopyToClipboard, t]);
 
   return (
     <div className="w-full max-w-lg">
-      <h2 className="text-2xl font-semibold">Group Settings</h2>
+      <h2 className="text-2xl font-semibold">{t("groups.settings.title")}</h2>
       <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-            Group Details
+            {t("groups.settings.groupDetails")}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
@@ -198,7 +190,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Group Name
+                {t("groups.create.nameLabel")}
               </Label>
               <Input
                 type="text"
@@ -215,7 +207,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 htmlFor="description"
                 className="block text-sm font-medium text-gray-700"
               >
-                Group Description
+                {t("groups.settings.descriptionLabel")}
               </Label>
               <Textarea
                 id="description"
@@ -232,7 +224,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 htmlFor="winning_criteria_id"
                 className="block text-sm font-medium text-gray-700"
               >
-                Winning Criteria
+                {t("groups.create.winningCriteria")}
               </Label>
               <SingleSelect
                 id="winning_criteria_id"
@@ -258,7 +250,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
             {isCreator && (
               <div>
                 <Button type="submit" variant="yellow" disabled={isUpdating}>
-                  {isUpdating ? "Updating..." : "Update Group"}
+                  {isUpdating
+                    ? t("common.buttons.loading")
+                    : t("groups.settings.updateButton")}
                 </Button>
               </div>
             )}
@@ -271,18 +265,17 @@ export default function GroupSettingsClient({ group, members }: Props) {
         <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg mt-4">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Invite Link
+              {t("groups.settings.inviteLink")}
             </h3>
             <div className="space-y-2 mb-4">
               <p className="text-sm text-gray-600">
-                Share this link with people you want to invite to your group.
+                {t("groups.settings.inviteLinkDescription")}
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm text-yellow-800">
-                <p className="font-medium">⏰ Token expires in 7 days</p>
-                <p>
-                  Generate a new link when the current one expires to ensure
-                  your invites remain active.
+                <p className="font-medium">
+                  {t("groups.settings.tokenExpiresTitle")}
                 </p>
+                <p>{t("groups.settings.tokenExpiresDescription")}</p>
               </div>
             </div>
 
@@ -293,11 +286,11 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   value={
                     inviteToken
                       ? `${window.location.origin}/join-group?token=${inviteToken}`
-                      : "Generate a new invite link ↓"
+                      : t("groups.settings.generatePrompt")
                   }
                   readOnly
                   className="flex-1 text-muted-foreground"
-                  placeholder="Generate a new invite link"
+                  placeholder={t("groups.settings.generatePrompt")}
                 />
                 <Button
                   type="button"
@@ -323,8 +316,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
               >
                 <Link className="w-4 h-4 mr-2" />
                 {isGeneratingToken
-                  ? "Generating..."
-                  : "Generate New Invite Link"}
+                  ? t("common.buttons.loading")
+                  : t("groups.settings.generateButton")}
               </Button>
             </div>
           </div>
@@ -332,19 +325,21 @@ export default function GroupSettingsClient({ group, members }: Props) {
       )}
 
       <div className="mt-4">
-        <h3 className="text-xl font-semibold mb-2">Group Members</h3>
+        <h3 className="text-xl font-semibold mb-2">
+          {t("groups.settings.members")}
+        </h3>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Username
+                {t("profile.account.usernameLabel")}
               </th>
               <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
+                {t("common.labels.name")}
               </th>
               {isCreator && (
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t("groups.settings.actions")}
                 </th>
               )}
             </tr>
@@ -369,7 +364,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                         setIsDialogOpen(true);
                       }}
                     >
-                      Kick out
+                      {t("groups.settings.kickOut")}
                     </Button>
                   </td>
                 )}
@@ -383,9 +378,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Removal</DialogTitle>
+            <DialogTitle>{t("groups.settings.confirmRemoveTitle")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove this member?
+              {t("groups.settings.confirmRemoveDescription")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -395,7 +390,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isRemoving}
               >
-                Cancel
+                {t("common.buttons.cancel")}
               </Button>
             </DialogClose>
             <Button
@@ -403,7 +398,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
               onClick={handleRemoveMember}
               disabled={isRemoving}
             >
-              {isRemoving ? "Removing..." : "Confirm"}
+              {isRemoving
+                ? t("common.buttons.loading")
+                : t("common.buttons.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

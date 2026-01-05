@@ -179,10 +179,18 @@
     },
     "settings": {
       "title": "Group Settings",
+      "groupDetails": "Group Details",
+      "descriptionLabel": "Group Description",
+      "updateButton": "Update Group",
       "members": "Members",
       "gallery": "Gallery",
       "leaderboard": "Leaderboard",
       "inviteLink": "Invite Link",
+      "inviteLinkDescription": "Share this link with people you want to invite to your group.",
+      "tokenExpiresTitle": "⏰ Token expires in 7 days",
+      "tokenExpiresDescription": "Generate a new link when the current one expires to ensure your invites remain active.",
+      "generatePrompt": "Generate a new invite link ↓",
+      "generateButton": "Generate New Invite Link",
       "copyLink": "Copy Link",
       "linkCopied": "Link copied!",
       "renewToken": "Regenerate Invite Link",
@@ -192,7 +200,11 @@
       "leaveSuccess": "You have left the group",
       "removeMember": "Remove Member",
       "confirmRemove": "Are you sure you want to remove {{name}} from the group?",
-      "removeSuccess": "Member removed successfully"
+      "confirmRemoveTitle": "Confirm Removal",
+      "confirmRemoveDescription": "Are you sure you want to remove this member?",
+      "removeSuccess": "Member removed successfully",
+      "actions": "Actions",
+      "kickOut": "Kick out"
     },
     "winningCriteria": {
       "days_attended": "Most Days Attended",
