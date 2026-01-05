@@ -1,15 +1,13 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import { updatePhotoVisibility } from "@/lib/actions/photo-visibility";
+import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { Database } from "@prostcounter/db";
-
-type PhotoVisibility = Database["public"]["Enums"]["photo_visibility_enum"];
+type PhotoVisibility = "public" | "private";
 
 interface PhotoVisibilityToggleProps {
   photoId: string;
@@ -37,7 +35,7 @@ export function PhotoVisibilityToggle({
     const newVisibility: PhotoVisibility = isPublic ? "private" : "public";
 
     try {
-      await updatePhotoVisibility(photoId, newVisibility);
+      await apiClient.photos.updateVisibility(photoId, newVisibility);
       setVisibility(newVisibility);
 
       toast.success("Photo visibility updated", {

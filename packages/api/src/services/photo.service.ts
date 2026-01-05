@@ -5,6 +5,9 @@ import type {
   BeerPicture,
   GetPhotoUploadUrlQuery,
   GetPhotoUploadUrlResponse,
+  GlobalPhotoSettings,
+  GroupPhotoSettings,
+  PhotoVisibility,
 } from "@prostcounter/shared";
 
 import { ValidationError } from "../middleware/error";
@@ -155,5 +158,118 @@ export class PhotoService {
     }
 
     return this.photoRepo.updateCaption(pictureId, userId, caption);
+  }
+
+  // ===== Photo Privacy Settings =====
+
+  /**
+   * Get user's global photo settings
+   *
+   * @param userId - User ID
+   * @returns Global photo settings
+   */
+  async getGlobalPhotoSettings(userId: string): Promise<GlobalPhotoSettings> {
+    return this.photoRepo.getGlobalPhotoSettings(userId);
+  }
+
+  /**
+   * Update user's global photo settings
+   *
+   * @param userId - User ID
+   * @param hidePhotosFromAllGroups - Whether to hide photos from all groups
+   * @returns Updated settings
+   */
+  async updateGlobalPhotoSettings(
+    userId: string,
+    hidePhotosFromAllGroups: boolean,
+  ): Promise<GlobalPhotoSettings> {
+    return this.photoRepo.updateGlobalPhotoSettings(
+      userId,
+      hidePhotosFromAllGroups,
+    );
+  }
+
+  /**
+   * Get user's photo settings for a specific group
+   *
+   * @param userId - User ID
+   * @param groupId - Group ID
+   * @returns Group photo settings
+   */
+  async getGroupPhotoSettings(
+    userId: string,
+    groupId: string,
+  ): Promise<GroupPhotoSettings> {
+    return this.photoRepo.getGroupPhotoSettings(userId, groupId);
+  }
+
+  /**
+   * Update user's photo settings for a specific group
+   *
+   * @param userId - User ID
+   * @param groupId - Group ID
+   * @param hidePhotosFromGroup - Whether to hide photos from this group
+   * @returns Updated settings
+   */
+  async updateGroupPhotoSettings(
+    userId: string,
+    groupId: string,
+    hidePhotosFromGroup: boolean,
+  ): Promise<GroupPhotoSettings> {
+    return this.photoRepo.updateGroupPhotoSettings(
+      userId,
+      groupId,
+      hidePhotosFromGroup,
+    );
+  }
+
+  /**
+   * Get all user's group photo settings
+   *
+   * @param userId - User ID
+   * @returns Array of group photo settings
+   */
+  async getAllGroupPhotoSettings(
+    userId: string,
+  ): Promise<GroupPhotoSettings[]> {
+    return this.photoRepo.getAllGroupPhotoSettings(userId);
+  }
+
+  /**
+   * Update visibility for a single photo
+   *
+   * @param userId - User ID
+   * @param photoId - Photo ID
+   * @param visibility - New visibility setting
+   * @returns Updated photo
+   */
+  async updatePhotoVisibility(
+    userId: string,
+    photoId: string,
+    visibility: PhotoVisibility,
+  ): Promise<BeerPicture> {
+    // Repository handles ownership verification
+    return this.photoRepo.updatePhotoVisibility(userId, photoId, visibility);
+  }
+
+  /**
+   * Bulk update visibility for multiple photos
+   *
+   * @param userId - User ID
+   * @param photoIds - Array of photo IDs
+   * @param visibility - New visibility setting
+   * @returns Number of photos updated
+   */
+  async bulkUpdatePhotoVisibility(
+    userId: string,
+    photoIds: string[],
+    visibility: PhotoVisibility,
+  ): Promise<number> {
+    // Repository handles ownership verification
+    return this.photoRepo.bulkUpdatePhotoVisibility(
+      userId,
+      photoIds,
+      visibility,
+    );
   }
 }

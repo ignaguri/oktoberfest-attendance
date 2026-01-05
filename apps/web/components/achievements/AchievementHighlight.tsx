@@ -10,13 +10,9 @@ import {
 } from "@/components/ui/card";
 import { SkeletonAchievements } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
-import { getUserAchievements } from "@/lib/actions/achievements";
-import { logger } from "@/lib/logger";
+import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
-import { useState, useEffect } from "react";
-
-import type { AchievementWithProgress } from "@/lib/types/achievements";
 
 import { AchievementBadge } from "./AchievementBadge";
 
@@ -26,33 +22,11 @@ interface AchievementHighlightProps {
 
 export function AchievementHighlight({ className }: AchievementHighlightProps) {
   const { currentFestival } = useFestival();
-  const [achievements, setAchievements] = useState<AchievementWithProgress[]>(
-    [],
+  const { data, loading: isLoading } = useAchievementsWithProgress(
+    currentFestival?.id,
   );
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      if (!currentFestival) return;
-
-      try {
-        const data = await getUserAchievements(currentFestival.id);
-        setAchievements(data);
-      } catch (error) {
-        logger.error(
-          "Error fetching achievements",
-          logger.clientComponent("AchievementHighlight", {
-            festivalId: currentFestival.id,
-          }),
-          error as Error,
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAchievements();
-  }, [currentFestival]);
+  const achievements = data?.data || [];
 
   if (!currentFestival || isLoading) {
     return <SkeletonAchievements />;

@@ -10,7 +10,6 @@ import {
   MAX_FILE_SIZE,
   MAX_PICTURES,
 } from "@/lib/schemas/uploads";
-import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Eye, EyeOff, X } from "lucide-react";
 import Image from "next/image";
@@ -92,9 +91,20 @@ export function BeerPicturesUpload({
         formData.append("picture", picture);
         formData.append("attendanceId", attendanceId);
         formData.append("visibility", data.visibility);
-        const result = await uploadBeerPicture(formData);
-        if (result) {
-          newUrls.push(result);
+
+        const response = await fetch("/api/photos/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.error || "Failed to upload picture");
+        }
+
+        const result = await response.json();
+        if (result.pictureUrl) {
+          newUrls.push(result.pictureUrl);
         }
       }
       const updatedUrls = [...allPictureUrls, ...newUrls];

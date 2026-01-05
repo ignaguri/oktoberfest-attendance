@@ -4,6 +4,7 @@ import type {
   FestivalTent,
   ListAttendancesResponse,
   DeleteAttendanceResponse,
+  AttendanceByDate,
   ListGroupsResponse,
   Group,
   GroupWithMembers,
@@ -12,6 +13,9 @@ import type {
   WinningCriteriaListResponse,
   ListAchievementsResponse,
   EvaluateAchievementsResponse,
+  GetAchievementsWithProgressResponse,
+  GetAchievementLeaderboardResponse,
+  ListAvailableAchievementsResponse,
   ListFestivalsResponse,
   GetFestivalResponse,
   GetCalendarEventsResponse,
@@ -211,6 +215,30 @@ export const apiClient = {
         message: string;
         attendanceId?: string;
       }>(response);
+    },
+
+    /**
+     * Get attendance for a specific date with tent IDs and picture URLs
+     */
+    async getByDate(query: {
+      festivalId: string;
+      date: string;
+    }): Promise<{ attendance: AttendanceByDate | null }> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({
+        festivalId: query.festivalId,
+        date: query.date,
+      });
+      const response = await fetch(
+        `${API_BASE_URL}/v1/attendance/by-date?${params}`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch attendance: ${response.statusText}`);
+      }
+      return parseJsonResponse<{ attendance: AttendanceByDate | null }>(
+        response,
+      );
     },
   },
 
@@ -638,6 +666,63 @@ export const apiClient = {
         throw new Error(error.message || "Failed to evaluate achievements");
       }
       return parseJsonResponse<EvaluateAchievementsResponse>(response);
+    },
+
+    /**
+     * Get all achievements with progress info (for achievements page)
+     */
+    async getWithProgress(
+      festivalId: string,
+    ): Promise<GetAchievementsWithProgressResponse> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({ festivalId });
+      const url = `${API_BASE_URL}/v1/achievements/with-progress?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch achievements with progress: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<GetAchievementsWithProgressResponse>(response);
+    },
+
+    /**
+     * Get achievement leaderboard
+     */
+    async leaderboard(
+      festivalId: string,
+    ): Promise<GetAchievementLeaderboardResponse> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({ festivalId });
+      const url = `${API_BASE_URL}/v1/achievements/leaderboard?${params}`;
+
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch achievement leaderboard: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<GetAchievementLeaderboardResponse>(response);
+    },
+
+    /**
+     * Get all available achievements
+     */
+    async available(): Promise<ListAvailableAchievementsResponse> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/achievements/available`,
+        {
+          headers,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch available achievements: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse<ListAvailableAchievementsResponse>(response);
     },
   },
 
@@ -1225,6 +1310,511 @@ export const apiClient = {
           response,
         ).catch(() => ({ message: undefined }));
         throw new Error(error.message || "Failed to check in");
+      }
+      return parseJsonResponse(response);
+    },
+  },
+
+  /**
+   * Activity Feed API
+   */
+  activityFeed: {
+    /**
+     * Get activity feed
+     */
+    async get(query: {
+      festivalId: string;
+      cursor?: string;
+      limit?: number;
+    }): Promise<{
+      activities: Array<{
+        user_id: string;
+        festival_id: string;
+        activity_type:
+          | "beer_count_update"
+          | "tent_checkin"
+          | "photo_upload"
+          | "group_join"
+          | "achievement_unlock";
+        activity_data: Record<string, unknown>;
+        activity_time: string;
+        username: string;
+        full_name: string;
+        avatar_url: string | null;
+      }>;
+      nextCursor: string | null;
+      hasMore: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const params = new URLSearchParams({ festivalId: query.festivalId });
+      if (query.cursor) params.set("cursor", query.cursor);
+      if (query.limit) params.set("limit", query.limit.toString());
+
+      const response = await fetch(
+        `${API_BASE_URL}/v1/activity-feed?${params}`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch activity feed: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+  },
+
+  /**
+   * Photos API
+   */
+  photos: {
+    /**
+     * Get global photo settings
+     */
+    async getGlobalSettings(): Promise<{
+      userId: string;
+      hidePhotosFromAllGroups: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/photos/settings/global`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch global photo settings: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Update global photo settings
+     */
+    async updateGlobalSettings(data: {
+      hidePhotosFromAllGroups: boolean;
+    }): Promise<{ userId: string; hidePhotosFromAllGroups: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/photos/settings/global`,
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify(data),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(
+          error.message || "Failed to update global photo settings",
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Get all group photo settings
+     */
+    async getAllGroupSettings(): Promise<{
+      settings: Array<{
+        userId: string;
+        groupId: string;
+        hidePhotosFromGroup: boolean;
+      }>;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/photos/settings/groups`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch group photo settings: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Get photo settings for a specific group
+     */
+    async getGroupSettings(groupId: string): Promise<{
+      userId: string;
+      groupId: string;
+      hidePhotosFromGroup: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/photos/settings/groups/${groupId}`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch group photo settings: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Update photo settings for a specific group
+     */
+    async updateGroupSettings(
+      groupId: string,
+      data: { hidePhotosFromGroup: boolean },
+    ): Promise<{
+      userId: string;
+      groupId: string;
+      hidePhotosFromGroup: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/photos/settings/groups/${groupId}`,
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify(data),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(
+          error.message || "Failed to update group photo settings",
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Update visibility for a single photo
+     */
+    async updateVisibility(
+      photoId: string,
+      visibility: "public" | "private",
+    ): Promise<{ success: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/photos/${photoId}/visibility`,
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ visibility }),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update photo visibility");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Bulk update visibility for multiple photos
+     */
+    async bulkUpdateVisibility(
+      photoIds: string[],
+      visibility: "public" | "private",
+    ): Promise<{ success: boolean; updatedCount: number }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/photos/visibility`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ photoIds, visibility }),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update photos visibility");
+      }
+      return parseJsonResponse(response);
+    },
+  },
+
+  /**
+   * Notifications API
+   */
+  notifications: {
+    /**
+     * Register FCM device token
+     */
+    async registerToken(token: string): Promise<{ success: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/notifications/token`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ token }),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to register FCM token");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Subscribe user to Novu
+     */
+    async subscribe(data: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    }): Promise<{ success: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/notifications/subscribe`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify(data),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to subscribe user");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Get notification preferences
+     */
+    async getPreferences(): Promise<{
+      userId: string;
+      pushEnabled: boolean | null;
+      groupJoinEnabled: boolean | null;
+      checkinEnabled: boolean | null;
+      remindersEnabled: boolean | null;
+      achievementNotificationsEnabled: boolean | null;
+      groupNotificationsEnabled: boolean | null;
+      createdAt: string;
+      updatedAt: string | null;
+    } | null> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/notifications/preferences`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch notification preferences: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Update notification preferences
+     */
+    async updatePreferences(data: {
+      pushEnabled?: boolean;
+      groupJoinEnabled?: boolean;
+      checkinEnabled?: boolean;
+      remindersEnabled?: boolean;
+      achievementNotificationsEnabled?: boolean;
+      groupNotificationsEnabled?: boolean;
+    }): Promise<{ success: boolean }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/notifications/preferences`,
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify(data),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to update preferences");
+      }
+      return parseJsonResponse(response);
+    },
+  },
+
+  /**
+   * Wrapped API
+   */
+  wrapped: {
+    /**
+     * Get wrapped data for a festival
+     */
+    async get(festivalId: string): Promise<{
+      wrapped: {
+        userId: string;
+        festivalId: string;
+        totalDays: number;
+        totalBeers: number;
+        totalSpent: number;
+        avgBeersPerDay: number;
+        favoriteTent: {
+          id: string;
+          name: string;
+          visitCount: number;
+        } | null;
+        topDrinkType: string | null;
+        achievements: Array<{
+          id: string;
+          name: string;
+          unlockedAt: string;
+        }>;
+        globalRank: number | null;
+        groupRanks: Array<{
+          groupId: string;
+          groupName: string;
+          rank: number;
+        }>;
+        firstVisitDate: string | null;
+        lastVisitDate: string | null;
+        longestStreak: number;
+        generatedAt: string;
+      } | null;
+      cached: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/wrapped/${festivalId}`, {
+        headers,
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch wrapped data: ${response.statusText}`);
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Generate wrapped data for a festival
+     */
+    async generate(
+      festivalId: string,
+      force = false,
+    ): Promise<{
+      wrapped: {
+        userId: string;
+        festivalId: string;
+        totalDays: number;
+        totalBeers: number;
+        totalSpent: number;
+        avgBeersPerDay: number;
+        favoriteTent: {
+          id: string;
+          name: string;
+          visitCount: number;
+        } | null;
+        topDrinkType: string | null;
+        achievements: Array<{
+          id: string;
+          name: string;
+          unlockedAt: string;
+        }>;
+        globalRank: number | null;
+        groupRanks: Array<{
+          groupId: string;
+          groupName: string;
+          rank: number;
+        }>;
+        firstVisitDate: string | null;
+        lastVisitDate: string | null;
+        longestStreak: number;
+        generatedAt: string;
+      };
+      regenerated: boolean;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/wrapped/${festivalId}/generate`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ force }),
+        },
+      );
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to generate wrapped data");
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Check if user can access wrapped for a festival
+     */
+    async checkAccess(festivalId: string): Promise<{
+      allowed: boolean;
+      reason?: "not_ended" | "no_data" | "not_authenticated" | "error";
+      message?: string;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(
+        `${API_BASE_URL}/v1/wrapped/${festivalId}/access`,
+        { headers },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to check wrapped access: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Get list of festivals with wrapped available
+     */
+    async getAvailableFestivals(): Promise<{
+      festivals: Array<{
+        id: string;
+        name: string;
+        year: number;
+        status: string;
+        hasData: boolean;
+      }>;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/wrapped/festivals`, {
+        headers,
+      });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch available wrapped festivals: ${response.statusText}`,
+        );
+      }
+      return parseJsonResponse(response);
+    },
+
+    /**
+     * Admin function to regenerate wrapped cache
+     */
+    async regenerateCache(data?: {
+      festivalId?: string;
+      userId?: string;
+    }): Promise<{
+      success: boolean;
+      regeneratedCount?: number;
+      error?: string;
+    }> {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/v1/wrapped/regenerate`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data || {}),
+      });
+      if (!response.ok) {
+        const error = await parseJsonResponse<{ message?: string }>(
+          response,
+        ).catch(() => ({ message: undefined }));
+        throw new Error(error.message || "Failed to regenerate wrapped cache");
       }
       return parseJsonResponse(response);
     },

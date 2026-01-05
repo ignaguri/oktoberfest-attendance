@@ -110,3 +110,33 @@ export const CheckInFromReservationResponseSchema = z.object({
   message: z.string(),
   attendanceId: z.uuid().optional(),
 });
+
+/**
+ * Query parameters for getting attendance by date
+ * GET /api/v1/attendance/by-date
+ */
+export const GetAttendanceByDateQuerySchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+});
+
+export type GetAttendanceByDateQuery = z.infer<typeof GetAttendanceByDateQuerySchema>;
+
+/**
+ * Attendance by date response - includes tent_ids and picture_urls
+ */
+export const AttendanceByDateSchema = AttendanceWithTotalsSchema.extend({
+  tentIds: z.array(z.uuid()),
+  pictureUrls: z.array(z.string()),
+});
+
+export type AttendanceByDate = z.infer<typeof AttendanceByDateSchema>;
+
+/**
+ * Response schema for get attendance by date
+ */
+export const GetAttendanceByDateResponseSchema = z.object({
+  attendance: AttendanceByDateSchema.nullable(),
+});
+
+export type GetAttendanceByDateResponse = z.infer<typeof GetAttendanceByDateResponseSchema>;

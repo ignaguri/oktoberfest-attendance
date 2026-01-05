@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "@/lib/i18n/client";
 import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
-import { uploadBeerPicture } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
@@ -78,7 +77,17 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       formData.append("picture", data.picture);
       formData.append("attendanceId", attendanceId);
       formData.append("visibility", data.visibility);
-      await uploadBeerPicture(formData);
+
+      const response = await fetch("/api/photos/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Failed to upload picture");
+      }
+
       toast.success(t("notifications.success.pictureUploaded"));
       setPictureAlreadyUploaded(true);
       setShowSuccessMessage(true);

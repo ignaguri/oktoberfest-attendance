@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-import type { AchievementWithProgress } from "@/lib/types/achievements";
+import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 
 import { AchievementBadge } from "./AchievementBadge";
 import { AchievementProgress } from "./AchievementProgress";

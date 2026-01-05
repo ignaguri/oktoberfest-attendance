@@ -1,35 +1,22 @@
 /**
  * Business logic hooks for activity feed data
  *
- * These hooks handle all activity feed-related functionality
+ * Migrated to use Hono API client instead of server actions
  */
 
-import { getActivityFeed } from "@/lib/actions/activity-feed";
+import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 import { useState, useCallback, useEffect } from "react";
 
-export interface ActivityFeedItem {
-  user_id: string;
-  festival_id: string;
-  activity_type:
-    | "beer_count_update"
-    | "tent_checkin"
-    | "photo_upload"
-    | "group_join"
-    | "achievement_unlock";
-  activity_data: Record<string, any>;
-  activity_time: string;
-  username: string;
-  full_name: string;
-  avatar_url: string | null;
-}
+import type {
+  ActivityFeedItem,
+  GetActivityFeedResponse,
+} from "@prostcounter/shared/schemas";
 
-export interface ActivityFeedResponse {
-  activities: ActivityFeedItem[];
-  nextCursor: string | null;
-  hasMore: boolean;
-}
+export type { ActivityFeedItem };
+
+export type ActivityFeedResponse = GetActivityFeedResponse;
 
 /**
  * Hook to fetch activity feed for a specific festival
@@ -37,7 +24,7 @@ export interface ActivityFeedResponse {
 export function useActivityFeed(festivalId?: string, cursor?: string) {
   return useQuery(
     QueryKeys.activityFeed(festivalId || ""),
-    () => getActivityFeed(festivalId!, cursor),
+    () => apiClient.activityFeed.get({ festivalId: festivalId!, cursor }),
     {
       enabled: !!festivalId,
       staleTime: 30 * 1000, // 30 seconds - activity feed should be relatively fresh
@@ -57,7 +44,11 @@ export function useActivityFeedItems(festivalId?: string) {
 
   const query = useQuery(
     [...QueryKeys.activityFeed(festivalId || ""), cursor || "initial"],
-    () => getActivityFeed(festivalId!, cursor || undefined),
+    () =>
+      apiClient.activityFeed.get({
+        festivalId: festivalId!,
+        cursor: cursor || undefined,
+      }),
     {
       enabled: !!festivalId,
       staleTime: 30 * 1000, // 30 seconds - activity feed should be relatively fresh

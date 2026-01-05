@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  syncUserWithNovu,
-  getUserNotificationPreferences,
-  updateUserNotificationPreferences,
-  registerFCMToken,
-} from "@/lib/actions/notifications";
+import { apiClient } from "@/lib/api-client";
 import { getFCMToken, onMessageListener } from "@/lib/firebase";
 import { logger } from "@/lib/logger";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
@@ -22,6 +17,35 @@ import type { User } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
+
+// API response type (camelCase)
+type ApiPreferences = {
+  userId: string;
+  pushEnabled: boolean | null;
+  groupJoinEnabled: boolean | null;
+  checkinEnabled: boolean | null;
+  remindersEnabled: boolean | null;
+  achievementNotificationsEnabled: boolean | null;
+  groupNotificationsEnabled: boolean | null;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
+// Convert API response to DB type
+const mapApiToDbPreferences = (
+  api: ApiPreferences,
+): NotificationPreferences => ({
+  id: "", // DB type requires id but API doesn't return it - use empty string as placeholder
+  user_id: api.userId,
+  push_enabled: api.pushEnabled,
+  group_join_enabled: api.groupJoinEnabled,
+  checkin_enabled: api.checkinEnabled,
+  reminders_enabled: api.remindersEnabled,
+  achievement_notifications_enabled: api.achievementNotificationsEnabled,
+  group_notifications_enabled: api.groupNotificationsEnabled,
+  created_at: api.createdAt,
+  updated_at: api.updatedAt,
+});
 
 interface NotificationContextType {
   // User
@@ -189,7 +213,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       try {
         // Only sync with Novu if not already synced for this user
         if (user?.id && userSynced !== user.id) {
-          const syncResult = await syncUserWithNovu();
+          const syncResult = await apiClient.notifications.subscribe({
+            email: user.email || undefined,
+          });
           if (syncResult.success) {
             setUserSynced(user.id); // Mark user as synced
           }
@@ -200,8 +226,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
       // Load notification preferences
       try {
-        const preferences = await getUserNotificationPreferences();
-        setPreferences(preferences);
+        const apiPreferences = await apiClient.notifications.getPreferences();
+        if (apiPreferences) {
+          setPreferences(mapApiToDbPreferences(apiPreferences));
+        } else {
+          setPreferences(null);
+        }
       } catch (error) {
         // Silent error handling
       } finally {
@@ -218,7 +248,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const result = await registerFCMToken(fcmToken);
+      const result = await apiClient.notifications.registerToken(fcmToken);
       return result.success;
     } catch (error) {
       return false;
@@ -275,9 +305,45 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const updatedPreferences =
-        await updateUserNotificationPreferences(updates);
-      setPreferences(updatedPreferences);
+      // Map snake_case to camelCase for API
+      const apiUpdates: {
+        pushEnabled?: boolean;
+        remindersEnabled?: boolean;
+        groupNotificationsEnabled?: boolean;
+        achievementNotificationsEnabled?: boolean;
+      } = {};
+
+      if (updates.push_enabled !== undefined && updates.push_enabled !== null) {
+        apiUpdates.pushEnabled = updates.push_enabled;
+      }
+      if (
+        updates.reminders_enabled !== undefined &&
+        updates.reminders_enabled !== null
+      ) {
+        apiUpdates.remindersEnabled = updates.reminders_enabled;
+      }
+      if (
+        updates.group_notifications_enabled !== undefined &&
+        updates.group_notifications_enabled !== null
+      ) {
+        apiUpdates.groupNotificationsEnabled =
+          updates.group_notifications_enabled;
+      }
+      if (
+        updates.achievement_notifications_enabled !== undefined &&
+        updates.achievement_notifications_enabled !== null
+      ) {
+        apiUpdates.achievementNotificationsEnabled =
+          updates.achievement_notifications_enabled;
+      }
+
+      await apiClient.notifications.updatePreferences(apiUpdates);
+
+      // Reload preferences after update
+      const apiPreferences = await apiClient.notifications.getPreferences();
+      if (apiPreferences) {
+        setPreferences(mapApiToDbPreferences(apiPreferences));
+      }
     } catch (error) {
       throw error;
     }
@@ -309,8 +375,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         const token = await getFCMTokenAndStore();
 
         if (token) {
-          // Register token with Novu
-          await registerFCMToken(token);
+          // Register token with Novu via API
+          await apiClient.notifications.registerToken(token);
         }
 
         // Enable push notifications in preferences

@@ -2,6 +2,9 @@ import type {
   BeerPicture,
   GetPhotoUploadUrlQuery,
   GetPhotoUploadUrlResponse,
+  GlobalPhotoSettings,
+  GroupPhotoSettings,
+  PhotoVisibility,
 } from "@prostcounter/shared";
 
 /**
@@ -73,4 +76,81 @@ export interface IPhotoRepository {
     userId: string,
     caption: string,
   ): Promise<BeerPicture>;
+
+  // ===== Photo Privacy Settings =====
+
+  /**
+   * Get user's global photo settings
+   * @param userId - User ID
+   * @returns Global photo settings
+   */
+  getGlobalPhotoSettings(userId: string): Promise<GlobalPhotoSettings>;
+
+  /**
+   * Update user's global photo settings
+   * @param userId - User ID
+   * @param hidePhotosFromAllGroups - Whether to hide photos from all groups
+   * @returns Updated settings
+   */
+  updateGlobalPhotoSettings(
+    userId: string,
+    hidePhotosFromAllGroups: boolean,
+  ): Promise<GlobalPhotoSettings>;
+
+  /**
+   * Get user's photo settings for a specific group
+   * @param userId - User ID
+   * @param groupId - Group ID
+   * @returns Group photo settings
+   */
+  getGroupPhotoSettings(
+    userId: string,
+    groupId: string,
+  ): Promise<GroupPhotoSettings>;
+
+  /**
+   * Update user's photo settings for a specific group
+   * @param userId - User ID
+   * @param groupId - Group ID
+   * @param hidePhotosFromGroup - Whether to hide photos from this group
+   * @returns Updated settings
+   */
+  updateGroupPhotoSettings(
+    userId: string,
+    groupId: string,
+    hidePhotosFromGroup: boolean,
+  ): Promise<GroupPhotoSettings>;
+
+  /**
+   * Get all user's group photo settings
+   * @param userId - User ID
+   * @returns Array of group photo settings
+   */
+  getAllGroupPhotoSettings(userId: string): Promise<GroupPhotoSettings[]>;
+
+  /**
+   * Update visibility for a single photo
+   * @param userId - User ID
+   * @param photoId - Photo ID
+   * @param visibility - New visibility setting
+   * @returns Updated photo
+   */
+  updatePhotoVisibility(
+    userId: string,
+    photoId: string,
+    visibility: PhotoVisibility,
+  ): Promise<BeerPicture>;
+
+  /**
+   * Bulk update visibility for multiple photos
+   * @param userId - User ID
+   * @param photoIds - Array of photo IDs
+   * @param visibility - New visibility setting
+   * @returns Number of photos updated
+   */
+  bulkUpdatePhotoVisibility(
+    userId: string,
+    photoIds: string[],
+    visibility: PhotoVisibility,
+  ): Promise<number>;
 }

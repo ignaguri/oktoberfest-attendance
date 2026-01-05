@@ -2,6 +2,7 @@ import type { IAttendanceRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
   AttendanceWithTotals,
+  AttendanceByDate,
   ListAttendancesQuery,
   CreateAttendanceInput,
   CreateAttendanceResponse,
@@ -292,6 +293,119 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     }
 
     return data;
+  }
+
+  async getByDate(
+    userId: string,
+    festivalId: string,
+    date: string,
+  ): Promise<AttendanceByDate | null> {
+    // Fetch attendance for the specific date
+    const { data: attendance, error: attendanceError } = await this.supabase
+      .from("attendance_with_totals")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .eq("date", date)
+      .single();
+
+    if (attendanceError) {
+      if (attendanceError.code === "PGRST116") {
+        return null; // Not found
+      }
+      throw new DatabaseError(
+        `Failed to fetch attendance: ${attendanceError.message}`,
+      );
+    }
+
+    // Validate required fields from view
+    if (
+      !attendance.id ||
+      !attendance.user_id ||
+      !attendance.festival_id ||
+      !attendance.date
+    ) {
+      throw new DatabaseError("Invalid attendance data from view");
+    }
+
+    const attendanceDate = new Date(date);
+
+    // Fetch tent visits for this date
+    const { data: tentVisits, error: tentVisitsError } = await this.supabase
+      .from("tent_visits")
+      .select("tent_id, visit_date, tents(name)")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId);
+
+    if (tentVisitsError) {
+      throw new DatabaseError(
+        `Failed to fetch tent visits: ${tentVisitsError.message}`,
+      );
+    }
+
+    // Filter tent visits for this specific date
+    const tentIdsForDate = (tentVisits || [])
+      .filter((visit) => {
+        if (!visit.visit_date) return false;
+        const visitDate = new Date(visit.visit_date);
+        return (
+          visitDate.getFullYear() === attendanceDate.getFullYear() &&
+          visitDate.getMonth() === attendanceDate.getMonth() &&
+          visitDate.getDate() === attendanceDate.getDate()
+        );
+      })
+      .map((visit) => visit.tent_id);
+
+    // Fetch beer pictures for this attendance
+    const { data: beerPictures, error: picturesError } = await this.supabase
+      .from("beer_pictures")
+      .select("picture_url")
+      .eq("user_id", userId)
+      .eq("attendance_id", attendance.id);
+
+    if (picturesError) {
+      throw new DatabaseError(
+        `Failed to fetch beer pictures: ${picturesError.message}`,
+      );
+    }
+
+    const pictureUrls = (beerPictures || [])
+      .map((pic) => pic.picture_url)
+      .filter((url): url is string => url !== null);
+
+    // Build tent visits array for the schema
+    const visitsForDate = (tentVisits || [])
+      .filter((visit) => {
+        if (!visit.visit_date) return false;
+        const visitDate = new Date(visit.visit_date);
+        return (
+          visitDate.getFullYear() === attendanceDate.getFullYear() &&
+          visitDate.getMonth() === attendanceDate.getMonth() &&
+          visitDate.getDate() === attendanceDate.getDate()
+        );
+      })
+      .map((visit) => ({
+        tentId: visit.tent_id,
+        visitDate: visit.visit_date!,
+        tentName: (visit.tents as any)?.name || null,
+      }));
+
+    return {
+      id: attendance.id,
+      userId: attendance.user_id,
+      festivalId: attendance.festival_id,
+      date: attendance.date,
+      createdAt: attendance.created_at || new Date().toISOString(),
+      updatedAt: attendance.updated_at || new Date().toISOString(),
+      drinkCount: attendance.drink_count || 0,
+      beerCount: attendance.beer_count || 0,
+      totalSpentCents: attendance.total_spent_cents || 0,
+      totalTipCents: attendance.total_tip_cents || 0,
+      avgPriceCents: attendance.avg_price_cents || 0,
+      tentVisits: visitsForDate,
+      tentIds: tentIdsForDate,
+      pictureUrls: pictureUrls,
+    };
   }
 
   private mapToAttendanceWithTotals(data: any): AttendanceWithTotals {

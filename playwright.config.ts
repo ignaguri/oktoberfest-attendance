@@ -8,7 +8,8 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: [["list"]],
   webServer: {
-    command: 'bash -c "pnpm build && pnpm start -p 3008"',
+    command:
+      'bash -c "pnpm --filter=@prostcounter/web build && pnpm --filter=@prostcounter/web start -p 3008"',
     url: process.env.BASE_URL || "http://localhost:3008",
     reuseExistingServer: true,
     timeout: 180_000,

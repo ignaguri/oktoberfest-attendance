@@ -11,10 +11,22 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
+import type { AchievementRarity } from "@prostcounter/shared/schemas";
 
 interface ActivityItemProps {
   activity: ActivityFeedItem;
 }
+
+// Type-safe accessor for activity_data properties
+const getActivityDataValue = <T,>(
+  data: Record<string, unknown>,
+  key: string,
+  defaultValue: T,
+): T => {
+  const value = data[key];
+  if (value === undefined || value === null) return defaultValue;
+  return value as T;
+};
 
 const getActivityIcon = (type: ActivityFeedItem["activity_type"]) => {
   switch (type) {
@@ -38,22 +50,38 @@ const getActivityDescription = (activity: ActivityFeedItem) => {
 
   switch (activity_type) {
     case "beer_count_update":
-      const beerCount = activity_data.beer_count || 0;
+      const beerCount = getActivityDataValue<number>(
+        activity_data,
+        "beer_count",
+        0,
+      );
       return `drank ${beerCount} beer${beerCount !== 1 ? "s" : ""}`;
 
     case "tent_checkin":
-      const tentName = activity_data.tent_name || "a tent";
+      const tentName = getActivityDataValue(
+        activity_data,
+        "tent_name",
+        "a tent",
+      );
       return `checked into ${tentName}`;
 
     case "photo_upload":
       return `uploaded a photo`;
 
     case "group_join":
-      const groupName = activity_data.group_name || "a group";
+      const groupName = getActivityDataValue(
+        activity_data,
+        "group_name",
+        "a group",
+      );
       return `joined ${groupName}`;
 
     case "achievement_unlock":
-      const rarity = activity_data.rarity;
+      const rarity = getActivityDataValue<string | undefined>(
+        activity_data,
+        "rarity",
+        undefined,
+      );
       return `unlocked an achievement${rarity ? ` (${rarity})` : ""}`;
 
     default:
@@ -82,7 +110,14 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
   }, [activity_time]);
 
   const displayName = full_name || username || "Unknown User";
-  const imageUrl = `/api/image/${activity_data.picture_url}?bucket=beer_pictures`;
+  const pictureUrl = getActivityDataValue<string | undefined>(
+    activity_data,
+    "picture_url",
+    undefined,
+  );
+  const imageUrl = pictureUrl
+    ? `/api/image/${pictureUrl}?bucket=beer_pictures`
+    : "";
 
   return (
     <div className="flex items-start gap-3 py-2 border-b border-border/50 last:border-b-0">
@@ -124,12 +159,32 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         {/* Additional badges for special activities */}
         <div className="flex items-center gap-2 mt-1">
           {activity_type === "achievement_unlock" &&
-            activity_data.achievement_name && (
+            getActivityDataValue<string | undefined>(
+              activity_data,
+              "achievement_name",
+              undefined,
+            ) && (
               <AchievementBadge
-                name={activity_data.achievement_name}
-                icon={activity_data.achievement_icon || "trophy"}
-                rarity={activity_data.rarity || "common"}
-                points={activity_data.achievement_points || 0}
+                name={getActivityDataValue(
+                  activity_data,
+                  "achievement_name",
+                  "",
+                )}
+                icon={getActivityDataValue(
+                  activity_data,
+                  "achievement_icon",
+                  "trophy",
+                )}
+                rarity={getActivityDataValue<AchievementRarity>(
+                  activity_data,
+                  "rarity",
+                  "common",
+                )}
+                points={getActivityDataValue(
+                  activity_data,
+                  "achievement_points",
+                  0,
+                )}
                 isUnlocked={true}
                 size="sm"
                 showPoints={false}
@@ -137,7 +192,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
             )}
 
           {activity_type === "beer_count_update" &&
-            activity_data.beer_count > 5 && (
+            getActivityDataValue(activity_data, "beer_count", 0) > 5 && (
               <Badge
                 variant="outline"
                 className="text-xs bg-orange-100 text-orange-800 border-orange-300"
@@ -148,7 +203,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         </div>
 
         {/* Photo preview for photo uploads */}
-        {activity_type === "photo_upload" && activity_data.picture_url && (
+        {activity_type === "photo_upload" && pictureUrl && (
           <div className="mt-2">
             <div
               className="size-16 rounded-lg overflow-hidden bg-muted relative cursor-pointer"

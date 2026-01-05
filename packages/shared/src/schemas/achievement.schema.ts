@@ -109,3 +109,127 @@ export const EvaluateAchievementsResponseSchema = z.object({
 export type EvaluateAchievementsResponse = z.infer<
   typeof EvaluateAchievementsResponseSchema
 >;
+
+/**
+ * Achievement progress (for locked achievements)
+ */
+export const AchievementProgressSchema = z.object({
+  current_value: z.number(),
+  target_value: z.number(),
+  percentage: z.number(),
+  last_updated: z.string(),
+});
+
+export type AchievementProgress = z.infer<typeof AchievementProgressSchema>;
+
+/**
+ * Achievement with progress (includes both locked and unlocked)
+ */
+export const AchievementWithProgressSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  description: z.string(),
+  category: AchievementCategorySchema,
+  icon: z.string(),
+  points: z.number().int(),
+  rarity: AchievementRaritySchema,
+  conditions: z.record(z.string(), z.unknown()).default({}),
+  is_active: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  is_unlocked: z.boolean(),
+  unlocked_at: z.string().nullable().optional(),
+  user_progress: AchievementProgressSchema.optional(),
+});
+
+export type AchievementWithProgress = z.infer<
+  typeof AchievementWithProgressSchema
+>;
+
+/**
+ * Category/rarity breakdown stats
+ */
+export const BreakdownStatsSchema = z.object({
+  total: z.number().int(),
+  unlocked: z.number().int(),
+  points: z.number().int(),
+});
+
+/**
+ * Achievement stats
+ */
+export const AchievementStatsSchema = z.object({
+  total_achievements: z.number().int(),
+  unlocked_achievements: z.number().int(),
+  total_points: z.number().int(),
+  breakdown_by_category: z.record(AchievementCategorySchema, BreakdownStatsSchema),
+  breakdown_by_rarity: z.record(AchievementRaritySchema, BreakdownStatsSchema),
+});
+
+export type AchievementStats = z.infer<typeof AchievementStatsSchema>;
+
+/**
+ * Achievement leaderboard entry
+ */
+export const AchievementLeaderboardEntrySchema = z.object({
+  user_id: z.string().uuid(),
+  username: z.string().nullable(),
+  full_name: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+  total_achievements: z.number().int(),
+  total_points: z.number().int(),
+});
+
+export type AchievementLeaderboardEntry = z.infer<
+  typeof AchievementLeaderboardEntrySchema
+>;
+
+/**
+ * GET /achievements/with-progress response
+ */
+export const GetAchievementsWithProgressResponseSchema = z.object({
+  data: z.array(AchievementWithProgressSchema),
+  stats: AchievementStatsSchema,
+});
+
+export type GetAchievementsWithProgressResponse = z.infer<
+  typeof GetAchievementsWithProgressResponseSchema
+>;
+
+/**
+ * GET /achievements/leaderboard response
+ */
+export const GetAchievementLeaderboardResponseSchema = z.object({
+  data: z.array(AchievementLeaderboardEntrySchema),
+});
+
+export type GetAchievementLeaderboardResponse = z.infer<
+  typeof GetAchievementLeaderboardResponseSchema
+>;
+
+/**
+ * Available achievement (for listing all achievements)
+ */
+export const AvailableAchievementSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  description: z.string(),
+  category: AchievementCategorySchema,
+  icon: z.string(),
+  points: z.number().int(),
+  rarity: AchievementRaritySchema,
+  is_active: z.boolean(),
+});
+
+export type AvailableAchievement = z.infer<typeof AvailableAchievementSchema>;
+
+/**
+ * GET /achievements/available response
+ */
+export const ListAvailableAchievementsResponseSchema = z.object({
+  data: z.array(AvailableAchievementSchema),
+});
+
+export type ListAvailableAchievementsResponse = z.infer<
+  typeof ListAvailableAchievementsResponseSchema
+>;

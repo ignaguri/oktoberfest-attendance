@@ -5,58 +5,22 @@ import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
-import {
-  getUserAchievements,
-  getUserAchievementStats,
-} from "@/lib/actions/achievements";
-import { logger } from "@/lib/logger";
-import { useState, useEffect } from "react";
+import { useAchievementsWithProgress } from "@/hooks/useAchievements";
+import { useState } from "react";
 
-import type {
-  AchievementWithProgress,
-  AchievementStats,
-  AchievementCategory,
-} from "@/lib/types/achievements";
+import type { AchievementCategory } from "@prostcounter/shared/schemas";
 
 export default function AchievementsPage() {
   const { currentFestival } = useFestival();
-  const [achievements, setAchievements] = useState<AchievementWithProgress[]>(
-    [],
+  const { data, loading: isLoading } = useAchievementsWithProgress(
+    currentFestival?.id,
   );
-  const [stats, setStats] = useState<AchievementStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"all" | AchievementCategory>(
     "all",
   );
 
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      if (!currentFestival) return;
-
-      setIsLoading(true);
-      try {
-        const [achievementsData, statsData] = await Promise.all([
-          getUserAchievements(currentFestival.id),
-          getUserAchievementStats(currentFestival.id),
-        ]);
-
-        setAchievements(achievementsData);
-        setStats(statsData);
-      } catch (error) {
-        logger.error(
-          "Error fetching achievements",
-          logger.clientComponent("AchievementsPage", {
-            festivalId: currentFestival?.id,
-          }),
-          error as Error,
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAchievements();
-  }, [currentFestival]);
+  const achievements = data?.data || [];
+  const stats = data?.stats;
 
   const filteredAchievements =
     activeTab === "all"
@@ -95,7 +59,7 @@ export default function AchievementsPage() {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">🎖️ Achievements</h1>
+        <h1 className="text-3xl font-bold mb-2">Achievements</h1>
         <p className="text-gray-600">
           Track your progress and unlock achievements at {currentFestival.name}
         </p>
@@ -114,10 +78,12 @@ export default function AchievementsPage() {
                 {stats.unlocked_achievements} / {stats.total_achievements}
               </div>
               <p className="text-sm text-gray-600">
-                {Math.round(
-                  (stats.unlocked_achievements / stats.total_achievements) *
-                    100,
-                )}
+                {stats.total_achievements > 0
+                  ? Math.round(
+                      (stats.unlocked_achievements / stats.total_achievements) *
+                        100,
+                    )
+                  : 0}
                 % unlocked
               </p>
             </CardContent>
@@ -146,14 +112,14 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_rarity).map(
-                  ([rarity, data]) => (
+                  ([rarity, rarityData]) => (
                     <div
                       key={rarity}
                       className="flex items-center justify-between text-sm"
                     >
                       <span className="capitalize">{rarity}:</span>
                       <span className="font-medium">
-                        {data.unlocked}/{data.total}
+                        {rarityData.unlocked}/{rarityData.total}
                       </span>
                     </div>
                   ),
@@ -171,16 +137,16 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_category)
-                  .filter(([_, data]) => data.total > 0)
+                  .filter(([_, catData]) => catData.total > 0)
                   .slice(0, 3)
-                  .map(([category, data]) => (
+                  .map(([category, catData]) => (
                     <div
                       key={category}
                       className="flex items-center justify-between text-sm"
                     >
                       <span className="capitalize">{category}:</span>
                       <span className="font-medium">
-                        {data.unlocked}/{data.total}
+                        {catData.unlocked}/{catData.total}
                       </span>
                     </div>
                   ))}
@@ -237,9 +203,7 @@ export default function AchievementsPage() {
 
           {unlockedAchievements.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-green-700">
-                ✅ Completed
-              </h3>
+              <h3 className="text-lg font-medium text-green-700">Completed</h3>
               <AchievementGrid
                 achievements={unlockedAchievements}
                 showProgress={true}
@@ -249,9 +213,7 @@ export default function AchievementsPage() {
 
           {lockedAchievements.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-700">
-                🎯 In Progress
-              </h3>
+              <h3 className="text-lg font-medium text-gray-700">In Progress</h3>
               <AchievementGrid
                 achievements={lockedAchievements}
                 showProgress={true}

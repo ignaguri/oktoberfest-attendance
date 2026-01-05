@@ -9,7 +9,7 @@ import { useQuery } from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@/lib/data/types";
 
 /**
- * Hook to fetch user's achievements for a specific festival
+ * Hook to fetch user's unlocked achievements for a specific festival
  */
 export function useUserAchievements(festivalId?: string) {
   return useQuery(
@@ -27,15 +27,55 @@ export function useUserAchievements(festivalId?: string) {
 }
 
 /**
- * Hook to fetch all available achievements
- * Note: API endpoint returns all achievements, filtering can be done on client
+ * Hook to fetch all achievements with progress info (locked + unlocked)
+ * Used on the achievements page to show progress toward locked achievements
+ */
+export function useAchievementsWithProgress(festivalId?: string) {
+  return useQuery(
+    [
+      ...QueryKeys.userAchievements("current", festivalId || ""),
+      "with-progress",
+    ],
+    async () => {
+      const response = await apiClient.achievements.getWithProgress(
+        festivalId!,
+      );
+      return response;
+    },
+    {
+      enabled: !!festivalId,
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes cache
+    },
+  );
+}
+
+/**
+ * Hook to fetch achievement leaderboard
+ */
+export function useAchievementLeaderboard(festivalId?: string) {
+  return useQuery(
+    [...QueryKeys.achievements(), "leaderboard", festivalId || ""],
+    async () => {
+      const response = await apiClient.achievements.leaderboard(festivalId!);
+      return response.data || [];
+    },
+    {
+      enabled: !!festivalId,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 15 * 60 * 1000, // 15 minutes cache
+    },
+  );
+}
+
+/**
+ * Hook to fetch all available achievements (without user progress)
  */
 export function useAvailableAchievements() {
   return useQuery(
-    QueryKeys.achievements(),
+    [...QueryKeys.achievements(), "available"],
     async () => {
-      // Fetch without festival filter to get all available achievements
-      const response = await apiClient.achievements.list({});
+      const response = await apiClient.achievements.available();
       return response.data || [];
     },
     {

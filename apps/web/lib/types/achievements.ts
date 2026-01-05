@@ -27,7 +27,7 @@ export interface AchievementProgress {
 export interface AchievementWithProgress extends Achievement {
   user_progress?: AchievementProgress;
   is_unlocked: boolean;
-  unlocked_at?: string;
+  unlocked_at?: string | null;
 }
 
 export interface AchievementStats {

@@ -1,5 +1,9 @@
 import type { IWrappedRepository } from "../repositories/interfaces";
-import type { WrappedData } from "@prostcounter/shared";
+import type {
+  WrappedData,
+  WrappedAccessResult,
+  AvailableWrappedFestival,
+} from "@prostcounter/shared";
 
 /**
  * Wrapped Service
@@ -69,5 +73,56 @@ export class WrappedService {
    */
   async invalidateCache(userId: string, festivalId?: string): Promise<void> {
     await this.wrappedRepo.invalidateCache(userId, festivalId);
+  }
+
+  /**
+   * Check if user can access wrapped for a festival
+   *
+   * @param userId - User ID
+   * @param festivalId - Festival ID
+   * @returns Access result with allowed status and reason
+   */
+  async checkAccess(
+    userId: string,
+    festivalId: string,
+  ): Promise<WrappedAccessResult> {
+    return this.wrappedRepo.checkAccess(userId, festivalId);
+  }
+
+  /**
+   * Get list of festivals with wrapped available for a user
+   *
+   * @param userId - User ID
+   * @returns List of festivals with wrapped availability status
+   */
+  async getAvailableFestivals(
+    userId: string,
+  ): Promise<AvailableWrappedFestival[]> {
+    return this.wrappedRepo.getAvailableFestivals(userId);
+  }
+
+  /**
+   * Admin function to regenerate cached wrapped data
+   *
+   * @param adminUserId - Admin user ID performing the action
+   * @param festivalId - Optional festival ID filter
+   * @param userId - Optional user ID filter
+   * @returns Number of entries regenerated and success status
+   */
+  async regenerateCache(
+    adminUserId: string,
+    festivalId?: string,
+    userId?: string,
+  ): Promise<{ success: boolean; regeneratedCount: number }> {
+    const regeneratedCount = await this.wrappedRepo.regenerateCache(
+      adminUserId,
+      festivalId,
+      userId,
+    );
+
+    return {
+      success: true,
+      regeneratedCount,
+    };
   }
 }

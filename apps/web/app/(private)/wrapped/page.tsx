@@ -1,17 +1,36 @@
+"use client";
+
 import {
   WrappedContainer,
   WrappedError,
 } from "@/components/wrapped/core/WrappedContainer";
-import { getWrappedData, canAccessWrapped } from "@/lib/actions/wrapped";
+import { useFestival } from "@/contexts/FestivalContext";
+import { useWrappedAccess, useWrappedData } from "@/hooks/useWrapped";
 
-export default async function WrappedPage() {
-  const [wrappedData, accessResult] = await Promise.all([
-    getWrappedData(),
-    canAccessWrapped(),
-  ]);
+export default function WrappedPage() {
+  const { currentFestival } = useFestival();
+  const festivalId = currentFestival?.id;
+
+  // Use direct Supabase call for wrapped data (preserves DB format for slides)
+  const { data: wrappedData, loading: wrappedLoading } =
+    useWrappedData(festivalId);
+  const { data: accessResult, loading: accessLoading } =
+    useWrappedAccess(festivalId);
+
+  // Loading state
+  if (wrappedLoading || accessLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🍺</div>
+          <p className="text-gray-600">Loading your wrapped...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Access denied
-  if (!accessResult.allowed) {
+  if (accessResult && !accessResult.allowed) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center max-w-md px-6">

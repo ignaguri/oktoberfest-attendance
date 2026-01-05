@@ -10,12 +10,16 @@ import {
   UpdatePersonalAttendanceResponseSchema,
   CheckInFromReservationParamSchema,
   CheckInFromReservationResponseSchema,
+  GetAttendanceByDateQuerySchema,
+  GetAttendanceByDateResponseSchema,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import type { AuthContext } from "../middleware/auth";
 
 import { NotFoundError, ValidationError } from "../middleware/error";
 import { SupabaseAttendanceRepository } from "../repositories/supabase";
+import { NotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -74,6 +78,56 @@ app.openapi(listAttendancesRoute, async (c) => {
   );
 });
 
+// GET /attendance/by-date - Get attendance for a specific date with pictures
+const getAttendanceByDateRoute = createRoute({
+  method: "get",
+  path: "/attendance/by-date",
+  tags: ["attendance"],
+  summary: "Get attendance for a specific date",
+  description:
+    "Returns attendance record for a specific date with tent IDs and picture URLs",
+  request: {
+    query: GetAttendanceByDateQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Attendance retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GetAttendanceByDateResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getAttendanceByDateRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const query = c.req.valid("query");
+
+  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
+  const result = await attendanceRepo.getByDate(
+    user.id,
+    query.festivalId,
+    query.date,
+  );
+
+  return c.json({ attendance: result }, 200);
+});
+
 // DELETE /attendance/:id - Delete an attendance
 const deleteAttendanceRoute = createRoute({
   method: "delete",
@@ -130,7 +184,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   const attendance = await attendanceRepo.findById(id);
 
   if (!attendance) {
-    throw new NotFoundError("Attendance not found");
+    throw new NotFoundError(ErrorCodes.ATTENDANCE_NOT_FOUND);
   }
 
   // Delete the attendance
@@ -207,13 +261,65 @@ app.openapi(createAttendanceRoute, async (c) => {
   // Validate festival exists
   const festival = await attendanceRepo.festivalExists(data.festivalId);
   if (!festival) {
-    throw new ValidationError(
-      `Invalid festival ID: ${data.festivalId}. Please refresh the page and try again.`,
-    );
+    throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
 
   // Create/update attendance with tents
   const result = await attendanceRepo.createWithTents(user.id, data);
+
+  // Trigger tent check-in notifications only if tents were actually changed
+  if (data.tents && data.tents.length > 0 && result.tentsChanged) {
+    const novuApiKey = process.env.NOVU_API_KEY;
+    if (novuApiKey) {
+      try {
+        // Get user's group memberships for this festival
+        const { data: groupMemberships, error: groupError } = await supabase
+          .from("group_members")
+          .select(
+            `
+            group_id,
+            groups!inner(festival_id)
+          `,
+          )
+          .eq("user_id", user.id)
+          .eq("groups.festival_id", data.festivalId);
+
+        if (!groupError && groupMemberships && groupMemberships.length > 0) {
+          // Get tent names for better notifications
+          const { data: tentData } = await supabase
+            .from("tents")
+            .select("id, name")
+            .in("id", data.tents);
+
+          const tentNames =
+            tentData
+              ?.map((tent) => tent.name)
+              .filter((name) => name)
+              .join(", ") || "Multiple tents";
+          const groupIds = groupMemberships
+            .map((membership) => membership.group_id)
+            .filter((id): id is string => id !== null);
+
+          const notificationService = new NotificationService(
+            supabase,
+            novuApiKey,
+          );
+          await notificationService.notifyTentCheckin(
+            user.id,
+            tentNames,
+            groupIds,
+            data.festivalId,
+          );
+        }
+      } catch (notificationError) {
+        // Don't fail the attendance operation if notification fails
+        console.error(
+          "Failed to send tent check-in notification:",
+          notificationError,
+        );
+      }
+    }
+  }
 
   return c.json(result, 200);
 });
@@ -280,9 +386,7 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
   // Validate festival exists
   const festival = await attendanceRepo.festivalExists(data.festivalId);
   if (!festival) {
-    throw new ValidationError(
-      `Invalid festival ID: ${data.festivalId}. Please refresh the page and try again.`,
-    );
+    throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
 
   // Update personal attendance
@@ -360,7 +464,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     .single();
 
   if (reservationError || !reservation) {
-    throw new NotFoundError("Reservation not found or already processed");
+    throw new NotFoundError(ErrorCodes.RESERVATION_NOT_FOUND);
   }
 
   // Get festival timezone
@@ -371,7 +475,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     .single();
 
   if (festivalError || !festival) {
-    throw new NotFoundError("Festival not found");
+    throw new NotFoundError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
 
   // Convert start_at to festival timezone date (YYYY-MM-DD)

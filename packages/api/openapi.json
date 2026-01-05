@@ -536,6 +536,178 @@
         }
       }
     },
+    "/v1/attendance/by-date": {
+      "get": {
+        "tags": [
+          "attendance"
+        ],
+        "summary": "Get attendance for a specific date",
+        "description": "Returns attendance record for a specific date with tent IDs and picture URLs",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attendance retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "attendance": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "festivalId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "date": {
+                          "type": "string",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "drinkCount": {
+                          "type": "integer"
+                        },
+                        "beerCount": {
+                          "type": "integer"
+                        },
+                        "totalSpentCents": {
+                          "type": "integer"
+                        },
+                        "totalTipCents": {
+                          "type": "integer"
+                        },
+                        "avgPriceCents": {
+                          "type": "integer"
+                        },
+                        "tentVisits": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tentId": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "visitDate": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "tentName": {
+                                "type": "string",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "tentId",
+                              "visitDate",
+                              "tentName"
+                            ]
+                          }
+                        },
+                        "tentIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "pictureUrls": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "userId",
+                        "festivalId",
+                        "date",
+                        "createdAt",
+                        "updatedAt",
+                        "drinkCount",
+                        "beerCount",
+                        "totalSpentCents",
+                        "totalTipCents",
+                        "avgPriceCents",
+                        "tentVisits",
+                        "tentIds",
+                        "pictureUrls"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "attendance"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/attendance/{id}": {
       "delete": {
         "tags": [
@@ -1667,6 +1839,9 @@
                           },
                           "memberCount": {
                             "type": "integer"
+                          },
+                          "isMember": {
+                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -1894,6 +2069,9 @@
                     },
                     "memberCount": {
                       "type": "integer"
+                    },
+                    "isMember": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -3939,6 +4117,639 @@
                   "required": [
                     "newAchievements",
                     "totalPoints"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/achievements/with-progress": {
+      "get": {
+        "tags": [
+          "achievements"
+        ],
+        "summary": "Get all achievements with progress",
+        "description": "Returns all achievements (locked and unlocked) with user progress for a festival",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "consumption",
+                "attendance",
+                "explorer",
+                "social",
+                "competitive",
+                "special"
+              ]
+            },
+            "required": false,
+            "name": "category",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Achievements with progress retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "consumption",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "special"
+                            ]
+                          },
+                          "icon": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "rarity": {
+                            "type": "string",
+                            "enum": [
+                              "common",
+                              "rare",
+                              "epic",
+                              "legendary"
+                            ]
+                          },
+                          "conditions": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "nullable": true
+                            },
+                            "default": {}
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          },
+                          "is_unlocked": {
+                            "type": "boolean"
+                          },
+                          "unlocked_at": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "user_progress": {
+                            "type": "object",
+                            "properties": {
+                              "current_value": {
+                                "type": "number"
+                              },
+                              "target_value": {
+                                "type": "number"
+                              },
+                              "percentage": {
+                                "type": "number"
+                              },
+                              "last_updated": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "current_value",
+                              "target_value",
+                              "percentage",
+                              "last_updated"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "description",
+                          "category",
+                          "icon",
+                          "points",
+                          "rarity",
+                          "is_active",
+                          "created_at",
+                          "updated_at",
+                          "is_unlocked"
+                        ]
+                      }
+                    },
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "total_achievements": {
+                          "type": "integer"
+                        },
+                        "unlocked_achievements": {
+                          "type": "integer"
+                        },
+                        "total_points": {
+                          "type": "integer"
+                        },
+                        "breakdown_by_category": {
+                          "type": "object",
+                          "properties": {
+                            "consumption": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "attendance": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "explorer": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "social": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "competitive": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "special": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            }
+                          }
+                        },
+                        "breakdown_by_rarity": {
+                          "type": "object",
+                          "properties": {
+                            "common": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "rare": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "epic": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "legendary": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "total_achievements",
+                        "unlocked_achievements",
+                        "total_points",
+                        "breakdown_by_category",
+                        "breakdown_by_rarity"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "stats"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/achievements/leaderboard": {
+      "get": {
+        "tags": [
+          "achievements"
+        ],
+        "summary": "Get achievement leaderboard",
+        "description": "Returns the achievement leaderboard for a festival",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "consumption",
+                "attendance",
+                "explorer",
+                "social",
+                "competitive",
+                "special"
+              ]
+            },
+            "required": false,
+            "name": "category",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leaderboard retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "user_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "full_name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "avatar_url": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "total_achievements": {
+                            "type": "integer"
+                          },
+                          "total_points": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "user_id",
+                          "username",
+                          "full_name",
+                          "avatar_url",
+                          "total_achievements",
+                          "total_points"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/achievements/available": {
+      "get": {
+        "tags": [
+          "achievements"
+        ],
+        "summary": "List all available achievements",
+        "description": "Returns all active achievements that can be unlocked",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available achievements retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "consumption",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "special"
+                            ]
+                          },
+                          "icon": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "rarity": {
+                            "type": "string",
+                            "enum": [
+                              "common",
+                              "rare",
+                              "epic",
+                              "legendary"
+                            ]
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "description",
+                          "category",
+                          "icon",
+                          "points",
+                          "rarity",
+                          "is_active"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
                   ]
                 }
               }
@@ -7351,6 +8162,10 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "preferred_language": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "email": {
                           "type": "string",
                           "nullable": true
@@ -7359,7 +8174,8 @@
                       "required": [
                         "full_name",
                         "username",
-                        "avatar_url"
+                        "avatar_url",
+                        "preferred_language"
                       ]
                     }
                   },
@@ -7420,6 +8236,10 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 100
+                  },
+                  "preferred_language": {
+                    "type": "string",
+                    "nullable": true
                   }
                 }
               }

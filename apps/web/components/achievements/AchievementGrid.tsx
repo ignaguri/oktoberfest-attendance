@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-import type { AchievementWithProgress } from "@/lib/types/achievements";
+import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 
 import { AchievementCard } from "./AchievementCard";
 

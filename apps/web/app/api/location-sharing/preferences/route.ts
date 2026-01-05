@@ -1,4 +1,4 @@
-import { sendLocationSharingNotification } from "@/lib/actions/notifications";
+import { createNotificationService } from "@/lib/services/notifications";
 import { reportSupabaseException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
@@ -168,7 +168,12 @@ export async function POST(request: NextRequest) {
     // Send notification if sharing was enabled
     if (sharingEnabled) {
       try {
-        await sendLocationSharingNotification(groupId, "started");
+        const notificationService = createNotificationService();
+        await notificationService.notifyLocationSharing(
+          user.id,
+          groupId,
+          "started",
+        );
       } catch (error) {
         console.warn("Failed to send location sharing notification:", error);
         // Don't fail the request if notification fails
