@@ -9,6 +9,7 @@ export async function proxy(request: NextRequest) {
     "/",
     "/api/cron/scheduler",
     "/api/novu",
+    "/api/v1", // API routes handle their own auth via Authorization header
     "/auth",
     "/auth/callback",
     "/auth/confirm",
@@ -80,7 +81,8 @@ export async function proxy(request: NextRequest) {
 
   if (
     publicPaths.includes(request.nextUrl.pathname) ||
-    request.nextUrl.pathname.startsWith("/r/")
+    request.nextUrl.pathname.startsWith("/r/") ||
+    request.nextUrl.pathname.startsWith("/api/v1/") // API routes handle their own auth
   ) {
     return NextResponse.next();
   }
