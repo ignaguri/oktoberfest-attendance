@@ -41,13 +41,12 @@
     "e2e:install-browsers": "playwright install --with-deps"
   },
   "devDependencies": {
-    "next": "16.1.1",
     "@eslint/compat": "^2.0.0",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
     "@novu/api": "^3.11.2",
     "@playwright/test": "^1.57.0",
-    "@typescript-eslint/eslint-plugin": "8.50.1",
+    "@typescript-eslint/eslint-plugin": "8.52.0",
     "dotenv": "^17.2.3",
     "eslint": "9.39.2",
     "eslint-config-next": "16.1.1",
@@ -57,12 +56,13 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unused-imports": "4.3.0",
     "husky": "^9.1.7",
+    "next": "16.1.1",
     "prettier": "3.7.4",
-    "supabase": "2.70.5",
+    "supabase": "2.71.0",
     "tsx": "^4.21.0",
-    "turbo": "^2.7.2",
+    "turbo": "^2.7.3",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.50.1"
+    "typescript-eslint": "^8.52.0"
   },
   "overrides": {
     "eslint": "$eslint"
