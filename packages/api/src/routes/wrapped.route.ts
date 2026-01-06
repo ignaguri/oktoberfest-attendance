@@ -297,7 +297,16 @@ const regenerateCacheRoute = createRoute({
 
 app.openapi(regenerateCacheRoute, async (c) => {
   const { user, supabase } = c.var;
-  const body = await c.req.json().catch(() => ({}));
+  // Parse optional body - use empty object if not provided or invalid JSON
+  let body: { festivalId?: string; userId?: string } = {};
+  try {
+    const contentType = c.req.header("content-type");
+    if (contentType?.includes("application/json")) {
+      body = await c.req.json();
+    }
+  } catch {
+    // Body is optional, so empty object is acceptable
+  }
 
   const wrappedRepo = new SupabaseWrappedRepository(supabase);
   const wrappedService = new WrappedService(wrappedRepo);

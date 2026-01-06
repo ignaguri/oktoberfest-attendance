@@ -20,12 +20,7 @@ const ACCESS_CONFIG = {
   allowInDev: true,
   requireFestivalEnded: true,
   minAttendanceDays: 0,
-  allowedUsers: [
-    "af1a053c-8b7d-42db-ae61-4d358e93fed0", // Ahmad
-    "0297b925-716f-4658-8286-bb8913522793", // Fede Pollo
-    "69d1594d-b923-4700-aa80-7a625dc99885", // Edu
-    "0c97626e-d930-4b66-96cc-92d49a7ff8a5", // Yo
-  ],
+  allowedUsers: [] as string[],
 };
 
 export class SupabaseWrappedRepository implements IWrappedRepository {
