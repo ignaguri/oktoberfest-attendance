@@ -9,6 +9,7 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\" --ignore-path .gitignore",
     "type-check": "turbo type-check",
     "test": "turbo test",
     "sup:db:pull": "supabase db pull",
