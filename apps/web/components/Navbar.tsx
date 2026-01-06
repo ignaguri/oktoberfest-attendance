@@ -1,5 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { getProfileShortFailsafe } from "@/lib/sharedActions";
+import { useCurrentProfile } from "@/hooks/useProfile";
 import AppLogo from "@/public/android-chrome-512x512.png";
 import { CalendarDays } from "lucide-react";
 import Image from "next/image";
@@ -9,8 +11,8 @@ import { NotificationBell } from "./NotificationBell";
 import { PWAReloadButton } from "./PWAReloadButton";
 import { UserMenu } from "./UserMenu/UserMenu";
 
-export default async function Navbar() {
-  const profileData = await getProfileShortFailsafe();
+export default function Navbar() {
+  const { data: profileData, loading } = useCurrentProfile();
 
   return (
     <nav className="w-full bg-gray-800 shadow-sm">
@@ -28,7 +30,13 @@ export default async function Navbar() {
           <span translate="no">ProstCounter</span>
         </Link>
 
-        {profileData && (
+        {loading && (
+          <div className="h-10 flex items-center">
+            <div className="w-8 h-8 rounded-full bg-gray-600 animate-pulse" />
+          </div>
+        )}
+
+        {!loading && profileData && (
           <div className="flex items-center gap-2">
             <PWAReloadButton />
             <Button
@@ -56,7 +64,7 @@ export default async function Navbar() {
           </div>
         )}
 
-        {!profileData && (
+        {!loading && !profileData && (
           <div className="h-10 flex items-center">
             <Link href="/sign-in" className="text-white">
               Sign In

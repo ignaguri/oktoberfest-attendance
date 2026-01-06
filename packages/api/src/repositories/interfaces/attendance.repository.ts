@@ -1,5 +1,6 @@
 import type {
   AttendanceWithTotals,
+  AttendanceByDate,
   ListAttendancesQuery,
   CreateAttendanceInput,
   CreateAttendanceResponse,
@@ -83,4 +84,17 @@ export interface IAttendanceRepository {
   festivalExists(
     festivalId: string,
   ): Promise<{ id: string; timezone: string | null } | null>;
+
+  /**
+   * Get attendance for a specific date with pictures
+   * @param userId - User ID
+   * @param festivalId - Festival ID
+   * @param date - Date in YYYY-MM-DD format
+   * @returns Attendance with tent IDs and picture URLs, or null if not found
+   */
+  getByDate(
+    userId: string,
+    festivalId: string,
+    date: string,
+  ): Promise<AttendanceByDate | null>;
 }

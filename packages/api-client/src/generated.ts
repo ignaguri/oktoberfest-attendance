@@ -261,6 +261,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/attendance/by-date": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get attendance for a specific date
+         * @description Returns attendance record for a specific date with tent IDs and picture URLs
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                    date: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Attendance retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            attendance: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                userId: string;
+                                /** Format: uuid */
+                                festivalId: string;
+                                date: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                drinkCount: number;
+                                beerCount: number;
+                                totalSpentCents: number;
+                                totalTipCents: number;
+                                avgPriceCents: number;
+                                tentVisits: {
+                                    /** Format: uuid */
+                                    tentId: string;
+                                    /** Format: date-time */
+                                    visitDate: string;
+                                    tentName: string | null;
+                                }[];
+                                tentIds: string[];
+                                pictureUrls: string[];
+                            } | null;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/attendance/{id}": {
         parameters: {
             query?: never;
@@ -868,6 +950,7 @@ export interface paths {
                                 /** Format: date-time */
                                 updatedAt: string;
                                 memberCount: number;
+                                isMember?: boolean;
                             }[];
                         };
                     };
@@ -1065,6 +1148,7 @@ export interface paths {
                             /** Format: date-time */
                             updatedAt: string;
                             memberCount: number;
+                            isMember?: boolean;
                         };
                     };
                 };
@@ -2223,6 +2307,276 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/achievements/with-progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all achievements with progress
+         * @description Returns all achievements (locked and unlocked) with user progress for a festival
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Achievements with progress retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                description: string;
+                                /** @enum {string} */
+                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                                icon: string;
+                                points: number;
+                                /** @enum {string} */
+                                rarity: "common" | "rare" | "epic" | "legendary";
+                                /** @default {} */
+                                conditions: {
+                                    [key: string]: unknown;
+                                };
+                                is_active: boolean;
+                                created_at: string;
+                                updated_at: string;
+                                is_unlocked: boolean;
+                                unlocked_at?: string | null;
+                                user_progress?: {
+                                    current_value: number;
+                                    target_value: number;
+                                    percentage: number;
+                                    last_updated: string;
+                                };
+                            }[];
+                            stats: {
+                                total_achievements: number;
+                                unlocked_achievements: number;
+                                total_points: number;
+                                breakdown_by_category: {
+                                    consumption?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    attendance?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    explorer?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    social?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    competitive?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    special?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                };
+                                breakdown_by_rarity: {
+                                    common?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    rare?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    epic?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    legendary?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/achievements/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get achievement leaderboard
+         * @description Returns the achievement leaderboard for a festival
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Leaderboard retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                user_id: string;
+                                username: string | null;
+                                full_name: string | null;
+                                avatar_url: string | null;
+                                total_achievements: number;
+                                total_points: number;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/achievements/available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all available achievements
+         * @description Returns all active achievements that can be unlocked
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Available achievements retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                description: string;
+                                /** @enum {string} */
+                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                                icon: string;
+                                points: number;
+                                /** @enum {string} */
+                                rarity: "common" | "rare" | "epic" | "legendary";
+                                is_active: boolean;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3991,6 +4345,7 @@ export interface paths {
                                 full_name: string | null;
                                 username: string | null;
                                 avatar_url: string | null;
+                                preferred_language: string | null;
                                 email?: string | null;
                             };
                         };
@@ -4026,6 +4381,7 @@ export interface paths {
                     "application/json": {
                         username?: string;
                         full_name?: string;
+                        preferred_language?: string | null;
                     };
                 };
             };

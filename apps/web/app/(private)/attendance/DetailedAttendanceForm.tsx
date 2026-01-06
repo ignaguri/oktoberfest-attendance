@@ -12,13 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFestival } from "@/contexts/FestivalContext";
+import { apiClient } from "@/lib/api-client";
+import { formatDateForDatabase } from "@/lib/date-utils";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
-import {
-  addPersonalAttendance,
-  fetchAttendanceByDate,
-} from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isWithinInterval } from "date-fns";
 import {
@@ -32,7 +30,7 @@ import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
-import type { AttendanceByDate } from "@/lib/sharedActions";
+import type { AttendanceByDate } from "@prostcounter/shared/schemas";
 
 import { AttendanceDatePicker } from "./AttendanceDatePicker";
 import { BeerPicturesUpload } from "./BeerPicturesUpload";
@@ -85,12 +83,13 @@ export default function DetailedAttendanceForm({
       if (!currentFestival) return;
 
       try {
-        const attendanceData = await fetchAttendanceByDate(
-          date,
-          currentFestival.id,
-        );
+        const dateString = formatDateForDatabase(date);
+        const { attendance } = await apiClient.attendance.getByDate({
+          festivalId: currentFestival.id,
+          date: dateString,
+        });
         startTransition(() => {
-          setExistingAttendance(attendanceData as AttendanceByDate);
+          setExistingAttendance(attendance);
         });
       } catch {
         toast.error(t("notifications.error.attendanceLoadFailed"));
@@ -131,15 +130,20 @@ export default function DetailedAttendanceForm({
 
   // Update form values when existingAttendance or currentDate changes
   useEffect(() => {
-    // Convert beer_count to number since the view returns bigint as string
-    setValue("amount", Number(existingAttendance?.beer_count) || 0);
+    setValue("amount", existingAttendance?.beerCount || 0);
     setValue("date", currentDate);
-    setValue("tents", existingAttendance?.tent_ids || []);
+    setValue("tents", existingAttendance?.tentIds || []);
   }, [existingAttendance, currentDate, setValue]);
 
   const onSubmit = async (data: DetailedAttendanceFormData) => {
     try {
-      await addPersonalAttendance({ ...data, festivalId: currentFestival!.id });
+      const dateString = formatDateForDatabase(data.date);
+      await apiClient.attendance.updatePersonal({
+        festivalId: currentFestival!.id,
+        date: dateString,
+        tents: data.tents,
+        amount: data.amount,
+      });
       toast.success(t("notifications.success.attendanceUpdated"));
       await fetchAttendanceForDate(data.date);
       onAttendanceUpdate();
@@ -157,7 +161,7 @@ export default function DetailedAttendanceForm({
     if (existingAttendance) {
       setExistingAttendance({
         ...existingAttendance,
-        picture_urls: newUrls,
+        pictureUrls: newUrls,
       });
     }
   };
@@ -265,7 +269,7 @@ export default function DetailedAttendanceForm({
             <BeerPicturesUpload
               key={existingAttendance.id} // Ensure re-render when existingAttendance changes
               attendanceId={existingAttendance.id}
-              existingPictureUrls={existingAttendance.picture_urls || []}
+              existingPictureUrls={existingAttendance.pictureUrls || []}
               onPicturesUpdate={handlePicturesUpdate}
             />
           </div>

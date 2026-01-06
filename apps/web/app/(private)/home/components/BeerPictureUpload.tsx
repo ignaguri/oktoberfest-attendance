@@ -5,9 +5,9 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useTranslation } from "@/lib/i18n/client";
-import { MAX_FILE_SIZE, singlePictureSchema } from "@/lib/schemas/uploads";
-import { uploadBeerPicture } from "@/lib/sharedActions";
+import { ApiError, apiClient } from "@/lib/api-client";
+import { translateError, useTranslation } from "@/lib/i18n/client";
+import { singlePictureSchema } from "@/lib/schemas/uploads";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
@@ -74,23 +74,22 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
     if (!data.picture || !attendanceId) return;
 
     try {
-      const formData = new FormData();
-      formData.append("picture", data.picture);
-      formData.append("attendanceId", attendanceId);
-      formData.append("visibility", data.visibility);
-      await uploadBeerPicture(formData);
+      await apiClient.photos.upload({
+        picture: data.picture,
+        attendanceId,
+        visibility: data.visibility,
+      });
+
       toast.success(t("notifications.success.pictureUploaded"));
       setPictureAlreadyUploaded(true);
       setShowSuccessMessage(true);
       reset();
     } catch (error) {
-      const fileSizeError =
-        error instanceof Error && error.message.includes("exceeded")
-          ? t("validation.file.tooLarge", {
-              max: MAX_FILE_SIZE / 1024 / 1024,
-            })
-          : "";
-      toast.error(fileSizeError || t("notifications.error.generic"));
+      if (error instanceof ApiError) {
+        toast.error(translateError(t, error.code, error.message));
+      } else {
+        toast.error(t("notifications.error.generic"));
+      }
     }
   };
 
@@ -124,14 +123,14 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
         className={buttonVariants({ variant: "outline" })}
       >
         {watchedPicture ? (
-          <span>Choose a different one</span>
+          <span>{t("attendance.pictures.chooseDifferent")}</span>
         ) : (
           <div className="flex items-center gap-2">
             <Camera size={24} />
             {pictureAlreadyUploaded ? (
-              <span>add another</span>
+              <span>{t("attendance.pictures.addAnother")}</span>
             ) : (
-              <span>with a beer</span>
+              <span>{t("attendance.pictures.withBeer")}</span>
             )}
           </div>
         )}
@@ -147,7 +146,9 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
             <EyeOff size={16} className="text-red-600" />
           )}
           <span className="text-sm font-medium">
-            {watchedVisibility === "public" ? "Public photo" : "Private photo"}
+            {watchedVisibility === "public"
+              ? t("attendance.pictures.publicPhoto")
+              : t("attendance.pictures.privatePhoto")}
           </span>
           <Switch
             checked={watchedVisibility === "public"}
@@ -160,15 +161,17 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
 
       {watchedPicture && !errors.picture && (
         <Button type="submit" disabled={isSubmitting} variant="darkYellow">
-          {isSubmitting ? "Uploading..." : "Upload picture"}
+          {isSubmitting
+            ? t("common.status.loading")
+            : t("attendance.pictures.upload", { count: 1 })}
         </Button>
       )}
 
       {showSuccessMessage && (
         <Alert className="text-center max-w-xs">
-          You can view all your pictures in your group&apos;s gallery or in{" "}
+          {t("attendance.pictures.viewInGallery")}{" "}
           <Link className="underline" href="/attendance">
-            My Attendances
+            {t("common.menu.attendance")}
           </Link>
         </Alert>
       )}

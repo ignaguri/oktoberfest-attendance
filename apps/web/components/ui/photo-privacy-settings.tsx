@@ -1,21 +1,11 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import {
-  getAllUserGroupPhotoSettings,
-  getUserGlobalPhotoSettings,
-  updateGlobalPhotoSettings,
-  updateGroupPhotoSettings,
-} from "@/lib/actions/photo-visibility";
+import { apiClient } from "@/lib/api-client";
 import { useTranslation } from "@/lib/i18n/client";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-import type {
-  GlobalPhotoSettingsFormData,
-  GroupPhotoSettingsFormData,
-} from "@/lib/schemas/photo-visibility";
 
 interface GroupPhotoSetting {
   group_id: string;
@@ -25,10 +15,11 @@ interface GroupPhotoSetting {
 
 export function PhotoPrivacySettings() {
   const { t } = useTranslation();
-  const [globalSettings, setGlobalSettings] =
-    useState<GlobalPhotoSettingsFormData>({
-      hide_photos_from_all_groups: false,
-    });
+  const [globalSettings, setGlobalSettings] = useState<{
+    hide_photos_from_all_groups: boolean;
+  }>({
+    hide_photos_from_all_groups: false,
+  });
   const [groupSettings, setGroupSettings] = useState<GroupPhotoSetting[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [savingGlobal, setSavingGlobal] = useState(false);
@@ -41,14 +32,22 @@ export function PhotoPrivacySettings() {
   const loadSettings = async () => {
     try {
       const [globalData, groupData] = await Promise.all([
-        getUserGlobalPhotoSettings(),
-        getAllUserGroupPhotoSettings(),
+        apiClient.photos.getGlobalSettings(),
+        apiClient.photos.getAllGroupSettings(),
       ]);
 
       setGlobalSettings({
-        hide_photos_from_all_groups: globalData.hide_photos_from_all_groups,
+        hide_photos_from_all_groups: globalData.hidePhotosFromAllGroups,
       });
-      setGroupSettings(groupData);
+
+      // Map API response to component format
+      setGroupSettings(
+        groupData.settings.map((s) => ({
+          group_id: s.groupId,
+          group_name: s.groupName,
+          hide_photos_from_group: s.hidePhotosFromGroup,
+        })),
+      );
     } catch {
       toast.error(t("common.status.error"), {
         description: t("photo.privacy.loadError"),
@@ -63,8 +62,8 @@ export function PhotoPrivacySettings() {
     const newValue = !globalSettings.hide_photos_from_all_groups;
 
     try {
-      await updateGlobalPhotoSettings({
-        hide_photos_from_all_groups: newValue,
+      await apiClient.photos.updateGlobalSettings({
+        hidePhotosFromAllGroups: newValue,
       });
 
       setGlobalSettings((prev) => ({
@@ -91,12 +90,9 @@ export function PhotoPrivacySettings() {
     const newValue = !currentValue;
 
     try {
-      const formData: GroupPhotoSettingsFormData = {
-        group_id: groupId,
-        hide_photos_from_group: newValue,
-      };
-
-      await updateGroupPhotoSettings(formData);
+      await apiClient.photos.updateGroupSettings(groupId, {
+        hidePhotosFromGroup: newValue,
+      });
 
       setGroupSettings((prev) =>
         prev.map((group) =>

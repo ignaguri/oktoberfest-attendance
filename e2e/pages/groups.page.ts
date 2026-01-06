@@ -39,19 +39,19 @@ export class GroupsPage extends BasePage {
     this.myGroupsSection = page.getByText(/my groups/i);
 
     // Join Group form - use heading to locate the form section
+    // Placeholder translations: groups.join.namePlaceholder: "Group Name", groups.join.passwordPlaceholder: "Group Password"
     this.joinFormHeading = page.getByRole("heading", { name: "Join a Group" });
-    // Find inputs relative to the Join form heading (inputs are siblings in the same container)
-    this.joinGroupNameInput = page.getByRole("textbox", { name: "Group Name" }).first();
-    this.joinPasswordInput = page.getByRole("textbox", { name: "Group Password" }).first();
+    this.joinGroupNameInput = page.getByPlaceholder(/^group name$/i);
+    this.joinPasswordInput = page.getByPlaceholder(/^group password$/i);
     this.joinButton = page.getByRole("button", { name: /^join group$/i });
 
-    // Create Group form
+    // Create Group form - heading text from groups.create.title: "Create Group"
+    // Placeholder translations: groups.create.namePlaceholder: "Enter group name", groups.create.passwordPlaceholder: "Enter password"
     this.createFormHeading = page.getByRole("heading", {
-      name: "Create a New Group",
+      name: /create group/i,
     });
-    // Find inputs for Create form (they come after Join form inputs)
-    this.createGroupNameInput = page.getByRole("textbox", { name: "Group Name" }).nth(1);
-    this.createPasswordInput = page.getByRole("textbox", { name: "Group Password" }).nth(1);
+    this.createGroupNameInput = page.getByPlaceholder(/enter group name/i);
+    this.createPasswordInput = page.getByPlaceholder(/enter password/i);
     this.createButton = page.getByRole("button", { name: /^create group$/i });
   }
 

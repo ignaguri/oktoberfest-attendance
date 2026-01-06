@@ -548,6 +548,132 @@ export class NotificationService {
       return false;
     }
   }
+
+  /**
+   * Send location sharing notification with rate limiting
+   * Only sends notifications for "started" actions and limits to once every 5 minutes per user
+   */
+  async notifyLocationSharing(
+    userId: string,
+    groupId: string,
+    action: "started" | "stopped",
+  ): Promise<{ success: boolean; error?: string }> {
+    // Skip all stopped notifications
+    if (action === "stopped") {
+      return { success: true };
+    }
+
+    try {
+      // Check rate limit using RPC
+      const { data: recentNotifications, error: rateLimitError } =
+        await this.supabase.rpc("check_notification_rate_limit", {
+          p_user_id: userId,
+          p_notification_type: "location_sharing",
+          p_group_id: groupId,
+          p_minutes_ago: 5,
+        });
+
+      if (rateLimitError) {
+        console.warn("Rate limit check failed", {
+          error: rateLimitError,
+          userId,
+          groupId,
+        });
+      }
+
+      // If we found a recent notification, skip sending
+      if (recentNotifications && recentNotifications > 0) {
+        return { success: true }; // Return success but don't send
+      }
+
+      // Get user profile
+      const { data: profile, error: profileError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name")
+        .eq("id", userId)
+        .single();
+
+      if (profileError || !profile) {
+        return { success: false, error: "Failed to get user profile" };
+      }
+
+      // Get group details
+      const { data: group, error: groupError } = await this.supabase
+        .from("groups")
+        .select("id, name, festival_id")
+        .eq("id", groupId)
+        .single();
+
+      if (groupError || !group) {
+        return { success: false, error: "Group not found" };
+      }
+
+      // Get group members to notify (excluding the sharer)
+      const { data: groupMembers, error: membersError } = await this.supabase
+        .from("group_members")
+        .select("user_id")
+        .eq("group_id", groupId)
+        .neq("user_id", userId);
+
+      if (membersError) {
+        return { success: false, error: "Failed to get group members" };
+      }
+
+      if (!groupMembers || groupMembers.length === 0) {
+        return { success: true }; // No one to notify
+      }
+
+      const sharerName = profile.full_name || profile.username || "Someone";
+
+      // Send notification to each group member
+      for (const member of groupMembers) {
+        if (!member.user_id) continue;
+
+        try {
+          await this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.LOCATION_SHARING,
+            to: member.user_id,
+            payload: {
+              sharerName,
+              groupName: group.name,
+              action,
+              festivalId: group.festival_id,
+              groupId: group.id,
+            },
+          });
+        } catch (error) {
+          console.warn("Failed to send notification to group member", {
+            memberId: member.user_id,
+            groupId,
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
+          // Continue with other members even if one fails
+        }
+      }
+
+      // Record the notification in rate limiting table using RPC
+      try {
+        await this.supabase.rpc("record_notification_rate_limit", {
+          p_user_id: userId,
+          p_group_id: groupId,
+          p_notification_type: "location_sharing",
+        });
+      } catch (error) {
+        console.warn("Failed to record rate limit entry", {
+          userId,
+          groupId,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+
+      return { success: true };
+    } catch (error) {
+      reportNotificationException("notifyLocationSharing", error as Error, {
+        id: userId,
+      });
+      return { success: false, error: "Failed to send notification" };
+    }
+  }
 }
 
 // Factory function to create instance on demand

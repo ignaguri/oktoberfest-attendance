@@ -97,3 +97,65 @@ export const GetPhotosResponseSchema = z.object({
 });
 
 export type GetPhotosResponse = z.infer<typeof GetPhotosResponseSchema>;
+
+// ===== Photo Privacy Settings =====
+
+/**
+ * Global photo settings schema
+ */
+export const GlobalPhotoSettingsSchema = z.object({
+  userId: z.uuid(),
+  hidePhotosFromAllGroups: z.boolean(),
+});
+
+export type GlobalPhotoSettings = z.infer<typeof GlobalPhotoSettingsSchema>;
+
+/**
+ * Update global photo settings request
+ */
+export const UpdateGlobalPhotoSettingsSchema = z.object({
+  hidePhotosFromAllGroups: z.boolean(),
+});
+
+export type UpdateGlobalPhotoSettingsInput = z.infer<typeof UpdateGlobalPhotoSettingsSchema>;
+
+/**
+ * Group photo settings schema
+ */
+export const GroupPhotoSettingsSchema = z.object({
+  userId: z.uuid(),
+  groupId: z.uuid(),
+  groupName: z.string(),
+  hidePhotosFromGroup: z.boolean(),
+});
+
+export type GroupPhotoSettings = z.infer<typeof GroupPhotoSettingsSchema>;
+
+/**
+ * Update group photo settings request
+ */
+export const UpdateGroupPhotoSettingsSchema = z.object({
+  groupId: z.uuid(),
+  hidePhotosFromGroup: z.boolean(),
+});
+
+export type UpdateGroupPhotoSettingsInput = z.infer<typeof UpdateGroupPhotoSettingsSchema>;
+
+/**
+ * Update photo visibility request
+ */
+export const UpdatePhotoVisibilitySchema = z.object({
+  visibility: PhotoVisibilitySchema,
+});
+
+export type UpdatePhotoVisibilityInput = z.infer<typeof UpdatePhotoVisibilitySchema>;
+
+/**
+ * Bulk update photo visibility request
+ */
+export const BulkUpdatePhotoVisibilitySchema = z.object({
+  photoIds: z.array(z.uuid()).min(1, "At least one photo ID is required"),
+  visibility: PhotoVisibilitySchema,
+});
+
+export type BulkUpdatePhotoVisibilityInput = z.infer<typeof BulkUpdatePhotoVisibilitySchema>;

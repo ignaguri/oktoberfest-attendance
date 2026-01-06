@@ -6,15 +6,29 @@ import Avatar from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/ui/badge";
 import { ProfilePreview } from "@/components/ui/profile-preview";
 import { formatRelativeTime } from "@/lib/date-utils";
+import { useTranslation } from "@/lib/i18n/client";
 import { Beer, MapPin, Camera, Users, Clock, Medal } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
+import type { AchievementRarity } from "@prostcounter/shared/schemas";
+import type { TFunction } from "i18next";
 
 interface ActivityItemProps {
   activity: ActivityFeedItem;
 }
+
+// Type-safe accessor for activity_data properties
+const getActivityDataValue = <T,>(
+  data: Record<string, unknown>,
+  key: string,
+  defaultValue: T,
+): T => {
+  const value = data[key];
+  if (value === undefined || value === null) return defaultValue;
+  return value as T;
+};
 
 const getActivityIcon = (type: ActivityFeedItem["activity_type"]) => {
   switch (type) {
@@ -33,35 +47,56 @@ const getActivityIcon = (type: ActivityFeedItem["activity_type"]) => {
   }
 };
 
-const getActivityDescription = (activity: ActivityFeedItem) => {
+const getActivityDescription = (activity: ActivityFeedItem, t: TFunction) => {
   const { activity_type, activity_data } = activity;
 
   switch (activity_type) {
     case "beer_count_update":
-      const beerCount = activity_data.beer_count || 0;
-      return `drank ${beerCount} beer${beerCount !== 1 ? "s" : ""}`;
+      const beerCount = getActivityDataValue<number>(
+        activity_data,
+        "beer_count",
+        0,
+      );
+      return t("activityFeed.drankBeers", { count: beerCount });
 
     case "tent_checkin":
-      const tentName = activity_data.tent_name || "a tent";
-      return `checked into ${tentName}`;
+      const tentName = getActivityDataValue(
+        activity_data,
+        "tent_name",
+        t("activityFeed.aTent"),
+      );
+      return t("activityFeed.checkedInto", { tent: tentName });
 
     case "photo_upload":
-      return `uploaded a photo`;
+      return t("activityFeed.uploadedPhoto");
 
     case "group_join":
-      const groupName = activity_data.group_name || "a group";
-      return `joined ${groupName}`;
+      const groupName = getActivityDataValue(
+        activity_data,
+        "group_name",
+        t("activityFeed.aGroup"),
+      );
+      return t("activityFeed.joinedGroup", { group: groupName });
 
     case "achievement_unlock":
-      const rarity = activity_data.rarity;
-      return `unlocked an achievement${rarity ? ` (${rarity})` : ""}`;
+      const rarity = getActivityDataValue<string | undefined>(
+        activity_data,
+        "rarity",
+        undefined,
+      );
+      return rarity
+        ? t("activityFeed.unlockedAchievementRarity", {
+            rarity: t(`achievements.rarity.${rarity}`),
+          })
+        : t("activityFeed.unlockedAchievement");
 
     default:
-      return "had some activity";
+      return t("activityFeed.hadActivity");
   }
 };
 
 export const ActivityItem = ({ activity }: ActivityItemProps) => {
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
@@ -77,12 +112,19 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     try {
       return formatRelativeTime(new Date(activity_time));
     } catch {
-      return "recently";
+      return t("activityFeed.recently");
     }
-  }, [activity_time]);
+  }, [activity_time, t]);
 
-  const displayName = full_name || username || "Unknown User";
-  const imageUrl = `/api/image/${activity_data.picture_url}?bucket=beer_pictures`;
+  const displayName = full_name || username || t("activityFeed.unknownUser");
+  const pictureUrl = getActivityDataValue<string | undefined>(
+    activity_data,
+    "picture_url",
+    undefined,
+  );
+  const imageUrl = pictureUrl
+    ? `/api/image/${pictureUrl}?bucket=beer_pictures`
+    : "";
 
   return (
     <div className="flex items-start gap-3 py-2 border-b border-border/50 last:border-b-0">
@@ -118,18 +160,38 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         </div>
 
         <p className="text-sm text-muted-foreground text-left">
-          {getActivityDescription(activity)}
+          {getActivityDescription(activity, t)}
         </p>
 
         {/* Additional badges for special activities */}
         <div className="flex items-center gap-2 mt-1">
           {activity_type === "achievement_unlock" &&
-            activity_data.achievement_name && (
+            getActivityDataValue<string | undefined>(
+              activity_data,
+              "achievement_name",
+              undefined,
+            ) && (
               <AchievementBadge
-                name={activity_data.achievement_name}
-                icon={activity_data.achievement_icon || "trophy"}
-                rarity={activity_data.rarity || "common"}
-                points={activity_data.achievement_points || 0}
+                name={getActivityDataValue(
+                  activity_data,
+                  "achievement_name",
+                  "",
+                )}
+                icon={getActivityDataValue(
+                  activity_data,
+                  "achievement_icon",
+                  "trophy",
+                )}
+                rarity={getActivityDataValue<AchievementRarity>(
+                  activity_data,
+                  "rarity",
+                  "common",
+                )}
+                points={getActivityDataValue(
+                  activity_data,
+                  "achievement_points",
+                  0,
+                )}
                 isUnlocked={true}
                 size="sm"
                 showPoints={false}
@@ -137,18 +199,18 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
             )}
 
           {activity_type === "beer_count_update" &&
-            activity_data.beer_count > 5 && (
+            getActivityDataValue(activity_data, "beer_count", 0) > 5 && (
               <Badge
                 variant="outline"
                 className="text-xs bg-orange-100 text-orange-800 border-orange-300"
               >
-                🔥 Hot streak
+                {t("activityFeed.hotStreak")}
               </Badge>
             )}
         </div>
 
         {/* Photo preview for photo uploads */}
-        {activity_type === "photo_upload" && activity_data.picture_url && (
+        {activity_type === "photo_upload" && pictureUrl && (
           <div className="mt-2">
             <div
               className="size-16 rounded-lg overflow-hidden bg-muted relative cursor-pointer"

@@ -6,9 +6,10 @@ import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 import { useConfetti } from "@/hooks/useConfetti";
+import { apiClient } from "@/lib/api-client";
+import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { quickAttendanceSchema } from "@/lib/schemas/attendance";
-import { addAttendance, fetchAttendanceByDate } from "@/lib/sharedActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { QuickAttendanceFormData } from "@/lib/schemas/attendance";
-import type { AttendanceByDate } from "@/lib/sharedActions";
+import type { AttendanceByDate } from "@prostcounter/shared/schemas";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
@@ -169,18 +170,19 @@ export const QuickAttendanceRegistrationForm = ({
       }
 
       try {
-        const attendance = await fetchAttendanceByDate(
-          new Date(),
-          currentFestival.id,
-        );
+        const dateString = formatDateForDatabase(new Date());
+        const { attendance } = await apiClient.attendance.getByDate({
+          festivalId: currentFestival.id,
+          date: dateString,
+        });
         if (attendance) {
           setAttendanceData(attendance);
           onAttendanceIdReceived(attendance.id);
           setValue(
             "tentId",
-            attendance.tent_ids[attendance.tent_ids.length - 1] || "",
+            attendance.tentIds[attendance.tentIds.length - 1] || "",
           );
-          setValue("beerCount", attendance.beer_count || 0);
+          setValue("beerCount", attendance.beerCount || 0);
         }
       } catch {
         toast.error(t("notifications.error.attendanceLoadFailed"));
@@ -188,7 +190,7 @@ export const QuickAttendanceRegistrationForm = ({
     };
 
     loadAttendance();
-  }, [onAttendanceIdReceived, currentFestival, setValue]);
+  }, [onAttendanceIdReceived, currentFestival, setValue, t]);
 
   const onSubmit = async (data: QuickAttendanceFormData) => {
     if (!currentFestival) {
@@ -197,25 +199,27 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
-      const previousBeerCount = attendanceData?.beer_count ?? 0;
+      const previousBeerCount = attendanceData?.beerCount ?? 0;
 
       // Only send the new tent ID if it's different from the last one and not empty
       // This prevents duplicate tent visits in the database
       const tentsToSend =
         data.tentId && // Only if tent is selected (not empty)
-        (!attendanceData?.tent_ids ||
-          attendanceData.tent_ids.length === 0 ||
-          attendanceData.tent_ids[attendanceData.tent_ids.length - 1] !==
+        (!attendanceData?.tentIds ||
+          attendanceData.tentIds.length === 0 ||
+          attendanceData.tentIds[attendanceData.tentIds.length - 1] !==
             data.tentId)
           ? [data.tentId] // Only the new tent
           : []; // No new tent to add
 
-      const newAttendanceId = await addAttendance({
-        amount: data.beerCount,
-        date: new Date(),
-        tents: tentsToSend,
-        festivalId: currentFestival.id,
-      });
+      const dateString = formatDateForDatabase(new Date());
+      const { attendanceId: newAttendanceId } =
+        await apiClient.attendance.create({
+          festivalId: currentFestival.id,
+          date: dateString,
+          tents: tentsToSend,
+          amount: data.beerCount,
+        });
 
       // Trigger confetti only if beer count increased
       if (data.beerCount > previousBeerCount) {
@@ -225,14 +229,14 @@ export const QuickAttendanceRegistrationForm = ({
       // Update the local state with the new tent ID if it was added
       const updatedTentIds =
         tentsToSend.length > 0
-          ? [...(attendanceData?.tent_ids ?? []), ...tentsToSend]
-          : (attendanceData?.tent_ids ?? []);
+          ? [...(attendanceData?.tentIds ?? []), ...tentsToSend]
+          : (attendanceData?.tentIds ?? []);
 
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
-        beer_count: data.beerCount,
-        tent_ids: updatedTentIds,
+        beerCount: data.beerCount,
+        tentIds: updatedTentIds,
       };
       setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);

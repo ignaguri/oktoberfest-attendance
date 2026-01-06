@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { regenerateWrappedCache } from "@/lib/actions/wrapped";
+import { apiClient } from "@/lib/api-client";
 import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import { useState } from "react";
@@ -46,10 +46,10 @@ const CacheManagement = () => {
   const handleRegenerateWrappedCache = async () => {
     setIsRegenerating(true);
     try {
-      const result = await regenerateWrappedCache(
-        festivalId || undefined,
-        userId || undefined,
-      );
+      const result = await apiClient.wrapped.regenerateCache({
+        festivalId: festivalId || undefined,
+        userId: userId || undefined,
+      });
 
       if (result.success) {
         toast.success(

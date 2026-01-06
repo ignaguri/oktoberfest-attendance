@@ -362,8 +362,8 @@ describe("Attendance Routes - Unit Tests", () => {
       const body = await res.json();
       expect(body).toMatchObject({
         error: expect.objectContaining({
-          message: "Attendance not found",
-          code: "NOT_FOUND",
+          message: "ATTENDANCE_NOT_FOUND",
+          code: "ATTENDANCE_NOT_FOUND",
           statusCode: 404,
         }),
       });

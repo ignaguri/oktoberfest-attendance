@@ -1,3 +1,5 @@
+"use client";
+
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
@@ -12,7 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { getTutorialStatus } from "@/lib/sharedActions";
+import { useTutorialStatus } from "@/hooks/useProfile";
 import LogoImage from "@/public/android-chrome-512x512.png";
 import Image from "next/image";
 
@@ -23,11 +25,13 @@ import MapButton from "./MapButton";
 import MissingFields from "./MissingFields";
 import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 
-export default async function Home() {
-  const tutorialStatus = await getTutorialStatus();
+export default function Home() {
+  const { data: tutorialStatus } = useTutorialStatus();
 
   return (
-    <TutorialProvider tutorialCompleted={tutorialStatus.tutorial_completed}>
+    <TutorialProvider
+      tutorialCompleted={tutorialStatus?.tutorial_completed ?? false}
+    >
       <div className="max-w-lg flex flex-col items-center gap-4">
         <header className="flex flex-row items-center gap-4">
           <Image

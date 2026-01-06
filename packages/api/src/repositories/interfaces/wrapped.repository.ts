@@ -1,4 +1,8 @@
-import type { WrappedData } from "@prostcounter/shared";
+import type {
+  WrappedData,
+  WrappedAccessResult,
+  AvailableWrappedFestival,
+} from "@prostcounter/shared";
 
 /**
  * Wrapped repository interface
@@ -40,4 +44,39 @@ export interface IWrappedRepository {
    * @returns True if cached data exists and is recent
    */
   isCached(userId: string, festivalId: string): Promise<boolean>;
+
+  /**
+   * Check if user can access wrapped for a festival
+   * @param userId - User ID
+   * @param festivalId - Festival ID
+   * @returns Access result with allowed status and reason
+   */
+  checkAccess(userId: string, festivalId: string): Promise<WrappedAccessResult>;
+
+  /**
+   * Get list of festivals with wrapped available for a user
+   * @param userId - User ID
+   * @returns List of festivals with wrapped availability status
+   */
+  getAvailableFestivals(userId: string): Promise<AvailableWrappedFestival[]>;
+
+  /**
+   * Admin function to regenerate cached wrapped data
+   * @param adminUserId - Admin user ID performing the action
+   * @param festivalId - Optional festival ID filter
+   * @param userId - Optional user ID filter
+   * @returns Number of entries regenerated
+   */
+  regenerateCache(
+    adminUserId: string,
+    festivalId?: string,
+    userId?: string,
+  ): Promise<number>;
+
+  /**
+   * Check if user is a super admin
+   * @param userId - User ID
+   * @returns True if user is a super admin
+   */
+  isAdmin(userId: string): Promise<boolean>;
 }

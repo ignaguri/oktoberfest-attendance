@@ -4,6 +4,9 @@ import type {
   BeerPicture,
   GetPhotoUploadUrlQuery,
   GetPhotoUploadUrlResponse,
+  GlobalPhotoSettings,
+  GroupPhotoSettings,
+  PhotoVisibility,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -228,5 +231,259 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       visibility: data.visibility,
       createdAt: data.created_at,
     };
+  }
+
+  // ===== Photo Privacy Settings =====
+
+  async getGlobalPhotoSettings(userId: string): Promise<GlobalPhotoSettings> {
+    const { data, error } = await this.supabase.rpc(
+      "get_user_photo_global_settings",
+      {
+        p_user_id: userId,
+      },
+    );
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to fetch global photo settings: ${error.message}`,
+      );
+    }
+
+    // Return default if no settings exist
+    const settings = data?.[0];
+    return {
+      userId,
+      hidePhotosFromAllGroups: settings?.hide_photos_from_all_groups ?? false,
+    };
+  }
+
+  async updateGlobalPhotoSettings(
+    userId: string,
+    hidePhotosFromAllGroups: boolean,
+  ): Promise<GlobalPhotoSettings> {
+    const { error } = await this.supabase.rpc(
+      "update_user_photo_global_settings",
+      {
+        p_user_id: userId,
+        p_hide_photos_from_all_groups: hidePhotosFromAllGroups,
+      },
+    );
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to update global photo settings: ${error.message}`,
+      );
+    }
+
+    return {
+      userId,
+      hidePhotosFromAllGroups,
+    };
+  }
+
+  async getGroupPhotoSettings(
+    userId: string,
+    groupId: string,
+  ): Promise<GroupPhotoSettings> {
+    // Get group name
+    const { data: group, error: groupError } = await this.supabase
+      .from("groups")
+      .select("name")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError) {
+      throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
+    }
+
+    const { data, error } = await this.supabase.rpc(
+      "get_user_group_photo_settings",
+      {
+        p_user_id: userId,
+        p_group_id: groupId,
+      },
+    );
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to fetch group photo settings: ${error.message}`,
+      );
+    }
+
+    // Return default if no settings exist
+    const settings = data?.[0];
+    return {
+      userId,
+      groupId,
+      groupName: group?.name || "Unknown Group",
+      hidePhotosFromGroup: settings?.hide_photos_from_group ?? false,
+    };
+  }
+
+  async updateGroupPhotoSettings(
+    userId: string,
+    groupId: string,
+    hidePhotosFromGroup: boolean,
+  ): Promise<GroupPhotoSettings> {
+    // Get group name
+    const { data: group, error: groupError } = await this.supabase
+      .from("groups")
+      .select("name")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError) {
+      throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
+    }
+
+    const { error } = await this.supabase.rpc(
+      "update_user_group_photo_settings",
+      {
+        p_user_id: userId,
+        p_group_id: groupId,
+        p_hide_photos_from_group: hidePhotosFromGroup,
+      },
+    );
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to update group photo settings: ${error.message}`,
+      );
+    }
+
+    return {
+      userId,
+      groupId,
+      groupName: group?.name || "Unknown Group",
+      hidePhotosFromGroup,
+    };
+  }
+
+  async getAllGroupPhotoSettings(
+    userId: string,
+  ): Promise<GroupPhotoSettings[]> {
+    // Get all groups the user is a member of
+    const { data: memberships, error: membershipError } = await this.supabase
+      .from("group_members")
+      .select(
+        `
+        group_id,
+        groups!inner(id, name)
+      `,
+      )
+      .eq("user_id", userId);
+
+    if (membershipError) {
+      throw new DatabaseError(
+        `Failed to fetch group memberships: ${membershipError.message}`,
+      );
+    }
+
+    if (!memberships || memberships.length === 0) {
+      return [];
+    }
+
+    // Get photo settings for each group via RPC
+    const { data: settings, error: settingsError } = await this.supabase.rpc(
+      "get_user_all_group_photo_settings",
+      {
+        p_user_id: userId,
+      },
+    );
+
+    if (settingsError) {
+      throw new DatabaseError(
+        `Failed to fetch all group photo settings: ${settingsError.message}`,
+      );
+    }
+
+    // Create a map of group_id -> settings
+    const settingsMap = new Map<string, boolean>();
+    for (const s of settings || []) {
+      settingsMap.set(s.group_id, s.hide_photos_from_group);
+    }
+
+    // Combine memberships with settings
+    return memberships.map((m: any) => ({
+      userId,
+      groupId: m.group_id,
+      groupName: m.groups?.name || "Unknown Group",
+      hidePhotosFromGroup: settingsMap.get(m.group_id) ?? false,
+    }));
+  }
+
+  async updatePhotoVisibility(
+    userId: string,
+    photoId: string,
+    visibility: PhotoVisibility,
+  ): Promise<BeerPicture> {
+    // Verify ownership
+    const { data: photo, error: selectError } = await this.supabase
+      .from("beer_pictures")
+      .select("*")
+      .eq("id", photoId)
+      .eq("user_id", userId)
+      .single();
+
+    if (selectError || !photo) {
+      throw new NotFoundError("Photo not found or access denied");
+    }
+
+    // Update visibility
+    const { data, error } = await this.supabase
+      .from("beer_pictures")
+      .update({ visibility })
+      .eq("id", photoId)
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to update photo visibility: ${error.message}`,
+      );
+    }
+
+    return this.mapToBeerPicture(data);
+  }
+
+  async bulkUpdatePhotoVisibility(
+    userId: string,
+    photoIds: string[],
+    visibility: PhotoVisibility,
+  ): Promise<number> {
+    // First verify all photos belong to the user
+    const { data: photos, error: selectError } = await this.supabase
+      .from("beer_pictures")
+      .select("id, user_id")
+      .in("id", photoIds);
+
+    if (selectError) {
+      throw new DatabaseError(
+        `Failed to verify photo ownership: ${selectError.message}`,
+      );
+    }
+
+    // Check for unauthorized photos
+    const unauthorizedPhotos =
+      photos?.filter((p) => p.user_id !== userId) || [];
+    if (unauthorizedPhotos.length > 0) {
+      throw new ForbiddenError("Some photos do not belong to the current user");
+    }
+
+    // Update visibility for all photos
+    const { error } = await this.supabase
+      .from("beer_pictures")
+      .update({ visibility })
+      .in("id", photoIds)
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to update photos visibility: ${error.message}`,
+      );
+    }
+
+    return photoIds.length;
   }
 }

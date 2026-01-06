@@ -250,6 +250,21 @@
       "success": "Attendance deleted",
       "error": "Failed to delete attendance"
     },
+    "pictures": {
+      "add": "Add pictures",
+      "addMore": "Add more pics",
+      "addAnother": "Add another",
+      "withBeer": "with a beer",
+      "chooseDifferent": "Choose a different one",
+      "clickToView": "Click on any picture to view full size",
+      "newToUpload": "New pictures to upload",
+      "publicPhotos": "Public photos",
+      "privatePhotos": "Private photos",
+      "publicPhoto": "Public photo",
+      "privatePhoto": "Private photo",
+      "upload": "Upload {{count}} picture(s)",
+      "viewInGallery": "You can view all your pictures in your group's gallery or in My Attendances"
+    },
     "table": {
       "date": "Date",
       "amount": "Amount",
@@ -271,12 +286,40 @@
     "locked": "Locked",
     "unlockedOn": "Unlocked on {{date}}",
     "progress": "{{current}} / {{target}}",
+    "selectFestival": "Please select a festival to view achievements.",
+    "trackProgress": "Track your progress and unlock achievements at {{festival}}",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "stats": {
+      "totalProgress": "Total Progress",
+      "percentUnlocked": "{{percent}}% unlocked",
+      "achievementPoints": "Achievement points",
+      "rarityBreakdown": "Rarity Breakdown",
+      "categories": "Categories"
+    },
+    "filter": {
+      "categoriesTitle": "Achievement Categories",
+      "selectCategory": "Select category",
+      "all": "All Achievements",
+      "consumption": "Beer Achievements",
+      "attendance": "Days Achievements",
+      "explorer": "Tents Achievements",
+      "social": "Social Achievements",
+      "competitive": "Compete Achievements",
+      "special": "Special Achievements"
+    },
+    "empty": {
+      "title": "No achievements in this category",
+      "description": "Try a different category or start participating to unlock achievements!"
+    },
     "categories": {
       "attendance": "Attendance",
+      "consumption": "Consumption",
       "social": "Social",
       "explorer": "Explorer",
       "veteran": "Veteran",
-      "special": "Special"
+      "special": "Special",
+      "competitive": "Competitive"
     },
     "rarity": {
       "common": "Common",
@@ -418,6 +461,9 @@
   "wrapped": {
     "title": "Your Year in Review",
     "generating": "Generating your wrapped...",
+    "loading": "Loading your wrapped...",
+    "notAvailable": "Wrapped Not Available",
+    "loadError": "Failed to load your wrapped",
     "notReady": "Your wrapped isn't ready yet. Check back after the festival!",
     "share": "Share My Wrapped",
     "downloadImage": "Download Image",
@@ -570,6 +616,21 @@
     "addAttendance": "Add attendance",
     "noEvents": "No events",
     "dailyTotal": "Daily Total"
+  },
+  "activityFeed": {
+    "drankBeers": "drank {{count}} beer",
+    "drankBeers_other": "drank {{count}} beers",
+    "checkedInto": "checked into {{tent}}",
+    "uploadedPhoto": "uploaded a photo",
+    "joinedGroup": "joined {{group}}",
+    "unlockedAchievement": "unlocked an achievement",
+    "unlockedAchievementRarity": "unlocked an achievement ({{rarity}})",
+    "hadActivity": "had some activity",
+    "recently": "recently",
+    "unknownUser": "Unknown User",
+    "aTent": "a tent",
+    "aGroup": "a group",
+    "hotStreak": "Hot streak"
   },
   "home": {
     "festivalOver": "Sadly, {{name}} is over. See you next time!",

@@ -4,6 +4,7 @@ import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
 // Import routes
 import achievementRoute from "./routes/achievement.route";
+import activityFeedRoute from "./routes/activity-feed.route";
 import attendanceRoute from "./routes/attendance.route";
 import calendarRoute from "./routes/calendar.route";
 import consumptionRoute from "./routes/consumption.route";
@@ -50,6 +51,7 @@ apiV1.route("/", reservationRoute);
 apiV1.route("/", locationRoute);
 apiV1.route("/", photoRoute);
 apiV1.route("/", profileRoute);
+apiV1.route("/", activityFeedRoute);
 
 // Mount v1 routes under /v1 prefix
 app.route("/v1", apiV1);

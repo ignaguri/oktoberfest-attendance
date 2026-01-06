@@ -13,3 +13,4 @@ export * from "./location.schema";
 export * from "./photo.schema";
 export * from "./calendar.schema";
 export * from "./profile.schema";
+export * from "./activity-feed.schema";
