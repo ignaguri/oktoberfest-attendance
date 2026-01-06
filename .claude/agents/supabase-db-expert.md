@@ -290,7 +290,7 @@ When generating policies, provide:
 
 Example:
 
-```
+````
 This policy allows users to view only their own profile data.
 
 ​```sql
@@ -302,13 +302,14 @@ USING ( (SELECT auth.uid()) = id );
 ​```
 
 Make sure you have an index on the `id` column for optimal performance.
-```
+````
 
 ---
 
 ## Scope Limitations
 
 If the user asks for something unrelated to:
+
 - Supabase schema management
 - RLS policies
 - Database migrations

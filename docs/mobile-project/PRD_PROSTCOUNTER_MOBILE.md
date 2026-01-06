@@ -5,12 +5,14 @@
 **ProstCounter Mobile** is a native iOS/Android app built with Expo (React Native) for tracking beer festival attendance. This PRD provides complete specifications for building the app from scratch, including a backend migration strategy and improved database schema.
 
 ### Project Goals
+
 1. Create a native mobile app with full feature parity to the existing PWA
 2. Migrate backend from Next.js server actions to shared Hono API layer
 3. Fix architectural issues (beer pricing, location sharing)
 4. Add native features: widgets, Apple Watch, background location, offline-first
 
 ### Key Decisions
+
 - **Shared Backend**: Same Supabase project for web + mobile
 - **API Layer**: Hono + OpenAPI deployed to Vercel (replacing Next.js server actions)
 - **Architecture**: Layered (API -> Services -> Repositories) for provider flexibility
@@ -24,6 +26,7 @@
 ## Part 1: Backend Architecture
 
 ### 1.1 Current State (Next.js)
+
 The existing PWA uses Next.js server actions for all backend logic. These are incompatible with React Native. We need to migrate to a platform-agnostic API layer.
 
 ### 1.2 Target Architecture
@@ -69,12 +72,12 @@ The existing PWA uses Next.js server actions for all backend logic. These are in
 
 ### 1.3 Why Hono + OpenAPI
 
-| Feature | Benefit |
-|---------|---------|
-| **Hono** | Lightweight (14KB), fast, runs on any runtime (Vercel, Cloudflare, Bun) |
-| **OpenAPI/Zod** | Generate type-safe clients automatically from API spec |
-| **Vercel Deployment** | Seamless integration, same as existing Next.js deployment |
-| **Provider Agnostic** | Repository pattern allows swapping Supabase for any database |
+| Feature               | Benefit                                                                 |
+| --------------------- | ----------------------------------------------------------------------- |
+| **Hono**              | Lightweight (14KB), fast, runs on any runtime (Vercel, Cloudflare, Bun) |
+| **OpenAPI/Zod**       | Generate type-safe clients automatically from API spec                  |
+| **Vercel Deployment** | Seamless integration, same as existing Next.js deployment               |
+| **Provider Agnostic** | Repository pattern allows swapping Supabase for any database            |
 
 ### 1.4 Layered Architecture
 
@@ -117,25 +120,38 @@ The existing PWA uses Next.js server actions for all backend logic. These are in
 ```typescript
 // packages/api/src/repositories/interfaces/attendance.repository.ts
 export interface IAttendanceRepository {
-  findByUserAndFestival(userId: string, festivalId: string): Promise<Attendance[]>;
-  findByDate(userId: string, festivalId: string, date: string): Promise<Attendance | null>;
+  findByUserAndFestival(
+    userId: string,
+    festivalId: string,
+  ): Promise<Attendance[]>;
+  findByDate(
+    userId: string,
+    festivalId: string,
+    date: string,
+  ): Promise<Attendance | null>;
   create(data: CreateAttendanceDTO): Promise<Attendance>;
   update(id: string, data: UpdateAttendanceDTO): Promise<Attendance>;
   delete(id: string): Promise<void>;
-  addConsumption(attendanceId: string, data: CreateConsumptionDTO): Promise<Consumption>;
+  addConsumption(
+    attendanceId: string,
+    data: CreateConsumptionDTO,
+  ): Promise<Consumption>;
 }
 
 // packages/api/src/repositories/supabase/attendance.repository.ts
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
   constructor(private supabase: SupabaseClient) {}
 
-  async findByUserAndFestival(userId: string, festivalId: string): Promise<Attendance[]> {
+  async findByUserAndFestival(
+    userId: string,
+    festivalId: string,
+  ): Promise<Attendance[]> {
     const { data, error } = await this.supabase
-      .from('attendances')
-      .select('*, consumptions(*), tent_visits(*, tent:tents(*))')
-      .eq('user_id', userId)
-      .eq('festival_id', festivalId)
-      .order('date', { ascending: false });
+      .from("attendances")
+      .select("*, consumptions(*), tent_visits(*, tent:tents(*))")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .order("date", { ascending: false });
 
     if (error) throw new DatabaseError(error.message);
     return data;
@@ -158,13 +174,18 @@ export class ConsumptionService {
     private consumptionRepo: IConsumptionRepository,
     private festivalRepo: IFestivalRepository,
     private achievementService: AchievementService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
   ) {}
 
-  async logConsumption(userId: string, data: LogConsumptionInput): Promise<Attendance> {
+  async logConsumption(
+    userId: string,
+    data: LogConsumptionInput,
+  ): Promise<Attendance> {
     // 1. Get or create attendance for date
     let attendance = await this.attendanceRepo.findByDate(
-      userId, data.festivalId, data.date
+      userId,
+      data.festivalId,
+      data.date,
     );
 
     if (!attendance) {
@@ -176,13 +197,16 @@ export class ConsumptionService {
     }
 
     // 2. Get base price (tent override or festival default)
-    const basePrice = await this.festivalRepo.getBeerPrice(data.festivalId, data.tentId);
+    const basePrice = await this.festivalRepo.getBeerPrice(
+      data.festivalId,
+      data.tentId,
+    );
 
     // 3. Add consumption record with drink type
     await this.consumptionRepo.create({
       attendanceId: attendance.id,
       tentId: data.tentId,
-      drinkType: data.drinkType ?? 'beer',
+      drinkType: data.drinkType ?? "beer",
       drinkName: data.drinkName,
       basePriceCents: basePrice,
       pricePaidCents: data.pricePaidCents ?? basePrice,
@@ -193,12 +217,20 @@ export class ConsumptionService {
     this.achievementService.evaluateAsync(userId, data.festivalId);
 
     // 5. Send tent check-in notification to groups (only for beer/radler)
-    if (data.tentId && ['beer', 'radler'].includes(data.drinkType ?? 'beer')) {
-      this.notificationService.notifyTentCheckIn(userId, data.festivalId, data.tentId);
+    if (data.tentId && ["beer", "radler"].includes(data.drinkType ?? "beer")) {
+      this.notificationService.notifyTentCheckIn(
+        userId,
+        data.festivalId,
+        data.tentId,
+      );
     }
 
     // 6. Return attendance with computed totals
-    return this.attendanceRepo.findByDateWithTotals(userId, data.festivalId, data.date);
+    return this.attendanceRepo.findByDateWithTotals(
+      userId,
+      data.festivalId,
+      data.date,
+    );
   }
 }
 ```
@@ -207,20 +239,25 @@ export class ConsumptionService {
 
 ```typescript
 // packages/api/src/routes/attendance.ts
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
-import { z } from 'zod';
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { z } from "zod";
 
 const DrinkTypeSchema = z.enum([
-  'beer', 'radler', 'alcohol_free', 'wine', 'soft_drink', 'other'
+  "beer",
+  "radler",
+  "alcohol_free",
+  "wine",
+  "soft_drink",
+  "other",
 ]);
 
 const LogConsumptionSchema = z.object({
   festivalId: z.string().uuid(),
   date: z.string().date(),
   tentId: z.string().uuid().optional(),
-  drinkType: DrinkTypeSchema.default('beer'),
+  drinkType: DrinkTypeSchema.default("beer"),
   drinkName: z.string().optional(),
   pricePaidCents: z.number().int().positive().optional(),
   volumeMl: z.number().int().positive().default(1000),
@@ -233,39 +270,41 @@ const AttendanceResponseSchema = z.object({
   date: z.string(),
   // Computed fields from consumptions
   drinkCount: z.number(),
-  beerCount: z.number(),  // Only beer + radler
+  beerCount: z.number(), // Only beer + radler
   totalSpentCents: z.number(),
   consumptions: z.array(ConsumptionSchema),
 });
 
 const logConsumptionRoute = createRoute({
-  method: 'post',
-  path: '/api/v1/consumption',
-  tags: ['Consumption'],
+  method: "post",
+  path: "/api/v1/consumption",
+  tags: ["Consumption"],
   security: [{ bearerAuth: [] }],
   request: {
     body: {
-      content: { 'application/json': { schema: LogConsumptionSchema } },
+      content: { "application/json": { schema: LogConsumptionSchema } },
     },
   },
   responses: {
     200: {
-      description: 'Attendance logged successfully',
-      content: { 'application/json': { schema: AttendanceResponseSchema } },
+      description: "Attendance logged successfully",
+      content: { "application/json": { schema: AttendanceResponseSchema } },
     },
-    401: { description: 'Unauthorized' },
-    422: { description: 'Validation error' },
+    401: { description: "Unauthorized" },
+    422: { description: "Validation error" },
   },
 });
 
-export const attendanceRouter = new OpenAPIHono()
-  .openapi(logAttendanceRoute, async (c) => {
-    const user = c.get('user'); // From auth middleware
-    const body = c.req.valid('json');
+export const attendanceRouter = new OpenAPIHono().openapi(
+  logAttendanceRoute,
+  async (c) => {
+    const user = c.get("user"); // From auth middleware
+    const body = c.req.valid("json");
 
     const attendance = await attendanceService.logAttendance(user.id, body);
     return c.json(attendance);
-  });
+  },
+);
 ```
 
 ### 1.8 Type-Safe Client Generation
@@ -280,7 +319,7 @@ pnpm client:generate
 
 ```typescript
 // Auto-generated client usage (web or mobile)
-import { createClient } from '@prostcounter/api-client';
+import { createClient } from "@prostcounter/api-client";
 
 const api = createClient({
   baseUrl: process.env.API_URL,
@@ -289,9 +328,9 @@ const api = createClient({
 
 // Fully typed request/response
 const attendance = await api.attendance.log({
-  festivalId: 'xxx',
-  date: '2025-09-20',
-  tentId: 'xxx',
+  festivalId: "xxx",
+  date: "2025-09-20",
+  tentId: "xxx",
   pricePaidCents: 1620,
 });
 // attendance is typed as AttendanceResponse
@@ -299,57 +338,60 @@ const attendance = await api.attendance.log({
 
 ### 1.9 API Endpoints
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/v1/attendance` | POST | Log beer consumption |
-| `/api/v1/attendance` | GET | List user's attendances |
-| `/api/v1/attendance/:id` | DELETE | Remove attendance |
-| `/api/v1/groups` | POST | Create group |
-| `/api/v1/groups` | GET | List user's groups |
-| `/api/v1/groups/:id` | GET | Get group details |
-| `/api/v1/groups/:id/join` | POST | Join group |
-| `/api/v1/groups/:id/leave` | POST | Leave group |
-| `/api/v1/groups/:id/leaderboard` | GET | Group rankings |
-| `/api/v1/leaderboard` | GET | Global rankings |
-| `/api/v1/achievements` | GET | User's achievements |
-| `/api/v1/achievements/evaluate` | POST | Trigger evaluation |
-| `/api/v1/wrapped/:festivalId` | GET | Get wrapped data |
-| `/api/v1/wrapped/:festivalId/generate` | POST | Generate wrapped |
-| `/api/v1/reservations` | POST | Create reservation |
-| `/api/v1/reservations/:id/checkin` | POST | Check in |
-| `/api/v1/location/sessions` | POST | Start sharing |
-| `/api/v1/location/sessions/:id` | DELETE | Stop sharing |
-| `/api/v1/location/nearby` | GET | Nearby members |
-| `/api/v1/notifications/token` | POST | Register FCM token |
-| `/api/v1/photos/upload-url` | GET | Get signed URL |
+| Route                                  | Method | Description             |
+| -------------------------------------- | ------ | ----------------------- |
+| `/api/v1/attendance`                   | POST   | Log beer consumption    |
+| `/api/v1/attendance`                   | GET    | List user's attendances |
+| `/api/v1/attendance/:id`               | DELETE | Remove attendance       |
+| `/api/v1/groups`                       | POST   | Create group            |
+| `/api/v1/groups`                       | GET    | List user's groups      |
+| `/api/v1/groups/:id`                   | GET    | Get group details       |
+| `/api/v1/groups/:id/join`              | POST   | Join group              |
+| `/api/v1/groups/:id/leave`             | POST   | Leave group             |
+| `/api/v1/groups/:id/leaderboard`       | GET    | Group rankings          |
+| `/api/v1/leaderboard`                  | GET    | Global rankings         |
+| `/api/v1/achievements`                 | GET    | User's achievements     |
+| `/api/v1/achievements/evaluate`        | POST   | Trigger evaluation      |
+| `/api/v1/wrapped/:festivalId`          | GET    | Get wrapped data        |
+| `/api/v1/wrapped/:festivalId/generate` | POST   | Generate wrapped        |
+| `/api/v1/reservations`                 | POST   | Create reservation      |
+| `/api/v1/reservations/:id/checkin`     | POST   | Check in                |
+| `/api/v1/location/sessions`            | POST   | Start sharing           |
+| `/api/v1/location/sessions/:id`        | DELETE | Stop sharing            |
+| `/api/v1/location/nearby`              | GET    | Nearby members          |
+| `/api/v1/notifications/token`          | POST   | Register FCM token      |
+| `/api/v1/photos/upload-url`            | GET    | Get signed URL          |
 
 ### 1.10 Authentication Middleware
 
 ```typescript
 // packages/api/src/middleware/auth.ts
-import { createMiddleware } from 'hono/factory';
-import { HTTPException } from 'hono/http-exception';
-import { createClient } from '@supabase/supabase-js';
+import { createMiddleware } from "hono/factory";
+import { HTTPException } from "hono/http-exception";
+import { createClient } from "@supabase/supabase-js";
 
 export const authMiddleware = createMiddleware(async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    throw new HTTPException(401, { message: 'Missing authorization header' });
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new HTTPException(401, { message: "Missing authorization header" });
   }
 
   const token = authHeader.slice(7);
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!
+    process.env.SUPABASE_SERVICE_KEY!,
   );
 
-  const { data: { user }, error } = await supabase.auth.getUser(token);
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser(token);
   if (error || !user) {
-    throw new HTTPException(401, { message: 'Invalid token' });
+    throw new HTTPException(401, { message: "Invalid token" });
   }
 
-  c.set('user', user);
-  c.set('supabase', supabase); // Authenticated client for RLS
+  c.set("user", user);
+  c.set("supabase", supabase); // Authenticated client for RLS
   await next();
 });
 ```
@@ -361,6 +403,7 @@ export const authMiddleware = createMiddleware(async (c, next) => {
 ### Why a Monorepo?
 
 A monorepo allows us to:
+
 - Share code between web (Next.js) and mobile (Expo) apps
 - Share API logic, types, and schemas across all packages
 - Single source of truth for database types
@@ -370,6 +413,7 @@ A monorepo allows us to:
 ### Why Turborepo?
 
 **Turborepo** is the ideal choice for this project:
+
 - Simple, minimal configuration for a 2-app monorepo
 - Native Vercel integration for seamless deployment
 - Fast builds with remote caching (free tier available)
@@ -560,8 +604,8 @@ prostcounter/
 ```yaml
 # pnpm-workspace.yaml
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - "apps/*"
+  - "packages/*"
 ```
 
 ### Root Package.json
@@ -711,11 +755,11 @@ packages:
 
 ```typescript
 // apps/web/app/api/[[...route]]/route.ts
-import { Hono } from 'hono';
-import { handle } from 'hono/vercel';
-import { app } from '@prostcounter/api';
+import { Hono } from "hono";
+import { handle } from "hono/vercel";
+import { app } from "@prostcounter/api";
 
-export const runtime = 'edge'; // or 'nodejs' for full Node.js APIs
+export const runtime = "edge"; // or 'nodejs' for full Node.js APIs
 
 export const GET = handle(app);
 export const POST = handle(app);
@@ -788,15 +832,17 @@ const attendanceService = new AttendanceService(attendanceRepo, ...);
 
 ```typescript
 // apps/mobile/lib/api.ts
-import { createClient } from '@prostcounter/api-client';
-import { supabase } from './supabase';
+import { createClient } from "@prostcounter/api-client";
+import { supabase } from "./supabase";
 
 export const api = createClient({
   baseUrl: process.env.EXPO_PUBLIC_API_URL!,
   getHeaders: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     return {
-      Authorization: session ? `Bearer ${session.access_token}` : '',
+      Authorization: session ? `Bearer ${session.access_token}` : "",
     };
   },
 });
@@ -804,8 +850,8 @@ export const api = createClient({
 
 ```typescript
 // apps/mobile/lib/supabase.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createClient } from '@supabase/supabase-js';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createClient } from "@supabase/supabase-js";
 
 export const supabase = createClient(
   process.env.EXPO_PUBLIC_SUPABASE_URL!,
@@ -817,7 +863,7 @@ export const supabase = createClient(
       persistSession: true,
       detectSessionInUrl: false,
     },
-  }
+  },
 );
 ```
 
@@ -827,19 +873,20 @@ export const supabase = createClient(
 
 ### 2.1 Schema Changes Overview
 
-| Change | Reason |
-|--------|--------|
-| Remove `profiles.custom_beer_cost` | Beer cost should not be user-configurable |
-| Add `consumptions` table | Track individual beers with actual price paid |
-| Remove `user_locations` table | Replace with session-based location model |
-| Add `location_sessions` table | Better location sharing architecture |
-| Add `location_points` table | Append-only location history |
+| Change                             | Reason                                        |
+| ---------------------------------- | --------------------------------------------- |
+| Remove `profiles.custom_beer_cost` | Beer cost should not be user-configurable     |
+| Add `consumptions` table           | Track individual beers with actual price paid |
+| Remove `user_locations` table      | Replace with session-based location model     |
+| Add `location_sessions` table      | Better location sharing architecture          |
+| Add `location_points` table        | Append-only location history                  |
 
 ### 2.2 Beer Pricing Model (Fixed)
 
 **Problem**: Current system has beer costs scattered across multiple tables with no clear hierarchy.
 
 **Solution**: Two-tier pricing only:
+
 1. **Festival default**: `festivals.beer_cost` (e.g., EUR 16.20 for Oktoberfest 2025)
 2. **Tent override**: `festival_tents.beer_price` (optional per-tent price)
 
@@ -888,6 +935,7 @@ CREATE INDEX idx_consumptions_drink_type ON consumptions(drink_type);
 ```
 
 **Calculation changes**:
+
 - `attendance.drink_count` = `COUNT(consumptions)` (computed via view)
 - `attendance.beer_count` = `COUNT(consumptions) WHERE drink_type IN ('beer', 'radler')` (computed)
 - `attendance.total_spent` = `SUM(consumptions.price_paid_cents)` (computed)
@@ -1337,6 +1385,7 @@ CREATE TABLE fcm_tokens (
 #### Wrapped Data Cache
 
 See **Part 5C: Wrapped Data Caching Strategy** for the improved caching approach using:
+
 - Materialized views for fast aggregation (`user_festival_stats`)
 - Event-driven invalidation with `wrapped_cache_metadata`
 - Preview mode during festival, permanent cache after
@@ -1350,12 +1399,14 @@ See **Part 5C: Wrapped Data Caching Strategy** for the improved caching approach
 **Providers**: Email/Password, Magic Link, Apple Sign-In, Google Sign-In
 
 **Flow**:
+
 1. User opens app -> Check for existing session in AsyncStorage
 2. If no session -> Show sign-in screen
 3. On sign-in -> Store session, create/update profile
 4. On sign-out -> Clear AsyncStorage, revoke session
 
 **Screens**:
+
 - `SignInScreen`: Email/password form, social buttons
 - `SignUpScreen`: Email/password with username
 - `ForgotPasswordScreen`: Reset password flow
@@ -1365,6 +1416,7 @@ See **Part 5C: Wrapped Data Caching Strategy** for the improved caching approach
 **Context**: `FestivalContext` provides current festival throughout app
 
 **Auto-selection logic**:
+
 1. Check AsyncStorage for saved preference
 2. If none, find festival where `start_date <= today <= end_date`
 3. If none active, select most recent `is_active = true`
@@ -1375,12 +1427,14 @@ See **Part 5C: Wrapped Data Caching Strategy** for the improved caching approach
 ### 3.3 Attendance Tracking
 
 #### Quick Add (Home Screen)
+
 - **Default**: Add 1 beer to today's count at current/selected tent
 - **Inputs**: Tent selector (required), beer count increment
 - **Price**: Show base price from tent/festival, optional tip input
 - **Action**: Creates consumption record, updates attendance totals
 
 #### Detailed Entry (Calendar/Attendance Screen)
+
 - **Date picker**: Constrained to festival date range
 - **Tent multi-select**: Visit multiple tents
 - **Beer count**: Total for the day
@@ -1388,6 +1442,7 @@ See **Part 5C: Wrapped Data Caching Strategy** for the improved caching approach
 - **Notes**: Optional text
 
 #### Data Flow
+
 ```
 User taps "+1 Beer"
        |
@@ -1415,16 +1470,19 @@ Update local cache
 ### 3.4 Groups & Competitions
 
 #### Create Group
+
 - **Inputs**: Name, password, winning criteria, description (optional)
 - **Result**: Group created, user auto-joined, invite token generated
 
 #### Join Group
+
 - **Methods**:
   - Scan QR code (contains invite token)
   - Enter group name + password
   - Deep link with token
 
 #### Group Screen
+
 - **Tabs**: Leaderboard, Gallery, Calendar, Location
 - **Leaderboard**: Ranked by winning criteria, shows days/beers/avg
 - **Gallery**: Photos from all members, grouped by date
@@ -1432,44 +1490,50 @@ Update local cache
 - **Location**: Map with member locations (if sharing)
 
 #### Winning Criteria
-| Type | Calculation |
-|------|-------------|
+
+| Type            | Calculation                        |
+| --------------- | ---------------------------------- |
 | `days_attended` | `COUNT(DISTINCT attendances.date)` |
-| `total_beers` | `SUM(attendances.beer_count)` |
-| `avg_beers` | `total_beers / days_attended` |
+| `total_beers`   | `SUM(attendances.beer_count)`      |
+| `avg_beers`     | `total_beers / days_attended`      |
 
 ### 3.5 Leaderboards
 
 #### Global Leaderboard
+
 - All festival participants ranked
 - Three tabs: Days, Beers, Average
 - Shows position, avatar, username, stat
 
 #### Group Leaderboard
+
 - Members only, ranked by group's winning criteria
 - Trophy icons for top 3
 
 ### 3.6 Achievements
 
 #### Categories
-| Category | Examples |
-|----------|----------|
-| Consumption | 10 beers, 50 beers, 100+ beers, most in single day |
-| Attendance | 3 days, 5 days, perfect attendance, every weekend |
-| Explorer | 5 tents, 10 tents, all large tents, all categories |
-| Social | Join group, create group, upload photo, 10 photos |
-| Competitive | Top 3 in group, #1 in group, top 10 global |
-| Special | First day (Early Bird), last day, same day as last year |
+
+| Category    | Examples                                                |
+| ----------- | ------------------------------------------------------- |
+| Consumption | 10 beers, 50 beers, 100+ beers, most in single day      |
+| Attendance  | 3 days, 5 days, perfect attendance, every weekend       |
+| Explorer    | 5 tents, 10 tents, all large tents, all categories      |
+| Social      | Join group, create group, upload photo, 10 photos       |
+| Competitive | Top 3 in group, #1 in group, top 10 global              |
+| Special     | First day (Early Bird), last day, same day as last year |
 
 #### Rarity & Points
-| Rarity | Points | Example |
-|--------|--------|---------|
-| Common | 10 | First beer, first day |
-| Rare | 25 | 25 beers, 5 tents |
-| Epic | 50 | 50 beers, all tents |
-| Legendary | 100 | Perfect attendance, 100+ beers |
+
+| Rarity    | Points | Example                        |
+| --------- | ------ | ------------------------------ |
+| Common    | 10     | First beer, first day          |
+| Rare      | 25     | 25 beers, 5 tents              |
+| Epic      | 50     | 50 beers, all tents            |
+| Legendary | 100    | Perfect attendance, 100+ beers |
 
 #### Progress Tracking
+
 ```typescript
 interface AchievementProgress {
   achievement_id: string;
@@ -1482,6 +1546,7 @@ interface AchievementProgress {
 ```
 
 #### Evaluation Triggers
+
 - On attendance log/update/delete
 - On tent visit
 - On photo upload
@@ -1491,6 +1556,7 @@ interface AchievementProgress {
 ### 3.7 Photo Gallery
 
 #### Upload Flow
+
 1. User taps camera/gallery button on attendance
 2. Select/capture images (max 5 per attendance)
 3. Upload to Supabase Storage
@@ -1498,25 +1564,29 @@ interface AchievementProgress {
 5. Thumbnails generated server-side
 
 #### Privacy Controls
+
 - **Per-photo**: Public/private toggle
 - **Global**: "Hide all my photos from groups"
 - **Per-group**: "Hide my photos from this group"
 
 #### Gallery Views
+
 - **Personal**: Calendar with photo indicators, tap to view
 - **Group**: All member photos, filterable by date/person
 
 ### 3.8 Wrapped (Year in Review)
 
 #### Availability
+
 - Only accessible when festival `status = 'ended'`
 - Minimum attendance requirement configurable
 
 #### Statistics Generated
+
 ```typescript
 interface WrappedData {
-  user_info: { username, full_name, avatar_url };
-  festival_info: { name, dates, location };
+  user_info: { username; full_name; avatar_url };
+  festival_info: { name; dates; location };
 
   basic_stats: {
     total_beers: number;
@@ -1533,14 +1603,14 @@ interface WrappedData {
   };
 
   peak_moments: {
-    best_day: { date, beers, tents, spent };
+    best_day: { date; beers; tents; spent };
     max_single_session: number;
-    most_expensive_day: { date, amount };
+    most_expensive_day: { date; amount };
   };
 
   social_stats: {
     groups_joined: number;
-    top_rankings: { group_name, position }[];
+    top_rankings: { group_name; position }[];
     photos_uploaded: number;
   };
 
@@ -1551,21 +1621,28 @@ interface WrappedData {
   };
 
   achievements: Achievement[];
-  timeline: { date, beers, spent, tents }[];
+  timeline: { date; beers; spent; tents }[];
 
   personality: {
-    type: 'Explorer' | 'Champion' | 'Loyalist' | 'Social Butterfly' | 'Consistent' | 'Casual';
+    type:
+      | "Explorer"
+      | "Champion"
+      | "Loyalist"
+      | "Social Butterfly"
+      | "Consistent"
+      | "Casual";
     traits: string[];
   };
 
   comparisons: {
-    vs_festival_avg: { beers_diff_pct, days_diff_pct };
-    vs_last_year?: { beers_diff, days_diff, spent_diff };
+    vs_festival_avg: { beers_diff_pct; days_diff_pct };
+    vs_last_year?: { beers_diff; days_diff; spent_diff };
   };
 }
 ```
 
 #### Slides (11 screens)
+
 1. **Intro**: Festival branding, "Your 2025 Wrapped"
 2. **Numbers**: Total beers, days, spent
 3. **Journey**: Daily timeline visualization
@@ -1581,10 +1658,12 @@ interface WrappedData {
 ### 3.9 Reservations
 
 #### Create Reservation
+
 - **Inputs**: Tent, date/time, reminder offset, visibility
 - **Validation**: Must be within festival dates, tent must exist
 
 #### Notification Flow
+
 ```
 Reservation created
        |
@@ -1610,6 +1689,7 @@ User confirms -> Creates attendance + tent_visit + marks completed
 ### 3.10 Location Sharing
 
 #### Session-Based Model
+
 1. User starts sharing -> Creates `location_session`
 2. User selects groups to share with -> Creates `location_session_members`
 3. App sends location updates -> Inserts `location_points`
@@ -1617,11 +1697,13 @@ User confirms -> Creates attendance + tent_visit + marks completed
 5. Session expires after 4 hours (configurable) or user stops
 
 #### Privacy Controls
+
 - Share with all groups vs specific groups
 - Per-group notification preferences
 - Auto-start on tent check-in (optional)
 
 #### Map Features
+
 - Real-time member locations
 - Clustering for multiple members
 - Distance to each member
@@ -1631,17 +1713,19 @@ User confirms -> Creates attendance + tent_visit + marks completed
 ### 3.11 Push Notifications
 
 #### Notification Types
-| Type | Trigger | Content |
-|------|---------|---------|
-| Group Join | Member joins your group | "{name} joined {group}!" |
-| Tent Check-in | Group member checks into tent | "{name} is at {tent}!" |
-| Achievement | User unlocks achievement | "You earned {achievement}!" |
-| Achievement (Group) | Member unlocks rare+ | "{name} earned {achievement}!" |
-| Reservation Reminder | Before reservation | "Your reservation is in {time}" |
-| Reservation Prompt | At reservation time | "Are you at {tent}?" |
-| Location Started | Member starts sharing | "{name} is sharing location" |
+
+| Type                 | Trigger                       | Content                         |
+| -------------------- | ----------------------------- | ------------------------------- |
+| Group Join           | Member joins your group       | "{name} joined {group}!"        |
+| Tent Check-in        | Group member checks into tent | "{name} is at {tent}!"          |
+| Achievement          | User unlocks achievement      | "You earned {achievement}!"     |
+| Achievement (Group)  | Member unlocks rare+          | "{name} earned {achievement}!"  |
+| Reservation Reminder | Before reservation            | "Your reservation is in {time}" |
+| Reservation Prompt   | At reservation time           | "Are you at {tent}?"            |
+| Location Started     | Member starts sharing         | "{name} is sharing location"    |
 
 #### Rate Limiting
+
 - Location notifications: 1 per user per group per 5 minutes
 - Achievement (group): 1 per achievement per group per 5 minutes
 - Check-in: 1 per user per tent per 30 minutes
@@ -1653,16 +1737,19 @@ User confirms -> Creates attendance + tent_visit + marks completed
 ### 4.1 Home Screen Widgets (iOS & Android)
 
 #### Beer Counter Widget (Small)
+
 - Shows: Beer count, festival name
 - Tap: Opens app to home screen
 - Updates: Every 15 minutes or on attendance change
 
 #### Stats Widget (Medium)
+
 - Shows: Beers, Days, Rank in top group
 - Tap: Opens leaderboard
 - Updates: Hourly
 
 #### Implementation
+
 - **iOS**: WidgetKit with SwiftUI
 - **Android**: Glance with Jetpack Compose
 - **Data Sync**: App Groups (iOS) / SharedPreferences (Android)
@@ -1670,30 +1757,36 @@ User confirms -> Creates attendance + tent_visit + marks completed
 ### 4.2 Apple Watch App
 
 #### Complications
+
 - Beer count (all sizes)
 - Days attended
 
 #### Watch App Screens
+
 1. **Quick Add**: Tap to add beer, select tent
 2. **Today's Stats**: Beers today, total, days
 3. **Leaderboard**: Top 5 in primary group
 
 #### Sync
+
 - WatchConnectivity framework
 - Background app refresh for updates
 
 ### 4.3 Background Location
 
 #### iOS
+
 - Significant location changes (battery efficient)
 - Background app refresh for updates
 - Background processing for sync
 
 #### Android
+
 - Foreground service with notification
 - Geofencing for tent regions (optional)
 
 #### Battery Optimization
+
 - Reduce update frequency when stationary
 - Batch updates for sync
 - Respect low power mode
@@ -1701,11 +1794,13 @@ User confirms -> Creates attendance + tent_visit + marks completed
 ### 4.4 Offline-First Architecture
 
 #### Local Database
+
 - **SQLite** via `expo-sqlite` or `WatermelonDB`
 - Mirror of server schema for offline access
 - Queue table for pending sync operations
 
 #### Sync Strategy
+
 ```
 Online Mode:
   - Write to server first, then local
@@ -1724,10 +1819,11 @@ Conflict Resolution:
 ```
 
 #### Sync Queue Schema
+
 ```typescript
 interface SyncQueueItem {
   id: string;
-  operation: 'insert' | 'update' | 'delete';
+  operation: "insert" | "update" | "delete";
   table: string;
   data: Record<string, unknown>;
   created_at: string;
@@ -1742,22 +1838,22 @@ interface SyncQueueItem {
 
 ### 5.1 Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Expo SDK 52+ |
-| Language | TypeScript 5.x |
-| Navigation | Expo Router (file-based) |
-| State | TanStack Query + Zustand |
-| Forms | React Hook Form + Zod |
-| UI | React Native Paper + Custom |
-| Database | Supabase + expo-sqlite |
-| Auth | Supabase Auth |
-| Storage | Supabase Storage |
-| Notifications | Expo Notifications + Novu |
-| Location | expo-location |
-| Maps | react-native-maps |
-| Charts | Victory Native |
-| Animations | React Native Reanimated |
+| Layer         | Technology                  |
+| ------------- | --------------------------- |
+| Framework     | Expo SDK 52+                |
+| Language      | TypeScript 5.x              |
+| Navigation    | Expo Router (file-based)    |
+| State         | TanStack Query + Zustand    |
+| Forms         | React Hook Form + Zod       |
+| UI            | React Native Paper + Custom |
+| Database      | Supabase + expo-sqlite      |
+| Auth          | Supabase Auth               |
+| Storage       | Supabase Storage            |
+| Notifications | Expo Notifications + Novu   |
+| Location      | expo-location               |
+| Maps          | react-native-maps           |
+| Charts        | Victory Native              |
+| Animations    | React Native Reanimated     |
 
 ### 5.2 Project Structure (Mobile App)
 
@@ -1809,28 +1905,31 @@ db/
 ### 5.3 State Management
 
 #### Server State (TanStack Query)
+
 ```typescript
 // Query keys factory
 const queryKeys = {
-  festivals: ['festivals'] as const,
-  festival: (id: string) => ['festival', id] as const,
+  festivals: ["festivals"] as const,
+  festival: (id: string) => ["festival", id] as const,
 
-  attendances: (festivalId: string) => ['attendances', festivalId] as const,
-  attendance: (id: string) => ['attendance', id] as const,
+  attendances: (festivalId: string) => ["attendances", festivalId] as const,
+  attendance: (id: string) => ["attendance", id] as const,
 
-  groups: (festivalId: string) => ['groups', festivalId] as const,
-  group: (id: string) => ['group', id] as const,
-  groupLeaderboard: (id: string) => ['group', id, 'leaderboard'] as const,
+  groups: (festivalId: string) => ["groups", festivalId] as const,
+  group: (id: string) => ["group", id] as const,
+  groupLeaderboard: (id: string) => ["group", id, "leaderboard"] as const,
 
-  achievements: (festivalId: string) => ['achievements', festivalId] as const,
+  achievements: (festivalId: string) => ["achievements", festivalId] as const,
 
-  wrapped: (festivalId: string) => ['wrapped', festivalId] as const,
+  wrapped: (festivalId: string) => ["wrapped", festivalId] as const,
 
-  nearbyMembers: (festivalId: string) => ['location', 'nearby', festivalId] as const,
+  nearbyMembers: (festivalId: string) =>
+    ["location", "nearby", festivalId] as const,
 };
 ```
 
 #### Local State (Zustand)
+
 ```typescript
 interface AppStore {
   // Festival
@@ -1857,13 +1956,15 @@ interface AppStore {
 
 ```typescript
 // lib/api/attendance.ts
-import { api } from '@prostcounter/api-client';
+import { api } from "@prostcounter/api-client";
 
 // In component using TanStack Query
 const logMutation = useMutation({
   mutationFn: (params) => api.attendance.log(params),
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.attendances(festivalId) });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.attendances(festivalId),
+    });
   },
 });
 ```
@@ -1878,12 +1979,12 @@ Internationalization is built into the project from day one, not added later. Ev
 
 ### Technology Stack
 
-| Tool | Purpose |
-|------|---------|
-| **react-i18next** | React/React Native translation hooks |
-| **i18next** | Core i18n framework |
-| **i18next-resources-to-backend** | Lazy-load translation files |
-| **Expo Localization** | Device locale detection |
+| Tool                             | Purpose                              |
+| -------------------------------- | ------------------------------------ |
+| **react-i18next**                | React/React Native translation hooks |
+| **i18next**                      | Core i18n framework                  |
+| **i18next-resources-to-backend** | Lazy-load translation files          |
+| **Expo Localization**            | Device locale detection              |
 
 ### Translation Structure
 
@@ -1968,20 +2069,20 @@ packages/shared/
 
 ```typescript
 // packages/shared/i18n/index.ts
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import * as Localization from 'expo-localization';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import * as Localization from "expo-localization";
 
-import en from '../locales/en.json';
-import de from '../locales/de.json';
+import en from "../locales/en.json";
+import de from "../locales/de.json";
 
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
     de: { translation: de },
   },
-  lng: Localization.locale.split('-')[0],
-  fallbackLng: 'en',
+  lng: Localization.locale.split("-")[0],
+  fallbackLng: "en",
   interpolation: {
     escapeValue: false,
   },
@@ -2024,23 +2125,23 @@ export function QuickAdd() {
 
 ```typescript
 // Pluralization
-t('calendar.daysAttended', { count: 5 }); // "5 days attended"
-t('calendar.daysAttended', { count: 1 }); // "1 day attended"
+t("calendar.daysAttended", { count: 5 }); // "5 days attended"
+t("calendar.daysAttended", { count: 1 }); // "1 day attended"
 
 // Number formatting (locale-aware)
 const formatCurrency = (cents: number, locale: string) => {
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: 'EUR',
+    style: "currency",
+    currency: "EUR",
   }).format(cents / 100);
 };
 
 // Date formatting
 const formatDate = (date: string, locale: string) => {
   return new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
+    weekday: "long",
+    month: "long",
+    day: "numeric",
   }).format(new Date(date));
 };
 ```
@@ -2049,12 +2150,12 @@ const formatDate = (date: string, locale: string) => {
 
 ```typescript
 // packages/shared/i18n/types.ts
-import type en from '../locales/en.json';
+import type en from "../locales/en.json";
 
 // Generate types from English JSON (source of truth)
 type Translations = typeof en;
 
-declare module 'i18next' {
+declare module "i18next" {
   interface CustomTypeOptions {
     resources: { translation: Translations };
   }
@@ -2097,11 +2198,11 @@ export function LanguageSelector() {
 
 ### Initial Language Support
 
-| Language | Status | Notes |
-|----------|--------|-------|
-| English | ✅ Complete | Default, source of truth |
-| German | 🔄 Planned | Primary target (Oktoberfest audience) |
-| Spanish | 📋 Future | Based on user demand |
+| Language | Status      | Notes                                 |
+| -------- | ----------- | ------------------------------------- |
+| English  | ✅ Complete | Default, source of truth              |
+| German   | 🔄 Planned  | Primary target (Oktoberfest audience) |
+| Spanish  | 📋 Future   | Based on user demand                  |
 
 ---
 
@@ -2110,6 +2211,7 @@ export function LanguageSelector() {
 ### Problem with Current Approach
 
 The current `wrapped_data_cache` table has limitations:
+
 - Full regeneration on every change is expensive
 - No incremental updates possible
 - Cache invalidation is all-or-nothing
@@ -2118,6 +2220,7 @@ The current `wrapped_data_cache` table has limitations:
 ### Improved Strategy: Event-Driven Incremental Computation
 
 Instead of caching the entire wrapped JSON, we use:
+
 1. **Materialized views** for aggregate statistics
 2. **Event-driven invalidation** with selective recomputation
 3. **Pre-computation during festival** with "preview mode"
@@ -2237,16 +2340,18 @@ FOR EACH ROW EXECUTE FUNCTION mark_wrapped_stale();
 ```typescript
 // packages/api/src/services/wrapped.service.ts
 export class WrappedService {
-
   /**
    * Get wrapped data with smart caching strategy:
    * 1. During festival: Always compute live (fast path via materialized view)
    * 2. After festival: Use cached data if available and not stale
    * 3. First request after festival end: Compute & cache permanently
    */
-  async getWrappedData(userId: string, festivalId: string): Promise<WrappedData> {
+  async getWrappedData(
+    userId: string,
+    festivalId: string,
+  ): Promise<WrappedData> {
     const festival = await this.festivalRepo.findById(festivalId);
-    const isFestivalActive = festival.status !== 'ended';
+    const isFestivalActive = festival.status !== "ended";
 
     // Get cache metadata
     const cacheMetadata = await this.getCacheMetadata(userId, festivalId);
@@ -2276,7 +2381,7 @@ export class WrappedService {
   private async computeLiveWrapped(
     userId: string,
     festivalId: string,
-    options: { isPreview: boolean }
+    options: { isPreview: boolean },
   ): Promise<WrappedData> {
     // Refresh materialized view if needed (async, non-blocking)
     this.refreshStatsViewIfStale(festivalId);
@@ -2295,7 +2400,10 @@ export class WrappedService {
   /**
    * Full wrapped computation - only run after festival ends
    */
-  private async computeFullWrapped(userId: string, festivalId: string): Promise<WrappedData> {
+  private async computeFullWrapped(
+    userId: string,
+    festivalId: string,
+  ): Promise<WrappedData> {
     // Run all expensive computations in parallel
     const [
       basicStats,
@@ -2349,23 +2457,28 @@ async function refreshFestivalStats() {
   `);
 
   if (activeFestival) {
-    await db.query('REFRESH MATERIALIZED VIEW CONCURRENTLY user_festival_stats');
+    await db.query(
+      "REFRESH MATERIALIZED VIEW CONCURRENTLY user_festival_stats",
+    );
   }
 }
 
 // Scheduled job: Pre-compute wrapped for all users when festival ends
 // Runs once at festival.end_date + 1 day
 async function precomputeAllWrapped(festivalId: string) {
-  const users = await db.query(`
+  const users = await db.query(
+    `
     SELECT DISTINCT user_id
     FROM attendances
     WHERE festival_id = $1
-  `, [festivalId]);
+  `,
+    [festivalId],
+  );
 
   // Process in batches to avoid overload
   for (const batch of chunk(users, 50)) {
     await Promise.all(
-      batch.map(user => wrappedService.getWrappedData(user.id, festivalId))
+      batch.map((user) => wrappedService.getWrappedData(user.id, festivalId)),
     );
   }
 }
@@ -2373,11 +2486,11 @@ async function precomputeAllWrapped(festivalId: string) {
 
 ### API Endpoints
 
-| Endpoint | During Festival | After Festival |
-|----------|-----------------|----------------|
-| `GET /wrapped/:festivalId` | Live preview (fast) | Cached final data |
-| `POST /wrapped/:festivalId/regenerate` | N/A | Force recompute (admin) |
-| `GET /wrapped/:festivalId/preview` | Live preview | Live preview (for testing) |
+| Endpoint                               | During Festival     | After Festival             |
+| -------------------------------------- | ------------------- | -------------------------- |
+| `GET /wrapped/:festivalId`             | Live preview (fast) | Cached final data          |
+| `POST /wrapped/:festivalId/regenerate` | N/A                 | Force recompute (admin)    |
+| `GET /wrapped/:festivalId/preview`     | Live preview        | Live preview (for testing) |
 
 ### Benefits of This Approach
 
@@ -2393,6 +2506,7 @@ async function precomputeAllWrapped(festivalId: string) {
 ## Part 6: Migration Plan
 
 ### Phase 1: Backend Migration (Weeks 1-2)
+
 1. Set up Turborepo monorepo structure
 2. Create Hono API package with all endpoints
 3. Update database schema (new pricing model, location tables)
@@ -2401,6 +2515,7 @@ async function precomputeAllWrapped(festivalId: string) {
 6. Gradually migrate web app to use new API client
 
 ### Phase 2: Expo Foundation (Weeks 3-4)
+
 1. Initialize Expo app in monorepo
 2. Set up navigation (Expo Router)
 3. Configure Supabase client
@@ -2408,29 +2523,34 @@ async function precomputeAllWrapped(festivalId: string) {
 5. Set up TanStack Query + Zustand
 
 ### Phase 3: Core Features (Weeks 5-7)
+
 1. Festival context & selection
 2. Attendance tracking (quick add + detailed)
 3. Groups & leaderboards
 4. Basic profile
 
 ### Phase 4: Advanced Features (Weeks 8-10)
+
 1. Achievement system
 2. Photo upload & gallery
 3. Reservations
 4. Push notifications
 
 ### Phase 5: Location & Wrapped (Weeks 11-12)
+
 1. Location sharing (new architecture)
 2. Wrapped feature with animations
 3. Share functionality
 
 ### Phase 6: Native Enhancements (Weeks 13-14)
+
 1. Offline-first with SQLite
 2. Home screen widgets
 3. Apple Watch app
 4. Background location
 
 ### Phase 7: Polish & Launch (Weeks 15-16)
+
 1. Performance optimization
 2. Beta testing
 3. App Store submission
@@ -2480,21 +2600,25 @@ DROP TABLE IF EXISTS user_locations CASCADE;
 ## Part 8: Testing Strategy
 
 ### Unit Tests
+
 - Business logic (price calculations, achievement evaluation)
 - Zustand stores
 - Utility functions
 
 ### Integration Tests
+
 - API client functions against Supabase
 - Sync queue operations
 - Authentication flow
 
 ### E2E Tests (Maestro)
+
 - Complete user journeys
 - Offline scenarios
 - Push notification handling
 
 ### Device Testing
+
 - iOS Simulator + Physical devices
 - Android Emulator + Physical devices
 - Widget testing
@@ -2507,62 +2631,177 @@ DROP TABLE IF EXISTS user_locations CASCADE;
 ```typescript
 const achievements = [
   // Consumption
-  { name: 'First Sip', category: 'consumption', rarity: 'common', points: 10,
-    conditions: { type: 'threshold', target_value: 1 } },
-  { name: 'Getting Started', category: 'consumption', rarity: 'common', points: 10,
-    conditions: { type: 'threshold', target_value: 5 } },
-  { name: 'Double Digits', category: 'consumption', rarity: 'rare', points: 25,
-    conditions: { type: 'threshold', target_value: 10 } },
-  { name: 'Quarter Century', category: 'consumption', rarity: 'rare', points: 25,
-    conditions: { type: 'threshold', target_value: 25 } },
-  { name: 'Half Century', category: 'consumption', rarity: 'epic', points: 50,
-    conditions: { type: 'threshold', target_value: 50 } },
-  { name: 'Century Club', category: 'consumption', rarity: 'legendary', points: 100,
-    conditions: { type: 'threshold', target_value: 100 } },
+  {
+    name: "First Sip",
+    category: "consumption",
+    rarity: "common",
+    points: 10,
+    conditions: { type: "threshold", target_value: 1 },
+  },
+  {
+    name: "Getting Started",
+    category: "consumption",
+    rarity: "common",
+    points: 10,
+    conditions: { type: "threshold", target_value: 5 },
+  },
+  {
+    name: "Double Digits",
+    category: "consumption",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "threshold", target_value: 10 },
+  },
+  {
+    name: "Quarter Century",
+    category: "consumption",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "threshold", target_value: 25 },
+  },
+  {
+    name: "Half Century",
+    category: "consumption",
+    rarity: "epic",
+    points: 50,
+    conditions: { type: "threshold", target_value: 50 },
+  },
+  {
+    name: "Century Club",
+    category: "consumption",
+    rarity: "legendary",
+    points: 100,
+    conditions: { type: "threshold", target_value: 100 },
+  },
 
   // Attendance
-  { name: 'First Day', category: 'attendance', rarity: 'common', points: 10,
-    conditions: { type: 'threshold', target_value: 1 } },
-  { name: 'Hat Trick', category: 'attendance', rarity: 'rare', points: 25,
-    conditions: { type: 'streak', min_days: 3 } },
-  { name: 'Week Warrior', category: 'attendance', rarity: 'epic', points: 50,
-    conditions: { type: 'streak', min_days: 7 } },
-  { name: 'Festival Warrior', category: 'attendance', rarity: 'legendary', points: 100,
-    conditions: { type: 'special', name: 'perfect_attendance' } },
+  {
+    name: "First Day",
+    category: "attendance",
+    rarity: "common",
+    points: 10,
+    conditions: { type: "threshold", target_value: 1 },
+  },
+  {
+    name: "Hat Trick",
+    category: "attendance",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "streak", min_days: 3 },
+  },
+  {
+    name: "Week Warrior",
+    category: "attendance",
+    rarity: "epic",
+    points: 50,
+    conditions: { type: "streak", min_days: 7 },
+  },
+  {
+    name: "Festival Warrior",
+    category: "attendance",
+    rarity: "legendary",
+    points: 100,
+    conditions: { type: "special", name: "perfect_attendance" },
+  },
 
   // Explorer
-  { name: 'Tent Hopper', category: 'explorer', rarity: 'common', points: 10,
-    conditions: { type: 'variety', target_value: 3 } },
-  { name: 'Tent Tourist', category: 'explorer', rarity: 'rare', points: 25,
-    conditions: { type: 'variety', target_value: 5 } },
-  { name: 'Tent Master', category: 'explorer', rarity: 'epic', points: 50,
-    conditions: { type: 'variety', target_value: 10 } },
-  { name: 'Tent Legend', category: 'explorer', rarity: 'legendary', points: 100,
-    conditions: { type: 'variety', target_value: 14 } },  // All large tents
+  {
+    name: "Tent Hopper",
+    category: "explorer",
+    rarity: "common",
+    points: 10,
+    conditions: { type: "variety", target_value: 3 },
+  },
+  {
+    name: "Tent Tourist",
+    category: "explorer",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "variety", target_value: 5 },
+  },
+  {
+    name: "Tent Master",
+    category: "explorer",
+    rarity: "epic",
+    points: 50,
+    conditions: { type: "variety", target_value: 10 },
+  },
+  {
+    name: "Tent Legend",
+    category: "explorer",
+    rarity: "legendary",
+    points: 100,
+    conditions: { type: "variety", target_value: 14 },
+  }, // All large tents
 
   // Social
-  { name: 'Team Player', category: 'social', rarity: 'common', points: 10,
-    conditions: { type: 'threshold', scope: 'groups_joined', target_value: 1 } },
-  { name: 'Pack Leader', category: 'social', rarity: 'rare', points: 25,
-    conditions: { type: 'threshold', scope: 'groups_created', target_value: 1 } },
-  { name: 'Photographer', category: 'social', rarity: 'common', points: 10,
-    conditions: { type: 'threshold', scope: 'photos', target_value: 1 } },
-  { name: 'Photo Master', category: 'social', rarity: 'rare', points: 25,
-    conditions: { type: 'threshold', scope: 'photos', target_value: 10 } },
+  {
+    name: "Team Player",
+    category: "social",
+    rarity: "common",
+    points: 10,
+    conditions: { type: "threshold", scope: "groups_joined", target_value: 1 },
+  },
+  {
+    name: "Pack Leader",
+    category: "social",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "threshold", scope: "groups_created", target_value: 1 },
+  },
+  {
+    name: "Photographer",
+    category: "social",
+    rarity: "common",
+    points: 10,
+    conditions: { type: "threshold", scope: "photos", target_value: 1 },
+  },
+  {
+    name: "Photo Master",
+    category: "social",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "threshold", scope: "photos", target_value: 10 },
+  },
 
   // Competitive
-  { name: 'Podium Finish', category: 'competitive', rarity: 'rare', points: 25,
-    conditions: { type: 'special', name: 'top_3_group' } },
-  { name: 'Champion', category: 'competitive', rarity: 'epic', points: 50,
-    conditions: { type: 'special', name: 'first_in_group' } },
+  {
+    name: "Podium Finish",
+    category: "competitive",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "special", name: "top_3_group" },
+  },
+  {
+    name: "Champion",
+    category: "competitive",
+    rarity: "epic",
+    points: 50,
+    conditions: { type: "special", name: "first_in_group" },
+  },
 
   // Special
-  { name: 'Early Bird', category: 'special', rarity: 'rare', points: 25,
-    conditions: { type: 'special', name: 'first_day_festival' } },
-  { name: 'Last Call', category: 'special', rarity: 'rare', points: 25,
-    conditions: { type: 'special', name: 'last_day_festival' } },
-  { name: 'Festival Veteran', category: 'special', rarity: 'legendary', points: 100,
-    conditions: { type: 'special', name: 'multi_year' } },
+  {
+    name: "Early Bird",
+    category: "special",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "special", name: "first_day_festival" },
+  },
+  {
+    name: "Last Call",
+    category: "special",
+    rarity: "rare",
+    points: 25,
+    conditions: { type: "special", name: "last_day_festival" },
+  },
+  {
+    name: "Festival Veteran",
+    category: "special",
+    rarity: "legendary",
+    points: 100,
+    conditions: { type: "special", name: "multi_year" },
+  },
 ];
 ```
 
@@ -2573,37 +2812,37 @@ const achievements = [
 ```typescript
 const tents = [
   // Large Tents (14)
-  { name: 'Armbrustschuetzenzelt', category: 'large' },
-  { name: 'Augustiner-Festhalle', category: 'large' },
-  { name: 'Braurosl (Pschorr)', category: 'large' },
-  { name: 'Fischer-Vroni', category: 'large' },
-  { name: 'Hacker-Festzelt', category: 'large' },
-  { name: 'Hofbrau-Festzelt', category: 'large' },
-  { name: 'Kafer Wiesn-Schaenke', category: 'large' },
-  { name: 'Lowenbrau-Festhalle', category: 'large' },
-  { name: 'Marstall', category: 'large' },
-  { name: 'Ochsenbraterei', category: 'large' },
-  { name: 'Paulaner-Festhalle', category: 'large' },
-  { name: 'Schottenhamel', category: 'large' },
-  { name: 'Schuetzen-Festzelt', category: 'large' },
-  { name: 'Weinzelt', category: 'large' },
+  { name: "Armbrustschuetzenzelt", category: "large" },
+  { name: "Augustiner-Festhalle", category: "large" },
+  { name: "Braurosl (Pschorr)", category: "large" },
+  { name: "Fischer-Vroni", category: "large" },
+  { name: "Hacker-Festzelt", category: "large" },
+  { name: "Hofbrau-Festzelt", category: "large" },
+  { name: "Kafer Wiesn-Schaenke", category: "large" },
+  { name: "Lowenbrau-Festhalle", category: "large" },
+  { name: "Marstall", category: "large" },
+  { name: "Ochsenbraterei", category: "large" },
+  { name: "Paulaner-Festhalle", category: "large" },
+  { name: "Schottenhamel", category: "large" },
+  { name: "Schuetzen-Festzelt", category: "large" },
+  { name: "Weinzelt", category: "large" },
 
   // Small Tents (9)
-  { name: 'Cafe Kaiserschmarrn', category: 'small' },
-  { name: 'Gloeckle Wirt', category: 'small' },
-  { name: 'Ammer Huehner- und Entenbraterei', category: 'small' },
-  { name: 'Bodos Cafezelt', category: 'small' },
-  { name: 'Feisingers Kas- und Weinstueberl', category: 'small' },
-  { name: 'Muenchner Knoedelei', category: 'small' },
-  { name: 'Schiebls Kaffeehaferl', category: 'small' },
-  { name: 'Wildstuben', category: 'small' },
-  { name: 'Zum Stiftl', category: 'small' },
+  { name: "Cafe Kaiserschmarrn", category: "small" },
+  { name: "Gloeckle Wirt", category: "small" },
+  { name: "Ammer Huehner- und Entenbraterei", category: "small" },
+  { name: "Bodos Cafezelt", category: "small" },
+  { name: "Feisingers Kas- und Weinstueberl", category: "small" },
+  { name: "Muenchner Knoedelei", category: "small" },
+  { name: "Schiebls Kaffeehaferl", category: "small" },
+  { name: "Wildstuben", category: "small" },
+  { name: "Zum Stiftl", category: "small" },
 
   // Traditional (4)
-  { name: 'Herzkasperlzelt', category: 'traditional' },
-  { name: 'Musikzelt', category: 'traditional' },
-  { name: 'Tradition Zelt', category: 'traditional' },
-  { name: 'Oide Wiesn', category: 'traditional' },
+  { name: "Herzkasperlzelt", category: "traditional" },
+  { name: "Musikzelt", category: "traditional" },
+  { name: "Tradition Zelt", category: "traditional" },
+  { name: "Oide Wiesn", category: "traditional" },
 ];
 ```
 
@@ -2631,14 +2870,14 @@ FIREBASE_SERVICE_ACCOUNT_KEY=xxx
 
 ---
 
-*Document Version: 1.1*
-*Created: 2025-12-29*
-*Last Updated: 2025-12-29*
-*For: ProstCounter Mobile App Development*
+_Document Version: 1.1_
+_Created: 2025-12-29_
+_Last Updated: 2025-12-29_
+_For: ProstCounter Mobile App Development_
 
 ### Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-12-29 | Initial PRD |
-| 1.1 | 2025-12-29 | Removed derived columns from attendances, added drink types, i18n support, improved wrapped caching strategy, removed Nx in favor of Turborepo only |
+| Version | Date       | Changes                                                                                                                                             |
+| ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2025-12-29 | Initial PRD                                                                                                                                         |
+| 1.1     | 2025-12-29 | Removed derived columns from attendances, added drink types, i18n support, improved wrapped caching strategy, removed Nx in favor of Turborepo only |

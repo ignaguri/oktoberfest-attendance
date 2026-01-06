@@ -9,6 +9,7 @@
 ## Overview
 
 Building a "Spotify Wrapped"-style experience for ProstCounter with:
+
 - Provider-agnostic slide architecture (similar to data layer abstraction)
 - Phase 1: Interactive web slides with Swiper + image sharing
 - Phase 2: Remotion video export (future enhancement)
@@ -340,16 +341,18 @@ Building a "Spotify Wrapped"-style experience for ProstCounter with:
 ## Dependencies
 
 ### Phase 1 (Current)
+
 ```json
 {
-  "react-confetti-explosion": "^3.0.3",  // ✅ Already installed
-  "swiper": "^11.1.14",                  // ⏳ To install
-  "html-to-image": "^1.11.11",           // ⏳ To install
-  "recharts": "^2.13.3"                  // ⏳ To install
+  "react-confetti-explosion": "^3.0.3", // ✅ Already installed
+  "swiper": "^11.1.14", // ⏳ To install
+  "html-to-image": "^1.11.11", // ⏳ To install
+  "recharts": "^2.13.3" // ⏳ To install
 }
 ```
 
 ### Phase 2 (Future)
+
 ```json
 {
   "remotion": "^4.0.0",
@@ -376,6 +379,7 @@ Building a "Spotify Wrapped"-style experience for ProstCounter with:
 **Phase 1 Progress:** 58 / 62 tasks (94%)
 
 ### By Section:
+
 - Database Setup: 5 / 5 ✅
 - Type System: 4 / 5 (skipped Zod schemas - optional)
 - Server Actions: 4 / 4 ✅ (added cache regeneration)
@@ -394,12 +398,14 @@ Building a "Spotify Wrapped"-style experience for ProstCounter with:
 ## Notes & Decisions
 
 ### Architecture Decisions
+
 - ✅ Provider abstraction layer (similar to data layer pattern)
 - ✅ Start with web provider (Swiper), add Remotion later
 - ✅ Dev environment access for testing
 - ✅ Per-festival wrapped (not combined)
 
 ### Design Decisions
+
 - ✅ 11 slides total
 - ✅ Data-focused (no personality quiz, just calculated insights)
 - ✅ Brand yellow theme (no dark mode)
@@ -407,6 +413,7 @@ Building a "Spotify Wrapped"-style experience for ProstCounter with:
 - ✅ Video export as future enhancement
 
 ### Technical Decisions
+
 - ✅ **Hybrid caching strategy**: On-demand generation + database caching
 - ✅ **Smart cache invalidation**: Automatic cleanup when user data changes
 - ✅ **Admin cache management**: Manual regeneration for data updates
@@ -428,6 +435,7 @@ _Document any questions or blockers here as they arise_
 ## Changelog
 
 ### 2025-10-01
+
 - ✅ Created implementation plan
 - ✅ Defined Phase 1 and Phase 2 scope
 - ✅ Set up task tracking structure
@@ -443,6 +451,7 @@ _Document any questions or blockers here as they arise_
 - 🚧 Ready for runtime testing
 
 ### 2025-10-01 (Caching Enhancement)
+
 - ✅ **Performance & Caching System Complete**
 - ✅ Created `wrapped_data_cache` table with smart indexing
 - ✅ Implemented `get_wrapped_data_cached()` for instant responses

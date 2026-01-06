@@ -20,11 +20,17 @@ export type DrinkType = z.infer<typeof DrinkTypeSchema>;
  */
 export const LogConsumptionSchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
   tentId: z.uuid({ error: "Invalid tent ID" }).optional(),
   drinkType: DrinkTypeSchema.default("beer"),
   drinkName: z.string().max(255).optional(),
-  basePriceCents: z.number().int().min(0, "Price must be non-negative").optional(),
+  basePriceCents: z
+    .number()
+    .int()
+    .min(0, "Price must be non-negative")
+    .optional(),
   pricePaidCents: z.number().int().min(0, "Price must be non-negative"),
   volumeMl: z.number().int().min(1, "Volume must be positive").default(1000),
   recordedAt: z.iso.datetime().optional(),
@@ -92,4 +98,6 @@ export type AttendanceWithTotals = z.infer<typeof AttendanceWithTotalsSchema>;
  */
 export const LogConsumptionResponseSchema = AttendanceWithTotalsSchema;
 
-export type LogConsumptionResponse = z.infer<typeof LogConsumptionResponseSchema>;
+export type LogConsumptionResponse = z.infer<
+  typeof LogConsumptionResponseSchema
+>;

@@ -1,9 +1,10 @@
 # ProstCounter Architecture Overview
 
 > **Current State Documentation** - Last updated: 2026-01-04
-> This document describes the *implemented* architecture. For future mobile migration plans, see [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md).
+> This document describes the _implemented_ architecture. For future mobile migration plans, see [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md).
 
 ## Table of Contents
+
 - [Quick Reference](#quick-reference)
 - [Monorepo Structure](#monorepo-structure)
 - [API Layer](#api-layer)
@@ -18,16 +19,16 @@
 
 ### Tech Stack
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Frontend** | Next.js 15.4.6 (App Router) | PWA web application |
-| **API** | Hono 4.11 + OpenAPI | Type-safe REST API |
-| **Database** | Supabase (PostgreSQL) | Auth, data, storage, realtime |
-| **State** | TanStack Query v5 | Server state with provider-agnostic abstraction |
-| **Validation** | Zod 4.2 | Runtime type validation & schemas |
-| **Testing** | Vitest 2.1.8 | Unit & integration tests |
-| **Build** | Turborepo 2.7.2 | Monorepo task runner |
-| **Package Manager** | pnpm 9.15.0 | Workspace management |
+| Layer               | Technology                  | Purpose                                         |
+| ------------------- | --------------------------- | ----------------------------------------------- |
+| **Frontend**        | Next.js 15.4.6 (App Router) | PWA web application                             |
+| **API**             | Hono 4.11 + OpenAPI         | Type-safe REST API                              |
+| **Database**        | Supabase (PostgreSQL)       | Auth, data, storage, realtime                   |
+| **State**           | TanStack Query v5           | Server state with provider-agnostic abstraction |
+| **Validation**      | Zod 4.2                     | Runtime type validation & schemas               |
+| **Testing**         | Vitest 2.1.8                | Unit & integration tests                        |
+| **Build**           | Turborepo 2.7.2             | Monorepo task runner                            |
+| **Package Manager** | pnpm 9.15.0                 | Workspace management                            |
 
 ### Essential Commands
 
@@ -212,27 +213,27 @@ The API follows a strict layered architecture for maintainability and testabilit
 
 ### Implemented Routes (14 route files, 50+ endpoints)
 
-| Route | Methods | Description | Status |
-|-------|---------|-------------|--------|
-| **`/achievements`** | GET, POST | User achievements & evaluation | ✅ Complete |
-| **`/attendance`** | GET, POST, PUT, DELETE | Daily attendance records | ✅ Complete |
-| **`/calendar`** | GET | Calendar events (personal & group) | ✅ Complete |
-| **`/consumption`** | POST | Log individual drinks | ✅ Complete |
-| **`/festivals`** | GET, POST, PUT | Festival management | ✅ Complete |
-| **`/groups`** | GET, POST, PUT | Create/list/update groups | ✅ Complete |
-| **`/groups/:id/join`** | POST | Join group with token | ✅ Complete |
-| **`/groups/:id/leave`** | POST | Leave group | ✅ Complete |
-| **`/groups/:id/leaderboard`** | GET | Group rankings | ✅ Complete |
-| **`/groups/:id/members`** | GET, DELETE | Group member management | ✅ Complete |
-| **`/groups/:id/gallery`** | GET | Group photo gallery | ✅ Complete |
-| **`/leaderboard`** | GET | Global leaderboard | ✅ Complete |
-| **`/location`** | GET, POST, DELETE | Location sharing sessions | ✅ Complete |
-| **`/notifications`** | GET, POST | Push notifications & tokens | ✅ Complete |
-| **`/photos`** | GET, POST, DELETE | Photo uploads with signed URLs | ✅ Complete |
-| **`/profile`** | GET, PUT, DELETE | User profile management | ✅ Complete |
-| **`/reservations`** | GET, POST, PUT, DELETE | Tent reservations & check-in | ✅ Complete |
-| **`/tents`** | GET, POST, PUT | Tent management | ✅ Complete |
-| **`/wrapped/:festivalId`** | GET, POST | Year-end summary | ✅ Complete |
+| Route                         | Methods                | Description                        | Status      |
+| ----------------------------- | ---------------------- | ---------------------------------- | ----------- |
+| **`/achievements`**           | GET, POST              | User achievements & evaluation     | ✅ Complete |
+| **`/attendance`**             | GET, POST, PUT, DELETE | Daily attendance records           | ✅ Complete |
+| **`/calendar`**               | GET                    | Calendar events (personal & group) | ✅ Complete |
+| **`/consumption`**            | POST                   | Log individual drinks              | ✅ Complete |
+| **`/festivals`**              | GET, POST, PUT         | Festival management                | ✅ Complete |
+| **`/groups`**                 | GET, POST, PUT         | Create/list/update groups          | ✅ Complete |
+| **`/groups/:id/join`**        | POST                   | Join group with token              | ✅ Complete |
+| **`/groups/:id/leave`**       | POST                   | Leave group                        | ✅ Complete |
+| **`/groups/:id/leaderboard`** | GET                    | Group rankings                     | ✅ Complete |
+| **`/groups/:id/members`**     | GET, DELETE            | Group member management            | ✅ Complete |
+| **`/groups/:id/gallery`**     | GET                    | Group photo gallery                | ✅ Complete |
+| **`/leaderboard`**            | GET                    | Global leaderboard                 | ✅ Complete |
+| **`/location`**               | GET, POST, DELETE      | Location sharing sessions          | ✅ Complete |
+| **`/notifications`**          | GET, POST              | Push notifications & tokens        | ✅ Complete |
+| **`/photos`**                 | GET, POST, DELETE      | Photo uploads with signed URLs     | ✅ Complete |
+| **`/profile`**                | GET, PUT, DELETE       | User profile management            | ✅ Complete |
+| **`/reservations`**           | GET, POST, PUT, DELETE | Tent reservations & check-in       | ✅ Complete |
+| **`/tents`**                  | GET, POST, PUT         | Tent management                    | ✅ Complete |
+| **`/wrapped/:festivalId`**    | GET, POST              | Year-end summary                   | ✅ Complete |
 
 ### Repository Pattern Example
 
@@ -252,12 +253,12 @@ export class SupabaseGroupRepository implements IGroupRepository {
 
   async findById(id: string): Promise<Group | null> {
     const { data, error } = await this.supabase
-      .from('groups')
-      .select('*, winning_criteria(*)')
-      .eq('id', id)
+      .from("groups")
+      .select("*, winning_criteria(*)")
+      .eq("id", id)
       .single();
 
-    if (error?.code === 'PGRST116') return null;
+    if (error?.code === "PGRST116") return null;
     if (error) throw new DatabaseError(error.message);
     return this.mapToGroup(data);
   }
@@ -271,24 +272,27 @@ export class SupabaseGroupRepository implements IGroupRepository {
 ```typescript
 // packages/api/src/middleware/auth.ts
 export const authMiddleware = createMiddleware(async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    throw new HTTPException(401, { message: 'Missing authorization' });
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new HTTPException(401, { message: "Missing authorization" });
   }
 
   const token = authHeader.slice(7);
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
+    process.env.SUPABASE_ANON_KEY!,
   );
 
-  const { data: { user }, error } = await supabase.auth.getUser(token);
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser(token);
   if (error || !user) {
-    throw new HTTPException(401, { message: 'Invalid token' });
+    throw new HTTPException(401, { message: "Invalid token" });
   }
 
-  c.set('user', user);
-  c.set('supabase', supabase); // Authenticated client for RLS
+  c.set("user", user);
+  c.set("supabase", supabase); // Authenticated client for RLS
   await next();
 });
 ```
@@ -303,10 +307,10 @@ export const authMiddleware = createMiddleware(async (c, next) => {
 
 ### Test Types
 
-| Type | Location | Purpose | Database |
-|------|----------|---------|----------|
-| **Unit Tests** | `*.test.ts` | HTTP layer, validation, business logic | Mocked Supabase |
-| **Integration Tests** | `*.integration.test.ts` | End-to-end with real DB | Local Supabase |
+| Type                  | Location                | Purpose                                | Database        |
+| --------------------- | ----------------------- | -------------------------------------- | --------------- |
+| **Unit Tests**        | `*.test.ts`             | HTTP layer, validation, business logic | Mocked Supabase |
+| **Integration Tests** | `*.integration.test.ts` | End-to-end with real DB                | Local Supabase  |
 
 ### Test Helpers
 
@@ -327,12 +331,15 @@ export function createAuthRequest(url: string, options?: RequestInit);
 // 3. test-supabase.ts - Real Supabase clients
 export function createTestSupabaseAdmin(): SupabaseClient<Database>;
 export function createTestSupabaseAnon(): SupabaseClient<Database>;
-export function createTestSupabaseWithAuth(token: string): SupabaseClient<Database>;
+export function createTestSupabaseWithAuth(
+  token: string,
+): SupabaseClient<Database>;
 ```
 
 ### Environment Setup
 
 Tests automatically load environment variables from:
+
 1. `.env.test` (if exists, for test-specific overrides)
 2. `.env.local` (existing local development config)
 
@@ -367,7 +374,7 @@ pnpm --filter=@prostcounter/api test:ui
 
 ### Writing Tests
 
-See [packages/api/src/__tests__/README.md](../packages/api/src/__tests__/README.md) for comprehensive testing guide.
+See [packages/api/src/**tests**/README.md](../packages/api/src/__tests__/README.md) for comprehensive testing guide.
 
 ---
 
@@ -380,14 +387,14 @@ The database supports multiple festivals with dynamic configuration:
 ```typescript
 interface Festival {
   id: string;
-  name: string;              // "Oktoberfest 2024", "Oktoberfest 2025"
+  name: string; // "Oktoberfest 2024", "Oktoberfest 2025"
   start_date: string;
   end_date: string;
-  beer_cost: number;         // Default price in cents (€16.20 = 1620)
+  beer_cost: number; // Default price in cents (€16.20 = 1620)
   location: string;
   map_url: string;
-  timezone: string;          // "Europe/Berlin"
-  is_active: boolean;        // Only one can be active
+  timezone: string; // "Europe/Berlin"
+  is_active: boolean; // Only one can be active
   status: "upcoming" | "active" | "ended";
 }
 ```
@@ -396,40 +403,40 @@ All business logic reads from the database - no hardcoded constants!
 
 ### Core Tables
 
-| Table | Purpose | Key Features |
-|-------|---------|--------------|
-| **festivals** | Festival definitions | Multi-year support, dynamic pricing |
-| **profiles** | User metadata | Extends Supabase auth.users |
-| **attendances** | Daily attendance records | Per festival, date unique constraint |
-| **consumptions** | Individual drink records | Flexible drink types, price history |
-| **tent_visits** | Location tracking | Visit timestamps per tent |
-| **groups** | Competition groups | Festival-scoped, invite tokens |
-| **group_members** | Group membership | User-group relationships |
-| **achievements** | Achievement definitions | Categories, rarity, conditions (JSONB) |
-| **user_achievements** | Unlocked achievements | Per user per festival |
-| **beer_pictures** | Photo uploads | Linked to attendances |
-| **tents** | Tent master data | Categories, capacity |
-| **festival_tents** | Festival-tent association | Per-tent pricing overrides |
+| Table                 | Purpose                   | Key Features                           |
+| --------------------- | ------------------------- | -------------------------------------- |
+| **festivals**         | Festival definitions      | Multi-year support, dynamic pricing    |
+| **profiles**          | User metadata             | Extends Supabase auth.users            |
+| **attendances**       | Daily attendance records  | Per festival, date unique constraint   |
+| **consumptions**      | Individual drink records  | Flexible drink types, price history    |
+| **tent_visits**       | Location tracking         | Visit timestamps per tent              |
+| **groups**            | Competition groups        | Festival-scoped, invite tokens         |
+| **group_members**     | Group membership          | User-group relationships               |
+| **achievements**      | Achievement definitions   | Categories, rarity, conditions (JSONB) |
+| **user_achievements** | Unlocked achievements     | Per user per festival                  |
+| **beer_pictures**     | Photo uploads             | Linked to attendances                  |
+| **tents**             | Tent master data          | Categories, capacity                   |
+| **festival_tents**    | Festival-tent association | Per-tent pricing overrides             |
 
 ### Flexible Drink Types
 
 ```typescript
 type DrinkType =
-  | 'beer'           // Standard Oktoberfest beer (Mass)
-  | 'radler'         // Beer + lemonade mix
-  | 'alcohol_free'   // Alcohol-free beer
-  | 'wine'           // Wine (at Weinzelt)
-  | 'soft_drink'     // Non-alcoholic beverages
-  | 'other';         // Custom drinks
+  | "beer" // Standard Oktoberfest beer (Mass)
+  | "radler" // Beer + lemonade mix
+  | "alcohol_free" // Alcohol-free beer
+  | "wine" // Wine (at Weinzelt)
+  | "soft_drink" // Non-alcoholic beverages
+  | "other"; // Custom drinks
 
 // consumptions table
 interface Consumption {
   attendance_id: string;
   drink_type: DrinkType;
-  drink_name?: string;       // Optional custom name
-  base_price_cents: number;  // Price at time of recording
-  price_paid_cents: number;  // Actual amount (includes tip)
-  volume_ml: number;         // 1000ml = 1 Mass, 500ml = half
+  drink_name?: string; // Optional custom name
+  base_price_cents: number; // Price at time of recording
+  price_paid_cents: number; // Actual amount (includes tip)
+  volume_ml: number; // 1000ml = 1 Mass, 500ml = half
 }
 ```
 
@@ -455,6 +462,7 @@ Never query `attendances` directly - always use `attendance_with_totals`!
 ### Row Level Security (RLS)
 
 All tables have RLS policies enforcing:
+
 - Users can only read/write their own data
 - Groups can read member data based on membership
 - Super admins bypass all restrictions
@@ -488,7 +496,7 @@ The repository layer uses interfaces to allow swapping database providers:
 
 ```typescript
 // Easy to swap Supabase for another provider
-const repo = new SupabaseGroupRepository(supabase);  // Current
+const repo = new SupabaseGroupRepository(supabase); // Current
 // const repo = new PrismaGroupRepository(prisma);   // Future option
 // const repo = new DrizzleGroupRepository(db);      // Future option
 
@@ -500,11 +508,21 @@ const groupService = new GroupService(repo);
 
 ```typescript
 // Custom error classes with proper HTTP status mapping
-export class DatabaseError extends Error { status = 500; }
-export class NotFoundError extends Error { status = 404; }
-export class ValidationError extends Error { status = 422; }
-export class UnauthorizedError extends Error { status = 401; }
-export class ForbiddenError extends Error { status = 403; }
+export class DatabaseError extends Error {
+  status = 500;
+}
+export class NotFoundError extends Error {
+  status = 404;
+}
+export class ValidationError extends Error {
+  status = 422;
+}
+export class UnauthorizedError extends Error {
+  status = 401;
+}
+export class ForbiddenError extends Error {
+  status = 403;
+}
 
 // Error middleware maps to HTTP responses
 export const errorHandler: ErrorHandler = (err, c) => {
@@ -523,15 +541,15 @@ Next.js `unstable_cache` for performance:
 const getCachedTents = unstable_cache(
   async (festivalId: string, supabase: SupabaseClient) => {
     const { data, error } = await supabase
-      .from('tents')
-      .select('*')
-      .eq('festival_id', festivalId);
+      .from("tents")
+      .select("*")
+      .eq("festival_id", festivalId);
 
     if (error) throw new DatabaseError(error.message);
     return data;
   },
-  ['tents'],
-  { revalidate: 7200, tags: ['tents'] } // 2 hours
+  ["tents"],
+  { revalidate: 7200, tags: ["tents"] }, // 2 hours
 );
 ```
 
@@ -543,7 +561,7 @@ const getCachedTents = unstable_cache(
 // Business logic hooks centralized in /hooks
 export function useGroups(festivalId: string) {
   return useQuery({
-    queryKey: ['groups', festivalId],
+    queryKey: ["groups", festivalId],
     queryFn: () => fetchUserGroups(festivalId),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -659,6 +677,7 @@ test
 ### Environment Variables
 
 **Required** (`.env.local`):
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<from supabase status>
@@ -666,6 +685,7 @@ SUPABASE_SERVICE_ROLE_KEY=<from supabase status>
 ```
 
 **Optional**:
+
 ```bash
 # OAuth (production only)
 SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=
@@ -712,6 +732,7 @@ LOG_FORMAT=json
 ### 📋 Planned (Mobile Migration)
 
 See [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md) for:
+
 - Expo (React Native) mobile app
 - Offline-first architecture
 - Native features (widgets, Apple Watch, background location)
@@ -723,7 +744,7 @@ See [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md) fo
 
 - **Project Instructions**: [CLAUDE.md](../CLAUDE.md)
 - **Mobile PRD**: [docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md)
-- **Test Documentation**: [packages/api/src/__tests__/README.md](../packages/api/src/__tests__/README.md)
+- **Test Documentation**: [packages/api/src/**tests**/README.md](../packages/api/src/__tests__/README.md)
 - **Database Migrations**: [supabase/migrations/](../supabase/migrations/)
 - **Progress Tracking**: [docs/progress/](./progress/)
 
@@ -740,5 +761,5 @@ See [PRD_PROSTCOUNTER_MOBILE.md](./mobile-project/PRD_PROSTCOUNTER_MOBILE.md) fo
 
 ---
 
-*Last updated: 2026-01-04*
-*Document version: 1.1*
+_Last updated: 2026-01-04_
+_Document version: 1.1_

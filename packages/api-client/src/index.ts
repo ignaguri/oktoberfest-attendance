@@ -66,20 +66,22 @@ export type ApiClient = ReturnType<typeof createApiClient>;
 export type ApiResponse<
   Path extends keyof paths,
   Method extends keyof paths[Path],
-> = paths[Path][Method] extends { responses: { 200: { content: { "application/json": infer T } } } }
+> = paths[Path][Method] extends {
+  responses: { 200: { content: { "application/json": infer T } } };
+}
   ? T
   : never;
 
 export type ApiRequestBody<
   Path extends keyof paths,
   Method extends keyof paths[Path],
-> = paths[Path][Method] extends { requestBody?: { content: { "application/json": infer T } } }
+> = paths[Path][Method] extends {
+  requestBody?: { content: { "application/json": infer T } };
+}
   ? T
   : never;
 
 export type ApiQueryParams<
   Path extends keyof paths,
   Method extends keyof paths[Path],
-> = paths[Path][Method] extends { parameters: { query: infer T } }
-  ? T
-  : never;
+> = paths[Path][Method] extends { parameters: { query: infer T } } ? T : never;

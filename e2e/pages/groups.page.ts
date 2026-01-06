@@ -129,7 +129,9 @@ export class GroupsPage extends BasePage {
    * Assert that a specific group is visible in My Groups
    */
   async expectGroupVisible(groupName: string | RegExp): Promise<void> {
-    await expect(this.page.getByRole("link", { name: groupName })).toBeVisible();
+    await expect(
+      this.page.getByRole("link", { name: groupName }),
+    ).toBeVisible();
   }
 
   /**

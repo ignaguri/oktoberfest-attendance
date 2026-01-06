@@ -26,7 +26,7 @@ test.describe("Groups Flows", () => {
     await signInPage.goto();
     await signInPage.signInAndWaitForHome(
       GROUPS_TEST_USER.email,
-      GROUPS_TEST_USER.password
+      GROUPS_TEST_USER.password,
     );
     await homePage.expectOnHomePage();
 
@@ -75,7 +75,7 @@ test.describe("Groups Flows", () => {
       // Join Group B (since user might already be in Group A from seed)
       await groupsPage.joinGroup(
         TEST_GROUPS.groupB.name,
-        TEST_GROUPS.groupB.password
+        TEST_GROUPS.groupB.password,
       );
 
       // Wait for navigation or success
@@ -83,7 +83,8 @@ test.describe("Groups Flows", () => {
 
       // Should either redirect to group page or show success toast
       const currentUrl = page.url();
-      const isOnGroupPage = currentUrl.includes("/groups/") && !currentUrl.endsWith("/groups");
+      const isOnGroupPage =
+        currentUrl.includes("/groups/") && !currentUrl.endsWith("/groups");
       if (!isOnGroupPage) {
         // If still on groups page, check for success toast or error
         await expect(page).toHaveURL(/\/groups/);
@@ -129,7 +130,7 @@ test.describe("Groups Flows", () => {
       // First join a group to ensure we're a member
       await groupsPage.joinGroup(
         TEST_GROUPS.groupC.name,
-        TEST_GROUPS.groupC.password
+        TEST_GROUPS.groupC.password,
       );
 
       // Wait for potential navigation
@@ -140,7 +141,9 @@ test.describe("Groups Flows", () => {
       await page.waitForLoadState("networkidle");
 
       // Try to click on the group in My Groups
-      const groupLink = page.getByRole("link", { name: TEST_GROUPS.groupC.name });
+      const groupLink = page.getByRole("link", {
+        name: TEST_GROUPS.groupC.name,
+      });
       const isGroupVisible = await groupLink.isVisible().catch(() => false);
 
       if (isGroupVisible) {
@@ -165,7 +168,7 @@ test.describe("Groups Flows", () => {
       // Join a group first
       await groupsPage.joinGroup(
         TEST_GROUPS.groupA.name,
-        TEST_GROUPS.groupA.password
+        TEST_GROUPS.groupA.password,
       );
 
       await page.waitForTimeout(2000);
@@ -174,7 +177,9 @@ test.describe("Groups Flows", () => {
       await page.goto("/groups");
       await page.waitForLoadState("networkidle");
 
-      const groupLink = page.getByRole("link", { name: TEST_GROUPS.groupA.name });
+      const groupLink = page.getByRole("link", {
+        name: TEST_GROUPS.groupA.name,
+      });
       const isGroupVisible = await groupLink.isVisible().catch(() => false);
 
       if (isGroupVisible) {
@@ -215,7 +220,7 @@ test.describe("Groups Flows", () => {
       if (hasToast) {
         // Verify it's an error toast - could be password error or festival selection error
         await expect(toast).toContainText(
-          /incorrect|error|unable|festival|password/i
+          /incorrect|error|unable|festival|password/i,
         );
       }
 
@@ -234,7 +239,7 @@ test.describe("Groups Flows", () => {
       // First join a group to ensure we're a member
       await groupsPage.joinGroup(
         TEST_GROUPS.groupA.name,
-        TEST_GROUPS.groupA.password
+        TEST_GROUPS.groupA.password,
       );
 
       await page.waitForTimeout(2000);
@@ -244,7 +249,9 @@ test.describe("Groups Flows", () => {
       await page.waitForLoadState("networkidle");
 
       // Try to find the specific group link (not breadcrumb)
-      const groupLink = page.getByRole("link", { name: TEST_GROUPS.groupA.name });
+      const groupLink = page.getByRole("link", {
+        name: TEST_GROUPS.groupA.name,
+      });
       const isGroupVisible = await groupLink.isVisible().catch(() => false);
 
       if (isGroupVisible) {

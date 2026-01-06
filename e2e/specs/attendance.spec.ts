@@ -19,7 +19,7 @@ test.describe("Attendance Flows", () => {
     await signInPage.goto();
     await signInPage.signInAndWaitForHome(
       ATTENDANCE_TEST_USER.email,
-      ATTENDANCE_TEST_USER.password
+      ATTENDANCE_TEST_USER.password,
     );
     await homePage.expectOnHomePage();
 
@@ -39,7 +39,9 @@ test.describe("Attendance Flows", () => {
 
       // Check if festival is active (quick attendance shown) or ended (wrapped shown)
       const festivalEndedMessage = page.getByText(/is over|has ended/i);
-      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      const isFestivalEnded = await festivalEndedMessage
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
 
       if (isFestivalEnded) {
         // Festival is over - verify the ended state UI is shown instead
@@ -62,7 +64,9 @@ test.describe("Attendance Flows", () => {
 
       // Check if festival is active
       const festivalEndedMessage = page.getByText(/is over|has ended/i);
-      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      const isFestivalEnded = await festivalEndedMessage
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       if (isFestivalEnded) {
         test.skip();
         return;
@@ -95,7 +99,9 @@ test.describe("Attendance Flows", () => {
 
       // Check if festival is active
       const festivalEndedMessage = page.getByText(/is over|has ended/i);
-      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      const isFestivalEnded = await festivalEndedMessage
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       if (isFestivalEnded) {
         test.skip();
         return;
@@ -120,7 +126,9 @@ test.describe("Attendance Flows", () => {
 
       // Check if festival is active
       const festivalEndedMessage = page.getByText(/is over|has ended/i);
-      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      const isFestivalEnded = await festivalEndedMessage
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       if (isFestivalEnded) {
         test.skip();
         return;
@@ -143,7 +151,9 @@ test.describe("Attendance Flows", () => {
 
       // Check if festival is active
       const festivalEndedMessage = page.getByText(/is over|has ended/i);
-      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      const isFestivalEnded = await festivalEndedMessage
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       if (isFestivalEnded) {
         test.skip();
         return;
@@ -174,7 +184,9 @@ test.describe("Attendance Flows", () => {
 
       // Check if festival is active
       const festivalEndedMessage = page.getByText(/is over|has ended/i);
-      const isFestivalEnded = await festivalEndedMessage.isVisible({ timeout: 2000 }).catch(() => false);
+      const isFestivalEnded = await festivalEndedMessage
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       if (isFestivalEnded) {
         test.skip();
         return;

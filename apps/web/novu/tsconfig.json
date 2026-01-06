@@ -12,5 +12,3 @@
   },
   "include": ["./workflows/**/*.ts", "../scripts/novu-sync.ts"]
 }
-
-

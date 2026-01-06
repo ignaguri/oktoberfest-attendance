@@ -50,7 +50,13 @@ export const CreateReservationSchema = z.object({
   note: z.string().max(500).optional(),
   visibleToGroups: z.boolean().optional().default(true),
   autoCheckin: z.boolean().optional().default(false),
-  reminderOffsetMinutes: z.number().int().min(0).max(1440).optional().default(30), // 30 minutes default
+  reminderOffsetMinutes: z
+    .number()
+    .int()
+    .min(0)
+    .max(1440)
+    .optional()
+    .default(30), // 30 minutes default
 });
 
 export type CreateReservationInput = z.infer<typeof CreateReservationSchema>;
@@ -62,7 +68,9 @@ export const CreateReservationResponseSchema = z.object({
   reservation: ReservationSchema,
 });
 
-export type CreateReservationResponse = z.infer<typeof CreateReservationResponseSchema>;
+export type CreateReservationResponse = z.infer<
+  typeof CreateReservationResponseSchema
+>;
 
 /**
  * Check-in to reservation request
@@ -79,13 +87,17 @@ export type CheckinReservationInput = z.infer<typeof CheckinReservationSchema>;
  */
 export const CheckinReservationResponseSchema = z.object({
   reservation: ReservationSchema,
-  attendance: z.object({
-    id: z.uuid(),
-    date: z.iso.date(),
-  }).optional(), // Created attendance if check-in creates one
+  attendance: z
+    .object({
+      id: z.uuid(),
+      date: z.iso.date(),
+    })
+    .optional(), // Created attendance if check-in creates one
 });
 
-export type CheckinReservationResponse = z.infer<typeof CheckinReservationResponseSchema>;
+export type CheckinReservationResponse = z.infer<
+  typeof CheckinReservationResponseSchema
+>;
 
 /**
  * Get user reservations query
@@ -111,7 +123,9 @@ export const GetReservationsResponseSchema = z.object({
   offset: z.number().int(),
 });
 
-export type GetReservationsResponse = z.infer<typeof GetReservationsResponseSchema>;
+export type GetReservationsResponse = z.infer<
+  typeof GetReservationsResponseSchema
+>;
 
 /**
  * Get single reservation param
@@ -130,7 +144,9 @@ export const GetReservationResponseSchema = z.object({
   reservation: ReservationSchema,
 });
 
-export type GetReservationResponse = z.infer<typeof GetReservationResponseSchema>;
+export type GetReservationResponse = z.infer<
+  typeof GetReservationResponseSchema
+>;
 
 /**
  * Update reservation request
@@ -154,4 +170,6 @@ export const UpdateReservationResponseSchema = z.object({
   reservation: ReservationSchema,
 });
 
-export type UpdateReservationResponse = z.infer<typeof UpdateReservationResponseSchema>;
+export type UpdateReservationResponse = z.infer<
+  typeof UpdateReservationResponseSchema
+>;
