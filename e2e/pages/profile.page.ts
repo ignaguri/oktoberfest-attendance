@@ -52,10 +52,10 @@ export class ProfilePage extends BasePage {
     this.fullNameInput = page.getByRole("textbox", { name: /full\s*name/i });
     this.usernameInput = page.getByRole("textbox", { name: /username/i });
 
-    // Buttons
-    this.editButton = page.getByRole("button", { name: "Edit" });
-    this.updateButton = page.getByRole("button", { name: /^update$/i });
-    this.cancelButton = page.getByRole("button", { name: "Cancel" });
+    // Buttons - using i18n translation keys: common.buttons.edit, common.buttons.save, common.buttons.cancel
+    this.editButton = page.getByRole("button", { name: /^edit$/i });
+    this.updateButton = page.getByRole("button", { name: /^save$/i });
+    this.cancelButton = page.getByRole("button", { name: /^cancel$/i });
     this.changePasswordLink = page.getByRole("link", {
       name: /change password/i,
     });

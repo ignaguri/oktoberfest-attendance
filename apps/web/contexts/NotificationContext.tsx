@@ -415,12 +415,30 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Default context value for use outside NotificationProvider (e.g., on public pages)
+const defaultContextValue: NotificationContextType = {
+  user: null,
+  preferences: null,
+  updatePreferences: async () => {},
+  pushSupported: false,
+  pushPermission: null,
+  requestPushPermission: async () => false,
+  fcmToken: null,
+  registerFCMTokenWithNovu: async () => false,
+  loading: false,
+  isWhatsNewVisible: false,
+  isInstallPWAVisible: false,
+  setWhatsNewVisible: () => {},
+  setInstallPWAVisible: () => {},
+  canShowInstallPWA: false,
+  canShowWhatsNew: false,
+};
+
 export function useNotifications() {
   const context = useContext(NotificationContext);
+  // Return safe default when used outside NotificationProvider (e.g., on public pages)
   if (context === undefined) {
-    throw new Error(
-      "useNotifications must be used within a NotificationProvider",
-    );
+    return defaultContextValue;
   }
   return context;
 }

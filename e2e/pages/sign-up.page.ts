@@ -33,7 +33,8 @@ export class SignUpPage extends BasePage {
     this.emailInput = page.getByLabel(/^email$/i);
     this.passwordInput = page.getByLabel(/^password$/i);
     this.confirmPasswordInput = page.getByLabel(/confirm password/i);
-    this.submitButton = page.getByRole("button", { name: /submit/i });
+    // Button text from auth.signUp.submit: "Create Account"
+    this.submitButton = page.getByRole("button", { name: /create account/i });
 
     // OAuth buttons
     this.googleButton = page.getByRole("button", {

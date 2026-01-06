@@ -27,9 +27,9 @@ export class LeaderboardPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
-    // Page heading
+    // Page heading - matches "Global Leaderboard" or "Leaderboard"
     this.pageHeading = page.getByRole("heading", {
-      name: "Global Leaderboard",
+      name: /leaderboard/i,
       level: 1,
     });
 

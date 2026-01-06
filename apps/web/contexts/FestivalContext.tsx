@@ -126,10 +126,20 @@ export function FestivalProvider({ children }: FestivalProviderProps) {
   );
 }
 
+// Default context value for use outside FestivalProvider (e.g., on public pages)
+const defaultContextValue: FestivalContextType = {
+  currentFestival: null,
+  festivals: [],
+  setCurrentFestival: () => {},
+  isLoading: false,
+  error: null,
+};
+
 export function useFestival() {
   const context = useContext(FestivalContext);
+  // Return safe default when used outside FestivalProvider (e.g., on public pages)
   if (context === undefined) {
-    throw new Error("useFestival must be used within a FestivalProvider");
+    return defaultContextValue;
   }
   return context;
 }

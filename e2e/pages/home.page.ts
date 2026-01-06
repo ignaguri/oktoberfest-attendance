@@ -152,18 +152,18 @@ export class HomePage extends BasePage {
    */
   async dismissWhatsNewIfVisible(): Promise<void> {
     try {
-      // Wait for the dialog to appear
-      const dialog = this.page.getByRole("dialog", { name: /what's new/i });
-      await dialog.waitFor({ state: "visible", timeout: 3000 });
+      // Look for "Got it" button directly (more reliable than finding dialog first)
+      const gotItButton = this.page.getByRole("button", { name: /^got it$/i });
 
-      // Click the "Got it" button
-      const gotItButton = this.page.getByRole("button", { name: /got it/i });
-      await gotItButton.click();
+      // Wait briefly for button to appear
+      await gotItButton.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
 
-      // Wait for dialog to close
-      await dialog.waitFor({ state: "hidden", timeout: 3000 });
+      if (await gotItButton.isVisible().catch(() => false)) {
+        await gotItButton.click({ force: true });
+        await this.page.waitForTimeout(500);
+      }
     } catch {
-      // Dialog not present, continue
+      // Dialog not present or already closed, continue
     }
   }
 
@@ -172,13 +172,16 @@ export class HomePage extends BasePage {
    */
   async dismissTutorialIfVisible(): Promise<void> {
     try {
-      // Wait for the skip button to appear (it's in the tutorial modal)
+      // Look for the skip button directly
       const skipButton = this.page.getByRole("button", { name: /^skip$/i });
-      await skipButton.waitFor({ state: "visible", timeout: 3000 });
-      await skipButton.click();
 
-      // Wait for modal to close
-      await this.page.waitForTimeout(500);
+      // Wait briefly for button to appear
+      await skipButton.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
+
+      if (await skipButton.isVisible().catch(() => false)) {
+        await skipButton.click({ force: true });
+        await this.page.waitForTimeout(500);
+      }
     } catch {
       // Tutorial not present, continue
     }
@@ -186,12 +189,42 @@ export class HomePage extends BasePage {
 
   /**
    * Dismiss all overlays (What's New dialog and Tutorial)
+   * Uses multiple attempts to ensure overlays are closed
    */
   async dismissAllOverlays(): Promise<void> {
-    // Dismiss What's New dialog first (it appears on top)
-    await this.dismissWhatsNewIfVisible();
-    // Then dismiss tutorial
-    await this.dismissTutorialIfVisible();
+    // Wait for page to settle after navigation
+    await this.page.waitForLoadState("domcontentloaded");
+    await this.page.waitForTimeout(1000);
+
+    // Try up to 3 times to dismiss all overlays
+    for (let attempt = 0; attempt < 3; attempt++) {
+      // Dismiss What's New dialog first (it appears on top)
+      await this.dismissWhatsNewIfVisible();
+
+      // Then dismiss tutorial
+      await this.dismissTutorialIfVisible();
+
+      // Check if any dialogs/overlays are still visible
+      const hasGotIt = await this.page
+        .getByRole("button", { name: /^got it$/i })
+        .isVisible()
+        .catch(() => false);
+      const hasSkip = await this.page
+        .getByRole("button", { name: /^skip$/i })
+        .isVisible()
+        .catch(() => false);
+
+      if (!hasGotIt && !hasSkip) {
+        break; // All overlays dismissed
+      }
+
+      // Small wait before retry
+      await this.page.waitForTimeout(500);
+    }
+
+    // Final escape key press to close any remaining modals
+    await this.page.keyboard.press("Escape");
+    await this.page.waitForTimeout(300);
   }
 
   /**
