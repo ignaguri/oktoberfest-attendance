@@ -162,7 +162,10 @@ export const AchievementStatsSchema = z.object({
   total_achievements: z.number().int(),
   unlocked_achievements: z.number().int(),
   total_points: z.number().int(),
-  breakdown_by_category: z.record(AchievementCategorySchema, BreakdownStatsSchema),
+  breakdown_by_category: z.record(
+    AchievementCategorySchema,
+    BreakdownStatsSchema,
+  ),
   breakdown_by_rarity: z.record(AchievementRaritySchema, BreakdownStatsSchema),
 });
 

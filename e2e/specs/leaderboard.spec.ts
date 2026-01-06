@@ -20,7 +20,7 @@ test.describe("Leaderboard Flows", () => {
     await signInPage.goto();
     await signInPage.signInAndWaitForHome(
       LEADERBOARD_TEST_USER.email,
-      LEADERBOARD_TEST_USER.password
+      LEADERBOARD_TEST_USER.password,
     );
     await homePage.expectOnHomePage();
 

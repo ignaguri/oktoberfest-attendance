@@ -1,6 +1,7 @@
 ## Reservations, Calendars, and Achievement Notifications - Implementation Plan
 
 ### Overview
+
 - **Goal**: Add reservations with reminders and check-in prompts; unified personal/group calendars; achievement notifications.
 - **Decisions**:
   - Tent is required for reservations.
@@ -35,6 +36,7 @@
 ### Phase 1: Database Schema
 
 #### 1.1 New table: `reservations` ✅
+
 - Columns:
   - `id uuid pk`
   - `user_id uuid not null` -> `profiles(id)`
@@ -64,6 +66,7 @@
   - Group visibility policy: users who share a group in the same `festival_id` with the owner can SELECT rows where `visible_to_groups = true`.
 
 #### 1.2 Preferences: `user_notification_preferences`
+
 - Add columns (and deprecate old toggles at UI-level):
   - `reminders_enabled boolean default true`
   - `group_notifications_enabled boolean default true`
@@ -72,6 +75,7 @@
 - Update default creation trigger to set new columns.
 
 #### 1.3 Achievement events queue
+
 - New table `achievement_events`:
   - `id uuid pk default gen_random_uuid()`
   - `user_id uuid not null` -> `profiles(id)`
@@ -88,6 +92,7 @@
 ### Phase 2: Server Actions & RPCs
 
 #### 2.1 Reservations actions (Next.js Server Actions) ✅ (create/update/cancel)
+
 - `createReservation({ festivalId, tentId, startAt, endAt?, reminderOffsetMinutes?, visibleToGroups?, note? })`
   - Validates: tent exists, within festival dates/timezone [[memory:6869223]].
   - Inserts `reservations`.
@@ -99,6 +104,7 @@
 - `listGroupReservations(festivalId, groupId?)` (all my groups by default)
 
 #### 2.2 RPCs (Supabase SQL)
+
 - `rpc_get_personal_calendar(p_user_id uuid, p_festival_id uuid)` ⏸️ (deferred)
   - Returns unified feed by day: attendances (with beer_count, tents) + upcoming reservations.
 - `rpc_get_group_calendar(p_user_id uuid, p_festival_id uuid, p_group_id uuid null)` ⏸️ (deferred)
@@ -111,6 +117,7 @@
 ### Phase 3: Notifications & Workflows ✅ (core workflows + service methods)
 
 #### 3.1 NotificationService additions ✅
+
 - Workflows (Novu): ✅ code-first in `novu/workflows/*`
   - `RESERVATION_REMINDER`
   - `RESERVATION_CHECKIN_PROMPT` (deep links into app with `?reservation=...`)
@@ -131,21 +138,23 @@
 - Route: `app/api/cron/scheduler/route.ts` (delegates to `./reservations.ts` and `./achievements.ts`)
 - Protection: require `X-CRON-SECRET` header; compare to env.
 - Steps (every 5 minutes):
-  1) Fetch due reminders via `rpc_due_reservation_reminders(now())`, send `RESERVATION_REMINDER`, set `reminder_sent_at = now()`.
-  2) Fetch due prompts via `rpc_due_reservation_prompts(now())`, send `RESERVATION_CHECKIN_PROMPT`, set `prompt_sent_at = now()`.
-  3) Process `achievement_events`:
+  1. Fetch due reminders via `rpc_due_reservation_reminders(now())`, send `RESERVATION_REMINDER`, set `reminder_sent_at = now()`.
+  2. Fetch due prompts via `rpc_due_reservation_prompts(now())`, send `RESERVATION_CHECKIN_PROMPT`, set `prompt_sent_at = now()`.
+  3. Process `achievement_events`:
      - User notifications: where `user_notified_at is null`; send `ACHIEVEMENT_UNLOCKED` when `achievement_notifications_enabled`; set timestamp.
      - Group notifications: where `group_notified_at is null AND rarity in (rare, epic)`; determine recipient group members for same `festival_id` (exclude achiever), and only if they share a group with the achiever; send `GROUP_ACHIEVEMENT_UNLOCKED` if recipients have `group_notifications_enabled`; set timestamp.
 - Idempotency: update timestamps inside a transaction; use `FOR UPDATE SKIP LOCKED` in backing SQL or limit batches.
 - Error handling: log to Sentry; mark reservation `status=failed` only on unrecoverable errors.
 
 Deployment notes:
+
 - Add `vercel.json` crons: `{"path":"/api/cron/scheduler","schedule":"*/5 * * * *"}`
 - Set `CRON_SECRET` in Vercel project env; use it in the scheduler request header `x-cron-secret`.
 
 ### Phase 5: UI
 
 #### 5.1 Personal Calendar ✅ (scaffold + dialogs + events)
+
 - Location: `app/(private)/attendance/calendar/page.tsx` (or integrate into existing `attendance` with tabs).
 - Features:
   - Calendar view: past attendances (beer count, tents) and future reservations.
@@ -156,27 +165,31 @@ Deployment notes:
   - Check-in prompt deep-link opens dialog with action to log attendance and tent visit.
 
 #### 5.2 Group Calendar ✅ (scaffold + events)
+
 - Location: `app/(private)/groups/[id]/calendar/page.tsx`.
 - Features:
   - Shows members’ past attendances and future reservations (only `visible_to_groups=true`).
   - Filters by member; per-day grouping.
 
 #### 5.3 Notification Settings ✅
+
 - Update `components/NotificationSettings.tsx` and `contexts/NotificationContext.tsx` to expose three toggles: `reminders_enabled`, `achievement_notifications_enabled`, `group_notifications_enabled`.
 - Remove UI references to legacy per-type toggles; keep backward compatibility server-side.
 
 ### Phase 6: Check-in Prompt Flow ✅
+
 - Push notification at `start_at` with CTA deep-link to `/attendance?reservationId=...&prompt=checkin`. ✅
 - In app load, detect `prompt=checkin` and show responsive dialog "Are you there yet?" ✅
 - CTA performs server action: create `attendances(beer_count=0)` for that day (festival-local date), insert `tent_visits(start_at)` if not present, set reservation `status=completed` and `processed_at`. ✅
 - If user already has attendance that day, skip creation and mark reservation `completed`. ✅
 
 ### Phase 7: Migration & Commits Strategy
+
 - Create new migrations using `pnpm sup:mig:new` for:
-  1) `reservations` table + RLS/policies + indexes.
-  2) Extend `user_notification_preferences` with 3 new columns + defaults in trigger.
-  3) `achievement_events` table + trigger on `user_achievements`.
-  4) RPCs for calendars and due items.
+  1. `reservations` table + RLS/policies + indexes.
+  2. Extend `user_notification_preferences` with 3 new columns + defaults in trigger.
+  3. `achievement_events` table + trigger on `user_achievements`.
+  4. RPCs for calendars and due items.
 - After DB changes: `pnpm sup:db:push`, `pnpm sup:db:types`.
 - Implement NotificationService changes and Novu workflows.
 - Add cron route and Vercel Cron configuration.
@@ -184,18 +197,21 @@ Deployment notes:
 - Group meaningful commits per phase (schema, service, cron, UI).
 
 ### API Contracts (Brief)
+
 - `POST /api/reservations` create
 - `PATCH /api/reservations/:id` update
 - `DELETE /api/reservations/:id` cancel
 - Server Actions equivalents for RSC.
 
 ### Risks & Mitigations
+
 - Timezone mishandling: use date-fns-tz; store UTC; convert using festival timezone [[memory:6869223]].
 - Duplicates on check-in: enforce unique attendance per (user, festival, date); pre-check in action.
 - Notification noise: consolidated preferences; defaults sensible.
 - RLS complexity for group visibility: start owner-only; add carefully tested SELECT policy.
 
 ### QA & Verification
+
 - Environment setup ⏳
   - Ensure env vars are set locally and on Vercel: `CRON_SECRET`, `NOVU_API_KEY`, FCM keys.
   - Verify `vercel.json` has cron `POST /api/cron/scheduler` every 5 minutes and header `x-cron-secret` is enforced.
@@ -244,6 +260,7 @@ Deployment notes:
   - Verify `unstable_cache` usage and revalidation tags keep calendars snappy; measure initial render and interactions.
 
 ### Success Criteria
+
 - Users see unified personal calendar; can create/edit reservations and attendances.
 - Reminders and check-in prompts fire at expected times.
 - Achievers receive notifications; groups notified only for rare/epic within same festival groups.

@@ -133,12 +133,12 @@ ProstCounter has comprehensive testing infrastructure using **Vitest 2.1.8** wit
 
 #### Test Types
 
-| Type | Location | Database | Purpose |
-|------|----------|----------|---------|
-| **Unit Tests** | `*.test.ts` | Mocked Supabase | HTTP layer, validation, business logic |
-| **Integration Tests** | `*.integration.test.ts` | Local Supabase | End-to-end with real DB, RLS, triggers |
+| Type                  | Location                | Database        | Purpose                                |
+| --------------------- | ----------------------- | --------------- | -------------------------------------- |
+| **Unit Tests**        | `*.test.ts`             | Mocked Supabase | HTTP layer, validation, business logic |
+| **Integration Tests** | `*.integration.test.ts` | Local Supabase  | End-to-end with real DB, RLS, triggers |
 
-#### Test Helpers (packages/api/src/__tests__/helpers/)
+#### Test Helpers (packages/api/src/**tests**/helpers/)
 
 - **`mock-supabase.ts`**: Comprehensive Supabase client mocking with chainable query builders
   - `createMockSupabase()` - Full mock client
@@ -158,6 +158,7 @@ ProstCounter has comprehensive testing infrastructure using **Vitest 2.1.8** wit
 #### Environment Setup
 
 Tests automatically load environment variables from:
+
 1. `.env.test` (if exists, for test-specific overrides)
 2. `.env.local` (existing local development config)
 
@@ -192,7 +193,7 @@ pnpm test:ui
 
 #### Documentation
 
-See [packages/api/src/__tests__/README.md](../packages/api/src/__tests__/README.md) for comprehensive testing guide.
+See [packages/api/src/**tests**/README.md](../packages/api/src/__tests__/README.md) for comprehensive testing guide.
 
 ## ✅ Multi-Festival Implementation (COMPLETED)
 
@@ -385,9 +386,7 @@ export default async function Page() {
 // For config files that need translations
 import type { TFunction } from "i18next";
 
-const items = [
-  { id: "home", labelKey: "common.menu.home" },
-];
+const items = [{ id: "home", labelKey: "common.menu.home" }];
 
 export const getItems = (t: TFunction) =>
   items.map((item) => ({ ...item, label: t(item.labelKey) }));
@@ -407,18 +406,18 @@ const message = translateError(t, error.code, error.message);
 
 #### Translation Keys Structure
 
-| Top-level Key | Content |
-|---------------|---------|
-| `common` | Buttons, labels, status, errors, menu items |
-| `auth` | Sign in/up, password reset |
-| `groups` | Group CRUD, invites, gallery |
-| `attendance` | Beer logging, tent visits |
-| `achievements` | Badge names, descriptions |
-| `leaderboard` | Rankings, stats |
-| `profile` | Settings, account |
-| `validation` | Zod schema messages |
-| `notifications` | Toast messages |
-| `apiErrors` | API error code translations |
+| Top-level Key   | Content                                     |
+| --------------- | ------------------------------------------- |
+| `common`        | Buttons, labels, status, errors, menu items |
+| `auth`          | Sign in/up, password reset                  |
+| `groups`        | Group CRUD, invites, gallery                |
+| `attendance`    | Beer logging, tent visits                   |
+| `achievements`  | Badge names, descriptions                   |
+| `leaderboard`   | Rankings, stats                             |
+| `profile`       | Settings, account                           |
+| `validation`    | Zod schema messages                         |
+| `notifications` | Toast messages                              |
+| `apiErrors`     | API error code translations                 |
 
 ### Image Handling
 
@@ -447,8 +446,14 @@ interface DataQueryResult<T> {
 }
 
 interface DataProvider {
-  useQuery: <T>(key: unknown[], fn: () => Promise<T>, options?: DataQueryOptions) => DataQueryResult<T>;
-  useMutation: <TData, TVariables>(fn: (vars: TVariables) => Promise<TData>) => DataMutationResult<TData, TVariables>;
+  useQuery: <T>(
+    key: unknown[],
+    fn: () => Promise<T>,
+    options?: DataQueryOptions,
+  ) => DataQueryResult<T>;
+  useMutation: <TData, TVariables>(
+    fn: (vars: TVariables) => Promise<TData>,
+  ) => DataMutationResult<TData, TVariables>;
   invalidateQueries: (queryKey?: unknown[]) => void;
 }
 ```
@@ -504,12 +509,12 @@ const getCachedFunctionName = unstable_cache(
       .from("table_name")
       .select("*")
       .eq("column", param1);
-    
+
     if (error) {
       reportSupabaseException("functionName", error, { id: param1 });
       throw new Error("Error message");
     }
-    
+
     return data;
   },
   ["cache-key"], // Unique cache key
@@ -622,12 +627,14 @@ await apiClient.attendance.create({ festivalId, date, beers, tentVisits });
 ```
 
 **Key Features**:
+
 - Auto-generated from OpenAPI spec (`pnpm --filter=@prostcounter/api generate-spec`)
 - Auth token automatically injected from Supabase session
 - Full TypeScript type safety with request/response types
 - Works in both web (Next.js) and mobile (Expo) contexts
 
 **Regenerating the Client**:
+
 ```bash
 cd packages/api
 pnpm generate-spec        # Creates openapi.json
@@ -638,43 +645,43 @@ pnpm generate             # Creates src/generated.ts
 
 ### Server Actions vs API Client
 
-| Use Case | Solution | Location |
-|----------|----------|----------|
-| Client component data fetching | `apiClient` | `@/lib/api-client` |
-| Client component mutations | `apiClient` | `@/lib/api-client` |
-| Server component data fetching | Server Actions | `actions.ts` files |
-| Image processing (Sharp) | Server Actions | `Avatar/actions.ts` |
-| OAuth flows | Server Actions | `Auth/actions.ts` |
-| Novu notifications | Server Actions | `api/join-group/actions.ts` |
-| Admin-only operations | Server Actions | `admin/actions.ts` |
+| Use Case                       | Solution       | Location                    |
+| ------------------------------ | -------------- | --------------------------- |
+| Client component data fetching | `apiClient`    | `@/lib/api-client`          |
+| Client component mutations     | `apiClient`    | `@/lib/api-client`          |
+| Server component data fetching | Server Actions | `actions.ts` files          |
+| Image processing (Sharp)       | Server Actions | `Avatar/actions.ts`         |
+| OAuth flows                    | Server Actions | `Auth/actions.ts`           |
+| Novu notifications             | Server Actions | `api/join-group/actions.ts` |
+| Admin-only operations          | Server Actions | `admin/actions.ts`          |
 
 ### Route Handlers (14 total - all implemented)
 
-| Route | Methods | Description | Status |
-|-------|---------|-------------|--------|
-| `/attendance` | GET, POST, PUT, DELETE | Daily attendance records | ✅ Complete |
-| `/attendance/check-in/:id` | POST | Check in from reservation | ✅ Complete |
-| `/consumption` | POST | Log individual drinks | ✅ Complete |
-| `/groups` | GET, POST | Create/list groups | ✅ Complete |
-| `/groups/:id` | GET, PUT, DELETE | Group CRUD operations | ✅ Complete |
-| `/groups/:id/join` | POST | Join group with token | ✅ Complete |
-| `/groups/:id/leave` | POST | Leave group | ✅ Complete |
-| `/groups/:id/leaderboard` | GET | Group rankings | ✅ Complete |
-| `/groups/:id/members` | GET | List group members | ✅ Complete |
-| `/groups/:id/members/:userId` | DELETE | Remove member | ✅ Complete |
-| `/groups/:id/token/renew` | POST | Regenerate invite token | ✅ Complete |
-| `/groups/:id/gallery` | GET | Group photo gallery | ✅ Complete |
-| `/groups/join-by-token` | POST | Join with invite token | ✅ Complete |
-| `/leaderboard` | GET | Global leaderboard | ✅ Complete |
-| `/achievements` | GET, POST | User achievements | ✅ Complete |
-| `/festivals` | GET, POST, PUT | Festival management | ✅ Complete |
-| `/tents` | GET, POST, PUT | Tent management | ✅ Complete |
-| `/photos` | GET, POST, DELETE | Photo uploads | ✅ Complete |
-| `/reservations` | GET, POST | User reservations | ✅ Complete |
-| `/reservations/:id` | GET, PUT, DELETE | Reservation CRUD | ✅ Complete |
-| `/profile` | GET, PUT, DELETE | User profile management | ✅ Complete |
-| `/calendar` | GET | Personal calendar events | ✅ Complete |
-| `/calendar/group/:id` | GET | Group calendar events | ✅ Complete |
+| Route                         | Methods                | Description               | Status      |
+| ----------------------------- | ---------------------- | ------------------------- | ----------- |
+| `/attendance`                 | GET, POST, PUT, DELETE | Daily attendance records  | ✅ Complete |
+| `/attendance/check-in/:id`    | POST                   | Check in from reservation | ✅ Complete |
+| `/consumption`                | POST                   | Log individual drinks     | ✅ Complete |
+| `/groups`                     | GET, POST              | Create/list groups        | ✅ Complete |
+| `/groups/:id`                 | GET, PUT, DELETE       | Group CRUD operations     | ✅ Complete |
+| `/groups/:id/join`            | POST                   | Join group with token     | ✅ Complete |
+| `/groups/:id/leave`           | POST                   | Leave group               | ✅ Complete |
+| `/groups/:id/leaderboard`     | GET                    | Group rankings            | ✅ Complete |
+| `/groups/:id/members`         | GET                    | List group members        | ✅ Complete |
+| `/groups/:id/members/:userId` | DELETE                 | Remove member             | ✅ Complete |
+| `/groups/:id/token/renew`     | POST                   | Regenerate invite token   | ✅ Complete |
+| `/groups/:id/gallery`         | GET                    | Group photo gallery       | ✅ Complete |
+| `/groups/join-by-token`       | POST                   | Join with invite token    | ✅ Complete |
+| `/leaderboard`                | GET                    | Global leaderboard        | ✅ Complete |
+| `/achievements`               | GET, POST              | User achievements         | ✅ Complete |
+| `/festivals`                  | GET, POST, PUT         | Festival management       | ✅ Complete |
+| `/tents`                      | GET, POST, PUT         | Tent management           | ✅ Complete |
+| `/photos`                     | GET, POST, DELETE      | Photo uploads             | ✅ Complete |
+| `/reservations`               | GET, POST              | User reservations         | ✅ Complete |
+| `/reservations/:id`           | GET, PUT, DELETE       | Reservation CRUD          | ✅ Complete |
+| `/profile`                    | GET, PUT, DELETE       | User profile management   | ✅ Complete |
+| `/calendar`                   | GET                    | Personal calendar events  | ✅ Complete |
+| `/calendar/group/:id`         | GET                    | Group calendar events     | ✅ Complete |
 
 ### Architecture Layers
 
@@ -690,6 +697,7 @@ Database Layer (Supabase)
 ```
 
 **Key Benefits**:
+
 - Provider-agnostic repository pattern (easy to swap Supabase for Prisma, Drizzle, etc.)
 - Type-safe with Zod validation and TypeScript
 - Testable with dependency injection
@@ -706,6 +714,7 @@ Database Layer (Supabase)
 ## Additional Documentation
 
 For comprehensive architecture details, see:
+
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Complete system architecture, testing guide, development workflow
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Future mobile app plans with Expo/React Native
 - **[Test Documentation](./packages/api/src/__tests__/README.md)** - Testing guide with examples

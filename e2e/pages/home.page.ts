@@ -32,37 +32,45 @@ export class HomePage extends BasePage {
     super(page);
 
     // Main sections - using test ids or common patterns
-    this.quickAttendanceSection = page.locator("[data-testid='quick-attendance']").or(
-      page.getByRole("region", { name: /attendance/i })
-    );
-    this.myGroupsSection = page.locator("[data-testid='my-groups']").or(
-      page.getByRole("region", { name: /groups/i })
-    );
-    this.highlightsSection = page.locator("[data-testid='highlights']").or(
-      page.getByRole("region", { name: /highlights/i })
-    );
-    this.activityFeedSection = page.locator("[data-testid='activity-feed']").or(
-      page.getByRole("region", { name: /activity/i })
-    );
+    this.quickAttendanceSection = page
+      .locator("[data-testid='quick-attendance']")
+      .or(page.getByRole("region", { name: /attendance/i }));
+    this.myGroupsSection = page
+      .locator("[data-testid='my-groups']")
+      .or(page.getByRole("region", { name: /groups/i }));
+    this.highlightsSection = page
+      .locator("[data-testid='highlights']")
+      .or(page.getByRole("region", { name: /highlights/i }));
+    this.activityFeedSection = page
+      .locator("[data-testid='activity-feed']")
+      .or(page.getByRole("region", { name: /activity/i }));
 
     // Quick attendance - the combobox has "Select your current tent" text
     this.tentSelector = page.getByRole("combobox");
     this.beerCountButtons = page.locator("[data-testid='beer-count-btn']");
-    this.registerButton = page.getByRole("button", { name: /register|check.?in/i });
+    this.registerButton = page.getByRole("button", {
+      name: /register|check.?in/i,
+    });
 
     // Beer count buttons - find buttons adjacent to the beer count text
     // The structure is: [button -] [text "X drank today"] [button +]
     this.beerCountDisplay = page.getByText(/\d+ 🍺 drank today/);
     // Use locator relative to the parent container of beer count
-    this.beerDecrementButton = this.beerCountDisplay.locator("..").locator("button").first();
-    this.beerIncrementButton = this.beerCountDisplay.locator("..").locator("button").last();
+    this.beerDecrementButton = this.beerCountDisplay
+      .locator("..")
+      .locator("button")
+      .first();
+    this.beerIncrementButton = this.beerCountDisplay
+      .locator("..")
+      .locator("button")
+      .last();
 
     // Navigation
     this.navbar = page.getByRole("navigation");
     // User menu button contains the user's initials (U1-U10) and name
-    this.userMenuButton = page.locator("[data-testid='user-menu']").or(
-      page.getByRole("button", { name: /User \d+/i })
-    );
+    this.userMenuButton = page
+      .locator("[data-testid='user-menu']")
+      .or(page.getByRole("button", { name: /User \d+/i }));
   }
 
   /**
@@ -143,7 +151,9 @@ export class HomePage extends BasePage {
     await this.openUserMenu();
 
     // Wait for menu to appear and click sign out
-    const signOutMenuItem = this.page.getByRole("menuitem", { name: /sign out/i });
+    const signOutMenuItem = this.page.getByRole("menuitem", {
+      name: /sign out/i,
+    });
     await signOutMenuItem.click();
   }
 
@@ -156,7 +166,9 @@ export class HomePage extends BasePage {
       const gotItButton = this.page.getByRole("button", { name: /^got it$/i });
 
       // Wait briefly for button to appear
-      await gotItButton.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
+      await gotItButton
+        .waitFor({ state: "visible", timeout: 2000 })
+        .catch(() => {});
 
       if (await gotItButton.isVisible().catch(() => false)) {
         await gotItButton.click({ force: true });
@@ -176,7 +188,9 @@ export class HomePage extends BasePage {
       const skipButton = this.page.getByRole("button", { name: /^skip$/i });
 
       // Wait briefly for button to appear
-      await skipButton.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
+      await skipButton
+        .waitFor({ state: "visible", timeout: 2000 })
+        .catch(() => {});
 
       if (await skipButton.isVisible().catch(() => false)) {
         await skipButton.click({ force: true });

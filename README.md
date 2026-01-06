@@ -13,11 +13,9 @@
 ## Technologies used
 
 - Frontend:
-
   - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
 
 - Backend:
-
   - [Supabase.js](https://supabase.com/) for user management, database and storage.
 
 ## Developing locally

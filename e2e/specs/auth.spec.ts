@@ -26,7 +26,7 @@ test.describe("Authentication Flows", () => {
       // Sign in with default test user
       await signInPage.signInAndWaitForHome(
         DEFAULT_TEST_USER.email,
-        DEFAULT_TEST_USER.password
+        DEFAULT_TEST_USER.password,
       );
 
       // Verify successful sign-in
@@ -42,7 +42,7 @@ test.describe("Authentication Flows", () => {
       // Sign in with user1
       await signInPage.signInAndWaitForHome(
         TEST_USERS.user1.email,
-        TEST_USERS.user1.password
+        TEST_USERS.user1.password,
       );
 
       await homePage.expectOnHomePage();
@@ -58,7 +58,7 @@ test.describe("Authentication Flows", () => {
       await signInPage.goto();
       await signInPage.signInAndWaitForHome(
         DEFAULT_TEST_USER.email,
-        DEFAULT_TEST_USER.password
+        DEFAULT_TEST_USER.password,
       );
       await homePage.expectOnHomePage();
 
@@ -82,7 +82,7 @@ test.describe("Authentication Flows", () => {
       await signInPage.goto();
       await signInPage.signInAndWaitForHome(
         DEFAULT_TEST_USER.email,
-        DEFAULT_TEST_USER.password
+        DEFAULT_TEST_USER.password,
       );
       await homePage.expectOnHomePage();
 
@@ -116,7 +116,7 @@ test.describe("Authentication Flows", () => {
       // Try to sign in with invalid credentials
       await signInPage.signIn(
         INVALID_CREDENTIALS.email,
-        INVALID_CREDENTIALS.password
+        INVALID_CREDENTIALS.password,
       );
 
       // Wait a bit for any redirect or error
@@ -246,7 +246,7 @@ test.describe("Authentication Flows", () => {
       await signUpPage.signUpWithMismatchedPasswords(
         generateUniqueEmail(),
         "Password123!",
-        "DifferentPassword!"
+        "DifferentPassword!",
       );
 
       // Should stay on sign-up page and show error

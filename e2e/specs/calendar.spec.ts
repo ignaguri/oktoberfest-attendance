@@ -20,7 +20,7 @@ test.describe("Calendar Flows", () => {
     await signInPage.goto();
     await signInPage.signInAndWaitForHome(
       CALENDAR_TEST_USER.email,
-      CALENDAR_TEST_USER.password
+      CALENDAR_TEST_USER.password,
     );
     await homePage.expectOnHomePage();
 
@@ -83,7 +83,9 @@ test.describe("Calendar Flows", () => {
       await calendarPage.expectCalendarLoaded();
 
       // Check if festival is active (button enabled) or ended (button disabled)
-      const isButtonEnabled = await calendarPage.addAttendanceButton.isEnabled().catch(() => false);
+      const isButtonEnabled = await calendarPage.addAttendanceButton
+        .isEnabled()
+        .catch(() => false);
       if (!isButtonEnabled) {
         // Festival is over - button is disabled, skip this test
         test.skip();

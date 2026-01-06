@@ -5,6 +5,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ## Features
 
 ### 🔍 **Core Search Capabilities**
+
 - **Real-time search** with debounced input (300ms)
 - **Full-text search** with PostgreSQL ILIKE queries
 - **Server-side pagination** for optimal performance
@@ -13,18 +14,21 @@ A comprehensive, high-performance search system for the admin panel built with T
 - **Search history** with localStorage persistence
 
 ### 🎛️ **Advanced Filtering**
+
 - **Multi-field filters** (text, select, checkbox, date, dateRange)
 - **Collapsible filter panels** with active filter indicators
 - **Filter state persistence** in URL parameters
 - **Clear all filters** functionality
 
 ### 📊 **Smart Pagination**
+
 - **Intelligent page controls** with ellipsis for large datasets
 - **Page size options** (25, 50, 100 items per page)
 - **Result count display** with search context
 - **Keyboard navigation** support
 
 ### ⚡ **Performance Optimizations**
+
 - **TanStack Query caching** with configurable stale times
 - **Server-side caching** with Next.js `unstable_cache`
 - **Request deduplication** and background refetching
@@ -32,6 +36,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 - **Query prefetching** for instant results
 
 ### 🔄 **State Management**
+
 - **URL synchronization** for shareable searches
 - **Search state persistence** across page reloads
 - **Debounced search** to prevent excessive API calls
@@ -42,6 +47,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ### Core Components
 
 #### `SearchInput`
+
 ```tsx
 <SearchInput
   value={search}
@@ -55,6 +61,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ```
 
 #### `SearchResults`
+
 ```tsx
 <SearchResults
   isLoading={isLoading}
@@ -67,6 +74,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ```
 
 #### `SearchPagination`
+
 ```tsx
 <SearchPagination
   currentPage={currentPage}
@@ -80,6 +88,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ```
 
 #### `SearchFilters`
+
 ```tsx
 <SearchFilters
   filters={filterConfig}
@@ -93,6 +102,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ### Advanced Components
 
 #### `SearchHighlight`
+
 ```tsx
 <SearchHighlight
   text={user.name}
@@ -102,6 +112,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ```
 
 #### `SearchSuggestions`
+
 ```tsx
 <SearchSuggestions
   suggestions={suggestions}
@@ -114,6 +125,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ### Entity-Specific Components
 
 #### `UserSearch`
+
 ```tsx
 <UserSearch
   onUserSelect={handleUserSelect}
@@ -126,6 +138,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ```
 
 #### `GroupSearch`
+
 ```tsx
 <GroupSearch
   onGroupSelect={handleGroupSelect}
@@ -140,6 +153,7 @@ A comprehensive, high-performance search system for the admin panel built with T
 ## Hooks
 
 ### `useSearchState`
+
 Manages search state with URL synchronization:
 
 ```tsx
@@ -161,6 +175,7 @@ searchState.updateFilter("status", "active");
 ```
 
 ### `useUserSearch`
+
 TanStack Query hook for user search:
 
 ```tsx
@@ -174,6 +189,7 @@ const { data, isLoading, error } = useUserSearch({
 ```
 
 ### `useSearchHistory`
+
 Manages search history and suggestions:
 
 ```tsx
@@ -218,27 +234,30 @@ const getCachedUsers = unstable_cache(
     // Search implementation
   },
   ["admin-users-search"],
-  { 
+  {
     revalidate: 300,
-    tags: ["admin-users", "users-search"] 
-  }
+    tags: ["admin-users", "users-search"],
+  },
 );
 ```
 
 ## Performance Features
 
 ### Caching Strategy
+
 - **Client-side**: TanStack Query with 5-minute stale time
 - **Server-side**: Next.js `unstable_cache` with 5-minute revalidation
 - **Query invalidation**: Automatic cache invalidation on mutations
 
 ### Search Optimizations
+
 - **Debounced input**: 300ms delay to prevent excessive API calls
 - **Server-side pagination**: Only fetch required data
 - **Query deduplication**: Automatic request deduplication
 - **Background refetching**: Fresh data when window regains focus
 
 ### UI Optimizations
+
 - **Virtual scrolling**: For large result sets (planned)
 - **Skeleton loading**: Smooth loading states
 - **Optimistic updates**: Immediate UI feedback
@@ -247,6 +266,7 @@ const getCachedUsers = unstable_cache(
 ## Usage Examples
 
 ### Basic User Search
+
 ```tsx
 import { UserSearch } from "@/components/admin/search";
 
@@ -265,9 +285,14 @@ function AdminUsersPage() {
 ```
 
 ### Custom Search Implementation
+
 ```tsx
 import { useSearchState, useUserSearch } from "@/hooks";
-import { SearchInput, SearchResults, SearchPagination } from "@/components/admin/search";
+import {
+  SearchInput,
+  SearchResults,
+  SearchPagination,
+} from "@/components/admin/search";
 
 function CustomUserSearch() {
   const searchState = useSearchState();
@@ -284,13 +309,13 @@ function CustomUserSearch() {
         onChange={searchState.updateSearch}
         placeholder="Search users..."
       />
-      
+
       <SearchResults isLoading={isLoading} isEmpty={!data?.users.length}>
-        {data?.users.map(user => (
+        {data?.users.map((user) => (
           <UserCard key={user.id} user={user} />
         ))}
       </SearchResults>
-      
+
       <SearchPagination
         currentPage={data?.currentPage || 1}
         totalPages={data?.totalPages || 1}
@@ -306,28 +331,31 @@ function CustomUserSearch() {
 ### From Old Search System
 
 1. **Replace manual state management**:
+
    ```tsx
    // Old
    const [search, setSearch] = useState("");
    const [page, setPage] = useState(1);
-   
+
    // New
    const searchState = useSearchState();
    ```
 
 2. **Replace manual API calls**:
+
    ```tsx
    // Old
    const [users, setUsers] = useState([]);
    useEffect(() => {
      fetchUsers(search, page).then(setUsers);
    }, [search, page]);
-   
+
    // New
    const { data: users } = useUserSearch({ search, page });
    ```
 
 3. **Replace manual pagination**:
+
    ```tsx
    // Old
    <div className="pagination">
@@ -335,7 +363,7 @@ function CustomUserSearch() {
      <span>Page {page}</span>
      <button onClick={() => setPage(page + 1)}>Next</button>
    </div>
-   
+
    // New
    <SearchPagination
      currentPage={page}

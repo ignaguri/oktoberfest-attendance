@@ -20,7 +20,7 @@ test.describe("Achievements Flows", () => {
     await signInPage.goto();
     await signInPage.signInAndWaitForHome(
       ACHIEVEMENTS_TEST_USER.email,
-      ACHIEVEMENTS_TEST_USER.password
+      ACHIEVEMENTS_TEST_USER.password,
     );
     await homePage.expectOnHomePage();
 

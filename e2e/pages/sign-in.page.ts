@@ -85,7 +85,10 @@ export class SignInPage extends BasePage {
     await this.signIn(email, password);
 
     // Wait for navigation to complete with longer timeout
-    await this.page.waitForURL(/\/home/, { timeout: 30000, waitUntil: "domcontentloaded" });
+    await this.page.waitForURL(/\/home/, {
+      timeout: 30000,
+      waitUntil: "domcontentloaded",
+    });
   }
 
   /**
@@ -127,14 +130,20 @@ export class SignInPage extends BasePage {
    * Navigate to sign-in page and ensure clean state
    */
   async gotoAndEnsureLoggedOut(): Promise<void> {
-    await this.page.goto(`${BASE_URL}${this.path}`, { waitUntil: "domcontentloaded" });
+    await this.page.goto(`${BASE_URL}${this.path}`, {
+      waitUntil: "domcontentloaded",
+    });
 
     // Check if we were redirected to home (already logged in)
     const currentUrl = this.page.url();
     if (currentUrl.includes("/home")) {
       // Already logged in, need to sign out first
-      const signOutLink = this.page.getByRole("menuitem", { name: /sign out/i });
-      const userMenuButton = this.page.getByRole("button", { name: /User \d+/i });
+      const signOutLink = this.page.getByRole("menuitem", {
+        name: /sign out/i,
+      });
+      const userMenuButton = this.page.getByRole("button", {
+        name: /User \d+/i,
+      });
 
       // Try to find and click user menu
       const hasUserMenu = await userMenuButton.isVisible().catch(() => false);
@@ -145,7 +154,9 @@ export class SignInPage extends BasePage {
       }
 
       // Navigate back to sign-in
-      await this.page.goto(`${BASE_URL}${this.path}`, { waitUntil: "domcontentloaded" });
+      await this.page.goto(`${BASE_URL}${this.path}`, {
+        waitUntil: "domcontentloaded",
+      });
     }
 
     // Wait for form to be ready

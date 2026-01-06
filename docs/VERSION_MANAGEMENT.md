@@ -5,6 +5,7 @@ This document describes the automated version management system for the Oktoberf
 ## Overview
 
 The system provides automated version bumping, changelog generation, and release management using:
+
 - **Version Script**: Node.js script for version management
 - **Husky Hooks**: Pre-commit and commit-msg validation
 - **GitHub Actions**: Automated release workflow
@@ -93,10 +94,12 @@ Migration guide:
 ## Pre-commit Hooks
 
 ### Pre-commit Hook
+
 - Runs TypeScript type checking
 - Ensures code compiles before commit
 
 ### Commit-msg Hook
+
 - Validates conventional commit format
 - Enforces commit message length limits
 - Requires detailed descriptions for breaking changes
@@ -106,12 +109,14 @@ Migration guide:
 The system generates two types of changelogs:
 
 ### 1. In-App Changelog (`changelog.ts`)
+
 - **Only includes `feat` commits**
 - Used by the `WhatsNew` component
 - Shows user-facing changes only
 - Automatically filtered and formatted
 
 ### 2. Repository Changelog (`CHANGELOG.md`)
+
 - **Includes ALL commit types**
 - Comprehensive development history
 - Used for GitHub releases
@@ -120,12 +125,14 @@ The system generates two types of changelogs:
 ## GitHub Actions Workflow
 
 ### Automatic Release
+
 - Triggered by pushing a version tag (`v*`)
 - Generates changelogs
 - Builds the application
 - Creates GitHub release with assets
 
 ### Manual Release
+
 - Can be triggered manually from GitHub Actions
 - Supports version bumping and release creation
 
@@ -182,18 +189,22 @@ docs/
 ## Workflow
 
 ### Daily Development
+
 1. Make changes following conventional commit format
 2. Pre-commit hooks validate code quality
 3. Commit-msg hook validates commit format
 4. Push changes to feature branch
 
 ### Release Process
+
 1. **Option 1**: Use quick release commands
+
    ```bash
    pnpm run release:minor  # Creates v0.4.0
    ```
 
 2. **Option 2**: Manual process
+
    ```bash
    pnpm run version:minor
    git add .
@@ -212,6 +223,7 @@ docs/
 ### Common Issues
 
 #### Husky Hooks Not Working
+
 ```bash
 # Reinstall husky
 pnpm run prepare
@@ -222,6 +234,7 @@ git config core.hooksPath
 ```
 
 #### Version Script Errors
+
 ```bash
 # Check script permissions
 chmod +x scripts/version.js
@@ -231,11 +244,13 @@ node --version  # Should be 18+
 ```
 
 #### Conventional Commit Validation Fails
+
 - Ensure commit message follows format: `type: description`
 - Check message length (max 72 characters for first line)
 - For breaking changes, add detailed description in body
 
 ### Reset Version
+
 ```bash
 # Reset to specific version
 pnpm run version:set 0.3.0
@@ -266,6 +281,7 @@ If you're migrating from manual version management:
 ## Support
 
 For issues with the version management system:
+
 1. Check this documentation
 2. Review GitHub Actions logs
 3. Verify husky configuration

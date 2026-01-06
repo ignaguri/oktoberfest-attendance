@@ -23,12 +23,16 @@ export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>;
  */
 export const GlobalLeaderboardQuerySchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
-  sortBy: z.enum(["days_attended", "total_beers", "avg_beers"]).default("total_beers"),
+  sortBy: z
+    .enum(["days_attended", "total_beers", "avg_beers"])
+    .default("total_beers"),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-export type GlobalLeaderboardQuery = z.infer<typeof GlobalLeaderboardQuerySchema>;
+export type GlobalLeaderboardQuery = z.infer<
+  typeof GlobalLeaderboardQuerySchema
+>;
 
 /**
  * Group leaderboard query

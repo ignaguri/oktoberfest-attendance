@@ -50,7 +50,9 @@ export class SignUpPage extends BasePage {
     });
 
     // Success state after account creation
-    this.successHeading = page.getByRole("heading", { name: /account created/i });
+    this.successHeading = page.getByRole("heading", {
+      name: /account created/i,
+    });
     this.verificationMessage = page.getByText(/check your email/i);
   }
 
@@ -98,7 +100,7 @@ export class SignUpPage extends BasePage {
   async signUpWithMismatchedPasswords(
     email: string,
     password: string,
-    confirmPassword: string
+    confirmPassword: string,
   ): Promise<void> {
     await this.fillEmail(email);
     await this.fillPassword(password);

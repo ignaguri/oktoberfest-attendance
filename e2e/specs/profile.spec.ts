@@ -20,7 +20,7 @@ test.describe("Profile Flows", () => {
     await signInPage.goto();
     await signInPage.signInAndWaitForHome(
       PROFILE_TEST_USER.email,
-      PROFILE_TEST_USER.password
+      PROFILE_TEST_USER.password,
     );
     await homePage.expectOnHomePage();
 

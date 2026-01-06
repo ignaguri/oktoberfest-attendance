@@ -5,6 +5,7 @@
 **ProstCounter** is a sophisticated Progressive Web App (PWA) built with Next.js 16 that enables users to track beer festival attendance, compete with friends in groups, earn achievements, and share their festival experiences. This document provides a comprehensive analysis of the application architecture, database schema, features, and implementation patterns to facilitate the creation of a native mobile app using Expo (React Native).
 
 ### Key Metrics
+
 - **Version**: 0.7.0
 - **Tech Stack**: Next.js 16.1.1, React 19.2.3, TypeScript 5.9.3
 - **Database**: Supabase (PostgreSQL)
@@ -21,29 +22,33 @@
 ### Core Tables
 
 #### **festivals**
+
 Multi-festival support with dynamic configuration
+
 ```typescript
 {
-  id: string (uuid)
-  name: string                    // "Oktoberfest 2024", "Oktoberfest 2025"
-  short_name: string              // Short display name
-  start_date: string (date)
-  end_date: string (date)
-  beer_cost: number | null        // Default €16.2, configurable per festival
-  location: string                // "Munich, Germany"
-  map_url: string | null          // URL to festival map
-  is_active: boolean
-  status: 'upcoming' | 'active' | 'ended'
-  festival_type: 'oktoberfest' | 'starkbierfest' | 'fruehlingsfest' | 'other'
-  timezone: string                // Default: "Europe/Berlin"
-  description: string | null
-  created_at: timestamp
-  updated_at: timestamp
+  id: string(uuid);
+  name: string; // "Oktoberfest 2024", "Oktoberfest 2025"
+  short_name: string; // Short display name
+  start_date: string(date);
+  end_date: string(date);
+  beer_cost: number | null; // Default €16.2, configurable per festival
+  location: string; // "Munich, Germany"
+  map_url: string | null; // URL to festival map
+  is_active: boolean;
+  status: "upcoming" | "active" | "ended";
+  festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+  timezone: string; // Default: "Europe/Berlin"
+  description: string | null;
+  created_at: timestamp;
+  updated_at: timestamp;
 }
 ```
 
 #### **profiles**
+
 User profile data (linked to Supabase auth.users)
+
 ```typescript
 {
   id: string (uuid, FK to auth.users)
@@ -60,7 +65,9 @@ User profile data (linked to Supabase auth.users)
 ```
 
 #### **attendances**
+
 Daily beer consumption tracking (festival-scoped)
+
 ```typescript
 {
   id: string (uuid)
@@ -74,7 +81,9 @@ Daily beer consumption tracking (festival-scoped)
 ```
 
 #### **tent_visits**
+
 Location tracking within festivals
+
 ```typescript
 {
   id: string (uuid)
@@ -86,17 +95,21 @@ Location tracking within festivals
 ```
 
 #### **tents**
+
 Beer tent master data
+
 ```typescript
 {
-  id: string (uuid)
-  name: string
-  category: string | null
+  id: string(uuid);
+  name: string;
+  category: string | null;
 }
 ```
 
 #### **festival_tents**
+
 Association table for tents available at specific festivals
+
 ```typescript
 {
   id: string (uuid)
@@ -109,7 +122,9 @@ Association table for tents available at specific festivals
 ```
 
 #### **groups**
+
 Competition groups (festival-scoped)
+
 ```typescript
 {
   id: string (uuid)
@@ -126,7 +141,9 @@ Competition groups (festival-scoped)
 ```
 
 #### **group_members**
+
 User-group relationships
+
 ```typescript
 {
   id: string (uuid)
@@ -137,16 +154,20 @@ User-group relationships
 ```
 
 #### **winning_criteria**
+
 Group competition types
+
 ```typescript
 {
-  id: number (serial)
-  name: 'days_attended' | 'total_beers' | 'avg_beers'
+  id: number(serial);
+  name: "days_attended" | "total_beers" | "avg_beers";
 }
 ```
 
 #### **beer_pictures**
+
 Photo uploads linked to attendance records
+
 ```typescript
 {
   id: string (uuid)
@@ -161,7 +182,9 @@ Photo uploads linked to attendance records
 ### Gamification Tables
 
 #### **achievements**
+
 Achievement definitions
+
 ```typescript
 {
   id: string (uuid)
@@ -179,7 +202,9 @@ Achievement definitions
 ```
 
 #### **user_achievements**
+
 User achievement progress
+
 ```typescript
 {
   id: string (uuid)
@@ -192,7 +217,9 @@ User achievement progress
 ```
 
 #### **achievement_events**
+
 Achievement unlock events for notifications
+
 ```typescript
 {
   id: string (uuid)
@@ -209,7 +236,9 @@ Achievement unlock events for notifications
 ### Social Features Tables
 
 #### **user_notification_preferences**
+
 Push notification settings
+
 ```typescript
 {
   id: string (uuid)
@@ -226,7 +255,9 @@ Push notification settings
 ```
 
 #### **notification_rate_limit**
+
 Rate limiting for spam prevention
+
 ```typescript
 {
   id: string (uuid)
@@ -238,7 +269,9 @@ Rate limiting for spam prevention
 ```
 
 #### **user_photo_global_settings**
+
 Global photo privacy settings
+
 ```typescript
 {
   id: string (uuid)
@@ -250,7 +283,9 @@ Global photo privacy settings
 ```
 
 #### **user_group_photo_settings**
+
 Per-group photo privacy settings
+
 ```typescript
 {
   id: string (uuid)
@@ -265,7 +300,9 @@ Per-group photo privacy settings
 ### Location Sharing Tables
 
 #### **user_locations**
+
 Real-time location sharing
+
 ```typescript
 {
   id: string (uuid)
@@ -286,7 +323,9 @@ Real-time location sharing
 ```
 
 #### **location_sharing_preferences**
+
 Per-group location sharing settings
+
 ```typescript
 {
   id: string (uuid)
@@ -304,7 +343,9 @@ Per-group location sharing settings
 ### Reservation & Wrapped Tables
 
 #### **reservations**
+
 Tent reservation system with reminders
+
 ```typescript
 {
   id: string (uuid)
@@ -327,7 +368,9 @@ Tent reservation system with reminders
 ```
 
 #### **wrapped_data_cache**
+
 Cached "Wrapped" (year-in-review) statistics
+
 ```typescript
 {
   id: string (uuid)
@@ -343,45 +386,55 @@ Cached "Wrapped" (year-in-review) statistics
 ### Views
 
 #### **leaderboard** (materialized view)
+
 Pre-aggregated leaderboard data for performance
+
 ```typescript
 {
-  user_id: string
-  festival_id: string
-  festival_name: string
-  username: string
-  full_name: string
-  avatar_url: string
-  group_id: string
-  group_name: string
-  total_beers: number
-  days_attended: number
-  avg_beers: number (decimal)
+  user_id: string;
+  festival_id: string;
+  festival_name: string;
+  username: string;
+  full_name: string;
+  avatar_url: string;
+  group_id: string;
+  group_name: string;
+  total_beers: number;
+  days_attended: number;
+  avg_beers: number(decimal);
 }
 ```
 
 #### **activity_feed** (view)
+
 News feed of recent group member activities
+
 ```typescript
 {
-  user_id: string
-  username: string
-  full_name: string
-  avatar_url: string
-  festival_id: string
-  activity_type: 'beer_count_update' | 'tent_checkin' | 'photo_upload' | 'group_join' | 'achievement_unlock'
-  activity_data: JSON
-  activity_time: timestamp
+  user_id: string;
+  username: string;
+  full_name: string;
+  avatar_url: string;
+  festival_id: string;
+  activity_type: "beer_count_update" |
+    "tent_checkin" |
+    "photo_upload" |
+    "group_join" |
+    "achievement_unlock";
+  activity_data: JSON;
+  activity_time: timestamp;
 }
 ```
 
 #### **v_user_shared_group_members** (view)
+
 Privacy view for shared group membership
+
 ```typescript
 {
-  viewer_id: string
-  owner_id: string
-  festival_id: string
+  viewer_id: string;
+  owner_id: string;
+  festival_id: string;
 }
 ```
 
@@ -406,6 +459,7 @@ Privacy view for shared group membership
 ### Tech Stack
 
 #### Frontend
+
 - **Framework**: Next.js 16.1.1 (App Router, React Server Components)
 - **React**: 19.2.3 (latest with server actions)
 - **TypeScript**: 5.9.3
@@ -415,6 +469,7 @@ Privacy view for shared group membership
 - **State Management**: TanStack React Query v5 (provider-agnostic abstraction)
 
 #### Backend
+
 - **Database**: Supabase (PostgreSQL + Auth + Storage)
 - **Auth**: Supabase Auth (JWT-based, Row Level Security)
 - **Storage**: Supabase Storage (beer_pictures bucket)
@@ -422,12 +477,14 @@ Privacy view for shared group membership
 - **Cron Jobs**: Vercel Cron (reservations, achievements)
 
 #### PWA Features
+
 - **Service Worker**: Serwist 9.4.2
 - **Offline Support**: Cache-first strategy
 - **Install Prompt**: Custom install UI
 - **Notifications**: Web Push API + FCM
 
 #### Developer Tools
+
 - **Testing**: Vitest + Playwright (E2E)
 - **Linting**: ESLint 9 + Prettier
 - **Type Safety**: Strict TypeScript + Zod validation
@@ -478,7 +535,9 @@ app/
 ### Context Providers
 
 #### **FestivalContext**
+
 Global festival state management
+
 - Manages current selected festival
 - Auto-selects festival based on:
   1. localStorage preference
@@ -488,7 +547,9 @@ Global festival state management
 - Provides festival list and switching capability
 
 #### **NotificationContext**
+
 Push notification management
+
 - Manages FCM token registration
 - Handles notification permissions
 - Syncs user with Novu
@@ -496,13 +557,17 @@ Push notification management
 - Coordinates WhatsNew and InstallPWA modals
 
 #### **TutorialContext**
+
 First-time user onboarding
+
 - Tutorial overlay system
 - Step-by-step guided tour
 - Completion tracking in database
 
 #### **DataProvider (TanStack React Query)**
+
 Provider-agnostic data layer
+
 - Query client setup with sensible defaults
 - React Query DevTools in development
 - Automatic retry and refetching logic
@@ -515,12 +580,14 @@ Provider-agnostic data layer
 ### 3.1 Festival Management
 
 **Multi-Festival Architecture**:
+
 - All data is festival-scoped (attendances, groups, achievements)
 - Dynamic configuration (dates, beer cost, timezone, map URL)
 - Festival switching persists in localStorage
 - Auto-selection based on current date
 
 **Festival Types**:
+
 - Oktoberfest (primary use case)
 - Starkbierfest
 - Fruehlingsfest
@@ -529,12 +596,14 @@ Provider-agnostic data layer
 ### 3.2 Attendance Tracking
 
 **Quick Attendance** (Home page):
+
 - Select single tent
 - Record beer count
 - Defaults to current date
 - Immediate submission
 
 **Detailed Attendance** (Calendar page):
+
 - Multiple tent selection
 - Custom date picker (within festival dates)
 - Beer count with validation
@@ -542,6 +611,7 @@ Provider-agnostic data layer
 - Photo uploads (multiple per attendance)
 
 **Business Rules**:
+
 - Beer count can be 0 (tent visit only)
 - Dates must be within festival range
 - One attendance record per user per date
@@ -549,6 +619,7 @@ Provider-agnostic data layer
 - Tent visits are additive (no duplicates)
 
 **Cost Calculation**:
+
 ```typescript
 cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ```
@@ -556,11 +627,13 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### 3.3 Group Competitions
 
 **Group Types** (winning_criteria):
+
 1. **Most Days Attended** - Longest attendance streak
 2. **Most Beers Drank** - Highest total beer count
 3. **Best Average** - Highest beers per day attended
 
 **Group Features**:
+
 - Password-protected
 - Shareable invite tokens (QR code + deep link)
 - Festival-scoped (groups exist per festival)
@@ -570,6 +643,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 - Leave/rejoin capability
 
 **Group Notifications**:
+
 - New member joins
 - Tent check-ins (nearby members)
 - Achievement unlocks (group chat style)
@@ -578,6 +652,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### 3.4 Achievement System
 
 **Achievement Categories**:
+
 1. **Consumption**: "10 beers total", "50+ beers"
 2. **Attendance**: "3 days in a row", "Perfect attendance"
 3. **Explorer**: "5+ different tents", "All tent categories"
@@ -586,6 +661,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 6. **Special**: "Early bird (first day)", "Photo master"
 
 **Achievement Mechanics**:
+
 - Evaluated automatically after attendance updates
 - Progress tracking in JSON field
 - Rarity levels: common, rare, epic, legendary
@@ -594,6 +670,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 - Group notifications for rare+ achievements
 
 **Achievement Conditions** (JSON format):
+
 ```json
 {
   "type": "beer_count",
@@ -604,6 +681,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ```
 
 **Auto-Evaluation Triggers**:
+
 - After attendance submission
 - After tent check-in
 - After photo upload
@@ -612,6 +690,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### 3.5 Location Sharing
 
 **Real-Time Features**:
+
 - Live location updates (polling every 30s)
 - Geospatial queries for nearby members
 - Auto-expiration (2 hour default)
@@ -619,12 +698,14 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 - Map visualization with clustering
 
 **Privacy Settings**:
+
 - Global toggle (share with all groups)
 - Per-group overrides
 - Notification preferences
 - Auto-enable on tent check-in
 
 **Notifications**:
+
 - Rate-limited (max 1 per 5 minutes per group)
 - "User started sharing location"
 - Silent stop notifications
@@ -632,6 +713,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### 3.6 Photo Management
 
 **Features**:
+
 - Multiple photos per attendance
 - Supabase Storage integration
 - Image optimization (Sharp)
@@ -640,11 +722,13 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 - Photo preview with lightbox
 
 **Privacy Layers**:
+
 1. **Photo Visibility**: public/private per photo
 2. **Global Setting**: Hide from all groups
 3. **Per-Group Setting**: Hide from specific group
 
 **Gallery Views**:
+
 - Personal gallery (calendar page)
 - Group gallery (grouped by date + user)
 - Wrapped slideshow (year highlights)
@@ -652,6 +736,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### 3.7 Wrapped Feature
 
 **"Year in Review" Statistics**:
+
 - Total beers consumed
 - Days attended
 - Favorite tent
@@ -665,12 +750,14 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 - Photo memories
 
 **Caching Strategy**:
+
 - Pre-computed and cached in database
 - Generated on first access
 - Invalidated on new attendance
 - Admin can regenerate for all users
 
 **Sharing**:
+
 - Social media share cards
 - Screenshot download (html-to-image)
 - Deep links to individual slides
@@ -678,6 +765,7 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### 3.8 Reservation System
 
 **Features**:
+
 - Schedule tent reservations
 - Reminder notifications (configurable offset)
 - Check-in prompts at reservation time
@@ -685,11 +773,13 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 - Group visibility toggle
 
 **Notification Flow**:
+
 1. **Reminder**: Sent X minutes before reservation
 2. **Prompt**: Sent at reservation start time
 3. **Auto-Check-In**: Automatically creates tent visit
 
 **Cron Jobs** (Vercel Cron):
+
 - `/api/cron/scheduler/reservations` - Every 5 minutes
 - `/api/cron/scheduler/achievements` - Hourly evaluation
 
@@ -700,28 +790,31 @@ cost = beer_count × (user.custom_beer_cost || festival.beer_cost || 16.2)
 ### Supabase Auth Flow
 
 **Sign Up**:
+
 ```typescript
 // Email + password registration
 supabase.auth.signUp({
   email,
   password,
   options: {
-    emailRedirectTo: `${origin}/auth/callback`
-  }
-})
+    emailRedirectTo: `${origin}/auth/callback`,
+  },
+});
 // Auto-creates profile row via database trigger
 ```
 
 **Sign In**:
+
 ```typescript
 // Email + password
-supabase.auth.signInWithPassword({ email, password })
+supabase.auth.signInWithPassword({ email, password });
 
 // Magic link
-supabase.auth.signInWithOtp({ email })
+supabase.auth.signInWithOtp({ email });
 ```
 
 **Session Management**:
+
 - Server-side: Cookie-based sessions via `@supabase/ssr`
 - Client-side: Automatic token refresh
 - Middleware: Auth check on protected routes
@@ -729,6 +822,7 @@ supabase.auth.signInWithOtp({ email })
 ### Row Level Security (RLS)
 
 **Key Policies**:
+
 - **attendances**: Users can only CRUD their own records
 - **profiles**: Users can read all, but only update their own
 - **groups**: Members can read, creators can update
@@ -737,6 +831,7 @@ supabase.auth.signInWithOtp({ email })
 - **user_achievements**: Users can read their own + shared group members'
 
 **Super Admin Bypass**:
+
 ```sql
 CREATE POLICY "Super admin can do everything"
 ON table_name
@@ -747,6 +842,7 @@ USING (is_super_admin());
 ### Server vs Client Supabase Clients
 
 **Server Client** (`utils/supabase/server.ts`):
+
 ```typescript
 // Regular client (respects RLS, uses user session)
 const supabase = await createClient();
@@ -756,6 +852,7 @@ const supabase = await createClient(true);
 ```
 
 **Browser Client** (`utils/supabase/client.ts`):
+
 ```typescript
 const supabase = createSupabaseBrowserClient();
 // Always respects RLS
@@ -768,13 +865,17 @@ const supabase = createSupabaseBrowserClient();
 ### Provider-Agnostic Architecture
 
 **Abstraction Layer** (`lib/data/types.ts`):
+
 ```typescript
 interface DataProvider {
-  useQuery<T>(key, fn, options): DataQueryResult<T>
-  useMutation<TData, TVariables>(fn, options): DataMutationResult<TData, TVariables>
-  invalidateQueries(key?)
-  setQueryData<T>(key, data)
-  getQueryData<T>(key)
+  useQuery<T>(key, fn, options): DataQueryResult<T>;
+  useMutation<TData, TVariables>(
+    fn,
+    options,
+  ): DataMutationResult<TData, TVariables>;
+  invalidateQueries(key?);
+  setQueryData<T>(key, data);
+  getQueryData<T>(key);
 }
 ```
 
@@ -784,16 +885,18 @@ interface DataProvider {
 ### Query Keys Factory
 
 Centralized cache key generation (`lib/data/types.ts`):
+
 ```typescript
-QueryKeys.festivals()                          // ["festivals"]
-QueryKeys.festival(id)                         // ["festival", id]
-QueryKeys.userGroups(userId, festivalId)       // ["user", userId, "groups", festivalId]
-QueryKeys.globalLeaderboard(criteria, fId)     // ["leaderboard", "global", criteria, fId]
+QueryKeys.festivals(); // ["festivals"]
+QueryKeys.festival(id); // ["festival", id]
+QueryKeys.userGroups(userId, festivalId); // ["user", userId, "groups", festivalId]
+QueryKeys.globalLeaderboard(criteria, fId); // ["leaderboard", "global", criteria, fId]
 ```
 
 ### Business Logic Hooks
 
 **Pattern**:
+
 ```typescript
 // hooks/useGroups.ts
 export function useUserGroups(festivalId?: string) {
@@ -802,29 +905,27 @@ export function useUserGroups(festivalId?: string) {
     () => fetchUserGroups(festivalId!),
     {
       enabled: !!festivalId,
-      staleTime: 5 * 60 * 1000,  // 5 minutes
-      gcTime: 10 * 60 * 1000,     // 10 minutes cache
-    }
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes cache
+    },
   );
 }
 
 export function useCreateGroup() {
   const invalidateQueries = useInvalidateQueries();
 
-  return useMutation(
-    (data) => createGroup(data),
-    {
-      onSuccess: (data, variables) => {
-        // Invalidate related queries
-        invalidateQueries(["user", "current", "groups"]);
-        invalidateQueries(["groups", variables.festivalId]);
-      }
-    }
-  );
+  return useMutation((data) => createGroup(data), {
+    onSuccess: (data, variables) => {
+      // Invalidate related queries
+      invalidateQueries(["user", "current", "groups"]);
+      invalidateQueries(["groups", variables.festivalId]);
+    },
+  });
 }
 ```
 
 **Available Hooks**:
+
 - `useGroups.ts`: Group CRUD operations
 - `useFestival.ts`: Festival data fetching
 - `useAttendance.ts`: Attendance management
@@ -838,15 +939,17 @@ export function useCreateGroup() {
 ### Caching Strategy
 
 **Stale Times** (by data volatility):
+
 - **Static data** (festivals, tents): 1-2 hours
 - **User settings** (profile, preferences): 5-10 minutes
 - **Dynamic data** (attendances, leaderboard): 1-5 minutes
 - **Real-time data** (locations, activity feed): 30 seconds
 
 **Invalidation Patterns**:
+
 1. **Prefix-based**: Invalidate all queries starting with key
    ```typescript
-   invalidateQueries(["user"]) // Invalidates all user-related queries
+   invalidateQueries(["user"]); // Invalidates all user-related queries
    ```
 2. **Optimistic updates**: Update cache before server confirmation
 3. **Manual invalidation**: After mutations (creates, updates, deletes)
@@ -854,6 +957,7 @@ export function useCreateGroup() {
 ### Server Actions
 
 **Pattern**:
+
 ```typescript
 "use server";
 
@@ -881,6 +985,7 @@ export async function createGroup(data: CreateGroupFormData) {
 ```
 
 **Benefits**:
+
 - Type-safe server functions
 - Direct database access (no API layer needed)
 - Automatic error handling
@@ -893,12 +998,14 @@ export async function createGroup(data: CreateGroupFormData) {
 ### Novu Integration
 
 **Workflow**:
+
 1. User registers/signs in → Sync with Novu subscriber
 2. User grants notification permission → Get FCM token
 3. Register FCM token with Novu
 4. Server triggers Novu workflow → Novu sends via FCM
 
 **Novu Workflows** (`workflows/`):
+
 - `group-join-notification` - New member joins group
 - `tent-checkin-notification` - Friend checks into tent
 - `achievement-unlock-notification` - User unlocks achievement
@@ -909,30 +1016,32 @@ export async function createGroup(data: CreateGroupFormData) {
 ### Firebase Cloud Messaging (FCM)
 
 **Client Setup** (`lib/firebase.ts`):
+
 ```typescript
 const messaging = getMessaging(app);
 
 // Get device token
 const token = await getToken(messaging, {
-  vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
+  vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
 });
 
 // Listen for foreground messages
 onMessage(messaging, (payload) => {
   new Notification(payload.notification.title, {
     body: payload.notification.body,
-    icon: "/android-chrome-192x192.png"
+    icon: "/android-chrome-192x192.png",
   });
 });
 ```
 
 **Service Worker** (`public/firebase-messaging-sw.js`):
+
 ```javascript
 // Background message handler
 messaging.onBackgroundMessage((payload) => {
   self.registration.showNotification(
     payload.notification.title,
-    payload.notification
+    payload.notification,
   );
 });
 ```
@@ -940,33 +1049,36 @@ messaging.onBackgroundMessage((payload) => {
 ### Notification Preferences
 
 **User Settings**:
+
 ```typescript
 {
-  push_enabled: boolean           // Master toggle
-  reminders_enabled: boolean      // Reservation reminders
-  group_notifications_enabled: boolean
-  achievement_notifications_enabled: boolean
-  group_join_enabled: boolean     // New member notifications
-  checkin_enabled: boolean        // Tent check-in notifications
+  push_enabled: boolean; // Master toggle
+  reminders_enabled: boolean; // Reservation reminders
+  group_notifications_enabled: boolean;
+  achievement_notifications_enabled: boolean;
+  group_join_enabled: boolean; // New member notifications
+  checkin_enabled: boolean; // Tent check-in notifications
 }
 ```
 
 ### Rate Limiting
 
 **Strategy**:
+
 - Per-notification-type limits
 - Per-group limits for social features
 - Time-based windows (5 minutes default)
 - Database-backed tracking
 
 **Implementation**:
+
 ```typescript
 // Check rate limit
-const recentCount = await supabase.rpc('check_notification_rate_limit', {
+const recentCount = await supabase.rpc("check_notification_rate_limit", {
   p_user_id: userId,
-  p_notification_type: 'location_sharing',
+  p_notification_type: "location_sharing",
   p_group_id: groupId,
-  p_minutes_ago: 5
+  p_minutes_ago: 5,
 });
 
 if (recentCount > 0) return; // Skip notification
@@ -974,16 +1086,17 @@ if (recentCount > 0) return; // Skip notification
 // Send notification...
 
 // Record rate limit
-await supabase.rpc('record_notification_rate_limit', {
+await supabase.rpc("record_notification_rate_limit", {
   p_user_id: userId,
   p_group_id: groupId,
-  p_notification_type: 'location_sharing'
+  p_notification_type: "location_sharing",
 });
 ```
 
 ### Novu Service Abstraction
 
 **Service Layer** (`lib/services/notifications.ts`):
+
 ```typescript
 class NotificationService {
   async subscribeUser(userId, email, firstName, lastName, avatar) {
@@ -991,13 +1104,13 @@ class NotificationService {
       email,
       firstName,
       lastName,
-      avatar
+      avatar,
     });
   }
 
   async registerFCMToken(userId, token) {
-    await this.novu.subscribers.setCredentials(userId, 'fcm', {
-      deviceTokens: [token]
+    await this.novu.subscribers.setCredentials(userId, "fcm", {
+      deviceTokens: [token],
     });
   }
 
@@ -1005,7 +1118,7 @@ class NotificationService {
     await this.novu.trigger({
       workflowId,
       to: userId,
-      payload
+      payload,
     });
   }
 }
@@ -1020,6 +1133,7 @@ class NotificationService {
 **Stack**: React Hook Form + Zod validation
 
 **Pattern**:
+
 ```typescript
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -1051,6 +1165,7 @@ const onSubmit = form.handleSubmit(async (data) => {
 ```
 
 **Schemas** (`lib/schemas/`):
+
 - Dynamic validation (festival dates in attendance schema)
 - Type inference from Zod schemas
 - Reusable validation rules
@@ -1058,6 +1173,7 @@ const onSubmit = form.handleSubmit(async (data) => {
 ### UI Components (shadcn/ui)
 
 **Base Components**:
+
 - Button, Input, Textarea, Select, Checkbox, Switch
 - Dialog, Drawer, Popover, Sheet
 - Table, Card, Badge, Avatar
@@ -1066,6 +1182,7 @@ const onSubmit = form.handleSubmit(async (data) => {
 - Alert, Toast (Sonner)
 
 **Custom Components**:
+
 - `TentSelector`: Multi-select tent picker
 - `FestivalSelector`: Festival switcher modal
 - `AttendanceDialog`: Quick attendance form
@@ -1079,6 +1196,7 @@ const onSubmit = form.handleSubmit(async (data) => {
 ### Responsive Design
 
 **Strategy**:
+
 - Mobile-first approach
 - Breakpoints: sm (640px), md (768px), lg (1024px)
 - `ResponsiveDialog`: Switches between Dialog (desktop) and Drawer (mobile)
@@ -1087,13 +1205,14 @@ const onSubmit = form.handleSubmit(async (data) => {
 ### Theming
 
 **Brand Colors** (Yellow theme):
+
 ```css
---yellow-400: #FBBF24  /* Light yellow */
---yellow-500: #F59E0B  /* Primary yellow */
---yellow-600: #D97706  /* Dark yellow */
+--yellow-400: #fbbf24 /* Light yellow */ --yellow-500: #f59e0b
+  /* Primary yellow */ --yellow-600: #d97706 /* Dark yellow */;
 ```
 
 **Usage**:
+
 - Primary buttons: `bg-yellow-500 hover:bg-yellow-600`
 - Text highlights: `text-yellow-600`
 - Gradients: Dual yellow for branding
@@ -1101,6 +1220,7 @@ const onSubmit = form.handleSubmit(async (data) => {
 ### Loading States
 
 **Patterns**:
+
 - Skeleton loaders (`Skeleton` component)
 - Loading spinners (`LoadingSpinner`)
 - Suspense boundaries
@@ -1109,6 +1229,7 @@ const onSubmit = form.handleSubmit(async (data) => {
 ### Error Handling
 
 **Layers**:
+
 1. **ErrorBoundary**: Catches React errors
 2. **Sentry**: Error tracking and reporting
 3. **Toast notifications**: User-facing error messages
@@ -1121,53 +1242,63 @@ const onSubmit = form.handleSubmit(async (data) => {
 ### API Routes
 
 **Version Check** (`/api/version`):
+
 ```typescript
 // Returns current app version for update prompts
-GET /api/version
-Response: { version: "0.7.0" }
+GET / api / version;
+Response: {
+  version: "0.7.0";
+}
 ```
 
 **Novu Webhook** (`/api/novu`):
+
 ```typescript
 // Handles Novu webhook events
-POST /api/novu
+POST / api / novu;
 ```
 
 **Image Proxy** (`/api/image/[id]`):
+
 ```typescript
 // Proxies and optimizes images from Supabase Storage
-GET /api/image/{id}
+GET / api / image / { id };
 ```
 
 **Location Sharing** (`/api/location-sharing`):
+
 ```typescript
 // REST API for location updates
-POST /api/location-sharing/location
-GET /api/location-sharing/preferences
-POST /api/location-sharing/preferences
+POST / api / location - sharing / location;
+GET / api / location - sharing / preferences;
+POST / api / location - sharing / preferences;
 ```
 
 **Cron Jobs** (`/api/cron/scheduler`):
+
 ```typescript
 // Vercel Cron handlers
-POST /api/cron/scheduler/reservations  // Every 5 minutes
-POST /api/cron/scheduler/achievements  // Hourly
+POST / api / cron / scheduler / reservations; // Every 5 minutes
+POST / api / cron / scheduler / achievements; // Hourly
 ```
 
 ### Server Actions by Feature
 
 **Authentication** (`lib/sharedActions.ts`):
+
 - `getUser()` - Get current authenticated user
 - `getProfileShort()` - Get minimal profile data
 - `getTutorialStatus()` - Check tutorial completion
 
 **Attendance** (`app/(private)/calendar/actions.ts`):
+
 - `addOrUpdateAttendance()` - Create/update attendance + tents
 - `deleteAttendance()` - Remove attendance record
 - `getUserAttendances()` - Fetch user's festival attendances
 - `getAttendanceTents()` - Get tents for specific attendance
 
 **Groups** (`app/(private)/groups/actions.ts`):
+
 - `createGroup()` - Create new group
 - `joinGroup()` - Join group by name/password or invite token
 - `fetchUserGroups()` - Get user's groups for festival
@@ -1175,12 +1306,14 @@ POST /api/cron/scheduler/achievements  // Hourly
 - `getGroupMembers()` - Get group member list
 
 **Achievements** (`lib/actions/achievements.ts`):
+
 - `getUserAchievements()` - Fetch user achievements with progress
 - `evaluateAchievements()` - Trigger achievement evaluation
 - `getAchievementLeaderboard()` - Ranking by achievement points
 - `getUserAchievementStats()` - Breakdown by category/rarity
 
 **Notifications** (`lib/actions/notifications.ts`):
+
 - `syncUserWithNovu()` - Register/update Novu subscriber
 - `registerFCMToken()` - Register device token
 - `getUserNotificationPreferences()` - Fetch preferences
@@ -1188,10 +1321,12 @@ POST /api/cron/scheduler/achievements  // Hourly
 - `sendLocationSharingNotification()` - Notify group members
 
 **Wrapped** (`lib/actions/wrapped.ts`):
+
 - `getWrappedData()` - Generate/fetch wrapped statistics
 - `invalidateWrappedCache()` - Clear cached wrapped data
 
 **Admin** (`app/(private)/admin/actions.ts`):
+
 - `regenerateAllWrappedData()` - Admin: regenerate all users' wrapped
 - `getUserList()` - Admin: fetch all users
 - `getGroupList()` - Admin: fetch all groups
@@ -1203,31 +1338,37 @@ POST /api/cron/scheduler/achievements  // Hourly
 ### Critical Differences
 
 #### 1. **No Server Components**
+
 - **Next.js**: Server Components, Server Actions
 - **Expo**: All components are client-side
 - **Solution**: Convert server actions to REST API or tRPC endpoints
 
 #### 2. **Navigation**
+
 - **Next.js**: File-based routing (App Router)
 - **Expo**: Expo Router (similar file-based) or React Navigation
 - **Recommendation**: Use Expo Router for similar DX
 
 #### 3. **Authentication**
+
 - **Next.js**: Cookie-based sessions
 - **Expo**: Token-based (AsyncStorage + secure storage)
 - **Solution**: Supabase has React Native SDK with proper session management
 
 #### 4. **Push Notifications**
+
 - **Web**: FCM via service workers
 - **Native**: Expo Notifications + FCM (iOS + Android)
 - **Solution**: Expo Notifications API with device push tokens
 
 #### 5. **Image Handling**
+
 - **Web**: Next.js Image optimization
 - **Native**: Expo Image, react-native-fast-image
 - **Solution**: Expo Image with caching
 
 #### 6. **Storage**
+
 - **Web**: Supabase Storage with signed URLs
 - **Native**: Same approach, use Supabase SDK
 - **Solution**: Keep Supabase Storage, handle uploads with `expo-image-picker`
@@ -1260,6 +1401,7 @@ POST /api/cron/scheduler/achievements  // Hourly
 ### Migration Strategy
 
 #### Phase 1: Foundation
+
 1. Set up Expo project with TypeScript
 2. Configure Expo Router (replicate route structure)
 3. Set up Supabase React Native client
@@ -1267,6 +1409,7 @@ POST /api/cron/scheduler/achievements  // Hourly
 5. Port data abstraction layer (keep React Query)
 
 #### Phase 2: Core Features
+
 1. Festival context (AsyncStorage for persistence)
 2. Attendance tracking (camera integration)
 3. Group management (QR code scanning with `expo-barcode-scanner`)
@@ -1274,6 +1417,7 @@ POST /api/cron/scheduler/achievements  // Hourly
 5. Profile management
 
 #### Phase 3: Advanced Features
+
 1. Achievement system
 2. Photo gallery with camera integration
 3. Push notifications (Expo Notifications)
@@ -1281,6 +1425,7 @@ POST /api/cron/scheduler/achievements  // Hourly
 5. Offline support (React Query persistence)
 
 #### Phase 4: Polish
+
 1. Wrapped feature (animations with `react-native-reanimated`)
 2. Reservation system
 3. News feed
@@ -1291,6 +1436,7 @@ POST /api/cron/scheduler/achievements  // Hourly
 ### Code Reusability
 
 **High Reusability** (95%+):
+
 - TypeScript types (`lib/database.types.ts`)
 - Zod schemas (`lib/schemas/`)
 - Business logic hooks (`hooks/`)
@@ -1299,12 +1445,14 @@ POST /api/cron/scheduler/achievements  // Hourly
 - Constants (`lib/constants.ts`)
 
 **Medium Reusability** (50-70%):
+
 - Form logic (React Hook Form patterns)
 - State management patterns
 - API interaction logic
 - Notification service abstraction
 
 **Low Reusability** (requires rewrite):
+
 - UI components (shadcn/ui → React Native components)
 - Navigation (Next.js routing → Expo Router)
 - Server actions (→ REST API calls)
@@ -1338,9 +1486,9 @@ POST /api/cron/scheduler/achievements  // Hourly
 ### Supabase React Native Setup
 
 ```typescript
-import 'react-native-url-polyfill/auto';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createClient } from '@supabase/supabase-js';
+import "react-native-url-polyfill/auto";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.EXPO_PUBLIC_SUPABASE_URL!,
@@ -1352,7 +1500,7 @@ const supabase = createClient(
       persistSession: true,
       detectSessionInUrl: false,
     },
-  }
+  },
 );
 ```
 
@@ -1381,13 +1529,13 @@ app/
 ### Push Notifications (Expo)
 
 ```typescript
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 
 // Get push token
 const token = (
   await Notifications.getExpoPushTokenAsync({
-    projectId: 'your-project-id',
+    projectId: "your-project-id",
   })
 ).data;
 
@@ -1407,7 +1555,7 @@ Notifications.addNotificationResponseReceivedListener((response) => {
 ### Location Sharing (Expo)
 
 ```typescript
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 
 // Request permissions
 const { status } = await Location.requestForegroundPermissionsAsync();
@@ -1421,14 +1569,14 @@ const subscription = await Location.watchPositionAsync(
   },
   (location) => {
     updateLocationOnServer(location.coords);
-  }
+  },
 );
 ```
 
 ### Camera Integration
 
 ```typescript
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 
 const result = await ImagePicker.launchCameraAsync({
   mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -1478,8 +1626,8 @@ if (!result.canceled) {
 ### Offline Support
 
 ```typescript
-import { onlineManager } from '@tanstack/react-query';
-import NetInfo from '@react-native-community/netinfo';
+import { onlineManager } from "@tanstack/react-query";
+import NetInfo from "@react-native-community/netinfo";
 
 // Sync online status
 onlineManager.setEventListener((setOnline) => {
@@ -1492,7 +1640,7 @@ onlineManager.setEventListener((setOnline) => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      networkMode: 'offlineFirst',
+      networkMode: "offlineFirst",
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
     },
   },
@@ -1506,12 +1654,14 @@ const queryClient = new QueryClient({
 ### Performance Optimization
 
 **Web (Next.js)**:
+
 - React Server Components (zero JS for static parts)
 - Automatic code splitting
 - Image optimization (next/image)
 - Caching at multiple layers
 
 **Expo Recommendations**:
+
 - Use `React.memo()` for expensive components
 - `useMemo()` and `useCallback()` judiciously
 - Virtualized lists (`FlashList` instead of `FlatList`)
@@ -1521,6 +1671,7 @@ const queryClient = new QueryClient({
 ### Security Considerations
 
 **Both Platforms**:
+
 - RLS policies on all tables
 - Input validation (Zod schemas)
 - Secure token storage (Expo SecureStore)
@@ -1528,6 +1679,7 @@ const queryClient = new QueryClient({
 - Rate limiting on APIs
 
 **Expo-Specific**:
+
 - Use `expo-secure-store` for sensitive data (not AsyncStorage)
 - Implement certificate pinning for API calls
 - Obfuscate sensitive code with ProGuard (Android)
@@ -1535,28 +1687,33 @@ const queryClient = new QueryClient({
 ### Testing Strategy
 
 **Unit Tests**:
+
 - Business logic hooks (Vitest)
 - Utility functions
 - Validation schemas
 
 **Integration Tests**:
+
 - API interactions
 - Database queries
 - Auth flows
 
 **E2E Tests** (Expo):
+
 - Detox (React Native E2E framework)
 - Maestro (newer alternative)
 
 ### Deployment
 
 **Expo Deployment**:
+
 1. **Development**: `npx expo start`
 2. **Preview Builds**: EAS Build (on-device testing)
 3. **Production**: EAS Submit (App Store + Google Play)
 4. **OTA Updates**: EAS Update (instant updates without app store)
 
 **CI/CD**:
+
 - GitHub Actions for automated builds
 - EAS Build for native builds
 - Automated testing pipeline
@@ -1565,6 +1722,7 @@ const queryClient = new QueryClient({
 ### Analytics & Monitoring
 
 **Expo Recommendations**:
+
 - **Analytics**: Expo Analytics or Firebase Analytics
 - **Error Tracking**: Sentry (same as web)
 - **Performance**: React Native Performance Monitor
@@ -1573,6 +1731,7 @@ const queryClient = new QueryClient({
 ### Backend Compatibility
 
 **No Changes Required**:
+
 - Supabase database (same schema)
 - Supabase Auth (React Native SDK)
 - Supabase Storage (same API)
@@ -1580,6 +1739,7 @@ const queryClient = new QueryClient({
 - Database functions (same RPC calls)
 
 **Considerations**:
+
 - Convert Next.js API routes to serverless functions if needed
 - Keep server actions → REST API mapping documented
 - Maintain API versioning for backward compatibility
@@ -1631,6 +1791,7 @@ const queryClient = new QueryClient({
 ## 11. Summary & Next Steps
 
 ### Project Strengths
+
 1. **Well-Architected**: Clean separation of concerns, provider-agnostic abstractions
 2. **Type-Safe**: Full TypeScript coverage, Zod validation
 3. **Modern Stack**: Latest React patterns, server components, React Query
@@ -1638,6 +1799,7 @@ const queryClient = new QueryClient({
 5. **Scalable**: Multi-festival architecture, RLS policies, caching strategies
 
 ### Migration Feasibility
+
 - **High**: Most business logic is reusable
 - **TypeScript types & schemas**: 100% reusable
 - **Hooks & utilities**: 95% reusable with minor tweaks
@@ -1671,6 +1833,7 @@ const queryClient = new QueryClient({
    - User acceptance testing
 
 ### Resources
+
 - [Expo Documentation](https://docs.expo.dev/)
 - [Supabase React Native Guide](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native)
 - [TanStack Query React Native](https://tanstack.com/query/latest/docs/react/overview)
