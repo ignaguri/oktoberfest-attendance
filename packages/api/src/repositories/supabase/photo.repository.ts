@@ -285,6 +285,17 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     userId: string,
     groupId: string,
   ): Promise<GroupPhotoSettings> {
+    // Get group name
+    const { data: group, error: groupError } = await this.supabase
+      .from("groups")
+      .select("name")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError) {
+      throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
+    }
+
     const { data, error } = await this.supabase.rpc(
       "get_user_group_photo_settings",
       {
@@ -304,6 +315,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     return {
       userId,
       groupId,
+      groupName: group?.name || "Unknown Group",
       hidePhotosFromGroup: settings?.hide_photos_from_group ?? false,
     };
   }
@@ -313,6 +325,17 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     groupId: string,
     hidePhotosFromGroup: boolean,
   ): Promise<GroupPhotoSettings> {
+    // Get group name
+    const { data: group, error: groupError } = await this.supabase
+      .from("groups")
+      .select("name")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError) {
+      throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
+    }
+
     const { error } = await this.supabase.rpc(
       "update_user_group_photo_settings",
       {
@@ -331,6 +354,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     return {
       userId,
       groupId,
+      groupName: group?.name || "Unknown Group",
       hidePhotosFromGroup,
     };
   }
@@ -338,23 +362,53 @@ export class SupabasePhotoRepository implements IPhotoRepository {
   async getAllGroupPhotoSettings(
     userId: string,
   ): Promise<GroupPhotoSettings[]> {
-    const { data, error } = await this.supabase.rpc(
+    // Get all groups the user is a member of
+    const { data: memberships, error: membershipError } = await this.supabase
+      .from("group_members")
+      .select(
+        `
+        group_id,
+        groups!inner(id, name)
+      `,
+      )
+      .eq("user_id", userId);
+
+    if (membershipError) {
+      throw new DatabaseError(
+        `Failed to fetch group memberships: ${membershipError.message}`,
+      );
+    }
+
+    if (!memberships || memberships.length === 0) {
+      return [];
+    }
+
+    // Get photo settings for each group via RPC
+    const { data: settings, error: settingsError } = await this.supabase.rpc(
       "get_user_all_group_photo_settings",
       {
         p_user_id: userId,
       },
     );
 
-    if (error) {
+    if (settingsError) {
       throw new DatabaseError(
-        `Failed to fetch all group photo settings: ${error.message}`,
+        `Failed to fetch all group photo settings: ${settingsError.message}`,
       );
     }
 
-    return (data || []).map((s: any) => ({
+    // Create a map of group_id -> settings
+    const settingsMap = new Map<string, boolean>();
+    for (const s of settings || []) {
+      settingsMap.set(s.group_id, s.hide_photos_from_group);
+    }
+
+    // Combine memberships with settings
+    return memberships.map((m: any) => ({
       userId,
-      groupId: s.group_id,
-      hidePhotosFromGroup: s.hide_photos_from_group,
+      groupId: m.group_id,
+      groupName: m.groups?.name || "Unknown Group",
+      hidePhotosFromGroup: settingsMap.get(m.group_id) ?? false,
     }));
   }
 

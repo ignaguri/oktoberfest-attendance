@@ -125,6 +125,7 @@ export type UpdateGlobalPhotoSettingsInput = z.infer<typeof UpdateGlobalPhotoSet
 export const GroupPhotoSettingsSchema = z.object({
   userId: z.uuid(),
   groupId: z.uuid(),
+  groupName: z.string(),
   hidePhotosFromGroup: z.boolean(),
 });
 

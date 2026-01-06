@@ -39,6 +39,20 @@ export interface ApiResponse<T> {
 }
 
 /**
+ * API Error with error code for i18n translation
+ */
+export class ApiError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public statusCode: number,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+/**
  * Get auth headers for API requests
  */
 async function getAuthHeaders(): Promise<HeadersInit> {
@@ -1368,6 +1382,52 @@ export const apiClient = {
    */
   photos: {
     /**
+     * Upload a photo with server-side Sharp compression
+     * Uses Next.js API route for image processing
+     */
+    async upload(data: {
+      picture: File;
+      attendanceId: string;
+      visibility: "public" | "private";
+    }): Promise<{
+      success: boolean;
+      pictureUrl: string;
+      message: string;
+    }> {
+      const supabase = createSupabaseBrowserClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const formData = new FormData();
+      formData.append("picture", data.picture);
+      formData.append("attendanceId", data.attendanceId);
+      formData.append("visibility", data.visibility);
+
+      const headers: HeadersInit = {};
+      if (session?.access_token) {
+        headers.Authorization = `Bearer ${session.access_token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/photos/upload`, {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await parseJsonResponse<{
+          error?: { code?: string; message?: string };
+        }>(response).catch(() => ({ error: undefined }));
+        const code = errorData.error?.code || "PHOTO_UPLOAD_FAILED";
+        const message = errorData.error?.message || "Failed to upload photo";
+        throw new ApiError(code, message, response.status);
+      }
+
+      return parseJsonResponse(response);
+    },
+
+    /**
      * Get global photo settings
      */
     async getGlobalSettings(): Promise<{
@@ -1420,6 +1480,7 @@ export const apiClient = {
       settings: Array<{
         userId: string;
         groupId: string;
+        groupName: string;
         hidePhotosFromGroup: boolean;
       }>;
     }> {
@@ -1442,6 +1503,7 @@ export const apiClient = {
     async getGroupSettings(groupId: string): Promise<{
       userId: string;
       groupId: string;
+      groupName: string;
       hidePhotosFromGroup: boolean;
     }> {
       const headers = await getAuthHeaders();

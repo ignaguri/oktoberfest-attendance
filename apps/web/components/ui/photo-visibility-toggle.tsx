@@ -2,12 +2,13 @@
 
 import { Switch } from "@/components/ui/switch";
 import { apiClient } from "@/lib/api-client";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type PhotoVisibility = "public" | "private";
+import type { PhotoVisibility } from "@prostcounter/shared/schemas";
 
 interface PhotoVisibilityToggleProps {
   photoId: string;
@@ -24,6 +25,7 @@ export function PhotoVisibilityToggle({
   showLabel = true,
   className = "",
 }: PhotoVisibilityToggleProps) {
+  const { t } = useTranslation();
   const [visibility, setVisibility] =
     useState<PhotoVisibility>(currentVisibility);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,12 +40,15 @@ export function PhotoVisibilityToggle({
       await apiClient.photos.updateVisibility(photoId, newVisibility);
       setVisibility(newVisibility);
 
-      toast.success("Photo visibility updated", {
-        description: `Photo is now ${newVisibility}`,
+      toast.success(t("notifications.success.photoVisibilityUpdated"), {
+        description:
+          newVisibility === "public"
+            ? t("notifications.descriptions.photoVisibilityPublic")
+            : t("notifications.descriptions.photoVisibilityPrivate"),
       });
     } catch {
-      toast.error("Error", {
-        description: "Failed to update photo visibility",
+      toast.error(t("common.status.error"), {
+        description: t("photo.privacy.updateError"),
       });
     } finally {
       setIsLoading(false);
@@ -74,7 +79,9 @@ export function PhotoVisibilityToggle({
         <span
           className={cn(size === "sm" ? "text-xs" : "text-sm", "font-medium")}
         >
-          {isPublic ? "Public" : "Private"}
+          {isPublic
+            ? t("photo.visibility.public")
+            : t("photo.visibility.private")}
         </span>
       )}
     </div>

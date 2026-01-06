@@ -44,7 +44,7 @@ export function PhotoPrivacySettings() {
       setGroupSettings(
         groupData.settings.map((s) => ({
           group_id: s.groupId,
-          group_name: "", // API doesn't return group name, we'd need to fetch it separately
+          group_name: s.groupName,
           hide_photos_from_group: s.hidePhotosFromGroup,
         })),
       );

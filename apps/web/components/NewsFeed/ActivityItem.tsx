@@ -6,12 +6,14 @@ import Avatar from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/ui/badge";
 import { ProfilePreview } from "@/components/ui/profile-preview";
 import { formatRelativeTime } from "@/lib/date-utils";
+import { useTranslation } from "@/lib/i18n/client";
 import { Beer, MapPin, Camera, Users, Clock, Medal } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
 import type { AchievementRarity } from "@prostcounter/shared/schemas";
+import type { TFunction } from "i18next";
 
 interface ActivityItemProps {
   activity: ActivityFeedItem;
@@ -45,7 +47,7 @@ const getActivityIcon = (type: ActivityFeedItem["activity_type"]) => {
   }
 };
 
-const getActivityDescription = (activity: ActivityFeedItem) => {
+const getActivityDescription = (activity: ActivityFeedItem, t: TFunction) => {
   const { activity_type, activity_data } = activity;
 
   switch (activity_type) {
@@ -55,26 +57,26 @@ const getActivityDescription = (activity: ActivityFeedItem) => {
         "beer_count",
         0,
       );
-      return `drank ${beerCount} beer${beerCount !== 1 ? "s" : ""}`;
+      return t("activityFeed.drankBeers", { count: beerCount });
 
     case "tent_checkin":
       const tentName = getActivityDataValue(
         activity_data,
         "tent_name",
-        "a tent",
+        t("activityFeed.aTent"),
       );
-      return `checked into ${tentName}`;
+      return t("activityFeed.checkedInto", { tent: tentName });
 
     case "photo_upload":
-      return `uploaded a photo`;
+      return t("activityFeed.uploadedPhoto");
 
     case "group_join":
       const groupName = getActivityDataValue(
         activity_data,
         "group_name",
-        "a group",
+        t("activityFeed.aGroup"),
       );
-      return `joined ${groupName}`;
+      return t("activityFeed.joinedGroup", { group: groupName });
 
     case "achievement_unlock":
       const rarity = getActivityDataValue<string | undefined>(
@@ -82,14 +84,19 @@ const getActivityDescription = (activity: ActivityFeedItem) => {
         "rarity",
         undefined,
       );
-      return `unlocked an achievement${rarity ? ` (${rarity})` : ""}`;
+      return rarity
+        ? t("activityFeed.unlockedAchievementRarity", {
+            rarity: t(`achievements.rarity.${rarity}`),
+          })
+        : t("activityFeed.unlockedAchievement");
 
     default:
-      return "had some activity";
+      return t("activityFeed.hadActivity");
   }
 };
 
 export const ActivityItem = ({ activity }: ActivityItemProps) => {
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
@@ -105,11 +112,11 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     try {
       return formatRelativeTime(new Date(activity_time));
     } catch {
-      return "recently";
+      return t("activityFeed.recently");
     }
-  }, [activity_time]);
+  }, [activity_time, t]);
 
-  const displayName = full_name || username || "Unknown User";
+  const displayName = full_name || username || t("activityFeed.unknownUser");
   const pictureUrl = getActivityDataValue<string | undefined>(
     activity_data,
     "picture_url",
@@ -153,7 +160,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         </div>
 
         <p className="text-sm text-muted-foreground text-left">
-          {getActivityDescription(activity)}
+          {getActivityDescription(activity, t)}
         </p>
 
         {/* Additional badges for special activities */}
@@ -197,7 +204,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
                 variant="outline"
                 className="text-xs bg-orange-100 text-orange-800 border-orange-300"
               >
-                🔥 Hot streak
+                {t("activityFeed.hotStreak")}
               </Badge>
             )}
         </div>

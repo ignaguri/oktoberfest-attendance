@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
@@ -7,6 +8,22 @@ import type { NextRequest } from "next/server";
 
 // Use Node.js runtime for Sharp image processing
 export const runtime = "nodejs";
+
+/**
+ * Helper to create error responses with consistent format
+ */
+function errorResponse(
+  code: string,
+  message: string,
+  status: number,
+): NextResponse {
+  return NextResponse.json(
+    {
+      error: { code, message, statusCode: status },
+    },
+    { status },
+  );
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +36,10 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        {
-          error: "Unauthorized",
-          message: "You must be logged in to upload photos",
-        },
-        { status: 401 },
+      return errorResponse(
+        ErrorCodes.UNAUTHORIZED,
+        "You must be logged in to upload photos",
+        401,
       );
     }
 
@@ -36,27 +51,47 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!picture) {
-      return NextResponse.json(
-        { error: "Bad Request", message: "No picture provided" },
-        { status: 400 },
+      return errorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        "No picture provided",
+        400,
       );
     }
 
     if (!attendanceId) {
-      return NextResponse.json(
-        { error: "Bad Request", message: "No attendanceId provided" },
-        { status: 400 },
+      return errorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        "No attendanceId provided",
+        400,
       );
     }
 
     // Validate visibility
     if (visibility !== "public" && visibility !== "private") {
-      return NextResponse.json(
-        {
-          error: "Bad Request",
-          message: "visibility must be 'public' or 'private'",
-        },
-        { status: 400 },
+      return errorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        "visibility must be 'public' or 'private'",
+        400,
+      );
+    }
+
+    // Check file size (10MB limit)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (picture.size > MAX_FILE_SIZE) {
+      return errorResponse(
+        ErrorCodes.FILE_TOO_LARGE,
+        "File size exceeds 10MB limit",
+        400,
+      );
+    }
+
+    // Validate file type
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!validTypes.includes(picture.type)) {
+      return errorResponse(
+        ErrorCodes.INVALID_FILE_TYPE,
+        "Invalid file type. Supported: JPEG, PNG, GIF, WebP",
+        400,
       );
     }
 
@@ -69,12 +104,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (attendanceError || !attendance) {
-      return NextResponse.json(
-        {
-          error: "Not Found",
-          message: "Attendance not found or does not belong to you",
-        },
-        { status: 404 },
+      return errorResponse(
+        ErrorCodes.ATTENDANCE_NOT_FOUND,
+        "Attendance not found or does not belong to you",
+        404,
       );
     }
 
@@ -89,9 +122,10 @@ export async function POST(request: NextRequest) {
         .webp({ quality: 80 })
         .toBuffer();
     } catch {
-      return NextResponse.json(
-        { error: "Processing Error", message: "Failed to process image" },
-        { status: 422 },
+      return errorResponse(
+        ErrorCodes.PHOTO_UPLOAD_FAILED,
+        "Failed to process image",
+        422,
       );
     }
 
@@ -109,9 +143,10 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      return NextResponse.json(
-        { error: "Upload Error", message: "Failed to upload image to storage" },
-        { status: 500 },
+      return errorResponse(
+        ErrorCodes.PHOTO_UPLOAD_FAILED,
+        "Failed to upload image to storage",
+        500,
       );
     }
 
@@ -128,25 +163,27 @@ export async function POST(request: NextRequest) {
       await supabase.storage.from("beer_pictures").remove([fileName]);
 
       console.error("Database error:", dbError);
-      return NextResponse.json(
-        { error: "Database Error", message: "Failed to save photo record" },
-        { status: 500 },
+      return errorResponse(
+        ErrorCodes.DATABASE_ERROR,
+        "Failed to save photo record",
+        500,
       );
     }
 
     return NextResponse.json(
       {
         success: true,
-        fileName,
+        pictureUrl: fileName,
         message: "Photo uploaded successfully",
       },
       { status: 200 },
     );
   } catch (error) {
     console.error("Unexpected error in photo upload:", error);
-    return NextResponse.json(
-      { error: "Internal Error", message: "An unexpected error occurred" },
-      { status: 500 },
+    return errorResponse(
+      ErrorCodes.INTERNAL_ERROR,
+      "An unexpected error occurred",
+      500,
     );
   }
 }

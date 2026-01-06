@@ -5,11 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhotoPreview } from "@/components/ui/photo-preview";
 import { Switch } from "@/components/ui/switch";
-import {
-  beerPicturesSchema,
-  MAX_FILE_SIZE,
-  MAX_PICTURES,
-} from "@/lib/schemas/uploads";
+import { ApiError, apiClient } from "@/lib/api-client";
+import { translateError, useTranslation } from "@/lib/i18n/client";
+import { beerPicturesSchema, MAX_PICTURES } from "@/lib/schemas/uploads";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Eye, EyeOff, X } from "lucide-react";
 import Image from "next/image";
@@ -61,6 +59,7 @@ export function BeerPicturesUpload({
   existingPictureUrls,
   onPicturesUpdate,
 }: BeerPicturesUploadProps) {
+  const { t } = useTranslation();
   const [allPictureUrls, setAllPictureUrls] =
     useState<string[]>(existingPictureUrls);
 
@@ -87,22 +86,12 @@ export function BeerPicturesUpload({
     try {
       const newUrls: string[] = [];
       for (const picture of data.pictures) {
-        const formData = new FormData();
-        formData.append("picture", picture);
-        formData.append("attendanceId", attendanceId);
-        formData.append("visibility", data.visibility);
-
-        const response = await fetch("/api/photos/upload", {
-          method: "POST",
-          body: formData,
+        const result = await apiClient.photos.upload({
+          picture,
+          attendanceId,
+          visibility: data.visibility,
         });
 
-        if (!response.ok) {
-          const error = await response.json().catch(() => ({}));
-          throw new Error(error.error || "Failed to upload picture");
-        }
-
-        const result = await response.json();
         if (result.pictureUrl) {
           newUrls.push(result.pictureUrl);
         }
@@ -110,16 +99,16 @@ export function BeerPicturesUpload({
       const updatedUrls = [...allPictureUrls, ...newUrls];
       setAllPictureUrls(updatedUrls);
       onPicturesUpdate(updatedUrls);
-      toast.success(`${newUrls.length} beer picture(s) uploaded successfully!`);
+      toast.success(
+        t("notifications.success.picturesUploaded", { count: newUrls.length }),
+      );
       reset();
     } catch (error) {
-      const fileSizeError =
-        error instanceof Error && error.message.includes("exceeded")
-          ? `File size exceeded (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`
-          : "";
-      toast.error(
-        `Failed to upload beer pictures${fileSizeError ? `: ${fileSizeError}` : ""}. Please try again.`,
-      );
+      if (error instanceof ApiError) {
+        toast.error(translateError(t, error.code, error.message));
+      } else {
+        toast.error(t("notifications.error.generic"));
+      }
     }
   };
 
@@ -166,8 +155,8 @@ export function BeerPicturesUpload({
           <Camera size={24} />
           <span>
             {allPictureUrls.length > 0 || watchedPictures.length > 0
-              ? "Add more pics"
-              : "Add pictures"}
+              ? t("attendance.pictures.addMore")
+              : t("attendance.pictures.add")}
           </span>
         </div>
       </Label>
@@ -187,7 +176,7 @@ export function BeerPicturesUpload({
             ))}
           </div>
           <p className="text-xs text-gray-600 text-center">
-            Click on any picture to view full size
+            {t("attendance.pictures.clickToView")}
           </p>
         </div>
       )}
@@ -196,7 +185,7 @@ export function BeerPicturesUpload({
       {watchedPictures.length > 0 && (
         <div className="flex flex-col gap-2">
           <p className="text-sm text-gray-600 text-center">
-            New pictures to upload
+            {t("attendance.pictures.newToUpload")}
           </p>
           <div className="flex flex-wrap gap-2 justify-center">
             {watchedPictures.map((file, index) => (
@@ -217,8 +206,8 @@ export function BeerPicturesUpload({
             )}
             <span className="text-sm font-medium">
               {watchedVisibility === "public"
-                ? "Public photos"
-                : "Private photos"}
+                ? t("attendance.pictures.publicPhotos")
+                : t("attendance.pictures.privatePhotos")}
             </span>
             <Switch
               checked={watchedVisibility === "public"}
@@ -233,8 +222,10 @@ export function BeerPicturesUpload({
       {watchedPictures.length > 0 && !errors.pictures && (
         <Button type="submit" disabled={isSubmitting} variant="darkYellow">
           {isSubmitting
-            ? "Uploading..."
-            : `Upload ${watchedPictures.length} picture(s)`}
+            ? t("common.status.loading")
+            : t("attendance.pictures.upload", {
+                count: watchedPictures.length,
+              })}
         </Button>
       )}
     </form>

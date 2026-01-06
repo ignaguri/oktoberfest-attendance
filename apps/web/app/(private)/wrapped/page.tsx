@@ -6,8 +6,10 @@ import {
 } from "@/components/wrapped/core/WrappedContainer";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useWrappedAccess, useWrappedData } from "@/hooks/useWrapped";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function WrappedPage() {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
 
@@ -23,7 +25,7 @@ export default function WrappedPage() {
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="text-6xl mb-4">🍺</div>
-          <p className="text-gray-600">Loading your wrapped...</p>
+          <p className="text-gray-600">{t("wrapped.loading")}</p>
         </div>
       </div>
     );
@@ -36,7 +38,7 @@ export default function WrappedPage() {
         <div className="text-center max-w-md px-6">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Wrapped Not Available
+            {t("wrapped.notAvailable")}
           </h2>
           <p className="text-gray-600 mb-6">{accessResult.message}</p>
         </div>
@@ -46,7 +48,7 @@ export default function WrappedPage() {
 
   // Error state
   if (!wrappedData) {
-    return <WrappedError message="Failed to load your wrapped" />;
+    return <WrappedError message={t("wrapped.loadError")} />;
   }
 
   // Success - show wrapped
