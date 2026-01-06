@@ -12,6 +12,8 @@ import { WinningCriteria } from "@/lib/types";
 import { useState, useEffect, useMemo, startTransition } from "react";
 import { toast } from "sonner";
 
+import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
+
 export default function GlobalLeaderboardClient() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
@@ -61,7 +63,7 @@ export default function GlobalLeaderboardClient() {
 
   const criteriaOptions = useMemo(
     () =>
-      winningCriterias?.map((criteria) => ({
+      winningCriterias?.map((criteria: WinningCriteriaOption) => ({
         value: criteria.id.toString(),
         label:
           winningCriteriaText[
@@ -72,7 +74,7 @@ export default function GlobalLeaderboardClient() {
   );
 
   const selectedCriteria = winningCriterias?.find(
-    (c) => c.id === winningCriteriaId,
+    (c: WinningCriteriaOption) => c.id === winningCriteriaId,
   );
 
   // Show loading state
@@ -104,7 +106,7 @@ export default function GlobalLeaderboardClient() {
             const newCriteriaId = Number(option.value);
             setWinningCriteriaId(newCriteriaId);
             const criteria = winningCriterias?.find(
-              (c) => c.id === newCriteriaId,
+              (c: WinningCriteriaOption) => c.id === newCriteriaId,
             );
             if (criteria) {
               setWinningCriteria(criteria.name as WinningCriteria);

@@ -13,7 +13,10 @@ export interface ApiClientConfig {
 }
 
 /**
- * Create a type-safe API client for ProstCounter API
+ * Create a low-level OpenAPI client for ProstCounter API
+ *
+ * For most use cases, prefer `createTypedApiClient` which provides
+ * higher-level convenience methods.
  *
  * @example
  * ```ts
@@ -85,3 +88,13 @@ export type ApiQueryParams<
   Path extends keyof paths,
   Method extends keyof paths[Path],
 > = paths[Path][Method] extends { parameters: { query: infer T } } ? T : never;
+
+// Export typed client factory and types
+export {
+  createTypedApiClient,
+  ApiError,
+  type ApiClientConfig as TypedApiClientConfig,
+  type ApiResponse as TypedApiResponse,
+  type TypedApiClient,
+  type ApiHeaders,
+} from "./typed-client";

@@ -15,7 +15,7 @@ import {
   useMutation,
   useInvalidateQueries,
 } from "@/lib/data/react-query-provider";
-import { QueryKeys } from "@/lib/data/types";
+import { QueryKeys } from "@prostcounter/shared/data";
 
 /**
  * Hook to fetch all users (admin only)

@@ -6,25 +6,22 @@ import {
   type ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { parseISO, isWithinInterval } from "date-fns";
+import { useFestivals } from "@prostcounter/shared/hooks";
 
-import { supabase } from "@/lib/supabase";
-
-// Festival type (simplified from shared schemas)
+// Festival type matching the API response (camelCase)
 export interface Festival {
   id: string;
   name: string;
-  short_name: string;
-  start_date: string;
-  end_date: string;
-  beer_cost: number | null;
-  location: string;
-  map_url: string | null;
-  timezone: string;
-  is_active: boolean;
+  startDate: string;
+  endDate: string;
+  beerCost: number | null;
+  location: string | null;
+  mapUrl: string | null;
+  isActive: boolean;
   status: "upcoming" | "active" | "ended";
-  created_at: string;
-  updated_at: string;
+  timezone: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface FestivalContextType {
@@ -42,76 +39,67 @@ const FestivalContext = createContext<FestivalContextType | undefined>(
 );
 
 export function FestivalProvider({ children }: { children: ReactNode }) {
-  const [festivals, setFestivals] = useState<Festival[]>([]);
   const [currentFestival, setCurrentFestivalState] = useState<Festival | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [storedFestivalId, setStoredFestivalId] = useState<string | null>(null);
 
+  // Load stored festival ID on mount
   useEffect(() => {
-    const fetchFestivals = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const { data: festivalsData, error: festivalsError } = await supabase
-          .from("festivals")
-          .select("*")
-          .order("start_date", { ascending: false });
-
-        if (festivalsError) {
-          throw new Error(`Error fetching festivals: ${festivalsError.message}`);
-        }
-
-        setFestivals((festivalsData as Festival[]) || []);
-
-        // Selection priority: stored > date match > active > most recent
-        const storedFestivalId = await AsyncStorage.getItem(FESTIVAL_STORAGE_KEY);
-        let selectedFestival: Festival | null = null;
-
-        if (storedFestivalId) {
-          selectedFestival =
-            festivalsData?.find((f) => f.id === storedFestivalId) || null;
-        }
-
-        if (!selectedFestival) {
-          const today = new Date();
-          selectedFestival =
-            festivalsData?.find((f) => {
-              const startDate = parseISO(f.start_date);
-              const endDate = parseISO(f.end_date);
-              return isWithinInterval(today, { start: startDate, end: endDate });
-            }) || null;
-        }
-
-        if (!selectedFestival) {
-          selectedFestival = festivalsData?.find((f) => f.is_active) || null;
-        }
-
-        if (!selectedFestival && festivalsData?.length) {
-          selectedFestival = festivalsData[0] as Festival;
-        }
-
-        if (selectedFestival) {
-          setCurrentFestivalState(selectedFestival);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch festivals"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFestivals();
+    AsyncStorage.getItem(FESTIVAL_STORAGE_KEY).then((id) => {
+      setStoredFestivalId(id);
+    });
   }, []);
+
+  // Fetch festivals using the useFestivals hook
+  const { data: festivalsData, loading: isLoading, error: queryError } = useFestivals();
+
+  const festivals: Festival[] = festivalsData || [];
+
+  // Select current festival based on priority
+  useEffect(() => {
+    if (!festivalsData || festivalsData.length === 0) return;
+
+    let selectedFestival: Festival | null = null;
+
+    // Priority 1: Stored festival ID
+    if (storedFestivalId) {
+      selectedFestival =
+        festivalsData.find((f: Festival) => f.id === storedFestivalId) || null;
+    }
+
+    // Priority 2: Currently active festival (by date)
+    if (!selectedFestival) {
+      const today = new Date();
+      selectedFestival =
+        festivalsData.find((f: Festival) => {
+          const start = new Date(f.startDate);
+          const end = new Date(f.endDate);
+          return today >= start && today <= end;
+        }) || null;
+    }
+
+    // Priority 3: Festival marked as active
+    if (!selectedFestival) {
+      selectedFestival = festivalsData.find((f: Festival) => f.isActive) || null;
+    }
+
+    // Priority 4: Most recent festival
+    if (!selectedFestival && festivalsData.length > 0) {
+      selectedFestival = festivalsData[0];
+    }
+
+    if (selectedFestival) {
+      setCurrentFestivalState(selectedFestival);
+    }
+  }, [festivalsData, storedFestivalId]);
 
   const setCurrentFestival = async (festival: Festival) => {
     setCurrentFestivalState(festival);
     await AsyncStorage.setItem(FESTIVAL_STORAGE_KEY, festival.id);
   };
+
+  const error = queryError?.message || null;
 
   return (
     <FestivalContext.Provider

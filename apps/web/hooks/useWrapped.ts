@@ -6,8 +6,8 @@
 
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
-import { QueryKeys } from "@/lib/data/types";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
+import { QueryKeys } from "@prostcounter/shared/data";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 

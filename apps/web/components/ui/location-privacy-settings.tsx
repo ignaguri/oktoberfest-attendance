@@ -12,8 +12,8 @@ import {
   useUpdateLocationSharingPreferences,
 } from "@/hooks/useLocationSharing";
 import { useInvalidateQueries } from "@/lib/data/react-query-provider";
-import { QueryKeys } from "@/lib/data/types";
 import { getFestivalConstants } from "@/lib/festivalConstants";
+import { QueryKeys } from "@prostcounter/shared/data";
 import { MapPin, Users, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";

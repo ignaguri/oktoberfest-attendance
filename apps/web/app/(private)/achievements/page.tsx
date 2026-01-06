@@ -9,7 +9,10 @@ import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { useTranslation } from "@/lib/i18n/client";
 import { useState } from "react";
 
-import type { AchievementCategory } from "@prostcounter/shared/schemas";
+import type {
+  AchievementCategory,
+  AchievementWithProgress,
+} from "@prostcounter/shared/schemas";
 
 export default function AchievementsPage() {
   const { t } = useTranslation();
@@ -27,12 +30,16 @@ export default function AchievementsPage() {
   const filteredAchievements =
     activeTab === "all"
       ? achievements
-      : achievements.filter((a) => a.category === activeTab);
+      : achievements.filter(
+          (a: AchievementWithProgress) => a.category === activeTab,
+        );
 
   const unlockedAchievements = filteredAchievements.filter(
-    (a) => a.is_unlocked,
+    (a: AchievementWithProgress) => a.is_unlocked,
   );
-  const lockedAchievements = filteredAchievements.filter((a) => !a.is_unlocked);
+  const lockedAchievements = filteredAchievements.filter(
+    (a: AchievementWithProgress) => !a.is_unlocked,
+  );
 
   if (!currentFestival) {
     return (
@@ -123,19 +130,25 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_rarity).map(
-                  ([rarity, rarityData]) => (
-                    <div
-                      key={rarity}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <span className="capitalize">
-                        {t(`achievements.rarity.${rarity}`)}:
-                      </span>
-                      <span className="font-medium">
-                        {rarityData.unlocked}/{rarityData.total}
-                      </span>
-                    </div>
-                  ),
+                  ([rarity, rarityData]) => {
+                    const data = rarityData as {
+                      unlocked: number;
+                      total: number;
+                    };
+                    return (
+                      <div
+                        key={rarity}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="capitalize">
+                          {t(`achievements.rarity.${rarity}`)}:
+                        </span>
+                        <span className="font-medium">
+                          {data.unlocked}/{data.total}
+                        </span>
+                      </div>
+                    );
+                  },
                 )}
               </div>
             </CardContent>
@@ -150,21 +163,26 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_category)
-                  .filter(([_, catData]) => catData.total > 0)
+                  .filter(
+                    ([_, catData]) => (catData as { total: number }).total > 0,
+                  )
                   .slice(0, 3)
-                  .map(([category, catData]) => (
-                    <div
-                      key={category}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <span className="capitalize">
-                        {t(`achievements.categories.${category}`)}:
-                      </span>
-                      <span className="font-medium">
-                        {catData.unlocked}/{catData.total}
-                      </span>
-                    </div>
-                  ))}
+                  .map(([category, catData]) => {
+                    const data = catData as { unlocked: number; total: number };
+                    return (
+                      <div
+                        key={category}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="capitalize">
+                          {t(`achievements.categories.${category}`)}:
+                        </span>
+                        <span className="font-medium">
+                          {data.unlocked}/{data.total}
+                        </span>
+                      </div>
+                    );
+                  })}
               </div>
             </CardContent>
           </Card>

@@ -3,3 +3,6 @@ export * from "./schemas";
 
 // Export error codes
 export * from "./errors";
+
+// Export data layer (query keys and types)
+export * from "./data";

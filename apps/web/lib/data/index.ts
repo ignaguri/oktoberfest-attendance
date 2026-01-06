@@ -5,15 +5,15 @@
  * Components should import from this file rather than directly from provider-specific files
  */
 
-// Core abstraction types and utilities
+// Core abstraction types and utilities from shared package
 export type {
   DataMutationOptions,
   DataMutationResult,
   DataProvider,
   DataQueryOptions,
   DataQueryResult,
-} from "./types";
-export { QueryKeys } from "./types";
+} from "@prostcounter/shared/data";
+export { QueryKeys } from "@prostcounter/shared/data";
 
 // Provider implementation (only the hooks, not the internals)
 export {

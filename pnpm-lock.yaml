@@ -134,12 +134,9 @@ importers:
       i18next:
         specifier: ^25.7.0
         version: 25.7.3(typescript@5.9.3)
-      metro:
-        specifier: ^0.83.3
-        version: 0.83.3
-      metro-runtime:
-        specifier: ^0.83.3
-        version: 0.83.3
+      nativewind:
+        specifier: 5.0.0-preview.2
+        version: 5.0.0-preview.2(react-native-css@3.0.1(@expo/metro-config@54.0.12(expo@54.0.30))(lightningcss@1.30.2)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(tailwindcss@4.1.18)
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -155,12 +152,12 @@ importers:
       react-native:
         specifier: 0.81.5
         version: 0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0)
+      react-native-css:
+        specifier: ^3.0.1
+        version: 3.0.1(@expo/metro-config@54.0.12(expo@54.0.30))(lightningcss@1.30.2)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-gesture-handler:
         specifier: ~2.28.0
         version: 2.28.0(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      react-native-paper:
-        specifier: ^5.13.0
-        version: 5.14.5(react-native-safe-area-context@5.6.2(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-reanimated:
         specifier: ~4.1.6
         version: 4.1.6(@babel/core@7.28.5)(react-native-worklets@0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
@@ -176,9 +173,6 @@ importers:
       react-native-web:
         specifier: ^0.21.2
         version: 0.21.2(encoding@0.1.13)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      semver:
-        specifier: ^7.7.3
-        version: 7.7.3
       zod:
         specifier: ^4.2.0
         version: 4.3.5
@@ -186,12 +180,21 @@ importers:
       '@babel/core':
         specifier: ^7.26.0
         version: 7.28.5
+      '@tailwindcss/postcss':
+        specifier: ^4.1.18
+        version: 4.1.18
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.3
       '@types/react':
         specifier: ~19.1.17
         version: 19.1.17
+      postcss:
+        specifier: 8.5.6
+        version: 8.5.6
+      tailwindcss:
+        specifier: 4.1.18
+        version: 4.1.18
       typescript:
         specifier: ^5.9.0
         version: 5.9.3
@@ -476,6 +479,9 @@ importers:
 
   packages/api-client:
     dependencies:
+      '@prostcounter/shared':
+        specifier: workspace:*
+        version: link:../shared
       openapi-fetch:
         specifier: ^0.12.0
         version: 0.12.5
@@ -507,6 +513,12 @@ importers:
         specifier: ^4.2.1
         version: 4.3.5
     devDependencies:
+      '@tanstack/react-query':
+        specifier: ^5.90.0
+        version: 5.90.16(react@19.2.3)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.3
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
@@ -1064,11 +1076,6 @@ packages:
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
-
-  '@callstack/react-theme-provider@3.0.9':
-    resolution: {integrity: sha512-tTQ0uDSCL0ypeMa8T/E9wAZRGKWj8kXP7+6RYgPTfOPs9N07C9xM8P02GJ3feETap4Ux5S69D9nteq9mEj86NA==}
-    peerDependencies:
-      react: '>=16.3.0'
 
   '@corvu/utils@0.4.2':
     resolution: {integrity: sha512-Ox2kYyxy7NoXdKWdHeDEjZxClwzO4SKM8plAaVwmAJPxHMqA0rLOoAsa+hBDwRLpctf+ZRnAd/ykguuJidnaTA==}
@@ -4515,6 +4522,9 @@ packages:
     resolution: {integrity: sha512-FmeCCAenzH0KH381SPT5FZmiA/TmpndpcaShhfgEN9eCVjnFBqq3l1xrI42y8+PPLI6hypzou4GXw00WHmPBLQ==}
     engines: {node: '>= 0.4'}
 
+  array-timsort@1.0.3:
+    resolution: {integrity: sha512-/+3GRL7dDAGEfM6TseQk/U+mi18TU2Ms9I3UlLdUMhz2hbvGNTKdj9xniwXfUqgYhHxRx0+8UnKkvlNwVU+cWQ==}
+
   array.prototype.findlast@1.2.5:
     resolution: {integrity: sha512-CVvd6FHg1Z3POpBLxO6E6zr+rSKEQ9L6rZHAaY7lLfhKsWYUBBOuMs0e9o24oopj6H+geRCX0YJ+TJLBK2eHyQ==}
     engines: {node: '>= 0.4'}
@@ -4602,6 +4612,9 @@ packages:
 
   babel-plugin-react-compiler@1.0.0:
     resolution: {integrity: sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw==}
+
+  babel-plugin-react-compiler@19.1.0-rc.3:
+    resolution: {integrity: sha512-mjRn69WuTz4adL0bXGx8Rsyk1086zFJeKmes6aK0xPuK3aaXmDJdLHqwKKMrpm6KAI1MCoUK72d2VeqQbu8YIA==}
 
   babel-plugin-react-native-web@0.21.2:
     resolution: {integrity: sha512-SPD0J6qjJn8231i0HZhlAGH6NORe+QvRSQM2mwQEzJ2Fb3E4ruWTiiicPlHjmeWShDXLcvoorOCXjeR7k/lyWA==}
@@ -4848,15 +4861,15 @@ packages:
   color-string@1.9.1:
     resolution: {integrity: sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==}
 
-  color@3.2.1:
-    resolution: {integrity: sha512-aBl7dZI9ENN6fUGC7mWpMTPNHmWUSNan9tuWN6ahh5ZLNk9baLJOnSMlrQkHcrfFgz2/RigjUVAjdx36VcemKA==}
-
   color@4.2.3:
     resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
     engines: {node: '>=12.5.0'}
 
   colorette@1.4.0:
     resolution: {integrity: sha512-Y2oEozpomLn7Q3HFP7dpww7AtMJplbM9lGZP6RDfHqmbeRjiwRg4n6VM6j4KLmRke85uWEI7JqF17f3pqdRA0g==}
+
+  colorjs.io@0.6.0-alpha.1:
+    resolution: {integrity: sha512-c/h/8uAmPydQcriRdX8UTAFHj6SpSHFHBA8LvMikvYWAVApPTwg/pyOXNsGmaCBd6L/EeDlRHSNhTtnIFp/qsg==}
 
   commander@10.0.1:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
@@ -4876,6 +4889,10 @@ packages:
   commander@7.2.0:
     resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
     engines: {node: '>= 10'}
+
+  comment-json@4.5.1:
+    resolution: {integrity: sha512-taEtr3ozUmOB7it68Jll7s0Pwm+aoiHyXKrEC8SEodL4rNpdfDLqa7PfBlrgFoCNNdR8ImL+muti5IGvktJAAg==}
+    engines: {node: '>= 6'}
 
   common-tags@1.8.2:
     resolution: {integrity: sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==}
@@ -4908,6 +4925,9 @@ packages:
 
   core-js-compat@3.47.0:
     resolution: {integrity: sha512-IGfuznZ/n7Kp9+nypamBhvwdwLsW6KC8IOaURw2doAK5e98AG3acVLdh0woOnEqCfUtS+Vu882JE4k/DAm3ItQ==}
+
+  core-util-is@1.0.3:
+    resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
   cross-fetch@3.2.0:
     resolution: {integrity: sha512-Q+xVJLoGOeIMXZmbUK4HYk+69cQH6LudR0Vu/pRm2YlU/hDV9CiS0gKUMaWY5f2NeUH9C1nV3bsTlCo0FsTV1Q==}
@@ -5056,10 +5076,6 @@ packages:
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
-
-  deepmerge@3.3.0:
-    resolution: {integrity: sha512-GRQOafGHwMHpjPx9iCvTgpu9NojZ49q794EEL94JVEw6VaeA8XTUyBKvAkOOjBX9oJNiV6G3P+T+tihFjo2TqA==}
-    engines: {node: '>=0.10.0'}
 
   deepmerge@4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
@@ -6654,6 +6670,13 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     hasBin: true
 
+  nativewind@5.0.0-preview.2:
+    resolution: {integrity: sha512-rTNrwFIwl/n2VH7KPvsZj/NdvKf+uGHF4NYtPamr5qG2eTYGT8B8VeyCPfYf/xUskpWOLJVqVEXaFO/vuIDEdw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react-native-css: ^3.0.1
+      tailwindcss: '>4.1.11'
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
@@ -7201,6 +7224,14 @@ packages:
   react-is@19.2.3:
     resolution: {integrity: sha512-qJNJfu81ByyabuG7hPFEbXqNcWSU3+eVus+KJs+0ncpGfMyYdvSmxiJxbWR65lYi1I+/0HBcliO029gc4F+PnA==}
 
+  react-native-css@3.0.1:
+    resolution: {integrity: sha512-sE/Qp2p+UaV9+W6T+GwsRH5sIynaTfhM2Khn+tN1q1YKYq1STVyAWyC+0i6ac4mFAO/FxQ/a03BDmrrt48qiuQ==}
+    peerDependencies:
+      '@expo/metro-config': '>=54'
+      lightningcss: '>=1.27.0'
+      react: '>=19'
+      react-native: '>=0.81'
+
   react-native-gesture-handler@2.28.0:
     resolution: {integrity: sha512-0msfJ1vRxXKVgTgvL+1ZOoYw3/0z1R+Ked0+udoJhyplC2jbVKIJ8Z1bzWdpQRCV3QcQ87Op0zJVE5DhKK2A0A==}
     peerDependencies:
@@ -7212,13 +7243,6 @@ packages:
     peerDependencies:
       react: '*'
       react-native: '*'
-
-  react-native-paper@5.14.5:
-    resolution: {integrity: sha512-eaIH5bUQjJ/mYm4AkI6caaiyc7BcHDwX6CqNDi6RIxfxfWxROsHpll1oBuwn/cFvknvA8uEAkqLk/vzVihI3AQ==}
-    peerDependencies:
-      react: '*'
-      react-native: '*'
-      react-native-safe-area-context: '*'
 
   react-native-reanimated@4.1.6:
     resolution: {integrity: sha512-F+ZJBYiok/6Jzp1re75F/9aLzkgoQCOh4yxrnwATa8392RvM3kx+fiXXFvwcgE59v48lMwd9q0nzF1oJLXpfxQ==}
@@ -7886,6 +7910,12 @@ packages:
     resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
+
+  tailwindcss-safe-area@1.3.0:
+    resolution: {integrity: sha512-RoxnW1zAjBWC3XK+row7Qj5toRMRlKNN/p3FLXb6fTGKxDGWT6JP/mcNX1yf09xRficQ308hbwiedgniepSp1Q==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      tailwindcss: ^4.0.0
 
   tailwindcss@4.1.18:
     resolution: {integrity: sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==}
@@ -9283,12 +9313,6 @@ snapshots:
   '@bcoe/v8-coverage@0.2.3': {}
 
   '@bcoe/v8-coverage@1.0.2': {}
-
-  '@callstack/react-theme-provider@3.0.9(react@19.1.0)':
-    dependencies:
-      deepmerge: 3.3.0
-      hoist-non-react-statics: 3.3.2
-      react: 19.1.0
 
   '@corvu/utils@0.4.2(solid-js@1.9.10)':
     dependencies:
@@ -13379,6 +13403,8 @@ snapshots:
       is-string: 1.1.1
       math-intrinsics: 1.1.0
 
+  array-timsort@1.0.3: {}
+
   array.prototype.findlast@1.2.5:
     dependencies:
       call-bind: 1.0.8
@@ -13509,6 +13535,10 @@ snapshots:
       - supports-color
 
   babel-plugin-react-compiler@1.0.0:
+    dependencies:
+      '@babel/types': 7.28.5
+
+  babel-plugin-react-compiler@19.1.0-rc.3:
     dependencies:
       '@babel/types': 7.28.5
 
@@ -13813,17 +13843,14 @@ snapshots:
       color-name: 1.1.4
       simple-swizzle: 0.2.4
 
-  color@3.2.1:
-    dependencies:
-      color-convert: 1.9.3
-      color-string: 1.9.1
-
   color@4.2.3:
     dependencies:
       color-convert: 2.0.1
       color-string: 1.9.1
 
   colorette@1.4.0: {}
+
+  colorjs.io@0.6.0-alpha.1: {}
 
   commander@10.0.1: {}
 
@@ -13834,6 +13861,12 @@ snapshots:
   commander@4.1.1: {}
 
   commander@7.2.0: {}
+
+  comment-json@4.5.1:
+    dependencies:
+      array-timsort: 1.0.3
+      core-util-is: 1.0.3
+      esprima: 4.0.1
 
   common-tags@1.8.2: {}
 
@@ -13873,6 +13906,8 @@ snapshots:
   core-js-compat@3.47.0:
     dependencies:
       browserslist: 4.28.1
+
+  core-util-is@1.0.3: {}
 
   cross-fetch@3.2.0(encoding@0.1.13):
     dependencies:
@@ -13995,8 +14030,6 @@ snapshots:
   deep-extend@0.6.0: {}
 
   deep-is@0.1.4: {}
-
-  deepmerge@3.3.0: {}
 
   deepmerge@4.3.1: {}
 
@@ -15893,6 +15926,12 @@ snapshots:
 
   napi-postinstall@0.3.4: {}
 
+  nativewind@5.0.0-preview.2(react-native-css@3.0.1(@expo/metro-config@54.0.12(expo@54.0.30))(lightningcss@1.30.2)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(tailwindcss@4.1.18):
+    dependencies:
+      react-native-css: 3.0.1(@expo/metro-config@54.0.12(expo@54.0.30))(lightningcss@1.30.2)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+      tailwindcss: 4.1.18
+      tailwindcss-safe-area: 1.3.0(tailwindcss@4.1.18)
+
   natural-compare@1.4.0: {}
 
   negotiator@0.6.3: {}
@@ -16490,6 +16529,19 @@ snapshots:
 
   react-is@19.2.3: {}
 
+  react-native-css@3.0.1(@expo/metro-config@54.0.12(expo@54.0.30))(lightningcss@1.30.2)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      '@expo/metro-config': 54.0.12(expo@54.0.30)
+      babel-plugin-react-compiler: 19.1.0-rc.3
+      colorjs.io: 0.6.0-alpha.1
+      comment-json: 4.5.1
+      debug: 4.4.3(supports-color@10.2.2)
+      lightningcss: 1.30.2
+      react: 19.1.0
+      react-native: 0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0)
+    transitivePeerDependencies:
+      - supports-color
+
   react-native-gesture-handler@2.28.0(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:
       '@egjs/hammerjs': 2.0.17
@@ -16502,15 +16554,6 @@ snapshots:
     dependencies:
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0)
-
-  react-native-paper@5.14.5(react-native-safe-area-context@5.6.2(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
-    dependencies:
-      '@callstack/react-theme-provider': 3.0.9(react@19.1.0)
-      color: 3.2.1
-      react: 19.1.0
-      react-native: 0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0)
-      react-native-safe-area-context: 5.6.2(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      use-latest-callback: 0.2.6(react@19.1.0)
 
   react-native-reanimated@4.1.6(@babel/core@7.28.5)(react-native-worklets@0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:
@@ -17402,6 +17445,10 @@ snapshots:
   tailwind-merge@3.4.0: {}
 
   tailwindcss-animate@1.0.7(tailwindcss@4.1.18):
+    dependencies:
+      tailwindcss: 4.1.18
+
+  tailwindcss-safe-area@1.3.0(tailwindcss@4.1.18):
     dependencies:
       tailwindcss: 4.1.18
 

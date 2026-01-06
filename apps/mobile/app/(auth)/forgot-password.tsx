@@ -1,7 +1,15 @@
 import { useState } from "react";
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { Text, TextInput, Button, HelperText } from "react-native-paper";
-import { Link, useRouter } from "expo-router";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
+import { Link } from "expo-router";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +26,6 @@ type ResetFormData = z.infer<typeof resetSchema>;
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const { resetPassword } = useAuth();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -41,7 +48,7 @@ export default function ForgotPasswordScreen() {
     const { error: resetError } = await resetPassword(data.email);
 
     if (resetError) {
-      setError(t("auth.resetPassword.errors.failed"));
+      setError(resetError.message || t("auth.forgotPassword.errors.generic"));
       setIsLoading(false);
       return;
     }
@@ -50,149 +57,113 @@ export default function ForgotPasswordScreen() {
     setIsLoading(false);
   };
 
-  if (success) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.successContainer}>
-          <Text variant="headlineMedium" style={styles.successTitle}>
-            {t("auth.resetPassword.success")}
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => router.replace("/(auth)/sign-in")}
-            style={styles.button}
-            contentStyle={styles.buttonContent}
-          >
-            {t("auth.resetPassword.backToSignIn")}
-          </Button>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
+        className="px-6"
       >
-        <View style={styles.header}>
-          <Text variant="bodyLarge" style={styles.subtitle}>
-            {t("auth.resetPassword.subtitle")}
+        {/* Header */}
+        <View className="bg-yellow-500 -mx-6 px-6 py-6 pt-16">
+          <Text className="text-center text-xl font-bold text-black">
+            {t("auth.forgotPassword.title")}
           </Text>
         </View>
 
-        <View style={styles.form}>
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+        {/* Form */}
+        <View className="mt-8">
+          <Text className="text-2xl font-bold text-gray-900 text-center mb-4">
+            {t("auth.forgotPassword.subtitle")}
+          </Text>
+
+          <Text className="text-gray-600 text-center mb-8">
+            {t("auth.forgotPassword.description")}
+          </Text>
+
+          {success ? (
+            <View className="bg-green-50 p-4 rounded-lg mb-4">
+              <Text className="text-green-700 text-center">
+                {t("auth.forgotPassword.success")}
+              </Text>
             </View>
-          )}
+          ) : (
+            <>
+              {error && (
+                <View className="bg-red-50 p-3 rounded-lg mb-4">
+                  <Text className="text-red-600 text-center">{error}</Text>
+                </View>
+              )}
 
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <TextInput
-                  label={t("auth.resetPassword.emailLabel")}
-                  placeholder={t("auth.resetPassword.emailPlaceholder")}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  mode="outlined"
-                  error={!!errors.email}
-                />
-                {errors.email && (
-                  <HelperText type="error" visible={!!errors.email}>
-                    {errors.email.message}
-                  </HelperText>
+              {/* Email Input */}
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View className="mb-6">
+                    <Text className="text-gray-700 font-medium mb-2">
+                      {t("auth.forgotPassword.emailLabel")}
+                    </Text>
+                    <TextInput
+                      className={`border rounded-xl px-4 py-3 text-base ${
+                        errors.email
+                          ? "border-red-500 bg-red-50"
+                          : "border-gray-300 bg-white"
+                      }`}
+                      placeholder={t("auth.forgotPassword.emailPlaceholder")}
+                      placeholderTextColor="#9CA3AF"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                    />
+                    {errors.email && (
+                      <Text className="text-red-500 text-sm mt-1">
+                        {errors.email.message}
+                      </Text>
+                    )}
+                  </View>
                 )}
-              </View>
-            )}
-          />
+              />
 
-          <Button
-            mode="contained"
-            onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
-            disabled={isLoading}
-            style={styles.button}
-            contentStyle={styles.buttonContent}
-          >
-            {t("auth.resetPassword.submit")}
-          </Button>
+              {/* Submit Button */}
+              <TouchableOpacity
+                className={`rounded-full py-4 ${
+                  isLoading
+                    ? "bg-yellow-300"
+                    : "bg-yellow-500 active:bg-yellow-600"
+                }`}
+                onPress={handleSubmit(onSubmit)}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#000" />
+                ) : (
+                  <Text className="text-center font-bold text-black text-base">
+                    {t("auth.forgotPassword.submit")}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
 
+        {/* Footer */}
+        <View className="flex-row justify-center items-center mt-8 pb-8">
           <Link href="/(auth)/sign-in" asChild>
-            <Button mode="text" style={styles.linkButton}>
-              {t("auth.resetPassword.backToSignIn")}
-            </Button>
+            <TouchableOpacity>
+              <Text className="text-yellow-600 font-semibold">
+                {t("auth.forgotPassword.backToSignIn")}
+              </Text>
+            </TouchableOpacity>
           </Link>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-  },
-  header: {
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  subtitle: {
-    textAlign: "center",
-    color: "#6B7280",
-  },
-  form: {
-    gap: 16,
-  },
-  inputContainer: {
-    marginBottom: 8,
-  },
-  errorContainer: {
-    backgroundColor: "#FEE2E2",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  errorText: {
-    color: "#DC2626",
-    textAlign: "center",
-  },
-  button: {
-    marginTop: 8,
-    backgroundColor: "#F59E0B",
-  },
-  buttonContent: {
-    paddingVertical: 8,
-  },
-  linkButton: {
-    marginTop: 8,
-  },
-  successContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  successTitle: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: "#1F2937",
-    marginBottom: 24,
-  },
-});

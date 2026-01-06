@@ -33,6 +33,7 @@ import { toast } from "sonner";
 
 import type { GroupSettingsFormData } from "@/lib/schemas/groups";
 import type { WinningCriteria } from "@/lib/types";
+import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 
 // Winning criteria as string literals (matching API response)
 type WinningCriteriaString = "days_attended" | "total_beers" | "avg_beers";
@@ -230,11 +231,13 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 id="winning_criteria_id"
                 options={[
                   {
-                    options: (winningCriterias ?? []).map((criteria) => ({
-                      value: criteria.id.toString(),
-                      label:
-                        winningCriteriaText[criteria.name as WinningCriteria],
-                    })),
+                    options: (winningCriterias ?? []).map(
+                      (criteria: WinningCriteriaOption) => ({
+                        value: criteria.id.toString(),
+                        label:
+                          winningCriteriaText[criteria.name as WinningCriteria],
+                      }),
+                    ),
                   },
                 ]}
                 placeholder="Select winning criteria"

@@ -7,7 +7,7 @@ import {
   useMutation,
   useInvalidateQueries,
 } from "@/lib/data/react-query-provider";
-import { QueryKeys } from "@/lib/data/types";
+import { QueryKeys } from "@prostcounter/shared/data";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 

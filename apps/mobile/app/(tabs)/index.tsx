@@ -1,5 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
-import { Text, Card, Button, ActivityIndicator, Chip } from "react-native-paper";
+import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
@@ -12,158 +11,91 @@ export default function HomeScreen() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Welcome Card */}
-      <Card style={styles.card}>
-        <Card.Content style={styles.welcomeContent}>
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="p-4 pb-8">
+        {/* Welcome Card */}
+        <View className="bg-white rounded-xl p-6 mb-4 shadow-sm items-center">
           <MaterialCommunityIcons name="beer" size={48} color="#F59E0B" />
-          <Text variant="headlineSmall" style={styles.welcomeTitle}>
+          <Text className="text-xl font-bold text-gray-900 mt-3">
             Welcome to ProstCounter!
           </Text>
-          <Text variant="bodyMedium" style={styles.welcomeSubtitle}>
-            {user?.email}
-          </Text>
-        </Card.Content>
-      </Card>
+          <Text className="text-gray-600 mt-1">{user?.email}</Text>
+        </View>
 
-      {/* Festival Card */}
-      <Card style={styles.card}>
-        <Card.Title
-          title="Current Festival"
-          left={(props) => (
+        {/* Festival Card */}
+        <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+          <View className="flex-row items-center mb-3">
             <MaterialCommunityIcons
-              {...props}
               name="calendar-star"
               size={24}
               color="#F59E0B"
             />
-          )}
-        />
-        <Card.Content>
+            <Text className="text-lg font-semibold text-gray-900 ml-2">
+              Current Festival
+            </Text>
+          </View>
+
           {festivalLoading ? (
-            <ActivityIndicator animating={true} color="#F59E0B" />
+            <ActivityIndicator color="#F59E0B" />
           ) : currentFestival ? (
-            <View style={styles.festivalInfo}>
-              <Text variant="titleMedium" style={styles.festivalName}>
+            <View className="gap-2">
+              <Text className="text-lg font-bold text-gray-900">
                 {currentFestival.name}
               </Text>
-              <Chip icon="map-marker" style={styles.chip}>
-                {currentFestival.location}
-              </Chip>
-              <Text variant="bodySmall" style={styles.festivalDates}>
-                {currentFestival.start_date} - {currentFestival.end_date}
+              <View className="flex-row items-center">
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={16}
+                  color="#6B7280"
+                />
+                <Text className="text-gray-600 ml-1">
+                  {currentFestival.location}
+                </Text>
+              </View>
+              <Text className="text-gray-500 text-sm">
+                {currentFestival.startDate} - {currentFestival.endDate}
               </Text>
-              {currentFestival.beer_cost && (
-                <Chip icon="currency-eur" style={styles.chip}>
-                  {currentFestival.beer_cost}€ per beer
-                </Chip>
+              {currentFestival.beerCost && (
+                <View className="flex-row items-center">
+                  <MaterialCommunityIcons
+                    name="currency-eur"
+                    size={16}
+                    color="#6B7280"
+                  />
+                  <Text className="text-gray-600 ml-1">
+                    {currentFestival.beerCost}€ per beer
+                  </Text>
+                </View>
               )}
             </View>
           ) : (
-            <Text variant="bodyMedium" style={styles.noFestival}>
-              No festival selected
-            </Text>
+            <Text className="text-gray-400 italic">No festival selected</Text>
           )}
-        </Card.Content>
-      </Card>
+        </View>
 
-      {/* Coming Soon Card */}
-      <Card style={styles.card}>
-        <Card.Content style={styles.comingSoon}>
+        {/* Coming Soon Card */}
+        <View className="bg-white rounded-xl p-6 mb-4 shadow-sm items-center">
           <MaterialCommunityIcons
             name="rocket-launch"
             size={32}
             color="#9CA3AF"
           />
-          <Text variant="titleMedium" style={styles.comingSoonTitle}>
+          <Text className="text-lg font-medium text-gray-500 mt-3">
             More Features Coming Soon!
           </Text>
-          <Text variant="bodyMedium" style={styles.comingSoonText}>
+          <Text className="text-gray-400 text-center mt-2">
             Quick beer registration, statistics, and more will be available in
             the next update.
           </Text>
-        </Card.Content>
-      </Card>
+        </View>
 
-      {/* Quick Actions */}
-      <View style={styles.quickActions}>
-        <Button
-          mode="contained"
-          icon="beer"
-          style={styles.quickButton}
-          contentStyle={styles.quickButtonContent}
-          disabled
-        >
-          Log Beer (Coming Soon)
-        </Button>
+        {/* Quick Action - Disabled for now */}
+        <View className="bg-yellow-200 rounded-full py-4 opacity-50">
+          <Text className="text-center font-bold text-gray-500">
+            Log Beer (Coming Soon)
+          </Text>
+        </View>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F9FAFB",
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  card: {
-    marginBottom: 16,
-    backgroundColor: "#FFFFFF",
-  },
-  welcomeContent: {
-    alignItems: "center",
-    paddingVertical: 24,
-  },
-  welcomeTitle: {
-    fontWeight: "bold",
-    marginTop: 12,
-    color: "#1F2937",
-  },
-  welcomeSubtitle: {
-    color: "#6B7280",
-    marginTop: 4,
-  },
-  festivalInfo: {
-    gap: 8,
-  },
-  festivalName: {
-    fontWeight: "bold",
-    color: "#1F2937",
-  },
-  festivalDates: {
-    color: "#6B7280",
-  },
-  chip: {
-    alignSelf: "flex-start",
-  },
-  noFestival: {
-    color: "#9CA3AF",
-    fontStyle: "italic",
-  },
-  comingSoon: {
-    alignItems: "center",
-    paddingVertical: 24,
-  },
-  comingSoonTitle: {
-    marginTop: 12,
-    color: "#6B7280",
-  },
-  comingSoonText: {
-    textAlign: "center",
-    color: "#9CA3AF",
-    marginTop: 8,
-  },
-  quickActions: {
-    marginTop: 8,
-  },
-  quickButton: {
-    backgroundColor: "#F59E0B",
-  },
-  quickButtonContent: {
-    paddingVertical: 8,
-  },
-});

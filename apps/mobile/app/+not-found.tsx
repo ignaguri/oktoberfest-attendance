@@ -1,5 +1,4 @@
-import { View, StyleSheet } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Link, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
@@ -7,44 +6,20 @@ export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "Oops!", headerShown: true }} />
-      <View style={styles.container}>
+      <View className="flex-1 bg-white items-center justify-center p-6">
         <MaterialCommunityIcons name="beer-outline" size={80} color="#D1D5DB" />
-        <Text variant="headlineMedium" style={styles.title}>
+        <Text className="text-2xl font-bold text-gray-900 mt-6">
           Page Not Found
         </Text>
-        <Text variant="bodyLarge" style={styles.subtitle}>
+        <Text className="text-gray-500 text-center mt-2">
           Looks like this page wandered off to another tent!
         </Text>
         <Link href="/(tabs)" asChild>
-          <Button mode="contained" style={styles.button}>
-            Go to Home
-          </Button>
+          <TouchableOpacity className="mt-8 bg-yellow-500 px-8 py-4 rounded-full active:bg-yellow-600">
+            <Text className="text-white font-bold text-center">Go to Home</Text>
+          </TouchableOpacity>
         </Link>
       </View>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  title: {
-    marginTop: 24,
-    fontWeight: "bold",
-    color: "#1F2937",
-  },
-  subtitle: {
-    marginTop: 8,
-    textAlign: "center",
-    color: "#6B7280",
-  },
-  button: {
-    marginTop: 32,
-    backgroundColor: "#F59E0B",
-  },
-});

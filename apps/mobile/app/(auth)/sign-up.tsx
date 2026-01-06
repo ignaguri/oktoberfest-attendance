@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { Text, TextInput, Button, HelperText } from "react-native-paper";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useForm, Controller } from "react-hook-form";
@@ -13,7 +21,7 @@ const signUpSchema = z
   .object({
     email: z.string().email("Please enter a valid email"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -50,7 +58,7 @@ export default function SignUpScreen() {
     const { error: signUpError } = await signUp(data.email, data.password);
 
     if (signUpError) {
-      setError(t("auth.signUp.errors.failed"));
+      setError(signUpError.message || t("auth.signUp.errors.generic"));
       setIsLoading(false);
       return;
     }
@@ -61,219 +69,183 @@ export default function SignUpScreen() {
 
   if (success) {
     return (
-      <View style={styles.container}>
-        <View style={styles.successContainer}>
-          <Text variant="headlineMedium" style={styles.successTitle}>
-            {t("auth.signUp.accountCreated")}
-          </Text>
-          <Text variant="bodyLarge" style={styles.successText}>
-            {t("auth.signUp.success.checkEmail")}
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => router.replace("/(auth)/sign-in")}
-            style={styles.button}
-            contentStyle={styles.buttonContent}
-          >
+      <View className="flex-1 bg-white justify-center items-center p-6">
+        <Text className="text-2xl font-bold text-gray-900 text-center mb-4">
+          {t("auth.signUp.accountCreated")}
+        </Text>
+        <Text className="text-gray-600 text-center mb-6">
+          {t("auth.signUp.success.checkEmail")}
+        </Text>
+        <TouchableOpacity
+          className="bg-yellow-500 rounded-full py-4 px-8"
+          onPress={() => router.replace("/(auth)/sign-in")}
+        >
+          <Text className="font-bold text-black">
             {t("auth.resetPassword.backToSignIn")}
-          </Button>
-        </View>
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
+        className="px-6"
       >
-        <View style={styles.header}>
-          <Text variant="headlineMedium" style={styles.title}>
-            {t("auth.signUp.subtitle")}
+        {/* Header */}
+        <View className="bg-yellow-500 -mx-6 px-6 py-6 pt-16">
+          <Text className="text-center text-xl font-bold text-black">
+            {t("auth.signUp.title")}
           </Text>
         </View>
 
-        <View style={styles.form}>
+        {/* Form */}
+        <View className="mt-8">
+          <Text className="text-2xl font-bold text-gray-900 text-center mb-8">
+            {t("auth.signUp.subtitle")}
+          </Text>
+
           {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+            <View className="bg-red-50 p-3 rounded-lg mb-4">
+              <Text className="text-red-600 text-center">{error}</Text>
             </View>
           )}
 
+          {/* Email Input */}
           <Controller
             control={control}
             name="email"
             render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
+              <View className="mb-4">
+                <Text className="text-gray-700 font-medium mb-2">
+                  {t("auth.signUp.emailLabel")}
+                </Text>
                 <TextInput
-                  label={t("auth.signUp.emailLabel")}
+                  className={`border rounded-xl px-4 py-3 text-base ${
+                    errors.email
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-300 bg-white"
+                  }`}
                   placeholder={t("auth.signUp.emailPlaceholder")}
+                  placeholderTextColor="#9CA3AF"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  mode="outlined"
-                  error={!!errors.email}
                 />
                 {errors.email && (
-                  <HelperText type="error" visible={!!errors.email}>
+                  <Text className="text-red-500 text-sm mt-1">
                     {errors.email.message}
-                  </HelperText>
+                  </Text>
                 )}
               </View>
             )}
           />
 
+          {/* Password Input */}
           <Controller
             control={control}
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
+              <View className="mb-4">
+                <Text className="text-gray-700 font-medium mb-2">
+                  {t("auth.signUp.passwordLabel")}
+                </Text>
                 <TextInput
-                  label={t("auth.signUp.passwordLabel")}
+                  className={`border rounded-xl px-4 py-3 text-base ${
+                    errors.password
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-300 bg-white"
+                  }`}
                   placeholder={t("auth.signUp.passwordPlaceholder")}
+                  placeholderTextColor="#9CA3AF"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   secureTextEntry
                   autoCapitalize="none"
                   autoComplete="new-password"
-                  mode="outlined"
-                  error={!!errors.password}
                 />
                 {errors.password && (
-                  <HelperText type="error" visible={!!errors.password}>
+                  <Text className="text-red-500 text-sm mt-1">
                     {errors.password.message}
-                  </HelperText>
+                  </Text>
                 )}
               </View>
             )}
           />
 
+          {/* Confirm Password Input */}
           <Controller
             control={control}
             name="confirmPassword"
             render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
+              <View className="mb-6">
+                <Text className="text-gray-700 font-medium mb-2">
+                  {t("auth.signUp.confirmPasswordLabel")}
+                </Text>
                 <TextInput
-                  label={t("auth.signUp.confirmPasswordLabel")}
+                  className={`border rounded-xl px-4 py-3 text-base ${
+                    errors.confirmPassword
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-300 bg-white"
+                  }`}
                   placeholder={t("auth.signUp.confirmPasswordPlaceholder")}
+                  placeholderTextColor="#9CA3AF"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   secureTextEntry
                   autoCapitalize="none"
                   autoComplete="new-password"
-                  mode="outlined"
-                  error={!!errors.confirmPassword}
                 />
                 {errors.confirmPassword && (
-                  <HelperText type="error" visible={!!errors.confirmPassword}>
+                  <Text className="text-red-500 text-sm mt-1">
                     {errors.confirmPassword.message}
-                  </HelperText>
+                  </Text>
                 )}
               </View>
             )}
           />
 
-          <Button
-            mode="contained"
+          {/* Submit Button */}
+          <TouchableOpacity
+            className={`rounded-full py-4 ${
+              isLoading ? "bg-yellow-300" : "bg-yellow-500 active:bg-yellow-600"
+            }`}
             onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
             disabled={isLoading}
-            style={styles.button}
-            contentStyle={styles.buttonContent}
           >
-            {t("auth.signUp.submit")}
-          </Button>
+            {isLoading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text className="text-center font-bold text-black text-base">
+                {t("auth.signUp.submit")}
+              </Text>
+            )}
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.footer}>
-          <Text variant="bodyMedium" style={styles.footerText}>
-            {t("auth.signUp.hasAccount")}{" "}
-          </Text>
+        {/* Footer */}
+        <View className="flex-row justify-center items-center mt-8 pb-8">
+          <Text className="text-gray-600">{t("auth.signUp.hasAccount")} </Text>
           <Link href="/(auth)/sign-in" asChild>
-            <Button mode="text" compact>
-              {t("auth.signUp.signInLink")}
-            </Button>
+            <TouchableOpacity>
+              <Text className="text-yellow-600 font-semibold">
+                {t("auth.signUp.signInLink")}
+              </Text>
+            </TouchableOpacity>
           </Link>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-  },
-  header: {
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  title: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: "#1F2937",
-  },
-  form: {
-    gap: 16,
-  },
-  inputContainer: {
-    marginBottom: 8,
-  },
-  errorContainer: {
-    backgroundColor: "#FEE2E2",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  errorText: {
-    color: "#DC2626",
-    textAlign: "center",
-  },
-  button: {
-    marginTop: 8,
-    backgroundColor: "#F59E0B",
-  },
-  buttonContent: {
-    paddingVertical: 8,
-  },
-  successContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  successTitle: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: "#1F2937",
-    marginBottom: 16,
-  },
-  successText: {
-    textAlign: "center",
-    color: "#6B7280",
-    marginBottom: 24,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 32,
-  },
-  footerText: {
-    color: "#6B7280",
-  },
-});

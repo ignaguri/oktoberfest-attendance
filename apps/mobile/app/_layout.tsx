@@ -1,20 +1,19 @@
+import "../global.css";
+
 import { useEffect, useState } from "react";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import {
-  MD3LightTheme,
-  PaperProvider,
-  configureFonts,
-} from "react-native-paper";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
+import { ApiClientProvider } from "@prostcounter/shared/data";
 
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { DataProvider } from "@/lib/data/query-client";
 import { FestivalProvider } from "@/lib/festival/FestivalContext";
 import { initMobileI18n } from "@/lib/i18n";
+import { apiClient } from "@/lib/api-client";
 
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {
@@ -23,28 +22,6 @@ if (Platform.OS !== "web") {
     // Ignore errors - splash screen may not be available
   });
 }
-
-// ProstCounter theme (yellow-based)
-const theme = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: "#F59E0B", // yellow-500
-    primaryContainer: "#FEF3C7", // yellow-100
-    secondary: "#D97706", // yellow-600
-    secondaryContainer: "#FDE68A", // yellow-200
-    surface: "#FFFFFF",
-    surfaceVariant: "#FFFBEB", // yellow-50
-    background: "#FFFFFF",
-    error: "#EF4444",
-    onPrimary: "#000000",
-    onSecondary: "#000000",
-    onSurface: "#1F2937",
-    onBackground: "#1F2937",
-    outline: "#D1D5DB",
-  },
-  fonts: configureFonts({ config: {} }),
-};
 
 // Navigation guard component
 function NavigationGuard({ children }: { children: React.ReactNode }) {
@@ -101,11 +78,12 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <I18nextProvider i18n={i18n}>
-        <PaperProvider theme={theme}>
-          <DataProvider>
+        <DataProvider>
+          <ApiClientProvider client={apiClient}>
             <AuthProvider>
               <FestivalProvider>
                 <NavigationGuard>
+                <View className="flex-1 bg-white">
                   <Stack
                     screenOptions={{
                       headerShown: false,
@@ -116,12 +94,13 @@ export default function RootLayout() {
                     <Stack.Screen name="(tabs)" />
                     <Stack.Screen name="+not-found" />
                   </Stack>
+                </View>
                 </NavigationGuard>
               </FestivalProvider>
             </AuthProvider>
-          </DataProvider>
-          <StatusBar style="dark" />
-        </PaperProvider>
+          </ApiClientProvider>
+        </DataProvider>
+        <StatusBar style="dark" />
       </I18nextProvider>
     </GestureHandlerRootView>
   );
