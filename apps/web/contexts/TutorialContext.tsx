@@ -48,6 +48,11 @@ export function TutorialProvider({
   const [visibleSteps, setVisibleSteps] = useState<TutorialStep[]>([]);
   const { mutateAsync: completeTutorial } = useCompleteTutorial();
 
+  // Sync internal state with prop changes (when cache is invalidated)
+  useEffect(() => {
+    setIsCompleted(initialTutorialCompleted);
+  }, [initialTutorialCompleted]);
+
   // Filter tutorial steps to only include those with visible elements
   const getVisibleSteps = () => {
     return tutorialSteps
