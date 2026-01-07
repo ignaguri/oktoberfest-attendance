@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { Slot as SlotPrimitive } from "radix-ui";
 import * as React from "react";
+
+import type { ButtonProps as ButtonPropsContract } from "@prostcounter/ui";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
@@ -37,16 +39,21 @@ const buttonVariants = cva(
   },
 );
 
+// Extend the contract with web-specific implementation props
+interface ButtonProps
+  extends
+    Omit<React.ComponentProps<"button">, keyof ButtonPropsContract>,
+    ButtonPropsContract {
+  asChild?: boolean;
+}
+
 function Button({
   className,
   variant,
   size,
   asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? SlotPrimitive.Slot : "button";
   return (
     <Comp

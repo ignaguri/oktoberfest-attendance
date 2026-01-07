@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
-import type { BadgeVariants } from "@/components/ui/badge";
 import type { Festival, FestivalStatus } from "@/lib/types";
+import type { BadgeVariant } from "@prostcounter/ui";
 
 interface FestivalSelectorProps {
   className?: string;
@@ -33,7 +33,7 @@ const getFestivalDisplayInfo = (festival: Festival) => {
 
 const getFestivalStatusBadgeProps = (
   festival: Festival,
-): { status: FestivalStatus; variant: BadgeVariants } => {
+): { status: FestivalStatus; variant: BadgeVariant } => {
   const status = getFestivalStatus(festival);
 
   if (status === "upcoming") {

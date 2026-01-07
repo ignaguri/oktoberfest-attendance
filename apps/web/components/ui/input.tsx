@@ -1,8 +1,13 @@
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
-export interface InputProps extends React.ComponentProps<"input"> {
-  errorMsg?: string;
+import type { InputProps as InputPropsContract } from "@prostcounter/ui";
+
+// Extend the contract with web-specific implementation props
+export interface InputProps
+  extends
+    Omit<React.ComponentProps<"input">, keyof InputPropsContract>,
+    InputPropsContract {
   rightElement?: React.ReactNode;
 }
 

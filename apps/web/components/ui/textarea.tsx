@@ -1,9 +1,13 @@
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
-export interface TextareaProps extends React.ComponentProps<"textarea"> {
-  errorMsg?: string;
-}
+import type { TextareaProps as TextareaPropsContract } from "@prostcounter/ui";
+
+// Extend the contract with web-specific implementation props
+export interface TextareaProps
+  extends
+    Omit<React.ComponentProps<"textarea">, keyof TextareaPropsContract>,
+    TextareaPropsContract {}
 
 function Textarea({ className, errorMsg, ...props }: TextareaProps) {
   const errorId = React.useId();
