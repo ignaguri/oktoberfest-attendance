@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * API Client Context
  *
@@ -16,7 +18,7 @@ import { createContext, useContext, type ReactNode } from "react";
  * from @prostcounter/api-client. This avoids importing from api-client
  * which would create a cyclic dependency.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export type ApiClient = any;
 
 const ApiClientContext = createContext<ApiClient | null>(null);
@@ -29,7 +31,10 @@ export interface ApiClientProviderProps {
 /**
  * Provider component that makes the API client available to shared hooks
  */
-export function ApiClientProvider({ client, children }: ApiClientProviderProps) {
+export function ApiClientProvider({
+  client,
+  children,
+}: ApiClientProviderProps) {
   return (
     <ApiClientContext.Provider value={client}>
       {children}

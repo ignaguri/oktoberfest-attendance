@@ -1,26 +1,5 @@
-@import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
 
-/*
- * ProstCounter Mobile - NativeWind Styles
- * Uses the same yellow brand colors as the web app
- */
-
-@theme {
-  /* Brand Colors - matching web app */
-  --color-brand: theme(colors.yellow.400);
-  --color-brand-dark: theme(colors.yellow.500);
-  --color-brand-darker: theme(colors.yellow.600);
-
-  /* Background colors */
-  --color-background: theme(colors.white);
-  --color-surface: theme(colors.gray.50);
-
-  /* Text colors */
-  --color-text-primary: theme(colors.gray.900);
-  --color-text-secondary: theme(colors.gray.600);
-  --color-text-muted: theme(colors.gray.400);
-
-  /* Status colors */
-  --color-error: theme(colors.red.500);
-  --color-success: theme(colors.green.500);
-}
+@import "nativewind/theme";

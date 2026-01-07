@@ -1,19 +1,19 @@
 import "../global.css";
 
-import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
-import { ApiClientProvider } from "@prostcounter/shared/data";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { Platform, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { DataProvider } from "@/lib/data/query-client";
 import { FestivalProvider } from "@/lib/festival/FestivalContext";
 import { initMobileI18n } from "@/lib/i18n";
-import { apiClient } from "@/lib/api-client";
 
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {
@@ -35,10 +35,8 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
-      // Redirect to sign-in if not authenticated
       router.replace("/(auth)/sign-in");
     } else if (isAuthenticated && inAuthGroup) {
-      // Redirect to home if authenticated but in auth group
       router.replace("/(tabs)");
     }
   }, [isAuthenticated, isLoading, segments]);
@@ -52,18 +50,14 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Initialize i18n
         await initMobileI18n();
       } catch (error) {
         console.error("Failed to initialize app:", error);
       } finally {
         setIsReady(true);
-        // Hide splash screen (only on native)
         if (Platform.OS !== "web") {
           const SplashScreen = require("expo-splash-screen");
-          SplashScreen.hideAsync().catch(() => {
-            // Ignore errors
-          });
+          SplashScreen.hideAsync().catch(() => {});
         }
       }
     }
@@ -83,18 +77,18 @@ export default function RootLayout() {
             <AuthProvider>
               <FestivalProvider>
                 <NavigationGuard>
-                <View className="flex-1 bg-white">
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      animation: "slide_from_right",
-                    }}
-                  >
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="+not-found" />
-                  </Stack>
-                </View>
+                  <View className="flex-1 bg-white">
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                        animation: "slide_from_right",
+                      }}
+                    >
+                      <Stack.Screen name="(auth)" />
+                      <Stack.Screen name="(tabs)" />
+                      <Stack.Screen name="+not-found" />
+                    </Stack>
+                  </View>
                 </NavigationGuard>
               </FestivalProvider>
             </AuthProvider>
