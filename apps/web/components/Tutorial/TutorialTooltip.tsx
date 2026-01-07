@@ -192,7 +192,7 @@ export function TutorialTooltip({
     };
 
     // More responsive scroll handling
-    let scrollTimeout: NodeJS.Timeout;
+    let scrollTimeout: number;
     const handleScroll = () => {
       handleUpdate();
       clearTimeout(scrollTimeout);

@@ -43,8 +43,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse FormData
-    const formData = await request.formData();
+    // Parse FormData (type assertion needed due to Node.js/Web API FormData conflict)
+    const formData = (await request.formData()) as unknown as FormData & {
+      get(name: string): FormDataEntryValue | null;
+    };
     const picture = formData.get("picture") as File | null;
     const attendanceId = formData.get("attendanceId") as string | null;
     const visibility = (formData.get("visibility") as string) || "public";

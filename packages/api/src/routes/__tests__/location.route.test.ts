@@ -102,7 +102,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -147,7 +147,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
     });
@@ -169,7 +169,7 @@ describe("Location Routes - Unit Tests", () => {
         body: JSON.stringify({ festivalId }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(409);
     });
@@ -183,7 +183,7 @@ describe("Location Routes - Unit Tests", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -197,7 +197,7 @@ describe("Location Routes - Unit Tests", () => {
         body: JSON.stringify({ festivalId: "invalid-uuid" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -213,7 +213,7 @@ describe("Location Routes - Unit Tests", () => {
         body: JSON.stringify({ festivalId, durationMinutes: 600 }), // Max is 480
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -308,7 +308,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -345,7 +345,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(404);
     });
@@ -365,7 +365,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -387,7 +387,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -409,7 +409,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -425,7 +425,7 @@ describe("Location Routes - Unit Tests", () => {
         body: JSON.stringify({ sessionId }), // Missing location
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -678,7 +678,7 @@ describe("Location Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });
@@ -719,7 +719,7 @@ describe("Location Routes - Unit Tests", () => {
         },
       );
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });

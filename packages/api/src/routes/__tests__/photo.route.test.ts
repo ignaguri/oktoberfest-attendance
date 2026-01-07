@@ -362,7 +362,7 @@ describe("Photo Routes - Unit Tests", () => {
         method: "POST",
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -387,7 +387,7 @@ describe("Photo Routes - Unit Tests", () => {
         method: "POST",
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(404);
     });
@@ -397,7 +397,7 @@ describe("Photo Routes - Unit Tests", () => {
         method: "POST",
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -629,7 +629,7 @@ describe("Photo Routes - Unit Tests", () => {
         method: "POST",
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });

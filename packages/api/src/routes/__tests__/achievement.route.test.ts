@@ -330,7 +330,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -409,7 +409,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -455,7 +455,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -471,7 +471,7 @@ describe("Achievement Routes - Unit Tests", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -487,7 +487,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -517,7 +517,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(500);
     });
@@ -553,7 +553,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });

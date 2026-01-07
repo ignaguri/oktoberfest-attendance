@@ -13,7 +13,7 @@ async function generateOpenAPISpec() {
     console.log("🔧 Generating OpenAPI specification...");
 
     // Create a mock request to trigger OpenAPI doc generation
-    const req = new Request("http://localhost/openapi.json");
+    const req = new Request("http://localhost/openapi.json") as Request;
     const res = await app.fetch(req);
 
     if (!res.ok) {
