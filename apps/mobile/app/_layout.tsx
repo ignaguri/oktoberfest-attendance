@@ -3,7 +3,9 @@ import "../global.css";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
-import { GluestackUIProvider } from "@prostcounter/ui";
+
+// Gluestack UI provider with NativeWind v4 styling
+import { GluestackUIProvider } from "@/components/ui";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";

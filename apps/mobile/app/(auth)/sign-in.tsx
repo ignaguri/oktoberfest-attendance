@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Button, ButtonText, ButtonSpinner } from "@prostcounter/ui";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -15,6 +14,7 @@ import {
 } from "react-native";
 import { z } from "zod";
 
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 const signInSchema = z.object({
@@ -167,15 +167,6 @@ export default function SignInScreen() {
             ) : (
               <ButtonText>{t("auth.signIn.submit")}</ButtonText>
             )}
-          </Button>
-          <Button
-            action="secondary"
-            size="md"
-            onPress={() => console.log("Test")}
-            isDisabled={isLoading}
-            className="mt-2"
-          >
-            <ButtonText className="text-white">Test</ButtonText>
           </Button>
 
           {/* Forgot Password */}

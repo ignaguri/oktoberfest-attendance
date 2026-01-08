@@ -95,6 +95,18 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* Dev-only Components showcase tab */}
+      {__DEV__ && (
+        <Tabs.Screen
+          name="components"
+          options={{
+            title: "Components",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon name="puzzle" color={color} focused={focused} />
+            ),
+          }}
+        />
+      )}
     </Tabs>
   );
 }

@@ -9,55 +9,54 @@
  * ### Web (Next.js)
  * - Location: `apps/web/components/ui/`
  * - Library: shadcn/ui (Radix UI + Tailwind CSS)
- * - Import: `import { Button } from "@/components/ui/button"`
  *
  * ### Mobile (React Native/Expo)
  * - Location: `apps/mobile/components/ui/`
- * - Library: React Native components or gluestack-ui
- * - Import: `import { Button } from "@/components/ui/button"`
+ * - Library: Gluestack UI v3 + NativeWind v5
  *
  * ## Usage Example:
  *
  * ```typescript
- * // Shared types (this package)
- * import type { ButtonProps } from "@prostcounter/ui";
+ * // Import shared types
+ * import type { ButtonProps, ButtonAction } from "@prostcounter/ui";
  *
- * // Platform-specific implementation
- * export const Button: React.FC<ButtonProps> = (props) => {
- *   // Web uses Radix UI
- *   // Mobile uses Pressable
- * }
+ * // Platform-specific implementation uses the shared types
  * ```
- *
- * ## Benefits:
- * - Type safety across platforms
- * - Clear API contracts
- * - Platform-specific optimizations
- * - No forced dependency on React Native Web
- * - Each platform uses its best-in-class libraries
  */
 
 // Export all component type interfaces and variant types
 export type {
+  // Accordion
   AccordionContentProps,
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
   AccordionType,
+  // Avatar
   AvatarProps,
   AvatarSize,
+  // Badge
   BadgeProps,
   BadgeVariant,
+  // Button (Gluestack-style)
+  ButtonAction,
+  ButtonColorTokens,
+  ButtonGroupProps,
+  ButtonGroupSpace,
   ButtonProps,
   ButtonSize,
+  ButtonTextProps,
   ButtonVariant,
+  // Card
   CardContentProps,
   CardDescriptionProps,
   CardFooterProps,
   CardHeaderProps,
   CardProps,
   CardTitleProps,
+  // Checkbox
   CheckboxProps,
+  // Dialog/Modal
   DialogContentProps,
   DialogDescriptionProps,
   DialogFooterProps,
@@ -65,34 +64,29 @@ export type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
+  // Input
   InputProps,
   InputType,
+  // Label
   LabelProps,
+  // Progress
   ProgressProps,
+  // ScrollArea
   ScrollAreaProps,
+  // Select
   SelectContentProps,
   SelectItemProps,
   SelectProps,
   SelectTriggerProps,
   SelectValueProps,
+  // Separator
   SeparatorOrientation,
   SeparatorProps,
+  // Switch
   SwitchProps,
+  // Textarea
   TextareaProps,
 } from "./types/components";
 
-// Re-export utilities (these are platform-agnostic)
+// Re-export utilities (platform-agnostic)
 export { cn } from "./utils";
-
-// Re-export GluestackUIProvider (platform-specific via file extensions)
-export type { ModeType } from "./components/ui/gluestack-ui-provider";
-export { GluestackUIProvider } from "./components/ui/gluestack-ui-provider";
-
-// Re-export gluestack components
-export {
-  Button,
-  ButtonGroup,
-  ButtonIcon,
-  ButtonSpinner,
-  ButtonText,
-} from "./components/button";

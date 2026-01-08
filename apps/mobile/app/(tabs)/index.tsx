@@ -1,6 +1,21 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import { ScrollView, ActivityIndicator } from "react-native";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
+import {
+  Button,
+  ButtonText,
+  Card,
+  Badge,
+  BadgeText,
+  Avatar,
+  AvatarFallbackText,
+  AvatarBadge,
+  VStack,
+  HStack,
+  Text,
+  Heading,
+} from "@/components/ui";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useFestival } from "@/lib/festival/FestivalContext";
@@ -12,90 +27,127 @@ export default function HomeScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-4 pb-8">
+      <VStack space="md" className="p-4 pb-8">
         {/* Welcome Card */}
-        <View className="bg-white rounded-xl p-6 mb-4 shadow-sm items-center">
-          <MaterialCommunityIcons name="beer" size={48} color="#F59E0B" />
-          <Text className="text-xl font-bold text-gray-900 mt-3">
-            Welcome to ProstCounter!
-          </Text>
-          <Text className="text-gray-600 mt-1">{user?.email}</Text>
-        </View>
+        <Card className="p-6">
+          <VStack space="md" className="items-center">
+            <Avatar size="xl">
+              <AvatarFallbackText>
+                {user?.email?.[0]?.toUpperCase() || "U"}
+              </AvatarFallbackText>
+              <AvatarBadge />
+            </Avatar>
+            <Heading size="xl" className="mt-3">
+              Welcome to ProstCounter!
+            </Heading>
+            <Text size="sm" className="text-gray-500 mt-1">
+              {user?.email}
+            </Text>
+            <HStack space="sm" className="mt-3">
+              <Badge action="info">
+                <BadgeText>Pro User</BadgeText>
+              </Badge>
+              <Badge action="success">
+                <BadgeText>Active</BadgeText>
+              </Badge>
+            </HStack>
+          </VStack>
+        </Card>
 
         {/* Festival Card */}
-        <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
-          <View className="flex-row items-center mb-3">
-            <MaterialCommunityIcons
-              name="calendar-star"
-              size={24}
-              color="#F59E0B"
-            />
-            <Text className="text-lg font-semibold text-gray-900 ml-2">
-              Current Festival
-            </Text>
-          </View>
-
-          {festivalLoading ? (
-            <ActivityIndicator color="#F59E0B" />
-          ) : currentFestival ? (
-            <View className="gap-2">
-              <Text className="text-lg font-bold text-gray-900">
-                {currentFestival.name}
-              </Text>
-              <View className="flex-row items-center">
-                <MaterialCommunityIcons
-                  name="map-marker"
-                  size={16}
-                  color="#6B7280"
-                />
-                <Text className="text-gray-600 ml-1">
-                  {currentFestival.location}
-                </Text>
-              </View>
-              <Text className="text-gray-500 text-sm">
-                {currentFestival.startDate} - {currentFestival.endDate}
-              </Text>
-              {currentFestival.beerCost && (
-                <View className="flex-row items-center">
+        <Card className="p-4">
+          <VStack space="md">
+            <HStack space="sm" className="items-center">
+              <MaterialCommunityIcons
+                name="calendar-star"
+                size={24}
+                color="#F59E0B"
+              />
+              <Heading size="md">Current Festival</Heading>
+            </HStack>
+            {festivalLoading ? (
+              <ActivityIndicator color="#F59E0B" />
+            ) : currentFestival ? (
+              <VStack space="sm">
+                <Heading size="lg">{currentFestival.name}</Heading>
+                <HStack space="xs" className="items-center">
                   <MaterialCommunityIcons
-                    name="currency-eur"
+                    name="map-marker"
                     size={16}
                     color="#6B7280"
                   />
-                  <Text className="text-gray-600 ml-1">
-                    {currentFestival.beerCost}€ per beer
+                  <Text className="text-gray-600">
+                    {currentFestival.location}
                   </Text>
-                </View>
-              )}
-            </View>
-          ) : (
-            <Text className="text-gray-400 italic">No festival selected</Text>
-          )}
-        </View>
+                </HStack>
+                <Text size="sm" className="text-gray-500">
+                  {currentFestival.startDate} - {currentFestival.endDate}
+                </Text>
+                {currentFestival.beerCost && (
+                  <Badge action="warning" size="sm">
+                    <BadgeText>
+                      {currentFestival.beerCost} per beer
+                    </BadgeText>
+                  </Badge>
+                )}
+              </VStack>
+            ) : (
+              <Text className="text-gray-400 italic">No festival selected</Text>
+            )}
+          </VStack>
+        </Card>
 
-        {/* Coming Soon Card */}
-        <View className="bg-white rounded-xl p-6 mb-4 shadow-sm items-center">
-          <MaterialCommunityIcons
-            name="rocket-launch"
-            size={32}
-            color="#9CA3AF"
-          />
-          <Text className="text-lg font-medium text-gray-500 mt-3">
-            More Features Coming Soon!
-          </Text>
-          <Text className="text-gray-400 text-center mt-2">
-            Quick beer registration, statistics, and more will be available in
-            the next update.
-          </Text>
-        </View>
+        {/* Quick Stats Card */}
+        <Card className="p-4">
+          <VStack space="md">
+            <HStack space="sm" className="items-center">
+              <MaterialCommunityIcons
+                name="chart-bar"
+                size={24}
+                color="#F59E0B"
+              />
+              <Heading size="md">Your Stats</Heading>
+            </HStack>
+            <HStack className="justify-around">
+              <VStack className="items-center">
+                <Text size="2xl" bold className="text-amber-600">
+                  0
+                </Text>
+                <Text size="xs" className="text-gray-500">
+                  Beers
+                </Text>
+              </VStack>
+              <VStack className="items-center">
+                <Text size="2xl" bold className="text-amber-600">
+                  0
+                </Text>
+                <Text size="xs" className="text-gray-500">
+                  Days
+                </Text>
+              </VStack>
+              <VStack className="items-center">
+                <Text size="2xl" bold className="text-amber-600">
+                  0
+                </Text>
+                <Text size="xs" className="text-gray-500">
+                  Spent
+                </Text>
+              </VStack>
+            </HStack>
+          </VStack>
+        </Card>
 
-        {/* Quick Action - Disabled for now */}
-        <View className="bg-yellow-200 rounded-full py-4 opacity-50">
-          <Text className="text-center font-bold text-gray-500">
-            Log Beer (Coming Soon)
-          </Text>
-        </View>
-      </View>
+        {/* Quick Action */}
+        <Button
+          action="primary"
+          size="lg"
+          isDisabled
+          className="rounded-full"
+        >
+          <MaterialCommunityIcons name="beer" size={20} color="white" />
+          <ButtonText>Log Beer (Coming Soon)</ButtonText>
+        </Button>
+      </VStack>
     </ScrollView>
   );
 }

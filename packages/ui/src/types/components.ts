@@ -21,30 +21,156 @@
 import type { ReactNode } from "react";
 
 // ============================================================================
-// Button
+// Button (Gluestack-style - shared between web and mobile)
 // ============================================================================
 
-export type ButtonVariant =
-  | "default"
-  | "destructive"
-  | "outline"
+/**
+ * Button action determines the semantic color scheme
+ * - primary: Brand color (amber-500 in ProstCounter)
+ * - primaryDark: Darker brand color (amber-600, matches web's darkYellow)
+ * - secondary: Neutral color (gray)
+ * - positive: Success color (green)
+ * - negative: Error/danger color (red)
+ * - default: Transparent background
+ */
+export type ButtonAction =
+  | "primary"
+  | "primaryDark"
   | "secondary"
-  | "ghost"
-  | "link"
-  | "yellow"
-  | "yellowOutline"
-  | "darkYellow";
+  | "positive"
+  | "negative"
+  | "default";
 
-export type ButtonSize = "default" | "sm" | "lg" | "icon";
+/**
+ * Button variant determines the visual style
+ * - solid: Filled background with the action color
+ * - outline: Transparent background with colored border
+ * - link: No background, text only with underline on hover/active
+ * - ghost: Transparent background, shows subtle color on hover/active
+ */
+export type ButtonVariant = "solid" | "outline" | "link" | "ghost";
 
+/**
+ * Button size determines height and padding
+ * - icon: Square button for icon-only content
+ */
+export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl" | "icon";
+
+/**
+ * Button group spacing options
+ */
+export type ButtonGroupSpace =
+  | "xs"
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "2xl"
+  | "3xl"
+  | "4xl";
+
+/**
+ * Gluestack Button Props - used by both web and mobile implementations
+ */
 export interface ButtonProps {
+  /** Semantic color action */
+  action?: ButtonAction;
+  /** Visual style variant */
   variant?: ButtonVariant;
+  /** Size of the button */
   size?: ButtonSize;
-  disabled?: boolean;
-  type?: "button" | "submit" | "reset";
-  onClick?: (event?: any) => void; // Flexible to support both web (MouseEvent) and mobile (Pressable onPress)
-  children?: ReactNode; // Optional to support icon-only buttons
+  /** Whether the button is disabled */
+  isDisabled?: boolean;
+  /** Press/click handler */
+  onPress?: (event?: any) => void;
+  /** Additional className for styling */
   className?: string;
+  /** Button content */
+  children?: ReactNode;
+}
+
+export interface ButtonTextProps {
+  /** Additional className for styling */
+  className?: string;
+  /** Text content */
+  children?: ReactNode;
+}
+
+export interface ButtonGroupProps {
+  /** Gap between buttons */
+  space?: ButtonGroupSpace;
+  /** Whether buttons are visually attached */
+  isAttached?: boolean;
+  /** Additional className for styling */
+  className?: string;
+  /** Button elements */
+  children?: ReactNode;
+}
+
+// ============================================================================
+// Button Color Mapping Contract
+// ============================================================================
+
+/**
+ * Color mapping contract for button styles.
+ * Each platform implements this with their available color tokens.
+ *
+ * Web uses CSS variables: primary-500, secondary-500, etc.
+ * Mobile uses direct Tailwind colors: amber-500, gray-500, etc.
+ */
+export interface ButtonColorTokens {
+  /** Primary action colors (brand) */
+  primary: {
+    bg: string;
+    bgHover: string;
+    bgActive: string;
+    border: string;
+    borderHover: string;
+    borderActive: string;
+    text: string;
+    textHover: string;
+    textActive: string;
+  };
+  /** Secondary action colors (neutral) */
+  secondary: {
+    bg: string;
+    bgHover: string;
+    bgActive: string;
+    border: string;
+    borderHover: string;
+    borderActive: string;
+    text: string;
+    textHover: string;
+    textActive: string;
+  };
+  /** Positive action colors (success) */
+  positive: {
+    bg: string;
+    bgHover: string;
+    bgActive: string;
+    border: string;
+    borderHover: string;
+    borderActive: string;
+    text: string;
+    textHover: string;
+    textActive: string;
+  };
+  /** Negative action colors (error/danger) */
+  negative: {
+    bg: string;
+    bgHover: string;
+    bgActive: string;
+    border: string;
+    borderHover: string;
+    borderActive: string;
+    text: string;
+    textHover: string;
+    textActive: string;
+  };
+  /** Solid variant text color (usually white) */
+  solidText: string;
+  /** Secondary solid text color (usually dark) */
+  secondarySolidText: string;
 }
 
 // ============================================================================
