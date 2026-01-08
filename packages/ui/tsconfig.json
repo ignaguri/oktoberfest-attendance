@@ -4,8 +4,12 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "jsx": "react-jsx",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./*"]
+    },
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "nativewind-env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

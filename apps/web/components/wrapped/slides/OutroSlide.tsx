@@ -37,8 +37,8 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
 
         <SlideSubtitle>Thanks for using ProstCounter</SlideSubtitle>
 
-        <div className="rounded-lg bg-white p-6 shadow-lg text-center max-w-md">
-          <p className="text-lg font-semibold text-gray-800 mb-2">
+        <div className="max-w-md rounded-lg bg-white p-6 text-center shadow-lg">
+          <p className="mb-2 text-lg font-semibold text-gray-800">
             {data.basic_stats.total_beers} beers &{" "}
             {data.tent_stats.unique_tents} tents
           </p>
@@ -51,12 +51,12 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
         <Button
           onClick={handleDownload}
           size="lg"
-          className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8"
+          className="mt-6 bg-yellow-500 px-8 font-semibold text-white hover:bg-yellow-600"
         >
           <Download className="mr-2 h-5 w-5" />
           Download & Share
         </Button>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           Click to generate a shareable summary of your festival experience
         </p>
 

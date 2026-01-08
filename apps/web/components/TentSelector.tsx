@@ -37,7 +37,7 @@ export default function TentSelector({
 
   return (
     <MultiSelect
-      className="self-center w-full"
+      className="w-full self-center"
       buttonClassName="w-4/5"
       options={tents.map((tent) => ({
         title: tent.category,

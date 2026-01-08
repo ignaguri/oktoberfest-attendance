@@ -59,7 +59,7 @@ export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
           className="inline-block size-20 sm:size-24"
         />
 
-        <SlideTitle className="text-5xl md:text-6xl bg-gradient-to-b from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+        <SlideTitle className="bg-gradient-to-b from-yellow-400 to-yellow-600 bg-clip-text text-5xl text-transparent md:text-6xl">
           {data.festival_info.name}
         </SlideTitle>
 

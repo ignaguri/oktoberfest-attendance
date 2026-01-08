@@ -291,18 +291,18 @@ export default function TentManagement() {
 
           {/* Stats */}
           {tentStats && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div className="text-center">
                 <div className="text-2xl font-bold">
                   {tentStats.total_tents}
                 </div>
-                <div className="text-sm text-muted-foreground">Total Tents</div>
+                <div className="text-muted-foreground text-sm">Total Tents</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">
                   {tentStats.with_custom_pricing}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   Custom Pricing
                 </div>
               </div>
@@ -312,13 +312,13 @@ export default function TentManagement() {
                     ? `€${tentStats.avg_price.toFixed(2)}`
                     : "N/A"}
                 </div>
-                <div className="text-sm text-muted-foreground">Avg Price</div>
+                <div className="text-muted-foreground text-sm">Avg Price</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">
                   {Object.keys(tentStats.categories).length}
                 </div>
-                <div className="text-sm text-muted-foreground">Categories</div>
+                <div className="text-muted-foreground text-sm">Categories</div>
               </div>
             </div>
           )}
@@ -332,7 +332,7 @@ export default function TentManagement() {
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="mr-2 h-4 w-4" />
                   Create New Tent
                 </Button>
               </DialogTrigger>
@@ -353,7 +353,7 @@ export default function TentManagement() {
                         placeholder="e.g., Hofbräu Festzelt"
                       />
                       {createTentForm.formState.errors.name && (
-                        <p className="text-sm text-red-600 mt-1">
+                        <p className="mt-1 text-sm text-red-600">
                           {createTentForm.formState.errors.name.message}
                         </p>
                       )}
@@ -381,7 +381,7 @@ export default function TentManagement() {
                     <div>
                       <Label htmlFor="beer-price">Beer Price (Optional)</Label>
                       <div className="relative">
-                        <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Euro className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                         <Input
                           id="beer-price"
                           type="number"
@@ -398,7 +398,7 @@ export default function TentManagement() {
                         />
                       </div>
                       {createTentForm.formState.errors.beer_price && (
-                        <p className="text-sm text-red-600 mt-1">
+                        <p className="mt-1 text-sm text-red-600">
                           {createTentForm.formState.errors.beer_price.message}
                         </p>
                       )}
@@ -421,7 +421,7 @@ export default function TentManagement() {
             <Dialog open={showCopyDialog} onOpenChange={setShowCopyDialog}>
               <DialogTrigger asChild>
                 <Button variant="outline">
-                  <Copy className="h-4 w-4 mr-2" />
+                  <Copy className="mr-2 h-4 w-4" />
                   Copy from Another Festival
                 </Button>
               </DialogTrigger>
@@ -449,14 +449,14 @@ export default function TentManagement() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-center py-4">Loading tents...</div>
+                <div className="py-4 text-center">Loading tents...</div>
               ) : festivalTents.length === 0 ? (
-                <div className="text-center py-8">
-                  <Tent className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-lg font-semibold mb-2">
+                <div className="py-8 text-center">
+                  <Tent className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                  <h3 className="mb-2 text-lg font-semibold">
                     No tents configured
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="mb-4 text-gray-600">
                     Add tents to this festival to get started
                   </p>
                 </div>
@@ -487,7 +487,7 @@ export default function TentManagement() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Available Tents</CardTitle>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Tents not yet added to this festival
                     </p>
                   </div>
@@ -502,13 +502,13 @@ export default function TentManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {availableTents.map((tent) => (
                     <div
                       key={tent.id}
-                      className="border rounded-lg p-4 space-y-2"
+                      className="space-y-2 rounded-lg border p-4"
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex items-start justify-between">
                         <div>
                           <h4 className="font-medium">{tent.name}</h4>
                           {tent.category && (
@@ -567,8 +567,8 @@ function TentCard({
   const effectivePrice = tent.beer_price || festivalDefaultPrice;
 
   return (
-    <div className="border rounded-lg p-4 space-y-3">
-      <div className="flex justify-between items-start">
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-start justify-between">
         <div className="space-y-1">
           <h4 className="font-medium">{tent.name}</h4>
           {tent.category && <Badge variant="secondary">{tent.category}</Badge>}
@@ -589,17 +589,17 @@ function TentCard({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Price:</span>
+          <span className="text-muted-foreground text-sm">Price:</span>
           {isEditing ? (
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Euro className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
+                <Euro className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 transform text-gray-400" />
                 <Input
                   type="number"
                   step="0.01"
                   min="0"
                   max="50"
-                  className="w-24 h-8 pl-6 text-sm"
+                  className="h-8 w-24 pl-6 text-sm"
                   value={editPrice}
                   onChange={(e) => setEditPrice(e.target.value)}
                   placeholder="Default"
@@ -698,7 +698,7 @@ function CopyTentsDialog({
       {sourceTents.length > 0 && (
         <div>
           <Label>Select Tents to Copy</Label>
-          <div className="max-h-60 overflow-y-auto border rounded-md p-3 space-y-2">
+          <div className="max-h-60 space-y-2 overflow-y-auto rounded-md border p-3">
             {sourceTents.map((tent) => (
               <div key={tent.id} className="flex items-center space-x-2">
                 <Checkbox
@@ -715,7 +715,7 @@ function CopyTentsDialog({
                   }}
                 />
                 <label htmlFor={tent.id} className="flex-1 cursor-pointer">
-                  <div className="flex justify-between items-center">
+                  <div className="flex items-center justify-between">
                     <span>{tent.name}</span>
                     <div className="flex items-center gap-2">
                       {tent.category && (
@@ -723,7 +723,7 @@ function CopyTentsDialog({
                           {tent.category}
                         </Badge>
                       )}
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-muted-foreground text-sm">
                         {formatPrice(tent.beer_price)}
                       </span>
                     </div>

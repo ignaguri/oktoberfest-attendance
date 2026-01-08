@@ -16,7 +16,7 @@ export default function SignOut() {
       variant="yellow"
       onClick={handleSignOut}
       title="Sign out"
-      className="px-2 py-2 sm:px-8 flex gap-1 items-center"
+      className="flex items-center gap-1 px-2 py-2 sm:px-8"
     >
       <LogOut size={20} />
       <span className="hidden sm:block">Sign Out</span>

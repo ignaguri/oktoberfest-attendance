@@ -33,13 +33,13 @@ export function ProfilePreview({
           {children}
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-sm p-0 overflow-hidden">
+      <DialogContent className="max-w-sm overflow-hidden p-0">
         <Card className="border-0 shadow-none">
           <CardHeader className="pb-4 text-center">
             <div className="flex flex-col items-center gap-3">
-              <Avatar className="w-20 h-20">
+              <Avatar className="h-20 w-20">
                 <AvatarImage src={getAvatarUrl(avatarUrl)} alt={username} />
-                <AvatarFallback className="bg-yellow-100 text-yellow-800 text-2xl">
+                <AvatarFallback className="bg-yellow-100 text-2xl text-yellow-800">
                   {username.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>

@@ -16,14 +16,14 @@ export default function DirectAttendancePage() {
   }, [searchParams]);
 
   return (
-    <div className="container max-w-lg mx-auto p-4">
+    <div className="container mx-auto max-w-lg p-4">
       <Button
         variant="ghost"
         size="sm"
         onClick={() => router.push("/calendar")}
         className="mb-4"
       >
-        <ArrowLeft className="h-4 w-4 mr-2" />
+        <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Calendar
       </Button>
 

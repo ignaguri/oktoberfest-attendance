@@ -1,10 +1,10 @@
 export default function PrivacyPolicy() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Privacy Policy</h1>
+      <h1 className="mb-8 text-center text-3xl font-bold">Privacy Policy</h1>
 
       <div className="prose prose-lg max-w-none space-y-6">
-        <p className="text-sm text-gray-600 mb-8">
+        <p className="mb-8 text-sm text-gray-600">
           <strong>Last updated:</strong>{" "}
           {new Date("2025-09-05").toLocaleDateString("de-DE", {
             year: "numeric",
@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
         </p>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
+          <h2 className="mb-4 text-2xl font-semibold">1. Introduction</h2>
           <p>
             Welcome to ProstCounter (&quot;we,&quot; &quot;our,&quot; or
             &quot;us&quot;). This privacy policy explains how we collect, use,
@@ -39,14 +39,14 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             2. Information We Collect
           </h2>
 
-          <h3 className="text-xl font-medium mb-3">
+          <h3 className="mb-3 text-xl font-medium">
             2.1 Information You Provide
           </h3>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Email address (for account creation and authentication)</li>
             <li>Username and display name</li>
             <li>Profile information (optional avatar/photo)</li>
@@ -57,11 +57,11 @@ export default function PrivacyPolicy() {
             <li>Group memberships and competition participation</li>
           </ul>
 
-          <h3 className="text-xl font-medium mb-3 mt-6">
+          <h3 className="mt-6 mb-3 text-xl font-medium">
             2.2 Information from Social Login
           </h3>
           <p>When you sign in using Google or Facebook, we receive:</p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Your name and email address</li>
             <li>Profile picture (if you choose to use it)</li>
             <li>
@@ -69,10 +69,10 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h3 className="text-xl font-medium mb-3 mt-6">
+          <h3 className="mt-6 mb-3 text-xl font-medium">
             2.3 Automatically Collected Information
           </h3>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Usage analytics through Google Analytics (anonymized)</li>
             <li>Error logs and crash reports through Sentry</li>
             <li>Device information necessary for app functionality</li>
@@ -81,11 +81,11 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             3. How We Use Your Information
           </h2>
           <p>We use your information to:</p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Provide and maintain the ProstCounter service</li>
             <li>Track your beer consumption and festival attendance</li>
             <li>Enable participation in group competitions and leaderboards</li>
@@ -104,7 +104,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             4. Information Sharing
           </h2>
           <p>
@@ -112,11 +112,11 @@ export default function PrivacyPolicy() {
             parties, except:
           </p>
 
-          <h3 className="text-xl font-medium mb-3 mt-4">
+          <h3 className="mt-4 mb-3 text-xl font-medium">
             4.1 Service Providers
           </h3>
           <p>We use the following trusted service providers:</p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>
               <strong>Supabase:</strong> Database and authentication services
             </li>
@@ -134,8 +134,8 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h3 className="text-xl font-medium mb-3 mt-6">4.2 Within the App</h3>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <h3 className="mt-6 mb-3 text-xl font-medium">4.2 Within the App</h3>
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>
               Your username and statistics are visible to other users in
               leaderboards
@@ -147,7 +147,7 @@ export default function PrivacyPolicy() {
             <li>Achievement information may be visible to other users</li>
           </ul>
 
-          <h3 className="text-xl font-medium mb-3 mt-6">
+          <h3 className="mt-6 mb-3 text-xl font-medium">
             4.3 Legal Requirements
           </h3>
           <p>
@@ -157,12 +157,12 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">5. Data Security</h2>
+          <h2 className="mb-4 text-2xl font-semibold">5. Data Security</h2>
           <p>
             We implement appropriate security measures to protect your personal
             information:
           </p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Encrypted data transmission (HTTPS/TLS)</li>
             <li>Secure authentication through trusted providers</li>
             <li>Regular security monitoring and updates</li>
@@ -171,7 +171,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">6. Data Retention</h2>
+          <h2 className="mb-4 text-2xl font-semibold">6. Data Retention</h2>
           <p>
             We retain your personal information for up to 3 years from your last
             activity on the platform. After this period, your data will be
@@ -185,14 +185,14 @@ export default function PrivacyPolicy() {
         </section>
 
         <section id="data-deletion">
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             7. How to Delete Your Data
           </h2>
           <p>
             You can permanently delete your account and all associated data at
             any time by following these steps:
           </p>
-          <ol className="list-decimal list-inside space-y-2 ml-4 mt-4">
+          <ol className="mt-4 ml-4 list-inside list-decimal space-y-2">
             <li>Sign in to your ProstCounter account</li>
             <li>
               Go to your <strong>Profile</strong> page (click your avatar in the
@@ -211,9 +211,9 @@ export default function PrivacyPolicy() {
               confirm
             </li>
           </ol>
-          <div className="bg-red-50 p-4 rounded-lg mt-4 border-x-4 border-red-400">
-            <p className="text-red-800 font-medium">⚠️ Important:</p>
-            <ul className="text-red-700 text-sm mt-2 space-y-1">
+          <div className="mt-4 rounded-lg border-x-4 border-red-400 bg-red-50 p-4">
+            <p className="font-medium text-red-800">⚠️ Important:</p>
+            <ul className="mt-2 space-y-1 text-sm text-red-700">
               <li>
                 • This action is <strong>immediate and irreversible</strong>
               </li>
@@ -245,9 +245,9 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">8. Your Rights (GDPR)</h2>
+          <h2 className="mb-4 text-2xl font-semibold">8. Your Rights (GDPR)</h2>
           <p>Under German and EU law, you have the right to:</p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>
               <strong>Access:</strong> Request a copy of your personal data
             </li>
@@ -284,11 +284,11 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             9. Cookies and Tracking
           </h2>
           <p>ProstCounter uses minimal cookies necessary for:</p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Authentication and maintaining your login session</li>
             <li>Remembering your preferences and settings</li>
             <li>Basic functionality of the web application</li>
@@ -301,7 +301,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             10. Children&apos;s Privacy
           </h2>
           <p>
@@ -313,7 +313,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             11. International Data Transfers
           </h2>
           <p>
@@ -325,7 +325,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">
+          <h2 className="mb-4 text-2xl font-semibold">
             12. Changes to This Privacy Policy
           </h2>
           <p>
@@ -338,12 +338,12 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">13. Contact Us</h2>
+          <h2 className="mb-4 text-2xl font-semibold">13. Contact Us</h2>
           <p>
             If you have questions about this privacy policy or our data
             practices, please contact us:
           </p>
-          <div className="bg-gray-50 p-4 rounded-lg mt-4">
+          <div className="mt-4 rounded-lg bg-gray-50 p-4">
             <p>
               <strong>ProstCounter</strong>
             </p>

@@ -91,7 +91,7 @@ export function TutorialSpotlight({
     <div
       ref={spotlightRef}
       className={cn(
-        "fixed inset-0 pointer-events-none z-50 transition-all duration-300",
+        "pointer-events-none fixed inset-0 z-50 transition-all duration-300",
         className,
       )}
       style={{
@@ -100,7 +100,7 @@ export function TutorialSpotlight({
     >
       {/* Highlight border around the element */}
       <div
-        className="absolute border-2 border-yellow-400 rounded-lg shadow-lg shadow-yellow-400/50 animate-pulse"
+        className="absolute animate-pulse rounded-lg border-2 border-yellow-400 shadow-lg shadow-yellow-400/50"
         style={{
           left: position.x - TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET,
           top: position.y - TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET,

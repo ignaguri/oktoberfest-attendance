@@ -45,7 +45,7 @@ export default function AchievementsPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">
+          <h1 className="mb-4 text-2xl font-bold">
             {t("achievements.pageTitle")}
           </h1>
           <p className="text-gray-600">{t("achievements.selectFestival")}</p>
@@ -58,7 +58,7 @@ export default function AchievementsPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className="mb-2 text-3xl font-bold">
             {t("achievements.pageTitle")}
           </h1>
           <p className="text-gray-600">{t("common.status.loading")}</p>
@@ -68,9 +68,9 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto space-y-6 py-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="mb-2 text-3xl font-bold">
           {t("achievements.pageTitle")}
         </h1>
         <p className="text-gray-600">
@@ -190,7 +190,7 @@ export default function AchievementsPage() {
       )}
 
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
           <SingleSelect
             value={activeTab}
             buttonClassName="w-full sm:w-[200px]"
@@ -238,7 +238,7 @@ export default function AchievementsPage() {
             <div className="flex items-center gap-2">
               <Badge
                 variant="default"
-                className="bg-green-100 text-green-800 border-green-200"
+                className="border-green-200 bg-green-100 text-green-800"
               >
                 {unlockedAchievements.length} {t("achievements.unlocked")}
               </Badge>
@@ -273,9 +273,9 @@ export default function AchievementsPage() {
           )}
 
           {filteredAchievements.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <div className="py-12 text-center">
+              <div className="mb-4 text-4xl">🎯</div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">
                 {t("achievements.empty.title")}
               </h3>
               <p className="text-gray-600">

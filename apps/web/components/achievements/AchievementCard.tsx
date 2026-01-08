@@ -59,10 +59,10 @@ export function AchievementCard({
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <CardTitle
               className={cn(
-                "text-lg font-semibold leading-tight",
+                "text-lg leading-tight font-semibold",
                 is_unlocked ? "text-green-800" : "text-gray-700",
               )}
             >
@@ -116,12 +116,12 @@ export function AchievementCard({
               <AchievementProgress progress={user_progress} />
 
               {is_unlocked && unlocked_at && (
-                <div className="rounded-lg bg-green-100 p-2 border border-green-200">
+                <div className="rounded-lg border border-green-200 bg-green-100 p-2">
                   <div className="flex items-center gap-2 text-sm text-green-800">
                     <span className="text-base">✅</span>
                     <span className="font-medium">Completed!</span>
                   </div>
-                  <div className="text-xs text-green-600 mt-1">
+                  <div className="mt-1 text-xs text-green-600">
                     {new Date(unlocked_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",

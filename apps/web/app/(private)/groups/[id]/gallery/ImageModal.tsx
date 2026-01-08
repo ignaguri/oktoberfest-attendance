@@ -14,11 +14,11 @@ export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
 
   return (
     <Dialog open={!!imageUrl} onOpenChange={onClose}>
-      <DialogContent className="min-w-[50vw] min-h-[50vh] sm:max-w-[90vw] sm:max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="min-h-[50vh] min-w-[50vw] overflow-hidden p-0 sm:max-h-[90vh] sm:max-w-[90vw]">
         <VisuallyHidden asChild>
           <DialogTitle>Full size image</DialogTitle>
         </VisuallyHidden>
-        <div className="relative w-full h-full">
+        <div className="relative h-full w-full">
           <Image
             src={imageUrl}
             alt="Full size image"

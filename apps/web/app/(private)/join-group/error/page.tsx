@@ -124,11 +124,11 @@ export default function JoinGroupErrorPage() {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="max-w-md w-full">
+      <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-              <Icon className="w-8 h-8 text-yellow-600" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
+              <Icon className="h-8 w-8 text-yellow-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
               {errorContent.title}
@@ -161,7 +161,7 @@ export default function JoinGroupErrorPage() {
                       }
                     }}
                   >
-                    <IconComponent className="size-4 mr-2" />
+                    <IconComponent className="mr-2 size-4" />
                     {action.label}
                   </Button>
                 );
@@ -190,7 +190,7 @@ export default function JoinGroupErrorPage() {
                   <span>Possible Reasons</span>
                 </AlertTitle>
                 <AlertDescription>
-                  <ul className="mt-2 flex flex-col gap-1 text-left items-start">
+                  <ul className="mt-2 flex flex-col items-start gap-1 text-left">
                     <li>• The invitation link was incorrect or mistyped</li>
                     <li>• The group no longer exists</li>
                     <li>• The invitation was cancelled by the group admin</li>

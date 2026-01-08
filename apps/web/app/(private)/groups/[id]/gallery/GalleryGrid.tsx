@@ -47,15 +47,15 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
       <div className="space-y-8">
         {Object.entries(galleryData).map(([date, userImages]) => (
           <div key={date} className="mb-8">
-            <h3 className="text-xl font-semibold mb-2">
+            <h3 className="mb-2 text-xl font-semibold">
               {format(new TZDate(date, TIMEZONE), "dd/MM/yyyy")}
             </h3>
             {Object.entries(userImages).map(([userId, images]) => (
               <div key={userId} className="mb-6">
-                <h4 className="text-lg font-medium mb-3 cursor-pointer hover:text-yellow-600 transition-colors">
+                <h4 className="mb-3 cursor-pointer text-lg font-medium transition-colors hover:text-yellow-600">
                   {images[0].username}
                 </h4>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
                   {images.map((image) => {
                     const isLoaded = loadedImages.has(image.id);
                     const imageUrl = `/api/image/${image.url}?bucket=beer_pictures`;
@@ -63,12 +63,12 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                     return (
                       <div
                         key={image.id}
-                        className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
+                        className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg"
                         onClick={() => setSelectedImage(imageUrl)}
                       >
                         {/* Skeleton placeholder while loading */}
                         {!isLoaded && (
-                          <div className="absolute inset-0 bg-gray-200 rounded-lg animate-pulse" />
+                          <div className="absolute inset-0 animate-pulse rounded-lg bg-gray-200" />
                         )}
 
                         <Image
@@ -76,7 +76,7 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                           alt={`Uploaded by ${image.username}`}
                           fill
                           className={cn(
-                            "rounded-lg transition-all duration-300 object-cover transform-gpu will-change-transform",
+                            "transform-gpu rounded-lg object-cover transition-all duration-300 will-change-transform",
                             isLoaded
                               ? "opacity-100 group-hover:scale-105"
                               : "opacity-0",
@@ -89,7 +89,7 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                         />
 
                         {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg" />
+                        <div className="absolute inset-0 rounded-lg bg-black/0 transition-colors group-hover:bg-black/10" />
                       </div>
                     );
                   })}

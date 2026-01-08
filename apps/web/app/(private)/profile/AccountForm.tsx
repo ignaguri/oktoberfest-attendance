@@ -164,7 +164,7 @@ export default function AccountForm() {
           {t("profile.pageTitle")}
         </h3>
         <Avatar
-          className="flex flex-col items-center mb-4"
+          className="mb-4 flex flex-col items-center"
           isEditing={isEditing}
           size="large"
           uid={user.id}
@@ -236,7 +236,7 @@ export default function AccountForm() {
             )}
           </div>
           {isEditing && (
-            <div className="flex flex-col gap-2 mt-4 items-center">
+            <div className="mt-4 flex flex-col items-center gap-2">
               <Button variant="yellow" type="submit" disabled={isUpdating}>
                 {isUpdating
                   ? t("common.buttons.loading")
@@ -254,7 +254,7 @@ export default function AccountForm() {
           )}
         </form>
         {!isEditing && (
-          <div className="flex flex-col gap-4 items-center">
+          <div className="flex flex-col items-center gap-4">
             <Button
               variant="yellow"
               type="button"
@@ -294,7 +294,7 @@ export default function AccountForm() {
           <h4 className="text-lg font-semibold text-gray-800">
             {t("profile.tutorial.title")}
           </h4>
-          <p className="text-sm text-gray-700 text-center">
+          <p className="text-center text-sm text-gray-700">
             {t("profile.tutorial.description")}
           </p>
           <Button
@@ -316,21 +316,21 @@ export default function AccountForm() {
           <h4 className="text-lg font-semibold text-gray-800">
             {t("profile.sections.danger")}
           </h4>
-          <p className="text-sm text-gray-700 text-center">
+          <p className="text-center text-sm text-gray-700">
             {t("profile.deleteAccount.warning")}
           </p>
           {showDeleteConfirm ? (
-            <div className="flex flex-col gap-2 items-center">
-              <p className="text-sm text-red-600 font-medium text-center">
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-center text-sm font-medium text-red-600">
                 {t("profile.deleteAccount.confirmPrompt")}
               </p>
-              <ul className="text-xs text-red-600 text-center list-disc list-inside">
+              <ul className="list-inside list-disc text-center text-xs text-red-600">
                 <li>{t("profile.deleteAccount.dataList.consumption")}</li>
                 <li>{t("profile.deleteAccount.dataList.photos")}</li>
                 <li>{t("profile.deleteAccount.dataList.groups")}</li>
                 <li>{t("profile.deleteAccount.dataList.profile")}</li>
               </ul>
-              <div className="flex gap-2 mt-2">
+              <div className="mt-2 flex gap-2">
                 <Button
                   variant="destructive"
                   size="sm"

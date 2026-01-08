@@ -24,11 +24,11 @@ export default function JoinGroupSuccessPage() {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="max-w-md w-full">
+      <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
               Welcome to the Group!
@@ -52,7 +52,7 @@ export default function JoinGroupSuccessPage() {
                 className="w-fit justify-center"
                 onClick={() => handleNavigation(`/groups/${group_id}`)}
               >
-                <Users className="size-4 mr-2" />
+                <Users className="mr-2 size-4" />
                 View Group
               </Button>
 
@@ -61,7 +61,7 @@ export default function JoinGroupSuccessPage() {
                 className="w-fit justify-center"
                 onClick={() => handleNavigation("/groups")}
               >
-                <Users className="size-4 mr-2" />
+                <Users className="mr-2 size-4" />
                 View All Groups
               </Button>
 
@@ -70,7 +70,7 @@ export default function JoinGroupSuccessPage() {
                 className="w-fit justify-center"
                 onClick={() => handleNavigation("/home")}
               >
-                <Home className="size-4 mr-2" />
+                <Home className="mr-2 size-4" />
                 Go to Home
               </Button>
             </div>

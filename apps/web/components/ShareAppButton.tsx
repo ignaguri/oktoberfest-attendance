@@ -27,7 +27,7 @@ export default function ShareAppButton() {
 
   const ButtonsGroup = useMemo(
     () => (
-      <div className="flex flex-col gap-2 items-center p-8">
+      <div className="flex flex-col items-center gap-2 p-8">
         <Button variant="yellow" onClick={shareViaNative}>
           {isWebShareSupported ? "Share App" : "Copy to Clipboard"}
         </Button>

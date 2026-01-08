@@ -20,7 +20,7 @@ export default function JoinGroupPage() {
   }, [token, router]);
 
   return (
-    <div className="min-h-screen flex items-start justify-center bg-gray-50">
+    <div className="flex min-h-screen items-start justify-center bg-gray-50">
       <div className="text-center">
         <LoadingSpinner size={32} />
         <p className="text-gray-600">Processing your invitation...</p>

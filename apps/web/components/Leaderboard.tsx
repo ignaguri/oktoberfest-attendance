@@ -76,7 +76,7 @@ export const Leaderboard = ({
             fullName={entry.fullName}
             avatarUrl={entry.avatarUrl}
           >
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
               <Avatar
                 url={entry.avatarUrl}
                 fallback={{
@@ -85,7 +85,7 @@ export const Leaderboard = ({
                   email: "no.name@email.com",
                 }}
               />
-              <span className="font-medium line-clamp-2">
+              <span className="line-clamp-2 font-medium">
                 {getDisplayName(entry, t("leaderboard.noName"))}
               </span>
             </div>

@@ -3,10 +3,11 @@ import "../global.css";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
+import { GluestackUIProvider } from "@prostcounter/ui";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { apiClient } from "@/lib/api-client";
@@ -71,13 +72,13 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <I18nextProvider i18n={i18n}>
-        <DataProvider>
-          <ApiClientProvider client={apiClient}>
-            <AuthProvider>
-              <FestivalProvider>
-                <NavigationGuard>
-                  <View className="flex-1 bg-white">
+      <GluestackUIProvider mode="light">
+        <I18nextProvider i18n={i18n}>
+          <DataProvider>
+            <ApiClientProvider client={apiClient}>
+              <AuthProvider>
+                <FestivalProvider>
+                  <NavigationGuard>
                     <Stack
                       screenOptions={{
                         headerShown: false,
@@ -88,14 +89,14 @@ export default function RootLayout() {
                       <Stack.Screen name="(tabs)" />
                       <Stack.Screen name="+not-found" />
                     </Stack>
-                  </View>
-                </NavigationGuard>
-              </FestivalProvider>
-            </AuthProvider>
-          </ApiClientProvider>
-        </DataProvider>
-        <StatusBar style="dark" />
-      </I18nextProvider>
+                  </NavigationGuard>
+                </FestivalProvider>
+              </AuthProvider>
+            </ApiClientProvider>
+          </DataProvider>
+          <StatusBar style="dark" />
+        </I18nextProvider>
+      </GluestackUIProvider>
     </GestureHandlerRootView>
   );
 }

@@ -222,7 +222,7 @@ export function TutorialTooltip({
     <div
       ref={tooltipRef}
       className={cn(
-        "fixed z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-6 max-w-sm transition-all duration-300",
+        "fixed z-50 max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-xl transition-all duration-300",
         "animate-in fade-in-0 zoom-in-95",
       )}
       style={{
@@ -231,7 +231,7 @@ export function TutorialTooltip({
       }}
     >
       {/* Progress indicator */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div className="text-sm text-gray-500">
           Step {currentStepIndex + 1} of {totalSteps}
         </div>
@@ -242,10 +242,10 @@ export function TutorialTooltip({
 
       {/* Content */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="mb-2 text-lg font-semibold text-gray-900">
           {step.title}
         </h3>
-        <p className="text-gray-600 text-sm leading-relaxed">
+        <p className="text-sm leading-relaxed text-gray-600">
           {step.description}
         </p>
       </div>
@@ -260,23 +260,23 @@ export function TutorialTooltip({
             disabled={!canGoPrevious}
             className="h-8"
           >
-            <ChevronLeft className="size-4 mr-1" />
+            <ChevronLeft className="mr-1 size-4" />
             Previous
           </Button>
           <Button variant="outline" size="sm" onClick={onSkip} className="h-8">
-            <SkipForward className="size-4 mr-1" />
+            <SkipForward className="mr-1 size-4" />
             Skip
           </Button>
         </div>
 
         <Button
           onClick={onNext}
-          className="h-8 bg-yellow-500 hover:bg-yellow-600 text-white"
+          className="h-8 bg-yellow-500 text-white hover:bg-yellow-600"
         >
           {canGoNext ? (
             <>
               Next
-              <ChevronRight className="size-4 ml-1" />
+              <ChevronRight className="ml-1 size-4" />
             </>
           ) : (
             "Get Started! 🍻"

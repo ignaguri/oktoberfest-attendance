@@ -127,7 +127,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   ) => {
     if (item.href) {
       return (
-        <DropdownMenuItem key={item.id} asChild className="py-2 cursor-pointer">
+        <DropdownMenuItem key={item.id} asChild className="cursor-pointer py-2">
           <Link href={item.href} className="flex items-center gap-2">
             {item.icon}
             {item.label}
@@ -142,7 +142,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
         onClick={item.onClick}
         disabled={item.disabled}
         className={cn(
-          "flex items-center gap-2 py-2 cursor-pointer",
+          "flex cursor-pointer items-center gap-2 py-2",
           item.variant === "destructive" &&
             "text-destructive focus:text-destructive",
         )}
@@ -162,34 +162,34 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
 
     return (
       <>
-        <DropdownMenuLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <DropdownMenuLabel className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
           <CalendarDays className="size-3" />
           {t("festival.selector.currentFestival")}
         </DropdownMenuLabel>
         <div className="px-2">
           <div
-            className="flex items-center gap-2 p-2 rounded-md bg-muted/50 hover:bg-muted/70 cursor-pointer transition-colors"
+            className="bg-muted/50 hover:bg-muted/70 flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors"
             onClick={() => setIsFestivalModalOpen(true)}
           >
-            <div className="h-8 w-8 rounded-md bg-yellow-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-yellow-600 text-sm font-semibold text-white">
               {firstLetter}
               <sub className="text-xs">{lastTwoDigits}</sub>
             </div>
-            <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-sm font-medium truncate">
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-medium">
                 {currentFestival.name}
               </span>
               <div className="flex items-center gap-2">
-                <Badge variant={variant} className="text-xs capitalize w-fit">
+                <Badge variant={variant} className="w-fit text-xs capitalize">
                   {t(`festival.status.${status}`)}
                 </Badge>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-muted-foreground text-xs">
                   {format(parseISO(currentFestival.start_date), "MMM d")} -{" "}
                   {format(parseISO(currentFestival.end_date), "MMM d")}
                 </div>
               </div>
             </div>
-            <ChevronDown className="size-4 text-muted-foreground" />
+            <ChevronDown className="text-muted-foreground size-4" />
           </div>
         </div>
         <DropdownMenuSeparator />
@@ -209,7 +209,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
               {t("festival.selector.description")}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 max-h-96 overflow-y-auto">
+          <div className="grid max-h-96 gap-3 overflow-y-auto">
             {festivals.map((festival) => {
               const { firstLetter, lastTwoDigits } =
                 getFestivalDisplayInfo(festival);
@@ -221,19 +221,19 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                   key={festival.id}
                   variant={isSelected ? "default" : "outline"}
                   className={cn(
-                    "justify-start h-auto p-4 w-full",
+                    "h-auto w-full justify-start p-4",
                     isSelected &&
-                      "bg-yellow-500 hover:bg-yellow-600 border-yellow-500",
+                      "border-yellow-500 bg-yellow-500 hover:bg-yellow-600",
                   )}
                   onClick={() => {
                     setCurrentFestival(festival);
                     setIsFestivalModalOpen(false);
                   }}
                 >
-                  <div className="flex items-center gap-3 w-full">
+                  <div className="flex w-full items-center gap-3">
                     <div
                       className={cn(
-                        "size-10 rounded-md flex items-center justify-center font-semibold flex-shrink-0",
+                        "flex size-10 flex-shrink-0 items-center justify-center rounded-md font-semibold",
                         isSelected
                           ? "bg-white text-yellow-500"
                           : "bg-yellow-500 text-white",
@@ -255,7 +255,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                         {format(parseISO(festival.start_date), "MMM d")} -{" "}
                         {format(parseISO(festival.end_date), "MMM d, yyyy")}
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         {festival.location}
                       </span>
                     </div>
@@ -297,7 +297,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
           <Button
             variant="ghost"
             className={cn(
-              "flex items-center gap-2 p-2 h-auto hover:bg-gray-700",
+              "flex h-auto items-center gap-2 p-2 hover:bg-gray-700",
               className,
             )}
           >
@@ -309,7 +309,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                 email: profileData.email || "no.name@user.com",
               }}
             />
-            <div className="hidden sm:flex flex-col items-start text-left">
+            <div className="hidden flex-col items-start text-left sm:flex">
               <span className="text-sm font-medium text-white">
                 {profileData.full_name || profileData.username || "User"}
               </span>
@@ -323,7 +323,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
 
         <DropdownMenuContent
           align="end"
-          className="w-80 max-h-[80vh] overflow-y-auto"
+          className="max-h-[80vh] w-80 overflow-y-auto"
           sideOffset={8}
         >
           {/* Festival Section - Always read-only */}

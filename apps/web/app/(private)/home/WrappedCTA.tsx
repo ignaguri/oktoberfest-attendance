@@ -32,7 +32,7 @@ export function WrappedCTA({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="overflow-hidden border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 shadow-lg p-2">
+      <Card className="overflow-hidden border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 p-2 shadow-lg">
         <CardContent>
           <div className="flex flex-col items-center gap-4 text-center">
             <motion.div
@@ -54,7 +54,7 @@ export function WrappedCTA({
             </motion.div>
 
             <div>
-              <p className="text-gray-600 text-sm">
+              <p className="text-sm text-gray-600">
                 {isLastDayOfFestival
                   ? `We're preparing your personalized ${currentFestival.name} story. Upload your final attendance info - it will be available tomorrow!`
                   : `See your personalized ${currentFestival.name} story`}
@@ -65,7 +65,7 @@ export function WrappedCTA({
               <Button
                 asChild
                 size="lg"
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                className="bg-yellow-500 font-semibold text-white shadow-md transition-all hover:bg-yellow-600 hover:shadow-lg"
               >
                 <Link href="/wrapped">
                   <Sparkles className="mr-2 size-5" />

@@ -3,12 +3,12 @@ import { Link } from "next-view-transitions";
 
 export default function ErrorPage({ error }: { error?: Error }) {
   return (
-    <div className="flex flex-col items-center p-2 bg-gray-100">
-      <div className="p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">
+    <div className="flex flex-col items-center bg-gray-100 p-2">
+      <div className="rounded-lg bg-white p-8 shadow-md">
+        <h1 className="mb-4 text-2xl font-bold text-red-600">
           Oops! Something went wrong.
         </h1>
-        <p className="text-gray-600 mb-4">
+        <p className="mb-4 text-gray-600">
           {error?.message || "An unexpected error occurred."}
         </p>
         <Button asChild variant="link">

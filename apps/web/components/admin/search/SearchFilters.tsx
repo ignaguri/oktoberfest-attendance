@@ -190,7 +190,7 @@ export function SearchFilters({
           <Filter className="h-4 w-4" />
           <span className="font-medium">{title}</span>
           {hasActiveFilters && (
-            <span className="rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground">
+            <span className="bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs">
               {filters.filter((f) => f.value).length}
             </span>
           )}
@@ -203,7 +203,7 @@ export function SearchFilters({
               onClick={onClearAll}
               className="h-8 px-2"
             >
-              <X className="h-3 w-3 mr-1" />
+              <X className="mr-1 h-3 w-3" />
               Clear All
             </Button>
           )}

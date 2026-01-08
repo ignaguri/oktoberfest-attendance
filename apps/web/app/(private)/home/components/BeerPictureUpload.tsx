@@ -38,7 +38,7 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
   if (!previewUrl) return null;
 
   return (
-    <div className="relative w-32 h-32">
+    <div className="relative h-32 w-32">
       <Image
         src={previewUrl}
         alt="Beer picture preview"
@@ -139,7 +139,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
 
       {/* Visibility Control */}
       {watchedPicture && (
-        <div className="flex items-center gap-3 bg-gray-50 rounded-md">
+        <div className="flex items-center gap-3 rounded-md bg-gray-50">
           {watchedVisibility === "public" ? (
             <Eye size={16} className="text-green-600" />
           ) : (
@@ -168,7 +168,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       )}
 
       {showSuccessMessage && (
-        <Alert className="text-center max-w-xs">
+        <Alert className="max-w-xs text-center">
           {t("attendance.pictures.viewInGallery")}{" "}
           <Link className="underline" href="/attendance">
             {t("common.menu.attendance")}

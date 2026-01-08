@@ -44,8 +44,8 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+    <div className="container mx-auto flex flex-col items-center p-4">
+      <h1 className="mb-4 text-2xl font-bold">Admin Dashboard</h1>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-4">
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>

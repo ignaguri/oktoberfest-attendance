@@ -100,7 +100,7 @@ const UserEditForm = ({
             disabled
             readOnly
           />
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             Email cannot be changed
           </p>
         </div>
@@ -164,7 +164,7 @@ const UserEditForm = ({
           />
           <Label
             htmlFor="is_super_admin"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             Is Super Admin
           </Label>
@@ -185,7 +185,7 @@ const UserEditForm = ({
             </AccordionTrigger>
             <AccordionContent>
               {isFetchingAttendances ? (
-                <div className="text-center py-4 text-muted-foreground">
+                <div className="text-muted-foreground py-4 text-center">
                   Loading attendances...
                 </div>
               ) : attendances && onDeleteAttendance ? (
@@ -194,7 +194,7 @@ const UserEditForm = ({
                   onDeleteAttendance={onDeleteAttendance}
                 />
               ) : (
-                <div className="text-center py-4 text-muted-foreground">
+                <div className="text-muted-foreground py-4 text-center">
                   Click to load attendances
                 </div>
               )}
@@ -364,7 +364,7 @@ const AttendanceTable = ({
 
   if (attendances.length === 0) {
     return (
-      <div className="text-center py-4 text-muted-foreground">
+      <div className="text-muted-foreground py-4 text-center">
         No attendances found for this user.
       </div>
     );
@@ -554,7 +554,7 @@ const UserList = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">User List</h2>
+      <h2 className="mb-4 text-xl font-semibold">User List</h2>
 
       {/* New Search System */}
       <UserSearch
@@ -596,7 +596,7 @@ const UserList = () => {
       >
         {selectedUser && (
           <div>
-            <h2 className="text-xl font-semibold mb-2">
+            <h2 className="mb-2 text-xl font-semibold">
               Attendances for {selectedUser.profile?.full_name}
             </h2>
             {attendances.map((attendance) => (

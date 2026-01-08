@@ -147,11 +147,11 @@ export function UserSearch({
     (user: any) => (
       <div
         key={user.id}
-        className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+        className="flex items-center justify-between rounded-lg border bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
       >
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-medium text-lg">
+          <div className="mb-1 flex items-center gap-2">
+            <h3 className="text-lg font-medium">
               <SearchHighlight
                 text={user.profile?.full_name || "N/A"}
                 searchTerm={searchState.search}
@@ -164,7 +164,7 @@ export function UserSearch({
               </Badge>
             )}
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-sm">
             {user.profile?.username && (
               <span className="mr-2">
                 @
@@ -185,7 +185,7 @@ export function UserSearch({
               ]
             </span>
           </div>
-          <div className="text-xs text-muted-foreground mt-1">
+          <div className="text-muted-foreground mt-1 text-xs">
             Created: {new Date(user.created_at).toLocaleDateString()}
           </div>
         </div>
@@ -222,8 +222,8 @@ export function UserSearch({
   return (
     <div className={cn("space-y-6", className)}>
       {/* Search Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex-1 w-full sm:max-w-md">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="w-full flex-1 sm:max-w-md">
           <SearchInput
             value={searchState.search}
             onChange={searchState.updateSearch}
@@ -295,7 +295,7 @@ export function UserSearch({
 
       {/* Search Results Info */}
       {hasValidSearchResult && (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <span>
               {searchResult.totalCount} user
@@ -308,7 +308,7 @@ export function UserSearch({
             )}
             {searchState.hasActiveFilters && (
               <Badge variant="outline">
-                <Filter className="h-3 w-3 mr-1" />
+                <Filter className="mr-1 h-3 w-3" />
                 Filtered
               </Badge>
             )}
@@ -357,7 +357,7 @@ export function UserSearch({
 
       {/* Error State */}
       {error && (
-        <div className="text-center py-8">
+        <div className="py-8 text-center">
           <p className="text-destructive mb-4">
             Error loading users: {error.message}
           </p>

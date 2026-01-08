@@ -100,7 +100,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   // If groupId is provided, show simple join button
   if (groupId) {
     return (
-      <div className="space-y-4 flex flex-col gap-2 items-center">
+      <div className="flex flex-col items-center gap-2 space-y-4">
         <p className="text-gray-600">
           {t("groups.join.clickToJoin", { groupName })}
         </p>
@@ -121,7 +121,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-2 flex flex-col gap-2"
+      className="flex flex-col gap-2 space-y-2"
     >
       <h3 className="text-xl font-semibold">{t("groups.join.title")}</h3>
       <Input
@@ -142,7 +142,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
             type="button"
             variant="ghost"
             onClick={() => setShowPassword(!showPassword)}
-            className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+            className="h-auto cursor-pointer p-0 text-gray-400 hover:bg-transparent"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>

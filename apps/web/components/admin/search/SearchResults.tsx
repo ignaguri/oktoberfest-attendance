@@ -45,12 +45,12 @@ export function SearchResults({
       >
         {emptyComponent || (
           <>
-            <Search className="h-12 w-12 text-muted-foreground mb-4" />
+            <Search className="text-muted-foreground mb-4 h-12 w-12" />
             <p className="text-muted-foreground text-lg font-medium">
               {emptyMessage}
             </p>
             {searchTerm && (
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-muted-foreground mt-2 text-sm">
                 No results found for{" "}
                 <span className="font-medium">&ldquo;{searchTerm}&rdquo;</span>
               </p>

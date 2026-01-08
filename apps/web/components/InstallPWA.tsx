@@ -53,13 +53,13 @@ export default function InstallPWA() {
   return (
     <div
       className={cn(
-        "fixed z-200 bottom-0 right-0 sm:right-4 sm:bottom-4 w-full sm:max-w-md duration-700",
+        "fixed right-0 bottom-0 z-200 w-full duration-700 sm:right-4 sm:bottom-4 sm:max-w-md",
         !isOpen
-          ? "transition-[opacity,transform] translate-y-8 opacity-0"
-          : "transition-[opacity,transform] translate-y-0 opacity-100",
+          ? "translate-y-8 opacity-0 transition-[opacity,transform]"
+          : "translate-y-0 opacity-100 transition-[opacity,transform]",
       )}
     >
-      <div className="m-3 dark:bg-card bg-background border border-border rounded-lg shadow-lg relative">
+      <div className="dark:bg-card bg-background border-border relative m-3 rounded-lg border shadow-lg">
         <button
           onClick={closePrompt}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -69,12 +69,12 @@ export default function InstallPWA() {
         <div className="p-4">
           <h1 className="text-lg font-medium">Install the App</h1>
           {showIOSInstructions ? (
-            <div className="text-sm text-left text-muted-foreground flex flex-col gap-3">
+            <div className="text-muted-foreground flex flex-col gap-3 text-left text-sm">
               <p>
                 Install this app on your iOS device for a better experience
                 (must be done in <span className="font-bold">Safari</span>):
               </p>
-              <ol className="flex flex-col gap-2 list-decimal pl-4">
+              <ol className="flex list-decimal flex-col gap-2 pl-4">
                 <li>
                   <div className="flex items-center gap-2">
                     <span>Tap the</span>
@@ -95,13 +95,13 @@ export default function InstallPWA() {
               </ol>
             </div>
           ) : (
-            <p className="text-sm text-left text-muted-foreground">
+            <p className="text-muted-foreground text-left text-sm">
               You can install this app on your device for a better experience.
               Click the button below to install.
             </p>
           )}
         </div>
-        <div className="p-4 flex items-center justify-center gap-2 border-t">
+        <div className="flex items-center justify-center gap-2 border-t p-4">
           {showIOSInstructions ? (
             <Button onClick={closePrompt} variant="outline">
               Got it

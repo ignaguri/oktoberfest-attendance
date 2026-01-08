@@ -25,7 +25,7 @@ function StatCard({ icon: Icon, value, label, className }: StatCardProps) {
   return (
     <div
       className={cn(
-        "bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg w-full",
+        "w-full rounded-3xl bg-white/80 p-8 shadow-lg backdrop-blur-sm",
         "flex items-center justify-center",
         className,
       )}
@@ -38,8 +38,8 @@ function StatCard({ icon: Icon, value, label, className }: StatCardProps) {
         transform: "translateZ(0)",
       }}
     >
-      <div className="grid grid-cols-4 items-center gap-6 w-full">
-        <Icon className="size-20 text-yellow-600 justify-self-center" />
+      <div className="grid w-full grid-cols-4 items-center gap-6">
+        <Icon className="size-20 justify-self-center text-yellow-600" />
         <div className="col-span-3 text-center">
           <p className="text-5xl font-bold text-gray-800">{value}</p>
           <p className="text-2xl text-gray-600">{label}</p>
@@ -102,7 +102,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
       >
         {/* Header */}
         <header className="text-center">
-          <p className="text-[140px] leading-tight font-bold mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+          <p className="mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 bg-clip-text text-[140px] leading-tight font-bold text-transparent">
             My {shareData.festivalName}
           </p>
           <p className="text-[100px] leading-tight font-bold text-yellow-800">
@@ -111,7 +111,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
         </header>
 
         {/* Stats Grid */}
-        <div className="w-full grid grid-cols-2 gap-8">
+        <div className="grid w-full grid-cols-2 gap-8">
           <StatCard
             icon={CalendarDays}
             value={shareData.daysAttended}
@@ -145,7 +145,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
 
         {/* Footer */}
         <footer className="text-center">
-          <div className="text-3xl text-gray-600 mb-3">Made with</div>
+          <div className="mb-3 text-3xl text-gray-600">Made with</div>
           <div className="flex flex-row items-center justify-center gap-4">
             <img
               src={LogoImage.src}

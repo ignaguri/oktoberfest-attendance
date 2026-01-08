@@ -20,9 +20,9 @@ export default function PersonalCalendarPage() {
 
   if (isLoading) {
     return (
-      <div className="container flex flex-col items-center justify-center p-4 min-h-[50vh]">
+      <div className="container flex min-h-[50vh] flex-col items-center justify-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
-        <p className="mt-2 text-muted-foreground">Loading calendar...</p>
+        <p className="text-muted-foreground mt-2">Loading calendar...</p>
       </div>
     );
   }
@@ -49,7 +49,7 @@ export default function PersonalCalendarPage() {
 
   return (
     <div className="container flex flex-col items-center p-4">
-      <h1 className="text-lg font-semibold mb-4">My Calendar</h1>
+      <h1 className="mb-4 text-lg font-semibold">My Calendar</h1>
       <EventCalendar
         events={events || []}
         initialMonth={initialMonth}

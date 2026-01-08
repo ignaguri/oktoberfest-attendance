@@ -160,16 +160,16 @@ const PersonalAttendanceTable = ({
       >
         {selectedAttendance &&
           (tentVisitsForDate?.length === 0 ? (
-            <div className="flex justify-center mb-4">
+            <div className="mb-4 flex justify-center">
               <p>{t("attendance.table.noTentsRegistered")}</p>
             </div>
           ) : (
-            <div className="p-4 mb-8">
+            <div className="mb-8 p-4">
               <ul className="space-y-2">
                 {tentVisitsForDate?.map((tentVisit) => (
                   <li
                     key={`${tentVisit.tentId}-${tentVisit.visitDate}`}
-                    className="text-base text-gray-700 list-disc list-inside"
+                    className="list-inside list-disc text-base text-gray-700"
                   >
                     <span className="font-semibold">{tentVisit.tentName}</span>
                     {tentVisit.visitDate ? (

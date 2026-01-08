@@ -170,7 +170,7 @@ export default function DetailedAttendanceForm({
   if (!currentFestival || !detailedAttendanceSchema) {
     return (
       <Card>
-        <CardContent className="text-center py-8">
+        <CardContent className="py-8 text-center">
           <p>{t("common.status.loading")}</p>
         </CardContent>
       </Card>

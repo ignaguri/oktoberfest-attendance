@@ -25,11 +25,11 @@ const NewsFeedHeader = ({
   _isEmpty?: boolean;
 }) => (
   <CardHeader>
-    <CardTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
+    <CardTitle className="flex items-center justify-center gap-2 text-center text-lg font-bold">
       <RadioTower className="size-5" />
       Latest activities
       {activitiesCount !== undefined && (
-        <span className="text-sm font-normal text-muted-foreground">
+        <span className="text-muted-foreground text-sm font-normal">
           ({activitiesCount})
         </span>
       )}
@@ -86,8 +86,8 @@ const NewsFeed = () => {
           _isError={true}
         />
         <CardContent>
-          <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground">
+          <div className="py-8 text-center">
+            <p className="text-muted-foreground text-sm">
               Failed to load activity feed. Please try again.
             </p>
           </div>
@@ -105,9 +105,9 @@ const NewsFeed = () => {
           _isEmpty={true}
         />
         <CardContent>
-          <div className="text-center py-8">
-            <RadioTower className="size-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">
+          <div className="py-8 text-center">
+            <RadioTower className="text-muted-foreground mx-auto mb-4 size-12" />
+            <p className="text-muted-foreground text-sm">
               No recent activity from your group members.
               <br />
               Activities will appear here when group members check into tents,
@@ -145,7 +145,7 @@ const NewsFeed = () => {
               >
                 {isFetchingNextPage ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Loading more...
                   </>
                 ) : (

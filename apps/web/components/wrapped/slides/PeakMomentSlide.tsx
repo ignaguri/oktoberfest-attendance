@@ -53,9 +53,9 @@ export function PeakMomentSlide({
       <SlideTitle>Peak moments</SlideTitle>
       <SlideSubtitle>Your best performances</SlideSubtitle>
 
-      <div className="z-10 w-full max-w-2xl flex flex-col gap-4">
+      <div className="z-10 flex w-full max-w-2xl flex-col gap-4">
         {best_day && (
-          <div className="rounded-xl bg-white p-6 shadow-lg flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-6 shadow-lg">
             <div className="flex items-center justify-center gap-4">
               <Beer className="size-10" />
               <Tent className="size-10" />
@@ -83,7 +83,7 @@ export function PeakMomentSlide({
           </div>
         )}
 
-        <div className="rounded-xl bg-white p-6 shadow-lg flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-6 shadow-lg">
           <BicepsFlexed className="size-10" />
           <h3 className="text-lg font-semibold text-gray-700">
             Biggest session

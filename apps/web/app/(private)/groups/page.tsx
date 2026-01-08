@@ -8,7 +8,7 @@ import { JoinGroupForm } from "./JoinGroupForm";
 
 export default async function GroupsPage() {
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="mx-auto max-w-lg">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Groups</h1>
       </div>

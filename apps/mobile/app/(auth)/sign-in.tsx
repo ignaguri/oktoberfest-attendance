@@ -1,4 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Button, ButtonText, ButtonSpinner } from "@prostcounter/ui";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import {
   View,
   Text,
@@ -7,18 +12,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 
 const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
+  email: z.email("Please enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -70,7 +70,7 @@ export default function SignInScreen() {
         className="px-6"
       >
         {/* Header */}
-        <View className="bg-yellow-500 -mx-6 px-6 py-6 pt-16">
+        <View className="-mx-6 bg-yellow-500 px-6 py-6 pt-16">
           <Text className="text-center text-xl font-bold text-black">
             {t("auth.signIn.title")}
           </Text>
@@ -78,13 +78,13 @@ export default function SignInScreen() {
 
         {/* Form */}
         <View className="mt-8">
-          <Text className="text-2xl font-bold text-gray-900 text-center mb-8">
+          <Text className="mb-8 text-center text-2xl font-bold text-gray-900">
             {t("auth.signIn.subtitle")}
           </Text>
 
           {error && (
-            <View className="bg-red-50 p-3 rounded-lg mb-4">
-              <Text className="text-red-600 text-center">{error}</Text>
+            <View className="mb-4 rounded-lg bg-red-50 p-3">
+              <Text className="text-center text-red-600">{error}</Text>
             </View>
           )}
 
@@ -94,11 +94,11 @@ export default function SignInScreen() {
             name="email"
             render={({ field: { onChange, onBlur, value } }) => (
               <View className="mb-4">
-                <Text className="text-gray-700 font-medium mb-2">
+                <Text className="mb-2 font-medium text-gray-700">
                   {t("auth.signIn.emailLabel")}
                 </Text>
                 <TextInput
-                  className={`border rounded-xl px-4 py-3 text-base ${
+                  className={`rounded-xl border px-4 py-3 text-base ${
                     errors.email
                       ? "border-red-500 bg-red-50"
                       : "border-gray-300 bg-white"
@@ -113,7 +113,7 @@ export default function SignInScreen() {
                   autoComplete="email"
                 />
                 {errors.email && (
-                  <Text className="text-red-500 text-sm mt-1">
+                  <Text className="mt-1 text-sm text-red-500">
                     {errors.email.message}
                   </Text>
                 )}
@@ -127,11 +127,11 @@ export default function SignInScreen() {
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <View className="mb-6">
-                <Text className="text-gray-700 font-medium mb-2">
+                <Text className="mb-2 font-medium text-gray-700">
                   {t("auth.signIn.passwordLabel")}
                 </Text>
                 <TextInput
-                  className={`border rounded-xl px-4 py-3 text-base ${
+                  className={`rounded-xl border px-4 py-3 text-base ${
                     errors.password
                       ? "border-red-500 bg-red-50"
                       : "border-gray-300 bg-white"
@@ -146,7 +146,7 @@ export default function SignInScreen() {
                   autoComplete="password"
                 />
                 {errors.password && (
-                  <Text className="text-red-500 text-sm mt-1">
+                  <Text className="mt-1 text-sm text-red-500">
                     {errors.password.message}
                   </Text>
                 )}
@@ -155,26 +155,33 @@ export default function SignInScreen() {
           />
 
           {/* Submit Button */}
-          <TouchableOpacity
-            className={`rounded-full py-4 ${
-              isLoading ? "bg-yellow-300" : "bg-yellow-500 active:bg-yellow-600"
-            }`}
+          <Button
+            action="primary"
+            size="lg"
             onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}
+            isDisabled={isLoading}
+            className="rounded-full"
           >
             {isLoading ? (
-              <ActivityIndicator color="#000" />
+              <ButtonSpinner />
             ) : (
-              <Text className="text-center font-bold text-black text-base">
-                {t("auth.signIn.submit")}
-              </Text>
+              <ButtonText>{t("auth.signIn.submit")}</ButtonText>
             )}
-          </TouchableOpacity>
+          </Button>
+          <Button
+            action="secondary"
+            size="md"
+            onPress={() => console.log("Test")}
+            isDisabled={isLoading}
+            className="mt-2"
+          >
+            <ButtonText className="text-white">Test</ButtonText>
+          </Button>
 
           {/* Forgot Password */}
           <Link href="/(auth)/forgot-password" asChild>
             <TouchableOpacity className="mt-4 py-2">
-              <Text className="text-center text-yellow-600 font-medium">
+              <Text className="text-center font-medium text-yellow-600">
                 {t("auth.signIn.forgotPassword")}
               </Text>
             </TouchableOpacity>
@@ -182,11 +189,11 @@ export default function SignInScreen() {
         </View>
 
         {/* Footer */}
-        <View className="flex-row justify-center items-center mt-8 pb-8">
+        <View className="mt-8 flex-row items-center justify-center pb-8">
           <Text className="text-gray-600">{t("auth.signIn.noAccount")} </Text>
           <Link href="/(auth)/sign-up" asChild>
             <TouchableOpacity>
-              <Text className="text-yellow-600 font-semibold">
+              <Text className="font-semibold text-yellow-600">
                 {t("auth.signIn.signUpLink")}
               </Text>
             </TouchableOpacity>

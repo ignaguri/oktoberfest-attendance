@@ -83,3 +83,16 @@ export type {
 
 // Re-export utilities (these are platform-agnostic)
 export { cn } from "./utils";
+
+// Re-export GluestackUIProvider (platform-specific via file extensions)
+export type { ModeType } from "./components/ui/gluestack-ui-provider";
+export { GluestackUIProvider } from "./components/ui/gluestack-ui-provider";
+
+// Re-export gluestack components
+export {
+  Button,
+  ButtonGroup,
+  ButtonIcon,
+  ButtonSpinner,
+  ButtonText,
+} from "./components/button";

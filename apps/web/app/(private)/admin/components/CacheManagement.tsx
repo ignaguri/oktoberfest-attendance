@@ -76,18 +76,18 @@ const CacheManagement = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Cache Management</h2>
+      <h2 className="mb-4 text-xl font-semibold">Cache Management</h2>
       <div className="space-y-4">
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+          <h3 className="mb-2 font-medium text-blue-900 dark:text-blue-100">
             New Caching System
           </h3>
-          <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+          <p className="mb-3 text-sm text-blue-700 dark:text-blue-300">
             The old NodeCache system has been replaced with modern HTTP caching
             headers and Next.js unstable_cache for better performance and
             serverless compatibility.
           </p>
-          <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+          <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
             <li>• Images: HTTP headers with ETags and 30-day cache</li>
             <li>• Service Worker: Optimized PWA caching strategies</li>
             <li>• Database queries: Next.js unstable_cache for metadata</li>
@@ -102,17 +102,17 @@ const CacheManagement = () => {
           >
             Clear Service Worker Caches
           </Button>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-muted-foreground mt-2 text-sm">
             This will clear all PWA service worker caches and update the service
             worker.
           </p>
         </div>
 
-        <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+          <h3 className="mb-2 font-medium text-green-900 dark:text-green-100">
             Wrapped Data Cache
           </h3>
-          <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+          <p className="mb-3 text-sm text-green-700 dark:text-green-300">
             Wrapped data is automatically cached after first calculation. Use
             this tool to manually regenerate cached data for specific users or
             festivals.
@@ -148,12 +148,12 @@ const CacheManagement = () => {
             <Button
               onClick={handleRegenerateWrappedCache}
               disabled={isRegenerating}
-              className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 sm:w-auto"
             >
               {isRegenerating ? "Regenerating..." : "Regenerate Wrapped Cache"}
             </Button>
 
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               This will recalculate and cache wrapped data for the specified
               user(s) and festival(s). Leave both fields empty to regenerate all
               cached data.

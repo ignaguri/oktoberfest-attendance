@@ -66,7 +66,7 @@ export default async function GroupPage({
   if (!isMember) {
     return (
       <div className="w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4">
+        <h2 className="mb-4 text-2xl font-bold">
           Join Group &quot;{group.name}&quot;
         </h2>
         <JoinGroupForm groupName={group.name} groupId={group.id} />
@@ -102,18 +102,18 @@ export default async function GroupPage({
   return (
     <div className="w-full max-w-lg">
       <Suspense fallback={<LoadingSpinner />}>
-        <div className="flex items-center justify-center mb-4">
-          <h2 className="text-3xl font-bold text-center grow pr-2">
+        <div className="mb-4 flex items-center justify-center">
+          <h2 className="grow pr-2 text-center text-3xl font-bold">
             Group &quot;{group.name}&quot;
           </h2>
           <ShareButton groupName={group.name} groupId={group.id} />
         </div>
 
         {group.description && (
-          <p className="text-gray-600 mb-4">{group.description}</p>
+          <p className="mb-4 text-gray-600">{group.description}</p>
         )}
 
-        <p className="text-sm font-medium text-gray-500 mb-4">
+        <p className="mb-4 text-sm font-medium text-gray-500">
           Winning Criteria:{" "}
           {winningCriteriaText[winningCriteriaName as WinningCriteria]}
         </p>
@@ -125,8 +125,8 @@ export default async function GroupPage({
             showGroupCount={false}
           />
 
-          <div className="flex flex-col gap-4 items-center">
-            <div className="flex gap-2 items-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-2">
               <Button asChild variant="outline">
                 <Link href={`/groups/${groupId}/calendar`}>
                   <CalendarDays size={24} />
@@ -146,7 +146,7 @@ export default async function GroupPage({
             <Button asChild variant="darkYellow">
               <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
             </Button>
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <QRButton groupName={group.name} groupId={group.id} withText />
               <ShareButton groupName={group.name} groupId={group.id} withText />
             </div>

@@ -264,7 +264,7 @@ export const QuickAttendanceRegistrationForm = ({
   return (
     <>
       {isExploding && (
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+        <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
           <ConfettiExplosion
             force={0.4}
             duration={2200}
@@ -277,10 +277,10 @@ export const QuickAttendanceRegistrationForm = ({
         <p className="text-sm font-semibold">
           {tentId ? "You are at:" : "Are you there today?"}
         </p>
-        <div className="flex items-center gap-2 w-full justify-center">
+        <div className="flex w-full items-center justify-center gap-2">
           <SingleSelect
             value={tentId}
-            className="flex-1 max-w-64"
+            className="max-w-64 flex-1"
             buttonClassName="self-center"
             options={tents.map((tent) => ({
               title: tent.category,
@@ -307,7 +307,7 @@ export const QuickAttendanceRegistrationForm = ({
             }}
             disabled={isSubmitting}
           >
-            <Minus className="w-4 h-4" />
+            <Minus className="h-4 w-4" />
           </Button>
           <span className="mx-2">{beerCount} 🍺 drank today</span>
           <Button
@@ -319,7 +319,7 @@ export const QuickAttendanceRegistrationForm = ({
             }}
             disabled={isSubmitting}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
       </form>

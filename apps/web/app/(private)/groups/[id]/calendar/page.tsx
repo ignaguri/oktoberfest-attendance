@@ -23,8 +23,8 @@ export default function GroupCalendarPage({ params }: PageProps) {
   if (loading || !calendarData) {
     return (
       <div className="container flex flex-col items-center p-4">
-        <h1 className="text-lg font-semibold mb-4">Group Calendar</h1>
-        <div className="flex flex-col justify-center items-center h-64 gap-4">
+        <h1 className="mb-4 text-lg font-semibold">Group Calendar</h1>
+        <div className="flex h-64 flex-col items-center justify-center gap-4">
           <LoadingSpinner />
           <span className="text-sm text-gray-500">Loading calendar...</span>
         </div>
@@ -51,7 +51,7 @@ export default function GroupCalendarPage({ params }: PageProps) {
 
   return (
     <div className="container flex flex-col items-center p-4">
-      <h1 className="text-lg font-semibold mb-4">Group Calendar</h1>
+      <h1 className="mb-4 text-lg font-semibold">Group Calendar</h1>
       <EventCalendar
         events={events}
         initialMonth={initialMonth}

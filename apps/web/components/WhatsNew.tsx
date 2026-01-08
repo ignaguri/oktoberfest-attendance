@@ -150,7 +150,7 @@ export function WhatsNew({
                     Version {APP_VERSION} - Current
                   </AccordionTrigger>
                   <AccordionContent>
-                    <ul className="space-y-2 list-disc pl-5">
+                    <ul className="list-disc space-y-2 pl-5">
                       {currentVersionChanges.map((change, index) => (
                         <li key={index}>{change}</li>
                       ))}
@@ -166,7 +166,7 @@ export function WhatsNew({
                     Version {version}
                   </AccordionTrigger>
                   <AccordionContent>
-                    <ul className="space-y-2 list-disc pl-5">
+                    <ul className="list-disc space-y-2 pl-5">
                       {changelog[version].map((change, index) => (
                         <li key={index}>{change}</li>
                       ))}

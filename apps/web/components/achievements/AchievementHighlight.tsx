@@ -57,12 +57,12 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
   return (
     <Card
       className={cn(
-        "shadow-lg rounded-lg border border-gray-200 min-h-[200px]",
+        "min-h-[200px] rounded-lg border border-gray-200 shadow-lg",
         className,
       )}
     >
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
+        <CardTitle className="flex items-center justify-center gap-2 text-center text-xl font-bold">
           🎖️ Achievements
         </CardTitle>
       </CardHeader>

@@ -59,7 +59,7 @@ export function LanguageSelector({
       <Label htmlFor="language-selector" className="font-semibold">
         {t("profile.language.title")}
       </Label>
-      <p className="text-sm text-gray-600 mb-2">
+      <p className="mb-2 text-sm text-gray-600">
         {t("profile.language.description")}
       </p>
       <Select

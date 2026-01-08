@@ -1,7 +1,6 @@
-import { Tabs } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { View, Text } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Tabs } from "expo-router";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 

@@ -9,15 +9,15 @@ export function SkeletonCard({ className }: { className?: string }) {
   return (
     <Card
       className={cn(
-        "shadow-lg rounded-lg border border-gray-200 min-h-[120px]",
+        "min-h-[120px] rounded-lg border border-gray-200 shadow-lg",
         className,
       )}
     >
       <CardHeader>
-        <Skeleton className="h-6 w-32 mx-auto" />
+        <Skeleton className="mx-auto h-6 w-32" />
       </CardHeader>
       <CardContent>
-        <Skeleton className="h-4 w-full mb-2" />
+        <Skeleton className="mb-2 h-4 w-full" />
         <Skeleton className="h-4 w-3/4" />
       </CardContent>
     </Card>
@@ -30,15 +30,15 @@ export function SkeletonCard({ className }: { className?: string }) {
  */
 export function SkeletonHighlights() {
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[140px]">
+    <Card className="min-h-[140px] rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center">
-          <Skeleton className="h-6 w-24 mx-auto" />
+        <CardTitle className="text-center text-xl font-bold">
+          <Skeleton className="mx-auto h-6 w-24" />
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="rounded-lg bg-blue-50 p-4 shadow-sm">
+          <div className="mb-2 flex items-center gap-2">
             <Skeleton className="h-4 w-4" />
             <Skeleton className="h-4 w-16" />
           </div>
@@ -59,23 +59,23 @@ export function SkeletonHighlights() {
  */
 export function SkeletonLeaderboard() {
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[280px]">
+    <Card className="min-h-[280px] rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center">
+        <CardTitle className="text-center text-xl font-bold">
           <div className="flex items-center justify-center gap-2">
             <Skeleton className="h-6 w-6" />
             <Skeleton className="h-6 w-40" />
           </div>
         </CardTitle>
         <div className="text-center">
-          <Skeleton className="h-4 w-32 mx-auto" />
+          <Skeleton className="mx-auto h-4 w-32" />
         </div>
       </CardHeader>
       <CardContent className="px-2">
         <div className="rounded-md border">
           <div className="p-2">
             {/* Table header */}
-            <div className="grid grid-cols-5 gap-2 mb-2 pb-2 border-b">
+            <div className="mb-2 grid grid-cols-5 gap-2 border-b pb-2">
               <Skeleton className="h-4 w-4" />
               <Skeleton className="h-4 w-12" />
               <Skeleton className="h-4 w-8" />
@@ -97,7 +97,7 @@ export function SkeletonLeaderboard() {
             ))}
           </div>
         </div>
-        <div className="flex justify-center mt-4">
+        <div className="mt-4 flex justify-center">
           <Skeleton className="h-9 w-40" />
         </div>
       </CardContent>
@@ -111,9 +111,9 @@ export function SkeletonLeaderboard() {
  */
 export function SkeletonAchievements() {
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[200px]">
+    <Card className="min-h-[200px] rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
+        <CardTitle className="flex items-center justify-center gap-2 text-center text-xl font-bold">
           <Skeleton className="h-6 w-6" />
           <Skeleton className="h-6 w-32" />
         </CardTitle>
@@ -150,13 +150,13 @@ export function SkeletonAchievements() {
 export function SkeletonGroups() {
   return (
     <div className="min-h-[120px]">
-      <h2 className="text-xl font-bold mb-2">
+      <h2 className="mb-2 text-xl font-bold">
         <Skeleton className="h-6 w-32" />
       </h2>
-      <div className="flex flex-wrap gap-2 justify-center">
+      <div className="flex flex-wrap justify-center gap-2">
         <div className="px-2 text-center">
-          <Skeleton className="h-4 w-64 mb-2" />
-          <Skeleton className="h-8 w-40 mx-auto" />
+          <Skeleton className="mb-2 h-4 w-64" />
+          <Skeleton className="mx-auto h-8 w-40" />
         </div>
       </div>
     </div>
@@ -169,11 +169,11 @@ export function SkeletonGroups() {
  */
 export function SkeletonQuickAttendance() {
   return (
-    <div className="flex flex-col items-center gap-4 min-h-[120px]">
+    <div className="flex min-h-[120px] flex-col items-center gap-4">
       <Skeleton className="h-4 w-32" />
-      <div className="flex items-center gap-2 w-full justify-center">
+      <div className="flex w-full items-center justify-center gap-2">
         <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-10 w-10 rounded-sm flex-shrink-0" />
+        <Skeleton className="h-10 w-10 flex-shrink-0 rounded-sm" />
       </div>
       <div className="flex items-center gap-4">
         <Skeleton className="h-8 w-8 rounded" />
@@ -191,7 +191,7 @@ export function SkeletonQuickAttendance() {
 export function SkeletonFestivalStatus() {
   return (
     <div className="w-fit">
-      <div className="flex items-center gap-2 p-3 rounded-lg border border-green-200 bg-green-50">
+      <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
         <Skeleton className="h-5 w-5" />
         <Skeleton className="h-5 w-48" />
       </div>
@@ -205,9 +205,9 @@ export function SkeletonFestivalStatus() {
  */
 export function SkeletonNewsFeed() {
   return (
-    <Card className="w-full shadow-lg rounded-lg border border-gray-200 min-h-[320px]">
+    <Card className="min-h-[320px] w-full rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center">
+        <CardTitle className="text-center text-xl font-bold">
           <div className="flex items-center justify-center gap-2">
             <Skeleton className="h-5 w-5" />
             <Skeleton className="h-6 w-32" />
@@ -219,19 +219,19 @@ export function SkeletonNewsFeed() {
           {Array.from({ length: 5 }).map((_, index) => (
             <div
               key={index}
-              className="flex items-start gap-3 py-2 border-b border-border/50 last:border-b-0"
+              className="border-border/50 flex items-start gap-3 border-b py-2 last:border-b-0"
             >
               {/* Avatar skeleton */}
-              <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+              <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full" />
 
               {/* Content skeleton */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-2">
                   <Skeleton className="h-4 w-4" />
                   <Skeleton className="h-4 w-24" />
                   <Skeleton className="h-3 w-16" />
                 </div>
-                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="mb-2 h-4 w-full" />
                 <Skeleton className="h-4 w-3/4" />
               </div>
             </div>

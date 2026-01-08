@@ -50,7 +50,7 @@ export default function FestivalStatus() {
   const festivalStatus = getFestivalStatus(currentFestival);
 
   return (
-    <div className="flex flex-col gap-2 items-center">
+    <div className="flex flex-col items-center gap-2">
       <Alert
         variant={
           festivalStatus === "active"

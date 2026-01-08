@@ -39,7 +39,7 @@ export default function GroupSettingsPage({ params }: Props) {
 
   if (groupLoading || membersLoading) {
     return (
-      <div className="flex flex-col justify-center items-center h-64 gap-4">
+      <div className="flex h-64 flex-col items-center justify-center gap-4">
         <LoadingSpinner />
         <span className="text-sm text-gray-500">Loading group settings...</span>
       </div>
@@ -48,7 +48,7 @@ export default function GroupSettingsPage({ params }: Props) {
 
   if (!groupResponse?.data) {
     return (
-      <div className="flex flex-col justify-center items-center h-64 gap-4">
+      <div className="flex h-64 flex-col items-center justify-center gap-4">
         <LoadingSpinner />
         <span className="text-sm text-gray-500">Loading...</span>
       </div>

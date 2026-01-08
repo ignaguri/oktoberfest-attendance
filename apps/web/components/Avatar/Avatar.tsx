@@ -80,7 +80,7 @@ export function AvatarPreview({
     <AvatarUI
       className={cn(
         avatarSizeVariants({ size }),
-        onEdit && "cursor-pointer hover:opacity-80 transition-opacity",
+        onEdit && "cursor-pointer transition-opacity hover:opacity-80",
       )}
       onClick={onEdit}
       role={onEdit ? "button" : undefined}

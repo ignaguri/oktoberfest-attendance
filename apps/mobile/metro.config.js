@@ -1,5 +1,6 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativewind } = require("nativewind/metro");
+const { resolve } = require("metro-resolver");
 const path = require("path");
 
 // Find the project and workspace directories
@@ -21,4 +22,25 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the project's node_modules
 config.resolver.disableHierarchicalLookup = true;
 
-module.exports = withNativewind(config);
+// Tailwind v4 doesn't export `tailwindcss/resolveConfig`, but some Gluestack utils still import it.
+// We alias it to a local shim to unblock native bundling.
+const tailwindResolveConfigShim = path.join(
+  projectRoot,
+  "shims",
+  "tailwindcss",
+  "resolveConfig.js",
+);
+const defaultResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === "tailwindcss/resolveConfig") {
+    return resolve(context, tailwindResolveConfigShim, platform);
+  }
+
+  if (defaultResolveRequest) {
+    return defaultResolveRequest(context, moduleName, platform);
+  }
+
+  return resolve(context, moduleName, platform);
+};
+
+module.exports = withNativewind(config, { input: "./global.css" });

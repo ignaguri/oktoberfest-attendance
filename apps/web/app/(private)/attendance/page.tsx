@@ -120,7 +120,7 @@ export default function AttendancePage() {
 
   if (festivalLoading || attendancesLoading || !currentFestival) {
     return (
-      <div className="w-full max-w-lg flex flex-col gap-6">
+      <div className="flex w-full max-w-lg flex-col gap-6">
         <p className="text-center text-gray-600">
           {t("common.status.loading")}
         </p>
@@ -129,7 +129,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="w-full max-w-lg flex flex-col gap-6">
+    <div className="flex w-full max-w-lg flex-col gap-6">
       <DetailedAttendanceForm
         onAttendanceUpdate={handleAttendanceUpdate}
         selectedDate={selectedDate}

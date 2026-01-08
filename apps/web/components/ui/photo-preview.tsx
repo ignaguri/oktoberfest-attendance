@@ -46,7 +46,7 @@ export function PhotoPreview({
           <div
             key={index}
             className={cn(
-              "relative cursor-pointer rounded overflow-hidden border border-gray-200 hover:border-yellow-400 transition-colors",
+              "relative cursor-pointer overflow-hidden rounded border border-gray-200 transition-colors hover:border-yellow-400",
               thumbnailSize,
             )}
             onClick={() => setSelectedImage(url)}
@@ -55,7 +55,7 @@ export function PhotoPreview({
               src={`/api/image/${url}?bucket=${bucket}`}
               alt="Photo preview"
               fill
-              className="object-cover transform-gpu will-change-transform"
+              className="transform-gpu object-cover will-change-transform"
               sizes={size === "sm" ? "32px" : size === "md" ? "48px" : "64px"}
               loading="lazy"
               placeholder="blur"
@@ -66,7 +66,7 @@ export function PhotoPreview({
         {remainingCount > 0 && (
           <div
             className={cn(
-              "flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-xs font-medium text-gray-600",
+              "flex items-center justify-center rounded border border-gray-200 bg-gray-100 text-xs font-medium text-gray-600",
               thumbnailSize,
             )}
           >
@@ -80,15 +80,15 @@ export function PhotoPreview({
         onOpenChange={() => setSelectedImage(null)}
       >
         <DialogOverlay />
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden p-0">
           {selectedImage && (
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={`/api/image/${selectedImage}?bucket=${bucket}`}
                 alt="Full size photo"
                 width={1200}
                 height={800}
-                className="w-full h-full object-contain"
+                className="h-full w-full object-contain"
                 priority
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               />

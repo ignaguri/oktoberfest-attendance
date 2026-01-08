@@ -102,7 +102,7 @@ export function NotificationSettings() {
                   {t("notificationSettings.reminders")}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 text-left">
+              <p className="text-left text-sm text-gray-600">
                 {t("notificationSettings.description.reminders")}
               </p>
             </div>
@@ -125,7 +125,7 @@ export function NotificationSettings() {
                   {t("notificationSettings.achievementNotifications")}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 text-left">
+              <p className="text-left text-sm text-gray-600">
                 {t("notificationSettings.description.achievements")}
               </p>
             </div>
@@ -148,7 +148,7 @@ export function NotificationSettings() {
                   {t("notificationSettings.groupNotifications")}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 text-left">
+              <p className="text-left text-sm text-gray-600">
                 {t("notificationSettings.description.groups")}
               </p>
             </div>
@@ -181,7 +181,7 @@ export function NotificationSettings() {
                     {t("notificationSettings.pushNotifications")}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 text-left">
+                <p className="text-left text-sm text-gray-600">
                   {t("notificationSettings.description.push")}
                 </p>
                 {!pushSupported && (
@@ -196,7 +196,7 @@ export function NotificationSettings() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-2 items-end">
+              <div className="flex flex-col items-end gap-2">
                 {pushSupported && pushPermission === "default" && (
                   <Button
                     variant="yellowOutline"

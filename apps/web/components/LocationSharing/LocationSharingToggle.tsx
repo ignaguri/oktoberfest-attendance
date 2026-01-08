@@ -179,11 +179,11 @@ export const LocationSharingToggle = ({
       title={getTooltipText()}
     >
       {isLoading ? (
-        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
       ) : isActuallySharing ? (
-        <MapPin className="w-4 h-4 text-green-600" />
+        <MapPin className="h-4 w-4 text-green-600" />
       ) : (
-        <MapPinOff className="w-4 h-4" />
+        <MapPinOff className="h-4 w-4" />
       )}
     </Button>
   );
