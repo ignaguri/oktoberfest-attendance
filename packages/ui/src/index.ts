@@ -35,8 +35,11 @@ export type {
   // Avatar
   AvatarProps,
   AvatarSize,
-  // Badge
+  // Badge (Gluestack-style)
+  BadgeAction,
   BadgeProps,
+  BadgeSize,
+  BadgeTextProps,
   BadgeVariant,
   // Button (Gluestack-style)
   ButtonAction,
@@ -69,8 +72,10 @@ export type {
   InputType,
   // Label
   LabelProps,
-  // Progress
+  // Progress (Gluestack-style)
+  ProgressOrientation,
   ProgressProps,
+  ProgressSize,
   // ScrollArea
   ScrollAreaProps,
   // Select

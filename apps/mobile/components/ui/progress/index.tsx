@@ -8,7 +8,9 @@ import {
   useStyleContext,
 } from '@gluestack-ui/utils/nativewind-utils';
 import { cssInterop } from 'nativewind';
-import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+
+// Import contract types from shared UI package
+import type { ProgressSize, ProgressOrientation } from '@prostcounter/ui';
 
 const SCOPE = 'PROGRESS';
 export const UIProgress = createProgress({
@@ -121,10 +123,22 @@ const progressFilledTrackStyle = tva({
   ],
 });
 
-type IProgressProps = VariantProps<typeof progressStyle> &
-  React.ComponentProps<typeof UIProgress>;
-type IProgressFilledTrackProps = VariantProps<typeof progressFilledTrackStyle> &
-  React.ComponentProps<typeof UIProgress.FilledTrack>;
+/**
+ * Progress Props - implements @prostcounter/ui ProgressProps contract
+ */
+type IProgressProps = React.ComponentProps<typeof UIProgress> & {
+  /** Size of the progress bar - from contract */
+  size?: ProgressSize;
+  /** Orientation of the progress bar - from contract */
+  orientation?: ProgressOrientation;
+  /** Additional className for styling */
+  className?: string;
+};
+
+type IProgressFilledTrackProps = React.ComponentProps<typeof UIProgress.FilledTrack> & {
+  /** Additional className for styling */
+  className?: string;
+};
 
 const Progress = React.forwardRef<
   React.ComponentRef<typeof UIProgress>,

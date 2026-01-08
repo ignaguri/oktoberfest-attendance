@@ -1,16 +1,18 @@
 'use client';
 import React from 'react';
 import { createAvatar } from '@gluestack-ui/core/avatar/creator';
-
 import { View, Text, Image, Platform } from 'react-native';
-
 import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import {
   withStyleContext,
   useStyleContext,
 } from '@gluestack-ui/utils/nativewind-utils';
-const SCOPE = 'AVATAR';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+
+// Import contract types from shared UI package
+import type { AvatarSize } from '@prostcounter/ui';
+
+const SCOPE = 'AVATAR';
 
 const UIAvatar = createAvatar({
   Root: withStyleContext(View, SCOPE),
@@ -71,11 +73,18 @@ const avatarImageStyle = tva({
   base: 'h-full w-full rounded-full absolute',
 });
 
+/**
+ * Avatar Props - implements @prostcounter/ui AvatarSize contract
+ */
 type IAvatarProps = Omit<
   React.ComponentPropsWithoutRef<typeof UIAvatar>,
   'context'
-> &
-  VariantProps<typeof avatarStyle>;
+> & {
+  /** Size of the avatar - from contract */
+  size?: AvatarSize;
+  /** Additional className for styling */
+  className?: string;
+};
 
 const Avatar = React.forwardRef<
   React.ComponentRef<typeof UIAvatar>,

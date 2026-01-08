@@ -9,8 +9,15 @@ import {
 } from '@gluestack-ui/utils/nativewind-utils';
 import { cssInterop } from 'nativewind';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
-
 import { Svg } from 'react-native-svg';
+
+// Import contract types from shared UI package
+import type {
+  BadgeAction,
+  BadgeVariant,
+  BadgeSize,
+} from '@prostcounter/ui';
+
 const SCOPE = 'BADGE';
 
 const badgeStyle = tva({
@@ -110,8 +117,20 @@ cssInterop(PrimitiveIcon, {
   },
 });
 
-type IBadgeProps = React.ComponentPropsWithoutRef<typeof ContextView> &
-  VariantProps<typeof badgeStyle>;
+/**
+ * Badge Props - implements @prostcounter/ui BadgeProps contract
+ */
+type IBadgeProps = React.ComponentPropsWithoutRef<typeof ContextView> & {
+  /** Semantic color action - from contract */
+  action?: BadgeAction;
+  /** Visual style variant - from contract */
+  variant?: BadgeVariant;
+  /** Size of the badge - from contract */
+  size?: BadgeSize;
+  /** Additional className for styling */
+  className?: string;
+};
+
 function Badge({
   children,
   action = 'muted',
@@ -119,7 +138,7 @@ function Badge({
   size = 'md',
   className,
   ...props
-}: { className?: string } & IBadgeProps) {
+}: IBadgeProps) {
 
   const contextValue = useMemo(
     () => ({ action, variant, size }),

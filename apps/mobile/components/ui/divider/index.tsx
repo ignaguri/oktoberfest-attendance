@@ -2,7 +2,9 @@
 import React from 'react';
 import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import { Platform, View } from 'react-native';
-import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+
+// Import contract types from shared UI package
+import type { SeparatorOrientation } from '@prostcounter/ui';
 
 const dividerStyle = tva({
   base: 'bg-background-200',
@@ -14,8 +16,15 @@ const dividerStyle = tva({
   },
 });
 
-type IUIDividerProps = React.ComponentPropsWithoutRef<typeof View> &
-  VariantProps<typeof dividerStyle>;
+/**
+ * Divider Props - implements @prostcounter/ui SeparatorProps contract
+ */
+type IUIDividerProps = React.ComponentPropsWithoutRef<typeof View> & {
+  /** Orientation of the divider - from contract */
+  orientation?: SeparatorOrientation;
+  /** Additional className for styling */
+  className?: string;
+};
 
 const Divider = React.forwardRef<
   React.ComponentRef<typeof View>,

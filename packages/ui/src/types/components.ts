@@ -272,20 +272,52 @@ export interface LabelProps {
 }
 
 // ============================================================================
-// Badge
+// Badge (Gluestack-style - shared between web and mobile)
 // ============================================================================
 
-export type BadgeVariant =
-  | "default"
-  | "secondary"
-  | "destructive"
-  | "outline"
-  | "success";
+/**
+ * Badge action determines the semantic color scheme
+ * - error: Error/danger color (red)
+ * - warning: Warning color (orange/yellow)
+ * - success: Success color (green)
+ * - info: Information color (blue)
+ * - muted: Neutral/muted color (gray)
+ */
+export type BadgeAction = "error" | "warning" | "success" | "info" | "muted";
 
+/**
+ * Badge variant determines the visual style
+ * - solid: Filled background with the action color
+ * - outline: Transparent background with colored border
+ */
+export type BadgeVariant = "solid" | "outline";
+
+/**
+ * Badge size determines text and padding
+ */
+export type BadgeSize = "sm" | "md" | "lg";
+
+/**
+ * Gluestack Badge Props - used by both web and mobile implementations
+ */
 export interface BadgeProps {
-  children: ReactNode;
-  variant?: BadgeVariant | null;
+  /** Semantic color action */
+  action?: BadgeAction;
+  /** Visual style variant */
+  variant?: BadgeVariant;
+  /** Size of the badge */
+  size?: BadgeSize;
+  /** Additional className for styling */
   className?: string;
+  /** Badge content */
+  children?: ReactNode;
+}
+
+export interface BadgeTextProps {
+  /** Additional className for styling */
+  className?: string;
+  /** Text content */
+  children?: ReactNode;
 }
 
 // ============================================================================
@@ -441,12 +473,29 @@ export interface AccordionContentProps {
 }
 
 // ============================================================================
-// Progress
+// Progress (Gluestack-style - shared between web and mobile)
 // ============================================================================
 
+/**
+ * Progress size determines the height/width of the progress bar
+ */
+export type ProgressSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+
+/**
+ * Progress orientation determines if progress is horizontal or vertical
+ */
+export type ProgressOrientation = "horizontal" | "vertical";
+
 export interface ProgressProps {
+  /** Current progress value (0-100 by default) */
   value?: number;
+  /** Maximum progress value */
   max?: number;
+  /** Size of the progress bar - from contract */
+  size?: ProgressSize;
+  /** Orientation of the progress bar */
+  orientation?: ProgressOrientation;
+  /** Additional className for styling */
   className?: string;
 }
 

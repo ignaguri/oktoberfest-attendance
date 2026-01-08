@@ -123,17 +123,20 @@ const ButtonsShowcase = () => (
     <VStack space="md">
       <VStack space="xs">
         <Text bold className="text-gray-600 text-xs uppercase">
-          Solid
+          Solid Actions
         </Text>
         <HStack space="sm" className="flex-wrap">
           <Button action="primary" size="sm">
             <ButtonText>Primary</ButtonText>
           </Button>
-          <Button action="secondary" size="sm">
-            <ButtonText>Secondary</ButtonText>
+          <Button action="primaryDark" size="sm">
+            <ButtonText>Primary Dark</ButtonText>
           </Button>
         </HStack>
         <HStack space="sm" className="flex-wrap">
+          <Button action="secondary" size="sm">
+            <ButtonText>Secondary</ButtonText>
+          </Button>
           <Button action="positive" size="sm">
             <ButtonText>Positive</ButtonText>
           </Button>
@@ -151,10 +154,32 @@ const ButtonsShowcase = () => (
           <Button action="primary" variant="outline" size="sm">
             <ButtonText>Primary</ButtonText>
           </Button>
+          <Button action="primaryDark" variant="outline" size="sm">
+            <ButtonText>Primary Dark</ButtonText>
+          </Button>
+        </HStack>
+        <HStack space="sm" className="flex-wrap">
           <Button action="secondary" variant="outline" size="sm">
             <ButtonText>Secondary</ButtonText>
           </Button>
           <Button action="negative" variant="outline" size="sm">
+            <ButtonText>Negative</ButtonText>
+          </Button>
+        </HStack>
+      </VStack>
+
+      <VStack space="xs">
+        <Text bold className="text-gray-600 text-xs uppercase">
+          Ghost (New)
+        </Text>
+        <HStack space="sm" className="flex-wrap">
+          <Button action="primary" variant="ghost" size="sm">
+            <ButtonText>Primary</ButtonText>
+          </Button>
+          <Button action="secondary" variant="ghost" size="sm">
+            <ButtonText>Secondary</ButtonText>
+          </Button>
+          <Button action="negative" variant="ghost" size="sm">
             <ButtonText>Negative</ButtonText>
           </Button>
         </HStack>
@@ -187,6 +212,18 @@ const ButtonsShowcase = () => (
           </Button>
           <Button action="primary" size="lg">
             <ButtonText>LG</ButtonText>
+          </Button>
+        </HStack>
+        <HStack space="sm" className="flex-wrap items-center mt-2">
+          <Text className="text-gray-600 text-xs">Icon Size:</Text>
+          <Button action="primary" size="icon">
+            <AddIcon className="text-white" />
+          </Button>
+          <Button action="secondary" size="icon">
+            <AddIcon className="text-gray-800" />
+          </Button>
+          <Button action="primary" variant="ghost" size="icon">
+            <AddIcon className="text-primary-600" />
           </Button>
         </HStack>
       </VStack>
