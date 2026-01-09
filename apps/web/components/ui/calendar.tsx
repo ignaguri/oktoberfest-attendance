@@ -1,6 +1,10 @@
 "use client";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Button,
+  buttonVariants,
+  type ShadcnButtonVariant,
+} from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   ChevronDownIcon,
@@ -22,7 +26,7 @@ function Calendar({
   components,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+  buttonVariant?: ShadcnButtonVariant;
 }) {
   const defaultClassNames = getDefaultClassNames();
 

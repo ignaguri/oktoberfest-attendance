@@ -37,7 +37,7 @@ import { Link } from "next-view-transitions";
 import { useState, useMemo } from "react";
 
 import type { FestivalStatus, Festival as FestivalType } from "@/lib/types";
-import type { BadgeVariant } from "@prostcounter/ui";
+import type { ShadcnBadgeVariant } from "@/lib/ui-adapters";
 
 interface UserMenuProps {
   profileData: {
@@ -58,7 +58,7 @@ const getFestivalDisplayInfo = (festival: FestivalType) => {
 
 const getFestivalStatusBadgeProps = (
   festival: FestivalType,
-): { status: FestivalStatus; variant: BadgeVariant } => {
+): { status: FestivalStatus; variant: ShadcnBadgeVariant } => {
   const status = getFestivalStatus(festival);
 
   if (status === "upcoming") {
