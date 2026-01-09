@@ -4,7 +4,9 @@ import { Switch as RNSwitch } from 'react-native';
 import { createSwitch } from '@gluestack-ui/core/switch/creator';
 import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import { withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
-import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+
+// Import contract types from shared UI package
+import type { SwitchSize } from '@prostcounter/ui';
 
 const UISwitch = createSwitch({
   Root: withStyleContext(RNSwitch),
@@ -22,8 +24,16 @@ const switchStyle = tva({
   },
 });
 
-type ISwitchProps = React.ComponentProps<typeof UISwitch> &
-  VariantProps<typeof switchStyle>;
+/**
+ * Switch Props - implements @prostcounter/ui SwitchProps contract
+ */
+type ISwitchProps = React.ComponentProps<typeof UISwitch> & {
+  /** Size of the switch - from contract */
+  size?: SwitchSize;
+  /** Additional className for styling */
+  className?: string;
+};
+
 const Switch = React.forwardRef<
   React.ComponentRef<typeof UISwitch>,
   ISwitchProps

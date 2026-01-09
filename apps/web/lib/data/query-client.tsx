@@ -1,7 +1,7 @@
 "use client";
 
 import { apiClient } from "@/lib/api-client";
-import { IS_PROD } from "@/lib/constants";
+import { IS_PROD } from "@prostcounter/shared/constants";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

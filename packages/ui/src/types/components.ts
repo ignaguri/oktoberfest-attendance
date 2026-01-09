@@ -187,6 +187,19 @@ export type InputType =
   | "date"
   | "file";
 
+/**
+ * Input size determines height
+ */
+export type InputSize = "sm" | "md" | "lg" | "xl";
+
+/**
+ * Input variant determines the visual style
+ * - outline: Standard bordered input
+ * - underlined: Only bottom border
+ * - rounded: Fully rounded corners
+ */
+export type InputVariant = "outline" | "underlined" | "rounded";
+
 export interface InputProps {
   id?: string;
   name?: string;
@@ -217,6 +230,16 @@ export interface InputProps {
 // Textarea
 // ============================================================================
 
+/**
+ * Textarea size determines text size
+ */
+export type TextareaSize = "sm" | "md" | "lg" | "xl";
+
+/**
+ * Textarea variant determines the visual style
+ */
+export type TextareaVariant = "default";
+
 export interface TextareaProps {
   id?: string;
   name?: string;
@@ -239,6 +262,11 @@ export interface TextareaProps {
 // Switch
 // ============================================================================
 
+/**
+ * Switch size determines scale
+ */
+export type SwitchSize = "sm" | "md" | "lg";
+
 export interface SwitchProps {
   id?: string;
   checked?: boolean;
@@ -250,6 +278,11 @@ export interface SwitchProps {
 // ============================================================================
 // Checkbox
 // ============================================================================
+
+/**
+ * Checkbox size determines indicator and label size
+ */
+export type CheckboxSize = "sm" | "md" | "lg";
 
 export interface CheckboxProps {
   id?: string;
@@ -342,7 +375,25 @@ export interface AvatarProps {
 // Card
 // ============================================================================
 
+/**
+ * Card size determines padding and border radius
+ */
+export type CardSize = "sm" | "md" | "lg";
+
+/**
+ * Card variant determines the visual style
+ * - elevated: Subtle background (default)
+ * - outline: Border with transparent background
+ * - ghost: No styling (transparent)
+ * - filled: Filled background
+ */
+export type CardVariant = "elevated" | "outline" | "ghost" | "filled";
+
 export interface CardProps {
+  /** Size of the card - from contract */
+  size?: CardSize;
+  /** Variant style of the card - from contract */
+  variant?: CardVariant;
   children: ReactNode;
   className?: string;
 }
@@ -375,6 +426,11 @@ export interface CardFooterProps {
 // ============================================================================
 // Dialog/Modal
 // ============================================================================
+
+/**
+ * Dialog/Modal size determines width
+ */
+export type DialogSize = "xs" | "sm" | "md" | "lg" | "full";
 
 export interface DialogProps {
   open?: boolean;
@@ -415,6 +471,19 @@ export interface DialogDescriptionProps {
 // ============================================================================
 // Select/Dropdown
 // ============================================================================
+
+/**
+ * Select size determines height and text size
+ */
+export type SelectSize = "sm" | "md" | "lg" | "xl";
+
+/**
+ * Select variant determines the visual style
+ * - outline: Standard bordered select
+ * - underlined: Only bottom border
+ * - rounded: Fully rounded corners
+ */
+export type SelectVariant = "outline" | "underlined" | "rounded";
 
 export interface SelectProps {
   value?: string;

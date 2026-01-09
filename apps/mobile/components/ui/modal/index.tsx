@@ -16,6 +16,9 @@ import {
 import { cssInterop } from 'nativewind';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 
+// Import contract types from shared UI package
+import type { DialogSize } from '@prostcounter/ui';
+
 type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
   MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;
 
@@ -89,8 +92,15 @@ const modalFooterStyle = tva({
   base: 'flex-row justify-end items-center gap-2',
 });
 
-type IModalProps = React.ComponentProps<typeof UIModal> &
-  VariantProps<typeof modalStyle> & { className?: string };
+/**
+ * Modal Props - implements @prostcounter/ui DialogProps contract
+ */
+type IModalProps = Omit<React.ComponentProps<typeof UIModal>, 'context'> & {
+  /** Size of the modal - from contract */
+  size?: DialogSize;
+  /** Additional className for styling */
+  className?: string;
+};
 
 type IModalBackdropProps = React.ComponentProps<typeof UIModal.Backdrop> &
   VariantProps<typeof modalBackdropStyle> & { className?: string };

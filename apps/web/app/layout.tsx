@@ -7,12 +7,13 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { Toaster } from "@/components/ui/sonner";
 import { FestivalProvider } from "@/contexts/FestivalContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
+import { GA_ID } from "@/lib/constants";
 import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/lib/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ViewTransitions } from "next-view-transitions";
 

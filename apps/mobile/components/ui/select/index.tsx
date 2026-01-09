@@ -10,6 +10,9 @@ import {
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import { createSelect } from '@gluestack-ui/core/select/creator';
 import { cssInterop } from 'nativewind';
+
+// Import contract types from shared UI package
+import type { SelectSize, SelectVariant } from '@prostcounter/ui';
 import {
   Actionsheet,
   ActionsheetContent,
@@ -148,8 +151,17 @@ const Select = React.forwardRef<
   );
 });
 
-type ISelectTriggerProps = VariantProps<typeof selectTriggerStyle> &
-  React.ComponentProps<typeof UISelect.Trigger> & { className?: string };
+/**
+ * SelectTrigger Props - implements @prostcounter/ui SelectTriggerProps contract
+ */
+type ISelectTriggerProps = Omit<React.ComponentProps<typeof UISelect.Trigger>, 'context'> & {
+  /** Size of the select trigger - from contract */
+  size?: SelectSize;
+  /** Variant style of the select trigger - from contract */
+  variant?: SelectVariant;
+  /** Additional className for styling */
+  className?: string;
+};
 
 const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof UISelect.Trigger>,

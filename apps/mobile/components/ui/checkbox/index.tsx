@@ -16,6 +16,9 @@ import {
 import { cssInterop } from 'nativewind';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 
+// Import contract types from shared UI package
+import type { CheckboxSize } from '@prostcounter/ui';
+
 const IndicatorWrapper = React.forwardRef<
   React.ComponentRef<typeof View>,
   ViewProps
@@ -110,8 +113,15 @@ const checkboxIconStyle = tva({
 
 const CheckboxGroup = UICheckbox.Group;
 
-type ICheckboxProps = React.ComponentPropsWithoutRef<typeof UICheckbox> &
-  VariantProps<typeof checkboxStyle>;
+/**
+ * Checkbox Props - implements @prostcounter/ui CheckboxProps contract
+ */
+type ICheckboxProps = Omit<React.ComponentPropsWithoutRef<typeof UICheckbox>, 'context'> & {
+  /** Size of the checkbox - from contract */
+  size?: CheckboxSize;
+  /** Additional className for styling */
+  className?: string;
+};
 
 const Checkbox = React.forwardRef<
   React.ComponentRef<typeof UICheckbox>,

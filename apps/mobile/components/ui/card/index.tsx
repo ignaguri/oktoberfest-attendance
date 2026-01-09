@@ -1,10 +1,21 @@
 import React from 'react';
-import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import { View, ViewProps } from 'react-native';
 import { cardStyle } from './styles';
 
-type ICardProps = ViewProps &
-  VariantProps<typeof cardStyle> & { className?: string };
+// Import contract types from shared UI package
+import type { CardSize, CardVariant } from '@prostcounter/ui';
+
+/**
+ * Card Props - implements @prostcounter/ui CardProps contract
+ */
+type ICardProps = ViewProps & {
+  /** Size of the card - from contract */
+  size?: CardSize;
+  /** Variant style of the card - from contract */
+  variant?: CardVariant;
+  /** Additional className for styling */
+  className?: string;
+};
 
 const Card = React.forwardRef<React.ComponentRef<typeof View>, ICardProps>(
   function Card(

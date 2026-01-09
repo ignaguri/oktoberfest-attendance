@@ -1,11 +1,12 @@
-import { winningCriteriaText } from "@/lib/constants";
+"use client";
+
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { prepareShareImageData } from "@/lib/wrapped/utils";
 import LogoImage from "@/public/android-chrome-512x512.png";
 import { Beer, CalendarDays, Trophy, Award, Tent } from "lucide-react";
 import { forwardRef } from "react";
 
-import type { WinningCriteria } from "@/lib/types";
 import type { WrappedData } from "@/lib/wrapped/types";
 import type { LucideIcon } from "lucide-react";
 
@@ -55,6 +56,7 @@ function StatCard({ icon: Icon, value, label, className }: StatCardProps) {
  */
 export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
   ({ data, className }, ref) => {
+    const { t } = useTranslation();
     const shareData = prepareShareImageData(data);
 
     const getPositionText = (
@@ -74,9 +76,9 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
     const getCriteriaLabel = () => {
       if (!shareData.bestGlobalPosition) return null;
 
-      return winningCriteriaText[
-        shareData.bestGlobalPosition?.criteria as WinningCriteria
-      ];
+      return t(
+        `groups.winningCriteria.${shareData.bestGlobalPosition?.criteria}`,
+      );
     };
 
     return (

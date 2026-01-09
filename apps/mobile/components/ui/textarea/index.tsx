@@ -9,6 +9,9 @@ import {
 } from '@gluestack-ui/utils/nativewind-utils';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 
+// Import contract types from shared UI package
+import type { TextareaSize, TextareaVariant } from '@prostcounter/ui';
+
 const SCOPE = 'TEXTAREA';
 const UITextarea = createTextarea({
   Root: withStyleContext(View, SCOPE),
@@ -44,8 +47,17 @@ const textareaInputStyle = tva({
   },
 });
 
-type ITextareaProps = React.ComponentProps<typeof UITextarea> &
-  VariantProps<typeof textareaStyle>;
+/**
+ * Textarea Props - implements @prostcounter/ui TextareaProps contract
+ */
+type ITextareaProps = Omit<React.ComponentProps<typeof UITextarea>, 'context'> & {
+  /** Size of the textarea - from contract */
+  size?: TextareaSize;
+  /** Variant style of the textarea - from contract */
+  variant?: TextareaVariant;
+  /** Additional className for styling */
+  className?: string;
+};
 
 const Textarea = React.forwardRef<
   React.ComponentRef<typeof UITextarea>,

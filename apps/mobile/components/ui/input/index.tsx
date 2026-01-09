@@ -11,6 +11,9 @@ import { cssInterop } from 'nativewind';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
 
+// Import contract types from shared UI package
+import type { InputSize, InputVariant } from '@prostcounter/ui';
+
 const SCOPE = 'INPUT';
 
 const UIInput = createInput({
@@ -101,8 +104,18 @@ const inputFieldStyle = tva({
   },
 });
 
-type IInputProps = React.ComponentProps<typeof UIInput> &
-  VariantProps<typeof inputStyle> & { className?: string };
+/**
+ * Input Props - implements @prostcounter/ui InputProps contract
+ */
+type IInputProps = Omit<React.ComponentProps<typeof UIInput>, 'context'> & {
+  /** Size of the input - from contract */
+  size?: InputSize;
+  /** Variant style of the input - from contract */
+  variant?: InputVariant;
+  /** Additional className for styling */
+  className?: string;
+};
+
 const Input = React.forwardRef<React.ComponentRef<typeof UIInput>, IInputProps>(
   function Input(
     { className, variant = 'outline', size = 'md', ...props },

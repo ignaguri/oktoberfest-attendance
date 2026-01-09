@@ -50,26 +50,32 @@ export type {
   ButtonSize,
   ButtonTextProps,
   ButtonVariant,
-  // Card
+  // Card (Gluestack-style)
   CardContentProps,
   CardDescriptionProps,
   CardFooterProps,
   CardHeaderProps,
   CardProps,
+  CardSize,
   CardTitleProps,
-  // Checkbox
+  CardVariant,
+  // Checkbox (Gluestack-style)
   CheckboxProps,
-  // Dialog/Modal
+  CheckboxSize,
+  // Dialog/Modal (Gluestack-style)
   DialogContentProps,
   DialogDescriptionProps,
   DialogFooterProps,
   DialogHeaderProps,
   DialogProps,
+  DialogSize,
   DialogTitleProps,
   DialogTriggerProps,
-  // Input
+  // Input (Gluestack-style)
   InputProps,
+  InputSize,
   InputType,
+  InputVariant,
   // Label
   LabelProps,
   // Progress (Gluestack-style)
@@ -78,20 +84,25 @@ export type {
   ProgressSize,
   // ScrollArea
   ScrollAreaProps,
-  // Select
+  // Select (Gluestack-style)
   SelectContentProps,
   SelectItemProps,
   SelectProps,
+  SelectSize,
   SelectTriggerProps,
   SelectValueProps,
+  SelectVariant,
   // Separator
   SeparatorOrientation,
   SeparatorProps,
-  // Switch
+  // Switch (Gluestack-style)
   SwitchProps,
-  // Textarea
+  SwitchSize,
+  // Textarea (Gluestack-style)
   TextareaProps,
+  TextareaSize,
+  TextareaVariant,
 } from "./types/components";
 
 // Re-export utilities (platform-agnostic)
-export { cn } from "./utils";
+export { cn, getInitials } from "./utils";

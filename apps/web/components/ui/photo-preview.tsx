@@ -1,7 +1,7 @@
 "use client";
 
-import { IMAGE_PLACEHOLDER_BASE64 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { IMAGE_PLACEHOLDER_BASE64 } from "@prostcounter/shared/constants";
 import Image from "next/image";
 import { useState } from "react";
 
