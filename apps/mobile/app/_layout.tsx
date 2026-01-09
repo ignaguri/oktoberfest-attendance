@@ -3,9 +3,6 @@ import "../global.css";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
-
-// Gluestack UI provider with NativeWind v4 styling
-import { GluestackUIProvider } from "@/components/ui";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -13,6 +10,8 @@ import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { GluestackUIProvider } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { DataProvider } from "@/lib/data/query-client";
@@ -78,33 +77,35 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <GluestackUIProvider mode="light">
           <I18nextProvider i18n={i18n}>
-            <DataProvider>
-              <ApiClientProvider client={apiClient}>
-                <AuthProvider>
-                  <FestivalProvider>
-                    <NavigationGuard>
-                      <Stack
-                        screenOptions={{
-                          headerShown: false,
-                          animation: "slide_from_right",
-                        }}
-                      >
-                        <Stack.Screen name="(auth)" />
-                        <Stack.Screen name="(tabs)" />
-                        <Stack.Screen
-                          name="settings"
-                          options={{
+            <ErrorBoundary>
+              <DataProvider>
+                <ApiClientProvider client={apiClient}>
+                  <AuthProvider>
+                    <FestivalProvider>
+                      <NavigationGuard>
+                        <Stack
+                          screenOptions={{
                             headerShown: false,
-                            presentation: "card",
+                            animation: "slide_from_right",
                           }}
-                        />
-                        <Stack.Screen name="+not-found" />
-                      </Stack>
-                    </NavigationGuard>
-                  </FestivalProvider>
-                </AuthProvider>
-              </ApiClientProvider>
-            </DataProvider>
+                        >
+                          <Stack.Screen name="(auth)" />
+                          <Stack.Screen name="(tabs)" />
+                          <Stack.Screen
+                            name="settings"
+                            options={{
+                              headerShown: false,
+                              presentation: "card",
+                            }}
+                          />
+                          <Stack.Screen name="+not-found" />
+                        </Stack>
+                      </NavigationGuard>
+                    </FestivalProvider>
+                  </AuthProvider>
+                </ApiClientProvider>
+              </DataProvider>
+            </ErrorBoundary>
             <StatusBar style="dark" />
           </I18nextProvider>
         </GluestackUIProvider>
