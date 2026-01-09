@@ -5,11 +5,11 @@
  * compression, and the API client for the two-step upload flow.
  */
 
-import { useState, useCallback } from "react";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
-import * as ImageManipulator from "expo-image-manipulator";
-import { Alert } from "react-native";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { Alert } from "react-native";
 
 import { apiClient } from "@/lib/api-client";
 
@@ -29,16 +29,16 @@ interface UseAvatarUploadReturn {
 /**
  * Compress and convert image to WebP format
  * Matches web behavior: 800x800 max size, 80% quality
+ * Uses the new context-based ImageManipulator API
  */
 async function compressImage(uri: string): Promise<string> {
-  const result = await ImageManipulator.manipulateAsync(
-    uri,
-    [{ resize: { width: 800, height: 800 } }],
-    {
-      compress: 0.8,
-      format: ImageManipulator.SaveFormat.WEBP,
-    }
-  );
+  const context = ImageManipulator.manipulate(uri);
+  context.resize({ width: 800, height: 800 });
+  const image = await context.renderAsync();
+  const result = await image.saveAsync({
+    format: SaveFormat.WEBP,
+    compress: 0.8,
+  });
 
   return result.uri;
 }
@@ -54,7 +54,7 @@ async function uriToArrayBuffer(uri: string): Promise<ArrayBuffer> {
 }
 
 export function useAvatarUpload(
-  options: UseAvatarUploadOptions = {}
+  options: UseAvatarUploadOptions = {},
 ): UseAvatarUploadReturn {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
@@ -67,14 +67,13 @@ export function useAvatarUpload(
 
         // Request permissions
         if (source === "camera") {
-          const { status } =
-            await ImagePicker.requestCameraPermissionsAsync();
+          const { status } = await ImagePicker.requestCameraPermissionsAsync();
           if (status !== "granted") {
             Alert.alert(
               t("common.status.error"),
               t("profile.avatar.permissionDenied", {
                 defaultValue: "Camera permission is required to take photos",
-              })
+              }),
             );
             return;
           }
@@ -87,7 +86,7 @@ export function useAvatarUpload(
               t("profile.avatar.permissionDenied", {
                 defaultValue:
                   "Photo library permission is required to select photos",
-              })
+              }),
             );
             return;
           }
@@ -95,7 +94,7 @@ export function useAvatarUpload(
 
         // Launch picker
         const pickerOptions: ImagePicker.ImagePickerOptions = {
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          mediaTypes: ["images"] as ImagePicker.MediaType[],
           allowsEditing: true,
           aspect: [1, 1],
           quality: 1, // We'll compress ourselves
@@ -162,11 +161,11 @@ export function useAvatarUpload(
           t("common.status.error"),
           t("profile.avatar.uploadError", {
             defaultValue: "Failed to update profile picture",
-          })
+          }),
         );
       }
     },
-    [t, options]
+    [t, options],
   );
 
   return {
