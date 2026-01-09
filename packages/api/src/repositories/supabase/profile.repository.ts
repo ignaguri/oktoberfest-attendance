@@ -304,9 +304,8 @@ export class SupabaseProfileRepository {
     userId: string,
     query: GetAvatarUploadUrlQuery,
   ): Promise<GetAvatarUploadUrlResponse> {
-    // Generate unique file name
-    const extension = query.fileName.split(".").pop() || "jpg";
-    const uniqueFileName = `${userId}_${Date.now()}.${extension}`;
+    // Generate unique file name (always use webp since mobile will compress to webp)
+    const uniqueFileName = `${userId}_${Date.now()}.webp`;
 
     // Create signed upload URL
     const { data, error } = await this.supabase.storage
@@ -317,32 +316,25 @@ export class SupabaseProfileRepository {
       throw new Error(`Failed to create upload URL: ${error?.message}`);
     }
 
-    // Get public URL for the file
-    const {
-      data: { publicUrl },
-    } = this.supabase.storage.from("avatars").getPublicUrl(uniqueFileName);
-
     return {
       uploadUrl: data.signedUrl,
-      publicUrl,
+      fileName: uniqueFileName,
       expiresIn: 3600, // 1 hour
     };
   }
 
-  async confirmAvatarUpload(
-    userId: string,
-    avatarUrl: string,
-  ): Promise<string> {
-    // Update profile with new avatar URL
+  async confirmAvatarUpload(userId: string, fileName: string): Promise<string> {
+    // Update profile with just the filename (not full URL)
+    // This matches the web behavior and allows clients to construct URLs
     const { error } = await this.supabase
       .from("profiles")
-      .update({ avatar_url: avatarUrl })
+      .update({ avatar_url: fileName })
       .eq("id", userId);
 
     if (error) {
-      throw new Error(`Failed to update avatar URL: ${error.message}`);
+      throw new Error(`Failed to update avatar: ${error.message}`);
     }
 
-    return avatarUrl;
+    return fileName;
   }
 }

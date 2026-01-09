@@ -1,0 +1,239 @@
+import { useState } from 'react';
+import {
+  View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import {
+  updatePasswordSchema,
+  type UpdatePasswordFormData,
+} from '@prostcounter/shared/schemas';
+
+import { Text } from '@/components/ui/text';
+import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
+import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth/AuthContext';
+
+export default function ChangePasswordScreen() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { updatePassword } = useAuth();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UpdatePasswordFormData>({
+    resolver: zodResolver(updatePasswordSchema),
+    defaultValues: {
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  const onSubmit = async (data: UpdatePasswordFormData) => {
+    setIsLoading(true);
+
+    try {
+      const { error } = await updatePassword(data.password);
+
+      if (error) {
+        Alert.alert(
+          t('common.status.error'),
+          error.message ||
+            t('profile.changePassword.error', {
+              defaultValue: 'Failed to update password',
+            })
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      Alert.alert(
+        t('common.status.success'),
+        t('profile.changePassword.success', {
+          defaultValue: 'Password updated successfully',
+        }),
+        [
+          {
+            text: t('common.buttons.gotIt'),
+            onPress: () => router.back(),
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert(
+        t('common.status.error'),
+        t('profile.changePassword.error', {
+          defaultValue: 'Failed to update password',
+        })
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      className="flex-1 bg-background-50"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="p-4">
+          {/* Info */}
+          <View className="bg-yellow-50 rounded-2xl p-4 mb-4 border border-yellow-200">
+            <View className="flex-row items-start gap-3">
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={24}
+                color="#D97706"
+              />
+              <Text className="text-yellow-800 text-sm flex-1">
+                {t('profile.changePassword.info', {
+                  defaultValue:
+                    'Choose a strong password with at least 8 characters, including uppercase, lowercase, and numbers.',
+                })}
+              </Text>
+            </View>
+          </View>
+
+          {/* Form */}
+          <View className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* New Password */}
+            <View className="mb-4">
+              <Text className="text-sm font-medium text-typography-700 mb-1">
+                {t('profile.changePassword.newPassword', {
+                  defaultValue: 'New Password',
+                })}
+              </Text>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="outline"
+                    size="md"
+                    isInvalid={!!errors.password}
+                  >
+                    <InputField
+                      placeholder={t('profile.changePassword.newPasswordPlaceholder', {
+                        defaultValue: 'Enter new password',
+                      })}
+                      secureTextEntry={!showNewPassword}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="none"
+                    />
+                    <InputSlot
+                      className="pr-3"
+                      onPress={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      <InputIcon
+                        as={() => (
+                          <MaterialCommunityIcons
+                            name={showNewPassword ? 'eye-off' : 'eye'}
+                            size={20}
+                            color="#6B7280"
+                          />
+                        )}
+                      />
+                    </InputSlot>
+                  </Input>
+                )}
+              />
+              {errors.password && (
+                <Text className="text-error-600 text-sm mt-1">
+                  {errors.password.message}
+                </Text>
+              )}
+            </View>
+
+            {/* Confirm Password */}
+            <View className="mb-6">
+              <Text className="text-sm font-medium text-typography-700 mb-1">
+                {t('profile.changePassword.confirmPassword', {
+                  defaultValue: 'Confirm Password',
+                })}
+              </Text>
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="outline"
+                    size="md"
+                    isInvalid={!!errors.confirmPassword}
+                  >
+                    <InputField
+                      placeholder={t('profile.changePassword.confirmPasswordPlaceholder', {
+                        defaultValue: 'Confirm new password',
+                      })}
+                      secureTextEntry={!showConfirmPassword}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="none"
+                    />
+                    <InputSlot
+                      className="pr-3"
+                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      <InputIcon
+                        as={() => (
+                          <MaterialCommunityIcons
+                            name={showConfirmPassword ? 'eye-off' : 'eye'}
+                            size={20}
+                            color="#6B7280"
+                          />
+                        )}
+                      />
+                    </InputSlot>
+                  </Input>
+                )}
+              />
+              {errors.confirmPassword && (
+                <Text className="text-error-600 text-sm mt-1">
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
+            </View>
+
+            {/* Submit Button */}
+            <Button
+              action="primary"
+              size="lg"
+              onPress={handleSubmit(onSubmit)}
+              disabled={isLoading}
+              className="rounded-full"
+            >
+              {isLoading ? (
+                <ButtonSpinner color="#FFFFFF" />
+              ) : (
+                <ButtonText>
+                  {t('profile.changePassword.submit', {
+                    defaultValue: 'Update Password',
+                  })}
+                </ButtonText>
+              )}
+            </Button>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}

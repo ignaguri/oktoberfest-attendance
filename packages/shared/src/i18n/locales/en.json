@@ -347,6 +347,17 @@
   },
   "profile": {
     "pageTitle": "Your Profile",
+    "editButton": "Edit Profile",
+    "username": "Username",
+    "usernamePlaceholder": "Choose a username",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your name",
+    "email": "Email",
+    "settings": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile",
     "sections": {
       "account": "Account",
       "notifications": "Notifications",
@@ -365,8 +376,22 @@
       "saveChanges": "Save Changes",
       "success": "Profile updated successfully"
     },
+    "avatar": {
+      "change": "Change Photo",
+      "takePhoto": "Take Photo",
+      "chooseFromLibrary": "Choose from Library",
+      "uploading": "Uploading...",
+      "uploadSuccess": "Profile picture updated",
+      "uploadError": "Failed to update profile picture",
+      "permissionDenied": "Permission is required to access photos"
+    },
+    "biometric": {
+      "label": "Biometric Login",
+      "description": "Quick sign-in with Face ID or Touch ID"
+    },
     "notifications": {
-      "title": "Notification Settings",
+      "title": "Notifications",
+      "description": "Configure push notifications",
       "push": "Push Notifications",
       "achievements": "Achievement Notifications",
       "groupActivity": "Group Activity",
@@ -377,30 +402,38 @@
       "locationSharing": "Location Sharing",
       "profileVisibility": "Profile Visibility"
     },
+    "signOut": {
+      "title": "Sign Out",
+      "message": "Are you sure you want to sign out?",
+      "button": "Sign Out",
+      "confirm": "Sign Out"
+    },
     "tutorial": {
       "title": "Tutorial",
       "description": "Reset the app tutorial to see it again on your next visit to the home page.",
       "resetButton": "Reset Tutorial",
       "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page."
     },
-    "language": {
+    "languageSettings": {
       "title": "Language",
       "description": "Choose your preferred language for the app",
       "autoDetect": "Auto-detect from browser",
       "autoDetectCurrent": "Auto-detect (currently: {{language}})",
       "languages": {
-        "en": "🇬🇧 English",
-        "de": "🇩🇪 Deutsch",
-        "es": "🇦🇷 Español",
-        "fr": "🇫🇷 Français"
+        "en": "English",
+        "de": "Deutsch",
+        "es": "Espanol",
+        "fr": "Francais"
       },
       "updateSuccess": "Language preference updated",
       "updateError": "Failed to update language preference"
     },
     "deleteAccount": {
       "title": "Delete Account",
-      "warning": "Permanently delete your account and all associated data. This action cannot be undone.",
-      "confirm": "Type DELETE to confirm",
+      "description": "Permanently delete your account and all data.",
+      "warning": "This will permanently delete all your data including consumption records, photos, and group memberships. This action cannot be undone.",
+      "finalWarning": "This is your final warning. Your account and all data will be permanently deleted.",
+      "confirm": "Delete Account",
       "confirmPrompt": "Are you sure? This will permanently delete all your data including:",
       "confirmButton": "Yes, Delete My Account",
       "button": "Delete Account",
@@ -703,6 +736,7 @@
     },
     "password": {
       "required": "Password is required",
+      "min": "Password must be at least 8 characters or leave blank to keep unchanged",
       "minLength": "Password must be at least {{min}} characters",
       "mismatch": "Passwords don't match",
       "confirm": "Please confirm your password",
@@ -710,9 +744,13 @@
     },
     "username": {
       "required": "Username is required",
+      "min": "Username must be at least 4 characters",
       "minLength": "Username must be at least {{min}} characters",
       "maxLength": "Username must be {{max}} characters or less",
       "invalid": "Username can only contain letters, numbers, and underscores"
+    },
+    "language": {
+      "invalid": "Invalid language code"
     },
     "groupName": {
       "required": "Group name is required",
@@ -732,20 +770,24 @@
     },
     "beerCount": {
       "required": "Please enter the number of beers",
-      "min": "Beer count must be at least {{min}}",
+      "min": "Beer count cannot be negative",
       "max": "That's a lot of beers! Are you sure?",
       "negative": "Beer count cannot be negative",
       "wholeNumber": "Must be a whole number",
+      "integer": "Must be a whole number",
       "tentRequired": "Must select at least one tent if beer count is 0"
     },
     "photo": {
       "required": "Select at least one photo",
+      "selectOne": "Select at least one photo",
       "maxPhotos": "Maximum {{max}} pictures allowed"
     },
     "file": {
-      "tooLarge": "File is too large (max {{max}}MB)",
+      "tooLarge": "File is too large (max 10MB)",
+      "invalidType": "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
       "invalidFormat": "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
       "required": "At least one picture is required",
+      "tooMany": "Maximum 10 pictures allowed",
       "avatarTooLarge": "File size must be less than 5MB",
       "avatarInvalidFormat": "File must be a JPEG, PNG, or WebP image"
     },
@@ -754,8 +796,13 @@
       "dateTimeRequired": "Please select a date and time",
       "reminderNegative": "Reminder offset cannot be negative"
     },
+    "reminder": {
+      "min": "Reminder offset cannot be negative"
+    },
     "tent": {
       "nameRequired": "Tent name is required",
+      "required": "Please select a tent",
+      "minOne": "At least one tent must be selected",
       "selected": "At least one tent must be selected"
     },
     "festival": {

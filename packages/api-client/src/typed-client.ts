@@ -770,7 +770,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         fileSize: number;
       }): Promise<{
         uploadUrl: string;
-        publicUrl: string;
+        fileName: string;
         expiresIn: number;
       }> {
         const headers = await getAuthHeaders();
@@ -792,15 +792,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse(response);
       },
 
-      async confirmAvatarUpload(avatarUrl: string): Promise<{
+      async confirmAvatarUpload(fileName: string): Promise<{
         success: boolean;
-        avatarUrl: string;
+        fileName: string;
       }> {
         const headers = await getAuthHeaders();
         const response = await fetch(`${baseUrl}/v1/profile/avatar/confirm`, {
           method: "POST",
           headers,
-          body: JSON.stringify({ avatarUrl }),
+          body: JSON.stringify({ fileName }),
         });
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(response).catch(

@@ -1,47 +1,90 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Link, useRouter } from "expo-router";
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useState, useEffect } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-} from "react-native";
-import { z } from "zod";
+  Pressable,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { signInSchema, type SignInFormData } from '@prostcounter/shared/schemas';
 
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui";
-import { useAuth } from "@/lib/auth/AuthContext";
-
-const signInSchema = z.object({
-  email: z.email("Please enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type SignInFormData = z.infer<typeof signInSchema>;
+import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import {
+  AuthHeader,
+  FormInput,
+  OAuthButtons,
+  OrDivider,
+  AuthFooterLink,
+  BiometricPrompt,
+  BiometricEnablePrompt,
+} from '@/components/auth';
+import { useAuth } from '@/lib/auth/AuthContext';
+import { useBiometrics } from '@/hooks/useBiometrics';
+import { getStoredUserEmail } from '@/lib/auth/secure-storage';
 
 export default function SignInScreen() {
   const { t } = useTranslation();
-  const { signIn } = useAuth();
   const router = useRouter();
+  const {
+    signIn,
+    signInWithGoogle,
+    signInWithFacebook,
+    signInWithApple,
+  } = useAuth();
+
+  const {
+    isAvailable: isBiometricAvailable,
+    biometricType,
+    isEnabled: isBiometricEnabled,
+    authenticate: authenticateBiometric,
+    enableBiometrics,
+  } = useBiometrics();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isFacebookLoading, setIsFacebookLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Biometric prompt states
+  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
+  const [showBiometricEnablePrompt, setShowBiometricEnablePrompt] = useState(false);
+  const [isBiometricAuthenticating, setIsBiometricAuthenticating] = useState(false);
+  const [storedEmail, setStoredEmail] = useState<string | null>(null);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
+
+  // Check for stored email and biometric availability on mount
+  useEffect(() => {
+    const checkBiometric = async () => {
+      const email = await getStoredUserEmail();
+      setStoredEmail(email);
+
+      // Show biometric prompt if available, enabled, and user has signed in before
+      if (isBiometricAvailable && isBiometricEnabled && email) {
+        setShowBiometricPrompt(true);
+      }
+    };
+
+    checkBiometric();
+  }, [isBiometricAvailable, isBiometricEnabled]);
 
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
@@ -50,147 +93,218 @@ export default function SignInScreen() {
     const { error: signInError } = await signIn(data.email, data.password);
 
     if (signInError) {
-      setError(t("auth.signIn.errors.invalidCredentials"));
+      setError(t('auth.signIn.errors.invalidCredentials'));
       setIsLoading(false);
       return;
     }
 
-    // Navigation handled by auth guard
-    router.replace("/(tabs)");
+    // Show biometric enable prompt if available but not enabled
+    if (isBiometricAvailable && !isBiometricEnabled) {
+      setShowBiometricEnablePrompt(true);
+      setIsLoading(false);
+      return;
+    }
+
+    // Navigate to main app
+    router.replace('/(tabs)');
   };
 
+  const handleBiometricAuth = async () => {
+    setIsBiometricAuthenticating(true);
+    const { success, error } = await authenticateBiometric();
+    setIsBiometricAuthenticating(false);
+
+    if (success && storedEmail) {
+      // For biometric auth, we need the stored session
+      // The session should already be restored from secure storage
+      setShowBiometricPrompt(false);
+      router.replace('/(tabs)');
+    } else if (error) {
+      setShowBiometricPrompt(false);
+      setError(error);
+    }
+  };
+
+  const handleUsePasword = () => {
+    setShowBiometricPrompt(false);
+    if (storedEmail) {
+      setValue('email', storedEmail);
+    }
+  };
+
+  const handleEnableBiometric = async () => {
+    await enableBiometrics();
+    setShowBiometricEnablePrompt(false);
+    router.replace('/(tabs)');
+  };
+
+  const handleSkipBiometric = () => {
+    setShowBiometricEnablePrompt(false);
+    router.replace('/(tabs)');
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    setError(null);
+    const { error } = await signInWithGoogle();
+    setIsGoogleLoading(false);
+
+    if (error && error.message !== 'Authentication was cancelled') {
+      setError(t('auth.signIn.errors.providerFailed', { provider: 'Google' }));
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setIsFacebookLoading(true);
+    setError(null);
+    const { error } = await signInWithFacebook();
+    setIsFacebookLoading(false);
+
+    if (error && error.message !== 'Authentication was cancelled') {
+      setError(t('auth.signIn.errors.providerFailed', { provider: 'Facebook' }));
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setIsAppleLoading(true);
+    setError(null);
+    const { error } = await signInWithApple();
+    setIsAppleLoading(false);
+
+    if (error && error.message !== 'Authentication was cancelled') {
+      setError(t('auth.signIn.errors.providerFailed', { provider: 'Apple' }));
+    }
+  };
+
+  const isAnyLoading =
+    isLoading || isGoogleLoading || isFacebookLoading || isAppleLoading;
+
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-        className="px-6"
+    <SafeAreaView className="flex-1 bg-background-0">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {/* Header */}
-        <View className="-mx-6 bg-yellow-500 px-6 py-6 pt-16">
-          <Text className="text-center text-xl font-bold text-black">
-            {t("auth.signIn.title")}
-          </Text>
-        </View>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          className="px-6"
+        >
+          {/* Header with Logo */}
+          <View className="mt-4 mb-8">
+            <AuthHeader
+              size="lg"
+              tagline={t('auth.signIn.tagline', {
+                defaultValue: 'Track your Oktoberfest adventure',
+              })}
+            />
+          </View>
 
-        {/* Form */}
-        <View className="mt-8">
-          <Text className="mb-8 text-center text-2xl font-bold text-gray-900">
-            {t("auth.signIn.subtitle")}
-          </Text>
-
+          {/* Error Message */}
           {error && (
-            <View className="mb-4 rounded-lg bg-red-50 p-3">
-              <Text className="text-center text-red-600">{error}</Text>
+            <View className="mb-4 rounded-lg bg-error-50 p-3">
+              <Text className="text-center text-error-600">{error}</Text>
             </View>
           )}
 
-          {/* Email Input */}
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View className="mb-4">
-                <Text className="mb-2 font-medium text-gray-700">
-                  {t("auth.signIn.emailLabel")}
-                </Text>
-                <TextInput
-                  className={`rounded-xl border px-4 py-3 text-base ${
-                    errors.email
-                      ? "border-red-500 bg-red-50"
-                      : "border-gray-300 bg-white"
-                  }`}
-                  placeholder={t("auth.signIn.emailPlaceholder")}
-                  placeholderTextColor="#9CA3AF"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                />
-                {errors.email && (
-                  <Text className="mt-1 text-sm text-red-500">
-                    {errors.email.message}
-                  </Text>
-                )}
-              </View>
-            )}
+          {/* Form */}
+          <View className="w-full">
+            <FormInput
+              control={control}
+              name="email"
+              label={t('auth.signIn.emailLabel')}
+              placeholder={t('auth.signIn.emailPlaceholder')}
+              keyboardType="email-address"
+              autoComplete="email"
+              autoFocus
+              error={errors.email?.message}
+              disabled={isAnyLoading}
+            />
+
+            <FormInput
+              control={control}
+              name="password"
+              label={t('auth.signIn.passwordLabel')}
+              placeholder={t('auth.signIn.passwordPlaceholder', {
+                defaultValue: 'Enter your password',
+              })}
+              secureTextEntry
+              autoComplete="password"
+              error={errors.password?.message}
+              disabled={isAnyLoading}
+            />
+
+            {/* Sign In Button */}
+            <Button
+              action="primary"
+              variant="solid"
+              size="lg"
+              onPress={handleSubmit(onSubmit)}
+              disabled={isAnyLoading}
+              className="mt-2 rounded-full"
+            >
+              {isLoading ? (
+                <ButtonSpinner color="#FFFFFF" />
+              ) : (
+                <ButtonText>{t('auth.signIn.submit')}</ButtonText>
+              )}
+            </Button>
+
+            {/* Forgot Password Link */}
+            <Pressable
+              onPress={() => router.push('/(auth)/forgot-password')}
+              className="mt-4 py-2"
+            >
+              <Text className="text-center font-medium text-primary-600">
+                {t('auth.signIn.forgotPassword')}
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Or Divider */}
+          <OrDivider />
+
+          {/* OAuth Buttons */}
+          <OAuthButtons
+            onGooglePress={handleGoogleSignIn}
+            onFacebookPress={handleFacebookSignIn}
+            onApplePress={handleAppleSignIn}
+            isGoogleLoading={isGoogleLoading}
+            isFacebookLoading={isFacebookLoading}
+            isAppleLoading={isAppleLoading}
+            disabled={isAnyLoading}
           />
 
-          {/* Password Input */}
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View className="mb-6">
-                <Text className="mb-2 font-medium text-gray-700">
-                  {t("auth.signIn.passwordLabel")}
-                </Text>
-                <TextInput
-                  className={`rounded-xl border px-4 py-3 text-base ${
-                    errors.password
-                      ? "border-red-500 bg-red-50"
-                      : "border-gray-300 bg-white"
-                  }`}
-                  placeholder={t("auth.signIn.passwordPlaceholder")}
-                  placeholderTextColor="#9CA3AF"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  secureTextEntry
-                  autoCapitalize="none"
-                  autoComplete="password"
-                />
-                {errors.password && (
-                  <Text className="mt-1 text-sm text-red-500">
-                    {errors.password.message}
-                  </Text>
-                )}
-              </View>
-            )}
+          {/* Sign Up Link */}
+          <AuthFooterLink
+            prefix={t('auth.signIn.noAccount')}
+            linkText={t('auth.signIn.signUpLink')}
+            href="/(auth)/sign-up"
           />
 
-          {/* Submit Button */}
-          <Button
-            action="primary"
-            size="lg"
-            onPress={handleSubmit(onSubmit)}
-            isDisabled={isLoading}
-            className="rounded-full"
-          >
-            {isLoading ? (
-              <ButtonSpinner />
-            ) : (
-              <ButtonText>{t("auth.signIn.submit")}</ButtonText>
-            )}
-          </Button>
+          {/* Spacer */}
+          <View className="h-8" />
+        </ScrollView>
 
-          {/* Forgot Password */}
-          <Link href="/(auth)/forgot-password" asChild>
-            <TouchableOpacity className="mt-4 py-2">
-              <Text className="text-center font-medium text-yellow-600">
-                {t("auth.signIn.forgotPassword")}
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
+        {/* Biometric Prompt Modal */}
+        <BiometricPrompt
+          isOpen={showBiometricPrompt}
+          onClose={() => setShowBiometricPrompt(false)}
+          onAuthenticate={handleBiometricAuth}
+          onUsePassword={handleUsePasword}
+          biometricType={biometricType}
+          isAuthenticating={isBiometricAuthenticating}
+        />
 
-        {/* Footer */}
-        <View className="mt-8 flex-row items-center justify-center pb-8">
-          <Text className="text-gray-600">{t("auth.signIn.noAccount")} </Text>
-          <Link href="/(auth)/sign-up" asChild>
-            <TouchableOpacity>
-              <Text className="font-semibold text-yellow-600">
-                {t("auth.signIn.signUpLink")}
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        {/* Biometric Enable Prompt Modal */}
+        <BiometricEnablePrompt
+          isOpen={showBiometricEnablePrompt}
+          onClose={handleSkipBiometric}
+          onEnable={handleEnableBiometric}
+          onSkip={handleSkipBiometric}
+          biometricType={biometricType}
+        />
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

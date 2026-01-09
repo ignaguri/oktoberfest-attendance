@@ -13,6 +13,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.prostcounter.app",
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Use Face ID to quickly sign in to your ProstCounter account",
+        "NSPhotoLibraryUsageDescription": "Allow ProstCounter to access your photos to share pictures",
+        "NSCameraUsageDescription": "Allow ProstCounter to use your camera to take pictures"
+      },
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -30,7 +36,10 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-web-browser",
+      "expo-apple-authentication",
+      "expo-image-picker"
     ],
     "experiments": {
       "typedRoutes": true

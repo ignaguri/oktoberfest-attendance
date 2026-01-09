@@ -465,15 +465,15 @@ const confirmAvatarUploadRoute = createRoute({
 
 app.openapi(confirmAvatarUploadRoute, async (c) => {
   const { user, supabase } = c.var;
-  const { avatarUrl } = c.req.valid("json");
+  const { fileName } = c.req.valid("json");
 
   const profileRepo = new SupabaseProfileRepository(supabase);
-  const confirmedUrl = await profileRepo.confirmAvatarUpload(
+  const confirmedFileName = await profileRepo.confirmAvatarUpload(
     user.id,
-    avatarUrl,
+    fileName,
   );
 
-  return c.json({ success: true, avatarUrl: confirmedUrl }, 200);
+  return c.json({ success: true, fileName: confirmedFileName }, 200);
 });
 
 export default app;

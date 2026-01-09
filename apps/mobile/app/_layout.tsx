@@ -11,6 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
@@ -74,31 +75,40 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <GluestackUIProvider mode="light">
-        <I18nextProvider i18n={i18n}>
-          <DataProvider>
-            <ApiClientProvider client={apiClient}>
-              <AuthProvider>
-                <FestivalProvider>
-                  <NavigationGuard>
-                    <Stack
-                      screenOptions={{
-                        headerShown: false,
-                        animation: "slide_from_right",
-                      }}
-                    >
-                      <Stack.Screen name="(auth)" />
-                      <Stack.Screen name="(tabs)" />
-                      <Stack.Screen name="+not-found" />
-                    </Stack>
-                  </NavigationGuard>
-                </FestivalProvider>
-              </AuthProvider>
-            </ApiClientProvider>
-          </DataProvider>
-          <StatusBar style="dark" />
-        </I18nextProvider>
-      </GluestackUIProvider>
+      <SafeAreaProvider>
+        <GluestackUIProvider mode="light">
+          <I18nextProvider i18n={i18n}>
+            <DataProvider>
+              <ApiClientProvider client={apiClient}>
+                <AuthProvider>
+                  <FestivalProvider>
+                    <NavigationGuard>
+                      <Stack
+                        screenOptions={{
+                          headerShown: false,
+                          animation: "slide_from_right",
+                        }}
+                      >
+                        <Stack.Screen name="(auth)" />
+                        <Stack.Screen name="(tabs)" />
+                        <Stack.Screen
+                          name="settings"
+                          options={{
+                            headerShown: false,
+                            presentation: "card",
+                          }}
+                        />
+                        <Stack.Screen name="+not-found" />
+                      </Stack>
+                    </NavigationGuard>
+                  </FestivalProvider>
+                </AuthProvider>
+              </ApiClientProvider>
+            </DataProvider>
+            <StatusBar style="dark" />
+          </I18nextProvider>
+        </GluestackUIProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
