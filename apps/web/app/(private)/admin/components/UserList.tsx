@@ -29,8 +29,11 @@ import { searchKeys } from "@/lib/data/search-query-keys";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
-import { userUpdateSchema, attendanceSchema } from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AdminUserUpdateFormSchema,
+  AdminAttendanceFormSchema,
+} from "@prostcounter/shared/schemas";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDate } from "date-fns/format";
 import { Beer, Tent, Trash } from "lucide-react";
@@ -38,11 +41,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
-import type {
-  UserUpdateFormData,
-  AttendanceFormData,
-} from "@/lib/schemas/admin";
 import type { Tables } from "@prostcounter/db";
+import type {
+  AdminUserUpdateForm,
+  AdminAttendanceForm,
+} from "@prostcounter/shared/schemas";
 import type { User } from "@supabase/supabase-js";
 
 import {
@@ -63,7 +66,7 @@ const UserEditForm = ({
   isFetchingAttendances,
 }: {
   user: CombinedUser;
-  onSubmit: (data: UserUpdateFormData) => Promise<void>;
+  onSubmit: (data: AdminUserUpdateForm) => Promise<void>;
   attendances?: AttendanceWithTents[];
   onDeleteAttendance?: (attendanceId: string) => void;
   onFetchAttendances?: () => void;
@@ -74,8 +77,8 @@ const UserEditForm = ({
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<UserUpdateFormData>({
-    resolver: zodResolver(userUpdateSchema),
+  } = useForm<AdminUserUpdateForm>({
+    resolver: zodResolver(AdminUserUpdateFormSchema),
     defaultValues: {
       password: "",
       full_name: user.profile?.full_name || "",
@@ -211,7 +214,7 @@ const AttendanceEditForm = ({
   onSubmit,
 }: {
   attendance: AttendanceWithTents;
-  onSubmit: (data: AttendanceFormData) => Promise<void>;
+  onSubmit: (data: AdminAttendanceForm) => Promise<void>;
 }) => {
   const {
     register,
@@ -219,8 +222,8 @@ const AttendanceEditForm = ({
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<AttendanceFormData>({
-    resolver: zodResolver(attendanceSchema),
+  } = useForm<AdminAttendanceForm>({
+    resolver: zodResolver(AdminAttendanceFormSchema),
     defaultValues: {
       date: new Date(attendance.date),
       beer_count: attendance.beer_count,
@@ -453,7 +456,7 @@ const UserList = () => {
     setIsUserDialogOpen(true); // Open the dialog for user editing
   }
 
-  async function handleUpdateUser(data: UserUpdateFormData) {
+  async function handleUpdateUser(data: AdminUserUpdateForm) {
     try {
       const authData: { password?: string } = {};
       if (data.password && data.password.trim() !== "") {
@@ -526,7 +529,7 @@ const UserList = () => {
     }
   }
 
-  async function handleUpdateAttendance(data: AttendanceFormData) {
+  async function handleUpdateAttendance(data: AdminAttendanceForm) {
     try {
       if (!selectedAttendance || !selectedUser) return;
       await updateAttendance(selectedAttendance.id, {

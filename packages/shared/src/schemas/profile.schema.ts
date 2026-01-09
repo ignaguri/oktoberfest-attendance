@@ -130,7 +130,7 @@ export type GetAvatarUploadUrlQuery = z.infer<
 
 export const GetAvatarUploadUrlResponseSchema = z.object({
   uploadUrl: z.url(),
-  publicUrl: z.url(),
+  fileName: z.string(), // The unique filename to use for confirmation
   expiresIn: z.number().int(),
 });
 
@@ -139,7 +139,7 @@ export type GetAvatarUploadUrlResponse = z.infer<
 >;
 
 export const ConfirmAvatarUploadSchema = z.object({
-  avatarUrl: z.string().min(1),
+  fileName: z.string().min(1), // Just the filename, not the full URL
 });
 
 export type ConfirmAvatarUploadInput = z.infer<
@@ -148,5 +148,5 @@ export type ConfirmAvatarUploadInput = z.infer<
 
 export const ConfirmAvatarUploadResponseSchema = z.object({
   success: z.boolean(),
-  avatarUrl: z.url(),
+  fileName: z.string(), // Returns the filename stored in the database
 });

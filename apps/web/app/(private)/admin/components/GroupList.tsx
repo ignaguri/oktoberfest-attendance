@@ -17,9 +17,9 @@ import { apiClient } from "@/lib/api-client";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
-import { groupSchema } from "@/lib/schemas/admin";
 import { getAvatarUrl } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AdminGroupFormSchema } from "@prostcounter/shared/schemas";
 import { useQueryClient } from "@tanstack/react-query";
 import { Copy, Check, Link } from "lucide-react";
 import Image from "next/image";
@@ -27,8 +27,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { GroupFormData } from "@/lib/schemas/admin";
 import type { Tables } from "@prostcounter/db";
+import type { AdminGroupForm } from "@prostcounter/shared/schemas";
 
 import {
   updateGroup,
@@ -49,7 +49,7 @@ const GroupEditForm = ({
   copiedToClipboard,
 }: {
   group: Tables<"groups">;
-  onSubmit: (data: GroupFormData) => Promise<void>;
+  onSubmit: (data: AdminGroupForm) => Promise<void>;
   winningCriteria: Tables<"winning_criteria">[];
   members: any[];
   inviteToken: string | null;
@@ -64,8 +64,8 @@ const GroupEditForm = ({
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<GroupFormData>({
-    resolver: zodResolver(groupSchema),
+  } = useForm<AdminGroupForm>({
+    resolver: zodResolver(AdminGroupFormSchema),
     defaultValues: {
       name: group.name,
       description: group.description || "",
@@ -327,7 +327,7 @@ const GroupList = () => {
     }
   };
 
-  async function handleUpdateGroup(data: GroupFormData) {
+  async function handleUpdateGroup(data: AdminGroupForm) {
     if (!selectedGroup) return;
     try {
       await updateGroup(selectedGroup.id, data);

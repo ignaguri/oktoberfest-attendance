@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
-import { signUpSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  signUpSchema,
+  type SignUpFormData,
+} from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
 import React, { useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-import type { SignUpFormData } from "@/lib/schemas/auth";
 
 import { signUp, signInWithOAuth } from "./actions";
 import { GoogleIcon, FacebookIcon } from "./SocialIcons";

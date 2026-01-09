@@ -5,7 +5,6 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
-import { winningCriteriaText } from "@/lib/constants";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import { WinningCriteria } from "@/lib/types";
@@ -65,12 +64,9 @@ export default function GlobalLeaderboardClient() {
     () =>
       winningCriterias?.map((criteria: WinningCriteriaOption) => ({
         value: criteria.id.toString(),
-        label:
-          winningCriteriaText[
-            criteria.name as keyof typeof winningCriteriaText
-          ],
+        label: t(`groups.winningCriteria.${criteria.name}`),
       })) || [],
-    [winningCriterias],
+    [winningCriterias, t],
   );
 
   const selectedCriteria = winningCriterias?.find(

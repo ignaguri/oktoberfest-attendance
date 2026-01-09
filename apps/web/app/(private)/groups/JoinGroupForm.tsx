@@ -6,15 +6,15 @@ import { useFestival } from "@/contexts/FestivalContext";
 import { useJoinGroup } from "@/hooks/useGroups";
 import { apiClient } from "@/lib/api-client";
 import { useTranslation } from "@/lib/i18n/client";
-import { joinGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { JoinGroupFormSchema } from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { JoinGroupFormData } from "@/lib/schemas/groups";
+import type { JoinGroupForm as JoinGroupFormData } from "@prostcounter/shared/schemas";
 
 interface JoinGroupFormProps {
   groupName?: string;
@@ -35,7 +35,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     handleSubmit,
     formState: { errors, isSubmitting: formSubmitting },
   } = useForm<JoinGroupFormData>({
-    resolver: zodResolver(joinGroupSchema),
+    resolver: zodResolver(JoinGroupFormSchema),
     defaultValues: {
       groupName: groupName || "",
       password: "",

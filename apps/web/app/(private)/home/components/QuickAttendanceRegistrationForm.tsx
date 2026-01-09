@@ -9,16 +9,18 @@ import { useConfetti } from "@/hooks/useConfetti";
 import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
-import { quickAttendanceSchema } from "@/lib/schemas/attendance";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { QuickAttendanceFormData } from "@/lib/schemas/attendance";
-import type { AttendanceByDate } from "@prostcounter/shared/schemas";
+import type {
+  QuickAttendanceForm,
+  AttendanceByDate,
+} from "@prostcounter/shared/schemas";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
@@ -152,8 +154,8 @@ export const QuickAttendanceRegistrationForm = ({
     watch,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<QuickAttendanceFormData>({
-    resolver: zodResolver(quickAttendanceSchema),
+  } = useForm<QuickAttendanceForm>({
+    resolver: zodResolver(QuickAttendanceFormSchema),
     defaultValues: {
       tentId: "",
       beerCount: 0,
@@ -192,7 +194,7 @@ export const QuickAttendanceRegistrationForm = ({
     loadAttendance();
   }, [onAttendanceIdReceived, currentFestival, setValue, t]);
 
-  const onSubmit = async (data: QuickAttendanceFormData) => {
+  const onSubmit = async (data: QuickAttendanceForm) => {
     if (!currentFestival) {
       toast.error(t("notifications.error.noFestivalSelected"));
       return;

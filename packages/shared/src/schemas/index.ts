@@ -1,4 +1,7 @@
 // Export all schemas from a central location
+
+// API schemas (request/response validation)
+export * from "./auth.schema";
 export * from "./consumption.schema";
 export * from "./attendance.schema";
 export * from "./festival.schema";
@@ -14,3 +17,8 @@ export * from "./photo.schema";
 export * from "./calendar.schema";
 export * from "./profile.schema";
 export * from "./activity-feed.schema";
+
+// Form schemas (client-side form validation)
+export * from "./forms.schema";
+export * from "./admin-forms.schema";
+export * from "./upload.schema";

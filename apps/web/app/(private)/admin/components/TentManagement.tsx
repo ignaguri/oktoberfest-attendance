@@ -23,13 +23,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "@/lib/i18n/client";
-import {
-  addTentToFestivalSchema,
-  copyTentsSchema,
-  type AddTentToFestivalFormData,
-  type CopyTentsFormData,
-} from "@/lib/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AdminAddTentToFestivalFormSchema,
+  AdminCopyTentsFormSchema,
+  type AdminAddTentToFestivalForm,
+  type AdminCopyTentsForm,
+} from "@prostcounter/shared/schemas";
 import { Copy, Edit, Plus, Trash2, Euro, Tent } from "lucide-react";
 import { useState, useEffect, useCallback, startTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -72,8 +72,8 @@ export default function TentManagement() {
   const [showCopyDialog, setShowCopyDialog] = useState(false);
 
   // Forms
-  const createTentForm = useForm<AddTentToFestivalFormData>({
-    resolver: zodResolver(addTentToFestivalSchema),
+  const createTentForm = useForm<AdminAddTentToFestivalForm>({
+    resolver: zodResolver(AdminAddTentToFestivalFormSchema),
     defaultValues: {
       name: "",
       category: "",
@@ -81,8 +81,8 @@ export default function TentManagement() {
     },
   });
 
-  const copyTentsForm = useForm<CopyTentsFormData>({
-    resolver: zodResolver(copyTentsSchema),
+  const copyTentsForm = useForm<AdminCopyTentsForm>({
+    resolver: zodResolver(AdminCopyTentsFormSchema),
     defaultValues: {
       sourceFestivalId: "",
       targetFestivalId: selectedFestival,
@@ -140,7 +140,7 @@ export default function TentManagement() {
     }
   };
 
-  const handleCreateTent = async (data: AddTentToFestivalFormData) => {
+  const handleCreateTent = async (data: AdminAddTentToFestivalForm) => {
     try {
       await createTent(
         { name: data.name, category: data.category || null },
@@ -203,7 +203,7 @@ export default function TentManagement() {
     }
   };
 
-  const handleCopyTents = async (data: CopyTentsFormData) => {
+  const handleCopyTents = async (data: AdminCopyTentsForm) => {
     try {
       await copyTentsToFestival(
         data.sourceFestivalId,
@@ -636,9 +636,9 @@ function CopyTentsDialog({
   festivals,
   onSubmit,
 }: {
-  form: ReturnType<typeof useForm<CopyTentsFormData>>;
+  form: ReturnType<typeof useForm<AdminCopyTentsForm>>;
   festivals: Festival[];
-  onSubmit: (data: CopyTentsFormData) => void;
+  onSubmit: (data: AdminCopyTentsForm) => void;
 }) {
   const { t } = useTranslation();
   const [sourceTents, setSourceTents] = useState<TentWithPrice[]>([]);
@@ -667,7 +667,7 @@ function CopyTentsDialog({
     }
   }, [sourceFestivalId, loadSourceTents]);
 
-  const handleSubmit = (data: CopyTentsFormData) => {
+  const handleSubmit = (data: AdminCopyTentsForm) => {
     onSubmit({
       ...data,
       tentIds: selectedTents,

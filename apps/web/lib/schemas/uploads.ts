@@ -1,8 +1,18 @@
+import {
+  MAX_FILE_SIZE,
+  MAX_FILE_SIZE_MB,
+  MAX_PICTURES,
+  VALID_IMAGE_TYPES,
+} from "@prostcounter/shared/schemas";
 import { z } from "zod";
 
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-export const MAX_PICTURES = 10;
-const VALID_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+// Re-export constants for consumers that import from here
+export { MAX_FILE_SIZE, MAX_PICTURES };
+
+/**
+ * Web-specific upload schemas using browser File API
+ * For mobile, use FileMetadataSchema from @prostcounter/shared/schemas
+ */
 
 export const beerPicturesSchema = z.object({
   pictures: z
@@ -10,11 +20,15 @@ export const beerPicturesSchema = z.object({
       z
         .instanceof(File)
         .refine((file) => file.size <= MAX_FILE_SIZE, {
-          message: `File is too large (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`,
+          message: `File is too large (max ${MAX_FILE_SIZE_MB}MB)`,
         })
-        .refine((file) => VALID_FILE_TYPES.includes(file.type), {
-          message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-        }),
+        .refine(
+          (file) =>
+            (VALID_IMAGE_TYPES as readonly string[]).includes(file.type),
+          {
+            message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+          },
+        ),
     )
     .min(1, "At least one picture is required")
     .max(MAX_PICTURES, `Maximum ${MAX_PICTURES} pictures allowed`),
@@ -25,11 +39,14 @@ export const singlePictureSchema = z.object({
   picture: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, {
-      message: `File is too large (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`,
+      message: `File is too large (max ${MAX_FILE_SIZE_MB}MB)`,
     })
-    .refine((file) => VALID_FILE_TYPES.includes(file.type), {
-      message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-    }),
+    .refine(
+      (file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type),
+      {
+        message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+      },
+    ),
   visibility: z.enum(["public", "private"]),
 });
 
@@ -37,11 +54,14 @@ export const avatarSchema = z.object({
   avatar: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, {
-      message: `File is too large (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`,
+      message: `File is too large (max ${MAX_FILE_SIZE_MB}MB)`,
     })
-    .refine((file) => VALID_FILE_TYPES.includes(file.type), {
-      message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-    }),
+    .refine(
+      (file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type),
+      {
+        message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+      },
+    ),
 });
 
 export type BeerPicturesFormData = z.infer<typeof beerPicturesSchema>;

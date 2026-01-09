@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
-import { signInSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  signInSchema,
+  type SignInFormData,
+} from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-
-import type { SignInFormData } from "@/lib/schemas/auth";
 
 import { login, signInWithOAuth } from "./actions";
 import { GoogleIcon, FacebookIcon } from "./SocialIcons";

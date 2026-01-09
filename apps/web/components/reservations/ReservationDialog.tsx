@@ -13,12 +13,12 @@ import {
   useUpdateReservation,
 } from "@/hooks/useReservations";
 import { useTranslation } from "@/lib/i18n/client";
-import {
-  reservationSchema,
-  type ReservationFormData,
-} from "@/lib/schemas/reservation";
 import { createUrlWithParams } from "@/lib/url-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ReservationFormSchema,
+  type ReservationForm,
+} from "@prostcounter/shared/schemas";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -65,8 +65,8 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
     watch,
     reset,
     formState: { errors },
-  } = useForm<ReservationFormData>({
-    resolver: zodResolver(reservationSchema),
+  } = useForm<ReservationForm>({
+    resolver: zodResolver(ReservationFormSchema),
     defaultValues: {
       tentId: "",
       startAt: undefined,
@@ -116,7 +116,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   }, [router, searchParams]);
 
   const onSubmit = useCallback(
-    async (data: ReservationFormData) => {
+    async (data: ReservationForm) => {
       try {
         if (reservationId) {
           await updateReservation({

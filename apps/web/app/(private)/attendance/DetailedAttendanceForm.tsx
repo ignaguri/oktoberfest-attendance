@@ -16,8 +16,8 @@ import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
-import { createDetailedAttendanceSchema } from "@/lib/schemas/attendance";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createDetailedAttendanceFormSchema } from "@prostcounter/shared/schemas";
 import { isWithinInterval } from "date-fns";
 import {
   useState,
@@ -29,8 +29,10 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { DetailedAttendanceFormData } from "@/lib/schemas/attendance";
-import type { AttendanceByDate } from "@prostcounter/shared/schemas";
+import type {
+  DetailedAttendanceForm,
+  AttendanceByDate,
+} from "@prostcounter/shared/schemas";
 
 import { AttendanceDatePicker } from "./AttendanceDatePicker";
 import { BeerPicturesUpload } from "./BeerPicturesUpload";
@@ -56,7 +58,7 @@ export default function DetailedAttendanceForm({
     const festivalDates = getFestivalDates(currentFestival);
     if (!festivalDates) return null;
 
-    return createDetailedAttendanceSchema(
+    return createDetailedAttendanceFormSchema(
       festivalDates.startDate,
       festivalDates.endDate,
     );
@@ -119,7 +121,7 @@ export default function DetailedAttendanceForm({
     setValue,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<DetailedAttendanceFormData>({
+  } = useForm<DetailedAttendanceForm>({
     resolver: zodResolver(detailedAttendanceSchema!),
     defaultValues: {
       amount: 0,
@@ -135,7 +137,7 @@ export default function DetailedAttendanceForm({
     setValue("tents", existingAttendance?.tentIds || []);
   }, [existingAttendance, currentDate, setValue]);
 
-  const onSubmit = async (data: DetailedAttendanceFormData) => {
+  const onSubmit = async (data: DetailedAttendanceForm) => {
     try {
       const dateString = formatDateForDatabase(data.date);
       await apiClient.attendance.updatePersonal({

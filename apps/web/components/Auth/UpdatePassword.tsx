@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
-import { updatePasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  updatePasswordSchema,
+  type UpdatePasswordFormData,
+} from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-import type { UpdatePasswordFormData } from "@/lib/schemas/auth";
 
 import { updatePassword } from "./actions";
 
