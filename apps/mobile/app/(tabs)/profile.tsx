@@ -16,9 +16,9 @@ import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
 
-import { DangerZone } from "@/components/profile/DangerZone";
-import { ProfileHeader } from "@/components/profile/ProfileHeader";
-import { SettingsSection } from "@/components/profile/SettingsSection";
+import { DangerZone } from "@/components/profile/danger-zone";
+import { ProfileHeader } from "@/components/profile/profile-header";
+import { SettingsSection } from "@/components/profile/settings-section";
 import {
   Actionsheet,
   ActionsheetBackdrop,

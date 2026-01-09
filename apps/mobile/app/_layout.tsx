@@ -10,7 +10,7 @@ import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { GluestackUIProvider } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
