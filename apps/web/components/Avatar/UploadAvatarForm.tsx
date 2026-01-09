@@ -66,9 +66,11 @@ export default function UploadAvatarForm({
     const file = event.currentTarget.files?.[0];
     if (file) {
       setValue("avatar", file);
-      if (!errors.avatar) {
-        handleSubmit(onSubmit)();
-      }
+      // Create a preview URL for the selected image
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      // Let form validation handle checking the file - submit directly
+      handleSubmit(onSubmit)();
     }
   };
 

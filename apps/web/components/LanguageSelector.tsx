@@ -57,10 +57,10 @@ export function LanguageSelector({
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor="language-selector" className="font-semibold">
-        {t("profile.language.title")}
+        {t("profile.languageSettings.title")}
       </Label>
       <p className="mb-2 text-sm text-gray-600">
-        {t("profile.language.description")}
+        {t("profile.languageSettings.description")}
       </p>
       <Select
         value={getDisplayValue()}
@@ -73,16 +73,16 @@ export function LanguageSelector({
         <SelectContent>
           <SelectItem value="auto">
             {currentLanguage === null
-              ? t("profile.language.autoDetectCurrent", {
+              ? t("profile.languageSettings.autoDetectCurrent", {
                   language: t(
-                    `profile.language.languages.${detectedLanguage}` as const,
+                    `profile.languageSettings.languages.${detectedLanguage}` as const,
                   ),
                 })
-              : t("profile.language.autoDetect")}
+              : t("profile.languageSettings.autoDetect")}
           </SelectItem>
           {SUPPORTED_LANGUAGES.map((lang) => (
             <SelectItem key={lang} value={lang}>
-              {t(`profile.language.languages.${lang}` as const)}
+              {t(`profile.languageSettings.languages.${lang}` as const)}
             </SelectItem>
           ))}
         </SelectContent>

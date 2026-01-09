@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -11,6 +12,13 @@ export interface InputProps
   rightElement?: React.ReactNode;
 }
 
+/**
+ * Check if a string looks like a translation key (e.g., "validation.groupName.required")
+ */
+function isTranslationKey(str: string): boolean {
+  return /^[a-zA-Z]+(\.[a-zA-Z_]+)+$/.test(str);
+}
+
 function Input({
   className,
   type,
@@ -18,7 +26,12 @@ function Input({
   rightElement,
   ...props
 }: InputProps) {
+  const { t } = useTranslation();
   const errorId = React.useId();
+
+  // Translate error message if it looks like a translation key
+  const translatedErrorMsg =
+    errorMsg && isTranslationKey(errorMsg) ? t(errorMsg) : errorMsg;
 
   return (
     <div className="w-full">
@@ -30,13 +43,13 @@ function Input({
             "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
             "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
             "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
-            errorMsg &&
+            translatedErrorMsg &&
               "border-red-500 bg-red-50 text-red-900 placeholder:text-red-700 focus-visible:ring-red-500",
             rightElement && "pr-10",
             className,
           )}
-          aria-describedby={errorMsg ? errorId : undefined}
-          aria-invalid={!!errorMsg}
+          aria-describedby={translatedErrorMsg ? errorId : undefined}
+          aria-invalid={!!translatedErrorMsg}
           {...props}
         />
         {rightElement && (
@@ -45,9 +58,9 @@ function Input({
           </div>
         )}
       </div>
-      {errorMsg && (
+      {translatedErrorMsg && (
         <span id={errorId} className="w-full text-center text-sm text-red-600">
-          {errorMsg}
+          {translatedErrorMsg}
         </span>
       )}
     </div>

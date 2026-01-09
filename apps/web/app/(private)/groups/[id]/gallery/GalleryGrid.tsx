@@ -1,9 +1,12 @@
 "use client";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { TIMEZONE, IMAGE_PLACEHOLDER_BASE64 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { TZDate } from "@date-fns/tz";
+import {
+  TIMEZONE,
+  IMAGE_PLACEHOLDER_BASE64,
+} from "@prostcounter/shared/constants";
 import { format } from "date-fns";
 import { Camera } from "lucide-react";
 import Image from "next/image";

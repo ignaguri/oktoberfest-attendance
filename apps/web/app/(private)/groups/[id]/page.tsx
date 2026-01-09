@@ -3,7 +3,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
-import { winningCriteriaText } from "@/lib/constants";
+import { getTranslations } from "@/lib/i18n/server";
 import { createClient } from "@/utils/supabase/server";
 import { CalendarDays, Images } from "lucide-react";
 import { headers } from "next/headers";
@@ -98,6 +98,7 @@ export default async function GroupPage({
   );
 
   const winningCriteriaName = leaderboardResponse.winningCriteria?.name;
+  const t = getTranslations();
 
   return (
     <div className="w-full max-w-lg">
@@ -114,8 +115,7 @@ export default async function GroupPage({
         )}
 
         <p className="mb-4 text-sm font-medium text-gray-500">
-          Winning Criteria:{" "}
-          {winningCriteriaText[winningCriteriaName as WinningCriteria]}
+          Winning Criteria: {t(`groups.winningCriteria.${winningCriteriaName}`)}
         </p>
 
         <div className="flex flex-col gap-4">

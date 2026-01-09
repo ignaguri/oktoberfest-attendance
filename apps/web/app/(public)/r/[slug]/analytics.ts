@@ -1,5 +1,5 @@
-import { IS_PROD } from "@/lib/constants";
 import { logger } from "@/lib/logger";
+import { IS_PROD } from "@prostcounter/shared/constants";
 
 type RedirectSlug = "bugs" | "feedback" | "donate" | "github";
 

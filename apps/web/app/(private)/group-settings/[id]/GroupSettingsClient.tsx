@@ -21,18 +21,16 @@ import {
   useRenewInviteToken,
 } from "@/hooks/useGroups";
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
-import { winningCriteriaText } from "@/lib/constants";
 import { useCurrentUser } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { groupSettingsSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GroupSettingsFormSchema } from "@prostcounter/shared/schemas";
 import { Link, Copy, Check } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { GroupSettingsFormData } from "@/lib/schemas/groups";
-import type { WinningCriteria } from "@/lib/types";
+import type { GroupSettingsForm } from "@prostcounter/shared/schemas";
 import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 
 // Winning criteria as string literals (matching API response)
@@ -88,8 +86,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<GroupSettingsFormData>({
-    resolver: zodResolver(groupSettingsSchema),
+  } = useForm<GroupSettingsForm>({
+    resolver: zodResolver(GroupSettingsFormSchema),
     defaultValues: {
       name: group.name,
       description: group.description || "",
@@ -100,7 +98,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const winningCriteriaId = watch("winning_criteria_id");
 
   const onSubmit = useCallback(
-    async (data: GroupSettingsFormData) => {
+    async (data: GroupSettingsForm) => {
       if (!isCreator) {
         alert(t("apiErrors.NOT_GROUP_CREATOR"));
         return;
@@ -234,8 +232,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                     options: (winningCriterias ?? []).map(
                       (criteria: WinningCriteriaOption) => ({
                         value: criteria.id.toString(),
-                        label:
-                          winningCriteriaText[criteria.name as WinningCriteria],
+                        label: t(`groups.winningCriteria.${criteria.name}`),
                       }),
                     ),
                   },

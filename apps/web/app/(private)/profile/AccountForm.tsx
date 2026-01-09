@@ -15,15 +15,15 @@ import {
   useUpdateProfile,
 } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { profileSchema } from "@/lib/schemas/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { changeLanguage } from "@prostcounter/shared/i18n";
+import { ProfileFormSchema } from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { ProfileFormData } from "@/lib/schemas/profile";
+import type { ProfileForm } from "@prostcounter/shared/schemas";
 
 export default function AccountForm() {
   const { t } = useTranslation();
@@ -49,8 +49,8 @@ export default function AccountForm() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+  } = useForm<ProfileForm>({
+    resolver: zodResolver(ProfileFormSchema),
     defaultValues: {
       fullname: "",
       username: "",
@@ -92,7 +92,7 @@ export default function AccountForm() {
     );
   }
 
-  const onSubmit = async (data: ProfileFormData) => {
+  const onSubmit = async (data: ProfileForm) => {
     try {
       await updateProfileMutation({
         ...(data.username && { username: data.username }),
@@ -151,9 +151,9 @@ export default function AccountForm() {
         await changeLanguage(detected);
       }
 
-      toast.success(t("profile.language.updateSuccess"));
+      toast.success(t("profile.languageSettings.updateSuccess"));
     } catch {
-      toast.error(t("profile.language.updateError"));
+      toast.error(t("profile.languageSettings.updateError"));
     }
   };
 
