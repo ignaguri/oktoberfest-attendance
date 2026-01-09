@@ -1,4 +1,3 @@
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useCurrentProfile,
@@ -12,6 +11,7 @@ import {
   type UpdateProfileInput,
 } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
+import { Lock, LogOut } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
@@ -302,7 +302,7 @@ export default function ProfileScreen() {
               onPress={handleSignOut}
               accessibilityLabel={t("profile.signOut.button")}
             >
-              <MaterialCommunityIcons name="logout" size={20} color="#FFFFFF" />
+              <LogOut size={20} color="#FFFFFF" />
               <ButtonText>{t("profile.signOut.button")}</ButtonText>
             </Button>
 
@@ -314,11 +314,7 @@ export default function ProfileScreen() {
                 defaultValue: "Change Password",
               })}
             >
-              <MaterialCommunityIcons
-                name="lock-outline"
-                size={20}
-                color="#6B7280"
-              />
+              <Lock size={20} color="#6B7280" />
               <ButtonText>
                 {t("profile.changePassword.title", {
                   defaultValue: "Change Password",

@@ -1,14 +1,22 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { useRouter } from "expo-router";
+import {
+  Bell,
+  ChevronRight,
+  Fingerprint,
+  Image as ImageIcon,
+  Languages,
+  ScanFace,
+} from "lucide-react-native";
+import React from "react";
+
+import type { BiometricType } from "@/hooks/useBiometrics";
+
 import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { useRouter } from "expo-router";
-import React from "react";
-
-import type { BiometricType } from "@/hooks/useBiometrics";
 
 interface SettingsSectionProps {
   isBiometricAvailable: boolean;
@@ -44,13 +52,11 @@ export function SettingsSection({
       {isBiometricAvailable && (
         <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
           <View className="flex-row items-center gap-3">
-            <MaterialCommunityIcons
-              name={
-                biometricType === "facial" ? "face-recognition" : "fingerprint"
-              }
-              size={24}
-              color="#6B7280"
-            />
+            {biometricType === "facial" ? (
+              <ScanFace size={24} color="#6B7280" />
+            ) : (
+              <Fingerprint size={24} color="#6B7280" />
+            )}
             <View>
               <Text className="text-typography-900">{biometricLabel}</Text>
               <Text className="text-sm text-typography-500">
@@ -76,11 +82,7 @@ export function SettingsSection({
         accessibilityLabel={t("profile.notifications.title")}
       >
         <View className="flex-row items-center gap-3">
-          <MaterialCommunityIcons
-            name="bell-outline"
-            size={24}
-            color="#6B7280"
-          />
+          <Bell size={24} color="#6B7280" />
           <View>
             <Text className="text-typography-900">
               {t("profile.notifications.title")}
@@ -90,11 +92,7 @@ export function SettingsSection({
             </Text>
           </View>
         </View>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={24}
-          color="#9CA3AF"
-        />
+        <ChevronRight size={24} color="#9CA3AF" />
       </Pressable>
 
       {/* Photo Privacy - Navigate to settings page */}
@@ -107,11 +105,7 @@ export function SettingsSection({
         })}
       >
         <View className="flex-row items-center gap-3">
-          <MaterialCommunityIcons
-            name="image-outline"
-            size={24}
-            color="#6B7280"
-          />
+          <ImageIcon size={24} color="#6B7280" />
           <View>
             <Text className="text-typography-900">
               {t("profile.photoPrivacy.title", {
@@ -125,17 +119,13 @@ export function SettingsSection({
             </Text>
           </View>
         </View>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={24}
-          color="#9CA3AF"
-        />
+        <ChevronRight size={24} color="#9CA3AF" />
       </Pressable>
 
       {/* Language Display - Only English available for now */}
       <View className="flex-row items-center justify-between py-3">
         <View className="flex-row items-center gap-3">
-          <MaterialCommunityIcons name="translate" size={24} color="#6B7280" />
+          <Languages size={24} color="#6B7280" />
           <Text className="text-typography-900">{t("profile.language")}</Text>
         </View>
         <View className="flex-row items-center gap-1">

@@ -1,3 +1,12 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn, getInitials } from "@prostcounter/ui";
+import { Camera } from "lucide-react-native";
+import React from "react";
+import { type Control, Controller, type FieldErrors } from "react-hook-form";
+
+import type { Profile, UpdateProfileInput } from "@prostcounter/shared/schemas";
+import type { User } from "@supabase/supabase-js";
+
 import {
   Avatar,
   AvatarBadge,
@@ -13,14 +22,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { getAvatarUrl } from "@/lib/utils";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn, getInitials } from "@prostcounter/ui";
-import React from "react";
-import { type Control, Controller, type FieldErrors } from "react-hook-form";
-
-import type { Profile, UpdateProfileInput } from "@prostcounter/shared/schemas";
-import type { User } from "@supabase/supabase-js";
 
 interface ProfileHeaderProps {
   profile: Profile | null;
@@ -86,11 +87,7 @@ export function ProfileHeader({
               {isAvatarUploading ? (
                 <Spinner size="small" color="#FFFFFF" />
               ) : (
-                <MaterialCommunityIcons
-                  name="camera"
-                  size={16}
-                  color="#FFFFFF"
-                />
+                <Camera size={16} color="#FFFFFF" />
               )}
             </AvatarBadge>
           </Avatar>
