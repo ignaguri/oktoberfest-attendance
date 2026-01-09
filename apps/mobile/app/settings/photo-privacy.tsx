@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff, Info, Users } from 'lucide-react-native';
 import { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -6,11 +8,10 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Text } from '@/components/ui/text';
 import { Switch } from '@/components/ui/switch';
+import { Colors, IconColors, SwitchColorsDestructive } from '@/lib/constants/colors';
 import { apiClient } from '@/lib/api-client';
 
 interface GroupPhotoSetting {
@@ -126,7 +127,7 @@ export default function PhotoPrivacyScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background-50 items-center justify-center">
-        <ActivityIndicator size="large" color="#F59E0B" />
+        <ActivityIndicator size="large" color={Colors.primary[500]} />
       </View>
     );
   }
@@ -142,11 +143,7 @@ export default function PhotoPrivacyScreen() {
         {/* Description */}
         <View className="bg-yellow-50 rounded-2xl p-4 mb-4 border border-yellow-200">
           <View className="flex-row items-start gap-3">
-            <MaterialCommunityIcons
-              name="information-outline"
-              size={24}
-              color="#D97706"
-            />
+            <Info size={24} color={Colors.primary[600]} />
             <Text className="text-yellow-800 text-sm flex-1">
               {t('profile.photoPrivacy.description', {
                 defaultValue:
@@ -164,11 +161,11 @@ export default function PhotoPrivacyScreen() {
 
           <View className="flex-row items-center justify-between py-3">
             <View className="flex-row items-center gap-3 flex-1">
-              <MaterialCommunityIcons
-                name={settings.hidePhotosFromAllGroups ? 'eye-off' : 'eye'}
-                size={24}
-                color={settings.hidePhotosFromAllGroups ? '#EF4444' : '#22C55E'}
-              />
+              {settings.hidePhotosFromAllGroups ? (
+                <EyeOff size={24} color={Colors.error[500]} />
+              ) : (
+                <Eye size={24} color={Colors.success[500]} />
+              )}
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t('profile.photoPrivacy.hideFromAll', {
@@ -186,8 +183,8 @@ export default function PhotoPrivacyScreen() {
               value={settings.hidePhotosFromAllGroups}
               onValueChange={handleGlobalToggle}
               disabled={isSaving}
-              trackColor={{ false: '#D1D5DB', true: '#EF4444' }}
-              thumbColor="#FFFFFF"
+              trackColor={{ false: SwitchColorsDestructive.trackOff, true: SwitchColorsDestructive.trackOn }}
+              thumbColor={SwitchColorsDestructive.thumb}
             />
           </View>
         </View>
@@ -206,11 +203,7 @@ export default function PhotoPrivacyScreen() {
 
           {settings.groups.length === 0 ? (
             <View className="py-4 items-center">
-              <MaterialCommunityIcons
-                name="account-group-outline"
-                size={48}
-                color="#D1D5DB"
-              />
+              <Users size={48} color={Colors.gray[300]} />
               <Text className="text-typography-500 text-center mt-2">
                 {t('profile.photoPrivacy.noGroups', {
                   defaultValue: "You're not a member of any groups yet.",
@@ -226,11 +219,11 @@ export default function PhotoPrivacyScreen() {
                 }`}
               >
                 <View className="flex-row items-center gap-3 flex-1">
-                  <MaterialCommunityIcons
-                    name={group.hidePhotosFromGroup ? 'eye-off' : 'eye'}
-                    size={24}
-                    color={group.hidePhotosFromGroup ? '#EF4444' : '#22C55E'}
-                  />
+                  {group.hidePhotosFromGroup ? (
+                    <EyeOff size={24} color={Colors.error[500]} />
+                  ) : (
+                    <Eye size={24} color={Colors.success[500]} />
+                  )}
                   <View className="flex-1">
                     <Text className="text-typography-900">
                       {t('profile.photoPrivacy.hideFromGroup', {
@@ -249,8 +242,8 @@ export default function PhotoPrivacyScreen() {
                   value={group.hidePhotosFromGroup}
                   onValueChange={(value) => handleGroupToggle(group.groupId, value)}
                   disabled={isSaving || settings.hidePhotosFromAllGroups}
-                  trackColor={{ false: '#D1D5DB', true: '#EF4444' }}
-                  thumbColor="#FFFFFF"
+                  trackColor={{ false: SwitchColorsDestructive.trackOff, true: SwitchColorsDestructive.trackOn }}
+                  thumbColor={SwitchColorsDestructive.thumb}
                 />
               </View>
             ))

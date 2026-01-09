@@ -4,9 +4,9 @@
  * A development-only screen for testing and previewing UI components.
  * This tab is only visible when __DEV__ is true.
  */
+import { ChevronDown, Puzzle, X } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Pressable, ActionSheetIOS, Platform } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import {
   Button,
@@ -70,7 +70,7 @@ import {
   ToastTitle,
   ToastDescription,
 } from "@/components/ui";
-import { ChevronDown } from "lucide-react-native";
+import { Colors, IconColors } from "@/lib/constants/colors";
 
 type ComponentType =
   | "buttons"
@@ -108,7 +108,13 @@ const COMPONENT_OPTIONS: { label: string; value: ComponentType }[] = [
 ];
 
 // Section wrapper component (replaces CardHeader/CardTitle/CardContent)
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
   <Card className="p-4">
     <VStack space="md">
       <Heading size="md">{title}</Heading>
@@ -122,7 +128,7 @@ const ButtonsShowcase = () => (
   <Section title="Buttons">
     <VStack space="md">
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">
+        <Text bold className="text-xs uppercase text-gray-600">
           Solid Actions
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -147,7 +153,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">
+        <Text bold className="text-xs uppercase text-gray-600">
           Outline
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -169,7 +175,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">
+        <Text bold className="text-xs uppercase text-gray-600">
           Ghost (New)
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -186,7 +192,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">
+        <Text bold className="text-xs uppercase text-gray-600">
           Link
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -197,7 +203,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">
+        <Text bold className="text-xs uppercase text-gray-600">
           Sizes
         </Text>
         <HStack space="sm" className="flex-wrap items-center">
@@ -214,8 +220,8 @@ const ButtonsShowcase = () => (
             <ButtonText>LG</ButtonText>
           </Button>
         </HStack>
-        <HStack space="sm" className="flex-wrap items-center mt-2">
-          <Text className="text-gray-600 text-xs">Icon Size:</Text>
+        <HStack space="sm" className="mt-2 flex-wrap items-center">
+          <Text className="text-xs text-gray-600">Icon Size:</Text>
           <Button action="primary" size="icon">
             <AddIcon className="text-white" />
           </Button>
@@ -234,7 +240,7 @@ const ButtonsShowcase = () => (
 const BadgesShowcase = () => (
   <Section title="Badges">
     <VStack space="sm">
-      <Text bold className="text-gray-600 text-xs uppercase">
+      <Text bold className="text-xs uppercase text-gray-600">
         Solid
       </Text>
       <HStack space="sm" className="flex-wrap">
@@ -256,7 +262,7 @@ const BadgesShowcase = () => (
           <BadgeText>Muted</BadgeText>
         </Badge>
       </HStack>
-      <Text bold className="text-gray-600 text-xs uppercase mt-2">
+      <Text bold className="mt-2 text-xs uppercase text-gray-600">
         Outline
       </Text>
       <HStack space="sm" className="flex-wrap">
@@ -274,7 +280,7 @@ const BadgesShowcase = () => (
 const AvatarsShowcase = () => (
   <Section title="Avatars">
     <VStack space="sm">
-      <Text bold className="text-gray-600 text-xs uppercase">
+      <Text bold className="text-xs uppercase text-gray-600">
         Sizes
       </Text>
       <HStack space="md" className="items-end">
@@ -294,7 +300,7 @@ const AvatarsShowcase = () => (
           <AvatarFallbackText>XL</AvatarFallbackText>
         </Avatar>
       </HStack>
-      <Text bold className="text-gray-600 text-xs uppercase mt-2">
+      <Text bold className="mt-2 text-xs uppercase text-gray-600">
         With Badge
       </Text>
       <HStack space="md">
@@ -319,7 +325,7 @@ const FormControlsShowcase = () => {
     <Section title="Form Controls">
       <VStack space="lg">
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Input
           </Text>
           <Input variant="outline" size="md">
@@ -378,18 +384,14 @@ const ModalShowcase = () => {
   return (
     <Section title="Modal">
       <VStack space="md">
-        <Text className="text-gray-600 text-sm">
+        <Text className="text-sm text-gray-600">
           Tap the button below to open a modal dialog.
         </Text>
         <Button action="primary" onPress={() => setModalOpen(true)}>
           <ButtonText>Open Modal</ButtonText>
         </Button>
 
-        <Modal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          size="md"
-        >
+        <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} size="md">
           <ModalBackdrop />
           <ModalContent>
             <ModalHeader>
@@ -397,13 +399,13 @@ const ModalShowcase = () => {
                 Example Modal
               </Heading>
               <ModalCloseButton>
-                <MaterialCommunityIcons name="close" size={24} color="#6B7280" />
+                <X size={24} color={IconColors.default} />
               </ModalCloseButton>
             </ModalHeader>
             <ModalBody>
               <Text>
-                This is an example modal dialog. It can contain any content
-                you need to display to the user.
+                This is an example modal dialog. It can contain any content you
+                need to display to the user.
               </Text>
             </ModalBody>
             <ModalFooter>
@@ -450,13 +452,17 @@ const TextareaShowcase = () => (
   <Section title="Textarea">
     <VStack space="md">
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">Default</Text>
+        <Text bold className="text-xs uppercase text-gray-600">
+          Default
+        </Text>
         <Textarea size="md">
           <TextareaInput placeholder="Enter your message here..." />
         </Textarea>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">Small Size</Text>
+        <Text bold className="text-xs uppercase text-gray-600">
+          Small Size
+        </Text>
         <Textarea size="sm">
           <TextareaInput placeholder="Small textarea" />
         </Textarea>
@@ -469,25 +475,33 @@ const ProgressShowcase = () => (
   <Section title="Progress">
     <VStack space="md">
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">25% Progress</Text>
+        <Text bold className="text-xs uppercase text-gray-600">
+          25% Progress
+        </Text>
         <Progress value={25} size="md">
           <ProgressFilledTrack />
         </Progress>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">50% Progress</Text>
+        <Text bold className="text-xs uppercase text-gray-600">
+          50% Progress
+        </Text>
         <Progress value={50} size="md">
           <ProgressFilledTrack />
         </Progress>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">75% Progress (Large)</Text>
+        <Text bold className="text-xs uppercase text-gray-600">
+          75% Progress (Large)
+        </Text>
         <Progress value={75} size="lg">
           <ProgressFilledTrack />
         </Progress>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">Complete (XL)</Text>
+        <Text bold className="text-xs uppercase text-gray-600">
+          Complete (XL)
+        </Text>
         <Progress value={100} size="xl">
           <ProgressFilledTrack />
         </Progress>
@@ -503,14 +517,20 @@ const SelectShowcase = () => {
     <Section title="Select">
       <VStack space="md">
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">Choose a tent</Text>
+          <Text bold className="text-xs uppercase text-gray-600">
+            Choose a tent
+          </Text>
           <Select
             selectedValue={selectedValue}
             onValueChange={setSelectedValue}
           >
             <SelectTrigger variant="outline" size="md">
               <SelectInput placeholder="Select tent..." />
-              <ChevronDown size={20} color="#6B7280" style={{ marginRight: 12 }} />
+              <ChevronDown
+                size={20}
+                color={IconColors.default}
+                style={{ marginRight: 12 }}
+              />
             </SelectTrigger>
             <SelectPortal>
               <SelectBackdrop />
@@ -540,16 +560,16 @@ const SelectShowcase = () => {
 const DividerShowcase = () => (
   <Section title="Divider">
     <VStack space="md">
-      <Text bold className="text-gray-600 text-xs uppercase">
+      <Text bold className="text-xs uppercase text-gray-600">
         Horizontal
       </Text>
       <Text>Content above divider</Text>
       <Divider orientation="horizontal" />
       <Text>Content below divider</Text>
-      <Text bold className="text-gray-600 text-xs uppercase mt-2">
+      <Text bold className="mt-2 text-xs uppercase text-gray-600">
         Vertical
       </Text>
-      <HStack space="md" className="items-center h-8">
+      <HStack space="md" className="h-8 items-center">
         <Text>Left</Text>
         <Divider orientation="vertical" />
         <Text>Middle</Text>
@@ -566,14 +586,17 @@ const ActionsheetShowcase = () => {
   return (
     <Section title="ActionSheet">
       <VStack space="md">
-        <Text className="text-gray-600 text-sm">
+        <Text className="text-sm text-gray-600">
           Bottom sheet with multiple action options.
         </Text>
         <Button action="primary" onPress={() => setShowActionsheet(true)}>
           <ButtonText>Open ActionSheet</ButtonText>
         </Button>
 
-        <Actionsheet isOpen={showActionsheet} onClose={() => setShowActionsheet(false)}>
+        <Actionsheet
+          isOpen={showActionsheet}
+          onClose={() => setShowActionsheet(false)}
+        >
           <ActionsheetBackdrop />
           <ActionsheetContent>
             <ActionsheetDragIndicatorWrapper>
@@ -601,10 +624,10 @@ const ActionsheetShowcase = () => {
 const FabShowcase = () => (
   <Section title="Floating Action Button (FAB)">
     <VStack space="md">
-      <Text className="text-gray-600 text-sm">
+      <Text className="text-sm text-gray-600">
         Floating action buttons for primary actions.
       </Text>
-      <Box className="h-48 bg-gray-100 rounded-lg relative">
+      <Box className="relative h-48 rounded-lg bg-gray-100">
         <Fab size="md" placement="bottom right">
           <FabIcon as={AddIcon} />
         </Fab>
@@ -617,21 +640,21 @@ const FabShowcase = () => (
         </Fab>
       </Box>
       <VStack space="xs">
-        <Text bold className="text-gray-600 text-xs uppercase">
+        <Text bold className="text-xs uppercase text-gray-600">
           Sizes
         </Text>
         <HStack space="md" className="items-center">
-          <Box className="h-16 w-16 bg-gray-100 rounded-lg relative">
+          <Box className="relative h-16 w-16 rounded-lg bg-gray-100">
             <Fab size="sm" placement="bottom right">
               <FabIcon as={AddIcon} />
             </Fab>
           </Box>
-          <Box className="h-16 w-16 bg-gray-100 rounded-lg relative">
+          <Box className="relative h-16 w-16 rounded-lg bg-gray-100">
             <Fab size="md" placement="bottom right">
               <FabIcon as={AddIcon} />
             </Fab>
           </Box>
-          <Box className="h-16 w-16 bg-gray-100 rounded-lg relative">
+          <Box className="relative h-16 w-16 rounded-lg bg-gray-100">
             <Fab size="lg" placement="bottom right">
               <FabIcon as={AddIcon} />
             </Fab>
@@ -648,18 +671,26 @@ const SkeletonShowcase = () => {
   return (
     <Section title="Skeleton">
       <VStack space="md">
-        <Text className="text-gray-600 text-sm">
+        <Text className="text-sm text-gray-600">
           Loading placeholders for content.
         </Text>
-        <Button action="secondary" variant="outline" onPress={() => setIsLoaded(!isLoaded)}>
+        <Button
+          action="secondary"
+          variant="outline"
+          onPress={() => setIsLoaded(!isLoaded)}
+        >
           <ButtonText>{isLoaded ? "Show Skeleton" : "Load Content"}</ButtonText>
         </Button>
 
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Card Skeleton
           </Text>
-          <Skeleton variant="rounded" isLoaded={isLoaded} className="h-24 w-full">
+          <Skeleton
+            variant="rounded"
+            isLoaded={isLoaded}
+            className="h-24 w-full"
+          >
             <Card className="p-4">
               <Text>Loaded card content!</Text>
             </Card>
@@ -667,10 +698,15 @@ const SkeletonShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Text Lines
           </Text>
-          <SkeletonText _lines={3} isLoaded={isLoaded} gap={2} className="h-3 w-full">
+          <SkeletonText
+            _lines={3}
+            isLoaded={isLoaded}
+            gap={2}
+            className="h-3 w-full"
+          >
             <VStack space="sm">
               <Text>First line of text</Text>
               <Text>Second line of text</Text>
@@ -680,10 +716,14 @@ const SkeletonShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Avatar Skeleton
           </Text>
-          <Skeleton variant="circular" isLoaded={isLoaded} className="h-16 w-16">
+          <Skeleton
+            variant="circular"
+            isLoaded={isLoaded}
+            className="h-16 w-16"
+          >
             <Avatar size="xl">
               <AvatarFallbackText>AB</AvatarFallbackText>
             </Avatar>
@@ -691,21 +731,35 @@ const SkeletonShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Combined Layout
           </Text>
           <HStack space="md" className="items-center">
-            <Skeleton variant="circular" isLoaded={isLoaded} className="h-12 w-12">
+            <Skeleton
+              variant="circular"
+              isLoaded={isLoaded}
+              className="h-12 w-12"
+            >
               <Avatar size="lg">
                 <AvatarFallbackText>JD</AvatarFallbackText>
               </Avatar>
             </Skeleton>
             <VStack className="flex-1">
-              <Skeleton variant="rounded" isLoaded={isLoaded} className="h-4 w-3/4 mb-2">
+              <Skeleton
+                variant="rounded"
+                isLoaded={isLoaded}
+                className="mb-2 h-4 w-3/4"
+              >
                 <Text bold>John Doe</Text>
               </Skeleton>
-              <Skeleton variant="rounded" isLoaded={isLoaded} className="h-3 w-1/2">
-                <Text size="sm" className="text-gray-500">@johndoe</Text>
+              <Skeleton
+                variant="rounded"
+                isLoaded={isLoaded}
+                className="h-3 w-1/2"
+              >
+                <Text size="sm" className="text-gray-500">
+                  @johndoe
+                </Text>
               </Skeleton>
             </VStack>
           </HStack>
@@ -718,7 +772,10 @@ const SkeletonShowcase = () => {
 const ToastShowcase = () => {
   const toast = useToast();
 
-  const showToast = (action: "success" | "error" | "warning" | "info" | "muted", variant: "solid" | "outline" = "solid") => {
+  const showToast = (
+    action: "success" | "error" | "warning" | "info" | "muted",
+    variant: "solid" | "outline" = "solid",
+  ) => {
     const titles: Record<string, string> = {
       success: "Success!",
       error: "Error!",
@@ -749,46 +806,77 @@ const ToastShowcase = () => {
   return (
     <Section title="Toast">
       <VStack space="md">
-        <Text className="text-gray-600 text-sm">
+        <Text className="text-sm text-gray-600">
           Toast notifications for user feedback.
         </Text>
 
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Solid Variants
           </Text>
           <HStack space="sm" className="flex-wrap">
-            <Button action="positive" size="sm" onPress={() => showToast("success")}>
+            <Button
+              action="positive"
+              size="sm"
+              onPress={() => showToast("success")}
+            >
               <ButtonText>Success</ButtonText>
             </Button>
-            <Button action="negative" size="sm" onPress={() => showToast("error")}>
+            <Button
+              action="negative"
+              size="sm"
+              onPress={() => showToast("error")}
+            >
               <ButtonText>Error</ButtonText>
             </Button>
           </HStack>
           <HStack space="sm" className="flex-wrap">
-            <Button action="primary" size="sm" onPress={() => showToast("warning")}>
+            <Button
+              action="primary"
+              size="sm"
+              onPress={() => showToast("warning")}
+            >
               <ButtonText>Warning</ButtonText>
             </Button>
-            <Button action="secondary" size="sm" onPress={() => showToast("info")}>
+            <Button
+              action="secondary"
+              size="sm"
+              onPress={() => showToast("info")}
+            >
               <ButtonText>Info</ButtonText>
             </Button>
           </HStack>
           <HStack space="sm" className="flex-wrap">
-            <Button action="secondary" variant="outline" size="sm" onPress={() => showToast("muted")}>
+            <Button
+              action="secondary"
+              variant="outline"
+              size="sm"
+              onPress={() => showToast("muted")}
+            >
               <ButtonText>Muted</ButtonText>
             </Button>
           </HStack>
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-gray-600 text-xs uppercase">
+          <Text bold className="text-xs uppercase text-gray-600">
             Outline Variants
           </Text>
           <HStack space="sm" className="flex-wrap">
-            <Button action="positive" variant="outline" size="sm" onPress={() => showToast("success", "outline")}>
+            <Button
+              action="positive"
+              variant="outline"
+              size="sm"
+              onPress={() => showToast("success", "outline")}
+            >
               <ButtonText>Success</ButtonText>
             </Button>
-            <Button action="negative" variant="outline" size="sm" onPress={() => showToast("error", "outline")}>
+            <Button
+              action="negative"
+              variant="outline"
+              size="sm"
+              onPress={() => showToast("error", "outline")}
+            >
               <ButtonText>Error</ButtonText>
             </Button>
           </HStack>
@@ -837,18 +925,21 @@ const renderComponent = (component: ComponentType) => {
 };
 
 export default function ComponentsScreen() {
-  const [selectedComponent, setSelectedComponent] = useState<ComponentType>("buttons");
+  const [selectedComponent, setSelectedComponent] =
+    useState<ComponentType>("buttons");
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
       <VStack space="md" className="p-4 pb-8">
         {/* Header */}
         <Box className="items-center py-2">
-          <MaterialCommunityIcons name="puzzle" size={40} color="#F59E0B" />
+          <Puzzle size={40} color={Colors.primary[500]} />
           <Heading size="lg" className="mt-1">
             UI Components
           </Heading>
-          <Text size="sm" className="text-gray-500">Development Preview</Text>
+          <Text size="sm" className="text-gray-500">
+            Development Preview
+          </Text>
         </Box>
 
         {/* Component Selector */}
@@ -863,18 +954,23 @@ export default function ComponentsScreen() {
                 },
                 (buttonIndex) => {
                   if (buttonIndex > 0) {
-                    setSelectedComponent(COMPONENT_OPTIONS[buttonIndex - 1].value);
+                    setSelectedComponent(
+                      COMPONENT_OPTIONS[buttonIndex - 1].value,
+                    );
                   }
-                }
+                },
               );
             }
           }}
-          className="bg-white rounded-xl border border-gray-300 px-4 py-3 flex-row items-center justify-between active:bg-gray-50"
+          className="flex-row items-center justify-between rounded-xl border border-gray-300 bg-white px-4 py-3 active:bg-gray-50"
         >
-          <Text className="text-gray-900 text-base">
-            {COMPONENT_OPTIONS.find((o) => o.value === selectedComponent)?.label}
+          <Text className="text-base text-gray-900">
+            {
+              COMPONENT_OPTIONS.find((o) => o.value === selectedComponent)
+                ?.label
+            }
           </Text>
-          <ChevronDown size={20} color="#6B7280" />
+          <ChevronDown size={20} color={IconColors.default} />
         </Pressable>
 
         {/* Selected Component Showcase */}

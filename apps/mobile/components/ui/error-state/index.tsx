@@ -5,6 +5,7 @@ import React from "react";
 import { Alert, AlertText } from "@/components/ui/alert";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
+import { IconColors } from "@/lib/constants/colors";
 
 interface ErrorStateProps {
   /** The error to display */
@@ -48,7 +49,7 @@ export function ErrorState({
   return (
     <VStack space="md" className="items-center p-4">
       <Alert action="error" variant="outline" className="w-full">
-        <AlertCircle size={20} color="#DC2626" />
+        <AlertCircle size={20} color={IconColors.error} />
         <VStack space="xs" className="flex-1">
           <AlertText bold>{errorTitle}</AlertText>
           <AlertText size="sm">{errorMessage}</AlertText>
@@ -56,7 +57,7 @@ export function ErrorState({
       </Alert>
       {showRetry && onRetry && (
         <Button variant="outline" action="secondary" onPress={onRetry}>
-          <RefreshCw size={18} color="#6B7280" />
+          <RefreshCw size={18} color={IconColors.default} />
           <ButtonText>
             {t("common.buttons.tryAgain", { defaultValue: "Try Again" })}
           </ButtonText>

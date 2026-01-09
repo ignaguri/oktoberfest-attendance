@@ -1,7 +1,9 @@
 import { Stack, useRouter } from 'expo-router';
-import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
+import { Colors, IconColors } from '@/lib/constants/colors';
 
 export default function SettingsLayout() {
   const { t } = useTranslation();
@@ -13,7 +15,7 @@ export default function SettingsLayout() {
       size="icon"
       onPress={() => router.back()}
     >
-      <ChevronLeft size={28} color="#FFFFFF" strokeWidth={2} />
+      <ChevronLeft size={28} color={IconColors.white} strokeWidth={2} />
     </Button>
   );
 
@@ -21,9 +23,9 @@ export default function SettingsLayout() {
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#F59E0B',
+          backgroundColor: Colors.primary[500],
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: IconColors.white,
         headerTitleStyle: {
           fontWeight: '600',
         },

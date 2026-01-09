@@ -49,6 +49,7 @@ import { VStack } from "@/components/ui/vstack";
 import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { Colors, IconColors } from "@/lib/constants/colors";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -302,7 +303,7 @@ export default function ProfileScreen() {
               onPress={handleSignOut}
               accessibilityLabel={t("profile.signOut.button")}
             >
-              <LogOut size={20} color="#FFFFFF" />
+              <LogOut size={20} color={IconColors.white} />
               <ButtonText>{t("profile.signOut.button")}</ButtonText>
             </Button>
 
@@ -314,7 +315,7 @@ export default function ProfileScreen() {
                 defaultValue: "Change Password",
               })}
             >
-              <Lock size={20} color="#6B7280" />
+              <Lock size={20} color={IconColors.default} />
               <ButtonText>
                 {t("profile.changePassword.title", {
                   defaultValue: "Change Password",
@@ -351,7 +352,7 @@ export default function ProfileScreen() {
               })}
             >
               {resetTutorialMutation.loading ? (
-                <ButtonSpinner color="#D97706" />
+                <ButtonSpinner color={Colors.primary[600]} />
               ) : (
                 <ButtonText className="text-yellow-700">
                   {t("profile.tutorial.button", {

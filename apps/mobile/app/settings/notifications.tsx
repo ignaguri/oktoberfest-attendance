@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { Bell, Clock, Info, Trophy, Users } from 'lucide-react-native';
 import { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -6,11 +8,10 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Text } from '@/components/ui/text';
 import { Switch } from '@/components/ui/switch';
+import { Colors, IconColors, SwitchColors } from '@/lib/constants/colors';
 import { apiClient } from '@/lib/api-client';
 
 interface NotificationPreferences {
@@ -93,7 +94,7 @@ export default function NotificationSettingsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background-50 items-center justify-center">
-        <ActivityIndicator size="large" color="#F59E0B" />
+        <ActivityIndicator size="large" color={Colors.primary[500]} />
       </View>
     );
   }
@@ -115,11 +116,7 @@ export default function NotificationSettingsScreen() {
           {/* Reminders */}
           <View className="flex-row items-center justify-between py-3 border-b border-outline-100">
             <View className="flex-row items-center gap-3 flex-1">
-              <MaterialCommunityIcons
-                name="clock-outline"
-                size={24}
-                color="#6B7280"
-              />
+              <Clock size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t('profile.notifications.reminders', { defaultValue: 'Reminders' })}
@@ -135,19 +132,15 @@ export default function NotificationSettingsScreen() {
               value={preferences.reminders_enabled}
               onValueChange={(value) => handleToggle('reminders_enabled', value)}
               disabled={isSaving}
-              trackColor={{ false: '#D1D5DB', true: '#F59E0B' }}
-              thumbColor="#FFFFFF"
+              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              thumbColor={SwitchColors.thumb}
             />
           </View>
 
           {/* Achievement Notifications */}
           <View className="flex-row items-center justify-between py-3 border-b border-outline-100">
             <View className="flex-row items-center gap-3 flex-1">
-              <MaterialCommunityIcons
-                name="trophy-outline"
-                size={24}
-                color="#6B7280"
-              />
+              <Trophy size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t('profile.notifications.achievements', {
@@ -167,19 +160,15 @@ export default function NotificationSettingsScreen() {
                 handleToggle('achievement_notifications_enabled', value)
               }
               disabled={isSaving}
-              trackColor={{ false: '#D1D5DB', true: '#F59E0B' }}
-              thumbColor="#FFFFFF"
+              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              thumbColor={SwitchColors.thumb}
             />
           </View>
 
           {/* Group Notifications */}
           <View className="flex-row items-center justify-between py-3">
             <View className="flex-row items-center gap-3 flex-1">
-              <MaterialCommunityIcons
-                name="account-group-outline"
-                size={24}
-                color="#6B7280"
-              />
+              <Users size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t('profile.notifications.groups', {
@@ -199,8 +188,8 @@ export default function NotificationSettingsScreen() {
                 handleToggle('group_notifications_enabled', value)
               }
               disabled={isSaving}
-              trackColor={{ false: '#D1D5DB', true: '#F59E0B' }}
-              thumbColor="#FFFFFF"
+              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              thumbColor={SwitchColors.thumb}
             />
           </View>
         </View>
@@ -213,11 +202,7 @@ export default function NotificationSettingsScreen() {
 
           <View className="flex-row items-center justify-between py-3">
             <View className="flex-row items-center gap-3 flex-1">
-              <MaterialCommunityIcons
-                name="bell-ring-outline"
-                size={24}
-                color="#6B7280"
-              />
+              <Bell size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t('profile.notifications.push', { defaultValue: 'Push Notifications' })}
@@ -239,8 +224,8 @@ export default function NotificationSettingsScreen() {
                   })
                 );
               }}
-              trackColor={{ false: '#D1D5DB', true: '#F59E0B' }}
-              thumbColor="#FFFFFF"
+              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              thumbColor={SwitchColors.thumb}
             />
           </View>
         </View>
@@ -248,11 +233,7 @@ export default function NotificationSettingsScreen() {
         {/* Info */}
         <View className="bg-yellow-50 rounded-2xl p-4 border border-yellow-200">
           <View className="flex-row items-start gap-3">
-            <MaterialCommunityIcons
-              name="information-outline"
-              size={24}
-              color="#D97706"
-            />
+            <Info size={24} color={Colors.primary[600]} />
             <Text className="text-yellow-800 text-sm flex-1">
               {t('profile.notifications.info', {
                 defaultValue:

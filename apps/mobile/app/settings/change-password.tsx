@@ -1,4 +1,13 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  updatePasswordSchema,
+  type UpdatePasswordFormData,
+} from '@prostcounter/shared/schemas';
+import { useRouter } from 'expo-router';
+import { Eye, EyeOff, Info } from 'lucide-react-native';
 import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   ScrollView,
@@ -6,20 +15,12 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'react-i18next';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import {
-  updatePasswordSchema,
-  type UpdatePasswordFormData,
-} from '@prostcounter/shared/schemas';
 
 import { Text } from '@/components/ui/text';
 import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
 import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { Colors, IconColors } from '@/lib/constants/colors';
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation();
@@ -97,11 +98,7 @@ export default function ChangePasswordScreen() {
           {/* Info */}
           <View className="bg-yellow-50 rounded-2xl p-4 mb-4 border border-yellow-200">
             <View className="flex-row items-start gap-3">
-              <MaterialCommunityIcons
-                name="information-outline"
-                size={24}
-                color="#D97706"
-              />
+              <Info size={24} color={Colors.primary[600]} />
               <Text className="text-yellow-800 text-sm flex-1">
                 {t('profile.changePassword.info', {
                   defaultValue:
@@ -144,13 +141,13 @@ export default function ChangePasswordScreen() {
                       onPress={() => setShowNewPassword(!showNewPassword)}
                     >
                       <InputIcon
-                        as={() => (
-                          <MaterialCommunityIcons
-                            name={showNewPassword ? 'eye-off' : 'eye'}
-                            size={20}
-                            color="#6B7280"
-                          />
-                        )}
+                        as={() =>
+                          showNewPassword ? (
+                            <EyeOff size={20} color={IconColors.default} />
+                          ) : (
+                            <Eye size={20} color={IconColors.default} />
+                          )
+                        }
                       />
                     </InputSlot>
                   </Input>
@@ -194,13 +191,13 @@ export default function ChangePasswordScreen() {
                       onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       <InputIcon
-                        as={() => (
-                          <MaterialCommunityIcons
-                            name={showConfirmPassword ? 'eye-off' : 'eye'}
-                            size={20}
-                            color="#6B7280"
-                          />
-                        )}
+                        as={() =>
+                          showConfirmPassword ? (
+                            <EyeOff size={20} color={IconColors.default} />
+                          ) : (
+                            <Eye size={20} color={IconColors.default} />
+                          )
+                        }
                       />
                     </InputSlot>
                   </Input>
@@ -222,7 +219,7 @@ export default function ChangePasswordScreen() {
               className="rounded-full"
             >
               {isLoading ? (
-                <ButtonSpinner color="#FFFFFF" />
+                <ButtonSpinner color={IconColors.white} />
               ) : (
                 <ButtonText>
                   {t('profile.changePassword.submit', {

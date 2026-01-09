@@ -21,6 +21,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
 
 interface ProfileHeaderProps {
@@ -85,9 +86,9 @@ export function ProfileHeader({
             )}
             <AvatarBadge className="items-center justify-center border-white bg-primary-500">
               {isAvatarUploading ? (
-                <Spinner size="small" color="#FFFFFF" />
+                <Spinner size="small" color={IconColors.white} />
               ) : (
-                <Camera size={16} color="#FFFFFF" />
+                <Camera size={16} color={IconColors.white} />
               )}
             </AvatarBadge>
           </Avatar>
@@ -193,7 +194,7 @@ export function ProfileHeader({
                 accessibilityLabel={t("common.buttons.save")}
               >
                 {isSaving ? (
-                  <ButtonSpinner color="#FFFFFF" />
+                  <ButtonSpinner color={IconColors.white} />
                 ) : (
                   <ButtonText>{t("common.buttons.save")}</ButtonText>
                 )}

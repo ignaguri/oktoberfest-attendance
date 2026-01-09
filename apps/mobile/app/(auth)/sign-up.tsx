@@ -22,6 +22,7 @@ import {
   AuthFooterLink,
 } from '@/components/auth';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { IconColors } from '@/lib/constants/colors';
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
@@ -206,7 +207,7 @@ export default function SignUpScreen() {
               className="mt-2 rounded-full"
             >
               {isLoading ? (
-                <ButtonSpinner color="#FFFFFF" />
+                <ButtonSpinner color={IconColors.white} />
               ) : (
                 <ButtonText>{t('auth.signUp.submit')}</ButtonText>
               )}

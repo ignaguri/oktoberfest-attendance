@@ -1,23 +1,25 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Tabs } from "expo-router";
+import {
+  Beer,
+  Home,
+  Puzzle,
+  Trophy,
+  User,
+  Users,
+  type LucideIcon,
+} from "lucide-react-native";
 
-type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+import { Colors } from "@/lib/constants/colors";
 
 interface TabIconProps {
-  name: IconName;
+  Icon: LucideIcon;
   color: string;
   focused: boolean;
 }
 
-function TabIcon({ name, color, focused }: TabIconProps) {
-  return (
-    <MaterialCommunityIcons
-      name={name}
-      size={focused ? 28 : 24}
-      color={color}
-    />
-  );
+function TabIcon({ Icon, color, focused }: TabIconProps) {
+  return <Icon size={focused ? 28 : 24} color={color} />;
 }
 
 export default function TabsLayout() {
@@ -27,18 +29,18 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor: "#F59E0B", // yellow-500
+          backgroundColor: Colors.primary[500],
         },
-        headerTintColor: "#000000",
+        headerTintColor: Colors.black,
         headerTitleStyle: {
           fontWeight: "bold",
         },
         headerShadowVisible: false,
-        tabBarActiveTintColor: "#F59E0B", // yellow-500
-        tabBarInactiveTintColor: "#6B7280", // gray-500
+        tabBarActiveTintColor: Colors.primary[500],
+        tabBarInactiveTintColor: Colors.gray[500],
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
-          borderTopColor: "#E5E7EB",
+          backgroundColor: Colors.white,
+          borderTopColor: Colors.gray[200],
           paddingTop: 4,
           paddingBottom: 8,
           height: 64,
@@ -55,7 +57,7 @@ export default function TabsLayout() {
           title: "Home",
           headerTitle: "ProstCounter",
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="home" color={color} focused={focused} />
+            <TabIcon Icon={Home} color={color} focused={focused} />
           ),
         }}
       />
@@ -64,7 +66,7 @@ export default function TabsLayout() {
         options={{
           title: t("common.menu.attendance"),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="beer" color={color} focused={focused} />
+            <TabIcon Icon={Beer} color={color} focused={focused} />
           ),
         }}
       />
@@ -73,7 +75,7 @@ export default function TabsLayout() {
         options={{
           title: t("common.menu.groups"),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="account-group" color={color} focused={focused} />
+            <TabIcon Icon={Users} color={color} focused={focused} />
           ),
         }}
       />
@@ -82,7 +84,7 @@ export default function TabsLayout() {
         options={{
           title: t("common.menu.leaderboard"),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="trophy" color={color} focused={focused} />
+            <TabIcon Icon={Trophy} color={color} focused={focused} />
           ),
         }}
       />
@@ -91,7 +93,7 @@ export default function TabsLayout() {
         options={{
           title: t("common.menu.profile"),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="account" color={color} focused={focused} />
+            <TabIcon Icon={User} color={color} focused={focused} />
           ),
         }}
       />
@@ -102,7 +104,7 @@ export default function TabsLayout() {
           options={{
             title: "Components",
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon name="puzzle" color={color} focused={focused} />
+              <TabIcon Icon={Puzzle} color={color} focused={focused} />
             ),
           }}
         />

@@ -18,6 +18,7 @@ export const Colors = {
 
   // Gray scale (for icons, muted elements)
   gray: {
+    200: "#E5E7EB", // gray-200 - borders
     300: "#D1D5DB", // gray-300 - disabled track color
     400: "#9CA3AF", // gray-400 - chevron/muted icons
     500: "#6B7280", // gray-500 - default icon color
@@ -28,6 +29,10 @@ export const Colors = {
     500: "#EF4444", // red-500
     600: "#DC2626", // red-600 - error icon
   },
+
+  success: {
+    500: "#22C55E", // green-500 - success states
+  },
 } as const;
 
 // Convenience exports for common use cases
@@ -36,10 +41,18 @@ export const IconColors = {
   muted: Colors.gray[400],
   white: Colors.white,
   error: Colors.error[600],
+  success: Colors.success[500],
 } as const;
 
 export const SwitchColors = {
   trackOn: Colors.primary[500],
+  trackOff: Colors.gray[300],
+  thumb: Colors.white,
+} as const;
+
+// For destructive/warning switches (e.g., hide photos)
+export const SwitchColorsDestructive = {
+  trackOn: Colors.error[500],
   trackOff: Colors.gray[300],
   thumb: Colors.white,
 } as const;

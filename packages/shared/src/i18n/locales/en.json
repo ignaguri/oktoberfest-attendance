@@ -20,7 +20,9 @@
       "gotIt": "Got it",
       "share": "Share",
       "copy": "Copy",
-      "install": "Install"
+      "install": "Install",
+      "goHome": "Go to Home",
+      "tryAgain": "Try Again"
     },
     "labels": {
       "name": "Name",
@@ -42,7 +44,11 @@
     "errors": {
       "title": "Error",
       "generic": "Something went wrong. Please try again.",
-      "notFound": "Not found",
+      "oops": "Oops!",
+      "notFound": {
+        "title": "Page Not Found",
+        "description": "Looks like this page wandered off to another tent!"
+      },
       "unauthorized": "Please sign in to continue",
       "forbidden": "You don't have permission to do that",
       "networkError": "Network error. Please check your connection."

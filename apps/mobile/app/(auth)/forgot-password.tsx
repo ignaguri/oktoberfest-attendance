@@ -1,25 +1,26 @@
-import { useState } from 'react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  resetPasswordSchema,
+  type ResetPasswordFormData,
+} from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   View,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Pressable,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'react-i18next';
-import {
-  resetPasswordSchema,
-  type ResetPasswordFormData,
-} from '@prostcounter/shared/schemas';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { AuthHeader, FormInput } from '@/components/auth';
-import { useAuth } from '@/lib/auth/AuthContext';
+import { AuthHeader, FormInput } from "@/components/auth";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { IconColors } from "@/lib/constants/colors";
 
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ export default function ForgotPasswordScreen() {
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: '',
+      email: "",
     },
   });
 
@@ -50,9 +51,9 @@ export default function ForgotPasswordScreen() {
     if (resetError) {
       setError(
         resetError.message ||
-          t('auth.forgotPassword.errors.generic', {
-            defaultValue: 'Failed to send reset email',
-          })
+          t("auth.forgotPassword.errors.generic", {
+            defaultValue: "Failed to send reset email",
+          }),
       );
       setIsLoading(false);
       return;
@@ -66,7 +67,7 @@ export default function ForgotPasswordScreen() {
     <SafeAreaView className="flex-1 bg-background-0">
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
@@ -74,18 +75,18 @@ export default function ForgotPasswordScreen() {
           className="px-6"
         >
           {/* Header with Logo */}
-          <View className="mt-4 mb-6">
+          <View className="mb-6 mt-4">
             <AuthHeader size="sm" />
           </View>
 
           {/* Title */}
-          <Text className="text-2xl font-bold text-typography-900 text-center mb-2">
-            {t('auth.resetPassword.title')}
+          <Text className="mb-2 text-center text-2xl font-bold text-typography-900">
+            {t("auth.resetPassword.title")}
           </Text>
 
           {/* Description */}
-          <Text className="text-typography-500 text-center mb-8 px-4">
-            {t('auth.resetPassword.description', {
+          <Text className="mb-8 px-4 text-center text-typography-500">
+            {t("auth.resetPassword.description", {
               defaultValue:
                 "Enter your email address and we'll send you instructions to reset your password.",
             })}
@@ -94,9 +95,9 @@ export default function ForgotPasswordScreen() {
           {/* Success State */}
           {success ? (
             <View className="items-center">
-              <View className="bg-success-50 p-4 rounded-lg mb-6 w-full">
-                <Text className="text-success-700 text-center">
-                  {t('auth.resetPassword.success')}
+              <View className="mb-6 w-full rounded-lg bg-success-50 p-4">
+                <Text className="text-center text-success-700">
+                  {t("auth.resetPassword.success")}
                 </Text>
               </View>
 
@@ -104,10 +105,10 @@ export default function ForgotPasswordScreen() {
                 action="primary"
                 variant="solid"
                 size="lg"
-                onPress={() => router.replace('/(auth)/sign-in')}
+                onPress={() => router.replace("/(auth)/sign-in")}
                 className="rounded-full px-8"
               >
-                <ButtonText>{t('auth.resetPassword.backToSignIn')}</ButtonText>
+                <ButtonText>{t("auth.resetPassword.backToSignIn")}</ButtonText>
               </Button>
             </View>
           ) : (
@@ -124,8 +125,8 @@ export default function ForgotPasswordScreen() {
                 <FormInput
                   control={control}
                   name="email"
-                  label={t('auth.resetPassword.emailLabel')}
-                  placeholder={t('auth.resetPassword.emailPlaceholder')}
+                  label={t("auth.resetPassword.emailLabel")}
+                  placeholder={t("auth.resetPassword.emailPlaceholder")}
                   keyboardType="email-address"
                   autoComplete="email"
                   autoFocus
@@ -143,9 +144,9 @@ export default function ForgotPasswordScreen() {
                   className="mt-2 rounded-full"
                 >
                   {isLoading ? (
-                    <ButtonSpinner color="#FFFFFF" />
+                    <ButtonSpinner color={IconColors.white} />
                   ) : (
-                    <ButtonText>{t('auth.resetPassword.submit')}</ButtonText>
+                    <ButtonText>{t("auth.resetPassword.submit")}</ButtonText>
                   )}
                 </Button>
               </View>
@@ -154,9 +155,9 @@ export default function ForgotPasswordScreen() {
 
           {/* Back to Sign In Link */}
           <View className="mt-8 items-center">
-            <Pressable onPress={() => router.push('/(auth)/sign-in')}>
-              <Text className="text-primary-600 font-semibold">
-                {t('auth.resetPassword.backToSignIn')}
+            <Pressable onPress={() => router.push("/(auth)/sign-in")}>
+              <Text className="font-semibold text-primary-600">
+                {t("auth.resetPassword.backToSignIn")}
               </Text>
             </Pressable>
           </View>
