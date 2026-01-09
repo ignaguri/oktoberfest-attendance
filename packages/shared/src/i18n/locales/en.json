@@ -39,6 +39,7 @@
       "success": "Success"
     },
     "errors": {
+      "title": "Error",
       "generic": "Something went wrong. Please try again.",
       "notFound": "Not found",
       "unauthorized": "Please sign in to continue",
@@ -727,6 +728,17 @@
     "success": "Success",
     "successMessage": "The app has been installed on your device.",
     "failed": "Installation failed"
+  },
+  "imageUpload": {
+    "permissions": {
+      "cameraRequired": "Camera permission is required to take photos",
+      "libraryRequired": "Photo library permission is required to select photos"
+    },
+    "errors": {
+      "uploadFailed": "Failed to upload image",
+      "avatarUploadFailed": "Failed to update profile picture",
+      "photoUploadFailed": "Failed to upload photo"
+    }
   },
   "validation": {
     "required": "This field is required",

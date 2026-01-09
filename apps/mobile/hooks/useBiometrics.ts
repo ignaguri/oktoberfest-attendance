@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import * as LocalAuthentication from 'expo-local-authentication';
+import * as LocalAuthentication from "expo-local-authentication";
+import { useState, useEffect } from "react";
+
 import {
   isBiometricEnabled,
   setBiometricEnabled as storeBiometricEnabled,
   clearBiometricEnabled,
-} from '@/lib/auth/secure-storage';
+} from "@/lib/auth/secure-storage";
 
-export type BiometricType = 'facial' | 'fingerprint' | null;
+export type BiometricType = "facial" | "fingerprint" | null;
 
 interface UseBiometricsResult {
   /** Whether biometric hardware is available on this device */
@@ -39,93 +40,60 @@ export function useBiometrics(): UseBiometricsResult {
   const [isLoading, setIsLoading] = useState(true);
 
   /**
-   * Check biometric hardware availability and type
+   * Load biometric availability and enabled state
    */
-  const checkBiometricAvailability = useCallback(async () => {
+  async function loadBiometricState() {
+    setIsLoading(true);
+
     try {
-      // Check if hardware supports biometrics
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      if (!compatible) {
-        setIsAvailable(false);
-        setBiometricType(null);
-        return;
-      }
+      // Check hardware and enrollment in parallel with enabled state
+      const [hardwareResult, enabledResult] = await Promise.all([
+        checkHardwareAndEnrollment(),
+        isBiometricEnabled(),
+      ]);
 
-      // Check if biometrics are enrolled
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
-      if (!enrolled) {
-        setIsAvailable(false);
-        setBiometricType(null);
-        return;
-      }
-
-      setIsAvailable(true);
-
-      // Get supported authentication types
-      const types =
-        await LocalAuthentication.supportedAuthenticationTypesAsync();
-
-      if (
-        types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)
-      ) {
-        setBiometricType('facial');
-      } else if (
-        types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
-      ) {
-        setBiometricType('fingerprint');
-      } else {
-        setBiometricType(null);
-      }
+      setIsAvailable(hardwareResult.available);
+      setBiometricType(hardwareResult.type);
+      setIsEnabled(enabledResult);
     } catch (error) {
-      console.error('Error checking biometric availability:', error);
+      console.error("Error loading biometric state:", error);
       setIsAvailable(false);
       setBiometricType(null);
-    }
-  }, []);
-
-  /**
-   * Check if biometric authentication is enabled in storage
-   */
-  const checkBiometricEnabled = useCallback(async () => {
-    try {
-      const enabled = await isBiometricEnabled();
-      setIsEnabled(enabled);
-    } catch (error) {
-      console.error('Error checking biometric enabled state:', error);
       setIsEnabled(false);
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }
 
-  /**
-   * Initialize biometric state
-   */
-  const initialize = useCallback(async () => {
-    setIsLoading(true);
-    await Promise.all([checkBiometricAvailability(), checkBiometricEnabled()]);
-    setIsLoading(false);
-  }, [checkBiometricAvailability, checkBiometricEnabled]);
-
+  // Initialize on mount
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    loadBiometricState();
+  }, []);
 
   /**
    * Authenticate using biometrics
    */
-  const authenticate = useCallback(async (): Promise<{
+  async function authenticate(): Promise<{
     success: boolean;
     error?: string;
-  }> => {
-    if (!isAvailable) {
-      return { success: false, error: 'Biometric authentication not available' };
+  }> {
+    // Check current availability (avoid stale closure)
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!hasHardware || !isEnrolled) {
+      return {
+        success: false,
+        error: "Biometric authentication not available",
+      };
     }
 
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Sign in to ProstCounter',
-        fallbackLabel: 'Use password',
+        promptMessage: "Sign in to ProstCounter",
+        fallbackLabel: "Use password",
         disableDeviceFallback: false,
-        cancelLabel: 'Cancel',
+        cancelLabel: "Cancel",
       });
 
       if (result.success) {
@@ -133,50 +101,46 @@ export function useBiometrics(): UseBiometricsResult {
       }
 
       // Handle different error cases
-      if (result.error === 'user_cancel') {
-        return { success: false, error: 'Authentication cancelled' };
-      } else if (result.error === 'user_fallback') {
-        return { success: false, error: 'User chose password fallback' };
-      } else if (result.error === 'lockout') {
-        return {
-          success: false,
-          error: 'Too many failed attempts. Please try again later.',
-        };
+      switch (result.error) {
+        case "user_cancel":
+          return { success: false, error: "Authentication cancelled" };
+        case "user_fallback":
+          return { success: false, error: "User chose password fallback" };
+        case "lockout":
+          return {
+            success: false,
+            error: "Too many failed attempts. Please try again later.",
+          };
+        default:
+          return {
+            success: false,
+            error: result.error || "Authentication failed",
+          };
       }
-
-      return { success: false, error: result.error || 'Authentication failed' };
     } catch (error) {
-      console.error('Biometric authentication error:', error);
+      console.error("Biometric authentication error:", error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Authentication failed',
+        error: error instanceof Error ? error.message : "Authentication failed",
       };
     }
-  }, [isAvailable]);
+  }
 
   /**
    * Enable biometric authentication
    */
-  const enableBiometrics = useCallback(async () => {
+  async function enableBiometrics() {
     await storeBiometricEnabled(true);
     setIsEnabled(true);
-  }, []);
+  }
 
   /**
    * Disable biometric authentication
    */
-  const disableBiometrics = useCallback(async () => {
+  async function disableBiometrics() {
     await clearBiometricEnabled();
     setIsEnabled(false);
-  }, []);
-
-  /**
-   * Refresh the biometric state
-   */
-  const refresh = useCallback(async () => {
-    await initialize();
-  }, [initialize]);
+  }
 
   return {
     isAvailable,
@@ -186,6 +150,39 @@ export function useBiometrics(): UseBiometricsResult {
     authenticate,
     enableBiometrics,
     disableBiometrics,
-    refresh,
+    refresh: loadBiometricState,
   };
+}
+
+/**
+ * Check biometric hardware availability and enrollment
+ */
+async function checkHardwareAndEnrollment(): Promise<{
+  available: boolean;
+  type: BiometricType;
+}> {
+  const compatible = await LocalAuthentication.hasHardwareAsync();
+  if (!compatible) {
+    return { available: false, type: null };
+  }
+
+  const enrolled = await LocalAuthentication.isEnrolledAsync();
+  if (!enrolled) {
+    return { available: false, type: null };
+  }
+
+  const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+
+  let type: BiometricType = null;
+  if (
+    types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)
+  ) {
+    type = "facial";
+  } else if (
+    types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
+  ) {
+    type = "fingerprint";
+  }
+
+  return { available: true, type };
 }
