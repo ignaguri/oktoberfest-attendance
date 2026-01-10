@@ -5,6 +5,7 @@ import { format } from "date-fns";
 
 import { useAttendances, useDeleteAttendance } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
 import {
   AlertDialog,
@@ -25,7 +26,6 @@ import { useFestival } from "@/lib/festival/FestivalContext";
 
 import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
 import { AttendanceFormSheet } from "@/components/attendance/attendance-form-sheet";
-import type { AttendanceData } from "@/components/attendance/attendance-card";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
@@ -64,13 +64,13 @@ export default function AttendanceScreen() {
   const existingAttendance = useMemo(() => {
     if (!selectedDate || !attendances) return null;
     const dateStr = format(selectedDate, "yyyy-MM-dd");
-    return (attendances as AttendanceData[]).find((a) => a.date === dateStr) ?? null;
+    return (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ?? null;
   }, [selectedDate, attendances]);
 
   // Transform attendances for calendar
   const calendarAttendances = useMemo(() => {
     if (!attendances) return [];
-    return (attendances as AttendanceData[]).map((a) => ({
+    return (attendances as AttendanceWithTotals[]).map((a) => ({
       date: a.date,
       beerCount: a.beerCount,
     }));
@@ -92,8 +92,8 @@ export default function AttendanceScreen() {
     showDialog(
       t("common.status.success"),
       existingAttendance
-        ? t("attendance.updateSuccess", { defaultValue: "Attendance updated" })
-        : t("attendance.createSuccess", { defaultValue: "Attendance recorded" })
+        ? t("attendance.updateSuccess")
+        : t("attendance.createSuccess")
     );
   }, [refetch, showDialog, existingAttendance, t]);
 
@@ -105,29 +105,17 @@ export default function AttendanceScreen() {
     if (!existingAttendance) return;
 
     showDialog(
-      t("attendance.delete.title", { defaultValue: "Delete Attendance" }),
-      t("attendance.delete.message", {
-        defaultValue: "Are you sure you want to delete this attendance record?",
-      }),
+      t("attendance.delete.title"),
+      t("attendance.delete.confirm"),
       "destructive",
       async () => {
         try {
           await deleteAttendanceMutation.mutateAsync(existingAttendance.id);
           refetch();
           setIsFormOpen(false);
-          showDialog(
-            t("common.status.success"),
-            t("attendance.delete.success", {
-              defaultValue: "Attendance deleted",
-            })
-          );
+          showDialog(t("common.status.success"), t("attendance.delete.success"));
         } catch {
-          showDialog(
-            t("common.status.error"),
-            t("attendance.delete.error", {
-              defaultValue: "Failed to delete attendance",
-            })
-          );
+          showDialog(t("common.status.error"), t("attendance.delete.error"));
         }
       }
     );
@@ -138,9 +126,7 @@ export default function AttendanceScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <Text className="text-typography-500 text-center">
-          {t("attendance.noFestival", {
-            defaultValue: "Please select a festival to view attendance",
-          })}
+          {t("attendance.noFestival")}
         </Text>
       </View>
     );
@@ -175,7 +161,7 @@ export default function AttendanceScreen() {
         <View className="p-4">
           {/* Header */}
           <Text className="text-sm text-typography-500 mb-4 text-center">
-            Tap a day to add or edit your attendance
+            {t("attendance.calendar.tapToAddOrEdit")}
           </Text>
 
           {/* Calendar */}
@@ -188,37 +174,43 @@ export default function AttendanceScreen() {
           />
 
           {/* Stats Summary */}
-          {attendances && (attendances as AttendanceData[]).length > 0 && (
+          {attendances && (attendances as AttendanceWithTotals[]).length > 0 && (
             <View className="mt-4 p-4 bg-background-0 rounded-xl">
               <Text className="text-sm font-medium text-typography-700 mb-2">
-                Festival Summary
+                {t("attendance.summary.title")}
               </Text>
               <View className="flex-row justify-around">
                 <View className="items-center">
                   <Text className="text-2xl font-bold text-primary-500">
-                    {(attendances as AttendanceData[]).length}
+                    {(attendances as AttendanceWithTotals[]).length}
                   </Text>
-                  <Text className="text-xs text-typography-500">Days</Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.days")}
+                  </Text>
                 </View>
                 <View className="items-center">
                   <Text className="text-2xl font-bold text-primary-500">
-                    {(attendances as AttendanceData[]).reduce(
+                    {(attendances as AttendanceWithTotals[]).reduce(
                       (sum, a) => sum + a.beerCount,
                       0
                     )}
                   </Text>
-                  <Text className="text-xs text-typography-500">Beers</Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.beers")}
+                  </Text>
                 </View>
                 <View className="items-center">
                   <Text className="text-2xl font-bold text-primary-500">
                     {(
-                      (attendances as AttendanceData[]).reduce(
+                      (attendances as AttendanceWithTotals[]).reduce(
                         (sum, a) => sum + a.beerCount,
                         0
-                      ) / (attendances as AttendanceData[]).length
+                      ) / (attendances as AttendanceWithTotals[]).length
                     ).toFixed(1)}
                   </Text>
-                  <Text className="text-xs text-typography-500">Avg/Day</Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.avgPerDay")}
+                  </Text>
                 </View>
               </View>
             </View>

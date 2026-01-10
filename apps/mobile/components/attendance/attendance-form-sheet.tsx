@@ -1,9 +1,24 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useUpdatePersonalAttendance,
+  useTents,
+  useAttendanceByDate,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import {
+  createDetailedAttendanceFormSchema,
+  type DetailedAttendanceForm,
+} from "@prostcounter/shared/schemas";
+import { format } from "date-fns";
+import { X, Calendar } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { X, Calendar } from "lucide-react-native";
-import { format } from "date-fns";
 
+import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
+
+import { BeerPicturesSection } from "./beer-pictures-section";
+import { BeerStepper } from "./beer-stepper";
+import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -12,22 +27,18 @@ import {
   ActionsheetDragIndicatorWrapper,
   ActionsheetScrollView,
 } from "@/components/ui/actionsheet";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { IconColors } from "@/lib/constants/colors";
 import {
-  createDetailedAttendanceFormSchema,
-  type DetailedAttendanceForm,
-} from "@prostcounter/shared/schemas";
-import { useUpdatePersonalAttendance, useTents } from "@prostcounter/shared/hooks";
-
-import { BeerStepper } from "./beer-stepper";
-import { BeerPicturesSection } from "./beer-pictures-section";
-import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
-import type { AttendanceData } from "./attendance-card";
+  useBeerPictureUpload,
+  type PendingPhoto,
+} from "@/hooks/useBeerPictureUpload";
+import { apiClient } from "@/lib/api-client";
+import { IconColors } from "@/lib/constants/colors";
 
 interface AttendanceFormSheetProps {
   isOpen: boolean;
@@ -36,7 +47,7 @@ interface AttendanceFormSheetProps {
   festivalStartDate: Date;
   festivalEndDate: Date;
   selectedDate: Date;
-  existingAttendance?: AttendanceData | null;
+  existingAttendance?: AttendanceWithTotals | null;
   onSuccess?: () => void;
 }
 
@@ -52,7 +63,7 @@ interface BeerPicture {
  * - Date display (from calendar selection)
  * - Beer count stepper (- / count / +)
  * - Tent multi-select via separate sheet
- * - Photo upload section
+ * - Photo upload section (uploads on save)
  * - React Hook Form with Zod validation
  */
 export function AttendanceFormSheet({
@@ -65,17 +76,34 @@ export function AttendanceFormSheet({
   existingAttendance,
   onSuccess,
 }: AttendanceFormSheetProps) {
+  const { t } = useTranslation();
   const [showTentSelector, setShowTentSelector] = useState(false);
   const [photos, setPhotos] = useState<BeerPicture[]>([]);
+  const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
+  const [photosMarkedForRemoval, setPhotosMarkedForRemoval] = useState<
+    string[]
+  >([]);
 
   const isEditMode = !!existingAttendance;
   const { tents } = useTents(festivalId);
   const updateAttendance = useUpdatePersonalAttendance();
+  const { uploadPendingPhotos, isUploading } = useBeerPictureUpload();
+
+  // Fetch complete attendance data with beer pictures when editing
+  const dateString =
+    selectedDate && !isNaN(selectedDate.getTime())
+      ? format(selectedDate, "yyyy-MM-dd")
+      : "";
+  const { data: attendanceWithPhotos } = useAttendanceByDate(
+    isOpen && isEditMode ? festivalId : "",
+    isOpen && isEditMode ? dateString : "",
+  );
 
   // Create dynamic schema based on festival dates
   const formSchema = useMemo(
-    () => createDetailedAttendanceFormSchema(festivalStartDate, festivalEndDate),
-    [festivalStartDate, festivalEndDate]
+    () =>
+      createDetailedAttendanceFormSchema(festivalStartDate, festivalEndDate),
+    [festivalStartDate, festivalEndDate],
   );
 
   // Default values based on existing attendance or selected date
@@ -112,9 +140,24 @@ export function AttendanceFormSheet({
   useEffect(() => {
     if (isOpen) {
       reset(defaultValues);
-      setPhotos(existingAttendance?.beerPictures ?? []);
+      // Clear photos when opening - will be populated from API
+      setPhotos([]);
+      setPendingPhotos([]);
+      setPhotosMarkedForRemoval([]);
     }
-  }, [isOpen, defaultValues, existingAttendance, reset]);
+  }, [isOpen, defaultValues, reset]);
+
+  // Load photos from API when attendance data is fetched
+  useEffect(() => {
+    if (isOpen && attendanceWithPhotos?.pictureUrls?.length) {
+      setPhotos(
+        attendanceWithPhotos.pictureUrls.map((url: string) => ({
+          id: url, // Use URL as ID since API returns just URLs
+          pictureUrl: url,
+        })),
+      );
+    }
+  }, [isOpen, attendanceWithPhotos]);
 
   // Update form date when selectedDate changes
   useEffect(() => {
@@ -123,51 +166,99 @@ export function AttendanceFormSheet({
     }
   }, [isOpen, selectedDate, existingAttendance, setValue]);
 
-  // Get tent names for display
-  const selectedTentNames = useMemo(() => {
-    if (!selectedTents.length) return "";
+  // Get tent info for display as badges
+  const selectedTentInfo = useMemo(() => {
+    if (!selectedTents.length) return [];
     const allOptions = tents.flatMap((group) => group.options);
-    const names = selectedTents
-      .map((id) => allOptions.find((opt) => opt.value === id)?.label)
-      .filter(Boolean);
-    return names.length > 2
-      ? `${names.slice(0, 2).join(", ")} +${names.length - 2}`
-      : names.join(", ");
+    return selectedTents
+      .map((id) => {
+        const option = allOptions.find((opt) => opt.value === id);
+        return option ? { id, label: option.label } : null;
+      })
+      .filter((item): item is { id: string; label: string } => item !== null);
   }, [selectedTents, tents]);
 
   // Handle form submission
   const onSubmit = useCallback(
     async (data: DetailedAttendanceForm) => {
       try {
-        await updateAttendance.mutateAsync({
+        // Step 1: Save attendance (creates or updates)
+        const result = await updateAttendance.mutateAsync({
           festivalId,
-          // Use format() to avoid UTC timezone shift - toISOString() converts to UTC
-          // which can cause the date to shift by a day depending on local timezone
           date: format(data.date, "yyyy-MM-dd"),
           amount: data.amount,
           tents: data.tents,
         });
+
+        // Step 2: Delete photos marked for removal
+        // Note: photos.id contains the URL (from API), but we need picture IDs for deletion
+        // For now, we attempt deletion - backend may need to support deletion by URL or ID extraction
+        if (photosMarkedForRemoval.length > 0) {
+          for (const photoId of photosMarkedForRemoval) {
+            try {
+              await apiClient.photos.delete(photoId);
+            } catch (deleteError) {
+              console.warn("Failed to delete photo:", photoId, deleteError);
+              // Continue with other operations even if deletion fails
+            }
+          }
+        }
+
+        // Step 3: Upload pending photos if any
+        if (pendingPhotos.length > 0) {
+          // Get attendance ID - either from existing or from the result
+          const attendanceId = existingAttendance?.id || result?.attendanceId;
+
+          if (attendanceId) {
+            await uploadPendingPhotos({
+              festivalId,
+              attendanceId,
+              pendingPhotos,
+            });
+          }
+        }
+
         onSuccess?.();
         onClose();
       } catch (error) {
         console.error("Failed to save attendance:", error);
       }
     },
-    [festivalId, updateAttendance, onSuccess, onClose]
+    [
+      festivalId,
+      updateAttendance,
+      existingAttendance,
+      pendingPhotos,
+      photosMarkedForRemoval,
+      uploadPendingPhotos,
+      onSuccess,
+      onClose,
+    ],
   );
 
   const handleTentsSelect = useCallback(
     (tentIds: string[]) => {
       setValue("tents", tentIds, { shouldValidate: true });
     },
-    [setValue]
+    [setValue],
   );
+
+  // Toggle photo marked for removal (clicking X on existing photos)
+  const handleTogglePhotoRemoval = useCallback((photoId: string) => {
+    setPhotosMarkedForRemoval((prev) =>
+      prev.includes(photoId)
+        ? prev.filter((id) => id !== photoId)
+        : [...prev, photoId],
+    );
+  }, []);
 
   // Format date for display - guard against invalid dates
   const formattedDate =
     selectedDate && !isNaN(selectedDate.getTime())
       ? format(selectedDate, "EEEE, MMMM d, yyyy")
       : "Select a date";
+
+  const isSaving = isSubmitting || isUploading;
 
   return (
     <>
@@ -179,9 +270,11 @@ export function AttendanceFormSheet({
           </ActionsheetDragIndicatorWrapper>
 
           {/* Header */}
-          <HStack className="w-full items-center justify-between px-2 mb-4">
+          <HStack className="mb-4 w-full items-center justify-between px-2">
             <Text className="text-lg font-semibold text-typography-900">
-              {isEditMode ? "Edit Attendance" : "Add Attendance"}
+              {isEditMode
+                ? t("attendance.form.editTitle")
+                : t("attendance.form.addTitle")}
             </Text>
             <Pressable onPress={onClose} hitSlop={8}>
               <X size={24} color={IconColors.default} />
@@ -193,7 +286,7 @@ export function AttendanceFormSheet({
               {/* Date Display */}
               <VStack className="gap-2">
                 <Text className="text-sm font-medium text-typography-700">
-                  Date
+                  {t("common.labels.date")}
                 </Text>
                 <HStack className="items-center gap-2 rounded-lg bg-background-100 px-4 py-3">
                   <Calendar size={18} color={IconColors.muted} />
@@ -205,8 +298,8 @@ export function AttendanceFormSheet({
 
               {/* Beer Count Stepper */}
               <VStack className="gap-3">
-                <Text className="text-sm font-medium text-typography-700 text-center">
-                  How many beers?
+                <Text className="text-center text-sm font-medium text-typography-700">
+                  {t("attendance.howManyBeers")}
                 </Text>
                 <Controller
                   control={control}
@@ -221,8 +314,8 @@ export function AttendanceFormSheet({
                   )}
                 />
                 {errors.amount && (
-                  <Text className="text-sm text-error-600 text-center">
-                    {errors.amount.message}
+                  <Text className="text-center text-sm text-error-600">
+                    {t(errors.amount.message || "validation.required")}
                   </Text>
                 )}
               </VStack>
@@ -230,59 +323,75 @@ export function AttendanceFormSheet({
               {/* Tent Selector */}
               <VStack className="gap-2">
                 <Text className="text-sm font-medium text-typography-700">
-                  Tents Visited
+                  {t("attendance.table.visitedTents")}
                 </Text>
                 <Pressable
                   onPress={() => setShowTentSelector(true)}
                   className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
                 >
-                  <Text
-                    className={`text-base ${
-                      selectedTents.length > 0
-                        ? "text-typography-900"
-                        : "text-typography-400"
-                    }`}
-                  >
-                    {selectedTents.length > 0
-                      ? selectedTentNames
-                      : "Select tents..."}
-                  </Text>
+                  {selectedTentInfo.length > 0 ? (
+                    <HStack className="flex-wrap gap-2">
+                      {selectedTentInfo.map((tent) => (
+                        <Badge
+                          key={tent.id}
+                          action="info"
+                          variant="outline"
+                          size="md"
+                        >
+                          <BadgeText className="normal-case">
+                            {tent.label}
+                          </BadgeText>
+                        </Badge>
+                      ))}
+                    </HStack>
+                  ) : (
+                    <Text className="text-base text-typography-400">
+                      {t("attendance.form.selectTents")}
+                    </Text>
+                  )}
                 </Pressable>
                 {errors.tents && (
                   <Text className="text-sm text-error-600">
-                    {errors.tents.message}
+                    {t(errors.tents.message || "validation.required")}
                   </Text>
                 )}
               </VStack>
 
               {/* Beer Pictures Section */}
               <BeerPicturesSection
-                attendanceId={existingAttendance?.id}
                 existingPhotos={photos}
-                onPhotosChange={setPhotos}
+                pendingPhotos={pendingPhotos}
+                photosMarkedForRemoval={photosMarkedForRemoval}
+                onPendingPhotosChange={setPendingPhotos}
+                onTogglePhotoRemoval={handleTogglePhotoRemoval}
+                isUploading={isUploading}
               />
             </VStack>
           </ActionsheetScrollView>
 
           {/* Footer Buttons */}
-          <HStack className="w-full pt-3 gap-3 px-2">
+          <HStack className="w-full gap-3 px-2 pt-3">
             <Button
               variant="outline"
               action="secondary"
               className="flex-1"
               onPress={onClose}
-              isDisabled={isSubmitting}
+              isDisabled={isSaving}
             >
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>{t("common.buttons.cancel")}</ButtonText>
             </Button>
             <Button
               variant="solid"
               action="primary"
               className="flex-1"
               onPress={handleSubmit(onSubmit)}
-              isDisabled={isSubmitting}
+              isDisabled={isSaving}
             >
-              <ButtonText>{isSubmitting ? "Saving..." : "Save"}</ButtonText>
+              <ButtonText>
+                {isSaving
+                  ? t("attendance.form.saving")
+                  : t("common.buttons.save")}
+              </ButtonText>
             </Button>
           </HStack>
         </ActionsheetContent>

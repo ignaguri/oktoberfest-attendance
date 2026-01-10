@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
-import { Camera, ImagePlus, Trash2, X } from "lucide-react-native";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Camera, ImagePlus, Minus, X } from "lucide-react-native";
 
 import {
   Actionsheet,
@@ -19,6 +20,7 @@ import { IconColors } from "@/lib/constants/colors";
 import {
   useBeerPictureUpload,
   type ImageSource,
+  type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 
 interface BeerPicture {
@@ -27,11 +29,20 @@ interface BeerPicture {
 }
 
 interface BeerPicturesSectionProps {
-  attendanceId?: string;
+  /** Already uploaded photos */
   existingPhotos: BeerPicture[];
-  onPhotosChange: (photos: BeerPicture[]) => void;
-  onPhotoRemove?: (photoId: string) => void;
+  /** Photos pending upload (local previews) */
+  pendingPhotos: PendingPhoto[];
+  /** IDs of existing photos marked for removal (deleted on Save) */
+  photosMarkedForRemoval: string[];
+  /** Called when pending photos change */
+  onPendingPhotosChange: (photos: PendingPhoto[]) => void;
+  /** Called when an existing photo is marked/unmarked for removal */
+  onTogglePhotoRemoval: (photoId: string) => void;
+  /** Whether the section is disabled */
   disabled?: boolean;
+  /** Whether photos are currently uploading */
+  isUploading?: boolean;
 }
 
 /**
@@ -39,91 +50,113 @@ interface BeerPicturesSectionProps {
  *
  * Features:
  * - Photo grid with add button
- * - Camera or gallery picker
- * - Loading state during upload
+ * - Camera or gallery picker (supports multi-select)
+ * - Local preview for pending photos
  * - Photo deletion
- *
- * NOTE: Photo upload is currently disabled as the API endpoint is not yet implemented.
- * Existing photos from the database will still be displayed.
+ * - Photos are NOT uploaded until form is saved
  */
 export function BeerPicturesSection({
-  attendanceId,
   existingPhotos,
-  onPhotosChange,
-  onPhotoRemove,
+  pendingPhotos,
+  photosMarkedForRemoval,
+  onPendingPhotosChange,
+  onTogglePhotoRemoval,
   disabled = false,
+  isUploading = false,
 }: BeerPicturesSectionProps) {
-  // Photo upload is currently disabled - API not implemented yet
-  const isUploadEnabled = false;
+  const { t } = useTranslation();
   const [showSourcePicker, setShowSourcePicker] = useState(false);
 
-  const { pickImages, isUploading, error } = useBeerPictureUpload({
-    attendanceId: attendanceId ?? "",
-    onSuccess: (fileNames) => {
-      // For now, create mock photos - replace with actual URLs when API is ready
-      const newPhotos = fileNames.map((fileName, index) => ({
-        id: `temp-${Date.now()}-${index}`,
-        pictureUrl: `file://${fileName}`, // Placeholder
-      }));
-      onPhotosChange([...existingPhotos, ...newPhotos]);
-    },
+  const { pickImages, error } = useBeerPictureUpload({
     onError: (err) => {
-      console.error("Photo upload failed:", err);
+      console.error("Photo selection failed:", err);
     },
   });
 
   const handleAddPress = useCallback(() => {
-    if (!disabled && !isUploading && isUploadEnabled) {
+    if (!disabled && !isUploading) {
       setShowSourcePicker(true);
     }
-  }, [disabled, isUploading, isUploadEnabled]);
+  }, [disabled, isUploading]);
 
   const handleSourceSelect = useCallback(
     async (source: ImageSource) => {
       setShowSourcePicker(false);
-      await pickImages(source);
-    },
-    [pickImages]
-  );
-
-  const handleRemovePhoto = useCallback(
-    (photoId: string) => {
-      if (onPhotoRemove) {
-        onPhotoRemove(photoId);
-      } else {
-        onPhotosChange(existingPhotos.filter((p) => p.id !== photoId));
+      const newPhotos = await pickImages(source);
+      if (newPhotos?.length) {
+        onPendingPhotosChange([...pendingPhotos, ...newPhotos]);
       }
     },
-    [existingPhotos, onPhotosChange, onPhotoRemove]
+    [pickImages, pendingPhotos, onPendingPhotosChange]
+  );
+
+  const handleRemovePendingPhoto = useCallback(
+    (photoId: string) => {
+      onPendingPhotosChange(pendingPhotos.filter((p) => p.id !== photoId));
+    },
+    [pendingPhotos, onPendingPhotosChange]
   );
 
   return (
     <VStack className="gap-2">
-      <Text className="text-sm font-medium text-typography-700">Photos</Text>
+      <Text className="text-sm font-medium text-typography-700">{t("attendance.form.photos")}</Text>
 
       {/* Photo Grid */}
       <HStack className="flex-wrap gap-2">
-        {/* Existing photos */}
-        {existingPhotos.map((photo) => (
+        {/* Existing (uploaded) photos - red X badge, toggle mark for removal */}
+        {existingPhotos.map((photo, index) => {
+          const isMarkedForRemoval = photosMarkedForRemoval.includes(photo.id);
+          return (
+            <View key={photo.id || `photo-${index}`} className="relative">
+              <Image
+                source={{ uri: photo.pictureUrl }}
+                className={`h-20 w-20 rounded-lg ${isMarkedForRemoval ? "opacity-40" : ""}`}
+                resizeMode="cover"
+              />
+              {isMarkedForRemoval && (
+                <View className="absolute inset-0 items-center justify-center">
+                  <X size={32} color={IconColors.error} />
+                </View>
+              )}
+              {!disabled && !isUploading && (
+                <Pressable
+                  onPress={() => onTogglePhotoRemoval(photo.id)}
+                  className="absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full bg-error-500"
+                >
+                  <X size={14} color={IconColors.white} />
+                </Pressable>
+              )}
+            </View>
+          );
+        })}
+
+        {/* Pending photos (local previews - not yet uploaded) - gray minus badge */}
+        {pendingPhotos.map((photo) => (
           <View key={photo.id} className="relative">
             <Image
-              source={{ uri: photo.pictureUrl }}
-              className="h-20 w-20 rounded-lg"
+              source={{ uri: photo.localUri }}
+              className={`h-20 w-20 rounded-lg ${isUploading ? "opacity-60" : ""}`}
               resizeMode="cover"
             />
-            {!disabled && (
-              <Pressable
-                onPress={() => handleRemovePhoto(photo.id)}
-                className="absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full bg-error-500"
-              >
-                <X size={14} color={IconColors.white} />
-              </Pressable>
+            {isUploading ? (
+              <View className="absolute inset-0 items-center justify-center">
+                <ActivityIndicator size="small" color={IconColors.white} />
+              </View>
+            ) : (
+              !disabled && (
+                <Pressable
+                  onPress={() => handleRemovePendingPhoto(photo.id)}
+                  className="absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full bg-background-400"
+                >
+                  <Minus size={14} color={IconColors.white} />
+                </Pressable>
+              )
             )}
           </View>
         ))}
 
-        {/* Add button - disabled until API is implemented */}
-        {!disabled && isUploadEnabled && (
+        {/* Add button */}
+        {!disabled && (
           <Pressable
             onPress={handleAddPress}
             disabled={isUploading}
@@ -136,25 +169,11 @@ export function BeerPicturesSection({
             )}
           </Pressable>
         )}
-
-        {/* Coming soon placeholder */}
-        {!disabled && !isUploadEnabled && existingPhotos.length === 0 && (
-          <View className="h-20 flex-1 items-center justify-center rounded-lg border border-dashed border-background-300 bg-background-50">
-            <Text className="text-xs text-typography-400">Coming soon</Text>
-          </View>
-        )}
       </HStack>
 
       {/* Error message */}
       {error && (
         <Text className="text-sm text-error-600">{error.message}</Text>
-      )}
-
-      {/* Note about upload */}
-      {!attendanceId && existingPhotos.length > 0 && (
-        <Text className="text-xs text-typography-400">
-          Photos will be uploaded after saving
-        </Text>
       )}
 
       {/* Source picker actionsheet */}
@@ -170,17 +189,17 @@ export function BeerPicturesSection({
 
           <ActionsheetItem onPress={() => handleSourceSelect("camera")}>
             <Camera size={20} color={IconColors.default} />
-            <ActionsheetItemText>Take Photo</ActionsheetItemText>
+            <ActionsheetItemText>{t("profile.avatar.takePhoto")}</ActionsheetItemText>
           </ActionsheetItem>
 
           <ActionsheetItem onPress={() => handleSourceSelect("library")}>
             <ImagePlus size={20} color={IconColors.default} />
-            <ActionsheetItemText>Choose from Library</ActionsheetItemText>
+            <ActionsheetItemText>{t("profile.avatar.chooseFromLibrary")}</ActionsheetItemText>
           </ActionsheetItem>
 
           <ActionsheetItem onPress={() => setShowSourcePicker(false)}>
             <X size={20} color={IconColors.muted} />
-            <ActionsheetItemText>Cancel</ActionsheetItemText>
+            <ActionsheetItemText>{t("common.buttons.cancel")}</ActionsheetItemText>
           </ActionsheetItem>
         </ActionsheetContent>
       </Actionsheet>

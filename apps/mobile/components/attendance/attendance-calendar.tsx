@@ -1,6 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
-import { View } from "react-native";
-import { ChevronLeft, ChevronRight, Beer } from "lucide-react-native";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   startOfMonth,
   endOfMonth,
@@ -15,12 +13,17 @@ import {
   subMonths,
   isBefore,
   isAfter,
+  addDays,
 } from "date-fns";
+import { ChevronLeft, ChevronRight, Beer } from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
+import { View } from "react-native";
 
 import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { cn } from "@prostcounter/ui";
 import { IconColors, Colors } from "@/lib/constants/colors";
 
 interface AttendanceData {
@@ -36,7 +39,21 @@ interface AttendanceCalendarProps {
   onDateSelect: (date: Date) => void;
 }
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// Week starts on Monday (ISO standard, used in Europe)
+const WEEK_STARTS_ON = 1 as const; // 0 = Sunday, 1 = Monday
+
+// Generate weekday headers dynamically based on WEEK_STARTS_ON
+// This ensures the headers always match the calendar grid
+const getWeekdayHeaders = () => {
+  // Use a reference Monday to generate the week
+  const referenceMonday = new Date(2024, 0, 1); // Jan 1, 2024 is a Monday
+  const weekStart = startOfWeek(referenceMonday, {
+    weekStartsOn: WEEK_STARTS_ON,
+  });
+  return Array.from({ length: 7 }, (_, i) =>
+    format(addDays(weekStart, i), "EEE"),
+  );
+};
 
 /**
  * Calendar view showing festival days with attendance indicators
@@ -55,10 +72,17 @@ export function AttendanceCalendar({
   selectedDate,
   onDateSelect,
 }: AttendanceCalendarProps) {
+  const { t } = useTranslation();
+
   // Current displayed month (starts at festival start month)
-  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(festivalStartDate));
+  const [currentMonth, setCurrentMonth] = useState(() =>
+    startOfMonth(festivalStartDate),
+  );
 
   const today = useMemo(() => new Date(), []);
+
+  // Generate weekday headers - memoized since it's static
+  const weekdayHeaders = useMemo(() => getWeekdayHeaders(), []);
 
   // Map of date string -> beer count for quick lookup
   const attendanceMap = useMemo(() => {
@@ -80,14 +104,23 @@ export function AttendanceCalendar({
     return !isAfter(startOfMonth(nextMonth), endOfMonth(festivalEndDate));
   }, [currentMonth, festivalEndDate]);
 
-  // Generate days for the calendar grid
-  const calendarDays = useMemo(() => {
+  // Generate days for the calendar grid, organized by weeks
+  const calendarWeeks = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart);
-    const calendarEnd = endOfWeek(monthEnd);
+    const calendarStart = startOfWeek(monthStart, {
+      weekStartsOn: WEEK_STARTS_ON,
+    });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: WEEK_STARTS_ON });
 
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+
+    // Split into weeks (7 days each) for proper grid alignment
+    const weeks: Date[][] = [];
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push(days.slice(i, i + 7));
+    }
+    return weeks;
   }, [currentMonth]);
 
   const handlePrevMonth = useCallback(() => {
@@ -112,7 +145,7 @@ export function AttendanceCalendar({
         onDateSelect(day);
       }
     },
-    [festivalStartDate, festivalEndDate, onDateSelect]
+    [festivalStartDate, festivalEndDate, onDateSelect],
   );
 
   const renderDay = useCallback(
@@ -128,30 +161,23 @@ export function AttendanceCalendar({
       const beerCount = attendanceMap.get(dateStr);
       const hasAttendance = beerCount !== undefined && beerCount > 0;
 
-      // Determine cell styling
-      let cellClassName = "h-12 w-12 items-center justify-center rounded-lg ";
-      let textClassName = "text-sm font-medium ";
+      // Determine cell styling using cn() for safe class merging
+      const cellClassName = cn(
+        "h-12 w-12 items-center justify-center rounded-lg",
+        !isCurrentMonth && "opacity-30",
+        isCurrentMonth && isSelected && "bg-primary-500",
+        isCurrentMonth && !isSelected && hasAttendance && "bg-primary-100 border border-primary-300",
+        isCurrentMonth && !isSelected && !hasAttendance && isFestivalDay && "bg-background-100"
+      );
 
-      if (!isCurrentMonth) {
-        // Outside current month
-        cellClassName += "opacity-30";
-        textClassName += "text-typography-400";
-      } else if (!isFestivalDay) {
-        // Not a festival day
-        textClassName += "text-typography-300";
-      } else if (isSelected) {
-        // Selected festival day
-        cellClassName += "bg-primary-500";
-        textClassName += "text-white";
-      } else if (hasAttendance) {
-        // Festival day with attendance
-        cellClassName += "bg-primary-100 border border-primary-300";
-        textClassName += "text-primary-700";
-      } else {
-        // Festival day without attendance
-        cellClassName += "bg-background-100";
-        textClassName += "text-typography-900";
-      }
+      const textClassName = cn(
+        "text-sm font-medium",
+        !isCurrentMonth && "text-typography-400",
+        isCurrentMonth && !isFestivalDay && "text-typography-300",
+        isCurrentMonth && isFestivalDay && isSelected && "text-white",
+        isCurrentMonth && isFestivalDay && !isSelected && hasAttendance && "text-primary-700",
+        isCurrentMonth && isFestivalDay && !isSelected && !hasAttendance && "text-typography-900"
+      );
 
       return (
         <Pressable
@@ -170,18 +196,21 @@ export function AttendanceCalendar({
             <Text className={textClassName}>{format(day, "d")}</Text>
 
             {/* Beer count badge */}
-            {hasAttendance && isFestivalDay && isCurrentMonth && !isSelected && (
-              <HStack className="items-center gap-0.5 mt-0.5">
-                <Beer size={10} color={Colors.primary[600]} />
-                <Text className="text-[10px] font-semibold text-primary-600">
-                  {beerCount}
-                </Text>
-              </HStack>
-            )}
+            {hasAttendance &&
+              isFestivalDay &&
+              isCurrentMonth &&
+              !isSelected && (
+                <HStack className="mt-0.5 items-center gap-0.5">
+                  <Beer size={10} color={Colors.primary[600]} />
+                  <Text className="text-[10px] font-semibold text-primary-600">
+                    {beerCount}
+                  </Text>
+                </HStack>
+              )}
 
             {/* Beer count on selected */}
             {hasAttendance && isSelected && (
-              <HStack className="items-center gap-0.5 mt-0.5">
+              <HStack className="mt-0.5 items-center gap-0.5">
                 <Beer size={10} color={Colors.white} />
                 <Text className="text-[10px] font-semibold text-white">
                   {beerCount}
@@ -200,13 +229,13 @@ export function AttendanceCalendar({
       festivalEndDate,
       attendanceMap,
       handleDayPress,
-    ]
+    ],
   );
 
   return (
-    <VStack className="bg-background-0 rounded-xl p-4">
+    <VStack className="rounded-xl bg-background-0 p-4">
       {/* Header with month navigation */}
-      <HStack className="items-center justify-between mb-4">
+      <HStack className="mb-4 items-center justify-between">
         <Pressable
           onPress={handlePrevMonth}
           disabled={!canGoPrev}
@@ -235,8 +264,8 @@ export function AttendanceCalendar({
       </HStack>
 
       {/* Weekday headers */}
-      <HStack className="justify-around mb-2">
-        {WEEKDAYS.map((day) => (
+      <HStack className="mb-2 justify-around">
+        {weekdayHeaders.map((day) => (
           <View key={day} className="w-12 items-center">
             <Text className="text-xs font-medium text-typography-500">
               {day}
@@ -245,20 +274,33 @@ export function AttendanceCalendar({
         ))}
       </HStack>
 
-      {/* Calendar grid */}
-      <View className="flex-row flex-wrap justify-around">
-        {calendarDays.map((day, index) => renderDay(day, index))}
-      </View>
+      {/* Calendar grid - render week by week for proper alignment */}
+      <VStack space="xs">
+        {calendarWeeks.map((week, weekIndex) => (
+          <HStack key={weekIndex} className="justify-around">
+            {week.map((day, dayIndex) =>
+              renderDay(day, weekIndex * 7 + dayIndex),
+            )}
+          </HStack>
+        ))}
+      </VStack>
 
       {/* Legend */}
-      <HStack className="justify-center gap-6 mt-4 pt-4 border-t border-background-200">
-        <HStack className="items-center gap-2">
-          <View className="h-3 w-3 rounded bg-primary-100 border border-primary-300" />
-          <Text className="text-xs text-typography-500">Has attendance</Text>
+      <HStack
+        space="xl"
+        className="mt-4 justify-center border-t border-background-200 pt-4"
+      >
+        <HStack space="sm" className="items-center">
+          <View className="h-3 w-3 rounded border border-primary-300 bg-primary-100" />
+          <Text className="text-xs text-typography-500">
+            {t("attendance.calendar.hasAttendance")}
+          </Text>
         </HStack>
-        <HStack className="items-center gap-2">
+        <HStack space="sm" className="items-center">
           <View className="h-3 w-3 rounded bg-primary-500" />
-          <Text className="text-xs text-typography-500">Selected</Text>
+          <Text className="text-xs text-typography-500">
+            {t("attendance.calendar.selected")}
+          </Text>
         </HStack>
       </HStack>
     </VStack>

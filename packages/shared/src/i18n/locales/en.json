@@ -250,7 +250,12 @@
       "notesLabel": "Notes",
       "notesPlaceholder": "Optional notes",
       "submit": "Submit",
-      "update": "Update"
+      "update": "Update",
+      "editTitle": "Edit Attendance",
+      "addTitle": "Add Attendance",
+      "selectTents": "Select tents...",
+      "photos": "Photos",
+      "saving": "Saving..."
     },
     "delete": {
       "title": "Confirm Deletion",
@@ -285,7 +290,21 @@
     "errors": {
       "invalidDate": "Please select a valid date",
       "dateOutsideFestival": "Date must be within the festival dates"
-    }
+    },
+    "calendar": {
+      "tapToAddOrEdit": "Tap a day to add or edit your attendance",
+      "hasAttendance": "Has attendance",
+      "selected": "Selected"
+    },
+    "summary": {
+      "title": "Festival Summary",
+      "days": "Days",
+      "beers": "Beers",
+      "avgPerDay": "Avg/Day"
+    },
+    "noFestival": "Please select a festival to view attendance",
+    "updateSuccess": "Attendance updated",
+    "createSuccess": "Attendance recorded"
   },
   "achievements": {
     "pageTitle": "Achievements",
