@@ -17,6 +17,7 @@ import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { DataProvider } from "@/lib/data/query-client";
 import { FestivalProvider } from "@/lib/festival/FestivalContext";
 import { initMobileI18n } from "@/lib/i18n";
+import { defaultScreenOptions } from "@/lib/navigation/header-config";
 
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {
@@ -87,6 +88,7 @@ export default function RootLayout() {
                           screenOptions={{
                             headerShown: false,
                             animation: "slide_from_right",
+                            ...defaultScreenOptions,
                           }}
                         >
                           <Stack.Screen name="(auth)" />

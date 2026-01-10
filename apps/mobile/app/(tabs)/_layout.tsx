@@ -35,7 +35,7 @@ export default function TabsLayout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerShadowVisible: false,
+        headerShadowVisible: true,
         tabBarActiveTintColor: Colors.primary[500],
         tabBarInactiveTintColor: Colors.gray[500],
         tabBarStyle: {
@@ -43,8 +43,9 @@ export default function TabsLayout() {
           borderTopColor: Colors.gray[200],
           paddingTop: 4,
           paddingBottom: 8,
-          height: 64,
+          height: 72,
         },
+        tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "500",
