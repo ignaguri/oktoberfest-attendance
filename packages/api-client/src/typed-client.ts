@@ -1428,6 +1428,114 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }
         return parseJsonResponse(response);
       },
+
+      /**
+       * Get a signed upload URL for uploading a photo
+       */
+      async getUploadUrl(params: {
+        festivalId: string;
+        attendanceId: string;
+        fileName: string;
+        fileType: string;
+        fileSize: number;
+      }): Promise<{
+        uploadUrl: string;
+        publicUrl: string;
+        pictureId: string;
+        expiresIn: number;
+      }> {
+        const headers = await getAuthHeaders();
+        const queryParams = new URLSearchParams({
+          festivalId: params.festivalId,
+          attendanceId: params.attendanceId,
+          fileName: params.fileName,
+          fileType: params.fileType,
+          fileSize: params.fileSize.toString(),
+        });
+        const response = await fetch(
+          `${baseUrl}/v1/photos/upload-url?${queryParams}`,
+          { headers }
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(response).catch(
+            () => ({ message: undefined })
+          );
+          throw new Error(error.message || "Failed to get photo upload URL");
+        }
+        return parseJsonResponse(response);
+      },
+
+      /**
+       * Confirm that a photo was successfully uploaded
+       */
+      async confirmUpload(pictureId: string): Promise<{
+        id: string;
+        pictureUrl: string;
+      }> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/photos/${pictureId}/confirm`, {
+          method: "POST",
+          headers,
+        });
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(response).catch(
+            () => ({ message: undefined })
+          );
+          throw new Error(error.message || "Failed to confirm photo upload");
+        }
+        // API returns { success, picture: { id, url, attendanceId, uploadedAt } }
+        // Transform to the expected format
+        const result = await parseJsonResponse<{
+          success: boolean;
+          picture: { id: string; url: string };
+        }>(response);
+        return {
+          id: result.picture.id,
+          pictureUrl: result.picture.url,
+        };
+      },
+
+      /**
+       * List user's photos
+       */
+      async list(festivalId?: string): Promise<{
+        photos: Array<{
+          id: string;
+          pictureUrl: string;
+          visibility: "public" | "private";
+          createdAt: string;
+          attendanceId: string;
+        }>;
+        total: number;
+      }> {
+        const headers = await getAuthHeaders();
+        const url = festivalId
+          ? `${baseUrl}/v1/photos?festivalId=${festivalId}`
+          : `${baseUrl}/v1/photos`;
+        const response = await fetch(url, { headers });
+        if (!response.ok) {
+          throw new Error("Failed to fetch photos");
+        }
+        return parseJsonResponse(response);
+      },
+
+      /**
+       * Delete a photo
+       */
+      async delete(pictureId: string): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/photos/${pictureId}`, {
+          method: "DELETE",
+          headers,
+        });
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(response).catch(
+            () => ({ message: undefined })
+          );
+          throw new Error(error.message || "Failed to delete photo");
+        }
+        return parseJsonResponse(response);
+      },
     },
   };
 }
