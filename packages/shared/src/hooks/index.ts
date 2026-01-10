@@ -60,7 +60,12 @@ export {
 } from "./useAchievements";
 
 // Attendance hooks
-export { useAttendances, useDeleteAttendance } from "./useAttendance";
+export {
+  useAttendances,
+  useAttendanceByDate,
+  useDeleteAttendance,
+  useUpdatePersonalAttendance,
+} from "./useAttendance";
 
 // Tent hooks
 export {

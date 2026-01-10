@@ -42,6 +42,8 @@ export const IconColors = {
   white: Colors.white,
   error: Colors.error[600],
   success: Colors.success[500],
+  primary: Colors.primary[500],
+  disabled: Colors.gray[300],
 } as const;
 
 export const SwitchColors = {

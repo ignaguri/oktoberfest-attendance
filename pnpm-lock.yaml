@@ -143,6 +143,9 @@ importers:
       '@react-native-async-storage/async-storage':
         specifier: ^2.1.0
         version: 2.2.0(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))
+      '@react-native-community/datetimepicker':
+        specifier: ^8.6.0
+        version: 8.6.0(expo@54.0.31)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
       '@react-native-picker/picker':
         specifier: ^2.11.4
         version: 2.11.4(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
@@ -175,6 +178,9 @@ importers:
         version: 18.0.13(expo@54.0.31)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))
       expo-crypto:
         specifier: ~15.0.8
+        version: 15.0.8(expo@54.0.31)
+      expo-haptics:
+        specifier: ^15.0.8
         version: 15.0.8(expo@54.0.31)
       expo-image-manipulator:
         specifier: ~14.0.8
@@ -3858,6 +3864,19 @@ packages:
     engines: {node: '>=20.19.4'}
     hasBin: true
 
+  '@react-native-community/datetimepicker@8.6.0':
+    resolution: {integrity: sha512-yxPSqNfxgpGaqHQIpatqe6ykeBdU/1pdsk/G3x01mY2bpTflLpmVTLqFSJYd3MiZzxNZcMs/j1dQakUczSjcYA==}
+    peerDependencies:
+      expo: '>=52.0.0'
+      react: '*'
+      react-native: '*'
+      react-native-windows: '*'
+    peerDependenciesMeta:
+      expo:
+        optional: true
+      react-native-windows:
+        optional: true
+
   '@react-native-picker/picker@2.11.4':
     resolution: {integrity: sha512-Kf8h1AMnBo54b1fdiVylP2P/iFcZqzpMYcglC28EEFB1DEnOjsNr6Ucqc+3R9e91vHxEDnhZFbYDmAe79P2gjA==}
     peerDependencies:
@@ -6679,6 +6698,11 @@ packages:
       expo: '*'
       react: '*'
       react-native: '*'
+
+  expo-haptics@15.0.8:
+    resolution: {integrity: sha512-lftutojy8Qs8zaDzzjwM3gKHFZ8bOOEZDCkmh2Ddpe95Ra6kt2izeOfOfKuP/QEh0MZ1j9TfqippyHdRd1ZM9g==}
+    peerDependencies:
+      expo: '*'
 
   expo-image-loader@6.0.0:
     resolution: {integrity: sha512-nKs/xnOGw6ACb4g26xceBD57FKLFkSwEUTDXEDF3Gtcu3MqF3ZIYd3YM+sSb1/z9AKV1dYT7rMSGVNgsveXLIQ==}
@@ -14288,6 +14312,14 @@ snapshots:
       - typescript
       - utf-8-validate
 
+  '@react-native-community/datetimepicker@8.6.0(expo@54.0.31)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      invariant: 2.2.4
+      react: 19.1.0
+      react-native: 0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0)
+    optionalDependencies:
+      expo: 54.0.31(@babel/core@7.28.5)(@expo/metro-runtime@6.1.2)(expo-router@6.0.21)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
+
   '@react-native-picker/picker@2.11.4(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
@@ -17720,6 +17752,10 @@ snapshots:
       fontfaceobserver: 2.3.0
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0)
+
+  expo-haptics@15.0.8(expo@54.0.31):
+    dependencies:
+      expo: 54.0.31(@babel/core@7.28.5)(@expo/metro-runtime@6.1.2)(expo-router@6.0.21)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.5))(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
 
   expo-image-loader@6.0.0(expo@54.0.31):
     dependencies:

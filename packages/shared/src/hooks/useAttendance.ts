@@ -59,3 +59,59 @@ export function useDeleteAttendance() {
     }
   );
 }
+
+/**
+ * Hook to fetch attendance for a specific date
+ */
+export function useAttendanceByDate(festivalId: string, date: string) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.attendanceByDate(festivalId, date),
+    async () => {
+      const response = await apiClient.attendance.getByDate({
+        festivalId,
+        date,
+      });
+      return response.attendance;
+    },
+    {
+      enabled: !!festivalId && !!date,
+      staleTime: 30 * 1000, // 30 seconds - may change while editing
+      gcTime: 5 * 60 * 1000, // 5 minutes cache
+    }
+  );
+}
+
+/**
+ * Hook to create or update personal attendance
+ */
+export function useUpdatePersonalAttendance() {
+  const apiClient = useApiClient();
+  const invalidateQueries = useInvalidateQueries();
+
+  return useMutation(
+    async (input: {
+      festivalId: string;
+      date: string;
+      tents?: string[];
+      amount?: number;
+    }) => {
+      return await apiClient.attendance.updatePersonal(input);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate all attendances
+        invalidateQueries(["attendances"]);
+        // Invalidate attendance by date queries
+        invalidateQueries(["attendanceByDate"]);
+        // Invalidate user stats
+        invalidateQueries(["user"]);
+        // Invalidate leaderboards
+        invalidateQueries(["leaderboard"]);
+        // Invalidate highlights
+        invalidateQueries(["highlights"]);
+      },
+    }
+  );
+}

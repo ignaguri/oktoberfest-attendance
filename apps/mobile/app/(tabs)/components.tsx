@@ -4,9 +4,12 @@
  * A development-only screen for testing and previewing UI components.
  * This tab is only visible when __DEV__ is true.
  */
-import { ChevronDown, Puzzle, X } from "lucide-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ChevronDown, Puzzle, Trash2, X } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Pressable, ActionSheetIOS, Platform } from "react-native";
+
+import { useAuth } from "@/lib/auth/AuthContext";
 
 import {
   Button,
@@ -87,9 +90,11 @@ type ComponentType =
   | "actionsheet"
   | "fab"
   | "skeleton"
-  | "toast";
+  | "toast"
+  | "dev-tools";
 
 const COMPONENT_OPTIONS: { label: string; value: ComponentType }[] = [
+  { label: "🛠 Dev Tools", value: "dev-tools" },
   { label: "Buttons", value: "buttons" },
   { label: "Badges", value: "badges" },
   { label: "Avatars", value: "avatars" },
@@ -886,6 +891,128 @@ const ToastShowcase = () => {
   );
 };
 
+const DevToolsShowcase = () => {
+  const { signOut } = useAuth();
+  const toast = useToast();
+  const [isClearing, setIsClearing] = useState(false);
+
+  const clearAuthCache = async () => {
+    setIsClearing(true);
+    try {
+      // Clear all auth-related keys from AsyncStorage
+      const keys = await AsyncStorage.getAllKeys();
+      const authKeys = keys.filter(
+        (key) =>
+          key.includes("supabase") ||
+          key.includes("auth") ||
+          key.includes("session") ||
+          key.includes("token")
+      );
+
+      if (authKeys.length > 0) {
+        await AsyncStorage.multiRemove(authKeys);
+      }
+
+      // Sign out to clear any in-memory auth state
+      await signOut();
+
+      toast.show({
+        placement: "top",
+        duration: 3000,
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="success" variant="solid">
+            <ToastTitle>Cache Cleared</ToastTitle>
+            <ToastDescription>
+              Auth cache cleared. Restart the app to sign in fresh.
+            </ToastDescription>
+          </Toast>
+        ),
+      });
+    } catch (error) {
+      console.error("Failed to clear auth cache:", error);
+      toast.show({
+        placement: "top",
+        duration: 3000,
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="error" variant="solid">
+            <ToastTitle>Error</ToastTitle>
+            <ToastDescription>Failed to clear auth cache.</ToastDescription>
+          </Toast>
+        ),
+      });
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  const clearAllStorage = async () => {
+    setIsClearing(true);
+    try {
+      await AsyncStorage.clear();
+      await signOut();
+
+      toast.show({
+        placement: "top",
+        duration: 3000,
+        render: ({ id }) => (
+          <Toast nativeID={`toast-${id}`} action="success" variant="solid">
+            <ToastTitle>Storage Cleared</ToastTitle>
+            <ToastDescription>
+              All app storage cleared. Restart the app.
+            </ToastDescription>
+          </Toast>
+        ),
+      });
+    } catch (error) {
+      console.error("Failed to clear storage:", error);
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  return (
+    <Section title="Dev Tools">
+      <VStack space="md">
+        <Text className="text-sm text-gray-600">
+          Development utilities for debugging and testing.
+        </Text>
+
+        <VStack space="xs">
+          <Text bold className="text-xs uppercase text-gray-600">
+            Auth & Storage
+          </Text>
+          <Button
+            action="negative"
+            variant="outline"
+            onPress={clearAuthCache}
+            disabled={isClearing}
+          >
+            <Trash2 size={18} color={IconColors.error} />
+            <ButtonText className="ml-2">Clear Auth Cache</ButtonText>
+          </Button>
+          <Text className="text-xs text-gray-500">
+            Clears auth tokens and signs out. Use when session is invalid.
+          </Text>
+        </VStack>
+
+        <VStack space="xs">
+          <Button
+            action="negative"
+            onPress={clearAllStorage}
+            disabled={isClearing}
+          >
+            <Trash2 size={18} color={IconColors.white} />
+            <ButtonText className="ml-2">Clear All Storage</ButtonText>
+          </Button>
+          <Text className="text-xs text-gray-500">
+            Clears ALL app data including preferences. Nuclear option.
+          </Text>
+        </VStack>
+      </VStack>
+    </Section>
+  );
+};
+
 // Component renderer
 const renderComponent = (component: ComponentType) => {
   switch (component) {
@@ -919,6 +1046,8 @@ const renderComponent = (component: ComponentType) => {
       return <SkeletonShowcase />;
     case "toast":
       return <ToastShowcase />;
+    case "dev-tools":
+      return <DevToolsShowcase />;
     default:
       return null;
   }
@@ -926,7 +1055,7 @@ const renderComponent = (component: ComponentType) => {
 
 export default function ComponentsScreen() {
   const [selectedComponent, setSelectedComponent] =
-    useState<ComponentType>("buttons");
+    useState<ComponentType>("dev-tools");
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
