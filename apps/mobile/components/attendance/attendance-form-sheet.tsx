@@ -1,13 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTents, useAttendanceByDate } from "@prostcounter/shared/hooks";
+import {
+  useTents,
+  useAttendanceByDate,
+  useDeleteAttendance,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   createDetailedAttendanceFormSchema,
   type DetailedAttendanceForm,
 } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
-import { X, Calendar } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { X, Calendar, Trash2 } from "lucide-react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
 import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
@@ -23,8 +27,17 @@ import {
   ActionsheetDragIndicatorWrapper,
   ActionsheetScrollView,
 } from "@/components/ui/actionsheet";
+import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "@/components/ui/alert-dialog";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -77,9 +90,15 @@ export function AttendanceFormSheet({
     string[]
   >([]);
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const isEditMode = !!existingAttendance;
   const { tents } = useTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
+  const deleteAttendance = useDeleteAttendance();
+
+  // Track previous isOpen state to detect when sheet opens
+  const prevIsOpenRef = useRef(isOpen);
 
   // Fetch complete attendance data with beer pictures when editing
   const dateString =
@@ -128,9 +147,12 @@ export function AttendanceFormSheet({
 
   const selectedTents = watch("tents");
 
-  // Reset form when opening/closing or date changes
+  // Reset form only when sheet opens (not when data updates during save)
   useEffect(() => {
-    if (isOpen) {
+    const justOpened = isOpen && !prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+
+    if (justOpened) {
       reset(defaultValues);
       // Clear photos when opening - will be populated from API
       setPhotos([]);
@@ -220,6 +242,31 @@ export function AttendanceFormSheet({
     );
   }, []);
 
+  // Handle delete attendance
+  const handleDeletePress = useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!existingAttendance?.id) return;
+
+    try {
+      await deleteAttendance.mutateAsync(existingAttendance.id);
+      setShowDeleteConfirm(false);
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      console.error("Failed to delete attendance:", error);
+    }
+  }, [existingAttendance?.id, deleteAttendance, onSuccess, onClose]);
+
+  const handleCancelDelete = useCallback(() => {
+    setShowDeleteConfirm(false);
+  }, []);
+
+  const isDeleting = deleteAttendance.loading;
+  const isProcessing = isSaving || isDeleting;
+
   // Format date for display - guard against invalid dates
   const formattedDate =
     selectedDate && !isNaN(selectedDate.getTime())
@@ -248,22 +295,39 @@ export function AttendanceFormSheet({
           </HStack>
 
           <ActionsheetScrollView className="w-full">
-            <VStack className="gap-5 px-2 pb-6">
+            <VStack space="xl" className="px-2 pb-4">
               {/* Date Display */}
-              <VStack className="gap-2">
+              <VStack space="sm">
                 <Text className="text-sm font-medium text-typography-700">
                   {t("common.labels.date")}
                 </Text>
-                <HStack className="items-center gap-2 rounded-lg bg-background-100 px-4 py-3">
-                  <Calendar size={18} color={IconColors.muted} />
-                  <Text className="text-base text-typography-700">
-                    {formattedDate}
-                  </Text>
+                <HStack space="lg" className="items-center justify-between">
+                  <HStack
+                    space="sm"
+                    className="flex-1 items-center rounded-lg bg-background-100 px-4 py-3"
+                  >
+                    <Calendar size={18} color={IconColors.muted} />
+                    <Text className="text-base text-typography-700">
+                      {formattedDate}
+                    </Text>
+                  </HStack>
+                  {/* Delete Button - Only in edit mode */}
+                  {isEditMode && (
+                    <Button
+                      variant="outline"
+                      action="negative"
+                      size="icon"
+                      onPress={handleDeletePress}
+                      isDisabled={isProcessing}
+                    >
+                      <Trash2 size={18} color={IconColors.error} />
+                    </Button>
+                  )}
                 </HStack>
               </VStack>
 
               {/* Beer Count Stepper */}
-              <VStack className="gap-3">
+              <VStack space="md">
                 <Text className="text-center text-sm font-medium text-typography-700">
                   {t("attendance.howManyBeers")}
                 </Text>
@@ -287,7 +351,7 @@ export function AttendanceFormSheet({
               </VStack>
 
               {/* Tent Selector */}
-              <VStack className="gap-2">
+              <VStack space="sm">
                 <Text className="text-sm font-medium text-typography-700">
                   {t("attendance.table.visitedTents")}
                 </Text>
@@ -330,7 +394,7 @@ export function AttendanceFormSheet({
                 photosMarkedForRemoval={photosMarkedForRemoval}
                 onPendingPhotosChange={setPendingPhotos}
                 onTogglePhotoRemoval={handleTogglePhotoRemoval}
-                isUploading={isSaving}
+                isUploading={isProcessing}
               />
             </VStack>
           </ActionsheetScrollView>
@@ -342,7 +406,7 @@ export function AttendanceFormSheet({
               action="secondary"
               className="flex-1"
               onPress={onClose}
-              isDisabled={isSaving}
+              isDisabled={isProcessing}
             >
               <ButtonText>{t("common.buttons.cancel")}</ButtonText>
             </Button>
@@ -351,7 +415,7 @@ export function AttendanceFormSheet({
               action="primary"
               className="flex-1"
               onPress={handleSubmit(onSubmit)}
-              isDisabled={isSaving}
+              isDisabled={isProcessing}
             >
               <ButtonText>
                 {isSaving
@@ -372,6 +436,55 @@ export function AttendanceFormSheet({
         selectedTents={selectedTents}
         onSelectTents={handleTentsSelect}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        isOpen={showDeleteConfirm}
+        onClose={handleCancelDelete}
+        size="md"
+      >
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Heading size="lg" className="text-error-600">
+              {t("attendance.form.deleteConfirmTitle", {
+                defaultValue: "Delete Attendance",
+              })}
+            </Heading>
+          </AlertDialogHeader>
+          <AlertDialogBody className="mb-4 mt-3">
+            <Text size="sm" className="text-typography-500">
+              {t("attendance.form.deleteConfirmMessage", {
+                defaultValue:
+                  "Are you sure you want to delete this attendance record? This action cannot be undone.",
+              })}
+            </Text>
+          </AlertDialogBody>
+          <AlertDialogFooter className="gap-3">
+            <Button
+              variant="outline"
+              action="secondary"
+              onPress={handleCancelDelete}
+              className="flex-1"
+              isDisabled={isDeleting}
+            >
+              <ButtonText>{t("common.buttons.cancel")}</ButtonText>
+            </Button>
+            <Button
+              action="negative"
+              onPress={handleConfirmDelete}
+              className="flex-1"
+              isDisabled={isDeleting}
+            >
+              <ButtonText>
+                {isDeleting
+                  ? t("common.status.deleting", { defaultValue: "Deleting..." })
+                  : t("common.buttons.delete", { defaultValue: "Delete" })}
+              </ButtonText>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

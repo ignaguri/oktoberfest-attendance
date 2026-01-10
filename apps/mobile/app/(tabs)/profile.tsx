@@ -16,18 +16,10 @@ import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
 
+import { ImageSourcePicker } from "@/components/image-source-picker";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-} from "@/components/ui/actionsheet";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -227,7 +219,6 @@ export default function ProfileScreen() {
 
   const handleAvatarOption = useCallback(
     (option: "camera" | "library") => {
-      setShowAvatarSheet(false);
       pickImage(option);
     },
     [pickImage],
@@ -373,32 +364,13 @@ export default function ProfileScreen() {
         />
       </VStack>
 
-      {/* Avatar Picker ActionSheet */}
-      <Actionsheet isOpen={showAvatarSheet} onClose={handleCloseAvatarSheet}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          <ActionsheetItem onPress={() => handleAvatarOption("camera")}>
-            <ActionsheetItemText>
-              {t("profile.avatar.takePhoto", { defaultValue: "Take Photo" })}
-            </ActionsheetItemText>
-          </ActionsheetItem>
-          <ActionsheetItem onPress={() => handleAvatarOption("library")}>
-            <ActionsheetItemText>
-              {t("profile.avatar.chooseFromLibrary", {
-                defaultValue: "Choose from Library",
-              })}
-            </ActionsheetItemText>
-          </ActionsheetItem>
-          <ActionsheetItem onPress={handleCloseAvatarSheet}>
-            <ActionsheetItemText className="text-error-500">
-              {t("common.buttons.cancel")}
-            </ActionsheetItemText>
-          </ActionsheetItem>
-        </ActionsheetContent>
-      </Actionsheet>
+      {/* Avatar Picker */}
+      <ImageSourcePicker
+        isOpen={showAvatarSheet}
+        onClose={handleCloseAvatarSheet}
+        onSelect={handleAvatarOption}
+        disabled={isAvatarUploading}
+      />
 
       {/* Gluestack AlertDialog */}
       <AlertDialog isOpen={dialog.isOpen} onClose={closeDialog} size="md">

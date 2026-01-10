@@ -202,7 +202,7 @@ export function AttendanceCalendar({
           <VStack className="items-center">
             {/* Today indicator */}
             {isToday && (
-              <View className="absolute -top-0.5 h-1 w-1 rounded-full bg-error-500" />
+              <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />
             )}
 
             {/* Day number */}

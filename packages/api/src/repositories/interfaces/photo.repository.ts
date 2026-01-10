@@ -65,6 +65,14 @@ export interface IPhotoRepository {
   delete(pictureId: string, userId: string): Promise<void>;
 
   /**
+   * Delete all photos for an attendance
+   * Used when deleting an attendance to avoid FK constraint violation
+   * @param attendanceId - Attendance ID
+   * @param userId - User ID (for authorization)
+   */
+  deleteByAttendanceId(attendanceId: string, userId: string): Promise<void>;
+
+  /**
    * Update photo caption
    * @param pictureId - Picture ID
    * @param userId - User ID (for authorization)

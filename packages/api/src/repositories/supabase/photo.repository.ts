@@ -209,6 +209,27 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     }
   }
 
+  /**
+   * Delete all photo records for an attendance (DB only, keeps storage files)
+   * Used when deleting an attendance to avoid FK constraint violation.
+   * Storage files are kept for potential data restoration.
+   */
+  async deleteByAttendanceId(
+    attendanceId: string,
+    userId: string,
+  ): Promise<void> {
+    // Delete database records only (keep storage files for potential restoration)
+    const { error: dbError } = await this.supabase
+      .from("beer_pictures")
+      .delete()
+      .eq("attendance_id", attendanceId)
+      .eq("user_id", userId);
+
+    if (dbError) {
+      throw new DatabaseError(`Failed to delete pictures: ${dbError.message}`);
+    }
+  }
+
   async updateCaption(
     pictureId: string,
     userId: string,

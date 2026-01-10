@@ -1,24 +1,18 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Camera, ImagePlus, Minus, X } from "lucide-react-native";
+import { ImagePlus, Minus, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 
 import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-} from "@/components/ui/actionsheet";
+  ImageSourcePicker,
+  type ImageSource,
+} from "@/components/image-source-picker";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
   useBeerPictureUpload,
-  type ImageSource,
   type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 import { IconColors } from "@/lib/constants/colors";
@@ -81,7 +75,6 @@ export function BeerPicturesSection({
 
   const handleSourceSelect = useCallback(
     async (source: ImageSource) => {
-      setShowSourcePicker(false);
       const newPhotos = await pickImages(source);
       if (newPhotos?.length) {
         onPendingPhotosChange([...pendingPhotos, ...newPhotos]);
@@ -179,39 +172,13 @@ export function BeerPicturesSection({
       {/* Error message */}
       {error && <Text className="text-sm text-error-600">{error.message}</Text>}
 
-      {/* Source picker actionsheet */}
-      <Actionsheet
+      {/* Source picker */}
+      <ImageSourcePicker
         isOpen={showSourcePicker}
         onClose={() => setShowSourcePicker(false)}
-      >
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-
-          <ActionsheetItem onPress={() => handleSourceSelect("camera")}>
-            <Camera size={20} color={IconColors.default} />
-            <ActionsheetItemText>
-              {t("profile.avatar.takePhoto")}
-            </ActionsheetItemText>
-          </ActionsheetItem>
-
-          <ActionsheetItem onPress={() => handleSourceSelect("library")}>
-            <ImagePlus size={20} color={IconColors.default} />
-            <ActionsheetItemText>
-              {t("profile.avatar.chooseFromLibrary")}
-            </ActionsheetItemText>
-          </ActionsheetItem>
-
-          <ActionsheetItem onPress={() => setShowSourcePicker(false)}>
-            <X size={20} color={IconColors.muted} />
-            <ActionsheetItemText>
-              {t("common.buttons.cancel")}
-            </ActionsheetItemText>
-          </ActionsheetItem>
-        </ActionsheetContent>
-      </Actionsheet>
+        onSelect={handleSourceSelect}
+        disabled={isUploading || isPicking}
+      />
     </VStack>
   );
 }

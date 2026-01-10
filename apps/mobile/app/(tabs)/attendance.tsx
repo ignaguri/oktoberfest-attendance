@@ -1,12 +1,14 @@
+import { useAttendances } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { format } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { format } from "date-fns";
 
-import { useAttendances, useDeleteAttendance } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
+import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
+import { AttendanceFormSheet } from "@/components/attendance/attendance-form-sheet";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -24,9 +26,6 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { useFestival } from "@/lib/festival/FestivalContext";
 
-import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
-import { AttendanceFormSheet } from "@/components/attendance/attendance-form-sheet";
-
 export default function AttendanceScreen() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
@@ -43,8 +42,6 @@ export default function AttendanceScreen() {
     isRefetching,
   } = useAttendances(currentFestival?.id ?? "");
 
-  const deleteAttendanceMutation = useDeleteAttendance();
-
   // Local UI state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -52,11 +49,11 @@ export default function AttendanceScreen() {
   // Parse festival dates
   const festivalStartDate = useMemo(
     () => (currentFestival ? new Date(currentFestival.startDate) : new Date()),
-    [currentFestival]
+    [currentFestival],
   );
   const festivalEndDate = useMemo(
     () => (currentFestival ? new Date(currentFestival.endDate) : new Date()),
-    [currentFestival]
+    [currentFestival],
   );
 
   // Find existing attendance for selected date
@@ -64,7 +61,10 @@ export default function AttendanceScreen() {
   const existingAttendance = useMemo(() => {
     if (!selectedDate || !attendances) return null;
     const dateStr = format(selectedDate, "yyyy-MM-dd");
-    return (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ?? null;
+    return (
+      (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ??
+      null
+    );
   }, [selectedDate, attendances]);
 
   // Transform attendances for calendar
@@ -93,7 +93,7 @@ export default function AttendanceScreen() {
       t("common.status.success"),
       existingAttendance
         ? t("attendance.updateSuccess")
-        : t("attendance.createSuccess")
+        : t("attendance.createSuccess"),
     );
   }, [refetch, showDialog, existingAttendance, t]);
 
@@ -101,31 +101,11 @@ export default function AttendanceScreen() {
     refetch();
   }, [refetch]);
 
-  const handleDeletePress = useCallback(() => {
-    if (!existingAttendance) return;
-
-    showDialog(
-      t("attendance.delete.title"),
-      t("attendance.delete.confirm"),
-      "destructive",
-      async () => {
-        try {
-          await deleteAttendanceMutation.mutateAsync(existingAttendance.id);
-          refetch();
-          setIsFormOpen(false);
-          showDialog(t("common.status.success"), t("attendance.delete.success"));
-        } catch {
-          showDialog(t("common.status.error"), t("attendance.delete.error"));
-        }
-      }
-    );
-  }, [existingAttendance, deleteAttendanceMutation, refetch, showDialog, t]);
-
   // No festival selected
   if (!currentFestival) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
-        <Text className="text-typography-500 text-center">
+        <Text className="text-center text-typography-500">
           {t("attendance.noFestival")}
         </Text>
       </View>
@@ -155,12 +135,15 @@ export default function AttendanceScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={
-          <RefreshControl refreshing={isRefetching ?? false} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={isRefetching ?? false}
+            onRefresh={onRefresh}
+          />
         }
       >
         <View className="p-4">
           {/* Header */}
-          <Text className="text-sm text-typography-500 mb-4 text-center">
+          <Text className="mb-4 text-center text-sm text-typography-500">
             {t("attendance.calendar.tapToAddOrEdit")}
           </Text>
 
@@ -174,47 +157,48 @@ export default function AttendanceScreen() {
           />
 
           {/* Stats Summary */}
-          {attendances && (attendances as AttendanceWithTotals[]).length > 0 && (
-            <View className="mt-4 p-4 bg-background-0 rounded-xl">
-              <Text className="text-sm font-medium text-typography-700 mb-2">
-                {t("attendance.summary.title")}
-              </Text>
-              <View className="flex-row justify-around">
-                <View className="items-center">
-                  <Text className="text-2xl font-bold text-primary-500">
-                    {(attendances as AttendanceWithTotals[]).length}
-                  </Text>
-                  <Text className="text-xs text-typography-500">
-                    {t("attendance.summary.days")}
-                  </Text>
-                </View>
-                <View className="items-center">
-                  <Text className="text-2xl font-bold text-primary-500">
-                    {(attendances as AttendanceWithTotals[]).reduce(
-                      (sum, a) => sum + a.beerCount,
-                      0
-                    )}
-                  </Text>
-                  <Text className="text-xs text-typography-500">
-                    {t("attendance.summary.beers")}
-                  </Text>
-                </View>
-                <View className="items-center">
-                  <Text className="text-2xl font-bold text-primary-500">
-                    {(
-                      (attendances as AttendanceWithTotals[]).reduce(
+          {attendances &&
+            (attendances as AttendanceWithTotals[]).length > 0 && (
+              <View className="mt-4 rounded-xl bg-background-0 p-4">
+                <Text className="mb-2 text-sm font-medium text-typography-700">
+                  {t("attendance.summary.title")}
+                </Text>
+                <View className="flex-row justify-around">
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-primary-500">
+                      {(attendances as AttendanceWithTotals[]).length}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.days")}
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-primary-500">
+                      {(attendances as AttendanceWithTotals[]).reduce(
                         (sum, a) => sum + a.beerCount,
-                        0
-                      ) / (attendances as AttendanceWithTotals[]).length
-                    ).toFixed(1)}
-                  </Text>
-                  <Text className="text-xs text-typography-500">
-                    {t("attendance.summary.avgPerDay")}
-                  </Text>
+                        0,
+                      )}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.beers")}
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-primary-500">
+                      {(
+                        (attendances as AttendanceWithTotals[]).reduce(
+                          (sum, a) => sum + a.beerCount,
+                          0,
+                        ) / (attendances as AttendanceWithTotals[]).length
+                      ).toFixed(1)}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.avgPerDay")}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
+            )}
         </View>
       </ScrollView>
 
@@ -265,7 +249,9 @@ export default function AttendanceScreen() {
                   <ButtonText>{t("common.buttons.cancel")}</ButtonText>
                 </Button>
                 <Button
-                  action={dialog.type === "destructive" ? "negative" : "primary"}
+                  action={
+                    dialog.type === "destructive" ? "negative" : "primary"
+                  }
                   onPress={() => {
                     dialog.onConfirm?.();
                     closeDialog();

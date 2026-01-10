@@ -2,22 +2,18 @@
  * Hook for handling beer picture uploads in the mobile app
  *
  * Provides separate methods for:
- * 1. Picking/compressing images (for preview)
- * 2. Uploading images (when form is saved)
+ * 1. Picking images (for instant preview - no compression)
+ * 2. Uploading images (compression happens here, when form is saved)
  *
  * Flow:
- * 1. User picks images → stored locally with preview URIs
- * 2. User clicks Save → images are uploaded
+ * 1. User picks images → stored locally with original URIs for instant preview
+ * 2. User clicks Save → images are compressed and uploaded
  * 3. API: Get signed upload URL → Upload to storage → Confirm upload
  */
 
 import { useCallback, useState } from "react";
 
-import {
-  useImageUpload,
-  type ImageSource,
-  type PickedImage,
-} from "./useImageUpload";
+import { useImageUpload, type ImageSource } from "./useImageUpload";
 import { apiClient } from "@/lib/api-client";
 
 interface UploadedPhoto {
@@ -25,10 +21,13 @@ interface UploadedPhoto {
   pictureUrl: string;
 }
 
+/**
+ * Pending photo ready for preview
+ * Stores original URI - compression happens at upload time
+ */
 interface PendingPhoto {
   id: string;
   localUri: string;
-  imageData: PickedImage;
 }
 
 interface UseBeerPictureUploadOptions {
@@ -62,7 +61,7 @@ export function useBeerPictureUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const { pickImages: pickAndProcessImages, showError } = useImageUpload({
+  const { pickImagesRaw, compressImage, showError } = useImageUpload({
     onError,
     allowMultiple: true,
     compress: {
@@ -74,25 +73,24 @@ export function useBeerPictureUpload({
 
   /**
    * Pick images from camera or library
-   * Returns pending photos with local URIs for preview
-   * Does NOT upload - call uploadPendingPhotos when ready
+   * Returns pending photos with original URIs for instant preview
+   * Does NOT compress or upload - compression happens in uploadPendingPhotos
    */
   const pickImages = useCallback(
     async (source: ImageSource): Promise<PendingPhoto[] | null> => {
       try {
         setError(null);
         setIsPicking(true);
-        const images = await pickAndProcessImages(source);
+        const images = await pickImagesRaw(source);
 
         if (!images?.length) {
           return null;
         }
 
-        // Create pending photos with local URIs for preview
+        // Create pending photos with original URIs for instant preview
         const pendingPhotos: PendingPhoto[] = images.map((img, index) => ({
           id: `pending-${Date.now()}-${index}`,
           localUri: img.uri,
-          imageData: img,
         }));
 
         return pendingPhotos;
@@ -106,11 +104,12 @@ export function useBeerPictureUpload({
         setIsPicking(false);
       }
     },
-    [pickAndProcessImages, onError],
+    [pickImagesRaw, onError],
   );
 
   /**
    * Upload pending photos to storage
+   * Compresses images at upload time (not when picking)
    * Call this when the form is saved
    */
   const uploadPendingPhotos = useCallback(
@@ -137,33 +136,34 @@ export function useBeerPictureUpload({
       try {
         const uploadedPhotos: UploadedPhoto[] = [];
 
-        // Upload each image sequentially
+        // Compress and upload each image sequentially
         for (const pending of pendingPhotos) {
-          const image = pending.imageData;
+          // Step 1: Compress image (deferred from pick time)
+          const compressedImage = await compressImage(pending.localUri);
 
-          // Step 1: Get signed upload URL from API
+          // Step 2: Get signed upload URL from API
           const { uploadUrl, pictureId } = await apiClient.photos.getUploadUrl({
             festivalId,
             attendanceId,
-            fileName: image.originalFileName,
-            fileType: image.mimeType,
-            fileSize: image.arrayBuffer.byteLength,
+            fileName: compressedImage.originalFileName,
+            fileType: compressedImage.mimeType,
+            fileSize: compressedImage.arrayBuffer.byteLength,
           });
 
-          // Step 2: Upload compressed image directly to storage
+          // Step 3: Upload compressed image directly to storage
           const uploadResponse = await fetch(uploadUrl, {
             method: "PUT",
             headers: {
-              "Content-Type": image.mimeType,
+              "Content-Type": compressedImage.mimeType,
             },
-            body: image.arrayBuffer,
+            body: compressedImage.arrayBuffer,
           });
 
           if (!uploadResponse.ok) {
             throw new Error("Failed to upload image to storage");
           }
 
-          // Step 3: Confirm upload with API
+          // Step 4: Confirm upload with API
           const confirmedPhoto =
             await apiClient.photos.confirmUpload(pictureId);
 
@@ -184,7 +184,7 @@ export function useBeerPictureUpload({
         setIsUploading(false);
       }
     },
-    [showError],
+    [compressImage, showError],
   );
 
   return {

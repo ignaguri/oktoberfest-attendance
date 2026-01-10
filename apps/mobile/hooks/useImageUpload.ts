@@ -40,9 +40,19 @@ export interface UseImageUploadOptions {
   errorMessageKey?: string;
 }
 
+/** Raw picked image before compression */
+export interface RawPickedImage {
+  uri: string;
+  originalFileName: string;
+}
+
 export interface UseImageUploadReturn {
-  /** Pick and process image(s) from camera or library */
+  /** Pick and process image(s) from camera or library (includes compression) */
   pickImages: (source: ImageSource) => Promise<PickedImage[] | null>;
+  /** Pick image(s) without compression - for instant preview */
+  pickImagesRaw: (source: ImageSource) => Promise<RawPickedImage[] | null>;
+  /** Compress a raw image for upload */
+  compressImage: (uri: string) => Promise<PickedImage>;
   /** Whether an upload is in progress */
   isUploading: boolean;
   /** Set uploading state (for custom upload flows) */
@@ -85,6 +95,9 @@ export function useImageUpload({
     Alert.alert(t("common.errors.title"), t(errorMessageKey));
   }
 
+  /**
+   * Pick and compress images (original behavior)
+   */
   async function pickImages(
     source: ImageSource,
   ): Promise<PickedImage[] | null> {
@@ -120,8 +133,56 @@ export function useImageUpload({
     }
   }
 
+  /**
+   * Pick images without compression - for instant preview
+   * Returns raw URIs that can be compressed later with compressImage()
+   */
+  async function pickImagesRaw(
+    source: ImageSource,
+  ): Promise<RawPickedImage[] | null> {
+    try {
+      setError(null);
+
+      // Request permissions
+      const hasPermission = await requestPermission(source, t);
+      if (!hasPermission) {
+        return null;
+      }
+
+      // Launch picker
+      const result = await launchPicker(
+        source,
+        allowMultiple && source === "library",
+      );
+      if (result.canceled || !result.assets?.length) {
+        return null;
+      }
+
+      // Return raw images without processing
+      return result.assets.map((asset) => ({
+        uri: asset.uri,
+        originalFileName: asset.uri.split("/").pop() || "image.jpg",
+      }));
+    } catch (err) {
+      const uploadError =
+        err instanceof Error ? err : new Error("Image selection failed");
+      showError(uploadError);
+      return null;
+    }
+  }
+
+  /**
+   * Compress a single image for upload
+   * Call this when ready to upload (e.g., on form save)
+   */
+  async function compressForUpload(uri: string): Promise<PickedImage> {
+    return processImage(uri, compressOptions);
+  }
+
   return {
     pickImages,
+    pickImagesRaw,
+    compressImage: compressForUpload,
     isUploading,
     setIsUploading,
     error,
