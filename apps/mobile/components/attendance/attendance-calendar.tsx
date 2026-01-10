@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import {
   startOfMonth,
   endOfMonth,
@@ -23,7 +24,6 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { cn } from "@prostcounter/ui";
 import { IconColors, Colors } from "@/lib/constants/colors";
 
 interface AttendanceData {
@@ -162,28 +162,41 @@ export function AttendanceCalendar({
       const hasAttendance = beerCount !== undefined && beerCount > 0;
 
       // Determine cell styling using cn() for safe class merging
+      // Festival days from adjacent months should be fully interactive and styled
       const cellClassName = cn(
         "h-12 w-12 items-center justify-center rounded-lg",
-        !isCurrentMonth && "opacity-30",
-        isCurrentMonth && isSelected && "bg-primary-500",
-        isCurrentMonth && !isSelected && hasAttendance && "bg-primary-100 border border-primary-300",
-        isCurrentMonth && !isSelected && !hasAttendance && isFestivalDay && "bg-background-100"
+        // Non-festival days outside current month - faded
+        !isCurrentMonth && !isFestivalDay && "opacity-30",
+        // Selected festival day (any month)
+        isFestivalDay && isSelected && "bg-primary-500",
+        // Festival day with attendance (not selected)
+        isFestivalDay &&
+          !isSelected &&
+          hasAttendance &&
+          "bg-primary-100 border border-primary-300",
+        // Festival day without attendance (not selected)
+        isFestivalDay && !isSelected && !hasAttendance && "bg-background-100",
       );
 
       const textClassName = cn(
         "text-sm font-medium",
-        !isCurrentMonth && "text-typography-400",
+        // Non-festival days outside current month - faded text
+        !isCurrentMonth && !isFestivalDay && "text-typography-400",
+        // Non-festival days in current month - slightly faded
         isCurrentMonth && !isFestivalDay && "text-typography-300",
-        isCurrentMonth && isFestivalDay && isSelected && "text-white",
-        isCurrentMonth && isFestivalDay && !isSelected && hasAttendance && "text-primary-700",
-        isCurrentMonth && isFestivalDay && !isSelected && !hasAttendance && "text-typography-900"
+        // Festival day selected (any month)
+        isFestivalDay && isSelected && "text-white",
+        // Festival day with attendance (not selected)
+        isFestivalDay && !isSelected && hasAttendance && "text-primary-700",
+        // Festival day without attendance (not selected)
+        isFestivalDay && !isSelected && !hasAttendance && "text-typography-900",
       );
 
       return (
         <Pressable
           key={index}
           onPress={() => handleDayPress(day)}
-          disabled={!isFestivalDay || !isCurrentMonth}
+          disabled={!isFestivalDay}
           className={cellClassName}
         >
           <VStack className="items-center">
@@ -196,17 +209,14 @@ export function AttendanceCalendar({
             <Text className={textClassName}>{format(day, "d")}</Text>
 
             {/* Beer count badge */}
-            {hasAttendance &&
-              isFestivalDay &&
-              isCurrentMonth &&
-              !isSelected && (
-                <HStack className="mt-0.5 items-center gap-0.5">
-                  <Beer size={10} color={Colors.primary[600]} />
-                  <Text className="text-[10px] font-semibold text-primary-600">
-                    {beerCount}
-                  </Text>
-                </HStack>
-              )}
+            {hasAttendance && isFestivalDay && !isSelected && (
+              <HStack className="mt-0.5 items-center gap-0.5">
+                <Beer size={10} color={Colors.primary[600]} />
+                <Text className="text-[10px] font-semibold text-primary-600">
+                  {beerCount}
+                </Text>
+              </HStack>
+            )}
 
             {/* Beer count on selected */}
             {hasAttendance && isSelected && (

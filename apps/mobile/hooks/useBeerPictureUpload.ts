@@ -45,6 +45,8 @@ interface UseBeerPictureUploadReturn {
     attendanceId: string;
     pendingPhotos: PendingPhoto[];
   }) => Promise<UploadedPhoto[]>;
+  /** Whether images are being picked/processed from gallery */
+  isPicking: boolean;
   /** Whether an upload is in progress */
   isUploading: boolean;
   /** Last error that occurred */
@@ -56,6 +58,7 @@ export type { ImageSource, PendingPhoto, UploadedPhoto };
 export function useBeerPictureUpload({
   onError,
 }: UseBeerPictureUploadOptions = {}): UseBeerPictureUploadReturn {
+  const [isPicking, setIsPicking] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -78,6 +81,7 @@ export function useBeerPictureUpload({
     async (source: ImageSource): Promise<PendingPhoto[] | null> => {
       try {
         setError(null);
+        setIsPicking(true);
         const images = await pickAndProcessImages(source);
 
         if (!images?.length) {
@@ -98,6 +102,8 @@ export function useBeerPictureUpload({
         setError(pickError);
         onError?.(pickError);
         return null;
+      } finally {
+        setIsPicking(false);
       }
     },
     [pickAndProcessImages, onError],
@@ -184,6 +190,7 @@ export function useBeerPictureUpload({
   return {
     pickImages,
     uploadPendingPhotos,
+    isPicking,
     isUploading,
     error,
   };

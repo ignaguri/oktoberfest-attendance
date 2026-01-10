@@ -1,9 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useUpdatePersonalAttendance,
-  useTents,
-  useAttendanceByDate,
-} from "@prostcounter/shared/hooks";
+import { useTents, useAttendanceByDate } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   createDetailedAttendanceFormSchema,
@@ -33,11 +29,8 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import {
-  useBeerPictureUpload,
-  type PendingPhoto,
-} from "@/hooks/useBeerPictureUpload";
-import { apiClient } from "@/lib/api-client";
+import { type PendingPhoto } from "@/hooks/useBeerPictureUpload";
+import { useSaveAttendance } from "@/hooks/useSaveAttendance";
 import { IconColors } from "@/lib/constants/colors";
 
 interface AttendanceFormSheetProps {
@@ -86,8 +79,7 @@ export function AttendanceFormSheet({
 
   const isEditMode = !!existingAttendance;
   const { tents } = useTents(festivalId);
-  const updateAttendance = useUpdatePersonalAttendance();
-  const { uploadPendingPhotos, isUploading } = useBeerPictureUpload();
+  const { saveAttendance, isSaving } = useSaveAttendance();
 
   // Fetch complete attendance data with beer pictures when editing
   const dateString =
@@ -128,7 +120,7 @@ export function AttendanceFormSheet({
     setValue,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<DetailedAttendanceForm>({
     resolver: zodResolver(formSchema),
     values: defaultValues,
@@ -149,12 +141,15 @@ export function AttendanceFormSheet({
 
   // Load photos from API when attendance data is fetched
   useEffect(() => {
-    if (isOpen && attendanceWithPhotos?.pictureUrls?.length) {
+    if (isOpen && attendanceWithPhotos?.pictures?.length) {
+      // Use the pictures array which includes proper IDs for deletion
       setPhotos(
-        attendanceWithPhotos.pictureUrls.map((url: string) => ({
-          id: url, // Use URL as ID since API returns just URLs
-          pictureUrl: url,
-        })),
+        attendanceWithPhotos.pictures.map(
+          (pic: { id: string; pictureUrl: string }) => ({
+            id: pic.id,
+            pictureUrl: pic.pictureUrl,
+          }),
+        ),
       );
     }
   }, [isOpen, attendanceWithPhotos]);
@@ -182,41 +177,15 @@ export function AttendanceFormSheet({
   const onSubmit = useCallback(
     async (data: DetailedAttendanceForm) => {
       try {
-        // Step 1: Save attendance (creates or updates)
-        const result = await updateAttendance.mutateAsync({
+        await saveAttendance({
           festivalId,
-          date: format(data.date, "yyyy-MM-dd"),
+          date: data.date,
           amount: data.amount,
           tents: data.tents,
+          existingAttendanceId: existingAttendance?.id,
+          pendingPhotos,
+          photosToDelete: photosMarkedForRemoval,
         });
-
-        // Step 2: Delete photos marked for removal
-        // Note: photos.id contains the URL (from API), but we need picture IDs for deletion
-        // For now, we attempt deletion - backend may need to support deletion by URL or ID extraction
-        if (photosMarkedForRemoval.length > 0) {
-          for (const photoId of photosMarkedForRemoval) {
-            try {
-              await apiClient.photos.delete(photoId);
-            } catch (deleteError) {
-              console.warn("Failed to delete photo:", photoId, deleteError);
-              // Continue with other operations even if deletion fails
-            }
-          }
-        }
-
-        // Step 3: Upload pending photos if any
-        if (pendingPhotos.length > 0) {
-          // Get attendance ID - either from existing or from the result
-          const attendanceId = existingAttendance?.id || result?.attendanceId;
-
-          if (attendanceId) {
-            await uploadPendingPhotos({
-              festivalId,
-              attendanceId,
-              pendingPhotos,
-            });
-          }
-        }
 
         onSuccess?.();
         onClose();
@@ -226,11 +195,10 @@ export function AttendanceFormSheet({
     },
     [
       festivalId,
-      updateAttendance,
       existingAttendance,
       pendingPhotos,
       photosMarkedForRemoval,
-      uploadPendingPhotos,
+      saveAttendance,
       onSuccess,
       onClose,
     ],
@@ -257,8 +225,6 @@ export function AttendanceFormSheet({
     selectedDate && !isNaN(selectedDate.getTime())
       ? format(selectedDate, "EEEE, MMMM d, yyyy")
       : "Select a date";
-
-  const isSaving = isSubmitting || isUploading;
 
   return (
     <>
@@ -364,7 +330,7 @@ export function AttendanceFormSheet({
                 photosMarkedForRemoval={photosMarkedForRemoval}
                 onPendingPhotosChange={setPendingPhotos}
                 onTogglePhotoRemoval={handleTogglePhotoRemoval}
-                isUploading={isUploading}
+                isUploading={isSaving}
               />
             </VStack>
           </ActionsheetScrollView>

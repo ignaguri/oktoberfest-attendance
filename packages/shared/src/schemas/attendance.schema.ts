@@ -143,11 +143,22 @@ export type GetAttendanceByDateQuery = z.infer<
 >;
 
 /**
- * Attendance by date response - includes tent_ids and picture_urls
+ * Picture reference with ID for deletion (minimal schema)
+ */
+export const PictureRefSchema = z.object({
+  id: z.uuid(),
+  pictureUrl: z.string(),
+});
+
+export type PictureRef = z.infer<typeof PictureRefSchema>;
+
+/**
+ * Attendance by date response - includes tent_ids and pictures
  */
 export const AttendanceByDateSchema = AttendanceWithTotalsSchema.extend({
   tentIds: z.array(z.uuid()),
-  pictureUrls: z.array(z.string()),
+  pictureUrls: z.array(z.string()), // Kept for backward compatibility
+  pictures: z.array(PictureRefSchema), // New: includes IDs for deletion
 });
 
 export type AttendanceByDate = z.infer<typeof AttendanceByDateSchema>;
