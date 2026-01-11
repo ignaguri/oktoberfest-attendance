@@ -17,6 +17,7 @@ export type WinningCriteria = z.infer<typeof WinningCriteriaSchema>;
 export const GroupSchema = z.object({
   id: z.uuid(),
   name: z.string(),
+  description: z.string().nullable().optional(),
   festivalId: z.uuid(),
   winningCriteria: WinningCriteriaSchema,
   inviteToken: z.string(),

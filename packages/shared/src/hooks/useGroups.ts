@@ -66,12 +66,13 @@ export function useCreateGroup() {
       groupName: string;
       password: string;
       festivalId: string;
+      winningCriteria?: "days_attended" | "total_beers" | "avg_beers";
     }) => {
       // Transform old schema to new API schema
       const response = await apiClient.groups.create({
         name: formData.groupName,
         festivalId: formData.festivalId,
-        winningCriteria: "total_beers", // Default value since form doesn't provide it
+        winningCriteria: formData.winningCriteria || "total_beers",
       });
 
       return response.data.id; // Return just the ID to match old behavior
@@ -130,6 +131,30 @@ export function useJoinGroup() {
     async (formData: { groupId: string; inviteToken?: string }) => {
       const { groupId, inviteToken } = formData;
       return await apiClient.groups.join(groupId, inviteToken);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate user groups
+        invalidateQueries(["user", "current", "groups"]);
+        // Invalidate all groups queries
+        invalidateQueries(["user"]);
+        invalidateQueries(["groups"]);
+      },
+    }
+  );
+}
+
+/**
+ * Hook to join a group using only an invite token
+ * Used for deep links and direct token entry
+ */
+export function useJoinGroupByToken() {
+  const apiClient = useApiClient();
+  const invalidateQueries = useInvalidateQueries();
+
+  return useMutation(
+    async (inviteToken: string) => {
+      return await apiClient.groups.joinByToken(inviteToken);
     },
     {
       onSuccess: () => {
@@ -290,6 +315,26 @@ export function useRenewInviteToken() {
         // Invalidate group details to refresh the invite token
         invalidateQueries(QueryKeys.group(groupId));
       },
+    }
+  );
+}
+
+/**
+ * Hook to fetch group gallery photos
+ */
+export function useGroupGallery(groupId: string) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.groupGallery(groupId),
+    async () => {
+      const response = await apiClient.groups.getGallery(groupId);
+      return response.data;
+    },
+    {
+      enabled: !!groupId,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 15 * 60 * 1000, // 15 minutes cache
     }
   );
 }

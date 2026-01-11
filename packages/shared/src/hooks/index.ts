@@ -36,12 +36,14 @@ export {
   useCreateGroup,
   useGroupSearch,
   useJoinGroup,
+  useJoinGroupByToken,
   useUpdateGroup,
   useLeaveGroup,
   useGroupName,
   useGroupMembers,
   useRemoveMember,
   useRenewInviteToken,
+  useGroupGallery,
 } from "./useGroups";
 
 // Leaderboard hooks

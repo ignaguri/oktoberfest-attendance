@@ -68,7 +68,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
         user_id: userId,
         attendance_id: query.attendanceId,
         picture_url: publicUrlData.publicUrl,
-        visibility: "private", // Default to private
+        visibility: "public", // Default to public so photos show in group galleries
       })
       .select()
       .single();

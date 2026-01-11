@@ -35,6 +35,8 @@ export class QueryKeys {
     ["user", userId, "groups", festivalId] as const;
   static groupSearch = (name: string, festivalId: string) =>
     ["groups", "search", name, festivalId] as const;
+  static groupGallery = (groupId: string) =>
+    ["group", groupId, "gallery"] as const;
 
   // Leaderboard queries
   static globalLeaderboard = (criteriaId: number, festivalId: string) =>

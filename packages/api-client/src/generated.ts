@@ -943,6 +943,7 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
+                                description?: string | null;
                                 /** Format: uuid */
                                 festivalId: string;
                                 /** @enum {string} */
@@ -1011,6 +1012,7 @@ export interface paths {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            description?: string | null;
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
@@ -1141,6 +1143,7 @@ export interface paths {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            description?: string | null;
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
@@ -1228,6 +1231,7 @@ export interface paths {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            description?: string | null;
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
@@ -1848,6 +1852,7 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
+                                description?: string | null;
                                 /** Format: uuid */
                                 festivalId: string;
                                 /** @enum {string} */

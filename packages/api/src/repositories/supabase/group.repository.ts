@@ -456,6 +456,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     return {
       id: data.id,
       name: data.name,
+      description: data.description || null,
       festivalId: data.festival_id,
       winningCriteria,
       inviteToken: data.invite_token,

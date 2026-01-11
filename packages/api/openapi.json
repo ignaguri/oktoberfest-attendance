@@ -1722,6 +1722,10 @@
                     "name": {
                       "type": "string"
                     },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "festivalId": {
                       "type": "string",
                       "format": "uuid"
@@ -1829,6 +1833,10 @@
                           },
                           "name": {
                             "type": "string"
+                          },
+                          "description": {
+                            "type": "string",
+                            "nullable": true
                           },
                           "festivalId": {
                             "type": "string",
@@ -2060,6 +2068,10 @@
                     "name": {
                       "type": "string"
                     },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "festivalId": {
                       "type": "string",
                       "format": "uuid"
@@ -2239,6 +2251,10 @@
                     },
                     "name": {
                       "type": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
                     },
                     "festivalId": {
                       "type": "string",
@@ -3209,6 +3225,10 @@
                         },
                         "name": {
                           "type": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "nullable": true
                         },
                         "festivalId": {
                           "type": "string",
