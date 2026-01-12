@@ -1,6 +1,6 @@
-import { useAttendances, useGlobalLeaderboard } from "@prostcounter/shared/hooks";
+import { useAttendances } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AttendanceWithTotals, LeaderboardEntry } from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 import { format, parseISO } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
@@ -23,13 +23,11 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useAuth } from "@/lib/auth/AuthContext";
 import { useFestival } from "@/lib/festival/FestivalContext";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const { user } = useAuth();
 
   // Dialog state
   const { dialog, showDialog, closeDialog } = useAlertDialog();
@@ -42,9 +40,6 @@ export default function AttendanceScreen() {
     refetch,
     isRefetching,
   } = useAttendances(currentFestival?.id ?? "");
-
-  // Fetch leaderboard to get user's rank (criteriaId 2 = total_beers)
-  const { data: leaderboard } = useGlobalLeaderboard(2, currentFestival?.id);
 
   // Local UI state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -89,15 +84,6 @@ export default function AttendanceScreen() {
       0
     );
   }, [attendances]);
-
-  // Find user's rank in leaderboard
-  const userRank = useMemo(() => {
-    if (!leaderboard || !user?.id) return null;
-    const entry = (leaderboard as LeaderboardEntry[]).find(
-      (e) => e.userId === user.id
-    );
-    return entry?.position ?? null;
-  }, [leaderboard, user?.id]);
 
   // Handlers
   const handleDateSelect = useCallback((date: Date) => {
@@ -221,22 +207,14 @@ export default function AttendanceScreen() {
                     </Text>
                   </View>
                 </View>
-                {/* Row 2: Spent, Rank */}
-                <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
+                {/* Row 2: Spent */}
+                <View className="mt-4 flex-row justify-center border-t border-background-200 pt-4">
                   <View className="items-center">
                     <Text className="text-2xl font-bold text-primary-500">
                       €{(totalSpentCents / 100).toFixed(0)}
                     </Text>
                     <Text className="text-xs text-typography-500">
                       {t("attendance.summary.spent", { defaultValue: "Spent" })}
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
-                      {userRank ? `#${userRank}` : "-"}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.rank", { defaultValue: "Rank" })}
                     </Text>
                   </View>
                 </View>
