@@ -11,12 +11,12 @@ import {
   type DetailedAttendanceForm,
   type DrinkType,
 } from "@prostcounter/shared/schemas";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { X, Calendar, Trash2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
-import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, TentVisit } from "@prostcounter/shared/schemas";
 
 import { BeerPicturesSection } from "./beer-pictures-section";
 import { DrinkTypePicker, VISIBLE_DRINK_TYPES } from "./drink-type-picker";
@@ -63,6 +63,13 @@ interface AttendanceFormSheetProps {
 interface BeerPicture {
   id: string;
   pictureUrl: string;
+}
+
+interface TentVisitDisplay {
+  id: string;
+  visitDate: string;
+  label: string;
+  checkInTime: string;
 }
 
 /**
@@ -161,21 +168,27 @@ export function AttendanceFormSheet({
     [festivalStartDate, festivalEndDate],
   );
 
+  // Use fresh tent visits from API when available, fall back to prop data
+  const freshTentVisits: TentVisit[] = attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [];
+
   // Default values based on existing attendance or selected date
+  // Use unique tent IDs for the form (for tent selector)
   const defaultValues = useMemo(() => {
     if (existingAttendance) {
+      // Get unique tent IDs from tent visits
+      const uniqueTentIds: string[] = [...new Set(freshTentVisits.map((tv: TentVisit) => tv.tentId))];
       return {
         amount: existingAttendance.drinkCount || existingAttendance.beerCount || 0,
         date: new Date(existingAttendance.date),
-        tents: existingAttendance.tentVisits?.map((tv) => tv.tentId) ?? [],
+        tents: uniqueTentIds,
       };
     }
     return {
       amount: consumptions.length,
       date: selectedDate,
-      tents: [],
+      tents: [] as string[],
     };
-  }, [existingAttendance, selectedDate, consumptions.length]);
+  }, [existingAttendance, selectedDate, consumptions.length, freshTentVisits]);
 
   const {
     control,
@@ -244,14 +257,35 @@ export function AttendanceFormSheet({
     }
   }, [isOpen, selectedDate, existingAttendance, setValue]);
 
-  // Get tent info for display as badges
+  // Get tent visits for display as badges (showing ALL visits with times)
+  const tentVisitsForDisplay = useMemo((): TentVisitDisplay[] => {
+    if (!freshTentVisits.length) return [];
+    const allOptions = tents.flatMap((group) => group.options);
+    return freshTentVisits
+      .map((visit: TentVisit) => {
+        const option = allOptions.find((opt) => opt.value === visit.tentId);
+        const label = option?.label || visit.tentName || "Unknown Tent";
+        const checkInTime = format(parseISO(visit.visitDate), "HH:mm");
+        // Use visitDate as part of key for uniqueness
+        return {
+          id: visit.tentId,
+          visitDate: visit.visitDate,
+          label,
+          checkInTime
+        };
+      })
+      .sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime());
+  }, [freshTentVisits, tents]);
+
+  // Get unique tent info for selector display (when no visits yet)
   const selectedTentInfo = useMemo(() => {
     if (!selectedTents.length) return [];
     const allOptions = tents.flatMap((group) => group.options);
     return selectedTents
       .map((id) => {
         const option = allOptions.find((opt) => opt.value === id);
-        return option ? { id, label: option.label } : null;
+        if (!option) return null;
+        return { id, label: option.label };
       })
       .filter((item): item is { id: string; label: string } => item !== null);
   }, [selectedTents, tents]);
@@ -442,7 +476,22 @@ export function AttendanceFormSheet({
                   onPress={() => setShowTentSelector(true)}
                   className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
                 >
-                  {selectedTentInfo.length > 0 ? (
+                  {tentVisitsForDisplay.length > 0 ? (
+                    <HStack className="flex-wrap gap-2">
+                      {tentVisitsForDisplay.map((visit) => (
+                        <Badge
+                          key={`${visit.id}-${visit.visitDate}`}
+                          action="info"
+                          variant="outline"
+                          size="md"
+                        >
+                          <BadgeText className="normal-case">
+                            {visit.label} ({visit.checkInTime})
+                          </BadgeText>
+                        </Badge>
+                      ))}
+                    </HStack>
+                  ) : selectedTentInfo.length > 0 ? (
                     <HStack className="flex-wrap gap-2">
                       {selectedTentInfo.map((tent) => (
                         <Badge
