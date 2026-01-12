@@ -1,4 +1,3 @@
-import { IconColors } from "@/lib/constants/colors";
 import { X } from "lucide-react-native";
 import { useState, useCallback } from "react";
 import {
@@ -9,6 +8,8 @@ import {
   ActivityIndicator,
   View,
 } from "react-native";
+
+import { IconColors } from "@/lib/constants/colors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -62,7 +63,7 @@ export function ImagePreviewModal({
             padding: 8,
           }}
         >
-          <X size={24} color="#FFFFFF" />
+          <X size={24} color={IconColors.white} />
         </Pressable>
 
         {/* Image Container - tap to close */}
@@ -77,7 +78,7 @@ export function ImagePreviewModal({
           {/* Loading Indicator */}
           {isLoading && (
             <View style={{ position: "absolute" }}>
-              <ActivityIndicator size="large" color="#FFFFFF" />
+              <ActivityIndicator size="large" color={IconColors.white} />
             </View>
           )}
 

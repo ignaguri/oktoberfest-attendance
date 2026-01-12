@@ -157,6 +157,9 @@
     "yourGroups": "Your Groups:",
     "noGroupsYet": "You are not a member of any group yet for this festival.",
     "joinOrCreate": "Join or Create a Group",
+    "detail": {
+      "notFound": "Group not found"
+    },
     "create": {
       "title": "Create Group",
       "nameLabel": "Group Name",
@@ -187,6 +190,7 @@
     },
     "settings": {
       "title": "Group Settings",
+      "loading": "Loading group settings...",
       "groupDetails": "Group Details",
       "descriptionLabel": "Group Description",
       "updateButton": "Update Group",
@@ -221,8 +225,14 @@
     },
     "gallery": {
       "title": "Group Gallery",
+      "loading": "Loading gallery...",
       "empty": "No photos yet",
       "emptyDescription": "Upload photos from your attendance to see them here"
+    },
+    "location": {
+      "title": "Group's live location",
+      "shareDescription": "Share your location to see nearby group members and let them see you.",
+      "controlNote": "Control which groups can see your location in your"
     }
   },
   "attendance": {
@@ -358,6 +368,7 @@
   "leaderboard": {
     "pageTitle": "Leaderboard",
     "global": "Global",
+    "globalTitle": "Global Leaderboard",
     "group": "Group",
     "groups": "Groups",
     "rank": "Rank",
@@ -475,6 +486,15 @@
   },
   "admin": {
     "pageTitle": "Admin Panel",
+    "dashboard": "Admin Dashboard",
+    "tabs": {
+      "users": "Users",
+      "groups": "Groups",
+      "festivals": "Festivals",
+      "tents": "Tents",
+      "cache": "Cache Management",
+      "imageConversion": "Image Conversion"
+    },
     "festivals": {
       "title": "Festival Management",
       "create": "Create Festival",
@@ -492,6 +512,59 @@
       "search": "Search users",
       "makeAdmin": "Make Admin",
       "removeAdmin": "Remove Admin"
+    }
+  },
+  "joinGroup": {
+    "processing": "Processing your invitation...",
+    "success": {
+      "title": "Welcome to the Group!",
+      "message": "You have successfully joined",
+      "membershipNote": "You're now a member of this group and can participate in the leaderboard competition.",
+      "viewGroup": "View Group",
+      "viewAllGroups": "View All Groups",
+      "goHome": "Go to Home",
+      "happyFestival": "Happy festival season!",
+      "reminder": "Remember to log your daily attendance and enjoy the competition!"
+    },
+    "error": {
+      "expired": {
+        "title": "Invitation Expired",
+        "message": "The invitation to join \"{{group}}\" has expired.",
+        "expiredOn": "This invitation expired on {{date}}.",
+        "noLongerValid": "This invitation is no longer valid.",
+        "hint": "Invitation links expire after 7 days for security reasons.",
+        "needNew": "Need a new invitation?",
+        "askMember": "Ask a group member to generate a new invite link for you."
+      },
+      "alreadyMember": {
+        "title": "Already a Member",
+        "message": "You're already a member of \"{{group}}\".",
+        "noNeed": "You don't need to use an invitation link to access this group."
+      },
+      "invalid": {
+        "title": "Invalid Invitation",
+        "message": "The invitation link you used is not valid.",
+        "detailedMessage": "This could happen if the link was incorrect or expired, the group no longer exists, or the invitation was cancelled.",
+        "possibleReasons": "Possible Reasons",
+        "reasons": {
+          "intro": "This could happen if:",
+          "incorrect": "The invitation link was incorrect or mistyped",
+          "deleted": "The group no longer exists",
+          "revoked": "The invitation was cancelled by the group admin",
+          "expired": "The invitation link has expired"
+        }
+      },
+      "generic": {
+        "title": "Unable to Join Group",
+        "message": "Something went wrong while trying to join the group.",
+        "tryAgainMessage": "Please try again or contact the group administrator for assistance."
+      },
+      "tryAgain": "Try Again",
+      "goToGroups": "Go to Groups",
+      "goHome": "Go Home",
+      "viewGroup": "View Group",
+      "contactAdmin": "Contact Group Admin",
+      "browseGroups": "Browse Groups"
     }
   },
   "tutorial": {
@@ -670,6 +743,11 @@
     }
   },
   "calendar": {
+    "title": "Calendar",
+    "myCalendar": "My Calendar",
+    "groupCalendar": "Group Calendar",
+    "loading": "Loading calendar...",
+    "loadError": "Failed to load calendar events",
     "selectDate": "Select a date",
     "clickToEdit": "Click on reservation to edit",
     "addReservation": "Add reservation",

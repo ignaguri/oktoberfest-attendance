@@ -1,158 +1,172 @@
+"use client";
+
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "@/lib/i18n/server";
-import { createClient } from "@/utils/supabase/server";
+import { useFestival } from "@/contexts/FestivalContext";
+import { useGroupLeaderboard, useGroupSettings } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { CalendarDays, Images } from "lucide-react";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Link } from "next-view-transitions";
-import { Suspense } from "react";
 
 import type { WinningCriteria } from "@/lib/types";
 
 import { JoinGroupForm } from "../JoinGroupForm";
 
-async function getAuthHeaders() {
-  const supabase = await createClient();
+// Map winning criteria to numeric ID for the leaderboard hook
+const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
+  days_attended: 1,
+  total_beers: 2,
+  avg_beers: 3,
+};
+
+export default function GroupPage() {
+  const { t } = useTranslation();
+  const params = useParams();
+  const groupId = params.id as string;
+  const { currentFestival } = useFestival();
+
+  // Fetch group settings
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return {
-    Authorization: `Bearer ${session?.access_token}`,
-    "Content-Type": "application/json",
-  };
-}
+    data: groupResponse,
+    loading: isLoadingGroup,
+    error: groupError,
+  } = useGroupSettings(groupId);
 
-// Get the full API URL for server-side fetch
-async function getServerApiUrl() {
-  const headersList = await headers();
-  const host = headersList.get("host") || "localhost:3008";
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  return `${protocol}://${host}/api`;
-}
+  // The group data is nested inside the response
+  const group = groupResponse?.data;
 
-export default async function GroupPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id: groupId } = await params;
-  const authHeaders = await getAuthHeaders();
-  const apiBase = await getServerApiUrl();
+  // Fetch leaderboard
+  const criteriaId = group
+    ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria]
+    : 0;
+  const { data: leaderboardData, loading: isLoadingLeaderboard } =
+    useGroupLeaderboard(groupId, criteriaId, currentFestival?.id || "");
 
-  // Fetch group and leaderboard in parallel
-  const [groupRes, leaderboardRes] = await Promise.all([
-    fetch(`${apiBase}/v1/groups/${groupId}`, {
-      headers: authHeaders,
-      cache: "no-store",
-    }),
-    fetch(`${apiBase}/v1/groups/${groupId}/leaderboard`, {
-      headers: authHeaders,
-      cache: "no-store",
-    }),
-  ]);
+  const isLoading = isLoadingGroup || isLoadingLeaderboard;
+  const isMember = group?.isMember ?? false;
 
-  if (!groupRes.ok) {
-    redirect("/groups");
+  // Loading state
+  if (isLoading && !group) {
+    return (
+      <div className="flex w-full max-w-lg items-center justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
-  const group = await groupRes.json();
-  const leaderboardResponse = await leaderboardRes.json();
-  const isMember = group.isMember ?? false;
+  // Error state
+  if (groupError) {
+    return (
+      <div className="w-full max-w-lg text-center">
+        <p className="text-red-500">
+          {t("notifications.error.groupLoadFailed")}
+        </p>
+      </div>
+    );
+  }
 
+  // No group found
+  if (!group) {
+    return (
+      <div className="w-full max-w-lg text-center">
+        <p className="text-gray-500">{t("groups.detail.notFound")}</p>
+      </div>
+    );
+  }
+
+  // Non-member view - show join form
   if (!isMember) {
     return (
       <div className="w-full max-w-lg">
         <h2 className="mb-4 text-2xl font-bold">
-          Join Group &quot;{group.name}&quot;
+          {t("groups.join.title")} &quot;{group.name}&quot;
         </h2>
         <JoinGroupForm groupName={group.name} groupId={group.id} />
       </div>
     );
   }
 
-  // Transform API response to match Leaderboard component expectations
-  type LeaderboardEntry = {
-    userId: string;
-    username: string | null;
-    fullName: string | null;
-    avatarUrl: string | null;
-    daysAttended: number;
-    totalBeers: number;
-    avgBeers: number;
-  };
-  const leaderboardEntries = leaderboardResponse.data.map(
-    (entry: LeaderboardEntry, index: number) => ({
-      userId: entry.userId,
-      username: entry.username,
-      fullName: entry.fullName,
-      avatarUrl: entry.avatarUrl,
-      daysAttended: entry.daysAttended,
-      totalBeers: entry.totalBeers,
-      avgBeers: entry.avgBeers,
-      position: index + 1,
-    }),
-  );
-
-  const t = getTranslations();
+  // Transform leaderboard entries
+  const leaderboardEntries =
+    leaderboardData?.map(
+      (
+        entry: {
+          userId: string;
+          username: string | null;
+          fullName: string | null;
+          avatarUrl: string | null;
+          daysAttended: number;
+          totalBeers: number;
+          avgBeers: number;
+        },
+        index: number,
+      ) => ({
+        userId: entry.userId,
+        username: entry.username,
+        fullName: entry.fullName,
+        avatarUrl: entry.avatarUrl,
+        daysAttended: entry.daysAttended,
+        totalBeers: entry.totalBeers,
+        avgBeers: entry.avgBeers,
+        position: index + 1,
+      }),
+    ) || [];
 
   return (
     <div className="w-full max-w-lg">
-      <Suspense fallback={<LoadingSpinner />}>
-        <div className="mb-4 flex items-center justify-center">
-          <h2 className="grow pr-2 text-center text-3xl font-bold">
-            Group &quot;{group.name}&quot;
-          </h2>
-          <ShareButton groupName={group.name} groupId={group.id} />
-        </div>
+      <div className="mb-4 flex items-center justify-center">
+        <h2 className="grow pr-2 text-center text-3xl font-bold">
+          {t("groups.pageTitle")} &quot;{group.name}&quot;
+        </h2>
+        <ShareButton groupName={group.name} groupId={group.id} />
+      </div>
 
-        {group.description && (
-          <p className="mb-4 text-gray-600">{group.description}</p>
-        )}
+      {group.description && (
+        <p className="mb-4 text-gray-600">{group.description}</p>
+      )}
 
-        <p className="mb-4 text-sm font-medium text-gray-500">
-          Winning Criteria:{" "}
-          {t(`groups.winningCriteria.${group.winningCriteria}`)}
-        </p>
+      <p className="mb-4 text-sm font-medium text-gray-500">
+        {t("groups.create.winningCriteria")}:{" "}
+        {t(`groups.winningCriteria.${group.winningCriteria}`)}
+      </p>
 
-        <div className="flex flex-col gap-4">
-          <Leaderboard
-            entries={leaderboardEntries}
-            winningCriteria={group.winningCriteria as WinningCriteria}
-            showGroupCount={false}
-          />
+      <div className="flex flex-col gap-4">
+        <Leaderboard
+          entries={leaderboardEntries}
+          winningCriteria={group.winningCriteria as WinningCriteria}
+          showGroupCount={false}
+        />
 
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Button asChild variant="outline">
-                <Link href={`/groups/${groupId}/calendar`}>
-                  <CalendarDays size={24} />
-                  <span className="ml-2">Calendar</span>
-                </Link>
-              </Button>
-              <Button asChild variant="yellow">
-                <Link href={`/groups/${groupId}/gallery`}>
-                  <Images size={24} />
-                  <span className="ml-2">Gallery</span>
-                </Link>
-              </Button>
-              {/* Location sharing feature disabled - requires migration from deprecated tables
-                  (user_locations, location_sharing_preferences) to session-based model.
-                  See: app/api/location-sharing/ for migration notes */}
-            </div>
-            <Button asChild variant="darkYellow">
-              <Link href={`/group-settings/${groupId}`}>Group Settings</Link>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href={`/groups/${groupId}/calendar`}>
+                <CalendarDays size={24} />
+                <span className="ml-2">{t("calendar.title")}</span>
+              </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <QRButton groupName={group.name} groupId={group.id} withText />
-              <ShareButton groupName={group.name} groupId={group.id} withText />
-            </div>
+            <Button asChild variant="yellow">
+              <Link href={`/groups/${groupId}/gallery`}>
+                <Images size={24} />
+                <span className="ml-2">{t("groups.settings.gallery")}</span>
+              </Link>
+            </Button>
+          </div>
+          <Button asChild variant="darkYellow">
+            <Link href={`/group-settings/${groupId}`}>
+              {t("groups.settings.title")}
+            </Link>
+          </Button>
+          <div className="flex items-center gap-2">
+            <QRButton groupName={group.name} groupId={group.id} withText />
+            <ShareButton groupName={group.name} groupId={group.id} withText />
           </div>
         </div>
-      </Suspense>
+      </div>
     </div>
   );
 }

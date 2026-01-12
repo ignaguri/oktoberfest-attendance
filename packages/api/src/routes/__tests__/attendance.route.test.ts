@@ -314,12 +314,17 @@ describe("Attendance Routes - Unit Tests", () => {
         ),
       );
 
-      // Mock delete - verify ownership check
+      // Mock photo delete (deleteByAttendanceId)
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain(mockSupabaseSuccess(null)),
+      );
+
+      // Mock attendance delete - verify ownership check
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
       );
 
-      // Mock delete operation
+      // Mock attendance delete operation
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(null)),
       );

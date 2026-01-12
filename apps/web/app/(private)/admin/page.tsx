@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useTranslation } from "@/lib/i18n/client";
 import { useSearchParams } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 import { useEffect, useState, startTransition } from "react";
@@ -15,6 +16,7 @@ import UserList from "./components/UserList";
 const tabValues = ["users", "groups", "festivals", "tents", "cache", "images"];
 
 export default function AdminPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("users");
   const searchParams = useSearchParams();
   const router = useTransitionRouter();
@@ -45,15 +47,19 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto flex flex-col items-center p-4">
-      <h1 className="mb-4 text-2xl font-bold">Admin Dashboard</h1>
+      <h1 className="mb-4 text-2xl font-bold">{t("admin.dashboard")}</h1>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-4">
         <TabsList>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="groups">Groups</TabsTrigger>
-          <TabsTrigger value="festivals">Festivals</TabsTrigger>
-          <TabsTrigger value="tents">Tents</TabsTrigger>
-          <TabsTrigger value="cache">Cache Management</TabsTrigger>
-          <TabsTrigger value="images">Image Conversion</TabsTrigger>
+          <TabsTrigger value="users">{t("admin.tabs.users")}</TabsTrigger>
+          <TabsTrigger value="groups">{t("admin.tabs.groups")}</TabsTrigger>
+          <TabsTrigger value="festivals">
+            {t("admin.tabs.festivals")}
+          </TabsTrigger>
+          <TabsTrigger value="tents">{t("admin.tabs.tents")}</TabsTrigger>
+          <TabsTrigger value="cache">{t("admin.tabs.cache")}</TabsTrigger>
+          <TabsTrigger value="images">
+            {t("admin.tabs.imageConversion")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
