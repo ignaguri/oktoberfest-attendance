@@ -4,6 +4,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -13,8 +14,10 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { getInitials } from "@prostcounter/ui";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Award, Beer, Camera, MapPin, Users } from "lucide-react-native";
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Image } from "react-native";
+
+import { ImagePreviewModal } from "./image-preview-modal";
 
 import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 
@@ -62,6 +65,15 @@ function getActivityIcon(type: ActivityFeedItem["activity_type"]) {
  */
 export function ActivityItem({ activity }: ActivityItemProps) {
   const { t } = useTranslation();
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const handleImagePress = useCallback((imageUrl: string) => {
+    setPreviewImage(imageUrl);
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewImage(null);
+  }, []);
 
   const {
     username,
@@ -190,7 +202,10 @@ export function ActivityItem({ activity }: ActivityItemProps) {
 
         {/* Photo thumbnail for photo uploads */}
         {activity_type === "photo_upload" && pictureUrl && (
-          <View className="mt-2">
+          <Pressable
+            onPress={() => handleImagePress(pictureUrl)}
+            className="mt-2"
+          >
             <Image
               source={{ uri: pictureUrl }}
               className="h-16 w-16 rounded-lg"
@@ -199,9 +214,12 @@ export function ActivityItem({ activity }: ActivityItemProps) {
                 defaultValue: "uploaded a photo",
               })}
             />
-          </View>
+          </Pressable>
         )}
       </VStack>
+
+      {/* Image Preview Modal */}
+      <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />
     </HStack>
   );
 }

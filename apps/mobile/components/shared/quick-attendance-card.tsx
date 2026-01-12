@@ -3,6 +3,7 @@ import {
   ImageSourcePicker,
   type ImageSource,
 } from "@/components/image-source-picker";
+import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { TentSelectorSheet } from "@/components/tent-selector/tent-selector-sheet";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -93,6 +94,7 @@ export function QuickAttendanceCard() {
   const [isSourcePickerOpen, setIsSourcePickerOpen] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Sync local state with fetched attendance
   useEffect(() => {
@@ -136,6 +138,15 @@ export function QuickAttendanceCard() {
   // Handle remove pending photo
   const handleRemovePendingPhoto = useCallback((photoId: string) => {
     setPendingPhotos((prev) => prev.filter((p) => p.id !== photoId));
+  }, []);
+
+  // Handle image preview
+  const handleImagePreview = useCallback((imageUri: string) => {
+    setPreviewImage(imageUri);
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewImage(null);
   }, []);
 
   // Auto-save attendance (beer count + tent) - called on change
@@ -343,7 +354,11 @@ export function QuickAttendanceCard() {
           <HStack className="flex-wrap gap-2">
             {/* Existing photos */}
             {existingPhotos.map((photo) => (
-              <View key={photo.id} className="relative">
+              <Pressable
+                key={photo.id}
+                onPress={() => handleImagePreview(photo.pictureUrl)}
+                className="relative"
+              >
                 <Image
                   source={{ uri: photo.pictureUrl }}
                   className="h-16 w-16 rounded-lg"
@@ -352,20 +367,22 @@ export function QuickAttendanceCard() {
                     defaultValue: "Beer photo",
                   })}
                 />
-              </View>
+              </Pressable>
             ))}
 
             {/* Pending photos */}
             {pendingPhotos.map((photo) => (
               <View key={photo.id} className="relative">
-                <Image
-                  source={{ uri: photo.localUri }}
-                  className={`h-16 w-16 rounded-lg ${isUploadingPhotos ? "opacity-60" : ""}`}
-                  resizeMode="cover"
-                  accessibilityLabel={t("home.quickAttendance.pendingPhoto", {
-                    defaultValue: "Pending photo upload",
-                  })}
-                />
+                <Pressable onPress={() => handleImagePreview(photo.localUri)}>
+                  <Image
+                    source={{ uri: photo.localUri }}
+                    className={`h-16 w-16 rounded-lg ${isUploadingPhotos ? "opacity-60" : ""}`}
+                    resizeMode="cover"
+                    accessibilityLabel={t("home.quickAttendance.pendingPhoto", {
+                      defaultValue: "Pending photo upload",
+                    })}
+                  />
+                </Pressable>
                 {isUploadingPhotos ? (
                   <View className="absolute inset-0 items-center justify-center">
                     <ActivityIndicator size="small" color={IconColors.white} />
@@ -457,6 +474,9 @@ export function QuickAttendanceCard() {
         onSelect={handleSourceSelect}
         disabled={isPicking}
       />
+
+      {/* Image Preview Modal */}
+      <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />
     </Card>
   );
 }

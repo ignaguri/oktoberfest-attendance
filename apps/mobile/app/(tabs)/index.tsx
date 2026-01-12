@@ -1,3 +1,7 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
+import { RefreshControl, ScrollView } from "react-native";
+
 import { ActivityFeed } from "@/components/shared/activity-feed";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { MapLinkButton } from "@/components/shared/map-link-button";
@@ -5,9 +9,6 @@ import { QuickAttendanceCard } from "@/components/shared/quick-attendance-card";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 import { useFestival } from "@/lib/festival/FestivalContext";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
 
 /**
  * Home screen displaying:
@@ -57,11 +58,11 @@ export default function HomeScreen() {
         {/* Quick Attendance Card */}
         <QuickAttendanceCard />
 
-        {/* Map Link Button (only shows if festival has mapUrl) */}
-        <MapLinkButton />
-
         {/* Activity Feed */}
         <ActivityFeed onRefresh={handleRefresh} />
+
+        {/* Map Link Button (only shows if festival has mapUrl) */}
+        <MapLinkButton />
       </VStack>
     </ScrollView>
   );

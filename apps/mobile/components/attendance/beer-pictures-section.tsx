@@ -7,6 +7,7 @@ import {
   ImageSourcePicker,
   type ImageSource,
 } from "@/components/image-source-picker";
+import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -60,6 +61,15 @@ export function BeerPicturesSection({
 }: BeerPicturesSectionProps) {
   const { t } = useTranslation();
   const [showSourcePicker, setShowSourcePicker] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const handleImagePreview = useCallback((imageUri: string) => {
+    setPreviewImage(imageUri);
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewImage(null);
+  }, []);
 
   const { pickImages, isPicking, error } = useBeerPictureUpload({
     onError: (err) => {
@@ -103,16 +113,18 @@ export function BeerPicturesSection({
           const isMarkedForRemoval = photosMarkedForRemoval.includes(photo.id);
           return (
             <View key={photo.id || `photo-${index}`} className="relative">
-              <Image
-                source={{ uri: photo.pictureUrl }}
-                className={`h-20 w-20 rounded-lg ${isMarkedForRemoval ? "opacity-40" : ""}`}
-                resizeMode="cover"
-              />
-              {isMarkedForRemoval && (
-                <View className="absolute inset-0 items-center justify-center">
-                  <X size={32} color={IconColors.error} />
-                </View>
-              )}
+              <Pressable onPress={() => handleImagePreview(photo.pictureUrl)}>
+                <Image
+                  source={{ uri: photo.pictureUrl }}
+                  className={`h-20 w-20 rounded-lg ${isMarkedForRemoval ? "opacity-40" : ""}`}
+                  resizeMode="cover"
+                />
+                {isMarkedForRemoval && (
+                  <View className="absolute inset-0 items-center justify-center">
+                    <X size={32} color={IconColors.error} />
+                  </View>
+                )}
+              </Pressable>
               {!disabled && !isUploading && (
                 <Pressable
                   onPress={() => onTogglePhotoRemoval(photo.id)}
@@ -128,11 +140,13 @@ export function BeerPicturesSection({
         {/* Pending photos (local previews - not yet uploaded) - gray minus badge */}
         {pendingPhotos.map((photo) => (
           <View key={photo.id} className="relative">
-            <Image
-              source={{ uri: photo.localUri }}
-              className={`h-20 w-20 rounded-lg ${isUploading ? "opacity-60" : ""}`}
-              resizeMode="cover"
-            />
+            <Pressable onPress={() => handleImagePreview(photo.localUri)}>
+              <Image
+                source={{ uri: photo.localUri }}
+                className={`h-20 w-20 rounded-lg ${isUploading ? "opacity-60" : ""}`}
+                resizeMode="cover"
+              />
+            </Pressable>
             {isUploading ? (
               <View className="absolute inset-0 items-center justify-center">
                 <ActivityIndicator size="small" color={IconColors.white} />
@@ -179,6 +193,9 @@ export function BeerPicturesSection({
         onSelect={handleSourceSelect}
         disabled={isUploading || isPicking}
       />
+
+      {/* Image Preview Modal */}
+      <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />
     </VStack>
   );
 }
