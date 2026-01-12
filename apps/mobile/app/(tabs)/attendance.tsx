@@ -1,11 +1,10 @@
-import { useAttendances } from "@prostcounter/shared/hooks";
+import { useAttendances, useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AttendanceWithTotals, LeaderboardEntry } from "@prostcounter/shared/schemas";
 import { format, parseISO } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
 import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
 import { AttendanceFormSheet } from "@/components/attendance/attendance-form-sheet";
@@ -24,11 +23,13 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { useFestival } from "@/lib/festival/FestivalContext";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
+  const { user } = useAuth();
 
   // Dialog state
   const { dialog, showDialog, closeDialog } = useAlertDialog();
@@ -41,6 +42,9 @@ export default function AttendanceScreen() {
     refetch,
     isRefetching,
   } = useAttendances(currentFestival?.id ?? "");
+
+  // Fetch leaderboard to get user's rank (criteriaId 2 = total_beers)
+  const { data: leaderboard } = useGlobalLeaderboard(2, currentFestival?.id);
 
   // Local UI state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -76,6 +80,24 @@ export default function AttendanceScreen() {
       drinkCount: a.drinkCount,
     }));
   }, [attendances]);
+
+  // Calculate total spent from all attendances
+  const totalSpentCents = useMemo(() => {
+    if (!attendances) return 0;
+    return (attendances as AttendanceWithTotals[]).reduce(
+      (sum, a) => sum + (a.totalSpentCents || 0),
+      0
+    );
+  }, [attendances]);
+
+  // Find user's rank in leaderboard
+  const userRank = useMemo(() => {
+    if (!leaderboard || !user?.id) return null;
+    const entry = (leaderboard as LeaderboardEntry[]).find(
+      (e) => e.userId === user.id
+    );
+    return entry?.position ?? null;
+  }, [leaderboard, user?.id]);
 
   // Handlers
   const handleDateSelect = useCallback((date: Date) => {
@@ -161,9 +183,10 @@ export default function AttendanceScreen() {
           {attendances &&
             (attendances as AttendanceWithTotals[]).length > 0 && (
               <View className="mt-4 rounded-xl bg-background-0 p-4">
-                <Text className="mb-2 text-sm font-medium text-typography-700">
+                <Text className="mb-3 text-sm font-medium text-typography-700">
                   {t("attendance.summary.title")}
                 </Text>
+                {/* Row 1: Days, Drinks, Avg */}
                 <View className="flex-row justify-around">
                   <View className="items-center">
                     <Text className="text-2xl font-bold text-primary-500">
@@ -195,6 +218,25 @@ export default function AttendanceScreen() {
                     </Text>
                     <Text className="text-xs text-typography-500">
                       {t("attendance.summary.avgPerDay")}
+                    </Text>
+                  </View>
+                </View>
+                {/* Row 2: Spent, Rank */}
+                <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-primary-500">
+                      €{(totalSpentCents / 100).toFixed(0)}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.spent", { defaultValue: "Spent" })}
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-primary-500">
+                      {userRank ? `#${userRank}` : "-"}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.rank", { defaultValue: "Rank" })}
                     </Text>
                   </View>
                 </View>
