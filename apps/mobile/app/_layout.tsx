@@ -100,6 +100,20 @@ export default function RootLayout() {
                               presentation: "card",
                             }}
                           />
+                          <Stack.Screen
+                            name="groups"
+                            options={{
+                              headerShown: false,
+                              presentation: "card",
+                            }}
+                          />
+                          <Stack.Screen
+                            name="join-group/[token]"
+                            options={{
+                              headerShown: false,
+                              presentation: "fullScreenModal",
+                            }}
+                          />
                           <Stack.Screen name="+not-found" />
                         </Stack>
                       </NavigationGuard>

@@ -458,10 +458,12 @@ export function createTypedApiClient(config: ApiClientConfig) {
           body: JSON.stringify({ inviteToken }),
         });
         if (!response.ok) {
-          const error = await parseJsonResponse<{ message?: string }>(response).catch(
-            () => ({ message: undefined })
-          );
-          throw new Error(error.message || "Failed to join group");
+          const errorResponse = await parseJsonResponse<{
+            error?: { message?: string; code?: string; statusCode?: number };
+          }>(response).catch(() => ({ error: undefined }));
+          const message = errorResponse?.error?.message || "Failed to join group";
+          const code = errorResponse?.error?.code || "UNKNOWN_ERROR";
+          throw new ApiError(code, message, response.status);
         }
         return parseJsonResponse(response);
       },

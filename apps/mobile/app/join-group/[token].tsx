@@ -1,8 +1,9 @@
 import { useJoinGroupByToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react-native";
+import { CheckCircle, XCircle, Users } from "lucide-react-native";
 import { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
 
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -11,7 +12,7 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
-type JoinStatus = "loading" | "success" | "error";
+type JoinStatus = "loading" | "success" | "error" | "already_member";
 
 interface JoinResult {
   groupId?: string;
@@ -53,14 +54,22 @@ export default function JoinGroupByTokenScreen() {
           groupName: response.group.name,
         });
       } catch (error: any) {
-        setStatus("error");
-        // Try to extract error message
-        const errorMessage =
-          error?.message ||
-          t("groups.deepLink.joinFailed", {
-            defaultValue: "Failed to join group. The invite link may be invalid or expired.",
+        const errorMessage = error?.message || "";
+
+        // Check if user is already a member
+        if (errorMessage.toLowerCase().includes("already a member")) {
+          setStatus("already_member");
+          setResult({ errorMessage });
+        } else {
+          setStatus("error");
+          setResult({
+            errorMessage:
+              errorMessage ||
+              t("groups.deepLink.joinFailed", {
+                defaultValue: "Failed to join group. The invite link may be invalid or expired.",
+              }),
           });
-        setResult({ errorMessage });
+        }
       }
     };
 
@@ -86,9 +95,7 @@ export default function JoinGroupByTokenScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <VStack space="lg" className="items-center">
-          <View className="animate-spin">
-            <Loader2 size={48} color={Colors.primary[500]} />
-          </View>
+          <ActivityIndicator size="large" color={Colors.primary[500]} />
           <Text className="text-center text-typography-500">
             {t("groups.deepLink.joining", { defaultValue: "Joining group..." })}
           </Text>
@@ -142,6 +149,58 @@ export default function JoinGroupByTokenScreen() {
             >
               <ButtonText>
                 {t("groups.deepLink.allGroups", { defaultValue: "All Groups" })}
+              </ButtonText>
+            </Button>
+          </VStack>
+        </VStack>
+      </View>
+    );
+  }
+
+  // Already a member state
+  if (status === "already_member") {
+    return (
+      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+        <VStack space="xl" className="w-full items-center">
+          <Users size={64} color={IconColors.primary} />
+
+          <VStack space="sm" className="items-center">
+            <Heading size="xl" className="text-center text-typography-900">
+              {t("groups.deepLink.alreadyMemberTitle", {
+                defaultValue: "Already a Member",
+              })}
+            </Heading>
+            <Text className="text-center text-typography-500">
+              {t("groups.deepLink.alreadyMemberMessage", {
+                defaultValue: "You're already a member of this group.",
+              })}
+            </Text>
+          </VStack>
+
+          <VStack space="md" className="w-full">
+            <Button
+              variant="solid"
+              action="primary"
+              size="lg"
+              className="w-full"
+              onPress={handleGoToGroups}
+            >
+              <ButtonText>
+                {t("groups.deepLink.viewYourGroups", {
+                  defaultValue: "View Your Groups",
+                })}
+              </ButtonText>
+            </Button>
+
+            <Button
+              variant="outline"
+              action="secondary"
+              size="lg"
+              className="w-full"
+              onPress={handleGoHome}
+            >
+              <ButtonText>
+                {t("groups.deepLink.goHome", { defaultValue: "Go Home" })}
               </ButtonText>
             </Button>
           </VStack>
