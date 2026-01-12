@@ -76,11 +76,14 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <GluestackUIProvider mode="light">
-          <I18nextProvider i18n={i18n}>
-            <ErrorBoundary>
-              <DataProvider>
-                <ApiClientProvider client={apiClient}>
+        <I18nextProvider i18n={i18n}>
+          <ErrorBoundary>
+            <DataProvider>
+              <ApiClientProvider client={apiClient}>
+                {/* GluestackUIProvider must be inside ApiClientProvider
+                    because its OverlayProvider renders modals/sheets
+                    via portal at this level */}
+                <GluestackUIProvider mode="light">
                   <AuthProvider>
                     <FestivalProvider>
                       <NavigationGuard>
@@ -119,12 +122,12 @@ export default function RootLayout() {
                       </NavigationGuard>
                     </FestivalProvider>
                   </AuthProvider>
-                </ApiClientProvider>
-              </DataProvider>
-            </ErrorBoundary>
-            <StatusBar style="dark" />
-          </I18nextProvider>
-        </GluestackUIProvider>
+                </GluestackUIProvider>
+              </ApiClientProvider>
+            </DataProvider>
+          </ErrorBoundary>
+          <StatusBar style="dark" />
+        </I18nextProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

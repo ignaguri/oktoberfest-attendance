@@ -24,6 +24,11 @@ export class QueryKeys {
   static attendanceByDate = (festivalId: string, date: string) =>
     ["attendanceByDate", festivalId, date] as const;
 
+  // Consumption queries
+  static consumptions = (festivalId: string, date: string) =>
+    ["consumptions", festivalId, date] as const;
+  static consumption = (id: string) => ["consumption", id] as const;
+
   // Group queries
   static groups = (festivalId: string) => ["groups", festivalId] as const;
   static group = (id: string) => ["group", id] as const;

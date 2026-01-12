@@ -1,6 +1,6 @@
 import { useAttendances } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -46,13 +46,14 @@ export default function AttendanceScreen() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  // Parse festival dates
+  // Parse festival dates using parseISO to avoid UTC timezone issues
+  // new Date("2024-12-31") parses as UTC midnight, but parseISO treats it as local
   const festivalStartDate = useMemo(
-    () => (currentFestival ? new Date(currentFestival.startDate) : new Date()),
+    () => (currentFestival ? parseISO(currentFestival.startDate) : new Date()),
     [currentFestival],
   );
   const festivalEndDate = useMemo(
-    () => (currentFestival ? new Date(currentFestival.endDate) : new Date()),
+    () => (currentFestival ? parseISO(currentFestival.endDate) : new Date()),
     [currentFestival],
   );
 

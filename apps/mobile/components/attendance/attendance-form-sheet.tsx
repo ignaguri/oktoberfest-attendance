@@ -3,11 +3,13 @@ import {
   useTents,
   useAttendanceByDate,
   useDeleteAttendance,
+  useConsumptions,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   createDetailedAttendanceFormSchema,
   type DetailedAttendanceForm,
+  type DrinkType,
 } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
 import { X, Calendar, Trash2 } from "lucide-react-native";
@@ -17,7 +19,8 @@ import { useForm, Controller } from "react-hook-form";
 import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
 import { BeerPicturesSection } from "./beer-pictures-section";
-import { BeerStepper } from "./beer-stepper";
+import { DrinkTypePicker, VISIBLE_DRINK_TYPES } from "./drink-type-picker";
+import { LocalDrinkStepper } from "./local-drink-stepper";
 import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
 import {
   Actionsheet,
@@ -89,22 +92,63 @@ export function AttendanceFormSheet({
   const [photosMarkedForRemoval, setPhotosMarkedForRemoval] = useState<
     string[]
   >([]);
-
+  const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // Local drink counts - tracks desired counts before save
+  const [localDrinkCounts, setLocalDrinkCounts] = useState<Record<DrinkType, number>>({
+    beer: 0,
+    radler: 0,
+    wine: 0,
+    soft_drink: 0,
+    alcohol_free: 0,
+    other: 0,
+  });
 
   const isEditMode = !!existingAttendance;
   const { tents } = useTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
   const deleteAttendance = useDeleteAttendance();
 
-  // Track previous isOpen state to detect when sheet opens
-  const prevIsOpenRef = useRef(isOpen);
-
-  // Fetch complete attendance data with beer pictures when editing
+  // Format date string for API calls
   const dateString =
     selectedDate && !isNaN(selectedDate.getTime())
       ? format(selectedDate, "yyyy-MM-dd")
       : "";
+
+  // Fetch consumptions for this date
+  const { data: consumptionsData } = useConsumptions(
+    isOpen ? festivalId : "",
+    isOpen ? dateString : ""
+  );
+  const consumptions = consumptionsData || [];
+
+  // Calculate counts per drink type from API consumptions (initial values)
+  const drinkCounts = useMemo(() => {
+    const counts: Record<DrinkType, number> = {
+      beer: 0,
+      radler: 0,
+      wine: 0,
+      soft_drink: 0,
+      alcohol_free: 0,
+      other: 0,
+    };
+    for (const c of consumptions) {
+      if (counts[c.drinkType] !== undefined) {
+        counts[c.drinkType]++;
+      }
+    }
+    return counts;
+  }, [consumptions]);
+
+  // Calculate total local drinks
+  const totalLocalDrinks = useMemo(() => {
+    return Object.values(localDrinkCounts).reduce((sum, count) => sum + count, 0);
+  }, [localDrinkCounts]);
+
+  // Track previous isOpen state to detect when sheet opens
+  const prevIsOpenRef = useRef(isOpen);
+
+  // Fetch complete attendance data with beer pictures when editing
   const { data: attendanceWithPhotos } = useAttendanceByDate(
     isOpen && isEditMode ? festivalId : "",
     isOpen && isEditMode ? dateString : "",
@@ -121,17 +165,17 @@ export function AttendanceFormSheet({
   const defaultValues = useMemo(() => {
     if (existingAttendance) {
       return {
-        amount: existingAttendance.beerCount,
+        amount: existingAttendance.drinkCount || existingAttendance.beerCount || 0,
         date: new Date(existingAttendance.date),
         tents: existingAttendance.tentVisits?.map((tv) => tv.tentId) ?? [],
       };
     }
     return {
-      amount: 0,
+      amount: consumptions.length,
       date: selectedDate,
       tents: [],
     };
-  }, [existingAttendance, selectedDate]);
+  }, [existingAttendance, selectedDate, consumptions.length]);
 
   const {
     control,
@@ -147,6 +191,9 @@ export function AttendanceFormSheet({
 
   const selectedTents = watch("tents");
 
+  // Track if we've initialized local counts for this session
+  const hasInitializedCountsRef = useRef(false);
+
   // Reset form only when sheet opens (not when data updates during save)
   useEffect(() => {
     const justOpened = isOpen && !prevIsOpenRef.current;
@@ -158,8 +205,22 @@ export function AttendanceFormSheet({
       setPhotos([]);
       setPendingPhotos([]);
       setPhotosMarkedForRemoval([]);
+      // Reset the initialized flag when sheet opens
+      hasInitializedCountsRef.current = false;
+    }
+
+    if (!isOpen) {
+      hasInitializedCountsRef.current = false;
     }
   }, [isOpen, defaultValues, reset]);
+
+  // Initialize local drink counts when consumptions are loaded
+  useEffect(() => {
+    if (isOpen && !hasInitializedCountsRef.current && consumptions.length > 0) {
+      setLocalDrinkCounts(drinkCounts);
+      hasInitializedCountsRef.current = true;
+    }
+  }, [isOpen, consumptions.length, drinkCounts]);
 
   // Load photos from API when attendance data is fetched
   useEffect(() => {
@@ -202,11 +263,14 @@ export function AttendanceFormSheet({
         await saveAttendance({
           festivalId,
           date: data.date,
-          amount: data.amount,
+          amount: totalLocalDrinks, // Use total from local counts
           tents: data.tents,
           existingAttendanceId: existingAttendance?.id,
           pendingPhotos,
           photosToDelete: photosMarkedForRemoval,
+          // Pass local counts and existing consumptions for sync
+          localDrinkCounts,
+          existingConsumptions: consumptions,
         });
 
         onSuccess?.();
@@ -223,6 +287,9 @@ export function AttendanceFormSheet({
       saveAttendance,
       onSuccess,
       onClose,
+      totalLocalDrinks,
+      localDrinkCounts,
+      consumptions,
     ],
   );
 
@@ -231,6 +298,17 @@ export function AttendanceFormSheet({
       setValue("tents", tentIds, { shouldValidate: true });
     },
     [setValue],
+  );
+
+  // Handle local drink count change (without API call)
+  const handleLocalDrinkCountChange = useCallback(
+    (drinkType: DrinkType, newCount: number) => {
+      setLocalDrinkCounts((prev) => ({
+        ...prev,
+        [drinkType]: newCount,
+      }));
+    },
+    [],
   );
 
   // Toggle photo marked for removal (clicking X on existing photos)
@@ -326,28 +404,33 @@ export function AttendanceFormSheet({
                 </HStack>
               </VStack>
 
-              {/* Beer Count Stepper */}
+              {/* Drink Type Picker & Stepper */}
               <VStack space="md">
                 <Text className="text-center text-sm font-medium text-typography-700">
-                  {t("attendance.howManyBeers")}
+                  {t("attendance.howManyDrinks", { defaultValue: "Log Your Drinks" })}
                 </Text>
-                <Controller
-                  control={control}
-                  name="amount"
-                  render={({ field: { value, onChange } }) => (
-                    <BeerStepper
-                      value={value}
-                      onChange={onChange}
-                      min={0}
-                      max={20}
-                    />
-                  )}
+
+                {/* Drink Type Icons */}
+                <DrinkTypePicker
+                  selectedType={selectedDrinkType}
+                  onSelect={setSelectedDrinkType}
+                  counts={localDrinkCounts}
+                  disabled={isProcessing}
+                  showLabels
                 />
-                {errors.amount && (
-                  <Text className="text-center text-sm text-error-600">
-                    {t(errors.amount.message || "validation.required")}
-                  </Text>
-                )}
+
+                {/* Stepper for selected drink type (local state) */}
+                <LocalDrinkStepper
+                  drinkType={selectedDrinkType}
+                  count={localDrinkCounts[selectedDrinkType]}
+                  onChange={handleLocalDrinkCountChange}
+                  disabled={isProcessing}
+                />
+
+                {/* Total drinks - simple number */}
+                <Text className="text-center text-sm text-typography-500">
+                  {t("attendance.totalDrinks", { defaultValue: "Total Drinks" })}: {totalLocalDrinks}
+                </Text>
               </VStack>
 
               {/* Tent Selector */}

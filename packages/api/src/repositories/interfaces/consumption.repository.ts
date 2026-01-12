@@ -26,6 +26,19 @@ export interface IConsumptionRepository {
   findByAttendance(attendanceId: string): Promise<Consumption[]>;
 
   /**
+   * Get all consumptions for a user on a specific date
+   * @param userId - User ID
+   * @param festivalId - Festival ID
+   * @param date - Date string in YYYY-MM-DD format
+   * @returns Array of consumption records
+   */
+  findByFestivalAndDate(
+    userId: string,
+    festivalId: string,
+    date: string,
+  ): Promise<Consumption[]>;
+
+  /**
    * Delete a consumption record
    * @param id - Consumption ID
    * @param userId - User ID (for authorization)

@@ -1,15 +1,21 @@
 /**
- * Hook for saving attendance with photos
+ * Hook for saving attendance with photos and consumption sync
  *
  * Orchestrates the complete save flow:
  * 1. Update attendance record
- * 2. Delete photos marked for removal
- * 3. Upload pending photos
- * 4. Invalidate relevant caches
+ * 2. Sync consumptions (create/delete based on delta)
+ * 3. Delete photos marked for removal
+ * 4. Upload pending photos
+ * 5. Invalidate relevant caches
  */
 
 import { useInvalidateQueries, QueryKeys } from "@prostcounter/shared/data";
-import { useUpdatePersonalAttendance } from "@prostcounter/shared/hooks";
+import {
+  useUpdatePersonalAttendance,
+  useLogConsumption,
+  useDeleteConsumption,
+} from "@prostcounter/shared/hooks";
+import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
 import { useCallback, useState } from "react";
 
@@ -27,6 +33,9 @@ interface SaveAttendanceInput {
   existingAttendanceId?: string;
   pendingPhotos: PendingPhoto[];
   photosToDelete: string[];
+  // New: Consumption sync data
+  localDrinkCounts?: Record<DrinkType, number>;
+  existingConsumptions?: Consumption[];
 }
 
 interface UseSaveAttendanceReturn {
@@ -40,6 +49,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const [error, setError] = useState<Error | null>(null);
 
   const updateAttendance = useUpdatePersonalAttendance();
+  const logConsumption = useLogConsumption();
+  const deleteConsumption = useDeleteConsumption();
   const { uploadPendingPhotos } = useBeerPictureUpload();
   const invalidateQueries = useInvalidateQueries();
 
@@ -53,6 +64,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         existingAttendanceId,
         pendingPhotos,
         photosToDelete,
+        localDrinkCounts,
+        existingConsumptions,
       } = input;
 
       setIsSaving(true);
@@ -69,7 +82,58 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           tents,
         });
 
-        // Step 2: Delete photos marked for removal
+        // Step 2: Sync consumptions if local counts provided
+        if (localDrinkCounts && existingConsumptions) {
+          // Calculate current counts from existing consumptions
+          const currentCounts: Record<DrinkType, number> = {
+            beer: 0,
+            radler: 0,
+            wine: 0,
+            soft_drink: 0,
+            alcohol_free: 0,
+            other: 0,
+          };
+          for (const c of existingConsumptions) {
+            if (currentCounts[c.drinkType] !== undefined) {
+              currentCounts[c.drinkType]++;
+            }
+          }
+
+          // Process each drink type
+          for (const drinkType of Object.keys(localDrinkCounts) as DrinkType[]) {
+            const desiredCount = localDrinkCounts[drinkType];
+            const currentCount = currentCounts[drinkType];
+            const delta = desiredCount - currentCount;
+
+            if (delta > 0) {
+              // Need to create more consumptions
+              for (let i = 0; i < delta; i++) {
+                await logConsumption.mutateAsync({
+                  festivalId,
+                  date: dateStr,
+                  drinkType,
+                  tentId: tents[0], // Use first tent
+                  pricePaidCents: 1620, // Default price
+                  volumeMl: 1000,
+                });
+              }
+            } else if (delta < 0) {
+              // Need to delete some consumptions
+              const consumptionsOfType = existingConsumptions
+                .filter((c) => c.drinkType === drinkType)
+                .sort((a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime());
+
+              for (let i = 0; i < Math.abs(delta); i++) {
+                const toDelete = consumptionsOfType[i];
+                if (toDelete) {
+                  await deleteConsumption.mutateAsync(toDelete.id);
+                }
+              }
+            }
+          }
+        }
+
+        // Step 3: Delete photos marked for removal
         if (photosToDelete.length > 0) {
           await Promise.all(
             photosToDelete.map(async (photoId) => {
@@ -83,7 +147,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           );
         }
 
-        // Step 3: Upload pending photos
+        // Step 4: Upload pending photos
         if (pendingPhotos.length > 0) {
           const attendanceId = existingAttendanceId || result?.attendanceId;
 
@@ -96,8 +160,9 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           }
         }
 
-        // Step 4: Invalidate caches
+        // Step 5: Invalidate caches
         invalidateQueries(QueryKeys.attendanceByDate(festivalId, dateStr));
+        invalidateQueries(QueryKeys.consumptions(festivalId, dateStr));
       } catch (err) {
         const saveError =
           err instanceof Error ? err : new Error("Failed to save attendance");
@@ -107,7 +172,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         setIsSaving(false);
       }
     },
-    [updateAttendance, uploadPendingPhotos, invalidateQueries],
+    [updateAttendance, logConsumption, deleteConsumption, uploadPendingPhotos, invalidateQueries],
   );
 
   return {

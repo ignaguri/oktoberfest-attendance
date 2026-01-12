@@ -161,21 +161,9 @@ export default function LeaderboardScreen() {
         <HStack space="sm" className="items-center">
           <Trophy size={24} color={Colors.primary[500]} />
           <Heading size="lg" className="text-typography-900">
-            {t("leaderboard.title", { defaultValue: "Global Leaderboard" })}
+            {currentFestival.name}
           </Heading>
         </HStack>
-
-        {/* Festival Name */}
-        <Text className="text-sm text-typography-500">
-          {currentFestival.name}
-        </Text>
-
-        {/* Sorting Instructions */}
-        <Text className="text-xs text-typography-400">
-          {t("leaderboard.sortHint", {
-            defaultValue: "Tap column headers to sort",
-          })}
-        </Text>
 
         {/* Leaderboard with sortable columns */}
         <Leaderboard

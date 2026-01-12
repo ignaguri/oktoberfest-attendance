@@ -58,3 +58,11 @@ export const SwitchColorsDestructive = {
   trackOff: Colors.gray[300],
   thumb: Colors.white,
 } as const;
+
+// Drink type colors for icons and backgrounds
+export const DrinkTypeColors = {
+  beer: "#F59E0B", // amber/yellow for beer
+  radler: "#84CC16", // lime green for radler (lemon)
+  wine: "#A855F7", // purple for wine
+  soft_drink: "#3B82F6", // blue for soft drinks
+} as const;

@@ -1,4 +1,8 @@
-import { BeerStepper } from "@/components/attendance/beer-stepper";
+import { cn } from "@prostcounter/ui";
+
+import { DrinkCountSummary } from "@/components/attendance/drink-count-summary";
+import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
+import { DrinkStepper } from "@/components/attendance/drink-stepper";
 import {
   ImageSourcePicker,
   type ImageSource,
@@ -22,8 +26,10 @@ import {
   useAttendanceByDate,
   useUpdatePersonalAttendance,
   useTents,
+  useConsumptions,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { DrinkType } from "@prostcounter/shared/schemas";
 import { format, isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import { Beer, Camera, Check, ChevronDown, Minus } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -71,6 +77,11 @@ export function QuickAttendanceCard() {
     refetch: refetchAttendance,
   } = useAttendanceByDate(festivalId || "", today);
 
+  // Fetch today's consumptions
+  const { data: consumptionsData, loading: loadingConsumptions } =
+    useConsumptions(festivalId || "", today);
+  const consumptions = consumptionsData || [];
+
   // Fetch tents for the selector
   const { rawTents } = useTents(festivalId);
 
@@ -86,8 +97,8 @@ export function QuickAttendanceCard() {
   } = useBeerPictureUpload();
 
   // Local state
-  const [beerCount, setBeerCount] = useState(0);
   const [selectedTentId, setSelectedTentId] = useState<string | undefined>();
+  const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [existingPhotos, setExistingPhotos] = useState<BeerPicture[]>([]);
   const [isTentSheetOpen, setIsTentSheetOpen] = useState(false);
@@ -96,10 +107,27 @@ export function QuickAttendanceCard() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  // Calculate drink counts by type
+  const drinkCounts = useMemo(() => {
+    const counts: Record<DrinkType, number> = {
+      beer: 0,
+      radler: 0,
+      wine: 0,
+      soft_drink: 0,
+      alcohol_free: 0,
+      other: 0,
+    };
+    for (const c of consumptions) {
+      if (counts[c.drinkType] !== undefined) {
+        counts[c.drinkType]++;
+      }
+    }
+    return counts;
+  }, [consumptions]);
+
   // Sync local state with fetched attendance
   useEffect(() => {
     if (attendance) {
-      setBeerCount(attendance.beerCount || 0);
       // Use first tent from the list if any
       const firstTentId = attendance.tentIds?.[0];
       setSelectedTentId(firstTentId);
@@ -149,9 +177,9 @@ export function QuickAttendanceCard() {
     setPreviewImage(null);
   }, []);
 
-  // Auto-save attendance (beer count + tent) - called on change
-  const autoSaveAttendance = useCallback(
-    async (newBeerCount: number, newTentId: string | undefined) => {
+  // Auto-save tent selection
+  const autoSaveTent = useCallback(
+    async (newTentId: string | undefined) => {
       if (!festivalId || isAutoSaving) return;
 
       setIsAutoSaving(true);
@@ -160,7 +188,6 @@ export function QuickAttendanceCard() {
         await updateAttendance.mutateAsync({
           festivalId,
           date: today,
-          amount: newBeerCount,
           tents: newTentId ? [newTentId] : [],
         });
 
@@ -176,23 +203,21 @@ export function QuickAttendanceCard() {
     [festivalId, today, updateAttendance, isAutoSaving],
   );
 
-  // Handle beer count change - auto-saves
-  const handleBeerCountChange = useCallback(
-    (newCount: number) => {
-      setBeerCount(newCount);
-      autoSaveAttendance(newCount, selectedTentId);
-    },
-    [autoSaveAttendance, selectedTentId],
-  );
-
   // Handle tent selection - auto-saves
   const handleTentSelect = useCallback(
     (tentId: string | undefined) => {
       setSelectedTentId(tentId);
-      autoSaveAttendance(beerCount, tentId);
+      autoSaveTent(tentId);
     },
-    [autoSaveAttendance, beerCount],
+    [autoSaveTent],
   );
+
+  // Handle quick add success (shows success feedback)
+  const handleQuickAddSuccess = useCallback(() => {
+    // The QuickAddDrinkButtons component handles its own success animation,
+    // but we can trigger a refetch here if needed
+    refetchAttendance();
+  }, [refetchAttendance]);
 
   // Handle photo upload save (only for pending photos)
   const handleUploadPhotos = useCallback(async () => {
@@ -205,7 +230,6 @@ export function QuickAttendanceCard() {
       const result = await updateAttendance.mutateAsync({
         festivalId,
         date: today,
-        amount: beerCount,
         tents: selectedTentId ? [selectedTentId] : [],
       });
 
@@ -234,7 +258,6 @@ export function QuickAttendanceCard() {
   }, [
     festivalId,
     today,
-    beerCount,
     selectedTentId,
     pendingPhotos,
     attendance?.id,
@@ -247,7 +270,7 @@ export function QuickAttendanceCard() {
   const hasPendingPhotos = pendingPhotos.length > 0;
 
   // Loading state
-  if (loadingAttendance && !attendance) {
+  if ((loadingAttendance || loadingConsumptions) && !attendance) {
     return (
       <Card variant="outline" size="md" className="bg-white">
         <VStack space="md" className="items-center py-6">
@@ -291,29 +314,47 @@ export function QuickAttendanceCard() {
   return (
     <Card variant="outline" size="md" className="bg-white">
       <VStack space="lg">
-        {/* Header */}
-        <HStack space="sm" className="items-center">
-          <Beer size={20} color={IconColors.primary} />
-          <Heading size="sm" className="text-typography-900">
-            {t("home.quickAttendance.title", {
-              defaultValue: "Log Today's Beer",
-            })}
-          </Heading>
+        {/* Header with drink count summary */}
+        <HStack className="items-center justify-between">
+          <HStack space="sm" className="items-center">
+            <Beer size={20} color={IconColors.primary} />
+            <Heading size="sm" className="text-typography-900">
+              {t("home.quickAttendance.title", {
+                defaultValue: "Quick Add",
+              })}
+            </Heading>
+          </HStack>
+          {consumptions.length > 0 && (
+            <DrinkCountSummary consumptions={consumptions} compact showTotal={false} />
+          )}
         </HStack>
 
-        {/* Beer Stepper */}
-        <VStack space="xs" className="items-center">
-          <Text className="text-sm font-medium text-typography-600">
-            {t("home.quickAttendance.beerCount", {
-              defaultValue: "Beer Count",
-            })}
-          </Text>
-          <BeerStepper
-            value={beerCount}
-            onChange={handleBeerCountChange}
-            disabled={isLoading}
-          />
-        </VStack>
+        {/* Drink Type Selector + Stepper (horizontal layout) */}
+        {festivalId && (
+          <HStack className="items-start justify-between">
+            {/* Drink Type Picker on the left */}
+            <DrinkTypePicker
+              selectedType={selectedDrinkType}
+              onSelect={setSelectedDrinkType}
+              counts={drinkCounts}
+              disabled={isLoading}
+              compact
+            />
+
+            {/* Stepper on the right - add top padding to align with icons */}
+            <VStack className="items-center pt-0.5">
+              <DrinkStepper
+                festivalId={festivalId}
+                date={today}
+                drinkType={selectedDrinkType}
+                tentId={selectedTentId}
+                consumptions={consumptions}
+                disabled={isLoading}
+                onMutationEnd={handleQuickAddSuccess}
+              />
+            </VStack>
+          </HStack>
+        )}
 
         {/* Tent Selector */}
         <VStack space="xs">
@@ -323,16 +364,17 @@ export function QuickAttendanceCard() {
           <Pressable
             onPress={() => setIsTentSheetOpen(true)}
             disabled={isLoading}
-            className={`flex-row items-center justify-between rounded-lg border px-4 py-3 ${
+            className={cn(
+              "flex-row items-center justify-between rounded-lg border px-4 py-3",
               isLoading
                 ? "border-background-200 bg-background-100"
                 : "border-outline-200 bg-white active:bg-background-50"
-            }`}
+            )}
           >
             <Text
-              className={
+              className={cn(
                 selectedTentName ? "text-typography-900" : "text-typography-400"
-              }
+              )}
             >
               {selectedTentName ||
                 t("home.quickAttendance.selectTent", {
@@ -376,7 +418,10 @@ export function QuickAttendanceCard() {
                 <Pressable onPress={() => handleImagePreview(photo.localUri)}>
                   <Image
                     source={{ uri: photo.localUri }}
-                    className={`h-16 w-16 rounded-lg ${isUploadingPhotos ? "opacity-60" : ""}`}
+                    className={cn(
+                      "h-16 w-16 rounded-lg",
+                      isUploadingPhotos && "opacity-60"
+                    )}
                     resizeMode="cover"
                     accessibilityLabel={t("home.quickAttendance.pendingPhoto", {
                       defaultValue: "Pending photo upload",

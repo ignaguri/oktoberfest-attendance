@@ -1,6 +1,7 @@
 import { useGroupSettings, useGroupLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WinningCriteria, LeaderboardEntry } from "@prostcounter/shared/schemas";
+import type { SortOrder } from "@/components/shared/leaderboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Settings, Share2, Users, Trophy, QrCode, Image } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -82,6 +83,10 @@ export default function GroupDetailScreen() {
   // QR Code sheet state
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
 
+  // Sorting state for leaderboard
+  const [sortColumn, setSortColumn] = useState<WinningCriteria | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+
   // Handle share
   const handleShare = useCallback(async () => {
     if (!group?.inviteToken) {
@@ -118,6 +123,12 @@ export default function GroupDetailScreen() {
   // Handle QR code
   const handleQRCode = useCallback(() => {
     setIsQRCodeOpen(true);
+  }, []);
+
+  // Handle sort change
+  const handleSortChange = useCallback((criteria: WinningCriteria, order: SortOrder) => {
+    setSortColumn(criteria);
+    setSortOrder(order);
   }, []);
 
   // Handle gallery navigation
@@ -287,6 +298,10 @@ export default function GroupDetailScreen() {
               emptyMessage={t("groups.detail.noMembers", {
                 defaultValue: "No members have logged attendance yet",
               })}
+              sortable
+              onSortChange={handleSortChange}
+              activeSortColumn={sortColumn}
+              sortOrder={sortOrder}
             />
           </VStack>
         </VStack>

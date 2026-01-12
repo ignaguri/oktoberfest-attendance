@@ -29,9 +29,9 @@ const STATUS_CONFIG: Record<FestivalStatusType, StatusConfig> = {
     textColor: "text-primary-700",
   },
   active: {
-    icon: <PartyPopper size={28} color={IconColors.success} />,
-    bgColor: "bg-success-50",
-    textColor: "text-success-700",
+    icon: <PartyPopper size={28} color="#16a34a" />,
+    bgColor: "bg-green-50",
+    textColor: "text-green-700",
   },
   ended: {
     icon: <Flag size={28} color={IconColors.muted} />,

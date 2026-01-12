@@ -106,7 +106,9 @@ cssInterop(PrimitiveIcon, {
 const actionsheetStyle = tva({ base: 'w-full h-full web:pointer-events-none' });
 
 const actionsheetContentStyle = tva({
-  base: 'items-center rounded-tl-3xl rounded-tr-3xl p-5 pt-2 bg-background-0 web:pointer-events-auto web:select-none shadow-hard-5 border border-b-0 border-outline-100 pb-safe',
+  // pb-5 provides minimum bottom padding for all devices (20px)
+  // On devices with home indicator, individual sheets can add pb-safe className if needed
+  base: 'items-center rounded-tl-3xl rounded-tr-3xl p-5 pt-2 pb-5 bg-background-0 web:pointer-events-auto web:select-none shadow-hard-5 border border-b-0 border-outline-100',
 });
 
 const actionsheetItemStyle = tva({

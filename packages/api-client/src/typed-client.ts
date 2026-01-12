@@ -11,6 +11,9 @@ import type {
   ListAttendancesResponse,
   DeleteAttendanceResponse,
   AttendanceByDate,
+  AttendanceWithTotals,
+  Consumption,
+  LogConsumptionInput,
   ListGroupsResponse,
   Group,
   GroupWithMembers,
@@ -222,6 +225,60 @@ export function createTypedApiClient(config: ApiClientConfig) {
           throw new Error(`Failed to fetch attendance: ${response.statusText}`);
         }
         return parseJsonResponse<{ attendance: AttendanceByDate | null }>(response);
+      },
+    },
+
+    /**
+     * Consumption API
+     */
+    consumption: {
+      async log(data: LogConsumptionInput): Promise<AttendanceWithTotals> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/consumption`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(response).catch(
+            () => ({ message: undefined })
+          );
+          throw new Error(error.message || "Failed to log consumption");
+        }
+        return parseJsonResponse<AttendanceWithTotals>(response);
+      },
+
+      async list(query: {
+        festivalId: string;
+        date: string;
+      }): Promise<{ consumptions: Consumption[] }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({
+          festivalId: query.festivalId,
+          date: query.date,
+        });
+        const response = await fetch(`${baseUrl}/v1/consumption?${params}`, {
+          headers,
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch consumptions: ${response.statusText}`);
+        }
+        return parseJsonResponse<{ consumptions: Consumption[] }>(response);
+      },
+
+      async delete(consumptionId: string): Promise<{ success: boolean; message: string }> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/consumption/${consumptionId}`, {
+          method: "DELETE",
+          headers,
+        });
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(response).catch(
+            () => ({ message: undefined })
+          );
+          throw new Error(error.message || "Failed to delete consumption");
+        }
+        return parseJsonResponse<{ success: boolean; message: string }>(response);
       },
     },
 

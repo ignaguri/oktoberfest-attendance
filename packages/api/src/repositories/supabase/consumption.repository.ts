@@ -97,6 +97,34 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
     return data.map((item) => this.mapToConsumption(item));
   }
 
+  async findByFestivalAndDate(
+    userId: string,
+    festivalId: string,
+    date: string,
+  ): Promise<Consumption[]> {
+    // First get the attendance for this user/festival/date
+    const { data: attendance, error: attError } = await this.supabase
+      .from("attendances")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .eq("date", date)
+      .single();
+
+    if (attError) {
+      // No attendance found means no consumptions
+      if (attError.code === "PGRST116") {
+        return [];
+      }
+      throw new DatabaseError(
+        `Failed to fetch attendance: ${attError.message}`,
+      );
+    }
+
+    // Get consumptions for this attendance
+    return this.findByAttendance(attendance.id);
+  }
+
   async delete(id: string, userId: string): Promise<void> {
     // First verify the consumption belongs to the user
     const { data: consumption, error: fetchError } = await this.supabase

@@ -71,6 +71,14 @@ export {
   useUpdatePersonalAttendance,
 } from "./useAttendance";
 
+// Consumption hooks
+export {
+  useLogConsumption,
+  useConsumptions,
+  useDeleteConsumption,
+  useConsumptionCounts,
+} from "./useConsumption";
+
 // Tent hooks
 export {
   useTents,

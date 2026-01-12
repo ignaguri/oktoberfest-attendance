@@ -7,6 +7,7 @@ import {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFestivals } from "@prostcounter/shared/hooks";
+import { parseISO } from "date-fns";
 
 // Festival type matching the API response (camelCase)
 export interface Festival {
@@ -69,12 +70,13 @@ export function FestivalProvider({ children }: { children: ReactNode }) {
     }
 
     // Priority 2: Currently active festival (by date)
+    // Use parseISO to avoid UTC timezone issues with date-only strings
     if (!selectedFestival) {
       const today = new Date();
       selectedFestival =
         festivalsData.find((f: Festival) => {
-          const start = new Date(f.startDate);
-          const end = new Date(f.endDate);
+          const start = parseISO(f.startDate);
+          const end = parseISO(f.endDate);
           return today >= start && today <= end;
         }) || null;
     }

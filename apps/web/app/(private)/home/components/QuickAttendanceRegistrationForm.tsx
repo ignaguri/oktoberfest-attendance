@@ -1,7 +1,8 @@
 "use client";
 
+import { DrinkStepper } from "@/components/attendance/drink-stepper";
+import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import { SingleSelect } from "@/components/Select/SingleSelect";
-import { Button } from "@/components/ui/button";
 import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
@@ -10,9 +11,9 @@ import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useConsumptions } from "@prostcounter/shared/hooks";
 import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
-import { Plus, Minus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,38 +21,12 @@ import { toast } from "sonner";
 import type {
   QuickAttendanceForm,
   AttendanceByDate,
+  DrinkType,
 } from "@prostcounter/shared/schemas";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
 }
-
-// const LocationSharingStatus = ({
-//   isSharing,
-//   hasGroupSharingEnabled,
-// }: {
-//   isSharing: boolean;
-//   hasGroupSharingEnabled: boolean;
-// }) => {
-//   const getStatusMessage = () => {
-//     if (isSharing && !hasGroupSharingEnabled) {
-//       return "Location tracking active, but no groups are enabled to see your location. Configure sharing in your profile settings.";
-//     }
-//     if (isSharing && hasGroupSharingEnabled) {
-//       return null;
-//     }
-//     return null;
-//   };
-
-//   const message = getStatusMessage();
-//   if (!message) return null;
-
-//   return (
-//     <div className="text-center mt-2">
-//       <p className="text-sm text-muted-foreground">{message}</p>
-//     </div>
-//   );
-// };
 
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
@@ -67,87 +42,38 @@ export const QuickAttendanceRegistrationForm = ({
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
     null,
   );
+  const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
 
-  // Location sharing hooks
-  // const {
-  //   startLocationSharing,
-  //   stopLocationSharing,
-  //   isUpdatingLocation,
-  //   isStoppingSharing,
-  //   isSharing,
-  // } = useLocationSharing(currentFestival?.id);
+  // Get today's date string
+  const todayString = useMemo(() => formatDateForDatabase(new Date()), []);
 
-  // const { data: preferences } = useLocationSharingPreferences(
-  //   currentFestival?.id,
-  // );
-  // const hasGroupSharingEnabled = useMemo(() => {
-  //   return preferences?.some((pref) => pref.sharing_enabled) ?? false;
-  // }, [preferences]);
+  // Fetch consumptions for today
+  const { data: consumptionsData } = useConsumptions(
+    currentFestival?.id || "",
+    todayString,
+  );
+  const consumptions = consumptionsData || [];
 
-  // const isActuallySharing = isSharing && hasGroupSharingEnabled;
-
-  // const handleToggle = async () => {
-  //   if (isUpdatingLocation || isStoppingSharing || !currentFestival) return;
-
-  //   try {
-  //     if (!isActuallySharing) {
-  //       // Request location permission and start sharing
-  //       if (!navigator.geolocation) {
-  //         toast.error("Geolocation is not supported by this browser");
-  //         return;
-  //       }
-
-  //       await startLocationSharing();
-
-  //       // Show appropriate message based on group sharing status
-  //       if (hasGroupSharingEnabled) {
-  //         toast.success(
-  //           "Location sharing enabled! Group members can now see your location.",
-  //         );
-  //       } else {
-  //         toast.success(
-  //           "Location tracking started! Enable location sharing for specific groups in your profile settings.",
-  //         );
-  //       }
-  //     } else {
-  //       // Stop sharing
-  //       await stopLocationSharing();
-  //       toast.success("Location sharing disabled.");
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof GeolocationPositionError) {
-  //       switch (error.code) {
-  //         case error.PERMISSION_DENIED:
-  //           toast.error(
-  //             "Location access denied. Please enable location permissions in your browser settings.",
-  //           );
-  //           break;
-  //         case error.POSITION_UNAVAILABLE:
-  //           toast.error("Location information is unavailable.");
-  //           break;
-  //         case error.TIMEOUT:
-  //           toast.error("Location request timed out. Please try again.");
-  //           break;
-  //       }
-  //     } else {
-  //       const errorMessage =
-  //         error instanceof Error
-  //           ? error.message
-  //           : "Failed to toggle location sharing. Please try again.";
-
-  //       // Handle specific API errors
-  //       if (
-  //         errorMessage.includes("Location sharing not enabled for any groups")
-  //       ) {
-  //         toast.error(
-  //           "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first.",
-  //         );
-  //       } else {
-  //         toast.error(errorMessage);
-  //       }
-  //     }
-  //   }
-  // };
+  // Calculate drink count summary
+  const drinkSummary = useMemo(() => {
+    const counts: Record<DrinkType, number> = {
+      beer: 0,
+      radler: 0,
+      wine: 0,
+      soft_drink: 0,
+      alcohol_free: 0,
+      other: 0,
+    };
+    for (const c of consumptions) {
+      if (counts[c.drinkType] !== undefined) {
+        counts[c.drinkType]++;
+      }
+    }
+    return {
+      counts,
+      total: consumptions.length,
+    };
+  }, [consumptions]);
 
   const {
     setValue,
@@ -299,31 +225,26 @@ export const QuickAttendanceRegistrationForm = ({
               to session-based model. See: app/api/location-sharing/ for details */}
         </div>
         {/* Location sharing status disabled - pending database migration */}
-        <div className="flex items-center">
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", Math.max(0, beerCount - 1));
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <span className="mx-2">{beerCount} 🍺 drank today</span>
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", beerCount + 1);
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Drink Type Selector + Stepper (vertical centered layout) */}
+        {currentFestival && (
+          <div className="flex flex-col items-center gap-4">
+            <DrinkTypePicker
+              selectedType={selectedDrinkType}
+              onSelect={setSelectedDrinkType}
+              counts={drinkSummary.counts}
+              disabled={isSubmitting}
+            />
+            <DrinkStepper
+              festivalId={currentFestival.id}
+              date={todayString}
+              drinkType={selectedDrinkType}
+              tentId={tentId || undefined}
+              consumptions={consumptions}
+              disabled={isSubmitting}
+              onSuccess={triggerConfetti}
+            />
+          </div>
+        )}
       </form>
     </>
   );

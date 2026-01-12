@@ -240,6 +240,27 @@
     "addNew": "Add Attendance",
     "beerCount": "{{count}} beer",
     "beerCount_other": "{{count}} beers",
+    "drinkCount": "{{count}} drink",
+    "drinkCount_other": "{{count}} drinks",
+    "drinkTypes": {
+      "beer": "Beer",
+      "radler": "Radler",
+      "wine": "Wine",
+      "soft_drink": "Soft Drink",
+      "alcohol_free": "Alcohol Free",
+      "other": "Other"
+    },
+    "quickAdd": {
+      "beer": "+1 Beer",
+      "radler": "+1 Radler",
+      "wine": "+1 Wine",
+      "soft_drink": "+1 Soft"
+    },
+    "howManyDrinks": "Log Your Drinks",
+    "totalDrinks": "Total Drinks",
+    "addDrink": "Add Drink",
+    "removeDrink": "Remove Drink",
+    "added": "Added!",
     "daysAttended": "{{count}} day attended",
     "daysAttended_other": "{{count}} days attended",
     "totalSpent": "Total Spent",
@@ -439,6 +460,21 @@
       "title": "Privacy Settings",
       "locationSharing": "Location Sharing",
       "profileVisibility": "Profile Visibility"
+    },
+    "photoPrivacy": {
+      "title": "Photo Privacy",
+      "description": "Control who can see your photos in group galleries. Individual photos can also be set as private.",
+      "globalSettings": "Global Settings",
+      "perGroupSettings": "Per-Group Settings",
+      "perGroupDescription": "Choose which groups can see your photos. These settings only apply when global hiding is disabled.",
+      "hideFromAll": "Hide photos from all groups",
+      "hideFromAllDescription": "When enabled, your photos won't appear in any group gallery",
+      "hideFromGroup": "Hide photos from {{group}}",
+      "hideFromGroupDescription": "When enabled, your photos won't appear in this group's gallery",
+      "noGroups": "You're not a member of any groups yet.",
+      "globalWarning": "Per-group settings are disabled because global hiding is enabled.",
+      "updateError": "Failed to update photo privacy settings",
+      "shortDescription": "Control who can see your photos"
     },
     "signOut": {
       "title": "Sign Out",

@@ -17,7 +17,7 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="photo-privacy"
         options={{
-          title: t("profile.photoPrivacy.title"),
+          title: t("profile.photoPrivacy.title", { defaultValue: "Photo Privacy" }),
         }}
       />
       <Stack.Screen
