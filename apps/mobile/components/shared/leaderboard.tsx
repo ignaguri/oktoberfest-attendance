@@ -1,9 +1,3 @@
-import { useTranslation } from "@prostcounter/shared/i18n";
-import type { LeaderboardEntry } from "@prostcounter/shared/schemas";
-import type { WinningCriteria } from "@prostcounter/shared/schemas";
-import { Trophy, Medal, Calendar, Beer, TrendingUp, X } from "lucide-react-native";
-import { useState, useCallback } from "react";
-
 import {
   Avatar,
   AvatarFallbackText,
@@ -23,15 +17,40 @@ import {
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { getInitials } from "@prostcounter/ui";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { getInitials } from "@prostcounter/ui";
+import {
+  Trophy,
+  Medal,
+  Calendar,
+  Beer,
+  TrendingUp,
+  X,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react-native";
+import { useState, useCallback, useMemo } from "react";
+
+import type { WinningCriteria } from "@prostcounter/shared/schemas";
+import type { LeaderboardEntry } from "@prostcounter/shared/schemas";
+
+export type SortOrder = "asc" | "desc";
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
   winningCriteria: WinningCriteria;
   currentUserId?: string;
   emptyMessage?: string;
+  /** Enable sortable column headers */
+  sortable?: boolean;
+  /** Callback when sort changes (requires sortable=true) */
+  onSortChange?: (criteria: WinningCriteria, order: SortOrder) => void;
+  /** Currently active sort column (requires sortable=true) */
+  activeSortColumn?: WinningCriteria;
+  /** Current sort order (requires sortable=true) */
+  sortOrder?: SortOrder;
 }
 
 // Position badge colors
@@ -41,18 +60,93 @@ const POSITION_COLORS = {
   3: { bg: "bg-orange-100", icon: "#CD7F32" },
 } as const;
 
+// Column configuration for sorting
+const COLUMN_CONFIG: Record<
+  WinningCriteria,
+  { icon: typeof Calendar; label: string }
+> = {
+  days_attended: { icon: Calendar, label: "Days" },
+  total_beers: { icon: Beer, label: "Beers" },
+  avg_beers: { icon: TrendingUp, label: "Avg" },
+};
+
+/**
+ * Sortable column header component
+ */
+function SortableHeader({
+  criteria,
+  isActive,
+  sortable,
+  sortOrder,
+  onPress,
+  width,
+}: {
+  criteria: WinningCriteria;
+  isActive: boolean;
+  sortable: boolean;
+  sortOrder: SortOrder;
+  onPress: () => void;
+  width: string;
+}) {
+  const config = COLUMN_CONFIG[criteria];
+  const Icon = config.icon;
+  const SortIcon = sortOrder === "asc" ? ChevronUp : ChevronDown;
+
+  if (!sortable) {
+    return (
+      <HStack className={`${width} items-center justify-center`} space="xs">
+        <Icon size={14} color={IconColors.muted} />
+      </HStack>
+    );
+  }
+
+  return (
+    <Pressable onPress={onPress} className={`${width} py-1`}>
+      <HStack className="items-center justify-center" space="xs">
+        <Icon
+          size={14}
+          color={isActive ? Colors.primary[600] : IconColors.muted}
+        />
+        {isActive && (
+          <SortIcon size={10} color={Colors.primary[600]} strokeWidth={3} />
+        )}
+      </HStack>
+    </Pressable>
+  );
+}
+
 /**
  * Compact table-style leaderboard component
  * Shows ranked entries with stats in aligned columns
+ *
+ * Features:
+ * - Position badges for top 3
+ * - User avatar with fallback initials
+ * - Current user highlighting
+ * - User detail modal on tap
+ * - Optional sortable columns (when sortable=true)
  */
+// Map criteria to entry field names
+const CRITERIA_TO_FIELD: Record<WinningCriteria, keyof LeaderboardEntry> = {
+  days_attended: "daysAttended",
+  total_beers: "totalBeers",
+  avg_beers: "avgBeers",
+};
+
 export function Leaderboard({
   entries,
   winningCriteria,
   currentUserId,
   emptyMessage,
+  sortable = false,
+  onSortChange,
+  activeSortColumn,
+  sortOrder = "desc",
 }: LeaderboardProps) {
   const { t } = useTranslation();
-  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(null);
+  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(
+    null,
+  );
 
   const handleUserPress = useCallback((entry: LeaderboardEntry) => {
     setSelectedUser(entry);
@@ -61,6 +155,35 @@ export function Leaderboard({
   const handleCloseModal = useCallback(() => {
     setSelectedUser(null);
   }, []);
+
+  // Use activeSortColumn if provided, otherwise fall back to winningCriteria
+  const currentSortColumn = activeSortColumn || winningCriteria;
+
+  const handleSortPress = useCallback(
+    (criteria: WinningCriteria) => {
+      if (sortable && onSortChange) {
+        // If clicking the same column, toggle direction; otherwise, default to desc
+        const newOrder: SortOrder =
+          criteria === currentSortColumn && sortOrder === "desc"
+            ? "asc"
+            : "desc";
+        onSortChange(criteria, newOrder);
+      }
+    },
+    [sortable, onSortChange, currentSortColumn, sortOrder],
+  );
+
+  // Sort entries client-side based on current column and order
+  const sortedEntries = useMemo(() => {
+    if (!sortable) return entries;
+
+    const field = CRITERIA_TO_FIELD[currentSortColumn];
+    return [...entries].sort((a, b) => {
+      const aVal = (a[field] as number) ?? 0;
+      const bVal = (b[field] as number) ?? 0;
+      return sortOrder === "desc" ? bVal - aVal : aVal - bVal;
+    });
+  }, [entries, sortable, currentSortColumn, sortOrder]);
 
   if (entries.length === 0) {
     return (
@@ -82,26 +205,44 @@ export function Leaderboard({
           <Text className="flex-1 text-sm font-medium text-typography-500">
             {t("leaderboard.header.player", { defaultValue: "Player" })}
           </Text>
-          <HStack className="w-14 items-center justify-center" space="xs">
-            <Calendar size={14} color={IconColors.muted} />
-          </HStack>
-          <HStack className="w-14 items-center justify-center" space="xs">
-            <Beer size={14} color={IconColors.muted} />
-          </HStack>
-          <HStack className="w-12 items-center justify-center" space="xs">
-            <TrendingUp size={14} color={IconColors.muted} />
-          </HStack>
+          <SortableHeader
+            criteria="days_attended"
+            isActive={currentSortColumn === "days_attended"}
+            sortable={sortable}
+            sortOrder={sortOrder}
+            onPress={() => handleSortPress("days_attended")}
+            width="w-14"
+          />
+          <SortableHeader
+            criteria="total_beers"
+            isActive={currentSortColumn === "total_beers"}
+            sortable={sortable}
+            sortOrder={sortOrder}
+            onPress={() => handleSortPress("total_beers")}
+            width="w-14"
+          />
+          <SortableHeader
+            criteria="avg_beers"
+            isActive={currentSortColumn === "avg_beers"}
+            sortable={sortable}
+            sortOrder={sortOrder}
+            onPress={() => handleSortPress("avg_beers")}
+            width="w-12"
+          />
         </HStack>
 
         {/* Data Rows */}
         <VStack>
-          {entries.map((entry, index) => {
+          {sortedEntries.map((entry, index) => {
             const isCurrentUser = entry.userId === currentUserId;
-            const isTopThree = entry.position <= 3;
+            // When sorting client-side, position may not reflect sorted order
+            // Use index + 1 for display position when sorting is active
+            const displayPosition = sortable ? index + 1 : entry.position;
+            const isTopThree = displayPosition <= 3;
             const positionStyle = isTopThree
-              ? POSITION_COLORS[entry.position as 1 | 2 | 3]
+              ? POSITION_COLORS[displayPosition as 1 | 2 | 3]
               : null;
-            const isLast = index === entries.length - 1;
+            const isLast = index === sortedEntries.length - 1;
 
             const displayName = entry.username || entry.fullName || "Unknown";
 
@@ -122,7 +263,7 @@ export function Leaderboard({
                       <VStack
                         className={`h-7 w-7 items-center justify-center rounded-full ${positionStyle?.bg}`}
                       >
-                        {entry.position === 1 ? (
+                        {displayPosition === 1 ? (
                           <Trophy size={14} color={positionStyle?.icon} />
                         ) : (
                           <Medal size={14} color={positionStyle?.icon} />
@@ -131,7 +272,7 @@ export function Leaderboard({
                     ) : (
                       <VStack className="h-7 w-7 items-center justify-center">
                         <Text className="text-sm font-semibold text-typography-400">
-                          {entry.position}
+                          {displayPosition}
                         </Text>
                       </VStack>
                     )}
@@ -145,7 +286,10 @@ export function Leaderboard({
                         />
                       ) : (
                         <AvatarFallbackText>
-                          {getInitials({ fullName: entry.fullName, username: entry.username })}
+                          {getInitials({
+                            fullName: entry.fullName,
+                            username: entry.username,
+                          })}
                         </AvatarFallbackText>
                       )}
                     </Avatar>
@@ -161,19 +305,40 @@ export function Leaderboard({
                     >
                       {displayName}
                       {isCurrentUser && (
-                        <Text className="text-xs text-typography-500"> (You)</Text>
+                        <Text className="text-xs text-typography-500">
+                          {" "}
+                          (You)
+                        </Text>
                       )}
                     </Text>
                   </HStack>
 
                   {/* Stats - aligned with headers */}
-                  <Text className="w-14 text-center text-sm font-semibold text-typography-800">
+                  <Text
+                    className={`w-14 text-center text-sm font-semibold ${
+                      currentSortColumn === "days_attended"
+                        ? "text-primary-700"
+                        : "text-typography-800"
+                    }`}
+                  >
                     {entry.daysAttended ?? 0}
                   </Text>
-                  <Text className="w-14 text-center text-sm font-semibold text-typography-800">
+                  <Text
+                    className={`w-14 text-center text-sm font-semibold ${
+                      currentSortColumn === "total_beers"
+                        ? "text-primary-700"
+                        : "text-typography-800"
+                    }`}
+                  >
                     {entry.totalBeers ?? 0}
                   </Text>
-                  <Text className="w-12 text-center text-sm font-semibold text-typography-800">
+                  <Text
+                    className={`w-12 text-center text-sm font-semibold ${
+                      currentSortColumn === "avg_beers"
+                        ? "text-primary-700"
+                        : "text-typography-800"
+                    }`}
+                  >
                     {typeof entry.avgBeers === "number"
                       ? entry.avgBeers.toFixed(1)
                       : "0.0"}
@@ -191,7 +356,9 @@ export function Leaderboard({
         <ModalContent>
           <ModalHeader>
             <Heading size="md" className="text-typography-900">
-              {t("leaderboard.userDetail.title", { defaultValue: "Player Profile" })}
+              {t("leaderboard.userDetail.title", {
+                defaultValue: "Player Profile",
+              })}
             </Heading>
             <ModalCloseButton>
               <X size={20} color={IconColors.default} />
@@ -205,11 +372,16 @@ export function Leaderboard({
                   {selectedUser.avatarUrl ? (
                     <AvatarImage
                       source={{ uri: getAvatarUrl(selectedUser.avatarUrl) }}
-                      alt={selectedUser.fullName || selectedUser.username || "User"}
+                      alt={
+                        selectedUser.fullName || selectedUser.username || "User"
+                      }
                     />
                   ) : (
                     <AvatarFallbackText>
-                      {getInitials({ fullName: selectedUser.fullName, username: selectedUser.username })}
+                      {getInitials({
+                        fullName: selectedUser.fullName,
+                        username: selectedUser.username,
+                      })}
                     </AvatarFallbackText>
                   )}
                 </Avatar>
@@ -262,7 +434,9 @@ export function Leaderboard({
                       </Text>
                     </HStack>
                     <Text className="text-xs text-typography-500">
-                      {t("leaderboard.metric.avgBeers", { defaultValue: "avg" })}
+                      {t("leaderboard.metric.avgBeers", {
+                        defaultValue: "avg",
+                      })}
                     </Text>
                   </VStack>
                 </HStack>
@@ -276,14 +450,13 @@ export function Leaderboard({
                     }`}
                   >
                     {selectedUser.position === 1 ? (
-                      <Trophy
-                        size={16}
-                        color={POSITION_COLORS[1].icon}
-                      />
+                      <Trophy size={16} color={POSITION_COLORS[1].icon} />
                     ) : (
                       <Medal
                         size={16}
-                        color={POSITION_COLORS[selectedUser.position as 2 | 3]?.icon}
+                        color={
+                          POSITION_COLORS[selectedUser.position as 2 | 3]?.icon
+                        }
                       />
                     )}
                     <Text className="text-sm font-medium text-typography-800">
