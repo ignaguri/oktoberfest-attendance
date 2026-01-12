@@ -4,7 +4,7 @@ import {
   useJoinGroupByToken,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { X, Search, Key, Users, ChevronRight } from "lucide-react-native";
+import { X, Search, Key, Users, ChevronRight, Link } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 
@@ -53,6 +53,7 @@ export function JoinGroupSheet({
     null,
   );
   const [inviteToken, setInviteToken] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   // Search query - debounced via React Query
   const { data: searchResults, loading: isSearching } = useGroupSearch(
@@ -67,11 +68,20 @@ export function JoinGroupSheet({
       setSearchQuery("");
       setSelectedGroup(null);
       setInviteToken("");
+      setError(null);
     }
   }, [isOpen]);
 
+  // Clear error when user types
+  useEffect(() => {
+    if (error) {
+      setError(null);
+    }
+  }, [inviteToken]);
+
   // Handle joining a group
   const handleJoin = useCallback(async () => {
+    setError(null);
     try {
       if (mode === "search" && selectedGroup) {
         // Join via search: use groupId + inviteToken
@@ -85,8 +95,14 @@ export function JoinGroupSheet({
       }
 
       onSuccess();
-    } catch (error) {
-      console.error("Failed to join group:", error);
+    } catch (err: any) {
+      console.error("Failed to join group:", err);
+      // Extract error message from API response
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        t("groups.join.error", { defaultValue: "Failed to join group. Please check the password and try again." });
+      setError(message);
     }
   }, [
     mode,
@@ -95,6 +111,7 @@ export function JoinGroupSheet({
     joinGroup,
     joinGroupByToken,
     onSuccess,
+    t,
   ]);
 
   const handleGroupSelect = useCallback((group: SearchGroupResult) => {
@@ -104,6 +121,7 @@ export function JoinGroupSheet({
   const handleBack = useCallback(() => {
     setSelectedGroup(null);
     setInviteToken("");
+    setError(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -187,51 +205,71 @@ export function JoinGroupSheet({
   };
 
   // Token Input View (for selected group or token-only mode)
-  const renderTokenInput = () => (
-    <VStack space="lg">
-      {selectedGroup && (
-        <Card variant="elevated" size="md" className="bg-background-0">
-          <VStack space="sm">
-            <Text className="font-semibold text-typography-900">
-              {selectedGroup.name}
-            </Text>
-            <HStack space="xs" className="items-center">
-              <Users size={14} color={IconColors.muted} />
-              <Text className="text-sm text-typography-500">
-                {t("groups.memberCount", {
-                  count: selectedGroup.memberCount,
-                  defaultValue: "{{count}} members",
-                })}
-              </Text>
-            </HStack>
-          </VStack>
-        </Card>
-      )}
+  // In search mode: show "Group Password" (what members share verbally)
+  // In token mode: show "Invite Link" (for pasting shared links)
+  const renderTokenInput = () => {
+    const isPasswordMode = mode === "search" && selectedGroup;
 
-      <VStack space="sm">
-        <Text className="text-sm font-medium text-typography-700">
-          {t("groups.join.tokenLabel", { defaultValue: "Invite Token" })}
-        </Text>
-        <Input size="md">
-          <InputSlot className="pl-3">
-            <InputIcon as={Key} color={IconColors.muted} />
-          </InputSlot>
-          <InputField
-            placeholder={t("groups.join.tokenPlaceholder", {
-              defaultValue: "Enter invite token",
-            })}
-            value={inviteToken}
-            onChangeText={setInviteToken}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </Input>
-        <Text className="text-xs text-typography-400">
-          {t("groups.join.tokenHelp", {
-            defaultValue: "Ask the group admin for the invite token",
-          })}
-        </Text>
-      </VStack>
+    return (
+      <VStack space="lg">
+        {selectedGroup && (
+          <Card variant="elevated" size="md" className="bg-background-0">
+            <VStack space="sm">
+              <Text className="font-semibold text-typography-900">
+                {selectedGroup.name}
+              </Text>
+              <HStack space="xs" className="items-center">
+                <Users size={14} color={IconColors.muted} />
+                <Text className="text-sm text-typography-500">
+                  {t("groups.memberCount", {
+                    count: selectedGroup.memberCount,
+                    defaultValue: "{{count}} members",
+                  })}
+                </Text>
+              </HStack>
+            </VStack>
+          </Card>
+        )}
+
+        <VStack space="sm">
+          <Text className="text-sm font-medium text-typography-700">
+            {isPasswordMode
+              ? t("groups.join.passwordLabel", { defaultValue: "Group Password" })
+              : t("groups.join.tokenLabel", { defaultValue: "Invite Link" })}
+          </Text>
+          <Input size="md">
+            <InputSlot className="pl-3">
+              <InputIcon as={isPasswordMode ? Key : Link} color={IconColors.muted} />
+            </InputSlot>
+            <InputField
+              placeholder={
+                isPasswordMode
+                  ? t("groups.join.passwordPlaceholder", {
+                      defaultValue: "Enter group password",
+                    })
+                  : t("groups.join.tokenPlaceholder", {
+                      defaultValue: "Paste invite link or token",
+                    })
+              }
+              value={inviteToken}
+              onChangeText={setInviteToken}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </Input>
+          <Text className="text-xs text-typography-400">
+            {isPasswordMode
+              ? t("groups.join.passwordHelp", {
+                  defaultValue: "Ask a group member for the password",
+                })
+              : t("groups.join.tokenHelp", {
+                  defaultValue: "Paste the invite link shared with you",
+                })}
+          </Text>
+          {error && (
+            <Text className="text-sm text-error-600">{error}</Text>
+          )}
+        </VStack>
 
       {/* Action Buttons */}
       <HStack className="w-full gap-3">
@@ -264,7 +302,8 @@ export function JoinGroupSheet({
         </Button>
       </HStack>
     </VStack>
-  );
+    );
+  };
 
   return (
     <Actionsheet isOpen={isOpen} onClose={handleClose}>
@@ -297,6 +336,7 @@ export function JoinGroupSheet({
                   setMode("search");
                   setSelectedGroup(null);
                   setInviteToken("");
+                  setError(null);
                 }}
               >
                 <Search
@@ -318,16 +358,17 @@ export function JoinGroupSheet({
                   setMode("token");
                   setSearchQuery("");
                   setSelectedGroup(null);
+                  setError(null);
                 }}
               >
-                <Key
+                <Link
                   size={16}
                   color={
                     mode === "token" ? IconColors.white : IconColors.default
                   }
                 />
                 <ButtonText className="ml-1">
-                  {t("groups.join.tokenMode", { defaultValue: "Invite Token" })}
+                  {t("groups.join.tokenMode", { defaultValue: "Invite Link" })}
                 </ButtonText>
               </Button>
             </HStack>
