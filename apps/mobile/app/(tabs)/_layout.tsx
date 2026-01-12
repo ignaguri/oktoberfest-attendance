@@ -56,7 +56,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Home",
-          headerTitle: "ProstCounter",
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon Icon={Home} color={color} focused={focused} />
           ),

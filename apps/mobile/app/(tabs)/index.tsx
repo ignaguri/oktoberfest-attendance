@@ -1,8 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ActivityFeed } from "@/components/shared/activity-feed";
+import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { MapLinkButton } from "@/components/shared/map-link-button";
 import { QuickAttendanceCard } from "@/components/shared/quick-attendance-card";
@@ -40,30 +42,35 @@ export default function HomeScreen() {
   }, [queryClient]);
 
   return (
-    <ScrollView
-      className="flex-1 bg-background-50"
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={handleRefresh}
-          tintColor={Colors.primary[500]}
-          colors={[Colors.primary[500]]}
-        />
-      }
-    >
-      <VStack space="md" className="p-4 pb-8">
-        {/* Festival Status */}
-        <FestivalStatus />
+    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={Colors.primary[500]}
+            colors={[Colors.primary[500]]}
+          />
+        }
+      >
+        <VStack space="md" className="p-4 pb-8">
+          {/* App Header with logo and name */}
+          <AppHeader />
 
-        {/* Quick Attendance Card */}
-        <QuickAttendanceCard />
+          {/* Festival Status */}
+          <FestivalStatus />
 
-        {/* Activity Feed */}
-        <ActivityFeed onRefresh={handleRefresh} />
+          {/* Quick Attendance Card */}
+          <QuickAttendanceCard />
 
-        {/* Map Link Button (only shows if festival has mapUrl) */}
-        <MapLinkButton />
-      </VStack>
-    </ScrollView>
+          {/* Activity Feed */}
+          <ActivityFeed onRefresh={handleRefresh} />
+
+          {/* Map Link Button (only shows if festival has mapUrl) */}
+          <MapLinkButton />
+        </VStack>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

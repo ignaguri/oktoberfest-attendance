@@ -4,6 +4,7 @@ import { Text } from "@/components/ui/text";
 import { IconColors } from "@/lib/constants/colors";
 import { useFestival } from "@/lib/festival/FestivalContext";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import {
   differenceInDays,
   isAfter,
@@ -23,17 +24,17 @@ interface StatusConfig {
 
 const STATUS_CONFIG: Record<FestivalStatusType, StatusConfig> = {
   upcoming: {
-    icon: <Clock size={20} color={IconColors.primary} />,
+    icon: <Clock size={28} color={IconColors.primary} />,
     bgColor: "bg-primary-50",
     textColor: "text-primary-700",
   },
   active: {
-    icon: <PartyPopper size={20} color={IconColors.success} />,
+    icon: <PartyPopper size={28} color={IconColors.success} />,
     bgColor: "bg-success-50",
     textColor: "text-success-700",
   },
   ended: {
-    icon: <Flag size={20} color={IconColors.muted} />,
+    icon: <Flag size={28} color={IconColors.muted} />,
     bgColor: "bg-background-100",
     textColor: "text-typography-500",
   },
@@ -97,17 +98,20 @@ export function FestivalStatus() {
   const config = STATUS_CONFIG[status];
 
   return (
-    <Card size="sm" variant="filled" className={`${config.bgColor} border-0`}>
-      <HStack space="sm" className="items-center">
+    <Card
+      size="md"
+      variant="filled"
+      className={cn(config.bgColor, "border border-outline-200")}
+    >
+      <HStack space="sm" className="items-center justify-center">
         {config.icon}
-        <Text className={`flex-1 font-medium ${config.textColor}`}>
+        <Text className={cn("text-base font-semibold", config.textColor)}>
           {message}
         </Text>
-        {status === "active" && (
-          <Text className="text-sm text-typography-500">
-            {currentFestival.name}
-          </Text>
-        )}
+        <Text className="text-typography-400">•</Text>
+        <Text className="text-base font-bold text-typography-700">
+          {currentFestival.name}
+        </Text>
       </HStack>
     </Card>
   );
