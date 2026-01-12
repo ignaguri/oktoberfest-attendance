@@ -28,7 +28,7 @@ import { IconColors, Colors } from "@/lib/constants/colors";
 
 interface AttendanceData {
   date: string;
-  beerCount: number;
+  drinkCount: number;
 }
 
 interface AttendanceCalendarProps {
@@ -84,11 +84,11 @@ export function AttendanceCalendar({
   // Generate weekday headers - memoized since it's static
   const weekdayHeaders = useMemo(() => getWeekdayHeaders(), []);
 
-  // Map of date string -> beer count for quick lookup
+  // Map of date string -> drink count for quick lookup
   const attendanceMap = useMemo(() => {
     const map = new Map<string, number>();
     attendances.forEach((a) => {
-      map.set(a.date, a.beerCount);
+      map.set(a.date, a.drinkCount);
     });
     return map;
   }, [attendances]);
@@ -158,8 +158,8 @@ export function AttendanceCalendar({
         start: festivalStartDate,
         end: festivalEndDate,
       });
-      const beerCount = attendanceMap.get(dateStr);
-      const hasAttendance = beerCount !== undefined && beerCount > 0;
+      const drinkCount = attendanceMap.get(dateStr);
+      const hasAttendance = drinkCount !== undefined && drinkCount > 0;
 
       // Determine cell styling using cn() for safe class merging
       // Festival days from adjacent months should be fully interactive and styled
@@ -213,7 +213,7 @@ export function AttendanceCalendar({
               <HStack className="mt-0.5 items-center gap-0.5">
                 <Beer size={10} color={Colors.primary[600]} />
                 <Text className="text-[10px] font-semibold text-primary-600">
-                  {beerCount}
+                  {drinkCount}
                 </Text>
               </HStack>
             )}
@@ -223,7 +223,7 @@ export function AttendanceCalendar({
               <HStack className="mt-0.5 items-center gap-0.5">
                 <Beer size={10} color={Colors.white} />
                 <Text className="text-[10px] font-semibold text-white">
-                  {beerCount}
+                  {drinkCount}
                 </Text>
               </HStack>
             )}

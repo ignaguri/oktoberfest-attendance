@@ -73,7 +73,7 @@ export default function AttendanceScreen() {
     if (!attendances) return [];
     return (attendances as AttendanceWithTotals[]).map((a) => ({
       date: a.date,
-      beerCount: a.beerCount,
+      drinkCount: a.drinkCount,
     }));
   }, [attendances]);
 
@@ -176,19 +176,19 @@ export default function AttendanceScreen() {
                   <View className="items-center">
                     <Text className="text-2xl font-bold text-primary-500">
                       {(attendances as AttendanceWithTotals[]).reduce(
-                        (sum, a) => sum + a.beerCount,
+                        (sum, a) => sum + a.drinkCount,
                         0,
                       )}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.beers")}
+                      {t("attendance.summary.drinks", { defaultValue: "Drinks" })}
                     </Text>
                   </View>
                   <View className="items-center">
                     <Text className="text-2xl font-bold text-primary-500">
                       {(
                         (attendances as AttendanceWithTotals[]).reduce(
-                          (sum, a) => sum + a.beerCount,
+                          (sum, a) => sum + a.drinkCount,
                           0,
                         ) / (attendances as AttendanceWithTotals[]).length
                       ).toFixed(1)}
