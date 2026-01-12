@@ -258,6 +258,7 @@ export function AttendanceFormSheet({
   }, [isOpen, selectedDate, existingAttendance, setValue]);
 
   // Get tent visits for display as badges (showing ALL visits with times)
+  // These are historical visits - displayed chronologically
   const tentVisitsForDisplay = useMemo((): TentVisitDisplay[] => {
     if (!freshTentVisits.length) return [];
     const allOptions = tents.flatMap((group) => group.options);
@@ -277,7 +278,8 @@ export function AttendanceFormSheet({
       .sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime());
   }, [freshTentVisits, tents]);
 
-  // Get unique tent info for selector display (when no visits yet)
+  // Get selected tents from form - these are what user currently has selected
+  // Shows tents that will be added on save (may include ones already visited)
   const selectedTentInfo = useMemo(() => {
     if (!selectedTents.length) return [];
     const allOptions = tents.flatMap((group) => group.options);
@@ -289,6 +291,36 @@ export function AttendanceFormSheet({
       })
       .filter((item): item is { id: string; label: string } => item !== null);
   }, [selectedTents, tents]);
+
+  // Combined display: show selected tents from form, with timestamps for those that have visits
+  const combinedTentDisplay = useMemo(() => {
+    const allOptions = tents.flatMap((group) => group.options);
+
+    // Build a map of tent visits by tent ID (most recent visit for each tent)
+    const latestVisitByTent = new Map<string, { visitDate: string; checkInTime: string }>();
+    for (const visit of freshTentVisits) {
+      const existing = latestVisitByTent.get(visit.tentId);
+      if (!existing || new Date(visit.visitDate) > new Date(existing.visitDate)) {
+        latestVisitByTent.set(visit.tentId, {
+          visitDate: visit.visitDate,
+          checkInTime: format(parseISO(visit.visitDate), "HH:mm"),
+        });
+      }
+    }
+
+    // Create display items for each selected tent
+    return selectedTents.map((tentId) => {
+      const option = allOptions.find((opt) => opt.value === tentId);
+      const label = option?.label || "Unknown Tent";
+      const visitInfo = latestVisitByTent.get(tentId);
+
+      return {
+        id: tentId,
+        label,
+        checkInTime: visitInfo?.checkInTime || null, // null means not yet visited
+      };
+    });
+  }, [selectedTents, freshTentVisits, tents]);
 
   // Handle form submission
   const onSubmit = useCallback(
@@ -476,24 +508,9 @@ export function AttendanceFormSheet({
                   onPress={() => setShowTentSelector(true)}
                   className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
                 >
-                  {tentVisitsForDisplay.length > 0 ? (
+                  {combinedTentDisplay.length > 0 ? (
                     <HStack className="flex-wrap gap-2">
-                      {tentVisitsForDisplay.map((visit) => (
-                        <Badge
-                          key={`${visit.id}-${visit.visitDate}`}
-                          action="info"
-                          variant="outline"
-                          size="md"
-                        >
-                          <BadgeText className="normal-case">
-                            {visit.label} ({visit.checkInTime})
-                          </BadgeText>
-                        </Badge>
-                      ))}
-                    </HStack>
-                  ) : selectedTentInfo.length > 0 ? (
-                    <HStack className="flex-wrap gap-2">
-                      {selectedTentInfo.map((tent) => (
+                      {combinedTentDisplay.map((tent) => (
                         <Badge
                           key={tent.id}
                           action="info"
@@ -501,7 +518,9 @@ export function AttendanceFormSheet({
                           size="md"
                         >
                           <BadgeText className="normal-case">
-                            {tent.label}
+                            {tent.checkInTime
+                              ? `${tent.label} (${tent.checkInTime})`
+                              : tent.label}
                           </BadgeText>
                         </Badge>
                       ))}
