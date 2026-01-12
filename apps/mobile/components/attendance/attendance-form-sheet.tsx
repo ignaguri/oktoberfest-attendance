@@ -199,7 +199,9 @@ export function AttendanceFormSheet({
     formState: { errors },
   } = useForm<DetailedAttendanceForm>({
     resolver: zodResolver(formSchema),
-    values: defaultValues,
+    // Use defaultValues for initial state only - don't use `values` as it continuously syncs
+    // and would override user changes to tents
+    defaultValues,
   });
 
   const selectedTents = watch("tents");

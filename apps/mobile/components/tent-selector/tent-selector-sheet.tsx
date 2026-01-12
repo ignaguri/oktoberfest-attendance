@@ -6,6 +6,7 @@ import {
   type SectionListRenderItemInfo,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { X } from "lucide-react-native";
 
 import {
@@ -67,6 +68,7 @@ export function TentSelectorSheet({
 }: TentSelectorSheetProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { tents, isLoading, error } = useTents(festivalId);
+  const insets = useSafeAreaInsets();
 
   // Filter tents based on search query
   const filteredSections: SectionData[] = useMemo(() => {
@@ -194,7 +196,7 @@ export function TentSelectorSheet({
             </Text>
           </VStack>
         ) : (
-          <View style={{ width: "100%", maxHeight: 400 }}>
+          <View style={{ width: "100%", maxHeight: 340 }}>
             <SectionList<TentOption, SectionData>
               sections={filteredSections}
               renderItem={renderItem}
@@ -208,7 +210,10 @@ export function TentSelectorSheet({
 
         {/* Footer (multi-select only) */}
         {mode === "multi" && (
-          <HStack className="w-full pt-3 gap-3">
+          <HStack
+            className="w-full pt-3 gap-3"
+            style={{ paddingBottom: Math.max(insets.bottom, 16) + 8 }}
+          >
             <Button
               variant="outline"
               action="secondary"
