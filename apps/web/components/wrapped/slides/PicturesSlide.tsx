@@ -8,6 +8,31 @@ import { useEffect, useState } from "react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ */
+function extractFilePath(urlOrPath: string): string {
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    const bucketIndex = pathParts.indexOf("beer_pictures");
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
 import {
   BaseSlide,
   SlideTitle,
@@ -107,7 +132,8 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
               <div className="absolute top-1/4 left-1/4 size-64 -translate-x-1/2 -translate-y-1/2 sm:size-80 md:size-96">
                 {picturesToShow.map((picture, index) => {
                   const isLoaded = loadedImages.has(picture.id);
-                  const imageUrl = `/api/image/${picture.picture_url}?bucket=beer_pictures`;
+                  const filePath = extractFilePath(picture.picture_url);
+                  const imageUrl = `/api/image/${encodeURIComponent(filePath)}?bucket=beer_pictures`;
 
                   return (
                     <motion.div
@@ -145,6 +171,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                           loading="lazy"
                           sizes="200px"
                           onLoad={() => handleImageLoad(picture.id)}
+                          unoptimized
                         />
 
                         {/* Subtle shadow overlay */}

@@ -1,13 +1,11 @@
-"use client";
-
 /**
- * i18n exports for client components
+ * Core i18n functions - server-safe (no React dependencies)
  *
- * For server components, import from '@prostcounter/shared/i18n/core' instead.
+ * Use this for server components/actions. For client components,
+ * import from '@prostcounter/shared/i18n' instead.
  */
 
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
 
 import en from "./locales/en.json";
 
@@ -22,22 +20,19 @@ export const resources = {
 export type TranslationResources = (typeof resources)["en"]["translation"];
 
 /**
- * Initialize i18n with React bindings
- * Call this once at app startup (in layout or _app)
+ * Initialize i18n for server-side usage (without React bindings)
+ * Call this once at server startup
  */
 export function initI18n(locale = "en") {
   if (!i18n.isInitialized) {
-    i18n.use(initReactI18next).init({
+    i18n.init({
       resources,
       lng: locale,
       fallbackLng: "en",
       defaultNS,
       ns: [defaultNS],
       interpolation: {
-        escapeValue: false, // React already escapes
-      },
-      react: {
-        useSuspense: false, // Disable for SSR compatibility
+        escapeValue: false,
       },
     });
   }
@@ -65,6 +60,4 @@ export function getCurrentLanguage(): string {
 export const SUPPORTED_LANGUAGES = ["en"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-// Re-export react-i18next hooks and components (client-only)
-export { useTranslation, Trans, I18nextProvider } from "react-i18next";
 export { i18n };

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Shared hooks for web and mobile apps
  *

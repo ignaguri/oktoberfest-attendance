@@ -12,6 +12,35 @@ import { Camera } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ * Handles URLs like: http://localhost:54321/storage/v1/object/public/beer_pictures/userId/festivalId/file.jpg
+ * Returns: userId/festivalId/file.jpg
+ */
+function extractFilePath(urlOrPath: string): string {
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    // Find "beer_pictures" in the path and get everything after it
+    const bucketIndex = pathParts.indexOf("beer_pictures");
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    // Fallback: return everything after /public/
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
 import type { GalleryData } from "@/lib/types";
 
 import { ImageModal } from "./ImageModal";
@@ -61,7 +90,8 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                 <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
                   {images.map((image) => {
                     const isLoaded = loadedImages.has(image.id);
-                    const imageUrl = `/api/image/${image.url}?bucket=beer_pictures`;
+                    const filePath = extractFilePath(image.url);
+                    const imageUrl = `/api/image/${encodeURIComponent(filePath)}?bucket=beer_pictures`;
 
                     return (
                       <div
@@ -89,6 +119,7 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                           placeholder="blur"
                           blurDataURL={IMAGE_PLACEHOLDER_BASE64}
                           onLoad={() => handleImageLoad(image.id)}
+                          unoptimized
                         />
 
                         {/* Hover overlay */}

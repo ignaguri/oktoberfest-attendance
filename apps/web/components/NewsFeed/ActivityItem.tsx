@@ -15,6 +15,31 @@ import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
 import type { AchievementRarity } from "@prostcounter/shared/schemas";
 import type { TFunction } from "i18next";
 
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ */
+function extractFilePath(urlOrPath: string): string {
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    const bucketIndex = pathParts.indexOf("beer_pictures");
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
 interface ActivityItemProps {
   activity: ActivityFeedItem;
 }
@@ -123,7 +148,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     undefined,
   );
   const imageUrl = pictureUrl
-    ? `/api/image/${pictureUrl}?bucket=beer_pictures`
+    ? `/api/image/${encodeURIComponent(extractFilePath(pictureUrl))}?bucket=beer_pictures`
     : "";
 
   return (
@@ -222,6 +247,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
                 fill
                 className="object-cover transition-transform hover:scale-110"
                 sizes="64px"
+                unoptimized
               />
             </div>
           </div>
