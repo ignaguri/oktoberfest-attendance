@@ -97,7 +97,6 @@ export default async function GroupPage({
     }),
   );
 
-  const winningCriteriaName = leaderboardResponse.winningCriteria?.name;
   const t = getTranslations();
 
   return (
@@ -115,13 +114,14 @@ export default async function GroupPage({
         )}
 
         <p className="mb-4 text-sm font-medium text-gray-500">
-          Winning Criteria: {t(`groups.winningCriteria.${winningCriteriaName}`)}
+          Winning Criteria:{" "}
+          {t(`groups.winningCriteria.${group.winningCriteria}`)}
         </p>
 
         <div className="flex flex-col gap-4">
           <Leaderboard
             entries={leaderboardEntries}
-            winningCriteria={winningCriteriaName as WinningCriteria}
+            winningCriteria={group.winningCriteria as WinningCriteria}
             showGroupCount={false}
           />
 

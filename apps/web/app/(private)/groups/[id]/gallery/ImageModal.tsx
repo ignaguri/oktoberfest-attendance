@@ -1,7 +1,13 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { X } from "lucide-react";
 import Image from "next/image";
 
 interface ImageModalProps {
@@ -14,18 +20,29 @@ export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
 
   return (
     <Dialog open={!!imageUrl} onOpenChange={onClose}>
-      <DialogContent className="min-h-[50vh] min-w-[50vw] overflow-hidden p-0 sm:max-h-[90vh] sm:max-w-[90vw]">
+      <DialogContent
+        className="flex min-h-[50vh] min-w-[50vw] items-center justify-center overflow-hidden border-none bg-black/95 p-0 sm:max-h-[90vh] sm:max-w-[90vw]"
+        showCloseButton={false}
+      >
         <VisuallyHidden asChild>
           <DialogTitle>Full size image</DialogTitle>
         </VisuallyHidden>
-        <div className="relative h-full w-full">
+
+        {/* Custom close button with high visibility */}
+        <DialogClose className="absolute top-4 right-4 z-50 rounded-full bg-white/90 p-2 transition-colors hover:bg-white">
+          <X className="size-5 text-black" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
+
+        <div className="relative h-[80vh] w-full">
           <Image
             src={imageUrl}
             alt="Full size image"
-            layout="fill"
-            objectFit="contain"
+            fill
+            className="object-contain"
             priority
             sizes="(max-width: 768px) 90vw, (max-width: 1200px) 80vw, 90vw"
+            unoptimized
           />
         </div>
       </DialogContent>
