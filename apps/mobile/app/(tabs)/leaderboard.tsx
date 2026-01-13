@@ -1,10 +1,8 @@
-import {
-  Leaderboard,
-  type SortOrder,
-} from "@/components/shared/leaderboard";
+import { Leaderboard, type SortOrder } from "@/components/shared/leaderboard";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -12,7 +10,8 @@ import { Colors, IconColors } from "@/lib/constants/colors";
 import { useFestival } from "@/lib/festival/FestivalContext";
 import { useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Trophy } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { Award, Trophy } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, RefreshControl, ScrollView } from "react-native";
 
@@ -38,6 +37,7 @@ export default function LeaderboardScreen() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const router = useRouter();
 
   // Sort state - default to total_beers, descending
   const [sortBy, setSortBy] = useState<WinningCriteria>("total_beers");
@@ -158,11 +158,27 @@ export default function LeaderboardScreen() {
     >
       <VStack space="md" className="p-4 pb-8">
         {/* Header */}
-        <HStack space="sm" className="items-center">
-          <Trophy size={24} color={Colors.primary[500]} />
-          <Heading size="lg" className="text-typography-900">
-            {currentFestival.name}
-          </Heading>
+        <HStack className="items-center justify-between">
+          <HStack space="sm" className="items-center">
+            <Trophy size={24} color={Colors.primary[500]} />
+            <Heading size="lg" className="text-typography-900">
+              {currentFestival.name}
+            </Heading>
+          </HStack>
+          <Pressable
+            onPress={() => router.push("/achievements")}
+            className="rounded-lg bg-primary-100 px-3 py-2"
+            accessibilityLabel={t("achievements.pageTitle", {
+              defaultValue: "Achievements",
+            })}
+          >
+            <HStack space="xs" className="items-center">
+              <Award size={18} color={Colors.primary[600]} />
+              <Text className="text-sm font-medium text-primary-700">
+                {t("achievements.pageTitle", { defaultValue: "Achievements" })}
+              </Text>
+            </HStack>
+          </Pressable>
         </HStack>
 
         {/* Leaderboard with sortable columns */}
