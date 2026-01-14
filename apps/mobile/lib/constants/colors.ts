@@ -64,5 +64,13 @@ export const DrinkTypeColors = {
   beer: "#F59E0B", // amber/yellow for beer
   radler: "#84CC16", // lime green for radler (lemon)
   wine: "#A855F7", // purple for wine
-  soft_drink: "#3B82F6", // blue for soft drinks
+  soft_drink: "#78716C", // stone/brown for soft drinks
+  alcohol_free: "#38BDF8", // sky-400 (light blue) for alcohol-free
+} as const;
+
+// Background colors for UI elements
+export const BackgroundColors = {
+  50: "#F9FAFB", // bg-background-50
+  100: "#F3F4F6", // bg-background-100
+  white: "#FFFFFF",
 } as const;

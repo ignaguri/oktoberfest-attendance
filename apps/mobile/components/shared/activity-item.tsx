@@ -13,7 +13,18 @@ import { getAvatarUrl } from "@/lib/utils";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { getInitials } from "@prostcounter/ui";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { Award, Beer, Camera, MapPin, Users } from "lucide-react-native";
+import {
+  Award,
+  Beer,
+  BeerOff,
+  Camera,
+  CupSoda,
+  MapPin,
+  Users,
+  Wine,
+} from "lucide-react-native";
+
+import { RadlerIcon } from "@/components/icons/radler-icon";
 import { useMemo, useState, useCallback } from "react";
 import { Image } from "react-native";
 
@@ -36,11 +47,36 @@ function getActivityDataValue<T>(
   return value as T;
 }
 
-// Get icon component for activity type
-function getActivityIcon(type: ActivityFeedItem["activity_type"]) {
-  switch (type) {
-    case "beer_count_update":
+// Get icon for drink type
+function getDrinkIcon(drinkType: string | undefined) {
+  switch (drinkType) {
+    case "beer":
       return <Beer size={16} color={IconColors.primary} />;
+    case "radler":
+      return <RadlerIcon size={16} color="#84cc16" />; // lime for radler
+    case "wine":
+      return <Wine size={16} color="#a855f7" />; // purple for wine
+    case "soft_drink":
+      return <CupSoda size={16} color="#78716C" />; // stone/brown for soft drinks
+    case "alcohol_free":
+      return <BeerOff size={16} color="#38BDF8" />; // sky-400 (light blue) for alcohol-free
+    case "other":
+      return <CupSoda size={16} color={IconColors.muted} />;
+    default:
+      return <Beer size={16} color={IconColors.primary} />;
+  }
+}
+
+// Get icon component for activity type
+function getActivityIcon(
+  type: ActivityFeedItem["activity_type"],
+  activityData?: Record<string, unknown>,
+) {
+  switch (type) {
+    case "beer_count_update": {
+      const drinkType = activityData?.drink_type as string | undefined;
+      return getDrinkIcon(drinkType);
+    }
     case "tent_checkin":
       return <MapPin size={16} color={IconColors.primary} />;
     case "photo_upload":
@@ -97,11 +133,37 @@ export function ActivityItem({ activity }: ActivityItemProps) {
   const description = useMemo(() => {
     switch (activity_type) {
       case "beer_count_update": {
+        // Check if we have drink_type and drink_count for new consumption system
+        const drinkType = getActivityDataValue<string | undefined>(
+          activity_data,
+          "drink_type",
+          undefined,
+        );
+        const drinkCount = getActivityDataValue<number>(
+          activity_data,
+          "drink_count",
+          0,
+        );
+
+        // Fall back to beer_count for old activities
         const beerCount = getActivityDataValue<number>(
           activity_data,
           "beer_count",
-          0,
+          drinkCount || 0,
         );
+
+        // If we have a specific drink type, use it with pluralization
+        if (drinkType && drinkCount > 0) {
+          return t(`activityFeed.drank_${drinkType}`, {
+            defaultValue: t("activityFeed.drankDrinks", {
+              defaultValue: `drank ${drinkCount} drinks`,
+              count: drinkCount,
+            }),
+            count: drinkCount,
+          });
+        }
+
+        // Fall back to showing beers for old data
         return t("activityFeed.drankBeers", {
           defaultValue: `drank ${beerCount} beers`,
           count: beerCount,
@@ -187,7 +249,7 @@ export function ActivityItem({ activity }: ActivityItemProps) {
       <VStack className="flex-1">
         <HStack className="items-center justify-between">
           <HStack space="xs" className="flex-1 items-center">
-            {getActivityIcon(activity_type)}
+            {getActivityIcon(activity_type, activity_data)}
             <Text
               className="flex-1 text-sm font-medium text-typography-900"
               numberOfLines={1}

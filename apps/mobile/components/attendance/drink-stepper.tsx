@@ -135,13 +135,13 @@ export function DrinkStepper({
   ]);
 
   return (
-    <HStack className="items-center justify-center gap-1.5">
+    <HStack className="items-center justify-center gap-2">
       {/* Decrement button */}
       <Pressable
         onPress={handleDecrement}
         disabled={!canDecrement}
         className={cn(
-          "h-10 w-10 items-center justify-center rounded-full border-2",
+          "h-14 w-14 items-center justify-center rounded-full border-2",
           canDecrement
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
             : "border-background-300 bg-background-100"
@@ -156,17 +156,17 @@ export function DrinkStepper({
           <ActivityIndicator size="small" color={IconColors.primary} />
         ) : (
           <Minus
-            size={20}
+            size={28}
             color={canDecrement ? IconColors.primary : IconColors.disabled}
           />
         )}
       </Pressable>
 
       {/* Count display */}
-      <VStack className="min-w-[40px] items-center">
+      <VStack className="min-w-[50px] items-center">
         <Text
           className={cn(
-            "text-3xl font-bold",
+            "text-4xl font-bold",
             disabled || isLoading ? "text-typography-400" : "text-typography-900"
           )}
         >
@@ -179,7 +179,7 @@ export function DrinkStepper({
         onPress={handleIncrement}
         disabled={!canIncrement}
         className={cn(
-          "h-10 w-10 items-center justify-center rounded-full border-2",
+          "h-14 w-14 items-center justify-center rounded-full border-2",
           canIncrement
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
             : "border-background-300 bg-background-100"
@@ -194,7 +194,7 @@ export function DrinkStepper({
           <ActivityIndicator size="small" color={IconColors.primary} />
         ) : (
           <Plus
-            size={20}
+            size={28}
             color={canIncrement ? IconColors.primary : IconColors.disabled}
           />
         )}

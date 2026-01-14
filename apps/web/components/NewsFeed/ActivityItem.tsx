@@ -155,7 +155,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     <div className="border-border/50 flex items-start gap-3 border-b py-2 last:border-b-0">
       {/* User Avatar */}
       <ProfilePreview
-        username={username}
+        username={username ?? "unknown"}
         fullName={full_name}
         avatarUrl={avatar_url}
         className="flex-shrink-0"

@@ -331,8 +331,8 @@ export function QuickAttendanceCard() {
 
         {/* Drink Type Selector + Stepper (horizontal layout) */}
         {festivalId && (
-          <HStack className="items-start justify-between">
-            {/* Drink Type Picker on the left */}
+          <HStack className="items-center justify-between">
+            {/* Drink Type Picker - 2x2 grid on left */}
             <DrinkTypePicker
               selectedType={selectedDrinkType}
               onSelect={setSelectedDrinkType}
@@ -341,8 +341,8 @@ export function QuickAttendanceCard() {
               compact
             />
 
-            {/* Stepper on the right - add top padding to align with icons */}
-            <VStack className="items-center pt-0.5">
+            {/* Stepper with label on right */}
+            <VStack space="xs" className="items-center">
               <DrinkStepper
                 festivalId={festivalId}
                 date={today}
@@ -352,6 +352,11 @@ export function QuickAttendanceCard() {
                 disabled={isLoading}
                 onMutationEnd={handleQuickAddSuccess}
               />
+              <Text className="text-xs font-medium text-typography-500">
+                {t(`attendance.drinkTypes.${selectedDrinkType}`, {
+                  count: drinkCounts[selectedDrinkType],
+                })}
+              </Text>
             </VStack>
           </HStack>
         )}

@@ -10248,10 +10248,12 @@
                             "type": "string"
                           },
                           "username": {
-                            "type": "string"
+                            "type": "string",
+                            "nullable": true
                           },
                           "full_name": {
-                            "type": "string"
+                            "type": "string",
+                            "nullable": true
                           },
                           "avatar_url": {
                             "type": "string",

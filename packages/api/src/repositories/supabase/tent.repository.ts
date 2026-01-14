@@ -77,7 +77,7 @@ export class SupabaseTentRepository implements ITentRepository {
     return {
       festivalId: data.festival_id,
       tentId: data.tent_id,
-      beerPrice: data.beer_price,
+      beerPrice: data.beer_price ? Number(data.beer_price) : null,
       tent: {
         id: tent.id,
         name: tent.name,

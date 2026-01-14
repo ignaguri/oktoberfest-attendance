@@ -5701,8 +5701,8 @@ export interface paths {
                                     [key: string]: unknown;
                                 };
                                 activity_time: string;
-                                username: string;
-                                full_name: string;
+                                username: string | null;
+                                full_name: string | null;
                                 avatar_url: string | null;
                             }[];
                             nextCursor: string | null;
