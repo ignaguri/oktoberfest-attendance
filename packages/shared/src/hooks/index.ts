@@ -116,6 +116,7 @@ export {
   useResetTutorial,
   useMissingProfileFields,
   useHighlights,
+  usePublicProfile,
 } from "./useProfile";
 
 // Calendar hooks

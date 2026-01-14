@@ -2,6 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type {
   Profile,
   ProfileShort,
+  PublicProfile,
   UpdateProfileInput,
   TutorialStatus,
   MissingProfileFields,
@@ -42,6 +43,49 @@ export class SupabaseProfileRepository {
     return {
       ...data,
       email: email ?? null,
+    };
+  }
+
+  async getPublicProfile(
+    userId: string,
+    festivalId?: string,
+  ): Promise<PublicProfile> {
+    const { data, error } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url")
+      .eq("id", userId)
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Profile not found: ${error?.message}`);
+    }
+
+    let stats: PublicProfile["stats"] = null;
+
+    // Fetch festival stats from user_festival_stats view if festivalId is provided
+    if (festivalId) {
+      const { data: statsData } = await this.supabase
+        .from("user_festival_stats")
+        .select("days_attended, total_beers, avg_beers")
+        .eq("user_id", userId)
+        .eq("festival_id", festivalId)
+        .maybeSingle();
+
+      if (statsData) {
+        stats = {
+          daysAttended: Number(statsData.days_attended) || 0,
+          totalBeers: Number(statsData.total_beers) || 0,
+          avgBeers: Number(statsData.avg_beers) || 0,
+        };
+      }
+    }
+
+    return {
+      id: data.id,
+      username: data.username,
+      fullName: data.full_name,
+      avatarUrl: data.avatar_url,
+      stats,
     };
   }
 

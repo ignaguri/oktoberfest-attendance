@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle } from "./card";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 
 interface ProfilePreviewProps {
-  username: string;
+  username?: string | null;
   fullName?: string | null;
   avatarUrl?: string | null;
   children: React.ReactNode;
@@ -21,6 +21,10 @@ export function ProfilePreview({
   children,
   className = "",
 }: ProfilePreviewProps) {
+  // Show username if available, otherwise full name
+  const displayName = username || fullName || "Unknown";
+  const fallbackInitial = displayName.charAt(0).toUpperCase();
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -38,17 +42,33 @@ export function ProfilePreview({
           <CardHeader className="pb-4 text-center">
             <div className="flex flex-col items-center gap-3">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={getAvatarUrl(avatarUrl)} alt={username} />
+                <AvatarImage src={getAvatarUrl(avatarUrl)} alt={displayName} />
                 <AvatarFallback className="bg-yellow-100 text-2xl text-yellow-800">
-                  {username.charAt(0).toUpperCase()}
+                  {fallbackInitial}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle className="text-lg font-semibold">
-                  {username}
-                </CardTitle>
+                {username && (
+                  <CardTitle className="text-lg font-semibold">
+                    {username}
+                  </CardTitle>
+                )}
                 {fullName && (
-                  <p className="text-sm text-gray-600">{fullName}</p>
+                  <p
+                    className={cn(
+                      "text-gray-600",
+                      username
+                        ? "text-sm"
+                        : "text-lg font-semibold text-gray-900",
+                    )}
+                  >
+                    {fullName}
+                  </p>
+                )}
+                {!username && !fullName && (
+                  <CardTitle className="text-lg font-semibold">
+                    Unknown User
+                  </CardTitle>
                 )}
               </div>
             </div>

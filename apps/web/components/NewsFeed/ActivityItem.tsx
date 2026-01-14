@@ -141,7 +141,8 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     }
   }, [activity_time, t]);
 
-  const displayName = full_name || username || t("activityFeed.unknownUser");
+  // Show username if available, otherwise fall back to full_name
+  const displayName = username || full_name || t("activityFeed.unknownUser");
   const pictureUrl = getActivityDataValue<string | undefined>(
     activity_data,
     "picture_url",
@@ -155,7 +156,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     <div className="border-border/50 flex items-start gap-3 border-b py-2 last:border-b-0">
       {/* User Avatar */}
       <ProfilePreview
-        username={username ?? "unknown"}
+        username={username}
         fullName={full_name}
         avatarUrl={avatar_url}
         className="flex-shrink-0"

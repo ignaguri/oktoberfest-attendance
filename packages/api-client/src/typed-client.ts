@@ -30,6 +30,7 @@ import type {
   GetCalendarEventsResponse,
   ProfileShort,
   Profile,
+  PublicProfile,
   TutorialStatus,
   MissingProfileFields,
   Highlights,
@@ -868,6 +869,24 @@ export function createTypedApiClient(config: ApiClientConfig) {
           throw new Error(error.message || "Failed to confirm avatar upload");
         }
         return parseJsonResponse(response);
+      },
+
+      async getPublicProfile(
+        userId: string,
+        festivalId?: string,
+      ): Promise<{ profile: PublicProfile }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams();
+        if (festivalId) {
+          params.append("festivalId", festivalId);
+        }
+        const queryString = params.toString();
+        const url = `${baseUrl}/v1/profiles/${userId}${queryString ? `?${queryString}` : ""}`;
+        const response = await fetch(url, { headers });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch public profile: ${response.statusText}`);
+        }
+        return parseJsonResponse<{ profile: PublicProfile }>(response);
       },
     },
 

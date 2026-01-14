@@ -150,3 +150,36 @@ export const ConfirmAvatarUploadResponseSchema = z.object({
   success: z.boolean(),
   fileName: z.string(), // Returns the filename stored in the database
 });
+
+// Public profile schema (for viewing other users)
+export const PublicProfileSchema = z.object({
+  id: z.uuid(),
+  username: z.string().nullable(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
+  // Festival-specific stats (optional, included when festivalId is provided)
+  stats: z
+    .object({
+      daysAttended: z.number(),
+      totalBeers: z.number(),
+      avgBeers: z.number(),
+    })
+    .nullable()
+    .optional(),
+});
+
+export type PublicProfile = z.infer<typeof PublicProfileSchema>;
+
+export const GetPublicProfileQuerySchema = z.object({
+  festivalId: z.uuid().optional(),
+});
+
+export type GetPublicProfileQuery = z.infer<typeof GetPublicProfileQuerySchema>;
+
+export const GetPublicProfileResponseSchema = z.object({
+  profile: PublicProfileSchema,
+});
+
+export type GetPublicProfileResponse = z.infer<
+  typeof GetPublicProfileResponseSchema
+>;

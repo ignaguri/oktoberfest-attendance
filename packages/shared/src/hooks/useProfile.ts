@@ -171,3 +171,28 @@ export function useHighlights(festivalId?: string) {
     }
   );
 }
+
+/**
+ * Hook to fetch public profile of any user (for viewing other users)
+ * Includes festival stats when festivalId is provided
+ */
+export function usePublicProfile(userId?: string, festivalId?: string) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.publicProfile(userId || "", festivalId),
+    async () => {
+      if (!userId) return null;
+      const response = await apiClient.profile.getPublicProfile(
+        userId,
+        festivalId,
+      );
+      return response.profile;
+    },
+    {
+      enabled: !!userId,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 15 * 60 * 1000, // 15 minutes cache
+    }
+  );
+}

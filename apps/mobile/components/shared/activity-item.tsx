@@ -1,17 +1,10 @@
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { getAvatarUrl } from "@/lib/utils";
+import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { getInitials } from "@prostcounter/ui";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import {
   Award,
@@ -29,11 +22,13 @@ import { useMemo, useState, useCallback } from "react";
 import { Image } from "react-native";
 
 import { ImagePreviewModal } from "./image-preview-modal";
+import { TappableAvatar, UserProfileModal } from "./user-profile-modal";
 
 import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 
 interface ActivityItemProps {
   activity: ActivityFeedItem;
+  festivalId?: string;
 }
 
 // Type-safe accessor for activity_data properties
@@ -98,10 +93,19 @@ function getActivityIcon(
  * - Activity-specific icon and message
  * - Relative timestamp ("2h ago")
  * - Photo thumbnail for photo_upload type
+ * - Tappable avatar opens user profile modal with async loading
  */
-export function ActivityItem({ activity }: ActivityItemProps) {
+export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
   const { t } = useTranslation();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  // Fetch public profile on demand when modal is opened
+  // Use festival_id from activity data, or fallback to prop
+  const { data: publicProfile, loading: profileLoading } = usePublicProfile(
+    selectedUserId ?? undefined,
+    festivalId ?? activity.festival_id,
+  );
 
   const handleImagePress = useCallback((imageUrl: string) => {
     setPreviewImage(imageUrl);
@@ -109,6 +113,14 @@ export function ActivityItem({ activity }: ActivityItemProps) {
 
   const handleClosePreview = useCallback(() => {
     setPreviewImage(null);
+  }, []);
+
+  const handleAvatarPress = useCallback(() => {
+    setSelectedUserId(activity.user_id);
+  }, [activity.user_id]);
+
+  const handleCloseProfileModal = useCallback(() => {
+    setSelectedUserId(null);
   }, []);
 
   const {
@@ -222,7 +234,8 @@ export function ActivityItem({ activity }: ActivityItemProps) {
     }
   }, [activity_type, activity_data, t]);
 
-  const displayName = full_name || username || "Unknown";
+  // Show username if available, otherwise fall back to full_name
+  const displayName = username || full_name || "Unknown";
   const pictureUrl = getActivityDataValue<string | undefined>(
     activity_data,
     "picture_url",
@@ -230,59 +243,66 @@ export function ActivityItem({ activity }: ActivityItemProps) {
   );
 
   return (
-    <HStack space="sm" className="py-3">
-      {/* User Avatar */}
-      <Avatar size="sm">
-        {avatar_url ? (
-          <AvatarImage
-            source={{ uri: getAvatarUrl(avatar_url) }}
-            alt={displayName}
-          />
-        ) : (
-          <AvatarFallbackText>
-            {getInitials({ fullName: full_name, username })}
-          </AvatarFallbackText>
-        )}
-      </Avatar>
+    <>
+      <HStack space="sm" className="py-3">
+        {/* User Avatar - Tappable to show profile */}
+        <TappableAvatar
+          avatarUrl={avatar_url}
+          username={username}
+          fullName={full_name}
+          onPress={handleAvatarPress}
+        />
 
-      {/* Activity Content */}
-      <VStack className="flex-1">
-        <HStack className="items-center justify-between">
-          <HStack space="xs" className="flex-1 items-center">
-            {getActivityIcon(activity_type, activity_data)}
-            <Text
-              className="flex-1 text-sm font-medium text-typography-900"
-              numberOfLines={1}
-            >
-              {displayName}
-            </Text>
+        {/* Activity Content */}
+        <VStack className="flex-1">
+          <HStack className="items-center justify-between">
+            <HStack space="xs" className="flex-1 items-center">
+              {getActivityIcon(activity_type, activity_data)}
+              <Text
+                className="flex-1 text-sm font-medium text-typography-900"
+                numberOfLines={1}
+              >
+                {displayName}
+              </Text>
+            </HStack>
+            <Text className="text-xs text-typography-400">{timeAgo}</Text>
           </HStack>
-          <Text className="text-xs text-typography-400">{timeAgo}</Text>
-        </HStack>
 
-        <Text className="text-sm text-typography-500">{description}</Text>
+          <Text className="text-sm text-typography-500">{description}</Text>
 
-        {/* Photo thumbnail for photo uploads */}
-        {activity_type === "photo_upload" && pictureUrl && (
-          <Pressable
-            onPress={() => handleImagePress(pictureUrl)}
-            className="mt-2"
-          >
-            <Image
-              source={{ uri: pictureUrl }}
-              className="h-16 w-16 rounded-lg"
-              resizeMode="cover"
-              accessibilityLabel={t("activityFeed.uploadedPhoto", {
-                defaultValue: "uploaded a photo",
-              })}
-            />
-          </Pressable>
-        )}
-      </VStack>
+          {/* Photo thumbnail for photo uploads */}
+          {activity_type === "photo_upload" && pictureUrl && (
+            <Pressable
+              onPress={() => handleImagePress(pictureUrl)}
+              className="mt-2"
+            >
+              <Image
+                source={{ uri: pictureUrl }}
+                className="h-16 w-16 rounded-lg"
+                resizeMode="cover"
+                accessibilityLabel={t("activityFeed.uploadedPhoto", {
+                  defaultValue: "uploaded a photo",
+                })}
+              />
+            </Pressable>
+          )}
+        </VStack>
 
-      {/* Image Preview Modal */}
-      <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />
-    </HStack>
+        {/* Image Preview Modal */}
+        <ImagePreviewModal
+          imageUri={previewImage}
+          onClose={handleClosePreview}
+        />
+      </HStack>
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        isOpen={!!selectedUserId}
+        onClose={handleCloseProfileModal}
+        profile={publicProfile}
+        loading={profileLoading}
+      />
+    </>
   );
 }
 

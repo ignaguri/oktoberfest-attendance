@@ -5239,6 +5239,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/profiles/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get public profile of a user
+         * @description Returns public profile information for any user. Optionally includes festival stats when festivalId is provided.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    festivalId?: string;
+                };
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Profile retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            profile: {
+                                /** Format: uuid */
+                                id: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                stats?: {
+                                    daysAttended: number;
+                                    totalBeers: number;
+                                    avgBeers: number;
+                                } | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description User not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/profile/tutorial": {
         parameters: {
             query?: never;

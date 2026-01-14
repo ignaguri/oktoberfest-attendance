@@ -104,6 +104,8 @@ export class QueryKeys {
   static missingProfileFields = () => ["missing-profile-fields"] as const;
   static highlights = (festivalId: string) =>
     ["highlights", festivalId] as const;
+  static publicProfile = (userId: string, festivalId?: string) =>
+    ["public-profile", userId, festivalId ?? "no-festival"] as const;
 
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
