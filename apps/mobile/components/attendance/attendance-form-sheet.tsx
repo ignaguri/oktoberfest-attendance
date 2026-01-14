@@ -220,6 +220,17 @@ export function AttendanceFormSheet({
       setPhotos([]);
       setPendingPhotos([]);
       setPhotosMarkedForRemoval([]);
+      // Reset local drink counts to zero when opening
+      setLocalDrinkCounts({
+        beer: 0,
+        radler: 0,
+        wine: 0,
+        soft_drink: 0,
+        alcohol_free: 0,
+        other: 0,
+      });
+      // Reset selected drink type to beer
+      setSelectedDrinkType("beer");
       // Reset the initialized flag when sheet opens
       hasInitializedCountsRef.current = false;
     }
@@ -258,6 +269,13 @@ export function AttendanceFormSheet({
       setValue("date", selectedDate);
     }
   }, [isOpen, selectedDate, existingAttendance, setValue]);
+
+  // Keep form amount field in sync with total local drinks for validation
+  useEffect(() => {
+    if (isOpen) {
+      setValue("amount", totalLocalDrinks);
+    }
+  }, [isOpen, totalLocalDrinks, setValue]);
 
   // Get tent visits for display as badges (showing ALL visits with times)
   // These are historical visits - displayed chronologically
@@ -499,6 +517,14 @@ export function AttendanceFormSheet({
                 <Text className="text-center text-sm text-typography-500">
                   {t("attendance.totalDrinks", { defaultValue: "Total Drinks" })}: {totalLocalDrinks}
                 </Text>
+                {/* Validation error for drinks */}
+                {errors.amount && (
+                  <Text className="text-center text-sm text-error-600">
+                    {t(errors.amount.message || "validation.tent.required", {
+                      defaultValue: "Please select at least one tent if no drinks are logged",
+                    })}
+                  </Text>
+                )}
               </VStack>
 
               {/* Tent Selector */}

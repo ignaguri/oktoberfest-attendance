@@ -99,6 +99,11 @@ export function ProfileHeader({
             <Text className="text-xl font-bold text-typography-900">
               {profile?.full_name || profile?.username || "User"}
             </Text>
+            {profile?.username && profile?.full_name && (
+              <Text className="text-sm text-typography-600">
+                @{profile.username}
+              </Text>
+            )}
             <Text className="text-typography-500">{user?.email}</Text>
             <Button
               variant="outline"

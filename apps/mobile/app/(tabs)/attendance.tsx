@@ -151,11 +151,6 @@ export default function AttendanceScreen() {
         }
       >
         <View className="p-4">
-          {/* Header */}
-          <Text className="mb-4 text-center text-sm text-typography-500">
-            {t("attendance.calendar.tapToAddOrEdit")}
-          </Text>
-
           {/* Calendar */}
           <AttendanceCalendar
             festivalStartDate={festivalStartDate}

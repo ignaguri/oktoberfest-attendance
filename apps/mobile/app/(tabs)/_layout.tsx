@@ -1,7 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Tabs } from "expo-router";
 import {
-  Beer,
+  CalendarDays,
   Home,
   Puzzle,
   Trophy,
@@ -41,15 +41,11 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: Colors.white,
           borderTopColor: Colors.gray[200],
-          paddingTop: 4,
-          paddingBottom: 8,
-          height: 72,
+          paddingTop: 6,
+          paddingBottom: 6,
+          height: 52,
         },
-        tabBarShowLabel: true,
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
-        },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
@@ -67,7 +63,7 @@ export default function TabsLayout() {
         options={{
           title: t("common.menu.attendance"),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={Beer} color={color} focused={focused} />
+            <TabIcon Icon={CalendarDays} color={color} focused={focused} />
           ),
         }}
       />

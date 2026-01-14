@@ -159,7 +159,7 @@ export function AttendanceCalendar({
         end: festivalEndDate,
       });
       const drinkCount = attendanceMap.get(dateStr);
-      const hasAttendance = drinkCount !== undefined && drinkCount > 0;
+      const hasAttendance = drinkCount !== undefined;
 
       // Determine cell styling using cn() for safe class merging
       // Festival days from adjacent months should be fully interactive and styled
@@ -208,8 +208,8 @@ export function AttendanceCalendar({
             {/* Day number */}
             <Text className={textClassName}>{format(day, "d")}</Text>
 
-            {/* Beer count badge */}
-            {hasAttendance && isFestivalDay && !isSelected && (
+            {/* Beer count badge - only show if drinkCount > 0 */}
+            {hasAttendance && drinkCount! > 0 && isFestivalDay && !isSelected && (
               <HStack className="mt-0.5 items-center gap-0.5">
                 <Beer size={10} color={Colors.primary[600]} />
                 <Text className="text-[10px] font-semibold text-primary-600">
@@ -218,8 +218,8 @@ export function AttendanceCalendar({
               </HStack>
             )}
 
-            {/* Beer count on selected */}
-            {hasAttendance && isSelected && (
+            {/* Beer count on selected - only show if drinkCount > 0 */}
+            {hasAttendance && drinkCount! > 0 && isSelected && (
               <HStack className="mt-0.5 items-center gap-0.5">
                 <Beer size={10} color={Colors.white} />
                 <Text className="text-[10px] font-semibold text-white">
