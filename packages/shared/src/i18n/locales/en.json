@@ -95,6 +95,7 @@
     "signIn": {
       "title": "Sign In",
       "subtitle": "Welcome back!",
+      "tagline": "Track your Oktoberfest adventure",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "passwordLabel": "Password",
@@ -106,6 +107,7 @@
       "orContinueWith": "or",
       "continueWithGoogle": "Continue with Google",
       "continueWithFacebook": "Continue with Facebook",
+      "continueWithApple": "Continue with Apple",
       "errors": {
         "invalidCredentials": "Invalid email or password",
         "failed": "Sign in failed. Please try again.",
@@ -916,6 +918,12 @@
     "title": "Activity Feed"
   },
   "home": {
+    "festivalStatus": {
+      "currentDay": "It's day {{currentDay}} / {{totalDays}}",
+      "startsInOneDay": "Starts tomorrow!",
+      "startsInDays": "Starts in {{daysUntil}} days",
+      "ended": "Festival has ended"
+    },
     "quickAttendance": {
       "title": "What are you having?",
       "tent": "Where are you at?",
@@ -923,6 +931,10 @@
       "selectTent": "Select a tent",
       "loading": "Loading attendance...",
       "outsideFestival": "Attendance logging is only available during the festival"
+    },
+    "activityFeed": {
+      "title": "Latest Activities",
+      "empty": "No activities yet. Start logging your festival adventures!"
     },
     "festivalOver": "Sadly, {{name}} is over. See you next time!",
     "wrappedReady": {
