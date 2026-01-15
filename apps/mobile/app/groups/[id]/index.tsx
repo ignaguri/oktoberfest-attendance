@@ -21,6 +21,7 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
+import { getAppUrl } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useGroupSettings,
@@ -110,7 +111,7 @@ export default function GroupDetailScreen() {
       return;
     }
 
-    const inviteUrl = `https://prostcounter.fun/join-group?token=${group.inviteToken}`;
+    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
     const message = t("groups.share.message", {
       name: group.name,
     });

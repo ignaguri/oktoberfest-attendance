@@ -1,3 +1,4 @@
+import { getAppUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Link, Copy, RefreshCw, Check, Share2 } from "lucide-react-native";
@@ -30,7 +31,7 @@ export function InviteLinkSection({
   const [copied, setCopied] = useState(false);
 
   const inviteUrl = inviteToken
-    ? `https://prostcounter.fun/join-group?token=${inviteToken}`
+    ? `${getAppUrl()}/join-group?token=${inviteToken}`
     : "";
 
   // Handle copy to clipboard (uses Share as fallback)

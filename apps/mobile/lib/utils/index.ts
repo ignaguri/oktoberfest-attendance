@@ -1,2 +1,2 @@
-export { getAvatarUrl } from "./avatar";
-export { getBeerPictureUrl } from "./pictures";
+// Re-export image URL utilities from centralized location
+export { getAvatarUrl, getBeerPictureUrl } from "../image-urls";

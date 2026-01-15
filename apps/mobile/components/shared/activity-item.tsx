@@ -4,9 +4,9 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { formatRelativeTime } from "@prostcounter/shared";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { formatDistanceToNow, parseISO } from "date-fns";
 import {
   Award,
   Beer,
@@ -131,10 +131,10 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
     activity_data,
   } = activity;
 
-  // Format relative time
+  // Format relative time using shared utility
   const timeAgo = useMemo(() => {
     try {
-      return formatDistanceToNow(parseISO(activity_time), { addSuffix: true });
+      return formatRelativeTime(new Date(activity_time));
     } catch {
       return t("activityFeed.recently");
     }

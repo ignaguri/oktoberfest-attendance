@@ -1,6 +1,6 @@
+import { getAppUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import Constants from "expo-constants";
 import { QrCode, RefreshCw } from "lucide-react-native";
 import { useState, useCallback, useEffect } from "react";
 import QRCode from "react-native-qrcode-svg";
@@ -26,18 +26,6 @@ interface QRCodeSheetProps {
   groupId: string;
   groupName: string;
   inviteToken?: string | null;
-}
-
-/**
- * Get the app URL for the QR code join link
- * TODO: Move this to a shared utility function
- */
-function getAppUrl(): string {
-  return (
-    Constants.expoConfig?.extra?.appUrl ||
-    process.env.EXPO_PUBLIC_APP_URL ||
-    "https://prostcounter.fun"
-  );
 }
 
 /**

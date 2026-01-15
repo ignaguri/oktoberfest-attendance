@@ -15,10 +15,11 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useAttendances } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -57,10 +58,10 @@ export default function AttendanceScreen() {
   );
 
   // Find existing attendance for selected date
-  // Use format() instead of toISOString() to avoid UTC timezone shift
+  // Use formatDateForDatabase() for timezone-aware date formatting
   const existingAttendance = useMemo(() => {
     if (!selectedDate || !attendances) return null;
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    const dateStr = formatDateForDatabase(selectedDate);
     return (
       (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ??
       null
