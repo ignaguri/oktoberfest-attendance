@@ -46,8 +46,8 @@ export function BiometricPrompt({
   const BiometricIcon = biometricType === "facial" ? ScanFace : Fingerprint;
   const biometricName =
     biometricType === "facial"
-      ? t("auth.biometric.faceId", { defaultValue: "Face ID" })
-      : t("auth.biometric.touchId", { defaultValue: "Touch ID" });
+      ? t("auth.biometric.faceId")
+      : t("auth.biometric.touchId");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -64,14 +64,12 @@ export function BiometricPrompt({
 
           <Text className="text-center text-xl font-semibold text-typography-900">
             {t("auth.biometric.prompt", {
-              defaultValue: `Sign in with ${biometricName}`,
               biometricName,
             })}
           </Text>
 
           <Text className="mt-2 text-center text-typography-500">
             {t("auth.biometric.description", {
-              defaultValue: `Use ${biometricName} for quick and secure access to your account`,
               biometricName,
             })}
           </Text>
@@ -88,11 +86,8 @@ export function BiometricPrompt({
           >
             <ButtonText>
               {isAuthenticating
-                ? t("common.status.authenticating", {
-                    defaultValue: "Authenticating...",
-                  })
+                ? t("common.status.authenticating")
                 : t("auth.biometric.authenticate", {
-                    defaultValue: `Use ${biometricName}`,
                     biometricName,
                   })}
             </ButtonText>
@@ -106,11 +101,7 @@ export function BiometricPrompt({
             disabled={isAuthenticating}
             className="w-full"
           >
-            <ButtonText>
-              {t("auth.biometric.usePassword", {
-                defaultValue: "Use password instead",
-              })}
-            </ButtonText>
+            <ButtonText>{t("auth.biometric.usePassword")}</ButtonText>
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -149,8 +140,8 @@ export function BiometricEnablePrompt({
   const BiometricIcon = biometricType === "facial" ? ScanFace : Fingerprint;
   const biometricName =
     biometricType === "facial"
-      ? t("auth.biometric.faceId", { defaultValue: "Face ID" })
-      : t("auth.biometric.touchId", { defaultValue: "Touch ID" });
+      ? t("auth.biometric.faceId")
+      : t("auth.biometric.touchId");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -163,14 +154,12 @@ export function BiometricEnablePrompt({
 
           <Text className="text-center text-xl font-semibold text-typography-900">
             {t("auth.biometric.enableTitle", {
-              defaultValue: `Enable ${biometricName}?`,
               biometricName,
             })}
           </Text>
 
           <Text className="mt-2 text-center text-typography-500">
             {t("auth.biometric.enableDescription", {
-              defaultValue: `Use ${biometricName} for faster sign-in next time`,
               biometricName,
             })}
           </Text>
@@ -184,9 +173,7 @@ export function BiometricEnablePrompt({
             onPress={onEnable}
             className="w-full rounded-full"
           >
-            <ButtonText>
-              {t("auth.biometric.enableButton", { defaultValue: "Enable" })}
-            </ButtonText>
+            <ButtonText>{t("auth.biometric.enableButton")}</ButtonText>
           </Button>
 
           <Button
@@ -196,9 +183,7 @@ export function BiometricEnablePrompt({
             onPress={onSkip}
             className="w-full"
           >
-            <ButtonText>
-              {t("auth.biometric.skipButton", { defaultValue: "Not now" })}
-            </ButtonText>
+            <ButtonText>{t("auth.biometric.skipButton")}</ButtonText>
           </Button>
         </ModalFooter>
       </ModalContent>

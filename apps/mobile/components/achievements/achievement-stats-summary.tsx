@@ -36,7 +36,7 @@ export function AchievementStatsSummary({
             {unlocked_achievements}/{total_achievements}
           </Text>
           <Text className="text-xs text-primary-600">
-            {t("achievements.unlocked", { defaultValue: "Unlocked" })}
+            {t("achievements.unlocked")}
           </Text>
         </VStack>
 
@@ -49,7 +49,7 @@ export function AchievementStatsSummary({
             {percentage}%
           </Text>
           <Text className="text-xs text-primary-600">
-            {t("achievements.complete", { defaultValue: "Complete" })}
+            {t("achievements.complete")}
           </Text>
         </VStack>
 
@@ -62,7 +62,7 @@ export function AchievementStatsSummary({
             {total_points}
           </Text>
           <Text className="text-xs text-primary-600">
-            {t("achievements.totalPoints", { defaultValue: "Points" })}
+            {t("achievements.totalPoints")}
           </Text>
         </VStack>
       </HStack>

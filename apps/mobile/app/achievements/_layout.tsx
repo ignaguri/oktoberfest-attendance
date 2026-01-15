@@ -10,7 +10,7 @@ export default function AchievementsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t("achievements.pageTitle", { defaultValue: "Achievements" }),
+          title: t("achievements.pageTitle"),
         }}
       />
     </Stack>

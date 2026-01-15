@@ -16,8 +16,7 @@ interface OrDividerProps {
  */
 export function OrDivider({ text }: OrDividerProps) {
   const { t } = useTranslation();
-  const displayText =
-    text ?? t("auth.signIn.orContinueWith", { defaultValue: "or" });
+  const displayText = text ?? t("auth.signIn.orContinueWith");
 
   return (
     <View className="my-6 w-full flex-row items-center">

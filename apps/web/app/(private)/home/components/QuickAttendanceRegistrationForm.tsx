@@ -241,9 +241,7 @@ export const QuickAttendanceRegistrationForm = ({
                 onSuccess={triggerConfetti}
               />
               <span className="text-muted-foreground text-xs">
-                {t(`attendance.drinkTypes.${selectedDrinkType}`, {
-                  defaultValue: selectedDrinkType,
-                })}
+                {t(`attendance.drinkTypes.${selectedDrinkType}`)}
               </span>
             </div>
           </div>

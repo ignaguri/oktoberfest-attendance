@@ -123,10 +123,9 @@ const Highlights = () => {
                     {t("home.spentOnBeers", { amount: spentOnBeers })}
                     {(totalBaseCents > 0 || totalTipCents > 0) && (
                       <span className="ml-2 text-xs text-gray-500">
-                        ({t("home.baseCost", { defaultValue: "Base" })}: €
-                        {(totalBaseCents / 100).toFixed(0)} |{" "}
-                        {t("home.tips", { defaultValue: "Tips" })}: €
-                        {(totalTipCents / 100).toFixed(0)})
+                        ({t("home.baseCost")}: €
+                        {(totalBaseCents / 100).toFixed(0)} | {t("home.tips")}:
+                        €{(totalTipCents / 100).toFixed(0)})
                       </span>
                     )}
                   </li>

@@ -27,13 +27,10 @@ export function EmptyGroupsState({
 
           <VStack space="sm" className="items-center">
             <Heading size="lg" className="text-center text-typography-900">
-              {t("groups.empty.title", { defaultValue: "No Groups Yet" })}
+              {t("groups.empty.title")}
             </Heading>
             <Text className="text-center text-typography-500">
-              {t("groups.empty.description", {
-                defaultValue:
-                  "Create a group to compete with friends or join an existing group to start tracking together.",
-              })}
+              {t("groups.empty.description")}
             </Text>
           </VStack>
 
@@ -47,7 +44,7 @@ export function EmptyGroupsState({
             >
               <Plus size={20} color={IconColors.white} />
               <ButtonText className="ml-2">
-                {t("groups.actions.create", { defaultValue: "Create Group" })}
+                {t("groups.actions.create")}
               </ButtonText>
             </Button>
 
@@ -60,7 +57,7 @@ export function EmptyGroupsState({
             >
               <UserPlus size={20} color={IconColors.default} />
               <ButtonText className="ml-2">
-                {t("groups.actions.join", { defaultValue: "Join Group" })}
+                {t("groups.actions.join")}
               </ButtonText>
             </Button>
           </VStack>

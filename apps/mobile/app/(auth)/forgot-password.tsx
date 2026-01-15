@@ -48,12 +48,7 @@ export default function ForgotPasswordScreen() {
     const { error: resetError } = await resetPassword(data.email);
 
     if (resetError) {
-      setError(
-        resetError.message ||
-          t("auth.forgotPassword.errors.generic", {
-            defaultValue: "Failed to send reset email",
-          }),
-      );
+      setError(resetError.message || t("auth.forgotPassword.errors.generic"));
       setIsLoading(false);
       return;
     }
@@ -85,10 +80,7 @@ export default function ForgotPasswordScreen() {
 
           {/* Description */}
           <Text className="mb-8 px-4 text-center text-typography-500">
-            {t("auth.resetPassword.description", {
-              defaultValue:
-                "Enter your email address and we'll send you instructions to reset your password.",
-            })}
+            {t("auth.resetPassword.description")}
           </Text>
 
           {/* Success State */}

@@ -82,9 +82,7 @@ export default function LeaderboardScreen() {
         <VStack space="md" className="items-center justify-center p-4 py-20">
           <ActivityIndicator size="large" color={Colors.primary[500]} />
           <Text className="text-typography-500">
-            {t("leaderboard.loading", {
-              defaultValue: "Loading leaderboard...",
-            })}
+            {t("leaderboard.loading")}
           </Text>
         </VStack>
       </ScrollView>
@@ -103,9 +101,7 @@ export default function LeaderboardScreen() {
           >
             <Trophy size={48} color={IconColors.disabled} />
             <Text className="mt-2 text-center text-typography-500">
-              {t("leaderboard.noFestival", {
-                defaultValue: "No festival selected",
-              })}
+              {t("leaderboard.noFestival")}
             </Text>
           </Card>
         </VStack>
@@ -135,14 +131,10 @@ export default function LeaderboardScreen() {
           >
             <Trophy size={48} color={IconColors.error} />
             <Text className="mt-2 text-center text-error-600">
-              {t("leaderboard.error", {
-                defaultValue: "Failed to load leaderboard",
-              })}
+              {t("leaderboard.error")}
             </Text>
             <Text className="mt-1 text-center text-sm text-typography-400">
-              {t("common.actions.pullToRefresh", {
-                defaultValue: "Pull to refresh",
-              })}
+              {t("common.actions.pullToRefresh")}
             </Text>
           </Card>
         </VStack>
@@ -167,9 +159,7 @@ export default function LeaderboardScreen() {
         <Pressable
           onPress={() => router.push("/achievements")}
           className="rounded-xl bg-primary-100 px-4 py-4"
-          accessibilityLabel={t("achievements.viewMyAchievements", {
-            defaultValue: "See my achievements",
-          })}
+          accessibilityLabel={t("achievements.viewMyAchievements")}
           accessibilityRole="button"
         >
           <HStack className="items-center justify-between">
@@ -179,14 +169,10 @@ export default function LeaderboardScreen() {
               </Box>
               <VStack>
                 <Text className="text-base font-semibold text-primary-800">
-                  {t("achievements.viewMyAchievements", {
-                    defaultValue: "See my achievements",
-                  })}
+                  {t("achievements.viewMyAchievements")}
                 </Text>
                 <Text className="text-sm text-primary-600">
-                  {t("achievements.viewProgress", {
-                    defaultValue: "View your progress and unlocked badges",
-                  })}
+                  {t("achievements.viewProgress")}
                 </Text>
               </VStack>
             </HStack>
@@ -202,7 +188,6 @@ export default function LeaderboardScreen() {
           <Trophy size={24} color={Colors.primary[500]} />
           <Heading size="lg" className="text-typography-900">
             {t("leaderboard.festivalLeaderboard", {
-              defaultValue: "{{festivalName}} Leaderboard",
               festivalName: currentFestival.name,
             })}
           </Heading>
@@ -217,9 +202,7 @@ export default function LeaderboardScreen() {
           activeSortColumn={sortBy}
           sortOrder={sortOrder}
           onSortChange={handleSortChange}
-          emptyMessage={t("leaderboard.empty", {
-            defaultValue: "No entries yet. Be the first to log a beer!",
-          })}
+          emptyMessage={t("leaderboard.empty")}
         />
       </VStack>
     </ScrollView>

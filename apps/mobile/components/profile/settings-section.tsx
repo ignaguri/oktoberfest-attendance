@@ -104,23 +104,16 @@ export function SettingsSection({
         className="flex-row items-center justify-between border-b border-outline-100 py-3"
         onPress={() => setShowFestivalSheet(true)}
         accessibilityRole="button"
-        accessibilityLabel={t("festival.selector.title", {
-          defaultValue: "Select Festival",
-        })}
+        accessibilityLabel={t("festival.selector.title")}
       >
         <View className="flex-row items-center gap-3">
           <CalendarDays size={24} color={IconColors.primary} />
           <View>
             <Text className="text-typography-900">
-              {t("festival.selector.title", {
-                defaultValue: "Select Festival",
-              })}
+              {t("festival.selector.title")}
             </Text>
             <Text className="text-sm text-typography-500">
-              {currentFestival?.name ||
-                t("festival.selector.noFestival", {
-                  defaultValue: "No festival selected",
-                })}
+              {currentFestival?.name || t("festival.selector.noFestival")}
             </Text>
           </View>
         </View>
@@ -139,15 +132,10 @@ export function SettingsSection({
           </ActionsheetDragIndicatorWrapper>
           <VStack space="md" className="w-full px-4 pt-4">
             <Heading size="md" className="text-center">
-              {t("festival.selector.title", {
-                defaultValue: "Select Festival",
-              })}
+              {t("festival.selector.title")}
             </Heading>
             <Text className="text-center text-sm text-typography-500">
-              {t("festival.selector.description", {
-                defaultValue:
-                  "Choose which festival you want to view and participate in.",
-              })}
+              {t("festival.selector.description")}
             </Text>
           </VStack>
           {festivals.map((festival) => {
@@ -221,7 +209,7 @@ export function SettingsSection({
               true: SwitchColors.trackOn,
             }}
             thumbColor={SwitchColors.thumb}
-            accessibilityLabel={`${biometricLabel} ${isBiometricEnabled ? t("common.status.enabled", { defaultValue: "enabled" }) : t("common.status.disabled", { defaultValue: "disabled" })}`}
+            accessibilityLabel={`${biometricLabel} ${isBiometricEnabled ? t("common.status.enabled") : t("common.status.disabled")}`}
           />
         </View>
       )}
@@ -252,22 +240,16 @@ export function SettingsSection({
         className="flex-row items-center justify-between border-b border-outline-100 py-3"
         onPress={() => router.push("/settings/photo-privacy")}
         accessibilityRole="button"
-        accessibilityLabel={t("profile.photoPrivacy.title", {
-          defaultValue: "Photo Privacy",
-        })}
+        accessibilityLabel={t("profile.photoPrivacy.title")}
       >
         <View className="flex-row items-center gap-3">
           <ImageIcon size={24} color={IconColors.default} />
           <View>
             <Text className="text-typography-900">
-              {t("profile.photoPrivacy.title", {
-                defaultValue: "Photo Privacy",
-              })}
+              {t("profile.photoPrivacy.title")}
             </Text>
             <Text className="text-sm text-typography-500">
-              {t("profile.photoPrivacy.shortDescription", {
-                defaultValue: "Control who can see your photos",
-              })}
+              {t("profile.photoPrivacy.shortDescription")}
             </Text>
           </View>
         </View>

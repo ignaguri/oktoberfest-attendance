@@ -138,7 +138,7 @@ export default function GroupGalleryScreen() {
       <View className="flex-1 items-center justify-center bg-background-50">
         <Stack.Screen
           options={{
-            title: t("groups.gallery.title", { defaultValue: "Gallery" }),
+            title: t("groups.gallery.title"),
           }}
         />
         <Spinner size="large" />
@@ -152,7 +152,7 @@ export default function GroupGalleryScreen() {
       <View className="flex-1 items-center justify-center bg-background-50">
         <Stack.Screen
           options={{
-            title: t("groups.gallery.title", { defaultValue: "Gallery" }),
+            title: t("groups.gallery.title"),
           }}
         />
         <ErrorState error={error} onRetry={refetch} />
@@ -166,10 +166,9 @@ export default function GroupGalleryScreen() {
         options={{
           title: groupName
             ? t("groups.gallery.titleWithName", {
-                defaultValue: "{{name}} Gallery",
                 name: groupName,
               })
-            : t("groups.gallery.title", { defaultValue: "Gallery" }),
+            : t("groups.gallery.title"),
         }}
       />
 
@@ -192,15 +191,10 @@ export default function GroupGalleryScreen() {
             >
               <Camera size={48} color={IconColors.disabled} />
               <Text className="mt-4 text-center text-lg font-medium text-typography-700">
-                {t("groups.gallery.empty.title", {
-                  defaultValue: "No Photos Yet",
-                })}
+                {t("groups.gallery.empty.title")}
               </Text>
               <Text className="mt-2 text-center text-sm text-typography-500">
-                {t("groups.gallery.empty.description", {
-                  defaultValue:
-                    "Be the first to share photos from your festival adventures! Upload pictures when you register your attendance.",
-                })}
+                {t("groups.gallery.empty.description")}
               </Text>
             </Card>
           )}

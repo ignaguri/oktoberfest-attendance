@@ -196,7 +196,7 @@ export function AchievementCard({
 
             {/* Points */}
             <Text className="text-sm text-typography-600">
-              {points} {t("achievements.points", { defaultValue: "pts" })}
+              {points} {t("achievements.points")}
             </Text>
           </HStack>
 

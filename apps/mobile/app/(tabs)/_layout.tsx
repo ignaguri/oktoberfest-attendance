@@ -78,9 +78,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="leaderboard"
         options={{
-          title: t("leaderboard.screenTitle", {
-            defaultValue: "Achievements & Leaderboard",
-          }),
+          title: t("leaderboard.screenTitle"),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon Icon={Trophy} color={color} focused={focused} />
           ),

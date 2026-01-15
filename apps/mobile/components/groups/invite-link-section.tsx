@@ -54,7 +54,6 @@ export function InviteLinkSection({
     if (!inviteUrl) return;
 
     const message = t("groups.share.message", {
-      defaultValue: `Join my group "${groupName}" on ProstCounter!`,
       name: groupName,
     });
 
@@ -86,7 +85,7 @@ export function InviteLinkSection({
         <HStack space="sm" className="items-center">
           <Link size={18} color={IconColors.primary} />
           <Text className="font-medium text-typography-900">
-            {t("groups.settings.inviteLink", { defaultValue: "Invite Link" })}
+            {t("groups.settings.inviteLink")}
           </Text>
         </HStack>
 
@@ -117,8 +116,8 @@ export function InviteLinkSection({
                 )}
                 <ButtonText className="ml-1">
                   {copied
-                    ? t("groups.settings.copied", { defaultValue: "Copied!" })
-                    : t("groups.settings.copy", { defaultValue: "Copy" })}
+                    ? t("groups.settings.copied")
+                    : t("groups.settings.copy")}
                 </ButtonText>
               </Button>
 
@@ -131,7 +130,7 @@ export function InviteLinkSection({
               >
                 <Share2 size={16} color={IconColors.default} />
                 <ButtonText className="ml-1">
-                  {t("groups.actions.share", { defaultValue: "Share" })}
+                  {t("groups.actions.share")}
                 </ButtonText>
               </Button>
 
@@ -149,27 +148,20 @@ export function InviteLinkSection({
                   <RefreshCw size={16} color={IconColors.default} />
                 )}
                 <ButtonText className="ml-1">
-                  {t("groups.settings.regenerate", {
-                    defaultValue: "Regenerate",
-                  })}
+                  {t("groups.settings.regenerate")}
                 </ButtonText>
               </Button>
             </HStack>
 
             {/* Warning */}
             <Text className="text-xs text-typography-400">
-              {t("groups.settings.tokenWarning", {
-                defaultValue:
-                  "Regenerating the link will invalidate the current one. Share the new link with members.",
-              })}
+              {t("groups.settings.tokenWarning")}
             </Text>
           </>
         ) : (
           <VStack space="sm" className="items-center py-4">
             <Text className="text-center text-typography-500">
-              {t("groups.settings.noToken", {
-                defaultValue: "No invite link generated yet.",
-              })}
+              {t("groups.settings.noToken")}
             </Text>
             <Button
               variant="solid"
@@ -179,11 +171,7 @@ export function InviteLinkSection({
               isDisabled={isRegenerating}
             >
               {isRegenerating && <ButtonSpinner color={Colors.white} />}
-              <ButtonText>
-                {t("groups.settings.generateLink", {
-                  defaultValue: "Generate Link",
-                })}
-              </ButtonText>
+              <ButtonText>{t("groups.settings.generateLink")}</ButtonText>
             </Button>
           </VStack>
         )}

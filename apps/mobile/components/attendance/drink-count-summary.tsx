@@ -130,7 +130,6 @@ export function DrinkCountSummary({
       {showTotal && (
         <Text className="text-sm text-typography-500">
           {t("attendance.totalDrinks", {
-            defaultValue: "Total: {{count}} drinks",
             count: total,
           })}
         </Text>

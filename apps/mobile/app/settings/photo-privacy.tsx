@@ -86,9 +86,7 @@ export default function PhotoPrivacyScreen() {
       }));
       Alert.alert(
         t("common.status.error"),
-        t("profile.photoPrivacy.updateError", {
-          defaultValue: "Failed to update photo privacy settings",
-        }),
+        t("profile.photoPrivacy.updateError"),
       );
     } finally {
       setIsSaving(false);
@@ -126,9 +124,7 @@ export default function PhotoPrivacyScreen() {
       }));
       Alert.alert(
         t("common.status.error"),
-        t("profile.photoPrivacy.updateError", {
-          defaultValue: "Failed to update photo privacy settings",
-        }),
+        t("profile.photoPrivacy.updateError"),
       );
     } finally {
       setIsSaving(false);
@@ -156,10 +152,7 @@ export default function PhotoPrivacyScreen() {
           <View className="flex-row items-start gap-3">
             <Info size={24} color={Colors.primary[600]} />
             <Text className="flex-1 text-sm text-yellow-800">
-              {t("profile.photoPrivacy.description", {
-                defaultValue:
-                  "Control who can see your photos in group galleries. Individual photos can also be set as private.",
-              })}
+              {t("profile.photoPrivacy.description")}
             </Text>
           </View>
         </View>
@@ -167,9 +160,7 @@ export default function PhotoPrivacyScreen() {
         {/* Global Settings */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
           <Text className="mb-4 text-lg font-semibold text-typography-900">
-            {t("profile.photoPrivacy.globalSettings", {
-              defaultValue: "Global Settings",
-            })}
+            {t("profile.photoPrivacy.globalSettings")}
           </Text>
 
           <View className="flex-row items-center justify-between py-3">
@@ -181,15 +172,10 @@ export default function PhotoPrivacyScreen() {
               )}
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t("profile.photoPrivacy.hideFromAll", {
-                    defaultValue: "Hide photos from all groups",
-                  })}
+                  {t("profile.photoPrivacy.hideFromAll")}
                 </Text>
                 <Text className="text-sm text-typography-500">
-                  {t("profile.photoPrivacy.hideFromAllDescription", {
-                    defaultValue:
-                      "When enabled, your photos won't appear in any group gallery",
-                  })}
+                  {t("profile.photoPrivacy.hideFromAllDescription")}
                 </Text>
               </View>
             </View>
@@ -209,24 +195,17 @@ export default function PhotoPrivacyScreen() {
         {/* Per-Group Settings */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
           <Text className="mb-2 text-lg font-semibold text-typography-900">
-            {t("profile.photoPrivacy.perGroupSettings", {
-              defaultValue: "Per-Group Settings",
-            })}
+            {t("profile.photoPrivacy.perGroupSettings")}
           </Text>
           <Text className="mb-4 text-sm text-typography-500">
-            {t("profile.photoPrivacy.perGroupDescription", {
-              defaultValue:
-                "Choose which groups can see your photos. These settings only apply when global hiding is disabled.",
-            })}
+            {t("profile.photoPrivacy.perGroupDescription")}
           </Text>
 
           {settings.groups.length === 0 ? (
             <View className="items-center py-4">
               <Users size={48} color={Colors.gray[300]} />
               <Text className="mt-2 text-center text-typography-500">
-                {t("profile.photoPrivacy.noGroups", {
-                  defaultValue: "You're not a member of any groups yet.",
-                })}
+                {t("profile.photoPrivacy.noGroups")}
               </Text>
             </View>
           ) : (
@@ -248,15 +227,11 @@ export default function PhotoPrivacyScreen() {
                   <View className="flex-1">
                     <Text className="text-typography-900">
                       {t("profile.photoPrivacy.hideFromGroup", {
-                        defaultValue: "Hide photos from {{group}}",
                         group: group.groupName,
                       })}
                     </Text>
                     <Text className="text-sm text-typography-500">
-                      {t("profile.photoPrivacy.hideFromGroupDescription", {
-                        defaultValue:
-                          "When enabled, your photos won't appear in this group's gallery",
-                      })}
+                      {t("profile.photoPrivacy.hideFromGroupDescription")}
                     </Text>
                   </View>
                 </View>
@@ -280,10 +255,7 @@ export default function PhotoPrivacyScreen() {
           {settings.hidePhotosFromAllGroups && settings.groups.length > 0 && (
             <View className="mt-4 rounded-lg bg-red-50 p-3">
               <Text className="text-sm text-red-600">
-                {t("profile.photoPrivacy.globalWarning", {
-                  defaultValue:
-                    "Per-group settings are disabled because global hiding is enabled.",
-                })}
+                {t("profile.photoPrivacy.globalWarning")}
               </Text>
             </View>
           )}

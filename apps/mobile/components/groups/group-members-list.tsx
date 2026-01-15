@@ -39,7 +39,7 @@ export function GroupMembersList({
       <Card variant="outline" size="md" className="items-center p-6">
         <Users size={48} color={IconColors.disabled} />
         <Text className="mt-2 text-center text-typography-500">
-          {t("groups.members.empty", { defaultValue: "No members yet" })}
+          {t("groups.members.empty")}
         </Text>
       </Card>
     );
@@ -93,7 +93,7 @@ export function GroupMembersList({
                     )}
                     {isCurrentUser && (
                       <Text className="text-xs text-typography-400">
-                        {t("groups.members.you", { defaultValue: "(You)" })}
+                        {t("groups.members.you")}
                       </Text>
                     )}
                   </HStack>
@@ -105,7 +105,6 @@ export function GroupMembersList({
                   {joinedDate && (
                     <Text className="text-xs text-typography-400">
                       {t("groups.members.joined", {
-                        defaultValue: "Joined {{date}}",
                         date: joinedDate,
                       })}
                     </Text>

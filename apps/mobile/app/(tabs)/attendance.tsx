@@ -189,9 +189,7 @@ export default function AttendanceScreen() {
                       )}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.drinks", {
-                        defaultValue: "Drinks",
-                      })}
+                      {t("attendance.summary.drinks")}
                     </Text>
                   </View>
                   <View className="items-center">
@@ -215,7 +213,7 @@ export default function AttendanceScreen() {
                       €{(spendingTotals.spent / 100).toFixed(0)}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.spent", { defaultValue: "Spent" })}
+                      {t("attendance.summary.spent")}
                     </Text>
                   </View>
                   <View className="items-center">
@@ -223,9 +221,7 @@ export default function AttendanceScreen() {
                       €{(spendingTotals.base / 100).toFixed(0)}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.baseCost", {
-                        defaultValue: "Base",
-                      })}
+                      {t("attendance.summary.baseCost")}
                     </Text>
                   </View>
                   <View className="items-center">
@@ -233,7 +229,7 @@ export default function AttendanceScreen() {
                       €{(spendingTotals.tips / 100).toFixed(0)}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.tips", { defaultValue: "Tips" })}
+                      {t("attendance.summary.tips")}
                     </Text>
                   </View>
                 </View>
@@ -300,7 +296,7 @@ export default function AttendanceScreen() {
                 >
                   <ButtonText>
                     {dialog.type === "destructive"
-                      ? t("common.buttons.delete", { defaultValue: "Delete" })
+                      ? t("common.buttons.delete")
                       : t("common.buttons.ok")}
                   </ButtonText>
                 </Button>

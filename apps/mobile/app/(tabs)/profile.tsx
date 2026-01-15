@@ -73,20 +73,10 @@ export default function ProfileScreen() {
   const { pickImage, isUploading: isAvatarUploading } = useAvatarUpload({
     onSuccess: () => {
       refetch();
-      showDialog(
-        t("common.status.success"),
-        t("profile.avatar.uploadSuccess", {
-          defaultValue: "Profile picture updated",
-        }),
-      );
+      showDialog(t("common.status.success"), t("profile.avatar.uploadSuccess"));
     },
     onError: () => {
-      showDialog(
-        t("common.status.error"),
-        t("profile.avatar.uploadError", {
-          defaultValue: "Failed to update profile picture",
-        }),
-      );
+      showDialog(t("common.status.error"), t("profile.avatar.uploadError"));
     },
   });
 
@@ -153,18 +143,10 @@ export default function ProfileScreen() {
       await resetTutorialMutation.mutateAsync(undefined);
       showDialog(
         t("common.status.success"),
-        t("profile.tutorial.resetSuccess", {
-          defaultValue:
-            "Tutorial will be shown on your next visit to the home page.",
-        }),
+        t("profile.tutorial.resetSuccess"),
       );
     } catch {
-      showDialog(
-        t("common.status.error"),
-        t("profile.tutorial.resetError", {
-          defaultValue: "Failed to reset tutorial",
-        }),
-      );
+      showDialog(t("common.status.error"), t("profile.tutorial.resetError"));
     }
   }, [resetTutorialMutation, showDialog, t]);
 
@@ -177,10 +159,7 @@ export default function ProfileScreen() {
         try {
           await signOut();
         } catch {
-          showDialog(
-            t("common.status.error"),
-            t("profile.signOut.error", { defaultValue: "Failed to sign out" }),
-          );
+          showDialog(t("common.status.error"), t("profile.signOut.error"));
         }
       },
     );
@@ -301,16 +280,10 @@ export default function ProfileScreen() {
               variant="solid"
               action="secondary"
               onPress={() => router.push("/settings/change-password")}
-              accessibilityLabel={t("profile.changePassword.title", {
-                defaultValue: "Change Password",
-              })}
+              accessibilityLabel={t("profile.changePassword.title")}
             >
               <Lock size={20} color={IconColors.default} />
-              <ButtonText>
-                {t("profile.changePassword.title", {
-                  defaultValue: "Change Password",
-                })}
-              </ButtonText>
+              <ButtonText>{t("profile.changePassword.title")}</ButtonText>
             </Button>
           </VStack>
         </Card>
@@ -323,13 +296,10 @@ export default function ProfileScreen() {
         >
           <VStack space="md" className="items-center">
             <Text className="text-lg font-semibold text-yellow-800">
-              {t("profile.tutorial.title", { defaultValue: "Tutorial" })}
+              {t("profile.tutorial.title")}
             </Text>
             <Text className="text-center text-sm text-yellow-700">
-              {t("profile.tutorial.description", {
-                defaultValue:
-                  "Reset the app tutorial to see it again on your next visit to the home page.",
-              })}
+              {t("profile.tutorial.description")}
             </Text>
             <Button
               variant="outline"
@@ -337,17 +307,13 @@ export default function ProfileScreen() {
               onPress={handleResetTutorial}
               disabled={resetTutorialMutation.loading}
               className="border-yellow-400"
-              accessibilityLabel={t("profile.tutorial.button", {
-                defaultValue: "Reset Tutorial",
-              })}
+              accessibilityLabel={t("profile.tutorial.button")}
             >
               {resetTutorialMutation.loading ? (
                 <ButtonSpinner color={Colors.primary[600]} />
               ) : (
                 <ButtonText className="text-yellow-700">
-                  {t("profile.tutorial.button", {
-                    defaultValue: "Reset Tutorial",
-                  })}
+                  {t("profile.tutorial.button")}
                 </ButtonText>
               )}
             </Button>

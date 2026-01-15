@@ -30,7 +30,6 @@ export function GroupListItem({ group, onPress }: GroupListItemProps) {
               <Text className="text-sm text-typography-500">
                 {t("groups.memberCount", {
                   count: group.memberCount,
-                  defaultValue: "{{count}} members",
                 })}
               </Text>
             </HStack>

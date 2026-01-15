@@ -343,16 +343,10 @@ export default function DetailedAttendanceForm({
             )}
           />
           {errors.date && (
-            <span className="error">
-              {t(errors.date.message as string, {
-                defaultValue: errors.date.message,
-              })}
-            </span>
+            <span className="error">{t(errors.date.message as string)}</span>
           )}
 
-          <Label htmlFor="amount">
-            {t("attendance.howManyDrinks", { defaultValue: "Log Your Drinks" })}
-          </Label>
+          <Label htmlFor="amount">{t("attendance.howManyDrinks")}</Label>
 
           {/* Drink Type Picker + Stepper */}
           <div className="flex w-full flex-col items-center gap-4">
@@ -372,16 +366,13 @@ export default function DetailedAttendanceForm({
 
             {/* Total drinks */}
             <p className="text-muted-foreground text-sm">
-              {t("attendance.totalDrinks", { defaultValue: "Total Drinks" })}:{" "}
-              {totalLocalDrinks}
+              {t("attendance.totalDrinks")}: {totalLocalDrinks}
             </p>
           </div>
 
           {errors.amount && (
             <span className="text-sm text-red-600">
-              {t(errors.amount.message as string, {
-                defaultValue: errors.amount.message,
-              })}
+              {t(errors.amount.message as string)}
             </span>
           )}
 

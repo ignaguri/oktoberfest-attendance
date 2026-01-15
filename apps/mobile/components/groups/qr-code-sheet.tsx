@@ -102,12 +102,11 @@ export function QRCodeSheet({
             <HStack space="sm" className="items-center">
               <QrCode size={24} color={IconColors.primary} />
               <Heading size="lg" className="text-typography-900">
-                {t("groups.qrCode.title", { defaultValue: "QR Code to Join" })}
+                {t("groups.qrCode.title")}
               </Heading>
             </HStack>
             <Text className="text-center text-sm text-typography-500">
               {t("groups.qrCode.description", {
-                defaultValue: `Scan this QR code to join "${groupName}"`,
                 name: groupName,
               })}
             </Text>
@@ -119,9 +118,7 @@ export function QRCodeSheet({
               <VStack className="h-52 w-52 items-center justify-center">
                 <Spinner size="large" />
                 <Text className="mt-2 text-sm text-typography-500">
-                  {t("groups.qrCode.generating", {
-                    defaultValue: "Generating...",
-                  })}
+                  {t("groups.qrCode.generating")}
                 </Text>
               </VStack>
             ) : (
@@ -136,10 +133,7 @@ export function QRCodeSheet({
 
           {/* Helper text */}
           <Text className="text-center text-sm text-typography-500">
-            {t("groups.qrCode.helper", {
-              defaultValue:
-                "Others can scan this code to join your group instantly!",
-            })}
+            {t("groups.qrCode.helper")}
           </Text>
 
           {/* Regenerate button */}
@@ -157,9 +151,7 @@ export function QRCodeSheet({
               <RefreshCw size={16} color={IconColors.default} />
             )}
             <ButtonText className="ml-2">
-              {t("groups.qrCode.regenerate", {
-                defaultValue: "Generate New Code",
-              })}
+              {t("groups.qrCode.regenerate")}
             </ButtonText>
           </Button>
         </VStack>

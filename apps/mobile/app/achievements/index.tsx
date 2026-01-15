@@ -66,9 +66,7 @@ export default function AchievementsScreen() {
         <VStack space="md" className="items-center justify-center p-4 py-20">
           <ActivityIndicator size="large" color={Colors.primary[500]} />
           <Text className="text-typography-500">
-            {t("achievements.loading", {
-              defaultValue: "Loading achievements...",
-            })}
+            {t("achievements.loading")}
           </Text>
         </VStack>
       </ScrollView>
@@ -87,9 +85,7 @@ export default function AchievementsScreen() {
           >
             <Award size={48} color={IconColors.disabled} />
             <Text className="mt-2 text-center text-typography-500">
-              {t("achievements.noFestival", {
-                defaultValue: "No festival selected",
-              })}
+              {t("achievements.noFestival")}
             </Text>
           </Card>
         </VStack>
@@ -119,14 +115,10 @@ export default function AchievementsScreen() {
           >
             <Award size={48} color={IconColors.error} />
             <Text className="mt-2 text-center text-error-600">
-              {t("achievements.error", {
-                defaultValue: "Failed to load achievements",
-              })}
+              {t("achievements.error")}
             </Text>
             <Text className="mt-1 text-center text-sm text-typography-400">
-              {t("common.actions.pullToRefresh", {
-                defaultValue: "Pull to refresh",
-              })}
+              {t("common.actions.pullToRefresh")}
             </Text>
           </Card>
         </VStack>
@@ -154,8 +146,7 @@ export default function AchievementsScreen() {
         {unlockedAchievements.length > 0 && (
           <VStack space="sm">
             <Heading size="md" className="text-green-700">
-              {t("achievements.completed", { defaultValue: "Completed" })} (
-              {unlockedAchievements.length})
+              {t("achievements.completed")} ({unlockedAchievements.length})
             </Heading>
             <VStack space="sm">
               {unlockedAchievements.map((achievement) => (
@@ -172,8 +163,7 @@ export default function AchievementsScreen() {
         {lockedAchievements.length > 0 && (
           <VStack space="sm">
             <Heading size="md" className="text-typography-700">
-              {t("achievements.inProgress", { defaultValue: "In Progress" })} (
-              {lockedAchievements.length})
+              {t("achievements.inProgress")} ({lockedAchievements.length})
             </Heading>
             <VStack space="sm">
               {lockedAchievements.map((achievement) => (
@@ -196,9 +186,7 @@ export default function AchievementsScreen() {
           >
             <Award size={48} color={IconColors.muted} />
             <Text className="mt-2 text-center text-typography-500">
-              {t("achievements.empty", {
-                defaultValue: "No achievements available yet",
-              })}
+              {t("achievements.empty")}
             </Text>
           </Card>
         )}

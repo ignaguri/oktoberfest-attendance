@@ -70,26 +70,20 @@ export function FestivalStatus() {
     const daysUntil = differenceInDays(startDate, today);
     message =
       daysUntil === 1
-        ? t("home.festivalStatus.startsInOneDay", {
-            defaultValue: "Festival starts tomorrow!",
-          })
+        ? t("home.festivalStatus.startsInOneDay")
         : t("home.festivalStatus.startsInDays", {
-            defaultValue: `Festival starts in ${daysUntil} days`,
             daysUntil,
           });
   } else if (isAfter(today, endDate)) {
     // Festival has ended
     status = "ended";
-    message = t("home.festivalStatus.ended", {
-      defaultValue: "Festival has ended",
-    });
+    message = t("home.festivalStatus.ended");
   } else {
     // Festival is currently active
     status = "active";
     const currentDay = differenceInDays(today, startDate) + 1;
     const totalDays = differenceInDays(endDate, startDate) + 1;
     message = t("home.festivalStatus.currentDay", {
-      defaultValue: `Day ${currentDay} of ${totalDays}`,
       currentDay,
       totalDays,
     });

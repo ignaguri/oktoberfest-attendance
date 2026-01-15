@@ -63,13 +63,8 @@ export function ProfileHeader({
           onPress={onAvatarPress}
           className="self-center"
           accessibilityRole="button"
-          accessibilityLabel={t("profile.avatar.change", {
-            defaultValue: "Change profile picture",
-          })}
-          accessibilityHint={t("profile.avatar.changeHint", {
-            defaultValue:
-              "Opens options to take a photo or choose from library",
-          })}
+          accessibilityLabel={t("profile.avatar.change")}
+          accessibilityHint={t("profile.avatar.changeHint")}
         >
           <Avatar size="2xl">
             {profile?.avatar_url ? (

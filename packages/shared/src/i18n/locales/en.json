@@ -39,7 +39,15 @@
       "offline": "You are offline",
       "online": "Online",
       "error": "An error occurred",
-      "success": "Success"
+      "success": "Success",
+      "added": "Added!",
+      "enabled": "enabled",
+      "disabled": "disabled",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "creating": "Creating...",
+      "deleting": "Deleting...",
+      "info": "Info"
     },
     "errors": {
       "title": "Error",
@@ -150,6 +158,14 @@
       "errors": {
         "failed": "Failed to update password"
       }
+    },
+    "biometric": {
+      "label": "Biometric Login",
+      "description": "Quick sign-in with Face ID or Touch ID",
+      "faceId": "Face ID",
+      "touchId": "Touch ID",
+      "enableButton": "Enable Biometric Login",
+      "skipButton": "Skip for now"
     }
   },
   "groups": {
@@ -158,7 +174,11 @@
     "noGroupsYet": "You are not a member of any group yet for this festival.",
     "joinOrCreate": "Join or Create a Group",
     "detail": {
+      "title": "Group Details",
       "notFound": "Group not found"
+    },
+    "qrCode": {
+      "title": "QR Code"
     },
     "create": {
       "title": "Create Group",
@@ -178,11 +198,24 @@
       "tokenLabel": "Invite Token",
       "tokenPlaceholder": "Paste invite token",
       "namePlaceholder": "Group Name",
+      "passwordLabel": "Group Password",
       "passwordPlaceholder": "Group Password",
+      "tokenPasswordPlaceholder": "Enter group password",
+      "linkTokenPlaceholder": "Paste invite link or token",
       "clickToJoin": "Click below to join <strong>{{groupName}}</strong>",
       "joining": "Joining...",
+      "searching": "Searching groups...",
       "submit": "Join Group",
       "success": "Successfully joined group!",
+      "noResults": "No groups found",
+      "searchMode": "Search by name",
+      "tokenMode": "Join by token",
+      "emptyDescription": "Search for a group by name to join",
+      "membersCount": "{{count}} members",
+      "passwordHint": "Ask a group member for the password",
+      "tokenHint": "Paste the invite link shared with you",
+      "searchPlaceholder": "Search by group name",
+      "error": "Failed to join group. Please check the password and try again.",
       "errors": {
         "failed": "Failed to join group",
         "invalidToken": "Invalid invite token"
@@ -233,6 +266,37 @@
       "title": "Group's live location",
       "shareDescription": "Share your location to see nearby group members and let them see you.",
       "controlNote": "Control which groups can see your location in your"
+    },
+    "members": {
+      "empty": "No members yet",
+      "you": "You"
+    },
+    "deepLink": {
+      "joining": "Joining group...",
+      "invalidToken": "Invalid invite link. The token is missing.",
+      "joinFailed": "Failed to join group. The invite link may be invalid or expired.",
+      "successTitle": "Welcome to the Group!",
+      "successMessage": "You've successfully joined",
+      "viewGroup": "View Group",
+      "allGroups": "View All Groups",
+      "alreadyMemberTitle": "Already a Member",
+      "alreadyMemberMessage": "You're already a member of this group.",
+      "viewYourGroups": "View Your Groups",
+      "goHome": "Go to Home",
+      "errorTitle": "Unable to Join",
+      "goToGroups": "Go to Groups"
+    },
+    "actions": {
+      "join": "Join",
+      "create": "Create",
+      "share": "Share",
+      "qrCode": "QR Code",
+      "gallery": "Gallery"
+    },
+    "empty": {
+      "title": "No groups yet",
+      "description": "You haven't joined any groups for this festival yet. Create or join a group to compete with friends!",
+      "action": "Create or Join a Group"
     }
   },
   "attendance": {
@@ -338,7 +402,11 @@
       "title": "Festival Summary",
       "days": "Days",
       "beers": "Beers",
-      "avgPerDay": "Avg/Day"
+      "drinks": "Drinks",
+      "avgPerDay": "Avg/Day",
+      "spent": "Spent",
+      "baseCost": "Base",
+      "tips": "Tips"
     },
     "noFestival": "Please select a festival to view attendance",
     "updateSuccess": "Attendance updated",
@@ -393,7 +461,9 @@
       "legendary": "Legendary"
     },
     "viewMyAchievements": "See my achievements",
-    "viewProgress": "View your progress and unlocked badges"
+    "viewProgress": "View your progress and unlocked badges",
+    "points": "pts",
+    "complete": "Complete"
   },
   "leaderboard": {
     "screenTitle": "Achievements & Leaderboard",
@@ -465,13 +535,19 @@
       "label": "Biometric Login",
       "description": "Quick sign-in with Face ID or Touch ID"
     },
+    "changePassword": {
+      "title": "Change Password",
+      "success": "Password updated successfully",
+      "error": "Failed to update password"
+    },
     "notifications": {
       "title": "Notifications",
       "description": "Configure push notifications",
       "push": "Push Notifications",
       "achievements": "Achievement Notifications",
       "groupActivity": "Group Activity",
-      "reminders": "Reminders"
+      "reminders": "Reminders",
+      "updateError": "Failed to update notification settings"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -835,7 +911,9 @@
     "unknownUser": "Unknown User",
     "aTent": "a tent",
     "aGroup": "a group",
-    "hotStreak": "Hot streak"
+    "hotStreak": "Hot streak",
+    "userProfile": "User Profile",
+    "title": "Activity Feed"
   },
   "home": {
     "quickAttendance": {
@@ -868,7 +946,12 @@
     "yourGroups": "Your Groups:",
     "festivalMap": "{{name}} Map",
     "shareApp": "Share this app",
-    "whatCanIDo": "What can I do with Prost Counter?"
+    "whatCanIDo": "What can I do with Prost Counter?",
+    "baseCost": "Base",
+    "tips": "Tips",
+    "mapLink": {
+      "title": "Map"
+    }
   },
   "search": {
     "users": {

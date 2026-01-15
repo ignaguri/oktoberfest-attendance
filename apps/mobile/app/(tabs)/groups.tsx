@@ -72,12 +72,7 @@ export default function GroupsScreen() {
     (groupId: string) => {
       refetch();
       setIsCreateSheetOpen(false);
-      showDialog(
-        t("common.status.success"),
-        t("groups.createSuccess", {
-          defaultValue: "Group created successfully!",
-        }),
-      );
+      showDialog(t("common.status.success"), t("groups.createSuccess"));
       // Navigate to the new group
       router.push(`/groups/${groupId}`);
     },
@@ -87,12 +82,7 @@ export default function GroupsScreen() {
   const handleJoinSuccess = useCallback(() => {
     refetch();
     setIsJoinSheetOpen(false);
-    showDialog(
-      t("common.status.success"),
-      t("groups.joinSuccess", {
-        defaultValue: "Successfully joined the group!",
-      }),
-    );
+    showDialog(t("common.status.success"), t("groups.joinSuccess"));
   }, [refetch, showDialog, t]);
 
   const onRefresh = useCallback(() => {
@@ -104,9 +94,7 @@ export default function GroupsScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <Text className="text-center text-typography-500">
-          {t("groups.noFestival", {
-            defaultValue: "Please select a festival to view groups.",
-          })}
+          {t("groups.noFestival")}
         </Text>
       </View>
     );
@@ -149,7 +137,7 @@ export default function GroupsScreen() {
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
               <Text className="text-sm text-typography-500">
-                {t("groups.yourGroups", { defaultValue: "Your Groups" })}
+                {t("groups.yourGroups")}
               </Text>
               <HStack space="sm">
                 <Button
@@ -160,7 +148,7 @@ export default function GroupsScreen() {
                 >
                   <UserPlus size={16} color={IconColors.default} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.join", { defaultValue: "Join" })}
+                    {t("groups.actions.join")}
                   </ButtonText>
                 </Button>
                 <Button
@@ -171,7 +159,7 @@ export default function GroupsScreen() {
                 >
                   <Plus size={16} color={IconColors.white} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.create", { defaultValue: "Create" })}
+                    {t("groups.actions.create")}
                   </ButtonText>
                 </Button>
               </HStack>

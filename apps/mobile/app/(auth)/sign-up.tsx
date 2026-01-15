@@ -109,9 +109,7 @@ export default function SignUpScreen() {
 
         <View className="mt-8 items-center">
           <Text className="mb-4 text-center text-2xl font-bold text-typography-900">
-            {t("auth.signUp.accountCreated", {
-              defaultValue: "Account created",
-            })}
+            {t("auth.signUp.accountCreated")}
           </Text>
           <Text className="mb-8 px-4 text-center text-typography-500">
             {t("auth.signUp.success.checkEmail")}
@@ -176,9 +174,7 @@ export default function SignUpScreen() {
               control={control}
               name="password"
               label={t("auth.signUp.passwordLabel")}
-              placeholder={t("auth.signUp.passwordPlaceholder", {
-                defaultValue: "Create a password",
-              })}
+              placeholder={t("auth.signUp.passwordPlaceholder")}
               secureTextEntry
               autoComplete="password-new"
               error={errors.password?.message}
@@ -189,9 +185,7 @@ export default function SignUpScreen() {
               control={control}
               name="confirmPassword"
               label={t("auth.signUp.confirmPasswordLabel")}
-              placeholder={t("auth.signUp.confirmPasswordPlaceholder", {
-                defaultValue: "Confirm your password",
-              })}
+              placeholder={t("auth.signUp.confirmPasswordPlaceholder")}
               secureTextEntry
               autoComplete="password-new"
               error={errors.confirmPassword?.message}

@@ -100,5 +100,5 @@ export function translateError(
   code: string,
   fallback?: string,
 ): string {
-  return t(`apiErrors.${code}`, { defaultValue: fallback || code });
+  return t(`apiErrors.${code}`);
 }

@@ -110,9 +110,7 @@ export function OAuthButtons({
           <>
             <GoogleIcon />
             <ButtonText className="ml-2 text-typography-700">
-              {t("auth.signIn.continueWithGoogle", {
-                defaultValue: "Continue with Google",
-              })}
+              {t("auth.signIn.continueWithGoogle")}
             </ButtonText>
           </>
         )}
@@ -132,9 +130,7 @@ export function OAuthButtons({
           <>
             <FacebookIcon />
             <ButtonText className="ml-2 text-white">
-              {t("auth.signIn.continueWithFacebook", {
-                defaultValue: "Continue with Facebook",
-              })}
+              {t("auth.signIn.continueWithFacebook")}
             </ButtonText>
           </>
         )}
@@ -155,9 +151,7 @@ export function OAuthButtons({
             <>
               <AppleIcon />
               <ButtonText className="ml-2 text-white">
-                {t("auth.signIn.continueWithApple", {
-                  defaultValue: "Continue with Apple",
-                })}
+                {t("auth.signIn.continueWithApple")}
               </ButtonText>
             </>
           )}

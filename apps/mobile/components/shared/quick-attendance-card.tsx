@@ -398,9 +398,7 @@ export function QuickAttendanceCard() {
                   source={{ uri: photo.pictureUrl }}
                   className="h-16 w-16 rounded-lg"
                   resizeMode="cover"
-                  accessibilityLabel={t("home.quickAttendance.beerPhoto", {
-                    defaultValue: "Beer photo",
-                  })}
+                  accessibilityLabel={t("home.quickAttendance.beerPhoto")}
                 />
               </Pressable>
             ))}
@@ -416,9 +414,7 @@ export function QuickAttendanceCard() {
                       isUploadingPhotos && "opacity-60",
                     )}
                     resizeMode="cover"
-                    accessibilityLabel={t("home.quickAttendance.pendingPhoto", {
-                      defaultValue: "Pending photo upload",
-                    })}
+                    accessibilityLabel={t("home.quickAttendance.pendingPhoto")}
                   />
                 </Pressable>
                 {isUploadingPhotos ? (
@@ -461,14 +457,14 @@ export function QuickAttendanceCard() {
           <HStack space="sm" className="items-center justify-center py-2">
             <ActivityIndicator size="small" color={Colors.primary[500]} />
             <Text className="text-sm text-typography-500">
-              {t("common.status.saving", { defaultValue: "Saving..." })}
+              {t("common.status.saving")}
             </Text>
           </HStack>
         ) : saveSuccess ? (
           <HStack space="sm" className="items-center justify-center py-2">
             <Check size={18} color={Colors.success[500]} />
             <Text className="text-sm text-success-600">
-              {t("common.status.saved", { defaultValue: "Saved!" })}
+              {t("common.status.saved")}
             </Text>
           </HStack>
         ) : hasPendingPhotos ? (
@@ -482,12 +478,8 @@ export function QuickAttendanceCard() {
             {isUploadingPhotos && <ButtonSpinner color={Colors.white} />}
             <ButtonText>
               {isUploadingPhotos
-                ? t("home.quickAttendance.uploadingPhotos", {
-                    defaultValue: "Uploading photos...",
-                  })
-                : t("home.quickAttendance.uploadPhotos", {
-                    defaultValue: "Upload Photos",
-                  })}
+                ? t("home.quickAttendance.uploadingPhotos")
+                : t("home.quickAttendance.uploadPhotos")}
             </ButtonText>
           </Button>
         ) : null}

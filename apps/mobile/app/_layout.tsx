@@ -4,6 +4,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { GluestackUIProvider } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
+import { useFocusManager } from "@/lib/data/focus-manager-setup";
+import { useOnlineManager } from "@/lib/data/online-manager-setup";
 import { DataProvider } from "@/lib/data/query-client";
 import { FestivalProvider } from "@/lib/festival/FestivalContext";
 import { initMobileI18n } from "@/lib/i18n";
@@ -49,6 +51,10 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
+
+  // Setup React Query integrations with React Native
+  useFocusManager(); // Enable refetchOnWindowFocus when app returns from background
+  useOnlineManager(); // Pause queries when offline, resume when online
 
   useEffect(() => {
     async function prepare() {

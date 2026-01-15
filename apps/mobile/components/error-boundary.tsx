@@ -73,12 +73,10 @@ function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
     <View className="flex-1 items-center justify-center bg-background-50 p-6">
       <VStack space="lg" className="items-center">
         <Heading size="xl" className="text-error-600">
-          {t("common.errors.title", { defaultValue: "Something went wrong" })}
+          {t("common.errors.title")}
         </Heading>
         <Text className="text-center text-typography-500">
-          {t("common.errors.unexpected", {
-            defaultValue: "An unexpected error occurred. Please try again.",
-          })}
+          {t("common.errors.unexpected")}
         </Text>
         {__DEV__ && error && (
           <View className="rounded-md bg-background-100 p-3">
@@ -88,9 +86,7 @@ function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
           </View>
         )}
         <Button action="primary" onPress={onReset}>
-          <ButtonText>
-            {t("common.buttons.tryAgain", { defaultValue: "Try Again" })}
-          </ButtonText>
+          <ButtonText>{t("common.buttons.tryAgain")}</ButtonText>
         </Button>
       </VStack>
     </View>

@@ -195,12 +195,7 @@ export default function SignInScreen() {
         >
           {/* Header with Logo */}
           <View className="mb-8 mt-4">
-            <AuthHeader
-              size="lg"
-              tagline={t("auth.signIn.tagline", {
-                defaultValue: "Track your Oktoberfest adventure",
-              })}
-            />
+            <AuthHeader size="lg" tagline={t("auth.signIn.tagline")} />
           </View>
 
           {/* Error Message */}
@@ -228,9 +223,7 @@ export default function SignInScreen() {
               control={control}
               name="password"
               label={t("auth.signIn.passwordLabel")}
-              placeholder={t("auth.signIn.passwordPlaceholder", {
-                defaultValue: "Enter your password",
-              })}
+              placeholder={t("auth.signIn.passwordPlaceholder")}
               secureTextEntry
               autoComplete="password"
               error={errors.password?.message}

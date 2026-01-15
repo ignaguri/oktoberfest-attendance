@@ -71,8 +71,7 @@ export function UserProfileModal({
 }: UserProfileModalProps) {
   const { t } = useTranslation();
 
-  const modalTitle =
-    title || t("activityFeed.userProfile", { defaultValue: "User Profile" });
+  const modalTitle = title || t("activityFeed.userProfile");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -91,7 +90,7 @@ export function UserProfileModal({
             <VStack className="items-center py-8">
               <Spinner size="large" color={Colors.primary[500]} />
               <Text className="mt-2 text-typography-500">
-                {t("common.loading", { defaultValue: "Loading..." })}
+                {t("common.loading")}
               </Text>
             </VStack>
           ) : profile ? (
@@ -169,9 +168,7 @@ export function UserProfileModal({
           ) : (
             <VStack className="items-center py-4">
               <Text className="text-typography-500">
-                {t("activityFeed.profileNotFound", {
-                  defaultValue: "Profile not found",
-                })}
+                {t("activityFeed.profileNotFound")}
               </Text>
             </VStack>
           )}
@@ -223,9 +220,7 @@ export function TappableAvatar({
   return (
     <Pressable
       onPress={onPress}
-      accessibilityLabel={t("activityFeed.viewProfile", {
-        defaultValue: "View profile",
-      })}
+      accessibilityLabel={t("activityFeed.viewProfile")}
       accessibilityRole="button"
     >
       {children || (

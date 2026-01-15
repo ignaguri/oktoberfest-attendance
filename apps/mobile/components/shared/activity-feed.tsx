@@ -62,7 +62,7 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
         <VStack space="md">
           <HStack className="items-center justify-between">
             <Heading size="sm" className="text-typography-900">
-              {t("home.activityFeed.title", { defaultValue: "Activity Feed" })}
+              {t("home.activityFeed.title")}
             </Heading>
           </HStack>
           <VStack space="sm" className="py-4">
@@ -86,15 +86,9 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
     return (
       <Card variant="outline" size="md" className="bg-white">
         <VStack space="md" className="items-center py-4">
-          <Text className="text-error-600">
-            {t("home.activityFeed.error", {
-              defaultValue: "Failed to load activity",
-            })}
-          </Text>
+          <Text className="text-error-600">{t("home.activityFeed.error")}</Text>
           <Button variant="outline" size="sm" onPress={handleRefresh}>
-            <ButtonText>
-              {t("common.actions.retry", { defaultValue: "Retry" })}
-            </ButtonText>
+            <ButtonText>{t("common.actions.retry")}</ButtonText>
           </Button>
         </VStack>
       </Card>
@@ -108,15 +102,13 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
         <VStack space="md">
           <HStack className="items-center justify-between">
             <Heading size="sm" className="text-typography-900">
-              {t("home.activityFeed.title", { defaultValue: "Activity Feed" })}
+              {t("home.activityFeed.title")}
             </Heading>
           </HStack>
           <VStack className="items-center py-6">
             <Newspaper size={40} color={IconColors.disabled} />
             <Text className="mt-2 text-center text-typography-500">
-              {t("home.activityFeed.empty", {
-                defaultValue: "No activity yet. Be the first to log a beer!",
-              })}
+              {t("home.activityFeed.empty")}
             </Text>
           </VStack>
         </VStack>
@@ -130,7 +122,7 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
         {/* Header */}
         <HStack className="items-center justify-between">
           <Heading size="sm" className="text-typography-900">
-            {t("home.activityFeed.title", { defaultValue: "Activity Feed" })}
+            {t("home.activityFeed.title")}
           </Heading>
           <Pressable onPress={handleRefresh} disabled={isRefreshing}>
             {isRefreshing ? (
@@ -173,10 +165,8 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
             {isFetchingNextPage && <ButtonSpinner color={Colors.gray[500]} />}
             <ButtonText>
               {isFetchingNextPage
-                ? t("common.status.loading", { defaultValue: "Loading..." })
-                : t("home.activityFeed.loadMore", {
-                    defaultValue: "Load More",
-                  })}
+                ? t("common.status.loading")
+                : t("home.activityFeed.loadMore")}
             </ButtonText>
           </Button>
         )}

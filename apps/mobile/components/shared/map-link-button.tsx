@@ -43,7 +43,7 @@ export function MapLinkButton() {
       <HStack space="sm" className="flex-1 items-center">
         <Map size={20} color={IconColors.primary} />
         <Text className="flex-1 font-medium text-typography-900">
-          {t("home.mapLink.title", { defaultValue: "Festival Map" })}
+          {t("home.mapLink.title")}
         </Text>
       </HStack>
     </Button>

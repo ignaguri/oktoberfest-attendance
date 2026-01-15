@@ -190,8 +190,7 @@ export function Leaderboard({
       <Card variant="outline" size="md" className="items-center bg-white p-6">
         <Trophy size={48} color={IconColors.disabled} />
         <Text className="mt-2 text-center text-typography-500">
-          {emptyMessage ||
-            t("leaderboard.empty", { defaultValue: "No entries yet" })}
+          {emptyMessage || t("leaderboard.empty")}
         </Text>
       </Card>
     );
@@ -203,7 +202,7 @@ export function Leaderboard({
         {/* Header Row */}
         <HStack className="border-b border-outline-100 px-3 py-2.5">
           <Text className="flex-1 text-sm font-medium text-typography-500">
-            {t("leaderboard.header.player", { defaultValue: "Player" })}
+            {t("leaderboard.header.player")}
           </Text>
           <SortableHeader
             criteria="days_attended"
@@ -356,9 +355,7 @@ export function Leaderboard({
         <ModalContent>
           <ModalHeader>
             <Heading size="md" className="text-typography-900">
-              {t("leaderboard.userDetail.title", {
-                defaultValue: "Player Profile",
-              })}
+              {t("leaderboard.userDetail.title")}
             </Heading>
             <ModalCloseButton>
               <X size={20} color={IconColors.default} />

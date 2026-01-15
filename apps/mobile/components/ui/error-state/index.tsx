@@ -33,17 +33,9 @@ export function ErrorState({
   const { t } = useTranslation();
 
   const errorMessage =
-    message ||
-    error?.message ||
-    t("common.errors.unexpected", {
-      defaultValue: "An unexpected error occurred",
-    });
+    message || error?.message || t("common.errors.unexpected");
 
-  const errorTitle =
-    title ||
-    t("common.errors.title", {
-      defaultValue: "Something went wrong",
-    });
+  const errorTitle = title || t("common.errors.title");
 
   return (
     <VStack space="md" className="items-center p-4">
@@ -57,9 +49,7 @@ export function ErrorState({
       {showRetry && onRetry && (
         <Button variant="outline" action="secondary" onPress={onRetry}>
           <RefreshCw size={18} color={IconColors.default} />
-          <ButtonText>
-            {t("common.buttons.tryAgain", { defaultValue: "Try Again" })}
-          </ButtonText>
+          <ButtonText>{t("common.buttons.tryAgain")}</ButtonText>
         </Button>
       )}
     </VStack>
