@@ -19,7 +19,7 @@ import {
   type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useAttendanceByDate,
   useUpdatePersonalAttendance,
@@ -291,7 +291,7 @@ export function QuickAttendanceCard() {
           <Heading size="sm" className="text-typography-500">
             {t("home.quickAttendance.title")}
           </Heading>
-          <Text className="text-center text-typography-400">
+          <Text className="text-typography-400 text-center">
             {t("home.quickAttendance.outsideFestival")}
           </Text>
         </VStack>
@@ -341,7 +341,7 @@ export function QuickAttendanceCard() {
                 disabled={isLoading}
                 onMutationEnd={handleQuickAddSuccess}
               />
-              <Text className="text-xs font-medium text-typography-500">
+              <Text className="text-typography-500 text-xs font-medium">
                 {t(`attendance.drinkTypes.${selectedDrinkType}`, {
                   count: drinkCounts[selectedDrinkType],
                 })}
@@ -352,7 +352,7 @@ export function QuickAttendanceCard() {
 
         {/* Tent Selector */}
         <VStack space="xs">
-          <Text className="text-sm font-medium text-typography-600">
+          <Text className="text-typography-600 text-sm font-medium">
             {t("home.quickAttendance.tent")}
           </Text>
           <Pressable
@@ -362,7 +362,7 @@ export function QuickAttendanceCard() {
               "flex-row items-center justify-between rounded-lg border px-4 py-3",
               isLoading
                 ? "border-background-200 bg-background-100"
-                : "border-outline-200 bg-white active:bg-background-50",
+                : "border-outline-200 active:bg-background-50 bg-white",
             )}
           >
             <Text
@@ -383,7 +383,7 @@ export function QuickAttendanceCard() {
 
         {/* Photos Section */}
         <VStack space="xs">
-          <Text className="text-sm font-medium text-typography-600">
+          <Text className="text-typography-600 text-sm font-medium">
             {t("home.quickAttendance.photos")}
           </Text>
           <HStack className="flex-wrap gap-2">
@@ -398,9 +398,7 @@ export function QuickAttendanceCard() {
                   source={{ uri: photo.pictureUrl }}
                   className="h-16 w-16 rounded-lg"
                   resizeMode="cover"
-                  accessibilityLabel={t("home.quickAttendance.beerPhoto", {
-                    defaultValue: "Beer photo",
-                  })}
+                  accessibilityLabel={t("home.quickAttendance.beerPhoto")}
                 />
               </Pressable>
             ))}
@@ -416,9 +414,7 @@ export function QuickAttendanceCard() {
                       isUploadingPhotos && "opacity-60",
                     )}
                     resizeMode="cover"
-                    accessibilityLabel={t("home.quickAttendance.pendingPhoto", {
-                      defaultValue: "Pending photo upload",
-                    })}
+                    accessibilityLabel={t("home.quickAttendance.pendingPhoto")}
                   />
                 </Pressable>
                 {isUploadingPhotos ? (
@@ -428,7 +424,7 @@ export function QuickAttendanceCard() {
                 ) : (
                   <Pressable
                     onPress={() => handleRemovePendingPhoto(photo.id)}
-                    className="absolute -right-2 -top-2 h-5 w-5 items-center justify-center rounded-full bg-background-400"
+                    className="bg-background-400 absolute -right-2 -top-2 h-5 w-5 items-center justify-center rounded-full"
                   >
                     <Minus size={12} color={IconColors.white} />
                   </Pressable>
@@ -438,7 +434,7 @@ export function QuickAttendanceCard() {
 
             {/* Loading skeleton while picking */}
             {isPicking && (
-              <View className="h-16 w-16 items-center justify-center rounded-lg bg-background-200">
+              <View className="bg-background-200 h-16 w-16 items-center justify-center rounded-lg">
                 <ActivityIndicator size="small" color={IconColors.muted} />
               </View>
             )}
@@ -448,7 +444,7 @@ export function QuickAttendanceCard() {
               <Pressable
                 onPress={() => setIsSourcePickerOpen(true)}
                 disabled={isPicking}
-                className="h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-background-300 bg-background-50"
+                className="border-background-300 bg-background-50 h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed"
               >
                 <Camera size={20} color={IconColors.muted} />
               </Pressable>
@@ -460,15 +456,15 @@ export function QuickAttendanceCard() {
         {isAutoSaving ? (
           <HStack space="sm" className="items-center justify-center py-2">
             <ActivityIndicator size="small" color={Colors.primary[500]} />
-            <Text className="text-sm text-typography-500">
-              {t("common.status.saving", { defaultValue: "Saving..." })}
+            <Text className="text-typography-500 text-sm">
+              {t("common.status.saving")}
             </Text>
           </HStack>
         ) : saveSuccess ? (
           <HStack space="sm" className="items-center justify-center py-2">
             <Check size={18} color={Colors.success[500]} />
-            <Text className="text-sm text-success-600">
-              {t("common.status.saved", { defaultValue: "Saved!" })}
+            <Text className="text-success-600 text-sm">
+              {t("common.status.saved")}
             </Text>
           </HStack>
         ) : hasPendingPhotos ? (
@@ -482,12 +478,8 @@ export function QuickAttendanceCard() {
             {isUploadingPhotos && <ButtonSpinner color={Colors.white} />}
             <ButtonText>
               {isUploadingPhotos
-                ? t("home.quickAttendance.uploadingPhotos", {
-                    defaultValue: "Uploading photos...",
-                  })
-                : t("home.quickAttendance.uploadPhotos", {
-                    defaultValue: "Upload Photos",
-                  })}
+                ? t("home.quickAttendance.uploadingPhotos")
+                : t("home.quickAttendance.uploadPhotos")}
             </ButtonText>
           </Button>
         ) : null}

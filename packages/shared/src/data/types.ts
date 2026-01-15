@@ -55,13 +55,24 @@ export interface DataQueryOptions {
   refetchOnReconnect?: boolean;
 }
 
-export interface DataMutationOptions<TData = unknown, TVariables = unknown> {
+export interface DataMutationOptions<
+  TData = unknown,
+  TVariables = unknown,
+  TContext = unknown,
+> {
+  /** Called before mutation executes - use for optimistic updates */
+  onMutate?: (variables: TVariables) => Promise<TContext> | TContext;
   /** Called on successful mutation */
-  onSuccess?: (data: TData, variables: TVariables) => void;
-  /** Called on mutation error */
-  onError?: (error: Error) => void;
+  onSuccess?: (data: TData, variables: TVariables, context?: TContext) => void;
+  /** Called on mutation error - use to rollback optimistic updates */
+  onError?: (error: Error, variables: TVariables, context?: TContext) => void;
   /** Called when mutation settles (success or error) */
-  onSettled?: (data: TData | null, error: Error | null) => void;
+  onSettled?: (
+    data: TData | null,
+    error: Error | null,
+    variables?: TVariables,
+    context?: TContext,
+  ) => void;
 }
 
 /**

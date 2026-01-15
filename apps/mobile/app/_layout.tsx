@@ -4,10 +4,13 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { GluestackUIProvider } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
+import { useFocusManager } from "@/lib/data/focus-manager-setup";
+import { useOnlineManager } from "@/lib/data/online-manager-setup";
 import { DataProvider } from "@/lib/data/query-client";
-import { FestivalProvider } from "@/lib/festival/FestivalContext";
+import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
+import { FestivalProvider } from "@prostcounter/shared/contexts";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
@@ -50,6 +53,10 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
+  // Setup React Query integrations with React Native
+  useFocusManager(); // Enable refetchOnWindowFocus when app returns from background
+  useOnlineManager(); // Pause queries when offline, resume when online
+
   useEffect(() => {
     async function prepare() {
       try {
@@ -84,7 +91,7 @@ export default function RootLayout() {
                     via portal at this level */}
                 <GluestackUIProvider mode="light">
                   <AuthProvider>
-                    <FestivalProvider>
+                    <FestivalProvider storage={mobileFestivalStorage}>
                       <NavigationGuard>
                         <Stack
                           screenOptions={{

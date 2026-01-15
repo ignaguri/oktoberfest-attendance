@@ -14,8 +14,8 @@ function createQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // Default stale time - data is fresh for 5 minutes
-        staleTime: 5 * 60 * 1000,
+        // Default stale time - data is fresh for 2 minutes (reduced for better freshness)
+        staleTime: 2 * 60 * 1000,
         // Default cache time - data stays in cache for 10 minutes
         gcTime: 10 * 60 * 1000,
         // Retry failed queries 2 times
@@ -24,6 +24,8 @@ function createQueryClient(): QueryClient {
         refetchOnWindowFocus: false,
         // Refetch when reconnecting to internet
         refetchOnReconnect: true,
+        // Refetch when component mounts if data is stale
+        refetchOnMount: true,
       },
       mutations: {
         // Retry failed mutations once

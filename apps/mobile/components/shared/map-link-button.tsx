@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import * as WebBrowser from "expo-web-browser";
 import { Map } from "lucide-react-native";
@@ -42,8 +42,8 @@ export function MapLinkButton() {
     >
       <HStack space="sm" className="flex-1 items-center">
         <Map size={20} color={IconColors.primary} />
-        <Text className="flex-1 font-medium text-typography-900">
-          {t("home.mapLink.title", { defaultValue: "Festival Map" })}
+        <Text className="text-typography-900 flex-1 font-medium">
+          {t("home.mapLink.title", { festivalName: currentFestival.name })}
         </Text>
       </HStack>
     </Button>

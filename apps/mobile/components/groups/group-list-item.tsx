@@ -22,15 +22,14 @@ export function GroupListItem({ group, onPress }: GroupListItemProps) {
       <Card variant="outline" size="md" className="bg-white">
         <HStack className="items-center justify-between">
           <VStack space="xs" className="flex-1">
-            <Text className="text-lg font-semibold text-typography-900">
+            <Text className="text-typography-900 text-lg font-semibold">
               {group.name}
             </Text>
             <HStack space="xs" className="items-center">
               <Users size={14} color={IconColors.muted} />
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 {t("groups.memberCount", {
                   count: group.memberCount,
-                  defaultValue: "{{count}} members",
                 })}
               </Text>
             </HStack>

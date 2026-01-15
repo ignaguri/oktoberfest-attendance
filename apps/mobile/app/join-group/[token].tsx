@@ -38,9 +38,7 @@ export default function JoinGroupByTokenScreen() {
     if (!token) {
       setStatus("error");
       setResult({
-        errorMessage: t("groups.deepLink.invalidToken", {
-          defaultValue: "Invalid invite link. The token is missing.",
-        }),
+        errorMessage: t("groups.deepLink.invalidToken"),
       });
       return;
     }
@@ -63,12 +61,7 @@ export default function JoinGroupByTokenScreen() {
         } else {
           setStatus("error");
           setResult({
-            errorMessage:
-              errorMessage ||
-              t("groups.deepLink.joinFailed", {
-                defaultValue:
-                  "Failed to join group. The invite link may be invalid or expired.",
-              }),
+            errorMessage: errorMessage || t("groups.deepLink.joinFailed"),
           });
         }
       }
@@ -95,11 +88,11 @@ export default function JoinGroupByTokenScreen() {
   // Loading state
   if (status === "loading") {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
         <VStack space="lg" className="items-center">
           <ActivityIndicator size="large" color={Colors.primary[500]} />
-          <Text className="text-center text-typography-500">
-            {t("groups.deepLink.joining", { defaultValue: "Joining group..." })}
+          <Text className="text-typography-500 text-center">
+            {t("groups.deepLink.joining")}
           </Text>
         </VStack>
       </View>
@@ -109,21 +102,19 @@ export default function JoinGroupByTokenScreen() {
   // Success state
   if (status === "success") {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
         <VStack space="xl" className="w-full items-center">
           <CheckCircle size={64} color={IconColors.success} />
 
           <VStack space="sm" className="items-center">
-            <Heading size="xl" className="text-center text-typography-900">
-              {t("groups.deepLink.successTitle", { defaultValue: "Welcome!" })}
+            <Heading size="xl" className="text-typography-900 text-center">
+              {t("groups.deepLink.successTitle")}
             </Heading>
-            <Text className="text-center text-typography-500">
-              {t("groups.deepLink.successMessage", {
-                defaultValue: "You've successfully joined",
-              })}
+            <Text className="text-typography-500 text-center">
+              {t("groups.deepLink.successMessage")}
             </Text>
             {result.groupName && (
-              <Text className="text-center text-lg font-semibold text-primary-600">
+              <Text className="text-primary-600 text-center text-lg font-semibold">
                 {result.groupName}
               </Text>
             )}
@@ -137,9 +128,7 @@ export default function JoinGroupByTokenScreen() {
               className="w-full"
               onPress={handleViewGroup}
             >
-              <ButtonText>
-                {t("groups.deepLink.viewGroup", { defaultValue: "View Group" })}
-              </ButtonText>
+              <ButtonText>{t("groups.deepLink.viewGroup")}</ButtonText>
             </Button>
 
             <Button
@@ -149,9 +138,7 @@ export default function JoinGroupByTokenScreen() {
               className="w-full"
               onPress={handleGoToGroups}
             >
-              <ButtonText>
-                {t("groups.deepLink.allGroups", { defaultValue: "All Groups" })}
-              </ButtonText>
+              <ButtonText>{t("groups.deepLink.allGroups")}</ButtonText>
             </Button>
           </VStack>
         </VStack>
@@ -162,20 +149,16 @@ export default function JoinGroupByTokenScreen() {
   // Already a member state
   if (status === "already_member") {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
         <VStack space="xl" className="w-full items-center">
           <Users size={64} color={IconColors.primary} />
 
           <VStack space="sm" className="items-center">
-            <Heading size="xl" className="text-center text-typography-900">
-              {t("groups.deepLink.alreadyMemberTitle", {
-                defaultValue: "Already a Member",
-              })}
+            <Heading size="xl" className="text-typography-900 text-center">
+              {t("groups.deepLink.alreadyMemberTitle")}
             </Heading>
-            <Text className="text-center text-typography-500">
-              {t("groups.deepLink.alreadyMemberMessage", {
-                defaultValue: "You're already a member of this group.",
-              })}
+            <Text className="text-typography-500 text-center">
+              {t("groups.deepLink.alreadyMemberMessage")}
             </Text>
           </VStack>
 
@@ -187,11 +170,7 @@ export default function JoinGroupByTokenScreen() {
               className="w-full"
               onPress={handleGoToGroups}
             >
-              <ButtonText>
-                {t("groups.deepLink.viewYourGroups", {
-                  defaultValue: "View Your Groups",
-                })}
-              </ButtonText>
+              <ButtonText>{t("groups.deepLink.viewYourGroups")}</ButtonText>
             </Button>
 
             <Button
@@ -201,9 +180,7 @@ export default function JoinGroupByTokenScreen() {
               className="w-full"
               onPress={handleGoHome}
             >
-              <ButtonText>
-                {t("groups.deepLink.goHome", { defaultValue: "Go Home" })}
-              </ButtonText>
+              <ButtonText>{t("groups.deepLink.goHome")}</ButtonText>
             </Button>
           </VStack>
         </VStack>
@@ -213,17 +190,15 @@ export default function JoinGroupByTokenScreen() {
 
   // Error state
   return (
-    <View className="flex-1 items-center justify-center bg-background-50 p-6">
+    <View className="bg-background-50 flex-1 items-center justify-center p-6">
       <VStack space="xl" className="w-full items-center">
         <XCircle size={64} color={IconColors.error} />
 
         <VStack space="sm" className="items-center">
-          <Heading size="xl" className="text-center text-error-600">
-            {t("groups.deepLink.errorTitle", {
-              defaultValue: "Unable to Join",
-            })}
+          <Heading size="xl" className="text-error-600 text-center">
+            {t("groups.deepLink.errorTitle")}
           </Heading>
-          <Text className="text-center text-typography-500">
+          <Text className="text-typography-500 text-center">
             {result.errorMessage}
           </Text>
         </VStack>
@@ -236,11 +211,7 @@ export default function JoinGroupByTokenScreen() {
             className="w-full"
             onPress={handleGoToGroups}
           >
-            <ButtonText>
-              {t("groups.deepLink.goToGroups", {
-                defaultValue: "Go to Groups",
-              })}
-            </ButtonText>
+            <ButtonText>{t("groups.deepLink.goToGroups")}</ButtonText>
           </Button>
 
           <Button
@@ -250,9 +221,7 @@ export default function JoinGroupByTokenScreen() {
             className="w-full"
             onPress={handleGoHome}
           >
-            <ButtonText>
-              {t("groups.deepLink.goHome", { defaultValue: "Go Home" })}
-            </ButtonText>
+            <ButtonText>{t("groups.deepLink.goHome")}</ButtonText>
           </Button>
         </VStack>
       </VStack>

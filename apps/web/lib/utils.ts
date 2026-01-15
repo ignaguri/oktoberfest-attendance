@@ -54,28 +54,8 @@ export function supportsBeforeInstallPrompt(): boolean {
   );
 }
 
-/**
- * Avatar URL Utilities
- */
-
-/**
- * Gets the correct avatar URL, handling both full URLs (from OAuth providers) and filenames (uploaded images)
- * @param avatarUrl - The avatar URL from the database (could be full URL or filename)
- * @returns The correct URL to use for displaying the avatar
- */
-export function getAvatarUrl(
-  avatarUrl: string | null | undefined,
-): string | undefined {
-  if (!avatarUrl) return undefined;
-
-  // If it's already a full URL (from Google, Facebook, etc.), return as-is
-  if (avatarUrl.startsWith("http")) {
-    return avatarUrl;
-  }
-
-  // If it's a filename, construct the API URL
-  return `/api/image/${avatarUrl}`;
-}
+// Re-export image URL utilities for convenience
+export { getAvatarUrl, getBeerPictureUrl } from "./image-urls";
 
 /**
  * Returns a new array shuffled using the Fisher-Yates algorithm.

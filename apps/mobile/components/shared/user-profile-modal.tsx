@@ -71,8 +71,7 @@ export function UserProfileModal({
 }: UserProfileModalProps) {
   const { t } = useTranslation();
 
-  const modalTitle =
-    title || t("activityFeed.userProfile", { defaultValue: "User Profile" });
+  const modalTitle = title || t("activityFeed.userProfile");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -90,8 +89,8 @@ export function UserProfileModal({
           {loading ? (
             <VStack className="items-center py-8">
               <Spinner size="large" color={Colors.primary[500]} />
-              <Text className="mt-2 text-typography-500">
-                {t("common.loading", { defaultValue: "Loading..." })}
+              <Text className="text-typography-500 mt-2">
+                {t("common.loading")}
               </Text>
             </VStack>
           ) : profile ? (
@@ -116,12 +115,12 @@ export function UserProfileModal({
               {/* User Info */}
               <VStack space="xs" className="items-center">
                 {profile.username && (
-                  <Text className="text-lg font-semibold text-typography-900">
+                  <Text className="text-typography-900 text-lg font-semibold">
                     {profile.username}
                   </Text>
                 )}
                 {profile.fullName && (
-                  <Text className="text-sm text-typography-500">
+                  <Text className="text-typography-500 text-sm">
                     {profile.fullName}
                   </Text>
                 )}
@@ -133,33 +132,33 @@ export function UserProfileModal({
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <Calendar size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
+                      <Text className="text-typography-900 text-xl font-bold">
                         {profile.stats.daysAttended}
                       </Text>
                     </HStack>
-                    <Text className="text-xs text-typography-500">
+                    <Text className="text-typography-500 text-xs">
                       {t("leaderboard.stats.days")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <Beer size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
+                      <Text className="text-typography-900 text-xl font-bold">
                         {profile.stats.totalBeers}
                       </Text>
                     </HStack>
-                    <Text className="text-xs text-typography-500">
+                    <Text className="text-typography-500 text-xs">
                       {t("leaderboard.stats.drinks")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <TrendingUp size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
+                      <Text className="text-typography-900 text-xl font-bold">
                         {profile.stats.avgBeers.toFixed(1)}
                       </Text>
                     </HStack>
-                    <Text className="text-xs text-typography-500">
+                    <Text className="text-typography-500 text-xs">
                       {t("leaderboard.stats.avg")}
                     </Text>
                   </VStack>
@@ -169,9 +168,7 @@ export function UserProfileModal({
           ) : (
             <VStack className="items-center py-4">
               <Text className="text-typography-500">
-                {t("activityFeed.profileNotFound", {
-                  defaultValue: "Profile not found",
-                })}
+                {t("activityFeed.profileNotFound")}
               </Text>
             </VStack>
           )}
@@ -223,9 +220,7 @@ export function TappableAvatar({
   return (
     <Pressable
       onPress={onPress}
-      accessibilityLabel={t("activityFeed.viewProfile", {
-        defaultValue: "View profile",
-      })}
+      accessibilityLabel={t("activityFeed.viewProfile")}
       accessibilityRole="button"
     >
       {children || (

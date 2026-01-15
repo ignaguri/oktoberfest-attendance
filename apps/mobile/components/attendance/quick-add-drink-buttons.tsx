@@ -91,13 +91,13 @@ export function QuickAddDrinkButtons({
   const getLabel = (type: DrinkType): string => {
     switch (type) {
       case "beer":
-        return t("home.quickAdd.beer", { defaultValue: "+1 Beer" });
+        return t("home.quickAdd.beer");
       case "radler":
-        return t("home.quickAdd.radler", { defaultValue: "+1 Radler" });
+        return t("home.quickAdd.radler");
       case "wine":
-        return t("home.quickAdd.wine", { defaultValue: "+1 Wine" });
+        return t("home.quickAdd.wine");
       case "soft_drink":
-        return t("home.quickAdd.soft", { defaultValue: "+1 Soft" });
+        return t("home.quickAdd.soft");
       default:
         return `+1 ${type}`;
     }
@@ -164,7 +164,7 @@ export function QuickAddDrinkButtons({
                 ? "border-success-500 bg-success-50"
                 : isDisabled
                   ? "border-background-200 bg-background-100"
-                  : "border-background-200 bg-white active:bg-background-50"
+                  : "border-background-200 active:bg-background-50 bg-white"
             }`}
             accessibilityLabel={getLabel(type)}
             accessibilityRole="button"
@@ -192,9 +192,7 @@ export function QuickAddDrinkButtons({
                 }`}
                 numberOfLines={1}
               >
-                {isSuccess
-                  ? t("common.status.added", { defaultValue: "Added!" })
-                  : getLabel(type)}
+                {isSuccess ? t("common.status.added") : getLabel(type)}
               </Text>
             </VStack>
           </Pressable>

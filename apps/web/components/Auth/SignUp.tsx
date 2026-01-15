@@ -84,7 +84,7 @@ export default function SignUp() {
     return (
       <div className="card">
         <h2 className="w-full text-center">
-          {t("auth.signUp.accountCreated", { defaultValue: "Account created" })}
+          {t("auth.signUp.accountCreated")}
         </h2>
         <div className="flex flex-col items-center gap-6">
           <p>{t("auth.signUp.success.checkEmail")}</p>

@@ -53,7 +53,7 @@ export default function InstallPWA() {
   return (
     <div
       className={cn(
-        "fixed right-0 bottom-0 z-200 w-full duration-700 sm:right-4 sm:bottom-4 sm:max-w-md",
+        "z-200 fixed bottom-0 right-0 w-full duration-700 sm:bottom-4 sm:right-4 sm:max-w-md",
         !isOpen
           ? "translate-y-8 opacity-0 transition-[opacity,transform]"
           : "translate-y-0 opacity-100 transition-[opacity,transform]",
@@ -62,7 +62,7 @@ export default function InstallPWA() {
       <div className="dark:bg-card bg-background border-border relative m-3 rounded-lg border shadow-lg">
         <button
           onClick={closePrompt}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          className="absolute right-2 top-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
           <X className="size-5" />
         </button>

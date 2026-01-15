@@ -104,16 +104,14 @@ export default function SignUpScreen() {
   // Success state - show confirmation message
   if (success) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background-0 p-6">
+      <SafeAreaView className="bg-background-0 flex-1 items-center justify-center p-6">
         <AuthHeader size="sm" />
 
         <View className="mt-8 items-center">
-          <Text className="mb-4 text-center text-2xl font-bold text-typography-900">
-            {t("auth.signUp.accountCreated", {
-              defaultValue: "Account created",
-            })}
+          <Text className="text-typography-900 mb-4 text-center text-2xl font-bold">
+            {t("auth.signUp.accountCreated")}
           </Text>
-          <Text className="mb-8 px-4 text-center text-typography-500">
+          <Text className="text-typography-500 mb-8 px-4 text-center">
             {t("auth.signUp.success.checkEmail")}
           </Text>
           <Button
@@ -131,7 +129,7 @@ export default function SignUpScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background-0">
+    <SafeAreaView className="bg-background-0 flex-1">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -147,14 +145,14 @@ export default function SignUpScreen() {
           </View>
 
           {/* Title */}
-          <Text className="mb-6 text-center text-2xl font-bold text-typography-900">
+          <Text className="text-typography-900 mb-6 text-center text-2xl font-bold">
             {t("auth.signUp.title")}
           </Text>
 
           {/* Error Message */}
           {error && (
-            <View className="mb-4 rounded-lg bg-error-50 p-3">
-              <Text className="text-center text-error-600">{error}</Text>
+            <View className="bg-error-50 mb-4 rounded-lg p-3">
+              <Text className="text-error-600 text-center">{error}</Text>
             </View>
           )}
 
@@ -176,9 +174,7 @@ export default function SignUpScreen() {
               control={control}
               name="password"
               label={t("auth.signUp.passwordLabel")}
-              placeholder={t("auth.signUp.passwordPlaceholder", {
-                defaultValue: "Create a password",
-              })}
+              placeholder={t("auth.signUp.passwordPlaceholder")}
               secureTextEntry
               autoComplete="password-new"
               error={errors.password?.message}
@@ -189,9 +185,7 @@ export default function SignUpScreen() {
               control={control}
               name="confirmPassword"
               label={t("auth.signUp.confirmPasswordLabel")}
-              placeholder={t("auth.signUp.confirmPasswordPlaceholder", {
-                defaultValue: "Confirm your password",
-              })}
+              placeholder={t("auth.signUp.confirmPasswordPlaceholder")}
               secureTextEntry
               autoComplete="password-new"
               error={errors.confirmPassword?.message}

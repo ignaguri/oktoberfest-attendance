@@ -14,7 +14,8 @@
     "./i18n/core": "./src/i18n/core.ts",
     "./data": "./src/data/index.ts",
     "./hooks": "./src/hooks/index.ts",
-    "./constants": "./src/constants/index.ts"
+    "./constants": "./src/constants/index.ts",
+    "./contexts": "./src/contexts/index.ts"
   },
   "scripts": {
     "build": "tsc",

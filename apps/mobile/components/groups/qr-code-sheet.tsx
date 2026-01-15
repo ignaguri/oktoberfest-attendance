@@ -12,9 +12,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { getAppUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import Constants from "expo-constants";
 import { QrCode, RefreshCw } from "lucide-react-native";
 import { useState, useCallback, useEffect } from "react";
 import QRCode from "react-native-qrcode-svg";
@@ -25,17 +25,6 @@ interface QRCodeSheetProps {
   groupId: string;
   groupName: string;
   inviteToken?: string | null;
-}
-
-/**
- * Get the app URL for the QR code join link
- */
-function getAppUrl(): string {
-  return (
-    Constants.expoConfig?.extra?.appUrl ||
-    process.env.EXPO_PUBLIC_APP_URL ||
-    "https://prostcounter.com"
-  );
 }
 
 /**
@@ -102,12 +91,11 @@ export function QRCodeSheet({
             <HStack space="sm" className="items-center">
               <QrCode size={24} color={IconColors.primary} />
               <Heading size="lg" className="text-typography-900">
-                {t("groups.qrCode.title", { defaultValue: "QR Code to Join" })}
+                {t("groups.qrCode.title")}
               </Heading>
             </HStack>
-            <Text className="text-center text-sm text-typography-500">
+            <Text className="text-typography-500 text-center text-sm">
               {t("groups.qrCode.description", {
-                defaultValue: `Scan this QR code to join "${groupName}"`,
                 name: groupName,
               })}
             </Text>
@@ -118,10 +106,8 @@ export function QRCodeSheet({
             {isGenerating || !joinUrl ? (
               <VStack className="h-52 w-52 items-center justify-center">
                 <Spinner size="large" />
-                <Text className="mt-2 text-sm text-typography-500">
-                  {t("groups.qrCode.generating", {
-                    defaultValue: "Generating...",
-                  })}
+                <Text className="text-typography-500 mt-2 text-sm">
+                  {t("groups.qrCode.generating")}
                 </Text>
               </VStack>
             ) : (
@@ -135,11 +121,8 @@ export function QRCodeSheet({
           </VStack>
 
           {/* Helper text */}
-          <Text className="text-center text-sm text-typography-500">
-            {t("groups.qrCode.helper", {
-              defaultValue:
-                "Others can scan this code to join your group instantly!",
-            })}
+          <Text className="text-typography-500 text-center text-sm">
+            {t("groups.qrCode.helper")}
           </Text>
 
           {/* Regenerate button */}
@@ -157,9 +140,7 @@ export function QRCodeSheet({
               <RefreshCw size={16} color={IconColors.default} />
             )}
             <ButtonText className="ml-2">
-              {t("groups.qrCode.regenerate", {
-                defaultValue: "Generate New Code",
-              })}
+              {t("groups.qrCode.regenerate")}
             </ButtonText>
           </Button>
         </VStack>

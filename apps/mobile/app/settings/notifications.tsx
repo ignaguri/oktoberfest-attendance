@@ -80,9 +80,7 @@ export default function NotificationSettingsScreen() {
       setPreferences((prev) => ({ ...prev, [key]: previousValue }));
       Alert.alert(
         t("common.status.error"),
-        t("profile.notifications.updateError", {
-          defaultValue: "Failed to update notification settings",
-        }),
+        t("profile.notifications.updateError"),
       );
     } finally {
       setIsSaving(false);
@@ -91,7 +89,7 @@ export default function NotificationSettingsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ActivityIndicator size="large" color={Colors.primary[500]} />
       </View>
     );
@@ -99,7 +97,7 @@ export default function NotificationSettingsScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-background-50"
+      className="bg-background-50 flex-1"
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
@@ -107,26 +105,20 @@ export default function NotificationSettingsScreen() {
       <View className="p-4">
         {/* Preferences Section */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-semibold text-typography-900">
-            {t("profile.notifications.preferences", {
-              defaultValue: "Preferences",
-            })}
+          <Text className="text-typography-900 mb-4 text-lg font-semibold">
+            {t("profile.notifications.preferences")}
           </Text>
 
           {/* Reminders */}
-          <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+          <View className="border-outline-100 flex-row items-center justify-between border-b py-3">
             <View className="flex-1 flex-row items-center gap-3">
               <Clock size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t("profile.notifications.reminders", {
-                    defaultValue: "Reminders",
-                  })}
+                  {t("profile.notifications.reminders")}
                 </Text>
-                <Text className="text-sm text-typography-500">
-                  {t("profile.notifications.remindersDescription", {
-                    defaultValue: "Reservation reminders and check-in prompts",
-                  })}
+                <Text className="text-typography-500 text-sm">
+                  {t("profile.notifications.remindersDescription")}
                 </Text>
               </View>
             </View>
@@ -145,19 +137,15 @@ export default function NotificationSettingsScreen() {
           </View>
 
           {/* Achievement Notifications */}
-          <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+          <View className="border-outline-100 flex-row items-center justify-between border-b py-3">
             <View className="flex-1 flex-row items-center gap-3">
               <Trophy size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t("profile.notifications.achievements", {
-                    defaultValue: "Achievement Notifications",
-                  })}
+                  {t("profile.notifications.achievements")}
                 </Text>
-                <Text className="text-sm text-typography-500">
-                  {t("profile.notifications.achievementsDescription", {
-                    defaultValue: "Get notified when you unlock achievements",
-                  })}
+                <Text className="text-typography-500 text-sm">
+                  {t("profile.notifications.achievementsDescription")}
                 </Text>
               </View>
             </View>
@@ -181,15 +169,10 @@ export default function NotificationSettingsScreen() {
               <Users size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t("profile.notifications.groups", {
-                    defaultValue: "Group Notifications",
-                  })}
+                  {t("profile.notifications.groups")}
                 </Text>
-                <Text className="text-sm text-typography-500">
-                  {t("profile.notifications.groupsDescription", {
-                    defaultValue:
-                      "Get notifications from your groups (check-ins, achievements, etc.)",
-                  })}
+                <Text className="text-typography-500 text-sm">
+                  {t("profile.notifications.groupsDescription")}
                 </Text>
               </View>
             </View>
@@ -210,10 +193,8 @@ export default function NotificationSettingsScreen() {
 
         {/* Push Notifications Section */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-semibold text-typography-900">
-            {t("profile.notifications.pushTitle", {
-              defaultValue: "Push Notifications",
-            })}
+          <Text className="text-typography-900 mb-4 text-lg font-semibold">
+            {t("profile.notifications.pushTitle")}
           </Text>
 
           <View className="flex-row items-center justify-between py-3">
@@ -221,15 +202,10 @@ export default function NotificationSettingsScreen() {
               <Bell size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t("profile.notifications.push", {
-                    defaultValue: "Push Notifications",
-                  })}
+                  {t("profile.notifications.push")}
                 </Text>
-                <Text className="text-sm text-typography-500">
-                  {t("profile.notifications.pushDescription", {
-                    defaultValue:
-                      "Receive notifications even when the app is closed",
-                  })}
+                <Text className="text-typography-500 text-sm">
+                  {t("profile.notifications.pushDescription")}
                 </Text>
               </View>
             </View>
@@ -237,10 +213,8 @@ export default function NotificationSettingsScreen() {
               value={false}
               onValueChange={() => {
                 Alert.alert(
-                  t("common.status.info", { defaultValue: "Info" }),
-                  t("profile.notifications.pushComingSoon", {
-                    defaultValue: "Push notifications coming soon!",
-                  }),
+                  t("common.status.info"),
+                  t("profile.notifications.pushComingSoon"),
                 );
               }}
               trackColor={{
@@ -257,10 +231,7 @@ export default function NotificationSettingsScreen() {
           <View className="flex-row items-start gap-3">
             <Info size={24} color={Colors.primary[600]} />
             <Text className="flex-1 text-sm text-yellow-800">
-              {t("profile.notifications.info", {
-                defaultValue:
-                  "Notification preferences are synced across all your devices.",
-              })}
+              {t("profile.notifications.info")}
             </Text>
           </View>
         </View>

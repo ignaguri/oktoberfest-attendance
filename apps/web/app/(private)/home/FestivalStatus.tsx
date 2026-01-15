@@ -2,11 +2,11 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SkeletonFestivalStatus } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import {
   getFestivalConstants,
   getFestivalStatus,
 } from "@/lib/festivalConstants";
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   differenceInDays,
   isWithinInterval,

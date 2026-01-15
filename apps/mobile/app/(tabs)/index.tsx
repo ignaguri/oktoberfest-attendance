@@ -5,7 +5,7 @@ import { MapLinkButton } from "@/components/shared/map-link-button";
 import { QuickAttendanceCard } from "@/components/shared/quick-attendance-card";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
@@ -41,7 +41,7 @@ export default function HomeScreen() {
   }, [queryClient]);
 
   return (
-    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+    <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
       <ScrollView
         className="flex-1"
         refreshControl={

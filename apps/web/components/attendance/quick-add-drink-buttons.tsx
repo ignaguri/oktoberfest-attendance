@@ -4,10 +4,12 @@ import { RadlerIcon } from "@/components/icons/radler-icon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLogConsumption } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Beer, Wine, CupSoda, BeerOff, Check, Loader2 } from "lucide-react";
 import { useState, useCallback } from "react";
 
 import type { DrinkType } from "@prostcounter/shared/schemas";
+import type { TFunction } from "i18next";
 
 /**
  * Visible drink types for the picker
@@ -73,18 +75,18 @@ function DrinkIcon({
 /**
  * Get the label for a drink type
  */
-function getLabel(type: DrinkType): string {
+function getLabel(type: DrinkType, t: TFunction): string {
   switch (type) {
     case "beer":
-      return "+1 Beer";
+      return t("attendance.quickAdd.beer");
     case "radler":
-      return "+1 Radler";
+      return t("attendance.quickAdd.radler");
     case "wine":
-      return "+1 Wine";
+      return t("attendance.quickAdd.wine");
     case "soft_drink":
-      return "+1 Soft";
+      return t("attendance.quickAdd.soft_drink");
     case "alcohol_free":
-      return "+1 AF";
+      return t("attendance.quickAdd.alcohol_free");
     default:
       return `+1 ${type}`;
   }
@@ -108,6 +110,7 @@ export function QuickAddDrinkButtons({
   onSuccess,
   className,
 }: QuickAddDrinkButtonsProps) {
+  const { t } = useTranslation();
   const logConsumption = useLogConsumption();
   const [successType, setSuccessType] = useState<DrinkType | null>(null);
   const [loadingType, setLoadingType] = useState<DrinkType | null>(null);
@@ -179,7 +182,7 @@ export function QuickAddDrinkButtons({
               <DrinkIcon type={type} className={DRINK_TYPE_COLORS[type]} />
             )}
             <span className="text-sm">
-              {isSuccess ? "Added!" : getLabel(type)}
+              {isSuccess ? t("common.status.added") : getLabel(type, t)}
             </span>
           </Button>
         );

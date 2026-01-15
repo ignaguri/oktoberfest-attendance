@@ -84,7 +84,7 @@ export function CheckInPromptDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       {isExploding && (
-        <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
+        <div className="pointer-events-none fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
           <ConfettiExplosion
             force={0.4}
             duration={2200}

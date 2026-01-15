@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SkeletonNewsFeed } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useActivityFeedItems } from "@/hooks/useActivityFeed";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Loader2, RadioTower, RefreshCw } from "lucide-react";
 import { useCallback } from "react";
 

@@ -2,9 +2,9 @@
 
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
-import { useFestival } from "@/contexts/FestivalContext";
 import { usePersonalCalendar } from "@/hooks/useCalendar";
 import { useTranslation } from "@/lib/i18n/client";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Loader2 } from "lucide-react";
 
 export default function PersonalCalendarPage() {
@@ -38,15 +38,15 @@ export default function PersonalCalendarPage() {
   }
 
   const initialMonth = currentFestival
-    ? new Date(currentFestival.start_date)
+    ? new Date(currentFestival.startDate)
     : new Date();
 
   const festivalStartDate = currentFestival
-    ? new Date(currentFestival.start_date)
+    ? new Date(currentFestival.startDate)
     : undefined;
 
   const festivalEndDate = currentFestival
-    ? new Date(currentFestival.end_date)
+    ? new Date(currentFestival.endDate)
     : undefined;
 
   return (

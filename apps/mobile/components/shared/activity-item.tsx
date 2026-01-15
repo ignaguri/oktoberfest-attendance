@@ -4,9 +4,9 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { formatRelativeTime } from "@prostcounter/shared";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { formatDistanceToNow, parseISO } from "date-fns";
 import {
   Award,
   Beer,
@@ -131,12 +131,12 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
     activity_data,
   } = activity;
 
-  // Format relative time
+  // Format relative time using shared utility
   const timeAgo = useMemo(() => {
     try {
-      return formatDistanceToNow(parseISO(activity_time), { addSuffix: true });
+      return formatRelativeTime(new Date(activity_time));
     } catch {
-      return t("activityFeed.recently", { defaultValue: "recently" });
+      return t("activityFeed.recently");
     }
   }, [activity_time, t]);
 
@@ -166,17 +166,12 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         // If we have a specific drink type, use it with pluralization
         if (drinkType && drinkCount > 0) {
           return t(`activityFeed.drank_${drinkType}`, {
-            defaultValue: t("activityFeed.drankDrinks", {
-              defaultValue: `drank ${drinkCount} drinks`,
-              count: drinkCount,
-            }),
             count: drinkCount,
           });
         }
 
         // Fall back to showing beers for old data
         return t("activityFeed.drankBeers", {
-          defaultValue: `drank ${beerCount} beers`,
           count: beerCount,
         });
       }
@@ -185,27 +180,23 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         const tentName = getActivityDataValue(
           activity_data,
           "tent_name",
-          t("activityFeed.aTent", { defaultValue: "a tent" }),
+          t("activityFeed.aTent"),
         );
         return t("activityFeed.checkedInto", {
-          defaultValue: `checked into ${tentName}`,
           tent: tentName,
         });
       }
 
       case "photo_upload":
-        return t("activityFeed.uploadedPhoto", {
-          defaultValue: "uploaded a photo",
-        });
+        return t("activityFeed.uploadedPhoto");
 
       case "group_join": {
         const groupName = getActivityDataValue(
           activity_data,
           "group_name",
-          t("activityFeed.aGroup", { defaultValue: "a group" }),
+          t("activityFeed.aGroup"),
         );
         return t("activityFeed.joinedGroup", {
-          defaultValue: `joined ${groupName}`,
           group: groupName,
         });
       }
@@ -218,18 +209,13 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         );
         return achievementName
           ? t("activityFeed.unlockedAchievementName", {
-              defaultValue: `unlocked "${achievementName}"`,
               name: achievementName,
             })
-          : t("activityFeed.unlockedAchievement", {
-              defaultValue: "unlocked an achievement",
-            });
+          : t("activityFeed.unlockedAchievement");
       }
 
       default:
-        return t("activityFeed.hadActivity", {
-          defaultValue: "had some activity",
-        });
+        return t("activityFeed.hadActivity");
     }
   }, [activity_type, activity_data, t]);
 
@@ -258,16 +244,16 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
             <HStack space="xs" className="flex-1 items-center">
               {getActivityIcon(activity_type, activity_data)}
               <Text
-                className="flex-1 text-sm font-medium text-typography-900"
+                className="text-typography-900 flex-1 text-sm font-medium"
                 numberOfLines={1}
               >
                 {displayName}
               </Text>
             </HStack>
-            <Text className="text-xs text-typography-400">{timeAgo}</Text>
+            <Text className="text-typography-400 text-xs">{timeAgo}</Text>
           </HStack>
 
-          <Text className="text-sm text-typography-500">{description}</Text>
+          <Text className="text-typography-500 text-sm">{description}</Text>
 
           {/* Photo thumbnail for photo uploads */}
           {activity_type === "photo_upload" && pictureUrl && (
@@ -279,9 +265,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
                 source={{ uri: pictureUrl }}
                 className="h-16 w-16 rounded-lg"
                 resizeMode="cover"
-                accessibilityLabel={t("activityFeed.uploadedPhoto", {
-                  defaultValue: "uploaded a photo",
-                })}
+                accessibilityLabel={t("activityFeed.uploadedPhoto")}
               />
             </Pressable>
           )}

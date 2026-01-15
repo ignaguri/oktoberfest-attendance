@@ -128,8 +128,8 @@ export function CreateGroupSheet({
 
         {/* Header */}
         <HStack className="mb-4 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
-            {t("groups.create.title", { defaultValue: "Create Group" })}
+          <Text className="text-typography-900 text-lg font-semibold">
+            {t("groups.create.title")}
           </Text>
           <Pressable onPress={handleClose} hitSlop={8}>
             <X size={24} color={IconColors.default} />
@@ -140,8 +140,8 @@ export function CreateGroupSheet({
           <VStack space="xl" className="px-2 pb-4">
             {/* Group Name Input */}
             <VStack space="sm">
-              <Text className="text-sm font-medium text-typography-700">
-                {t("groups.create.nameLabel", { defaultValue: "Group Name" })}
+              <Text className="text-typography-700 text-sm font-medium">
+                {t("groups.create.nameLabel")}
               </Text>
               <Controller
                 control={control}
@@ -149,9 +149,7 @@ export function CreateGroupSheet({
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input size="md">
                     <InputField
-                      placeholder={t("groups.create.namePlaceholder", {
-                        defaultValue: "Enter group name",
-                      })}
+                      placeholder={t("groups.create.namePlaceholder")}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -161,7 +159,7 @@ export function CreateGroupSheet({
                 )}
               />
               {errors.name && (
-                <Text className="text-sm text-error-600">
+                <Text className="text-error-600 text-sm">
                   {t(errors.name.message || "validation.required")}
                 </Text>
               )}
@@ -169,10 +167,8 @@ export function CreateGroupSheet({
 
             {/* Winning Criteria Select */}
             <VStack space="sm">
-              <Text className="text-sm font-medium text-typography-700">
-                {t("groups.create.criteriaLabel", {
-                  defaultValue: "Winning Criteria",
-                })}
+              <Text className="text-typography-700 text-sm font-medium">
+                {t("groups.create.criteriaLabel")}
               </Text>
               <Controller
                 control={control}
@@ -181,9 +177,7 @@ export function CreateGroupSheet({
                   <Select selectedValue={value} onValueChange={onChange}>
                     <SelectTrigger variant="outline" size="md">
                       <SelectInput
-                        placeholder={t("groups.create.criteriaPlaceholder", {
-                          defaultValue: "Select winning criteria",
-                        })}
+                        placeholder={t("groups.create.criteriaPlaceholder")}
                         value={
                           WINNING_CRITERIA_OPTIONS.find(
                             (opt) => opt.value === value,
@@ -192,11 +186,6 @@ export function CreateGroupSheet({
                                 WINNING_CRITERIA_OPTIONS.find(
                                   (opt) => opt.value === value,
                                 )!.label,
-                                {
-                                  defaultValue: WINNING_CRITERIA_OPTIONS.find(
-                                    (opt) => opt.value === value,
-                                  )!.defaultLabel,
-                                },
                               )
                             : ""
                         }
@@ -212,9 +201,7 @@ export function CreateGroupSheet({
                         {WINNING_CRITERIA_OPTIONS.map((option) => (
                           <SelectItem
                             key={option.value}
-                            label={t(option.label, {
-                              defaultValue: option.defaultLabel,
-                            })}
+                            label={t(option.label)}
                             value={option.value}
                           />
                         ))}
@@ -224,18 +211,15 @@ export function CreateGroupSheet({
                 )}
               />
               {errors.winningCriteria && (
-                <Text className="text-sm text-error-600">
+                <Text className="text-error-600 text-sm">
                   {t(errors.winningCriteria.message || "validation.required")}
                 </Text>
               )}
             </VStack>
 
             {/* Helper text */}
-            <Text className="text-sm text-typography-500">
-              {t("groups.create.criteriaHelp", {
-                defaultValue:
-                  "The winning criteria determines how the leaderboard ranks group members.",
-              })}
+            <Text className="text-typography-500 text-sm">
+              {t("groups.create.criteriaHelp")}
             </Text>
           </VStack>
         </ActionsheetScrollView>
@@ -261,8 +245,8 @@ export function CreateGroupSheet({
             {isSubmitting && <ButtonSpinner color={Colors.white} />}
             <ButtonText>
               {isSubmitting
-                ? t("common.status.creating", { defaultValue: "Creating..." })
-                : t("groups.actions.create", { defaultValue: "Create Group" })}
+                ? t("common.status.creating")
+                : t("groups.actions.create")}
             </ButtonText>
           </Button>
         </HStack>

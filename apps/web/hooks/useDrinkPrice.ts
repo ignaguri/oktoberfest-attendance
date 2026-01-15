@@ -7,7 +7,7 @@
  * provide the current festival's beer cost to the shared hook.
  */
 
-import { useFestival } from "@/contexts/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useDrinkPrice as useSharedDrinkPrice,
   type UseDrinkPriceReturn,
@@ -21,7 +21,6 @@ export function useDrinkPrice(): UseDrinkPriceReturn {
   const { currentFestival } = useFestival();
 
   return useSharedDrinkPrice({
-    // Web Festival type uses snake_case (beer_cost from database)
-    festivalBeerCost: currentFestival?.beer_cost,
+    festivalBeerCost: currentFestival?.beerCost,
   });
 }

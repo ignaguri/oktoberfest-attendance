@@ -102,12 +102,7 @@ export function JoinGroupSheet({
       console.error("Failed to join group:", err);
       // Extract error message from API response
       const message =
-        err?.response?.data?.message ||
-        err?.message ||
-        t("groups.join.error", {
-          defaultValue:
-            "Failed to join group. Please check the password and try again.",
-        });
+        err?.response?.data?.message || err?.message || t("groups.join.error");
       setError(message);
     }
   }, [
@@ -148,10 +143,8 @@ export function JoinGroupSheet({
       return (
         <VStack className="items-center py-8">
           <ActivityIndicator color={Colors.primary[500]} />
-          <Text className="mt-2 text-sm text-typography-500">
-            {t("groups.join.searching", {
-              defaultValue: "Searching groups...",
-            })}
+          <Text className="text-typography-500 mt-2 text-sm">
+            {t("groups.join.searching")}
           </Text>
         </VStack>
       );
@@ -161,8 +154,8 @@ export function JoinGroupSheet({
       return (
         <VStack className="items-center py-8">
           <Users size={48} color={IconColors.disabled} />
-          <Text className="mt-2 text-sm text-typography-500">
-            {t("groups.join.noResults", { defaultValue: "No groups found" })}
+          <Text className="text-typography-500 mt-2 text-sm">
+            {t("groups.join.noResults")}
           </Text>
         </VStack>
       );
@@ -176,15 +169,14 @@ export function JoinGroupSheet({
               <Card variant="outline" size="sm" className="bg-background-0">
                 <HStack className="items-center justify-between">
                   <VStack space="xs">
-                    <Text className="font-medium text-typography-900">
+                    <Text className="text-typography-900 font-medium">
                       {group.name}
                     </Text>
                     <HStack space="xs" className="items-center">
                       <Users size={12} color={IconColors.muted} />
-                      <Text className="text-xs text-typography-500">
+                      <Text className="text-typography-500 text-xs">
                         {t("groups.memberCount", {
                           count: group.memberCount,
-                          defaultValue: "{{count}} members",
                         })}
                       </Text>
                     </HStack>
@@ -201,10 +193,8 @@ export function JoinGroupSheet({
     return (
       <VStack className="items-center py-8">
         <Search size={48} color={IconColors.disabled} />
-        <Text className="mt-2 text-center text-sm text-typography-500">
-          {t("groups.join.searchPrompt", {
-            defaultValue: "Search for a group by name to join",
-          })}
+        <Text className="text-typography-500 mt-2 text-center text-sm">
+          {t("groups.join.searchPrompt")}
         </Text>
       </VStack>
     );
@@ -221,15 +211,14 @@ export function JoinGroupSheet({
         {selectedGroup && (
           <Card variant="elevated" size="md" className="bg-background-0">
             <VStack space="sm">
-              <Text className="font-semibold text-typography-900">
+              <Text className="text-typography-900 font-semibold">
                 {selectedGroup.name}
               </Text>
               <HStack space="xs" className="items-center">
                 <Users size={14} color={IconColors.muted} />
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("groups.memberCount", {
                     count: selectedGroup.memberCount,
-                    defaultValue: "{{count}} members",
                   })}
                 </Text>
               </HStack>
@@ -238,12 +227,10 @@ export function JoinGroupSheet({
         )}
 
         <VStack space="sm">
-          <Text className="text-sm font-medium text-typography-700">
+          <Text className="text-typography-700 text-sm font-medium">
             {isPasswordMode
-              ? t("groups.join.passwordLabel", {
-                  defaultValue: "Group Password",
-                })
-              : t("groups.join.tokenLabel", { defaultValue: "Invite Link" })}
+              ? t("groups.join.passwordLabel")
+              : t("groups.join.tokenLabel")}
           </Text>
           <Input size="md">
             <InputSlot className="pl-3">
@@ -255,12 +242,8 @@ export function JoinGroupSheet({
             <InputField
               placeholder={
                 isPasswordMode
-                  ? t("groups.join.passwordPlaceholder", {
-                      defaultValue: "Enter group password",
-                    })
-                  : t("groups.join.tokenPlaceholder", {
-                      defaultValue: "Paste invite link or token",
-                    })
+                  ? t("groups.join.passwordPlaceholder")
+                  : t("groups.join.tokenPlaceholder")
               }
               value={inviteToken}
               onChangeText={setInviteToken}
@@ -268,16 +251,12 @@ export function JoinGroupSheet({
               autoCorrect={false}
             />
           </Input>
-          <Text className="text-xs text-typography-400">
+          <Text className="text-typography-400 text-xs">
             {isPasswordMode
-              ? t("groups.join.passwordHelp", {
-                  defaultValue: "Ask a group member for the password",
-                })
-              : t("groups.join.tokenHelp", {
-                  defaultValue: "Paste the invite link shared with you",
-                })}
+              ? t("groups.join.passwordHelp")
+              : t("groups.join.tokenHelp")}
           </Text>
-          {error && <Text className="text-sm text-error-600">{error}</Text>}
+          {error && <Text className="text-error-600 text-sm">{error}</Text>}
         </VStack>
 
         {/* Action Buttons */}
@@ -291,7 +270,7 @@ export function JoinGroupSheet({
           >
             <ButtonText>
               {selectedGroup
-                ? t("common.buttons.back", { defaultValue: "Back" })
+                ? t("common.buttons.back")
                 : t("common.buttons.cancel")}
             </ButtonText>
           </Button>
@@ -304,9 +283,7 @@ export function JoinGroupSheet({
           >
             {isJoining && <ButtonSpinner color={Colors.white} />}
             <ButtonText>
-              {isJoining
-                ? t("groups.join.joining", { defaultValue: "Joining..." })
-                : t("groups.actions.join", { defaultValue: "Join Group" })}
+              {isJoining ? t("groups.join.joining") : t("groups.actions.join")}
             </ButtonText>
           </Button>
         </HStack>
@@ -324,8 +301,8 @@ export function JoinGroupSheet({
 
         {/* Header */}
         <HStack className="mb-4 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
-            {t("groups.join.title", { defaultValue: "Join Group" })}
+          <Text className="text-typography-900 text-lg font-semibold">
+            {t("groups.join.title")}
           </Text>
           <Pressable onPress={handleClose} hitSlop={8}>
             <X size={24} color={IconColors.default} />
@@ -355,7 +332,7 @@ export function JoinGroupSheet({
                   }
                 />
                 <ButtonText className="ml-1">
-                  {t("groups.join.searchMode", { defaultValue: "Search" })}
+                  {t("groups.join.searchMode")}
                 </ButtonText>
               </Button>
               <Button
@@ -377,7 +354,7 @@ export function JoinGroupSheet({
                   }
                 />
                 <ButtonText className="ml-1">
-                  {t("groups.join.tokenMode", { defaultValue: "Invite Link" })}
+                  {t("groups.join.tokenMode")}
                 </ButtonText>
               </Button>
             </HStack>
@@ -390,9 +367,7 @@ export function JoinGroupSheet({
                     <InputIcon as={Search} color={IconColors.muted} />
                   </InputSlot>
                   <InputField
-                    placeholder={t("groups.join.searchPlaceholder", {
-                      defaultValue: "Search by group name",
-                    })}
+                    placeholder={t("groups.join.searchPlaceholder")}
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                   />

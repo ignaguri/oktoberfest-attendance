@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Oktoberfest and other beer festivals attendance. Users log daily beer consumption, participate in group competitions, view leaderboards, and earn achievements.
 
+**Important**: Server actions were migrated to Hono API (commit #86) for Expo compatibility. Both web and mobile now use the same REST API via the type-safe API client.
+
 ## Development Commands
 
 ### Core Development
@@ -63,11 +65,21 @@ prostcounter/
 │   │
 │   └── mobile/               # Expo React Native app
 │       ├── app/              # Expo Router pages
+│       │   ├── (auth)/       # Auth screens (sign-in, sign-up, forgot-password)
+│       │   ├── (tabs)/       # Main tabs (home, attendance, groups, leaderboard, profile)
+│       │   ├── settings/     # Settings screens (change-password, notifications, photo-privacy)
+│       │   ├── groups/       # Group detail screens ([id]/index, [id]/settings, [id]/gallery)
+│       │   ├── achievements/ # Achievements screen
+│       │   └── join-group/   # Join group by invite token
 │       ├── components/       # React Native components
 │       │   ├── ui/           # Gluestack UI components
-│       │   └── [feature]/    # Feature-specific components
-│       ├── hooks/            # Custom hooks
+│       │   └── [feature]/    # Feature-specific (profile, attendance, groups, etc.)
+│       ├── hooks/            # Mobile-specific hooks (biometrics, image upload)
 │       └── lib/              # Utilities, constants, contexts
+│           ├── auth/         # AuthContext, biometrics
+│           ├── constants/    # colors.ts
+│           ├── festival/     # FestivalContext
+│           └── data/         # query-client setup
 │
 ├── packages/
 │   ├── api/                  # Hono API routes & business logic
@@ -98,7 +110,28 @@ prostcounter/
 ### Authentication Flow
 
 - Supabase Auth with Row Level Security (RLS)
-- Private layout redirects unauthenticated users to `/sign-in`
+- **Web**: Private layout redirects unauthenticated users to `/sign-in`
+- **Mobile**: NavigationGuard component handles route protection in `_layout.tsx`
+
+### Provider Architecture (Mobile)
+
+The mobile app uses a nested provider structure in `apps/mobile/app/_layout.tsx`:
+
+```
+GestureHandlerRootView
+└── SafeAreaProvider
+    └── I18nextProvider
+        └── ErrorBoundary
+            └── DataProvider (TanStack React Query)
+                └── ApiClientProvider
+                    └── GluestackUIProvider
+                        └── AuthProvider
+                            └── FestivalProvider
+                                └── NavigationGuard
+                                    └── Stack (Expo Router)
+```
+
+**Important**: GluestackUIProvider must be inside ApiClientProvider because OverlayProvider renders modals/sheets via portal.
 
 ### Form Validation
 
@@ -126,8 +159,50 @@ prostcounter/
 ## API Layer
 
 - **Hono REST API** in `packages/api/` with OpenAPI spec generation
-- **Type-safe client** auto-generated in `packages/api-client/`
-- Regenerate: `pnpm --filter=@prostcounter/api generate-spec && pnpm --filter=@prostcounter/api-client generate`
+- **Type-safe client** auto-generated in `packages/api-client/` using `openapi-typescript` and `openapi-fetch`
+- Regenerate API client:
+  1. `pnpm --filter=@prostcounter/api generate-spec` - Generate OpenAPI spec from Hono routes
+  2. `pnpm --filter=@prostcounter/api-client generate` - Generate TypeScript types and client from spec
+- Both web and mobile use the same API client for all server communication
+
+## Mobile-Specific Features
+
+The mobile app includes several features not present in the web version:
+
+1. **Biometric Authentication** (Face ID/Touch ID)
+   - Hook: `useBiometrics()` in `apps/mobile/hooks/useBiometrics.ts`
+   - Can be enabled/disabled in profile settings
+
+2. **Tutorial/Onboarding System**
+   - Tutorial shown on first app launch
+   - Can be reset from profile settings using `useResetTutorial()`
+
+3. **Native Image Capture**
+   - Camera and photo library integration
+   - Hooks: `useImageUpload()`, `useAvatarUpload()`, `useBeerPictureUpload()`
+   - Component: `ImageSourcePicker` for camera/library selection
+
+4. **Settings Screens**
+   - `/settings/change-password` - Change password
+   - `/settings/notifications` - Notification preferences (UI ready, API TODO)
+   - `/settings/photo-privacy` - Photo visibility settings
+
+5. **Navigation Guards**
+   - Auto-redirect to sign-in for unauthenticated users
+   - Protected route handling via NavigationGuard component
+
+6. **Error Boundaries**
+   - App-wide error handling with ErrorBoundary component
+   - Prevents crashes from propagating
+
+### Mobile-Specific Hooks
+
+- `useBiometrics()` - Biometric authentication management
+- `useBeerPictureUpload()` - Upload beer photos
+- `useImageUpload()` - Generic image upload
+- `useAvatarUpload()` - Profile avatar upload
+- `useSaveAttendance()` - Save attendance with optimistic updates
+- `useDrinkPrice()` - Calculate drink costs (mobile & web)
 
 ## Mobile Development Patterns
 

@@ -26,11 +26,13 @@ import MissingFields from "./MissingFields";
 import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 
 export default function Home() {
-  const { data: tutorialStatus } = useTutorialStatus();
+  const { data: tutorialStatus, loading: isTutorialStatusLoading } =
+    useTutorialStatus();
 
   return (
     <TutorialProvider
       tutorialCompleted={tutorialStatus?.tutorial_completed ?? false}
+      isLoadingStatus={isTutorialStatusLoading}
     >
       <div className="flex max-w-lg flex-col items-center gap-4">
         <header className="flex flex-row items-center gap-4">
@@ -90,7 +92,7 @@ export default function Home() {
               What can I do with Prost Counter?
             </AccordionTrigger>
             <AccordionContent className="max-w-80">
-              <p className="text-center text-balance text-gray-600">
+              <p className="text-balance text-center text-gray-600">
                 Compete with friends in different groups to see who visits beer
                 festivals more often and drinks the most beers!
                 <br />

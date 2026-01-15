@@ -174,6 +174,10 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         // Step 5: Invalidate caches
         invalidateQueries(QueryKeys.attendanceByDate(festivalId, dateStr));
         invalidateQueries(QueryKeys.consumptions(festivalId, dateStr));
+        // Invalidate galleries if photos were deleted
+        if (photosToDelete.length > 0) {
+          invalidateQueries(["gallery"]); // Prefix match: all galleries
+        }
       } catch (err) {
         const saveError =
           err instanceof Error ? err : new Error("Failed to save attendance");

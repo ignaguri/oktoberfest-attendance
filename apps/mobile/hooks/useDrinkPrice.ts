@@ -5,7 +5,7 @@
  * provide the current festival's beer cost to the shared hook.
  */
 
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useDrinkPrice as useSharedDrinkPrice } from "@prostcounter/shared/hooks";
 
 /**

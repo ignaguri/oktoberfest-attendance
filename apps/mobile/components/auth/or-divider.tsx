@@ -16,14 +16,13 @@ interface OrDividerProps {
  */
 export function OrDivider({ text }: OrDividerProps) {
   const { t } = useTranslation();
-  const displayText =
-    text ?? t("auth.signIn.orContinueWith", { defaultValue: "or" });
+  const displayText = text ?? t("auth.signIn.orContinueWith");
 
   return (
     <View className="my-6 w-full flex-row items-center">
-      <View className="h-px flex-1 bg-background-300" />
-      <Text className="mx-4 text-sm text-typography-500">{displayText}</Text>
-      <View className="h-px flex-1 bg-background-300" />
+      <View className="bg-background-300 h-px flex-1" />
+      <Text className="text-typography-500 mx-4 text-sm">{displayText}</Text>
+      <View className="bg-background-300 h-px flex-1" />
     </View>
   );
 }

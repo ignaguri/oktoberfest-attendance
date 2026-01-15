@@ -10,6 +10,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { format } from "date-fns";
 import { UserMinus, Crown, Users } from "lucide-react-native";
 
@@ -38,8 +39,8 @@ export function GroupMembersList({
     return (
       <Card variant="outline" size="md" className="items-center p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="mt-2 text-center text-typography-500">
-          {t("groups.members.empty", { defaultValue: "No members yet" })}
+        <Text className="text-typography-500 mt-2 text-center">
+          {t("groups.members.empty")}
         </Text>
       </Card>
     );
@@ -68,7 +69,7 @@ export function GroupMembersList({
             key={member.userId}
             variant="outline"
             size="sm"
-            className={isCurrentUser ? "border-primary-200 bg-primary-50" : ""}
+            className={cn(isCurrentUser && "border-primary-200 bg-primary-50")}
           >
             <HStack className="items-center justify-between">
               <HStack space="md" className="flex-1 items-center">
@@ -83,7 +84,11 @@ export function GroupMembersList({
                 <VStack className="flex-1">
                   <HStack space="xs" className="items-center">
                     <Text
-                      className={`font-medium ${isCurrentUser ? "text-primary-600" : "text-typography-900"}`}
+                      className={cn(
+                        "font-medium",
+                        isCurrentUser && "text-primary-600",
+                        !isCurrentUser && "text-typography-900",
+                      )}
                       numberOfLines={1}
                     >
                       {displayName}
@@ -92,20 +97,19 @@ export function GroupMembersList({
                       <Crown size={14} color={IconColors.primary} />
                     )}
                     {isCurrentUser && (
-                      <Text className="text-xs text-typography-400">
-                        {t("groups.members.you", { defaultValue: "(You)" })}
+                      <Text className="text-typography-400 text-xs">
+                        {t("groups.members.you")}
                       </Text>
                     )}
                   </HStack>
                   {member.username && member.fullName && (
-                    <Text className="text-xs text-typography-400">
+                    <Text className="text-typography-400 text-xs">
                       @{member.username}
                     </Text>
                   )}
                   {joinedDate && (
-                    <Text className="text-xs text-typography-400">
+                    <Text className="text-typography-400 text-xs">
                       {t("groups.members.joined", {
-                        defaultValue: "Joined {{date}}",
                         date: joinedDate,
                       })}
                     </Text>

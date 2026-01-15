@@ -51,10 +51,7 @@ export default function ChangePasswordScreen() {
       if (error) {
         Alert.alert(
           t("common.status.error"),
-          error.message ||
-            t("profile.changePassword.error", {
-              defaultValue: "Failed to update password",
-            }),
+          error.message || t("profile.changePassword.error"),
         );
         setIsLoading(false);
         return;
@@ -62,9 +59,7 @@ export default function ChangePasswordScreen() {
 
       Alert.alert(
         t("common.status.success"),
-        t("profile.changePassword.success", {
-          defaultValue: "Password updated successfully",
-        }),
+        t("profile.changePassword.success"),
         [
           {
             text: t("common.buttons.gotIt"),
@@ -73,12 +68,7 @@ export default function ChangePasswordScreen() {
         ],
       );
     } catch (error) {
-      Alert.alert(
-        t("common.status.error"),
-        t("profile.changePassword.error", {
-          defaultValue: "Failed to update password",
-        }),
-      );
+      Alert.alert(t("common.status.error"), t("profile.changePassword.error"));
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +76,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-background-50"
+      className="bg-background-50 flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -99,10 +89,7 @@ export default function ChangePasswordScreen() {
             <View className="flex-row items-start gap-3">
               <Info size={24} color={Colors.primary[600]} />
               <Text className="flex-1 text-sm text-yellow-800">
-                {t("profile.changePassword.info", {
-                  defaultValue:
-                    "Choose a strong password with at least 8 characters, including uppercase, lowercase, and numbers.",
-                })}
+                {t("profile.changePassword.info")}
               </Text>
             </View>
           </View>
@@ -111,10 +98,8 @@ export default function ChangePasswordScreen() {
           <View className="rounded-2xl bg-white p-4 shadow-sm">
             {/* New Password */}
             <View className="mb-4">
-              <Text className="mb-1 text-sm font-medium text-typography-700">
-                {t("profile.changePassword.newPassword", {
-                  defaultValue: "New Password",
-                })}
+              <Text className="text-typography-700 mb-1 text-sm font-medium">
+                {t("profile.changePassword.newPassword")}
               </Text>
               <Controller
                 control={control}
@@ -128,9 +113,6 @@ export default function ChangePasswordScreen() {
                     <InputField
                       placeholder={t(
                         "profile.changePassword.newPasswordPlaceholder",
-                        {
-                          defaultValue: "Enter new password",
-                        },
                       )}
                       secureTextEntry={!showNewPassword}
                       value={value}
@@ -156,7 +138,7 @@ export default function ChangePasswordScreen() {
                 )}
               />
               {errors.password && (
-                <Text className="mt-1 text-sm text-error-600">
+                <Text className="text-error-600 mt-1 text-sm">
                   {errors.password.message}
                 </Text>
               )}
@@ -164,10 +146,8 @@ export default function ChangePasswordScreen() {
 
             {/* Confirm Password */}
             <View className="mb-6">
-              <Text className="mb-1 text-sm font-medium text-typography-700">
-                {t("profile.changePassword.confirmPassword", {
-                  defaultValue: "Confirm Password",
-                })}
+              <Text className="text-typography-700 mb-1 text-sm font-medium">
+                {t("profile.changePassword.confirmPassword")}
               </Text>
               <Controller
                 control={control}
@@ -181,9 +161,6 @@ export default function ChangePasswordScreen() {
                     <InputField
                       placeholder={t(
                         "profile.changePassword.confirmPasswordPlaceholder",
-                        {
-                          defaultValue: "Confirm new password",
-                        },
                       )}
                       secureTextEntry={!showConfirmPassword}
                       value={value}
@@ -211,7 +188,7 @@ export default function ChangePasswordScreen() {
                 )}
               />
               {errors.confirmPassword && (
-                <Text className="mt-1 text-sm text-error-600">
+                <Text className="text-error-600 mt-1 text-sm">
                   {errors.confirmPassword.message}
                 </Text>
               )}
@@ -228,11 +205,7 @@ export default function ChangePasswordScreen() {
               {isLoading ? (
                 <ButtonSpinner color={IconColors.white} />
               ) : (
-                <ButtonText>
-                  {t("profile.changePassword.submit", {
-                    defaultValue: "Update Password",
-                  })}
-                </ButtonText>
+                <ButtonText>{t("profile.changePassword.submit")}</ButtonText>
               )}
             </Button>
           </View>

@@ -56,7 +56,7 @@ export function TentListItem({
     >
       <HStack className="items-center justify-between">
         <Text
-          className={`flex-1 ${isSelected ? "font-semibold text-primary-700" : "text-typography-700"}`}
+          className={`flex-1 ${isSelected ? "text-primary-700 font-semibold" : "text-typography-700"}`}
         >
           {tentName}
         </Text>

@@ -30,12 +30,12 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
       {/* App Name with gradient-like styling */}
       <View className="mt-3 flex-row">
         <Text
-          className={`font-bold text-primary-600 ${isLarge ? "text-3xl" : "text-2xl"}`}
+          className={`text-primary-600 font-bold ${isLarge ? "text-3xl" : "text-2xl"}`}
         >
           Prost
         </Text>
         <Text
-          className={`font-bold text-primary-500 ${isLarge ? "text-3xl" : "text-2xl"}`}
+          className={`text-primary-500 font-bold ${isLarge ? "text-3xl" : "text-2xl"}`}
         >
           Counter
         </Text>
@@ -43,7 +43,7 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
 
       {/* Optional Tagline */}
       {tagline && (
-        <Text className="mt-2 text-center text-typography-500" size="sm">
+        <Text className="text-typography-500 mt-2 text-center" size="sm">
           {tagline}
         </Text>
       )}

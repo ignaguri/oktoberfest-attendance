@@ -36,11 +36,13 @@ const TutorialContext = createContext<TutorialContextType | undefined>(
 interface TutorialProviderProps {
   children: ReactNode;
   initialTutorialCompleted?: boolean;
+  isLoadingStatus?: boolean;
 }
 
 export function TutorialProvider({
   children,
   initialTutorialCompleted = false,
+  isLoadingStatus = false,
 }: TutorialProviderProps) {
   const [isActive, setIsActive] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -174,16 +176,16 @@ export function TutorialProvider({
     }
   };
 
-  // Auto-start tutorial for new users
+  // Auto-start tutorial for new users (only after status is loaded)
   useEffect(() => {
-    if (!isCompleted && !isActive) {
+    if (!isLoadingStatus && !isCompleted && !isActive) {
       // Small delay to ensure page is loaded
       const timer = setTimeout(() => {
         startTutorial();
       }, TUTORIAL_CONSTANTS.AUTO_START_DELAY);
       return () => clearTimeout(timer);
     }
-  }, [isCompleted, isActive]);
+  }, [isLoadingStatus, isCompleted, isActive]);
 
   const value: TutorialContextType = {
     isActive,

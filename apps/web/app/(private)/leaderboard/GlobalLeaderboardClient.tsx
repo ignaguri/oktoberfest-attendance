@@ -4,10 +4,10 @@ import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import { WinningCriteria } from "@/lib/types";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useState, useEffect, useMemo, startTransition } from "react";
 import { toast } from "sonner";
 

@@ -146,9 +146,7 @@ export default function SignIn() {
           className="flex w-full items-center justify-center gap-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
         >
           <GoogleIcon className="size-5" />
-          {t("auth.signIn.continueWithGoogle", {
-            defaultValue: "Continue with Google",
-          })}
+          {t("auth.signIn.continueWithGoogle")}
         </Button>
 
         <Button
@@ -159,9 +157,7 @@ export default function SignIn() {
           className="flex w-full items-center justify-center gap-2 border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#166FE5]"
         >
           <FacebookIcon className="size-5" />
-          {t("auth.signIn.continueWithFacebook", {
-            defaultValue: "Continue with Facebook",
-          })}
+          {t("auth.signIn.continueWithFacebook")}
         </Button>
       </div>
 

@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalConstants } from "@/lib/festivalConstants";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { ExternalLink } from "lucide-react";
 import { Link } from "next-view-transitions";
 

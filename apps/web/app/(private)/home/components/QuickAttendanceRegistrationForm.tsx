@@ -4,13 +4,13 @@ import { DrinkStepper } from "@/components/attendance/drink-stepper";
 import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
 import { useConfetti } from "@/hooks/useConfetti";
 import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useConsumptions } from "@prostcounter/shared/hooks";
 import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
 import { useEffect, useState, useMemo } from "react";
@@ -196,7 +196,7 @@ export const QuickAttendanceRegistrationForm = ({
   return (
     <>
       {isExploding && (
-        <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
+        <div className="pointer-events-none fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
           <ConfettiExplosion
             force={0.4}
             duration={2200}
@@ -241,9 +241,7 @@ export const QuickAttendanceRegistrationForm = ({
                 onSuccess={triggerConfetti}
               />
               <span className="text-muted-foreground text-xs">
-                {t(`attendance.drinkTypes.${selectedDrinkType}`, {
-                  defaultValue: selectedDrinkType,
-                })}
+                {t(`attendance.drinkTypes.${selectedDrinkType}`)}
               </span>
             </div>
           </div>

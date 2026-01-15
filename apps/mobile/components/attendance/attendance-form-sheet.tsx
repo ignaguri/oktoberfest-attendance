@@ -469,7 +469,7 @@ export function AttendanceFormSheet({
 
           {/* Header */}
           <HStack className="mb-4 w-full items-center justify-between px-2">
-            <Text className="text-lg font-semibold text-typography-900">
+            <Text className="text-typography-900 text-lg font-semibold">
               {isEditMode
                 ? t("attendance.form.editTitle")
                 : t("attendance.form.addTitle")}
@@ -483,16 +483,16 @@ export function AttendanceFormSheet({
             <VStack space="xl" className="px-2 pb-4">
               {/* Date Display */}
               <VStack space="sm">
-                <Text className="text-sm font-medium text-typography-700">
+                <Text className="text-typography-700 text-sm font-medium">
                   {t("common.labels.date")}
                 </Text>
                 <HStack space="lg" className="items-center justify-between">
                   <HStack
                     space="sm"
-                    className="flex-1 items-center rounded-lg bg-background-100 px-4 py-3"
+                    className="bg-background-100 flex-1 items-center rounded-lg px-4 py-3"
                   >
                     <Calendar size={18} color={IconColors.muted} />
-                    <Text className="text-base text-typography-700">
+                    <Text className="text-typography-700 text-base">
                       {formattedDate}
                     </Text>
                   </HStack>
@@ -513,10 +513,8 @@ export function AttendanceFormSheet({
 
               {/* Drink Type Picker & Stepper */}
               <VStack space="md">
-                <Text className="text-center text-sm font-medium text-typography-700">
-                  {t("attendance.howManyDrinks", {
-                    defaultValue: "Log Your Drinks",
-                  })}
+                <Text className="text-typography-700 text-center text-sm font-medium">
+                  {t("attendance.howManyDrinks")}
                 </Text>
 
                 {/* Drink Type Icons */}
@@ -537,31 +535,25 @@ export function AttendanceFormSheet({
                 />
 
                 {/* Total drinks - simple number */}
-                <Text className="text-center text-sm text-typography-500">
-                  {t("attendance.totalDrinks", {
-                    defaultValue: "Total Drinks",
-                  })}
-                  : {totalLocalDrinks}
+                <Text className="text-typography-500 text-center text-sm">
+                  {t("attendance.totalDrinks")}: {totalLocalDrinks}
                 </Text>
                 {/* Validation error for drinks */}
                 {errors.amount && (
-                  <Text className="text-center text-sm text-error-600">
-                    {t(errors.amount.message || "validation.tent.required", {
-                      defaultValue:
-                        "Please select at least one tent if no drinks are logged",
-                    })}
+                  <Text className="text-error-600 text-center text-sm">
+                    {t(errors.amount.message || "validation.tent.required")}
                   </Text>
                 )}
               </VStack>
 
               {/* Tent Selector */}
               <VStack space="sm">
-                <Text className="text-sm font-medium text-typography-700">
+                <Text className="text-typography-700 text-sm font-medium">
                   {t("attendance.table.visitedTents")}
                 </Text>
                 <Pressable
                   onPress={() => setShowTentSelector(true)}
-                  className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
+                  className="border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3"
                 >
                   {combinedTentDisplay.length > 0 ? (
                     <HStack className="flex-wrap gap-2">
@@ -581,13 +573,13 @@ export function AttendanceFormSheet({
                       ))}
                     </HStack>
                   ) : (
-                    <Text className="text-base text-typography-400">
+                    <Text className="text-typography-400 text-base">
                       {t("attendance.form.selectTents")}
                     </Text>
                   )}
                 </Pressable>
                 {errors.tents && (
-                  <Text className="text-sm text-error-600">
+                  <Text className="text-error-600 text-sm">
                     {t(errors.tents.message || "validation.required")}
                   </Text>
                 )}
@@ -653,17 +645,12 @@ export function AttendanceFormSheet({
         <AlertDialogContent>
           <AlertDialogHeader>
             <Heading size="lg" className="text-error-600">
-              {t("attendance.form.deleteConfirmTitle", {
-                defaultValue: "Delete Attendance",
-              })}
+              {t("attendance.form.deleteConfirmTitle")}
             </Heading>
           </AlertDialogHeader>
           <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
-              {t("attendance.form.deleteConfirmMessage", {
-                defaultValue:
-                  "Are you sure you want to delete this attendance record? This action cannot be undone.",
-              })}
+              {t("attendance.form.deleteConfirmMessage")}
             </Text>
           </AlertDialogBody>
           <AlertDialogFooter className="gap-3">
@@ -684,8 +671,8 @@ export function AttendanceFormSheet({
             >
               <ButtonText>
                 {isDeleting
-                  ? t("common.status.deleting", { defaultValue: "Deleting..." })
-                  : t("common.buttons.delete", { defaultValue: "Delete" })}
+                  ? t("common.status.deleting")
+                  : t("common.buttons.delete")}
               </ButtonText>
             </Button>
           </AlertDialogFooter>

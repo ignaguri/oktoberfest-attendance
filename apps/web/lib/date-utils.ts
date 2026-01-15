@@ -1,10 +1,17 @@
 /**
- * Utility functions for date and timezone handling
+ * Web-specific date utility functions for HTML inputs
+ * Shared date utilities are in @prostcounter/shared/utils
  */
 
 import { TZDate } from "@date-fns/tz";
-import { TIMEZONE } from "@prostcounter/shared";
 import { format } from "date-fns";
+
+// Re-export shared date utilities for convenience
+export {
+  formatDateForDatabase,
+  formatRelativeTime,
+  formatTimestampForDatabase,
+} from "@prostcounter/shared";
 
 /**
  * Formats a Date object for use with HTML datetime-local input
@@ -81,90 +88,4 @@ export function formatDateInTimezone(
 
   const tzDate = new TZDate(dateInTimezone, timezone);
   return format(tzDate, "yyyy-MM-dd'T'HH:mm");
-}
-
-/**
- * Formats a date for database storage in YYYY-MM-DD format
- * Uses the festival timezone to ensure consistent date representation
- * This replaces the problematic toISOString().split('T')[0] pattern
- *
- * @param date - The date to format
- * @param timezone - Optional timezone (defaults to festival timezone)
- * @returns Date string in format "YYYY-MM-DD" in the specified timezone
- *
- * @example
- * ```ts
- * const date = new Date('2024-09-15T22:00:00Z'); // UTC
- * const formatted = formatDateForDatabase(date);
- * // Returns: "2024-09-16" (in Europe/Berlin timezone, next day)
- *
- * const localDate = new Date('2024-09-15T18:00:00');
- * const formatted = formatDateForDatabase(localDate);
- * // Returns: "2024-09-15" (in Europe/Berlin timezone)
- * ```
- */
-export function formatDateForDatabase(
-  date: Date,
-  timezone: string = TIMEZONE,
-): string {
-  const tzDate = new TZDate(date, timezone);
-  return format(tzDate, "yyyy-MM-dd");
-}
-
-/**
- * Formats a date for database storage as a full timestamp with timezone
- * Preserves the time information for tent visits and other timestamp fields
- * Uses the festival timezone to ensure consistent timestamp representation
- *
- * @param date - The date to format
- * @param timezone - Optional timezone (defaults to festival timezone)
- * @returns ISO timestamp string with timezone information
- *
- * @example
- * ```ts
- * const date = new Date('2024-09-15T22:00:00Z'); // UTC
- * const formatted = formatTimestampForDatabase(date);
- * // Returns: "2024-09-16T00:00:00.000+02:00" (in Europe/Berlin timezone)
- *
- * const localDate = new Date('2024-09-15T18:00:00');
- * const formatted = formatTimestampForDatabase(localDate);
- * // Returns: "2024-09-15T18:00:00.000+02:00" (in Europe/Berlin timezone)
- * ```
- */
-export function formatTimestampForDatabase(
-  date: Date,
-  timezone: string = TIMEZONE,
-): string {
-  const tzDate = new TZDate(date, timezone);
-  return tzDate.toISOString();
-}
-
-/**
- * Formats a date for relative time using Intl.RelativeTimeFormat
- *
- * @param date - The date to format
- * @param timezone - Optional timezone (defaults to festival timezone)
- * @returns Relative time string (e.g., "2 minutes ago", "1 hour ago", "2 days ago", "1 week ago")
- */
-export function formatRelativeTime(
-  date: Date,
-  timezone: string = TIMEZONE,
-): string {
-  const now = new TZDate(new Date(), timezone);
-  const tzDate = new TZDate(date, timezone);
-  const diffInSeconds = Math.floor((now.getTime() - tzDate.getTime()) / 1000);
-
-  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-
-  if (diffInSeconds < 60) {
-    return rtf.format(-diffInSeconds, "second");
-  } else if (diffInSeconds < 3600) {
-    return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
-  } else if (diffInSeconds < 86400) {
-    return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
-  } else if (diffInSeconds < 604800) {
-    return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
-  } else {
-    return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
-  }
 }

@@ -9,11 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SkeletonHighlights } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useHighlights } from "@/hooks/useProfile";
 import { getDefaultBeerCost } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Link } from "next-view-transitions";
 
 const Highlights = () => {
@@ -123,10 +123,9 @@ const Highlights = () => {
                     {t("home.spentOnBeers", { amount: spentOnBeers })}
                     {(totalBaseCents > 0 || totalTipCents > 0) && (
                       <span className="ml-2 text-xs text-gray-500">
-                        ({t("home.baseCost", { defaultValue: "Base" })}: €
-                        {(totalBaseCents / 100).toFixed(0)} |{" "}
-                        {t("home.tips", { defaultValue: "Tips" })}: €
-                        {(totalTipCents / 100).toFixed(0)})
+                        ({t("home.baseCost")}: €
+                        {(totalBaseCents / 100).toFixed(0)} | {t("home.tips")}:
+                        €{(totalTipCents / 100).toFixed(0)})
                       </span>
                     )}
                   </li>

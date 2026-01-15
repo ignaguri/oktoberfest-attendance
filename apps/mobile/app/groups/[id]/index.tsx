@@ -21,7 +21,8 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { getAppUrl } from "@prostcounter/shared";
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useGroupSettings,
   useGroupLeaderboard,
@@ -106,19 +107,12 @@ export default function GroupDetailScreen() {
   // Handle share
   const handleShare = useCallback(async () => {
     if (!group?.inviteToken) {
-      showDialog(
-        t("common.status.error"),
-        t("groups.share.noToken", {
-          defaultValue:
-            "No invite link available. Please generate one in settings.",
-        }),
-      );
+      showDialog(t("common.status.error"), t("groups.share.noToken"));
       return;
     }
 
-    const inviteUrl = `https://prostcounter.com/join-group?token=${group.inviteToken}`;
+    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
     const message = t("groups.share.message", {
-      defaultValue: `Join my group "${group.name}" on ProstCounter!`,
       name: group.name,
     });
 
@@ -165,7 +159,7 @@ export default function GroupDetailScreen() {
   // Loading state
   if (isLoading && !group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
       </View>
     );
@@ -174,7 +168,7 @@ export default function GroupDetailScreen() {
   // Error state
   if (groupError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={groupError} onRetry={refetchGroup} />
       </View>
     );
@@ -183,10 +177,10 @@ export default function GroupDetailScreen() {
   // No group found
   if (!group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="mt-4 text-center text-typography-500">
-          {t("groups.detail.notFound", { defaultValue: "Group not found" })}
+        <Text className="text-typography-500 mt-4 text-center">
+          {t("groups.detail.notFound")}
         </Text>
         <Button
           variant="outline"
@@ -194,28 +188,19 @@ export default function GroupDetailScreen() {
           className="mt-4"
           onPress={() => router.back()}
         >
-          <ButtonText>
-            {t("common.buttons.goBack", { defaultValue: "Go Back" })}
-          </ButtonText>
+          <ButtonText>{t("common.buttons.goBack")}</ButtonText>
         </Button>
       </View>
     );
   }
 
   const winningCriteria = group.winningCriteria as WinningCriteria;
-  const criteriaLabel = t(CRITERIA_LABELS[winningCriteria], {
-    defaultValue:
-      winningCriteria === "days_attended"
-        ? "Days Attended"
-        : winningCriteria === "total_beers"
-          ? "Total Beers"
-          : "Avg Beers",
-  });
+  const criteriaLabel = t(CRITERIA_LABELS[winningCriteria]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -234,10 +219,9 @@ export default function GroupDetailScreen() {
                   </Heading>
                   <HStack space="sm" className="items-center">
                     <Users size={14} color={IconColors.muted} />
-                    <Text className="text-sm text-typography-500">
+                    <Text className="text-typography-500 text-sm">
                       {t("groups.memberCount", {
                         count: group.memberCount || 0,
-                        defaultValue: "{{count}} members",
                       })}
                     </Text>
                   </HStack>
@@ -257,7 +241,7 @@ export default function GroupDetailScreen() {
 
               {/* Description */}
               {group.description && (
-                <Text className="text-sm text-typography-600">
+                <Text className="text-typography-600 text-sm">
                   {group.description}
                 </Text>
               )}
@@ -272,7 +256,7 @@ export default function GroupDetailScreen() {
                 >
                   <Share2 size={16} color={IconColors.default} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.share", { defaultValue: "Share" })}
+                    {t("groups.actions.share")}
                   </ButtonText>
                 </Button>
                 <Button
@@ -283,7 +267,7 @@ export default function GroupDetailScreen() {
                 >
                   <QrCode size={16} color={IconColors.default} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.qrCode", { defaultValue: "QR" })}
+                    {t("groups.actions.qrCode")}
                   </ButtonText>
                 </Button>
                 <Button
@@ -294,7 +278,7 @@ export default function GroupDetailScreen() {
                 >
                   <Image size={16} color={IconColors.default} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.gallery", { defaultValue: "Gallery" })}
+                    {t("groups.actions.gallery")}
                   </ButtonText>
                 </Button>
                 {isCreator && (
@@ -306,9 +290,7 @@ export default function GroupDetailScreen() {
                   >
                     <Settings size={16} color={IconColors.white} />
                     <ButtonText className="ml-1">
-                      {t("groups.actions.settings", {
-                        defaultValue: "Settings",
-                      })}
+                      {t("groups.actions.settings")}
                     </ButtonText>
                   </Button>
                 )}
@@ -319,10 +301,8 @@ export default function GroupDetailScreen() {
           {/* Leaderboard Section */}
           <VStack space="sm">
             <HStack className="items-center justify-between">
-              <Text className="text-sm font-medium text-typography-700">
-                {t("groups.detail.leaderboard", {
-                  defaultValue: "Leaderboard",
-                })}
+              <Text className="text-typography-700 text-sm font-medium">
+                {t("groups.detail.leaderboard")}
               </Text>
               {isLoadingLeaderboard && <Spinner size="small" />}
             </HStack>
@@ -331,9 +311,7 @@ export default function GroupDetailScreen() {
               entries={(leaderboardData as LeaderboardEntry[]) || []}
               winningCriteria={winningCriteria}
               currentUserId={user?.id}
-              emptyMessage={t("groups.detail.noMembers", {
-                defaultValue: "No members have logged attendance yet",
-              })}
+              emptyMessage={t("groups.detail.noMembers")}
               sortable
               onSortChange={handleSortChange}
               activeSortColumn={sortColumn}

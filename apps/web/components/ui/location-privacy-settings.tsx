@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useUserGroups } from "@/hooks/useGroups";
 import {
   useLocationSharingPreferences,
@@ -13,6 +12,7 @@ import {
 } from "@/hooks/useLocationSharing";
 import { useInvalidateQueries } from "@/lib/data/react-query-provider";
 import { getFestivalConstants } from "@/lib/festivalConstants";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { QueryKeys } from "@prostcounter/shared/data";
 import { MapPin, Users, Loader2 } from "lucide-react";
 import { useMemo } from "react";

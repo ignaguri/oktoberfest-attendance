@@ -12,6 +12,9 @@ import {
   useQuery,
   useMutation,
   useInvalidateQueries,
+  useSetQueryData,
+  useGetQueryData,
+  useCancelQueries,
   QueryKeys,
 } from "../data";
 
@@ -34,28 +37,82 @@ export function useCurrentProfile() {
   );
 }
 
+// Type for profile cache data
+type ProfileCacheData = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  tutorial_completed: boolean | null;
+  tutorial_completed_at: string | null;
+  updated_at: string | null;
+};
+
 /**
- * Hook to update user profile with cache invalidation
+ * Hook to update user profile with optimistic updates
  */
 export function useUpdateProfile() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
+  const cancelQueries = useCancelQueries();
 
-  return useMutation(
-    async (profileData: {
+  return useMutation<
+    ProfileCacheData,
+    {
       username?: string;
       full_name?: string;
       preferred_language?: string | null;
-    }) => {
+    },
+    { previousProfile: ProfileCacheData | undefined }
+  >(
+    async (profileData) => {
       const response = await apiClient.profile.update(profileData);
       return response.profile;
     },
     {
-      onSuccess: () => {
-        // Invalidate profile and user queries
+      onMutate: async (newData) => {
+        // Cancel any outgoing refetches so they don't overwrite our optimistic update
+        await cancelQueries(QueryKeys.profile());
+
+        // Snapshot the previous value
+        const previousProfile = getQueryData<ProfileCacheData>(
+          QueryKeys.profile(),
+        );
+
+        // Optimistically update the cache with new values
+        if (previousProfile) {
+          setQueryData<ProfileCacheData>(QueryKeys.profile(), {
+            ...previousProfile,
+            ...(newData.username !== undefined && {
+              username: newData.username,
+            }),
+            ...(newData.full_name !== undefined && {
+              full_name: newData.full_name,
+            }),
+          });
+        }
+
+        // Return context with the previous value for rollback
+        return { previousProfile };
+      },
+      onError: (_error, _variables, context) => {
+        // Rollback to previous value on error
+        if (context?.previousProfile) {
+          setQueryData<ProfileCacheData>(
+            QueryKeys.profile(),
+            context.previousProfile,
+          );
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success to ensure cache is in sync
         invalidateQueries(QueryKeys.profile());
         invalidateQueries(QueryKeys.user());
         invalidateQueries(["highlights"]);
+        // Invalidate activity feed (profile changes appear in feed)
+        invalidateQueries(["activity-feed"]);
       },
     },
   );
@@ -92,19 +149,59 @@ export function useTutorialStatus() {
   );
 }
 
+// Type for tutorial status cache data
+type TutorialStatusCacheData = {
+  tutorial_completed: boolean;
+  tutorial_completed_at: string | null;
+};
+
 /**
  * Hook to complete tutorial
+ * Uses optimistic updates to prevent tutorial from reappearing on navigation
  */
 export function useCompleteTutorial() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
+  const cancelQueries = useCancelQueries();
 
-  return useMutation(
+  return useMutation<
+    { success: boolean },
+    void,
+    { previousStatus: TutorialStatusCacheData | undefined }
+  >(
     async () => {
       return await apiClient.profile.completeTutorial();
     },
     {
-      onSuccess: () => {
+      onMutate: async () => {
+        // Cancel any outgoing refetches
+        await cancelQueries(QueryKeys.tutorialStatus());
+
+        // Snapshot the previous value
+        const previousStatus = getQueryData<TutorialStatusCacheData>(
+          QueryKeys.tutorialStatus(),
+        );
+
+        // Optimistically update to completed
+        setQueryData<TutorialStatusCacheData>(QueryKeys.tutorialStatus(), {
+          tutorial_completed: true,
+          tutorial_completed_at: new Date().toISOString(),
+        });
+
+        return { previousStatus };
+      },
+      onError: (_error, _variables, context) => {
+        // Rollback on error
+        if (context?.previousStatus) {
+          setQueryData<TutorialStatusCacheData>(
+            QueryKeys.tutorialStatus(),
+            context.previousStatus,
+          );
+        }
+      },
+      onSettled: () => {
         invalidateQueries(QueryKeys.tutorialStatus());
         invalidateQueries(QueryKeys.profile());
       },
@@ -166,8 +263,9 @@ export function useHighlights(festivalId?: string) {
     },
     {
       enabled: !!festivalId,
-      staleTime: 2 * 60 * 1000, // 2 minutes
+      staleTime: 1 * 60 * 1000, // 1 minute - user highlights change during festival
       gcTime: 10 * 60 * 1000, // 10 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }

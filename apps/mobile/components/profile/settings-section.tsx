@@ -17,7 +17,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors, SwitchColors, Colors } from "@/lib/constants/colors";
-import { useFestival, type Festival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { format, parseISO } from "date-fns";
@@ -35,6 +35,7 @@ import {
 import React, { useState, useCallback } from "react";
 
 import type { BiometricType } from "@/hooks/useBiometrics";
+import type { Festival } from "@prostcounter/shared/schemas";
 
 interface SettingsSectionProps {
   isBiometricAvailable: boolean;
@@ -95,32 +96,25 @@ export function SettingsSection({
 
   return (
     <Card size="md" variant="elevated">
-      <Text className="mb-4 text-lg font-semibold text-typography-900">
+      <Text className="text-typography-900 mb-4 text-lg font-semibold">
         {t("profile.settings")}
       </Text>
 
       {/* Festival Selector */}
       <Pressable
-        className="flex-row items-center justify-between border-b border-outline-100 py-3"
+        className="border-outline-100 flex-row items-center justify-between border-b py-3"
         onPress={() => setShowFestivalSheet(true)}
         accessibilityRole="button"
-        accessibilityLabel={t("festival.selector.title", {
-          defaultValue: "Select Festival",
-        })}
+        accessibilityLabel={t("festival.selector.title")}
       >
         <View className="flex-row items-center gap-3">
           <CalendarDays size={24} color={IconColors.primary} />
           <View>
             <Text className="text-typography-900">
-              {t("festival.selector.title", {
-                defaultValue: "Select Festival",
-              })}
+              {t("festival.selector.title")}
             </Text>
-            <Text className="text-sm text-typography-500">
-              {currentFestival?.name ||
-                t("festival.selector.noFestival", {
-                  defaultValue: "No festival selected",
-                })}
+            <Text className="text-typography-500 text-sm">
+              {currentFestival?.name || t("festival.selector.noFestival")}
             </Text>
           </View>
         </View>
@@ -139,15 +133,10 @@ export function SettingsSection({
           </ActionsheetDragIndicatorWrapper>
           <VStack space="md" className="w-full px-4 pt-4">
             <Heading size="md" className="text-center">
-              {t("festival.selector.title", {
-                defaultValue: "Select Festival",
-              })}
+              {t("festival.selector.title")}
             </Heading>
-            <Text className="text-center text-sm text-typography-500">
-              {t("festival.selector.description", {
-                defaultValue:
-                  "Choose which festival you want to view and participate in.",
-              })}
+            <Text className="text-typography-500 text-center text-sm">
+              {t("festival.selector.description")}
             </Text>
           </VStack>
           {festivals.map((festival) => {
@@ -166,7 +155,7 @@ export function SettingsSection({
                     <HStack space="sm" className="items-center">
                       <ActionsheetItemText
                         className={
-                          isSelected ? "font-semibold text-primary-600" : ""
+                          isSelected ? "text-primary-600 font-semibold" : ""
                         }
                       >
                         {festival.name}
@@ -177,12 +166,12 @@ export function SettingsSection({
                         </BadgeText>
                       </Badge>
                     </HStack>
-                    <Text className="text-xs text-typography-400">
+                    <Text className="text-typography-400 text-xs">
                       {format(parseISO(festival.startDate), "MMM d")} -{" "}
                       {format(parseISO(festival.endDate), "MMM d, yyyy")}
                     </Text>
                     {festival.location && (
-                      <Text className="text-xs text-typography-400">
+                      <Text className="text-typography-400 text-xs">
                         {festival.location}
                       </Text>
                     )}
@@ -199,7 +188,7 @@ export function SettingsSection({
 
       {/* Biometric Authentication (if available) */}
       {isBiometricAvailable && (
-        <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+        <View className="border-outline-100 flex-row items-center justify-between border-b py-3">
           <View className="flex-row items-center gap-3">
             {biometricType === "facial" ? (
               <ScanFace size={24} color={IconColors.default} />
@@ -208,7 +197,7 @@ export function SettingsSection({
             )}
             <View>
               <Text className="text-typography-900">{biometricLabel}</Text>
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 {t("profile.biometric.description")}
               </Text>
             </View>
@@ -221,14 +210,14 @@ export function SettingsSection({
               true: SwitchColors.trackOn,
             }}
             thumbColor={SwitchColors.thumb}
-            accessibilityLabel={`${biometricLabel} ${isBiometricEnabled ? t("common.status.enabled", { defaultValue: "enabled" }) : t("common.status.disabled", { defaultValue: "disabled" })}`}
+            accessibilityLabel={`${biometricLabel} ${isBiometricEnabled ? t("common.status.enabled") : t("common.status.disabled")}`}
           />
         </View>
       )}
 
       {/* Notifications - Navigate to settings page */}
       <Pressable
-        className="flex-row items-center justify-between border-b border-outline-100 py-3"
+        className="border-outline-100 flex-row items-center justify-between border-b py-3"
         onPress={() => router.push("/settings/notifications")}
         accessibilityRole="button"
         accessibilityLabel={t("profile.notifications.title")}
@@ -239,7 +228,7 @@ export function SettingsSection({
             <Text className="text-typography-900">
               {t("profile.notifications.title")}
             </Text>
-            <Text className="text-sm text-typography-500">
+            <Text className="text-typography-500 text-sm">
               {t("profile.notifications.description")}
             </Text>
           </View>
@@ -249,25 +238,19 @@ export function SettingsSection({
 
       {/* Photo Privacy - Navigate to settings page */}
       <Pressable
-        className="flex-row items-center justify-between border-b border-outline-100 py-3"
+        className="border-outline-100 flex-row items-center justify-between border-b py-3"
         onPress={() => router.push("/settings/photo-privacy")}
         accessibilityRole="button"
-        accessibilityLabel={t("profile.photoPrivacy.title", {
-          defaultValue: "Photo Privacy",
-        })}
+        accessibilityLabel={t("profile.photoPrivacy.title")}
       >
         <View className="flex-row items-center gap-3">
           <ImageIcon size={24} color={IconColors.default} />
           <View>
             <Text className="text-typography-900">
-              {t("profile.photoPrivacy.title", {
-                defaultValue: "Photo Privacy",
-              })}
+              {t("profile.photoPrivacy.title")}
             </Text>
-            <Text className="text-sm text-typography-500">
-              {t("profile.photoPrivacy.shortDescription", {
-                defaultValue: "Control who can see your photos",
-              })}
+            <Text className="text-typography-500 text-sm">
+              {t("profile.photoPrivacy.shortDescription")}
             </Text>
           </View>
         </View>

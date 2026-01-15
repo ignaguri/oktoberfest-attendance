@@ -16,7 +16,7 @@ export const UIIcon = createIcon({
 >;
 
 const iconStyle = tva({
-  base: "pointer-events-none fill-none text-typography-950",
+  base: "text-typography-950 pointer-events-none fill-none",
   variants: {
     size: {
       "2xs": "h-3 w-3",

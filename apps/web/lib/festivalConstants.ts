@@ -1,6 +1,7 @@
 import { parseISO, isBefore, isWithinInterval, endOfDay } from "date-fns";
 
-import type { Festival, FestivalTent } from "./types";
+import type { FestivalTent } from "./types";
+import type { Festival } from "@prostcounter/shared/schemas";
 
 // Default fallback values for when festival data is not available
 const DEFAULT_BEER_COST = 16.2;
@@ -9,16 +10,16 @@ interface FestivalConstants {
   festivalStartDate: Date;
   festivalEndDate: Date;
   festivalMapUrl: string | null;
-  timezone: string;
+  timezone: string | null;
   festivalName: string;
-  festivalLocation: string;
+  festivalLocation: string | null;
 }
 
 export function getFestivalConstants(festival: Festival): FestivalConstants {
   return {
-    festivalStartDate: parseISO(festival.start_date),
-    festivalEndDate: parseISO(festival.end_date),
-    festivalMapUrl: festival.map_url,
+    festivalStartDate: parseISO(festival.startDate),
+    festivalEndDate: parseISO(festival.endDate),
+    festivalMapUrl: festival.mapUrl,
     timezone: festival.timezone,
     festivalName: festival.name,
     festivalLocation: festival.location,
@@ -27,15 +28,15 @@ export function getFestivalConstants(festival: Festival): FestivalConstants {
 
 function isFestivalActive(festival: Festival): boolean {
   const now = new Date();
-  const startDate = parseISO(festival.start_date);
-  const endDate = endOfDay(parseISO(festival.end_date));
+  const startDate = parseISO(festival.startDate);
+  const endDate = endOfDay(parseISO(festival.endDate));
 
   return isWithinInterval(now, { start: startDate, end: endDate });
 }
 
 function isFestivalUpcoming(festival: Festival): boolean {
   const now = new Date();
-  const startDate = parseISO(festival.start_date);
+  const startDate = parseISO(festival.startDate);
 
   return isBefore(now, startDate);
 }
@@ -69,7 +70,7 @@ export function getDefaultBeerCost(festival: Festival | null): number {
   }
 
   // Use festival's beer cost or default fallback
-  return festival.beer_cost || DEFAULT_BEER_COST;
+  return festival.beerCost || DEFAULT_BEER_COST;
 }
 
 // Helper function to get festival dates as Date objects
@@ -82,7 +83,7 @@ export function getFestivalDates(festival: Festival | null): {
   }
 
   return {
-    startDate: parseISO(festival.start_date),
-    endDate: parseISO(festival.end_date),
+    startDate: parseISO(festival.startDate),
+    endDate: parseISO(festival.endDate),
   };
 }

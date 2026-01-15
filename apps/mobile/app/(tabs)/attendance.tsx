@@ -15,10 +15,11 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { formatDateForDatabase } from "@prostcounter/shared";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useAttendances } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -57,10 +58,10 @@ export default function AttendanceScreen() {
   );
 
   // Find existing attendance for selected date
-  // Use format() instead of toISOString() to avoid UTC timezone shift
+  // Use formatDateForDatabase() for timezone-aware date formatting
   const existingAttendance = useMemo(() => {
     if (!selectedDate || !attendances) return null;
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    const dateStr = formatDateForDatabase(selectedDate);
     return (
       (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ??
       null
@@ -117,8 +118,8 @@ export default function AttendanceScreen() {
   // No festival selected
   if (!currentFestival) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
-        <Text className="text-center text-typography-500">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
+        <Text className="text-typography-500 text-center">
           {t("attendance.noFestival")}
         </Text>
       </View>
@@ -128,7 +129,7 @@ export default function AttendanceScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
       </View>
     );
@@ -137,7 +138,7 @@ export default function AttendanceScreen() {
   // Error state
   if (attendancesError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={attendancesError} onRetry={refetch} />
       </View>
     );
@@ -146,7 +147,7 @@ export default function AttendanceScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -167,35 +168,33 @@ export default function AttendanceScreen() {
           {/* Stats Summary */}
           {attendances &&
             (attendances as AttendanceWithTotals[]).length > 0 && (
-              <View className="mt-4 rounded-xl bg-background-0 p-4">
-                <Text className="mb-3 text-sm font-medium text-typography-700">
+              <View className="bg-background-0 mt-4 rounded-xl p-4">
+                <Text className="text-typography-700 mb-3 text-sm font-medium">
                   {t("attendance.summary.title")}
                 </Text>
                 {/* Row 1: Days, Drinks, Avg */}
                 <View className="flex-row justify-around">
                   <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
+                    <Text className="text-primary-500 text-2xl font-bold">
                       {(attendances as AttendanceWithTotals[]).length}
                     </Text>
-                    <Text className="text-xs text-typography-500">
+                    <Text className="text-typography-500 text-xs">
                       {t("attendance.summary.days")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
+                    <Text className="text-primary-500 text-2xl font-bold">
                       {(attendances as AttendanceWithTotals[]).reduce(
                         (sum, a) => sum + a.drinkCount,
                         0,
                       )}
                     </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.drinks", {
-                        defaultValue: "Drinks",
-                      })}
+                    <Text className="text-typography-500 text-xs">
+                      {t("attendance.summary.drinks")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
+                    <Text className="text-primary-500 text-2xl font-bold">
                       {(
                         (attendances as AttendanceWithTotals[]).reduce(
                           (sum, a) => sum + a.drinkCount,
@@ -203,37 +202,35 @@ export default function AttendanceScreen() {
                         ) / (attendances as AttendanceWithTotals[]).length
                       ).toFixed(1)}
                     </Text>
-                    <Text className="text-xs text-typography-500">
+                    <Text className="text-typography-500 text-xs">
                       {t("attendance.summary.avgPerDay")}
                     </Text>
                   </View>
                 </View>
                 {/* Row 2: Spending Breakdown */}
-                <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
+                <View className="border-background-200 mt-4 flex-row justify-around border-t pt-4">
                   <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
+                    <Text className="text-primary-500 text-2xl font-bold">
                       €{(spendingTotals.spent / 100).toFixed(0)}
                     </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.spent", { defaultValue: "Spent" })}
+                    <Text className="text-typography-500 text-xs">
+                      {t("attendance.summary.spent")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-2xl font-bold text-typography-700">
+                    <Text className="text-typography-700 text-2xl font-bold">
                       €{(spendingTotals.base / 100).toFixed(0)}
                     </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.baseCost", {
-                        defaultValue: "Base",
-                      })}
+                    <Text className="text-typography-500 text-xs">
+                      {t("attendance.summary.baseCost")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-2xl font-bold text-success-500">
+                    <Text className="text-success-500 text-2xl font-bold">
                       €{(spendingTotals.tips / 100).toFixed(0)}
                     </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.tips", { defaultValue: "Tips" })}
+                    <Text className="text-typography-500 text-xs">
+                      {t("attendance.summary.tips")}
                     </Text>
                   </View>
                 </View>
@@ -300,7 +297,7 @@ export default function AttendanceScreen() {
                 >
                   <ButtonText>
                     {dialog.type === "destructive"
-                      ? t("common.buttons.delete", { defaultValue: "Delete" })
+                      ? t("common.buttons.delete")
                       : t("common.buttons.ok")}
                   </ButtonText>
                 </Button>

@@ -10,13 +10,13 @@ export default function GroupsLayout() {
       <Stack.Screen
         name="[id]/index"
         options={{
-          title: t("groups.detail.title", { defaultValue: "Group" }),
+          title: t("groups.detail.title"),
         }}
       />
       <Stack.Screen
         name="[id]/settings"
         options={{
-          title: t("groups.settings.title", { defaultValue: "Group Settings" }),
+          title: t("groups.settings.title"),
         }}
       />
     </Stack>

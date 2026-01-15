@@ -34,8 +34,9 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
     },
     {
       enabled: !!festivalId && criteriaId > 0,
-      staleTime: 2 * 60 * 1000, // 2 minutes - leaderboard changes frequently
+      staleTime: 30 * 1000, // 30 seconds - real-time competitive data
       gcTime: 5 * 60 * 1000, // 5 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
@@ -58,8 +59,9 @@ export function useGroupLeaderboard(
     },
     {
       enabled: !!groupId && !!festivalId && criteriaId > 0,
-      staleTime: 2 * 60 * 1000,
+      staleTime: 30 * 1000, // 30 seconds - real-time competitive data
       gcTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }

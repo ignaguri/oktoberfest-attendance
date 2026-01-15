@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import {
@@ -70,26 +70,20 @@ export function FestivalStatus() {
     const daysUntil = differenceInDays(startDate, today);
     message =
       daysUntil === 1
-        ? t("home.festivalStatus.startsInOneDay", {
-            defaultValue: "Festival starts tomorrow!",
-          })
+        ? t("home.festivalStatus.startsInOneDay")
         : t("home.festivalStatus.startsInDays", {
-            defaultValue: `Festival starts in ${daysUntil} days`,
             daysUntil,
           });
   } else if (isAfter(today, endDate)) {
     // Festival has ended
     status = "ended";
-    message = t("home.festivalStatus.ended", {
-      defaultValue: "Festival has ended",
-    });
+    message = t("home.festivalStatus.ended");
   } else {
     // Festival is currently active
     status = "active";
     const currentDay = differenceInDays(today, startDate) + 1;
     const totalDays = differenceInDays(endDate, startDate) + 1;
     message = t("home.festivalStatus.currentDay", {
-      defaultValue: `Day ${currentDay} of ${totalDays}`,
       currentDay,
       totalDays,
     });
@@ -101,7 +95,7 @@ export function FestivalStatus() {
     <Card
       size="md"
       variant="filled"
-      className={cn(config.bgColor, "border border-outline-200")}
+      className={cn(config.bgColor, "border-outline-200 border")}
     >
       <HStack space="sm" className="items-center justify-center">
         {config.icon}
@@ -109,7 +103,7 @@ export function FestivalStatus() {
           {message}
         </Text>
         <Text className="text-typography-400">•</Text>
-        <Text className="text-base font-bold text-typography-700">
+        <Text className="text-typography-700 text-base font-bold">
           {currentFestival.name}
         </Text>
       </HStack>

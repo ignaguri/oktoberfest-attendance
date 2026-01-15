@@ -18,8 +18,8 @@ export function AppHeader() {
         accessibilityLabel="ProstCounter Logo"
       />
       <HStack>
-        <Text className="text-3xl font-extrabold text-primary-600">Prost</Text>
-        <Text className="text-3xl font-extrabold text-primary-500">
+        <Text className="text-primary-600 text-3xl font-extrabold">Prost</Text>
+        <Text className="text-primary-500 text-3xl font-extrabold">
           Counter
         </Text>
       </HStack>

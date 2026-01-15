@@ -20,7 +20,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useUserGroups } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
@@ -72,12 +72,7 @@ export default function GroupsScreen() {
     (groupId: string) => {
       refetch();
       setIsCreateSheetOpen(false);
-      showDialog(
-        t("common.status.success"),
-        t("groups.createSuccess", {
-          defaultValue: "Group created successfully!",
-        }),
-      );
+      showDialog(t("common.status.success"), t("groups.createSuccess"));
       // Navigate to the new group
       router.push(`/groups/${groupId}`);
     },
@@ -87,12 +82,7 @@ export default function GroupsScreen() {
   const handleJoinSuccess = useCallback(() => {
     refetch();
     setIsJoinSheetOpen(false);
-    showDialog(
-      t("common.status.success"),
-      t("groups.joinSuccess", {
-        defaultValue: "Successfully joined the group!",
-      }),
-    );
+    showDialog(t("common.status.success"), t("groups.joinSuccess"));
   }, [refetch, showDialog, t]);
 
   const onRefresh = useCallback(() => {
@@ -102,11 +92,9 @@ export default function GroupsScreen() {
   // No festival selected
   if (!currentFestival) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
-        <Text className="text-center text-typography-500">
-          {t("groups.noFestival", {
-            defaultValue: "Please select a festival to view groups.",
-          })}
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
+        <Text className="text-typography-500 text-center">
+          {t("groups.noFestival")}
         </Text>
       </View>
     );
@@ -115,7 +103,7 @@ export default function GroupsScreen() {
   // Loading state - only show full-page spinner on initial load
   if (isLoading && !groups) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
       </View>
     );
@@ -124,7 +112,7 @@ export default function GroupsScreen() {
   // Error state
   if (groupsError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={groupsError} onRetry={refetch} />
       </View>
     );
@@ -136,7 +124,7 @@ export default function GroupsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -148,8 +136,8 @@ export default function GroupsScreen() {
           <VStack space="md" className="p-4">
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
-              <Text className="text-sm text-typography-500">
-                {t("groups.yourGroups", { defaultValue: "Your Groups" })}
+              <Text className="text-typography-500 text-sm">
+                {t("groups.yourGroups")}
               </Text>
               <HStack space="sm">
                 <Button
@@ -160,7 +148,7 @@ export default function GroupsScreen() {
                 >
                   <UserPlus size={16} color={IconColors.default} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.join", { defaultValue: "Join" })}
+                    {t("groups.actions.join")}
                   </ButtonText>
                 </Button>
                 <Button
@@ -171,7 +159,7 @@ export default function GroupsScreen() {
                 >
                   <Plus size={16} color={IconColors.white} />
                   <ButtonText className="ml-1">
-                    {t("groups.actions.create", { defaultValue: "Create" })}
+                    {t("groups.actions.create")}
                   </ButtonText>
                 </Button>
               </HStack>

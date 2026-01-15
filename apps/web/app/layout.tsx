@@ -5,8 +5,8 @@ import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Toaster } from "@/components/ui/sonner";
-import { FestivalProvider } from "@/contexts/FestivalContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { WebFestivalProvider } from "@/contexts/WebFestivalProvider";
 import { GA_ID } from "@/lib/constants";
 import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
@@ -123,11 +123,11 @@ export default async function RootLayout({
           <DataProvider>
             <I18nProvider>
               {isLoggedIn ? (
-                <FestivalProvider>
+                <WebFestivalProvider>
                   <NotificationProvider>
                     <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
                   </NotificationProvider>
-                </FestivalProvider>
+                </WebFestivalProvider>
               ) : (
                 <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
               )}

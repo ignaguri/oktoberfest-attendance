@@ -24,6 +24,10 @@
       "goHome": "Go to Home",
       "tryAgain": "Try Again"
     },
+    "actions": {
+      "retry": "Retry",
+      "pullToRefresh": "Pull to refresh"
+    },
     "labels": {
       "name": "Name",
       "email": "Email",
@@ -39,7 +43,15 @@
       "offline": "You are offline",
       "online": "Online",
       "error": "An error occurred",
-      "success": "Success"
+      "success": "Success",
+      "added": "Added!",
+      "enabled": "enabled",
+      "disabled": "disabled",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "creating": "Creating...",
+      "deleting": "Deleting...",
+      "info": "Info"
     },
     "errors": {
       "title": "Error",
@@ -87,6 +99,7 @@
     "signIn": {
       "title": "Sign In",
       "subtitle": "Welcome back!",
+      "tagline": "Track your Oktoberfest adventure",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "passwordLabel": "Password",
@@ -98,6 +111,7 @@
       "orContinueWith": "or",
       "continueWithGoogle": "Continue with Google",
       "continueWithFacebook": "Continue with Facebook",
+      "continueWithApple": "Continue with Apple",
       "errors": {
         "invalidCredentials": "Invalid email or password",
         "failed": "Sign in failed. Please try again.",
@@ -150,6 +164,14 @@
       "errors": {
         "failed": "Failed to update password"
       }
+    },
+    "biometric": {
+      "label": "Biometric Login",
+      "description": "Quick sign-in with Face ID or Touch ID",
+      "faceId": "Face ID",
+      "touchId": "Touch ID",
+      "enableButton": "Enable Biometric Login",
+      "skipButton": "Skip for now"
     }
   },
   "groups": {
@@ -157,8 +179,26 @@
     "yourGroups": "Your Groups:",
     "noGroupsYet": "You are not a member of any group yet for this festival.",
     "joinOrCreate": "Join or Create a Group",
+    "memberCount": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "createSuccess": "Group created successfully!",
+    "joinSuccess": "Successfully joined group!",
     "detail": {
-      "notFound": "Group not found"
+      "title": "Group Details",
+      "notFound": "Group not found",
+      "location": "Location",
+      "viewMembers": "View Members",
+      "leaderboard": "Leaderboard",
+      "noMembers": "No members yet"
+    },
+    "qrCode": {
+      "title": "QR Code",
+      "description": "Share this QR code with friends to let them join {{name}}",
+      "scanToJoin": "Scan to join {{groupName}}",
+      "shareQR": "Share QR Code",
+      "generating": "Generating QR code...",
+      "helper": "Friends can scan this code to join your group instantly",
+      "regenerate": "Regenerate QR Code"
     },
     "create": {
       "title": "Create Group",
@@ -167,6 +207,9 @@
       "passwordLabel": "Group Password (optional)",
       "passwordPlaceholder": "Enter password",
       "winningCriteria": "Winning Criteria",
+      "criteriaLabel": "Competition Type",
+      "criteriaPlaceholder": "Select competition type",
+      "criteriaHelp": "How will the winner be determined?",
       "submit": "Create Group",
       "success": "Group created successfully!",
       "errors": {
@@ -178,11 +221,27 @@
       "tokenLabel": "Invite Token",
       "tokenPlaceholder": "Paste invite token",
       "namePlaceholder": "Group Name",
+      "passwordLabel": "Group Password",
       "passwordPlaceholder": "Group Password",
+      "tokenPasswordPlaceholder": "Enter group password",
+      "linkTokenPlaceholder": "Paste invite link or token",
       "clickToJoin": "Click below to join <strong>{{groupName}}</strong>",
       "joining": "Joining...",
+      "searching": "Searching groups...",
       "submit": "Join Group",
       "success": "Successfully joined group!",
+      "noResults": "No groups found",
+      "searchMode": "Search by name",
+      "tokenMode": "Join by token",
+      "emptyDescription": "Search for a group by name to join",
+      "membersCount": "{{count}} members",
+      "passwordHint": "Ask a group member for the password",
+      "tokenHint": "Paste the invite link shared with you",
+      "passwordHelp": "Ask a group member for the password",
+      "tokenHelp": "Paste the invite link shared with you",
+      "searchPlaceholder": "Search by group name",
+      "searchPrompt": "Enter a group name to search",
+      "error": "Failed to join group. Please check the password and try again.",
       "errors": {
         "failed": "Failed to join group",
         "invalidToken": "Invalid invite token"
@@ -216,23 +275,105 @@
       "confirmRemoveDescription": "Are you sure you want to remove this member?",
       "removeSuccess": "Member removed successfully",
       "actions": "Actions",
-      "kickOut": "Kick out"
+      "kickOut": "Kick out",
+      "groupName": "Group Name",
+      "winningCriteria": "Competition Type",
+      "deleteGroup": "Delete Group",
+      "deleteGroupDescription": "Permanently delete this group and all its data",
+      "deleteConfirmTitle": "Delete Group?",
+      "deleteConfirmMessage": "This action cannot be undone. All group data will be permanently deleted.",
+      "updating": "Updating...",
+      "updateSuccess": "Group settings updated",
+      "updateError": "Failed to update group settings",
+      "deleteSuccess": "Group deleted successfully",
+      "deleteError": "Failed to delete group",
+      "dangerZone": "Danger Zone",
+      "details": "Details",
+      "description": "Description",
+      "descriptionPlaceholder": "Add a description for your group...",
+      "removeMemberTitle": "Remove Member?",
+      "removeMemberMessage": "Are you sure you want to remove {{name}} from the group?",
+      "leaveTitle": "Leave Group?",
+      "leaveMessage": "Are you sure you want to leave this group?",
+      "notFound": "Group not found",
+      "leaveCreatorWarning": "As the creator, leaving will delete the group for all members",
+      "leaveWarning": "You'll need a new invite to rejoin this group",
+      "copied": "Copied!",
+      "copy": "Copy",
+      "regenerate": "Regenerate",
+      "tokenWarning": "Regenerating will invalidate the previous invite link",
+      "noToken": "No invite link available",
+      "generateLink": "Generate Invite Link"
+    },
+    "share": {
+      "title": "Invite Members",
+      "inviteLink": "Invite Link",
+      "copyLink": "Copy Link",
+      "shareLink": "Share Link",
+      "linkCopied": "Link copied to clipboard",
+      "message": "Join my group '{{groupName}}' on ProstCounter! {{inviteUrl}}",
+      "noToken": "No invite token available. Please regenerate the invite link."
     },
     "winningCriteria": {
       "days_attended": "Most Days Attended",
       "total_beers": "Most Beers Drank",
       "avg_beers": "Best Average Beers per Day"
     },
+    "criteria": {
+      "daysAttended": "Most Days Attended",
+      "totalBeers": "Most Beers Drank",
+      "avgBeers": "Best Average Beers per Day"
+    },
     "gallery": {
       "title": "Group Gallery",
+      "titleWithName": "{{groupName}} Gallery",
       "loading": "Loading gallery...",
-      "empty": "No photos yet",
-      "emptyDescription": "Upload photos from your attendance to see them here"
+      "empty": {
+        "title": "No photos yet",
+        "description": "Group members' beer photos will appear here"
+      }
     },
     "location": {
       "title": "Group's live location",
       "shareDescription": "Share your location to see nearby group members and let them see you.",
       "controlNote": "Control which groups can see your location in your"
+    },
+    "members": {
+      "title": "Members",
+      "empty": "No members yet",
+      "you": "You",
+      "admin": "Admin",
+      "removeConfirmTitle": "Remove Member?",
+      "removeConfirmMessage": "Are you sure you want to remove this member from the group?",
+      "joined": "Joined {{date}}"
+    },
+    "deepLink": {
+      "joining": "Joining group...",
+      "invalidToken": "Invalid invite link. The token is missing.",
+      "joinFailed": "Failed to join group. The invite link may be invalid or expired.",
+      "successTitle": "Welcome to the Group!",
+      "successMessage": "You've successfully joined",
+      "viewGroup": "View Group",
+      "allGroups": "View All Groups",
+      "alreadyMemberTitle": "Already a Member",
+      "alreadyMemberMessage": "You're already a member of this group.",
+      "viewYourGroups": "View Your Groups",
+      "goHome": "Go to Home",
+      "errorTitle": "Unable to Join",
+      "goToGroups": "Go to Groups"
+    },
+    "actions": {
+      "join": "Join",
+      "create": "Create",
+      "share": "Share",
+      "qrCode": "QR Code",
+      "gallery": "Gallery",
+      "settings": "Settings"
+    },
+    "empty": {
+      "title": "No groups yet",
+      "description": "You haven't joined any groups for this festival yet. Create or join a group to compete with friends!",
+      "action": "Create or Join a Group"
     }
   },
   "attendance": {
@@ -292,7 +433,9 @@
       "addTitle": "Add Attendance",
       "selectTents": "Select tents...",
       "photos": "Photos",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "deleteConfirmTitle": "Delete Attendance?",
+      "deleteConfirmMessage": "This will permanently delete this attendance record. This action cannot be undone."
     },
     "delete": {
       "title": "Confirm Deletion",
@@ -338,7 +481,11 @@
       "title": "Festival Summary",
       "days": "Days",
       "beers": "Beers",
-      "avgPerDay": "Avg/Day"
+      "drinks": "Drinks",
+      "avgPerDay": "Avg/Day",
+      "spent": "Spent",
+      "baseCost": "Base",
+      "tips": "Tips"
     },
     "noFestival": "Please select a festival to view attendance",
     "updateSuccess": "Attendance updated",
@@ -346,6 +493,7 @@
   },
   "achievements": {
     "pageTitle": "Achievements",
+    "loading": "Loading achievements...",
     "totalPoints": "Total Points",
     "unlocked": "Unlocked",
     "locked": "Locked",
@@ -393,7 +541,9 @@
       "legendary": "Legendary"
     },
     "viewMyAchievements": "See my achievements",
-    "viewProgress": "View your progress and unlocked badges"
+    "viewProgress": "View your progress and unlocked badges",
+    "points": "pts",
+    "complete": "Complete"
   },
   "leaderboard": {
     "screenTitle": "Achievements & Leaderboard",
@@ -415,6 +565,15 @@
     "empty": "No rankings yet",
     "emptyDescription": "Be the first to track your attendance!",
     "noName": "No name",
+    "loading": "Loading leaderboard...",
+    "noFestival": "Please select a festival to view the leaderboard",
+    "error": "Failed to load leaderboard",
+    "header": {
+      "player": "Player"
+    },
+    "userDetail": {
+      "title": "User Stats"
+    },
     "stats": {
       "days": "Days",
       "drinks": "Drinks",
@@ -465,13 +624,34 @@
       "label": "Biometric Login",
       "description": "Quick sign-in with Face ID or Touch ID"
     },
+    "changePassword": {
+      "title": "Change Password",
+      "info": "Enter your new password below. Make sure it's secure and memorable.",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "submit": "Update Password",
+      "success": "Password updated successfully",
+      "error": "Failed to update password"
+    },
     "notifications": {
       "title": "Notifications",
       "description": "Configure push notifications",
+      "preferences": "Notification Preferences",
       "push": "Push Notifications",
+      "pushTitle": "Push Notifications",
+      "pushDescription": "Receive notifications even when the app is closed",
+      "pushComingSoon": "Push notifications are coming soon!",
       "achievements": "Achievement Notifications",
+      "achievementsDescription": "Get notified when you unlock achievements",
+      "groups": "Group Notifications",
+      "groupsDescription": "Get notifications from your groups (check-ins, achievements, etc.)",
       "groupActivity": "Group Activity",
-      "reminders": "Reminders"
+      "reminders": "Reminders",
+      "remindersDescription": "Reservation reminders and check-in prompts",
+      "info": "You can change your notification preferences at any time",
+      "updateError": "Failed to update notification settings"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -502,8 +682,10 @@
     "tutorial": {
       "title": "Tutorial",
       "description": "Reset the app tutorial to see it again on your next visit to the home page.",
+      "button": "Reset Tutorial",
       "resetButton": "Reset Tutorial",
-      "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page."
+      "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page.",
+      "resetError": "Failed to reset tutorial. Please try again."
     },
     "languageSettings": {
       "title": "Language",
@@ -835,9 +1017,17 @@
     "unknownUser": "Unknown User",
     "aTent": "a tent",
     "aGroup": "a group",
-    "hotStreak": "Hot streak"
+    "hotStreak": "Hot streak",
+    "userProfile": "User Profile",
+    "title": "Activity Feed"
   },
   "home": {
+    "festivalStatus": {
+      "currentDay": "It's day {{currentDay}} / {{totalDays}}",
+      "startsInOneDay": "Starts tomorrow!",
+      "startsInDays": "Starts in {{daysUntil}} days",
+      "ended": "Festival has ended"
+    },
     "quickAttendance": {
       "title": "What are you having?",
       "tent": "Where are you at?",
@@ -845,6 +1035,12 @@
       "selectTent": "Select a tent",
       "loading": "Loading attendance...",
       "outsideFestival": "Attendance logging is only available during the festival"
+    },
+    "activityFeed": {
+      "title": "Latest Activities",
+      "empty": "No activities yet. Start logging your festival adventures!",
+      "loadMore": "Load More",
+      "error": "Failed to load activity feed"
     },
     "festivalOver": "Sadly, {{name}} is over. See you next time!",
     "wrappedReady": {
@@ -868,7 +1064,12 @@
     "yourGroups": "Your Groups:",
     "festivalMap": "{{name}} Map",
     "shareApp": "Share this app",
-    "whatCanIDo": "What can I do with Prost Counter?"
+    "whatCanIDo": "What can I do with Prost Counter?",
+    "baseCost": "Base",
+    "tips": "Tips",
+    "mapLink": {
+      "title": "{{festivalName}} Map"
+    }
   },
   "search": {
     "users": {

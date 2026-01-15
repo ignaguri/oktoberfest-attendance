@@ -4,9 +4,11 @@ import { RadlerIcon } from "@/components/icons/radler-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Beer, Wine, GlassWater, CupSoda, BeerOff } from "lucide-react";
 
 import type { DrinkType } from "@prostcounter/shared/schemas";
+import type { TFunction } from "i18next";
 
 /**
  * Visible drink types for the picker (subset of all DrinkType values)
@@ -91,20 +93,20 @@ function DrinkIcon({
 /**
  * Get the label for a drink type
  */
-export function getDrinkTypeLabel(type: DrinkType): string {
+export function getDrinkTypeLabel(type: DrinkType, t: TFunction): string {
   switch (type) {
     case "beer":
-      return "Beer";
+      return t("attendance.drinkTypes.beer");
     case "radler":
-      return "Radler";
+      return t("attendance.drinkTypes.radler");
     case "wine":
-      return "Wine";
+      return t("attendance.drinkTypes.wine");
     case "soft_drink":
-      return "Soft";
+      return t("attendance.drinkTypes.soft_drink");
     case "alcohol_free":
-      return "AF";
+      return t("attendance.drinkTypes.alcohol_free");
     default:
-      return type;
+      return t("attendance.drinkTypes.other");
   }
 }
 
@@ -127,6 +129,8 @@ export function DrinkTypePicker({
   responsive = false,
   className,
 }: DrinkTypePickerProps) {
+  const { t } = useTranslation();
+
   // Split into two rows for responsive layout: 3 on first row, 2 on second
   const firstRow = VISIBLE_DRINK_TYPES.slice(0, 3);
   const secondRow = VISIBLE_DRINK_TYPES.slice(3);
@@ -156,14 +160,16 @@ export function DrinkTypePicker({
             isSelected ? DRINK_TYPE_COLORS[type] : DRINK_TYPE_COLORS[type],
           )}
         />
-        {showLabels && <span className="ml-1">{getDrinkTypeLabel(type)}</span>}
+        {showLabels && (
+          <span className="ml-1">{getDrinkTypeLabel(type, t)}</span>
+        )}
 
         {/* Count badge */}
         {count > 0 && (
           <Badge
             variant="secondary"
             className={cn(
-              "absolute -top-2 -right-2 h-5 min-w-[20px] px-1 text-xs",
+              "absolute -right-2 -top-2 h-5 min-w-[20px] px-1 text-xs",
               DRINK_TYPE_BG_COLORS[type],
               "border-0 text-white",
             )}
@@ -196,7 +202,7 @@ export function DrinkTypePicker({
       {/* Selected type label - hide in responsive mode since label is shown elsewhere */}
       {!responsive && (
         <span className="text-muted-foreground text-sm font-medium">
-          {getDrinkTypeLabel(selectedType)}
+          {getDrinkTypeLabel(selectedType, t)}
         </span>
       )}
     </div>

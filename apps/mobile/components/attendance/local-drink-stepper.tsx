@@ -67,9 +67,7 @@ export function LocalDrinkStepper({
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
             : "border-background-300 bg-background-100",
         )}
-        accessibilityLabel={t("attendance.removeDrink", {
-          defaultValue: "Remove drink",
-        })}
+        accessibilityLabel={t("attendance.removeDrink")}
         accessibilityRole="button"
         accessibilityState={{ disabled: !canDecrement }}
       >
@@ -101,9 +99,7 @@ export function LocalDrinkStepper({
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
             : "border-background-300 bg-background-100",
         )}
-        accessibilityLabel={t("attendance.addDrink", {
-          defaultValue: "Add drink",
-        })}
+        accessibilityLabel={t("attendance.addDrink")}
         accessibilityRole="button"
         accessibilityState={{ disabled: !canIncrement }}
       >

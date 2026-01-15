@@ -72,7 +72,7 @@ export function ImageSourcePicker({
         >
           <Camera size={20} color={IconColors.default} />
           <ActionsheetItemText>
-            {t("profile.avatar.takePhoto", { defaultValue: "Take Photo" })}
+            {t("profile.avatar.takePhoto")}
           </ActionsheetItemText>
         </ActionsheetItem>
 
@@ -82,9 +82,7 @@ export function ImageSourcePicker({
         >
           <ImagePlus size={20} color={IconColors.default} />
           <ActionsheetItemText>
-            {t("profile.avatar.chooseFromLibrary", {
-              defaultValue: "Choose from Library",
-            })}
+            {t("profile.avatar.chooseFromLibrary")}
           </ActionsheetItemText>
         </ActionsheetItem>
 

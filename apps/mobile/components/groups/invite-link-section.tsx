@@ -5,6 +5,7 @@ import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { getAppUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Link, Copy, RefreshCw, Check, Share2 } from "lucide-react-native";
@@ -29,7 +30,7 @@ export function InviteLinkSection({
   const [copied, setCopied] = useState(false);
 
   const inviteUrl = inviteToken
-    ? `https://prostcounter.com/join-group?token=${inviteToken}`
+    ? `${getAppUrl()}/join-group?token=${inviteToken}`
     : "";
 
   // Handle copy to clipboard (uses Share as fallback)
@@ -54,7 +55,6 @@ export function InviteLinkSection({
     if (!inviteUrl) return;
 
     const message = t("groups.share.message", {
-      defaultValue: `Join my group "${groupName}" on ProstCounter!`,
       name: groupName,
     });
 
@@ -85,8 +85,8 @@ export function InviteLinkSection({
       <VStack space="md">
         <HStack space="sm" className="items-center">
           <Link size={18} color={IconColors.primary} />
-          <Text className="font-medium text-typography-900">
-            {t("groups.settings.inviteLink", { defaultValue: "Invite Link" })}
+          <Text className="text-typography-900 font-medium">
+            {t("groups.settings.inviteLink")}
           </Text>
         </HStack>
 
@@ -96,7 +96,7 @@ export function InviteLinkSection({
             <Input size="md" isReadOnly>
               <InputField
                 value={inviteUrl}
-                className="text-sm text-typography-600"
+                className="text-typography-600 text-sm"
                 numberOfLines={1}
               />
             </Input>
@@ -117,8 +117,8 @@ export function InviteLinkSection({
                 )}
                 <ButtonText className="ml-1">
                   {copied
-                    ? t("groups.settings.copied", { defaultValue: "Copied!" })
-                    : t("groups.settings.copy", { defaultValue: "Copy" })}
+                    ? t("groups.settings.copied")
+                    : t("groups.settings.copy")}
                 </ButtonText>
               </Button>
 
@@ -131,7 +131,7 @@ export function InviteLinkSection({
               >
                 <Share2 size={16} color={IconColors.default} />
                 <ButtonText className="ml-1">
-                  {t("groups.actions.share", { defaultValue: "Share" })}
+                  {t("groups.actions.share")}
                 </ButtonText>
               </Button>
 
@@ -149,27 +149,20 @@ export function InviteLinkSection({
                   <RefreshCw size={16} color={IconColors.default} />
                 )}
                 <ButtonText className="ml-1">
-                  {t("groups.settings.regenerate", {
-                    defaultValue: "Regenerate",
-                  })}
+                  {t("groups.settings.regenerate")}
                 </ButtonText>
               </Button>
             </HStack>
 
             {/* Warning */}
-            <Text className="text-xs text-typography-400">
-              {t("groups.settings.tokenWarning", {
-                defaultValue:
-                  "Regenerating the link will invalidate the current one. Share the new link with members.",
-              })}
+            <Text className="text-typography-400 text-xs">
+              {t("groups.settings.tokenWarning")}
             </Text>
           </>
         ) : (
           <VStack space="sm" className="items-center py-4">
-            <Text className="text-center text-typography-500">
-              {t("groups.settings.noToken", {
-                defaultValue: "No invite link generated yet.",
-              })}
+            <Text className="text-typography-500 text-center">
+              {t("groups.settings.noToken")}
             </Text>
             <Button
               variant="solid"
@@ -179,11 +172,7 @@ export function InviteLinkSection({
               isDisabled={isRegenerating}
             >
               {isRegenerating && <ButtonSpinner color={Colors.white} />}
-              <ButtonText>
-                {t("groups.settings.generateLink", {
-                  defaultValue: "Generate Link",
-                })}
-              </ButtonText>
+              <ButtonText>{t("groups.settings.generateLink")}</ButtonText>
             </Button>
           </VStack>
         )}

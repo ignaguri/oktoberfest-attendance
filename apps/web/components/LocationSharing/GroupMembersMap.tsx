@@ -2,9 +2,9 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useNearbyGroupMembers } from "@/hooks/useLocationSharing";
 import { DEFAULT_AVATAR_URL } from "@prostcounter/shared/constants";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { MapPin, Users, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 

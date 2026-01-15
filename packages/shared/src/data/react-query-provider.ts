@@ -37,15 +37,17 @@ function mapQueryOptions(
   };
 }
 
-function mapMutationOptions<TData, TVariables = unknown>(
-  options?: DataMutationOptions<TData, TVariables>,
-): UseMutationOptions<TData, Error, TVariables> {
+function mapMutationOptions<TData, TVariables = unknown, TContext = unknown>(
+  options?: DataMutationOptions<TData, TVariables, TContext>,
+): UseMutationOptions<TData, Error, TVariables, TContext> {
   if (!options) return {};
 
   return {
+    onMutate: options.onMutate,
     onSuccess: options.onSuccess,
     onError: options.onError,
-    onSettled: (data, error) => options.onSettled?.(data ?? null, error),
+    onSettled: (data, error, variables, context) =>
+      options.onSettled?.(data ?? null, error, variables, context),
   };
 }
 
@@ -78,13 +80,13 @@ export function useQuery<T>(
 /**
  * React Query implementation of useMutation
  */
-export function useMutation<TData, TVariables>(
+export function useMutation<TData, TVariables, TContext = unknown>(
   mutationFn: (variables: TVariables) => Promise<TData>,
-  options?: DataMutationOptions<TData, TVariables>,
+  options?: DataMutationOptions<TData, TVariables, TContext>,
 ): DataMutationResult<TData, TVariables> {
-  const mutation = useReactMutation<TData, Error, TVariables>({
+  const mutation = useReactMutation<TData, Error, TVariables, TContext>({
     mutationFn,
-    ...mapMutationOptions<TData, TVariables>(options),
+    ...mapMutationOptions<TData, TVariables, TContext>(options),
   });
 
   return {
@@ -192,5 +194,19 @@ export function useGetQueryData() {
       return getQueryData<T>(queryKey);
     },
     [getQueryData],
+  );
+}
+
+/**
+ * Utility hook to cancel queries (for optimistic updates)
+ */
+export function useCancelQueries() {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    async (queryKey: readonly unknown[]) => {
+      await queryClient.cancelQueries({ queryKey });
+    },
+    [queryClient],
   );
 }

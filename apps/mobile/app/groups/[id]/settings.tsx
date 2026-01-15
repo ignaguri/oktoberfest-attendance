@@ -167,18 +167,11 @@ export default function GroupSettingsScreen() {
         refetchGroup();
         showDialog(
           t("common.status.success"),
-          t("groups.settings.updateSuccess", {
-            defaultValue: "Group settings updated successfully!",
-          }),
+          t("groups.settings.updateSuccess"),
         );
       } catch (error) {
         console.error("Failed to update group:", error);
-        showDialog(
-          t("common.status.error"),
-          t("groups.settings.updateError", {
-            defaultValue: "Failed to update group settings.",
-          }),
-        );
+        showDialog(t("common.status.error"), t("groups.settings.updateError"));
       }
     },
     [id, updateGroup, refetchGroup, showDialog, t],
@@ -188,11 +181,8 @@ export default function GroupSettingsScreen() {
   const handleRemoveMember = useCallback(
     (userId: string, memberName: string) => {
       showDialog(
-        t("groups.settings.removeMemberTitle", {
-          defaultValue: "Remove Member",
-        }),
+        t("groups.settings.removeMemberTitle"),
         t("groups.settings.removeMemberMessage", {
-          defaultValue: `Are you sure you want to remove ${memberName} from the group?`,
           name: memberName,
         }),
         "destructive",
@@ -202,6 +192,11 @@ export default function GroupSettingsScreen() {
             refetchMembers();
           } catch (error) {
             console.error("Failed to remove member:", error);
+            showDialog(
+              t("common.status.error"),
+              t("common.errors.generic"),
+              "destructive",
+            );
           }
         },
       );
@@ -213,11 +208,8 @@ export default function GroupSettingsScreen() {
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const handleLeaveGroup = useCallback(() => {
     showDialog(
-      t("groups.settings.leaveTitle", { defaultValue: "Leave Group" }),
-      t("groups.settings.leaveMessage", {
-        defaultValue:
-          "Are you sure you want to leave this group? You can rejoin later with an invite.",
-      }),
+      t("groups.settings.leaveTitle"),
+      t("groups.settings.leaveMessage"),
       "destructive",
       async () => {
         try {
@@ -228,6 +220,11 @@ export default function GroupSettingsScreen() {
           router.replace("/(tabs)/groups");
         } catch (error) {
           console.error("Failed to leave group:", error);
+          showDialog(
+            t("common.status.error"),
+            t("common.errors.generic"),
+            "destructive",
+          );
         }
       },
     );
@@ -242,7 +239,7 @@ export default function GroupSettingsScreen() {
   // Loading state
   if (isLoading && !group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
       </View>
     );
@@ -251,7 +248,7 @@ export default function GroupSettingsScreen() {
   // Error state
   if (groupError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={groupError} onRetry={refetchGroup} />
       </View>
     );
@@ -260,10 +257,10 @@ export default function GroupSettingsScreen() {
   // No group found
   if (!group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
         <SettingsIcon size={48} color={IconColors.disabled} />
-        <Text className="mt-4 text-center text-typography-500">
-          {t("groups.settings.notFound", { defaultValue: "Group not found" })}
+        <Text className="text-typography-500 mt-4 text-center">
+          {t("groups.settings.notFound")}
         </Text>
         <Button
           variant="outline"
@@ -271,9 +268,7 @@ export default function GroupSettingsScreen() {
           className="mt-4"
           onPress={() => router.back()}
         >
-          <ButtonText>
-            {t("common.buttons.goBack", { defaultValue: "Go Back" })}
-          </ButtonText>
+          <ButtonText>{t("common.buttons.goBack")}</ButtonText>
         </Button>
       </View>
     );
@@ -286,7 +281,7 @@ export default function GroupSettingsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -301,19 +296,15 @@ export default function GroupSettingsScreen() {
               <VStack space="lg">
                 <HStack space="sm" className="items-center">
                   <SettingsIcon size={18} color={IconColors.primary} />
-                  <Text className="font-medium text-typography-900">
-                    {t("groups.settings.details", {
-                      defaultValue: "Group Details",
-                    })}
+                  <Text className="text-typography-900 font-medium">
+                    {t("groups.settings.details")}
                   </Text>
                 </HStack>
 
                 {/* Group Name */}
                 <VStack space="sm">
-                  <Text className="text-sm font-medium text-typography-700">
-                    {t("groups.create.nameLabel", {
-                      defaultValue: "Group Name",
-                    })}
+                  <Text className="text-typography-700 text-sm font-medium">
+                    {t("groups.create.nameLabel")}
                   </Text>
                   <Controller
                     control={control}
@@ -330,7 +321,7 @@ export default function GroupSettingsScreen() {
                     )}
                   />
                   {errors.name && (
-                    <Text className="text-sm text-error-600">
+                    <Text className="text-error-600 text-sm">
                       {errors.name.message}
                     </Text>
                   )}
@@ -338,10 +329,8 @@ export default function GroupSettingsScreen() {
 
                 {/* Description */}
                 <VStack space="sm">
-                  <Text className="text-sm font-medium text-typography-700">
-                    {t("groups.settings.description", {
-                      defaultValue: "Description",
-                    })}
+                  <Text className="text-typography-700 text-sm font-medium">
+                    {t("groups.settings.description")}
                   </Text>
                   <Controller
                     control={control}
@@ -351,10 +340,6 @@ export default function GroupSettingsScreen() {
                         <TextareaInput
                           placeholder={t(
                             "groups.settings.descriptionPlaceholder",
-                            {
-                              defaultValue:
-                                "Add a description for your group...",
-                            },
                           )}
                           value={value || ""}
                           onChangeText={onChange}
@@ -365,7 +350,7 @@ export default function GroupSettingsScreen() {
                     )}
                   />
                   {errors.description && (
-                    <Text className="text-sm text-error-600">
+                    <Text className="text-error-600 text-sm">
                       {errors.description.message}
                     </Text>
                   )}
@@ -373,10 +358,8 @@ export default function GroupSettingsScreen() {
 
                 {/* Winning Criteria */}
                 <VStack space="sm">
-                  <Text className="text-sm font-medium text-typography-700">
-                    {t("groups.create.criteriaLabel", {
-                      defaultValue: "Winning Criteria",
-                    })}
+                  <Text className="text-typography-700 text-sm font-medium">
+                    {t("groups.create.criteriaLabel")}
                   </Text>
                   <Controller
                     control={control}
@@ -393,12 +376,6 @@ export default function GroupSettingsScreen() {
                                     WINNING_CRITERIA_OPTIONS.find(
                                       (opt) => opt.value === value,
                                     )!.label,
-                                    {
-                                      defaultValue:
-                                        WINNING_CRITERIA_OPTIONS.find(
-                                          (opt) => opt.value === value,
-                                        )!.defaultLabel,
-                                    },
                                   )
                                 : ""
                             }
@@ -414,9 +391,7 @@ export default function GroupSettingsScreen() {
                             {WINNING_CRITERIA_OPTIONS.map((option) => (
                               <SelectItem
                                 key={option.value}
-                                label={t(option.label, {
-                                  defaultValue: option.defaultLabel,
-                                })}
+                                label={t(option.label)}
                                 value={option.value}
                               />
                             ))}
@@ -442,10 +417,8 @@ export default function GroupSettingsScreen() {
                   )}
                   <ButtonText className="ml-2">
                     {isSaving
-                      ? t("common.status.saving", { defaultValue: "Saving..." })
-                      : t("common.buttons.save", {
-                          defaultValue: "Save Changes",
-                        })}
+                      ? t("common.status.saving")
+                      : t("common.buttons.save")}
                   </ButtonText>
                 </Button>
               </VStack>
@@ -466,10 +439,10 @@ export default function GroupSettingsScreen() {
           <VStack space="sm">
             <HStack space="sm" className="items-center">
               <Users size={18} color={IconColors.default} />
-              <Text className="font-medium text-typography-900">
-                {t("groups.settings.members", { defaultValue: "Members" })}
+              <Text className="text-typography-900 font-medium">
+                {t("groups.settings.members")}
               </Text>
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 ({(members as GroupMember[])?.length || 0})
               </Text>
               {isLoadingMembers && <Spinner size="small" />}
@@ -488,20 +461,13 @@ export default function GroupSettingsScreen() {
           {/* Leave Group Section */}
           <Card variant="outline" size="md" className="border-error-200">
             <VStack space="sm">
-              <Text className="font-medium text-error-600">
-                {t("groups.settings.dangerZone", {
-                  defaultValue: "Danger Zone",
-                })}
+              <Text className="text-error-600 font-medium">
+                {t("groups.settings.dangerZone")}
               </Text>
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 {isCreator
-                  ? t("groups.settings.leaveCreatorWarning", {
-                      defaultValue:
-                        "As the group creator, leaving will transfer ownership to another member.",
-                    })
-                  : t("groups.settings.leaveWarning", {
-                      defaultValue: "You can rejoin later with an invite link.",
-                    })}
+                  ? t("groups.settings.leaveCreatorWarning")
+                  : t("groups.settings.leaveWarning")}
               </Text>
               <Button
                 variant="outline"
@@ -516,7 +482,7 @@ export default function GroupSettingsScreen() {
                   <LogOut size={18} color={IconColors.error} />
                 )}
                 <ButtonText className="ml-2">
-                  {t("groups.settings.leave", { defaultValue: "Leave Group" })}
+                  {t("groups.settings.leave")}
                 </ButtonText>
               </Button>
             </VStack>
@@ -568,7 +534,7 @@ export default function GroupSettingsScreen() {
                 >
                   <ButtonText>
                     {dialog.type === "destructive"
-                      ? t("common.buttons.confirm", { defaultValue: "Confirm" })
+                      ? t("common.buttons.confirm")
                       : t("common.buttons.ok")}
                   </ButtonText>
                 </Button>
