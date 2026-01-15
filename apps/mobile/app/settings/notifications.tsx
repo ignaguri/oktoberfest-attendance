@@ -89,7 +89,7 @@ export default function NotificationSettingsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ActivityIndicator size="large" color={Colors.primary[500]} />
       </View>
     );
@@ -97,7 +97,7 @@ export default function NotificationSettingsScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-background-50"
+      className="bg-background-50 flex-1"
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
@@ -105,19 +105,19 @@ export default function NotificationSettingsScreen() {
       <View className="p-4">
         {/* Preferences Section */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 mb-4 text-lg font-semibold">
             {t("profile.notifications.preferences")}
           </Text>
 
           {/* Reminders */}
-          <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+          <View className="border-outline-100 flex-row items-center justify-between border-b py-3">
             <View className="flex-1 flex-row items-center gap-3">
               <Clock size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t("profile.notifications.reminders")}
                 </Text>
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("profile.notifications.remindersDescription")}
                 </Text>
               </View>
@@ -137,14 +137,14 @@ export default function NotificationSettingsScreen() {
           </View>
 
           {/* Achievement Notifications */}
-          <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+          <View className="border-outline-100 flex-row items-center justify-between border-b py-3">
             <View className="flex-1 flex-row items-center gap-3">
               <Trophy size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
                   {t("profile.notifications.achievements")}
                 </Text>
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("profile.notifications.achievementsDescription")}
                 </Text>
               </View>
@@ -171,7 +171,7 @@ export default function NotificationSettingsScreen() {
                 <Text className="text-typography-900">
                   {t("profile.notifications.groups")}
                 </Text>
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("profile.notifications.groupsDescription")}
                 </Text>
               </View>
@@ -193,7 +193,7 @@ export default function NotificationSettingsScreen() {
 
         {/* Push Notifications Section */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 mb-4 text-lg font-semibold">
             {t("profile.notifications.pushTitle")}
           </Text>
 
@@ -204,7 +204,7 @@ export default function NotificationSettingsScreen() {
                 <Text className="text-typography-900">
                   {t("profile.notifications.push")}
                 </Text>
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("profile.notifications.pushDescription")}
                 </Text>
               </View>

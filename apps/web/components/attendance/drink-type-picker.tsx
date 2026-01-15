@@ -169,7 +169,7 @@ export function DrinkTypePicker({
           <Badge
             variant="secondary"
             className={cn(
-              "absolute -top-2 -right-2 h-5 min-w-[20px] px-1 text-xs",
+              "absolute -right-2 -top-2 h-5 min-w-[20px] px-1 text-xs",
               DRINK_TYPE_BG_COLORS[type],
               "border-0 text-white",
             )}

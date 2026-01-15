@@ -180,7 +180,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       <h2 className="text-2xl font-semibold">{t("groups.settings.title")}</h2>
       <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="mb-4 text-lg leading-6 font-medium text-gray-900">
+          <h3 className="mb-4 text-lg font-medium leading-6 text-gray-900">
             {t("groups.settings.groupDetails")}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -194,7 +194,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               <Input
                 type="text"
                 id="name"
-                className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-xs"
+                className="shadow-xs mt-1 block w-full rounded-md border border-gray-300 p-2"
                 disabled={!isCreator}
                 errorMsg={errors.name?.message}
                 {...register("name")}
@@ -211,7 +211,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               <Textarea
                 id="description"
                 rows={3}
-                className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-xs"
+                className="shadow-xs mt-1 block w-full rounded-md border border-gray-300 p-2"
                 disabled={!isCreator}
                 errorMsg={errors.description?.message}
                 {...register("description")}
@@ -264,7 +264,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       {isCreator && (
         <div className="mt-4 overflow-hidden bg-white shadow-sm sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="mb-4 text-lg leading-6 font-medium text-gray-900">
+            <h3 className="mb-4 text-lg font-medium leading-6 text-gray-900">
               {t("groups.settings.inviteLink")}
             </h3>
             <div className="mb-4 space-y-2">
@@ -331,14 +331,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">
+              <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                 {t("profile.account.usernameLabel")}
               </th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">
+              <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                 {t("common.labels.name")}
               </th>
               {isCreator && (
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                   {t("groups.settings.actions")}
                 </th>
               )}
@@ -347,14 +347,14 @@ export default function GroupSettingsClient({ group, members }: Props) {
           <tbody className="divide-y divide-gray-200 bg-white">
             {members.map((member) => (
               <tr key={member.id}>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {member.username || "–"}
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {member.full_name || "–"}
                 </td>
                 {isCreator && (
-                  <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
                     <Button
                       variant="ghost"
                       className="text-red-600 underline hover:text-red-900 disabled:text-gray-400 disabled:no-underline"

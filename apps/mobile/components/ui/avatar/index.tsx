@@ -22,7 +22,7 @@ const UIAvatar = createAvatar({
 });
 
 const avatarStyle = tva({
-  base: "relative items-center justify-center rounded-full bg-primary-600 group-[.avatar-group]/avatar-group:-ml-2.5",
+  base: "bg-primary-600 relative items-center justify-center rounded-full group-[.avatar-group]/avatar-group:-ml-2.5",
   variants: {
     size: {
       xs: "h-6 w-6",
@@ -36,7 +36,7 @@ const avatarStyle = tva({
 });
 
 const avatarFallbackTextStyle = tva({
-  base: "text-transform:uppercase overflow-hidden font-semibold text-typography-0 web:cursor-default",
+  base: "text-transform:uppercase text-typography-0 web:cursor-default overflow-hidden font-semibold",
 
   parentVariants: {
     size: {
@@ -55,7 +55,7 @@ const avatarGroupStyle = tva({
 });
 
 const avatarBadgeStyle = tva({
-  base: "absolute bottom-0 right-0 h-5 w-5 rounded-full border-2 border-background-0 bg-success-500",
+  base: "border-background-0 bg-success-500 absolute bottom-0 right-0 h-5 w-5 rounded-full border-2",
   parentVariants: {
     size: {
       xs: "h-2 w-2",

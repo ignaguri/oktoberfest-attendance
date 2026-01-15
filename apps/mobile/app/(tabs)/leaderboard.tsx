@@ -78,7 +78,7 @@ export default function LeaderboardScreen() {
   // Loading state (initial or festival loading)
   if (festivalLoading || (loading && entries.length === 0)) {
     return (
-      <ScrollView className="flex-1 bg-background-50">
+      <ScrollView className="bg-background-50 flex-1">
         <VStack space="md" className="items-center justify-center p-4 py-20">
           <ActivityIndicator size="large" color={Colors.primary[500]} />
           <Text className="text-typography-500">
@@ -92,7 +92,7 @@ export default function LeaderboardScreen() {
   // No festival selected
   if (!currentFestival) {
     return (
-      <ScrollView className="flex-1 bg-background-50">
+      <ScrollView className="bg-background-50 flex-1">
         <VStack space="md" className="p-4">
           <Card
             variant="outline"
@@ -100,7 +100,7 @@ export default function LeaderboardScreen() {
             className="items-center bg-white p-6"
           >
             <Trophy size={48} color={IconColors.disabled} />
-            <Text className="mt-2 text-center text-typography-500">
+            <Text className="text-typography-500 mt-2 text-center">
               {t("leaderboard.noFestival")}
             </Text>
           </Card>
@@ -113,7 +113,7 @@ export default function LeaderboardScreen() {
   if (error && entries.length === 0) {
     return (
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
@@ -130,10 +130,10 @@ export default function LeaderboardScreen() {
             className="items-center bg-white p-6"
           >
             <Trophy size={48} color={IconColors.error} />
-            <Text className="mt-2 text-center text-error-600">
+            <Text className="text-error-600 mt-2 text-center">
               {t("leaderboard.error")}
             </Text>
-            <Text className="mt-1 text-center text-sm text-typography-400">
+            <Text className="text-typography-400 mt-1 text-center text-sm">
               {t("common.actions.pullToRefresh")}
             </Text>
           </Card>
@@ -144,7 +144,7 @@ export default function LeaderboardScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-background-50"
+      className="bg-background-50 flex-1"
       refreshControl={
         <RefreshControl
           refreshing={isRefetching}
@@ -158,20 +158,20 @@ export default function LeaderboardScreen() {
         {/* Achievements Section */}
         <Pressable
           onPress={() => router.push("/achievements")}
-          className="rounded-xl bg-primary-100 px-4 py-4"
+          className="bg-primary-100 rounded-xl px-4 py-4"
           accessibilityLabel={t("achievements.viewMyAchievements")}
           accessibilityRole="button"
         >
           <HStack className="items-center justify-between">
             <HStack space="md" className="items-center">
-              <Box className="rounded-full bg-primary-200 p-2">
+              <Box className="bg-primary-200 rounded-full p-2">
                 <Award size={24} color={Colors.primary[600]} />
               </Box>
               <VStack>
-                <Text className="text-base font-semibold text-primary-800">
+                <Text className="text-primary-800 text-base font-semibold">
                   {t("achievements.viewMyAchievements")}
                 </Text>
-                <Text className="text-sm text-primary-600">
+                <Text className="text-primary-600 text-sm">
                   {t("achievements.viewProgress")}
                 </Text>
               </VStack>
@@ -181,7 +181,7 @@ export default function LeaderboardScreen() {
         </Pressable>
 
         {/* Divider */}
-        <View className="my-1 h-px bg-outline-200" />
+        <View className="bg-outline-200 my-1 h-px" />
 
         {/* Leaderboard Section Header */}
         <HStack space="sm" className="items-center">

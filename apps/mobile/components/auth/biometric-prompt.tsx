@@ -57,18 +57,18 @@ export function BiometricPrompt({
           {isAuthenticating ? (
             <ActivityIndicator size="large" color="#F59E0B" className="my-4" />
           ) : (
-            <View className="mb-4 rounded-full bg-primary-100 p-4">
+            <View className="bg-primary-100 mb-4 rounded-full p-4">
               <BiometricIcon size={48} className="text-primary-600" />
             </View>
           )}
 
-          <Text className="text-center text-xl font-semibold text-typography-900">
+          <Text className="text-typography-900 text-center text-xl font-semibold">
             {t("auth.biometric.prompt", {
               biometricName,
             })}
           </Text>
 
-          <Text className="mt-2 text-center text-typography-500">
+          <Text className="text-typography-500 mt-2 text-center">
             {t("auth.biometric.description", {
               biometricName,
             })}
@@ -148,17 +148,17 @@ export function BiometricEnablePrompt({
       <ModalBackdrop />
       <ModalContent className="items-center">
         <ModalBody className="items-center pt-6">
-          <View className="mb-4 rounded-full bg-primary-100 p-4">
+          <View className="bg-primary-100 mb-4 rounded-full p-4">
             <BiometricIcon size={48} className="text-primary-600" />
           </View>
 
-          <Text className="text-center text-xl font-semibold text-typography-900">
+          <Text className="text-typography-900 text-center text-xl font-semibold">
             {t("auth.biometric.enableTitle", {
               biometricName,
             })}
           </Text>
 
-          <Text className="mt-2 text-center text-typography-500">
+          <Text className="text-typography-500 mt-2 text-center">
             {t("auth.biometric.enableDescription", {
               biometricName,
             })}

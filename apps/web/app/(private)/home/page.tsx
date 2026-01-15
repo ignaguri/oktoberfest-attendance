@@ -92,7 +92,7 @@ export default function Home() {
               What can I do with Prost Counter?
             </AccordionTrigger>
             <AccordionContent className="max-w-80">
-              <p className="text-center text-balance text-gray-600">
+              <p className="text-balance text-center text-gray-600">
                 Compete with friends in different groups to see who visits beer
                 festivals more often and drinks the most beers!
                 <br />

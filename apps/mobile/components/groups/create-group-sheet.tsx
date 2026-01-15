@@ -128,7 +128,7 @@ export function CreateGroupSheet({
 
         {/* Header */}
         <HStack className="mb-4 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 text-lg font-semibold">
             {t("groups.create.title")}
           </Text>
           <Pressable onPress={handleClose} hitSlop={8}>
@@ -140,7 +140,7 @@ export function CreateGroupSheet({
           <VStack space="xl" className="px-2 pb-4">
             {/* Group Name Input */}
             <VStack space="sm">
-              <Text className="text-sm font-medium text-typography-700">
+              <Text className="text-typography-700 text-sm font-medium">
                 {t("groups.create.nameLabel")}
               </Text>
               <Controller
@@ -159,7 +159,7 @@ export function CreateGroupSheet({
                 )}
               />
               {errors.name && (
-                <Text className="text-sm text-error-600">
+                <Text className="text-error-600 text-sm">
                   {t(errors.name.message || "validation.required")}
                 </Text>
               )}
@@ -167,7 +167,7 @@ export function CreateGroupSheet({
 
             {/* Winning Criteria Select */}
             <VStack space="sm">
-              <Text className="text-sm font-medium text-typography-700">
+              <Text className="text-typography-700 text-sm font-medium">
                 {t("groups.create.criteriaLabel")}
               </Text>
               <Controller
@@ -211,14 +211,14 @@ export function CreateGroupSheet({
                 )}
               />
               {errors.winningCriteria && (
-                <Text className="text-sm text-error-600">
+                <Text className="text-error-600 text-sm">
                   {t(errors.winningCriteria.message || "validation.required")}
                 </Text>
               )}
             </VStack>
 
             {/* Helper text */}
-            <Text className="text-sm text-typography-500">
+            <Text className="text-typography-500 text-sm">
               {t("groups.create.criteriaHelp")}
             </Text>
           </VStack>

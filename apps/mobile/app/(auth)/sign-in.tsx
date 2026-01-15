@@ -183,7 +183,7 @@ export default function SignInScreen() {
     isLoading || isGoogleLoading || isFacebookLoading || isAppleLoading;
 
   return (
-    <SafeAreaView className="flex-1 bg-background-0">
+    <SafeAreaView className="bg-background-0 flex-1">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -200,8 +200,8 @@ export default function SignInScreen() {
 
           {/* Error Message */}
           {error && (
-            <View className="mb-4 rounded-lg bg-error-50 p-3">
-              <Text className="text-center text-error-600">{error}</Text>
+            <View className="bg-error-50 mb-4 rounded-lg p-3">
+              <Text className="text-error-600 text-center">{error}</Text>
             </View>
           )}
 
@@ -251,7 +251,7 @@ export default function SignInScreen() {
               onPress={() => router.push("/(auth)/forgot-password")}
               className="mt-4 py-2"
             >
-              <Text className="text-center font-medium text-primary-600">
+              <Text className="text-primary-600 text-center font-medium">
                 {t("auth.signIn.forgotPassword")}
               </Text>
             </Pressable>

@@ -34,7 +34,7 @@ cssInterop(PrimitiveIcon, {
 });
 
 const fabStyle = tva({
-  base: "group/fab disabled:pointer-events-all absolute z-20 flex-row items-center justify-center rounded-full bg-primary-500 p-4 shadow-hard-2 hover:bg-primary-600 active:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-40 data-[focus=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[focus-visible=true]:web:ring-indicator-info",
+  base: "group/fab disabled:pointer-events-all bg-primary-500 shadow-hard-2 hover:bg-primary-600 active:bg-primary-700 data-[focus=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[focus-visible=true]:web:ring-indicator-info absolute z-20 flex-row items-center justify-center rounded-full p-4 disabled:cursor-not-allowed disabled:opacity-40",
   variants: {
     size: {
       sm: "px-2.5 py-2.5",
@@ -53,7 +53,7 @@ const fabStyle = tva({
 });
 
 const fabLabelStyle = tva({
-  base: "font-body tracking-md mx-2 text-left font-normal text-typography-50",
+  base: "font-body tracking-md text-typography-50 mx-2 text-left font-normal",
   variants: {
     isTruncated: {
       true: "",
@@ -100,7 +100,7 @@ const fabLabelStyle = tva({
 });
 
 const fabIconStyle = tva({
-  base: "fill-none text-typography-50",
+  base: "text-typography-50 fill-none",
   variants: {
     size: {
       "2xs": "h-3 w-3",

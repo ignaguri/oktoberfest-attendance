@@ -37,7 +37,7 @@ const SelectTriggerWrapper = React.forwardRef<
 });
 
 const selectIconStyle = tva({
-  base: "fill-none text-background-500",
+  base: "text-background-500 fill-none",
   parentVariants: {
     size: {
       "2xs": "h-3 w-3",
@@ -55,7 +55,7 @@ const selectStyle = tva({
 });
 
 const selectTriggerStyle = tva({
-  base: "flex-row items-center overflow-hidden rounded border border-background-300 data-[disabled=true]:data-[hover=true]:border-background-300 data-[focus=true]:border-primary-700 data-[hover=true]:border-outline-400 data-[disabled=true]:opacity-40",
+  base: "border-background-300 data-[disabled=true]:data-[hover=true]:border-background-300 data-[focus=true]:border-primary-700 data-[hover=true]:border-outline-400 flex-row items-center overflow-hidden rounded border data-[disabled=true]:opacity-40",
   variants: {
     size: {
       xl: "h-12",
@@ -65,17 +65,17 @@ const selectTriggerStyle = tva({
     },
     variant: {
       underlined:
-        "rounded-none border-0 border-b data-[focus=true]:border-primary-700 data-[hover=true]:border-primary-700 data-[invalid=true]:border-error-700 data-[focus=true]:web:shadow-[inset_0_-1px_0_0] data-[focus=true]:web:shadow-primary-700 data-[invalid=true]:web:shadow-error-700",
+        "data-[focus=true]:border-primary-700 data-[hover=true]:border-primary-700 data-[invalid=true]:border-error-700 data-[focus=true]:web:shadow-[inset_0_-1px_0_0] data-[focus=true]:web:shadow-primary-700 data-[invalid=true]:web:shadow-error-700 rounded-none border-0 border-b",
       outline:
         "data-[focus=true]:border-primary-700 data-[invalid=true]:border-error-700 data-[invalid=true]:data-[hover=true]:border-error-700 data-[focus=true]:web:shadow-[inset_0_0_0_1px] data-[invalid=true]:web:shadow-[inset_0_0_0_1px] data-[focus=true]:data-[hover=true]:web:shadow-primary-600 data-[invalid=true]:web:shadow-error-700",
       rounded:
-        "rounded-full data-[focus=true]:border-primary-700 data-[invalid=true]:border-error-700 data-[focus=true]:web:shadow-[inset_0_0_0_1px] data-[focus=true]:web:shadow-primary-700 data-[invalid=true]:web:shadow-error-700",
+        "data-[focus=true]:border-primary-700 data-[invalid=true]:border-error-700 data-[focus=true]:web:shadow-[inset_0_0_0_1px] data-[focus=true]:web:shadow-primary-700 data-[invalid=true]:web:shadow-error-700 rounded-full",
     },
   },
 });
 
 const selectInputStyle = tva({
-  base: "ios:leading-[0px] pointer-events-none h-full flex-1 px-3 py-0 text-typography-900 placeholder:text-typography-500 web:w-full web:outline-none",
+  base: "ios:leading-[0px] text-typography-900 placeholder:text-typography-500 web:w-full web:outline-none pointer-events-none h-full flex-1 px-3 py-0",
   parentVariants: {
     size: {
       xl: "text-xl",

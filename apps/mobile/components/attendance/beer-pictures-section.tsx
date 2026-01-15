@@ -101,7 +101,7 @@ export function BeerPicturesSection({
 
   return (
     <VStack className="gap-2">
-      <Text className="text-sm font-medium text-typography-700">
+      <Text className="text-typography-700 text-sm font-medium">
         {t("attendance.form.photos")}
       </Text>
 
@@ -127,7 +127,7 @@ export function BeerPicturesSection({
               {!disabled && !isUploading && (
                 <Pressable
                   onPress={() => onTogglePhotoRemoval(photo.id)}
-                  className="absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full bg-error-500"
+                  className="bg-error-500 absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full"
                 >
                   <X size={14} color={IconColors.white} />
                 </Pressable>
@@ -154,7 +154,7 @@ export function BeerPicturesSection({
               !disabled && (
                 <Pressable
                   onPress={() => handleRemovePendingPhoto(photo.id)}
-                  className="absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full bg-background-400"
+                  className="bg-background-400 absolute -right-2 -top-2 h-6 w-6 items-center justify-center rounded-full"
                 >
                   <Minus size={14} color={IconColors.white} />
                 </Pressable>
@@ -165,7 +165,7 @@ export function BeerPicturesSection({
 
         {/* Loading skeleton while picking/processing images */}
         {isPicking && (
-          <View className="h-20 w-20 items-center justify-center rounded-lg bg-background-200">
+          <View className="bg-background-200 h-20 w-20 items-center justify-center rounded-lg">
             <ActivityIndicator size="small" color={IconColors.muted} />
           </View>
         )}
@@ -175,7 +175,7 @@ export function BeerPicturesSection({
           <Pressable
             onPress={handleAddPress}
             disabled={isUploading || isPicking}
-            className="h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed border-background-300 bg-background-50"
+            className="border-background-300 bg-background-50 h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed"
           >
             <ImagePlus size={24} color={IconColors.muted} />
           </Pressable>
@@ -183,7 +183,7 @@ export function BeerPicturesSection({
       </HStack>
 
       {/* Error message */}
-      {error && <Text className="text-sm text-error-600">{error.message}</Text>}
+      {error && <Text className="text-error-600 text-sm">{error.message}</Text>}
 
       {/* Source picker */}
       <ImageSourcePicker

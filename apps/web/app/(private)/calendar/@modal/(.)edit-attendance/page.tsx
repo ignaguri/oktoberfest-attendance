@@ -50,7 +50,7 @@ export default function InterceptedAttendanceModal() {
           <Button
             variant="ghost"
             size="sm"
-            className="hover:bg-muted absolute top-2 right-2 z-10 h-8 w-8 p-0"
+            className="hover:bg-muted absolute right-2 top-2 z-10 h-8 w-8 p-0"
             onClick={handleClose}
             aria-label="Close modal"
           >

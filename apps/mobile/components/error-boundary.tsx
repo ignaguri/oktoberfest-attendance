@@ -70,17 +70,17 @@ function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
   const { t } = useTranslation();
 
   return (
-    <View className="flex-1 items-center justify-center bg-background-50 p-6">
+    <View className="bg-background-50 flex-1 items-center justify-center p-6">
       <VStack space="lg" className="items-center">
         <Heading size="xl" className="text-error-600">
           {t("common.errors.title")}
         </Heading>
-        <Text className="text-center text-typography-500">
+        <Text className="text-typography-500 text-center">
           {t("common.errors.unexpected")}
         </Text>
         {__DEV__ && error && (
-          <View className="rounded-md bg-background-100 p-3">
-            <Text className="font-mono text-xs text-error-500">
+          <View className="bg-background-100 rounded-md p-3">
+            <Text className="text-error-500 font-mono text-xs">
               {error.message}
             </Text>
           </View>

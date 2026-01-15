@@ -109,7 +109,7 @@ export function OAuthButtons({
         ) : (
           <>
             <GoogleIcon />
-            <ButtonText className="ml-2 text-typography-700">
+            <ButtonText className="text-typography-700 ml-2">
               {t("auth.signIn.continueWithGoogle")}
             </ButtonText>
           </>
