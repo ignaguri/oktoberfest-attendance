@@ -1,9 +1,12 @@
 import React from "react";
-import { View, ViewProps } from "react-native";
+import { View } from "react-native";
+
+import type { CardSize, CardVariant } from "@prostcounter/ui";
+import type { ViewProps } from "react-native";
+
 import { cardStyle } from "./styles";
 
 // Import contract types from shared UI package
-import type { CardSize, CardVariant } from "@prostcounter/ui";
 
 /**
  * Card Props - implements @prostcounter/ui CardProps contract

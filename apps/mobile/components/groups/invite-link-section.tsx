@@ -1,9 +1,3 @@
-import { useRenewInviteToken } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Link, Copy, RefreshCw, Check, Share2 } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { Share, Platform } from "react-native";
-
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -11,6 +5,11 @@ import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useRenewInviteToken } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Link, Copy, RefreshCw, Check, Share2 } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { Share, Platform } from "react-native";
 
 interface InviteLinkSectionProps {
   groupId: string;

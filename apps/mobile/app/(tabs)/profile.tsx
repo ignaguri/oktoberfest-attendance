@@ -1,21 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useCurrentProfile,
-  useDeleteProfile,
-  useResetTutorial,
-  useUpdateProfile,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  UpdateProfileSchema,
-  type UpdateProfileInput,
-} from "@prostcounter/shared/schemas";
-import { useRouter } from "expo-router";
-import { Lock, LogOut } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
-import { RefreshControl } from "react-native";
-
 import { ImageSourcePicker } from "@/components/image-source-picker";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
@@ -42,6 +24,23 @@ import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useCurrentProfile,
+  useDeleteProfile,
+  useResetTutorial,
+  useUpdateProfile,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import {
+  UpdateProfileSchema,
+  type UpdateProfileInput,
+} from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
+import { Lock, LogOut } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
+import { RefreshControl } from "react-native";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();

@@ -1,13 +1,4 @@
-import { cn } from "@prostcounter/ui";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import * as Haptics from "expo-haptics";
-import { Beer, BeerOff, Wine, CupSoda } from "lucide-react-native";
-
 import { RadlerIcon } from "@/components/icons/radler-icon";
-import { useCallback } from "react";
-
-import type { DrinkType } from "@prostcounter/shared/schemas";
-
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -17,6 +8,13 @@ import {
   DrinkTypeColors,
   IconColors,
 } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import * as Haptics from "expo-haptics";
+import { Beer, BeerOff, Wine, CupSoda } from "lucide-react-native";
+import { useCallback } from "react";
+
+import type { DrinkType } from "@prostcounter/shared/schemas";
 
 /**
  * Visible drink types for the picker

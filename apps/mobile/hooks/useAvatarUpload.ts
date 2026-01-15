@@ -5,8 +5,9 @@
  * upload flow (signed URL, storage upload, confirmation).
  */
 
-import { useImageUpload, type ImageSource } from "./useImageUpload";
 import { apiClient } from "@/lib/api-client";
+
+import { useImageUpload, type ImageSource } from "./useImageUpload";
 
 interface UseAvatarUploadOptions {
   onSuccess?: (fileName: string) => void;

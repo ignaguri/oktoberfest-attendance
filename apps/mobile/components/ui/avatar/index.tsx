@@ -1,15 +1,14 @@
 "use client";
-import React from "react";
 import { createAvatar } from "@gluestack-ui/core/avatar/creator";
-import { View, Text, Image, Platform } from "react-native";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
   withStyleContext,
   useStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import React from "react";
+import { View, Text, Image, Platform } from "react-native";
 
-// Import contract types from shared UI package
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import type { AvatarSize } from "@prostcounter/ui";
 
 const SCOPE = "AVATAR";
@@ -191,4 +190,4 @@ const AvatarGroup = React.forwardRef<
   );
 });
 
-export { Avatar, AvatarBadge, AvatarFallbackText, AvatarImage, AvatarGroup };
+export { Avatar, AvatarBadge, AvatarFallbackText, AvatarGroup, AvatarImage };

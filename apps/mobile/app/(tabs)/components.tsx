@@ -4,13 +4,6 @@
  * A development-only screen for testing and previewing UI components.
  * This tab is only visible when __DEV__ is true.
  */
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ChevronDown, Puzzle, Trash2, X } from "lucide-react-native";
-import { useState } from "react";
-import { ScrollView, Pressable, ActionSheetIOS, Platform } from "react-native";
-
-import { useAuth } from "@/lib/auth/AuthContext";
-
 import {
   Button,
   ButtonText,
@@ -73,7 +66,12 @@ import {
   ToastTitle,
   ToastDescription,
 } from "@/components/ui";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ChevronDown, Puzzle, Trash2, X } from "lucide-react-native";
+import { useState } from "react";
+import { ScrollView, Pressable, ActionSheetIOS, Platform } from "react-native";
 
 type ComponentType =
   | "buttons"

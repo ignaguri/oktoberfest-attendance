@@ -1,15 +1,14 @@
 "use client";
-import React from "react";
 import { createTextarea } from "@gluestack-ui/core/textarea/creator";
-import { View, TextInput } from "react-native";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
   withStyleContext,
   useStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import React from "react";
+import { View, TextInput } from "react-native";
 
-// Import contract types from shared UI package
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import type { TextareaSize, TextareaVariant } from "@prostcounter/ui";
 
 const SCOPE = "TEXTAREA";

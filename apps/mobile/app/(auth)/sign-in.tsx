@@ -1,3 +1,18 @@
+import {
+  AuthHeader,
+  FormInput,
+  OAuthButtons,
+  OrDivider,
+  AuthFooterLink,
+  BiometricPrompt,
+  BiometricEnablePrompt,
+} from "@/components/auth";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import { useBiometrics } from "@/hooks/useBiometrics";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { getStoredUserEmail } from "@/lib/auth/secure-storage";
+import { IconColors } from "@/lib/constants/colors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   signInSchema,
@@ -15,22 +30,6 @@ import {
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import {
-  AuthHeader,
-  FormInput,
-  OAuthButtons,
-  OrDivider,
-  AuthFooterLink,
-  BiometricPrompt,
-  BiometricEnablePrompt,
-} from "@/components/auth";
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
-import { useBiometrics } from "@/hooks/useBiometrics";
-import { useAuth } from "@/lib/auth/AuthContext";
-import { getStoredUserEmail } from "@/lib/auth/secure-storage";
-import { IconColors } from "@/lib/constants/colors";
 
 export default function SignInScreen() {
   const { t } = useTranslation();

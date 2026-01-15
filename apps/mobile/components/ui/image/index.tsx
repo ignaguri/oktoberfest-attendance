@@ -1,7 +1,8 @@
-import React from "react";
 import { createImage } from "@gluestack-ui/core/image/creator";
-import { Platform, Image as RNImage } from "react-native";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
+import React from "react";
+import { Platform, Image as RNImage } from "react-native";
+
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 
 const imageStyle = tva({

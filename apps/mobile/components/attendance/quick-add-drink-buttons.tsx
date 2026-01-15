@@ -1,16 +1,17 @@
-import { useCallback, useState } from "react";
-import { Beer, Wine, CupSoda, Check } from "lucide-react-native";
-import * as Haptics from "expo-haptics";
-import { ActivityIndicator } from "react-native";
-import type { DrinkType } from "@prostcounter/shared/schemas";
-import { useLogConsumption } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-
 import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { DrinkTypeColors, IconColors, Colors } from "@/lib/constants/colors";
+import { useLogConsumption } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import * as Haptics from "expo-haptics";
+import { Beer, Wine, CupSoda, Check } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator } from "react-native";
+
+import type { DrinkType } from "@prostcounter/shared/schemas";
+
 import { VISIBLE_DRINK_TYPES } from "./drink-type-picker";
 
 interface QuickAddDrinkButtonsProps {

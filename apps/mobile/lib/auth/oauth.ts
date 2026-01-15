@@ -1,7 +1,7 @@
+import { supabase } from "@/lib/supabase";
+import * as AppleAuthentication from "expo-apple-authentication";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import * as AppleAuthentication from "expo-apple-authentication";
-import { supabase } from "@/lib/supabase";
 import { Platform } from "react-native";
 
 // Complete the auth session to enable browser redirect handling

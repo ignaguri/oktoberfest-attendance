@@ -5,10 +5,6 @@
  * across the app (avatar upload, beer pictures, etc.)
  */
 
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Camera, ImagePlus, X } from "lucide-react-native";
-import { useCallback } from "react";
-
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -19,6 +15,9 @@ import {
   ActionsheetItemText,
 } from "@/components/ui/actionsheet";
 import { IconColors } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Camera, ImagePlus, X } from "lucide-react-native";
+import { useCallback } from "react";
 
 export type ImageSource = "camera" | "library";
 

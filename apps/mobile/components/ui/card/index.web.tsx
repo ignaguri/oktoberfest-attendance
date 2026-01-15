@@ -1,6 +1,8 @@
 import React from "react";
-import { cardStyle } from "./styles";
+
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+
+import { cardStyle } from "./styles";
 
 type ICardProps = React.ComponentPropsWithoutRef<"div"> &
   VariantProps<typeof cardStyle>;

@@ -1,6 +1,8 @@
 import React, { forwardRef } from "react";
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { Animated, Easing, Platform, View } from "react-native";
+
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+
 import { skeletonStyle, skeletonTextStyle } from "./styles";
 
 type ISkeletonProps = React.ComponentProps<typeof View> &

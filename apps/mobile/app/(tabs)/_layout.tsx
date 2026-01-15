@@ -1,3 +1,4 @@
+import { Colors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Tabs } from "expo-router";
 import {
@@ -9,8 +10,6 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react-native";
-
-import { Colors } from "@/lib/constants/colors";
 
 interface TabIconProps {
   Icon: LucideIcon;

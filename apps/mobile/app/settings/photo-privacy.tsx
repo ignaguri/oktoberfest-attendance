@@ -1,6 +1,10 @@
-import { useTranslation } from "react-i18next";
+import { Switch } from "@/components/ui/switch";
+import { Text } from "@/components/ui/text";
+import { apiClient } from "@/lib/api-client";
+import { Colors, SwitchColorsDestructive } from "@/lib/constants/colors";
 import { Eye, EyeOff, Info, Users } from "lucide-react-native";
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   ScrollView,
@@ -8,15 +12,6 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-
-import { Text } from "@/components/ui/text";
-import { Switch } from "@/components/ui/switch";
-import {
-  Colors,
-  IconColors,
-  SwitchColorsDestructive,
-} from "@/lib/constants/colors";
-import { apiClient } from "@/lib/api-client";
 
 interface GroupPhotoSetting {
   groupId: string;

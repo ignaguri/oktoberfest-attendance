@@ -1,13 +1,13 @@
 "use client";
-import React from "react";
 import { createProgress } from "@gluestack-ui/core/progress/creator";
-import { View } from "react-native";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
   withStyleContext,
   useStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
+import React from "react";
+import { View } from "react-native";
 
 // Import contract types from shared UI package
 import type { ProgressSize, ProgressOrientation } from "@prostcounter/ui";

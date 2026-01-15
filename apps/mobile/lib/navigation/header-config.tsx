@@ -1,9 +1,9 @@
-import { useRouter } from "expo-router";
-import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { ChevronLeft } from "lucide-react-native";
-
 import { Button } from "@/components/ui/button";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useRouter } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
+
+import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 
 function BackButton() {
   const router = useRouter();

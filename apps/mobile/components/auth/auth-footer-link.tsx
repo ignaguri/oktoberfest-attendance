@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useRouter } from "expo-router";
+import React from "react";
+import { View, Pressable } from "react-native";
+
 import type { Href } from "expo-router";
 
 interface AuthFooterLinkProps {

@@ -1,8 +1,3 @@
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { ImagePlus, Minus, X } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { ActivityIndicator, Image, View } from "react-native";
-
 import {
   ImageSourcePicker,
   type ImageSource,
@@ -17,6 +12,10 @@ import {
   type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 import { IconColors } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { ImagePlus, Minus, X } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, Image, View } from "react-native";
 
 interface BeerPicture {
   id: string;

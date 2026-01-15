@@ -1,13 +1,13 @@
-import { useTranslation } from "@prostcounter/shared/i18n";
-import type { GroupWithMembers } from "@prostcounter/shared/schemas";
-import { Users, ChevronRight } from "lucide-react-native";
-
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Users, ChevronRight } from "lucide-react-native";
+
+import type { GroupWithMembers } from "@prostcounter/shared/schemas";
 
 interface GroupListItemProps {
   group: GroupWithMembers;

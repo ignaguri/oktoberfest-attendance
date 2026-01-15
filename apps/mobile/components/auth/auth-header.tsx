@@ -1,6 +1,6 @@
+import { Text } from "@/components/ui/text";
 import React from "react";
 import { View, Image } from "react-native";
-import { Text } from "@/components/ui/text";
 
 interface AuthHeaderProps {
   /** Size variant of the header */
@@ -22,7 +22,6 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
     <View className="items-center">
       {/* Logo */}
       <Image
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
         source={require("@/assets/images/logo.png")}
         className={isLarge ? "h-24 w-24" : "h-16 w-16"}
         resizeMode="contain"

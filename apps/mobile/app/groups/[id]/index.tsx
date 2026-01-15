@@ -1,28 +1,4 @@
-import {
-  useGroupSettings,
-  useGroupLeaderboard,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  WinningCriteria,
-  LeaderboardEntry,
-} from "@prostcounter/shared/schemas";
-import type { SortOrder } from "@/components/shared/leaderboard";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Settings,
-  Share2,
-  Users,
-  Trophy,
-  QrCode,
-  Image,
-} from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { RefreshControl, ScrollView, Share } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-
 import { QRCodeSheet } from "@/components/groups/qr-code-sheet";
-
 import { Leaderboard } from "@/components/shared/leaderboard";
 import {
   AlertDialog,
@@ -46,6 +22,29 @@ import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
 import { useFestival } from "@/lib/festival/FestivalContext";
+import {
+  useGroupSettings,
+  useGroupLeaderboard,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Settings,
+  Share2,
+  Users,
+  Trophy,
+  QrCode,
+  Image,
+} from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { RefreshControl, ScrollView, Share } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import type { SortOrder } from "@/components/shared/leaderboard";
+import type {
+  WinningCriteria,
+  LeaderboardEntry,
+} from "@prostcounter/shared/schemas";
 
 // Map winning criteria to numeric ID for the leaderboard hook
 const CRITERIA_TO_ID: Record<WinningCriteria, number> = {

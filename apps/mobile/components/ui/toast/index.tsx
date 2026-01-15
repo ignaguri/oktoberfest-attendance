@@ -1,19 +1,18 @@
 "use client";
-import React from "react";
 import { createToastHook } from "@gluestack-ui/core/toast/creator";
-import { AccessibilityInfo, Text, View, ViewStyle } from "react-native";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import { cssInterop } from "nativewind";
-import {
-  Motion,
-  AnimatePresence,
-  MotionComponentProps,
-} from "@legendapp/motion";
 import {
   withStyleContext,
   useStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
+import { Motion, AnimatePresence } from "@legendapp/motion";
+import { cssInterop } from "nativewind";
+import React from "react";
+import { AccessibilityInfo, Text, View } from "react-native";
+
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import type { MotionComponentProps } from "@legendapp/motion";
+import type { ViewStyle } from "react-native";
 
 type IMotionViewProps = React.ComponentProps<typeof View> &
   MotionComponentProps<typeof View, ViewStyle, unknown, unknown, unknown>;
@@ -237,4 +236,4 @@ Toast.displayName = "Toast";
 ToastTitle.displayName = "ToastTitle";
 ToastDescription.displayName = "ToastDescription";
 
-export { useToast, Toast, ToastTitle, ToastDescription };
+export { Toast, ToastDescription, ToastTitle, useToast };

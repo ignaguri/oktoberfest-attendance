@@ -1,18 +1,19 @@
 "use client";
 
-import React from "react";
-import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
+import { createSelect } from "@gluestack-ui/core/select/creator";
+import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
   withStyleContext,
   useStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import { createSelect } from "@gluestack-ui/core/select/creator";
 import { cssInterop } from "nativewind";
+import React from "react";
+import { Pressable, View, TextInput } from "react-native";
 
-// Import contract types from shared UI package
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import type { SelectSize, SelectVariant } from "@prostcounter/ui";
+
 import {
   Actionsheet,
   ActionsheetContent,
@@ -27,7 +28,6 @@ import {
   ActionsheetSectionList,
   ActionsheetSectionHeaderText,
 } from "./select-actionsheet";
-import { Pressable, View, TextInput } from "react-native";
 
 const SelectTriggerWrapper = React.forwardRef<
   React.ComponentRef<typeof Pressable>,
@@ -275,18 +275,18 @@ const SelectSectionHeaderText = UISelect.SectionHeaderText;
 
 export {
   Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
   SelectBackdrop,
   SelectContent,
   SelectDragIndicator,
   SelectDragIndicatorWrapper,
-  SelectItem,
-  SelectScrollView,
-  SelectVirtualizedList,
   SelectFlatList,
-  SelectSectionList,
+  SelectIcon,
+  SelectInput,
+  SelectItem,
+  SelectPortal,
+  SelectScrollView,
   SelectSectionHeaderText,
+  SelectSectionList,
+  SelectTrigger,
+  SelectVirtualizedList,
 };

@@ -1,6 +1,3 @@
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Users, UserPlus, Plus } from "lucide-react-native";
-
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -8,6 +5,8 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Users, UserPlus, Plus } from "lucide-react-native";
 
 interface EmptyGroupsStateProps {
   onCreateGroup: () => void;

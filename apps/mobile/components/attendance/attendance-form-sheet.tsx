@@ -1,30 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useTents,
-  useAttendanceByDate,
-  useDeleteAttendance,
-  useConsumptions,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  createDetailedAttendanceFormSchema,
-  type DetailedAttendanceForm,
-  type DrinkType,
-} from "@prostcounter/shared/schemas";
-import { format, parseISO } from "date-fns";
-import { X, Calendar, Trash2 } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-
-import type {
-  AttendanceWithTotals,
-  TentVisit,
-} from "@prostcounter/shared/schemas";
-
-import { BeerPicturesSection } from "./beer-pictures-section";
-import { DrinkTypePicker, VISIBLE_DRINK_TYPES } from "./drink-type-picker";
-import { LocalDrinkStepper } from "./local-drink-stepper";
-import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -51,6 +24,33 @@ import { VStack } from "@/components/ui/vstack";
 import { type PendingPhoto } from "@/hooks/useBeerPictureUpload";
 import { useSaveAttendance } from "@/hooks/useSaveAttendance";
 import { IconColors } from "@/lib/constants/colors";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useTents,
+  useAttendanceByDate,
+  useDeleteAttendance,
+  useConsumptions,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import {
+  createDetailedAttendanceFormSchema,
+  type DetailedAttendanceForm,
+  type DrinkType,
+} from "@prostcounter/shared/schemas";
+import { format, parseISO } from "date-fns";
+import { X, Calendar, Trash2 } from "lucide-react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+
+import type {
+  AttendanceWithTotals,
+  TentVisit,
+} from "@prostcounter/shared/schemas";
+
+import { BeerPicturesSection } from "./beer-pictures-section";
+import { DrinkTypePicker } from "./drink-type-picker";
+import { LocalDrinkStepper } from "./local-drink-stepper";
+import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
 
 interface AttendanceFormSheetProps {
   isOpen: boolean;

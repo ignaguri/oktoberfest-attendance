@@ -1,17 +1,3 @@
-import { useState } from "react";
-import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "react-i18next";
-import {
-  signUpSchema,
-  type SignUpFormData,
-} from "@prostcounter/shared/schemas";
-
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
 import {
   AuthHeader,
   FormInput,
@@ -19,8 +5,21 @@ import {
   OrDivider,
   AuthFooterLink,
 } from "@/components/auth";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  signUpSchema,
+  type SignUpFormData,
+} from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
   const { t } = useTranslation();

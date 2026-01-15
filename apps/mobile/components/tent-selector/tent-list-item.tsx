@@ -1,5 +1,3 @@
-import { Check } from "lucide-react-native";
-
 import {
   Checkbox,
   CheckboxIcon,
@@ -10,6 +8,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { IconColors } from "@/lib/constants/colors";
+import { Check } from "lucide-react-native";
 
 interface TentListItemProps {
   tentId: string;

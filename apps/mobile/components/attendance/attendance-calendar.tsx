@@ -1,3 +1,8 @@
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { IconColors, Colors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import {
@@ -19,12 +24,6 @@ import {
 import { ChevronLeft, ChevronRight, Beer } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { IconColors, Colors } from "@/lib/constants/colors";
 
 interface AttendanceData {
   date: string;

@@ -61,9 +61,9 @@ export async function setLanguage(language: string) {
 }
 
 // Re-export from shared
-export { i18n, sharedChangeLanguage as changeLanguage };
+export { sharedChangeLanguage as changeLanguage, i18n };
 export {
-  useTranslation,
-  Trans,
   I18nextProvider,
+  Trans,
+  useTranslation,
 } from "@prostcounter/shared/i18n";

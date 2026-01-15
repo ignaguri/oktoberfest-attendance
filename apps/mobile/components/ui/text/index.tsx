@@ -1,7 +1,8 @@
 import React from "react";
+import { Text as RNText } from "react-native";
 
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import { Text as RNText } from "react-native";
+
 import { textStyle } from "./styles";
 
 type ITextProps = React.ComponentProps<typeof RNText> &

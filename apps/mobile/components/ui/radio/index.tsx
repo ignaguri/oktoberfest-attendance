@@ -1,15 +1,16 @@
 "use client";
-import React from "react";
+import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 import { createRadio } from "@gluestack-ui/core/radio/creator";
-import { Pressable, View, Platform, Text } from "react-native";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
   withStyleContext,
   useStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
+import React from "react";
+import { Pressable, View, Platform, Text } from "react-native";
+
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 
 const SCOPE = "Radio";
 
@@ -217,4 +218,4 @@ RadioIndicator.displayName = "RadioIndicator";
 RadioLabel.displayName = "RadioLabel";
 RadioIcon.displayName = "RadioIcon";
 
-export { Radio, RadioGroup, RadioIndicator, RadioLabel, RadioIcon };
+export { Radio, RadioGroup, RadioIcon, RadioIndicator, RadioLabel };

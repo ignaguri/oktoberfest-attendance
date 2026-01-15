@@ -1,12 +1,13 @@
-import { useMemo } from "react";
-import { Beer, Wine, CupSoda } from "lucide-react-native";
-import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
-import { useTranslation } from "@prostcounter/shared/i18n";
-
 import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { DrinkTypeColors, IconColors } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Beer, Wine, CupSoda } from "lucide-react-native";
+import { useMemo } from "react";
+
+import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
+
 import { VISIBLE_DRINK_TYPES } from "./drink-type-picker";
 
 interface DrinkCountSummaryProps {

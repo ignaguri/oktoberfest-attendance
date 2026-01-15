@@ -1,14 +1,3 @@
-import { useCallback, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  SectionList,
-  type SectionListData,
-  type SectionListRenderItemInfo,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { X } from "lucide-react-native";
-
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -28,6 +17,16 @@ import {
   type TentGroup,
   type TentOption,
 } from "@prostcounter/shared/hooks";
+import { X } from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  SectionList,
+  type SectionListData,
+  type SectionListRenderItemInfo,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TentListItem } from "./tent-list-item";
 import { TentSearchInput } from "./tent-search-input";

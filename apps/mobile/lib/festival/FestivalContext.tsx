@@ -1,3 +1,6 @@
+import { useFestivals } from "@prostcounter/shared/hooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { parseISO } from "date-fns";
 import {
   createContext,
   useContext,
@@ -5,9 +8,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFestivals } from "@prostcounter/shared/hooks";
-import { parseISO } from "date-fns";
 
 // Festival type matching the API response (camelCase)
 export interface Festival {
@@ -97,6 +97,7 @@ export function FestivalProvider({ children }: { children: ReactNode }) {
     }
 
     if (selectedFestival) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentFestivalState(selectedFestival);
     }
   }, [festivalsData, storedFestivalId]);

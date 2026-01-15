@@ -1,3 +1,8 @@
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { Colors, IconColors } from "@/lib/constants/colors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   updatePasswordSchema,
@@ -15,12 +20,6 @@ import {
   Platform,
   Alert,
 } from "react-native";
-
-import { Text } from "@/components/ui/text";
-import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth/AuthContext";
-import { Colors, IconColors } from "@/lib/constants/colors";
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation();

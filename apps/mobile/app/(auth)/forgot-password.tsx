@@ -1,3 +1,8 @@
+import { AuthHeader, FormInput } from "@/components/auth";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { IconColors } from "@/lib/constants/colors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   resetPasswordSchema,
@@ -15,12 +20,6 @@ import {
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { AuthHeader, FormInput } from "@/components/auth";
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
-import { useAuth } from "@/lib/auth/AuthContext";
-import { IconColors } from "@/lib/constants/colors";
 
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();

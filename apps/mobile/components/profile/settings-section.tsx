@@ -1,21 +1,3 @@
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn } from "@prostcounter/ui";
-import { format, parseISO } from "date-fns";
-import { useRouter } from "expo-router";
-import {
-  Bell,
-  CalendarDays,
-  Check,
-  ChevronRight,
-  Fingerprint,
-  Image as ImageIcon,
-  Languages,
-  ScanFace,
-} from "lucide-react-native";
-import React, { useState, useCallback } from "react";
-
-import type { BiometricType } from "@/hooks/useBiometrics";
-
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -36,6 +18,23 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors, SwitchColors, Colors } from "@/lib/constants/colors";
 import { useFestival, type Festival } from "@/lib/festival/FestivalContext";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import { format, parseISO } from "date-fns";
+import { useRouter } from "expo-router";
+import {
+  Bell,
+  CalendarDays,
+  Check,
+  ChevronRight,
+  Fingerprint,
+  Image as ImageIcon,
+  Languages,
+  ScanFace,
+} from "lucide-react-native";
+import React, { useState, useCallback } from "react";
+
+import type { BiometricType } from "@/hooks/useBiometrics";
 
 interface SettingsSectionProps {
   isBiometricAvailable: boolean;

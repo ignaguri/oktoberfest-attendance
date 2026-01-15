@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { Search, X } from "lucide-react-native";
-
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { IconColors } from "@/lib/constants/colors";
+import { Search, X } from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
 
 interface TentSearchInputProps {
   value: string;

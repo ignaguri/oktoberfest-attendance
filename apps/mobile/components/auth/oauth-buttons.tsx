@@ -1,8 +1,8 @@
+import { Button, ButtonText } from "@/components/ui/button";
 import React from "react";
-import { View, Platform, ActivityIndicator } from "react-native";
-import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import Svg, { Path, G, Rect, Defs, ClipPath } from "react-native-svg";
+import { View, Platform, ActivityIndicator } from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 interface OAuthButtonsProps {
   /** Handler for Google sign-in */

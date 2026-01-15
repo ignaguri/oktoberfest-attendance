@@ -1,8 +1,6 @@
-import { cn } from "@prostcounter/ui";
-
 import { DrinkCountSummary } from "@/components/attendance/drink-count-summary";
-import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import { DrinkStepper } from "@/components/attendance/drink-stepper";
+import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import {
   ImageSourcePicker,
   type ImageSource,
@@ -29,11 +27,13 @@ import {
   useConsumptions,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { DrinkType } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { format, isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import { Camera, Check, ChevronDown, Minus } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
+
+import type { DrinkType } from "@prostcounter/shared/schemas";
 
 interface BeerPicture {
   id: string;

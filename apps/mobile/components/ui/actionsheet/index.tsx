@@ -1,7 +1,15 @@
 "use client";
-import React from "react";
 import { H4 } from "@expo/html-elements";
 import { createActionsheet } from "@gluestack-ui/core/actionsheet/creator";
+import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
+import { tva } from "@gluestack-ui/utils/nativewind-utils";
+import {
+  Motion,
+  AnimatePresence,
+  createMotionAnimatedComponent,
+} from "@legendapp/motion";
+import { cssInterop } from "nativewind";
+import React from "react";
 import {
   Pressable,
   View,
@@ -10,19 +18,11 @@ import {
   VirtualizedList,
   FlatList,
   SectionList,
-  PressableProps,
-  ViewStyle,
 } from "react-native";
-import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
-import { tva } from "@gluestack-ui/utils/nativewind-utils";
+
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import { cssInterop } from "nativewind";
-import {
-  Motion,
-  AnimatePresence,
-  createMotionAnimatedComponent,
-  MotionComponentProps,
-} from "@legendapp/motion";
+import type { MotionComponentProps } from "@legendapp/motion";
+import type { PressableProps, ViewStyle } from "react-native";
 
 const ItemWrapper = React.forwardRef<
   React.ComponentRef<typeof Pressable>,
@@ -559,16 +559,16 @@ const ActionsheetIcon = React.forwardRef<
 
 export {
   Actionsheet,
+  ActionsheetBackdrop,
   ActionsheetContent,
-  ActionsheetItem,
-  ActionsheetItemText,
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
-  ActionsheetBackdrop,
-  ActionsheetScrollView,
-  ActionsheetVirtualizedList,
   ActionsheetFlatList,
-  ActionsheetSectionList,
-  ActionsheetSectionHeaderText,
   ActionsheetIcon,
+  ActionsheetItem,
+  ActionsheetItemText,
+  ActionsheetScrollView,
+  ActionsheetSectionHeaderText,
+  ActionsheetSectionList,
+  ActionsheetVirtualizedList,
 };

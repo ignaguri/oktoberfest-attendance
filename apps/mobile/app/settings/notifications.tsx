@@ -1,6 +1,9 @@
-import { useTranslation } from "react-i18next";
+import { Switch } from "@/components/ui/switch";
+import { Text } from "@/components/ui/text";
+import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 import { Bell, Clock, Info, Trophy, Users } from "lucide-react-native";
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   ScrollView,
@@ -8,11 +11,6 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-
-import { Text } from "@/components/ui/text";
-import { Switch } from "@/components/ui/switch";
-import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
-import { apiClient } from "@/lib/api-client";
 
 interface NotificationPreferences {
   reminders_enabled: boolean;

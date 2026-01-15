@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import {
   createContext,
   useContext,
@@ -6,9 +7,9 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+
 import type { Session, User } from "@supabase/supabase-js";
 
-import { supabase } from "@/lib/supabase";
 import {
   signInWithGoogle as googleSignIn,
   signInWithFacebook as facebookSignIn,

@@ -9,22 +9,23 @@
  * 5. Invalidate relevant caches
  */
 
+import { apiClient } from "@/lib/api-client";
 import { useInvalidateQueries, QueryKeys } from "@prostcounter/shared/data";
 import {
   useUpdatePersonalAttendance,
   useLogConsumption,
   useDeleteConsumption,
 } from "@prostcounter/shared/hooks";
-import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
 import { useCallback, useState } from "react";
+
+import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
 
 import {
   useBeerPictureUpload,
   type PendingPhoto,
 } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
-import { apiClient } from "@/lib/api-client";
 
 interface SaveAttendanceInput {
   festivalId: string;

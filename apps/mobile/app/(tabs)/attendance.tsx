@@ -1,11 +1,3 @@
-import { useAttendances } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
-import { format, parseISO } from "date-fns";
-import { useCallback, useMemo, useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-
 import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
 import { AttendanceFormSheet } from "@/components/attendance/attendance-form-sheet";
 import {
@@ -24,6 +16,14 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { useFestival } from "@/lib/festival/FestivalContext";
+import { useAttendances } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { format, parseISO } from "date-fns";
+import { useCallback, useMemo, useState } from "react";
+import { RefreshControl, ScrollView } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();

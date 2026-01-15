@@ -1,9 +1,8 @@
+import { Colors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Link, Stack } from "expo-router";
 import { Beer } from "lucide-react-native";
 import { View, Text, TouchableOpacity } from "react-native";
-
-import { Colors } from "@/lib/constants/colors";
 
 export default function NotFoundScreen() {
   const { t } = useTranslation();

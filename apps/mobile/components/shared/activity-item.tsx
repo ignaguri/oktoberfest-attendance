@@ -1,3 +1,4 @@
+import { RadlerIcon } from "@/components/icons/radler-icon";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -16,15 +17,13 @@ import {
   Users,
   Wine,
 } from "lucide-react-native";
-
-import { RadlerIcon } from "@/components/icons/radler-icon";
 import { useMemo, useState, useCallback } from "react";
 import { Image } from "react-native";
 
+import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
+
 import { ImagePreviewModal } from "./image-preview-modal";
 import { TappableAvatar, UserProfileModal } from "./user-profile-modal";
-
-import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 
 interface ActivityItemProps {
   activity: ActivityFeedItem;

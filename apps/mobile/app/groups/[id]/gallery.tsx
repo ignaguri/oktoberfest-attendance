@@ -1,7 +1,22 @@
+import {
+  Avatar,
+  AvatarFallbackText,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import { ErrorState } from "@/components/ui/error-state";
+import { HStack } from "@/components/ui/hstack";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { View } from "@/components/ui/view";
+import { VStack } from "@/components/ui/vstack";
+import { IconColors } from "@/lib/constants/colors";
+import { getAvatarUrl, getBeerPictureUrl } from "@/lib/utils";
+import { TZDate } from "@date-fns/tz";
+import { TIMEZONE } from "@prostcounter/shared/constants";
 import { useGroupGallery, useGroupName } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { TIMEZONE } from "@prostcounter/shared/constants";
-import { TZDate } from "@date-fns/tz";
+import { getInitials } from "@prostcounter/ui";
 import { format } from "date-fns";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { Camera, X } from "lucide-react-native";
@@ -16,22 +31,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { ErrorState } from "@/components/ui/error-state";
-import { HStack } from "@/components/ui/hstack";
-import { Spinner } from "@/components/ui/spinner";
-import { Text } from "@/components/ui/text";
-import { View } from "@/components/ui/view";
-import { VStack } from "@/components/ui/vstack";
-import { getInitials } from "@prostcounter/ui";
-import { IconColors } from "@/lib/constants/colors";
-import { getAvatarUrl, getBeerPictureUrl } from "@/lib/utils";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NUM_COLUMNS = 3;

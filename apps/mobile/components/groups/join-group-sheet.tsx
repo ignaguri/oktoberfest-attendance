@@ -1,16 +1,4 @@
 import {
-  useGroupSearch,
-  useJoinGroup,
-  useJoinGroupByToken,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { X, Search, Key, Users, ChevronRight, Link } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
-
-import type { SearchGroupResult } from "@prostcounter/shared/schemas";
-
-import {
   Actionsheet,
   ActionsheetBackdrop,
   ActionsheetContent,
@@ -26,6 +14,17 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import {
+  useGroupSearch,
+  useJoinGroup,
+  useJoinGroupByToken,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { X, Search, Key, Users, ChevronRight, Link } from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
+
+import type { SearchGroupResult } from "@prostcounter/shared/schemas";
 
 type JoinMode = "search" | "token";
 
@@ -62,6 +61,7 @@ export function JoinGroupSheet({
   );
 
   // Reset state when sheet opens/closes
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen) {
       setMode("search");
@@ -71,13 +71,16 @@ export function JoinGroupSheet({
       setError(null);
     }
   }, [isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Clear error when user types
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (error) {
       setError(null);
     }
   }, [inviteToken]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Handle joining a group
   const handleJoin = useCallback(async () => {
