@@ -110,7 +110,7 @@ export default function GroupDetailScreen() {
       return;
     }
 
-    const inviteUrl = `https://prostcounter.com/join-group?token=${group.inviteToken}`;
+    const inviteUrl = `https://prostcounter.fun/join-group?token=${group.inviteToken}`;
     const message = t("groups.share.message", {
       name: group.name,
     });

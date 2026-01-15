@@ -1,3 +1,30 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useGroupSettings,
+  useGroupMembers,
+  useUpdateGroup,
+  useRemoveMember,
+  useLeaveGroup,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Save,
+  LogOut,
+  Users,
+  Settings as SettingsIcon,
+} from "lucide-react-native";
+import { useCallback } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { RefreshControl, ScrollView } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { z } from "zod";
+
+import type {
+  GroupMember,
+  WinningCriteria,
+} from "@prostcounter/shared/schemas";
+
 import { GroupMembersList } from "@/components/groups/group-members-list";
 import { InviteLinkSection } from "@/components/groups/invite-link-section";
 import {
@@ -34,32 +61,6 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useGroupSettings,
-  useGroupMembers,
-  useUpdateGroup,
-  useRemoveMember,
-  useLeaveGroup,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Save,
-  LogOut,
-  Users,
-  Settings as SettingsIcon,
-} from "lucide-react-native";
-import { useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { RefreshControl, ScrollView } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { z } from "zod";
-
-import type {
-  GroupMember,
-  WinningCriteria,
-} from "@prostcounter/shared/schemas";
 
 // Form validation schema
 const UpdateGroupFormSchema = z.object({
@@ -192,6 +193,11 @@ export default function GroupSettingsScreen() {
             refetchMembers();
           } catch (error) {
             console.error("Failed to remove member:", error);
+            showDialog(
+              t("common.status.error"),
+              t("common.errors.generic"),
+              "destructive",
+            );
           }
         },
       );
@@ -215,6 +221,11 @@ export default function GroupSettingsScreen() {
           router.replace("/(tabs)/groups");
         } catch (error) {
           console.error("Failed to leave group:", error);
+          showDialog(
+            t("common.status.error"),
+            t("common.errors.generic"),
+            "destructive",
+          );
         }
       },
     );

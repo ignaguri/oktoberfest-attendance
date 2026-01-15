@@ -193,7 +193,7 @@
     },
     "qrCode": {
       "title": "QR Code",
-      "description": "Share this QR code with friends to let them join {{groupName}}",
+      "description": "Share this QR code with friends to let them join {{name}}",
       "scanToJoin": "Scan to join {{groupName}}",
       "shareQR": "Share QR Code",
       "generating": "Generating QR code...",
@@ -237,6 +237,8 @@
       "membersCount": "{{count}} members",
       "passwordHint": "Ask a group member for the password",
       "tokenHint": "Paste the invite link shared with you",
+      "passwordHelp": "Ask a group member for the password",
+      "tokenHelp": "Paste the invite link shared with you",
       "searchPlaceholder": "Search by group name",
       "searchPrompt": "Enter a group name to search",
       "error": "Failed to join group. Please check the password and try again.",
@@ -285,7 +287,23 @@
       "updateError": "Failed to update group settings",
       "deleteSuccess": "Group deleted successfully",
       "deleteError": "Failed to delete group",
-      "dangerZone": "Danger Zone"
+      "dangerZone": "Danger Zone",
+      "details": "Details",
+      "description": "Description",
+      "descriptionPlaceholder": "Add a description for your group...",
+      "removeMemberTitle": "Remove Member?",
+      "removeMemberMessage": "Are you sure you want to remove {{name}} from the group?",
+      "leaveTitle": "Leave Group?",
+      "leaveMessage": "Are you sure you want to leave this group?",
+      "notFound": "Group not found",
+      "leaveCreatorWarning": "As the creator, leaving will delete the group for all members",
+      "leaveWarning": "You'll need a new invite to rejoin this group",
+      "copied": "Copied!",
+      "copy": "Copy",
+      "regenerate": "Regenerate",
+      "tokenWarning": "Regenerating will invalidate the previous invite link",
+      "noToken": "No invite link available",
+      "generateLink": "Generate Invite Link"
     },
     "share": {
       "title": "Invite Members",
@@ -326,7 +344,8 @@
       "you": "You",
       "admin": "Admin",
       "removeConfirmTitle": "Remove Member?",
-      "removeConfirmMessage": "Are you sure you want to remove this member from the group?"
+      "removeConfirmMessage": "Are you sure you want to remove this member from the group?",
+      "joined": "Joined {{date}}"
     },
     "deepLink": {
       "joining": "Joining group...",
