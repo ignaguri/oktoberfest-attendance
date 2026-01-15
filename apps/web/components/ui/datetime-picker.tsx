@@ -114,8 +114,8 @@ export function DateTimePicker({
         autoFocus
         className={calendarClassName}
       />
-      <div className="p-3 flex flex-col space-y-2 border-t">
-        <div className="flex items-center space-x-2 mb-2">
+      <div className="flex flex-col space-y-2 border-t p-3">
+        <div className="mb-2 flex items-center space-x-2">
           <Clock className="h-4 w-4" />
           <span className="text-sm font-medium">Time</span>
         </div>
@@ -130,7 +130,7 @@ export function DateTimePicker({
                   : "outline"
               }
               size="sm"
-              className="text-xs h-8"
+              className="h-8 text-xs"
               onClick={() =>
                 handleTimePresetSelect(preset.hours, preset.minutes)
               }
@@ -176,7 +176,7 @@ export function DateTimePicker({
           <DrawerHeader>
             <DrawerTitle>Select Date & Time</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-6 overflow-y-auto">
+          <div className="overflow-y-auto px-4 pb-6">
             <DateTimeContent />
           </div>
         </DrawerContent>
@@ -198,12 +198,12 @@ export function DateTimePicker({
             autoFocus
             className={calendarClassName}
           />
-          <div className="p-3 flex flex-col space-y-2">
-            <div className="flex items-center space-x-2 mb-2">
+          <div className="flex flex-col space-y-2 p-3">
+            <div className="mb-2 flex items-center space-x-2">
               <Clock className="h-4 w-4" />
               <span className="text-sm font-medium">Time</span>
             </div>
-            <div className="grid grid-cols-2 gap-1 max-w-xs">
+            <div className="grid max-w-xs grid-cols-2 gap-1">
               {timePresets.map((preset) => (
                 <Button
                   key={preset.label}
@@ -214,7 +214,7 @@ export function DateTimePicker({
                       : "outline"
                   }
                   size="sm"
-                  className="text-xs h-8"
+                  className="h-8 text-xs"
                   onClick={() =>
                     handleTimePresetSelect(preset.hours, preset.minutes)
                   }

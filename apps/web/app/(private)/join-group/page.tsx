@@ -1,10 +1,12 @@
 "use client";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useTranslation } from "@/lib/i18n/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function JoinGroupPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -20,10 +22,10 @@ export default function JoinGroupPage() {
   }, [token, router]);
 
   return (
-    <div className="min-h-screen flex items-start justify-center bg-gray-50">
+    <div className="flex min-h-screen items-start justify-center bg-gray-50">
       <div className="text-center">
         <LoadingSpinner size={32} />
-        <p className="text-gray-600">Processing your invitation...</p>
+        <p className="text-gray-600">{t("joinGroup.processing")}</p>
       </div>
     </div>
   );

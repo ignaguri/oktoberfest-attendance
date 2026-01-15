@@ -83,8 +83,10 @@ export const AttendanceWithTotalsSchema = z.object({
   // Computed fields from consumptions
   drinkCount: z.number().int(),
   beerCount: z.number().int(),
-  totalSpentCents: z.number().int(),
-  totalTipCents: z.number().int(),
+  // Spending breakdown (all in cents)
+  totalSpentCents: z.number().int(), // Total price paid (includes tips)
+  totalBaseCents: z.number().int(), // Base cost before tips
+  totalTipCents: z.number().int(), // Tips given
   avgPriceCents: z.number().int(),
   // Enriched tent visits for this attendance date
   tentVisits: z.array(TentVisitSchema),

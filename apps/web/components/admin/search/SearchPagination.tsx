@@ -69,7 +69,7 @@ export function SearchPagination({
   return (
     <div className={cn("flex items-center justify-between", className)}>
       {showInfo && totalItems && itemsPerPage && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}{" "}
           to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}{" "}
           results
@@ -102,7 +102,7 @@ export function SearchPagination({
                   1
                 </Button>
                 <div className="flex h-8 w-8 items-center justify-center">
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <MoreHorizontal className="text-muted-foreground h-4 w-4" />
                 </div>
               </>
             )}
@@ -123,7 +123,7 @@ export function SearchPagination({
             {showEndEllipsis && (
               <>
                 <div className="flex h-8 w-8 items-center justify-center">
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <MoreHorizontal className="text-muted-foreground h-4 w-4" />
                 </div>
                 <Button
                   variant="outline"

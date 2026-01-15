@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-@plugin '@tailwindcss/forms';
-@plugin 'tailwindcss-animate';
+@plugin "@tailwindcss/forms";
+@plugin "tailwindcss-animate";
 
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
@@ -371,7 +371,7 @@
 @layer components {
   /* Enhanced disabled day styling */
   .rdp-day[aria-disabled="true"] {
-    @apply opacity-30 cursor-not-allowed;
+    @apply cursor-not-allowed opacity-30;
   }
 
   .rdp-day[aria-disabled="true"]:hover {
@@ -380,7 +380,7 @@
 
   /* Hidden days (outside festival range) */
   .rdp-day[aria-hidden="true"] {
-    @apply opacity-20 cursor-not-allowed;
+    @apply cursor-not-allowed opacity-20;
   }
 
   .rdp-day[aria-hidden="true"]:hover {

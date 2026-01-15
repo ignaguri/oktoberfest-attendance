@@ -18,7 +18,10 @@ import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { AuthContext } from "../middleware/auth";
 
 import { NotFoundError, ValidationError } from "../middleware/error";
-import { SupabaseAttendanceRepository } from "../repositories/supabase";
+import {
+  SupabaseAttendanceRepository,
+  SupabasePhotoRepository,
+} from "../repositories/supabase";
 import { NotificationService } from "../services/notification.service";
 
 // Create router
@@ -186,6 +189,10 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   if (!attendance) {
     throw new NotFoundError(ErrorCodes.ATTENDANCE_NOT_FOUND);
   }
+
+  // Delete associated photos first (to avoid FK constraint)
+  const photoRepo = new SupabasePhotoRepository(supabase);
+  await photoRepo.deleteByAttendanceId(id, user.id);
 
   // Delete the attendance
   await attendanceRepo.delete(id, user.id);

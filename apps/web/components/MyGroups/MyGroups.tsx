@@ -30,11 +30,11 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
 
   return (
     <div className="min-h-[120px]">
-      <h2 className="text-xl font-bold mb-2">Your Groups:</h2>
-      <div className="flex flex-wrap gap-2 justify-center">
+      <h2 className="mb-2 text-xl font-bold">Your Groups:</h2>
+      <div className="flex flex-wrap justify-center gap-2">
         {(error || !groups || groups.length === 0) && (
           <div className="px-2 text-center">
-            <p className="text-sm text-gray-500 mb-2">
+            <p className="mb-2 text-sm text-gray-500">
               You are not a member of any group yet for this festival.
             </p>
             {showGroupsLink && (

@@ -35,11 +35,11 @@ export function TentExplorerSlide({
 
       <SlideContent className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-lg bg-white p-4 shadow text-center">
+          <div className="rounded-lg bg-white p-4 text-center shadow">
             <p className="text-3xl font-bold text-yellow-600">{unique_tents}</p>
             <p className="text-sm text-gray-600">Tents visited</p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow text-center">
+          <div className="rounded-lg bg-white p-4 text-center shadow">
             <p className="text-3xl font-bold text-yellow-600">
               {tent_diversity_pct.toFixed(0)}%
             </p>
@@ -48,8 +48,8 @@ export function TentExplorerSlide({
         </div>
 
         {favorite_tent && (
-          <div className="rounded-lg bg-white p-4 shadow text-center">
-            <p className="text-sm text-gray-600 mb-1">Favorite tent</p>
+          <div className="rounded-lg bg-white p-4 text-center shadow">
+            <p className="mb-1 text-sm text-gray-600">Favorite tent</p>
             <p className="text-2xl font-bold text-yellow-600">
               {favorite_tent}
             </p>
@@ -77,7 +77,7 @@ export function TentExplorerSlide({
                   <span className="font-medium text-gray-700">
                     {tent.tent_name}
                   </span>
-                  <span className="text-yellow-600 font-bold">
+                  <span className="font-bold text-yellow-600">
                     {tent.visit_count}x
                   </span>
                 </motion.div>

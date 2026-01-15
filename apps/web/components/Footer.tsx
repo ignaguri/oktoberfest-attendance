@@ -24,7 +24,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap justify-center">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {isLoggedIn && (
             <>
               <Link
@@ -32,7 +32,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Buy me a beer (opens PayPal)"
-                className="inline-flex items-center gap-1 text-sm underline text-gray-500"
+                className="inline-flex items-center gap-1 text-sm text-gray-500 underline"
               >
                 <span>Buy me a</span>
                 <Beer size={16} aria-hidden />
@@ -43,7 +43,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             </>
           )}
 
-          <div className="flex items-center gap-2 text-gray-500 flex-wrap">
+          <div className="flex flex-wrap items-center gap-2 text-gray-500">
             <Link
               href="/r/bugs"
               target="_blank"

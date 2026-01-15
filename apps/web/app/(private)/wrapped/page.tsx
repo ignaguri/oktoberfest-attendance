@@ -24,7 +24,7 @@ export default function WrappedPage() {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="text-6xl mb-4">🍺</div>
+          <div className="mb-4 text-6xl">🍺</div>
           <p className="text-gray-600">{t("wrapped.loading")}</p>
         </div>
       </div>
@@ -35,12 +35,12 @@ export default function WrappedPage() {
   if (accessResult && !accessResult.allowed) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md px-6">
-          <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <div className="max-w-md px-6 text-center">
+          <div className="mb-4 text-6xl">🔒</div>
+          <h2 className="mb-2 text-2xl font-bold text-gray-800">
             {t("wrapped.notAvailable")}
           </h2>
-          <p className="text-gray-600 mb-6">{accessResult.message}</p>
+          <p className="mb-6 text-gray-600">{accessResult.message}</p>
         </div>
       </div>
     );

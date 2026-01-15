@@ -1,7 +1,7 @@
 "use client";
 
 import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
-import { apiClient } from "@/lib/api-client";
+import { useCompleteTutorial } from "@/hooks/useProfile";
 import { tutorialSteps, type TutorialStep } from "@/lib/tutorialSteps";
 import {
   createContext,
@@ -46,6 +46,12 @@ export function TutorialProvider({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isCompleted, setIsCompleted] = useState(initialTutorialCompleted);
   const [visibleSteps, setVisibleSteps] = useState<TutorialStep[]>([]);
+  const { mutateAsync: completeTutorial } = useCompleteTutorial();
+
+  // Sync internal state with prop changes (when cache is invalidated)
+  useEffect(() => {
+    setIsCompleted(initialTutorialCompleted);
+  }, [initialTutorialCompleted]);
 
   // Filter tutorial steps to only include those with visible elements
   const getVisibleSteps = () => {
@@ -135,9 +141,9 @@ export function TutorialProvider({
     setCurrentStepIndex(0);
     setIsCompleted(true);
 
-    // Save completion to database via API
+    // Save completion to database via mutation hook (invalidates cache)
     try {
-      await apiClient.profile.completeTutorial();
+      await completeTutorial(undefined);
     } catch (error) {
       console.error("Failed to save tutorial completion:", error);
     }

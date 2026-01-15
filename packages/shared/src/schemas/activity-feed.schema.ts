@@ -22,8 +22,8 @@ export const ActivityFeedItemSchema = z.object({
   activity_type: ActivityTypeSchema,
   activity_data: z.record(z.string(), z.unknown()),
   activity_time: z.string(),
-  username: z.string(),
-  full_name: z.string(),
+  username: z.string().nullable(),
+  full_name: z.string().nullable(),
   avatar_url: z.string().nullable(),
 });
 

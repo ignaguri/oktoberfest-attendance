@@ -18,8 +18,8 @@ interface MissingFieldProps {
 
 const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex gap-2 justify-center items-center">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center justify-center gap-2">
         <span className="text-xl" role="img" aria-label={label}>
           {icon}
         </span>
@@ -27,7 +27,7 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
       </div>
       <Button asChild variant="ghost">
         <Link href={link} aria-label="Edit">
-          <Edit className="w-4 h-4" />
+          <Edit className="h-4 w-4" />
         </Link>
       </Button>
     </div>
@@ -58,21 +58,21 @@ export default function MissingFields() {
           {missingFields.full_name && (
             <MissingField
               label="Name"
-              icon={<User className="w-4 h-4" />}
+              icon={<User className="h-4 w-4" />}
               link="/profile"
             />
           )}
           {missingFields.username && (
             <MissingField
               label="Username"
-              icon={<UserCheck className="w-4 h-4" />}
+              icon={<UserCheck className="h-4 w-4" />}
               link="/profile"
             />
           )}
           {missingFields.avatar_url && (
             <MissingField
               label="Profile picture"
-              icon={<ImageIcon className="w-4 h-4" />}
+              icon={<ImageIcon className="h-4 w-4" />}
               link="/profile"
             />
           )}

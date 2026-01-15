@@ -356,10 +356,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       })
       .map((visit) => visit.tent_id);
 
-    // Fetch beer pictures for this attendance
+    // Fetch beer pictures for this attendance (including IDs for deletion)
     const { data: beerPictures, error: picturesError } = await this.supabase
       .from("beer_pictures")
-      .select("picture_url")
+      .select("id, picture_url")
       .eq("user_id", userId)
       .eq("attendance_id", attendance.id);
 
@@ -369,9 +369,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       );
     }
 
-    const pictureUrls = (beerPictures || [])
-      .map((pic) => pic.picture_url)
-      .filter((url): url is string => url !== null);
+    // Build pictures array with IDs for deletion support
+    const pictures = (beerPictures || [])
+      .filter((pic) => pic.picture_url !== null)
+      .map((pic) => ({
+        id: pic.id,
+        pictureUrl: pic.picture_url!,
+      }));
+
+    // Keep pictureUrls for backward compatibility
+    const pictureUrls = pictures.map((pic) => pic.pictureUrl);
 
     // Build tent visits array for the schema
     const visitsForDate = (tentVisits || [])
@@ -399,12 +406,15 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       updatedAt: attendance.updated_at || new Date().toISOString(),
       drinkCount: attendance.drink_count || 0,
       beerCount: attendance.beer_count || 0,
+      // Spending breakdown
       totalSpentCents: attendance.total_spent_cents || 0,
+      totalBaseCents: attendance.total_base_cents || 0,
       totalTipCents: attendance.total_tip_cents || 0,
       avgPriceCents: attendance.avg_price_cents || 0,
       tentVisits: visitsForDate,
       tentIds: tentIdsForDate,
       pictureUrls: pictureUrls,
+      pictures: pictures,
     };
   }
 
@@ -418,7 +428,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       updatedAt: data.updated_at,
       drinkCount: data.drink_count || 0,
       beerCount: data.beer_count || 0,
+      // Spending breakdown
       totalSpentCents: data.total_spent_cents || 0,
+      totalBaseCents: data.total_base_cents || 0,
       totalTipCents: data.total_tip_cents || 0,
       avgPriceCents: data.avg_price_cents || 0,
       tentVisits: [], // Will be enriched in list() method

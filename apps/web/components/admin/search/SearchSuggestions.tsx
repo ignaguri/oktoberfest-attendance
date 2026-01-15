@@ -114,7 +114,7 @@ export function SearchSuggestions({
           className={cn("h-8 px-2", className)}
           title="View search suggestions and history"
         >
-          <Search className="size-4 mr-1" />
+          <Search className="mr-1 size-4" />
           Suggestions
         </Button>
       </PopoverTrigger>

@@ -91,7 +91,9 @@ export const GetMissingProfileFieldsResponseSchema = z.object({
 export const HighlightsSchema = z.object({
   totalBeers: z.number(),
   totalDays: z.number(),
-  totalSpent: z.number(),
+  totalSpent: z.number(), // Total price paid (includes tips) in cents
+  totalBaseCents: z.number(), // Base cost before tips in cents
+  totalTipCents: z.number(), // Tips given in cents
   avgBeersPerDay: z.number(),
   favoriteDay: z.string().nullable(),
   favoriteTent: z.string().nullable(),
@@ -130,7 +132,7 @@ export type GetAvatarUploadUrlQuery = z.infer<
 
 export const GetAvatarUploadUrlResponseSchema = z.object({
   uploadUrl: z.url(),
-  publicUrl: z.url(),
+  fileName: z.string(), // The unique filename to use for confirmation
   expiresIn: z.number().int(),
 });
 
@@ -139,7 +141,7 @@ export type GetAvatarUploadUrlResponse = z.infer<
 >;
 
 export const ConfirmAvatarUploadSchema = z.object({
-  avatarUrl: z.string().min(1),
+  fileName: z.string().min(1), // Just the filename, not the full URL
 });
 
 export type ConfirmAvatarUploadInput = z.infer<
@@ -148,5 +150,38 @@ export type ConfirmAvatarUploadInput = z.infer<
 
 export const ConfirmAvatarUploadResponseSchema = z.object({
   success: z.boolean(),
-  avatarUrl: z.url(),
+  fileName: z.string(), // Returns the filename stored in the database
 });
+
+// Public profile schema (for viewing other users)
+export const PublicProfileSchema = z.object({
+  id: z.uuid(),
+  username: z.string().nullable(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
+  // Festival-specific stats (optional, included when festivalId is provided)
+  stats: z
+    .object({
+      daysAttended: z.number(),
+      totalBeers: z.number(),
+      avgBeers: z.number(),
+    })
+    .nullable()
+    .optional(),
+});
+
+export type PublicProfile = z.infer<typeof PublicProfileSchema>;
+
+export const GetPublicProfileQuerySchema = z.object({
+  festivalId: z.uuid().optional(),
+});
+
+export type GetPublicProfileQuery = z.infer<typeof GetPublicProfileQuerySchema>;
+
+export const GetPublicProfileResponseSchema = z.object({
+  profile: PublicProfileSchema,
+});
+
+export type GetPublicProfileResponse = z.infer<
+  typeof GetPublicProfileResponseSchema
+>;

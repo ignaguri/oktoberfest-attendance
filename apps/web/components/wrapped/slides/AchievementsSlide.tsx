@@ -41,13 +41,13 @@ export function AchievementsSlide({
       <SlideTitle>Achievements unlocked</SlideTitle>
       <SlideSubtitle>{achievements.length} badges earned</SlideSubtitle>
 
-      <div className="w-full max-w-2xl flex flex-col gap-4">
-        <div className="rounded-lg bg-white p-4 shadow text-center">
+      <div className="flex w-full max-w-2xl flex-col gap-4">
+        <div className="rounded-lg bg-white p-4 text-center shadow">
           <p className="text-3xl font-bold text-yellow-600">{totalPoints}</p>
           <p className="text-sm text-gray-600">Total points</p>
         </div>
 
-        <div className="flex flex-col gap-2 max-h-[50dvh] overflow-y-auto">
+        <div className="flex max-h-[50dvh] flex-col gap-2 overflow-y-auto">
           {achievements.map((achievement, index) => (
             <motion.div
               key={achievement.id}

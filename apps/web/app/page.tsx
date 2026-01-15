@@ -43,7 +43,7 @@ export default async function Root({
   }
 
   return (
-    <div className="max-w-lg flex flex-col items-center justify-center gap-12">
+    <div className="flex max-w-lg flex-col items-center justify-center gap-12">
       <header className="flex flex-col items-center gap-2">
         <Image
           src={LogoImage}
@@ -59,7 +59,7 @@ export default async function Root({
           </span>
         </h1>
       </header>
-      <p className="text-center text-gray-700 px-4">
+      <p className="px-4 text-center text-gray-700">
         Compete with friends in different groups to see who visits beer
         festivals more often and drinks the most beers!
         <br />

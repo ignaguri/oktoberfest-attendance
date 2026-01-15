@@ -91,7 +91,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ token: fcmToken }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -114,7 +114,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ token: fcmToken }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -130,7 +130,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -144,7 +144,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ token: "" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -169,7 +169,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify(subscribeData),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -194,7 +194,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -219,7 +219,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ email: "test@example.com" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -237,7 +237,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ email: "test@example.com" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -253,7 +253,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ email: "invalid-email" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -267,7 +267,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ avatar: "not-a-url" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -390,7 +390,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify(updateData),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -413,7 +413,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ pushEnabled: false }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -436,7 +436,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -456,7 +456,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ pushEnabled: true }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -472,7 +472,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ pushEnabled: "yes" }), // Invalid: should be boolean
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -488,7 +488,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ token: "test-token" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });
@@ -502,7 +502,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ email: "test@example.com" }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });
@@ -529,7 +529,7 @@ describe("Notification Routes - Unit Tests", () => {
         body: JSON.stringify({ pushEnabled: true }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });

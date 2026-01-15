@@ -65,21 +65,46 @@ SET
     full_name = EXCLUDED.full_name,
     avatar_url = EXCLUDED.avatar_url;
 
--- Insert current 2025 Oktoberfest data first
+-- =====================================================
+-- FESTIVALS
+-- =====================================================
+
+-- Insert Test Festival (always current: -10 days to +10 days)
+-- This is the primary festival for development/testing
 INSERT INTO festivals (
-  name, short_name, festival_type, location, 
-  start_date, end_date, map_url, 
+  id, name, short_name, festival_type, location,
+  start_date, end_date, map_url,
+  is_active, status, description, beer_cost
+) VALUES (
+  'a0000000-0000-4000-a000-000000000001',
+  'Test Festival',
+  'test-festival',
+  'oktoberfest',
+  'Munich, Germany',
+  CURRENT_DATE - INTERVAL '10 days',
+  CURRENT_DATE + INTERVAL '10 days',
+  'https://wiesnmap.muenchen.de/',
+  true,
+  'active',
+  'Always-active test festival for development',
+  16.20
+);
+
+-- Insert Oktoberfest 2025 for reference (inactive - only one festival can be active)
+INSERT INTO festivals (
+  name, short_name, festival_type, location,
+  start_date, end_date, map_url,
   is_active, status, description
 ) VALUES (
-  'Oktoberfest 2025', 
+  'Oktoberfest 2025',
   'oktoberfest-2025',
   'oktoberfest',
   'Munich, Germany',
   '2025-09-20',
-  '2025-10-05', 
+  '2025-10-05',
   'https://wiesnmap.muenchen.de/',
-  true,
-  'active',
+  false,
+  'ended',
   'The 190th Oktoberfest in Munich'
 );
 
@@ -89,6 +114,10 @@ INSERT INTO winning_criteria (id, name) VALUES
   (2, 'total_beers'),
   (3, 'avg_beers')
 ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================
+-- TENTS
+-- =====================================================
 
 -- Seed tents (Oktoberfest venues)
 INSERT INTO tents (id, name, category) VALUES
@@ -135,6 +164,28 @@ INSERT INTO tents (id, name, category) VALUES
   ('2b8dcaaf-b24b-4f8e-8496-012120df341c', 'Zur Schönheitskönigin', 'old')
 ON CONFLICT (id) DO NOTHING;
 
+-- Link all tents to the Test Festival via festival_tents
+INSERT INTO festival_tents (festival_id, tent_id, beer_price)
+SELECT
+  'a0000000-0000-4000-a000-000000000001'::uuid,
+  t.id,
+  16.20 + (random() * 2)::numeric(5,2) -- Slight price variation per tent
+FROM tents t
+ON CONFLICT (festival_id, tent_id) DO NOTHING;
+
+-- Also link tents to Oktoberfest 2025
+INSERT INTO festival_tents (festival_id, tent_id, beer_price)
+SELECT
+  (SELECT id FROM festivals WHERE short_name = 'oktoberfest-2025'),
+  t.id,
+  16.20
+FROM tents t
+ON CONFLICT (festival_id, tent_id) DO NOTHING;
+
+-- =====================================================
+-- ACHIEVEMENTS
+-- =====================================================
+
 -- Seed achievements
 INSERT INTO achievements (id, name, description, icon, category, rarity, points, conditions, is_active) VALUES
   ('99887469-29c6-4608-8320-0e0ec2b4295d', 'First Drop', 'Record your first beer at the festival', 'first_beer', 'consumption', 'common', 10, '{"type":"threshold","target_value":1,"comparison_operator":"gte"}', true),
@@ -180,57 +231,147 @@ INSERT INTO achievements (id, name, description, icon, category, rarity, points,
   ('ee6032e6-373d-457d-af9b-79a102d72bda', 'Multi-Year Champion', 'Win group competitions in 2+ festivals', 'multi_year', 'special', 'legendary', 300, '{"type":"threshold","target_value":2,"comparison_operator":"gte"}', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Seed the attendances table with random attendances for the 10 users
--- Now explicitly reference the 2025 festival
-INSERT INTO attendances (user_id, festival_id, date, beer_count)
-SELECT
-    p.id AS user_id,
-    (SELECT id FROM festivals WHERE short_name = 'oktoberfest-2025') AS festival_id,
-    current_timestamp - (random() * 365)::integer * interval '1 day' AS date,
-    (random() * 10)::integer AS beer_count
-FROM profiles p;
+-- =====================================================
+-- GROUPS (for Test Festival)
+-- =====================================================
 
--- Insert groups with created_by set to one of the user IDs
--- Now explicitly reference the 2025 festival
-INSERT INTO groups (id, name, password, winning_criteria_id, festival_id, created_at, created_by)
-SELECT
-    uuid_generate_v4(),
-    'Group ' || chr(65 + (ROW_NUMBER() OVER ())::int - 1),
-    crypt('password' || chr(65 + (ROW_NUMBER() OVER ())::int - 1), gen_salt('bf')),
-    (SELECT id FROM winning_criteria ORDER BY RANDOM() LIMIT 1),
-    (SELECT id FROM festivals WHERE short_name = 'oktoberfest-2025'),
-    current_timestamp,
-    u.id
-FROM
-    auth.users u
-LIMIT 3;
+-- Insert groups linked to Test Festival
+-- Group A: Users 1 and 2
+-- Group B: Users 2 and 3 (user 2 is in both groups for testing)
+-- Group C: Users 4, 5, and 6
+DO $$
+DECLARE
+  v_test_festival_id uuid := 'a0000000-0000-4000-a000-000000000001';
+  v_user1 uuid;
+  v_user2 uuid;
+  v_user3 uuid;
+  v_user4 uuid;
+  v_user5 uuid;
+  v_user6 uuid;
+  v_group_a uuid;
+  v_group_b uuid;
+  v_group_c uuid;
+BEGIN
+  SELECT id INTO v_user1 FROM auth.users ORDER BY email LIMIT 1 OFFSET 0;
+  SELECT id INTO v_user2 FROM auth.users ORDER BY email LIMIT 1 OFFSET 1;
+  SELECT id INTO v_user3 FROM auth.users ORDER BY email LIMIT 1 OFFSET 2;
+  SELECT id INTO v_user4 FROM auth.users ORDER BY email LIMIT 1 OFFSET 3;
+  SELECT id INTO v_user5 FROM auth.users ORDER BY email LIMIT 1 OFFSET 4;
+  SELECT id INTO v_user6 FROM auth.users ORDER BY email LIMIT 1 OFFSET 5;
 
--- Insert group members using user IDs
-INSERT INTO group_members (id, group_id, user_id, joined_at)
-SELECT
-    uuid_generate_v4(),
-    g.id,
-    u.id,
-    current_timestamp
-FROM
-    groups g,
-    auth.users u
-WHERE
-    (g.name = 'Group A' AND u.id IN (
-        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 0),
-        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 1)
-    ))
-    OR (g.name = 'Group B' AND u.id IN (
-        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 2),
-        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 3)
-    ))
-    OR (g.name = 'Group C' AND u.id IN (
-        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 4),
-        (SELECT id FROM auth.users ORDER BY email LIMIT 1 OFFSET 5)
-    ));
+  -- Create Group A
+  v_group_a := gen_random_uuid();
+  INSERT INTO groups (id, name, password, winning_criteria_id, festival_id, created_at, created_by)
+  VALUES (v_group_a, 'Test Group A', crypt('passwordA', gen_salt('bf')), 2, v_test_festival_id, now(), v_user1);
+
+  -- Create Group B
+  v_group_b := gen_random_uuid();
+  INSERT INTO groups (id, name, password, winning_criteria_id, festival_id, created_at, created_by)
+  VALUES (v_group_b, 'Test Group B', crypt('passwordB', gen_salt('bf')), 2, v_test_festival_id, now(), v_user2);
+
+  -- Create Group C
+  v_group_c := gen_random_uuid();
+  INSERT INTO groups (id, name, password, winning_criteria_id, festival_id, created_at, created_by)
+  VALUES (v_group_c, 'Test Group C', crypt('passwordC', gen_salt('bf')), 1, v_test_festival_id, now(), v_user4);
+
+  -- Add members to Group A (users 1 and 2)
+  INSERT INTO group_members (id, group_id, user_id, joined_at) VALUES
+    (gen_random_uuid(), v_group_a, v_user1, now() - interval '5 days'),
+    (gen_random_uuid(), v_group_a, v_user2, now() - interval '4 days');
+
+  -- Add members to Group B (users 2 and 3)
+  INSERT INTO group_members (id, group_id, user_id, joined_at) VALUES
+    (gen_random_uuid(), v_group_b, v_user2, now() - interval '3 days'),
+    (gen_random_uuid(), v_group_b, v_user3, now() - interval '2 days');
+
+  -- Add members to Group C (users 4, 5, 6)
+  INSERT INTO group_members (id, group_id, user_id, joined_at) VALUES
+    (gen_random_uuid(), v_group_c, v_user4, now() - interval '6 days'),
+    (gen_random_uuid(), v_group_c, v_user5, now() - interval '5 days'),
+    (gen_random_uuid(), v_group_c, v_user6, now() - interval '4 days');
+END $$;
+
+-- =====================================================
+-- ATTENDANCES & CONSUMPTIONS (for Test Festival)
+-- =====================================================
+
+-- Create attendances and consumptions for users in the Test Festival
+DO $$
+DECLARE
+  v_test_festival_id uuid := 'a0000000-0000-4000-a000-000000000001';
+  v_user record;
+  v_attendance_id uuid;
+  v_day_offset int;
+  v_num_drinks int;
+  v_drink_idx int;
+  v_drink_type text;
+  v_tent_id uuid;
+  v_drink_types text[] := ARRAY['beer', 'beer', 'beer', 'radler', 'wine', 'soft_drink'];
+BEGIN
+  -- Loop through first 6 users (those in groups)
+  FOR v_user IN (SELECT id FROM auth.users ORDER BY email LIMIT 6)
+  LOOP
+    -- Create attendances for past few days (within last 5 days to appear in activity feed)
+    FOR v_day_offset IN 0..4
+    LOOP
+      -- Skip some days randomly to simulate real usage
+      IF random() > 0.3 THEN
+        v_attendance_id := gen_random_uuid();
+
+        -- Get a random tent for this attendance
+        SELECT id INTO v_tent_id FROM tents ORDER BY random() LIMIT 1;
+
+        -- Create attendance record
+        INSERT INTO attendances (id, user_id, festival_id, date, beer_count)
+        VALUES (
+          v_attendance_id,
+          v_user.id,
+          v_test_festival_id,
+          CURRENT_DATE - (v_day_offset || ' days')::interval,
+          0 -- beer_count is now deprecated, we use consumptions
+        );
+
+        -- Create tent visit
+        INSERT INTO tent_visits (id, user_id, festival_id, tent_id, visit_date)
+        VALUES (gen_random_uuid(), v_user.id, v_test_festival_id, v_tent_id, now() - (v_day_offset || ' days')::interval)
+        ON CONFLICT DO NOTHING;
+
+        -- Create random number of consumptions (1-5 drinks)
+        v_num_drinks := 1 + floor(random() * 5)::int;
+
+        FOR v_drink_idx IN 1..v_num_drinks
+        LOOP
+          -- Pick a random drink type (weighted towards beer)
+          v_drink_type := v_drink_types[1 + floor(random() * array_length(v_drink_types, 1))::int];
+
+          INSERT INTO consumptions (
+            attendance_id,
+            tent_id,
+            drink_type,
+            base_price_cents,
+            price_paid_cents,
+            volume_ml,
+            recorded_at
+          ) VALUES (
+            v_attendance_id,
+            v_tent_id,
+            v_drink_type::drink_type,
+            1620, -- €16.20 base
+            1620 + floor(random() * 200)::int, -- Some tip variation
+            1000, -- 1L
+            now() - (v_day_offset || ' days')::interval + (v_drink_idx || ' hours')::interval
+          );
+        END LOOP;
+      END IF;
+    END LOOP;
+  END LOOP;
+END $$;
+
+-- =====================================================
+-- QA: NOTIFICATION PREFERENCES
+-- =====================================================
 
 -- QA: Notification preferences toggles for a few users
--- u0: reminders disabled; u1: group notifications disabled; u2: achievements disabled
 INSERT INTO user_notification_preferences (
   user_id, reminders_enabled, group_notifications_enabled, achievement_notifications_enabled
 )
@@ -244,17 +385,18 @@ ON CONFLICT (user_id) DO UPDATE SET
   achievement_notifications_enabled = EXCLUDED.achievement_notifications_enabled,
   updated_at = now();
 
--- QA: Seed reservations to cover reminder-due, prompt-due, and early-checkin cases
--- Common context
+-- =====================================================
+-- QA: RESERVATIONS
+-- =====================================================
+
 DO $$
 DECLARE
-  v_festival_id uuid;
+  v_festival_id uuid := 'a0000000-0000-4000-a000-000000000001';
   v_tent_id uuid;
   v_user0 uuid;
   v_user1 uuid;
   v_user2 uuid;
 BEGIN
-  SELECT id INTO v_festival_id FROM festivals WHERE short_name = 'oktoberfest-2025' LIMIT 1;
   SELECT id INTO v_tent_id FROM tents WHERE name = 'Hofbräu-Festzelt' LIMIT 1;
   SELECT id INTO v_user0 FROM auth.users ORDER BY email LIMIT 1 OFFSET 0;
   SELECT id INTO v_user1 FROM auth.users ORDER BY email LIMIT 1 OFFSET 1;
@@ -280,12 +422,7 @@ BEGIN
     1440, true, 'QA: prompt-due'
   );
 
-  -- Early check-in: attendance exists earlier today; reservation start_at now - 1 minute
-  -- Cron should treat as completed/skip prompt depending on RPC logic
-  INSERT INTO attendances (user_id, festival_id, date, beer_count)
-  VALUES (v_user2, v_festival_id, CURRENT_DATE, 0)
-  ON CONFLICT (user_id, date, festival_id) DO NOTHING;
-
+  -- Early check-in reservation
   INSERT INTO reservations (
     id, user_id, festival_id, tent_id, start_at, end_at, status,
     reminder_offset_minutes, visible_to_groups, note
@@ -296,20 +433,22 @@ BEGIN
   );
 END $$;
 
--- QA: Seed achievements to produce notification events (common + rare/epic)
+-- =====================================================
+-- QA: ACHIEVEMENTS
+-- =====================================================
+
 DO $$
 DECLARE
   v_user3 uuid;
   v_user4 uuid;
   v_common_ach uuid;
   v_epic_ach uuid;
-  v_festival_id uuid;
+  v_festival_id uuid := 'a0000000-0000-4000-a000-000000000001';
 BEGIN
   SELECT id INTO v_user3 FROM auth.users ORDER BY email LIMIT 1 OFFSET 3;
   SELECT id INTO v_user4 FROM auth.users ORDER BY email LIMIT 1 OFFSET 4;
   SELECT id INTO v_common_ach FROM achievements WHERE rarity = 'common' LIMIT 1;
   SELECT id INTO v_epic_ach FROM achievements WHERE rarity = 'epic' LIMIT 1;
-  SELECT id INTO v_festival_id FROM festivals WHERE short_name = 'oktoberfest-2025' LIMIT 1;
 
   IF v_common_ach IS NOT NULL THEN
     INSERT INTO user_achievements (user_id, festival_id, achievement_id, unlocked_at)

@@ -70,9 +70,9 @@ const LeaderboardPreview = () => {
   const topUsers = leaderboardData.slice(0, LEADERBOARD_PREVIEW_LIMIT);
 
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[280px]">
+    <Card className="min-h-[280px] rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center">
+        <CardTitle className="text-center text-xl font-bold">
           🏆 Global Leaderboard
         </CardTitle>
         <CardDescription className="text-center">
@@ -113,11 +113,13 @@ const LeaderboardPreview = () => {
                     </TableCell>
                     <TableCell className="w-full max-w-[min(200px,35vw)]">
                       <ProfilePreview
+                        userId={user.userId}
+                        festivalId={currentFestival?.id}
                         username={user.username || "Unknown"}
                         fullName={user.fullName}
                         avatarUrl={user.avatarUrl}
                       >
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex min-w-0 items-center gap-2">
                           <Avatar
                             url={user.avatarUrl}
                             fallback={{
@@ -127,7 +129,7 @@ const LeaderboardPreview = () => {
                             }}
                             size="small"
                           />
-                          <span className="font-medium truncate">
+                          <span className="truncate font-medium">
                             {getDisplayName({
                               username: user.username,
                               full_name: user.fullName,

@@ -141,7 +141,7 @@ export function PhotoPrivacySettings() {
       <h3 className="py-2 text-xl font-black text-gray-800">
         {t("photo.privacy.title")}
       </h3>
-      <p className="text-sm text-gray-600 mb-6">
+      <p className="mb-6 text-sm text-gray-600">
         {t("photo.privacy.description")}
       </p>
 
@@ -164,7 +164,7 @@ export function PhotoPrivacySettings() {
                   {t("photo.privacy.hideFromAll")}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 text-left">
+              <p className="text-left text-sm text-gray-600">
                 {t("photo.privacy.hideFromAllDescription")}
               </p>
             </div>
@@ -207,7 +207,7 @@ export function PhotoPrivacySettings() {
                           })}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 text-left">
+                      <p className="text-left text-sm text-gray-600">
                         {t("photo.privacy.hideFromGroupDescription")}
                       </p>
                     </div>
@@ -229,7 +229,7 @@ export function PhotoPrivacySettings() {
               </div>
 
               {globalSettings.hide_photos_from_all_groups && (
-                <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-md">
+                <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-600">
                   {t("photo.privacy.globalHidingWarning")}
                 </div>
               )}
@@ -238,7 +238,7 @@ export function PhotoPrivacySettings() {
         )}
 
         {groupSettings.length === 0 && (
-          <div className="text-center text-gray-500 py-4">
+          <div className="py-4 text-center text-gray-500">
             {t("photo.privacy.noGroupsYet")}
           </div>
         )}

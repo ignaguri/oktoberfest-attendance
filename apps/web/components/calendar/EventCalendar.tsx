@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { TIMEZONE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { TZDate } from "@date-fns/tz";
+import { TIMEZONE } from "@prostcounter/shared/constants";
 import { format as formatDate, subMonths, addMonths } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, startTransition } from "react";
@@ -125,7 +125,7 @@ export function EventCalendar({
           }
         />
       </CardContent>
-      <CardFooter className="flex flex-col items-start gap-3 border-t px-4 !pt-4 w-full">
+      <CardFooter className="flex w-full flex-col items-start gap-3 border-t px-4 !pt-4">
         <div className="flex w-full items-center justify-between px-1">
           <div className="text-xs font-medium">
             {date
@@ -137,14 +137,14 @@ export function EventCalendar({
               : "Select a date"}
           </div>
           <div
-            className="h-4 w-px bg-muted-foreground/30"
+            className="bg-muted-foreground/30 h-4 w-px"
             role="separator"
             aria-hidden="true"
           />
           {renderAddButton ? (
             renderAddButton(date)
           ) : (
-            <div className="flex gap-1 justify-end">
+            <div className="flex justify-end gap-1">
               <Button
                 variant="ghost"
                 size="sm"

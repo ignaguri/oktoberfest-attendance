@@ -47,11 +47,11 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
     >
       <SlideTitle>Your rankings</SlideTitle>
 
-      <div className="w-full max-w-2xl flex flex-col gap-6">
+      <div className="flex w-full max-w-2xl flex-col gap-6">
         {/* Group Rankings Section */}
         {hasGroupRankings && (
           <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
+            <h3 className="flex items-center justify-center gap-2 text-lg font-semibold text-gray-800">
               <Users className="size-5" />
               Group rankings
             </h3>
@@ -71,7 +71,7 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
                   <span className="text-4xl">
                     {getMedalEmoji(ranking.position)}
                   </span>
-                  <p className="font-semibold text-gray-800 line-clamp-2">
+                  <p className="line-clamp-2 font-semibold text-gray-800">
                     {ranking.group_name}
                   </p>
                   <span className="text-3xl font-bold text-yellow-600">
@@ -86,7 +86,7 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
         {/* Global Rankings Section */}
         {hasGlobalPositions && (
           <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
+            <h3 className="flex items-center justify-center gap-2 text-lg font-semibold text-gray-800">
               <Globe className="size-5" />
               Global rankings
             </h3>

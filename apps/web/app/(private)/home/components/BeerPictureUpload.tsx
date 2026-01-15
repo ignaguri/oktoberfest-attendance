@@ -38,7 +38,7 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
   if (!previewUrl) return null;
 
   return (
-    <div className="relative w-32 h-32">
+    <div className="relative h-32 w-32">
       <Image
         src={previewUrl}
         alt="Beer picture preview"
@@ -106,10 +106,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center gap-4"
-    >
+    <div className="flex flex-col items-center gap-4">
       <Input
         type="file"
         accept="image/*"
@@ -126,11 +123,11 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
           <span>{t("attendance.pictures.chooseDifferent")}</span>
         ) : (
           <div className="flex items-center gap-2">
-            <Camera size={24} />
+            <Camera size={20} />
             {pictureAlreadyUploaded ? (
               <span>{t("attendance.pictures.addAnother")}</span>
             ) : (
-              <span>{t("attendance.pictures.withBeer")}</span>
+              <span>{t("attendance.pictures.withDrink")}</span>
             )}
           </div>
         )}
@@ -139,7 +136,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
 
       {/* Visibility Control */}
       {watchedPicture && (
-        <div className="flex items-center gap-3 bg-gray-50 rounded-md">
+        <div className="flex items-center gap-3 rounded-md bg-gray-50">
           {watchedVisibility === "public" ? (
             <Eye size={16} className="text-green-600" />
           ) : (
@@ -160,7 +157,12 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       )}
 
       {watchedPicture && !errors.picture && (
-        <Button type="submit" disabled={isSubmitting} variant="darkYellow">
+        <Button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
+          variant="darkYellow"
+        >
           {isSubmitting
             ? t("common.status.loading")
             : t("attendance.pictures.upload", { count: 1 })}
@@ -168,13 +170,13 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       )}
 
       {showSuccessMessage && (
-        <Alert className="text-center max-w-xs">
+        <Alert className="max-w-xs text-center">
           {t("attendance.pictures.viewInGallery")}{" "}
           <Link className="underline" href="/attendance">
             {t("common.menu.attendance")}
           </Link>
         </Alert>
       )}
-    </form>
+    </div>
   );
 }

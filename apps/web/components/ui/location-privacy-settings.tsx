@@ -12,8 +12,8 @@ import {
   useUpdateLocationSharingPreferences,
 } from "@/hooks/useLocationSharing";
 import { useInvalidateQueries } from "@/lib/data/react-query-provider";
-import { QueryKeys } from "@/lib/data/types";
 import { getFestivalConstants } from "@/lib/festivalConstants";
+import { QueryKeys } from "@prostcounter/shared/data";
 import { MapPin, Users, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -101,16 +101,16 @@ export const LocationPrivacySettings = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Control which groups can see your live location during{" "}
             {festivalName}. You can enable or disable location sharing for each
             group independently.
           </p>
 
           {groupsWithPreferences.length === 0 ? (
-            <div className="text-center py-8">
-              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-sm text-muted-foreground">
+            <div className="py-8 text-center">
+              <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+              <p className="text-muted-foreground text-sm">
                 You&apos;re not a member of any groups yet.
                 <br />
                 Join a group to control your location sharing preferences.
@@ -126,10 +126,10 @@ export const LocationPrivacySettings = () => {
                 }) => (
                   <div
                     key={group.groupId}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className="flex items-center justify-between rounded-lg border p-4"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="mb-1 flex items-center gap-2">
                         <Label className="font-medium">{group.groupName}</Label>
                         <Badge
                           variant={
@@ -140,7 +140,7 @@ export const LocationPrivacySettings = () => {
                           {group.sharingEnabled ? "Sharing" : "Not Sharing"}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground text-left">
+                      <p className="text-muted-foreground text-left text-xs">
                         {group.sharingEnabled
                           ? "Group members can see your live location"
                           : "Group members cannot see your location"}
@@ -172,7 +172,7 @@ export const LocationPrivacySettings = () => {
             </div>
           )}
 
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+          <div className="mt-4 rounded-lg bg-blue-50 p-3">
             <p className="text-xs text-blue-800">
               <strong>Note:</strong> Location sharing only works when
               you&apos;re actively sharing your location using the toggle

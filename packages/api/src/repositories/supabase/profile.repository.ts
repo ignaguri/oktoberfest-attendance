@@ -2,6 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type {
   Profile,
   ProfileShort,
+  PublicProfile,
   UpdateProfileInput,
   TutorialStatus,
   MissingProfileFields,
@@ -42,6 +43,49 @@ export class SupabaseProfileRepository {
     return {
       ...data,
       email: email ?? null,
+    };
+  }
+
+  async getPublicProfile(
+    userId: string,
+    festivalId?: string,
+  ): Promise<PublicProfile> {
+    const { data, error } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url")
+      .eq("id", userId)
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Profile not found: ${error?.message}`);
+    }
+
+    let stats: PublicProfile["stats"] = null;
+
+    // Fetch festival stats from user_festival_stats view if festivalId is provided
+    if (festivalId) {
+      const { data: statsData } = await this.supabase
+        .from("user_festival_stats")
+        .select("days_attended, total_beers, avg_beers")
+        .eq("user_id", userId)
+        .eq("festival_id", festivalId)
+        .maybeSingle();
+
+      if (statsData) {
+        stats = {
+          daysAttended: Number(statsData.days_attended) || 0,
+          totalBeers: Number(statsData.total_beers) || 0,
+          avgBeers: Number(statsData.avg_beers) || 0,
+        };
+      }
+    }
+
+    return {
+      id: data.id,
+      username: data.username,
+      fullName: data.full_name,
+      avatarUrl: data.avatar_url,
+      stats,
     };
   }
 
@@ -209,6 +253,14 @@ export class SupabaseProfileRepository {
     // Cast to any to handle varying RPC return types
     const userStats = (stats as any)?.[0];
 
+    // Get spending stats from the spending view
+    const { data: spendingStats } = await this.supabase
+      .from("user_festival_spending_stats")
+      .select("total_spent_cents, total_base_cents, total_tips_cents")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .maybeSingle();
+
     // Get favorite tent
     const { data: tentVisits } = await this.supabase
       .from("tent_visits")
@@ -255,7 +307,9 @@ export class SupabaseProfileRepository {
     return {
       totalBeers: Number(userStats?.total_beers) || 0,
       totalDays: Number(userStats?.days_attended) || 0,
-      totalSpent: Number(userStats?.total_spent_cents) || 0,
+      totalSpent: Number(spendingStats?.total_spent_cents) || 0,
+      totalBaseCents: Number(spendingStats?.total_base_cents) || 0,
+      totalTipCents: Number(spendingStats?.total_tips_cents) || 0,
       avgBeersPerDay: Number(userStats?.avg_beers) || 0,
       favoriteDay: null, // Could be calculated if needed
       favoriteTent,
@@ -304,9 +358,8 @@ export class SupabaseProfileRepository {
     userId: string,
     query: GetAvatarUploadUrlQuery,
   ): Promise<GetAvatarUploadUrlResponse> {
-    // Generate unique file name
-    const extension = query.fileName.split(".").pop() || "jpg";
-    const uniqueFileName = `${userId}_${Date.now()}.${extension}`;
+    // Generate unique file name (always use webp since mobile will compress to webp)
+    const uniqueFileName = `${userId}_${Date.now()}.webp`;
 
     // Create signed upload URL
     const { data, error } = await this.supabase.storage
@@ -317,32 +370,25 @@ export class SupabaseProfileRepository {
       throw new Error(`Failed to create upload URL: ${error?.message}`);
     }
 
-    // Get public URL for the file
-    const {
-      data: { publicUrl },
-    } = this.supabase.storage.from("avatars").getPublicUrl(uniqueFileName);
-
     return {
       uploadUrl: data.signedUrl,
-      publicUrl,
+      fileName: uniqueFileName,
       expiresIn: 3600, // 1 hour
     };
   }
 
-  async confirmAvatarUpload(
-    userId: string,
-    avatarUrl: string,
-  ): Promise<string> {
-    // Update profile with new avatar URL
+  async confirmAvatarUpload(userId: string, fileName: string): Promise<string> {
+    // Update profile with just the filename (not full URL)
+    // This matches the web behavior and allows clients to construct URLs
     const { error } = await this.supabase
       .from("profiles")
-      .update({ avatar_url: avatarUrl })
+      .update({ avatar_url: fileName })
       .eq("id", userId);
 
     if (error) {
-      throw new Error(`Failed to update avatar URL: ${error.message}`);
+      throw new Error(`Failed to update avatar: ${error.message}`);
     }
 
-    return avatarUrl;
+    return fileName;
   }
 }

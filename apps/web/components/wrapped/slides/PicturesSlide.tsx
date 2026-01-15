@@ -8,6 +8,31 @@ import { useEffect, useState } from "react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ */
+function extractFilePath(urlOrPath: string): string {
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    const bucketIndex = pathParts.indexOf("beer_pictures");
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
 import {
   BaseSlide,
   SlideTitle,
@@ -102,12 +127,13 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
               <span>You captured {pictures.length} moments</span>
             </div>
 
-            <div className="relative w-full h-96 sm:h-[28rem] md:h-[32rem]">
+            <div className="relative h-96 w-full sm:h-[28rem] md:h-[32rem]">
               {/* Photo scattering container - centered below the text */}
-              <div className="absolute left-1/4 top-1/4 -translate-x-1/2 -translate-y-1/2 size-64 sm:size-80 md:size-96">
+              <div className="absolute top-1/4 left-1/4 size-64 -translate-x-1/2 -translate-y-1/2 sm:size-80 md:size-96">
                 {picturesToShow.map((picture, index) => {
                   const isLoaded = loadedImages.has(picture.id);
-                  const imageUrl = `/api/image/${picture.picture_url}?bucket=beer_pictures`;
+                  const filePath = extractFilePath(picture.picture_url);
+                  const imageUrl = `/api/image/${encodeURIComponent(filePath)}?bucket=beer_pictures`;
 
                   return (
                     <motion.div
@@ -133,22 +159,23 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                         />
                       )}
 
-                      <div className="relative w-full h-full overflow-hidden rounded-lg">
+                      <div className="relative h-full w-full overflow-hidden rounded-lg">
                         <Image
                           src={imageUrl}
                           alt={`Festival photo from ${new Date(picture.attendance_date).toLocaleDateString()}`}
                           fill
                           className={cn(
-                            "rounded-lg transition-all duration-300 object-cover transform-gpu will-change-transform",
+                            "transform-gpu rounded-lg object-cover transition-all duration-300 will-change-transform",
                             isLoaded ? "opacity-100" : "opacity-0",
                           )}
                           loading="lazy"
                           sizes="200px"
                           onLoad={() => handleImageLoad(picture.id)}
+                          unoptimized
                         />
 
                         {/* Subtle shadow overlay */}
-                        <div className="absolute inset-0 bg-black/1 rounded-lg" />
+                        <div className="absolute inset-0 rounded-lg bg-black/1" />
 
                         {/* Hover overlay with date */}
                         <motion.div
@@ -158,7 +185,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                           transition={{ duration: 0.3 }}
                         />
                         <motion.div
-                          className="absolute bottom-0 left-0 right-0 p-3"
+                          className="absolute right-0 bottom-0 left-0 p-3"
                           initial={{
                             background:
                               "linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2), transparent)",
@@ -167,7 +194,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                           whileHover={{ opacity: 1 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <p className="text-xs text-white font-medium">
+                          <p className="text-xs font-medium text-white">
                             {new Date(
                               picture.attendance_date,
                             ).toLocaleDateString()}

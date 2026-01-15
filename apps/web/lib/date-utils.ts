@@ -3,9 +3,8 @@
  */
 
 import { TZDate } from "@date-fns/tz";
+import { TIMEZONE } from "@prostcounter/shared";
 import { format } from "date-fns";
-
-import { TIMEZONE } from "./constants";
 
 /**
  * Formats a Date object for use with HTML datetime-local input

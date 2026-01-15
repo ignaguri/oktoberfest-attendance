@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useNearbyGroupMembers } from "@/hooks/useLocationSharing";
-import { DEFAULT_AVATAR_URL } from "@/lib/constants";
+import { DEFAULT_AVATAR_URL } from "@prostcounter/shared/constants";
 import { MapPin, Users, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 
@@ -92,8 +92,8 @@ export const GroupMembersMap = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground">
+          <div className="py-8 text-center">
+            <p className="text-muted-foreground text-sm">
               Failed to load nearby members. Please try again.
             </p>
           </div>
@@ -112,9 +112,9 @@ export const GroupMembersMap = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">
+          <div className="py-8 text-center">
+            <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+            <p className="text-muted-foreground text-sm">
               {activeSharing
                 ? "No group members are sharing their location nearby."
                 : "Enable location sharing to see nearby group members."}
@@ -133,7 +133,7 @@ export const GroupMembersMap = ({
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5" />
           Nearby Group Members
-          <span className="text-sm font-normal text-muted-foreground ml-1">
+          <span className="text-muted-foreground ml-1 text-sm font-normal">
             ({sortedMembers.length})
           </span>
         </CardTitle>
@@ -148,7 +148,7 @@ export const GroupMembersMap = ({
             return (
               <div
                 key={member.user_id}
-                className="flex items-center space-x-3 py-3 border-b border-border/50 last:border-b-0"
+                className="border-border/50 flex items-center space-x-3 border-b py-3 last:border-b-0"
               >
                 {/* User Avatar */}
                 <Avatar className="h-10 w-10">
@@ -159,41 +159,41 @@ export const GroupMembersMap = ({
                 </Avatar>
 
                 {/* Member Info */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm truncate">
+                    <span className="truncate text-sm font-medium">
                       {displayName}
                     </span>
-                    <span className="text-xs text-green-600 font-medium">
+                    <span className="text-xs font-medium text-green-600">
                       {formatDistance(member.distance_meters)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between mt-1">
+                  <div className="mt-1 flex items-center justify-between">
                     <div className="flex flex-wrap gap-1">
                       {member.group_names.map((groupName: string) => (
                         <span
                           key={groupName}
-                          className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full"
+                          className="inline-block rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-800"
                         >
                           {groupName}
                         </span>
                       ))}
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">
                       {formatLastUpdated(member.last_updated)}
                     </span>
                   </div>
                 </div>
 
                 {/* Location Indicator */}
-                <MapPin className="h-4 w-4 text-green-500 flex-shrink-0" />
+                <MapPin className="h-4 w-4 flex-shrink-0 text-green-500" />
               </div>
             );
           })}
 
-          <div className="text-center pt-2">
-            <p className="text-xs text-muted-foreground">
+          <div className="pt-2 text-center">
+            <p className="text-muted-foreground text-xs">
               Showing members within {formatDistance(radiusMeters)}
             </p>
           </div>

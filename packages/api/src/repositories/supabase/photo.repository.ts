@@ -68,7 +68,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
         user_id: userId,
         attendance_id: query.attendanceId,
         picture_url: publicUrlData.publicUrl,
-        visibility: "private", // Default to private
+        visibility: "public", // Default to public so photos show in group galleries
       })
       .select()
       .single();
@@ -206,6 +206,27 @@ export class SupabasePhotoRepository implements IPhotoRepository {
 
     if (dbError) {
       throw new DatabaseError(`Failed to delete picture: ${dbError.message}`);
+    }
+  }
+
+  /**
+   * Delete all photo records for an attendance (DB only, keeps storage files)
+   * Used when deleting an attendance to avoid FK constraint violation.
+   * Storage files are kept for potential data restoration.
+   */
+  async deleteByAttendanceId(
+    attendanceId: string,
+    userId: string,
+  ): Promise<void> {
+    // Delete database records only (keep storage files for potential restoration)
+    const { error: dbError } = await this.supabase
+      .from("beer_pictures")
+      .delete()
+      .eq("attendance_id", attendanceId)
+      .eq("user_id", userId);
+
+    if (dbError) {
+      throw new DatabaseError(`Failed to delete pictures: ${dbError.message}`);
     }
   }
 

@@ -28,6 +28,9 @@ const getMimeType = (filename: string): string => {
       return "image/gif";
     case "webp":
       return "image/webp";
+    case "heic":
+    case "heif":
+      return "image/heic";
     default:
       return "application/octet-stream";
   }
@@ -35,12 +38,18 @@ const getMimeType = (filename: string): string => {
 
 // Cache metadata retrieval for 24 hours
 const getCachedImageMetadata = unstable_cache(
-  async (bucket: string, fileName: string) => {
+  async (bucket: string, filePath: string) => {
     // Use service role client - image metadata is public
     const supabase = await createClient(true);
+
+    // Split path into directory and filename
+    const pathParts = filePath.split("/");
+    const fileName = pathParts.pop() || filePath;
+    const directory = pathParts.join("/");
+
     const { data, error } = await supabase.storage
       .from(bucket)
-      .list("", { search: fileName });
+      .list(directory, { search: fileName });
 
     if (error || !data || data.length === 0) {
       return null;
@@ -59,14 +68,58 @@ const getCachedImageMetadata = unstable_cache(
   { revalidate: 86400 }, // 24 hours
 );
 
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ * Handles URLs like: http://localhost:54321/storage/v1/object/public/beer_pictures/userId/festivalId/file.jpg
+ * Returns: userId/festivalId/file.jpg
+ */
+function extractFilePath(urlOrPath: string, bucket: string): string {
+  // If it's already a path (doesn't start with http), return as-is
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    // Find the bucket name in the path and get everything after it
+    const bucketIndex = pathParts.indexOf(bucket);
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    // Fallback: return everything after /public/
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    // Last resort: return original
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const decodedId = decodeURIComponent(id);
+  let decodedId = decodeURIComponent(id);
   const { searchParams } = new URL(request.url);
-  const bucketParam = searchParams.get("bucket") || "avatars";
+
+  // Handle case where bucket param is encoded into the path (happens with Next.js Image optimization)
+  // The URL might look like: /api/image/http%3A...%3Fbucket%3Dbeer_pictures
+  // After decoding: /api/image/http://...?bucket=beer_pictures
+  let bucketParam = searchParams.get("bucket");
+
+  if (!bucketParam && decodedId.includes("?bucket=")) {
+    const [pathPart, queryPart] = decodedId.split("?");
+    decodedId = pathPart;
+    const embeddedParams = new URLSearchParams(queryPart);
+    bucketParam = embeddedParams.get("bucket");
+  }
+
+  bucketParam = bucketParam || "avatars";
 
   if (!ALLOWED_BUCKETS[bucketParam as AllowedBucket]) {
     return NextResponse.json(
@@ -77,23 +130,42 @@ export async function GET(
 
   const bucket = bucketParam as AllowedBucket;
 
+  // Extract file path from full URL or use as-is
+  const filePath = extractFilePath(decodedId, bucket);
+
   try {
     // Create Supabase client outside cache scope
     const supabase = await createClient(true);
 
-    // Get image metadata for ETag generation
-    const metadata = await getCachedImageMetadata(bucket, decodedId);
-    if (!metadata) {
+    // Try to download the file directly first
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .download(filePath);
+
+    if (error) {
+      logger.error(
+        "Error downloading image from storage",
+        logger.apiRoute("image/[id]", { imageId: filePath, bucket }),
+        error as Error,
+      );
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
 
-    // Generate ETag based on file metadata
+    const arrayBuffer = await data.arrayBuffer();
+
+    // Generate ETag based on content hash
     const etag = crypto
       .createHash("md5")
-      .update(
-        `${bucket}:${decodedId}:${metadata.lastModified}:${metadata.size}`,
-      )
+      .update(Buffer.from(arrayBuffer))
       .digest("hex");
+
+    // Cache-Control strategy for authenticated image content:
+    // - private: only browser cache, not CDN/proxy (since auth required)
+    // - max-age=31536000: cache for 1 year (images have unique paths with timestamps)
+    // - immutable: never revalidate (file paths are unique per upload)
+    // - stale-while-revalidate=86400: serve stale while fetching new (1 day grace)
+    const cacheControl =
+      "private, max-age=31536000, immutable, stale-while-revalidate=86400";
 
     // Check If-None-Match header for conditional requests
     const ifNoneMatch = request.headers.get("if-none-match");
@@ -101,29 +173,16 @@ export async function GET(
       return new NextResponse(null, {
         status: 304,
         headers: {
-          "Cache-Control": "public, max-age=2592000, immutable", // 30 days
+          "Cache-Control": cacheControl,
           ETag: `"${etag}"`,
         },
       });
     }
 
-    // Fetch the actual image data
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .download(decodedId);
-
-    if (error) {
-      throw error;
-    }
-
-    const arrayBuffer = await data.arrayBuffer();
-    const lastModified = new Date(metadata.lastModified).toUTCString();
-
     const headers = new Headers();
-    headers.set("Content-Type", getMimeType(decodedId));
-    headers.set("Cache-Control", "public, max-age=2592000, immutable"); // 30 days
+    headers.set("Content-Type", getMimeType(filePath));
+    headers.set("Cache-Control", cacheControl);
     headers.set("ETag", `"${etag}"`);
-    headers.set("Last-Modified", lastModified);
     headers.set("Vary", "Accept-Encoding");
 
     return new NextResponse(arrayBuffer, {
@@ -133,7 +192,7 @@ export async function GET(
   } catch (error) {
     logger.error(
       "Error fetching image",
-      logger.apiRoute("image/[id]", { imageId: decodedId, bucket }),
+      logger.apiRoute("image/[id]", { imageId: filePath, bucket }),
       error as Error,
     );
     return NextResponse.json(

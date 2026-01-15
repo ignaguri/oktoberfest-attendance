@@ -45,7 +45,7 @@ const PicturePreview = ({
         <button
           type="button"
           onClick={onRemove}
-          className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1"
+          className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1"
         >
           <X size={16} className="text-white" />
         </button>
@@ -164,18 +164,18 @@ export function BeerPicturesUpload({
       {/* Existing uploaded pictures with preview functionality */}
       {allPictureUrls.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap gap-2 justify-center">
+          <div className="flex flex-wrap justify-center gap-2">
             {allPictureUrls.map((url, index) => (
               <PhotoPreview
                 key={`existing-${index}`}
                 urls={[url]}
                 size="lg"
                 maxThumbnails={1}
-                className="cursor-pointer hover:scale-105 transition-transform"
+                className="cursor-pointer transition-transform hover:scale-105"
               />
             ))}
           </div>
-          <p className="text-xs text-gray-600 text-center">
+          <p className="text-center text-xs text-gray-600">
             {t("attendance.pictures.clickToView")}
           </p>
         </div>
@@ -184,10 +184,10 @@ export function BeerPicturesUpload({
       {/* New pictures being uploaded */}
       {watchedPictures.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-center text-sm text-gray-600">
             {t("attendance.pictures.newToUpload")}
           </p>
-          <div className="flex flex-wrap gap-2 justify-center">
+          <div className="flex flex-wrap justify-center gap-2">
             {watchedPictures.map((file, index) => (
               <PicturePreview
                 key={`new-${index}`}
@@ -198,7 +198,7 @@ export function BeerPicturesUpload({
           </div>
 
           {/* Visibility Control for all new photos */}
-          <div className="flex items-center justify-center gap-3 p-2 bg-gray-50 rounded-md">
+          <div className="flex items-center justify-center gap-3 rounded-md bg-gray-50 p-2">
             {watchedVisibility === "public" ? (
               <Eye size={16} className="text-green-600" />
             ) : (

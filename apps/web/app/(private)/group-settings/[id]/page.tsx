@@ -3,6 +3,7 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
+import { useTranslation } from "@/lib/i18n/client";
 import { useTransitionRouter } from "next-view-transitions";
 import { use, useEffect } from "react";
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function GroupSettingsPage({ params }: Props) {
+  const { t } = useTranslation();
   const { id: groupId } = use(params);
   const router = useTransitionRouter();
 
@@ -39,18 +41,22 @@ export default function GroupSettingsPage({ params }: Props) {
 
   if (groupLoading || membersLoading) {
     return (
-      <div className="flex flex-col justify-center items-center h-64 gap-4">
+      <div className="flex h-64 flex-col items-center justify-center gap-4">
         <LoadingSpinner />
-        <span className="text-sm text-gray-500">Loading group settings...</span>
+        <span className="text-sm text-gray-500">
+          {t("groups.settings.loading")}
+        </span>
       </div>
     );
   }
 
   if (!groupResponse?.data) {
     return (
-      <div className="flex flex-col justify-center items-center h-64 gap-4">
+      <div className="flex h-64 flex-col items-center justify-center gap-4">
         <LoadingSpinner />
-        <span className="text-sm text-gray-500">Loading...</span>
+        <span className="text-sm text-gray-500">
+          {t("common.status.loading")}
+        </span>
       </div>
     );
   }

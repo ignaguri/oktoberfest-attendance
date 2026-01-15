@@ -1,6 +1,8 @@
 "use client";
 
-import { IS_PROD } from "@/lib/constants";
+import { apiClient } from "@/lib/api-client";
+import { IS_PROD } from "@prostcounter/shared/constants";
+import { ApiClientProvider } from "@prostcounter/shared/data";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState, type ReactNode } from "react";
@@ -45,7 +47,7 @@ export function DataProvider({ children }: DataProviderProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <ApiClientProvider client={apiClient}>{children}</ApiClientProvider>
       {/* Only show DevTools in development */}
       {!IS_PROD && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>

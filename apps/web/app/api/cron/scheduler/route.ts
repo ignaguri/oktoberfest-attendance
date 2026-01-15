@@ -1,6 +1,6 @@
-import { IS_PROD, DEV_URL, PROD_URL } from "@/lib/constants";
 import { createNotificationService } from "@/lib/services/notifications";
 import { createClient } from "@/utils/supabase/server";
+import { IS_PROD, DEV_URL, PROD_URL } from "@prostcounter/shared/constants";
 import { NextResponse } from "next/server";
 
 import { processAchievementNotifications } from "./achievements";

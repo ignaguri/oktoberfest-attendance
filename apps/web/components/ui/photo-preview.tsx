@@ -1,11 +1,36 @@
 "use client";
 
-import { IMAGE_PLACEHOLDER_BASE64 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { IMAGE_PLACEHOLDER_BASE64 } from "@prostcounter/shared/constants";
 import Image from "next/image";
 import { useState } from "react";
 
 import { Dialog, DialogContent, DialogOverlay } from "./dialog";
+
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ */
+function extractFilePath(urlOrPath: string, bucket: string): string {
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    const bucketIndex = pathParts.indexOf(bucket);
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
 
 interface PhotoPreviewProps {
   urls: string[];
@@ -42,31 +67,35 @@ export function PhotoPreview({
   return (
     <>
       <div className={cn("flex items-center gap-1", className)}>
-        {displayUrls.map((url, index) => (
-          <div
-            key={index}
-            className={cn(
-              "relative cursor-pointer rounded overflow-hidden border border-gray-200 hover:border-yellow-400 transition-colors",
-              thumbnailSize,
-            )}
-            onClick={() => setSelectedImage(url)}
-          >
-            <Image
-              src={`/api/image/${url}?bucket=${bucket}`}
-              alt="Photo preview"
-              fill
-              className="object-cover transform-gpu will-change-transform"
-              sizes={size === "sm" ? "32px" : size === "md" ? "48px" : "64px"}
-              loading="lazy"
-              placeholder="blur"
-              blurDataURL={IMAGE_PLACEHOLDER_BASE64}
-            />
-          </div>
-        ))}
+        {displayUrls.map((url, index) => {
+          const filePath = extractFilePath(url, bucket);
+          return (
+            <div
+              key={index}
+              className={cn(
+                "relative cursor-pointer overflow-hidden rounded border border-gray-200 transition-colors hover:border-yellow-400",
+                thumbnailSize,
+              )}
+              onClick={() => setSelectedImage(url)}
+            >
+              <Image
+                src={`/api/image/${encodeURIComponent(filePath)}?bucket=${bucket}`}
+                alt="Photo preview"
+                fill
+                className="transform-gpu object-cover will-change-transform"
+                sizes={size === "sm" ? "32px" : size === "md" ? "48px" : "64px"}
+                loading="lazy"
+                placeholder="blur"
+                blurDataURL={IMAGE_PLACEHOLDER_BASE64}
+                unoptimized
+              />
+            </div>
+          );
+        })}
         {remainingCount > 0 && (
           <div
             className={cn(
-              "flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-xs font-medium text-gray-600",
+              "flex items-center justify-center rounded border border-gray-200 bg-gray-100 text-xs font-medium text-gray-600",
               thumbnailSize,
             )}
           >
@@ -80,17 +109,18 @@ export function PhotoPreview({
         onOpenChange={() => setSelectedImage(null)}
       >
         <DialogOverlay />
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden p-0">
           {selectedImage && (
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
-                src={`/api/image/${selectedImage}?bucket=${bucket}`}
+                src={`/api/image/${encodeURIComponent(extractFilePath(selectedImage, bucket))}?bucket=${bucket}`}
                 alt="Full size photo"
                 width={1200}
                 height={800}
-                className="w-full h-full object-contain"
+                className="h-full w-full object-contain"
                 priority
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                unoptimized
               />
             </div>
           )}

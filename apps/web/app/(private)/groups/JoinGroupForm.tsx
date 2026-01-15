@@ -6,15 +6,15 @@ import { useFestival } from "@/contexts/FestivalContext";
 import { useJoinGroup } from "@/hooks/useGroups";
 import { apiClient } from "@/lib/api-client";
 import { useTranslation } from "@/lib/i18n/client";
-import { joinGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { JoinGroupFormSchema } from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { JoinGroupFormData } from "@/lib/schemas/groups";
+import type { JoinGroupForm as JoinGroupFormData } from "@prostcounter/shared/schemas";
 
 interface JoinGroupFormProps {
   groupName?: string;
@@ -35,7 +35,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     handleSubmit,
     formState: { errors, isSubmitting: formSubmitting },
   } = useForm<JoinGroupFormData>({
-    resolver: zodResolver(joinGroupSchema),
+    resolver: zodResolver(JoinGroupFormSchema),
     defaultValues: {
       groupName: groupName || "",
       password: "",
@@ -100,7 +100,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   // If groupId is provided, show simple join button
   if (groupId) {
     return (
-      <div className="space-y-4 flex flex-col gap-2 items-center">
+      <div className="flex flex-col items-center gap-2 space-y-4">
         <p className="text-gray-600">
           {t("groups.join.clickToJoin", { groupName })}
         </p>
@@ -121,7 +121,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-2 flex flex-col gap-2"
+      className="flex flex-col gap-2 space-y-2"
     >
       <h3 className="text-xl font-semibold">{t("groups.join.title")}</h3>
       <Input
@@ -142,7 +142,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
             type="button"
             variant="ghost"
             onClick={() => setShowPassword(!showPassword)}
-            className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+            className="h-auto cursor-pointer p-0 text-gray-400 hover:bg-transparent"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>

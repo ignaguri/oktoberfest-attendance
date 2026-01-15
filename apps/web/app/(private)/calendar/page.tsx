@@ -4,9 +4,11 @@ import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
 import { useFestival } from "@/contexts/FestivalContext";
 import { usePersonalCalendar } from "@/hooks/useCalendar";
+import { useTranslation } from "@/lib/i18n/client";
 import { Loader2 } from "lucide-react";
 
 export default function PersonalCalendarPage() {
+  const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const festivalId = currentFestival?.id;
 
@@ -20,9 +22,9 @@ export default function PersonalCalendarPage() {
 
   if (isLoading) {
     return (
-      <div className="container flex flex-col items-center justify-center p-4 min-h-[50vh]">
+      <div className="container flex min-h-[50vh] flex-col items-center justify-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
-        <p className="mt-2 text-muted-foreground">Loading calendar...</p>
+        <p className="text-muted-foreground mt-2">{t("calendar.loading")}</p>
       </div>
     );
   }
@@ -30,7 +32,7 @@ export default function PersonalCalendarPage() {
   if (error) {
     return (
       <div className="container flex flex-col items-center p-4">
-        <p className="text-red-500">Failed to load calendar events</p>
+        <p className="text-red-500">{t("calendar.loadError")}</p>
       </div>
     );
   }
@@ -49,7 +51,7 @@ export default function PersonalCalendarPage() {
 
   return (
     <div className="container flex flex-col items-center p-4">
-      <h1 className="text-lg font-semibold mb-4">My Calendar</h1>
+      <h1 className="mb-4 text-lg font-semibold">{t("calendar.myCalendar")}</h1>
       <EventCalendar
         events={events || []}
         initialMonth={initialMonth}

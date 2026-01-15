@@ -82,11 +82,11 @@ export default function QRButton({
         description={description}
         className="sm:max-w-[425px]"
       >
-        <div className="flex flex-col gap-4 items-center p-6">
+        <div className="flex flex-col items-center gap-4 p-6">
           {groupLink && (
             <>
               <QRCode value={groupLink} size={220} />
-              <p className="text-sm text-muted-foreground text-center">
+              <p className="text-muted-foreground text-center text-sm">
                 Others can scan this code to join your group instantly!
               </p>
             </>

@@ -1,7 +1,13 @@
+import { mapBadgeVariant, type ShadcnBadgeVariant } from "@/lib/ui-adapters";
 import { cn } from "@/lib/utils";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { Slot as SlotPrimitive } from "radix-ui";
 import * as React from "react";
+
+import type {
+  BadgeAction,
+  BadgeVariant as ContractBadgeVariant,
+} from "@prostcounter/ui";
 
 const badgeVariants = cva(
   "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
@@ -26,20 +32,44 @@ const badgeVariants = cva(
   },
 );
 
-export type BadgeVariants = VariantProps<typeof badgeVariants>["variant"];
+/**
+ * Badge props supporting both contract API and shadcn API
+ *
+ * Contract API (Gluestack-style):
+ * - action: "error" | "warning" | "success" | "info" | "muted"
+ * - variant: "solid" | "outline"
+ *
+ * shadcn API (backward compatible):
+ * - variant: "default" | "success" | "secondary" | "destructive" | "outline"
+ */
+interface BadgeProps extends React.ComponentProps<"span"> {
+  // Contract props (Gluestack-style)
+  action?: BadgeAction;
+  /** Contract variant or shadcn variant */
+  variant?: ContractBadgeVariant | ShadcnBadgeVariant;
+  // shadcn-specific props
+  asChild?: boolean;
+}
 
 function Badge({
   className,
+  action,
   variant,
   asChild = false,
   ...props
-}: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+}: BadgeProps) {
   const Comp = asChild ? SlotPrimitive.Slot : "span";
+
+  // Determine final variant: if action is provided, use contract mapping
+  // Otherwise, use variant directly (shadcn style)
+  const finalVariant: ShadcnBadgeVariant = action
+    ? mapBadgeVariant(action, variant as ContractBadgeVariant)
+    : ((variant as ShadcnBadgeVariant) ?? "default");
+
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant: finalVariant }), className)}
       {...props}
     />
   );

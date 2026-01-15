@@ -121,7 +121,7 @@ export function AchievementBadge({
         sizeStyles[size],
         isUnlocked
           ? `${config.bgColor} ${config.textColor} ${config.borderColor}`
-          : "bg-gray-50 text-gray-400 border-gray-200 opacity-60",
+          : "border-gray-200 bg-gray-50 text-gray-400 opacity-60",
         className,
       )}
     >

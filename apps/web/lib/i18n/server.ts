@@ -1,4 +1,4 @@
-import { initI18n, i18n } from "@prostcounter/shared/i18n";
+import { initI18n, i18n } from "@prostcounter/shared/i18n/core";
 
 // Initialize i18n for server
 initI18n();

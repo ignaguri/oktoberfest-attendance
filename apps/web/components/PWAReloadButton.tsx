@@ -63,7 +63,7 @@ export function PWAReloadButton() {
       size="icon"
       onClick={handleReload}
       disabled={isReloading}
-      className="text-white hover:bg-gray-700 h-8 w-8"
+      className="h-8 w-8 text-white hover:bg-gray-700"
       title="Refresh app and clear cache"
     >
       <RotateCcw className={`h-4 w-4 ${isReloading ? "animate-spin" : ""}`} />

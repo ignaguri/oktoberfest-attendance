@@ -19,9 +19,9 @@ export function AchievementGrid({
 }: AchievementGridProps) {
   if (achievements.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-4xl mb-4">🏆</div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <div className="py-12 text-center">
+        <div className="mb-4 text-4xl">🏆</div>
+        <h3 className="mb-2 text-lg font-semibold text-gray-900">
           No achievements yet
         </h3>
         <p className="text-gray-600">
@@ -34,7 +34,7 @@ export function AchievementGrid({
   return (
     <div
       className={cn(
-        "grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+        "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3",
         className,
       )}
     >

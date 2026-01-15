@@ -1,7 +1,8 @@
 "use client";
 
+import { DrinkStepper } from "@/components/attendance/drink-stepper";
+import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import { SingleSelect } from "@/components/Select/SingleSelect";
-import { Button } from "@/components/ui/button";
 import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useTents } from "@/hooks/use-tents";
@@ -9,50 +10,30 @@ import { useConfetti } from "@/hooks/useConfetti";
 import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
-import { quickAttendanceSchema } from "@/lib/schemas/attendance";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Minus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useConsumptions } from "@prostcounter/shared/hooks";
+import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
+import { useEffect, useState, useMemo } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { QuickAttendanceFormData } from "@/lib/schemas/attendance";
-import type { AttendanceByDate } from "@prostcounter/shared/schemas";
+import type {
+  QuickAttendanceForm,
+  AttendanceByDate,
+  DrinkType,
+} from "@prostcounter/shared/schemas";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
+  attendanceId: string | null;
+  renderPhotoUpload?: (attendanceId: string | null) => React.ReactNode;
 }
-
-// const LocationSharingStatus = ({
-//   isSharing,
-//   hasGroupSharingEnabled,
-// }: {
-//   isSharing: boolean;
-//   hasGroupSharingEnabled: boolean;
-// }) => {
-//   const getStatusMessage = () => {
-//     if (isSharing && !hasGroupSharingEnabled) {
-//       return "Location tracking active, but no groups are enabled to see your location. Configure sharing in your profile settings.";
-//     }
-//     if (isSharing && hasGroupSharingEnabled) {
-//       return null;
-//     }
-//     return null;
-//   };
-
-//   const message = getStatusMessage();
-//   if (!message) return null;
-
-//   return (
-//     <div className="text-center mt-2">
-//       <p className="text-sm text-muted-foreground">{message}</p>
-//     </div>
-//   );
-// };
 
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
+  attendanceId,
+  renderPhotoUpload,
 }: QuickAttendanceRegistrationFormProps) => {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
@@ -65,95 +46,46 @@ export const QuickAttendanceRegistrationForm = ({
   const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
     null,
   );
+  const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
 
-  // Location sharing hooks
-  // const {
-  //   startLocationSharing,
-  //   stopLocationSharing,
-  //   isUpdatingLocation,
-  //   isStoppingSharing,
-  //   isSharing,
-  // } = useLocationSharing(currentFestival?.id);
+  // Get today's date string
+  const todayString = useMemo(() => formatDateForDatabase(new Date()), []);
 
-  // const { data: preferences } = useLocationSharingPreferences(
-  //   currentFestival?.id,
-  // );
-  // const hasGroupSharingEnabled = useMemo(() => {
-  //   return preferences?.some((pref) => pref.sharing_enabled) ?? false;
-  // }, [preferences]);
+  // Fetch consumptions for today
+  const { data: consumptionsData } = useConsumptions(
+    currentFestival?.id || "",
+    todayString,
+  );
+  const consumptions = consumptionsData || [];
 
-  // const isActuallySharing = isSharing && hasGroupSharingEnabled;
-
-  // const handleToggle = async () => {
-  //   if (isUpdatingLocation || isStoppingSharing || !currentFestival) return;
-
-  //   try {
-  //     if (!isActuallySharing) {
-  //       // Request location permission and start sharing
-  //       if (!navigator.geolocation) {
-  //         toast.error("Geolocation is not supported by this browser");
-  //         return;
-  //       }
-
-  //       await startLocationSharing();
-
-  //       // Show appropriate message based on group sharing status
-  //       if (hasGroupSharingEnabled) {
-  //         toast.success(
-  //           "Location sharing enabled! Group members can now see your location.",
-  //         );
-  //       } else {
-  //         toast.success(
-  //           "Location tracking started! Enable location sharing for specific groups in your profile settings.",
-  //         );
-  //       }
-  //     } else {
-  //       // Stop sharing
-  //       await stopLocationSharing();
-  //       toast.success("Location sharing disabled.");
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof GeolocationPositionError) {
-  //       switch (error.code) {
-  //         case error.PERMISSION_DENIED:
-  //           toast.error(
-  //             "Location access denied. Please enable location permissions in your browser settings.",
-  //           );
-  //           break;
-  //         case error.POSITION_UNAVAILABLE:
-  //           toast.error("Location information is unavailable.");
-  //           break;
-  //         case error.TIMEOUT:
-  //           toast.error("Location request timed out. Please try again.");
-  //           break;
-  //       }
-  //     } else {
-  //       const errorMessage =
-  //         error instanceof Error
-  //           ? error.message
-  //           : "Failed to toggle location sharing. Please try again.";
-
-  //       // Handle specific API errors
-  //       if (
-  //         errorMessage.includes("Location sharing not enabled for any groups")
-  //       ) {
-  //         toast.error(
-  //           "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first.",
-  //         );
-  //       } else {
-  //         toast.error(errorMessage);
-  //       }
-  //     }
-  //   }
-  // };
+  // Calculate drink count summary
+  const drinkSummary = useMemo(() => {
+    const counts: Record<DrinkType, number> = {
+      beer: 0,
+      radler: 0,
+      wine: 0,
+      soft_drink: 0,
+      alcohol_free: 0,
+      other: 0,
+    };
+    for (const c of consumptions) {
+      if (counts[c.drinkType] !== undefined) {
+        counts[c.drinkType]++;
+      }
+    }
+    return {
+      counts,
+      total: consumptions.length,
+    };
+  }, [consumptions]);
 
   const {
     setValue,
     watch,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<QuickAttendanceFormData>({
-    resolver: zodResolver(quickAttendanceSchema),
+  } = useForm<QuickAttendanceForm>({
+    resolver: zodResolver(QuickAttendanceFormSchema),
     defaultValues: {
       tentId: "",
       beerCount: 0,
@@ -192,7 +124,7 @@ export const QuickAttendanceRegistrationForm = ({
     loadAttendance();
   }, [onAttendanceIdReceived, currentFestival, setValue, t]);
 
-  const onSubmit = async (data: QuickAttendanceFormData) => {
+  const onSubmit = async (data: QuickAttendanceForm) => {
     if (!currentFestival) {
       toast.error(t("notifications.error.noFestivalSelected"));
       return;
@@ -264,7 +196,7 @@ export const QuickAttendanceRegistrationForm = ({
   return (
     <>
       {isExploding && (
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+        <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
           <ConfettiExplosion
             force={0.4}
             duration={2200}
@@ -273,56 +205,81 @@ export const QuickAttendanceRegistrationForm = ({
           />
         </div>
       )}
-      <form className="flex flex-col items-center gap-4">
-        <p className="text-sm font-semibold">
-          {tentId ? "You are at:" : "Are you there today?"}
-        </p>
-        <div className="flex items-center gap-2 w-full justify-center">
-          <SingleSelect
-            value={tentId}
-            className="flex-1 max-w-64"
-            buttonClassName="self-center"
-            options={tents.map((tent) => ({
-              title: tent.category,
-              options: tent.options,
-            }))}
-            placeholder="Select your current tent"
-            onSelect={(option) => {
-              setValue("tentId", option.value);
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          />
-          {/* Location sharing toggle disabled - requires migration from deprecated tables
-              to session-based model. See: app/api/location-sharing/ for details */}
-        </div>
-        {/* Location sharing status disabled - pending database migration */}
-        <div className="flex items-center">
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", Math.max(0, beerCount - 1));
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <span className="mx-2">{beerCount} 🍺 drank today</span>
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() => {
-              setValue("beerCount", beerCount + 1);
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
-      </form>
+      {/* Card containing all attendance controls - matching mobile layout */}
+      {currentFestival && (
+        <form className="flex w-full flex-col gap-4 rounded-lg border bg-white p-4">
+          {/* Header with title and count summary */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">
+              {t("home.quickAttendance.title")}
+            </h3>
+            {drinkSummary.total > 0 && (
+              <span className="text-muted-foreground text-sm">
+                {drinkSummary.total}{" "}
+                {drinkSummary.total === 1 ? "drink" : "drinks"} today
+              </span>
+            )}
+          </div>
+
+          {/* Drink Type Selector + Stepper (horizontal layout like mobile) */}
+          <div className="flex items-center justify-between gap-4">
+            <DrinkTypePicker
+              selectedType={selectedDrinkType}
+              onSelect={setSelectedDrinkType}
+              counts={drinkSummary.counts}
+              disabled={isSubmitting}
+              responsive
+            />
+            <div className="flex flex-col items-center gap-1">
+              <DrinkStepper
+                festivalId={currentFestival.id}
+                date={todayString}
+                drinkType={selectedDrinkType}
+                tentId={tentId || undefined}
+                consumptions={consumptions}
+                disabled={isSubmitting}
+                onSuccess={triggerConfetti}
+              />
+              <span className="text-muted-foreground text-xs">
+                {t(`attendance.drinkTypes.${selectedDrinkType}`, {
+                  defaultValue: selectedDrinkType,
+                })}
+              </span>
+            </div>
+          </div>
+
+          {/* Tent selector section */}
+          <div className="flex flex-col gap-1">
+            <span className="text-muted-foreground text-sm font-medium">
+              {t("home.quickAttendance.tent")}
+            </span>
+            <SingleSelect
+              value={tentId}
+              className="w-full"
+              options={tents.map((tent) => ({
+                title: tent.category,
+                options: tent.options,
+              }))}
+              placeholder={t("home.quickAttendance.selectTent")}
+              onSelect={(option) => {
+                setValue("tentId", option.value);
+                handleSubmit(onSubmit)();
+              }}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Photo upload section */}
+          {renderPhotoUpload && (
+            <div className="flex flex-col">
+              <span className="text-muted-foreground text-sm font-medium">
+                {t("home.quickAttendance.photos")}
+              </span>
+              {renderPhotoUpload(attendanceId)}
+            </div>
+          )}
+        </form>
+      )}
     </>
   );
 };

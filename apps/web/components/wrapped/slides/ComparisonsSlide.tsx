@@ -53,11 +53,11 @@ export function ComparisonsSlide({
         {/* vs Festival Average */}
         {vs_festival_avg && (
           <div className="rounded-xl bg-white p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+            <h3 className="mb-4 text-center text-lg font-semibold text-gray-700">
               vs Festival Average
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">Beers</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_festival_avg.beers_diff_pct || 0)}
@@ -66,7 +66,7 @@ export function ComparisonsSlide({
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">Days</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_festival_avg.days_diff_pct || 0)}
@@ -82,12 +82,12 @@ export function ComparisonsSlide({
         {/* vs Last Year */}
         {vs_last_year && improvement && (
           <div className="rounded-xl bg-white p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+            <h3 className="mb-4 text-center text-lg font-semibold text-gray-700">
               vs Last Year (
               {vs_last_year.prev_festival_name || "Previous Festival"})
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">Beers</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_last_year.beers_diff || 0)}
@@ -97,7 +97,7 @@ export function ComparisonsSlide({
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">Days</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_last_year.days_diff || 0)}
@@ -113,7 +113,7 @@ export function ComparisonsSlide({
 
         {/* No data message */}
         {!vs_festival_avg && !vs_last_year && (
-          <div className="rounded-xl bg-white p-6 shadow-lg text-center">
+          <div className="rounded-xl bg-white p-6 text-center shadow-lg">
             <p className="text-gray-600">
               No comparison data available for this festival
             </p>

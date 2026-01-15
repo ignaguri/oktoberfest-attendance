@@ -7,12 +7,13 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { Toaster } from "@/components/ui/sonner";
 import { FestivalProvider } from "@/contexts/FestivalContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { DEV_URL, GA_ID, IS_PROD, PROD_URL } from "@/lib/constants";
+import { GA_ID } from "@/lib/constants";
 import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/lib/version";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ViewTransitions } from "next-view-transitions";
 
@@ -99,7 +100,7 @@ function AppContent({
     <div className="flex min-h-screen flex-col items-center justify-center pb-2">
       <Navbar />
       <OfflineBanner />
-      <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:px-20 sm:justify-start">
+      <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:justify-start sm:px-20">
         <Breadcrumbs />
         {children}
       </main>

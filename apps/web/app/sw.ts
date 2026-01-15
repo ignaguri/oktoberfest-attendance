@@ -111,7 +111,7 @@ const serwist = new Serwist({
 serwist.addEventListeners();
 
 // App update detection
-let updateCheckInterval: NodeJS.Timeout | null = null;
+let updateCheckInterval: ReturnType<typeof setInterval> | null = null;
 
 function startUpdateChecking() {
   // Check for updates every 30 minutes

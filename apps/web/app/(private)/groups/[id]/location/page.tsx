@@ -1,4 +1,5 @@
 import { GroupMembersMap } from "@/components/LocationSharing";
+import { getTranslations } from "@/lib/i18n/server";
 import { Link } from "next-view-transitions";
 
 export default async function GroupLocationPage({
@@ -6,22 +7,24 @@ export default async function GroupLocationPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = getTranslations();
+
   return (
     <div className="w-full max-w-lg">
-      <div className="flex items-center justify-center mb-4">
-        <h2 className="text-2xl font-bold">Group&apos;s live location</h2>
+      <div className="mb-4 flex items-center justify-center">
+        <h2 className="text-2xl font-bold">{t("groups.location.title")}</h2>
       </div>
 
       <GroupMembersMap radiusMeters={1000} />
 
-      <div className="mt-4 text-center space-y-2">
-        <p className="text-sm text-muted-foreground">
-          Share your location to see nearby group members and let them see you.
+      <div className="mt-4 space-y-2 text-center">
+        <p className="text-muted-foreground text-sm">
+          {t("groups.location.shareDescription")}
         </p>
-        <p className="text-xs text-muted-foreground">
-          Control which groups can see your location in your{" "}
+        <p className="text-muted-foreground text-xs">
+          {t("groups.location.controlNote")}{" "}
           <Link href="/profile" className="underline hover:no-underline">
-            profile settings
+            {t("profile.sections.privacy")}
           </Link>
           .
         </p>

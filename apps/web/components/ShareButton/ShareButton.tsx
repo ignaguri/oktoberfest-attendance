@@ -85,10 +85,10 @@ export default function ShareButton({
 
   const ButtonsGroup = useMemo(
     () => (
-      <div className="flex flex-col gap-4 items-center p-6">
+      <div className="flex flex-col items-center gap-4 p-6">
         {groupLink && (
           <div className="flex flex-col items-center gap-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Scan QR code to join:
             </p>
             <QRCode value={groupLink} size={180} />

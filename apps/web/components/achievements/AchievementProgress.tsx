@@ -34,7 +34,7 @@ export function AchievementProgress({
       <div className="space-y-1">
         <Progress value={clampedPercentage} className="h-2" />
 
-        <div className="text-xs text-gray-500 text-right">
+        <div className="text-right text-xs text-gray-500">
           {Math.round(clampedPercentage)}% complete
         </div>
       </div>

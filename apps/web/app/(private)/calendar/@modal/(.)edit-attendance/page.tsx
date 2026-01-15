@@ -35,22 +35,22 @@ export default function InterceptedAttendanceModal() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-black/50 animate-in fade-in"
+        className="animate-in fade-in fixed inset-0 z-50 bg-black/50"
         onClick={handleClose}
         aria-hidden="true"
       />
 
       {/* Modal Content */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in zoom-in-95 duration-200">
+      <div className="animate-in zoom-in-95 fixed inset-0 z-50 flex items-center justify-center p-4 duration-200">
         <div
-          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-lg"
+          className="bg-background relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
           <Button
             variant="ghost"
             size="sm"
-            className="absolute right-2 top-2 z-10 h-8 w-8 p-0 hover:bg-muted"
+            className="hover:bg-muted absolute top-2 right-2 z-10 h-8 w-8 p-0"
             onClick={handleClose}
             aria-label="Close modal"
           >

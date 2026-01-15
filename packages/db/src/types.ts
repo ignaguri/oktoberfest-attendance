@@ -302,9 +302,55 @@ export type Database = {
           },
         ];
       };
+      drink_type_prices: {
+        Row: {
+          created_at: string;
+          drink_type: Database["public"]["Enums"]["drink_type"];
+          festival_id: string | null;
+          festival_tent_id: string | null;
+          id: string;
+          price_cents: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          drink_type: Database["public"]["Enums"]["drink_type"];
+          festival_id?: string | null;
+          festival_tent_id?: string | null;
+          id?: string;
+          price_cents: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          drink_type?: Database["public"]["Enums"]["drink_type"];
+          festival_id?: string | null;
+          festival_tent_id?: string | null;
+          id?: string;
+          price_cents?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "drink_type_prices_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "drink_type_prices_festival_tent_id_fkey";
+            columns: ["festival_tent_id"];
+            isOneToOne: false;
+            referencedRelation: "festival_tents";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       festival_tents: {
         Row: {
           beer_price: number | null;
+          beer_price_cents: number | null;
           created_at: string | null;
           festival_id: string;
           id: string;
@@ -313,6 +359,7 @@ export type Database = {
         };
         Insert: {
           beer_price?: number | null;
+          beer_price_cents?: number | null;
           created_at?: string | null;
           festival_id: string;
           id?: string;
@@ -321,6 +368,7 @@ export type Database = {
         };
         Update: {
           beer_price?: number | null;
+          beer_price_cents?: number | null;
           created_at?: string | null;
           festival_id?: string;
           id?: string;
@@ -348,6 +396,7 @@ export type Database = {
         Row: {
           beer_cost: number | null;
           created_at: string;
+          default_beer_price_cents: number | null;
           description: string | null;
           end_date: string;
           festival_type: Database["public"]["Enums"]["festival_type_enum"];
@@ -365,6 +414,7 @@ export type Database = {
         Insert: {
           beer_cost?: number | null;
           created_at?: string;
+          default_beer_price_cents?: number | null;
           description?: string | null;
           end_date: string;
           festival_type: Database["public"]["Enums"]["festival_type_enum"];
@@ -382,6 +432,7 @@ export type Database = {
         Update: {
           beer_cost?: number | null;
           created_at?: string;
+          default_beer_price_cents?: number | null;
           description?: string | null;
           end_date?: string;
           festival_type?: Database["public"]["Enums"]["festival_type_enum"];
@@ -1155,6 +1206,7 @@ export type Database = {
           drink_count: number | null;
           festival_id: string | null;
           id: string | null;
+          total_base_cents: number | null;
           total_spent_cents: number | null;
           total_tip_cents: number | null;
           updated_at: string | null;
@@ -1183,6 +1235,50 @@ export type Database = {
           username: string | null;
         };
         Relationships: [];
+      };
+      user_festival_spending_stats: {
+        Row: {
+          avg_spent_per_day_cents: number | null;
+          avg_tip_per_drink_cents: number | null;
+          days_attended: number | null;
+          festival_id: string | null;
+          total_base_cents: number | null;
+          total_beers: number | null;
+          total_drinks: number | null;
+          total_spent_cents: number | null;
+          total_tips_cents: number | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attendances_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_festival_stats: {
+        Row: {
+          avg_beers: number | null;
+          days_attended: number | null;
+          festival_id: string | null;
+          total_base_cents: number | null;
+          total_beers: number | null;
+          total_spent_cents: number | null;
+          total_tips_cents: number | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attendances_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       v_user_shared_group_members: {
         Row: {
@@ -1344,6 +1440,14 @@ export type Database = {
           user_id: string;
           username: string;
         }[];
+      };
+      get_drink_price_cents: {
+        Args: {
+          p_drink_type?: Database["public"]["Enums"]["drink_type"];
+          p_festival_id: string;
+          p_tent_id?: string;
+        };
+        Returns: number;
       };
       get_festival_beer_cost: {
         Args: { p_festival_id: string };

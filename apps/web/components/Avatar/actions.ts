@@ -40,7 +40,7 @@ export async function uploadAvatar(formData: FormData) {
     });
   if (error) {
     reportLog("Error uploading avatar: " + error.message, "error");
-    throw new Error("Error uploading avatar");
+    throw new Error(`Error uploading avatar: ${error.message}`);
   }
   const { error: updateError } = await supabase
     .from("profiles")

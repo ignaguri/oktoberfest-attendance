@@ -32,7 +32,7 @@ export default function Home() {
     <TutorialProvider
       tutorialCompleted={tutorialStatus?.tutorial_completed ?? false}
     >
-      <div className="max-w-lg flex flex-col items-center gap-4">
+      <div className="flex max-w-lg flex-col items-center gap-4">
         <header className="flex flex-row items-center gap-4">
           <Image
             src={LogoImage}
@@ -45,11 +45,11 @@ export default function Home() {
           </h1>
         </header>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4">
           <div data-tutorial="festival-status" className="self-center">
             <FestivalStatus />
           </div>
-          <div data-tutorial="quick-attendance">
+          <div data-tutorial="quick-attendance" className="w-full">
             <QuickAttendanceWrapper />
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function Home() {
           <Separator decorative />
 
           <div
-            className="flex flex-col gap-2 items-center"
+            className="flex flex-col items-center gap-2"
             data-tutorial="map-share"
           >
             <MapButton />

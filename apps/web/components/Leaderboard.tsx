@@ -55,10 +55,12 @@ export const Leaderboard = ({
   entries,
   winningCriteria,
   showGroupCount = false,
+  festivalId,
 }: {
   entries: LeaderboardEntry[];
   winningCriteria: WinningCriteria;
   showGroupCount?: boolean;
+  festivalId?: string;
 }) => {
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -72,11 +74,13 @@ export const Leaderboard = ({
 
         return (
           <ProfilePreview
+            userId={entry.userId}
+            festivalId={festivalId}
             username={entry.username || t("common.empty.noData")}
             fullName={entry.fullName}
             avatarUrl={entry.avatarUrl}
           >
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
               <Avatar
                 url={entry.avatarUrl}
                 fallback={{
@@ -85,7 +89,7 @@ export const Leaderboard = ({
                   email: "no.name@email.com",
                 }}
               />
-              <span className="font-medium line-clamp-2">
+              <span className="line-clamp-2 font-medium">
                 {getDisplayName(entry, t("leaderboard.noName"))}
               </span>
             </div>

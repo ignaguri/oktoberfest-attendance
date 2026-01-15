@@ -43,5 +43,5 @@ export function createAuthRequest(
       "Content-Type": "application/json",
       ...options?.headers,
     },
-  });
+  } as any) as Request;
 }

@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
-import { updatePasswordSchema } from "@/lib/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  updatePasswordSchema,
+  type UpdatePasswordFormData,
+} from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-import type { UpdatePasswordFormData } from "@/lib/schemas/auth";
 
 import { updatePassword } from "./actions";
 
@@ -54,7 +55,7 @@ export default function UpdatePassword() {
               type="button"
               variant="ghost"
               onClick={() => setShowPassword(!showPassword)}
-              className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+              className="h-auto cursor-pointer p-0 text-gray-400 hover:bg-transparent"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </Button>
@@ -75,7 +76,7 @@ export default function UpdatePassword() {
               type="button"
               variant="ghost"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+              className="h-auto cursor-pointer p-0 text-gray-400 hover:bg-transparent"
             >
               {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </Button>

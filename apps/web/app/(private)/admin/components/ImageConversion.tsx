@@ -62,7 +62,7 @@ export function ImageConversion() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Non-WebP Images</h2>
+      <h2 className="mb-4 text-xl font-semibold">Non-WebP Images</h2>
       <Table>
         <TableHeader>
           <TableRow>

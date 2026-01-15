@@ -31,11 +31,15 @@ const Highlights = () => {
     totalBeers = 0,
     totalDays = 0,
     totalSpent = 0,
+    totalBaseCents = 0,
+    totalTipCents = 0,
   } = highlightsData || {
     groupPositions: [],
     totalBeers: 0,
     totalDays: 0,
     totalSpent: 0,
+    totalBaseCents: 0,
+    totalTipCents: 0,
   };
 
   // Convert totalSpent from cents to euros - React Compiler handles memoization automatically
@@ -70,17 +74,17 @@ const Highlights = () => {
     groupPositions.length > 0 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1";
 
   return (
-    <Card className="shadow-lg rounded-lg border border-gray-200 min-h-[140px]">
+    <Card className="min-h-[140px] rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center">
+        <CardTitle className="text-center text-xl font-bold">
           {t("home.highlights")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className={cn("grid gap-4", gridCols)}>
           {groupPositions.length > 0 && (
-            <div className="bg-green-50 p-4 rounded-lg shadow-sm">
-              <CardDescription className="font-semibold mb-2">
+            <div className="rounded-lg bg-green-50 p-4 shadow-sm">
+              <CardDescription className="mb-2 font-semibold">
                 {t("home.topGroups")}
               </CardDescription>
               <ul>
@@ -99,8 +103,8 @@ const Highlights = () => {
             </div>
           )}
           {(totalBeers > 0 || totalDays > 0) && (
-            <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
-              <CardDescription className="font-semibold mb-2">
+            <div className="rounded-lg bg-blue-50 p-4 shadow-sm">
+              <CardDescription className="mb-2 font-semibold">
                 {t("home.stats")}
               </CardDescription>
               <ul className="text-sm">
@@ -115,7 +119,17 @@ const Highlights = () => {
                   </li>
                 )}
                 {spentOnBeers && (
-                  <li>{t("home.spentOnBeers", { amount: spentOnBeers })}</li>
+                  <li className="mb-2">
+                    {t("home.spentOnBeers", { amount: spentOnBeers })}
+                    {(totalBaseCents > 0 || totalTipCents > 0) && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        ({t("home.baseCost", { defaultValue: "Base" })}: €
+                        {(totalBaseCents / 100).toFixed(0)} |{" "}
+                        {t("home.tips", { defaultValue: "Tips" })}: €
+                        {(totalTipCents / 100).toFixed(0)})
+                      </span>
+                    )}
+                  </li>
                 )}
               </ul>
             </div>

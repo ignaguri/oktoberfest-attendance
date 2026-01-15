@@ -81,7 +81,7 @@ export function TutorialOverlay() {
 
       // Wait for scroll to complete before showing step
       // Use a more reliable method to detect scroll completion
-      let scrollEndTimer: NodeJS.Timeout;
+      let scrollEndTimer: ReturnType<typeof setTimeout>;
       const checkScrollEnd = () => {
         clearTimeout(scrollEndTimer);
         scrollEndTimer = setTimeout(() => {

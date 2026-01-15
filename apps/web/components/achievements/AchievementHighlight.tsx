@@ -14,6 +14,8 @@ import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
 
+import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
+
 import { AchievementBadge } from "./AchievementBadge";
 
 interface AchievementHighlightProps {
@@ -32,17 +34,19 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
     return <SkeletonAchievements />;
   }
 
-  const unlockedAchievements = achievements.filter((a) => a.is_unlocked);
+  const unlockedAchievements = achievements.filter(
+    (a: AchievementWithProgress) => a.is_unlocked,
+  );
   const recentAchievements = unlockedAchievements
     .sort(
-      (a, b) =>
+      (a: AchievementWithProgress, b: AchievementWithProgress) =>
         new Date(b.unlocked_at || 0).getTime() -
         new Date(a.unlocked_at || 0).getTime(),
     )
     .slice(0, 3);
 
   const totalPoints = unlockedAchievements.reduce(
-    (sum, a) => sum + a.points,
+    (sum: number, a: AchievementWithProgress) => sum + a.points,
     0,
   );
 
@@ -53,12 +57,12 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
   return (
     <Card
       className={cn(
-        "shadow-lg rounded-lg border border-gray-200 min-h-[200px]",
+        "min-h-[200px] rounded-lg border border-gray-200 shadow-lg",
         className,
       )}
     >
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
+        <CardTitle className="flex items-center justify-center gap-2 text-center text-xl font-bold">
           🎖️ Achievements
         </CardTitle>
       </CardHeader>
@@ -84,22 +88,24 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
                 🎉 Recent achievements:
               </CardDescription>
               <div className="space-y-2">
-                {recentAchievements.map((achievement) => (
-                  <div
-                    key={achievement.id}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <AchievementBadge
-                      name={achievement.name}
-                      icon={achievement.icon}
-                      rarity={achievement.rarity}
-                      points={achievement.points}
-                      isUnlocked={true}
-                      size="sm"
-                      className="flex-1 truncate"
-                    />
-                  </div>
-                ))}
+                {recentAchievements.map(
+                  (achievement: AchievementWithProgress) => (
+                    <div
+                      key={achievement.id}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <AchievementBadge
+                        name={achievement.name}
+                        icon={achievement.icon}
+                        rarity={achievement.rarity}
+                        points={achievement.points}
+                        isUnlocked={true}
+                        size="sm"
+                        className="flex-1 truncate"
+                      />
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           )}

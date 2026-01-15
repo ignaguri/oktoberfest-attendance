@@ -274,7 +274,7 @@ describe("Achievement Routes - Unit Tests", () => {
     it("should evaluate achievements and return new unlocked achievements", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
-      // Mock RPC call to evaluate_achievements
+      // Mock RPC call to evaluate_user_achievements
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: null,
         error: null,
@@ -330,7 +330,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -348,10 +348,13 @@ describe("Achievement Routes - Unit Tests", () => {
       });
 
       // Verify RPC was called correctly
-      expect(mockSupabase.rpc).toHaveBeenCalledWith("evaluate_achievements", {
-        p_user_id: mockUser.id,
-        p_festival_id: festivalId,
-      });
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        "evaluate_user_achievements",
+        {
+          p_user_id: mockUser.id,
+          p_festival_id: festivalId,
+        },
+      );
     });
 
     it("should handle case with no new achievements", async () => {
@@ -409,7 +412,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -455,7 +458,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -471,7 +474,7 @@ describe("Achievement Routes - Unit Tests", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -487,7 +490,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400); // Bad request
     });
@@ -517,7 +520,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(500);
     });
@@ -553,7 +556,7 @@ describe("Achievement Routes - Unit Tests", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });

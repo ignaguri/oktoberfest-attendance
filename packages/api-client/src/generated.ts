@@ -11,7 +11,85 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * List consumptions for a date
+     * @description Get all consumptions for the authenticated user on a specific date
+     */
+    get: {
+      parameters: {
+        query: {
+          festivalId: string;
+          date: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Consumptions retrieved successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              consumptions: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                attendanceId: string;
+                /** Format: uuid */
+                tentId: string | null;
+                /** @enum {string} */
+                drinkType:
+                  | "beer"
+                  | "radler"
+                  | "alcohol_free"
+                  | "wine"
+                  | "soft_drink"
+                  | "other";
+                drinkName: string | null;
+                basePriceCents: number;
+                pricePaidCents: number;
+                tipCents: number | null;
+                volumeMl: number | null;
+                /** Format: date-time */
+                recordedAt: string;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+              }[];
+            };
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
     put?: never;
     /**
      * Log a new beer or drink consumption
@@ -115,6 +193,86 @@ export interface paths {
       };
     };
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/consumption/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete a consumption
+     * @description Delete a consumption record by ID
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Consumption deleted successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              success: boolean;
+              message: string;
+            };
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description Consumption not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -323,6 +481,11 @@ export interface paths {
                 }[];
                 tentIds: string[];
                 pictureUrls: string[];
+                pictures: {
+                  /** Format: uuid */
+                  id: string;
+                  pictureUrl: string;
+                }[];
               } | null;
             };
           };
@@ -952,6 +1115,7 @@ export interface paths {
                 /** Format: uuid */
                 id: string;
                 name: string;
+                description?: string | null;
                 /** Format: uuid */
                 festivalId: string;
                 /** @enum {string} */
@@ -1020,6 +1184,7 @@ export interface paths {
               /** Format: uuid */
               id: string;
               name: string;
+              description?: string | null;
               /** Format: uuid */
               festivalId: string;
               /** @enum {string} */
@@ -1150,6 +1315,7 @@ export interface paths {
               /** Format: uuid */
               id: string;
               name: string;
+              description?: string | null;
               /** Format: uuid */
               festivalId: string;
               /** @enum {string} */
@@ -1237,6 +1403,7 @@ export interface paths {
               /** Format: uuid */
               id: string;
               name: string;
+              description?: string | null;
               /** Format: uuid */
               festivalId: string;
               /** @enum {string} */
@@ -1857,6 +2024,7 @@ export interface paths {
                 /** Format: uuid */
                 id: string;
                 name: string;
+                description?: string | null;
                 /** Format: uuid */
                 festivalId: string;
                 /** @enum {string} */
@@ -2209,12 +2377,7 @@ export interface paths {
                   /** @enum {string} */
                   rarity: "common" | "rare" | "epic" | "legendary";
                   condition: {
-                    [key: string]:
-                      | string
-                      | number
-                      | boolean
-                      | unknown
-                      | unknown;
+                    [key: string]: string | number | boolean | unknown;
                   };
                   /** Format: date-time */
                   createdAt: string;
@@ -2318,12 +2481,7 @@ export interface paths {
                   /** @enum {string} */
                   rarity: "common" | "rare" | "epic" | "legendary";
                   condition: {
-                    [key: string]:
-                      | string
-                      | number
-                      | boolean
-                      | unknown
-                      | unknown;
+                    [key: string]: string | number | boolean | unknown;
                   };
                   /** Format: date-time */
                   createdAt: string;
@@ -3083,6 +3241,200 @@ export interface paths {
         };
         /** @description Festival not found or no data available */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/wrapped/{festivalId}/access": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Check wrapped access
+     * @description Checks if the user is allowed to access wrapped data for a specific festival.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          festivalId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Access check result */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              allowed: boolean;
+              /** @enum {string} */
+              reason?: "not_ended" | "no_data" | "not_authenticated" | "error";
+              message?: string;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/wrapped/festivals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get available wrapped festivals
+     * @description Returns a list of festivals for which wrapped data is available for the user.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Available festivals list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              festivals: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                year: number;
+                status: string;
+                hasData: boolean;
+              }[];
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/wrapped/regenerate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Regenerate wrapped cache (admin only)
+     * @description Admin function to regenerate cached wrapped data for specific users or festivals.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            /** Format: uuid */
+            festivalId?: string;
+            /** Format: uuid */
+            userId?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Cache regeneration result */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              success: boolean;
+              regeneratedCount?: number;
+              error?: string;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description Forbidden - not an admin */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -4415,6 +4767,424 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/photos/settings/global": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get global photo privacy settings
+     * @description Returns user's global photo visibility settings
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Settings retrieved successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** Format: uuid */
+              userId: string;
+              hidePhotosFromAllGroups: boolean;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Update global photo privacy settings
+     * @description Updates user's global photo visibility settings
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            hidePhotosFromAllGroups: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Settings updated successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** Format: uuid */
+              userId: string;
+              hidePhotosFromAllGroups: boolean;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/photos/settings/groups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all group photo privacy settings
+     * @description Returns user's photo visibility settings for all groups
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Settings retrieved successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              settings: {
+                /** Format: uuid */
+                userId: string;
+                /** Format: uuid */
+                groupId: string;
+                groupName: string;
+                hidePhotosFromGroup: boolean;
+              }[];
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/photos/settings/groups/{groupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get group photo privacy settings
+     * @description Returns user's photo visibility settings for a specific group
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          groupId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Settings retrieved successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** Format: uuid */
+              userId: string;
+              /** Format: uuid */
+              groupId: string;
+              groupName: string;
+              hidePhotosFromGroup: boolean;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Update group photo privacy settings
+     * @description Updates user's photo visibility settings for a specific group
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          groupId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            hidePhotosFromGroup: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Settings updated successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** Format: uuid */
+              userId: string;
+              /** Format: uuid */
+              groupId: string;
+              groupName: string;
+              hidePhotosFromGroup: boolean;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/photos/{id}/visibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Update photo visibility
+     * @description Updates visibility setting for a specific photo
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            /** @enum {string} */
+            visibility: "public" | "private";
+          };
+        };
+      };
+      responses: {
+        /** @description Visibility updated successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              success: boolean;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description Photo not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/photos/visibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Bulk update photo visibility
+     * @description Updates visibility setting for multiple photos
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            photoIds: string[];
+            /** @enum {string} */
+            visibility: "public" | "private";
+          };
+        };
+      };
+      responses: {
+        /** @description Visibility updated successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              success: boolean;
+              updatedCount: number;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description Forbidden - some photos don't belong to user */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/profile": {
     parameters: {
       query?: never;
@@ -4561,6 +5331,86 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/profiles/{userId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get public profile of a user
+     * @description Returns public profile information for any user. Optionally includes festival stats when festivalId is provided.
+     */
+    get: {
+      parameters: {
+        query?: {
+          festivalId?: string;
+        };
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Profile retrieved successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              profile: {
+                /** Format: uuid */
+                id: string;
+                username: string | null;
+                fullName: string | null;
+                avatarUrl: string | null;
+                stats?: {
+                  daysAttended: number;
+                  totalBeers: number;
+                  avgBeers: number;
+                } | null;
+              };
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -4887,8 +5737,7 @@ export interface paths {
             "application/json": {
               /** Format: uri */
               uploadUrl: string;
-              /** Format: uri */
-              publicUrl: string;
+              fileName: string;
               expiresIn: number;
             };
           };
@@ -4950,7 +5799,7 @@ export interface paths {
       requestBody?: {
         content: {
           "application/json": {
-            avatarUrl: string;
+            fileName: string;
           };
         };
       };
@@ -4963,8 +5812,7 @@ export interface paths {
           content: {
             "application/json": {
               success: boolean;
-              /** Format: uri */
-              avatarUrl: string;
+              fileName: string;
             };
           };
         };
@@ -4982,6 +5830,84 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/activity-feed": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get activity feed
+     * @description Returns activity feed items for a festival with cursor-based pagination
+     */
+    get: {
+      parameters: {
+        query: {
+          festivalId: string;
+          cursor?: string;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Activity feed retrieved successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              activities: {
+                /** Format: uuid */
+                user_id: string;
+                /** Format: uuid */
+                festival_id: string;
+                /** @enum {string} */
+                activity_type:
+                  | "beer_count_update"
+                  | "tent_checkin"
+                  | "photo_upload"
+                  | "group_join"
+                  | "achievement_unlock";
+                activity_data: {
+                  [key: string]: unknown;
+                };
+                activity_time: string;
+                username: string | null;
+                full_name: string | null;
+                avatar_url: string | null;
+              }[];
+              nextCursor: string | null;
+              hasMore: boolean;
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              error: string;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;

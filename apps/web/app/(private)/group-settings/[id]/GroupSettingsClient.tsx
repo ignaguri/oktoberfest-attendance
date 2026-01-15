@@ -21,18 +21,17 @@ import {
   useRenewInviteToken,
 } from "@/hooks/useGroups";
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
-import { winningCriteriaText } from "@/lib/constants";
 import { useCurrentUser } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { groupSettingsSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GroupSettingsFormSchema } from "@prostcounter/shared/schemas";
 import { Link, Copy, Check } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { GroupSettingsFormData } from "@/lib/schemas/groups";
-import type { WinningCriteria } from "@/lib/types";
+import type { GroupSettingsForm } from "@prostcounter/shared/schemas";
+import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 
 // Winning criteria as string literals (matching API response)
 type WinningCriteriaString = "days_attended" | "total_beers" | "avg_beers";
@@ -87,8 +86,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<GroupSettingsFormData>({
-    resolver: zodResolver(groupSettingsSchema),
+  } = useForm<GroupSettingsForm>({
+    resolver: zodResolver(GroupSettingsFormSchema),
     defaultValues: {
       name: group.name,
       description: group.description || "",
@@ -99,7 +98,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const winningCriteriaId = watch("winning_criteria_id");
 
   const onSubmit = useCallback(
-    async (data: GroupSettingsFormData) => {
+    async (data: GroupSettingsForm) => {
       if (!isCreator) {
         alert(t("apiErrors.NOT_GROUP_CREATOR"));
         return;
@@ -179,9 +178,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
   return (
     <div className="w-full max-w-lg">
       <h2 className="text-2xl font-semibold">{t("groups.settings.title")}</h2>
-      <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg">
+      <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+          <h3 className="mb-4 text-lg leading-6 font-medium text-gray-900">
             {t("groups.settings.groupDetails")}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -195,7 +194,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               <Input
                 type="text"
                 id="name"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-xs"
                 disabled={!isCreator}
                 errorMsg={errors.name?.message}
                 {...register("name")}
@@ -212,7 +211,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
               <Textarea
                 id="description"
                 rows={3}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
+                className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-xs"
                 disabled={!isCreator}
                 errorMsg={errors.description?.message}
                 {...register("description")}
@@ -230,11 +229,12 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 id="winning_criteria_id"
                 options={[
                   {
-                    options: (winningCriterias ?? []).map((criteria) => ({
-                      value: criteria.id.toString(),
-                      label:
-                        winningCriteriaText[criteria.name as WinningCriteria],
-                    })),
+                    options: (winningCriterias ?? []).map(
+                      (criteria: WinningCriteriaOption) => ({
+                        value: criteria.id.toString(),
+                        label: t(`groups.winningCriteria.${criteria.name}`),
+                      }),
+                    ),
                   },
                 ]}
                 placeholder="Select winning criteria"
@@ -262,16 +262,16 @@ export default function GroupSettingsClient({ group, members }: Props) {
 
       {/* Invite Token Section */}
       {isCreator && (
-        <div className="bg-white shadow-sm overflow-hidden sm:rounded-lg mt-4">
+        <div className="mt-4 overflow-hidden bg-white shadow-sm sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            <h3 className="mb-4 text-lg leading-6 font-medium text-gray-900">
               {t("groups.settings.inviteLink")}
             </h3>
-            <div className="space-y-2 mb-4">
+            <div className="mb-4 space-y-2">
               <p className="text-sm text-gray-600">
                 {t("groups.settings.inviteLinkDescription")}
               </p>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm text-yellow-800">
+              <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
                 <p className="font-medium">
                   {t("groups.settings.tokenExpiresTitle")}
                 </p>
@@ -289,7 +289,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
                       : t("groups.settings.generatePrompt")
                   }
                   readOnly
-                  className="flex-1 text-muted-foreground"
+                  className="text-muted-foreground flex-1"
                   placeholder={t("groups.settings.generatePrompt")}
                 />
                 <Button
@@ -300,9 +300,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
                   className="px-3"
                 >
                   {copiedToClipboard ? (
-                    <Check className="w-4 h-4 text-green-600" />
+                    <Check className="h-4 w-4 text-green-600" />
                   ) : (
-                    <Copy className="w-4 h-4" />
+                    <Copy className="h-4 w-4" />
                   )}
                 </Button>
               </div>
@@ -312,9 +312,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 variant="yellow"
                 onClick={handleRegenerateToken}
                 disabled={isGeneratingToken}
-                className="flex items-center w-fit self-center"
+                className="flex w-fit items-center self-center"
               >
-                <Link className="w-4 h-4 mr-2" />
+                <Link className="mr-2 h-4 w-4" />
                 {isGeneratingToken
                   ? t("common.buttons.loading")
                   : t("groups.settings.generateButton")}
@@ -325,39 +325,39 @@ export default function GroupSettingsClient({ group, members }: Props) {
       )}
 
       <div className="mt-4">
-        <h3 className="text-xl font-semibold mb-2">
+        <h3 className="mb-2 text-xl font-semibold">
           {t("groups.settings.members")}
         </h3>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">
                 {t("profile.account.usernameLabel")}
               </th>
-              <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">
                 {t("common.labels.name")}
               </th>
               {isCreator && (
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">
                   {t("groups.settings.actions")}
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 bg-white">
             {members.map((member) => (
               <tr key={member.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
                   {member.username || "–"}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
                   {member.full_name || "–"}
                 </td>
                 {isCreator && (
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                     <Button
                       variant="ghost"
-                      className="text-red-600 hover:text-red-900 underline disabled:text-gray-400 disabled:no-underline"
+                      className="text-red-600 underline hover:text-red-900 disabled:text-gray-400 disabled:no-underline"
                       disabled={member.id === userId}
                       onClick={() => {
                         setSelectedUserId(member.id);

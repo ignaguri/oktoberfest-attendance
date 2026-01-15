@@ -16,9 +16,9 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-gray-800 shadow-sm">
-      <div className="justify-between items-center flex px-4 sm:px-8 py-2 sm:py-4">
+      <div className="flex items-center justify-between px-4 py-2 sm:px-8 sm:py-4">
         <Link
-          className="text-base sm:text-xl text-white font-bold flex items-center gap-2"
+          className="flex items-center gap-2 text-base font-bold text-white sm:text-xl"
           href={profileData ? "/home" : "/"}
         >
           <Image
@@ -31,8 +31,8 @@ export default function Navbar() {
         </Link>
 
         {loading && (
-          <div className="h-10 flex items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-600 animate-pulse" />
+          <div className="flex h-10 items-center">
+            <div className="h-8 w-8 animate-pulse rounded-full bg-gray-600" />
           </div>
         )}
 
@@ -43,7 +43,7 @@ export default function Navbar() {
               asChild
               variant="ghost"
               size="sm"
-              className="text-white hover:text-gray-600 px-2"
+              className="px-2 text-white hover:text-gray-600"
               data-tutorial="calendar-nav"
             >
               <Link href="/calendar">
@@ -65,7 +65,7 @@ export default function Navbar() {
         )}
 
         {!loading && !profileData && (
-          <div className="h-10 flex items-center">
+          <div className="flex h-10 items-center">
             <Link href="/sign-in" className="text-white">
               Sign In
             </Link>

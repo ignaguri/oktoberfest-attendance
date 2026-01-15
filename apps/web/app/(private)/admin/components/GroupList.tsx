@@ -17,9 +17,9 @@ import { apiClient } from "@/lib/api-client";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
-import { groupSchema } from "@/lib/schemas/admin";
 import { getAvatarUrl } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AdminGroupFormSchema } from "@prostcounter/shared/schemas";
 import { useQueryClient } from "@tanstack/react-query";
 import { Copy, Check, Link } from "lucide-react";
 import Image from "next/image";
@@ -27,8 +27,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { GroupFormData } from "@/lib/schemas/admin";
 import type { Tables } from "@prostcounter/db";
+import type { AdminGroupForm } from "@prostcounter/shared/schemas";
 
 import {
   updateGroup,
@@ -49,7 +49,7 @@ const GroupEditForm = ({
   copiedToClipboard,
 }: {
   group: Tables<"groups">;
-  onSubmit: (data: GroupFormData) => Promise<void>;
+  onSubmit: (data: AdminGroupForm) => Promise<void>;
   winningCriteria: Tables<"winning_criteria">[];
   members: any[];
   inviteToken: string | null;
@@ -64,8 +64,8 @@ const GroupEditForm = ({
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<GroupFormData>({
-    resolver: zodResolver(groupSchema),
+  } = useForm<AdminGroupForm>({
+    resolver: zodResolver(AdminGroupFormSchema),
     defaultValues: {
       name: group.name,
       description: group.description || "",
@@ -128,10 +128,10 @@ const GroupEditForm = ({
 
       {/* Members Section */}
       <div>
-        <Label className="block font-semibold mb-2">
+        <Label className="mb-2 block font-semibold">
           Members ({members.length})
         </Label>
-        <div className="max-h-40 overflow-y-auto border rounded-md p-2">
+        <div className="max-h-40 overflow-y-auto rounded-md border p-2">
           {members.length === 0 ? (
             <p className="text-muted-foreground text-sm">No members yet</p>
           ) : (
@@ -139,9 +139,9 @@ const GroupEditForm = ({
               {members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center gap-2 p-2 bg-muted rounded"
+                  className="bg-muted flex items-center gap-2 rounded p-2"
                 >
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full">
                     {member.profiles.avatar_url ? (
                       <Image
                         src={getAvatarUrl(member.profiles.avatar_url) || ""}
@@ -150,7 +150,7 @@ const GroupEditForm = ({
                         }
                         width={32}
                         height={32}
-                        className="w-8 h-8 rounded-full"
+                        className="h-8 w-8 rounded-full"
                       />
                     ) : (
                       <span className="text-sm font-medium">
@@ -161,12 +161,12 @@ const GroupEditForm = ({
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">
+                    <p className="text-sm font-medium">
                       {member.profiles.full_name ||
                         member.profiles.username ||
                         "Unknown User"}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Joined {new Date(member.joined_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -179,7 +179,7 @@ const GroupEditForm = ({
 
       {/* Invite Token Section */}
       <div>
-        <Label className="block font-semibold mb-2">Invite Link</Label>
+        <Label className="mb-2 block font-semibold">Invite Link</Label>
 
         <div className="space-y-3">
           <div className="flex space-x-2">
@@ -202,9 +202,9 @@ const GroupEditForm = ({
               className="px-3"
             >
               {copiedToClipboard ? (
-                <Check className="w-4 h-4 text-green-600" />
+                <Check className="h-4 w-4 text-green-600" />
               ) : (
-                <Copy className="w-4 h-4" />
+                <Copy className="h-4 w-4" />
               )}
             </Button>
           </div>
@@ -216,7 +216,7 @@ const GroupEditForm = ({
             disabled={isGeneratingToken}
             className="flex items-center"
           >
-            <Link className="w-4 h-4 mr-2" />
+            <Link className="mr-2 h-4 w-4" />
             {isGeneratingToken ? "Generating..." : "Generate New Invite Link"}
           </Button>
         </div>
@@ -327,7 +327,7 @@ const GroupList = () => {
     }
   };
 
-  async function handleUpdateGroup(data: GroupFormData) {
+  async function handleUpdateGroup(data: AdminGroupForm) {
     if (!selectedGroup) return;
     try {
       await updateGroup(selectedGroup.id, data);
@@ -365,7 +365,7 @@ const GroupList = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Group List</h2>
+      <h2 className="mb-4 text-xl font-semibold">Group List</h2>
 
       {/* New Search System */}
       <GroupSearch

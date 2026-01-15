@@ -115,7 +115,7 @@ export default function ShareImagePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
       <Button
         onClick={handleDownload}
         disabled={isGenerating}
@@ -129,7 +129,7 @@ export default function ShareImagePage() {
       {/* Centered ShareImage at proper scale */}
       <div className="flex items-center justify-center">
         <div
-          className="shadow-2xl rounded-lg overflow-hidden"
+          className="overflow-hidden rounded-lg shadow-2xl"
           style={{
             width: "1080px",
             height: "1920px",

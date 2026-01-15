@@ -191,9 +191,9 @@ export function WrappedLoading() {
 export function WrappedError({ message }: { message?: string }) {
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
-      <div className="text-center max-w-md px-6">
-        <div className="text-6xl mb-4">😕</div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h2>
+      <div className="max-w-md px-6 text-center">
+        <div className="mb-4 text-6xl">😕</div>
+        <h2 className="mb-2 text-2xl font-bold text-gray-800">Oops!</h2>
         <p className="text-gray-600">
           {message || "Something went wrong loading your wrapped"}
         </p>

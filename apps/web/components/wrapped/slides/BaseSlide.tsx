@@ -84,7 +84,7 @@ export function BaseSlide({
           opacity: 0,
         }}
         animate={controls}
-        className="size-full flex flex-col items-center justify-center"
+        className="flex size-full flex-col items-center justify-center"
         style={{
           // Only control pointer events via style to avoid CSS conflicts
           pointerEvents: isActive ? "auto" : "none",

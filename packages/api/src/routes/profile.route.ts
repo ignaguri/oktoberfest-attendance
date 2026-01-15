@@ -1,6 +1,8 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   GetProfileShortResponseSchema,
+  GetPublicProfileResponseSchema,
+  GetPublicProfileQuerySchema,
   UpdateProfileSchema,
   UpdateProfileResponseSchema,
   DeleteProfileResponseSchema,
@@ -60,6 +62,70 @@ app.openapi(getProfileRoute, async (c) => {
   const profile = await profileRepo.getProfileShort(user.id, user.email);
 
   return c.json({ profile }, 200);
+});
+
+// GET /profiles/:userId - Get public profile of a user
+const getPublicProfileRoute = createRoute({
+  method: "get",
+  path: "/profiles/{userId}",
+  tags: ["profile"],
+  summary: "Get public profile of a user",
+  description:
+    "Returns public profile information for any user. Optionally includes festival stats when festivalId is provided.",
+  request: {
+    params: z.object({
+      userId: z.string().uuid({ message: "Invalid user ID" }),
+    }),
+    query: GetPublicProfileQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Profile retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GetPublicProfileResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "User not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getPublicProfileRoute, async (c) => {
+  const { supabase } = c.var;
+  const { userId } = c.req.valid("param");
+  const { festivalId } = c.req.valid("query");
+
+  const profileRepo = new SupabaseProfileRepository(supabase);
+
+  try {
+    const profile = await profileRepo.getPublicProfile(userId, festivalId);
+    return c.json({ profile }, 200);
+  } catch {
+    return c.json({ error: "Not Found", message: "User not found" }, 404);
+  }
 });
 
 // PUT /profile - Update current user's profile
@@ -465,15 +531,15 @@ const confirmAvatarUploadRoute = createRoute({
 
 app.openapi(confirmAvatarUploadRoute, async (c) => {
   const { user, supabase } = c.var;
-  const { avatarUrl } = c.req.valid("json");
+  const { fileName } = c.req.valid("json");
 
   const profileRepo = new SupabaseProfileRepository(supabase);
-  const confirmedUrl = await profileRepo.confirmAvatarUpload(
+  const confirmedFileName = await profileRepo.confirmAvatarUpload(
     user.id,
-    avatarUrl,
+    fileName,
   );
 
-  return c.json({ success: true, avatarUrl: confirmedUrl }, 200);
+  return c.json({ success: true, fileName: confirmedFileName }, 200);
 });
 
 export default app;

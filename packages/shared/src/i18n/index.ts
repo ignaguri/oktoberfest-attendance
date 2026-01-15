@@ -1,3 +1,11 @@
+"use client";
+
+/**
+ * i18n exports for client components
+ *
+ * For server components, import from '@prostcounter/shared/i18n/core' instead.
+ */
+
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
@@ -14,7 +22,7 @@ export const resources = {
 export type TranslationResources = (typeof resources)["en"]["translation"];
 
 /**
- * Initialize i18n
+ * Initialize i18n with React bindings
  * Call this once at app startup (in layout or _app)
  */
 export function initI18n(locale = "en") {
@@ -57,6 +65,6 @@ export function getCurrentLanguage(): string {
 export const SUPPORTED_LANGUAGES = ["en"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-// Re-export react-i18next hooks and components
+// Re-export react-i18next hooks and components (client-only)
 export { useTranslation, Trans, I18nextProvider } from "react-i18next";
 export { i18n };

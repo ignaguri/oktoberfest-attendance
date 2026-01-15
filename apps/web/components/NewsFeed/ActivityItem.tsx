@@ -15,6 +15,31 @@ import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
 import type { AchievementRarity } from "@prostcounter/shared/schemas";
 import type { TFunction } from "i18next";
 
+/**
+ * Extract file path from a full Supabase storage URL or return the path as-is
+ */
+function extractFilePath(urlOrPath: string): string {
+  if (!urlOrPath.startsWith("http")) {
+    return urlOrPath;
+  }
+
+  try {
+    const url = new URL(urlOrPath);
+    const pathParts = url.pathname.split("/");
+    const bucketIndex = pathParts.indexOf("beer_pictures");
+    if (bucketIndex !== -1) {
+      return pathParts.slice(bucketIndex + 1).join("/");
+    }
+    const publicIndex = pathParts.indexOf("public");
+    if (publicIndex !== -1) {
+      return pathParts.slice(publicIndex + 2).join("/");
+    }
+    return urlOrPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
 interface ActivityItemProps {
   activity: ActivityFeedItem;
 }
@@ -100,6 +125,8 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
+    user_id,
+    festival_id,
     username,
     full_name,
     avatar_url,
@@ -116,20 +143,23 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     }
   }, [activity_time, t]);
 
-  const displayName = full_name || username || t("activityFeed.unknownUser");
+  // Show username if available, otherwise fall back to full_name
+  const displayName = username || full_name || t("activityFeed.unknownUser");
   const pictureUrl = getActivityDataValue<string | undefined>(
     activity_data,
     "picture_url",
     undefined,
   );
   const imageUrl = pictureUrl
-    ? `/api/image/${pictureUrl}?bucket=beer_pictures`
+    ? `/api/image/${encodeURIComponent(extractFilePath(pictureUrl))}?bucket=beer_pictures`
     : "";
 
   return (
-    <div className="flex items-start gap-3 py-2 border-b border-border/50 last:border-b-0">
+    <div className="border-border/50 flex items-start gap-3 border-b py-2 last:border-b-0">
       {/* User Avatar */}
       <ProfilePreview
+        userId={user_id}
+        festivalId={festival_id}
         username={username}
         fullName={full_name}
         avatarUrl={avatar_url}
@@ -146,25 +176,25 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
       </ProfilePreview>
 
       {/* Activity Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-center mb-1">
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-yellow-600">
               {getActivityIcon(activity_type)}
             </span>
-            <span className="text-sm font-medium hover:text-yellow-600 transition-colors truncate">
+            <span className="truncate text-sm font-medium transition-colors hover:text-yellow-600">
               {displayName}
             </span>
           </div>
-          <span className="text-xs text-muted-foreground">{timeAgo}</span>
+          <span className="text-muted-foreground text-xs">{timeAgo}</span>
         </div>
 
-        <p className="text-sm text-muted-foreground text-left">
+        <p className="text-muted-foreground text-left text-sm">
           {getActivityDescription(activity, t)}
         </p>
 
         {/* Additional badges for special activities */}
-        <div className="flex items-center gap-2 mt-1">
+        <div className="mt-1 flex items-center gap-2">
           {activity_type === "achievement_unlock" &&
             getActivityDataValue<string | undefined>(
               activity_data,
@@ -202,7 +232,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
             getActivityDataValue(activity_data, "beer_count", 0) > 5 && (
               <Badge
                 variant="outline"
-                className="text-xs bg-orange-100 text-orange-800 border-orange-300"
+                className="border-orange-300 bg-orange-100 text-xs text-orange-800"
               >
                 {t("activityFeed.hotStreak")}
               </Badge>
@@ -213,15 +243,16 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         {activity_type === "photo_upload" && pictureUrl && (
           <div className="mt-2">
             <div
-              className="size-16 rounded-lg overflow-hidden bg-muted relative cursor-pointer"
+              className="bg-muted relative size-16 cursor-pointer overflow-hidden rounded-lg"
               onClick={() => setSelectedImage(imageUrl)}
             >
               <Image
                 src={imageUrl}
                 alt="Activity photo"
                 fill
-                className="object-cover hover:scale-110 transition-transform"
+                className="object-cover transition-transform hover:scale-110"
                 sizes="64px"
+                unoptimized
               />
             </div>
           </div>

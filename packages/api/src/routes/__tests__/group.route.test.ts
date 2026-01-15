@@ -96,7 +96,7 @@ describe("Group Routes", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -113,7 +113,7 @@ describe("Group Routes", () => {
         body: JSON.stringify({ name: "" }), // Invalid: empty name
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(400); // Validation error
     });
 
@@ -126,7 +126,7 @@ describe("Group Routes", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(400);
     });
 
@@ -141,7 +141,7 @@ describe("Group Routes", () => {
         }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(401);
     });
   });
@@ -192,7 +192,7 @@ describe("Group Routes", () => {
       const req = createAuthRequest(
         "/groups?festivalId=223e4567-e89b-12d3-a456-426614174000",
       );
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       const json = (await res.json()) as { data: GroupWithMembers[] };
 
       expect(res.status).toBe(200);
@@ -208,14 +208,14 @@ describe("Group Routes", () => {
       const req = createAuthRequest(
         "/groups?festivalId=623e4567-e89b-12d3-a456-426614174000",
       );
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
     });
 
     it("should require authentication", async () => {
       const req = new Request("http://localhost/groups");
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(401);
     });
   });
@@ -251,7 +251,7 @@ describe("Group Routes", () => {
       const req = createAuthRequest(
         "/groups/723e4567-e89b-12d3-a456-426614174000",
       );
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -270,14 +270,14 @@ describe("Group Routes", () => {
       const req = createAuthRequest(
         "/groups/823e4567-e89b-12d3-a456-426614174000",
       );
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(404);
     });
 
     it("should validate group ID format", async () => {
       const req = createAuthRequest("/groups/invalid-uuid");
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -327,7 +327,7 @@ describe("Group Routes", () => {
         },
       );
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -348,7 +348,7 @@ describe("Group Routes", () => {
         },
       );
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(404);
     });
 
@@ -358,7 +358,7 @@ describe("Group Routes", () => {
         body: JSON.stringify({}),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(400);
     });
   });
@@ -406,7 +406,7 @@ describe("Group Routes", () => {
         },
       );
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -445,7 +445,7 @@ describe("Group Routes", () => {
         },
       );
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
       expect(res.status).toBe(403); // ForbiddenError when not a member
     });
   });

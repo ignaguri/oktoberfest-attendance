@@ -261,7 +261,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({ force: false }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -310,7 +310,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({ force: true }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -360,7 +360,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({ force: false }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
@@ -401,7 +401,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({}), // Empty object - force defaults to false
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
       expect(mockWrappedService.generateWrapped).toHaveBeenCalledWith(
@@ -420,7 +420,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({ force: false }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
@@ -440,7 +440,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({ force: false }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(404);
     });
@@ -460,7 +460,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         body: JSON.stringify({ force: false }),
       });
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(404);
     });
@@ -494,7 +494,7 @@ describe("Wrapped Routes - Unit Tests", () => {
         },
       );
 
-      const res = await app.request(req);
+      const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
     });

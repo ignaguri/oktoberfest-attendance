@@ -5,15 +5,15 @@ import { Input } from "@/components/ui/input";
 import { useFestival } from "@/contexts/FestivalContext";
 import { useCreateGroup } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { createGroupSchema } from "@/lib/schemas/groups";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CreateGroupFormSchema } from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { CreateGroupFormData } from "@/lib/schemas/groups";
+import type { CreateGroupForm as CreateGroupFormData } from "@prostcounter/shared/schemas";
 
 export const CreateGroupForm = () => {
   const { t } = useTranslation();
@@ -27,7 +27,7 @@ export const CreateGroupForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<CreateGroupFormData>({
-    resolver: zodResolver(createGroupSchema),
+    resolver: zodResolver(CreateGroupFormSchema),
   });
 
   const onSubmit = async (data: CreateGroupFormData) => {
@@ -53,7 +53,7 @@ export const CreateGroupForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-2 flex flex-col gap-2"
+      className="flex flex-col gap-2 space-y-2"
     >
       <h3 className="text-xl font-semibold">{t("groups.create.title")}</h3>
       <Input
@@ -74,7 +74,7 @@ export const CreateGroupForm = () => {
             type="button"
             variant="ghost"
             onClick={() => setShowPassword(!showPassword)}
-            className="h-auto p-0 text-gray-400 cursor-pointer hover:bg-transparent"
+            className="h-auto cursor-pointer p-0 text-gray-400 hover:bg-transparent"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>

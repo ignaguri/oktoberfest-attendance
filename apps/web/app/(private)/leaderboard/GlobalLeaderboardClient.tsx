@@ -5,12 +5,13 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Label } from "@/components/ui/label";
 import { useFestival } from "@/contexts/FestivalContext";
-import { winningCriteriaText } from "@/lib/constants";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import { WinningCriteria } from "@/lib/types";
 import { useState, useEffect, useMemo, startTransition } from "react";
 import { toast } from "sonner";
+
+import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 
 export default function GlobalLeaderboardClient() {
   const { t } = useTranslation();
@@ -61,18 +62,15 @@ export default function GlobalLeaderboardClient() {
 
   const criteriaOptions = useMemo(
     () =>
-      winningCriterias?.map((criteria) => ({
+      winningCriterias?.map((criteria: WinningCriteriaOption) => ({
         value: criteria.id.toString(),
-        label:
-          winningCriteriaText[
-            criteria.name as keyof typeof winningCriteriaText
-          ],
+        label: t(`groups.winningCriteria.${criteria.name}`),
       })) || [],
-    [winningCriterias],
+    [winningCriterias, t],
   );
 
   const selectedCriteria = winningCriterias?.find(
-    (c) => c.id === winningCriteriaId,
+    (c: WinningCriteriaOption) => c.id === winningCriteriaId,
   );
 
   // Show loading state
@@ -104,7 +102,7 @@ export default function GlobalLeaderboardClient() {
             const newCriteriaId = Number(option.value);
             setWinningCriteriaId(newCriteriaId);
             const criteria = winningCriterias?.find(
-              (c) => c.id === newCriteriaId,
+              (c: WinningCriteriaOption) => c.id === newCriteriaId,
             );
             if (criteria) {
               setWinningCriteria(criteria.name as WinningCriteria);
@@ -118,6 +116,7 @@ export default function GlobalLeaderboardClient() {
           entries={leaderboardData}
           showGroupCount
           winningCriteria={winningCriteria}
+          festivalId={currentFestival?.id}
         />
       )}
     </div>

@@ -182,7 +182,7 @@ export default function FestivalManagement() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Festival Management</h2>
         <Button onClick={handleNewFestival} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           New Festival
         </Button>
       </div>
@@ -197,7 +197,7 @@ export default function FestivalManagement() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <Label htmlFor="name">Festival Name</Label>
                   <Input
@@ -381,7 +381,7 @@ export default function FestivalManagement() {
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="mb-2 flex items-center gap-3">
                     <h3 className="text-lg font-semibold">{festival.name}</h3>
                     <span
                       className={`text-sm font-medium capitalize ${getFestivalStatusColor(festival.status)}`}
@@ -389,7 +389,7 @@ export default function FestivalManagement() {
                       {festival.status}
                     </span>
                     {festival.is_active && (
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800">
                         Active
                       </span>
                     )}
@@ -397,7 +397,7 @@ export default function FestivalManagement() {
 
                   <div className="space-y-1 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="h-4 w-4" />
                       <span>
                         {format(parseISO(festival.start_date), "MMM d, yyyy")} -{" "}
                         {format(parseISO(festival.end_date), "MMM d, yyyy")}
@@ -408,21 +408,21 @@ export default function FestivalManagement() {
                       {festival.festival_type.replace("_", " ")}
                     </div>
                     {festival.description && (
-                      <div className="text-gray-500 mt-2">
+                      <div className="mt-2 text-gray-500">
                         {festival.description}
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="ml-4 flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleEdit(festival)}
                     className="flex items-center gap-1"
                   >
-                    <Edit className="w-3 h-3" />
+                    <Edit className="h-3 w-3" />
                     Edit
                   </Button>
                   <Button
@@ -431,7 +431,7 @@ export default function FestivalManagement() {
                     onClick={() => handleDelete(festival.id, festival.name)}
                     className="flex items-center gap-1"
                   >
-                    <Trash2 className="w-3 h-3" />
+                    <Trash2 className="h-3 w-3" />
                     Delete
                   </Button>
                 </div>
