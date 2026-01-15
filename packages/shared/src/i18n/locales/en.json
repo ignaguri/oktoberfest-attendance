@@ -24,6 +24,10 @@
       "goHome": "Go to Home",
       "tryAgain": "Try Again"
     },
+    "actions": {
+      "retry": "Retry",
+      "pullToRefresh": "Pull to refresh"
+    },
     "labels": {
       "name": "Name",
       "email": "Email",
@@ -175,12 +179,20 @@
     "yourGroups": "Your Groups:",
     "noGroupsYet": "You are not a member of any group yet for this festival.",
     "joinOrCreate": "Join or Create a Group",
+    "memberCount": "{{count}} member",
+    "memberCount_other": "{{count}} members",
     "detail": {
       "title": "Group Details",
-      "notFound": "Group not found"
+      "notFound": "Group not found",
+      "location": "Location",
+      "viewMembers": "View Members",
+      "leaderboard": "Leaderboard",
+      "noMembers": "No members yet"
     },
     "qrCode": {
-      "title": "QR Code"
+      "title": "QR Code",
+      "scanToJoin": "Scan to join {{groupName}}",
+      "shareQR": "Share QR Code"
     },
     "create": {
       "title": "Create Group",
@@ -189,6 +201,9 @@
       "passwordLabel": "Group Password (optional)",
       "passwordPlaceholder": "Enter password",
       "winningCriteria": "Winning Criteria",
+      "criteriaLabel": "Competition Type",
+      "criteriaPlaceholder": "Select competition type",
+      "criteriaHelp": "How will the winner be determined?",
       "submit": "Create Group",
       "success": "Group created successfully!",
       "errors": {
@@ -217,6 +232,7 @@
       "passwordHint": "Ask a group member for the password",
       "tokenHint": "Paste the invite link shared with you",
       "searchPlaceholder": "Search by group name",
+      "searchPrompt": "Enter a group name to search",
       "error": "Failed to join group. Please check the password and try again.",
       "errors": {
         "failed": "Failed to join group",
@@ -251,12 +267,36 @@
       "confirmRemoveDescription": "Are you sure you want to remove this member?",
       "removeSuccess": "Member removed successfully",
       "actions": "Actions",
-      "kickOut": "Kick out"
+      "kickOut": "Kick out",
+      "groupName": "Group Name",
+      "winningCriteria": "Competition Type",
+      "deleteGroup": "Delete Group",
+      "deleteGroupDescription": "Permanently delete this group and all its data",
+      "deleteConfirmTitle": "Delete Group?",
+      "deleteConfirmMessage": "This action cannot be undone. All group data will be permanently deleted.",
+      "updating": "Updating...",
+      "updateSuccess": "Group settings updated",
+      "updateError": "Failed to update group settings",
+      "deleteSuccess": "Group deleted successfully",
+      "deleteError": "Failed to delete group",
+      "dangerZone": "Danger Zone"
+    },
+    "share": {
+      "title": "Invite Members",
+      "inviteLink": "Invite Link",
+      "copyLink": "Copy Link",
+      "shareLink": "Share Link",
+      "linkCopied": "Link copied to clipboard"
     },
     "winningCriteria": {
       "days_attended": "Most Days Attended",
       "total_beers": "Most Beers Drank",
       "avg_beers": "Best Average Beers per Day"
+    },
+    "criteria": {
+      "daysAttended": "Most Days Attended",
+      "totalBeers": "Most Beers Drank",
+      "avgBeers": "Best Average Beers per Day"
     },
     "gallery": {
       "title": "Group Gallery",
@@ -270,8 +310,12 @@
       "controlNote": "Control which groups can see your location in your"
     },
     "members": {
+      "title": "Members",
       "empty": "No members yet",
-      "you": "You"
+      "you": "You",
+      "admin": "Admin",
+      "removeConfirmTitle": "Remove Member?",
+      "removeConfirmMessage": "Are you sure you want to remove this member from the group?"
     },
     "deepLink": {
       "joining": "Joining group...",
@@ -293,7 +337,8 @@
       "create": "Create",
       "share": "Share",
       "qrCode": "QR Code",
-      "gallery": "Gallery"
+      "gallery": "Gallery",
+      "settings": "Settings"
     },
     "empty": {
       "title": "No groups yet",
@@ -358,7 +403,9 @@
       "addTitle": "Add Attendance",
       "selectTents": "Select tents...",
       "photos": "Photos",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "deleteConfirmTitle": "Delete Attendance?",
+      "deleteConfirmMessage": "This will permanently delete this attendance record. This action cannot be undone."
     },
     "delete": {
       "title": "Confirm Deletion",
@@ -487,6 +534,15 @@
     "empty": "No rankings yet",
     "emptyDescription": "Be the first to track your attendance!",
     "noName": "No name",
+    "loading": "Loading leaderboard...",
+    "noFestival": "Please select a festival to view the leaderboard",
+    "error": "Failed to load leaderboard",
+    "header": {
+      "player": "Player"
+    },
+    "userDetail": {
+      "title": "User Stats"
+    },
     "stats": {
       "days": "Days",
       "drinks": "Drinks",
@@ -934,7 +990,9 @@
     },
     "activityFeed": {
       "title": "Latest Activities",
-      "empty": "No activities yet. Start logging your festival adventures!"
+      "empty": "No activities yet. Start logging your festival adventures!",
+      "loadMore": "Load More",
+      "error": "Failed to load activity feed"
     },
     "festivalOver": "Sadly, {{name}} is over. See you next time!",
     "wrappedReady": {
@@ -962,7 +1020,7 @@
     "baseCost": "Base",
     "tips": "Tips",
     "mapLink": {
-      "title": "Map"
+      "title": "{{festivalName}} Map"
     }
   },
   "search": {
