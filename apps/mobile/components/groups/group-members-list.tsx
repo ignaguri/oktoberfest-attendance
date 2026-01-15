@@ -1,3 +1,10 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import { format } from "date-fns";
+import { UserMinus, Crown, Users } from "lucide-react-native";
+
+import type { GroupMember } from "@prostcounter/shared/schemas";
+
 import {
   Avatar,
   AvatarFallbackText,
@@ -9,11 +16,6 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { format } from "date-fns";
-import { UserMinus, Crown, Users } from "lucide-react-native";
-
-import type { GroupMember } from "@prostcounter/shared/schemas";
 
 interface GroupMembersListProps {
   members: GroupMember[];
@@ -68,7 +70,7 @@ export function GroupMembersList({
             key={member.userId}
             variant="outline"
             size="sm"
-            className={isCurrentUser ? "border-primary-200 bg-primary-50" : ""}
+            className={cn(isCurrentUser && "border-primary-200 bg-primary-50")}
           >
             <HStack className="items-center justify-between">
               <HStack space="md" className="flex-1 items-center">
@@ -83,7 +85,11 @@ export function GroupMembersList({
                 <VStack className="flex-1">
                   <HStack space="xs" className="items-center">
                     <Text
-                      className={`font-medium ${isCurrentUser ? "text-primary-600" : "text-typography-900"}`}
+                      className={cn(
+                        "font-medium",
+                        isCurrentUser && "text-primary-600",
+                        !isCurrentUser && "text-typography-900",
+                      )}
                       numberOfLines={1}
                     >
                       {displayName}

@@ -1,3 +1,10 @@
+import { useRenewInviteToken } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import Constants from "expo-constants";
+import { QrCode, RefreshCw } from "lucide-react-native";
+import { useState, useCallback, useEffect } from "react";
+import QRCode from "react-native-qrcode-svg";
+
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -12,12 +19,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useRenewInviteToken } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import Constants from "expo-constants";
-import { QrCode, RefreshCw } from "lucide-react-native";
-import { useState, useCallback, useEffect } from "react";
-import QRCode from "react-native-qrcode-svg";
 
 interface QRCodeSheetProps {
   isOpen: boolean;
@@ -29,12 +30,13 @@ interface QRCodeSheetProps {
 
 /**
  * Get the app URL for the QR code join link
+ * TODO: Move this to a shared utility function
  */
 function getAppUrl(): string {
   return (
     Constants.expoConfig?.extra?.appUrl ||
     process.env.EXPO_PUBLIC_APP_URL ||
-    "https://prostcounter.com"
+    "https://prostcounter.fun"
   );
 }
 

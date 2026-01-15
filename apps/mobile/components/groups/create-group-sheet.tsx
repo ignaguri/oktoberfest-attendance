@@ -1,3 +1,11 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateGroup } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { X } from "lucide-react-native";
+import { useCallback } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -25,13 +33,6 @@ import {
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateGroup } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { X } from "lucide-react-native";
-import { useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
 
 // Form validation schema
 const CreateGroupFormSchema = z.object({

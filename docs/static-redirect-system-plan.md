@@ -33,7 +33,7 @@ Change external URLs to internal redirect paths:
 - **Clean URLs**: `/r/bugs` instead of external domains
 - **Future Flexibility**: Easy to change destinations without app updates
 - **Analytics Ready**: Foundation for tracking external link clicks
-- **Consistent Branding**: All URLs start with prostcounter.com
+- **Consistent Branding**: All URLs start with prostcounter.fun
 - **URL Ownership**: Control over all redirect destinations
 
 ### 4. Implementation Details
