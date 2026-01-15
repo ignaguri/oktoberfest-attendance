@@ -1,10 +1,3 @@
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn } from "@prostcounter/ui";
-import { format } from "date-fns";
-import { UserMinus, Crown, Users } from "lucide-react-native";
-
-import type { GroupMember } from "@prostcounter/shared/schemas";
-
 import {
   Avatar,
   AvatarFallbackText,
@@ -16,6 +9,12 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import { format } from "date-fns";
+import { UserMinus, Crown, Users } from "lucide-react-native";
+
+import type { GroupMember } from "@prostcounter/shared/schemas";
 
 interface GroupMembersListProps {
   members: GroupMember[];

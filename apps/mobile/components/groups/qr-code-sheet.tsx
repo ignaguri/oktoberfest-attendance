@@ -1,10 +1,3 @@
-import { getAppUrl } from "@prostcounter/shared";
-import { useRenewInviteToken } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { QrCode, RefreshCw } from "lucide-react-native";
-import { useState, useCallback, useEffect } from "react";
-import QRCode from "react-native-qrcode-svg";
-
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -19,6 +12,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { getAppUrl } from "@prostcounter/shared";
+import { useRenewInviteToken } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { QrCode, RefreshCw } from "lucide-react-native";
+import { useState, useCallback, useEffect } from "react";
+import QRCode from "react-native-qrcode-svg";
 
 interface QRCodeSheetProps {
   isOpen: boolean;
