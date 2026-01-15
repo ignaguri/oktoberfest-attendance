@@ -391,9 +391,13 @@
       "rare": "Rare",
       "epic": "Epic",
       "legendary": "Legendary"
-    }
+    },
+    "viewMyAchievements": "See my achievements",
+    "viewProgress": "View your progress and unlocked badges"
   },
   "leaderboard": {
+    "screenTitle": "Achievements & Leaderboard",
+    "festivalLeaderboard": "{{festivalName}} Leaderboard",
     "pageTitle": "Leaderboard",
     "global": "Global",
     "globalTitle": "Global Leaderboard",

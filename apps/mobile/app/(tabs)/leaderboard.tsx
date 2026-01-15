@@ -1,4 +1,5 @@
 import { Leaderboard, type SortOrder } from "@/components/shared/leaderboard";
+import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -11,9 +12,9 @@ import { useFestival } from "@/lib/festival/FestivalContext";
 import { useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
-import { Award, Trophy } from "lucide-react-native";
+import { Award, ChevronRight, Trophy } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView } from "react-native";
+import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
 
 import type { WinningCriteria } from "@prostcounter/shared/schemas";
 
@@ -157,28 +158,49 @@ export default function LeaderboardScreen() {
       }
     >
       <VStack space="md" className="p-4 pb-8">
-        {/* Header */}
-        <HStack className="items-center justify-between">
-          <HStack space="sm" className="items-center">
-            <Trophy size={24} color={Colors.primary[500]} />
-            <Heading size="lg" className="text-typography-900">
-              {currentFestival.name}
-            </Heading>
-          </HStack>
-          <Pressable
-            onPress={() => router.push("/achievements")}
-            className="rounded-lg bg-primary-100 px-3 py-2"
-            accessibilityLabel={t("achievements.pageTitle", {
-              defaultValue: "Achievements",
-            })}
-          >
-            <HStack space="xs" className="items-center">
-              <Award size={18} color={Colors.primary[600]} />
-              <Text className="text-sm font-medium text-primary-700">
-                {t("achievements.pageTitle", { defaultValue: "Achievements" })}
-              </Text>
+        {/* Achievements Section */}
+        <Pressable
+          onPress={() => router.push("/achievements")}
+          className="rounded-xl bg-primary-100 px-4 py-4"
+          accessibilityLabel={t("achievements.viewMyAchievements", {
+            defaultValue: "See my achievements",
+          })}
+          accessibilityRole="button"
+        >
+          <HStack className="items-center justify-between">
+            <HStack space="md" className="items-center">
+              <Box className="rounded-full bg-primary-200 p-2">
+                <Award size={24} color={Colors.primary[600]} />
+              </Box>
+              <VStack>
+                <Text className="text-base font-semibold text-primary-800">
+                  {t("achievements.viewMyAchievements", {
+                    defaultValue: "See my achievements",
+                  })}
+                </Text>
+                <Text className="text-sm text-primary-600">
+                  {t("achievements.viewProgress", {
+                    defaultValue: "View your progress and unlocked badges",
+                  })}
+                </Text>
+              </VStack>
             </HStack>
-          </Pressable>
+            <ChevronRight size={24} color={Colors.primary[600]} />
+          </HStack>
+        </Pressable>
+
+        {/* Divider */}
+        <View className="my-1 h-px bg-outline-200" />
+
+        {/* Leaderboard Section Header */}
+        <HStack space="sm" className="items-center">
+          <Trophy size={24} color={Colors.primary[500]} />
+          <Heading size="lg" className="text-typography-900">
+            {t("leaderboard.festivalLeaderboard", {
+              defaultValue: "{{festivalName}} Leaderboard",
+              festivalName: currentFestival.name,
+            })}
+          </Heading>
         </HStack>
 
         {/* Leaderboard with sortable columns */}
