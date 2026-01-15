@@ -181,6 +181,8 @@
     "joinOrCreate": "Join or Create a Group",
     "memberCount": "{{count}} member",
     "memberCount_other": "{{count}} members",
+    "createSuccess": "Group created successfully!",
+    "joinSuccess": "Successfully joined group!",
     "detail": {
       "title": "Group Details",
       "notFound": "Group not found",
@@ -191,8 +193,12 @@
     },
     "qrCode": {
       "title": "QR Code",
+      "description": "Share this QR code with friends to let them join {{groupName}}",
       "scanToJoin": "Scan to join {{groupName}}",
-      "shareQR": "Share QR Code"
+      "shareQR": "Share QR Code",
+      "generating": "Generating QR code...",
+      "helper": "Friends can scan this code to join your group instantly",
+      "regenerate": "Regenerate QR Code"
     },
     "create": {
       "title": "Create Group",
@@ -286,7 +292,9 @@
       "inviteLink": "Invite Link",
       "copyLink": "Copy Link",
       "shareLink": "Share Link",
-      "linkCopied": "Link copied to clipboard"
+      "linkCopied": "Link copied to clipboard",
+      "message": "Join my group '{{groupName}}' on ProstCounter! {{inviteUrl}}",
+      "noToken": "No invite token available. Please regenerate the invite link."
     },
     "winningCriteria": {
       "days_attended": "Most Days Attended",
@@ -300,9 +308,12 @@
     },
     "gallery": {
       "title": "Group Gallery",
+      "titleWithName": "{{groupName}} Gallery",
       "loading": "Loading gallery...",
-      "empty": "No photos yet",
-      "emptyDescription": "Upload photos from your attendance to see them here"
+      "empty": {
+        "title": "No photos yet",
+        "description": "Group members' beer photos will appear here"
+      }
     },
     "location": {
       "title": "Group's live location",
@@ -463,6 +474,7 @@
   },
   "achievements": {
     "pageTitle": "Achievements",
+    "loading": "Loading achievements...",
     "totalPoints": "Total Points",
     "unlocked": "Unlocked",
     "locked": "Locked",
@@ -595,16 +607,31 @@
     },
     "changePassword": {
       "title": "Change Password",
+      "info": "Enter your new password below. Make sure it's secure and memorable.",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "submit": "Update Password",
       "success": "Password updated successfully",
       "error": "Failed to update password"
     },
     "notifications": {
       "title": "Notifications",
       "description": "Configure push notifications",
+      "preferences": "Notification Preferences",
       "push": "Push Notifications",
+      "pushTitle": "Push Notifications",
+      "pushDescription": "Receive notifications even when the app is closed",
+      "pushComingSoon": "Push notifications are coming soon!",
       "achievements": "Achievement Notifications",
+      "achievementsDescription": "Get notified when you unlock achievements",
+      "groups": "Group Notifications",
+      "groupsDescription": "Get notifications from your groups (check-ins, achievements, etc.)",
       "groupActivity": "Group Activity",
       "reminders": "Reminders",
+      "remindersDescription": "Reservation reminders and check-in prompts",
+      "info": "You can change your notification preferences at any time",
       "updateError": "Failed to update notification settings"
     },
     "privacy": {
@@ -636,8 +663,10 @@
     "tutorial": {
       "title": "Tutorial",
       "description": "Reset the app tutorial to see it again on your next visit to the home page.",
+      "button": "Reset Tutorial",
       "resetButton": "Reset Tutorial",
-      "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page."
+      "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page.",
+      "resetError": "Failed to reset tutorial. Please try again."
     },
     "languageSettings": {
       "title": "Language",
