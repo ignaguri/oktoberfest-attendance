@@ -12,6 +12,7 @@
     "ios:clean": "expo prebuild --clean && expo run:ios",
     "web": "expo start --web",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "prebuild": "expo prebuild"
   },
