@@ -9,6 +9,9 @@ import {
   useQuery,
   useMutation,
   useInvalidateQueries,
+  useSetQueryData,
+  useGetQueryData,
+  useCancelQueries,
   QueryKeys,
 } from "../data";
 
@@ -28,8 +31,9 @@ export function useUserGroups(festivalId?: string) {
     },
     {
       enabled: !!festivalId,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 2 * 60 * 1000, // 2 minutes - group list changes moderately
       gcTime: 10 * 60 * 1000, // 10 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
@@ -47,7 +51,7 @@ export function useGroupSettings(groupId: string) {
     },
     {
       enabled: !!groupId,
-      staleTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 5 * 60 * 1000, // 5 minutes - admin settings change occasionally
       gcTime: 30 * 60 * 1000, // 30 minutes cache
       retry: 2,
     },
@@ -85,9 +89,8 @@ export function useCreateGroup() {
         if (variables.festivalId) {
           invalidateQueries(["groups", variables.festivalId]);
         }
-        // Also invalidate general user and groups queries
-        invalidateQueries(["user"]);
-        invalidateQueries(["groups"]);
+        // Invalidate activity feed (group creation appears in feed)
+        invalidateQueries(["activity-feed"]);
       },
     },
   );
@@ -139,6 +142,8 @@ export function useJoinGroup() {
         // Invalidate all groups queries
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
+        // Invalidate activity feed (joining group appears in feed)
+        invalidateQueries(["activity-feed"]);
       },
     },
   );
@@ -163,6 +168,8 @@ export function useJoinGroupByToken() {
         // Invalidate all groups queries
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
+        // Invalidate activity feed (joining group appears in feed)
+        invalidateQueries(["activity-feed"]);
       },
     },
   );
@@ -195,35 +202,99 @@ export function useUpdateGroup() {
         invalidateQueries(["group", groupId]);
         // Invalidate user groups
         invalidateQueries(["user", "current", "groups"]);
-        // Invalidate all groups and user queries as fallback
-        invalidateQueries(["user"]);
-        invalidateQueries(["groups"]);
+        // Invalidate activity feed (group updates appear in feed)
+        invalidateQueries(["activity-feed"]);
       },
     },
   );
 }
 
+// Type for group cache data (used for optimistic updates)
+type GroupCacheData = {
+  id: string;
+  name: string;
+  description?: string | null;
+  festivalId: string;
+  winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+  inviteToken: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  memberCount: number;
+  isMember?: boolean;
+};
+
 /**
- * Hook to leave a group
+ * Hook to leave a group with optimistic updates
  */
 export function useLeaveGroup() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
+  const cancelQueries = useCancelQueries();
 
-  return useMutation(
-    async ({ groupId }: { groupId: string; userId: string }) => {
+  return useMutation<
+    unknown,
+    { groupId: string; userId: string; festivalId?: string },
+    { previousGroups: GroupCacheData[] | undefined; festivalId: string | null }
+  >(
+    async ({ groupId }) => {
       return await apiClient.groups.leave(groupId);
     },
     {
-      onSuccess: (_data, { groupId }) => {
-        // Invalidate specific group and its members
+      onMutate: async ({ groupId, festivalId }) => {
+        // Cancel any outgoing refetches
+        await cancelQueries(["user", "current", "groups"]);
+
+        // Get the festivalId from the group cache if not provided
+        let targetFestivalId = festivalId || null;
+        if (!targetFestivalId) {
+          const groupData = getQueryData<{ data: GroupCacheData }>(
+            QueryKeys.group(groupId),
+          );
+          targetFestivalId = groupData?.data?.festivalId || null;
+        }
+
+        // Snapshot the previous groups
+        let previousGroups: GroupCacheData[] | undefined;
+        if (targetFestivalId) {
+          previousGroups = getQueryData<GroupCacheData[]>(
+            QueryKeys.userGroups("current", targetFestivalId),
+          );
+
+          // Optimistically remove the group from the list
+          if (previousGroups) {
+            setQueryData<GroupCacheData[]>(
+              QueryKeys.userGroups("current", targetFestivalId),
+              previousGroups.filter((g) => g.id !== groupId),
+            );
+          }
+        }
+
+        return { previousGroups, festivalId: targetFestivalId };
+      },
+      onError: (_error, _variables, context) => {
+        // Rollback on error
+        if (context?.previousGroups && context?.festivalId) {
+          setQueryData<GroupCacheData[]>(
+            QueryKeys.userGroups("current", context.festivalId),
+            context.previousGroups,
+          );
+        }
+      },
+      onSettled: (_data, _error, variables) => {
+        if (!variables) return;
+        const { groupId } = variables;
+        // Always invalidate to ensure cache is in sync
         invalidateQueries(["group", groupId]);
         invalidateQueries(["group", groupId, "members"]);
-        // Invalidate user groups
         invalidateQueries(["user", "current", "groups"]);
-        // Invalidate all groups and user queries as fallback
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
+        invalidateQueries(["leaderboard", "group", groupId]);
+        invalidateQueries(QueryKeys.groupGallery(groupId));
+        invalidateQueries(["activity-feed"]);
       },
     },
   );
@@ -269,8 +340,9 @@ export function useGroupMembers(groupId: string) {
     },
     {
       enabled: !!groupId,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 2 * 60 * 1000, // 2 minutes - members join/leave moderately
       gcTime: 15 * 60 * 1000, // 15 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
@@ -292,8 +364,8 @@ export function useRemoveMember() {
         invalidateQueries(QueryKeys.groupMembers(groupId));
         // Invalidate group details
         invalidateQueries(QueryKeys.group(groupId));
-        // Invalidate leaderboards that might be affected
-        invalidateQueries(["leaderboard"]);
+        // Invalidate group leaderboards only (more specific than all leaderboards)
+        invalidateQueries(["leaderboard", "group", groupId]);
       },
     },
   );

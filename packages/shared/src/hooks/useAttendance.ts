@@ -77,7 +77,7 @@ export function useAttendanceByDate(festivalId: string, date: string) {
     },
     {
       enabled: !!festivalId && !!date,
-      staleTime: 30 * 1000, // 30 seconds - may change while editing
+      staleTime: 15 * 1000, // 15 seconds - frequently edited during festival
       gcTime: 5 * 60 * 1000, // 5 minutes cache
     },
   );

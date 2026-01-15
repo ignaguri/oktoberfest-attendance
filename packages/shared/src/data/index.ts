@@ -24,6 +24,7 @@ export {
   useInvalidateQueries,
   useSetQueryData,
   useGetQueryData,
+  useCancelQueries,
 } from "./react-query-provider";
 
 // API Client context for shared hooks

@@ -5,6 +5,9 @@
  * upload flow (signed URL, storage upload, confirmation).
  */
 
+import { useInvalidateQueries } from "@prostcounter/shared/data";
+import { QueryKeys } from "@prostcounter/shared/data";
+
 import { apiClient } from "@/lib/api-client";
 
 import { useImageUpload, type ImageSource } from "./useImageUpload";
@@ -26,6 +29,7 @@ export function useAvatarUpload({
   onSuccess,
   onError,
 }: UseAvatarUploadOptions = {}): UseAvatarUploadReturn {
+  const invalidateQueries = useInvalidateQueries();
   const { pickImages, isUploading, setIsUploading, error, showError } =
     useImageUpload({
       onError,
@@ -70,6 +74,9 @@ export function useAvatarUpload({
 
       // Step 3: Confirm upload with just the filename
       await apiClient.profile.confirmAvatarUpload(fileName);
+
+      // Invalidate profile query to refetch updated avatar
+      invalidateQueries(QueryKeys.profile());
 
       onSuccess?.(fileName);
     } catch (err) {

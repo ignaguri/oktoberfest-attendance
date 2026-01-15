@@ -24,8 +24,9 @@ export function useActivityFeed(festivalId?: string, cursor?: string) {
     () => apiClient.activityFeed.get({ festivalId: festivalId!, cursor }),
     {
       enabled: !!festivalId,
-      staleTime: 30 * 1000, // 30 seconds - activity feed should be relatively fresh
+      staleTime: 10 * 1000, // 10 seconds - real-time activity updates
       gcTime: 5 * 60 * 1000, // 5 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
@@ -49,8 +50,9 @@ export function useActivityFeedItems(festivalId?: string) {
       }),
     {
       enabled: !!festivalId,
-      staleTime: 30 * 1000, // 30 seconds - activity feed should be relatively fresh
+      staleTime: 10 * 1000, // 10 seconds - real-time activity updates
       gcTime: 5 * 60 * 1000, // 5 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 

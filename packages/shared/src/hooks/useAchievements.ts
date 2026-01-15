@@ -20,8 +20,9 @@ export function useUserAchievements(festivalId?: string) {
     },
     {
       enabled: !!festivalId,
-      staleTime: 2 * 60 * 1000, // 2 minutes - achievements can change based on activity
+      staleTime: 1 * 60 * 1000, // 1 minute - achievements unlock during festival
       gcTime: 10 * 60 * 1000, // 10 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
@@ -46,8 +47,9 @@ export function useAchievementsWithProgress(festivalId?: string) {
     },
     {
       enabled: !!festivalId,
-      staleTime: 2 * 60 * 1000, // 2 minutes
+      staleTime: 1 * 60 * 1000, // 1 minute - show fresh progress
       gcTime: 10 * 60 * 1000, // 10 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
@@ -66,8 +68,9 @@ export function useAchievementLeaderboard(festivalId?: string) {
     },
     {
       enabled: !!festivalId,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 2 * 60 * 1000, // 2 minutes - competitive achievement rankings
       gcTime: 15 * 60 * 1000, // 15 minutes cache
+      refetchOnWindowFocus: true, // Refresh when returning to tab
     },
   );
 }
