@@ -280,7 +280,9 @@ type IActionsheetSectionListProps = VariantProps<
 type IActionsheetSectionHeaderTextProps = VariantProps<
   typeof actionsheetSectionHeaderTextStyle
 > &
-  React.ComponentPropsWithoutRef<typeof UIActionsheet.SectionHeaderText>;
+  React.ComponentPropsWithoutRef<typeof UIActionsheet.SectionHeaderText> & {
+    className?: string;
+  };
 
 type IActionsheetIconProps = VariantProps<typeof actionsheetIconStyle> &
   React.ComponentPropsWithoutRef<typeof UIActionsheet.Icon> & {
@@ -500,6 +502,7 @@ const ActionsheetSectionHeaderText = React.forwardRef<
 ) {
   return (
     <UIActionsheet.SectionHeaderText
+      // @ts-ignore - cssInterop adds className prop at runtime
       className={actionsheetSectionHeaderTextStyle({
         class: className,
         isTruncated: Boolean(isTruncated),

@@ -497,6 +497,7 @@ const ActionsheetSectionHeaderText = React.forwardRef<
 ) {
   return (
     <UIActionsheet.SectionHeaderText
+      // @ts-ignore - cssInterop adds className prop at runtime
       className={actionsheetSectionHeaderTextStyle({
         class: className,
         isTruncated: isTruncated as boolean,
