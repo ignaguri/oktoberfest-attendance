@@ -55,10 +55,12 @@ export const Leaderboard = ({
   entries,
   winningCriteria,
   showGroupCount = false,
+  festivalId,
 }: {
   entries: LeaderboardEntry[];
   winningCriteria: WinningCriteria;
   showGroupCount?: boolean;
+  festivalId?: string;
 }) => {
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -72,6 +74,8 @@ export const Leaderboard = ({
 
         return (
           <ProfilePreview
+            userId={entry.userId}
+            festivalId={festivalId}
             username={entry.username || t("common.empty.noData")}
             fullName={entry.fullName}
             avatarUrl={entry.avatarUrl}

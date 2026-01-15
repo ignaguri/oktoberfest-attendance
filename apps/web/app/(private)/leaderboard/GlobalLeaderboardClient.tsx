@@ -116,6 +116,7 @@ export default function GlobalLeaderboardClient() {
           entries={leaderboardData}
           showGroupCount
           winningCriteria={winningCriteria}
+          festivalId={currentFestival?.id}
         />
       )}
     </div>

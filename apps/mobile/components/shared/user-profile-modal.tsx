@@ -137,7 +137,7 @@ export function UserProfileModal({
                       </Text>
                     </HStack>
                     <Text className="text-xs text-typography-500">
-                      {t("leaderboard.metric.days", { defaultValue: "days" })}
+                      {t("leaderboard.stats.days")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
@@ -148,7 +148,7 @@ export function UserProfileModal({
                       </Text>
                     </HStack>
                     <Text className="text-xs text-typography-500">
-                      {t("leaderboard.metric.beers", { defaultValue: "beers" })}
+                      {t("leaderboard.stats.drinks")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
@@ -159,7 +159,7 @@ export function UserProfileModal({
                       </Text>
                     </HStack>
                     <Text className="text-xs text-typography-500">
-                      {t("leaderboard.metric.avgBeers", { defaultValue: "avg" })}
+                      {t("leaderboard.stats.avg")}
                     </Text>
                   </VStack>
                 </HStack>

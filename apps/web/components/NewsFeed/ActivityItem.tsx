@@ -125,6 +125,8 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
+    user_id,
+    festival_id,
     username,
     full_name,
     avatar_url,
@@ -156,6 +158,8 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
     <div className="border-border/50 flex items-start gap-3 border-b py-2 last:border-b-0">
       {/* User Avatar */}
       <ProfilePreview
+        userId={user_id}
+        festivalId={festival_id}
         username={username}
         fullName={full_name}
         avatarUrl={avatar_url}

@@ -139,6 +139,7 @@ export default function GroupPage() {
           entries={leaderboardEntries}
           winningCriteria={group.winningCriteria as WinningCriteria}
           showGroupCount={false}
+          festivalId={currentFestival?.id}
         />
 
         <div className="flex flex-col items-center gap-4">

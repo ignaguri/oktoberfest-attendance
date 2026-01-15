@@ -403,13 +403,19 @@
     "player": "Player",
     "days": "Days",
     "beers": "Beers",
+    "drinks": "Drinks",
     "average": "Avg",
     "yourPosition": "Your Position",
     "notRanked": "Not ranked yet",
     "viewAll": "View All",
     "empty": "No rankings yet",
     "emptyDescription": "Be the first to track your attendance!",
-    "noName": "No name"
+    "noName": "No name",
+    "stats": {
+      "days": "Days",
+      "drinks": "Drinks",
+      "avg": "Avg"
+    }
   },
   "profile": {
     "pageTitle": "Your Profile",

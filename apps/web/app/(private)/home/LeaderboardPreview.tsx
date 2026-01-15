@@ -113,6 +113,8 @@ const LeaderboardPreview = () => {
                     </TableCell>
                     <TableCell className="w-full max-w-[min(200px,35vw)]">
                       <ProfilePreview
+                        userId={user.userId}
+                        festivalId={currentFestival?.id}
                         username={user.username || "Unknown"}
                         fullName={user.fullName}
                         avatarUrl={user.avatarUrl}
