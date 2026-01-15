@@ -310,7 +310,11 @@ export function QuickAttendanceCard() {
             {t("home.quickAttendance.title")}
           </Heading>
           {consumptions.length > 0 && (
-            <DrinkCountSummary consumptions={consumptions} compact showTotal={false} />
+            <DrinkCountSummary
+              consumptions={consumptions}
+              compact
+              showTotal={false}
+            />
           )}
         </HStack>
 
@@ -358,12 +362,14 @@ export function QuickAttendanceCard() {
               "flex-row items-center justify-between rounded-lg border px-4 py-3",
               isLoading
                 ? "border-background-200 bg-background-100"
-                : "border-outline-200 bg-white active:bg-background-50"
+                : "border-outline-200 bg-white active:bg-background-50",
             )}
           >
             <Text
               className={cn(
-                selectedTentName ? "text-typography-900" : "text-typography-400"
+                selectedTentName
+                  ? "text-typography-900"
+                  : "text-typography-400",
               )}
             >
               {selectedTentName || t("home.quickAttendance.selectTent")}
@@ -407,7 +413,7 @@ export function QuickAttendanceCard() {
                     source={{ uri: photo.localUri }}
                     className={cn(
                       "h-16 w-16 rounded-lg",
-                      isUploadingPhotos && "opacity-60"
+                      isUploadingPhotos && "opacity-60",
                     )}
                     resizeMode="cover"
                     accessibilityLabel={t("home.quickAttendance.pendingPhoto", {

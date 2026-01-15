@@ -43,7 +43,7 @@ export function useLogConsumption() {
         // Invalidate activity feed
         invalidateQueries(["activity-feed"]);
       },
-    }
+    },
   );
 }
 
@@ -64,7 +64,7 @@ export function useConsumptions(festivalId: string, date: string) {
       enabled: !!festivalId && !!date,
       staleTime: 30 * 1000, // 30 seconds - may change while editing
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 }
 
@@ -93,7 +93,7 @@ export function useDeleteConsumption() {
         // Invalidate activity feed
         invalidateQueries(["activity-feed"]);
       },
-    }
+    },
   );
 }
 

@@ -906,7 +906,7 @@ const DevToolsShowcase = () => {
           key.includes("supabase") ||
           key.includes("auth") ||
           key.includes("session") ||
-          key.includes("token")
+          key.includes("token"),
       );
 
       if (authKeys.length > 0) {

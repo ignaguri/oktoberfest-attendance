@@ -5,35 +5,29 @@ import {
   useState,
   useCallback,
   type ReactNode,
-} from 'react';
-import type { Session, User } from '@supabase/supabase-js';
+} from "react";
+import type { Session, User } from "@supabase/supabase-js";
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
 import {
   signInWithGoogle as googleSignIn,
   signInWithFacebook as facebookSignIn,
   signInWithApple as appleSignIn,
-} from './oauth';
+} from "./oauth";
 import {
   storeSession,
   clearSession,
   storeUserEmail,
   clearAllAuthData,
-} from './secure-storage';
+} from "./secure-storage";
 
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signIn: (
-    email: string,
-    password: string
-  ) => Promise<{ error: Error | null }>;
-  signUp: (
-    email: string,
-    password: string
-  ) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
@@ -105,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'prostcounter://reset-password',
+      redirectTo: "prostcounter://reset-password",
     });
     return { error: error as Error | null };
   }, []);
@@ -154,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

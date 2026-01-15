@@ -19,7 +19,9 @@ export function AppHeader() {
       />
       <HStack>
         <Text className="text-3xl font-extrabold text-primary-600">Prost</Text>
-        <Text className="text-3xl font-extrabold text-primary-500">Counter</Text>
+        <Text className="text-3xl font-extrabold text-primary-500">
+          Counter
+        </Text>
       </HStack>
     </HStack>
   );

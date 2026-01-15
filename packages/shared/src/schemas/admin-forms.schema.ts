@@ -61,9 +61,7 @@ export const AdminAttendanceFormSchema = z.object({
     .number()
     .min(0, { error: "validation.beerCount.min" })
     .int({ error: "validation.beerCount.integer" }),
-  tent_ids: z
-    .array(z.string())
-    .min(1, { error: "validation.tent.minOne" }),
+  tent_ids: z.array(z.string()).min(1, { error: "validation.tent.minOne" }),
 });
 
 // =============================================================================
@@ -102,8 +100,12 @@ export const AdminAddTentToFestivalFormSchema = z.object({
 
 export type AdminCopyTentsForm = z.infer<typeof AdminCopyTentsFormSchema>;
 export const AdminCopyTentsFormSchema = z.object({
-  sourceFestivalId: z.string().min(1, { error: "validation.festival.sourceRequired" }),
-  targetFestivalId: z.string().min(1, { error: "validation.festival.targetRequired" }),
+  sourceFestivalId: z
+    .string()
+    .min(1, { error: "validation.festival.sourceRequired" }),
+  targetFestivalId: z
+    .string()
+    .min(1, { error: "validation.festival.targetRequired" }),
   tentIds: z.array(z.string()).min(1, { error: "validation.tent.minOne" }),
   copyPrices: z.boolean(),
   overridePrice: z

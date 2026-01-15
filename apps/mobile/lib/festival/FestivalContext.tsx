@@ -36,12 +36,12 @@ interface FestivalContextType {
 const FESTIVAL_STORAGE_KEY = "@prostcounter/selectedFestivalId";
 
 const FestivalContext = createContext<FestivalContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function FestivalProvider({ children }: { children: ReactNode }) {
   const [currentFestival, setCurrentFestivalState] = useState<Festival | null>(
-    null
+    null,
   );
   const [storedFestivalId, setStoredFestivalId] = useState<string | null>(null);
 
@@ -53,7 +53,11 @@ export function FestivalProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Fetch festivals using the useFestivals hook
-  const { data: festivalsData, loading: isLoading, error: queryError } = useFestivals();
+  const {
+    data: festivalsData,
+    loading: isLoading,
+    error: queryError,
+  } = useFestivals();
 
   const festivals: Festival[] = festivalsData || [];
 
@@ -83,7 +87,8 @@ export function FestivalProvider({ children }: { children: ReactNode }) {
 
     // Priority 3: Festival marked as active
     if (!selectedFestival) {
-      selectedFestival = festivalsData.find((f: Festival) => f.isActive) || null;
+      selectedFestival =
+        festivalsData.find((f: Festival) => f.isActive) || null;
     }
 
     // Priority 4: Most recent festival

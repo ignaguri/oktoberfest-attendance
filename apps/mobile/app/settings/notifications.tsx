@@ -1,18 +1,18 @@
-import { useTranslation } from 'react-i18next';
-import { Bell, Clock, Info, Trophy, Users } from 'lucide-react-native';
-import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from "react-i18next";
+import { Bell, Clock, Info, Trophy, Users } from "lucide-react-native";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   ScrollView,
   RefreshControl,
   ActivityIndicator,
   Alert,
-} from 'react-native';
+} from "react-native";
 
-import { Text } from '@/components/ui/text';
-import { Switch } from '@/components/ui/switch';
-import { Colors, IconColors, SwitchColors } from '@/lib/constants/colors';
-import { apiClient } from '@/lib/api-client';
+import { Text } from "@/components/ui/text";
+import { Switch } from "@/components/ui/switch";
+import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { apiClient } from "@/lib/api-client";
 
 interface NotificationPreferences {
   reminders_enabled: boolean;
@@ -45,7 +45,7 @@ export default function NotificationSettingsScreen() {
         group_notifications_enabled: true,
       });
     } catch (error) {
-      console.error('Error fetching notification preferences:', error);
+      console.error("Error fetching notification preferences:", error);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -63,7 +63,7 @@ export default function NotificationSettingsScreen() {
 
   const handleToggle = async (
     key: keyof NotificationPreferences,
-    value: boolean
+    value: boolean,
   ) => {
     const previousValue = preferences[key];
 
@@ -81,10 +81,10 @@ export default function NotificationSettingsScreen() {
       // Revert on error
       setPreferences((prev) => ({ ...prev, [key]: previousValue }));
       Alert.alert(
-        t('common.status.error'),
-        t('profile.notifications.updateError', {
-          defaultValue: 'Failed to update notification settings',
-        })
+        t("common.status.error"),
+        t("profile.notifications.updateError", {
+          defaultValue: "Failed to update notification settings",
+        }),
       );
     } finally {
       setIsSaving(false);
@@ -93,7 +93,7 @@ export default function NotificationSettingsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-background-50 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ActivityIndicator size="large" color={Colors.primary[500]} />
       </View>
     );
@@ -108,48 +108,57 @@ export default function NotificationSettingsScreen() {
     >
       <View className="p-4">
         {/* Preferences Section */}
-        <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-          <Text className="text-lg font-semibold text-typography-900 mb-4">
-            {t('profile.notifications.preferences', { defaultValue: 'Preferences' })}
+        <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
+          <Text className="mb-4 text-lg font-semibold text-typography-900">
+            {t("profile.notifications.preferences", {
+              defaultValue: "Preferences",
+            })}
           </Text>
 
           {/* Reminders */}
-          <View className="flex-row items-center justify-between py-3 border-b border-outline-100">
-            <View className="flex-row items-center gap-3 flex-1">
+          <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+            <View className="flex-1 flex-row items-center gap-3">
               <Clock size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t('profile.notifications.reminders', { defaultValue: 'Reminders' })}
+                  {t("profile.notifications.reminders", {
+                    defaultValue: "Reminders",
+                  })}
                 </Text>
-                <Text className="text-typography-500 text-sm">
-                  {t('profile.notifications.remindersDescription', {
-                    defaultValue: 'Reservation reminders and check-in prompts',
+                <Text className="text-sm text-typography-500">
+                  {t("profile.notifications.remindersDescription", {
+                    defaultValue: "Reservation reminders and check-in prompts",
                   })}
                 </Text>
               </View>
             </View>
             <Switch
               value={preferences.reminders_enabled}
-              onValueChange={(value) => handleToggle('reminders_enabled', value)}
+              onValueChange={(value) =>
+                handleToggle("reminders_enabled", value)
+              }
               disabled={isSaving}
-              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              trackColor={{
+                false: SwitchColors.trackOff,
+                true: SwitchColors.trackOn,
+              }}
               thumbColor={SwitchColors.thumb}
             />
           </View>
 
           {/* Achievement Notifications */}
-          <View className="flex-row items-center justify-between py-3 border-b border-outline-100">
-            <View className="flex-row items-center gap-3 flex-1">
+          <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+            <View className="flex-1 flex-row items-center gap-3">
               <Trophy size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t('profile.notifications.achievements', {
-                    defaultValue: 'Achievement Notifications',
+                  {t("profile.notifications.achievements", {
+                    defaultValue: "Achievement Notifications",
                   })}
                 </Text>
-                <Text className="text-typography-500 text-sm">
-                  {t('profile.notifications.achievementsDescription', {
-                    defaultValue: 'Get notified when you unlock achievements',
+                <Text className="text-sm text-typography-500">
+                  {t("profile.notifications.achievementsDescription", {
+                    defaultValue: "Get notified when you unlock achievements",
                   })}
                 </Text>
               </View>
@@ -157,27 +166,31 @@ export default function NotificationSettingsScreen() {
             <Switch
               value={preferences.achievement_notifications_enabled}
               onValueChange={(value) =>
-                handleToggle('achievement_notifications_enabled', value)
+                handleToggle("achievement_notifications_enabled", value)
               }
               disabled={isSaving}
-              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              trackColor={{
+                false: SwitchColors.trackOff,
+                true: SwitchColors.trackOn,
+              }}
               thumbColor={SwitchColors.thumb}
             />
           </View>
 
           {/* Group Notifications */}
           <View className="flex-row items-center justify-between py-3">
-            <View className="flex-row items-center gap-3 flex-1">
+            <View className="flex-1 flex-row items-center gap-3">
               <Users size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t('profile.notifications.groups', {
-                    defaultValue: 'Group Notifications',
+                  {t("profile.notifications.groups", {
+                    defaultValue: "Group Notifications",
                   })}
                 </Text>
-                <Text className="text-typography-500 text-sm">
-                  {t('profile.notifications.groupsDescription', {
-                    defaultValue: 'Get notifications from your groups (check-ins, achievements, etc.)',
+                <Text className="text-sm text-typography-500">
+                  {t("profile.notifications.groupsDescription", {
+                    defaultValue:
+                      "Get notifications from your groups (check-ins, achievements, etc.)",
                   })}
                 </Text>
               </View>
@@ -185,31 +198,39 @@ export default function NotificationSettingsScreen() {
             <Switch
               value={preferences.group_notifications_enabled}
               onValueChange={(value) =>
-                handleToggle('group_notifications_enabled', value)
+                handleToggle("group_notifications_enabled", value)
               }
               disabled={isSaving}
-              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              trackColor={{
+                false: SwitchColors.trackOff,
+                true: SwitchColors.trackOn,
+              }}
               thumbColor={SwitchColors.thumb}
             />
           </View>
         </View>
 
         {/* Push Notifications Section */}
-        <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-          <Text className="text-lg font-semibold text-typography-900 mb-4">
-            {t('profile.notifications.pushTitle', { defaultValue: 'Push Notifications' })}
+        <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
+          <Text className="mb-4 text-lg font-semibold text-typography-900">
+            {t("profile.notifications.pushTitle", {
+              defaultValue: "Push Notifications",
+            })}
           </Text>
 
           <View className="flex-row items-center justify-between py-3">
-            <View className="flex-row items-center gap-3 flex-1">
+            <View className="flex-1 flex-row items-center gap-3">
               <Bell size={24} color={IconColors.default} />
               <View className="flex-1">
                 <Text className="text-typography-900">
-                  {t('profile.notifications.push', { defaultValue: 'Push Notifications' })}
+                  {t("profile.notifications.push", {
+                    defaultValue: "Push Notifications",
+                  })}
                 </Text>
-                <Text className="text-typography-500 text-sm">
-                  {t('profile.notifications.pushDescription', {
-                    defaultValue: 'Receive notifications even when the app is closed',
+                <Text className="text-sm text-typography-500">
+                  {t("profile.notifications.pushDescription", {
+                    defaultValue:
+                      "Receive notifications even when the app is closed",
                   })}
                 </Text>
               </View>
@@ -218,26 +239,29 @@ export default function NotificationSettingsScreen() {
               value={false}
               onValueChange={() => {
                 Alert.alert(
-                  t('common.status.info', { defaultValue: 'Info' }),
-                  t('profile.notifications.pushComingSoon', {
-                    defaultValue: 'Push notifications coming soon!',
-                  })
+                  t("common.status.info", { defaultValue: "Info" }),
+                  t("profile.notifications.pushComingSoon", {
+                    defaultValue: "Push notifications coming soon!",
+                  }),
                 );
               }}
-              trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+              trackColor={{
+                false: SwitchColors.trackOff,
+                true: SwitchColors.trackOn,
+              }}
               thumbColor={SwitchColors.thumb}
             />
           </View>
         </View>
 
         {/* Info */}
-        <View className="bg-yellow-50 rounded-2xl p-4 border border-yellow-200">
+        <View className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
           <View className="flex-row items-start gap-3">
             <Info size={24} color={Colors.primary[600]} />
-            <Text className="text-yellow-800 text-sm flex-1">
-              {t('profile.notifications.info', {
+            <Text className="flex-1 text-sm text-yellow-800">
+              {t("profile.notifications.info", {
                 defaultValue:
-                  'Notification preferences are synced across all your devices.',
+                  "Notification preferences are synced across all your devices.",
               })}
             </Text>
           </View>

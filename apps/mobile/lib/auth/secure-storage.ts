@@ -1,13 +1,13 @@
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 
 /**
  * Storage keys for auth data
  */
 const KEYS = {
-  ACCESS_TOKEN: 'prostcounter_access_token',
-  REFRESH_TOKEN: 'prostcounter_refresh_token',
-  BIOMETRIC_ENABLED: 'prostcounter_biometric_enabled',
-  USER_EMAIL: 'prostcounter_user_email',
+  ACCESS_TOKEN: "prostcounter_access_token",
+  REFRESH_TOKEN: "prostcounter_refresh_token",
+  BIOMETRIC_ENABLED: "prostcounter_biometric_enabled",
+  USER_EMAIL: "prostcounter_user_email",
 } as const;
 
 /**
@@ -15,7 +15,7 @@ const KEYS = {
  */
 export async function storeSession(
   accessToken: string,
-  refreshToken: string
+  refreshToken: string,
 ): Promise<void> {
   await Promise.all([
     SecureStore.setItemAsync(KEYS.ACCESS_TOKEN, accessToken),
@@ -54,7 +54,7 @@ export async function clearSession(): Promise<void> {
 export async function setBiometricEnabled(enabled: boolean): Promise<void> {
   await SecureStore.setItemAsync(
     KEYS.BIOMETRIC_ENABLED,
-    enabled ? 'true' : 'false'
+    enabled ? "true" : "false",
   );
 }
 
@@ -63,7 +63,7 @@ export async function setBiometricEnabled(enabled: boolean): Promise<void> {
  */
 export async function isBiometricEnabled(): Promise<boolean> {
   const value = await SecureStore.getItemAsync(KEYS.BIOMETRIC_ENABLED);
-  return value === 'true';
+  return value === "true";
 }
 
 /**

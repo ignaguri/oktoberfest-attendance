@@ -12,7 +12,11 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { BackgroundColors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
+import {
+  BackgroundColors,
+  DrinkTypeColors,
+  IconColors,
+} from "@/lib/constants/colors";
 
 /**
  * Visible drink types for the picker
@@ -53,7 +57,13 @@ function DrinkIcon({
     case "beer":
       return <Beer size={size} color={color} />;
     case "radler":
-      return <RadlerIcon size={size} color={color} backgroundColor={backgroundColor} />;
+      return (
+        <RadlerIcon
+          size={size}
+          color={color}
+          backgroundColor={backgroundColor}
+        />
+      );
     case "wine":
       return <Wine size={size} color={color} />;
     case "soft_drink":
@@ -180,8 +190,12 @@ export function DrinkTypePicker({
                       "relative items-center justify-center rounded-xl border-2",
                       iconContainerSize,
                       isSelected && "bg-background-50",
-                      !isSelected && disabled && "border-background-200 bg-background-100",
-                      !isSelected && !disabled && "border-background-200 bg-white"
+                      !isSelected &&
+                        disabled &&
+                        "border-background-200 bg-background-100",
+                      !isSelected &&
+                        !disabled &&
+                        "border-background-200 bg-white",
                     )}
                     style={getBorderStyle(type, isSelected)}
                   >
@@ -203,11 +217,13 @@ export function DrinkTypePicker({
                       <VStack
                         className={cn(
                           "absolute -right-1 -top-1 items-center justify-center rounded-full px-1",
-                          badgeSize
+                          badgeSize,
                         )}
                         style={{ backgroundColor: color }}
                       >
-                        <Text className={cn(badgeTextSize, "font-bold text-white")}>
+                        <Text
+                          className={cn(badgeTextSize, "font-bold text-white")}
+                        >
                           {count}
                         </Text>
                       </VStack>
@@ -221,7 +237,7 @@ export function DrinkTypePicker({
                         "text-xs",
                         isSelected
                           ? "font-medium text-typography-900"
-                          : "text-typography-500"
+                          : "text-typography-500",
                       )}
                     >
                       {getLabel(type)}

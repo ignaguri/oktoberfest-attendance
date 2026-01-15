@@ -41,7 +41,7 @@ export function useTents(festivalId?: string) {
       staleTime: 30 * 60 * 1000, // 30 minutes - tents don't change frequently
       gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
       enabled: true, // Always enabled since API handles undefined festivalId
-    }
+    },
   );
 
   // Transform raw tent data into grouped structure
@@ -56,7 +56,7 @@ export function useTents(festivalId?: string) {
         : "Uncategorized";
 
       const existingCategory = acc.find(
-        (g: TentGroup) => g.category === category
+        (g: TentGroup) => g.category === category,
       );
 
       if (existingCategory) {

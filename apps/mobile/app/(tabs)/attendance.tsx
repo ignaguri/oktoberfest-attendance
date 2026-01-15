@@ -85,7 +85,7 @@ export default function AttendanceScreen() {
         base: totals.base + (a.totalBaseCents || 0),
         tips: totals.tips + (a.totalTipCents || 0),
       }),
-      { spent: 0, base: 0, tips: 0 }
+      { spent: 0, base: 0, tips: 0 },
     );
   }, [attendances]);
 
@@ -189,7 +189,9 @@ export default function AttendanceScreen() {
                       )}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.drinks", { defaultValue: "Drinks" })}
+                      {t("attendance.summary.drinks", {
+                        defaultValue: "Drinks",
+                      })}
                     </Text>
                   </View>
                   <View className="items-center">
@@ -221,7 +223,9 @@ export default function AttendanceScreen() {
                       €{(spendingTotals.base / 100).toFixed(0)}
                     </Text>
                     <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.baseCost", { defaultValue: "Base" })}
+                      {t("attendance.summary.baseCost", {
+                        defaultValue: "Base",
+                      })}
                     </Text>
                   </View>
                   <View className="items-center">

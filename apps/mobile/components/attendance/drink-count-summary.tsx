@@ -100,7 +100,7 @@ export function DrinkCountSummary({
       (type) => ({
         type,
         count: counts[type],
-      })
+      }),
     );
   }, [counts]);
 

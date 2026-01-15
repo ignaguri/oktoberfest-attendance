@@ -14,7 +14,12 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import { Award, ChevronRight, Trophy } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  View,
+} from "react-native";
 
 import type { WinningCriteria } from "@prostcounter/shared/schemas";
 

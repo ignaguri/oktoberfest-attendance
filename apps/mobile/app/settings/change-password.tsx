@@ -1,26 +1,26 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   updatePasswordSchema,
   type UpdatePasswordFormData,
-} from '@prostcounter/shared/schemas';
-import { useRouter } from 'expo-router';
-import { Eye, EyeOff, Info } from 'lucide-react-native';
-import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+} from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
+import { Eye, EyeOff, Info } from "lucide-react-native";
+import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   View,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert,
-} from 'react-native';
+} from "react-native";
 
-import { Text } from '@/components/ui/text';
-import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
-import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
-import { useAuth } from '@/lib/auth/AuthContext';
-import { Colors, IconColors } from '@/lib/constants/colors';
+import { Text } from "@/components/ui/text";
+import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { Colors, IconColors } from "@/lib/constants/colors";
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation();
@@ -38,8 +38,8 @@ export default function ChangePasswordScreen() {
   } = useForm<UpdatePasswordFormData>({
     resolver: zodResolver(updatePasswordSchema),
     defaultValues: {
-      password: '',
-      confirmPassword: '',
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -51,34 +51,34 @@ export default function ChangePasswordScreen() {
 
       if (error) {
         Alert.alert(
-          t('common.status.error'),
+          t("common.status.error"),
           error.message ||
-            t('profile.changePassword.error', {
-              defaultValue: 'Failed to update password',
-            })
+            t("profile.changePassword.error", {
+              defaultValue: "Failed to update password",
+            }),
         );
         setIsLoading(false);
         return;
       }
 
       Alert.alert(
-        t('common.status.success'),
-        t('profile.changePassword.success', {
-          defaultValue: 'Password updated successfully',
+        t("common.status.success"),
+        t("profile.changePassword.success", {
+          defaultValue: "Password updated successfully",
         }),
         [
           {
-            text: t('common.buttons.gotIt'),
+            text: t("common.buttons.gotIt"),
             onPress: () => router.back(),
           },
-        ]
+        ],
       );
     } catch (error) {
       Alert.alert(
-        t('common.status.error'),
-        t('profile.changePassword.error', {
-          defaultValue: 'Failed to update password',
-        })
+        t("common.status.error"),
+        t("profile.changePassword.error", {
+          defaultValue: "Failed to update password",
+        }),
       );
     } finally {
       setIsLoading(false);
@@ -88,7 +88,7 @@ export default function ChangePasswordScreen() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-background-50"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -96,25 +96,25 @@ export default function ChangePasswordScreen() {
       >
         <View className="p-4">
           {/* Info */}
-          <View className="bg-yellow-50 rounded-2xl p-4 mb-4 border border-yellow-200">
+          <View className="mb-4 rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
             <View className="flex-row items-start gap-3">
               <Info size={24} color={Colors.primary[600]} />
-              <Text className="text-yellow-800 text-sm flex-1">
-                {t('profile.changePassword.info', {
+              <Text className="flex-1 text-sm text-yellow-800">
+                {t("profile.changePassword.info", {
                   defaultValue:
-                    'Choose a strong password with at least 8 characters, including uppercase, lowercase, and numbers.',
+                    "Choose a strong password with at least 8 characters, including uppercase, lowercase, and numbers.",
                 })}
               </Text>
             </View>
           </View>
 
           {/* Form */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
+          <View className="rounded-2xl bg-white p-4 shadow-sm">
             {/* New Password */}
             <View className="mb-4">
-              <Text className="text-sm font-medium text-typography-700 mb-1">
-                {t('profile.changePassword.newPassword', {
-                  defaultValue: 'New Password',
+              <Text className="mb-1 text-sm font-medium text-typography-700">
+                {t("profile.changePassword.newPassword", {
+                  defaultValue: "New Password",
                 })}
               </Text>
               <Controller
@@ -127,9 +127,12 @@ export default function ChangePasswordScreen() {
                     isInvalid={!!errors.password}
                   >
                     <InputField
-                      placeholder={t('profile.changePassword.newPasswordPlaceholder', {
-                        defaultValue: 'Enter new password',
-                      })}
+                      placeholder={t(
+                        "profile.changePassword.newPasswordPlaceholder",
+                        {
+                          defaultValue: "Enter new password",
+                        },
+                      )}
                       secureTextEntry={!showNewPassword}
                       value={value}
                       onChangeText={onChange}
@@ -154,7 +157,7 @@ export default function ChangePasswordScreen() {
                 )}
               />
               {errors.password && (
-                <Text className="text-error-600 text-sm mt-1">
+                <Text className="mt-1 text-sm text-error-600">
                   {errors.password.message}
                 </Text>
               )}
@@ -162,9 +165,9 @@ export default function ChangePasswordScreen() {
 
             {/* Confirm Password */}
             <View className="mb-6">
-              <Text className="text-sm font-medium text-typography-700 mb-1">
-                {t('profile.changePassword.confirmPassword', {
-                  defaultValue: 'Confirm Password',
+              <Text className="mb-1 text-sm font-medium text-typography-700">
+                {t("profile.changePassword.confirmPassword", {
+                  defaultValue: "Confirm Password",
                 })}
               </Text>
               <Controller
@@ -177,9 +180,12 @@ export default function ChangePasswordScreen() {
                     isInvalid={!!errors.confirmPassword}
                   >
                     <InputField
-                      placeholder={t('profile.changePassword.confirmPasswordPlaceholder', {
-                        defaultValue: 'Confirm new password',
-                      })}
+                      placeholder={t(
+                        "profile.changePassword.confirmPasswordPlaceholder",
+                        {
+                          defaultValue: "Confirm new password",
+                        },
+                      )}
                       secureTextEntry={!showConfirmPassword}
                       value={value}
                       onChangeText={onChange}
@@ -188,7 +194,9 @@ export default function ChangePasswordScreen() {
                     />
                     <InputSlot
                       className="pr-3"
-                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onPress={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
                       <InputIcon
                         as={() =>
@@ -204,7 +212,7 @@ export default function ChangePasswordScreen() {
                 )}
               />
               {errors.confirmPassword && (
-                <Text className="text-error-600 text-sm mt-1">
+                <Text className="mt-1 text-sm text-error-600">
                   {errors.confirmPassword.message}
                 </Text>
               )}
@@ -222,8 +230,8 @@ export default function ChangePasswordScreen() {
                 <ButtonSpinner color={IconColors.white} />
               ) : (
                 <ButtonText>
-                  {t('profile.changePassword.submit', {
-                    defaultValue: 'Update Password',
+                  {t("profile.changePassword.submit", {
+                    defaultValue: "Update Password",
                   })}
                 </ButtonText>
               )}

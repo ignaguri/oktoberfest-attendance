@@ -16,7 +16,10 @@ import { X, Calendar, Trash2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
-import type { AttendanceWithTotals, TentVisit } from "@prostcounter/shared/schemas";
+import type {
+  AttendanceWithTotals,
+  TentVisit,
+} from "@prostcounter/shared/schemas";
 
 import { BeerPicturesSection } from "./beer-pictures-section";
 import { DrinkTypePicker, VISIBLE_DRINK_TYPES } from "./drink-type-picker";
@@ -102,7 +105,9 @@ export function AttendanceFormSheet({
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   // Local drink counts - tracks desired counts before save
-  const [localDrinkCounts, setLocalDrinkCounts] = useState<Record<DrinkType, number>>({
+  const [localDrinkCounts, setLocalDrinkCounts] = useState<
+    Record<DrinkType, number>
+  >({
     beer: 0,
     radler: 0,
     wine: 0,
@@ -125,7 +130,7 @@ export function AttendanceFormSheet({
   // Fetch consumptions for this date
   const { data: consumptionsData } = useConsumptions(
     isOpen ? festivalId : "",
-    isOpen ? dateString : ""
+    isOpen ? dateString : "",
   );
   const consumptions = consumptionsData || [];
 
@@ -149,7 +154,10 @@ export function AttendanceFormSheet({
 
   // Calculate total local drinks
   const totalLocalDrinks = useMemo(() => {
-    return Object.values(localDrinkCounts).reduce((sum, count) => sum + count, 0);
+    return Object.values(localDrinkCounts).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
   }, [localDrinkCounts]);
 
   // Track previous isOpen state to detect when sheet opens
@@ -169,16 +177,20 @@ export function AttendanceFormSheet({
   );
 
   // Use fresh tent visits from API when available, fall back to prop data
-  const freshTentVisits: TentVisit[] = attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [];
+  const freshTentVisits: TentVisit[] =
+    attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [];
 
   // Default values based on existing attendance or selected date
   // Use unique tent IDs for the form (for tent selector)
   const defaultValues = useMemo(() => {
     if (existingAttendance) {
       // Get unique tent IDs from tent visits
-      const uniqueTentIds: string[] = [...new Set(freshTentVisits.map((tv: TentVisit) => tv.tentId))];
+      const uniqueTentIds: string[] = [
+        ...new Set(freshTentVisits.map((tv: TentVisit) => tv.tentId)),
+      ];
       return {
-        amount: existingAttendance.drinkCount || existingAttendance.beerCount || 0,
+        amount:
+          existingAttendance.drinkCount || existingAttendance.beerCount || 0,
         date: new Date(existingAttendance.date),
         tents: uniqueTentIds,
       };
@@ -292,10 +304,13 @@ export function AttendanceFormSheet({
           id: visit.tentId,
           visitDate: visit.visitDate,
           label,
-          checkInTime
+          checkInTime,
         };
       })
-      .sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime(),
+      );
   }, [freshTentVisits, tents]);
 
   // Get selected tents from form - these are what user currently has selected
@@ -317,10 +332,16 @@ export function AttendanceFormSheet({
     const allOptions = tents.flatMap((group) => group.options);
 
     // Build a map of tent visits by tent ID (most recent visit for each tent)
-    const latestVisitByTent = new Map<string, { visitDate: string; checkInTime: string }>();
+    const latestVisitByTent = new Map<
+      string,
+      { visitDate: string; checkInTime: string }
+    >();
     for (const visit of freshTentVisits) {
       const existing = latestVisitByTent.get(visit.tentId);
-      if (!existing || new Date(visit.visitDate) > new Date(existing.visitDate)) {
+      if (
+        !existing ||
+        new Date(visit.visitDate) > new Date(existing.visitDate)
+      ) {
         latestVisitByTent.set(visit.tentId, {
           visitDate: visit.visitDate,
           checkInTime: format(parseISO(visit.visitDate), "HH:mm"),
@@ -493,7 +514,9 @@ export function AttendanceFormSheet({
               {/* Drink Type Picker & Stepper */}
               <VStack space="md">
                 <Text className="text-center text-sm font-medium text-typography-700">
-                  {t("attendance.howManyDrinks", { defaultValue: "Log Your Drinks" })}
+                  {t("attendance.howManyDrinks", {
+                    defaultValue: "Log Your Drinks",
+                  })}
                 </Text>
 
                 {/* Drink Type Icons */}
@@ -515,13 +538,17 @@ export function AttendanceFormSheet({
 
                 {/* Total drinks - simple number */}
                 <Text className="text-center text-sm text-typography-500">
-                  {t("attendance.totalDrinks", { defaultValue: "Total Drinks" })}: {totalLocalDrinks}
+                  {t("attendance.totalDrinks", {
+                    defaultValue: "Total Drinks",
+                  })}
+                  : {totalLocalDrinks}
                 </Text>
                 {/* Validation error for drinks */}
                 {errors.amount && (
                   <Text className="text-center text-sm text-error-600">
                     {t(errors.amount.message || "validation.tent.required", {
-                      defaultValue: "Please select at least one tent if no drinks are logged",
+                      defaultValue:
+                        "Please select at least one tent if no drinks are logged",
                     })}
                   </Text>
                 )}

@@ -23,7 +23,11 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useTents, type TentGroup, type TentOption } from "@prostcounter/shared/hooks";
+import {
+  useTents,
+  type TentGroup,
+  type TentOption,
+} from "@prostcounter/shared/hooks";
 
 import { TentListItem } from "./tent-list-item";
 import { TentSearchInput } from "./tent-search-input";
@@ -81,7 +85,7 @@ export function TentSelectorSheet({
         title: group.category,
         data: query
           ? group.options.filter((opt) =>
-              opt.label.toLowerCase().includes(query)
+              opt.label.toLowerCase().includes(query),
             )
           : group.options,
       }))
@@ -96,7 +100,7 @@ export function TentSelectorSheet({
       }
       return selectedTents.includes(tentId);
     },
-    [mode, selectedTent, selectedTents]
+    [mode, selectedTent, selectedTents],
   );
 
   // Handle tent toggle
@@ -112,7 +116,7 @@ export function TentSelectorSheet({
         onSelectTents?.(newSelection);
       }
     },
-    [mode, selectedTents, onSelectTent, onSelectTents, onClose]
+    [mode, selectedTents, onSelectTent, onSelectTents, onClose],
   );
 
   // Handle clear selection (multi-select only)
@@ -127,7 +131,7 @@ export function TentSelectorSheet({
         {section.title}
       </ActionsheetSectionHeaderText>
     ),
-    []
+    [],
   );
 
   // Render tent item
@@ -141,13 +145,13 @@ export function TentSelectorSheet({
         mode={mode}
       />
     ),
-    [isTentSelected, handleTentToggle, mode]
+    [isTentSelected, handleTentToggle, mode],
   );
 
   // Key extractor
   const keyExtractor = useCallback(
     (item: TentOption, index: number) => item.value,
-    []
+    [],
   );
 
   return (
@@ -159,7 +163,7 @@ export function TentSelectorSheet({
         </ActionsheetDragIndicatorWrapper>
 
         {/* Header */}
-        <HStack className="w-full items-center justify-between px-2 mb-3">
+        <HStack className="mb-3 w-full items-center justify-between px-2">
           <Text className="text-lg font-semibold text-typography-900">
             {mode === "single" ? "Select Tent" : "Select Tents"}
           </Text>
@@ -169,7 +173,7 @@ export function TentSelectorSheet({
         </HStack>
 
         {/* Search Input */}
-        <View className="w-full px-2 mb-3">
+        <View className="mb-3 w-full px-2">
           <TentSearchInput
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -211,7 +215,7 @@ export function TentSelectorSheet({
         {/* Footer (multi-select only) */}
         {mode === "multi" && (
           <HStack
-            className="w-full pt-3 gap-3"
+            className="w-full gap-3 pt-3"
             style={{ paddingBottom: Math.max(insets.bottom, 16) + 8 }}
           >
             <Button
@@ -230,7 +234,8 @@ export function TentSelectorSheet({
               onPress={onClose}
             >
               <ButtonText>
-                Done{selectedTents.length > 0 ? ` (${selectedTents.length})` : ""}
+                Done
+                {selectedTents.length > 0 ? ` (${selectedTents.length})` : ""}
               </ButtonText>
             </Button>
           </HStack>

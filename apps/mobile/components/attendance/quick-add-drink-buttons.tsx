@@ -133,7 +133,16 @@ export function QuickAddDrinkButtons({
         setLoadingType(null);
       }
     },
-    [disabled, loadingType, festivalId, date, tentId, defaultPriceCents, logConsumption, onSuccess]
+    [
+      disabled,
+      loadingType,
+      festivalId,
+      date,
+      tentId,
+      defaultPriceCents,
+      logConsumption,
+      onSuccess,
+    ],
   );
 
   return (
@@ -149,7 +158,7 @@ export function QuickAddDrinkButtons({
             key={type}
             onPress={() => handleQuickAdd(type)}
             disabled={isDisabled}
-            className={`flex-1 min-w-[70px] max-w-[90px] items-center justify-center rounded-xl border-2 px-2 py-3 ${
+            className={`min-w-[70px] max-w-[90px] flex-1 items-center justify-center rounded-xl border-2 px-2 py-3 ${
               isSuccess
                 ? "border-success-500 bg-success-50"
                 : isDisabled

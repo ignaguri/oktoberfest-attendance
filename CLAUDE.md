@@ -140,9 +140,15 @@ When developing mobile screens, follow the patterns established in the profile p
 ```typescript
 // 1. External imports (grouped by package)
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCurrentProfile, useUpdateProfile } from "@prostcounter/shared/hooks";
+import {
+  useCurrentProfile,
+  useUpdateProfile,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { UpdateProfileSchema, type UpdateProfileInput } from "@prostcounter/shared/schemas";
+import {
+  UpdateProfileSchema,
+  type UpdateProfileInput,
+} from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { Lock, LogOut } from "lucide-react-native";
 import { useCallback, useState } from "react";

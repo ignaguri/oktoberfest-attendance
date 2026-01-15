@@ -7,10 +7,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useApiClient, useQuery, QueryKeys } from "../data";
 
-import type {
-  ActivityFeedItem,
-  GetActivityFeedResponse,
-} from "../schemas";
+import type { ActivityFeedItem, GetActivityFeedResponse } from "../schemas";
 
 export type { ActivityFeedItem };
 
@@ -29,7 +26,7 @@ export function useActivityFeed(festivalId?: string, cursor?: string) {
       enabled: !!festivalId,
       staleTime: 30 * 1000, // 30 seconds - activity feed should be relatively fresh
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 }
 
@@ -54,7 +51,7 @@ export function useActivityFeedItems(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 30 * 1000, // 30 seconds - activity feed should be relatively fresh
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 
   // Cast data to proper type for type-safe access

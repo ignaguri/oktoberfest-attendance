@@ -70,7 +70,9 @@ function getSupabaseClient(): SupabaseClient<Database> {
 export const supabase = new Proxy({} as SupabaseClient<Database>, {
   get(_, prop) {
     const client = getSupabaseClient();
-    const value = (client as unknown as Record<string, unknown>)[prop as string];
+    const value = (client as unknown as Record<string, unknown>)[
+      prop as string
+    ];
     if (typeof value === "function") {
       return value.bind(client);
     }

@@ -23,7 +23,7 @@ import type {
 } from "./types";
 
 function mapQueryOptions(
-  options?: DataQueryOptions
+  options?: DataQueryOptions,
 ): Omit<UseQueryOptions, "queryKey" | "queryFn"> {
   if (!options) return {};
 
@@ -38,7 +38,7 @@ function mapQueryOptions(
 }
 
 function mapMutationOptions<TData, TVariables = unknown>(
-  options?: DataMutationOptions<TData, TVariables>
+  options?: DataMutationOptions<TData, TVariables>,
 ): UseMutationOptions<TData, Error, TVariables> {
   if (!options) return {};
 
@@ -55,7 +55,7 @@ function mapMutationOptions<TData, TVariables = unknown>(
 export function useQuery<T>(
   queryKey: readonly unknown[],
   queryFn: () => Promise<T>,
-  options?: DataQueryOptions
+  options?: DataQueryOptions,
 ): DataQueryResult<T> {
   const query = useReactQuery({
     queryKey,
@@ -80,7 +80,7 @@ export function useQuery<T>(
  */
 export function useMutation<TData, TVariables>(
   mutationFn: (variables: TVariables) => Promise<TData>,
-  options?: DataMutationOptions<TData, TVariables>
+  options?: DataMutationOptions<TData, TVariables>,
 ): DataMutationResult<TData, TVariables> {
   const mutation = useReactMutation<TData, Error, TVariables>({
     mutationFn,
@@ -97,11 +97,11 @@ export function useMutation<TData, TVariables>(
           });
         });
       },
-      [mutation]
+      [mutation],
     ),
     mutateAsync: useCallback(
       (variables: TVariables) => mutation.mutateAsync(variables),
-      [mutation]
+      [mutation],
     ),
     loading: mutation.isPending,
     error: mutation.error,
@@ -163,7 +163,7 @@ export function useInvalidateQueries() {
     (queryKey?: readonly unknown[]) => {
       invalidateQueries(queryKey);
     },
-    [invalidateQueries]
+    [invalidateQueries],
   );
 }
 
@@ -177,7 +177,7 @@ export function useSetQueryData() {
     <T>(queryKey: readonly unknown[], data: T) => {
       setQueryData(queryKey, data);
     },
-    [setQueryData]
+    [setQueryData],
   );
 }
 
@@ -191,6 +191,6 @@ export function useGetQueryData() {
     <T>(queryKey: readonly unknown[]) => {
       return getQueryData<T>(queryKey);
     },
-    [getQueryData]
+    [getQueryData],
   );
 }

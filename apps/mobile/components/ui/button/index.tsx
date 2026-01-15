@@ -1,15 +1,15 @@
-'use client';
-import React from 'react';
-import { createButton } from '@gluestack-ui/core/button/creator';
+"use client";
+import React from "react";
+import { createButton } from "@gluestack-ui/core/button/creator";
 import {
   tva,
   withStyleContext,
   useStyleContext,
   type VariantProps,
-} from '@gluestack-ui/utils/nativewind-utils';
-import { cssInterop } from 'nativewind';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
+} from "@gluestack-ui/utils/nativewind-utils";
+import { cssInterop } from "nativewind";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 
 // Import contract types from shared UI package
 import type {
@@ -17,9 +17,9 @@ import type {
   ButtonVariant,
   ButtonSize,
   ButtonGroupSpace,
-} from '@prostcounter/ui';
+} from "@prostcounter/ui";
 
-const SCOPE = 'BUTTON';
+const SCOPE = "BUTTON";
 
 const Root = withStyleContext(Pressable, SCOPE);
 
@@ -33,392 +33,392 @@ const UIButton = createButton({
 
 cssInterop(PrimitiveIcon, {
   className: {
-    target: 'style',
+    target: "style",
     nativeStyleToProp: {
       height: true,
       width: true,
       fill: true,
-      color: 'classNameColor',
+      color: "classNameColor",
       stroke: true,
     },
   },
 });
 
 const buttonStyle = tva({
-  base: 'group/button rounded bg-primary-500 flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2',
+  base: "group/button flex-row items-center justify-center gap-2 rounded bg-primary-500 data-[disabled=true]:opacity-40 data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2",
   variants: {
     action: {
       primary:
-        'bg-primary-500 data-[hover=true]:bg-primary-600 data-[active=true]:bg-primary-700 border-primary-300 data-[hover=true]:border-primary-400 data-[active=true]:border-primary-500 data-[focus-visible=true]:web:ring-indicator-info',
+        "border-primary-300 bg-primary-500 data-[active=true]:border-primary-500 data-[hover=true]:border-primary-400 data-[active=true]:bg-primary-700 data-[hover=true]:bg-primary-600 data-[focus-visible=true]:web:ring-indicator-info",
       primaryDark:
-        'bg-primary-600 data-[hover=true]:bg-primary-700 data-[active=true]:bg-primary-800 border-primary-400 data-[hover=true]:border-primary-500 data-[active=true]:border-primary-600 data-[focus-visible=true]:web:ring-indicator-info',
+        "border-primary-400 bg-primary-600 data-[active=true]:border-primary-600 data-[hover=true]:border-primary-500 data-[active=true]:bg-primary-800 data-[hover=true]:bg-primary-700 data-[focus-visible=true]:web:ring-indicator-info",
       secondary:
-        'bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info',
+        "border-secondary-300 bg-secondary-500 data-[active=true]:border-secondary-700 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[hover=true]:bg-secondary-600 data-[focus-visible=true]:web:ring-indicator-info",
       positive:
-        'bg-success-500 border-success-300 data-[hover=true]:bg-success-600 data-[hover=true]:border-success-400 data-[active=true]:bg-success-700 data-[active=true]:border-success-500 data-[focus-visible=true]:web:ring-indicator-info',
+        "border-success-300 bg-success-500 data-[active=true]:border-success-500 data-[hover=true]:border-success-400 data-[active=true]:bg-success-700 data-[hover=true]:bg-success-600 data-[focus-visible=true]:web:ring-indicator-info",
       negative:
-        'bg-error-500 border-error-300 data-[hover=true]:bg-error-600 data-[hover=true]:border-error-400 data-[active=true]:bg-error-700 data-[active=true]:border-error-500 data-[focus-visible=true]:web:ring-indicator-info',
+        "border-error-300 bg-error-500 data-[active=true]:border-error-500 data-[hover=true]:border-error-400 data-[active=true]:bg-error-700 data-[hover=true]:bg-error-600 data-[focus-visible=true]:web:ring-indicator-info",
       default:
-        'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     variant: {
-      solid: '',
+      solid: "",
       outline:
-        'bg-transparent border data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
-      link: 'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
+        "border bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
+      link: "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
       ghost:
-        'bg-transparent data-[hover=true]:bg-background-100 data-[active=true]:bg-background-200',
+        "bg-transparent data-[active=true]:bg-background-200 data-[hover=true]:bg-background-100",
     },
 
     size: {
-      xs: 'px-3.5 h-8',
-      sm: 'px-4 h-9',
-      md: 'px-5 h-10',
-      lg: 'px-6 h-11',
-      xl: 'px-7 h-12',
-      icon: 'h-10 w-10 p-0',
+      xs: "h-8 px-3.5",
+      sm: "h-9 px-4",
+      md: "h-10 px-5",
+      lg: "h-11 px-6",
+      xl: "h-12 px-7",
+      icon: "h-10 w-10 p-0",
     },
   },
   compoundVariants: [
     {
-      action: 'primary',
-      variant: 'link',
+      action: "primary",
+      variant: "link",
       class:
-        'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
+        "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
     },
     {
-      action: 'secondary',
-      variant: 'link',
+      action: "secondary",
+      variant: "link",
       class:
-        'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
+        "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
     },
     {
-      action: 'positive',
-      variant: 'link',
+      action: "positive",
+      variant: "link",
       class:
-        'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
+        "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
     },
     {
-      action: 'negative',
-      variant: 'link',
+      action: "negative",
+      variant: "link",
       class:
-        'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
+        "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
     },
     {
-      action: 'primary',
-      variant: 'outline',
+      action: "primary",
+      variant: "outline",
       class:
-        'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
-      action: 'secondary',
-      variant: 'outline',
+      action: "secondary",
+      variant: "outline",
       class:
-        'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
-      action: 'positive',
-      variant: 'outline',
+      action: "positive",
+      variant: "outline",
       class:
-        'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
-      action: 'negative',
-      variant: 'outline',
+      action: "negative",
+      variant: "outline",
       class:
-        'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     // primaryDark compound variants
     {
-      action: 'primaryDark',
-      variant: 'link',
+      action: "primaryDark",
+      variant: "link",
       class:
-        'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
+        "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
     },
     {
-      action: 'primaryDark',
-      variant: 'outline',
+      action: "primaryDark",
+      variant: "outline",
       class:
-        'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
-      action: 'primaryDark',
-      variant: 'ghost',
+      action: "primaryDark",
+      variant: "ghost",
       class:
-        'bg-transparent data-[hover=true]:bg-primary-100 data-[active=true]:bg-primary-200',
+        "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
     },
     // ghost variant compound variants for all actions
     {
-      action: 'primary',
-      variant: 'ghost',
+      action: "primary",
+      variant: "ghost",
       class:
-        'bg-transparent data-[hover=true]:bg-primary-100 data-[active=true]:bg-primary-200',
+        "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
     },
     {
-      action: 'secondary',
-      variant: 'ghost',
+      action: "secondary",
+      variant: "ghost",
       class:
-        'bg-transparent data-[hover=true]:bg-secondary-100 data-[active=true]:bg-secondary-200',
+        "bg-transparent data-[active=true]:bg-secondary-200 data-[hover=true]:bg-secondary-100",
     },
     {
-      action: 'positive',
-      variant: 'ghost',
+      action: "positive",
+      variant: "ghost",
       class:
-        'bg-transparent data-[hover=true]:bg-success-100 data-[active=true]:bg-success-200',
+        "bg-transparent data-[active=true]:bg-success-200 data-[hover=true]:bg-success-100",
     },
     {
-      action: 'negative',
-      variant: 'ghost',
+      action: "negative",
+      variant: "ghost",
       class:
-        'bg-transparent data-[hover=true]:bg-error-100 data-[active=true]:bg-error-200',
+        "bg-transparent data-[active=true]:bg-error-200 data-[hover=true]:bg-error-100",
     },
   ],
 });
 
 const buttonTextStyle = tva({
-  base: 'text-typography-0 font-semibold web:select-none',
+  base: "font-semibold text-typography-0 web:select-none",
   parentVariants: {
     action: {
       primary:
-        'text-primary-600 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
+        "text-primary-600 data-[active=true]:text-primary-700 data-[hover=true]:text-primary-600",
       primaryDark:
-        'text-primary-700 data-[hover=true]:text-primary-700 data-[active=true]:text-primary-800',
+        "text-primary-700 data-[active=true]:text-primary-800 data-[hover=true]:text-primary-700",
       secondary:
-        'text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700',
+        "text-typography-500 data-[active=true]:text-typography-700 data-[hover=true]:text-typography-600",
       positive:
-        'text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700',
+        "text-success-600 data-[active=true]:text-success-700 data-[hover=true]:text-success-600",
       negative:
-        'text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
+        "text-error-600 data-[active=true]:text-error-700 data-[hover=true]:text-error-600",
     },
     variant: {
       solid:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
-      outline: '',
-      link: 'data-[hover=true]:underline data-[active=true]:underline',
-      ghost: '',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
+      outline: "",
+      link: "data-[active=true]:underline data-[hover=true]:underline",
+      ghost: "",
     },
     size: {
-      xs: 'text-xs',
-      sm: 'text-sm',
-      md: 'text-base',
-      lg: 'text-lg',
-      xl: 'text-xl',
-      icon: 'text-base',
+      xs: "text-xs",
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg",
+      xl: "text-xl",
+      icon: "text-base",
     },
   },
   parentCompoundVariants: [
     {
-      variant: 'solid',
-      action: 'primary',
+      variant: "solid",
+      action: "primary",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'solid',
-      action: 'secondary',
+      variant: "solid",
+      action: "secondary",
       class:
-        'text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800',
+        "text-typography-800 data-[active=true]:text-typography-800 data-[hover=true]:text-typography-800",
     },
     {
-      variant: 'solid',
-      action: 'positive',
+      variant: "solid",
+      action: "positive",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'solid',
-      action: 'negative',
+      variant: "solid",
+      action: "negative",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'outline',
-      action: 'primary',
+      variant: "outline",
+      action: "primary",
       class:
-        'text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500',
+        "text-primary-500 data-[active=true]:text-primary-500 data-[hover=true]:text-primary-500",
     },
     {
-      variant: 'outline',
-      action: 'secondary',
+      variant: "outline",
+      action: "secondary",
       class:
-        'text-typography-500 data-[hover=true]:text-primary-600 data-[active=true]:text-typography-700',
+        "text-typography-500 data-[active=true]:text-typography-700 data-[hover=true]:text-primary-600",
     },
     {
-      variant: 'outline',
-      action: 'positive',
+      variant: "outline",
+      action: "positive",
       class:
-        'text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500',
+        "text-primary-500 data-[active=true]:text-primary-500 data-[hover=true]:text-primary-500",
     },
     {
-      variant: 'outline',
-      action: 'negative',
+      variant: "outline",
+      action: "negative",
       class:
-        'text-error-500 data-[hover=true]:text-error-500 data-[active=true]:text-error-500',
+        "text-error-500 data-[active=true]:text-error-500 data-[hover=true]:text-error-500",
     },
     // primaryDark compound variants
     {
-      variant: 'solid',
-      action: 'primaryDark',
+      variant: "solid",
+      action: "primaryDark",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'outline',
-      action: 'primaryDark',
+      variant: "outline",
+      action: "primaryDark",
       class:
-        'text-primary-600 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-600',
+        "text-primary-600 data-[active=true]:text-primary-600 data-[hover=true]:text-primary-600",
     },
     // ghost compound variants
     {
-      variant: 'ghost',
-      action: 'primary',
+      variant: "ghost",
+      action: "primary",
       class:
-        'text-primary-600 data-[hover=true]:text-primary-700 data-[active=true]:text-primary-800',
+        "text-primary-600 data-[active=true]:text-primary-800 data-[hover=true]:text-primary-700",
     },
     {
-      variant: 'ghost',
-      action: 'primaryDark',
+      variant: "ghost",
+      action: "primaryDark",
       class:
-        'text-primary-700 data-[hover=true]:text-primary-800 data-[active=true]:text-primary-900',
+        "text-primary-700 data-[active=true]:text-primary-900 data-[hover=true]:text-primary-800",
     },
     {
-      variant: 'ghost',
-      action: 'secondary',
+      variant: "ghost",
+      action: "secondary",
       class:
-        'text-typography-600 data-[hover=true]:text-typography-700 data-[active=true]:text-typography-800',
+        "text-typography-600 data-[active=true]:text-typography-800 data-[hover=true]:text-typography-700",
     },
     {
-      variant: 'ghost',
-      action: 'positive',
+      variant: "ghost",
+      action: "positive",
       class:
-        'text-success-600 data-[hover=true]:text-success-700 data-[active=true]:text-success-800',
+        "text-success-600 data-[active=true]:text-success-800 data-[hover=true]:text-success-700",
     },
     {
-      variant: 'ghost',
-      action: 'negative',
+      variant: "ghost",
+      action: "negative",
       class:
-        'text-error-600 data-[hover=true]:text-error-700 data-[active=true]:text-error-800',
+        "text-error-600 data-[active=true]:text-error-800 data-[hover=true]:text-error-700",
     },
   ],
 });
 
 const buttonIconStyle = tva({
-  base: 'fill-none',
+  base: "fill-none",
   parentVariants: {
     variant: {
       solid:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
-      outline: '',
-      link: 'data-[hover=true]:underline data-[active=true]:underline',
-      ghost: '',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
+      outline: "",
+      link: "data-[active=true]:underline data-[hover=true]:underline",
+      ghost: "",
     },
     size: {
-      xs: 'h-3.5 w-3.5',
-      sm: 'h-4 w-4',
-      md: 'h-[18px] w-[18px]',
-      lg: 'h-[18px] w-[18px]',
-      xl: 'h-5 w-5',
-      icon: 'h-5 w-5',
+      xs: "h-3.5 w-3.5",
+      sm: "h-4 w-4",
+      md: "h-[18px] w-[18px]",
+      lg: "h-[18px] w-[18px]",
+      xl: "h-5 w-5",
+      icon: "h-5 w-5",
     },
     action: {
       primary:
-        'text-primary-600 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
+        "text-primary-600 data-[active=true]:text-primary-700 data-[hover=true]:text-primary-600",
       primaryDark:
-        'text-primary-700 data-[hover=true]:text-primary-700 data-[active=true]:text-primary-800',
+        "text-primary-700 data-[active=true]:text-primary-800 data-[hover=true]:text-primary-700",
       secondary:
-        'text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700',
+        "text-typography-500 data-[active=true]:text-typography-700 data-[hover=true]:text-typography-600",
       positive:
-        'text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700',
+        "text-success-600 data-[active=true]:text-success-700 data-[hover=true]:text-success-600",
       negative:
-        'text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
+        "text-error-600 data-[active=true]:text-error-700 data-[hover=true]:text-error-600",
     },
   },
   parentCompoundVariants: [
     {
-      variant: 'solid',
-      action: 'primary',
+      variant: "solid",
+      action: "primary",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'solid',
-      action: 'primaryDark',
+      variant: "solid",
+      action: "primaryDark",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'solid',
-      action: 'secondary',
+      variant: "solid",
+      action: "secondary",
       class:
-        'text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800',
+        "text-typography-800 data-[active=true]:text-typography-800 data-[hover=true]:text-typography-800",
     },
     {
-      variant: 'solid',
-      action: 'positive',
+      variant: "solid",
+      action: "positive",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     {
-      variant: 'solid',
-      action: 'negative',
+      variant: "solid",
+      action: "negative",
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        "text-typography-0 data-[active=true]:text-typography-0 data-[hover=true]:text-typography-0",
     },
     // ghost compound variants for icons
     {
-      variant: 'ghost',
-      action: 'primary',
+      variant: "ghost",
+      action: "primary",
       class:
-        'text-primary-600 data-[hover=true]:text-primary-700 data-[active=true]:text-primary-800',
+        "text-primary-600 data-[active=true]:text-primary-800 data-[hover=true]:text-primary-700",
     },
     {
-      variant: 'ghost',
-      action: 'primaryDark',
+      variant: "ghost",
+      action: "primaryDark",
       class:
-        'text-primary-700 data-[hover=true]:text-primary-800 data-[active=true]:text-primary-900',
+        "text-primary-700 data-[active=true]:text-primary-900 data-[hover=true]:text-primary-800",
     },
     {
-      variant: 'ghost',
-      action: 'secondary',
+      variant: "ghost",
+      action: "secondary",
       class:
-        'text-typography-600 data-[hover=true]:text-typography-700 data-[active=true]:text-typography-800',
+        "text-typography-600 data-[active=true]:text-typography-800 data-[hover=true]:text-typography-700",
     },
     {
-      variant: 'ghost',
-      action: 'positive',
+      variant: "ghost",
+      action: "positive",
       class:
-        'text-success-600 data-[hover=true]:text-success-700 data-[active=true]:text-success-800',
+        "text-success-600 data-[active=true]:text-success-800 data-[hover=true]:text-success-700",
     },
     {
-      variant: 'ghost',
-      action: 'negative',
+      variant: "ghost",
+      action: "negative",
       class:
-        'text-error-600 data-[hover=true]:text-error-700 data-[active=true]:text-error-800',
+        "text-error-600 data-[active=true]:text-error-800 data-[hover=true]:text-error-700",
     },
   ],
 });
 
 const buttonGroupStyle = tva({
-  base: '',
+  base: "",
   variants: {
     space: {
-      'xs': 'gap-1',
-      'sm': 'gap-2',
-      'md': 'gap-3',
-      'lg': 'gap-4',
-      'xl': 'gap-5',
-      '2xl': 'gap-6',
-      '3xl': 'gap-7',
-      '4xl': 'gap-8',
+      xs: "gap-1",
+      sm: "gap-2",
+      md: "gap-3",
+      lg: "gap-4",
+      xl: "gap-5",
+      "2xl": "gap-6",
+      "3xl": "gap-7",
+      "4xl": "gap-8",
     },
     isAttached: {
-      true: 'gap-0',
+      true: "gap-0",
     },
     flexDirection: {
-      'row': 'flex-row',
-      'column': 'flex-col',
-      'row-reverse': 'flex-row-reverse',
-      'column-reverse': 'flex-col-reverse',
+      row: "flex-row",
+      column: "flex-col",
+      "row-reverse": "flex-row-reverse",
+      "column-reverse": "flex-col-reverse",
     },
   },
 });
@@ -428,7 +428,7 @@ const buttonGroupStyle = tva({
  */
 type IButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof UIButton>,
-  'context'
+  "context"
 > & {
   /** Semantic color action - from contract */
   action?: ButtonAction;
@@ -445,8 +445,8 @@ const Button = React.forwardRef<
   IButtonProps
 >(
   (
-    { className, variant = 'solid', size = 'md', action = 'primary', ...props },
-    ref
+    { className, variant = "solid", size = "md", action = "primary", ...props },
+    ref,
   ) => {
     return (
       <UIButton
@@ -456,7 +456,7 @@ const Button = React.forwardRef<
         context={{ variant, size, action }}
       />
     );
-  }
+  },
 );
 
 type IButtonTextProps = React.ComponentPropsWithoutRef<typeof UIButton.Text> &
@@ -511,7 +511,7 @@ const ButtonIcon = React.forwardRef<
     action: parentAction,
   } = useStyleContext(SCOPE);
 
-  if (typeof size === 'number') {
+  if (typeof size === "number") {
     return (
       <UIButton.Icon
         ref={ref}
@@ -552,13 +552,15 @@ const ButtonIcon = React.forwardRef<
 /**
  * ButtonGroup Props - implements @prostcounter/ui ButtonGroupProps contract
  */
-type IButtonGroupProps = React.ComponentPropsWithoutRef<typeof UIButton.Group> & {
+type IButtonGroupProps = React.ComponentPropsWithoutRef<
+  typeof UIButton.Group
+> & {
   /** Gap between buttons - from contract */
   space?: ButtonGroupSpace;
   /** Whether buttons are visually attached */
   isAttached?: boolean;
   /** Flex direction */
-  flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
+  flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
   /** Additional className for styling */
   className?: string;
 };
@@ -570,12 +572,12 @@ const ButtonGroup = React.forwardRef<
   (
     {
       className,
-      space = 'md',
+      space = "md",
       isAttached = false,
-      flexDirection = 'column',
+      flexDirection = "column",
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <UIButton.Group
@@ -589,13 +591,13 @@ const ButtonGroup = React.forwardRef<
         ref={ref}
       />
     );
-  }
+  },
 );
 
-Button.displayName = 'Button';
-ButtonText.displayName = 'ButtonText';
-ButtonSpinner.displayName = 'ButtonSpinner';
-ButtonIcon.displayName = 'ButtonIcon';
-ButtonGroup.displayName = 'ButtonGroup';
+Button.displayName = "Button";
+ButtonText.displayName = "ButtonText";
+ButtonSpinner.displayName = "ButtonSpinner";
+ButtonIcon.displayName = "ButtonIcon";
+ButtonGroup.displayName = "ButtonGroup";
 
 export { Button, ButtonText, ButtonSpinner, ButtonIcon, ButtonGroup };

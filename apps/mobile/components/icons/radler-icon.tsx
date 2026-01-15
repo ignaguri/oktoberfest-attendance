@@ -12,7 +12,11 @@ interface RadlerIconProps {
  * Composite icon for Radler (beer + citrus)
  * Beer with citrus garnish in top-right corner
  */
-export function RadlerIcon({ size, color, backgroundColor = "#FFFFFF" }: RadlerIconProps) {
+export function RadlerIcon({
+  size,
+  color,
+  backgroundColor = "#FFFFFF",
+}: RadlerIconProps) {
   const garnishSize = size * 0.55;
 
   return (

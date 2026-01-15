@@ -21,7 +21,7 @@ export function useFestivals() {
     {
       staleTime: 60 * 60 * 1000, // 1 hour - festivals don't change often
       gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
-    }
+    },
   );
 }
 
@@ -41,7 +41,7 @@ export function useActiveFestival() {
     {
       staleTime: 30 * 60 * 1000, // 30 minutes
       gcTime: 60 * 60 * 1000, // 1 hour cache
-    }
+    },
   );
 }
 
@@ -60,6 +60,6 @@ export function useFestivalById(festivalId: string) {
       enabled: !!festivalId,
       staleTime: 60 * 60 * 1000, // 1 hour
       gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
-    }
+    },
   );
 }

@@ -15,10 +15,7 @@ import { DEFAULT_TIMEZONE } from "../constants/app";
 export type ProfileForm = z.infer<typeof ProfileFormSchema>;
 export const ProfileFormSchema = z.object({
   fullname: z.string().optional(),
-  username: z
-    .string()
-    .min(4, { error: "validation.username.min" })
-    .trim(),
+  username: z.string().min(4, { error: "validation.username.min" }).trim(),
   preferred_language: z
     .string()
     .nullable()
@@ -58,10 +55,7 @@ export const JoinGroupFormSchema = z.object({
 
 export type GroupSettingsForm = z.infer<typeof GroupSettingsFormSchema>;
 export const GroupSettingsFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, { error: "validation.groupName.required" })
-    .trim(),
+  name: z.string().min(1, { error: "validation.groupName.required" }).trim(),
   description: z.string().optional(),
   winning_criteria_id: z
     .number()

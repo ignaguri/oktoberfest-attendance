@@ -1,5 +1,8 @@
 import { cn } from "@prostcounter/ui";
-import { useLogConsumption, useDeleteConsumption } from "@prostcounter/shared/hooks";
+import {
+  useLogConsumption,
+  useDeleteConsumption,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import * as Haptics from "expo-haptics";
 import { Minus, Plus } from "lucide-react-native";
@@ -144,7 +147,7 @@ export function DrinkStepper({
           "h-14 w-14 items-center justify-center rounded-full border-2",
           canDecrement
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
-            : "border-background-300 bg-background-100"
+            : "border-background-300 bg-background-100",
         )}
         accessibilityLabel={t("attendance.removeDrink", {
           defaultValue: "Remove drink",
@@ -167,7 +170,9 @@ export function DrinkStepper({
         <Text
           className={cn(
             "text-4xl font-bold",
-            disabled || isLoading ? "text-typography-400" : "text-typography-900"
+            disabled || isLoading
+              ? "text-typography-400"
+              : "text-typography-900",
           )}
         >
           {count}
@@ -182,7 +187,7 @@ export function DrinkStepper({
           "h-14 w-14 items-center justify-center rounded-full border-2",
           canIncrement
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
-            : "border-background-300 bg-background-100"
+            : "border-background-300 bg-background-100",
         )}
         accessibilityLabel={t("attendance.addDrink", {
           defaultValue: "Add drink",

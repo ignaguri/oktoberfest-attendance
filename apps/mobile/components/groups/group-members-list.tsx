@@ -3,7 +3,11 @@ import type { GroupMember } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
 import { UserMinus, Crown, Users } from "lucide-react-native";
 
-import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallbackText,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";

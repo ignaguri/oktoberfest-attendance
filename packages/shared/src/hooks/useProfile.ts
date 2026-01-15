@@ -30,7 +30,7 @@ export function useCurrentProfile() {
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }
 
@@ -57,7 +57,7 @@ export function useUpdateProfile() {
         invalidateQueries(QueryKeys.user());
         invalidateQueries(["highlights"]);
       },
-    }
+    },
   );
 }
 
@@ -88,7 +88,7 @@ export function useTutorialStatus() {
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }
 
@@ -108,7 +108,7 @@ export function useCompleteTutorial() {
         invalidateQueries(QueryKeys.tutorialStatus());
         invalidateQueries(QueryKeys.profile());
       },
-    }
+    },
   );
 }
 
@@ -128,7 +128,7 @@ export function useResetTutorial() {
         invalidateQueries(QueryKeys.tutorialStatus());
         invalidateQueries(QueryKeys.profile());
       },
-    }
+    },
   );
 }
 
@@ -147,7 +147,7 @@ export function useMissingProfileFields() {
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }
 
@@ -168,7 +168,7 @@ export function useHighlights(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }
 
@@ -193,6 +193,6 @@ export function usePublicProfile(userId?: string, festivalId?: string) {
       enabled: !!userId,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }

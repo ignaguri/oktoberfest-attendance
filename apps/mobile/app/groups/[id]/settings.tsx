@@ -7,9 +7,17 @@ import {
   useLeaveGroup,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { GroupMember, WinningCriteria } from "@prostcounter/shared/schemas";
+import type {
+  GroupMember,
+  WinningCriteria,
+} from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Save, LogOut, Users, Settings as SettingsIcon } from "lucide-react-native";
+import {
+  Save,
+  LogOut,
+  Users,
+  Settings as SettingsIcon,
+} from "lucide-react-native";
 import { useCallback, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { RefreshControl, ScrollView } from "react-native";
@@ -66,9 +74,21 @@ const UpdateGroupFormSchema = z.object({
 type UpdateGroupFormData = z.infer<typeof UpdateGroupFormSchema>;
 
 const WINNING_CRITERIA_OPTIONS = [
-  { value: "total_beers", label: "groups.criteria.totalBeers", defaultLabel: "Total Beers" },
-  { value: "days_attended", label: "groups.criteria.daysAttended", defaultLabel: "Days Attended" },
-  { value: "avg_beers", label: "groups.criteria.avgBeers", defaultLabel: "Avg Beers per Day" },
+  {
+    value: "total_beers",
+    label: "groups.criteria.totalBeers",
+    defaultLabel: "Total Beers",
+  },
+  {
+    value: "days_attended",
+    label: "groups.criteria.daysAttended",
+    defaultLabel: "Days Attended",
+  },
+  {
+    value: "avg_beers",
+    label: "groups.criteria.avgBeers",
+    defaultLabel: "Avg Beers per Day",
+  },
 ] as const;
 
 // Map criteria string to ID for API
@@ -168,7 +188,9 @@ export default function GroupSettingsScreen() {
   const handleRemoveMember = useCallback(
     (userId: string, memberName: string) => {
       showDialog(
-        t("groups.settings.removeMemberTitle", { defaultValue: "Remove Member" }),
+        t("groups.settings.removeMemberTitle", {
+          defaultValue: "Remove Member",
+        }),
         t("groups.settings.removeMemberMessage", {
           defaultValue: `Are you sure you want to remove ${memberName} from the group?`,
           name: memberName,
@@ -192,12 +214,16 @@ export default function GroupSettingsScreen() {
     showDialog(
       t("groups.settings.leaveTitle", { defaultValue: "Leave Group" }),
       t("groups.settings.leaveMessage", {
-        defaultValue: "Are you sure you want to leave this group? You can rejoin later with an invite.",
+        defaultValue:
+          "Are you sure you want to leave this group? You can rejoin later with an invite.",
       }),
       "destructive",
       async () => {
         try {
-          await leaveGroup.mutateAsync({ groupId: id!, userId: user?.id || "" });
+          await leaveGroup.mutateAsync({
+            groupId: id!,
+            userId: user?.id || "",
+          });
           router.replace("/(tabs)/groups");
         } catch (error) {
           console.error("Failed to leave group:", error);
@@ -244,7 +270,9 @@ export default function GroupSettingsScreen() {
           className="mt-4"
           onPress={() => router.back()}
         >
-          <ButtonText>{t("common.buttons.goBack", { defaultValue: "Go Back" })}</ButtonText>
+          <ButtonText>
+            {t("common.buttons.goBack", { defaultValue: "Go Back" })}
+          </ButtonText>
         </Button>
       </View>
     );
@@ -259,7 +287,10 @@ export default function GroupSettingsScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={
-          <RefreshControl refreshing={isRefetching ?? false} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={isRefetching ?? false}
+            onRefresh={onRefresh}
+          />
         }
       >
         <VStack space="lg" className="p-4 pb-8">
@@ -270,14 +301,18 @@ export default function GroupSettingsScreen() {
                 <HStack space="sm" className="items-center">
                   <SettingsIcon size={18} color={IconColors.primary} />
                   <Text className="font-medium text-typography-900">
-                    {t("groups.settings.details", { defaultValue: "Group Details" })}
+                    {t("groups.settings.details", {
+                      defaultValue: "Group Details",
+                    })}
                   </Text>
                 </HStack>
 
                 {/* Group Name */}
                 <VStack space="sm">
                   <Text className="text-sm font-medium text-typography-700">
-                    {t("groups.create.nameLabel", { defaultValue: "Group Name" })}
+                    {t("groups.create.nameLabel", {
+                      defaultValue: "Group Name",
+                    })}
                   </Text>
                   <Controller
                     control={control}
@@ -303,7 +338,9 @@ export default function GroupSettingsScreen() {
                 {/* Description */}
                 <VStack space="sm">
                   <Text className="text-sm font-medium text-typography-700">
-                    {t("groups.settings.description", { defaultValue: "Description" })}
+                    {t("groups.settings.description", {
+                      defaultValue: "Description",
+                    })}
                   </Text>
                   <Controller
                     control={control}
@@ -311,9 +348,13 @@ export default function GroupSettingsScreen() {
                     render={({ field: { onChange, onBlur, value } }) => (
                       <Textarea size="md">
                         <TextareaInput
-                          placeholder={t("groups.settings.descriptionPlaceholder", {
-                            defaultValue: "Add a description for your group...",
-                          })}
+                          placeholder={t(
+                            "groups.settings.descriptionPlaceholder",
+                            {
+                              defaultValue:
+                                "Add a description for your group...",
+                            },
+                          )}
                           value={value || ""}
                           onChangeText={onChange}
                           onBlur={onBlur}
@@ -332,7 +373,9 @@ export default function GroupSettingsScreen() {
                 {/* Winning Criteria */}
                 <VStack space="sm">
                   <Text className="text-sm font-medium text-typography-700">
-                    {t("groups.create.criteriaLabel", { defaultValue: "Winning Criteria" })}
+                    {t("groups.create.criteriaLabel", {
+                      defaultValue: "Winning Criteria",
+                    })}
                   </Text>
                   <Controller
                     control={control}
@@ -342,14 +385,18 @@ export default function GroupSettingsScreen() {
                         <SelectTrigger variant="outline" size="md">
                           <SelectInput
                             value={
-                              WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)
+                              WINNING_CRITERIA_OPTIONS.find(
+                                (opt) => opt.value === value,
+                              )
                                 ? t(
-                                    WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)!
-                                      .label,
+                                    WINNING_CRITERIA_OPTIONS.find(
+                                      (opt) => opt.value === value,
+                                    )!.label,
                                     {
-                                      defaultValue: WINNING_CRITERIA_OPTIONS.find(
-                                        (opt) => opt.value === value,
-                                      )!.defaultLabel,
+                                      defaultValue:
+                                        WINNING_CRITERIA_OPTIONS.find(
+                                          (opt) => opt.value === value,
+                                        )!.defaultLabel,
                                     },
                                   )
                                 : ""
@@ -366,7 +413,9 @@ export default function GroupSettingsScreen() {
                             {WINNING_CRITERIA_OPTIONS.map((option) => (
                               <SelectItem
                                 key={option.value}
-                                label={t(option.label, { defaultValue: option.defaultLabel })}
+                                label={t(option.label, {
+                                  defaultValue: option.defaultLabel,
+                                })}
                                 value={option.value}
                               />
                             ))}
@@ -393,7 +442,9 @@ export default function GroupSettingsScreen() {
                   <ButtonText className="ml-2">
                     {isSaving
                       ? t("common.status.saving", { defaultValue: "Saving..." })
-                      : t("common.buttons.save", { defaultValue: "Save Changes" })}
+                      : t("common.buttons.save", {
+                          defaultValue: "Save Changes",
+                        })}
                   </ButtonText>
                 </Button>
               </VStack>
@@ -437,7 +488,9 @@ export default function GroupSettingsScreen() {
           <Card variant="outline" size="md" className="border-error-200">
             <VStack space="sm">
               <Text className="font-medium text-error-600">
-                {t("groups.settings.dangerZone", { defaultValue: "Danger Zone" })}
+                {t("groups.settings.dangerZone", {
+                  defaultValue: "Danger Zone",
+                })}
               </Text>
               <Text className="text-sm text-typography-500">
                 {isCreator
@@ -503,7 +556,9 @@ export default function GroupSettingsScreen() {
                   <ButtonText>{t("common.buttons.cancel")}</ButtonText>
                 </Button>
                 <Button
-                  action={dialog.type === "destructive" ? "negative" : "primary"}
+                  action={
+                    dialog.type === "destructive" ? "negative" : "primary"
+                  }
                   onPress={() => {
                     dialog.onConfirm?.();
                     closeDialog();

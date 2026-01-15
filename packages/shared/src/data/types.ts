@@ -71,12 +71,12 @@ export interface DataProvider {
   useQuery: <T>(
     queryKey: readonly unknown[],
     queryFn: () => Promise<T>,
-    options?: DataQueryOptions
+    options?: DataQueryOptions,
   ) => DataQueryResult<T>;
 
   useMutation: <TData, TVariables>(
     mutationFn: (variables: TVariables) => Promise<TData>,
-    options?: DataMutationOptions<TData, TVariables>
+    options?: DataMutationOptions<TData, TVariables>,
   ) => DataMutationResult<TData, TVariables>;
 
   invalidateQueries: (queryKey?: readonly unknown[]) => void;

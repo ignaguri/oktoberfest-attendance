@@ -152,7 +152,10 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
                   : ""
               }
             >
-              <ActivityItem activity={activity} festivalId={currentFestival?.id} />
+              <ActivityItem
+                activity={activity}
+                festivalId={currentFestival?.id}
+              />
             </View>
           ))}
         </VStack>

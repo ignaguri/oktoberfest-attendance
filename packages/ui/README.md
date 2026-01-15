@@ -41,11 +41,17 @@ apps/mobile/components/ui/      # gluestack-ui v3 implementations (React Native)
 - **Import Pattern**: `import { Button } from "@/components/ui/button"`
 
 **Example**:
+
 ```tsx
 // apps/web/components/ui/button.tsx
 import type { ButtonProps } from "@prostcounter/ui";
 
-export const Button: React.FC<ButtonProps> = ({ variant, size, children, ...props }) => {
+export const Button: React.FC<ButtonProps> = ({
+  variant,
+  size,
+  children,
+  ...props
+}) => {
   return (
     <RadixButton className={buttonVariants({ variant, size })} {...props}>
       {children}
@@ -61,12 +67,17 @@ export const Button: React.FC<ButtonProps> = ({ variant, size, children, ...prop
 - **Import Pattern**: `import { Button } from "@/components/ui/button"`
 
 **Example**:
+
 ```tsx
 // apps/mobile/components/ui/button.tsx
 import type { ButtonProps } from "@prostcounter/ui";
 import { Button as GButton, ButtonText } from "@gluestack-ui/themed";
 
-export const Button: React.FC<ButtonProps> = ({ variant, children, ...props }) => {
+export const Button: React.FC<ButtonProps> = ({
+  variant,
+  children,
+  ...props
+}) => {
   return (
     <GButton sx={{ variant: variant }}>
       <ButtonText>{children}</ButtonText>
@@ -115,6 +126,7 @@ export interface ButtonProps {
 ```
 
 **Using variant types elsewhere:**
+
 ```typescript
 import type { BadgeVariant } from "@prostcounter/ui";
 
@@ -199,12 +211,14 @@ import type {
 ```
 
 **Use cases:**
+
 - Type-safe helper functions
 - API response typing
 - State management
 - Business logic validation
 
 **Example:**
+
 ```typescript
 import type { BadgeVariant } from "@prostcounter/ui";
 
@@ -236,23 +250,23 @@ function getFestivalBadgeVariant(status: Festival["status"]): BadgeVariant {
 
 ## Available Components
 
-| Component     | Web Library   | Mobile Library | Contract Status |
-|---------------|---------------|----------------|-----------------|
-| Button        | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Input         | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Textarea      | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Switch        | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Checkbox      | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Label         | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Badge         | Custom        | gluestack-ui   | ✅ Defined      |
-| Avatar        | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Card          | Custom        | gluestack-ui   | ✅ Defined      |
-| Dialog        | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Select        | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Accordion     | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Progress      | Radix UI      | gluestack-ui   | ✅ Defined      |
-| Separator     | Custom        | gluestack-ui   | ✅ Defined      |
-| ScrollArea    | Radix UI      | ScrollView     | ✅ Defined      |
+| Component  | Web Library | Mobile Library | Contract Status |
+| ---------- | ----------- | -------------- | --------------- |
+| Button     | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Input      | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Textarea   | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Switch     | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Checkbox   | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Label      | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Badge      | Custom      | gluestack-ui   | ✅ Defined      |
+| Avatar     | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Card       | Custom      | gluestack-ui   | ✅ Defined      |
+| Dialog     | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Select     | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Accordion  | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Progress   | Radix UI    | gluestack-ui   | ✅ Defined      |
+| Separator  | Custom      | gluestack-ui   | ✅ Defined      |
+| ScrollArea | Radix UI    | ScrollView     | ✅ Defined      |
 
 ## Platform-Specific Components
 

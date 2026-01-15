@@ -35,7 +35,7 @@ function getSupabaseUrl(): string {
  * // Returns: "https://lh3.googleusercontent.com/..." (unchanged)
  */
 export function getAvatarUrl(
-  avatarUrl: string | null | undefined
+  avatarUrl: string | null | undefined,
 ): string | undefined {
   if (!avatarUrl) return undefined;
 

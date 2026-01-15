@@ -102,7 +102,9 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           }
 
           // Process each drink type
-          for (const drinkType of Object.keys(localDrinkCounts) as DrinkType[]) {
+          for (const drinkType of Object.keys(
+            localDrinkCounts,
+          ) as DrinkType[]) {
             const desiredCount = localDrinkCounts[drinkType];
             const currentCount = currentCounts[drinkType];
             const delta = desiredCount - currentCount;
@@ -125,7 +127,11 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
               // Need to delete some consumptions
               const consumptionsOfType = existingConsumptions
                 .filter((c) => c.drinkType === drinkType)
-                .sort((a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime());
+                .sort(
+                  (a, b) =>
+                    new Date(b.recordedAt).getTime() -
+                    new Date(a.recordedAt).getTime(),
+                );
 
               for (let i = 0; i < Math.abs(delta); i++) {
                 const toDelete = consumptionsOfType[i];
@@ -176,7 +182,14 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         setIsSaving(false);
       }
     },
-    [updateAttendance, logConsumption, deleteConsumption, uploadPendingPhotos, getDrinkPriceCents, invalidateQueries],
+    [
+      updateAttendance,
+      logConsumption,
+      deleteConsumption,
+      uploadPendingPhotos,
+      getDrinkPriceCents,
+      invalidateQueries,
+    ],
   );
 
   return {

@@ -29,7 +29,7 @@ export function useReservation(reservationId: string | null) {
       enabled: !!reservationId,
       staleTime: 1 * 60 * 1000, // 1 minute
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 }
 
@@ -50,7 +50,7 @@ export function useReservations(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }
 
@@ -82,7 +82,7 @@ export function useCreateReservation() {
         // Invalidate calendar queries
         invalidateQueries(QueryKeys.personalCalendar(variables.festivalId));
       },
-    }
+    },
   );
 }
 
@@ -120,7 +120,7 @@ export function useUpdateReservation() {
         // Invalidate calendar queries
         invalidateQueries(QueryKeys.personalCalendar(data.festivalId));
       },
-    }
+    },
   );
 }
 
@@ -151,7 +151,7 @@ export function useCancelReservation() {
         // Invalidate calendar queries
         invalidateQueries(QueryKeys.personalCalendar(variables.festivalId));
       },
-    }
+    },
   );
 }
 
@@ -183,6 +183,6 @@ export function useCheckInReservation() {
         invalidateQueries(QueryKeys.personalCalendar(variables.festivalId));
         invalidateQueries(QueryKeys.attendances(variables.festivalId));
       },
-    }
+    },
   );
 }

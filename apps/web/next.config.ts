@@ -16,9 +16,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   // Transpile shared packages for proper bundling
-  transpilePackages: [
-    "@prostcounter/ui",
-  ],
+  transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
   serverExternalPackages: [],
   async headers() {

@@ -209,14 +209,17 @@ export function AttendanceCalendar({
             <Text className={textClassName}>{format(day, "d")}</Text>
 
             {/* Beer count badge - only show if drinkCount > 0 */}
-            {hasAttendance && drinkCount! > 0 && isFestivalDay && !isSelected && (
-              <HStack className="mt-0.5 items-center gap-0.5">
-                <Beer size={10} color={Colors.primary[600]} />
-                <Text className="text-[10px] font-semibold text-primary-600">
-                  {drinkCount}
-                </Text>
-              </HStack>
-            )}
+            {hasAttendance &&
+              drinkCount! > 0 &&
+              isFestivalDay &&
+              !isSelected && (
+                <HStack className="mt-0.5 items-center gap-0.5">
+                  <Beer size={10} color={Colors.primary[600]} />
+                  <Text className="text-[10px] font-semibold text-primary-600">
+                    {drinkCount}
+                  </Text>
+                </HStack>
+              )}
 
             {/* Beer count on selected - only show if drinkCount > 0 */}
             {hasAttendance && drinkCount! > 0 && isSelected && (

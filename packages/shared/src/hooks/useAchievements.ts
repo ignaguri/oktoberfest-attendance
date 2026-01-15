@@ -22,7 +22,7 @@ export function useUserAchievements(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes - achievements can change based on activity
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }
 
@@ -40,7 +40,7 @@ export function useAchievementsWithProgress(festivalId?: string) {
     ],
     async () => {
       const response = await apiClient.achievements.getWithProgress(
-        festivalId!
+        festivalId!,
       );
       return response;
     },
@@ -48,7 +48,7 @@ export function useAchievementsWithProgress(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }
 
@@ -68,7 +68,7 @@ export function useAchievementLeaderboard(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }
 
@@ -87,6 +87,6 @@ export function useAvailableAchievements() {
     {
       staleTime: 60 * 60 * 1000, // 1 hour - available achievements rarely change
       gcTime: 2 * 60 * 60 * 1000, // 2 hours cache
-    }
+    },
   );
 }

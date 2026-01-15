@@ -75,7 +75,9 @@ export default function GroupsScreen() {
       setIsCreateSheetOpen(false);
       showDialog(
         t("common.status.success"),
-        t("groups.createSuccess", { defaultValue: "Group created successfully!" }),
+        t("groups.createSuccess", {
+          defaultValue: "Group created successfully!",
+        }),
       );
       // Navigate to the new group
       router.push(`/groups/${groupId}`);
@@ -88,7 +90,9 @@ export default function GroupsScreen() {
     setIsJoinSheetOpen(false);
     showDialog(
       t("common.status.success"),
-      t("groups.joinSuccess", { defaultValue: "Successfully joined the group!" }),
+      t("groups.joinSuccess", {
+        defaultValue: "Successfully joined the group!",
+      }),
     );
   }, [refetch, showDialog, t]);
 

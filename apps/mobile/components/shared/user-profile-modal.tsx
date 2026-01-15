@@ -71,7 +71,8 @@ export function UserProfileModal({
 }: UserProfileModalProps) {
   const { t } = useTranslation();
 
-  const modalTitle = title || t("activityFeed.userProfile", { defaultValue: "User Profile" });
+  const modalTitle =
+    title || t("activityFeed.userProfile", { defaultValue: "User Profile" });
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">

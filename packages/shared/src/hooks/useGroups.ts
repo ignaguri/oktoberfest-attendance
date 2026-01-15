@@ -30,7 +30,7 @@ export function useUserGroups(festivalId?: string) {
       enabled: !!festivalId,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }
 
@@ -50,7 +50,7 @@ export function useGroupSettings(groupId: string) {
       staleTime: 10 * 60 * 1000, // 10 minutes
       gcTime: 30 * 60 * 1000, // 30 minutes cache
       retry: 2,
-    }
+    },
   );
 }
 
@@ -89,7 +89,7 @@ export function useCreateGroup() {
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
       },
-    }
+    },
   );
 }
 
@@ -116,7 +116,7 @@ export function useGroupSearch(name: string, festivalId?: string) {
       enabled: name.length >= 2,
       staleTime: 30 * 1000, // 30 seconds
       gcTime: 60 * 1000, // 1 minute cache
-    }
+    },
   );
 }
 
@@ -140,7 +140,7 @@ export function useJoinGroup() {
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
       },
-    }
+    },
   );
 }
 
@@ -164,7 +164,7 @@ export function useJoinGroupByToken() {
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
       },
-    }
+    },
   );
 }
 
@@ -199,7 +199,7 @@ export function useUpdateGroup() {
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
       },
-    }
+    },
   );
 }
 
@@ -225,7 +225,7 @@ export function useLeaveGroup() {
         invalidateQueries(["user"]);
         invalidateQueries(["groups"]);
       },
-    }
+    },
   );
 }
 
@@ -251,7 +251,7 @@ export function useGroupName(groupId: string) {
       staleTime: 10 * 60 * 1000, // 10 minutes (same as group settings)
       gcTime: 30 * 60 * 1000, // 30 minutes cache
       retry: 2,
-    }
+    },
   );
 }
 
@@ -271,7 +271,7 @@ export function useGroupMembers(groupId: string) {
       enabled: !!groupId,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }
 
@@ -295,7 +295,7 @@ export function useRemoveMember() {
         // Invalidate leaderboards that might be affected
         invalidateQueries(["leaderboard"]);
       },
-    }
+    },
   );
 }
 
@@ -315,7 +315,7 @@ export function useRenewInviteToken() {
         // Invalidate group details to refresh the invite token
         invalidateQueries(QueryKeys.group(groupId));
       },
-    }
+    },
   );
 }
 
@@ -335,6 +335,6 @@ export function useGroupGallery(groupId: string) {
       enabled: !!groupId,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes cache
-    }
+    },
   );
 }

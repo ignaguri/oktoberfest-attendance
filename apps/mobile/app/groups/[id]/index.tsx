@@ -1,9 +1,22 @@
-import { useGroupSettings, useGroupLeaderboard } from "@prostcounter/shared/hooks";
+import {
+  useGroupSettings,
+  useGroupLeaderboard,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { WinningCriteria, LeaderboardEntry } from "@prostcounter/shared/schemas";
+import type {
+  WinningCriteria,
+  LeaderboardEntry,
+} from "@prostcounter/shared/schemas";
 import type { SortOrder } from "@/components/shared/leaderboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Settings, Share2, Users, Trophy, QrCode, Image } from "lucide-react-native";
+import {
+  Settings,
+  Share2,
+  Users,
+  Trophy,
+  QrCode,
+  Image,
+} from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView, Share } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -68,7 +81,9 @@ export default function GroupDetailScreen() {
   const group = groupResponse?.data;
 
   // Fetch leaderboard
-  const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;
+  const criteriaId = group
+    ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria]
+    : 0;
   const {
     data: leaderboardData,
     loading: isLoadingLeaderboard,
@@ -84,7 +99,9 @@ export default function GroupDetailScreen() {
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
 
   // Sorting state for leaderboard
-  const [sortColumn, setSortColumn] = useState<WinningCriteria | undefined>(undefined);
+  const [sortColumn, setSortColumn] = useState<WinningCriteria | undefined>(
+    undefined,
+  );
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   // Handle share
@@ -93,7 +110,8 @@ export default function GroupDetailScreen() {
       showDialog(
         t("common.status.error"),
         t("groups.share.noToken", {
-          defaultValue: "No invite link available. Please generate one in settings.",
+          defaultValue:
+            "No invite link available. Please generate one in settings.",
         }),
       );
       return;
@@ -126,10 +144,13 @@ export default function GroupDetailScreen() {
   }, []);
 
   // Handle sort change
-  const handleSortChange = useCallback((criteria: WinningCriteria, order: SortOrder) => {
-    setSortColumn(criteria);
-    setSortOrder(order);
-  }, []);
+  const handleSortChange = useCallback(
+    (criteria: WinningCriteria, order: SortOrder) => {
+      setSortColumn(criteria);
+      setSortOrder(order);
+    },
+    [],
+  );
 
   // Handle gallery navigation
   const handleGallery = useCallback(() => {
@@ -174,7 +195,9 @@ export default function GroupDetailScreen() {
           className="mt-4"
           onPress={() => router.back()}
         >
-          <ButtonText>{t("common.buttons.goBack", { defaultValue: "Go Back" })}</ButtonText>
+          <ButtonText>
+            {t("common.buttons.goBack", { defaultValue: "Go Back" })}
+          </ButtonText>
         </Button>
       </View>
     );
@@ -195,7 +218,10 @@ export default function GroupDetailScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={
-          <RefreshControl refreshing={isRefetching ?? false} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={isRefetching ?? false}
+            onRefresh={onRefresh}
+          />
         }
       >
         <VStack space="lg" className="p-4">
@@ -217,9 +243,16 @@ export default function GroupDetailScreen() {
                     </Text>
                   </HStack>
                 </VStack>
-                <Badge action="warning" variant="solid" size="md" className="bg-primary-500">
+                <Badge
+                  action="warning"
+                  variant="solid"
+                  size="md"
+                  className="bg-primary-500"
+                >
                   <Trophy size={12} color={IconColors.white} />
-                  <BadgeText className="ml-1 text-white">{criteriaLabel}</BadgeText>
+                  <BadgeText className="ml-1 text-white">
+                    {criteriaLabel}
+                  </BadgeText>
                 </Badge>
               </HStack>
 
@@ -274,7 +307,9 @@ export default function GroupDetailScreen() {
                   >
                     <Settings size={16} color={IconColors.white} />
                     <ButtonText className="ml-1">
-                      {t("groups.actions.settings", { defaultValue: "Settings" })}
+                      {t("groups.actions.settings", {
+                        defaultValue: "Settings",
+                      })}
                     </ButtonText>
                   </Button>
                 )}
@@ -286,7 +321,9 @@ export default function GroupDetailScreen() {
           <VStack space="sm">
             <HStack className="items-center justify-between">
               <Text className="text-sm font-medium text-typography-700">
-                {t("groups.detail.leaderboard", { defaultValue: "Leaderboard" })}
+                {t("groups.detail.leaderboard", {
+                  defaultValue: "Leaderboard",
+                })}
               </Text>
               {isLoadingLeaderboard && <Spinner size="small" />}
             </HStack>

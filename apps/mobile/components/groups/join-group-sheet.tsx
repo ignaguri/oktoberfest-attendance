@@ -101,7 +101,10 @@ export function JoinGroupSheet({
       const message =
         err?.response?.data?.message ||
         err?.message ||
-        t("groups.join.error", { defaultValue: "Failed to join group. Please check the password and try again." });
+        t("groups.join.error", {
+          defaultValue:
+            "Failed to join group. Please check the password and try again.",
+        });
       setError(message);
     }
   }, [
@@ -234,12 +237,17 @@ export function JoinGroupSheet({
         <VStack space="sm">
           <Text className="text-sm font-medium text-typography-700">
             {isPasswordMode
-              ? t("groups.join.passwordLabel", { defaultValue: "Group Password" })
+              ? t("groups.join.passwordLabel", {
+                  defaultValue: "Group Password",
+                })
               : t("groups.join.tokenLabel", { defaultValue: "Invite Link" })}
           </Text>
           <Input size="md">
             <InputSlot className="pl-3">
-              <InputIcon as={isPasswordMode ? Key : Link} color={IconColors.muted} />
+              <InputIcon
+                as={isPasswordMode ? Key : Link}
+                color={IconColors.muted}
+              />
             </InputSlot>
             <InputField
               placeholder={
@@ -266,42 +274,40 @@ export function JoinGroupSheet({
                   defaultValue: "Paste the invite link shared with you",
                 })}
           </Text>
-          {error && (
-            <Text className="text-sm text-error-600">{error}</Text>
-          )}
+          {error && <Text className="text-sm text-error-600">{error}</Text>}
         </VStack>
 
-      {/* Action Buttons */}
-      <HStack className="w-full gap-3">
-        <Button
-          variant="outline"
-          action="secondary"
-          className="flex-1"
-          onPress={selectedGroup ? handleBack : handleClose}
-          isDisabled={isJoining}
-        >
-          <ButtonText>
-            {selectedGroup
-              ? t("common.buttons.back", { defaultValue: "Back" })
-              : t("common.buttons.cancel")}
-          </ButtonText>
-        </Button>
-        <Button
-          variant="solid"
-          action="primary"
-          className="flex-1"
-          onPress={handleJoin}
-          isDisabled={!canJoin || isJoining}
-        >
-          {isJoining && <ButtonSpinner color={Colors.white} />}
-          <ButtonText>
-            {isJoining
-              ? t("groups.join.joining", { defaultValue: "Joining..." })
-              : t("groups.actions.join", { defaultValue: "Join Group" })}
-          </ButtonText>
-        </Button>
-      </HStack>
-    </VStack>
+        {/* Action Buttons */}
+        <HStack className="w-full gap-3">
+          <Button
+            variant="outline"
+            action="secondary"
+            className="flex-1"
+            onPress={selectedGroup ? handleBack : handleClose}
+            isDisabled={isJoining}
+          >
+            <ButtonText>
+              {selectedGroup
+                ? t("common.buttons.back", { defaultValue: "Back" })
+                : t("common.buttons.cancel")}
+            </ButtonText>
+          </Button>
+          <Button
+            variant="solid"
+            action="primary"
+            className="flex-1"
+            onPress={handleJoin}
+            isDisabled={!canJoin || isJoining}
+          >
+            {isJoining && <ButtonSpinner color={Colors.white} />}
+            <ButtonText>
+              {isJoining
+                ? t("groups.join.joining", { defaultValue: "Joining..." })
+                : t("groups.actions.join", { defaultValue: "Join Group" })}
+            </ButtonText>
+          </Button>
+        </HStack>
+      </VStack>
     );
   };
 

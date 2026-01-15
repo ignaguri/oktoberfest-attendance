@@ -66,7 +66,8 @@ export default function JoinGroupByTokenScreen() {
             errorMessage:
               errorMessage ||
               t("groups.deepLink.joinFailed", {
-                defaultValue: "Failed to join group. The invite link may be invalid or expired.",
+                defaultValue:
+                  "Failed to join group. The invite link may be invalid or expired.",
               }),
           });
         }
@@ -217,7 +218,9 @@ export default function JoinGroupByTokenScreen() {
 
         <VStack space="sm" className="items-center">
           <Heading size="xl" className="text-center text-error-600">
-            {t("groups.deepLink.errorTitle", { defaultValue: "Unable to Join" })}
+            {t("groups.deepLink.errorTitle", {
+              defaultValue: "Unable to Join",
+            })}
           </Heading>
           <Text className="text-center text-typography-500">
             {result.errorMessage}
@@ -233,7 +236,9 @@ export default function JoinGroupByTokenScreen() {
             onPress={handleGoToGroups}
           >
             <ButtonText>
-              {t("groups.deepLink.goToGroups", { defaultValue: "Go to Groups" })}
+              {t("groups.deepLink.goToGroups", {
+                defaultValue: "Go to Groups",
+              })}
             </ButtonText>
           </Button>
 

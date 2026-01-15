@@ -1,5 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateGroup, useWinningCriterias } from "@prostcounter/shared/hooks";
+import {
+  useCreateGroup,
+  useWinningCriterias,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { X } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
@@ -53,9 +56,21 @@ interface CreateGroupSheetProps {
 }
 
 const WINNING_CRITERIA_OPTIONS = [
-  { value: "total_beers", label: "groups.criteria.totalBeers", defaultLabel: "Total Beers" },
-  { value: "days_attended", label: "groups.criteria.daysAttended", defaultLabel: "Days Attended" },
-  { value: "avg_beers", label: "groups.criteria.avgBeers", defaultLabel: "Avg Beers per Day" },
+  {
+    value: "total_beers",
+    label: "groups.criteria.totalBeers",
+    defaultLabel: "Total Beers",
+  },
+  {
+    value: "days_attended",
+    label: "groups.criteria.daysAttended",
+    defaultLabel: "Days Attended",
+  },
+  {
+    value: "avg_beers",
+    label: "groups.criteria.avgBeers",
+    defaultLabel: "Avg Beers per Day",
+  },
 ] as const;
 
 export function CreateGroupSheet({
@@ -159,25 +174,28 @@ export function CreateGroupSheet({
             {/* Winning Criteria Select */}
             <VStack space="sm">
               <Text className="text-sm font-medium text-typography-700">
-                {t("groups.create.criteriaLabel", { defaultValue: "Winning Criteria" })}
+                {t("groups.create.criteriaLabel", {
+                  defaultValue: "Winning Criteria",
+                })}
               </Text>
               <Controller
                 control={control}
                 name="winningCriteria"
                 render={({ field: { onChange, value } }) => (
-                  <Select
-                    selectedValue={value}
-                    onValueChange={onChange}
-                  >
+                  <Select selectedValue={value} onValueChange={onChange}>
                     <SelectTrigger variant="outline" size="md">
                       <SelectInput
                         placeholder={t("groups.create.criteriaPlaceholder", {
                           defaultValue: "Select winning criteria",
                         })}
                         value={
-                          WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)
+                          WINNING_CRITERIA_OPTIONS.find(
+                            (opt) => opt.value === value,
+                          )
                             ? t(
-                                WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)!.label,
+                                WINNING_CRITERIA_OPTIONS.find(
+                                  (opt) => opt.value === value,
+                                )!.label,
                                 {
                                   defaultValue: WINNING_CRITERIA_OPTIONS.find(
                                     (opt) => opt.value === value,
@@ -198,7 +216,9 @@ export function CreateGroupSheet({
                         {WINNING_CRITERIA_OPTIONS.map((option) => (
                           <SelectItem
                             key={option.value}
-                            label={t(option.label, { defaultValue: option.defaultLabel })}
+                            label={t(option.label, {
+                              defaultValue: option.defaultLabel,
+                            })}
                             value={option.value}
                           />
                         ))}

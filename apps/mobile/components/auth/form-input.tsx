@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { View, Pressable } from 'react-native';
-import { Input, InputField, InputSlot } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-import { Eye, EyeOff } from 'lucide-react-native';
+import React, { useState } from "react";
+import { View, Pressable } from "react-native";
+import { Input, InputField, InputSlot } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
+import { Eye, EyeOff } from "lucide-react-native";
 import type {
   Control,
   FieldValues,
   Path,
   ControllerRenderProps,
-} from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+} from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 interface FormInputProps<T extends FieldValues> {
   /** React Hook Form control */
@@ -25,17 +25,17 @@ interface FormInputProps<T extends FieldValues> {
   /** Error message to display */
   error?: string;
   /** Input type for keyboard optimization */
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
   /** Auto-capitalize behavior */
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
   /** Auto-complete hint */
   autoComplete?:
-    | 'email'
-    | 'password'
-    | 'password-new'
-    | 'name'
-    | 'username'
-    | 'off';
+    | "email"
+    | "password"
+    | "password-new"
+    | "name"
+    | "username"
+    | "off";
   /** Whether to auto-focus this input */
   autoFocus?: boolean;
   /** Whether the input is disabled */
@@ -55,9 +55,9 @@ export function FormInput<T extends FieldValues>({
   placeholder,
   secureTextEntry = false,
   error,
-  keyboardType = 'default',
-  autoCapitalize = 'none',
-  autoComplete = 'off',
+  keyboardType = "default",
+  autoCapitalize = "none",
+  autoComplete = "off",
   autoFocus = false,
   disabled = false,
 }: FormInputProps<T>) {
@@ -100,12 +100,10 @@ export function FormInput<T extends FieldValues>({
   );
 
   return (
-    <View className="w-full mb-4">
-      <Text className="text-typography-700 font-medium mb-1.5">{label}</Text>
+    <View className="mb-4 w-full">
+      <Text className="mb-1.5 font-medium text-typography-700">{label}</Text>
       <Controller control={control} name={name} render={renderInput} />
-      {error && (
-        <Text className="text-error-600 text-sm mt-1">{error}</Text>
-      )}
+      {error && <Text className="mt-1 text-sm text-error-600">{error}</Text>}
     </View>
   );
 }

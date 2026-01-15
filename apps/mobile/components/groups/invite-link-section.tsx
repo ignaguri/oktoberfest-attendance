@@ -150,7 +150,9 @@ export function InviteLinkSection({
                   <RefreshCw size={16} color={IconColors.default} />
                 )}
                 <ButtonText className="ml-1">
-                  {t("groups.settings.regenerate", { defaultValue: "Regenerate" })}
+                  {t("groups.settings.regenerate", {
+                    defaultValue: "Regenerate",
+                  })}
                 </ButtonText>
               </Button>
             </HStack>
@@ -179,7 +181,9 @@ export function InviteLinkSection({
             >
               {isRegenerating && <ButtonSpinner color={Colors.white} />}
               <ButtonText>
-                {t("groups.settings.generateLink", { defaultValue: "Generate Link" })}
+                {t("groups.settings.generateLink", {
+                  defaultValue: "Generate Link",
+                })}
               </ButtonText>
             </Button>
           </VStack>

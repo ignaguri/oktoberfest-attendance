@@ -36,7 +36,7 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
       enabled: !!festivalId && criteriaId > 0,
       staleTime: 2 * 60 * 1000, // 2 minutes - leaderboard changes frequently
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 }
 
@@ -46,7 +46,7 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
 export function useGroupLeaderboard(
   groupId: string,
   criteriaId: number,
-  festivalId: string
+  festivalId: string,
 ) {
   const apiClient = useApiClient();
 
@@ -60,7 +60,7 @@ export function useGroupLeaderboard(
       enabled: !!groupId && !!festivalId && criteriaId > 0,
       staleTime: 2 * 60 * 1000,
       gcTime: 5 * 60 * 1000,
-    }
+    },
   );
 }
 
@@ -79,6 +79,6 @@ export function useWinningCriterias() {
     {
       staleTime: 30 * 60 * 1000, // 30 minutes - winning criteria rarely change
       gcTime: 60 * 60 * 1000, // 1 hour cache
-    }
+    },
   );
 }

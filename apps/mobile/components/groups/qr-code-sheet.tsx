@@ -51,7 +51,9 @@ export function QRCodeSheet({
   inviteToken: initialToken,
 }: QRCodeSheetProps) {
   const { t } = useTranslation();
-  const [currentToken, setCurrentToken] = useState<string | null>(initialToken || null);
+  const [currentToken, setCurrentToken] = useState<string | null>(
+    initialToken || null,
+  );
   const [isGenerating, setIsGenerating] = useState(false);
 
   const renewToken = useRenewInviteToken();
@@ -118,7 +120,9 @@ export function QRCodeSheet({
               <VStack className="h-52 w-52 items-center justify-center">
                 <Spinner size="large" />
                 <Text className="mt-2 text-sm text-typography-500">
-                  {t("groups.qrCode.generating", { defaultValue: "Generating..." })}
+                  {t("groups.qrCode.generating", {
+                    defaultValue: "Generating...",
+                  })}
                 </Text>
               </VStack>
             ) : (
@@ -134,7 +138,8 @@ export function QRCodeSheet({
           {/* Helper text */}
           <Text className="text-center text-sm text-typography-500">
             {t("groups.qrCode.helper", {
-              defaultValue: "Others can scan this code to join your group instantly!",
+              defaultValue:
+                "Others can scan this code to join your group instantly!",
             })}
           </Text>
 
@@ -153,7 +158,9 @@ export function QRCodeSheet({
               <RefreshCw size={16} color={IconColors.default} />
             )}
             <ButtonText className="ml-2">
-              {t("groups.qrCode.regenerate", { defaultValue: "Generate New Code" })}
+              {t("groups.qrCode.regenerate", {
+                defaultValue: "Generate New Code",
+              })}
             </ButtonText>
           </Button>
         </VStack>

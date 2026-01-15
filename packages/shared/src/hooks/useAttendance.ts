@@ -30,7 +30,7 @@ export function useAttendances(festivalId: string) {
       enabled: !!festivalId,
       staleTime: 60 * 1000, // 1 minute - attendance changes frequently
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 }
 
@@ -56,7 +56,7 @@ export function useDeleteAttendance() {
         // Invalidate highlights as they depend on attendance
         invalidateQueries(["highlights"]);
       },
-    }
+    },
   );
 }
 
@@ -79,7 +79,7 @@ export function useAttendanceByDate(festivalId: string, date: string) {
       enabled: !!festivalId && !!date,
       staleTime: 30 * 1000, // 30 seconds - may change while editing
       gcTime: 5 * 60 * 1000, // 5 minutes cache
-    }
+    },
   );
 }
 
@@ -112,6 +112,6 @@ export function useUpdatePersonalAttendance() {
         // Invalidate highlights
         invalidateQueries(["highlights"]);
       },
-    }
+    },
   );
 }

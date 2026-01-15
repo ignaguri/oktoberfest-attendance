@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, ViewProps } from 'react-native';
-import { cardStyle } from './styles';
+import React from "react";
+import { View, ViewProps } from "react-native";
+import { cardStyle } from "./styles";
 
 // Import contract types from shared UI package
-import type { CardSize, CardVariant } from '@prostcounter/ui';
+import type { CardSize, CardVariant } from "@prostcounter/ui";
 
 /**
  * Card Props - implements @prostcounter/ui CardProps contract
@@ -19,8 +19,8 @@ type ICardProps = ViewProps & {
 
 const Card = React.forwardRef<React.ComponentRef<typeof View>, ICardProps>(
   function Card(
-    { className, size = 'md', variant = 'elevated', ...props },
-    ref
+    { className, size = "md", variant = "elevated", ...props },
+    ref,
   ) {
     return (
       <View
@@ -29,9 +29,9 @@ const Card = React.forwardRef<React.ComponentRef<typeof View>, ICardProps>(
         ref={ref}
       />
     );
-  }
+  },
 );
 
-Card.displayName = 'Card';
+Card.displayName = "Card";
 
 export { Card };

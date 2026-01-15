@@ -36,7 +36,8 @@ import { getAvatarUrl, getBeerPictureUrl } from "@/lib/utils";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NUM_COLUMNS = 3;
 const IMAGE_GAP = 4;
-const IMAGE_SIZE = (SCREEN_WIDTH - 32 - IMAGE_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
+const IMAGE_SIZE =
+  (SCREEN_WIDTH - 32 - IMAGE_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
 
 interface GalleryPhoto {
   id: string;
@@ -117,7 +118,7 @@ export default function GroupGalleryScreen() {
   // Group photos by date and user
   const groupedGallery = useMemo(
     () => groupGalleryData((galleryData as GalleryPhoto[]) || []),
-    [galleryData]
+    [galleryData],
   );
 
   const hasPhotos = groupedGallery.length > 0;
@@ -176,16 +177,25 @@ export default function GroupGalleryScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={
-          <RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={isRefetching ?? false}
+            onRefresh={refetch}
+          />
         }
       >
         <VStack space="lg" className="p-4 pb-8">
           {/* Empty State */}
           {!hasPhotos && (
-            <Card variant="outline" size="md" className="items-center bg-white p-8">
+            <Card
+              variant="outline"
+              size="md"
+              className="items-center bg-white p-8"
+            >
               <Camera size={48} color={IconColors.disabled} />
               <Text className="mt-4 text-center text-lg font-medium text-typography-700">
-                {t("groups.gallery.empty.title", { defaultValue: "No Photos Yet" })}
+                {t("groups.gallery.empty.title", {
+                  defaultValue: "No Photos Yet",
+                })}
               </Text>
               <Text className="mt-2 text-center text-sm text-typography-500">
                 {t("groups.gallery.empty.description", {

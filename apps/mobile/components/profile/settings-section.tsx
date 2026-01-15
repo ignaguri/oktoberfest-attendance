@@ -44,7 +44,9 @@ interface SettingsSectionProps {
   onBiometricToggle: (value: boolean) => void;
 }
 
-const getFestivalStatus = (festival: Festival): "upcoming" | "active" | "ended" => {
+const getFestivalStatus = (
+  festival: Festival,
+): "upcoming" | "active" | "ended" => {
   const now = new Date();
   // Use parseISO to avoid UTC timezone issues with date-only strings
   const start = parseISO(festival.startDate);
@@ -84,10 +86,13 @@ export function SettingsSection({
 
   const biometricLabel = getBiometricLabel();
 
-  const handleFestivalSelect = useCallback((festival: Festival) => {
-    setCurrentFestival(festival);
-    setShowFestivalSheet(false);
-  }, [setCurrentFestival]);
+  const handleFestivalSelect = useCallback(
+    (festival: Festival) => {
+      setCurrentFestival(festival);
+      setShowFestivalSheet(false);
+    },
+    [setCurrentFestival],
+  );
 
   return (
     <Card size="md" variant="elevated">
@@ -100,16 +105,23 @@ export function SettingsSection({
         className="flex-row items-center justify-between border-b border-outline-100 py-3"
         onPress={() => setShowFestivalSheet(true)}
         accessibilityRole="button"
-        accessibilityLabel={t("festival.selector.title", { defaultValue: "Select Festival" })}
+        accessibilityLabel={t("festival.selector.title", {
+          defaultValue: "Select Festival",
+        })}
       >
         <View className="flex-row items-center gap-3">
           <CalendarDays size={24} color={IconColors.primary} />
           <View>
             <Text className="text-typography-900">
-              {t("festival.selector.title", { defaultValue: "Select Festival" })}
+              {t("festival.selector.title", {
+                defaultValue: "Select Festival",
+              })}
             </Text>
             <Text className="text-sm text-typography-500">
-              {currentFestival?.name || t("festival.selector.noFestival", { defaultValue: "No festival selected" })}
+              {currentFestival?.name ||
+                t("festival.selector.noFestival", {
+                  defaultValue: "No festival selected",
+                })}
             </Text>
           </View>
         </View>
@@ -117,7 +129,10 @@ export function SettingsSection({
       </Pressable>
 
       {/* Festival Selection Sheet */}
-      <Actionsheet isOpen={showFestivalSheet} onClose={() => setShowFestivalSheet(false)}>
+      <Actionsheet
+        isOpen={showFestivalSheet}
+        onClose={() => setShowFestivalSheet(false)}
+      >
         <ActionsheetBackdrop />
         <ActionsheetContent className="pb-8">
           <ActionsheetDragIndicatorWrapper>
@@ -125,10 +140,15 @@ export function SettingsSection({
           </ActionsheetDragIndicatorWrapper>
           <VStack space="md" className="w-full px-4 pt-4">
             <Heading size="md" className="text-center">
-              {t("festival.selector.title", { defaultValue: "Select Festival" })}
+              {t("festival.selector.title", {
+                defaultValue: "Select Festival",
+              })}
             </Heading>
             <Text className="text-center text-sm text-typography-500">
-              {t("festival.selector.description", { defaultValue: "Choose which festival you want to view and participate in." })}
+              {t("festival.selector.description", {
+                defaultValue:
+                  "Choose which festival you want to view and participate in.",
+              })}
             </Text>
           </VStack>
           {festivals.map((festival) => {
@@ -145,21 +165,32 @@ export function SettingsSection({
                 <HStack className="w-full items-center justify-between">
                   <VStack space="xs" className="flex-1">
                     <HStack space="sm" className="items-center">
-                      <ActionsheetItemText className={isSelected ? "font-semibold text-primary-600" : ""}>
+                      <ActionsheetItemText
+                        className={
+                          isSelected ? "font-semibold text-primary-600" : ""
+                        }
+                      >
                         {festival.name}
                       </ActionsheetItemText>
                       <Badge size="sm" className={cn("rounded-md", badgeClass)}>
-                        <BadgeText className={cn("capitalize", textClass)}>{status}</BadgeText>
+                        <BadgeText className={cn("capitalize", textClass)}>
+                          {status}
+                        </BadgeText>
                       </Badge>
                     </HStack>
                     <Text className="text-xs text-typography-400">
-                      {format(parseISO(festival.startDate), "MMM d")} - {format(parseISO(festival.endDate), "MMM d, yyyy")}
+                      {format(parseISO(festival.startDate), "MMM d")} -{" "}
+                      {format(parseISO(festival.endDate), "MMM d, yyyy")}
                     </Text>
                     {festival.location && (
-                      <Text className="text-xs text-typography-400">{festival.location}</Text>
+                      <Text className="text-xs text-typography-400">
+                        {festival.location}
+                      </Text>
                     )}
                   </VStack>
-                  {isSelected && <Check size={20} color={Colors.primary[500]} />}
+                  {isSelected && (
+                    <Check size={20} color={Colors.primary[500]} />
+                  )}
                 </HStack>
               </ActionsheetItem>
             );
@@ -186,7 +217,10 @@ export function SettingsSection({
           <Switch
             value={isBiometricEnabled}
             onValueChange={onBiometricToggle}
-            trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
+            trackColor={{
+              false: SwitchColors.trackOff,
+              true: SwitchColors.trackOn,
+            }}
             thumbColor={SwitchColors.thumb}
             accessibilityLabel={`${biometricLabel} ${isBiometricEnabled ? t("common.status.enabled", { defaultValue: "enabled" }) : t("common.status.disabled", { defaultValue: "disabled" })}`}
           />

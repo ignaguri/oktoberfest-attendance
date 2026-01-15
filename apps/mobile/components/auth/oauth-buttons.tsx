@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Platform, ActivityIndicator } from 'react-native';
-import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
-import { useTranslation } from 'react-i18next';
-import Svg, { Path, G, Rect, Defs, ClipPath } from 'react-native-svg';
+import React from "react";
+import { View, Platform, ActivityIndicator } from "react-native";
+import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+import Svg, { Path, G, Rect, Defs, ClipPath } from "react-native-svg";
 
 interface OAuthButtonsProps {
   /** Handler for Google sign-in */
@@ -109,9 +109,9 @@ export function OAuthButtons({
         ) : (
           <>
             <GoogleIcon />
-            <ButtonText className="text-typography-700 ml-2">
-              {t('auth.signIn.continueWithGoogle', {
-                defaultValue: 'Continue with Google',
+            <ButtonText className="ml-2 text-typography-700">
+              {t("auth.signIn.continueWithGoogle", {
+                defaultValue: "Continue with Google",
               })}
             </ButtonText>
           </>
@@ -124,16 +124,16 @@ export function OAuthButtons({
         size="lg"
         onPress={onFacebookPress}
         disabled={disabled || isAnyLoading}
-        className="bg-[#1877F2] border-0"
+        className="border-0 bg-[#1877F2]"
       >
         {isFacebookLoading ? (
           <ActivityIndicator size="small" color="#FFFFFF" />
         ) : (
           <>
             <FacebookIcon />
-            <ButtonText className="text-white ml-2">
-              {t('auth.signIn.continueWithFacebook', {
-                defaultValue: 'Continue with Facebook',
+            <ButtonText className="ml-2 text-white">
+              {t("auth.signIn.continueWithFacebook", {
+                defaultValue: "Continue with Facebook",
               })}
             </ButtonText>
           </>
@@ -141,22 +141,22 @@ export function OAuthButtons({
       </Button>
 
       {/* Apple Button - iOS only */}
-      {Platform.OS === 'ios' && (
+      {Platform.OS === "ios" && (
         <Button
           variant="solid"
           size="lg"
           onPress={onApplePress}
           disabled={disabled || isAnyLoading}
-          className="bg-black border-0"
+          className="border-0 bg-black"
         >
           {isAppleLoading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
             <>
               <AppleIcon />
-              <ButtonText className="text-white ml-2">
-                {t('auth.signIn.continueWithApple', {
-                  defaultValue: 'Continue with Apple',
+              <ButtonText className="ml-2 text-white">
+                {t("auth.signIn.continueWithApple", {
+                  defaultValue: "Continue with Apple",
                 })}
               </ButtonText>
             </>

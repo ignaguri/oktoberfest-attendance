@@ -27,7 +27,7 @@ function transformEvents(
     from: string;
     to?: string | null;
     type: "attendance" | "tent_visit" | "beer_summary" | "reservation";
-  }>
+  }>,
 ): CalendarEvent[] {
   return events.map((event) => ({
     ...event,
@@ -52,7 +52,7 @@ export function usePersonalCalendar(festivalId: string) {
       enabled: !!festivalId,
       staleTime: 2 * 60 * 1000, // 2 minutes - calendar changes with attendance
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }
 
@@ -72,6 +72,6 @@ export function useGroupCalendar(groupId: string) {
       enabled: !!groupId,
       staleTime: 2 * 60 * 1000, // 2 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes cache
-    }
+    },
   );
 }

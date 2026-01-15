@@ -36,7 +36,7 @@ function getSupabaseUrl(): string {
  */
 export function getBeerPictureUrl(
   pictureUrl: string | null | undefined,
-  bucket: string = "beer_pictures"
+  bucket: string = "beer_pictures",
 ): string | undefined {
   if (!pictureUrl) return undefined;
 

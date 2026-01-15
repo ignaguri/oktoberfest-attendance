@@ -22,9 +22,7 @@ export type ValidImageType = (typeof VALID_IMAGE_TYPES)[number];
 export type FileMetadata = z.infer<typeof FileMetadataSchema>;
 export const FileMetadataSchema = z.object({
   uri: z.string().min(1, { error: "validation.file.required" }),
-  size: z
-    .number()
-    .max(MAX_FILE_SIZE, { error: "validation.file.tooLarge" }),
+  size: z.number().max(MAX_FILE_SIZE, { error: "validation.file.tooLarge" }),
   mimeType: z.enum(VALID_IMAGE_TYPES, { error: "validation.file.invalidType" }),
   name: z.string().optional(),
 });

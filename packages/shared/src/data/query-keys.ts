@@ -49,7 +49,7 @@ export class QueryKeys {
   static groupLeaderboard = (
     groupId: string,
     criteriaId: number,
-    festivalId: string
+    festivalId: string,
   ) => ["leaderboard", "group", groupId, criteriaId, festivalId] as const;
 
   // Notification queries
