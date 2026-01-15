@@ -1,9 +1,10 @@
 "use client";
 
+import { RadlerIcon } from "@/components/icons/radler-icon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLogConsumption } from "@prostcounter/shared/hooks";
-import { Beer, Wine, CupSoda, Check, Loader2 } from "lucide-react";
+import { Beer, Wine, CupSoda, BeerOff, Check, Loader2 } from "lucide-react";
 import { useState, useCallback } from "react";
 
 import type { DrinkType } from "@prostcounter/shared/schemas";
@@ -14,6 +15,7 @@ import type { DrinkType } from "@prostcounter/shared/schemas";
 export const VISIBLE_DRINK_TYPES: DrinkType[] = [
   "beer",
   "radler",
+  "alcohol_free",
   "wine",
   "soft_drink",
 ];
@@ -54,12 +56,15 @@ function DrinkIcon({
 
   switch (type) {
     case "beer":
-    case "radler":
       return <Beer className={iconClass} />;
+    case "radler":
+      return <RadlerIcon className={className} />;
     case "wine":
       return <Wine className={iconClass} />;
     case "soft_drink":
       return <CupSoda className={iconClass} />;
+    case "alcohol_free":
+      return <BeerOff className={iconClass} />;
     default:
       return <Beer className={iconClass} />;
   }
@@ -78,6 +83,8 @@ function getLabel(type: DrinkType): string {
       return "+1 Wine";
     case "soft_drink":
       return "+1 Soft";
+    case "alcohol_free":
+      return "+1 AF";
     default:
       return `+1 ${type}`;
   }

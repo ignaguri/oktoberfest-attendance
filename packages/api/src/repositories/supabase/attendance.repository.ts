@@ -406,7 +406,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       updatedAt: attendance.updated_at || new Date().toISOString(),
       drinkCount: attendance.drink_count || 0,
       beerCount: attendance.beer_count || 0,
+      // Spending breakdown
       totalSpentCents: attendance.total_spent_cents || 0,
+      totalBaseCents: attendance.total_base_cents || 0,
       totalTipCents: attendance.total_tip_cents || 0,
       avgPriceCents: attendance.avg_price_cents || 0,
       tentVisits: visitsForDate,
@@ -426,7 +428,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       updatedAt: data.updated_at,
       drinkCount: data.drink_count || 0,
       beerCount: data.beer_count || 0,
+      // Spending breakdown
       totalSpentCents: data.total_spent_cents || 0,
+      totalBaseCents: data.total_base_cents || 0,
       totalTipCents: data.total_tip_cents || 0,
       avgPriceCents: data.avg_price_cents || 0,
       tentVisits: [], // Will be enriched in list() method

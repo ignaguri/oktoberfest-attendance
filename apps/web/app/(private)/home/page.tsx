@@ -45,11 +45,11 @@ export default function Home() {
           </h1>
         </header>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4">
           <div data-tutorial="festival-status" className="self-center">
             <FestivalStatus />
           </div>
-          <div data-tutorial="quick-attendance">
+          <div data-tutorial="quick-attendance" className="w-full">
             <QuickAttendanceWrapper />
           </div>
         </div>

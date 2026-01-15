@@ -253,6 +253,14 @@ export class SupabaseProfileRepository {
     // Cast to any to handle varying RPC return types
     const userStats = (stats as any)?.[0];
 
+    // Get spending stats from the spending view
+    const { data: spendingStats } = await this.supabase
+      .from("user_festival_spending_stats")
+      .select("total_spent_cents, total_base_cents, total_tips_cents")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .maybeSingle();
+
     // Get favorite tent
     const { data: tentVisits } = await this.supabase
       .from("tent_visits")
@@ -299,7 +307,9 @@ export class SupabaseProfileRepository {
     return {
       totalBeers: Number(userStats?.total_beers) || 0,
       totalDays: Number(userStats?.days_attended) || 0,
-      totalSpent: Number(userStats?.total_spent_cents) || 0,
+      totalSpent: Number(spendingStats?.total_spent_cents) || 0,
+      totalBaseCents: Number(spendingStats?.total_base_cents) || 0,
+      totalTipCents: Number(spendingStats?.total_tips_cents) || 0,
       avgBeersPerDay: Number(userStats?.avg_beers) || 0,
       favoriteDay: null, // Could be calculated if needed
       favoriteTent,

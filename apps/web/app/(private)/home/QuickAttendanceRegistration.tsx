@@ -28,11 +28,12 @@ const QuickAttendanceRegistration = () => {
       : false;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       <QuickAttendanceRegistrationForm
         onAttendanceIdReceived={handleAttendanceIdReceived}
+        attendanceId={attendanceId}
+        renderPhotoUpload={(id) => <BeerPictureUpload attendanceId={id} />}
       />
-      <BeerPictureUpload attendanceId={attendanceId} />
       {isLastDayOfFestival && (
         <WrappedCTA isLastDayOfFestival={isLastDayOfFestival} />
       )}

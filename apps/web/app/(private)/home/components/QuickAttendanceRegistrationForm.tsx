@@ -26,10 +26,14 @@ import type {
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
+  attendanceId: string | null;
+  renderPhotoUpload?: (attendanceId: string | null) => React.ReactNode;
 }
 
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
+  attendanceId,
+  renderPhotoUpload,
 }: QuickAttendanceRegistrationFormProps) => {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
@@ -201,51 +205,81 @@ export const QuickAttendanceRegistrationForm = ({
           />
         </div>
       )}
-      <form className="flex flex-col items-center gap-4">
-        <p className="text-sm font-semibold">
-          {tentId ? "You are at:" : "Are you there today?"}
-        </p>
-        <div className="flex w-full items-center justify-center gap-2">
-          <SingleSelect
-            value={tentId}
-            className="max-w-64 flex-1"
-            buttonClassName="self-center"
-            options={tents.map((tent) => ({
-              title: tent.category,
-              options: tent.options,
-            }))}
-            placeholder="Select your current tent"
-            onSelect={(option) => {
-              setValue("tentId", option.value);
-              handleSubmit(onSubmit)();
-            }}
-            disabled={isSubmitting}
-          />
-          {/* Location sharing toggle disabled - requires migration from deprecated tables
-              to session-based model. See: app/api/location-sharing/ for details */}
-        </div>
-        {/* Location sharing status disabled - pending database migration */}
-        {/* Drink Type Selector + Stepper (vertical centered layout) */}
-        {currentFestival && (
-          <div className="flex flex-col items-center gap-4">
+      {/* Card containing all attendance controls - matching mobile layout */}
+      {currentFestival && (
+        <form className="flex w-full flex-col gap-4 rounded-lg border bg-white p-4">
+          {/* Header with title and count summary */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">
+              {t("home.quickAttendance.title")}
+            </h3>
+            {drinkSummary.total > 0 && (
+              <span className="text-muted-foreground text-sm">
+                {drinkSummary.total}{" "}
+                {drinkSummary.total === 1 ? "drink" : "drinks"} today
+              </span>
+            )}
+          </div>
+
+          {/* Drink Type Selector + Stepper (horizontal layout like mobile) */}
+          <div className="flex items-center justify-between gap-4">
             <DrinkTypePicker
               selectedType={selectedDrinkType}
               onSelect={setSelectedDrinkType}
               counts={drinkSummary.counts}
               disabled={isSubmitting}
+              responsive
             />
-            <DrinkStepper
-              festivalId={currentFestival.id}
-              date={todayString}
-              drinkType={selectedDrinkType}
-              tentId={tentId || undefined}
-              consumptions={consumptions}
+            <div className="flex flex-col items-center gap-1">
+              <DrinkStepper
+                festivalId={currentFestival.id}
+                date={todayString}
+                drinkType={selectedDrinkType}
+                tentId={tentId || undefined}
+                consumptions={consumptions}
+                disabled={isSubmitting}
+                onSuccess={triggerConfetti}
+              />
+              <span className="text-muted-foreground text-xs">
+                {t(`attendance.drinkTypes.${selectedDrinkType}`, {
+                  defaultValue: selectedDrinkType,
+                })}
+              </span>
+            </div>
+          </div>
+
+          {/* Tent selector section */}
+          <div className="flex flex-col gap-1">
+            <span className="text-muted-foreground text-sm font-medium">
+              {t("home.quickAttendance.tent")}
+            </span>
+            <SingleSelect
+              value={tentId}
+              className="w-full"
+              options={tents.map((tent) => ({
+                title: tent.category,
+                options: tent.options,
+              }))}
+              placeholder={t("home.quickAttendance.selectTent")}
+              onSelect={(option) => {
+                setValue("tentId", option.value);
+                handleSubmit(onSubmit)();
+              }}
               disabled={isSubmitting}
-              onSuccess={triggerConfetti}
             />
           </div>
-        )}
-      </form>
+
+          {/* Photo upload section */}
+          {renderPhotoUpload && (
+            <div className="flex flex-col">
+              <span className="text-muted-foreground text-sm font-medium">
+                {t("home.quickAttendance.photos")}
+              </span>
+              {renderPhotoUpload(attendanceId)}
+            </div>
+          )}
+        </form>
+      )}
     </>
   );
 };

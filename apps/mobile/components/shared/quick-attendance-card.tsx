@@ -31,7 +31,7 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { format, isAfter, isBefore, parseISO, startOfDay } from "date-fns";
-import { Beer, Camera, Check, ChevronDown, Minus } from "lucide-react-native";
+import { Camera, Check, ChevronDown, Minus } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 
@@ -276,9 +276,7 @@ export function QuickAttendanceCard() {
         <VStack space="md" className="items-center py-6">
           <ActivityIndicator size="small" color={Colors.primary[500]} />
           <Text className="text-typography-500">
-            {t("home.quickAttendance.loading", {
-              defaultValue: "Loading attendance...",
-            })}
+            {t("home.quickAttendance.loading")}
           </Text>
         </VStack>
       </Card>
@@ -290,19 +288,11 @@ export function QuickAttendanceCard() {
     return (
       <Card variant="outline" size="md" className="bg-white">
         <VStack space="md">
-          <HStack space="sm" className="items-center">
-            <Beer size={20} color={IconColors.disabled} />
-            <Heading size="sm" className="text-typography-500">
-              {t("home.quickAttendance.title", {
-                defaultValue: "Log Today's Beer",
-              })}
-            </Heading>
-          </HStack>
+          <Heading size="sm" className="text-typography-500">
+            {t("home.quickAttendance.title")}
+          </Heading>
           <Text className="text-center text-typography-400">
-            {t("home.quickAttendance.outsideFestival", {
-              defaultValue:
-                "Attendance logging is only available during the festival",
-            })}
+            {t("home.quickAttendance.outsideFestival")}
           </Text>
         </VStack>
       </Card>
@@ -316,14 +306,9 @@ export function QuickAttendanceCard() {
       <VStack space="lg">
         {/* Header with drink count summary */}
         <HStack className="items-center justify-between">
-          <HStack space="sm" className="items-center">
-            <Beer size={20} color={IconColors.primary} />
-            <Heading size="sm" className="text-typography-900">
-              {t("home.quickAttendance.title", {
-                defaultValue: "Quick Add",
-              })}
-            </Heading>
-          </HStack>
+          <Heading size="sm" className="text-typography-900">
+            {t("home.quickAttendance.title")}
+          </Heading>
           {consumptions.length > 0 && (
             <DrinkCountSummary consumptions={consumptions} compact showTotal={false} />
           )}
@@ -364,7 +349,7 @@ export function QuickAttendanceCard() {
         {/* Tent Selector */}
         <VStack space="xs">
           <Text className="text-sm font-medium text-typography-600">
-            {t("home.quickAttendance.tent", { defaultValue: "Tent" })}
+            {t("home.quickAttendance.tent")}
           </Text>
           <Pressable
             onPress={() => setIsTentSheetOpen(true)}
@@ -381,10 +366,7 @@ export function QuickAttendanceCard() {
                 selectedTentName ? "text-typography-900" : "text-typography-400"
               )}
             >
-              {selectedTentName ||
-                t("home.quickAttendance.selectTent", {
-                  defaultValue: "Select a tent",
-                })}
+              {selectedTentName || t("home.quickAttendance.selectTent")}
             </Text>
             <ChevronDown
               size={20}
@@ -396,7 +378,7 @@ export function QuickAttendanceCard() {
         {/* Photos Section */}
         <VStack space="xs">
           <Text className="text-sm font-medium text-typography-600">
-            {t("home.quickAttendance.photos", { defaultValue: "Photos" })}
+            {t("home.quickAttendance.photos")}
           </Text>
           <HStack className="flex-wrap gap-2">
             {/* Existing photos */}

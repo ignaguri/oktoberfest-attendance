@@ -106,10 +106,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center gap-4"
-    >
+    <div className="flex flex-col items-center gap-4">
       <Input
         type="file"
         accept="image/*"
@@ -126,11 +123,11 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
           <span>{t("attendance.pictures.chooseDifferent")}</span>
         ) : (
           <div className="flex items-center gap-2">
-            <Camera size={24} />
+            <Camera size={20} />
             {pictureAlreadyUploaded ? (
               <span>{t("attendance.pictures.addAnother")}</span>
             ) : (
-              <span>{t("attendance.pictures.withBeer")}</span>
+              <span>{t("attendance.pictures.withDrink")}</span>
             )}
           </div>
         )}
@@ -160,7 +157,12 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
       )}
 
       {watchedPicture && !errors.picture && (
-        <Button type="submit" disabled={isSubmitting} variant="darkYellow">
+        <Button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
+          variant="darkYellow"
+        >
           {isSubmitting
             ? t("common.status.loading")
             : t("attendance.pictures.upload", { count: 1 })}
@@ -175,6 +177,6 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
           </Link>
         </Alert>
       )}
-    </form>
+    </div>
   );
 }

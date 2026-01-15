@@ -31,11 +31,15 @@ const Highlights = () => {
     totalBeers = 0,
     totalDays = 0,
     totalSpent = 0,
+    totalBaseCents = 0,
+    totalTipCents = 0,
   } = highlightsData || {
     groupPositions: [],
     totalBeers: 0,
     totalDays: 0,
     totalSpent: 0,
+    totalBaseCents: 0,
+    totalTipCents: 0,
   };
 
   // Convert totalSpent from cents to euros - React Compiler handles memoization automatically
@@ -115,7 +119,17 @@ const Highlights = () => {
                   </li>
                 )}
                 {spentOnBeers && (
-                  <li>{t("home.spentOnBeers", { amount: spentOnBeers })}</li>
+                  <li className="mb-2">
+                    {t("home.spentOnBeers", { amount: spentOnBeers })}
+                    {(totalBaseCents > 0 || totalTipCents > 0) && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        ({t("home.baseCost", { defaultValue: "Base" })}: €
+                        {(totalBaseCents / 100).toFixed(0)} |{" "}
+                        {t("home.tips", { defaultValue: "Tips" })}: €
+                        {(totalTipCents / 100).toFixed(0)})
+                      </span>
+                    )}
+                  </li>
                 )}
               </ul>
             </div>

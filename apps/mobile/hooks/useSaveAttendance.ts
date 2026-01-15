@@ -23,6 +23,7 @@ import {
   useBeerPictureUpload,
   type PendingPhoto,
 } from "./useBeerPictureUpload";
+import { useDrinkPrice } from "./useDrinkPrice";
 import { apiClient } from "@/lib/api-client";
 
 interface SaveAttendanceInput {
@@ -52,6 +53,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const logConsumption = useLogConsumption();
   const deleteConsumption = useDeleteConsumption();
   const { uploadPendingPhotos } = useBeerPictureUpload();
+  const { getDrinkPriceCents } = useDrinkPrice();
   const invalidateQueries = useInvalidateQueries();
 
   const saveAttendance = useCallback(
@@ -107,13 +109,15 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
 
             if (delta > 0) {
               // Need to create more consumptions
+              const tentId = tents[0]; // Use first tent
+              const priceCents = getDrinkPriceCents(drinkType, tentId);
               for (let i = 0; i < delta; i++) {
                 await logConsumption.mutateAsync({
                   festivalId,
                   date: dateStr,
                   drinkType,
-                  tentId: tents[0], // Use first tent
-                  pricePaidCents: 1620, // Default price
+                  tentId,
+                  pricePaidCents: priceCents,
                   volumeMl: 1000,
                 });
               }
@@ -172,7 +176,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         setIsSaving(false);
       }
     },
-    [updateAttendance, logConsumption, deleteConsumption, uploadPendingPhotos, invalidateQueries],
+    [updateAttendance, logConsumption, deleteConsumption, uploadPendingPhotos, getDrinkPriceCents, invalidateQueries],
   );
 
   return {

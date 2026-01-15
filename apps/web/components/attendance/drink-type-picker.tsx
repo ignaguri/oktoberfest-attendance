@@ -1,9 +1,10 @@
 "use client";
 
+import { RadlerIcon } from "@/components/icons/radler-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Beer, Wine, GlassWater, CupSoda } from "lucide-react";
+import { Beer, Wine, GlassWater, CupSoda, BeerOff } from "lucide-react";
 
 import type { DrinkType } from "@prostcounter/shared/schemas";
 
@@ -13,6 +14,7 @@ import type { DrinkType } from "@prostcounter/shared/schemas";
 export const VISIBLE_DRINK_TYPES: DrinkType[] = [
   "beer",
   "radler",
+  "alcohol_free",
   "wine",
   "soft_drink",
 ];
@@ -72,14 +74,15 @@ function DrinkIcon({
 
   switch (type) {
     case "beer":
-    case "radler":
       return <Beer className={iconClass} />;
+    case "radler":
+      return <RadlerIcon className={className} />;
     case "wine":
       return <Wine className={iconClass} />;
     case "soft_drink":
       return <CupSoda className={iconClass} />;
     case "alcohol_free":
-      return <GlassWater className={iconClass} />;
+      return <BeerOff className={iconClass} />;
     default:
       return <GlassWater className={iconClass} />;
   }
@@ -124,66 +127,78 @@ export function DrinkTypePicker({
   responsive = false,
   className,
 }: DrinkTypePickerProps) {
-  return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
-      <div
+  // Split into two rows for responsive layout: 3 on first row, 2 on second
+  const firstRow = VISIBLE_DRINK_TYPES.slice(0, 3);
+  const secondRow = VISIBLE_DRINK_TYPES.slice(3);
+
+  const renderButton = (type: DrinkType) => {
+    const isSelected = selectedType === type;
+    const count = counts[type] || 0;
+
+    return (
+      <Button
+        key={type}
+        type="button"
+        variant="outline"
+        size={showLabels ? "default" : "icon"}
+        onClick={() => onSelect(type)}
+        disabled={disabled}
         className={cn(
-          "flex justify-center gap-2",
-          responsive && "grid grid-cols-2 sm:flex sm:grid-cols-none",
+          "relative",
+          isSelected &&
+            `ring-2 ring-offset-2 ${DRINK_TYPE_BORDER_COLORS[type]}`,
+          !showLabels && "h-12 w-12",
         )}
       >
-        {VISIBLE_DRINK_TYPES.map((type) => {
-          const isSelected = selectedType === type;
-          const count = counts[type] || 0;
+        <DrinkIcon
+          type={type}
+          className={cn(
+            isSelected ? DRINK_TYPE_COLORS[type] : DRINK_TYPE_COLORS[type],
+          )}
+        />
+        {showLabels && <span className="ml-1">{getDrinkTypeLabel(type)}</span>}
 
-          return (
-            <Button
-              key={type}
-              type="button"
-              variant="outline"
-              size={showLabels ? "default" : "icon"}
-              onClick={() => onSelect(type)}
-              disabled={disabled}
-              className={cn(
-                "relative",
-                isSelected &&
-                  `ring-2 ring-offset-2 ${DRINK_TYPE_BORDER_COLORS[type]}`,
-                !showLabels && "h-12 w-12",
-              )}
-            >
-              <DrinkIcon
-                type={type}
-                className={cn(
-                  isSelected
-                    ? DRINK_TYPE_COLORS[type]
-                    : DRINK_TYPE_COLORS[type],
-                )}
-              />
-              {showLabels && (
-                <span className="ml-1">{getDrinkTypeLabel(type)}</span>
-              )}
+        {/* Count badge */}
+        {count > 0 && (
+          <Badge
+            variant="secondary"
+            className={cn(
+              "absolute -top-2 -right-2 h-5 min-w-[20px] px-1 text-xs",
+              DRINK_TYPE_BG_COLORS[type],
+              "border-0 text-white",
+            )}
+          >
+            {count}
+          </Badge>
+        )}
+      </Button>
+    );
+  };
 
-              {/* Count badge */}
-              {count > 0 && (
-                <Badge
-                  variant="secondary"
-                  className={cn(
-                    "absolute -top-2 -right-2 h-5 min-w-[20px] px-1 text-xs",
-                    DRINK_TYPE_BG_COLORS[type],
-                    "border-0 text-white",
-                  )}
-                >
-                  {count}
-                </Badge>
-              )}
-            </Button>
-          );
-        })}
-      </div>
-      {/* Selected type label */}
-      <span className="text-muted-foreground text-sm font-medium">
-        {getDrinkTypeLabel(selectedType)}
-      </span>
+  return (
+    <div className={cn("flex flex-col items-center gap-2", className)}>
+      {responsive ? (
+        // Responsive layout: two flex rows, second row centered
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex justify-center gap-2">
+            {firstRow.map(renderButton)}
+          </div>
+          <div className="flex justify-center gap-2">
+            {secondRow.map(renderButton)}
+          </div>
+        </div>
+      ) : (
+        // Default layout: single row
+        <div className="flex justify-center gap-2">
+          {VISIBLE_DRINK_TYPES.map(renderButton)}
+        </div>
+      )}
+      {/* Selected type label - hide in responsive mode since label is shown elsewhere */}
+      {!responsive && (
+        <span className="text-muted-foreground text-sm font-medium">
+          {getDrinkTypeLabel(selectedType)}
+        </span>
+      )}
     </div>
   );
 }

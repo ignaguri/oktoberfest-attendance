@@ -125,3 +125,6 @@ export {
   useGroupCalendar,
   type CalendarEvent,
 } from "./useCalendar";
+
+// Pricing hooks
+export { useDrinkPrice, type UseDrinkPriceReturn } from "./useDrinkPrice";

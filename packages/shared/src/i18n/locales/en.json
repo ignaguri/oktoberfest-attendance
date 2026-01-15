@@ -305,6 +305,7 @@
       "addMore": "Add more pics",
       "addAnother": "Add another",
       "withBeer": "with a beer",
+      "withDrink": "with a drink",
       "chooseDifferent": "Choose a different one",
       "clickToView": "Click on any picture to view full size",
       "newToUpload": "New pictures to upload",
@@ -827,6 +828,14 @@
     "hotStreak": "Hot streak"
   },
   "home": {
+    "quickAttendance": {
+      "title": "What are you having?",
+      "tent": "Where are you at?",
+      "photos": "Photos",
+      "selectTent": "Select a tent",
+      "loading": "Loading attendance...",
+      "outsideFestival": "Attendance logging is only available during the festival"
+    },
     "festivalOver": "Sadly, {{name}} is over. See you next time!",
     "wrappedReady": {
       "title": "Your Wrapped is ready!",

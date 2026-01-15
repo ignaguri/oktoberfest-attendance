@@ -76,12 +76,16 @@ export default function AttendanceScreen() {
     }));
   }, [attendances]);
 
-  // Calculate total spent from all attendances
-  const totalSpentCents = useMemo(() => {
-    if (!attendances) return 0;
+  // Calculate spending totals from all attendances
+  const spendingTotals = useMemo(() => {
+    if (!attendances) return { spent: 0, base: 0, tips: 0 };
     return (attendances as AttendanceWithTotals[]).reduce(
-      (sum, a) => sum + (a.totalSpentCents || 0),
-      0
+      (totals, a) => ({
+        spent: totals.spent + (a.totalSpentCents || 0),
+        base: totals.base + (a.totalBaseCents || 0),
+        tips: totals.tips + (a.totalTipCents || 0),
+      }),
+      { spent: 0, base: 0, tips: 0 }
     );
   }, [attendances]);
 
@@ -202,14 +206,30 @@ export default function AttendanceScreen() {
                     </Text>
                   </View>
                 </View>
-                {/* Row 2: Spent */}
-                <View className="mt-4 flex-row justify-center border-t border-background-200 pt-4">
+                {/* Row 2: Spending Breakdown */}
+                <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
                   <View className="items-center">
                     <Text className="text-2xl font-bold text-primary-500">
-                      €{(totalSpentCents / 100).toFixed(0)}
+                      €{(spendingTotals.spent / 100).toFixed(0)}
                     </Text>
                     <Text className="text-xs text-typography-500">
                       {t("attendance.summary.spent", { defaultValue: "Spent" })}
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-typography-700">
+                      €{(spendingTotals.base / 100).toFixed(0)}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.baseCost", { defaultValue: "Base" })}
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Text className="text-2xl font-bold text-success-500">
+                      €{(spendingTotals.tips / 100).toFixed(0)}
+                    </Text>
+                    <Text className="text-xs text-typography-500">
+                      {t("attendance.summary.tips", { defaultValue: "Tips" })}
                     </Text>
                   </View>
                 </View>

@@ -91,7 +91,9 @@ export const GetMissingProfileFieldsResponseSchema = z.object({
 export const HighlightsSchema = z.object({
   totalBeers: z.number(),
   totalDays: z.number(),
-  totalSpent: z.number(),
+  totalSpent: z.number(), // Total price paid (includes tips) in cents
+  totalBaseCents: z.number(), // Base cost before tips in cents
+  totalTipCents: z.number(), // Tips given in cents
   avgBeersPerDay: z.number(),
   favoriteDay: z.string().nullable(),
   favoriteTent: z.string().nullable(),
