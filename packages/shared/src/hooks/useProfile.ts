@@ -149,19 +149,59 @@ export function useTutorialStatus() {
   );
 }
 
+// Type for tutorial status cache data
+type TutorialStatusCacheData = {
+  tutorial_completed: boolean;
+  tutorial_completed_at: string | null;
+};
+
 /**
  * Hook to complete tutorial
+ * Uses optimistic updates to prevent tutorial from reappearing on navigation
  */
 export function useCompleteTutorial() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
+  const cancelQueries = useCancelQueries();
 
-  return useMutation(
+  return useMutation<
+    { success: boolean },
+    void,
+    { previousStatus: TutorialStatusCacheData | undefined }
+  >(
     async () => {
       return await apiClient.profile.completeTutorial();
     },
     {
-      onSuccess: () => {
+      onMutate: async () => {
+        // Cancel any outgoing refetches
+        await cancelQueries(QueryKeys.tutorialStatus());
+
+        // Snapshot the previous value
+        const previousStatus = getQueryData<TutorialStatusCacheData>(
+          QueryKeys.tutorialStatus(),
+        );
+
+        // Optimistically update to completed
+        setQueryData<TutorialStatusCacheData>(QueryKeys.tutorialStatus(), {
+          tutorial_completed: true,
+          tutorial_completed_at: new Date().toISOString(),
+        });
+
+        return { previousStatus };
+      },
+      onError: (_error, _variables, context) => {
+        // Rollback on error
+        if (context?.previousStatus) {
+          setQueryData<TutorialStatusCacheData>(
+            QueryKeys.tutorialStatus(),
+            context.previousStatus,
+          );
+        }
+      },
+      onSettled: () => {
         invalidateQueries(QueryKeys.tutorialStatus());
         invalidateQueries(QueryKeys.profile());
       },

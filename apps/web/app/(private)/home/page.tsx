@@ -26,11 +26,13 @@ import MissingFields from "./MissingFields";
 import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 
 export default function Home() {
-  const { data: tutorialStatus } = useTutorialStatus();
+  const { data: tutorialStatus, loading: isTutorialStatusLoading } =
+    useTutorialStatus();
 
   return (
     <TutorialProvider
       tutorialCompleted={tutorialStatus?.tutorial_completed ?? false}
+      isLoadingStatus={isTutorialStatusLoading}
     >
       <div className="flex max-w-lg flex-col items-center gap-4">
         <header className="flex flex-row items-center gap-4">

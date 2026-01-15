@@ -7,14 +7,19 @@ import type { ReactNode } from "react";
 interface TutorialProviderProps {
   children: ReactNode;
   tutorialCompleted?: boolean;
+  isLoadingStatus?: boolean;
 }
 
 export function TutorialProvider({
   children,
   tutorialCompleted = false,
+  isLoadingStatus = false,
 }: TutorialProviderProps) {
   return (
-    <TutorialContextProvider initialTutorialCompleted={tutorialCompleted}>
+    <TutorialContextProvider
+      initialTutorialCompleted={tutorialCompleted}
+      isLoadingStatus={isLoadingStatus}
+    >
       {children}
     </TutorialContextProvider>
   );
