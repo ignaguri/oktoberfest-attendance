@@ -7,7 +7,8 @@ import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { useFocusManager } from "@/lib/data/focus-manager-setup";
 import { useOnlineManager } from "@/lib/data/online-manager-setup";
 import { DataProvider } from "@/lib/data/query-client";
-import { FestivalProvider } from "@/lib/festival/FestivalContext";
+import { mobileFestivalStorage } from "@/lib/festival-storage";
+import { FestivalProvider } from "@prostcounter/shared/contexts";
 import { initMobileI18n } from "@/lib/i18n";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 import { ApiClientProvider } from "@prostcounter/shared/data";
@@ -90,7 +91,7 @@ export default function RootLayout() {
                     via portal at this level */}
                 <GluestackUIProvider mode="light">
                   <AuthProvider>
-                    <FestivalProvider>
+                    <FestivalProvider storage={mobileFestivalStorage}>
                       <NavigationGuard>
                         <Stack
                           screenOptions={{

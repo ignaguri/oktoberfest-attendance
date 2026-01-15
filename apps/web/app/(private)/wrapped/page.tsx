@@ -4,9 +4,9 @@ import {
   WrappedContainer,
   WrappedError,
 } from "@/components/wrapped/core/WrappedContainer";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useWrappedAccess, useWrappedData } from "@/hooks/useWrapped";
 import { useTranslation } from "@/lib/i18n/client";
+import { useFestival } from "@prostcounter/shared/contexts";
 
 export default function WrappedPage() {
   const { t } = useTranslation();

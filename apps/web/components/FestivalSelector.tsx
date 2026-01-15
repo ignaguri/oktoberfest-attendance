@@ -10,14 +10,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
-import type { Festival, FestivalStatus } from "@/lib/types";
+import type { FestivalStatus } from "@/lib/types";
 import type { ShadcnBadgeVariant } from "@/lib/ui-adapters";
+import type { Festival } from "@prostcounter/shared/schemas";
 
 interface FestivalSelectorProps {
   className?: string;
@@ -162,8 +163,8 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-600">
-                      {format(parseISO(festival.start_date), "MMM d")} -{" "}
-                      {format(parseISO(festival.end_date), "MMM d, yyyy")}
+                      {format(parseISO(festival.startDate), "MMM d")} -{" "}
+                      {format(parseISO(festival.endDate), "MMM d, yyyy")}
                     </div>
                     <span className="text-muted-foreground text-xs">
                       {festival.location}

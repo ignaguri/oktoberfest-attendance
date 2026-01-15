@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { SkeletonGroups } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useUserGroups } from "@/lib/data";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Link } from "next-view-transitions";
 
 import type { GroupWithMembers } from "@prostcounter/shared/schemas";

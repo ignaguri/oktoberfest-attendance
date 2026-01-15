@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useLocationSharing } from "@/hooks/useLocationSharing";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { MapPin, MapPinOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";

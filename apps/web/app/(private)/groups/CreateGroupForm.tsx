@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useCreateGroup } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { CreateGroupFormSchema } from "@prostcounter/shared/schemas";
 import { EyeOff, Eye } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";

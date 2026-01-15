@@ -9,9 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SkeletonAchievements } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Link } from "next-view-transitions";
 
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";

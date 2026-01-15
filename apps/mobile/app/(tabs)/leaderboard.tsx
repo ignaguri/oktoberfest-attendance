@@ -8,7 +8,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";

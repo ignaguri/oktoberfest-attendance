@@ -21,7 +21,7 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useGroupSettings,
   useGroupLeaderboard,

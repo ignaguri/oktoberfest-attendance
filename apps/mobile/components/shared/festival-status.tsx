@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import {

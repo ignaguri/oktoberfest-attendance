@@ -15,7 +15,7 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useAttendances } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { format, parseISO } from "date-fns";

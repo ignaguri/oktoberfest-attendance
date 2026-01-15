@@ -19,9 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useGlobalLeaderboard } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Crown } from "lucide-react";
 import { Link } from "next-view-transitions";
 

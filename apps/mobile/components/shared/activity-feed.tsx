@@ -6,7 +6,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useActivityFeedItems } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Newspaper, RefreshCw } from "lucide-react-native";

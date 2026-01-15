@@ -1,10 +1,10 @@
 "use client";
 
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useReservation, useCheckInReservation } from "@/hooks/useReservations";
 import { useAttendances } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useSearchParams } from "next/navigation";
 import {
   useState,

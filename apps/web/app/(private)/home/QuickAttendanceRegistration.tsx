@@ -1,7 +1,7 @@
 "use client";
 
-import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalConstants } from "@/lib/festivalConstants";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { isSameDay } from "date-fns";
 import { useState } from "react";
 

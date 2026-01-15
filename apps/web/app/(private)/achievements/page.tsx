@@ -4,9 +4,9 @@ import { AchievementGrid } from "@/components/achievements/AchievementGrid";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { useTranslation } from "@/lib/i18n/client";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useState } from "react";
 
 import type {

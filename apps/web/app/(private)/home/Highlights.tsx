@@ -9,11 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SkeletonHighlights } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useHighlights } from "@/hooks/useProfile";
 import { getDefaultBeerCost } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Link } from "next-view-transitions";
 
 const Highlights = () => {

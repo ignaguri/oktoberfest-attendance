@@ -19,7 +19,7 @@ import {
   type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@/lib/festival/FestivalContext";
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useAttendanceByDate,
   useUpdatePersonalAttendance,

@@ -1,8 +1,8 @@
 "use client";
 
 import { SkeletonQuickAttendance } from "@/components/ui/skeleton-cards";
-import { useFestival } from "@/contexts/FestivalContext";
 import { getFestivalStatus } from "@/lib/festivalConstants";
+import { useFestival } from "@prostcounter/shared/contexts";
 
 import QuickAttendanceRegistration from "./QuickAttendanceRegistration";
 

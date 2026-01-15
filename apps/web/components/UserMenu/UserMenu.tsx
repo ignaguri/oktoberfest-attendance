@@ -26,18 +26,19 @@ import {
   getMenuItemsBySection,
 } from "@/components/UserMenu/menuConfig";
 import { WhatsNew } from "@/components/WhatsNew";
-import { useFestival } from "@/contexts/FestivalContext";
 import { useInstallPWA } from "@/hooks/use-install-pwa";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
+import { useFestival } from "@prostcounter/shared/contexts";
 import { format, parseISO } from "date-fns";
 import { ChevronDown, CalendarDays } from "lucide-react";
 import { Link } from "next-view-transitions";
 import { useState, useMemo } from "react";
 
-import type { FestivalStatus, Festival as FestivalType } from "@/lib/types";
+import type { FestivalStatus } from "@/lib/types";
 import type { ShadcnBadgeVariant } from "@/lib/ui-adapters";
+import type { Festival as FestivalType } from "@prostcounter/shared/schemas";
 
 interface UserMenuProps {
   profileData: {
@@ -184,8 +185,8 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                   {t(`festival.status.${status}`)}
                 </Badge>
                 <div className="text-muted-foreground text-xs">
-                  {format(parseISO(currentFestival.start_date), "MMM d")} -{" "}
-                  {format(parseISO(currentFestival.end_date), "MMM d")}
+                  {format(parseISO(currentFestival.startDate), "MMM d")} -{" "}
+                  {format(parseISO(currentFestival.endDate), "MMM d")}
                 </div>
               </div>
             </div>
@@ -252,8 +253,8 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-600">
-                        {format(parseISO(festival.start_date), "MMM d")} -{" "}
-                        {format(parseISO(festival.end_date), "MMM d, yyyy")}
+                        {format(parseISO(festival.startDate), "MMM d")} -{" "}
+                        {format(parseISO(festival.endDate), "MMM d, yyyy")}
                       </div>
                       <span className="text-muted-foreground text-xs">
                         {festival.location}
