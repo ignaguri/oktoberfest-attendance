@@ -21,8 +21,12 @@
         "NSCameraUsageDescription": "Allow ProstCounter to use your camera to take pictures",
         "UIBackgroundModes": ["remote-notification"],
         "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true,
-          "NSAllowsLocalNetworking": true
+          "NSAllowsLocalNetworking": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
         }
       },
       "config": {

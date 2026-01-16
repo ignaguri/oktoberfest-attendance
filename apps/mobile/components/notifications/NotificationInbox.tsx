@@ -2,6 +2,7 @@ import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
 import { useNotifications, useCounts } from "@novu/react-native";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { Bell, CheckCheck } from "lucide-react-native";
 import { useCallback } from "react";
 import {
@@ -23,7 +24,7 @@ interface NotificationItemProps {
  * Single notification item component
  */
 function NotificationItem({ notification, onPress }: NotificationItemProps) {
-  const timeAgo = getTimeAgo(notification.createdAt);
+  const timeAgo = formatRelativeTime(new Date(notification.createdAt));
   const isRead = notification.isRead;
 
   return (
@@ -226,29 +227,4 @@ export function NotificationInbox({
       />
     </View>
   );
-}
-
-/**
- * Format time ago string
- */
-function getTimeAgo(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSecs < 60) {
-    return "Just now";
-  } else if (diffMins < 60) {
-    return `${diffMins}m ago`;
-  } else if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  } else if (diffDays < 7) {
-    return `${diffDays}d ago`;
-  } else {
-    return date.toLocaleDateString();
-  }
 }

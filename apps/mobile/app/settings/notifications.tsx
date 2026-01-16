@@ -101,14 +101,8 @@ export default function NotificationSettingsScreen() {
     }
 
     registerWithNovu();
-  }, [
-    permissionStatus,
-    fcmToken,
-    profile,
-    isLoading,
-    subscribeToNotifications,
-    registerToken,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [permissionStatus, fcmToken, profile, isLoading]);
 
   const onRefresh = useCallback(() => {
     refetch();

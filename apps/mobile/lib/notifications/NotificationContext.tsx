@@ -137,7 +137,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
               }
             } catch (tokenError) {
               // This is expected to fail in simulator or if Firebase is not configured
-              console.log(
+              console.error(
                 "Could not get FCM token (expected in simulator):",
                 tokenError,
               );
