@@ -12,6 +12,7 @@ import {
   type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 import { IconColors } from "@/lib/constants/colors";
+import { getBeerPictureUrl } from "@/lib/utils";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { ImagePlus, Minus, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -110,11 +111,14 @@ export function BeerPicturesSection({
         {/* Existing (uploaded) photos - red X badge, toggle mark for removal */}
         {existingPhotos.map((photo, index) => {
           const isMarkedForRemoval = photosMarkedForRemoval.includes(photo.id);
+          const imageUrl = getBeerPictureUrl(photo.pictureUrl);
           return (
             <View key={photo.id || `photo-${index}`} className="relative">
-              <Pressable onPress={() => handleImagePreview(photo.pictureUrl)}>
+              <Pressable
+                onPress={() => handleImagePreview(imageUrl || photo.pictureUrl)}
+              >
                 <Image
-                  source={{ uri: photo.pictureUrl }}
+                  source={{ uri: imageUrl }}
                   className={`h-20 w-20 rounded-lg ${isMarkedForRemoval ? "opacity-40" : ""}`}
                   resizeMode="cover"
                 />

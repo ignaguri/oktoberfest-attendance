@@ -119,17 +119,20 @@ export class NotificationService {
   ): Promise<boolean> {
     const { error } = await this.supabase
       .from("user_notification_preferences")
-      .upsert({
-        user_id: userId,
-        push_enabled: preferences.pushEnabled,
-        group_join_enabled: preferences.groupJoinEnabled,
-        checkin_enabled: preferences.checkinEnabled,
-        reminders_enabled: preferences.remindersEnabled,
-        achievement_notifications_enabled:
-          preferences.achievementNotificationsEnabled,
-        group_notifications_enabled: preferences.groupNotificationsEnabled,
-        updated_at: new Date().toISOString(),
-      });
+      .upsert(
+        {
+          user_id: userId,
+          push_enabled: preferences.pushEnabled,
+          group_join_enabled: preferences.groupJoinEnabled,
+          checkin_enabled: preferences.checkinEnabled,
+          reminders_enabled: preferences.remindersEnabled,
+          achievement_notifications_enabled:
+            preferences.achievementNotificationsEnabled,
+          group_notifications_enabled: preferences.groupNotificationsEnabled,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" },
+      );
 
     if (error) {
       console.error("Error updating notification preferences:", error);

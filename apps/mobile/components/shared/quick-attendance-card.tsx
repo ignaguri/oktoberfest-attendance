@@ -19,6 +19,7 @@ import {
   type PendingPhoto,
 } from "@/hooks/useBeerPictureUpload";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { getBeerPictureUrl } from "@/lib/utils";
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useAttendanceByDate,
@@ -388,20 +389,25 @@ export function QuickAttendanceCard() {
           </Text>
           <HStack className="flex-wrap gap-2">
             {/* Existing photos */}
-            {existingPhotos.map((photo) => (
-              <Pressable
-                key={photo.id}
-                onPress={() => handleImagePreview(photo.pictureUrl)}
-                className="relative"
-              >
-                <Image
-                  source={{ uri: photo.pictureUrl }}
-                  className="h-16 w-16 rounded-lg"
-                  resizeMode="cover"
-                  accessibilityLabel={t("home.quickAttendance.beerPhoto")}
-                />
-              </Pressable>
-            ))}
+            {existingPhotos.map((photo) => {
+              const imageUrl = getBeerPictureUrl(photo.pictureUrl);
+              return (
+                <Pressable
+                  key={photo.id}
+                  onPress={() =>
+                    handleImagePreview(imageUrl || photo.pictureUrl)
+                  }
+                  className="relative"
+                >
+                  <Image
+                    source={{ uri: imageUrl }}
+                    className="h-16 w-16 rounded-lg"
+                    resizeMode="cover"
+                    accessibilityLabel={t("home.quickAttendance.beerPhoto")}
+                  />
+                </Pressable>
+              );
+            })}
 
             {/* Pending photos */}
             {pendingPhotos.map((photo) => (

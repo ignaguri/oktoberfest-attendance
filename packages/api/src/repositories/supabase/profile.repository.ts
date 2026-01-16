@@ -1,3 +1,5 @@
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+
 import type { Database } from "@prostcounter/db";
 import type {
   Profile,
@@ -370,8 +372,15 @@ export class SupabaseProfileRepository {
       throw new Error(`Failed to create upload URL: ${error?.message}`);
     }
 
+    // Replace localhost with actual network IP for mobile access (upload URLs only)
+    const supabaseUrl =
+      process.env.SUPABASE_PUBLIC_URL ||
+      process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      "";
+    const uploadUrl = replaceLocalhostInUrl(data.signedUrl, supabaseUrl);
+
     return {
-      uploadUrl: data.signedUrl,
+      uploadUrl,
       fileName: uniqueFileName,
       expiresIn: 3600, // 1 hour
     };

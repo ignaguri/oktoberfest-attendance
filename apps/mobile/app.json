@@ -14,10 +14,20 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.prostcounter.app",
       "usesAppleSignIn": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Use Face ID to quickly sign in to your ProstCounter account",
         "NSPhotoLibraryUsageDescription": "Allow ProstCounter to access your photos to share pictures",
-        "NSCameraUsageDescription": "Allow ProstCounter to use your camera to take pictures"
+        "NSCameraUsageDescription": "Allow ProstCounter to use your camera to take pictures",
+        "UIBackgroundModes": ["remote-notification"],
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        }
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -27,7 +37,8 @@
       "adaptiveIcon": {
         "backgroundColor": "#FBBF24"
       },
-      "package": "com.prostcounter.app"
+      "package": "com.prostcounter.app",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -39,7 +50,14 @@
       "expo-localization",
       "expo-web-browser",
       "expo-apple-authentication",
-      "expo-image-picker"
+      "expo-image-picker",
+      [
+        "expo-notifications",
+        {
+          "color": "#FBBF24"
+        }
+      ],
+      "./plugins/withModularHeaders.js"
     ],
     "experiments": {
       "typedRoutes": true
