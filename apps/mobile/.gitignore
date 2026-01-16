@@ -11,6 +11,10 @@ web-build/
 *.key
 *.mobileprovision
 
+# Firebase Config (contains client API keys)
+google-services.json
+GoogleService-Info.plist
+
 # iOS
 ios/
 

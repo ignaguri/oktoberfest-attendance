@@ -1,3 +1,5 @@
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+
 import type { IPhotoRepository } from "../interfaces/photo.repository";
 import type { Database } from "@prostcounter/db";
 import type {
@@ -56,18 +58,14 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       );
     }
 
-    // Get public URL for the file
-    const { data: publicUrlData } = this.supabase.storage
-      .from(this.BUCKET_NAME)
-      .getPublicUrl(filePath);
-
-    // Pre-create beer_pictures record
+    // Pre-create beer_pictures record with just the path (like avatars)
+    // Client utilities will construct the full URL
     const { data: picture, error: pictureError } = await this.supabase
       .from("beer_pictures")
       .insert({
         user_id: userId,
         attendance_id: query.attendanceId,
-        picture_url: publicUrlData.publicUrl,
+        picture_url: filePath, // Store only the path, not full URL
         visibility: "public", // Default to public so photos show in group galleries
       })
       .select()
@@ -79,9 +77,25 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       );
     }
 
+    // Replace localhost with actual network IP for mobile access (upload URLs only)
+    const supabaseUrl =
+      process.env.SUPABASE_PUBLIC_URL ||
+      process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      "";
+    const uploadUrl = replaceLocalhostInUrl(uploadData.signedUrl, supabaseUrl);
+
+    // Get public URL for the response (but don't store it)
+    const { data: publicUrlData } = this.supabase.storage
+      .from(this.BUCKET_NAME)
+      .getPublicUrl(filePath);
+    const publicUrl = replaceLocalhostInUrl(
+      publicUrlData.publicUrl,
+      supabaseUrl,
+    );
+
     return {
-      uploadUrl: uploadData.signedUrl,
-      publicUrl: publicUrlData.publicUrl,
+      uploadUrl,
+      publicUrl,
       expiresIn: this.UPLOAD_URL_EXPIRY,
       pictureId: picture.id,
     };
@@ -244,6 +258,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
   }
 
   private mapToBeerPicture(data: any): BeerPicture {
+    // Store only the path, client utilities will construct the full URL
     return {
       id: data.id,
       userId: data.user_id,

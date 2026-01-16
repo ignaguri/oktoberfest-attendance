@@ -166,7 +166,7 @@ export default function GroupGalleryScreen() {
         options={{
           title: groupName
             ? t("groups.gallery.titleWithName", {
-                name: groupName,
+                groupName,
               })
             : t("groups.gallery.title"),
         }}

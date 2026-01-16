@@ -1,6 +1,7 @@
 import "../global.css";
 
 import { ErrorBoundary } from "@/components/error-boundary";
+import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { GluestackUIProvider } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
@@ -10,6 +11,16 @@ import { DataProvider } from "@/lib/data/query-client";
 import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
+import {
+  configureNotificationHandler,
+  setupNotificationListeners,
+  checkInitialNotification,
+} from "@/lib/notifications/handlers";
+import {
+  NotificationProvider,
+  useNotificationContext,
+} from "@/lib/notifications/NotificationContext";
+import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
 import { FestivalProvider } from "@prostcounter/shared/contexts";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
@@ -27,6 +38,11 @@ if (Platform.OS !== "web") {
   SplashScreen.preventAutoHideAsync().catch(() => {
     // Ignore errors - splash screen may not be available
   });
+}
+
+// Configure notification handler at module level (before app renders)
+if (Platform.OS !== "web") {
+  configureNotificationHandler();
 }
 
 // Navigation guard component
@@ -48,6 +64,62 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, isLoading, segments]);
 
   return <>{children}</>;
+}
+
+// Auto-show notification permission prompt after first login
+function NotificationPromptHandler() {
+  const { isAuthenticated } = useAuth();
+  const {
+    hasPromptBeenShown,
+    permissionStatus,
+    isPermissionLoading,
+    requestPermission,
+    markPromptAsShown,
+    registerForPushNotifications,
+  } = useNotificationContext();
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  useEffect(() => {
+    // Show prompt if user is authenticated, hasn't seen prompt, and permission is undetermined
+    if (
+      isAuthenticated &&
+      !hasPromptBeenShown &&
+      !isPermissionLoading &&
+      permissionStatus === "undetermined" &&
+      Platform.OS !== "web"
+    ) {
+      // Small delay to let the app settle after login
+      const timer = setTimeout(() => setShowPrompt(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [
+    isAuthenticated,
+    hasPromptBeenShown,
+    isPermissionLoading,
+    permissionStatus,
+  ]);
+
+  const handleEnable = async () => {
+    setShowPrompt(false);
+    const granted = await requestPermission();
+    if (granted) {
+      await registerForPushNotifications();
+    }
+  };
+
+  const handleSkip = () => {
+    setShowPrompt(false);
+    markPromptAsShown();
+  };
+
+  return (
+    <NotificationPermissionPrompt
+      isOpen={showPrompt}
+      onClose={() => setShowPrompt(false)}
+      onEnable={handleEnable}
+      onSkip={handleSkip}
+    />
+  );
 }
 
 export default function RootLayout() {
@@ -75,6 +147,19 @@ export default function RootLayout() {
     prepare();
   }, []);
 
+  // Setup notification listeners
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+
+    // Setup listeners for notification interactions
+    const cleanup = setupNotificationListeners();
+
+    // Check if app was opened from a notification (cold start)
+    checkInitialNotification();
+
+    return cleanup;
+  }, []);
+
   if (!isReady) {
     return null;
   }
@@ -91,49 +176,54 @@ export default function RootLayout() {
                     via portal at this level */}
                 <GluestackUIProvider mode="light">
                   <AuthProvider>
-                    <FestivalProvider storage={mobileFestivalStorage}>
-                      <NavigationGuard>
-                        <Stack
-                          screenOptions={{
-                            headerShown: false,
-                            animation: "slide_from_right",
-                            ...defaultScreenOptions,
-                          }}
-                        >
-                          <Stack.Screen name="(auth)" />
-                          <Stack.Screen name="(tabs)" />
-                          <Stack.Screen
-                            name="settings"
-                            options={{
-                              headerShown: false,
-                              presentation: "card",
-                            }}
-                          />
-                          <Stack.Screen
-                            name="groups"
-                            options={{
-                              headerShown: false,
-                              presentation: "card",
-                            }}
-                          />
-                          <Stack.Screen
-                            name="achievements"
-                            options={{
-                              headerShown: false,
-                              presentation: "card",
-                            }}
-                          />
-                          <Stack.Screen
-                            name="join-group/[token]"
-                            options={{
-                              headerShown: false,
-                              presentation: "fullScreenModal",
-                            }}
-                          />
-                          <Stack.Screen name="+not-found" />
-                        </Stack>
-                      </NavigationGuard>
-                    </FestivalProvider>
+                    <NotificationProvider>
+                      <NovuProviderWrapper>
+                        <FestivalProvider storage={mobileFestivalStorage}>
+                          <NavigationGuard>
+                            <NotificationPromptHandler />
+                            <Stack
+                              screenOptions={{
+                                headerShown: false,
+                                animation: "slide_from_right",
+                                ...defaultScreenOptions,
+                              }}
+                            >
+                              <Stack.Screen name="(auth)" />
+                              <Stack.Screen name="(tabs)" />
+                              <Stack.Screen
+                                name="settings"
+                                options={{
+                                  headerShown: false,
+                                  presentation: "card",
+                                }}
+                              />
+                              <Stack.Screen
+                                name="groups"
+                                options={{
+                                  headerShown: false,
+                                  presentation: "card",
+                                }}
+                              />
+                              <Stack.Screen
+                                name="achievements"
+                                options={{
+                                  headerShown: false,
+                                  presentation: "card",
+                                }}
+                              />
+                              <Stack.Screen
+                                name="join-group/[token]"
+                                options={{
+                                  headerShown: false,
+                                  presentation: "fullScreenModal",
+                                }}
+                              />
+                              <Stack.Screen name="+not-found" />
+                            </Stack>
+                          </NavigationGuard>
+                        </FestivalProvider>
+                      </NovuProviderWrapper>
+                    </NotificationProvider>
                   </AuthProvider>
                 </GluestackUIProvider>
               </ApiClientProvider>

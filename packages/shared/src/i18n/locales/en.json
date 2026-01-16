@@ -1032,6 +1032,7 @@
       "title": "What are you having?",
       "tent": "Where are you at?",
       "photos": "Photos",
+      "uploadPhotos": "Upload Photos",
       "selectTent": "Select a tent",
       "loading": "Loading attendance...",
       "outsideFestival": "Attendance logging is only available during the festival"

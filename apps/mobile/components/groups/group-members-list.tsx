@@ -9,6 +9,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/utils";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { format } from "date-fns";
@@ -75,7 +76,9 @@ export function GroupMembersList({
               <HStack space="md" className="flex-1 items-center">
                 <Avatar size="sm">
                   {member.avatarUrl ? (
-                    <AvatarImage source={{ uri: member.avatarUrl }} />
+                    <AvatarImage
+                      source={{ uri: getAvatarUrl(member.avatarUrl) }}
+                    />
                   ) : (
                     <AvatarFallbackText>{initials}</AvatarFallbackText>
                   )}

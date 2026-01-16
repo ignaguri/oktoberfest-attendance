@@ -128,3 +128,13 @@ export {
 
 // Pricing hooks
 export { useDrinkPrice, type UseDrinkPriceReturn } from "./useDrinkPrice";
+
+// Notification hooks
+export {
+  useNotificationPreferences,
+  useUpdateNotificationPreferences,
+  useRegisterFCMToken,
+  useSubscribeToNotifications,
+  type NotificationPreferencesResponse,
+  type UpdateNotificationPreferencesInput,
+} from "./useNotificationPreferences";
