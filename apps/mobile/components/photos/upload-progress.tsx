@@ -111,7 +111,7 @@ export function UploadProgressList({
           <HStack space="sm" className="items-center">
             <Upload size={ICON_SIZE} color={Colors.primary[500]} />
             <Text className="text-typography-900 font-semibold">
-              {t("photos.upload.title", { defaultValue: "Photo Upload" })}
+              {t("photos.upload.title")}
             </Text>
           </HStack>
 
@@ -148,7 +148,6 @@ export function UploadProgressList({
             <HStack className="items-center justify-between">
               <Text className="text-typography-600 text-sm">
                 {t("photos.upload.uploading", {
-                  defaultValue: "Uploading {{current}} of {{total}}...",
                   current: completedCount + uploadingCount,
                   total: photos.length,
                 })}
@@ -180,23 +179,17 @@ export function UploadProgressList({
         <HStack space="sm" className="justify-end">
           {isUploading && onCancel && (
             <Button variant="outline" size="sm" onPress={onCancel}>
-              <ButtonText>
-                {t("common.actions.cancel", { defaultValue: "Cancel" })}
-              </ButtonText>
+              <ButtonText>{t("common.actions.cancel")}</ButtonText>
             </Button>
           )}
           {!isUploading && pendingCount > 0 && onStartUpload && (
             <Button size="sm" onPress={onStartUpload}>
-              <ButtonText>
-                {t("photos.upload.start", { defaultValue: "Upload Now" })}
-              </ButtonText>
+              <ButtonText>{t("photos.upload.start")}</ButtonText>
             </Button>
           )}
           {!isUploading && failedCount > 0 && onStartUpload && (
             <Button variant="outline" size="sm" onPress={onStartUpload}>
-              <ButtonText>
-                {t("photos.upload.retry", { defaultValue: "Retry Failed" })}
-              </ButtonText>
+              <ButtonText>{t("photos.upload.retry")}</ButtonText>
             </Button>
           )}
         </HStack>
@@ -283,7 +276,7 @@ function PhotoProgressItem({ photo, onRetry }: PhotoProgressItemProps) {
         {photo.status === "failed" && onRetry && (
           <Button variant="link" size="xs" onPress={() => onRetry(photo.id)}>
             <ButtonText className="text-xs">
-              {t("common.actions.retry", { defaultValue: "Retry" })}
+              {t("common.actions.retry")}
             </ButtonText>
           </Button>
         )}
@@ -353,11 +346,8 @@ export function UploadProgressBadge({
           className={`text-xs ${isUploading ? "text-primary-600" : "text-typography-600"}`}
         >
           {isUploading
-            ? t("photos.upload.inProgress", { defaultValue: "Uploading..." })
-            : t("photos.upload.pending", {
-                defaultValue: "{{count}} pending",
-                count: pendingCount,
-              })}
+            ? t("photos.upload.inProgress")
+            : t("photos.upload.pending", { count: pendingCount })}
         </Text>
       </HStack>
     </Button>
@@ -422,20 +412,10 @@ export function UploadSummaryCard({
               className={`font-medium ${allSuccess ? "text-success-700" : failed > 0 ? "text-error-700" : "text-typography-900"}`}
             >
               {isUploading
-                ? t("photos.upload.uploading", {
-                    defaultValue: "Uploading {{current}} of {{total}}...",
-                    current: completed,
-                    total,
-                  })
+                ? t("photos.upload.uploading", { current: completed, total })
                 : allSuccess
-                  ? t("photos.upload.complete", {
-                      defaultValue: "All photos uploaded",
-                    })
-                  : t("photos.upload.partial", {
-                      defaultValue: "{{completed}} uploaded, {{failed}} failed",
-                      completed,
-                      failed,
-                    })}
+                  ? t("photos.upload.complete")
+                  : t("photos.upload.partial", { completed, failed })}
             </Text>
             {isUploading && (
               <Progress
@@ -450,9 +430,7 @@ export function UploadSummaryCard({
         </HStack>
         {allComplete && onDismiss && (
           <Button variant="link" size="sm" onPress={onDismiss}>
-            <ButtonText>
-              {t("common.actions.dismiss", { defaultValue: "Dismiss" })}
-            </ButtonText>
+            <ButtonText>{t("common.actions.dismiss")}</ButtonText>
           </Button>
         )}
       </HStack>

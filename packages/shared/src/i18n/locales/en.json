@@ -26,6 +26,8 @@
     },
     "actions": {
       "retry": "Retry",
+      "cancel": "Cancel",
+      "dismiss": "Dismiss",
       "pullToRefresh": "Pull to refresh"
     },
     "labels": {
@@ -923,6 +925,18 @@
       "disableForGroup": "Disable location sharing for {{group}}"
     }
   },
+  "photos": {
+    "upload": {
+      "title": "Photo Upload",
+      "uploading": "Uploading {{current}} of {{total}}...",
+      "start": "Upload Now",
+      "retry": "Retry Failed",
+      "inProgress": "Uploading...",
+      "pending": "{{count}} pending",
+      "complete": "All photos uploaded",
+      "partial": "{{completed}} uploaded, {{failed}} failed"
+    }
+  },
   "photo": {
     "privacy": {
       "title": "Photo Privacy Settings",
@@ -1372,5 +1386,19 @@
     "USERNAME_TAKEN": "This username is already taken.",
     "WRAPPED_NOT_FOUND": "Wrapped data not found.",
     "WRAPPED_NOT_READY": "Your wrapped isn't ready yet."
+  },
+  "offline": {
+    "status": {
+      "offline": "Offline",
+      "syncing": "Syncing...",
+      "error": "Sync error",
+      "pending": "{{count}} pending",
+      "synced": "Synced"
+    },
+    "banner": {
+      "offlineWithPending": "You're offline. {{count}} changes will sync when connected.",
+      "offline": "You're offline. Changes will sync when you reconnect.",
+      "error": "Sync failed. Tap to retry."
+    }
   }
 }

@@ -113,7 +113,7 @@ export function OfflineIndicator({
           <CloudOff size={iconSize} color={Colors.gray[500]} />
           {showText && (
             <Text className={`${textClass} text-typography-500`}>
-              {t("offline.status.offline", { defaultValue: "Offline" })}
+              {t("offline.status.offline")}
             </Text>
           )}
         </>
@@ -129,7 +129,7 @@ export function OfflineIndicator({
           </Animated.View>
           {showText && (
             <Text className={`${textClass} text-primary-500`}>
-              {t("offline.status.syncing", { defaultValue: "Syncing..." })}
+              {t("offline.status.syncing")}
             </Text>
           )}
         </>
@@ -143,7 +143,7 @@ export function OfflineIndicator({
           <AlertCircle size={iconSize} color={Colors.error[500]} />
           {showText && (
             <Text className={`${textClass} text-error-500`}>
-              {t("offline.status.error", { defaultValue: "Sync error" })}
+              {t("offline.status.error")}
             </Text>
           )}
         </>
@@ -157,10 +157,7 @@ export function OfflineIndicator({
           <Cloud size={iconSize} color={Colors.primary[500]} />
           {showText && (
             <Text className={`${textClass} text-primary-500`}>
-              {t("offline.status.pending", {
-                defaultValue: "{{count}} pending",
-                count: pendingCount,
-              })}
+              {t("offline.status.pending", { count: pendingCount })}
             </Text>
           )}
         </>
@@ -173,7 +170,7 @@ export function OfflineIndicator({
         <Check size={iconSize} color={Colors.success[500]} />
         {showText && (
           <Text className={`${textClass} text-success-500`}>
-            {t("offline.status.synced", { defaultValue: "Synced" })}
+            {t("offline.status.synced")}
           </Text>
         )}
       </>
@@ -285,23 +282,12 @@ export function OfflineBanner({ className = "" }: OfflineBannerProps) {
   const getMessage = () => {
     if (!isOnline) {
       if (pendingCount > 0) {
-        return t("offline.banner.offlineWithPending", {
-          defaultValue:
-            "You're offline. {{count}} changes will sync when connected.",
-          count: pendingCount,
-        });
+        return t("offline.banner.offlineWithPending", { count: pendingCount });
       }
-      return t("offline.banner.offline", {
-        defaultValue: "You're offline. Changes will sync when you reconnect.",
-      });
+      return t("offline.banner.offline");
     }
     if (syncStatus === "error") {
-      return (
-        error ||
-        t("offline.banner.error", {
-          defaultValue: "Sync failed. Tap to retry.",
-        })
-      );
+      return error || t("offline.banner.error");
     }
     return "";
   };
