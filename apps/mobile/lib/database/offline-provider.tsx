@@ -17,6 +17,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -83,7 +84,9 @@ const ONLINE_SYNC_DELAY = 2000;
 // Context
 // =============================================================================
 
-const OfflineContext = createContext<OfflineContextType | undefined>(undefined);
+export const OfflineContext = createContext<OfflineContextType | undefined>(
+  undefined,
+);
 
 // =============================================================================
 // Provider Component
@@ -388,23 +391,41 @@ export function OfflineDataProvider({
     performSync,
   ]);
 
-  // Context value
-  const contextValue: OfflineContextType = {
-    isReady,
-    isOnline: effectiveIsOnline,
-    syncStatus,
-    lastSyncResult,
-    pendingCount,
-    lastSyncAt,
-    error,
-    sync,
-    abortSync,
-    getDb,
-    getSyncManager,
-    refreshPendingCount,
-    isSimulatingOffline: simulateOffline,
-    setSimulateOffline,
-  };
+  // Context value - memoized to prevent unnecessary re-renders of consumers
+  const contextValue: OfflineContextType = useMemo(
+    () => ({
+      isReady,
+      isOnline: effectiveIsOnline,
+      syncStatus,
+      lastSyncResult,
+      pendingCount,
+      lastSyncAt,
+      error,
+      sync,
+      abortSync,
+      getDb,
+      getSyncManager,
+      refreshPendingCount,
+      isSimulatingOffline: simulateOffline,
+      setSimulateOffline,
+    }),
+    [
+      isReady,
+      effectiveIsOnline,
+      syncStatus,
+      lastSyncResult,
+      pendingCount,
+      lastSyncAt,
+      error,
+      sync,
+      abortSync,
+      getDb,
+      getSyncManager,
+      refreshPendingCount,
+      simulateOffline,
+      setSimulateOffline,
+    ],
+  );
 
   return (
     <OfflineContext.Provider value={contextValue}>
@@ -454,4 +475,45 @@ export function useIsOnline(): boolean {
 export function usePendingCount(): number {
   const context = useContext(OfflineContext);
   return context?.pendingCount ?? 0;
+}
+
+// Stable default context for when provider is unavailable
+const DEFAULT_OFFLINE_CONTEXT: OfflineContextType = {
+  isReady: false,
+  isOnline: true,
+  syncStatus: "idle",
+  lastSyncResult: null,
+  pendingCount: 0,
+  lastSyncAt: null,
+  error: null,
+  sync: async () => ({
+    success: false,
+    direction: "both" as const,
+    pulled: 0,
+    pushed: 0,
+    failed: 0,
+    errors: ["OfflineDataProvider not available"],
+    duration: 0,
+  }),
+  abortSync: () => {},
+  getDb: () => {
+    throw new Error("OfflineDataProvider not available");
+  },
+  getSyncManager: () => {
+    throw new Error("OfflineDataProvider not available");
+  },
+  refreshPendingCount: async () => {},
+  isSimulatingOffline: false,
+  setSimulateOffline: () => {},
+};
+
+/**
+ * Hook to safely access offline data capabilities.
+ * Safe to use outside of OfflineDataProvider (returns defaults).
+ * Use this when the component might render outside the provider context.
+ */
+export function useOfflineSafe(): OfflineContextType {
+  const context = useContext(OfflineContext);
+  // Return stable default if context unavailable, otherwise return context directly
+  return context ?? DEFAULT_OFFLINE_CONTEXT;
 }

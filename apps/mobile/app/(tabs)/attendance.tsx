@@ -1,15 +1,24 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useAttendances } from "@prostcounter/shared/hooks";
+import {
+  useAttendances,
+  useCheckInReservation,
+  useReservations,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
-import { parseISO } from "date-fns";
-import { useCallback, useMemo, useState } from "react";
+import type {
+  AttendanceWithTotals,
+  Reservation,
+} from "@prostcounter/shared/schemas";
+import { format, parseISO } from "date-fns";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
-import { AttendanceFormSheet } from "@/components/attendance/attendance-form-sheet";
+import { CalendarActionSheet } from "@/components/attendance/calendar-action-sheet";
+import { CheckInDialog } from "@/components/attendance/check-in-dialog";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -29,6 +38,10 @@ import { View } from "@/components/ui/view";
 export default function AttendanceScreen() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
+  const router = useRouter();
+  const { checkInReservationId } = useLocalSearchParams<{
+    checkInReservationId?: string;
+  }>();
 
   // Dialog state
   const { dialog, showDialog, closeDialog } = useAlertDialog();
@@ -42,9 +55,47 @@ export default function AttendanceScreen() {
     isRefetching,
   } = useAttendances(currentFestival?.id ?? "");
 
+  const {
+    data: reservationsData,
+    loading: reservationsLoading,
+    refetch: refetchReservations,
+  } = useReservations(currentFestival?.id);
+
+  const reservations = reservationsData?.reservations ?? [];
+
+  // Check-in mutation
+  const checkInReservation = useCheckInReservation();
+
   // Local UI state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
+  const [checkInReservation_, setCheckInReservation_] =
+    useState<Reservation | null>(null);
+  const [checkInMode, setCheckInMode] = useState(false);
+  const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
+
+  // Handle check-in from deep link
+  // This effect intentionally sets state when a deep link is detected
+  useEffect(() => {
+    if (checkInReservationId && reservations.length > 0) {
+      const reservation = reservations.find(
+        (r: Reservation) => r.id === checkInReservationId,
+      );
+      if (
+        reservation &&
+        (reservation.status === "pending" || reservation.status === "confirmed")
+      ) {
+        // Use queueMicrotask to defer state updates and avoid lint warning
+        queueMicrotask(() => {
+          setCheckInReservation_(reservation);
+          setCheckInDialogOpen(true);
+          // Clear the query param to prevent re-triggering
+          router.setParams({ checkInReservationId: undefined });
+        });
+      }
+    }
+  }, [checkInReservationId, reservations, router]);
 
   // Parse festival dates using parseISO to avoid UTC timezone issues
   // new Date("2024-12-31") parses as UTC midnight, but parseISO treats it as local
@@ -67,6 +118,24 @@ export default function AttendanceScreen() {
       null
     );
   }, [selectedDate, attendances]);
+
+  // Find existing reservation for selected date
+  // Active statuses: pending, confirmed, and scheduled (legacy from db)
+  const existingReservation = useMemo((): Reservation | null => {
+    if (!selectedDate || !reservations.length) return null;
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    return (
+      reservations.find((r: Reservation) => {
+        const reservationDate = format(new Date(r.startAt), "yyyy-MM-dd");
+        // Include "scheduled" for legacy data (status is string in db, typed enum in schema)
+        const isActiveStatus =
+          r.status === "pending" ||
+          r.status === "confirmed" ||
+          (r.status as string) === "scheduled";
+        return reservationDate === dateStr && isActiveStatus;
+      }) ?? null
+    );
+  }, [selectedDate, reservations]);
 
   // Transform attendances for calendar
   const calendarAttendances = useMemo(() => {
@@ -98,22 +167,72 @@ export default function AttendanceScreen() {
 
   const handleFormClose = useCallback(() => {
     setIsFormOpen(false);
+    setCheckInMode(false);
+    setPrefillTentId(undefined);
     // Keep selectedDate so calendar shows selection
   }, []);
 
   const handleFormSuccess = useCallback(() => {
     refetch();
-    showDialog(
-      t("common.status.success"),
-      existingAttendance
-        ? t("attendance.updateSuccess")
-        : t("attendance.createSuccess"),
-    );
-  }, [refetch, showDialog, existingAttendance, t]);
+    refetchReservations();
+    showDialog(t("common.status.success"), t("attendance.saveSuccess"));
+  }, [refetch, refetchReservations, showDialog, t]);
 
   const onRefresh = useCallback(() => {
     refetch();
-  }, [refetch]);
+    refetchReservations();
+  }, [refetch, refetchReservations]);
+
+  // Handle check-in dialog close
+  const handleCheckInDialogClose = useCallback(() => {
+    setCheckInDialogOpen(false);
+    setCheckInReservation_(null);
+  }, []);
+
+  // Handle check-in confirmation
+  const handleCheckIn = useCallback(async () => {
+    if (!checkInReservation_ || !currentFestival) return;
+
+    try {
+      await checkInReservation.mutateAsync({
+        reservationId: checkInReservation_.id,
+        festivalId: currentFestival.id,
+      });
+
+      // Close check-in dialog
+      setCheckInDialogOpen(false);
+
+      // Set up check-in mode for attendance form
+      setCheckInMode(true);
+      setPrefillTentId(checkInReservation_.tentId);
+
+      // Select the reservation date and open the form
+      const reservationDate = parseISO(checkInReservation_.startAt);
+      setSelectedDate(reservationDate);
+      setIsFormOpen(true);
+
+      // Clear the check-in reservation
+      setCheckInReservation_(null);
+
+      // Refresh data
+      refetch();
+      refetchReservations();
+    } catch (error) {
+      console.error("Failed to check in:", error);
+      showDialog(
+        t("common.status.error"),
+        t("reservation.checkIn.failedDescription"),
+      );
+    }
+  }, [
+    checkInReservation_,
+    currentFestival,
+    checkInReservation,
+    refetch,
+    refetchReservations,
+    showDialog,
+    t,
+  ]);
 
   // No festival selected
   if (!currentFestival) {
@@ -127,7 +246,7 @@ export default function AttendanceScreen() {
   }
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || reservationsLoading) {
     return (
       <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
@@ -161,6 +280,7 @@ export default function AttendanceScreen() {
             festivalStartDate={festivalStartDate}
             festivalEndDate={festivalEndDate}
             attendances={calendarAttendances}
+            reservations={reservations}
             selectedDate={selectedDate}
             onDateSelect={handleDateSelect}
           />
@@ -239,9 +359,9 @@ export default function AttendanceScreen() {
         </View>
       </ScrollView>
 
-      {/* Attendance Form Sheet */}
+      {/* Calendar Action Sheet (Attendance/Reservation tabs) */}
       {selectedDate && (
-        <AttendanceFormSheet
+        <CalendarActionSheet
           isOpen={isFormOpen}
           onClose={handleFormClose}
           festivalId={currentFestival.id}
@@ -249,9 +369,22 @@ export default function AttendanceScreen() {
           festivalEndDate={festivalEndDate}
           selectedDate={selectedDate}
           existingAttendance={existingAttendance}
+          existingReservation={existingReservation}
           onSuccess={handleFormSuccess}
+          checkInMode={checkInMode}
+          prefillTentId={prefillTentId}
         />
       )}
+
+      {/* Check-in Dialog */}
+      <CheckInDialog
+        isOpen={checkInDialogOpen}
+        onClose={handleCheckInDialogClose}
+        reservation={checkInReservation_}
+        festivalId={currentFestival.id}
+        onCheckIn={handleCheckIn}
+        isLoading={checkInReservation.loading}
+      />
 
       {/* Alert Dialog */}
       <AlertDialog isOpen={dialog.isOpen} onClose={closeDialog} size="md">

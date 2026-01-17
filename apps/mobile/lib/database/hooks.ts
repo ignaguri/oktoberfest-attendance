@@ -13,9 +13,9 @@ import {
   useQueryClient,
   type UseQueryOptions,
 } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 
-import { useOffline } from "./offline-provider";
+import { OfflineContext } from "./offline-provider";
 import type {
   LocalAchievement,
   LocalAttendance,
@@ -215,13 +215,52 @@ export function useOfflineMutation<TData = void, TVariables = void>({
 // Helper Hook
 // =============================================================================
 
+// Stable default values for when context is unavailable
+const DEFAULT_SYNC_RESULT = {
+  success: false,
+  direction: "both" as const,
+  pulled: 0,
+  pushed: 0,
+  failed: 0,
+  errors: ["OfflineDataProvider not available"],
+  duration: 0,
+};
+
+const noopSync = async () => DEFAULT_SYNC_RESULT;
+const noopAbort = () => {};
+const noopGetDb = () => {
+  throw new Error("OfflineDataProvider not available");
+};
+const noopGetSyncManager = () => {
+  throw new Error("OfflineDataProvider not available");
+};
+const noopRefreshPendingCount = async () => {};
+const noopSetSimulateOffline = () => {};
+
 /**
- * Internal hook to get offline context with proper typing.
+ * Internal hook to safely get offline context.
+ * Returns individual values to avoid object spreading issues.
  */
 function useOfflineWithContext() {
-  const offline = useOffline();
+  const context = useContext(OfflineContext);
+
+  // Return individual values - primitives are stable, functions from context are stable
   return {
-    ...offline,
+    isReady: context?.isReady ?? false,
+    isOnline: context?.isOnline ?? true,
+    syncStatus: context?.syncStatus ?? ("idle" as const),
+    lastSyncResult: context?.lastSyncResult ?? null,
+    pendingCount: context?.pendingCount ?? 0,
+    lastSyncAt: context?.lastSyncAt ?? null,
+    error: context?.error ?? null,
+    sync: context?.sync ?? noopSync,
+    abortSync: context?.abortSync ?? noopAbort,
+    getDb: context?.getDb ?? noopGetDb,
+    getSyncManager: context?.getSyncManager ?? noopGetSyncManager,
+    refreshPendingCount:
+      context?.refreshPendingCount ?? noopRefreshPendingCount,
+    isSimulatingOffline: context?.isSimulatingOffline ?? false,
+    setSimulateOffline: context?.setSimulateOffline ?? noopSetSimulateOffline,
     festivalId: undefined as string | undefined,
     userId: undefined as string | undefined,
   };
@@ -246,7 +285,7 @@ export function useLocalFestivals() {
  * Hook to get a single festival by ID.
  */
 export function useLocalFestival(festivalId: string | undefined) {
-  const { isReady, getDb } = useOffline();
+  const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalFestival | null, Error>({
     queryKey: ["local-festivals", festivalId],
@@ -308,7 +347,7 @@ export function useLocalAttendanceByDate(
   festivalId: string | undefined,
   date: string | undefined,
 ) {
-  const { isReady, getDb } = useOffline();
+  const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalAttendance | null, Error>({
     queryKey: ["local-attendances", festivalId, date],
@@ -330,7 +369,7 @@ export function useLocalAttendanceByDate(
  * Hook to create or update an attendance.
  */
 export function useLocalSaveAttendance() {
-  const { isReady, getDb, refreshPendingCount } = useOffline();
+  const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
   return useMutation<
@@ -426,7 +465,7 @@ export function useLocalSaveAttendance() {
  * Hook to delete an attendance.
  */
 export function useLocalDeleteAttendance() {
-  const { isReady, getDb, refreshPendingCount } = useOffline();
+  const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, { attendanceId: string; festivalId: string }>(
@@ -494,7 +533,7 @@ export function useLocalConsumptionsByDate(
   festivalId: string | undefined,
   date: string | undefined,
 ) {
-  const { isReady, getDb } = useOffline();
+  const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalConsumption[], Error>({
     queryKey: ["local-consumptions", festivalId, date],
@@ -542,7 +581,7 @@ export interface LogConsumptionInput {
  * Hook to log a consumption.
  */
 export function useLocalLogConsumption() {
-  const { isReady, getDb, refreshPendingCount } = useOffline();
+  const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
   return useMutation<LocalConsumption, Error, LogConsumptionInput>({
@@ -641,7 +680,7 @@ export function useLocalLogConsumption() {
  * Hook to delete a consumption.
  */
 export function useLocalDeleteConsumption() {
-  const { isReady, getDb, refreshPendingCount } = useOffline();
+  const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
   return useMutation<

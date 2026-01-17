@@ -10,6 +10,7 @@ interface NotificationData {
   achievementId?: string;
   tentId?: string;
   userId?: string;
+  reservationId?: string;
   url?: string;
   [key: string]: unknown;
 }
@@ -71,8 +72,17 @@ export function handleNotificationResponse(
       break;
 
     case "reminder":
-    case "reservation-reminder":
       router.push("/");
+      break;
+
+    case "reservation-reminder":
+    case "reservation-check-in-prompt":
+      // Navigate to attendance tab with check-in reservation ID
+      if (data.reservationId) {
+        router.push(`/attendance?checkInReservationId=${data.reservationId}`);
+      } else {
+        router.push("/attendance");
+      }
       break;
 
     case "leaderboard-update":

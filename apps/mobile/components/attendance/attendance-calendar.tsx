@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { Reservation } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import {
   addDays,
@@ -16,7 +17,12 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { Beer, ChevronLeft, ChevronRight } from "lucide-react-native";
+import {
+  Beer,
+  CalendarClock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 
@@ -35,6 +41,7 @@ interface AttendanceCalendarProps {
   festivalStartDate: Date;
   festivalEndDate: Date;
   attendances: AttendanceData[];
+  reservations?: Reservation[];
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
@@ -69,6 +76,7 @@ export function AttendanceCalendar({
   festivalStartDate,
   festivalEndDate,
   attendances,
+  reservations = [],
   selectedDate,
   onDateSelect,
 }: AttendanceCalendarProps) {
@@ -92,6 +100,24 @@ export function AttendanceCalendar({
     });
     return map;
   }, [attendances]);
+
+  // Map of date string -> reservation for quick lookup (only active reservations)
+  // Include "scheduled" for legacy data compatibility (status is string in db)
+  const reservationMap = useMemo(() => {
+    const map = new Map<string, Reservation>();
+    reservations
+      .filter(
+        (r) =>
+          r.status === "pending" ||
+          r.status === "confirmed" ||
+          (r.status as string) === "scheduled",
+      )
+      .forEach((r) => {
+        const dateStr = format(new Date(r.startAt), "yyyy-MM-dd");
+        map.set(dateStr, r);
+      });
+    return map;
+  }, [reservations]);
 
   // Check if we can navigate to prev/next month
   const canGoPrev = useMemo(() => {
@@ -160,6 +186,7 @@ export function AttendanceCalendar({
       });
       const drinkCount = attendanceMap.get(dateStr);
       const hasAttendance = drinkCount !== undefined;
+      const hasReservation = reservationMap.has(dateStr);
 
       // Determine cell styling using cn() for safe class merging
       // Festival days from adjacent months should be fully interactive and styled
@@ -174,8 +201,18 @@ export function AttendanceCalendar({
           !isSelected &&
           hasAttendance &&
           "bg-primary-100 border border-primary-300",
-        // Festival day without attendance (not selected)
-        isFestivalDay && !isSelected && !hasAttendance && "bg-background-100",
+        // Festival day with reservation only (not selected, no attendance)
+        isFestivalDay &&
+          !isSelected &&
+          !hasAttendance &&
+          hasReservation &&
+          "bg-teal-100 border border-teal-300",
+        // Festival day without attendance or reservation (not selected)
+        isFestivalDay &&
+          !isSelected &&
+          !hasAttendance &&
+          !hasReservation &&
+          "bg-background-100",
       );
 
       const textClassName = cn(
@@ -188,8 +225,18 @@ export function AttendanceCalendar({
         isFestivalDay && isSelected && "text-white",
         // Festival day with attendance (not selected)
         isFestivalDay && !isSelected && hasAttendance && "text-primary-700",
-        // Festival day without attendance (not selected)
-        isFestivalDay && !isSelected && !hasAttendance && "text-typography-900",
+        // Festival day with reservation only (not selected)
+        isFestivalDay &&
+          !isSelected &&
+          !hasAttendance &&
+          hasReservation &&
+          "text-teal-700",
+        // Festival day without attendance or reservation (not selected)
+        isFestivalDay &&
+          !isSelected &&
+          !hasAttendance &&
+          !hasReservation &&
+          "text-typography-900",
       );
 
       return (
@@ -208,26 +255,41 @@ export function AttendanceCalendar({
             {/* Day number */}
             <Text className={textClassName}>{format(day, "d")}</Text>
 
-            {/* Beer count badge - only show if drinkCount > 0 */}
-            {hasAttendance &&
-              drinkCount! > 0 &&
-              isFestivalDay &&
-              !isSelected && (
-                <HStack className="mt-0.5 items-center gap-0.5">
-                  <Beer size={10} color={Colors.primary[600]} />
-                  <Text className="text-primary-600 text-[10px] font-semibold">
-                    {drinkCount}
-                  </Text>
+            {/* Indicators row - show both if applicable */}
+            {isFestivalDay &&
+              !isSelected &&
+              (hasAttendance || hasReservation) && (
+                <HStack className="mt-0.5 items-center gap-1">
+                  {/* Beer count badge - only show if drinkCount > 0 */}
+                  {hasAttendance && drinkCount! > 0 && (
+                    <HStack className="items-center gap-0.5">
+                      <Beer size={10} color={Colors.primary[600]} />
+                      <Text className="text-primary-600 text-[10px] font-semibold">
+                        {drinkCount}
+                      </Text>
+                    </HStack>
+                  )}
+                  {/* Reservation indicator */}
+                  {hasReservation && !hasAttendance && (
+                    <CalendarClock size={12} color="#0D9488" />
+                  )}
                 </HStack>
               )}
 
-            {/* Beer count on selected - only show if drinkCount > 0 */}
-            {hasAttendance && drinkCount! > 0 && isSelected && (
-              <HStack className="mt-0.5 items-center gap-0.5">
-                <Beer size={10} color={Colors.white} />
-                <Text className="text-[10px] font-semibold text-white">
-                  {drinkCount}
-                </Text>
+            {/* Indicators on selected */}
+            {isSelected && (hasAttendance || hasReservation) && (
+              <HStack className="mt-0.5 items-center gap-1">
+                {hasAttendance && drinkCount! > 0 && (
+                  <HStack className="items-center gap-0.5">
+                    <Beer size={10} color={Colors.white} />
+                    <Text className="text-[10px] font-semibold text-white">
+                      {drinkCount}
+                    </Text>
+                  </HStack>
+                )}
+                {hasReservation && !hasAttendance && (
+                  <CalendarClock size={12} color={Colors.white} />
+                )}
               </HStack>
             )}
           </VStack>
@@ -241,6 +303,7 @@ export function AttendanceCalendar({
       festivalStartDate,
       festivalEndDate,
       attendanceMap,
+      reservationMap,
       handleDayPress,
     ],
   );
@@ -300,13 +363,21 @@ export function AttendanceCalendar({
 
       {/* Legend */}
       <HStack
-        space="xl"
-        className="border-background-200 mt-4 justify-center border-t pt-4"
+        space="lg"
+        className="border-background-200 mt-4 flex-wrap justify-center border-t pt-4"
       >
         <HStack space="sm" className="items-center">
           <View className="border-primary-300 bg-primary-100 h-3 w-3 rounded border" />
           <Text className="text-typography-500 text-xs">
             {t("attendance.calendar.hasAttendance")}
+          </Text>
+        </HStack>
+        <HStack space="sm" className="items-center">
+          <View className="h-3 w-3 rounded border border-teal-300 bg-teal-100" />
+          <Text className="text-typography-500 text-xs">
+            {t("attendance.calendar.hasReservation", {
+              defaultValue: "Reservation",
+            })}
           </Text>
         </HStack>
         <HStack space="sm" className="items-center">

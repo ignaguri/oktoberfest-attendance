@@ -36,7 +36,7 @@ import {
   type DirtyRecord,
   type SyncQueueEntry,
 } from "@/lib/database/debug";
-import { useOffline } from "@/lib/database/offline-provider";
+import { useOfflineSafe } from "@/lib/database/offline-provider";
 
 // =============================================================================
 // Main Screen
@@ -50,7 +50,7 @@ export default function DatabaseDebugScreen() {
     syncStatus,
     isSimulatingOffline,
     setSimulateOffline,
-  } = useOffline();
+  } = useOfflineSafe();
 
   const [stats, setStats] = useState<DatabaseStats | null>(null);
   const [pendingOps, setPendingOps] = useState<SyncQueueEntry[]>([]);

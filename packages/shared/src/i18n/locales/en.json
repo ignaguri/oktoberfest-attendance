@@ -53,6 +53,7 @@
       "saved": "Saved",
       "creating": "Creating...",
       "deleting": "Deleting...",
+      "cancelling": "Cancelling...",
       "info": "Info"
     },
     "errors": {
@@ -477,8 +478,14 @@
     "calendar": {
       "tapToAddOrEdit": "Tap a day to add or edit your attendance",
       "hasAttendance": "Has attendance",
+      "hasReservation": "Reservation",
       "selected": "Selected"
     },
+    "tabs": {
+      "attendance": "Attendance",
+      "reservation": "Reservation"
+    },
+    "saveSuccess": "Changes saved successfully",
     "summary": {
       "title": "Festival Summary",
       "days": "Days",
@@ -891,14 +898,41 @@
       "create": "Create",
       "save": "Save"
     },
+    "form": {
+      "tent": "Tent",
+      "selectTent": "Select tent",
+      "arrivalTime": "Arrival Time",
+      "selectTime": "Select time",
+      "reminder": "Reminder",
+      "reminderOptions": {
+        "none": "No reminder",
+        "30min": "30 minutes before",
+        "1hour": "1 hour before",
+        "2hours": "2 hours before",
+        "1day": "1 day before"
+      },
+      "note": "Note (optional)",
+      "notePlaceholder": "Add a note for your reservation...",
+      "visibleToGroups": "Visible to Groups",
+      "visibleToGroupsDescription": "Group members can see your reservation",
+      "tentCannotBeChanged": "Tent cannot be changed after creation",
+      "createReservation": "Create Reservation",
+      "cancelReservation": "Cancel Reservation",
+      "saving": "Saving...",
+      "cancelConfirmTitle": "Cancel Reservation?",
+      "cancelConfirmMessage": "Are you sure you want to cancel this reservation? This action cannot be undone."
+    },
     "checkIn": {
+      "title": "Time to Check In!",
+      "description": "Your reservation is ready. Would you like to check in now?",
       "prompt": "Are you there yet?",
       "timeForReservation": "It's time for your reservation at {{tentName}}.",
       "theTent": "the tent",
       "unknownTent": "Unknown Tent",
       "note": "Note",
       "notYet": "Not yet",
-      "checkInNow": "Check in now",
+      "notNow": "Not Now",
+      "checkInNow": "Check In Now",
       "checking": "Checking in...",
       "failedDescription": "Failed to check in. Please try again."
     }

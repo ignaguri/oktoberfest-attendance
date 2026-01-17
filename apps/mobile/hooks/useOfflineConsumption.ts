@@ -15,24 +15,29 @@ import type {
   LogConsumptionInput,
 } from "@prostcounter/shared/schemas";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 
-import { useOffline } from "@/lib/database/offline-provider";
+import { OfflineContext } from "@/lib/database/offline-provider";
 import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
 
 /**
  * Offline-aware hook to log a new consumption
  * - Online: Makes API call directly
  * - Offline: Stores locally and queues for sync
+ * - Falls back to online-only mode when OfflineDataProvider isn't available
  */
 export function useOfflineLogConsumption() {
-  const { isOnline, isReady, getDb, refreshPendingCount } = useOffline();
+  const context = useContext(OfflineContext);
+  const isOnline = context?.isOnline ?? true;
+  const isReady = context?.isReady ?? false;
+  const getDb = context?.getDb;
+  const refreshPendingCount = context?.refreshPendingCount;
   const apiMutation = useLogConsumptionApi();
 
   const logConsumptionOffline = useCallback(
     async (input: LogConsumptionInput): Promise<Consumption | null> => {
-      if (!isReady) {
-        throw new Error("Database not ready");
+      if (!isReady || !getDb || !refreshPendingCount) {
+        throw new Error("Offline mode not available");
       }
 
       const db = getDb();
@@ -80,8 +85,8 @@ export function useOfflineLogConsumption() {
 
   return useMutation({
     mutationFn: async (input: LogConsumptionInput) => {
-      if (isOnline) {
-        // Online: use API
+      // If online or offline mode not available, use API
+      if (isOnline || !context) {
         console.log("[OfflineConsumption] Online - calling API");
         return apiMutation.mutateAsync(input);
       } else {
@@ -100,15 +105,20 @@ export function useOfflineLogConsumption() {
  * Offline-aware hook to delete a consumption
  * - Online: Makes API call directly
  * - Offline: Marks as deleted locally and queues for sync
+ * - Falls back to online-only mode when OfflineDataProvider isn't available
  */
 export function useOfflineDeleteConsumption() {
-  const { isOnline, isReady, getDb, refreshPendingCount } = useOffline();
+  const context = useContext(OfflineContext);
+  const isOnline = context?.isOnline ?? true;
+  const isReady = context?.isReady ?? false;
+  const getDb = context?.getDb;
+  const refreshPendingCount = context?.refreshPendingCount;
   const apiMutation = useDeleteConsumptionApi();
 
   const deleteConsumptionOffline = useCallback(
     async (consumptionId: string): Promise<void> => {
-      if (!isReady) {
-        throw new Error("Database not ready");
+      if (!isReady || !getDb || !refreshPendingCount) {
+        throw new Error("Offline mode not available");
       }
 
       const db = getDb();
@@ -136,8 +146,8 @@ export function useOfflineDeleteConsumption() {
 
   return useMutation({
     mutationFn: async (consumptionId: string) => {
-      if (isOnline) {
-        // Online: use API
+      // If online or offline mode not available, use API
+      if (isOnline || !context) {
         console.log("[OfflineConsumption] Online - calling API for delete");
         return apiMutation.mutateAsync(consumptionId);
       } else {
