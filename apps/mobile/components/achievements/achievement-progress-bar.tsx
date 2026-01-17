@@ -1,8 +1,8 @@
+import type { AchievementProgress } from "@prostcounter/shared/schemas";
+
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-
-import type { AchievementProgress } from "@prostcounter/shared/schemas";
 
 interface AchievementProgressBarProps {
   progress: AchievementProgress;

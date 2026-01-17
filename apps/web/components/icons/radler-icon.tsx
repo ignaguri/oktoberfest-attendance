@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Beer, Citrus } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface RadlerIconProps {
   className?: string;

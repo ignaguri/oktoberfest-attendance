@@ -1,5 +1,16 @@
 import "../global.css";
 
+import { FestivalProvider, useFestival } from "@prostcounter/shared/contexts";
+import { ApiClientProvider } from "@prostcounter/shared/data";
+import { I18nextProvider } from "@prostcounter/shared/i18n";
+import { i18n } from "@prostcounter/shared/i18n";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { GluestackUIProvider } from "@/components/ui";
@@ -13,25 +24,15 @@ import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 import {
+  checkInitialNotification,
   configureNotificationHandler,
   setupNotificationListeners,
-  checkInitialNotification,
 } from "@/lib/notifications/handlers";
 import {
   NotificationProvider,
   useNotificationContext,
 } from "@/lib/notifications/NotificationContext";
 import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
-import { FestivalProvider, useFestival } from "@prostcounter/shared/contexts";
-import { ApiClientProvider } from "@prostcounter/shared/data";
-import { I18nextProvider } from "@prostcounter/shared/i18n";
-import { i18n } from "@prostcounter/shared/i18n";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { Platform } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {

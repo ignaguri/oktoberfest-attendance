@@ -1,9 +1,9 @@
-import type { IFestivalRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type { Festival, ListFestivalsQuery } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
+import type { IFestivalRepository } from "../interfaces";
 
 export class SupabaseFestivalRepository implements IFestivalRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

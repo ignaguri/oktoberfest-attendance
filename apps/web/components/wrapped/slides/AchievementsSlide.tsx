@@ -1,13 +1,13 @@
 "use client";
 
-import { AchievementBadge } from "@/components/achievements/AchievementBadge";
-import { sortAchievements, calculateTotalPoints } from "@/lib/wrapped/utils";
 import { motion } from "framer-motion";
 
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
 import type { AchievementRarity } from "@/lib/types/achievements";
 import type { WrappedData } from "@/lib/wrapped/types";
+import { calculateTotalPoints, sortAchievements } from "@/lib/wrapped/utils";
 
-import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
+import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface AchievementsSlideProps {
   data: WrappedData;

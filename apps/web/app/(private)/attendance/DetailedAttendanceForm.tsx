@@ -1,5 +1,26 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFestival } from "@prostcounter/shared/contexts";
+import { useConsumptions } from "@prostcounter/shared/hooks";
+import type {
+  AttendanceByDate,
+  DetailedAttendanceForm,
+  DrinkType,
+} from "@prostcounter/shared/schemas";
+import { createDetailedAttendanceFormSchema } from "@prostcounter/shared/schemas";
+import { isWithinInterval } from "date-fns";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import { LocalDrinkStepper } from "@/components/attendance/local-drink-stepper";
 import TentSelector from "@/components/TentSelector";
@@ -10,27 +31,6 @@ import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { getFestivalDates } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useConsumptions } from "@prostcounter/shared/hooks";
-import { createDetailedAttendanceFormSchema } from "@prostcounter/shared/schemas";
-import { isWithinInterval } from "date-fns";
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  startTransition,
-  useRef,
-} from "react";
-import { useForm, Controller } from "react-hook-form";
-import { toast } from "sonner";
-
-import type {
-  DetailedAttendanceForm,
-  AttendanceByDate,
-  DrinkType,
-} from "@prostcounter/shared/schemas";
 
 import { AttendanceDatePicker } from "./AttendanceDatePicker";
 import { BeerPicturesUpload } from "./BeerPicturesUpload";

@@ -1,10 +1,11 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Component, type ErrorInfo, type ReactNode } from "react";
+import { View } from "react-native";
+
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Component, type ErrorInfo, type ReactNode } from "react";
-import { View } from "react-native";
 
 interface ErrorBoundaryProps {
   children: ReactNode;

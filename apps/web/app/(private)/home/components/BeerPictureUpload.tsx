@@ -1,22 +1,22 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Camera, Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import { Link } from "next-view-transitions";
+import { startTransition, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { Alert } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ApiError, apiClient } from "@/lib/api-client";
+import { apiClient, ApiError } from "@/lib/api-client";
 import { translateError, useTranslation } from "@/lib/i18n/client";
-import { singlePictureSchema } from "@/lib/schemas/uploads";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
-import { Link } from "next-view-transitions";
-import { useState, useEffect, startTransition } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 import type { SinglePictureFormData } from "@/lib/schemas/uploads";
+import { singlePictureSchema } from "@/lib/schemas/uploads";
 
 interface BeerPictureUploadProps {
   attendanceId: string | null;

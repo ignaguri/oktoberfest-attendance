@@ -1,11 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { getFestivalConstants } from "@/lib/festivalConstants";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { ExternalLink } from "lucide-react";
 import { Link } from "next-view-transitions";
+
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getFestivalConstants } from "@/lib/festivalConstants";
 
 export default function MapButton() {
   const { currentFestival, isLoading } = useFestival();

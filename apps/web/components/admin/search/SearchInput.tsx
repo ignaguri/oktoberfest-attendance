@@ -1,10 +1,11 @@
 "use client";
 
+import { Loader2, Search, X } from "lucide-react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Search, X, Loader2 } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useState } from "react";
 
 export interface SearchInputProps {
   value: string;

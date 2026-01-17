@@ -13,32 +13,32 @@
  * - Server always wins conflicts
  */
 
-import type {
-  LocalAttendance,
-  LocalConsumption,
-  LocalProfile,
-  LocalFestival,
-  LocalTent,
-  LocalGroup,
-  LocalAchievement,
-  LocalUserAchievement,
-  SyncQueueItem,
-} from "./schema";
 import type * as SQLite from "expo-sqlite";
 
 import { apiClient } from "../api-client";
+import type {
+  LocalAchievement,
+  LocalAttendance,
+  LocalConsumption,
+  LocalFestival,
+  LocalGroup,
+  LocalProfile,
+  LocalTent,
+  LocalUserAchievement,
+  SyncQueueItem,
+} from "./schema";
 import { MUTABLE_TABLES } from "./schema";
 import {
-  getSyncMetadata,
-  updateLastSyncAt,
+  generateUUID,
+  getDirtyRecords,
   getPendingOperations,
-  markOperationProcessing,
+  getQueueStats,
+  getSyncMetadata,
   markOperationCompleted,
   markOperationFailed,
+  markOperationProcessing,
   markRecordClean,
-  getDirtyRecords,
-  generateUUID,
-  getQueueStats,
+  updateLastSyncAt,
 } from "./sync-queue";
 
 // =============================================================================

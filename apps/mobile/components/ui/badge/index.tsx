@@ -1,16 +1,15 @@
 "use client";
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
+import type { BadgeAction, BadgeSize, BadgeVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
-
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import type { BadgeAction, BadgeVariant, BadgeSize } from "@prostcounter/ui";
 import type { Svg } from "react-native-svg";
 
 // Import contract types from shared UI package

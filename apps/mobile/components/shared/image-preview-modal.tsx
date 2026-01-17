@@ -1,14 +1,15 @@
-import { IconColors } from "@/lib/constants/colors";
 import { X } from "lucide-react-native";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
   Modal,
   Pressable,
-  Image,
-  Dimensions,
-  ActivityIndicator,
   View,
 } from "react-native";
+
+import { IconColors } from "@/lib/constants/colors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 

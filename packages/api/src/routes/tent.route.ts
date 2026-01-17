@@ -5,7 +5,6 @@ import {
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabaseTentRepository } from "../repositories/supabase";
 
 // Create router

@@ -5,8 +5,9 @@
  * Only accessible in development mode.
  */
 
-import { defaultScreenOptions } from "@/lib/navigation/header-config";
 import { Stack } from "expo-router";
+
+import { defaultScreenOptions } from "@/lib/navigation/header-config";
 
 export default function DevLayout() {
   // Only show in development

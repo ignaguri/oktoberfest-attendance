@@ -1,3 +1,13 @@
+import { useFestival } from "@prostcounter/shared/contexts";
+import { useUserGroups } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { GroupWithMembers } from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
+import { Plus, UserPlus } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { RefreshControl, ScrollView } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import { CreateGroupSheet } from "@/components/groups/create-group-sheet";
 import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
 import { GroupListItem } from "@/components/groups/group-list-item";
@@ -20,16 +30,6 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useUserGroups } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { useRouter } from "expo-router";
-import { Plus, UserPlus } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import type { GroupWithMembers } from "@prostcounter/shared/schemas";
 
 export default function GroupsScreen() {
   const { t } = useTranslation();

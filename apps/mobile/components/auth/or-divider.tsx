@@ -1,7 +1,8 @@
-import { Text } from "@/components/ui/text";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+
+import { Text } from "@/components/ui/text";
 
 interface OrDividerProps {
   /** Custom text to display (defaults to translated "or") */

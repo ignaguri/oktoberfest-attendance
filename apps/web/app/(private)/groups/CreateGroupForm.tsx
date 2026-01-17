@@ -1,19 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useCreateGroup } from "@/lib/data";
-import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFestival } from "@prostcounter/shared/contexts";
+import type { CreateGroupForm as CreateGroupFormData } from "@prostcounter/shared/schemas";
 import { CreateGroupFormSchema } from "@prostcounter/shared/schemas";
-import { EyeOff, Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { CreateGroupForm as CreateGroupFormData } from "@prostcounter/shared/schemas";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useCreateGroup } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 
 export const CreateGroupForm = () => {
   const { t } = useTranslation();

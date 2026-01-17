@@ -1,6 +1,7 @@
+import { Suspense } from "react";
+
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getTranslations } from "@/lib/i18n/server";
-import { Suspense } from "react";
 
 import GlobalLeaderboardClient from "./GlobalLeaderboardClient";
 

@@ -1,12 +1,12 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import type { GroupWithMembers } from "@prostcounter/shared/schemas";
+import { Link } from "next-view-transitions";
+
 import { Button } from "@/components/ui/button";
 import { SkeletonGroups } from "@/components/ui/skeleton-cards";
 import { useUserGroups } from "@/lib/data";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { Link } from "next-view-transitions";
-
-import type { GroupWithMembers } from "@prostcounter/shared/schemas";
 
 interface MyGroupsProps {
   showGroupsLink?: boolean;

@@ -1,4 +1,15 @@
 import {
+  useGroupSearch,
+  useJoinGroup,
+  useJoinGroupByToken,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { SearchGroupResult } from "@prostcounter/shared/schemas";
+import { ChevronRight, Key, Link, Search, Users, X } from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
+
+import {
   Actionsheet,
   ActionsheetBackdrop,
   ActionsheetContent,
@@ -14,17 +25,6 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import {
-  useGroupSearch,
-  useJoinGroup,
-  useJoinGroupByToken,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { X, Search, Key, Users, ChevronRight, Link } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
-
-import type { SearchGroupResult } from "@prostcounter/shared/schemas";
 
 type JoinMode = "search" | "token";
 

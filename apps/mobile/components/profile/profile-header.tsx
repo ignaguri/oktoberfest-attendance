@@ -1,3 +1,11 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { Profile, UpdateProfileInput } from "@prostcounter/shared/schemas";
+import { cn, getInitials } from "@prostcounter/ui";
+import type { User } from "@supabase/supabase-js";
+import { Camera } from "lucide-react-native";
+import React from "react";
+import { type Control, Controller, type FieldErrors } from "react-hook-form";
+
 import {
   Avatar,
   AvatarBadge,
@@ -14,14 +22,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn, getInitials } from "@prostcounter/ui";
-import { Camera } from "lucide-react-native";
-import React from "react";
-import { type Control, Controller, type FieldErrors } from "react-hook-form";
-
-import type { Profile, UpdateProfileInput } from "@prostcounter/shared/schemas";
-import type { User } from "@supabase/supabase-js";
 
 interface ProfileHeaderProps {
   profile: Profile | null;

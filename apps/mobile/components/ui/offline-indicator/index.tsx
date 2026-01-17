@@ -5,25 +5,26 @@
  * Shows different states: syncing, offline, pending changes, error.
  */
 
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import {
+  AlertCircle,
+  Check,
+  Cloud,
+  CloudOff,
+  RefreshCw,
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { Animated, Easing, Pressable } from "react-native";
+
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
 import {
-  useOffline,
   useIsOnline,
+  useOffline,
   usePendingCount,
 } from "@/lib/database/offline-provider";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn } from "@prostcounter/ui";
-import {
-  Cloud,
-  CloudOff,
-  RefreshCw,
-  AlertCircle,
-  Check,
-} from "lucide-react-native";
-import React, { useEffect, useState } from "react";
-import { Pressable, Animated, Easing } from "react-native";
 
 // =============================================================================
 // Types

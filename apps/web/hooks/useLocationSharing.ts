@@ -2,14 +2,15 @@
  * Business logic hooks for location sharing functionality
  */
 
-import {
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-} from "@/lib/data/react-query-provider";
 import { QueryKeys } from "@prostcounter/shared/data";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
+import {
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
+} from "@/lib/data/react-query-provider";
 
 export interface LocationSharingPreference {
   id: string;

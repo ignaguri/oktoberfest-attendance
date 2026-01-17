@@ -1,6 +1,7 @@
-import { Text } from "@/components/ui/text";
 import React from "react";
-import { View, Image } from "react-native";
+import { Image, View } from "react-native";
+
+import { Text } from "@/components/ui/text";
 
 interface AuthHeaderProps {
   /** Size variant of the header */

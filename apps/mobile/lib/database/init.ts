@@ -8,12 +8,12 @@
 import * as SQLite from "expo-sqlite";
 
 import {
+  CREATE_INDEXES_SQL,
+  CREATE_TABLES_SQL,
   DATABASE_NAME,
   SCHEMA_VERSION,
-  CREATE_TABLES_SQL,
-  CREATE_INDEXES_SQL,
-  TABLE_CREATION_ORDER,
   SYNCABLE_TABLES,
+  TABLE_CREATION_ORDER,
 } from "./schema";
 
 // Singleton database instance

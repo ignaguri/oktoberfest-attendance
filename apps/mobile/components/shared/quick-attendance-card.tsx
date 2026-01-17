@@ -1,9 +1,24 @@
+import { useFestival } from "@prostcounter/shared/contexts";
+import {
+  useAttendanceByDate,
+  useConsumptions,
+  useTents,
+  useUpdatePersonalAttendance,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { DrinkType } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
+import { format, isAfter, isBefore, parseISO, startOfDay } from "date-fns";
+import { Camera, Check, ChevronDown, Minus } from "lucide-react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Image, View } from "react-native";
+
 import { DrinkCountSummary } from "@/components/attendance/drink-count-summary";
 import { DrinkStepper } from "@/components/attendance/drink-stepper";
 import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import {
-  ImageSourcePicker,
   type ImageSource,
+  ImageSourcePicker,
 } from "@/components/image-source-picker";
 import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { TentSelectorSheet } from "@/components/tent-selector/tent-selector-sheet";
@@ -15,26 +30,11 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
-  useBeerPictureUpload,
   type PendingPhoto,
+  useBeerPictureUpload,
 } from "@/hooks/useBeerPictureUpload";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { getBeerPictureUrl } from "@/lib/utils";
-import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useAttendanceByDate,
-  useUpdatePersonalAttendance,
-  useTents,
-  useConsumptions,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn } from "@prostcounter/ui";
-import { format, isAfter, isBefore, parseISO, startOfDay } from "date-fns";
-import { Camera, Check, ChevronDown, Minus } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Image, View } from "react-native";
-
-import type { DrinkType } from "@prostcounter/shared/schemas";
 
 interface BeerPicture {
   id: string;

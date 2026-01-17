@@ -1,4 +1,11 @@
 import "@/styles/globals.css";
+
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata } from "next";
+import { ViewTransitions } from "next-view-transitions";
+
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
@@ -12,12 +19,6 @@ import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/lib/version";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { ViewTransitions } from "next-view-transitions";
-
-import type { Metadata } from "next";
 
 // do not cache this layout
 export const revalidate = 0;

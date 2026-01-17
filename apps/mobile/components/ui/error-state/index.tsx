@@ -1,10 +1,11 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { AlertCircle, RefreshCw } from "lucide-react-native";
+import React from "react";
+
 import { Alert, AlertText } from "@/components/ui/alert";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { AlertCircle, RefreshCw } from "lucide-react-native";
-import React from "react";
 
 interface ErrorStateProps {
   /** The error to display */

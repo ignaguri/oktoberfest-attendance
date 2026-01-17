@@ -1,16 +1,16 @@
-import { Input, InputField, InputSlot } from "@/components/ui/input";
-import { Text } from "@/components/ui/text";
 import { Eye, EyeOff } from "lucide-react-native";
 import React, { useState } from "react";
-import { Controller } from "react-hook-form";
-import { View, Pressable } from "react-native";
-
 import type {
   Control,
+  ControllerRenderProps,
   FieldValues,
   Path,
-  ControllerRenderProps,
 } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { Pressable, View } from "react-native";
+
+import { Input, InputField, InputSlot } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 
 interface FormInputProps<T extends FieldValues> {
   /** React Hook Form control */

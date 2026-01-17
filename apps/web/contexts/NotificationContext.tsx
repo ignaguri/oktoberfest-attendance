@@ -1,9 +1,8 @@
 "use client";
 
-import { apiClient } from "@/lib/api-client";
-import { getFCMToken, onMessageListener } from "@/lib/firebase";
-import { logger } from "@/lib/logger";
-import { createSupabaseBrowserClient } from "@/utils/supabase/client";
+import type { Tables } from "@prostcounter/db";
+import type { User } from "@supabase/supabase-js";
+import type { ReactNode } from "react";
 import {
   createContext,
   useCallback,
@@ -12,9 +11,10 @@ import {
   useState,
 } from "react";
 
-import type { Tables } from "@prostcounter/db";
-import type { User } from "@supabase/supabase-js";
-import type { ReactNode } from "react";
+import { apiClient } from "@/lib/api-client";
+import { getFCMToken, onMessageListener } from "@/lib/firebase";
+import { logger } from "@/lib/logger";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
 

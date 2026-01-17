@@ -1,10 +1,9 @@
 "use client";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import React from "react";
-import { Platform, View } from "react-native";
-
 // Import contract types from shared UI package
 import type { SeparatorOrientation } from "@prostcounter/ui";
+import React from "react";
+import { Platform, View } from "react-native";
 
 const dividerStyle = tva({
   base: "bg-background-200",

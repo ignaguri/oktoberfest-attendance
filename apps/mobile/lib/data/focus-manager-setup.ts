@@ -8,9 +8,8 @@
 
 import { focusManager } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { AppState, Platform } from "react-native";
-
 import type { AppStateStatus } from "react-native";
+import { AppState, Platform } from "react-native";
 
 /**
  * Hook to setup focus manager for React Query.

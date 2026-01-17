@@ -1,16 +1,17 @@
+import { Fingerprint, ScanFace } from "lucide-react-native";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { ActivityIndicator, View } from "react-native";
+
 import { Button, ButtonText } from "@/components/ui/button";
 import {
   Modal,
   ModalBackdrop,
-  ModalContent,
   ModalBody,
+  ModalContent,
   ModalFooter,
 } from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
-import { Fingerprint, ScanFace } from "lucide-react-native";
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { View, ActivityIndicator } from "react-native";
 
 interface BiometricPromptProps {
   /** Whether the modal is visible */

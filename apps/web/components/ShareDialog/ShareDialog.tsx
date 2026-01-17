@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,7 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useShare } from "@/hooks/use-share";
-import Image from "next/image";
 
 interface ShareDialogProps {
   open: boolean;

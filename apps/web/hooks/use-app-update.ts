@@ -1,5 +1,6 @@
+import { startTransition, useCallback, useEffect, useState } from "react";
+
 import { logger } from "@/lib/logger";
-import { useCallback, useEffect, useState, startTransition } from "react";
 
 interface VersionData {
   version: string;

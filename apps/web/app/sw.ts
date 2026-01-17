@@ -1,10 +1,10 @@
-import { swLogger } from "@/lib/sw-logger";
 import { defaultCache } from "@serwist/next/worker";
-import { Serwist } from "serwist";
-import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from "serwist";
-
 import type { RuntimeCaching } from "serwist";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
+import { Serwist } from "serwist";
+import { CacheFirst, NetworkFirst, StaleWhileRevalidate } from "serwist";
+
+import { swLogger } from "@/lib/sw-logger";
 
 // This declares the value of `injectionPoint` to TypeScript.
 // `injectionPoint` is the string that will be replaced by the

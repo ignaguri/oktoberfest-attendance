@@ -1,12 +1,13 @@
 "use client";
 
+import { DEFAULT_AVATAR_URL } from "@prostcounter/shared/constants";
+import { useFestival } from "@prostcounter/shared/contexts";
+import { Loader2, MapPin, Users } from "lucide-react";
+import { useMemo } from "react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNearbyGroupMembers } from "@/hooks/useLocationSharing";
-import { DEFAULT_AVATAR_URL } from "@prostcounter/shared/constants";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { MapPin, Users, Loader2 } from "lucide-react";
-import { useMemo } from "react";
 
 interface GroupMembersMapProps {
   className?: string;

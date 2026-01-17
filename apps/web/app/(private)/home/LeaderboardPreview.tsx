@@ -1,5 +1,10 @@
 "use client";
 
+import type { LeaderboardEntry } from "@prostcounter/shared";
+import { useFestival } from "@prostcounter/shared/contexts";
+import { Crown } from "lucide-react";
+import { Link } from "next-view-transitions";
+
 import Avatar from "@/components/Avatar/Avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,11 +26,6 @@ import {
 } from "@/components/ui/table";
 import { useGlobalLeaderboard } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { Crown } from "lucide-react";
-import { Link } from "next-view-transitions";
-
-import type { LeaderboardEntry } from "@prostcounter/shared";
 
 // Configurable constant for easy modification
 const LEADERBOARD_PREVIEW_LIMIT = 3;

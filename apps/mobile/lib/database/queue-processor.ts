@@ -8,16 +8,16 @@
  * - Error handling and recovery
  */
 
-import type { SyncQueueItem } from "./schema";
 import type * as SQLite from "expo-sqlite";
 
+import type { SyncQueueItem } from "./schema";
 import {
   getPendingOperations,
-  markOperationProcessing,
+  getQueueStats,
   markOperationCompleted,
   markOperationFailed,
+  markOperationProcessing,
   markRecordClean,
-  getQueueStats,
 } from "./sync-queue";
 
 // =============================================================================

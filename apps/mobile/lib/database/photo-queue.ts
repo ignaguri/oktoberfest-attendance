@@ -11,16 +11,15 @@
 import {
   copyAsync,
   deleteAsync,
+  documentDirectory,
   getInfoAsync,
   makeDirectoryAsync,
   readDirectoryAsync,
-  documentDirectory,
 } from "expo-file-system/legacy";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
-
-import type { LocalBeerPicture, PhotoVisibility } from "./schema";
 import type * as SQLite from "expo-sqlite";
 
+import type { LocalBeerPicture, PhotoVisibility } from "./schema";
 import { enqueueOperation } from "./sync-queue";
 
 // =============================================================================

@@ -1,7 +1,7 @@
-import { parseISO, isBefore, isWithinInterval, endOfDay } from "date-fns";
+import type { Festival } from "@prostcounter/shared/schemas";
+import { endOfDay, isBefore, isWithinInterval, parseISO } from "date-fns";
 
 import type { FestivalTent } from "./types";
-import type { Festival } from "@prostcounter/shared/schemas";
 
 // Default fallback values for when festival data is not available
 const DEFAULT_BEER_COST = 16.2;

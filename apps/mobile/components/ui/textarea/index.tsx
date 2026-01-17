@@ -1,15 +1,14 @@
 "use client";
 import { createTextarea } from "@gluestack-ui/core/textarea/creator";
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
-import React from "react";
-import { View, TextInput } from "react-native";
-
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import type { TextareaSize, TextareaVariant } from "@prostcounter/ui";
+import React from "react";
+import { TextInput, View } from "react-native";
 
 const SCOPE = "TEXTAREA";
 const UITextarea = createTextarea({

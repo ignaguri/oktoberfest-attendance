@@ -1,5 +1,14 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { changeLanguage } from "@prostcounter/shared/i18n";
+import type { ProfileForm } from "@prostcounter/shared/schemas";
+import { ProfileFormSchema } from "@prostcounter/shared/schemas";
+import { Link } from "next-view-transitions";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import Avatar from "@/components/Avatar/Avatar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationSettings } from "@/components/NotificationSettings";
@@ -15,15 +24,6 @@ import {
   useUpdateProfile,
 } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { changeLanguage } from "@prostcounter/shared/i18n";
-import { ProfileFormSchema } from "@prostcounter/shared/schemas";
-import { Link } from "next-view-transitions";
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import type { ProfileForm } from "@prostcounter/shared/schemas";
 
 export default function AccountForm() {
   const { t } = useTranslation();

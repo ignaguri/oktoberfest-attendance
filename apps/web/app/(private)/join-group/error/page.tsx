@@ -1,5 +1,9 @@
 "use client";
 
+import { format } from "date-fns";
+import { AlertCircle, Clock, Home, Info, RefreshCw, Users } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +14,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/client";
-import { format } from "date-fns";
-import { AlertCircle, Clock, Users, Home, RefreshCw, Info } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 export default function JoinGroupErrorPage() {
   const { t } = useTranslation();

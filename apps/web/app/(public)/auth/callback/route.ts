@@ -1,8 +1,8 @@
-import { logger } from "@/lib/logger";
-import { createClient } from "@/utils/supabase/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import type { NextRequest } from "next/server";
+import { logger } from "@/lib/logger";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();

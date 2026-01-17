@@ -1,15 +1,15 @@
 "use client";
 
+import { useLogConsumption } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { DrinkType } from "@prostcounter/shared/schemas";
+import type { TFunction } from "i18next";
+import { Beer, BeerOff, Check, CupSoda, Loader2, Wine } from "lucide-react";
+import { useCallback, useState } from "react";
+
 import { RadlerIcon } from "@/components/icons/radler-icon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useLogConsumption } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Beer, Wine, CupSoda, BeerOff, Check, Loader2 } from "lucide-react";
-import { useState, useCallback } from "react";
-
-import type { DrinkType } from "@prostcounter/shared/schemas";
-import type { TFunction } from "i18next";
 
 /**
  * Visible drink types for the picker

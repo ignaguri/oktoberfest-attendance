@@ -1,11 +1,12 @@
 "use client";
 
+import { Share, SquarePlus, X } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useInstallPWA } from "@/hooks/use-install-pwa";
 import { cn } from "@/lib/utils";
-import { X, Share, SquarePlus } from "lucide-react";
-import { useState } from "react";
 
 export default function InstallPWA() {
   const { setInstallPWAVisible, canShowInstallPWA } = useNotifications();

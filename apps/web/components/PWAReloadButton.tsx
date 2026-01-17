@@ -1,10 +1,11 @@
 "use client";
 
+import { RotateCcw } from "lucide-react";
+import { startTransition, useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logger";
 import { isPWAInstalled } from "@/lib/utils";
-import { RotateCcw } from "lucide-react";
-import { useState, useEffect, startTransition } from "react";
 
 export function PWAReloadButton() {
   const [isPWA, setIsPWA] = useState(false);

@@ -1,5 +1,16 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Tables } from "@prostcounter/db";
+import type { AdminGroupForm } from "@prostcounter/shared/schemas";
+import { AdminGroupFormSchema } from "@prostcounter/shared/schemas";
+import { useQueryClient } from "@tanstack/react-query";
+import { Check, Copy, Link } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { GroupSearch } from "@/components/admin/search/GroupSearch";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
@@ -18,23 +29,12 @@ import { searchKeys } from "@/lib/data/search-query-keys";
 import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import { getAvatarUrl } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminGroupFormSchema } from "@prostcounter/shared/schemas";
-import { useQueryClient } from "@tanstack/react-query";
-import { Copy, Check, Link } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import type { Tables } from "@prostcounter/db";
-import type { AdminGroupForm } from "@prostcounter/shared/schemas";
 
 import {
-  updateGroup,
   deleteGroup,
   getGroupMembers,
   getWinningCriteria,
+  updateGroup,
 } from "../actions";
 
 const GroupEditForm = ({

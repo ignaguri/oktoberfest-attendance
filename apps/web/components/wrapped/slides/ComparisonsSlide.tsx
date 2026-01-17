@@ -1,11 +1,11 @@
 "use client";
 
-import { formatPercentage, isImprovement } from "@/lib/wrapped/utils";
-import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
+import { formatPercentage, isImprovement } from "@/lib/wrapped/utils";
 
-import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
+import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface ComparisonsSlideProps {
   data: WrappedData;

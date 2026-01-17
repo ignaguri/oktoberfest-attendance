@@ -1,29 +1,30 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import {
+  addDays,
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isSameMonth,
+  isWithinInterval,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
+import { Beer, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
+import { View } from "react-native";
+
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { IconColors, Colors } from "@/lib/constants/colors";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn } from "@prostcounter/ui";
-import {
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  format,
-  isSameMonth,
-  isSameDay,
-  isWithinInterval,
-  addMonths,
-  subMonths,
-  isBefore,
-  isAfter,
-  addDays,
-} from "date-fns";
-import { ChevronLeft, ChevronRight, Beer } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
-import { View } from "react-native";
+import { Colors, IconColors } from "@/lib/constants/colors";
 
 interface AttendanceData {
   date: string;

@@ -1,11 +1,10 @@
 "use client";
 
-import { Combobox } from "@/components/ui/combobox";
-
 import type {
   ComboboxOption,
   ComboboxOptionGroup,
 } from "@/components/ui/combobox";
+import { Combobox } from "@/components/ui/combobox";
 
 interface SingleSelectProps {
   id?: string;

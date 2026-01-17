@@ -1,6 +1,3 @@
-import { ErrorCodes } from "@prostcounter/shared/errors";
-
-import type { IPhotoRepository } from "../repositories/interfaces";
 import type {
   BeerPicture,
   GetPhotoUploadUrlQuery,
@@ -9,8 +6,10 @@ import type {
   GroupPhotoSettings,
   PhotoVisibility,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { ValidationError } from "../middleware/error";
+import type { IPhotoRepository } from "../repositories/interfaces";
 
 /**
  * Photo Service

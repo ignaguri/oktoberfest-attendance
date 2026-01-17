@@ -1,13 +1,13 @@
 "use server";
 
-import { reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import "server-only";
+
+import type { Tables } from "@prostcounter/db";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
 
-import type { Tables } from "@prostcounter/db";
-
-import "server-only";
+import { reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 // Types for tent management
 export type TentWithPrice = {

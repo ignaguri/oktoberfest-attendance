@@ -1,12 +1,13 @@
 "use server";
 
-import { reportLog, reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import "server-only";
+
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
-import "server-only";
+import { reportLog, reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 export async function uploadAvatar(formData: FormData) {
   const supabase = await createClient();

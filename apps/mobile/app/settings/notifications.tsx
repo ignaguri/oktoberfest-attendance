@@ -1,27 +1,28 @@
+import {
+  useCurrentProfile,
+  useNotificationPreferences,
+  useRegisterFCMToken,
+  useSubscribeToNotifications,
+  useUpdateNotificationPreferences,
+} from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Bell, Clock, ExternalLink, Trophy, Users } from "lucide-react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  View,
+} from "react-native";
+
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 import { useNotificationContextSafe } from "@/lib/notifications/NotificationContext";
-import {
-  useNotificationPreferences,
-  useUpdateNotificationPreferences,
-  useRegisterFCMToken,
-  useSubscribeToNotifications,
-  useCurrentProfile,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Bell, Clock, Trophy, Users, ExternalLink } from "lucide-react-native";
-import { useCallback, useState, useEffect, useRef } from "react";
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-  ActivityIndicator,
-  Alert,
-  Linking,
-  Platform,
-} from "react-native";
 
 export default function NotificationSettingsScreen() {
   const { t } = useTranslation();

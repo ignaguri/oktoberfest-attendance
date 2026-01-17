@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createMockSupabase } from "../../__tests__/helpers/mock-supabase";
 import {
-  createTestApp,
-  createMockUser,
   createAuthRequest,
+  createMockUser,
+  createTestApp,
 } from "../../__tests__/helpers/test-server";
-import { ValidationError, NotFoundError } from "../../middleware/error";
+import { NotFoundError, ValidationError } from "../../middleware/error";
 import { ReservationService } from "../../services/reservation.service";
 import reservationRoutes from "../reservation.route";
 

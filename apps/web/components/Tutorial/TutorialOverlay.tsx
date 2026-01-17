@@ -1,7 +1,8 @@
 "use client";
 
+import { startTransition, useEffect, useState } from "react";
+
 import { useTutorial } from "@/contexts/TutorialContext";
-import { useEffect, useState, startTransition } from "react";
 
 import { TUTORIAL_CONSTANTS } from "./constants";
 import { TutorialSpotlight } from "./TutorialSpotlight";

@@ -1,35 +1,36 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  type SignInFormData,
+  signInSchema,
+} from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import {
+  AuthFooterLink,
   AuthHeader,
+  BiometricEnablePrompt,
+  BiometricPrompt,
   FormInput,
   OAuthButtons,
   OrDivider,
-  AuthFooterLink,
-  BiometricPrompt,
-  BiometricEnablePrompt,
 } from "@/components/auth";
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { getStoredUserEmail } from "@/lib/auth/secure-storage";
 import { IconColors } from "@/lib/constants/colors";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  signInSchema,
-  type SignInFormData,
-} from "@prostcounter/shared/schemas";
-import { useRouter } from "expo-router";
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import {
-  View,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignInScreen() {
   const { t } = useTranslation();

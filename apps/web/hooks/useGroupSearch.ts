@@ -1,18 +1,18 @@
 "use client";
 
-import {
-  getGroups,
-  updateGroup,
-  deleteGroup,
-} from "@/app/(private)/admin/actions";
-import {
-  searchKeys,
-  type GroupSearchFilters,
-} from "@/lib/data/search-query-keys";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Tables } from "@prostcounter/db";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import type { Tables } from "@prostcounter/db";
+import {
+  deleteGroup,
+  getGroups,
+  updateGroup,
+} from "@/app/(private)/admin/actions";
+import {
+  type GroupSearchFilters,
+  searchKeys,
+} from "@/lib/data/search-query-keys";
 
 // Import the server actions
 

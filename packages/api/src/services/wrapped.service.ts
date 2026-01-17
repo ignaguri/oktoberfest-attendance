@@ -1,9 +1,10 @@
-import type { IWrappedRepository } from "../repositories/interfaces";
 import type {
-  WrappedData,
-  WrappedAccessResult,
   AvailableWrappedFestival,
+  WrappedAccessResult,
+  WrappedData,
 } from "@prostcounter/shared";
+
+import type { IWrappedRepository } from "../repositories/interfaces";
 
 /**
  * Wrapped Service

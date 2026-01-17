@@ -1,7 +1,7 @@
 import {
-  initI18n,
   changeLanguage as sharedChangeLanguage,
   i18n,
+  initI18n,
 } from "@prostcounter/shared/i18n";
 
 const LANGUAGE_KEY = "@prostcounter/language";

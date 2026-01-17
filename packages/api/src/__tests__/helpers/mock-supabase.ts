@@ -1,7 +1,6 @@
-import { vi } from "vitest";
-
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { vi } from "vitest";
 
 import { createMockUser } from "./test-server";
 

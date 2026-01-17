@@ -1,9 +1,9 @@
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
 import { logger } from "@/lib/logger";
 import { reportApiException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
-import { NextResponse } from "next/server";
-
-import type { NextRequest } from "next/server";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 

@@ -1,13 +1,4 @@
-import {
-  hasNotificationPromptBeenShown,
-  setNotificationPromptShown,
-  getNotificationPermissionStatus,
-  setNotificationPermissionStatus,
-  getStoredFCMToken,
-  storeFCMToken as saveFCMToken,
-  clearFCMToken,
-  type NotificationPermissionStatus,
-} from "@/lib/auth/secure-storage";
+import type { ReactNode } from "react";
 import {
   createContext,
   useCallback,
@@ -16,7 +7,16 @@ import {
   useState,
 } from "react";
 
-import type { ReactNode } from "react";
+import {
+  clearFCMToken,
+  getNotificationPermissionStatus,
+  getStoredFCMToken,
+  hasNotificationPromptBeenShown,
+  type NotificationPermissionStatus,
+  setNotificationPermissionStatus,
+  setNotificationPromptShown,
+  storeFCMToken as saveFCMToken,
+} from "@/lib/auth/secure-storage";
 
 /**
  * Notification Context Type

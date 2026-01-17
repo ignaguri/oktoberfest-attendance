@@ -1,5 +1,11 @@
 "use client";
 
+import type { ColumnDef } from "@tanstack/react-table";
+import { formatDate } from "date-fns/format";
+import { Beer, Tent, Trash } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
+
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { DataTable } from "@/components/Table/DataTable";
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
@@ -16,13 +22,8 @@ import {
 } from "@/components/ui/dialog";
 import { useDeleteAttendance } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { formatDate } from "date-fns/format";
-import { Beer, Tent, Trash } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import type { AttendanceWithTentVisits } from "./page";
-import type { ColumnDef } from "@tanstack/react-table";
 
 interface PersonalAttendanceTableProps {
   data?: AttendanceWithTentVisits[];

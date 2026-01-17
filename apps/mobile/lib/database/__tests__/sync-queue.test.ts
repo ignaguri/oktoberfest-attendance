@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { generateUUID, generateConsumptionIdempotencyKey } from "../sync-queue";
+import { generateConsumptionIdempotencyKey, generateUUID } from "../sync-queue";
 
 describe("generateUUID", () => {
   it("should generate a valid UUID v4 format", () => {

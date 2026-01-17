@@ -1,33 +1,33 @@
 "use client";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { hasWrappedData } from "@/lib/wrapped/utils";
-import { useEffect, useMemo, useRef } from "react";
-import { Keyboard, Mousewheel, Pagination, Virtual } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-
-import type { WrappedData } from "@/lib/wrapped/types";
-
-// Import slides
-import {
-  IntroSlide,
-  NumbersSlide,
-  JourneySlide,
-  TentExplorerSlide,
-  PeakMomentSlide,
-  SocialSlide,
-  PicturesSlide,
-  AchievementsSlide,
-  PersonalitySlide,
-  RankingsSlide,
-  ComparisonsSlide,
-  OutroSlide,
-} from "../slides";
-
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/virtual";
+
+import { useEffect, useMemo, useRef } from "react";
+import { Keyboard, Mousewheel, Pagination, Virtual } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import LoadingSpinner from "@/components/LoadingSpinner";
+import type { WrappedData } from "@/lib/wrapped/types";
+import { hasWrappedData } from "@/lib/wrapped/utils";
+
+// Import slides
+import {
+  AchievementsSlide,
+  ComparisonsSlide,
+  IntroSlide,
+  JourneySlide,
+  NumbersSlide,
+  OutroSlide,
+  PeakMomentSlide,
+  PersonalitySlide,
+  PicturesSlide,
+  RankingsSlide,
+  SocialSlide,
+  TentExplorerSlide,
+} from "../slides";
 
 interface WrappedContainerProps {
   data: WrappedData;

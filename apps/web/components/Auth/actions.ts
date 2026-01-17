@@ -1,11 +1,12 @@
 "use server";
 
-import { reportSupabaseAuthException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import "server-only";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import "server-only";
+import { reportSupabaseAuthException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 function revalidateBase() {
   revalidatePath("/");

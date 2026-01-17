@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { resolve } from "path";
-import { beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll } from "vitest";
 
 beforeAll(() => {
   // Load environment variables from .env.test or .env.local

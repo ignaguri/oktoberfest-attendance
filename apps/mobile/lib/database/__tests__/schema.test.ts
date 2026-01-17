@@ -11,14 +11,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  SCHEMA_VERSION,
-  DATABASE_NAME,
-  CREATE_TABLES_SQL,
   CREATE_INDEXES_SQL,
-  TABLE_CREATION_ORDER,
-  SYNCABLE_TABLES,
+  CREATE_TABLES_SQL,
+  DATABASE_NAME,
   MUTABLE_TABLES,
   REFERENCE_TABLES,
+  SCHEMA_VERSION,
+  SYNCABLE_TABLES,
+  TABLE_CREATION_ORDER,
 } from "../schema";
 
 describe("Schema Constants", () => {

@@ -1,21 +1,22 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  type SignUpFormData,
+  signUpSchema,
+} from "@prostcounter/shared/schemas";
+import { Link } from "next-view-transitions";
+import React, { useCallback, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  signUpSchema,
-  type SignUpFormData,
-} from "@prostcounter/shared/schemas";
-import { Link } from "next-view-transitions";
-import React, { useState, useRef, useCallback } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
-import { signUp, signInWithOAuth } from "./actions";
-import { GoogleIcon, FacebookIcon } from "./SocialIcons";
+import { signInWithOAuth, signUp } from "./actions";
+import { FacebookIcon, GoogleIcon } from "./SocialIcons";
 
 export default function SignUp() {
   const { t } = useTranslation();

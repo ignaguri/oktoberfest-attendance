@@ -1,15 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
-  useLogConsumption,
   useDeleteConsumption,
+  useLogConsumption,
 } from "@prostcounter/shared/hooks";
-import { Minus, Plus, Loader2 } from "lucide-react";
+import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
+import { Loader2, Minus, Plus } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
-import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface DrinkStepperProps {
   festivalId: string;

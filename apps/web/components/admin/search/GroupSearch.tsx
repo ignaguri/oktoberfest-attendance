@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  Calendar,
+  Filter,
+  RefreshCw,
+  SortAsc,
+  SortDesc,
+  Users,
+} from "lucide-react";
+import { useCallback, useMemo } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,20 +17,10 @@ import {
   useGroupSearchMutations,
 } from "@/hooks/useGroupSearch";
 import { useSearchState } from "@/hooks/useSearchState";
-import { cn } from "@/lib/utils";
-import {
-  Filter,
-  SortAsc,
-  SortDesc,
-  RefreshCw,
-  Users,
-  Calendar,
-} from "lucide-react";
-import { useCallback, useMemo } from "react";
-
 import type { GroupSearchFilters } from "@/lib/data/search-query-keys";
+import { cn } from "@/lib/utils";
 
-import { SearchFilters, type SearchFilter } from "./SearchFilters";
+import { type SearchFilter, SearchFilters } from "./SearchFilters";
 import { SearchInput } from "./SearchInput";
 import { SearchPagination } from "./SearchPagination";
 import { SearchResults } from "./SearchResults";

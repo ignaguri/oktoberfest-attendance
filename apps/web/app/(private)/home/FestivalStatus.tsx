@@ -1,19 +1,20 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import {
+  differenceInDays,
+  endOfDay,
+  isBefore,
+  isWithinInterval,
+} from "date-fns";
+import { CalendarCheck, Frown } from "lucide-react";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SkeletonFestivalStatus } from "@/components/ui/skeleton-cards";
 import {
   getFestivalConstants,
   getFestivalStatus,
 } from "@/lib/festivalConstants";
-import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  differenceInDays,
-  isWithinInterval,
-  isBefore,
-  endOfDay,
-} from "date-fns";
-import { CalendarCheck, Frown } from "lucide-react";
 
 import { WrappedCTA } from "./WrappedCTA";
 

@@ -1,5 +1,10 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import { CalendarDays, Images } from "lucide-react";
+import { useParams } from "next/navigation";
+import { Link } from "next-view-transitions";
+
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import QRButton from "@/components/QR/QRButton";
@@ -7,11 +12,6 @@ import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
 import { useGroupLeaderboard, useGroupSettings } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { CalendarDays, Images } from "lucide-react";
-import { useParams } from "next/navigation";
-import { Link } from "next-view-transitions";
-
 import type { WinningCriteria } from "@/lib/types";
 
 import { JoinGroupForm } from "../JoinGroupForm";

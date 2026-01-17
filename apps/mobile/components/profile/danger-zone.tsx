@@ -1,11 +1,12 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import React from "react";
+
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import React from "react";
 
 interface DangerZoneProps {
   showDeleteConfirm: boolean;

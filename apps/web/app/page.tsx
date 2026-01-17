@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { getUser } from "@/lib/sharedActions";
-import LogoImage from "@/public/android-chrome-512x512.png";
+import "server-only";
+
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Link } from "next-view-transitions";
 
-import "server-only";
+import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/sharedActions";
+import LogoImage from "@/public/android-chrome-512x512.png";
 
 export default async function Root({
   searchParams,

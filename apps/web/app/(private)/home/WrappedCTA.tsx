@@ -1,12 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useWrappedAccess } from "@/hooks/useWrapped";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Link } from "next-view-transitions";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useWrappedAccess } from "@/hooks/useWrapped";
 
 export function WrappedCTA({
   isLastDayOfFestival,

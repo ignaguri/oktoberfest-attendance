@@ -1,10 +1,11 @@
 "use client";
 
+import { usePublicProfile } from "@prostcounter/shared/hooks";
+import { Beer, Calendar, Loader2, TrendingUp } from "lucide-react";
+import { useState } from "react";
+
 import { useTranslation } from "@/lib/i18n/client";
 import { cn, getAvatarUrl } from "@/lib/utils";
-import { usePublicProfile } from "@prostcounter/shared/hooks";
-import { Beer, Calendar, TrendingUp, Loader2 } from "lucide-react";
-import { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Card, CardHeader, CardTitle } from "./card";

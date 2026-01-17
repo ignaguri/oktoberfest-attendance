@@ -1,11 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  GetPersonalCalendarQuerySchema,
   GetCalendarEventsResponseSchema,
+  GetPersonalCalendarQuerySchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabaseCalendarRepository } from "../repositories/supabase";
 
 // Create router

@@ -1,8 +1,8 @@
 import type {
-  Reservation,
   CreateReservationInput,
-  UpdateReservationInput,
+  Reservation,
   ReservationStatus,
+  UpdateReservationInput,
 } from "@prostcounter/shared";
 
 /**

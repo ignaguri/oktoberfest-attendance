@@ -1,22 +1,22 @@
 "use client";
 
-import { formatCurrency, formatNumber } from "@/lib/wrapped/utils";
 import {
   Beer,
   CalendarDays,
-  TrendingUp,
   DollarSign,
   PartyPopper,
+  TrendingUp,
 } from "lucide-react";
 import { useMemo } from "react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
+import { formatCurrency, formatNumber } from "@/lib/wrapped/utils";
 
 import {
   BaseSlide,
-  SlideTitle,
-  SlideSubtitle,
   SlideContent,
+  SlideSubtitle,
+  SlideTitle,
   StatItem,
 } from "./BaseSlide";
 

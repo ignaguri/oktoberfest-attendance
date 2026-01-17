@@ -6,19 +6,19 @@
  * - When offline: queues operations locally for later sync
  */
 
-import { useOffline } from "@/lib/database/offline-provider";
-import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
 import {
-  useLogConsumption as useLogConsumptionApi,
   useDeleteConsumption as useDeleteConsumptionApi,
+  useLogConsumption as useLogConsumptionApi,
 } from "@prostcounter/shared/hooks";
+import type {
+  Consumption,
+  LogConsumptionInput,
+} from "@prostcounter/shared/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import type {
-  LogConsumptionInput,
-  Consumption,
-} from "@prostcounter/shared/schemas";
+import { useOffline } from "@/lib/database/offline-provider";
+import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
 
 /**
  * Offline-aware hook to log a new consumption

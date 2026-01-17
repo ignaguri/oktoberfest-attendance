@@ -1,9 +1,10 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { MultiSelect } from "@/components/Select/MultiSelect";
 import { useTents } from "@/hooks/use-tents";
-import { useFestival } from "@prostcounter/shared/contexts";
 
 interface TentSelectorProps {
   selectedTents: string[];

@@ -1,11 +1,10 @@
 import {
+  type ErrorCode,
   ErrorCodes,
   isErrorCode,
-  type ErrorCode,
 } from "@prostcounter/shared/errors";
-import { HTTPException } from "hono/http-exception";
-
 import type { Context } from "hono";
+import { HTTPException } from "hono/http-exception";
 
 export class ApiError extends Error {
   public code: ErrorCode;

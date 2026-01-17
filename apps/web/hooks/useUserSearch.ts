@@ -1,19 +1,19 @@
 "use client";
 
-import { getUsers, getUserAttendances } from "@/app/(private)/admin/actions";
+import type { Tables } from "@prostcounter/db";
+import type { User } from "@supabase/supabase-js";
 import {
-  searchKeys,
-  type UserSearchFilters,
-} from "@/lib/data/search-query-keys";
-import {
-  useQuery,
   useInfiniteQuery,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import type { Tables } from "@prostcounter/db";
-import type { User } from "@supabase/supabase-js";
+import { getUserAttendances, getUsers } from "@/app/(private)/admin/actions";
+import {
+  searchKeys,
+  type UserSearchFilters,
+} from "@/lib/data/search-query-keys";
 
 // Import the server actions
 

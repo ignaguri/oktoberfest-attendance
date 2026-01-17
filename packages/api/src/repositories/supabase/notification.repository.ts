@@ -1,4 +1,3 @@
-import type { INotificationRepository } from "../interfaces/notification.repository";
 import type { Database } from "@prostcounter/db";
 import type {
   NotificationPreferences,
@@ -7,6 +6,7 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
+import type { INotificationRepository } from "../interfaces/notification.repository";
 
 export class SupabaseNotificationRepository implements INotificationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

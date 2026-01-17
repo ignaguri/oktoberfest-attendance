@@ -1,5 +1,15 @@
 "use client";
 
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Crown } from "lucide-react";
+import { useState } from "react";
+
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
 import {
   Table,
@@ -10,17 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "@/lib/i18n/client";
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Crown } from "lucide-react";
-import { useState } from "react";
-
 import type { WinningCriteria } from "@/lib/types";
-import type { ColumnDef, SortingState } from "@tanstack/react-table";
 
 import Avatar from "./Avatar/Avatar";
 import { ProfilePreview } from "./ui/profile-preview";

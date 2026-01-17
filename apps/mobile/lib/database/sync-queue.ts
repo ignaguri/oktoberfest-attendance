@@ -8,13 +8,14 @@
  * - Handling operation dependencies
  */
 
+import type * as SQLite from "expo-sqlite";
+
 import type {
   SyncMetadata,
-  SyncQueueItem,
   SyncOperationType,
+  SyncQueueItem,
   SyncStatus,
 } from "./schema";
-import type * as SQLite from "expo-sqlite";
 
 // =============================================================================
 // UUID Generation

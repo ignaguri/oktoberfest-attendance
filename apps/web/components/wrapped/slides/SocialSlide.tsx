@@ -1,14 +1,14 @@
 "use client";
 
-import { Users, Camera, UserSearch } from "lucide-react";
+import { Camera, Users, UserSearch } from "lucide-react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 
 import {
   BaseSlide,
-  SlideTitle,
-  SlideSubtitle,
   SlideContent,
+  SlideSubtitle,
+  SlideTitle,
   StatItem,
 } from "./BaseSlide";
 

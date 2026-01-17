@@ -1,5 +1,8 @@
 "use client";
 
+import { cva } from "class-variance-authority";
+import React from "react";
+
 import {
   Avatar as AvatarUI,
   AvatarFallback,
@@ -7,8 +10,6 @@ import {
 } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import { cva } from "class-variance-authority";
-import React from "react";
 
 import UploadAvatarForm from "./UploadAvatarForm";
 

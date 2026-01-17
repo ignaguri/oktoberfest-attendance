@@ -1,15 +1,14 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  LogConsumptionSchema,
-  LogConsumptionResponseSchema,
   ConsumptionSchema,
+  LogConsumptionResponseSchema,
+  LogConsumptionSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import {
-  SupabaseConsumptionRepository,
   SupabaseAttendanceRepository,
+  SupabaseConsumptionRepository,
 } from "../repositories/supabase";
 import { ConsumptionService } from "../services/consumption.service";
 

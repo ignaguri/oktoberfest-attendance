@@ -7,9 +7,9 @@
  * Note: These tests mock the database and API client to test sync logic.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SyncManager, createSyncManager } from "../sync-manager";
+import { createSyncManager, SyncManager } from "../sync-manager";
 
 // Mock the API client
 vi.mock("../../api-client", () => ({

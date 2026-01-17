@@ -1,9 +1,9 @@
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
 import { logger } from "@/lib/logger";
 import { createNotificationService } from "@/lib/services/notifications";
 import { getUser } from "@/lib/sharedActions";
-import { NextResponse } from "next/server";
-
-import type { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {

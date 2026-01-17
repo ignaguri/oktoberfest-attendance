@@ -1,5 +1,12 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import type { Festival as FestivalType } from "@prostcounter/shared/schemas";
+import { format, parseISO } from "date-fns";
+import { CalendarDays, ChevronDown } from "lucide-react";
+import { Link } from "next-view-transitions";
+import { useMemo, useState } from "react";
+
 import { logout } from "@/components/Auth/actions";
 import Avatar from "@/components/Avatar/Avatar";
 import { ShareDialog } from "@/components/ShareDialog/ShareDialog";
@@ -22,23 +29,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   getMenuItems,
-  getMenuSections,
   getMenuItemsBySection,
+  getMenuSections,
 } from "@/components/UserMenu/menuConfig";
 import { WhatsNew } from "@/components/WhatsNew";
 import { useInstallPWA } from "@/hooks/use-install-pwa";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utils";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { format, parseISO } from "date-fns";
-import { ChevronDown, CalendarDays } from "lucide-react";
-import { Link } from "next-view-transitions";
-import { useState, useMemo } from "react";
-
 import type { FestivalStatus } from "@/lib/types";
 import type { ShadcnBadgeVariant } from "@/lib/ui-adapters";
-import type { Festival as FestivalType } from "@prostcounter/shared/schemas";
+import { cn } from "@/lib/utils";
 
 interface UserMenuProps {
   profileData: {

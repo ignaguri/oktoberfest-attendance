@@ -5,7 +5,23 @@
  * Only accessible in development mode.
  */
 
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronRight,
+  Clock,
+  Database,
+  Download,
+  RefreshCw,
+  Trash2,
+  Upload,
+  WifiOff,
+  XCircle,
+} from "lucide-react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, RefreshControl, ScrollView, Switch } from "react-native";
+
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
@@ -17,25 +33,10 @@ import { Colors, IconColors } from "@/lib/constants/colors";
 import {
   DatabaseDebugger,
   type DatabaseStats,
-  type SyncQueueEntry,
   type DirtyRecord,
+  type SyncQueueEntry,
 } from "@/lib/database/debug";
 import { useOffline } from "@/lib/database/offline-provider";
-import {
-  Database,
-  RefreshCw,
-  Trash2,
-  Download,
-  Upload,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  ChevronRight,
-  XCircle,
-  WifiOff,
-} from "lucide-react-native";
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, ScrollView, RefreshControl, Switch } from "react-native";
 
 // =============================================================================
 // Main Screen

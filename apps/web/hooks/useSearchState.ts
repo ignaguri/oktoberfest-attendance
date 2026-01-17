@@ -2,11 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  startTransition,
   useCallback,
   useEffect,
-  useState,
-  startTransition,
   useRef,
+  useState,
 } from "react";
 
 export interface SearchState {

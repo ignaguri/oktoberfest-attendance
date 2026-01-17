@@ -1,18 +1,17 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  CreateReservationSchema,
-  CreateReservationResponseSchema,
   CheckinReservationResponseSchema,
+  CreateReservationResponseSchema,
+  CreateReservationSchema,
+  GetReservationResponseSchema,
   GetReservationsQuerySchema,
   GetReservationsResponseSchema,
   ReservationIdParamSchema,
-  GetReservationResponseSchema,
-  UpdateReservationSchema,
   UpdateReservationResponseSchema,
+  UpdateReservationSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabaseReservationRepository } from "../repositories/supabase";
 import { ReservationService } from "../services/reservation.service";
 

@@ -1,18 +1,18 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import type {
+  AchievementCategory,
+  AchievementWithProgress,
+} from "@prostcounter/shared/schemas";
+import { useState } from "react";
+
 import { AchievementGrid } from "@/components/achievements/AchievementGrid";
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { useTranslation } from "@/lib/i18n/client";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useState } from "react";
-
-import type {
-  AchievementCategory,
-  AchievementWithProgress,
-} from "@prostcounter/shared/schemas";
 
 export default function AchievementsPage() {
   const { t } = useTranslation();

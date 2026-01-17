@@ -1,4 +1,20 @@
 import {
+  type TentGroup,
+  type TentOption,
+  useTents,
+} from "@prostcounter/shared/hooks";
+import { X } from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  SectionList,
+  type SectionListData,
+  type SectionListRenderItemInfo,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import {
   Actionsheet,
   ActionsheetBackdrop,
   ActionsheetContent,
@@ -12,21 +28,6 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import {
-  useTents,
-  type TentGroup,
-  type TentOption,
-} from "@prostcounter/shared/hooks";
-import { X } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  SectionList,
-  type SectionListData,
-  type SectionListRenderItemInfo,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TentListItem } from "./tent-list-item";
 import { TentSearchInput } from "./tent-search-input";

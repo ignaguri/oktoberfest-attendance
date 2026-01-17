@@ -5,16 +5,15 @@
  * Run with: pnpm test --filter=@prostcounter/mobile
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
-import type { SyncQueueItem } from "../schema";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  QueueProcessor,
   createQueueProcessor,
+  QueueProcessor,
   sleep,
   withRetry,
 } from "../queue-processor";
+import type { SyncQueueItem } from "../schema";
 
 // Mock the sync-queue module
 vi.mock("../sync-queue", () => ({

@@ -8,14 +8,15 @@
  * because they depend on server actions or web-specific file handling.
  */
 
+import { QueryKeys } from "@prostcounter/shared/data";
+
 import { uploadAvatar } from "@/components/Avatar/actions";
 import {
-  useQuery,
-  useMutation,
   useInvalidateQueries,
+  useMutation,
+  useQuery,
 } from "@/lib/data/react-query-provider";
 import { getUser } from "@/lib/sharedActions";
-import { QueryKeys } from "@prostcounter/shared/data";
 
 // Re-export shared profile hooks
 export {

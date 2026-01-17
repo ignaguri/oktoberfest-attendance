@@ -1,12 +1,13 @@
 "use client";
 
+import { use } from "react";
+
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { useTranslation } from "@/lib/i18n/client";
-import { use } from "react";
 
 interface PageProps {
   params: Promise<{ id: string }>;

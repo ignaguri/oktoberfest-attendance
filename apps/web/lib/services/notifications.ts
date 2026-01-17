@@ -1,3 +1,15 @@
+import { Novu } from "@novu/api";
+import { ChatOrPushProviderEnum } from "@novu/api/models/components";
+import type { Tables } from "@prostcounter/db";
+import {
+  DEFAULT_AVATAR_URL,
+  DEV_URL,
+  IS_PROD,
+  PROD_URL,
+} from "@prostcounter/shared/constants";
+import type { PostgrestError } from "@supabase/supabase-js";
+import { createClient as createBrowserClient } from "@supabase/supabase-js";
+
 import { ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/achievement-unlocked";
 import { GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/group-achievement-unlocked";
 import { GROUP_JOIN_WORKFLOW_ID } from "@/novu/workflows/group-join";
@@ -9,18 +21,6 @@ import {
   reportNotificationException,
   reportSupabaseException,
 } from "@/utils/sentry";
-import { Novu } from "@novu/api";
-import { ChatOrPushProviderEnum } from "@novu/api/models/components";
-import {
-  DEFAULT_AVATAR_URL,
-  IS_PROD,
-  PROD_URL,
-  DEV_URL,
-} from "@prostcounter/shared/constants";
-import { createClient as createBrowserClient } from "@supabase/supabase-js";
-
-import type { Tables } from "@prostcounter/db";
-import type { PostgrestError } from "@supabase/supabase-js";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
 

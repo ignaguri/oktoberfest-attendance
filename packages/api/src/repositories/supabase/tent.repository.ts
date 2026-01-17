@@ -1,9 +1,9 @@
-import type { ITentRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type { FestivalTent } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
+import type { ITentRepository } from "../interfaces";
 
 export class SupabaseTentRepository implements ITentRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

@@ -1,3 +1,23 @@
+import { TZDate } from "@date-fns/tz";
+import { TIMEZONE } from "@prostcounter/shared/constants";
+import { useGroupGallery, useGroupName } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { getInitials } from "@prostcounter/ui";
+import { format } from "date-fns";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { Camera, X } from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Modal,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+} from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import {
   Avatar,
   AvatarFallbackText,
@@ -12,25 +32,6 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl, getBeerPictureUrl } from "@/lib/utils";
-import { TZDate } from "@date-fns/tz";
-import { TIMEZONE } from "@prostcounter/shared/constants";
-import { useGroupGallery, useGroupName } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { getInitials } from "@prostcounter/ui";
-import { format } from "date-fns";
-import { useLocalSearchParams, Stack } from "expo-router";
-import { Camera, X } from "lucide-react-native";
-import { useState, useCallback, useMemo } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Pressable,
-  Image,
-  Dimensions,
-  Modal,
-  ActivityIndicator,
-} from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NUM_COLUMNS = 3;

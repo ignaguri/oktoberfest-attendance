@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
+import type { TextareaProps as TextareaPropsContract } from "@prostcounter/ui";
 import * as React from "react";
 
-import type { TextareaProps as TextareaPropsContract } from "@prostcounter/ui";
+import { cn } from "@/lib/utils";
 
 // Extend the contract with web-specific implementation props
 export interface TextareaProps

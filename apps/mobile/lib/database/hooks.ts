@@ -8,29 +8,28 @@
  */
 
 import {
-  useQuery,
   useMutation,
+  useQuery,
   useQueryClient,
   type UseQueryOptions,
 } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { useOffline } from "./offline-provider";
 import type {
+  LocalAchievement,
   LocalAttendance,
   LocalConsumption,
   LocalFestival,
-  LocalTent,
-  LocalProfile,
   LocalGroup,
-  LocalAchievement,
+  LocalProfile,
+  LocalTent,
   LocalUserAchievement,
 } from "./schema";
-
-import { useOffline } from "./offline-provider";
 import {
   enqueueOperation,
-  generateUUID,
   generateConsumptionIdempotencyKey,
+  generateUUID,
 } from "./sync-queue";
 
 // =============================================================================

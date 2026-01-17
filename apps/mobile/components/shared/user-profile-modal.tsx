@@ -1,3 +1,8 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { getInitials } from "@prostcounter/ui";
+import { Beer, Calendar, TrendingUp, X } from "lucide-react-native";
+import type { ReactNode } from "react";
+
 import {
   Avatar,
   AvatarFallbackText,
@@ -19,11 +24,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { getInitials } from "@prostcounter/ui";
-import { Beer, Calendar, TrendingUp, X } from "lucide-react-native";
-
-import type { ReactNode } from "react";
 
 export interface UserProfileData {
   username?: string | null;

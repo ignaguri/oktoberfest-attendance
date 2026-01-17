@@ -8,30 +8,29 @@
  * - Exposing database status and operations
  */
 
+import type { NetInfoState } from "@react-native-community/netinfo";
 import NetInfo from "@react-native-community/netinfo";
+import type * as SQLite from "expo-sqlite";
 import {
   createContext,
+  type ReactNode,
+  useCallback,
   useContext,
   useEffect,
-  useState,
-  useCallback,
   useMemo,
-  type ReactNode,
+  useState,
 } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 
-import type { DatabaseStatus, SyncState } from "./types";
-import type { NetInfoState } from "@react-native-community/netinfo";
-import type * as SQLite from "expo-sqlite";
-
-import { initializeDatabase, closeDatabase, resetDatabase } from "./init";
-import { runMigrations, getMigrationStatus } from "./migrations";
+import { closeDatabase, initializeDatabase, resetDatabase } from "./init";
+import { getMigrationStatus, runMigrations } from "./migrations";
 import { MUTABLE_TABLES } from "./schema";
 import {
-  getQueueStats,
-  getDirtyRecordCount,
   cleanupCompletedOperations,
+  getDirtyRecordCount,
+  getQueueStats,
 } from "./sync-queue";
+import type { DatabaseStatus, SyncState } from "./types";
 
 // =============================================================================
 // Context Types

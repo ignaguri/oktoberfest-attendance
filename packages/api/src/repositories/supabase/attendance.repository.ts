@@ -1,17 +1,17 @@
-import type { IAttendanceRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
-  AttendanceWithTotals,
   AttendanceByDate,
-  ListAttendancesQuery,
+  AttendanceWithTotals,
   CreateAttendanceInput,
   CreateAttendanceResponse,
+  ListAttendancesQuery,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError, NotFoundError } from "../../middleware/error";
+import type { IAttendanceRepository } from "../interfaces";
 
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

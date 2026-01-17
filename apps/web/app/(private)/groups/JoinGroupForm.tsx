@@ -1,20 +1,20 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useJoinGroup } from "@/hooks/useGroups";
-import { apiClient } from "@/lib/api-client";
-import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFestival } from "@prostcounter/shared/contexts";
+import type { JoinGroupForm as JoinGroupFormData } from "@prostcounter/shared/schemas";
 import { JoinGroupFormSchema } from "@prostcounter/shared/schemas";
-import { EyeOff, Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { JoinGroupForm as JoinGroupFormData } from "@prostcounter/shared/schemas";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useJoinGroup } from "@/hooks/useGroups";
+import { apiClient } from "@/lib/api-client";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface JoinGroupFormProps {
   groupName?: string;

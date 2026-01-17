@@ -14,7 +14,7 @@
 
 import type * as SQLite from "expo-sqlite";
 
-import { getSchemaVersion, setSchemaVersion, initializeSchema } from "./init";
+import { getSchemaVersion, initializeSchema, setSchemaVersion } from "./init";
 import { SCHEMA_VERSION } from "./schema";
 
 /**

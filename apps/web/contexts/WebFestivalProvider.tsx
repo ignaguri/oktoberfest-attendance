@@ -1,9 +1,9 @@
 "use client";
 
-import { webFestivalStorage } from "@/lib/festival-storage";
 import { FestivalProvider } from "@prostcounter/shared/contexts";
-
 import type { ReactNode } from "react";
+
+import { webFestivalStorage } from "@/lib/festival-storage";
 
 interface WebFestivalProviderProps {
   children: ReactNode;

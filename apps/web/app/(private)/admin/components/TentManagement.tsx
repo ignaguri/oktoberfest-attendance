@@ -1,5 +1,17 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  type AdminAddTentToFestivalForm,
+  AdminAddTentToFestivalFormSchema,
+  type AdminCopyTentsForm,
+  AdminCopyTentsFormSchema,
+} from "@prostcounter/shared/schemas";
+import { Copy, Edit, Euro, Plus, Tent, Trash2 } from "lucide-react";
+import { startTransition, useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,32 +35,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "@/lib/i18n/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  AdminAddTentToFestivalFormSchema,
-  AdminCopyTentsFormSchema,
-  type AdminAddTentToFestivalForm,
-  type AdminCopyTentsForm,
-} from "@prostcounter/shared/schemas";
-import { Copy, Edit, Plus, Trash2, Euro, Tent } from "lucide-react";
-import { useState, useEffect, useCallback, startTransition } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 import type { Festival } from "@/lib/types";
 
 import { fetchAllFestivals } from "../festivalActions";
 import {
-  getFestivalTents,
-  getAvailableTents,
-  addTentToFestival,
   addAllAvailableTentsToFestival,
-  removeTentFromFestival,
-  updateTentPrice,
-  createTent,
+  addTentToFestival,
   copyTentsToFestival,
+  createTent,
+  getAvailableTents,
+  getFestivalTents,
   getFestivalTentStats,
+  removeTentFromFestival,
   type TentWithPrice,
+  updateTentPrice,
 } from "../tentActions";
 
 const TENT_CATEGORIES = [

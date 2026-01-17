@@ -1,12 +1,12 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { WRAPPED_THEME } from "@/lib/wrapped/config";
 import { motion, useAnimation } from "framer-motion";
+import type { ReactNode } from "react";
 import { Children, cloneElement, isValidElement, useEffect } from "react";
 
+import { cn } from "@/lib/utils";
+import { WRAPPED_THEME } from "@/lib/wrapped/config";
 import type { AnimationConfig } from "@/lib/wrapped/types";
-import type { ReactNode } from "react";
 
 interface BaseSlideProps {
   children: ReactNode;

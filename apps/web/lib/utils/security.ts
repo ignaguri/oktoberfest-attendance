@@ -1,6 +1,7 @@
-import { logger } from "@/lib/logger";
 import * as Sentry from "@sentry/nextjs";
 import sanitizeHtml from "sanitize-html";
+
+import { logger } from "@/lib/logger";
 
 /**
  * Sanitize HTML input to prevent XSS attacks

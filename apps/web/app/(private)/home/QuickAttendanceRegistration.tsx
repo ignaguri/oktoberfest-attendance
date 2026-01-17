@@ -1,9 +1,10 @@
 "use client";
 
-import { getFestivalConstants } from "@/lib/festivalConstants";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { isSameDay } from "date-fns";
 import { useState } from "react";
+
+import { getFestivalConstants } from "@/lib/festivalConstants";
 
 import { BeerPictureUpload } from "./components/BeerPictureUpload";
 import { QuickAttendanceRegistrationForm } from "./components/QuickAttendanceRegistrationForm";

@@ -1,6 +1,5 @@
 import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
-
 import type { Database } from "@prostcounter/db";
 import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";

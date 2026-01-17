@@ -3,7 +3,7 @@
  * Centralized configuration for slides, themes, and animations
  */
 
-import type { ThemeConfig, AnimationConfig } from "./types";
+import type { AnimationConfig, ThemeConfig } from "./types";
 
 /**
  * Brand theme configuration (yellow theme)

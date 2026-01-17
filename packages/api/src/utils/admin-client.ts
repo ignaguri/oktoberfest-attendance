@@ -1,6 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-
 import type { Database } from "@prostcounter/db";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * Creates a Supabase client with service role key for admin operations

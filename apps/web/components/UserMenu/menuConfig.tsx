@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import {
   Calendar,
   CalendarSync,
@@ -6,13 +7,11 @@ import {
   MapPin,
   Medal,
   Share2,
+  Sparkles,
   Trophy,
   User,
   Users,
-  Sparkles,
 } from "lucide-react";
-
-import type { TFunction } from "i18next";
 
 export interface MenuItem {
   id: string;

@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {
   createTestSupabaseAdmin,

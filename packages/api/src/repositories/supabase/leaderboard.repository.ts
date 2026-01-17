@@ -1,14 +1,14 @@
-import type { ILeaderboardRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
-  LeaderboardEntry,
   GlobalLeaderboardQuery,
   GroupLeaderboardQuery,
+  LeaderboardEntry,
   WinningCriteriaOption,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
+import type { ILeaderboardRepository } from "../interfaces";
 
 // Mapping between winning criteria strings and database IDs
 const WINNING_CRITERIA_MAP: Record<string, number> = {

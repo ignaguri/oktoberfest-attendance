@@ -1,15 +1,15 @@
 "use client";
 
-import { useConfetti } from "@/hooks/useConfetti";
-import { ANIMATION_DELAYS } from "@/lib/wrapped/config";
-import { formatWrappedDate, formatCurrency } from "@/lib/wrapped/utils";
-import { BicepsFlexed, Tent, Beer } from "lucide-react";
+import { Beer, BicepsFlexed, Tent } from "lucide-react";
 import { useEffect } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 
+import { useConfetti } from "@/hooks/useConfetti";
+import { ANIMATION_DELAYS } from "@/lib/wrapped/config";
 import type { WrappedData } from "@/lib/wrapped/types";
+import { formatCurrency, formatWrappedDate } from "@/lib/wrapped/utils";
 
-import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
+import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface PeakMomentSlideProps {
   data: WrappedData;

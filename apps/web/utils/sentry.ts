@@ -1,6 +1,5 @@
-import * as Sentry from "@sentry/nextjs";
-
 import type { SeverityLevel } from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import type { AuthError, PostgrestError } from "@supabase/supabase-js";
 
 export const reportSupabaseException = (

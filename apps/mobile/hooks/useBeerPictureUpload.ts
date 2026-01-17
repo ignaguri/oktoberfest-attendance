@@ -11,10 +11,11 @@
  * 3. API: Get signed upload URL → Upload to storage → Confirm upload
  */
 
-import { apiClient } from "@/lib/api-client";
 import { useCallback, useState } from "react";
 
-import { useImageUpload, type ImageSource } from "./useImageUpload";
+import { apiClient } from "@/lib/api-client";
+
+import { type ImageSource, useImageUpload } from "./useImageUpload";
 
 interface UploadedPhoto {
   id: string;

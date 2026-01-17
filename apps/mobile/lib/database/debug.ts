@@ -10,19 +10,18 @@
  */
 
 import {
+  cacheDirectory,
   copyAsync,
   deleteAsync,
-  getInfoAsync,
   documentDirectory,
-  cacheDirectory,
+  getInfoAsync,
 } from "expo-file-system/legacy";
-
 import type * as SQLite from "expo-sqlite";
 
 import { closeDatabase, initializeDatabase } from "./init";
-import { getPhotoQueueStats, cleanupOrphanedPhotos } from "./photo-queue";
-import { SYNCABLE_TABLES, MUTABLE_TABLES, DATABASE_NAME } from "./schema";
-import { getQueueStats, cleanupCompletedOperations } from "./sync-queue";
+import { cleanupOrphanedPhotos, getPhotoQueueStats } from "./photo-queue";
+import { DATABASE_NAME, MUTABLE_TABLES, SYNCABLE_TABLES } from "./schema";
+import { cleanupCompletedOperations, getQueueStats } from "./sync-queue";
 
 // =============================================================================
 // Types

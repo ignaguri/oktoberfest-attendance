@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-
-import type { NotificationService } from "@/lib/services/notifications";
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { NotificationService } from "@/lib/services/notifications";
 
 import { processReservationNotifications } from "./reservations";
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { cn, shuffleArray } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Camera, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+import { cn, shuffleArray } from "@/lib/utils";
 import type { WrappedData } from "@/lib/wrapped/types";
 
 /**
@@ -35,9 +35,9 @@ function extractFilePath(urlOrPath: string): string {
 
 import {
   BaseSlide,
-  SlideTitle,
-  SlideSubtitle,
   SlideContent,
+  SlideSubtitle,
+  SlideTitle,
 } from "./BaseSlide";
 
 interface PicturesSlideProps {

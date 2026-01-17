@@ -8,8 +8,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { LocalAttendance, OfflineFields } from "../schema";
-
-import { stripOfflineFields, needsSync, isDeleted, isSynced } from "../types";
+import { isDeleted, isSynced, needsSync, stripOfflineFields } from "../types";
 
 describe("stripOfflineFields", () => {
   it("should remove _synced_at, _deleted, and _dirty fields", () => {

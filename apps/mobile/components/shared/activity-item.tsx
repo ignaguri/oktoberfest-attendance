@@ -1,10 +1,5 @@
-import { RadlerIcon } from "@/components/icons/radler-icon";
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { IconColors } from "@/lib/constants/colors";
 import { formatRelativeTime } from "@prostcounter/shared";
+import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
@@ -17,10 +12,15 @@ import {
   Users,
   Wine,
 } from "lucide-react-native";
-import { useMemo, useState, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Image } from "react-native";
 
-import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
+import { RadlerIcon } from "@/components/icons/radler-icon";
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { IconColors } from "@/lib/constants/colors";
 
 import { ImagePreviewModal } from "./image-preview-modal";
 import { TappableAvatar, UserProfileModal } from "./user-profile-modal";

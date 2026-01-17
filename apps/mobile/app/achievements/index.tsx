@@ -1,3 +1,11 @@
+import { useFestival } from "@prostcounter/shared/contexts";
+import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
+import { Award } from "lucide-react-native";
+import { useCallback, useMemo } from "react";
+import { ActivityIndicator, RefreshControl, ScrollView } from "react-native";
+
 import { AchievementCard } from "@/components/achievements/achievement-card";
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
 import { Card } from "@/components/ui/card";
@@ -5,14 +13,6 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Award } from "lucide-react-native";
-import { useCallback, useMemo } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView } from "react-native";
-
-import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 
 /**
  * Achievements screen showing user's achievement progress

@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createMockSupabase } from "../../__tests__/helpers/mock-supabase";
 import {
-  createTestApp,
-  createMockUser,
   createAuthRequest,
+  createMockUser,
+  createTestApp,
 } from "../../__tests__/helpers/test-server";
 import { NotFoundError } from "../../middleware/error";
 import { PhotoService } from "../../services/photo.service";

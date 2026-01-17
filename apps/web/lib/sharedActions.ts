@@ -1,11 +1,11 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
-import * as Sentry from "@sentry/nextjs";
+import "server-only";
 
+import * as Sentry from "@sentry/nextjs";
 import type { User } from "@supabase/supabase-js";
 
-import "server-only";
+import { createClient } from "@/utils/supabase/server";
 
 /**
  * Get the current authenticated user from Supabase Auth.

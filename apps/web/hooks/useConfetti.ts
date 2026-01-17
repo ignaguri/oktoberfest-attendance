@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export function useConfetti(duration: number = 2200) {
   const [isExploding, setIsExploding] = useState(false);

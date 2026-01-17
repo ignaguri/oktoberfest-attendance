@@ -5,17 +5,16 @@
  * Run with: pnpm test --filter=@prostcounter/mobile
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
-import type { LocalBeerPicture } from "../schema";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  getPendingUploadsDir,
   compressPhoto,
+  getPendingUploadsDir,
+  type PhotoQueueStats,
   type PhotoUploadResult,
   type ProcessPendingPhotosResult,
-  type PhotoQueueStats,
 } from "../photo-queue";
+import type { LocalBeerPicture } from "../schema";
 
 // Mock expo-file-system/legacy
 vi.mock("expo-file-system/legacy", () => ({

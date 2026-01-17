@@ -1,15 +1,15 @@
 "use client";
 
-import { getTopTents } from "@/lib/wrapped/utils";
 import { motion } from "framer-motion";
 
 import type { WrappedData } from "@/lib/wrapped/types";
+import { getTopTents } from "@/lib/wrapped/utils";
 
 import {
   BaseSlide,
-  SlideTitle,
-  SlideSubtitle,
   SlideContent,
+  SlideSubtitle,
+  SlideTitle,
 } from "./BaseSlide";
 
 interface TentExplorerSlideProps {

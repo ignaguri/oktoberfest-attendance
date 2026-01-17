@@ -1,15 +1,14 @@
-import { ErrorCodes } from "@prostcounter/shared/errors";
-
-import type {
-  IConsumptionRepository,
-  IAttendanceRepository,
-} from "../repositories/interfaces";
 import type {
   AttendanceWithTotals,
   LogConsumptionInput,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { ValidationError } from "../middleware/error";
+import type {
+  IAttendanceRepository,
+  IConsumptionRepository,
+} from "../repositories/interfaces";
 
 /**
  * Consumption Service

@@ -1,3 +1,19 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { WinningCriteria } from "@prostcounter/shared/schemas";
+import type { LeaderboardEntry } from "@prostcounter/shared/schemas";
+import { getInitials } from "@prostcounter/ui";
+import {
+  Beer,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Medal,
+  TrendingUp,
+  Trophy,
+  X,
+} from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
+
 import {
   Avatar,
   AvatarFallbackText,
@@ -19,22 +35,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { getInitials } from "@prostcounter/ui";
-import {
-  Trophy,
-  Medal,
-  Calendar,
-  Beer,
-  TrendingUp,
-  X,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react-native";
-import { useState, useCallback, useMemo } from "react";
-
-import type { WinningCriteria } from "@prostcounter/shared/schemas";
-import type { LeaderboardEntry } from "@prostcounter/shared/schemas";
 
 export type SortOrder = "asc" | "desc";
 

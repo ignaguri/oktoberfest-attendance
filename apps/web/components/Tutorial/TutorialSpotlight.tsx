@@ -1,7 +1,8 @@
 "use client";
 
+import { startTransition, useEffect, useRef, useState } from "react";
+
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useRef, startTransition } from "react";
 
 import { TUTORIAL_CONSTANTS } from "./constants";
 

@@ -1,16 +1,15 @@
 "use client";
 import { createFab } from "@gluestack-ui/core/fab/creator";
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
 import React from "react";
 import { Pressable, Text } from "react-native";
-
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 
 const SCOPE = "FAB";
 const Root = withStyleContext(Pressable, SCOPE);

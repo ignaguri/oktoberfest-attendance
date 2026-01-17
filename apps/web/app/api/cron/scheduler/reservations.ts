@@ -1,6 +1,7 @@
-import type { NotificationService } from "@/lib/services/notifications";
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+import type { NotificationService } from "@/lib/services/notifications";
 
 export async function processReservationNotifications(
   supabase: SupabaseClient<Database>,

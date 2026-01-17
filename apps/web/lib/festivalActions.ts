@@ -1,12 +1,12 @@
 "use server";
 
-import { reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import "server-only";
+
 import { unstable_cache } from "next/cache";
 
 import type { Festival, FestivalTent } from "@/lib/types";
-
-import "server-only";
+import { reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 // Cache festivals data for 1 hour since it changes infrequently
 const getCachedFestivals = unstable_cache(

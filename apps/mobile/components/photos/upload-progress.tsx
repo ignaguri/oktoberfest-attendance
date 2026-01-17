@@ -5,24 +5,25 @@
  * Shows upload status, progress bars, and error states.
  */
 
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Image,
+  Upload,
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { Animated, Easing, View } from "react-native";
+
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { cn } from "@prostcounter/ui";
-import {
-  Upload,
-  CheckCircle,
-  AlertCircle,
-  Clock,
-  Image,
-} from "lucide-react-native";
-import React, { useEffect, useState } from "react";
-import { Animated, Easing, View } from "react-native";
 
 // =============================================================================
 // Types

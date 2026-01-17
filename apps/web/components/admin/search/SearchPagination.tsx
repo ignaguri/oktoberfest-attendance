@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { useCallback } from "react";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export interface SearchPaginationProps {
   currentPage: number;

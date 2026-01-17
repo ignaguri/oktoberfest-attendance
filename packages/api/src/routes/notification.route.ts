@@ -1,15 +1,14 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  RegisterFCMTokenSchema,
-  RegisterFCMTokenResponseSchema,
-  SubscribeUserSchema,
-  SubscribeUserResponseSchema,
   NotificationPreferencesSchema,
+  RegisterFCMTokenResponseSchema,
+  RegisterFCMTokenSchema,
+  SubscribeUserResponseSchema,
+  SubscribeUserSchema,
   UpdateNotificationPreferencesSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { NotificationService } from "../services/notification.service";
 
 // Create router

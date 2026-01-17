@@ -1,3 +1,10 @@
+import { useFestival } from "@prostcounter/shared/contexts";
+import { useActivityFeedItems } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Newspaper, RefreshCw } from "lucide-react-native";
+import { useCallback } from "react";
+import { ActivityIndicator, View } from "react-native";
+
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -6,12 +13,6 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useActivityFeedItems } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Newspaper, RefreshCw } from "lucide-react-native";
-import { useCallback } from "react";
-import { ActivityIndicator, View } from "react-native";
 
 import { ActivityItem } from "./activity-item";
 

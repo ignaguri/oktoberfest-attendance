@@ -1,13 +1,12 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  ListFestivalsQuerySchema,
-  ListFestivalsResponseSchema,
   FestivalIdParamSchema,
   GetFestivalResponseSchema,
+  ListFestivalsQuerySchema,
+  ListFestivalsResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { NotFoundError } from "../middleware/error";
 import { SupabaseFestivalRepository } from "../repositories/supabase";
 

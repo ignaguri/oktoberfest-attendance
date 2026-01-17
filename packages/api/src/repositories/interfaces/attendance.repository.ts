@@ -1,9 +1,9 @@
 import type {
-  AttendanceWithTotals,
   AttendanceByDate,
-  ListAttendancesQuery,
+  AttendanceWithTotals,
   CreateAttendanceInput,
   CreateAttendanceResponse,
+  ListAttendancesQuery,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";

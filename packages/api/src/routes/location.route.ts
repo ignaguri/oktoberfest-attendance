@@ -1,15 +1,14 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  StartLocationSessionSchema,
-  StartLocationSessionResponseSchema,
-  StopLocationSessionResponseSchema,
   GetNearbyMembersQuerySchema,
   GetNearbyMembersResponseSchema,
+  StartLocationSessionResponseSchema,
+  StartLocationSessionSchema,
+  StopLocationSessionResponseSchema,
   UpdateLocationSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabaseLocationRepository } from "../repositories/supabase";
 import { LocationService } from "../services/location.service";
 

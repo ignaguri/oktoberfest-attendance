@@ -1,20 +1,20 @@
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import {
-  useOfflineLogConsumption,
-  useOfflineDeleteConsumption,
-} from "@/hooks/useOfflineConsumption";
-import { IconColors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { Minus, Plus } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import { ActivityIndicator } from "react-native";
 
-import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import {
+  useOfflineDeleteConsumption,
+  useOfflineLogConsumption,
+} from "@/hooks/useOfflineConsumption";
+import { IconColors } from "@/lib/constants/colors";
 
 interface DrinkStepperProps {
   festivalId: string;

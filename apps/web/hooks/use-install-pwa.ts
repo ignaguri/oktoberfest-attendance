@@ -1,12 +1,13 @@
 "use client";
 
+import { startTransition, useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+
 import {
-  isPWAInstalled,
   isIOS,
+  isPWAInstalled,
   supportsBeforeInstallPrompt,
 } from "@/lib/utils";
-import { useState, useEffect, useCallback, startTransition } from "react";
-import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;

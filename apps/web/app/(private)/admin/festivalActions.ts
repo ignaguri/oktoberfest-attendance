@@ -1,12 +1,12 @@
 "use server";
 
-import { reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import "server-only";
+
 import { revalidatePath } from "next/cache";
 
 import type { Festival, FestivalInsert, FestivalUpdate } from "@/lib/types";
-
-import "server-only";
+import { reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 export async function fetchAllFestivals(): Promise<Festival[]> {
   const supabase = await createClient();

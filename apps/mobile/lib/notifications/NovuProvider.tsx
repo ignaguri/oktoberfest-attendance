@@ -1,7 +1,7 @@
-import { useAuth } from "@/lib/auth/AuthContext";
 import { NovuProvider as NovuSDKProvider } from "@novu/react-native";
-
 import type { ReactNode } from "react";
+
+import { useAuth } from "@/lib/auth/AuthContext";
 
 /**
  * Novu App ID from environment

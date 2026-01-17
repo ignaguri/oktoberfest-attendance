@@ -1,5 +1,9 @@
 "use client";
 
+import { Clock, Search, TrendingUp } from "lucide-react";
+import type { ReactNode } from "react";
+import { useCallback, useMemo, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -13,10 +17,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Search, Clock, TrendingUp } from "lucide-react";
-import { useState, useCallback, useMemo } from "react";
-
-import type { ReactNode } from "react";
 
 export interface SearchSuggestion {
   id: string;

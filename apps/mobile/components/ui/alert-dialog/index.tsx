@@ -1,22 +1,21 @@
 "use client";
 import { createAlertDialog } from "@gluestack-ui/core/alert-dialog/creator";
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
+import type { MotionComponentProps } from "@legendapp/motion";
 import {
-  Motion,
   AnimatePresence,
   createMotionAnimatedComponent,
+  Motion,
 } from "@legendapp/motion";
 import { cssInterop } from "nativewind";
-import React, { useState, useCallback } from "react";
-import { View, Pressable, ScrollView } from "react-native";
-
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import type { MotionComponentProps } from "@legendapp/motion";
+import React, { useCallback, useState } from "react";
 import type { ViewStyle } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 const SCOPE = "ALERT_DIALOG";
 

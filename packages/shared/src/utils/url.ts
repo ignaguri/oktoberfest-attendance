@@ -41,7 +41,10 @@ export function getAppUrl(): string {
  * @param supabaseUrl - The Supabase URL from environment (e.g., process.env.SUPABASE_URL)
  * @returns The URL with localhost replaced by the actual host
  */
-export function replaceLocalhostInUrl(url: string, supabaseUrl: string): string {
+export function replaceLocalhostInUrl(
+  url: string,
+  supabaseUrl: string,
+): string {
   try {
     const supabaseHost = new URL(supabaseUrl).host;
     return url

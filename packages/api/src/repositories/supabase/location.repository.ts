@@ -1,18 +1,18 @@
-import type { ILocationRepository } from "../interfaces/location.repository";
 import type { Database } from "@prostcounter/db";
 import type {
-  LocationSession,
   LocationPoint,
+  LocationSession,
   LocationSessionMember,
   StartLocationSessionInput,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  ConflictError,
   DatabaseError,
   NotFoundError,
-  ConflictError,
 } from "../../middleware/error";
+import type { ILocationRepository } from "../interfaces/location.repository";
 
 export class SupabaseLocationRepository implements ILocationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

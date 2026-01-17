@@ -1,20 +1,20 @@
 "use client";
 
-import { CHART_CONFIG } from "@/lib/wrapped/config";
-import { prepareTimelineData } from "@/lib/wrapped/utils";
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 
+import { CHART_CONFIG } from "@/lib/wrapped/config";
 import type { WrappedData } from "@/lib/wrapped/types";
+import { prepareTimelineData } from "@/lib/wrapped/utils";
 
-import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
+import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface JourneySlideProps {
   data: WrappedData;

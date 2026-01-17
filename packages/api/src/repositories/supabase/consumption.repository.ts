@@ -1,9 +1,9 @@
-import type { IConsumptionRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type { Consumption, LogConsumptionInput } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
+import type { IConsumptionRepository } from "../interfaces";
 
 export class SupabaseConsumptionRepository implements IConsumptionRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

@@ -1,16 +1,7 @@
-import { Leaderboard, type SortOrder } from "@/components/shared/leaderboard";
-import { Box } from "@/components/ui/box";
-import { Card } from "@/components/ui/card";
-import { Heading } from "@/components/ui/heading";
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { useAuth } from "@/lib/auth/AuthContext";
-import { Colors, IconColors } from "@/lib/constants/colors";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { WinningCriteria } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { Award, ChevronRight, Trophy } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -21,7 +12,16 @@ import {
   View,
 } from "react-native";
 
-import type { WinningCriteria } from "@prostcounter/shared/schemas";
+import { Leaderboard, type SortOrder } from "@/components/shared/leaderboard";
+import { Box } from "@/components/ui/box";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { Colors, IconColors } from "@/lib/constants/colors";
 
 // Map WinningCriteria to API criteria IDs
 const CRITERIA_TO_ID: Record<WinningCriteria, number> = {

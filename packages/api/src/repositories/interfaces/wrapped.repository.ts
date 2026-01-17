@@ -1,7 +1,7 @@
 import type {
-  WrappedData,
-  WrappedAccessResult,
   AvailableWrappedFestival,
+  WrappedAccessResult,
+  WrappedData,
 } from "@prostcounter/shared";
 
 /**

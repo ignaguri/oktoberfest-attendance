@@ -8,28 +8,27 @@
  * - Provides sync state and controls to child components
  */
 
+import type { NetInfoState } from "@react-native-community/netinfo";
 import NetInfo from "@react-native-community/netinfo";
+import type * as SQLite from "expo-sqlite";
 import {
   createContext,
+  type ReactNode,
+  useCallback,
   useContext,
   useEffect,
-  useState,
-  useCallback,
   useRef,
-  type ReactNode,
+  useState,
 } from "react";
+import type { AppStateStatus } from "react-native";
 import { AppState, Platform } from "react-native";
 
-import type { SyncManager } from "./sync-manager";
-import type { NetInfoState } from "@react-native-community/netinfo";
-import type * as SQLite from "expo-sqlite";
-import type { AppStateStatus } from "react-native";
-
 import { initializeDatabase } from "./init";
+import type { SyncManager } from "./sync-manager";
 import {
   createSyncManager,
-  type SyncResult,
   type SyncOptions,
+  type SyncResult,
 } from "./sync-manager";
 import { getQueueStats } from "./sync-queue";
 

@@ -1,5 +1,11 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import { QueryKeys } from "@prostcounter/shared/data";
+import { Loader2, MapPin, Users } from "lucide-react";
+import { useMemo } from "react";
+import { toast } from "sonner";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +18,6 @@ import {
 } from "@/hooks/useLocationSharing";
 import { useInvalidateQueries } from "@/lib/data/react-query-provider";
 import { getFestivalConstants } from "@/lib/festivalConstants";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { QueryKeys } from "@prostcounter/shared/data";
-import { MapPin, Users, Loader2 } from "lucide-react";
-import { useMemo } from "react";
-import { toast } from "sonner";
 
 export const LocationPrivacySettings = () => {
   const { currentFestival } = useFestival();
