@@ -1,8 +1,8 @@
-import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utils";
+import type { InputProps as InputPropsContract } from "@prostcounter/ui";
 import * as React from "react";
 
-import type { InputProps as InputPropsContract } from "@prostcounter/ui";
+import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
 
 // Extend the contract with web-specific implementation props
 export interface InputProps

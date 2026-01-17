@@ -1,13 +1,13 @@
-import { mapBadgeVariant, type ShadcnBadgeVariant } from "@/lib/ui-adapters";
-import { cn } from "@/lib/utils";
-import { cva } from "class-variance-authority";
-import { Slot as SlotPrimitive } from "radix-ui";
-import * as React from "react";
-
 import type {
   BadgeAction,
   BadgeVariant as ContractBadgeVariant,
 } from "@prostcounter/ui";
+import { cva } from "class-variance-authority";
+import { Slot as SlotPrimitive } from "radix-ui";
+import * as React from "react";
+
+import { mapBadgeVariant, type ShadcnBadgeVariant } from "@/lib/ui-adapters";
+import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
   "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",

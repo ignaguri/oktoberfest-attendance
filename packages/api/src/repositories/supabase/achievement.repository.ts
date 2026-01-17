@@ -1,12 +1,12 @@
-import type { IAchievementRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
-  UserAchievement,
   ListAchievementsQuery,
+  UserAchievement,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
+import type { IAchievementRepository } from "../interfaces";
 
 export class SupabaseAchievementRepository implements IAchievementRepository {
   constructor(private supabase: SupabaseClient<Database>) {}

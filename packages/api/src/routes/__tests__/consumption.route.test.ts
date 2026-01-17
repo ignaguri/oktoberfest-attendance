@@ -1,15 +1,15 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  createMockSupabase,
-  mockSupabaseSuccess,
-  mockSupabaseError,
   createMockChain,
+  createMockSupabase,
+  mockSupabaseError,
+  mockSupabaseSuccess,
 } from "../../__tests__/helpers/mock-supabase";
 import {
-  createTestApp,
-  createMockUser,
   createAuthRequest,
+  createMockUser,
+  createTestApp,
 } from "../../__tests__/helpers/test-server";
 import consumptionRoutes from "../consumption.route";
 

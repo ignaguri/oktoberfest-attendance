@@ -1,11 +1,12 @@
 "use client";
 
+import { QrCode } from "lucide-react";
+import { startTransition, useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useRenewInviteToken } from "@/hooks/useGroups";
-import { QrCode } from "lucide-react";
-import { useState, useEffect, useCallback, startTransition } from "react";
-import { toast } from "sonner";
 
 import QRCode from "./QRCode";
 

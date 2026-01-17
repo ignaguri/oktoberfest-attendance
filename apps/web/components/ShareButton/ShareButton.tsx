@@ -1,19 +1,20 @@
 "use client";
 
+import { Share2 } from "lucide-react";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { toast } from "sonner";
+
 import QRCode from "@/components/QR/QRCode";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
 import { useRenewInviteToken } from "@/hooks/useGroups";
-import { Share2 } from "lucide-react";
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  startTransition,
-} from "react";
-import { toast } from "sonner";
 
 interface ShareButtonProps {
   groupName: string;

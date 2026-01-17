@@ -1,7 +1,8 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEffect, useState } from "react";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function OfflineBanner() {
   const [isOffline, setIsOffline] = useState(false);

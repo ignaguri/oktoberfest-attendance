@@ -1,17 +1,17 @@
 "use client";
 
-import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
-import { useCompleteTutorial } from "@/hooks/useProfile";
-import { tutorialSteps, type TutorialStep } from "@/lib/tutorialSteps";
+import type { ReactNode } from "react";
 import {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   startTransition,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
 
-import type { ReactNode } from "react";
+import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
+import { useCompleteTutorial } from "@/hooks/useProfile";
+import { type TutorialStep, tutorialSteps } from "@/lib/tutorialSteps";
 
 interface TutorialContextType {
   isActive: boolean;

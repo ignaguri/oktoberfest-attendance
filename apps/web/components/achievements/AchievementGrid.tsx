@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
+
+import { cn } from "@/lib/utils";
 
 import { AchievementCard } from "./AchievementCard";
 

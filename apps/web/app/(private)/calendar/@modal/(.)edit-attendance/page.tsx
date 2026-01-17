@@ -1,10 +1,11 @@
 "use client";
 
-import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
-import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useEffect } from "react";
+import { useEffect, useMemo } from "react";
+
+import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
+import { Button } from "@/components/ui/button";
 
 export default function InterceptedAttendanceModal() {
   const router = useRouter();

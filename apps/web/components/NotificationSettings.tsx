@@ -1,12 +1,13 @@
 "use client";
 
+import { Bell, BellOff, Smartphone } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useTranslation } from "@/lib/i18n/client";
-import { Bell, BellOff, Smartphone } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 export function NotificationSettings() {
   const { t } = useTranslation();

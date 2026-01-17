@@ -1,7 +1,8 @@
 "use client";
 
-import { useNotifications } from "@/contexts/NotificationContext";
 import { Inbox } from "@novu/nextjs";
+
+import { useNotifications } from "@/contexts/NotificationContext";
 
 export function NotificationBell() {
   const { user, loading } = useNotifications();

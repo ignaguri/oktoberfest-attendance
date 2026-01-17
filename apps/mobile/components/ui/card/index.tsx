@@ -1,8 +1,7 @@
-import React from "react";
-import { View } from "react-native";
-
 import type { CardSize, CardVariant } from "@prostcounter/ui";
+import React from "react";
 import type { ViewProps } from "react-native";
+import { View } from "react-native";
 
 import { cardStyle } from "./styles";
 

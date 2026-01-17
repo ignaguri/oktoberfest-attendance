@@ -2,15 +2,14 @@
 import { createProgress } from "@gluestack-ui/core/progress/creator";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
+// Import contract types from shared UI package
+import type { ProgressOrientation, ProgressSize } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
 import { View } from "react-native";
-
-// Import contract types from shared UI package
-import type { ProgressSize, ProgressOrientation } from "@prostcounter/ui";
 
 const SCOPE = "PROGRESS";
 export const UIProgress = createProgress({

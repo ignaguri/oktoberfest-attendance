@@ -1,11 +1,10 @@
-import { DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
-
 import type { Database } from "@prostcounter/db";
 import type {
   DrinkType,
   GetDrinkPriceResponse,
   PriceSource,
 } from "@prostcounter/shared";
+import { DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export class SupabasePricingRepository {

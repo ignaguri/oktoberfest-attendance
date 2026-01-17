@@ -1,16 +1,16 @@
 "use client";
 
-import { getPersonalityDescription } from "@/lib/wrapped/personality";
-import { getPersonalityEmoji, getTraitEmoji } from "@/lib/wrapped/utils";
 import { motion } from "framer-motion";
 
+import { getPersonalityDescription } from "@/lib/wrapped/personality";
 import type { WrappedData } from "@/lib/wrapped/types";
+import { getPersonalityEmoji, getTraitEmoji } from "@/lib/wrapped/utils";
 
 import {
   BaseSlide,
-  SlideTitle,
-  SlideSubtitle,
   SlideContent,
+  SlideSubtitle,
+  SlideTitle,
 } from "./BaseSlide";
 
 interface PersonalitySlideProps {

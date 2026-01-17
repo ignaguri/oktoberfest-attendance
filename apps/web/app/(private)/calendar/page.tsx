@@ -1,11 +1,12 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import { Loader2 } from "lucide-react";
+
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
 import { usePersonalCalendar } from "@/hooks/useCalendar";
 import { useTranslation } from "@/lib/i18n/client";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { Loader2 } from "lucide-react";
 
 export default function PersonalCalendarPage() {
   const { t } = useTranslation();

@@ -1,17 +1,17 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type {
+  AchievementRarity,
+  AchievementWithProgress,
+} from "@prostcounter/shared/schemas";
+import { format, parseISO } from "date-fns";
+import { useMemo } from "react";
+import { View } from "react-native";
+
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { format, parseISO } from "date-fns";
-import { useMemo } from "react";
-import { View } from "react-native";
-
-import type {
-  AchievementRarity,
-  AchievementWithProgress,
-} from "@prostcounter/shared/schemas";
 
 import { AchievementProgressBar } from "./achievement-progress-bar";
 

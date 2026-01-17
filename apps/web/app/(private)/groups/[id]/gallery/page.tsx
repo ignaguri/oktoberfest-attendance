@@ -1,10 +1,11 @@
 "use client";
 
+import { use } from "react";
+
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { useTranslation } from "@/lib/i18n/client";
-import { use } from "react";
 
 import { GalleryGrid } from "./GalleryGrid";
 

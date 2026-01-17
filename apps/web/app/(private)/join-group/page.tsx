@@ -1,9 +1,10 @@
 "use client";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { useTranslation } from "@/lib/i18n/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function JoinGroupPage() {
   const { t } = useTranslation();

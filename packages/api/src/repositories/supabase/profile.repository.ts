@@ -1,17 +1,16 @@
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
-
 import type { Database } from "@prostcounter/db";
 import type {
+  GetAvatarUploadUrlQuery,
+  GetAvatarUploadUrlResponse,
+  Highlights,
+  MissingProfileFields,
   Profile,
   ProfileShort,
   PublicProfile,
-  UpdateProfileInput,
   TutorialStatus,
-  MissingProfileFields,
-  Highlights,
-  GetAvatarUploadUrlQuery,
-  GetAvatarUploadUrlResponse,
+  UpdateProfileInput,
 } from "@prostcounter/shared";
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export class SupabaseProfileRepository {

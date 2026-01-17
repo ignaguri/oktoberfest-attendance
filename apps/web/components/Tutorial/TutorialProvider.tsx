@@ -1,8 +1,8 @@
 "use client";
 
-import { TutorialProvider as TutorialContextProvider } from "@/contexts/TutorialContext";
-
 import type { ReactNode } from "react";
+
+import { TutorialProvider as TutorialContextProvider } from "@/contexts/TutorialContext";
 
 interface TutorialProviderProps {
   children: ReactNode;

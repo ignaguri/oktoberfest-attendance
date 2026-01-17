@@ -1,9 +1,9 @@
 import "react-native-url-polyfill/auto";
+
+import type { Database } from "@prostcounter/db";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
-
-import type { Database } from "@prostcounter/db";
 
 const supabaseUrl =
   Constants.expoConfig?.extra?.supabaseUrl ||

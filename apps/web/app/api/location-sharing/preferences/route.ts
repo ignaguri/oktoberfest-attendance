@@ -1,10 +1,10 @@
-import { createNotificationService } from "@/lib/services/notifications";
-import { reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import type { NextRequest } from "next/server";
+import { createNotificationService } from "@/lib/services/notifications";
+import { reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 // NOTE: This API uses deprecated tables (location_sharing_preferences)
 // that were replaced by location_sessions, location_session_members.

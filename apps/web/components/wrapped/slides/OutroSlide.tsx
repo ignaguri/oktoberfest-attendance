@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Beer, HeartHandshake, Heart, Download } from "lucide-react";
+import { Beer, Download, Heart, HeartHandshake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
+import { Button } from "@/components/ui/button";
 import type { WrappedData } from "@/lib/wrapped/types";
 
-import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
+import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface OutroSlideProps {
   data: WrappedData;

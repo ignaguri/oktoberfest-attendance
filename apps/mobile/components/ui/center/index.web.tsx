@@ -1,6 +1,5 @@
-import React from "react";
-
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import React from "react";
 
 import { centerStyle } from "./styles";
 

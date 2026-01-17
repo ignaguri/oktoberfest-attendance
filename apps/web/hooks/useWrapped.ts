@@ -4,12 +4,12 @@
  * These hooks handle all wrapped-related functionality using React Query
  */
 
-import { apiClient } from "@/lib/api-client";
-import { useQuery } from "@/lib/data/react-query-provider";
-import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import { QueryKeys } from "@prostcounter/shared/data";
 
+import { apiClient } from "@/lib/api-client";
+import { useQuery } from "@/lib/data/react-query-provider";
 import type { WrappedData } from "@/lib/wrapped/types";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 /**
  * Hook to fetch wrapped data for a specific festival

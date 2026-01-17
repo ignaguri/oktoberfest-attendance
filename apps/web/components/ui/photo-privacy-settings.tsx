@@ -1,11 +1,12 @@
 "use client";
 
-import { Switch } from "@/components/ui/switch";
-import { apiClient } from "@/lib/api-client";
-import { useTranslation } from "@/lib/i18n/client";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import { Switch } from "@/components/ui/switch";
+import { apiClient } from "@/lib/api-client";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface GroupPhotoSetting {
   group_id: string;

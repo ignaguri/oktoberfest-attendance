@@ -1,15 +1,16 @@
+import { useJoinGroupByToken } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { CheckCircle, Users, XCircle } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
+
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { useJoinGroupByToken } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { CheckCircle, XCircle, Users } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
 
 type JoinStatus = "loading" | "success" | "error" | "already_member";
 

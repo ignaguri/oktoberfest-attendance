@@ -1,7 +1,3 @@
-import { Card } from "@/components/ui/card";
-import { HStack } from "@/components/ui/hstack";
-import { Text } from "@/components/ui/text";
-import { IconColors } from "@/lib/constants/colors";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
@@ -13,6 +9,11 @@ import {
   startOfDay,
 } from "date-fns";
 import { Clock, Flag, PartyPopper } from "lucide-react-native";
+
+import { Card } from "@/components/ui/card";
+import { HStack } from "@/components/ui/hstack";
+import { Text } from "@/components/ui/text";
+import { IconColors } from "@/lib/constants/colors";
 
 type FestivalStatusType = "upcoming" | "active" | "ended";
 

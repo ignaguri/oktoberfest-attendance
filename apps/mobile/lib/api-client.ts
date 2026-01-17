@@ -6,9 +6,9 @@
  */
 
 import {
-  createTypedApiClient,
   ApiError,
   type ApiHeaders,
+  createTypedApiClient,
 } from "@prostcounter/api-client";
 import Constants from "expo-constants";
 

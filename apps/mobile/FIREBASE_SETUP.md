@@ -10,15 +10,18 @@ The mobile app requires Firebase configuration files for push notifications to w
 ## How to Obtain These Files
 
 ### 1. Access Firebase Console
+
 Go to [Firebase Console](https://console.firebase.google.com/) and select the **prostcounter** project.
 
 ### 2. Download Android Config
+
 1. Go to **Project Settings** (gear icon)
 2. Select the **Android app** (`com.prostcounter.app`)
 3. Click **Download google-services.json**
 4. Place it in `apps/mobile/google-services.json`
 
 ### 3. Download iOS Config
+
 1. Go to **Project Settings** (gear icon)
 2. Select the **iOS app** (`com.prostcounter.app`)
 3. Click **Download GoogleService-Info.plist**

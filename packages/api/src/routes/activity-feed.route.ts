@@ -1,11 +1,11 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import type { ActivityFeedItem } from "@prostcounter/shared";
 import {
   GetActivityFeedQuerySchema,
   GetActivityFeedResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-import type { ActivityFeedItem } from "@prostcounter/shared";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();

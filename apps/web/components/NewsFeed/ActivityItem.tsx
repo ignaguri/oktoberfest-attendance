@@ -1,19 +1,19 @@
 "use client";
 
+import type { AchievementRarity } from "@prostcounter/shared/schemas";
+import type { TFunction } from "i18next";
+import { Beer, Camera, Clock, MapPin, Medal, Users } from "lucide-react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+
 import { ImageModal } from "@/app/(private)/groups/[id]/gallery/ImageModal";
 import { AchievementBadge } from "@/components/achievements/AchievementBadge";
 import Avatar from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/ui/badge";
 import { ProfilePreview } from "@/components/ui/profile-preview";
+import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
 import { formatRelativeTime } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
-import { Beer, MapPin, Camera, Users, Clock, Medal } from "lucide-react";
-import Image from "next/image";
-import { useMemo, useState } from "react";
-
-import type { ActivityFeedItem } from "@/hooks/useActivityFeed";
-import type { AchievementRarity } from "@prostcounter/shared/schemas";
-import type { TFunction } from "i18next";
 
 /**
  * Extract file path from a full Supabase storage URL or return the path as-is

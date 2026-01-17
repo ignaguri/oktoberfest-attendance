@@ -1,27 +1,6 @@
 import "../global.css";
 
-import { ErrorBoundary } from "@/components/error-boundary";
-import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
-import { GluestackUIProvider } from "@/components/ui";
-import { apiClient } from "@/lib/api-client";
-import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
-import { useFocusManager } from "@/lib/data/focus-manager-setup";
-import { useOnlineManager } from "@/lib/data/online-manager-setup";
-import { DataProvider } from "@/lib/data/query-client";
-import { mobileFestivalStorage } from "@/lib/festival-storage";
-import { initMobileI18n } from "@/lib/i18n";
-import { defaultScreenOptions } from "@/lib/navigation/header-config";
-import {
-  configureNotificationHandler,
-  setupNotificationListeners,
-  checkInitialNotification,
-} from "@/lib/notifications/handlers";
-import {
-  NotificationProvider,
-  useNotificationContext,
-} from "@/lib/notifications/NotificationContext";
-import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
-import { FestivalProvider } from "@prostcounter/shared/contexts";
+import { FestivalProvider, useFestival } from "@prostcounter/shared/contexts";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
@@ -31,6 +10,29 @@ import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import { ErrorBoundary } from "@/components/error-boundary";
+import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
+import { GluestackUIProvider } from "@/components/ui";
+import { apiClient } from "@/lib/api-client";
+import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
+import { useFocusManager } from "@/lib/data/focus-manager-setup";
+import { useOnlineManager } from "@/lib/data/online-manager-setup";
+import { DataProvider } from "@/lib/data/query-client";
+import { OfflineDataProvider } from "@/lib/database/offline-provider";
+import { mobileFestivalStorage } from "@/lib/festival-storage";
+import { initMobileI18n } from "@/lib/i18n";
+import { defaultScreenOptions } from "@/lib/navigation/header-config";
+import {
+  checkInitialNotification,
+  configureNotificationHandler,
+  setupNotificationListeners,
+} from "@/lib/notifications/handlers";
+import {
+  NotificationProvider,
+  useNotificationContext,
+} from "@/lib/notifications/NotificationContext";
+import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
 
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {
@@ -64,6 +66,18 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, isLoading, segments]);
 
   return <>{children}</>;
+}
+
+// Bridge component to connect OfflineDataProvider with Auth and Festival contexts
+function OfflineDataBridge({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const { currentFestival } = useFestival();
+
+  return (
+    <OfflineDataProvider festivalId={currentFestival?.id} userId={user?.id}>
+      {children}
+    </OfflineDataProvider>
+  );
 }
 
 // Auto-show notification permission prompt after first login
@@ -179,48 +193,50 @@ export default function RootLayout() {
                     <NotificationProvider>
                       <NovuProviderWrapper>
                         <FestivalProvider storage={mobileFestivalStorage}>
-                          <NavigationGuard>
-                            <NotificationPromptHandler />
-                            <Stack
-                              screenOptions={{
-                                headerShown: false,
-                                animation: "slide_from_right",
-                                ...defaultScreenOptions,
-                              }}
-                            >
-                              <Stack.Screen name="(auth)" />
-                              <Stack.Screen name="(tabs)" />
-                              <Stack.Screen
-                                name="settings"
-                                options={{
+                          <OfflineDataBridge>
+                            <NavigationGuard>
+                              <NotificationPromptHandler />
+                              <Stack
+                                screenOptions={{
                                   headerShown: false,
-                                  presentation: "card",
+                                  animation: "slide_from_right",
+                                  ...defaultScreenOptions,
                                 }}
-                              />
-                              <Stack.Screen
-                                name="groups"
-                                options={{
-                                  headerShown: false,
-                                  presentation: "card",
-                                }}
-                              />
-                              <Stack.Screen
-                                name="achievements"
-                                options={{
-                                  headerShown: false,
-                                  presentation: "card",
-                                }}
-                              />
-                              <Stack.Screen
-                                name="join-group/[token]"
-                                options={{
-                                  headerShown: false,
-                                  presentation: "fullScreenModal",
-                                }}
-                              />
-                              <Stack.Screen name="+not-found" />
-                            </Stack>
-                          </NavigationGuard>
+                              >
+                                <Stack.Screen name="(auth)" />
+                                <Stack.Screen name="(tabs)" />
+                                <Stack.Screen
+                                  name="settings"
+                                  options={{
+                                    headerShown: false,
+                                    presentation: "card",
+                                  }}
+                                />
+                                <Stack.Screen
+                                  name="groups"
+                                  options={{
+                                    headerShown: false,
+                                    presentation: "card",
+                                  }}
+                                />
+                                <Stack.Screen
+                                  name="achievements"
+                                  options={{
+                                    headerShown: false,
+                                    presentation: "card",
+                                  }}
+                                />
+                                <Stack.Screen
+                                  name="join-group/[token]"
+                                  options={{
+                                    headerShown: false,
+                                    presentation: "fullScreenModal",
+                                  }}
+                                />
+                                <Stack.Screen name="+not-found" />
+                              </Stack>
+                            </NavigationGuard>
+                          </OfflineDataBridge>
                         </FestivalProvider>
                       </NovuProviderWrapper>
                     </NotificationProvider>

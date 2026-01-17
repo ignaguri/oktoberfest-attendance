@@ -1,8 +1,8 @@
-import { logAdminAction } from "@/lib/utils/security";
 import { createServerClient } from "@supabase/ssr";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import type { NextRequest } from "next/server";
+import { logAdminAction } from "@/lib/utils/security";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({

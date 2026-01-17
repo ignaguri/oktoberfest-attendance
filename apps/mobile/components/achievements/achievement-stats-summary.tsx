@@ -1,10 +1,10 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AchievementStats } from "@prostcounter/shared/schemas";
+
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { useTranslation } from "@prostcounter/shared/i18n";
-
-import type { AchievementStats } from "@prostcounter/shared/schemas";
 
 interface AchievementStatsSummaryProps {
   stats: AchievementStats;

@@ -1,14 +1,13 @@
-import { ErrorCodes } from "@prostcounter/shared/errors";
-
-import type { ILocationRepository } from "../repositories/interfaces";
 import type {
-  LocationSession,
   LocationPoint,
+  LocationSession,
   LocationSessionMember,
   StartLocationSessionInput,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { ConflictError, ValidationError } from "../middleware/error";
+import type { ILocationRepository } from "../repositories/interfaces";
 
 /**
  * Location Service

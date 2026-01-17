@@ -1,9 +1,9 @@
 "use client";
 
-import { logger } from "@/lib/logger";
+import type { ErrorInfo, ReactNode } from "react";
 import React from "react";
 
-import type { ErrorInfo, ReactNode } from "react";
+import { logger } from "@/lib/logger";
 
 import ErrorPage from "./ErrorPage";
 

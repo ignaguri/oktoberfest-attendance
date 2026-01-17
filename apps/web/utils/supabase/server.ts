@@ -1,9 +1,8 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import "server-only";
 
 import type { Database } from "@prostcounter/db";
-
-import "server-only";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function createClient(withServiceRole: boolean = false) {
   // Service role client doesn't need cookies - it bypasses RLS

@@ -1,23 +1,23 @@
-import type { IGroupRepository } from "../interfaces";
 import type { Database } from "@prostcounter/db";
 import type {
-  Group,
-  GroupWithMembers,
   CreateGroupInput,
-  UpdateGroupInput,
-  ListGroupsQuery,
-  SearchGroupsQuery,
-  SearchGroupResult,
-  GroupMember,
+  Group,
   GroupGalleryPhoto,
+  GroupMember,
+  GroupWithMembers,
+  ListGroupsQuery,
+  SearchGroupResult,
+  SearchGroupsQuery,
+  UpdateGroupInput,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  ConflictError,
   DatabaseError,
   NotFoundError,
-  ConflictError,
 } from "../../middleware/error";
+import type { IGroupRepository } from "../interfaces";
 
 // Mapping between winning criteria strings and database IDs
 const WINNING_CRITERIA_MAP: Record<string, number> = {

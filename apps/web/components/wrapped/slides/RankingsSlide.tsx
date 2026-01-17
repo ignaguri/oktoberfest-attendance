@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Globe, CalendarDays, Beer, DiamondPercent } from "lucide-react";
+import { Beer, CalendarDays, DiamondPercent, Globe, Users } from "lucide-react";
 
 import type { WrappedData } from "@/lib/wrapped/types";
 

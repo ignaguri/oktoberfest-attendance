@@ -1,15 +1,15 @@
 "use server";
 
-import { formatTimestampForDatabase } from "@/lib/date-utils";
-import { sanitizeSearchTerm, logAdminAction } from "@/lib/utils/security";
-import { createClient } from "@/utils/supabase/server";
+import "server-only";
+
+import type { Tables } from "@prostcounter/db";
 import { revalidatePath, unstable_cache } from "next/cache";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
-import type { Tables } from "@prostcounter/db";
-
-import "server-only";
+import { formatTimestampForDatabase } from "@/lib/date-utils";
+import { logAdminAction, sanitizeSearchTerm } from "@/lib/utils/security";
+import { createClient } from "@/utils/supabase/server";
 
 // Cached version of getUsers for better performance
 const getCachedUsers = unstable_cache(

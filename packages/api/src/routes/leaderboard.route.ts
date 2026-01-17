@@ -1,18 +1,17 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   GlobalLeaderboardQuerySchema,
-  GroupLeaderboardQuerySchema,
   GroupIdParamSchema,
+  GroupLeaderboardQuerySchema,
   LeaderboardResponseSchema,
   WinningCriteriaListResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
-import { NotFoundError, ForbiddenError } from "../middleware/error";
+import { ForbiddenError, NotFoundError } from "../middleware/error";
 import {
-  SupabaseLeaderboardRepository,
   SupabaseGroupRepository,
+  SupabaseLeaderboardRepository,
 } from "../repositories/supabase";
 
 // Create router

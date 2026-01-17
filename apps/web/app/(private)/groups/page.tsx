@@ -1,8 +1,9 @@
+import { Suspense } from "react";
+
 import LoadingSpinner from "@/components/LoadingSpinner";
 import MyGroups from "@/components/MyGroups/MyGroups";
 import { Separator } from "@/components/ui/separator";
 import { getTranslations } from "@/lib/i18n/server";
-import { Suspense } from "react";
 
 import { CreateGroupForm } from "./CreateGroupForm";
 import { JoinGroupForm } from "./JoinGroupForm";

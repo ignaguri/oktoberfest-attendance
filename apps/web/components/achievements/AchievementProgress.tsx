@@ -1,9 +1,9 @@
 "use client";
 
+import type { AchievementProgress as AchievementProgressType } from "@prostcounter/shared/schemas";
+
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-
-import type { AchievementProgress as AchievementProgressType } from "@prostcounter/shared/schemas";
 
 interface AchievementProgressProps {
   progress: AchievementProgressType;

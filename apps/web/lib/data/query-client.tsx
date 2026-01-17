@@ -1,11 +1,12 @@
 "use client";
 
-import { apiClient } from "@/lib/api-client";
 import { IS_PROD } from "@prostcounter/shared/constants";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+
+import { apiClient } from "@/lib/api-client";
 
 /**
  * Create a QueryClient with optimized settings for ProstCounter

@@ -1,6 +1,11 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { ImagePlus, Minus, X } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, Image, View } from "react-native";
+
 import {
-  ImageSourcePicker,
   type ImageSource,
+  ImageSourcePicker,
 } from "@/components/image-source-picker";
 import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { HStack } from "@/components/ui/hstack";
@@ -8,15 +13,11 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
-  useBeerPictureUpload,
   type PendingPhoto,
+  useBeerPictureUpload,
 } from "@/hooks/useBeerPictureUpload";
 import { IconColors } from "@/lib/constants/colors";
 import { getBeerPictureUrl } from "@/lib/utils";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { ImagePlus, Minus, X } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { ActivityIndicator, Image, View } from "react-native";
 
 interface BeerPicture {
   id: string;

@@ -1,14 +1,14 @@
 "use client";
 
-import { Switch } from "@/components/ui/switch";
-import { apiClient } from "@/lib/api-client";
-import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utils";
+import type { PhotoVisibility } from "@prostcounter/shared/schemas";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { PhotoVisibility } from "@prostcounter/shared/schemas";
+import { Switch } from "@/components/ui/switch";
+import { apiClient } from "@/lib/api-client";
+import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
 
 interface PhotoVisibilityToggleProps {
   photoId: string;

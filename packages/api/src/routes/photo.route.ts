@@ -1,19 +1,18 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  GetPhotoUploadUrlQuerySchema,
-  GetPhotoUploadUrlResponseSchema,
+  BulkUpdatePhotoVisibilitySchema,
   ConfirmPhotoUploadResponseSchema,
   GetPhotosQuerySchema,
   GetPhotosResponseSchema,
+  GetPhotoUploadUrlQuerySchema,
+  GetPhotoUploadUrlResponseSchema,
   GlobalPhotoSettingsSchema,
-  UpdateGlobalPhotoSettingsSchema,
   GroupPhotoSettingsSchema,
+  UpdateGlobalPhotoSettingsSchema,
   UpdatePhotoVisibilitySchema,
-  BulkUpdatePhotoVisibilitySchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabasePhotoRepository } from "../repositories/supabase";
 import { PhotoService } from "../services/photo.service";
 

@@ -1,9 +1,8 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-
 import type { AchievementRarity } from "@/lib/types/achievements";
+import { cn } from "@/lib/utils";
 
 const rarityConfig = {
   common: {

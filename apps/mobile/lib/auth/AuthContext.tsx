@@ -1,25 +1,25 @@
-import { supabase } from "@/lib/supabase";
+import type { Session, User } from "@supabase/supabase-js";
 import {
   createContext,
+  type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
-  useCallback,
-  type ReactNode,
 } from "react";
 
-import type { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 import {
-  signInWithGoogle as googleSignIn,
-  signInWithFacebook as facebookSignIn,
   signInWithApple as appleSignIn,
+  signInWithFacebook as facebookSignIn,
+  signInWithGoogle as googleSignIn,
 } from "./oauth";
 import {
-  storeSession,
-  clearSession,
-  storeUserEmail,
   clearAllAuthData,
+  clearSession,
+  storeSession,
+  storeUserEmail,
 } from "./secure-storage";
 
 interface AuthContextType {

@@ -1,17 +1,17 @@
-import type { IWrappedRepository } from "../interfaces/wrapped.repository";
 import type { Database } from "@prostcounter/db";
 import type {
-  WrappedData,
-  WrappedAccessResult,
   AvailableWrappedFestival,
+  WrappedAccessResult,
+  WrappedData,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   DatabaseError,
-  NotFoundError,
   ForbiddenError,
+  NotFoundError,
 } from "../../middleware/error";
+import type { IWrappedRepository } from "../interfaces/wrapped.repository";
 
 /**
  * Access control configuration for wrapped feature

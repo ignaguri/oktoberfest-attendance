@@ -4,18 +4,19 @@
  * These hooks handle all admin-related data operations
  */
 
-import { getUsers, getGroups } from "@/app/(private)/admin/actions";
+import { QueryKeys } from "@prostcounter/shared/data";
+
+import { getGroups, getUsers } from "@/app/(private)/admin/actions";
 import {
   createFestival,
-  updateFestival,
   deleteFestival,
+  updateFestival,
 } from "@/app/(private)/admin/festivalActions";
 import {
-  useQuery,
-  useMutation,
   useInvalidateQueries,
+  useMutation,
+  useQuery,
 } from "@/lib/data/react-query-provider";
-import { QueryKeys } from "@prostcounter/shared/data";
 
 /**
  * Hook to fetch all users (admin only)

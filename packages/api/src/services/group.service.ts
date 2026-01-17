@@ -1,17 +1,16 @@
+import type {
+  CreateGroupInput,
+  Group,
+  GroupGalleryPhoto,
+  GroupMember,
+  GroupWithMembers,
+  ListGroupsQuery,
+  UpdateGroupInput,
+} from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
+import { ForbiddenError, NotFoundError } from "../middleware/error";
 import type { IGroupRepository } from "../repositories/interfaces";
-import type {
-  Group,
-  GroupWithMembers,
-  CreateGroupInput,
-  UpdateGroupInput,
-  ListGroupsQuery,
-  GroupMember,
-  GroupGalleryPhoto,
-} from "@prostcounter/shared";
-
-import { NotFoundError, ForbiddenError } from "../middleware/error";
 
 /**
  * Group Service

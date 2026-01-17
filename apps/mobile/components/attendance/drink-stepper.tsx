@@ -1,20 +1,20 @@
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { IconColors } from "@/lib/constants/colors";
-import {
-  useLogConsumption,
-  useDeleteConsumption,
-} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { Minus, Plus } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import { ActivityIndicator } from "react-native";
 
-import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import {
+  useOfflineDeleteConsumption,
+  useOfflineLogConsumption,
+} from "@/hooks/useOfflineConsumption";
+import { IconColors } from "@/lib/constants/colors";
 
 interface DrinkStepperProps {
   festivalId: string;
@@ -55,8 +55,8 @@ export function DrinkStepper({
   onMutationEnd,
 }: DrinkStepperProps) {
   const { t } = useTranslation();
-  const logConsumption = useLogConsumption();
-  const deleteConsumption = useDeleteConsumption();
+  const logConsumption = useOfflineLogConsumption();
+  const deleteConsumption = useOfflineDeleteConsumption();
 
   // Filter consumptions by drink type and calculate count
   const typeConsumptions = useMemo(() => {
@@ -75,7 +75,7 @@ export function DrinkStepper({
     });
   }, [typeConsumptions]);
 
-  const isLoading = logConsumption.loading || deleteConsumption.loading;
+  const isLoading = logConsumption.isPending || deleteConsumption.isPending;
   const canDecrement = count > min && !disabled && !isLoading;
   const canIncrement = count < max && !disabled && !isLoading;
 
@@ -152,7 +152,7 @@ export function DrinkStepper({
         accessibilityRole="button"
         accessibilityState={{ disabled: !canDecrement }}
       >
-        {deleteConsumption.loading ? (
+        {deleteConsumption.isPending ? (
           <ActivityIndicator size="small" color={IconColors.primary} />
         ) : (
           <Minus
@@ -190,7 +190,7 @@ export function DrinkStepper({
         accessibilityRole="button"
         accessibilityState={{ disabled: !canIncrement }}
       >
-        {logConsumption.loading ? (
+        {logConsumption.isPending ? (
           <ActivityIndicator size="small" color={IconColors.primary} />
         ) : (
           <Plus

@@ -1,20 +1,20 @@
 "use client";
 
-import { useCurrentProfile } from "@/lib/data";
-import { detectBrowserLanguage } from "@/lib/utils/detectLanguage";
 import {
-  initI18n,
-  I18nextProvider,
-  i18n,
-  useTranslation as useTranslationBase,
-  Trans as TransBase,
-  SUPPORTED_LANGUAGES,
   changeLanguage,
+  i18n,
+  I18nextProvider,
+  initI18n,
+  SUPPORTED_LANGUAGES,
+  Trans as TransBase,
+  useTranslation as useTranslationBase,
 } from "@prostcounter/shared/i18n";
-import { useEffect, useState } from "react";
-
 import type { TFunction } from "i18next";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+
+import { useCurrentProfile } from "@/lib/data";
+import { detectBrowserLanguage } from "@/lib/utils/detectLanguage";
 
 // Initialize i18n on client with default language
 initI18n();

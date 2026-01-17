@@ -1,5 +1,10 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
+import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
+import { startTransition, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { SingleSelect } from "@/components/Select/SingleSelect";
@@ -7,11 +12,6 @@ import { Label } from "@/components/ui/label";
 import { useGlobalLeaderboard, useWinningCriterias } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import { WinningCriteria } from "@/lib/types";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useState, useEffect, useMemo, startTransition } from "react";
-import { toast } from "sonner";
-
-import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 
 export default function GlobalLeaderboardClient() {
   const { t } = useTranslation();

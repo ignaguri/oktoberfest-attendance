@@ -1,10 +1,11 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useTranslation } from "@/lib/i18n/client";
 import { useSearchParams } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
-import { useEffect, useState, startTransition } from "react";
+import { startTransition, useEffect, useState } from "react";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "@/lib/i18n/client";
 
 import CacheManagement from "./components/CacheManagement";
 import FestivalManagement from "./components/FestivalManagement";

@@ -1,10 +1,11 @@
+import * as LocalAuthentication from "expo-local-authentication";
+import { useEffect, useState } from "react";
+
 import {
+  clearBiometricEnabled,
   isBiometricEnabled,
   setBiometricEnabled as storeBiometricEnabled,
-  clearBiometricEnabled,
 } from "@/lib/auth/secure-storage";
-import * as LocalAuthentication from "expo-local-authentication";
-import { useState, useEffect } from "react";
 
 export type BiometricType = "facial" | "fingerprint" | null;
 

@@ -1,26 +1,25 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   CreateGroupSchema,
-  UpdateGroupSchema,
+  GroupActionResponseSchema,
+  GroupGalleryResponseSchema,
+  GroupIdParamSchema,
+  GroupMemberParamSchema,
   GroupSchema,
+  GroupWithMembersSchema,
+  JoinByTokenResponseSchema,
+  JoinByTokenSchema,
+  JoinGroupSchema,
+  ListGroupMembersResponseSchema,
   ListGroupsQuerySchema,
   ListGroupsResponseSchema,
-  GroupIdParamSchema,
-  GroupWithMembersSchema,
-  JoinGroupSchema,
-  GroupActionResponseSchema,
+  RenewTokenResponseSchema,
   SearchGroupsQuerySchema,
   SearchGroupsResponseSchema,
-  ListGroupMembersResponseSchema,
-  GroupMemberParamSchema,
-  RenewTokenResponseSchema,
-  JoinByTokenSchema,
-  JoinByTokenResponseSchema,
-  GroupGalleryResponseSchema,
+  UpdateGroupSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabaseGroupRepository } from "../repositories/supabase";
 import { GroupService } from "../services/group.service";
 

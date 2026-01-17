@@ -1,17 +1,16 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-
 import type { Group, GroupWithMembers } from "@prostcounter/shared";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  createMockSupabase,
-  mockSupabaseSuccess,
-  mockSupabaseNotFound,
   createMockChain,
+  createMockSupabase,
+  mockSupabaseNotFound,
+  mockSupabaseSuccess,
 } from "../../__tests__/helpers/mock-supabase";
 import {
-  createTestApp,
-  createMockUser,
   createAuthRequest,
+  createMockUser,
+  createTestApp,
 } from "../../__tests__/helpers/test-server";
 import groupRoute from "../group.route";
 

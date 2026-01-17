@@ -1,3 +1,7 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import { Bell, Clock, Trophy, Users } from "lucide-react-native";
+import { View } from "react-native";
+
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -12,9 +16,6 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { Bell, Users, Trophy, Clock } from "lucide-react-native";
-import { View } from "react-native";
 
 interface NotificationPermissionPromptProps {
   isOpen: boolean;

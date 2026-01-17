@@ -2,11 +2,10 @@
 import { createSwitch } from "@gluestack-ui/core/switch/creator";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import { withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
-import React from "react";
-import { Switch as RNSwitch } from "react-native";
-
 // Import contract types from shared UI package
 import type { SwitchSize } from "@prostcounter/ui";
+import React from "react";
+import { Switch as RNSwitch } from "react-native";
 
 const UISwitch = createSwitch({
   Root: withStyleContext(RNSwitch),

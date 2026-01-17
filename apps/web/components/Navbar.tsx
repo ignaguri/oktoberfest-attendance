@@ -1,11 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useCurrentProfile } from "@/hooks/useProfile";
-import AppLogo from "@/public/android-chrome-512x512.png";
 import { CalendarDays } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
+
+import { Button } from "@/components/ui/button";
+import { useCurrentProfile } from "@/hooks/useProfile";
+import AppLogo from "@/public/android-chrome-512x512.png";
 
 import { NotificationBell } from "./NotificationBell";
 import { PWAReloadButton } from "./PWAReloadButton";

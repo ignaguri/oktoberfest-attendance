@@ -1,7 +1,6 @@
+import type { User } from "@supabase/supabase-js";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createMiddleware } from "hono/factory";
-
-import type { User } from "@supabase/supabase-js";
 
 import { UnauthorizedError } from "./error";
 

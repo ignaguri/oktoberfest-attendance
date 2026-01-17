@@ -1,9 +1,10 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+
 import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
 
 export function AttendanceDialog() {
   const searchParams = useSearchParams();

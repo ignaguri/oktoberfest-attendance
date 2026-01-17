@@ -1,5 +1,14 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { GroupSettingsForm } from "@prostcounter/shared/schemas";
+import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
+import { GroupSettingsFormSchema } from "@prostcounter/shared/schemas";
+import { Check, Copy, Link } from "lucide-react";
+import { useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { SingleSelect } from "@/components/Select/SingleSelect";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,22 +25,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  useUpdateGroup,
   useRemoveMember,
   useRenewInviteToken,
+  useUpdateGroup,
 } from "@/hooks/useGroups";
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
 import { useCurrentUser } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { GroupSettingsFormSchema } from "@prostcounter/shared/schemas";
-import { Link, Copy, Check } from "lucide-react";
-import { useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import type { GroupSettingsForm } from "@prostcounter/shared/schemas";
-import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 
 // Winning criteria as string literals (matching API response)
 type WinningCriteriaString = "days_attended" | "total_beers" | "avg_beers";

@@ -1,10 +1,10 @@
-import { reportSupabaseException } from "@/utils/sentry";
-import { createClient } from "@/utils/supabase/server";
+import type { PostgrestError } from "@supabase/supabase-js";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import type { PostgrestError } from "@supabase/supabase-js";
-import type { NextRequest } from "next/server";
+import { reportSupabaseException } from "@/utils/sentry";
+import { createClient } from "@/utils/supabase/server";
 
 // NOTE: This API uses deprecated tables (user_locations, location_sharing_preferences)
 // that were replaced by location_sessions, location_session_members, location_points.

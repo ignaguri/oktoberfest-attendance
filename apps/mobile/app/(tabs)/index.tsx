@@ -1,3 +1,9 @@
+import { useFestival } from "@prostcounter/shared/contexts";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
+import { RefreshControl, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
@@ -5,11 +11,6 @@ import { MapLinkButton } from "@/components/shared/map-link-button";
 import { QuickAttendanceCard } from "@/components/shared/quick-attendance-card";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 /**
  * Home screen displaying:

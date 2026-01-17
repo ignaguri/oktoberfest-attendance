@@ -1,7 +1,7 @@
 import type {
-  LeaderboardEntry,
   GlobalLeaderboardQuery,
   GroupLeaderboardQuery,
+  LeaderboardEntry,
   WinningCriteriaOption,
 } from "@prostcounter/shared";
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { IMAGE_PLACEHOLDER_BASE64 } from "@prostcounter/shared/constants";
 import Image from "next/image";
 import { useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 import { Dialog, DialogContent, DialogOverlay } from "./dialog";
 

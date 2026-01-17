@@ -1,10 +1,10 @@
 "use client";
 
+import { Search } from "lucide-react";
+import type { ReactNode } from "react";
+
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { cn } from "@/lib/utils";
-import { Search } from "lucide-react";
-
-import type { ReactNode } from "react";
 
 export interface SearchResultsProps {
   children: ReactNode;

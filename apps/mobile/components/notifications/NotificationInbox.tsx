@@ -1,19 +1,19 @@
-import { Text } from "@/components/ui/text";
-import { Colors } from "@/lib/constants/colors";
-import { useNotifications, useCounts } from "@novu/react-native";
+import type { Notification } from "@novu/js";
+import { useCounts, useNotifications } from "@novu/react-native";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { Bell, CheckCheck } from "lucide-react-native";
 import { useCallback } from "react";
 import {
-  View,
+  ActivityIndicator,
   FlatList,
   RefreshControl,
-  ActivityIndicator,
   TouchableOpacity,
+  View,
 } from "react-native";
 
-import type { Notification } from "@novu/js";
+import { Text } from "@/components/ui/text";
+import { Colors } from "@/lib/constants/colors";
 
 interface NotificationItemProps {
   notification: Notification;

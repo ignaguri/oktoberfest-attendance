@@ -1,8 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-
-import type { AuthContext } from "../../middleware/auth";
 import type { User } from "@supabase/supabase-js";
 
+import type { AuthContext } from "../../middleware/auth";
 import { errorHandler } from "../../middleware/error";
 
 /**

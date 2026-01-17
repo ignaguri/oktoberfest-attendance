@@ -1,5 +1,9 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+import { Link } from "next-view-transitions";
+import React, { useMemo } from "react";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,9 +13,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useGroupName } from "@/hooks/useGroups";
-import { usePathname } from "next/navigation";
-import { Link } from "next-view-transitions";
-import React, { useMemo } from "react";
 
 function isUUID(str: string) {
   const uuidRegex =

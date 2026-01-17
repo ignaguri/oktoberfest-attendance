@@ -5,13 +5,14 @@
  * with platform-specific auth configuration.
  */
 
-import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import {
-  createTypedApiClient,
   ApiError,
-  type TypedApiClient,
   type ApiHeaders,
+  createTypedApiClient,
+  type TypedApiClient,
 } from "@prostcounter/api-client";
+
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 // Re-export ApiError for convenience
 export { ApiError };

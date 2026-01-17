@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import type { DrinkType } from "@prostcounter/shared/schemas";
 import { Minus, Plus } from "lucide-react";
 import { useCallback } from "react";
 
-import type { DrinkType } from "@prostcounter/shared/schemas";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface LocalDrinkStepperProps {
   drinkType: DrinkType;

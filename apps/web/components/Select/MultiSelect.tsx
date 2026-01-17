@@ -1,7 +1,14 @@
 "use client";
 
+import { Check, ChevronsUpDown, X } from "lucide-react";
+import { startTransition, useEffect, useState } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type {
+  ComboboxOption,
+  ComboboxOptionGroup,
+} from "@/components/ui/combobox";
 import {
   Command,
   CommandEmpty,
@@ -16,13 +23,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown, X } from "lucide-react";
-import { useEffect, useState, startTransition } from "react";
-
-import type {
-  ComboboxOption,
-  ComboboxOptionGroup,
-} from "@/components/ui/combobox";
 
 interface MultiSelectProps {
   id?: string;

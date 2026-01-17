@@ -1,6 +1,6 @@
 import type {
-  UserAchievement,
   ListAchievementsQuery,
+  UserAchievement,
 } from "@prostcounter/shared";
 
 /**

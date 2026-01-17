@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Link } from "next-view-transitions";
+
+import { Button } from "@/components/ui/button";
 
 export default function OfflinePage() {
   return (

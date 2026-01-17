@@ -1,10 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useAppUpdate } from "@/hooks/use-app-update";
 import { RefreshCw, X } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { useAppUpdate } from "@/hooks/use-app-update";
 
 export function VersionChecker() {
   const { hasUpdate, applyUpdate, skipUpdate } = useAppUpdate();

@@ -1,5 +1,8 @@
 "use client";
 
+import { CheckCircle, Home, Users } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/client";
-import { CheckCircle, Users, Home } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 export default function JoinGroupSuccessPage() {
   const { t } = useTranslation();

@@ -1,14 +1,15 @@
 "use client";
 
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { X } from "lucide-react";
+import Image from "next/image";
+
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { X } from "lucide-react";
-import Image from "next/image";
 
 interface ImageModalProps {
   imageUrl: string | null;

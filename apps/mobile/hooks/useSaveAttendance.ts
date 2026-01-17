@@ -9,23 +9,23 @@
  * 5. Invalidate relevant caches
  */
 
-import { apiClient } from "@/lib/api-client";
-import { useInvalidateQueries, QueryKeys } from "@prostcounter/shared/data";
-import {
-  useUpdatePersonalAttendance,
-  useLogConsumption,
-  useDeleteConsumption,
-} from "@prostcounter/shared/hooks";
+import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
+import { useUpdatePersonalAttendance } from "@prostcounter/shared/hooks";
+import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
 import { useCallback, useState } from "react";
 
-import type { DrinkType, Consumption } from "@prostcounter/shared/schemas";
+import { apiClient } from "@/lib/api-client";
 
 import {
-  useBeerPictureUpload,
   type PendingPhoto,
+  useBeerPictureUpload,
 } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
+import {
+  useOfflineDeleteConsumption,
+  useOfflineLogConsumption,
+} from "./useOfflineConsumption";
 
 interface SaveAttendanceInput {
   festivalId: string;
@@ -51,8 +51,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const [error, setError] = useState<Error | null>(null);
 
   const updateAttendance = useUpdatePersonalAttendance();
-  const logConsumption = useLogConsumption();
-  const deleteConsumption = useDeleteConsumption();
+  const logConsumption = useOfflineLogConsumption();
+  const deleteConsumption = useOfflineDeleteConsumption();
   const { uploadPendingPhotos } = useBeerPictureUpload();
   const { getDrinkPriceCents } = useDrinkPrice();
   const invalidateQueries = useInvalidateQueries();

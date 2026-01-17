@@ -1,23 +1,22 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  GetProfileShortResponseSchema,
-  GetPublicProfileResponseSchema,
-  GetPublicProfileQuerySchema,
-  UpdateProfileSchema,
-  UpdateProfileResponseSchema,
+  ConfirmAvatarUploadResponseSchema,
+  ConfirmAvatarUploadSchema,
   DeleteProfileResponseSchema,
-  GetTutorialStatusResponseSchema,
-  UpdateTutorialStatusResponseSchema,
-  GetMissingProfileFieldsResponseSchema,
-  GetHighlightsResponseSchema,
   GetAvatarUploadUrlQuerySchema,
   GetAvatarUploadUrlResponseSchema,
-  ConfirmAvatarUploadSchema,
-  ConfirmAvatarUploadResponseSchema,
+  GetHighlightsResponseSchema,
+  GetMissingProfileFieldsResponseSchema,
+  GetProfileShortResponseSchema,
+  GetPublicProfileQuerySchema,
+  GetPublicProfileResponseSchema,
+  GetTutorialStatusResponseSchema,
+  UpdateProfileResponseSchema,
+  UpdateProfileSchema,
+  UpdateTutorialStatusResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-
 import { SupabaseProfileRepository } from "../repositories/supabase";
 import { deleteAuthUser } from "../utils/admin-client";
 

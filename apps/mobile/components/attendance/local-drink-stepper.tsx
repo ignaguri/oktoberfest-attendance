@@ -1,15 +1,15 @@
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { IconColors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { Minus, Plus } from "lucide-react-native";
 import { useCallback } from "react";
 
-import type { DrinkType } from "@prostcounter/shared/schemas";
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { IconColors } from "@/lib/constants/colors";
 
 interface LocalDrinkStepperProps {
   drinkType: DrinkType;

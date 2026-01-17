@@ -1,5 +1,11 @@
 "use client";
 
+import { Clock, MapPin, Users } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
+import ConfettiExplosion from "react-confetti-explosion";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,11 +17,6 @@ import {
 import { useConfetti } from "@/hooks/useConfetti";
 import { useTranslation } from "@/lib/i18n/client";
 import { createUrlWithParams } from "@/lib/url-utils";
-import { MapPin, Clock, Users } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
-import ConfettiExplosion from "react-confetti-explosion";
-import { toast } from "sonner";
 
 interface Reservation {
   id: string;

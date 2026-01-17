@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { changelog } from "@/changelog";
 import {
   Accordion,
@@ -11,14 +13,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { APP_VERSION } from "@/lib/version";
-import { useState, useEffect } from "react";
 
 interface WhatsNewProps {
   open?: boolean;

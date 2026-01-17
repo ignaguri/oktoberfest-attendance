@@ -1,14 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ShareImage } from "@/components/wrapped/ShareImage";
-import { useTranslation } from "@/lib/i18n/client";
-import { generateShareImageFromElement } from "@/lib/wrapped/preview-utils";
 import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
+import { ShareImage } from "@/components/wrapped/ShareImage";
+import { useTranslation } from "@/lib/i18n/client";
+import { generateShareImageFromElement } from "@/lib/wrapped/preview-utils";
 import type { WrappedData } from "@/lib/wrapped/types";
 
 export default function ShareImagePage() {

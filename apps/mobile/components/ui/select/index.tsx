@@ -2,31 +2,30 @@
 
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 import { createSelect } from "@gluestack-ui/core/select/creator";
+import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
+import type { SelectSize, SelectVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
-import { Pressable, View, TextInput } from "react-native";
-
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import type { SelectSize, SelectVariant } from "@prostcounter/ui";
+import { Pressable, TextInput, View } from "react-native";
 
 import {
   Actionsheet,
+  ActionsheetBackdrop,
   ActionsheetContent,
-  ActionsheetItem,
-  ActionsheetItemText,
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
-  ActionsheetBackdrop,
-  ActionsheetScrollView,
-  ActionsheetVirtualizedList,
   ActionsheetFlatList,
-  ActionsheetSectionList,
+  ActionsheetItem,
+  ActionsheetItemText,
+  ActionsheetScrollView,
   ActionsheetSectionHeaderText,
+  ActionsheetSectionList,
+  ActionsheetVirtualizedList,
 } from "./select-actionsheet";
 
 const SelectTriggerWrapper = React.forwardRef<

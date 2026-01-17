@@ -1,15 +1,15 @@
 "use client";
 
-import { useConfetti } from "@/hooks/useConfetti";
-import { CELEBRATION_ANIMATION, ANIMATION_DELAYS } from "@/lib/wrapped/config";
-import LogoImage from "@/public/android-chrome-512x512.png";
 import Image from "next/image";
 import { useEffect } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 
+import { useConfetti } from "@/hooks/useConfetti";
+import { ANIMATION_DELAYS, CELEBRATION_ANIMATION } from "@/lib/wrapped/config";
 import type { WrappedData } from "@/lib/wrapped/types";
+import LogoImage from "@/public/android-chrome-512x512.png";
 
-import { BaseSlide, SlideTitle, SlideSubtitle } from "./BaseSlide";
+import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface IntroSlideProps {
   data: WrappedData;

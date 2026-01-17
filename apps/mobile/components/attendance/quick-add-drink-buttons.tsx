@@ -1,16 +1,16 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { DrinkType } from "@prostcounter/shared/schemas";
+import * as Haptics from "expo-haptics";
+import { Beer, Check, CupSoda, Wine } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator } from "react-native";
+
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { DrinkTypeColors, IconColors, Colors } from "@/lib/constants/colors";
-import { useLogConsumption } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import * as Haptics from "expo-haptics";
-import { Beer, Wine, CupSoda, Check } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { ActivityIndicator } from "react-native";
-
-import type { DrinkType } from "@prostcounter/shared/schemas";
+import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
+import { Colors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
 
 import { VISIBLE_DRINK_TYPES } from "./drink-type-picker";
 
@@ -84,7 +84,7 @@ export function QuickAddDrinkButtons({
   onSuccess,
 }: QuickAddDrinkButtonsProps) {
   const { t } = useTranslation();
-  const logConsumption = useLogConsumption();
+  const logConsumption = useOfflineLogConsumption();
   const [successType, setSuccessType] = useState<DrinkType | null>(null);
   const [loadingType, setLoadingType] = useState<DrinkType | null>(null);
 

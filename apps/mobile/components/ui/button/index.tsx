@@ -3,21 +3,20 @@ import { createButton } from "@gluestack-ui/core/button/creator";
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 import {
   tva,
-  withStyleContext,
   useStyleContext,
   type VariantProps,
+  withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
-import { cssInterop } from "nativewind";
-import React from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
-
 // Import contract types from shared UI package
 import type {
   ButtonAction,
-  ButtonVariant,
-  ButtonSize,
   ButtonGroupSpace,
+  ButtonSize,
+  ButtonVariant,
 } from "@prostcounter/ui";
+import { cssInterop } from "nativewind";
+import React from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 const SCOPE = "BUTTON";
 

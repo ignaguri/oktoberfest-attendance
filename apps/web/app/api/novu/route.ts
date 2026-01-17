@@ -1,15 +1,14 @@
 import { serve } from "@novu/framework/next";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import type { NextRequest } from "next/server";
-
 import {
-  groupJoinWorkflow,
-  tentCheckinWorkflow,
-  reservationReminderWorkflow,
-  reservationPromptWorkflow,
   achievementUnlockedWorkflow,
   groupAchievementUnlockedWorkflow,
+  groupJoinWorkflow,
+  reservationPromptWorkflow,
+  reservationReminderWorkflow,
+  tentCheckinWorkflow,
 } from "../../../novu/workflows";
 
 // Tell Next.js this is a dynamic route that should not be pre-rendered during build

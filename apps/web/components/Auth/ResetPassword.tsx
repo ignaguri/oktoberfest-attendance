@@ -1,17 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  resetPasswordSchema,
   type ResetPasswordFormData,
+  resetPasswordSchema,
 } from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n/client";
 
 import { resetPassword } from "./actions";
 

@@ -1,14 +1,13 @@
+import type {
+  CreateReservationInput,
+  Reservation,
+  ReservationStatus,
+  UpdateReservationInput,
+} from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
+import { NotFoundError, ValidationError } from "../middleware/error";
 import type { IReservationRepository } from "../repositories/interfaces";
-import type {
-  Reservation,
-  CreateReservationInput,
-  UpdateReservationInput,
-  ReservationStatus,
-} from "@prostcounter/shared";
-
-import { ValidationError, NotFoundError } from "../middleware/error";
 
 /**
  * Reservation Service

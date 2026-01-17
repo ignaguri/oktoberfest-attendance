@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
@@ -16,7 +18,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useTutorialStatus } from "@/hooks/useProfile";
 import LogoImage from "@/public/android-chrome-512x512.png";
-import Image from "next/image";
 
 import FestivalStatus from "./FestivalStatus";
 import Highlights from "./Highlights";

@@ -1,14 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { apiClient } from "@/lib/api-client";
-import { useQuery } from "@/lib/data/react-query-provider";
-import { User, UserCheck, Image as ImageIcon, Edit } from "lucide-react";
+import { Edit, Image as ImageIcon, User, UserCheck } from "lucide-react";
 import { Link } from "next-view-transitions";
-
 import type { ReactNode } from "react";
 import type { FC } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { apiClient } from "@/lib/api-client";
+import { useQuery } from "@/lib/data/react-query-provider";
 
 interface MissingFieldProps {
   label: string;

@@ -1,16 +1,16 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
-import { avatarSchema } from "@/lib/schemas/uploads";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 import type { AvatarFormData } from "@/lib/schemas/uploads";
+import { avatarSchema } from "@/lib/schemas/uploads";
 
 import { uploadAvatar } from "./actions";
 import { AvatarPreview } from "./Avatar";

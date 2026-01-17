@@ -1,5 +1,9 @@
 "use client";
 
+import { Filter, X } from "lucide-react";
+import type { ReactNode } from "react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -12,10 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Filter, X } from "lucide-react";
-import { useState } from "react";
-
-import type { ReactNode } from "react";
 
 export interface FilterOption {
   value: string;

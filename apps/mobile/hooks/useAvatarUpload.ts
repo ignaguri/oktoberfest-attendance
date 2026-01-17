@@ -5,11 +5,12 @@
  * upload flow (signed URL, storage upload, confirmation).
  */
 
-import { apiClient } from "@/lib/api-client";
 import { useInvalidateQueries } from "@prostcounter/shared/data";
 import { QueryKeys } from "@prostcounter/shared/data";
 
-import { useImageUpload, type ImageSource } from "./useImageUpload";
+import { apiClient } from "@/lib/api-client";
+
+import { type ImageSource, useImageUpload } from "./useImageUpload";
 
 interface UseAvatarUploadOptions {
   onSuccess?: (fileName: string) => void;

@@ -1,6 +1,7 @@
+import { Image } from "react-native";
+
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
-import { Image } from "react-native";
 
 const logoImage = require("@/assets/images/logo.png");
 

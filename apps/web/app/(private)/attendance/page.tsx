@@ -1,21 +1,21 @@
 "use client";
 
-import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
-import { useReservation, useCheckInReservation } from "@/hooks/useReservations";
-import { useAttendances } from "@/lib/data";
-import { useTranslation } from "@/lib/i18n/client";
 import { useFestival } from "@prostcounter/shared/contexts";
+import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 import { useSearchParams } from "next/navigation";
 import {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
   startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 import { toast } from "sonner";
 
-import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
+import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
+import { useCheckInReservation, useReservation } from "@/hooks/useReservations";
+import { useAttendances } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 
 import DetailedAttendanceForm from "./DetailedAttendanceForm";
 import PersonalAttendanceTable from "./PersonalAttendanceTable";

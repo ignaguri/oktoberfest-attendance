@@ -1,8 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Link } from "next-view-transitions";
-import { useState, useEffect, startTransition } from "react";
+import { startTransition, useEffect, useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 /**
  * @deprecated

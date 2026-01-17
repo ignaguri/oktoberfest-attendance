@@ -1,11 +1,12 @@
 "use client";
 
+import { useTransitionRouter } from "next-view-transitions";
+import { use, useEffect } from "react";
+
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
 import { useTranslation } from "@/lib/i18n/client";
-import { useTransitionRouter } from "next-view-transitions";
-import { use, useEffect } from "react";
 
 import GroupSettingsClient from "./GroupSettingsClient";
 

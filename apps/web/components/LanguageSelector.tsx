@@ -1,5 +1,8 @@
 "use client";
 
+import { SUPPORTED_LANGUAGES } from "@prostcounter/shared/i18n";
+import { useEffect, useState } from "react";
+
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -10,8 +13,6 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "@/lib/i18n/client";
 import { detectBrowserLanguage } from "@/lib/utils/detectLanguage";
-import { SUPPORTED_LANGUAGES } from "@prostcounter/shared/i18n";
-import { useState, useEffect } from "react";
 
 interface LanguageSelectorProps {
   currentLanguage: string | null; // null = auto-detect

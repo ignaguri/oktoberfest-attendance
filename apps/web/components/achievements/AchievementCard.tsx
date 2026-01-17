@@ -1,5 +1,7 @@
 "use client";
 
+import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -9,8 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
-import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 
 import { AchievementBadge } from "./AchievementBadge";
 import { AchievementProgress } from "./AchievementProgress";

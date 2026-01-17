@@ -1,6 +1,6 @@
 import type {
-  LocationSession,
   LocationPoint,
+  LocationSession,
   LocationSessionMember,
   StartLocationSessionInput,
 } from "@prostcounter/shared";

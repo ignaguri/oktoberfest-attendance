@@ -1,6 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-
 import type { Database } from "@prostcounter/db";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Create Supabase admin client for integration tests

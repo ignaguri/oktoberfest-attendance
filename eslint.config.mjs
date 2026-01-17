@@ -58,21 +58,7 @@ const config = [
         },
       ],
       "@typescript-eslint/consistent-type-imports": "error",
-      "import/order": [
-        "error",
-        {
-          groups: [
-            ["builtin", "external", "internal", "index", "object"],
-
-            ["type"], // All type imports go after other imports
-          ],
-          "newlines-between": "always", // Add a new line between groups
-          alphabetize: {
-            order: "asc", // Sort in ascending order
-            caseInsensitive: true,
-          },
-        },
-      ],
+      "simple-import-sort/imports": "error",
       "unused-imports/no-unused-imports": "warn",
       "unused-imports/no-unused-vars": [
         "warn",
@@ -83,7 +69,7 @@ const config = [
           argsIgnorePattern: "^_",
         },
       ],
-      "simple-import-sort/exports": "warn",
+      "simple-import-sort/exports": "error",
     },
   },
   // E2E override with its own TS project

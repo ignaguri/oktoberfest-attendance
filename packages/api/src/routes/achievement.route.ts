@@ -1,22 +1,21 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import type {
+  AchievementLeaderboardEntry,
+  AchievementStats,
+  AchievementWithProgress,
+  AvailableAchievement,
+} from "@prostcounter/shared";
 import {
+  EvaluateAchievementsResponseSchema,
+  EvaluateAchievementsSchema,
+  GetAchievementLeaderboardResponseSchema,
+  GetAchievementsWithProgressResponseSchema,
   ListAchievementsQuerySchema,
   ListAchievementsResponseSchema,
-  EvaluateAchievementsSchema,
-  EvaluateAchievementsResponseSchema,
-  GetAchievementsWithProgressResponseSchema,
-  GetAchievementLeaderboardResponseSchema,
   ListAvailableAchievementsResponseSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-import type {
-  AchievementWithProgress,
-  AchievementStats,
-  AchievementLeaderboardEntry,
-  AvailableAchievement,
-} from "@prostcounter/shared";
-
 import { SupabaseAchievementRepository } from "../repositories/supabase";
 
 // Create router

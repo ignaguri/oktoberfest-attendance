@@ -1,8 +1,8 @@
-import { logger } from "@/lib/logger";
 import { initializeApp } from "firebase/app";
+import type { MessagePayload } from "firebase/messaging";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-import type { MessagePayload } from "firebase/messaging";
+import { logger } from "@/lib/logger";
 
 // Minimal Firebase config for FCM only
 const firebaseConfig = {

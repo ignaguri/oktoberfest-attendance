@@ -1,6 +1,7 @@
+import { Link } from "next-view-transitions";
+
 import { GroupMembersMap } from "@/components/LocationSharing";
 import { getTranslations } from "@/lib/i18n/server";
-import { Link } from "next-view-transitions";
 
 export default async function GroupLocationPage({
   params,

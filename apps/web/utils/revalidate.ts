@@ -1,7 +1,8 @@
 "use server";
 
-import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
+
+import { logger } from "@/lib/logger";
 
 const clearCachesByServerAction = async (path: string) => {
   try {

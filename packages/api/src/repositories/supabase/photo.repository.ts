@@ -1,6 +1,3 @@
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
-
-import type { IPhotoRepository } from "../interfaces/photo.repository";
 import type { Database } from "@prostcounter/db";
 import type {
   BeerPicture,
@@ -10,13 +7,15 @@ import type {
   GroupPhotoSettings,
   PhotoVisibility,
 } from "@prostcounter/shared";
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   DatabaseError,
-  NotFoundError,
   ForbiddenError,
+  NotFoundError,
 } from "../../middleware/error";
+import type { IPhotoRepository } from "../interfaces/photo.repository";
 
 export class SupabasePhotoRepository implements IPhotoRepository {
   private readonly BUCKET_NAME = "beer_pictures";

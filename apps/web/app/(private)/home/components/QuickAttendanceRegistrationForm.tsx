@@ -1,5 +1,19 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFestival } from "@prostcounter/shared/contexts";
+import { useConsumptions } from "@prostcounter/shared/hooks";
+import type {
+  AttendanceByDate,
+  DrinkType,
+  QuickAttendanceForm,
+} from "@prostcounter/shared/schemas";
+import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
+import { useEffect, useMemo, useState } from "react";
+import ConfettiExplosion from "react-confetti-explosion";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { DrinkStepper } from "@/components/attendance/drink-stepper";
 import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
 import { SingleSelect } from "@/components/Select/SingleSelect";
@@ -9,20 +23,6 @@ import { useConfetti } from "@/hooks/useConfetti";
 import { apiClient } from "@/lib/api-client";
 import { formatDateForDatabase } from "@/lib/date-utils";
 import { useTranslation } from "@/lib/i18n/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useConsumptions } from "@prostcounter/shared/hooks";
-import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
-import { useEffect, useState, useMemo } from "react";
-import ConfettiExplosion from "react-confetti-explosion";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import type {
-  QuickAttendanceForm,
-  AttendanceByDate,
-  DrinkType,
-} from "@prostcounter/shared/schemas";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;

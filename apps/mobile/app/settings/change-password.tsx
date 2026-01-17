@@ -1,25 +1,26 @@
-import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
-import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
-import { Text } from "@/components/ui/text";
-import { useAuth } from "@/lib/auth/AuthContext";
-import { Colors, IconColors } from "@/lib/constants/colors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  updatePasswordSchema,
   type UpdatePasswordFormData,
+  updatePasswordSchema,
 } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { Eye, EyeOff, Info } from "lucide-react-native";
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  View,
-  ScrollView,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  ScrollView,
+  View,
 } from "react-native";
+
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { Colors, IconColors } from "@/lib/constants/colors";
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation();
