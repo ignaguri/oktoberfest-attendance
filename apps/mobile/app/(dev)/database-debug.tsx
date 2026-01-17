@@ -21,8 +21,6 @@ import {
   type DirtyRecord,
 } from "@/lib/database/debug";
 import { useOffline } from "@/lib/database/offline-provider";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import { useRouter } from "expo-router";
 import {
   Database,
   RefreshCw,
@@ -40,24 +38,15 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, RefreshControl, Switch } from "react-native";
 
 // =============================================================================
-// Constants
-// =============================================================================
-
-const ICON_SIZE = 20;
-
-// =============================================================================
 // Main Screen
 // =============================================================================
 
 export default function DatabaseDebugScreen() {
-  const { t } = useTranslation();
-  const router = useRouter();
   const {
     isReady,
     getDb,
     sync,
     syncStatus,
-    isOnline,
     isSimulatingOffline,
     setSimulateOffline,
   } = useOffline();

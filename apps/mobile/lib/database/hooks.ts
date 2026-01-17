@@ -82,7 +82,7 @@ export function useOfflineQuery<T = unknown[]>({
   syncAfterQuery = false,
   ...options
 }: UseOfflineQueryOptions<T>) {
-  const { isReady, getDb, sync, festivalId, userId } = useOfflineWithContext();
+  const { isReady, getDb, sync } = useOfflineWithContext();
 
   const queryKey = [queryKeyPrefix, ...queryKeyParts.filter(Boolean)];
 

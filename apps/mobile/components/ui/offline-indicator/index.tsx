@@ -66,7 +66,7 @@ export function OfflineIndicator({
   className = "",
 }: OfflineIndicatorProps) {
   const { t } = useTranslation();
-  const { syncStatus, pendingCount, error, sync, lastSyncAt } = useOffline();
+  const { syncStatus, pendingCount, error, sync } = useOffline();
   const isOnline = useIsOnline();
 
   // Animation for syncing state

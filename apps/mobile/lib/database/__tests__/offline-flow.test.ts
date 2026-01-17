@@ -224,7 +224,7 @@ describe("Offline Flow Integration", () => {
       // Start offline
       mockNetInfo.isConnected = false;
 
-      const pendingAttendance = createMockAttendance({ _dirty: 1 });
+      const _pendingAttendance = createMockAttendance({ _dirty: 1 });
 
       // Come back online
       mockNetInfo.isConnected = true;
@@ -312,7 +312,7 @@ describe("Offline Flow Integration", () => {
     });
 
     it("should clean up local files after successful upload", async () => {
-      const localUri = "file:///mock/pending-uploads/photo-to-delete.jpg";
+      const _localUri = "file:///mock/pending-uploads/photo-to-delete.jpg";
 
       // After successful upload
       const uploadedPhoto = createMockBeerPicture({
@@ -349,7 +349,7 @@ describe("Offline Flow Integration", () => {
     });
 
     it("should apply server-wins strategy for conflicts", async () => {
-      const localCount = 5;
+      const _localCount = 5;
       const serverCount = 7;
 
       // After conflict resolution, server value should win

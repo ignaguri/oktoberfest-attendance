@@ -71,7 +71,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   const [syncState, setSyncState] = useState<SyncState>("idle");
   const [pendingOperations, setPendingOperations] = useState(0);
   const [dirtyRecords, setDirtyRecords] = useState(0);
-  const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
+  const [lastSyncAt, _setLastSyncAt] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------

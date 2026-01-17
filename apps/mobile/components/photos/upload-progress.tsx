@@ -256,19 +256,6 @@ function PhotoProgressItem({ photo, onRetry }: PhotoProgressItemProps) {
     }
   };
 
-  const getStatusColor = () => {
-    switch (photo.status) {
-      case "completed":
-        return "text-success-500";
-      case "failed":
-        return "text-error-500";
-      case "uploading":
-        return "text-primary-500";
-      default:
-        return "text-typography-400";
-    }
-  };
-
   return (
     <HStack className="items-center justify-between">
       <HStack space="sm" className="flex-1 items-center">
