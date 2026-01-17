@@ -14,7 +14,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "prebuild": "expo prebuild"
+    "prebuild": "expo prebuild",
+    "test": "vitest run",
+    "test:watch": "vitest --watch"
   },
   "dependencies": {
     "@expo/html-elements": "^0.12.5",
@@ -38,11 +40,11 @@
     "@prostcounter/shared": "workspace:*",
     "@prostcounter/ui": "workspace:*",
     "@react-native-async-storage/async-storage": "^2.1.0",
-    "@react-native-community/datetimepicker": "^8.6.0",
+    "@react-native-community/datetimepicker": "8.4.4",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-firebase/app": "^23.8.2",
     "@react-native-firebase/messaging": "^23.8.2",
-    "@react-native-picker/picker": "^2.11.4",
+    "@react-native-picker/picker": "2.11.1",
     "@supabase/supabase-js": "2.90.0",
     "@tanstack/react-query": "^5.90.0",
     "class-variance-authority": "^0.7.1",
@@ -64,6 +66,7 @@
     "expo-router": "~6.0.21",
     "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
+    "expo-sqlite": "^16.0.10",
     "expo-status-bar": "~3.0.9",
     "expo-web-browser": "~15.0.10",
     "i18next": "^25.7.4",
@@ -74,12 +77,12 @@
     "react-hook-form": "^7.69.0",
     "react-i18next": "^16.5.0",
     "react-native": "0.81.5",
-    "react-native-gesture-handler": "~2.30.0",
+    "react-native-gesture-handler": "~2.28.0",
     "react-native-qrcode-svg": "^6.3.21",
-    "react-native-reanimated": "~4.2.1",
+    "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.2",
-    "react-native-screens": "~4.19.0",
-    "react-native-svg": "^15.15.1",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
     "react-native-url-polyfill": "^3.0.0",
     "react-native-web": "^0.21.2",
     "semver": "^7.7.3",
@@ -95,6 +98,7 @@
     "@types/react": "~19.2.7",
     "react-native-worklets-core": "^1.6.2",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^3.0.0"
   }
 }

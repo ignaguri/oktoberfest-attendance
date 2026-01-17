@@ -69,7 +69,8 @@ import {
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ChevronDown, Puzzle, Trash2, X } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { ChevronDown, Database, Puzzle, Trash2, X } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Pressable, ActionSheetIOS, Platform } from "react-native";
 
@@ -891,6 +892,7 @@ const ToastShowcase = () => {
 
 const DevToolsShowcase = () => {
   const { signOut } = useAuth();
+  const router = useRouter();
   const toast = useToast();
   const [isClearing, setIsClearing] = useState(false);
 
@@ -974,6 +976,23 @@ const DevToolsShowcase = () => {
         <Text className="text-sm text-gray-600">
           Development utilities for debugging and testing.
         </Text>
+
+        <VStack space="xs">
+          <Text bold className="text-xs uppercase text-gray-600">
+            Database
+          </Text>
+          <Button
+            action="primary"
+            variant="outline"
+            onPress={() => router.push("/(dev)/database-debug")}
+          >
+            <Database size={18} color={Colors.primary[500]} />
+            <ButtonText className="ml-2">Database Debug</ButtonText>
+          </Button>
+          <Text className="text-xs text-gray-500">
+            Inspect offline database, sync queue, and dirty records.
+          </Text>
+        </VStack>
 
         <VStack space="xs">
           <Text bold className="text-xs uppercase text-gray-600">
