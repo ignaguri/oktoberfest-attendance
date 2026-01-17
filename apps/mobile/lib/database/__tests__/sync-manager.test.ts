@@ -223,6 +223,7 @@ function createMockDb() {
         }
         return { changes: 1 };
       }),
+    execAsync: vi.fn().mockResolvedValue(undefined),
     // Helper for tests to access mock records
     _records: records,
   };
