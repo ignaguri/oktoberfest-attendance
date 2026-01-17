@@ -14,6 +14,7 @@ import {
   usePendingCount,
 } from "@/lib/database/offline-provider";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import {
   Cloud,
   CloudOff,
@@ -112,7 +113,7 @@ export function OfflineIndicator({
         <>
           <CloudOff size={iconSize} color={Colors.gray[500]} />
           {showText && (
-            <Text className={`${textClass} text-typography-500`}>
+            <Text className={cn(textClass, "text-typography-500")}>
               {t("offline.status.offline")}
             </Text>
           )}
@@ -128,7 +129,7 @@ export function OfflineIndicator({
             <RefreshCw size={iconSize} color={Colors.primary[500]} />
           </Animated.View>
           {showText && (
-            <Text className={`${textClass} text-primary-500`}>
+            <Text className={cn(textClass, "text-primary-500")}>
               {t("offline.status.syncing")}
             </Text>
           )}
@@ -142,7 +143,7 @@ export function OfflineIndicator({
         <>
           <AlertCircle size={iconSize} color={Colors.error[500]} />
           {showText && (
-            <Text className={`${textClass} text-error-500`}>
+            <Text className={cn(textClass, "text-error-500")}>
               {t("offline.status.error")}
             </Text>
           )}
@@ -156,7 +157,7 @@ export function OfflineIndicator({
         <>
           <Cloud size={iconSize} color={Colors.primary[500]} />
           {showText && (
-            <Text className={`${textClass} text-primary-500`}>
+            <Text className={cn(textClass, "text-primary-500")}>
               {t("offline.status.pending", { count: pendingCount })}
             </Text>
           )}
@@ -169,7 +170,7 @@ export function OfflineIndicator({
       <>
         <Check size={iconSize} color={Colors.success[500]} />
         {showText && (
-          <Text className={`${textClass} text-success-500`}>
+          <Text className={cn(textClass, "text-success-500")}>
             {t("offline.status.synced")}
           </Text>
         )}
@@ -179,7 +180,7 @@ export function OfflineIndicator({
 
   return (
     <Pressable onPress={handlePress} disabled={syncStatus === "syncing"}>
-      <HStack space="xs" className={`items-center ${className}`}>
+      <HStack space="xs" className={cn("items-center", className)}>
         {renderContent()}
       </HStack>
     </Pressable>
@@ -226,7 +227,11 @@ export function OfflineBadge({ className = "" }: OfflineBadgeProps) {
   return (
     <HStack
       space="xs"
-      className={`items-center rounded-full px-2 py-1 ${getBgColor()} ${className}`}
+      className={cn(
+        "items-center rounded-full px-2 py-1",
+        getBgColor(),
+        className,
+      )}
     >
       {!isOnline ? (
         <CloudOff size={12} color={getIconColor()} />
@@ -295,14 +300,18 @@ export function OfflineBanner({ className = "" }: OfflineBannerProps) {
   return (
     <HStack
       space="sm"
-      className={`items-center justify-center px-4 py-2 ${getBgColor()} ${className}`}
+      className={cn(
+        "items-center justify-center px-4 py-2",
+        getBgColor(),
+        className,
+      )}
     >
       {!isOnline ? (
         <CloudOff size={16} color={Colors.gray[500]} />
       ) : (
         <AlertCircle size={16} color={Colors.error[500]} />
       )}
-      <Text className={`text-sm ${getTextColor()}`}>{getMessage()}</Text>
+      <Text className={cn("text-sm", getTextColor())}>{getMessage()}</Text>
     </HStack>
   );
 }

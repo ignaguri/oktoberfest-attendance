@@ -13,6 +13,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import {
   Upload,
   CheckCircle,
@@ -104,7 +105,7 @@ export function UploadProgressList({
       : 0;
 
   return (
-    <Card size="md" variant="elevated" className={`p-4 ${className}`}>
+    <Card size="md" variant="elevated" className={cn("p-4", className)}>
       <VStack space="md">
         {/* Header */}
         <HStack className="items-center justify-between">
@@ -332,7 +333,7 @@ export function UploadProgressBadge({
       variant="link"
       size="sm"
       onPress={onPress}
-      className={`rounded-full px-3 py-1 ${getBgColor()} ${className}`}
+      className={cn("rounded-full px-3 py-1", getBgColor(), className)}
     >
       <HStack space="xs" className="items-center">
         {isUploading ? (
@@ -343,7 +344,10 @@ export function UploadProgressBadge({
           <Clock size={12} color={Colors.gray[500]} />
         )}
         <Text
-          className={`text-xs ${isUploading ? "text-primary-600" : "text-typography-600"}`}
+          className={cn(
+            "text-xs",
+            isUploading ? "text-primary-600" : "text-typography-600",
+          )}
         >
           {isUploading
             ? t("photos.upload.inProgress")
@@ -394,7 +398,12 @@ export function UploadSummaryCard({
     <Card
       size="sm"
       variant="elevated"
-      className={`p-3 ${allSuccess ? "bg-success-50" : allComplete && failed > 0 ? "bg-error-50" : ""} ${className}`}
+      className={cn(
+        "p-3",
+        allSuccess && "bg-success-50",
+        allComplete && failed > 0 && "bg-error-50",
+        className,
+      )}
     >
       <HStack className="items-center justify-between">
         <HStack space="sm" className="items-center">
@@ -409,7 +418,14 @@ export function UploadSummaryCard({
           )}
           <VStack>
             <Text
-              className={`font-medium ${allSuccess ? "text-success-700" : failed > 0 ? "text-error-700" : "text-typography-900"}`}
+              className={cn(
+                "font-medium",
+                allSuccess
+                  ? "text-success-700"
+                  : failed > 0
+                    ? "text-error-700"
+                    : "text-typography-900",
+              )}
             >
               {isUploading
                 ? t("photos.upload.uploading", { current: completed, total })
