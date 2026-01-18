@@ -1,3 +1,4 @@
+import { cn } from "@prostcounter/ui";
 import { useCallback } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
@@ -107,13 +108,12 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
               accessibilityLabel={tab.label}
             >
               <Text
-                className={`text-sm font-medium ${
-                  isActive
-                    ? "text-typography-900"
-                    : isDisabled
-                      ? "text-typography-300"
-                      : "text-typography-500"
-                }`}
+                className={cn(
+                  "text-sm font-medium",
+                  isActive && "text-typography-900",
+                  !isActive && isDisabled && "text-typography-300",
+                  !isActive && !isDisabled && "text-typography-500",
+                )}
               >
                 {tab.label}
               </Text>

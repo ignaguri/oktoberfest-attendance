@@ -7,6 +7,7 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Reservation } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { format, setHours, setMinutes } from "date-fns";
 import { ChevronDown, MapPin, Trash2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -295,9 +296,7 @@ export function ReservationTabContent({
             >
               <Trash2 size={16} color={IconColors.error} />
               <ButtonText className="ml-2">
-                {t("reservation.form.cancelReservation", {
-                  defaultValue: "Cancel Reservation",
-                })}
+                {t("reservation.form.cancelReservation")}
               </ButtonText>
             </Button>
           </HStack>
@@ -306,33 +305,31 @@ export function ReservationTabContent({
         {/* Tent Selector */}
         <VStack space="sm">
           <Text className="text-typography-700 text-sm font-medium">
-            {t("reservation.form.tent", { defaultValue: "Tent" })}
+            {t("reservation.form.tent")}
           </Text>
           <Pressable
             onPress={() => !isEditMode && setShowTentSelector(true)}
             disabled={isEditMode}
-            className={`border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3 ${
-              isEditMode ? "opacity-50" : ""
-            } ${errors.tentId ? "border-error-500" : ""}`}
+            className={cn(
+              "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
+              isEditMode && "opacity-50",
+              errors.tentId && "border-error-500",
+            )}
             accessibilityRole="button"
-            accessibilityLabel={t("reservation.form.selectTent", {
-              defaultValue: "Select tent",
-            })}
+            accessibilityLabel={t("reservation.form.selectTent")}
           >
             <HStack className="items-center justify-between">
               <HStack space="sm" className="items-center">
                 <MapPin size={18} color={IconColors.muted} />
                 <Text
-                  className={`text-base ${
+                  className={cn(
+                    "text-base",
                     selectedTentName
                       ? "text-typography-900"
-                      : "text-typography-400"
-                  }`}
+                      : "text-typography-400",
+                  )}
                 >
-                  {selectedTentName ||
-                    t("reservation.form.selectTent", {
-                      defaultValue: "Select tent",
-                    })}
+                  {selectedTentName || t("reservation.form.selectTent")}
                 </Text>
               </HStack>
               {!isEditMode && (
@@ -342,16 +339,12 @@ export function ReservationTabContent({
           </Pressable>
           {errors.tentId && (
             <Text className="text-error-600 text-sm">
-              {t("validation.tentRequired", {
-                defaultValue: "Please select a tent",
-              })}
+              {t("validation.tentRequired")}
             </Text>
           )}
           {isEditMode && (
             <Text className="text-typography-400 text-xs">
-              {t("reservation.form.tentCannotBeChanged", {
-                defaultValue: "Tent cannot be changed after creation",
-              })}
+              {t("reservation.form.tentCannotBeChanged")}
             </Text>
           )}
         </VStack>
@@ -365,9 +358,7 @@ export function ReservationTabContent({
               selectedDate={selectedDate}
               value={value}
               onChange={onChange}
-              label={t("reservation.form.arrivalTime", {
-                defaultValue: "Arrival Time",
-              })}
+              label={t("reservation.form.arrivalTime")}
               disabled={isProcessing}
               error={errors.startTime?.message}
             />
@@ -382,9 +373,7 @@ export function ReservationTabContent({
             <ReminderOffsetSelect
               value={value}
               onChange={onChange}
-              label={t("reservation.form.reminder", {
-                defaultValue: "Reminder",
-              })}
+              label={t("reservation.form.reminder")}
               disabled={isProcessing}
             />
           )}
@@ -393,7 +382,7 @@ export function ReservationTabContent({
         {/* Notes Field */}
         <VStack space="sm">
           <Text className="text-typography-700 text-sm font-medium">
-            {t("reservation.form.note", { defaultValue: "Note (optional)" })}
+            {t("reservation.form.note")}
           </Text>
           <Controller
             control={control}
@@ -405,9 +394,7 @@ export function ReservationTabContent({
                 className="border-background-300"
               >
                 <TextareaInput
-                  placeholder={t("reservation.form.notePlaceholder", {
-                    defaultValue: "Add a note for your reservation...",
-                  })}
+                  placeholder={t("reservation.form.notePlaceholder")}
                   value={value || ""}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -426,14 +413,10 @@ export function ReservationTabContent({
             <HStack className="items-center justify-between">
               <VStack>
                 <Text className="text-typography-900 text-base font-medium">
-                  {t("reservation.form.visibleToGroups", {
-                    defaultValue: "Visible to Groups",
-                  })}
+                  {t("reservation.form.visibleToGroups")}
                 </Text>
                 <Text className="text-typography-500 text-sm">
-                  {t("reservation.form.visibleToGroupsDescription", {
-                    defaultValue: "Group members can see your reservation",
-                  })}
+                  {t("reservation.form.visibleToGroupsDescription")}
                 </Text>
               </VStack>
               <Switch
@@ -469,12 +452,10 @@ export function ReservationTabContent({
           >
             <ButtonText>
               {isSaving
-                ? t("reservation.form.saving", { defaultValue: "Saving..." })
+                ? t("reservation.form.saving")
                 : isEditMode
                   ? t("common.buttons.save")
-                  : t("reservation.form.createReservation", {
-                      defaultValue: "Create Reservation",
-                    })}
+                  : t("reservation.form.createReservation")}
             </ButtonText>
           </Button>
         </HStack>
@@ -500,17 +481,12 @@ export function ReservationTabContent({
         <AlertDialogContent>
           <AlertDialogHeader>
             <Heading size="lg" className="text-error-600">
-              {t("reservation.form.cancelConfirmTitle", {
-                defaultValue: "Cancel Reservation?",
-              })}
+              {t("reservation.form.cancelConfirmTitle")}
             </Heading>
           </AlertDialogHeader>
           <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
-              {t("reservation.form.cancelConfirmMessage", {
-                defaultValue:
-                  "Are you sure you want to cancel this reservation? This action cannot be undone.",
-              })}
+              {t("reservation.form.cancelConfirmMessage")}
             </Text>
           </AlertDialogBody>
           <AlertDialogFooter className="gap-3">
@@ -521,9 +497,7 @@ export function ReservationTabContent({
               className="flex-1"
               isDisabled={isCancelling}
             >
-              <ButtonText>
-                {t("common.buttons.back", { defaultValue: "Back" })}
-              </ButtonText>
+              <ButtonText>{t("common.buttons.back")}</ButtonText>
             </Button>
             <Button
               action="negative"
@@ -533,12 +507,8 @@ export function ReservationTabContent({
             >
               <ButtonText>
                 {isCancelling
-                  ? t("common.status.cancelling", {
-                      defaultValue: "Cancelling...",
-                    })
-                  : t("reservation.form.cancelReservation", {
-                      defaultValue: "Cancel Reservation",
-                    })}
+                  ? t("common.status.cancelling")
+                  : t("reservation.form.cancelReservation")}
               </ButtonText>
             </Button>
           </AlertDialogFooter>

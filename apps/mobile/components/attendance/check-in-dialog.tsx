@@ -80,9 +80,7 @@ export function CheckInDialog({
           <HStack space="sm" className="items-center">
             <CalendarClock size={24} color={Colors.primary[500]} />
             <Heading size="lg" className="text-typography-900">
-              {t("reservation.checkIn.title", {
-                defaultValue: "Time to Check In!",
-              })}
+              {t("reservation.checkIn.title")}
             </Heading>
           </HStack>
         </AlertDialogHeader>
@@ -90,10 +88,7 @@ export function CheckInDialog({
         <AlertDialogBody className="mb-4 mt-3">
           <VStack space="md">
             <Text className="text-typography-600">
-              {t("reservation.checkIn.description", {
-                defaultValue:
-                  "Your reservation is ready. Would you like to check in now?",
-              })}
+              {t("reservation.checkIn.description")}
             </Text>
 
             {/* Reservation Details */}
@@ -140,9 +135,7 @@ export function CheckInDialog({
             className="flex-1"
             isDisabled={isLoading}
           >
-            <ButtonText>
-              {t("reservation.checkIn.notNow", { defaultValue: "Not Now" })}
-            </ButtonText>
+            <ButtonText>{t("reservation.checkIn.notNow")}</ButtonText>
           </Button>
           <Button
             action="primary"
@@ -153,11 +146,7 @@ export function CheckInDialog({
             {isLoading ? (
               <ButtonSpinner color={Colors.white} />
             ) : (
-              <ButtonText>
-                {t("reservation.checkIn.checkInNow", {
-                  defaultValue: "Check In Now",
-                })}
-              </ButtonText>
+              <ButtonText>{t("reservation.checkIn.checkInNow")}</ButtonText>
             )}
           </Button>
         </AlertDialogFooter>

@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { Bell, ChevronDown } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
@@ -56,36 +57,11 @@ export function ReminderOffsetSelect({
   // Reminder options with translations
   const options = useMemo((): ReminderOption[] => {
     return [
-      {
-        value: 0,
-        label: t("reservation.form.reminderOptions.none", {
-          defaultValue: "No reminder",
-        }),
-      },
-      {
-        value: 30,
-        label: t("reservation.form.reminderOptions.30min", {
-          defaultValue: "30 minutes before",
-        }),
-      },
-      {
-        value: 60,
-        label: t("reservation.form.reminderOptions.1hour", {
-          defaultValue: "1 hour before",
-        }),
-      },
-      {
-        value: 120,
-        label: t("reservation.form.reminderOptions.2hours", {
-          defaultValue: "2 hours before",
-        }),
-      },
-      {
-        value: 1440,
-        label: t("reservation.form.reminderOptions.1day", {
-          defaultValue: "1 day before",
-        }),
-      },
+      { value: 0, label: t("reservation.form.reminderOptions.none") },
+      { value: 30, label: t("reservation.form.reminderOptions.30min") },
+      { value: 60, label: t("reservation.form.reminderOptions.1hour") },
+      { value: 120, label: t("reservation.form.reminderOptions.2hours") },
+      { value: 1440, label: t("reservation.form.reminderOptions.1day") },
     ];
   }, [t]);
 
@@ -113,13 +89,12 @@ export function ReminderOffsetSelect({
       <Pressable
         onPress={() => !disabled && setIsOpen(true)}
         disabled={disabled}
-        className={`border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3 ${
-          disabled ? "opacity-50" : ""
-        }`}
+        className={cn(
+          "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
+          disabled && "opacity-50",
+        )}
         accessibilityRole="button"
-        accessibilityLabel={t("reservation.form.reminder", {
-          defaultValue: "Reminder",
-        })}
+        accessibilityLabel={t("reservation.form.reminder")}
         accessibilityValue={{ text: selectedLabel }}
       >
         <HStack className="items-center justify-between">
@@ -142,7 +117,7 @@ export function ReminderOffsetSelect({
           </ActionsheetDragIndicatorWrapper>
 
           <Text className="text-typography-900 mb-4 text-center text-lg font-semibold">
-            {t("reservation.form.reminder", { defaultValue: "Reminder" })}
+            {t("reservation.form.reminder")}
           </Text>
 
           <ActionsheetScrollView className="max-h-64">

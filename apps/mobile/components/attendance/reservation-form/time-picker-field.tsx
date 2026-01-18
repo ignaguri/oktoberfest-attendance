@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format, setHours, setMinutes } from "date-fns";
 import { Clock } from "lucide-react-native";
@@ -83,21 +84,22 @@ export function TimePickerField({
       <Pressable
         onPress={handlePress}
         disabled={disabled}
-        className={`border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3 ${
-          disabled ? "opacity-50" : ""
-        } ${error ? "border-error-500" : ""}`}
-        accessibilityLabel={t("reservation.form.selectTime", {
-          defaultValue: "Select time",
-        })}
+        className={cn(
+          "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
+          disabled && "opacity-50",
+          error && "border-error-500",
+        )}
+        accessibilityLabel={t("reservation.form.selectTime")}
         accessibilityRole="button"
         accessibilityValue={{ text: formattedTime }}
       >
         <HStack space="sm" className="items-center">
           <Clock size={18} color={IconColors.muted} />
           <Text
-            className={`text-base ${
-              value ? "text-typography-900" : "text-typography-400"
-            }`}
+            className={cn(
+              "text-base",
+              value ? "text-typography-900" : "text-typography-400",
+            )}
           >
             {formattedTime}
           </Text>
@@ -126,7 +128,7 @@ export function TimePickerField({
           className="bg-primary-500 mt-2 items-center rounded-lg py-2"
         >
           <Text className="font-medium text-white">
-            {t("common.buttons.done", { defaultValue: "Done" })}
+            {t("common.buttons.done")}
           </Text>
         </Pressable>
       )}

@@ -368,9 +368,7 @@ export function AttendanceCalendar({
         <HStack space="sm" className="items-center">
           <View className="h-3 w-3 rounded border border-teal-300 bg-teal-100" />
           <Text className="text-typography-500 text-xs">
-            {t("attendance.calendar.hasReservation", {
-              defaultValue: "Reservation",
-            })}
+            {t("attendance.calendar.hasReservation")}
           </Text>
         </HStack>
         <HStack space="sm" className="items-center">

@@ -81,13 +81,13 @@ export function CalendarActionSheet({
   const availableTabs = useMemo((): Tab[] => {
     const attendanceTab: Tab = {
       key: "attendance",
-      label: t("attendance.tabs.attendance", { defaultValue: "Attendance" }),
+      label: t("attendance.tabs.attendance"),
       disabled: isFutureDate,
     };
 
     const reservationTab: Tab = {
       key: "reservation",
-      label: t("attendance.tabs.reservation", { defaultValue: "Reservation" }),
+      label: t("attendance.tabs.reservation"),
       disabled: isPastDate,
     };
 
@@ -137,7 +137,7 @@ export function CalendarActionSheet({
   const formattedDate =
     selectedDate && !isNaN(selectedDate.getTime())
       ? format(selectedDate, "EEEE, MMMM d, yyyy")
-      : t("common.labels.selectDate", { defaultValue: "Select a date" });
+      : t("common.labels.selectDate");
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
