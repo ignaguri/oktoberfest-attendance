@@ -185,15 +185,15 @@ export default function RootLayout() {
           <ErrorBoundary>
             <DataProvider>
               <ApiClientProvider client={apiClient}>
-                {/* GluestackUIProvider must be inside ApiClientProvider
-                    because its OverlayProvider renders modals/sheets
-                    via portal at this level */}
-                <GluestackUIProvider mode="light">
-                  <AuthProvider>
-                    <NotificationProvider>
-                      <NovuProviderWrapper>
-                        <FestivalProvider storage={mobileFestivalStorage}>
-                          <OfflineDataBridge>
+                <AuthProvider>
+                  <FestivalProvider storage={mobileFestivalStorage}>
+                    {/* OfflineDataBridge must wrap GluestackUIProvider so that
+                        portal-rendered content (Actionsheets, Modals) have access
+                        to the OfflineDataProvider context */}
+                    <OfflineDataBridge>
+                      <GluestackUIProvider mode="light">
+                        <NotificationProvider>
+                          <NovuProviderWrapper>
                             <NavigationGuard>
                               <NotificationPromptHandler />
                               <Stack
@@ -236,12 +236,12 @@ export default function RootLayout() {
                                 <Stack.Screen name="+not-found" />
                               </Stack>
                             </NavigationGuard>
-                          </OfflineDataBridge>
-                        </FestivalProvider>
-                      </NovuProviderWrapper>
-                    </NotificationProvider>
-                  </AuthProvider>
-                </GluestackUIProvider>
+                          </NovuProviderWrapper>
+                        </NotificationProvider>
+                      </GluestackUIProvider>
+                    </OfflineDataBridge>
+                  </FestivalProvider>
+                </AuthProvider>
               </ApiClientProvider>
             </DataProvider>
           </ErrorBoundary>

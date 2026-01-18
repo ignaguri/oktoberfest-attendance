@@ -42,13 +42,13 @@ export class SupabaseCalendarRepository {
       throw new Error(tentError.message);
     }
 
-    // Get reservations
+    // Get reservations (pending or confirmed)
     const { data: reservations, error: resError } = await this.supabase
       .from("reservations")
       .select("id, start_at, end_at, status, tent:tents(id, name)")
       .eq("festival_id", festivalId)
       .eq("user_id", userId)
-      .eq("status", "scheduled");
+      .in("status", ["pending", "confirmed"]);
 
     if (resError) {
       throw new Error(resError.message);

@@ -466,7 +466,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     )
     .eq("id", reservationId)
     .eq("user_id", user.id)
-    .eq("status", "scheduled")
+    .in("status", ["pending", "confirmed"])
     .single();
 
   if (reservationError || !reservation) {

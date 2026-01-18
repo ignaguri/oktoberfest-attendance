@@ -22,7 +22,7 @@ import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
 import {
   useIsOnline,
-  useOffline,
+  useOfflineSafe,
   usePendingCount,
 } from "@/lib/database/offline-provider";
 
@@ -68,7 +68,7 @@ export function OfflineIndicator({
   className = "",
 }: OfflineIndicatorProps) {
   const { t } = useTranslation();
-  const { syncStatus, pendingCount, sync } = useOffline();
+  const { syncStatus, pendingCount, sync } = useOfflineSafe();
   const isOnline = useIsOnline();
 
   // Animation for syncing state
@@ -204,7 +204,7 @@ interface OfflineBadgeProps {
 export function OfflineBadge({ className = "" }: OfflineBadgeProps) {
   const isOnline = useIsOnline();
   const pendingCount = usePendingCount();
-  const { syncStatus } = useOffline();
+  const { syncStatus } = useOfflineSafe();
 
   // Don't show if online and no pending changes
   if (isOnline && pendingCount === 0 && syncStatus !== "syncing") {
@@ -266,7 +266,7 @@ interface OfflineBannerProps {
 export function OfflineBanner({ className = "" }: OfflineBannerProps) {
   const { t } = useTranslation();
   const isOnline = useIsOnline();
-  const { syncStatus, error, pendingCount } = useOffline();
+  const { syncStatus, error, pendingCount } = useOfflineSafe();
 
   // Don't show if online and everything is fine
   if (isOnline && syncStatus !== "error") {

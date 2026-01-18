@@ -408,7 +408,7 @@ BEGIN
     reminder_offset_minutes, visible_to_groups, note
   ) VALUES (
     gen_random_uuid(), v_user0, v_festival_id, v_tent_id,
-    now() + interval '55 minutes', NULL, 'scheduled',
+    now() + interval '55 minutes', NULL, 'pending',
     60, true, 'QA: reminder-due'
   );
 
@@ -418,7 +418,7 @@ BEGIN
     reminder_offset_minutes, visible_to_groups, note
   ) VALUES (
     gen_random_uuid(), v_user1, v_festival_id, v_tent_id,
-    now() - interval '1 minute', NULL, 'scheduled',
+    now() - interval '1 minute', NULL, 'pending',
     1440, true, 'QA: prompt-due'
   );
 
@@ -428,7 +428,7 @@ BEGIN
     reminder_offset_minutes, visible_to_groups, note
   ) VALUES (
     gen_random_uuid(), v_user2, v_festival_id, v_tent_id,
-    now() - interval '1 minute', NULL, 'scheduled',
+    now() - interval '1 minute', NULL, 'pending',
     1440, true, 'QA: early-checkin-reservation'
   );
 END $$;
