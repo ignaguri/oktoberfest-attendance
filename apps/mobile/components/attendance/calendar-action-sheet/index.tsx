@@ -139,9 +139,6 @@ export function CalendarActionSheet({
       ? format(selectedDate, "EEEE, MMMM d, yyyy")
       : t("common.labels.selectDate", { defaultValue: "Select a date" });
 
-  // Should show single tab or both?
-  const showTabs = !isPastDate || !isFutureDate; // Always show tabs for now, disabled state handles access
-
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <ActionsheetBackdrop />

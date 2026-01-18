@@ -138,7 +138,6 @@ export function ReservationTabContent({
   });
 
   const selectedTentId = watch("tentId");
-  const startTime = watch("startTime");
 
   // Format date for tracking
   const dateStr = format(selectedDate, "yyyy-MM-dd");

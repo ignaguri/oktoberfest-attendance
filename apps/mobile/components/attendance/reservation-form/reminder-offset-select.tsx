@@ -120,6 +120,7 @@ export function ReminderOffsetSelect({
         accessibilityLabel={t("reservation.form.reminder", {
           defaultValue: "Reminder",
         })}
+        accessibilityValue={{ text: selectedLabel }}
       >
         <HStack className="items-center justify-between">
           <HStack space="sm" className="items-center">

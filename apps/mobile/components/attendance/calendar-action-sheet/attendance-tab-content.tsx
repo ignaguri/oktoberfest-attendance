@@ -186,7 +186,6 @@ export function AttendanceTabContent({
   ]);
 
   const {
-    control,
     handleSubmit,
     setValue,
     watch,

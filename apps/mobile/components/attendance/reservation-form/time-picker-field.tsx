@@ -90,6 +90,7 @@ export function TimePickerField({
           defaultValue: "Select time",
         })}
         accessibilityRole="button"
+        accessibilityValue={{ text: formattedTime }}
       >
         <HStack space="sm" className="items-center">
           <Clock size={18} color={IconColors.muted} />

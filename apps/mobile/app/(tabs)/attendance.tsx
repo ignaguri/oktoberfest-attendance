@@ -34,6 +34,7 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { isActiveReservation } from "@/lib/utils/reservation";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
@@ -70,7 +71,7 @@ export default function AttendanceScreen() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
-  const [checkInReservation_, setCheckInReservation_] =
+  const [pendingCheckInReservation, setPendingCheckInReservation] =
     useState<Reservation | null>(null);
   const [checkInMode, setCheckInMode] = useState(false);
   const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
@@ -88,7 +89,7 @@ export default function AttendanceScreen() {
       ) {
         // Use queueMicrotask to defer state updates and avoid lint warning
         queueMicrotask(() => {
-          setCheckInReservation_(reservation);
+          setPendingCheckInReservation(reservation);
           setCheckInDialogOpen(true);
           // Clear the query param to prevent re-triggering
           router.setParams({ checkInReservationId: undefined });
@@ -120,19 +121,13 @@ export default function AttendanceScreen() {
   }, [selectedDate, attendances]);
 
   // Find existing reservation for selected date
-  // Active statuses: pending, confirmed, and scheduled (legacy from db)
   const existingReservation = useMemo((): Reservation | null => {
     if (!selectedDate || !reservations.length) return null;
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     return (
       reservations.find((r: Reservation) => {
         const reservationDate = format(new Date(r.startAt), "yyyy-MM-dd");
-        // Include "scheduled" for legacy data (status is string in db, typed enum in schema)
-        const isActiveStatus =
-          r.status === "pending" ||
-          r.status === "confirmed" ||
-          (r.status as string) === "scheduled";
-        return reservationDate === dateStr && isActiveStatus;
+        return reservationDate === dateStr && isActiveReservation(r);
       }) ?? null
     );
   }, [selectedDate, reservations]);
@@ -186,16 +181,16 @@ export default function AttendanceScreen() {
   // Handle check-in dialog close
   const handleCheckInDialogClose = useCallback(() => {
     setCheckInDialogOpen(false);
-    setCheckInReservation_(null);
+    setPendingCheckInReservation(null);
   }, []);
 
   // Handle check-in confirmation
   const handleCheckIn = useCallback(async () => {
-    if (!checkInReservation_ || !currentFestival) return;
+    if (!pendingCheckInReservation || !currentFestival) return;
 
     try {
       await checkInReservation.mutateAsync({
-        reservationId: checkInReservation_.id,
+        reservationId: pendingCheckInReservation.id,
         festivalId: currentFestival.id,
       });
 
@@ -204,15 +199,15 @@ export default function AttendanceScreen() {
 
       // Set up check-in mode for attendance form
       setCheckInMode(true);
-      setPrefillTentId(checkInReservation_.tentId);
+      setPrefillTentId(pendingCheckInReservation.tentId);
 
       // Select the reservation date and open the form
-      const reservationDate = parseISO(checkInReservation_.startAt);
+      const reservationDate = parseISO(pendingCheckInReservation.startAt);
       setSelectedDate(reservationDate);
       setIsFormOpen(true);
 
       // Clear the check-in reservation
-      setCheckInReservation_(null);
+      setPendingCheckInReservation(null);
 
       // Refresh data
       refetch();
@@ -225,7 +220,7 @@ export default function AttendanceScreen() {
       );
     }
   }, [
-    checkInReservation_,
+    pendingCheckInReservation,
     currentFestival,
     checkInReservation,
     refetch,
@@ -380,7 +375,7 @@ export default function AttendanceScreen() {
       <CheckInDialog
         isOpen={checkInDialogOpen}
         onClose={handleCheckInDialogClose}
-        reservation={checkInReservation_}
+        reservation={pendingCheckInReservation}
         festivalId={currentFestival.id}
         onCheckIn={handleCheckIn}
         isLoading={checkInReservation.loading}

@@ -33,6 +33,12 @@ export const Colors = {
   success: {
     500: "#22C55E", // green-500 - success states
   },
+
+  // Teal colors (for reservations)
+  teal: {
+    500: "#14B8A6", // teal-500
+    600: "#0D9488", // teal-600 - reservation indicator
+  },
 } as const;
 
 // Convenience exports for common use cases
@@ -44,6 +50,7 @@ export const IconColors = {
   success: Colors.success[500],
   primary: Colors.primary[500],
   disabled: Colors.gray[300],
+  reservation: Colors.teal[600],
 } as const;
 
 export const SwitchColors = {

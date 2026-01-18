@@ -31,6 +31,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { isActiveReservation } from "@/lib/utils/reservation";
 
 interface AttendanceData {
   date: string;
@@ -102,20 +103,12 @@ export function AttendanceCalendar({
   }, [attendances]);
 
   // Map of date string -> reservation for quick lookup (only active reservations)
-  // Include "scheduled" for legacy data compatibility (status is string in db)
   const reservationMap = useMemo(() => {
     const map = new Map<string, Reservation>();
-    reservations
-      .filter(
-        (r) =>
-          r.status === "pending" ||
-          r.status === "confirmed" ||
-          (r.status as string) === "scheduled",
-      )
-      .forEach((r) => {
-        const dateStr = format(new Date(r.startAt), "yyyy-MM-dd");
-        map.set(dateStr, r);
-      });
+    reservations.filter(isActiveReservation).forEach((r) => {
+      const dateStr = format(new Date(r.startAt), "yyyy-MM-dd");
+      map.set(dateStr, r);
+    });
     return map;
   }, [reservations]);
 
@@ -271,7 +264,7 @@ export function AttendanceCalendar({
                   )}
                   {/* Reservation indicator */}
                   {hasReservation && !hasAttendance && (
-                    <CalendarClock size={12} color="#0D9488" />
+                    <CalendarClock size={12} color={IconColors.reservation} />
                   )}
                 </HStack>
               )}
