@@ -1069,6 +1069,11 @@
     "userProfile": "User Profile",
     "title": "Activity Feed"
   },
+  "quickAttendance": {
+    "sheetTitle": "Quick Add",
+    "save": "Save",
+    "drinkLogged": "Drink logged!"
+  },
   "home": {
     "festivalStatus": {
       "currentDay": "It's day {{currentDay}} / {{totalDays}}",
