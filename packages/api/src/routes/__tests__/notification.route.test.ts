@@ -12,7 +12,7 @@ import notificationRoutes from "../notification.route";
 // Mock the NotificationService
 vi.mock("../../services/notification.service", () => ({
   NotificationService: vi.fn().mockImplementation(() => ({
-    registerFCMToken: vi.fn(),
+    registerPushToken: vi.fn(),
     subscribeUser: vi.fn(),
     getUserNotificationPreferences: vi.fn(),
     updateUserNotificationPreferences: vi.fn(),
@@ -24,7 +24,7 @@ describe("Notification Routes - Unit Tests", () => {
   let mockSupabase: ReturnType<typeof createMockSupabase>;
   let mockUser: ReturnType<typeof createMockUser>;
   let mockNotificationService: {
-    registerFCMToken: ReturnType<typeof vi.fn>;
+    registerPushToken: ReturnType<typeof vi.fn>;
     subscribeUser: ReturnType<typeof vi.fn>;
     getUserNotificationPreferences: ReturnType<typeof vi.fn>;
     updateUserNotificationPreferences: ReturnType<typeof vi.fn>;
@@ -37,7 +37,7 @@ describe("Notification Routes - Unit Tests", () => {
 
     // Set up mock notification service instance
     mockNotificationService = {
-      registerFCMToken: vi.fn(),
+      registerPushToken: vi.fn(),
       subscribeUser: vi.fn(),
       getUserNotificationPreferences: vi.fn(),
       updateUserNotificationPreferences: vi.fn(),
@@ -81,7 +81,10 @@ describe("Notification Routes - Unit Tests", () => {
   describe("POST /notifications/token", () => {
     it("should register FCM token successfully", async () => {
       const fcmToken = "test-fcm-token-1234567890";
-      mockNotificationService.registerFCMToken.mockResolvedValueOnce(true);
+      mockNotificationService.registerPushToken.mockResolvedValueOnce({
+        success: true,
+        novuRegistered: true,
+      });
 
       const req = createAuthRequest("/notifications/token", {
         method: "POST",
@@ -95,8 +98,8 @@ describe("Notification Routes - Unit Tests", () => {
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
-      expect(body).toEqual({ success: true });
-      expect(mockNotificationService.registerFCMToken).toHaveBeenCalledWith(
+      expect(body).toEqual({ success: true, novuRegistered: true });
+      expect(mockNotificationService.registerPushToken).toHaveBeenCalledWith(
         mockUser.id,
         fcmToken,
       );
@@ -104,7 +107,11 @@ describe("Notification Routes - Unit Tests", () => {
 
     it("should return success: false when registration fails", async () => {
       const fcmToken = "test-fcm-token-invalid";
-      mockNotificationService.registerFCMToken.mockResolvedValueOnce(false);
+      mockNotificationService.registerPushToken.mockResolvedValueOnce({
+        success: false,
+        novuRegistered: false,
+        error: "Failed to register",
+      });
 
       const req = createAuthRequest("/notifications/token", {
         method: "POST",
@@ -118,7 +125,11 @@ describe("Notification Routes - Unit Tests", () => {
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
-      expect(body).toEqual({ success: false });
+      expect(body).toEqual({
+        success: false,
+        novuRegistered: false,
+        error: "Failed to register",
+      });
     });
 
     it("should validate token is required", async () => {
@@ -152,7 +163,9 @@ describe("Notification Routes - Unit Tests", () => {
 
   describe("POST /notifications/subscribe", () => {
     it("should subscribe user with full profile data", async () => {
-      mockNotificationService.subscribeUser.mockResolvedValueOnce(true);
+      mockNotificationService.subscribeUser.mockResolvedValueOnce({
+        success: true,
+      });
 
       const subscribeData = {
         email: "test@example.com",
@@ -184,7 +197,9 @@ describe("Notification Routes - Unit Tests", () => {
     });
 
     it("should subscribe user with minimal data (empty object)", async () => {
-      mockNotificationService.subscribeUser.mockResolvedValueOnce(true);
+      mockNotificationService.subscribeUser.mockResolvedValueOnce({
+        success: true,
+      });
 
       const req = createAuthRequest("/notifications/subscribe", {
         method: "POST",
@@ -209,7 +224,9 @@ describe("Notification Routes - Unit Tests", () => {
     });
 
     it("should subscribe user with only email", async () => {
-      mockNotificationService.subscribeUser.mockResolvedValueOnce(true);
+      mockNotificationService.subscribeUser.mockResolvedValueOnce({
+        success: true,
+      });
 
       const req = createAuthRequest("/notifications/subscribe", {
         method: "POST",
@@ -227,7 +244,10 @@ describe("Notification Routes - Unit Tests", () => {
     });
 
     it("should return success: false when subscription fails", async () => {
-      mockNotificationService.subscribeUser.mockResolvedValueOnce(false);
+      mockNotificationService.subscribeUser.mockResolvedValueOnce({
+        success: false,
+        error: "Subscription failed",
+      });
 
       const req = createAuthRequest("/notifications/subscribe", {
         method: "POST",
@@ -241,7 +261,7 @@ describe("Notification Routes - Unit Tests", () => {
 
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
-      expect(body).toEqual({ success: false });
+      expect(body).toEqual({ success: false, error: "Subscription failed" });
     });
 
     it("should validate email format when provided", async () => {
