@@ -5209,7 +5209,18 @@
                 "type": "object",
                 "properties": {
                   "email": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      }
+                    ]
                   },
                   "firstName": {
                     "type": "string"
@@ -5218,7 +5229,18 @@
                     "type": "string"
                   },
                   "avatar": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      }
+                    ]
                   }
                 }
               }

@@ -27,15 +27,14 @@ export type RegisterFCMTokenResponse = z.infer<
  * Subscribe user to Novu request
  * POST /api/v1/notifications/subscribe
  *
- * Note: We use plain strings here instead of z.email()/z.url() because
- * the OpenAPI validation runs before Zod transforms, rejecting empty strings.
- * The Novu API handles its own validation for email/url formats.
+ * Note: email and avatar use union with empty string to handle optional fields
+ * that might receive empty strings from the client.
  */
 export const SubscribeUserSchema = z.object({
-  email: z.string().optional(),
+  email: z.union([z.email(), z.literal("")]).optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  avatar: z.string().optional(),
+  avatar: z.union([z.url(), z.literal("")]).optional(),
 });
 
 export type SubscribeUserInput = z.infer<typeof SubscribeUserSchema>;

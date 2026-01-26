@@ -2832,10 +2832,10 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        email?: string;
+                        email?: string | "";
                         firstName?: string;
                         lastName?: string;
-                        avatar?: string;
+                        avatar?: string | "";
                     };
                 };
             };
