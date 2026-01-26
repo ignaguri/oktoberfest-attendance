@@ -667,7 +667,16 @@
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
       "info": "You can change your notification preferences at any time",
-      "updateError": "Failed to update notification settings"
+      "updateError": "Failed to update notification settings",
+      "noToken": "Failed to get push notification token. Please try again.",
+      "subscribeFailed": "Failed to register with notification service.",
+      "tokenRegistrationFailed": "Failed to register device for push notifications.",
+      "enableFailed": "Failed to enable push notifications. Please try again.",
+      "permissionDenied": "Notifications Disabled",
+      "openSettings": "To enable notifications, please go to your device settings and allow notifications for ProstCounter.",
+      "goToSettings": "Open Settings",
+      "permissionDeniedHint": "Notifications are disabled. Tap the toggle to open settings.",
+      "registrationFailed": "Failed to register for push notifications"
     },
     "privacy": {
       "title": "Privacy Settings",

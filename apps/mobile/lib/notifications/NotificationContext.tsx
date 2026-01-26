@@ -1,3 +1,4 @@
+import * as Notifications from "expo-notifications";
 import type { ReactNode } from "react";
 import {
   createContext,
@@ -6,6 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { Platform } from "react-native";
 
 import {
   clearFCMToken,
@@ -15,8 +17,14 @@ import {
   type NotificationPermissionStatus,
   setNotificationPermissionStatus,
   setNotificationPromptShown,
-  storeFCMToken as saveFCMToken,
+  storeFCMToken as saveExpoPushToken,
 } from "@/lib/auth/secure-storage";
+
+/**
+ * Expo Project ID for push tokens
+ * This should be set in your EAS project configuration
+ */
+const EXPO_PROJECT_ID = process.env.EXPO_PUBLIC_EAS_PROJECT_ID;
 
 /**
  * Notification Context Type
@@ -27,9 +35,9 @@ interface NotificationContextType {
   hasPromptBeenShown: boolean;
   isPermissionLoading: boolean;
 
-  // FCM state
-  fcmToken: string | null;
-  isFCMTokenLoading: boolean;
+  // Push token state (Expo Push Token)
+  expoPushToken: string | null;
+  isTokenLoading: boolean;
 
   // Registration state
   isRegistered: boolean;
@@ -54,10 +62,8 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
 /**
  * Notification Provider
  *
- * Manages notification permissions, FCM tokens, and Novu registration.
- * Note: expo-notifications and @react-native-firebase/messaging must be installed
- * for full functionality. This context provides a safe wrapper that handles
- * cases where the packages aren't available.
+ * Manages notification permissions, Expo push tokens, and Novu registration.
+ * Uses Expo Push Notifications (not FCM) for simpler setup.
  */
 export function NotificationProvider({ children }: { children: ReactNode }) {
   // Permission state
@@ -66,13 +72,36 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [hasPromptBeenShown, setHasPromptBeenShown] = useState(false);
   const [isPermissionLoading, setIsPermissionLoading] = useState(true);
 
-  // FCM state
-  const [fcmToken, setFCMToken] = useState<string | null>(null);
-  const [isFCMTokenLoading, setIsFCMTokenLoading] = useState(true);
+  // Push token state (Expo Push Token)
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+  const [isTokenLoading, setIsTokenLoading] = useState(true);
 
   // Registration state
   const [isRegistered, setIsRegistered] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  /**
+   * Get Expo push token
+   */
+  const getExpoPushToken = useCallback(async (): Promise<string | null> => {
+    try {
+      // Expo push tokens only work on physical devices
+      if (Platform.OS === "ios" && !EXPO_PROJECT_ID) {
+        console.warn(
+          "EXPO_PUBLIC_EAS_PROJECT_ID is not set. Push tokens may not work correctly.",
+        );
+      }
+
+      const tokenData = await Notifications.getExpoPushTokenAsync({
+        projectId: EXPO_PROJECT_ID,
+      });
+
+      return tokenData.data;
+    } catch (error) {
+      console.error("Error getting Expo push token:", error);
+      return null;
+    }
+  }, []);
 
   /**
    * Load initial notification state from storage and sync with device permission
@@ -83,82 +112,68 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         const [promptShown, storedStatus, storedToken] = await Promise.all([
           hasNotificationPromptBeenShown(),
           getNotificationPermissionStatus(),
-          getStoredFCMToken(),
+          getStoredFCMToken(), // Legacy name, but stores Expo push token now
         ]);
 
         setHasPromptBeenShown(promptShown);
         if (storedToken) {
-          setFCMToken(storedToken);
-          setIsRegistered(true);
+          setExpoPushToken(storedToken);
+          // Note: Don't auto-set isRegistered - this only means we have a token locally
+          // The token may not have been successfully registered with Novu
+          // isRegistered should only be set after successful Novu registration
         }
 
         // Check actual device permission status and sync with stored state
-        try {
-          const Notifications = await import("expo-notifications");
-          const { status: deviceStatus } =
-            await Notifications.getPermissionsAsync();
+        const { status: deviceStatus } =
+          await Notifications.getPermissionsAsync();
 
-          // Map expo permission status to our status type
-          let actualStatus: NotificationPermissionStatus = "undetermined";
-          if (deviceStatus === "granted") {
-            actualStatus = "granted";
-          } else if (deviceStatus === "denied") {
-            actualStatus = "denied";
-          }
+        // Map expo permission status to our status type
+        let actualStatus: NotificationPermissionStatus = "undetermined";
+        if (deviceStatus === "granted") {
+          actualStatus = "granted";
+        } else if (deviceStatus === "denied") {
+          actualStatus = "denied";
+        }
 
-          // If device status differs from stored status, use device status (source of truth)
-          if (actualStatus !== storedStatus) {
+        // If device status differs from stored status, use device status (source of truth)
+        if (actualStatus !== storedStatus) {
+          console.log(
+            `Syncing permission status: stored=${storedStatus}, device=${actualStatus}`,
+          );
+          setPermissionStatusState(actualStatus);
+          await setNotificationPermissionStatus(actualStatus);
+        } else if (storedStatus) {
+          setPermissionStatusState(storedStatus);
+        } else {
+          setPermissionStatusState(actualStatus);
+        }
+
+        // If permission is granted but no token stored, try to get one
+        if (actualStatus === "granted" && !storedToken) {
+          console.log(
+            "Permission granted but no token, attempting to get Expo push token...",
+          );
+          const token = await getExpoPushToken();
+          if (token) {
+            await saveExpoPushToken(token);
+            setExpoPushToken(token);
+            // Note: Don't auto-set isRegistered - token obtained but not registered with Novu yet
             console.log(
-              `Syncing permission status: stored=${storedStatus}, device=${actualStatus}`,
+              "Successfully obtained and stored Expo push token:",
+              token.substring(0, 30) + "...",
             );
-            setPermissionStatusState(actualStatus);
-            await setNotificationPermissionStatus(actualStatus);
-          } else if (storedStatus) {
-            setPermissionStatusState(storedStatus);
-          } else {
-            setPermissionStatusState(actualStatus);
-          }
-
-          // If permission is granted but no token stored, try to get one
-          if (actualStatus === "granted" && !storedToken) {
-            console.log(
-              "Permission granted but no token, attempting to get FCM token...",
-            );
-            try {
-              // Try to get FCM token from Firebase Messaging
-              const messaging =
-                await import("@react-native-firebase/messaging");
-              const token = await messaging.default().getToken();
-              if (token) {
-                await saveFCMToken(token);
-                setFCMToken(token);
-                setIsRegistered(true);
-                console.log("Successfully obtained and stored FCM token");
-              }
-            } catch (tokenError) {
-              // This is expected to fail in simulator or if Firebase is not configured
-              console.error(
-                "Could not get FCM token (expected in simulator):",
-                tokenError,
-              );
-            }
-          }
-        } catch {
-          // expo-notifications not available, use stored status
-          if (storedStatus) {
-            setPermissionStatusState(storedStatus);
           }
         }
       } catch (error) {
         console.error("Error loading notification state:", error);
       } finally {
         setIsPermissionLoading(false);
-        setIsFCMTokenLoading(false);
+        setIsTokenLoading(false);
       }
     }
 
     loadNotificationState();
-  }, []);
+  }, [getExpoPushToken]);
 
   /**
    * Mark the permission prompt as shown
@@ -170,27 +185,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   /**
    * Request notification permission
-   *
-   * Note: This is a placeholder implementation.
-   * Full implementation requires expo-notifications to be installed.
    */
   const requestPermission = useCallback(async (): Promise<boolean> => {
     try {
       // Mark prompt as shown first
       await markPromptAsShown();
-
-      // Try to dynamically import expo-notifications
-      let Notifications: any = null;
-      try {
-        Notifications = await import("expo-notifications");
-      } catch {
-        console.warn(
-          "expo-notifications not available. Notification permissions cannot be requested.",
-        );
-        setPermissionStatusState("denied");
-        await setNotificationPermissionStatus("denied");
-        return false;
-      }
 
       // Request permission
       const { status: existingStatus } =
@@ -224,8 +223,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   /**
    * Register for push notifications
    *
-   * Gets the FCM registration token using Firebase Messaging.
-   * This token is required for Novu's FCM provider to send push notifications.
+   * Gets the Expo push token for use with Novu's Expo push provider.
+   * Note: This only obtains the local token - actual registration with Novu
+   * happens in the notifications settings screen via API hooks.
    */
   const registerForPushNotifications = useCallback(
     async (_userProfile?: {
@@ -244,69 +244,44 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setIsRegistering(true);
 
       try {
-        // Use Firebase Messaging to get FCM token
-        const messaging = await import("@react-native-firebase/messaging");
-
-        // Get the FCM registration token
-        const token = await messaging.default().getToken();
+        // Get Expo push token
+        const token = await getExpoPushToken();
 
         if (!token) {
-          console.error("Failed to get FCM registration token");
+          console.error("Failed to get Expo push token");
           return false;
         }
 
-        console.log("FCM token obtained:", token.substring(0, 20) + "...");
+        console.log(
+          "Expo push token obtained:",
+          token.substring(0, 30) + "...",
+        );
 
         // Store token locally
-        await saveFCMToken(token);
-        setFCMToken(token);
+        await saveExpoPushToken(token);
+        setExpoPushToken(token);
 
-        // Register token with backend via API client
-        // Note: This requires the API client to be available
-        // The actual registration will be handled by the parent component
-        // that has access to the API client
+        // Note: Don't set isRegistered here - this function only obtains the local token
+        // The actual registration with Novu happens in the notifications settings screen
+        // isRegistered should be set after successful Novu registration
 
-        setIsRegistered(true);
         return true;
       } catch (error) {
         console.error("Error registering for push notifications:", error);
-        // Fallback to expo-notifications if Firebase Messaging is not available
-        try {
-          console.log("Falling back to expo-notifications...");
-          const Notifications = await import("expo-notifications");
-          const tokenData = await Notifications.getExpoPushTokenAsync();
-          const token = tokenData.data;
-
-          if (token) {
-            console.log(
-              "Expo push token obtained:",
-              token.substring(0, 20) + "...",
-            );
-            await saveFCMToken(token);
-            setFCMToken(token);
-            setIsRegistered(true);
-            return true;
-          }
-        } catch (fallbackError) {
-          console.error(
-            "Fallback to expo-notifications also failed:",
-            fallbackError,
-          );
-        }
         return false;
       } finally {
         setIsRegistering(false);
       }
     },
-    [permissionStatus],
+    [permissionStatus, getExpoPushToken],
   );
 
   /**
    * Clear all notification state
    */
   const clearNotificationState = useCallback(async () => {
-    await clearFCMToken();
-    setFCMToken(null);
+    await clearFCMToken(); // Legacy name, clears Expo push token
+    setExpoPushToken(null);
     setIsRegistered(false);
   }, []);
 
@@ -316,9 +291,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     hasPromptBeenShown,
     isPermissionLoading,
 
-    // FCM state
-    fcmToken,
-    isFCMTokenLoading,
+    // Push token state (Expo Push Token)
+    expoPushToken,
+    isTokenLoading,
 
     // Registration state
     isRegistered,
@@ -358,8 +333,8 @@ const defaultContext: NotificationContextType = {
   permissionStatus: "undetermined",
   hasPromptBeenShown: false,
   isPermissionLoading: true,
-  fcmToken: null,
-  isFCMTokenLoading: true,
+  expoPushToken: null,
+  isTokenLoading: true,
   isRegistered: false,
   isRegistering: false,
   requestPermission: async () => false,

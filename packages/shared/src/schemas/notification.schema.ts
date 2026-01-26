@@ -15,6 +15,8 @@ export type RegisterFCMTokenInput = z.infer<typeof RegisterFCMTokenSchema>;
  */
 export const RegisterFCMTokenResponseSchema = z.object({
   success: z.boolean(),
+  novuRegistered: z.boolean().optional(),
+  error: z.string().optional(),
 });
 
 export type RegisterFCMTokenResponse = z.infer<
@@ -24,12 +26,16 @@ export type RegisterFCMTokenResponse = z.infer<
 /**
  * Subscribe user to Novu request
  * POST /api/v1/notifications/subscribe
+ *
+ * Note: We use plain strings here instead of z.email()/z.url() because
+ * the OpenAPI validation runs before Zod transforms, rejecting empty strings.
+ * The Novu API handles its own validation for email/url formats.
  */
 export const SubscribeUserSchema = z.object({
-  email: z.email().optional(),
+  email: z.string().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  avatar: z.url().optional(),
+  avatar: z.string().optional(),
 });
 
 export type SubscribeUserInput = z.infer<typeof SubscribeUserSchema>;
@@ -39,6 +45,7 @@ export type SubscribeUserInput = z.infer<typeof SubscribeUserSchema>;
  */
 export const SubscribeUserResponseSchema = z.object({
   success: z.boolean(),
+  error: z.string().optional(),
 });
 
 export type SubscribeUserResponse = z.infer<typeof SubscribeUserResponseSchema>;
