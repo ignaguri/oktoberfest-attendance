@@ -7,7 +7,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Platform } from "react-native";
 
 import {
   clearFCMToken,
@@ -39,7 +38,7 @@ interface NotificationContextType {
   expoPushToken: string | null;
   isTokenLoading: boolean;
 
-  // Registration state
+  // Registration state (isRegistered means registered with Novu, not just token obtained)
   isRegistered: boolean;
   isRegistering: boolean;
 
@@ -52,6 +51,7 @@ interface NotificationContextType {
     lastName?: string;
     avatar?: string;
   }) => Promise<string | null>;
+  markAsRegisteredWithNovu: () => void;
   clearNotificationState: () => Promise<void>;
 }
 
@@ -85,11 +85,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
    */
   const getExpoPushToken = useCallback(async (): Promise<string | null> => {
     try {
-      // Expo push tokens only work on physical devices
-      if (Platform.OS === "ios" && !EXPO_PROJECT_ID) {
-        console.warn(
-          "EXPO_PUBLIC_EAS_PROJECT_ID is not set. Push tokens may not work correctly.",
+      // Validate EXPO_PROJECT_ID is set before attempting to get token
+      if (!EXPO_PROJECT_ID) {
+        console.error(
+          "EXPO_PUBLIC_EAS_PROJECT_ID is not set. Cannot get push token.",
         );
+        return null;
       }
 
       const tokenData = await Notifications.getExpoPushTokenAsync({
@@ -279,6 +280,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   );
 
   /**
+   * Mark as registered with Novu
+   * Call this after successful Novu subscriber and token registration
+   */
+  const markAsRegisteredWithNovu = useCallback(() => {
+    setIsRegistered(true);
+  }, []);
+
+  /**
    * Clear all notification state
    */
   const clearNotificationState = useCallback(async () => {
@@ -305,6 +314,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     requestPermission,
     markPromptAsShown,
     registerForPushNotifications,
+    markAsRegisteredWithNovu,
     clearNotificationState,
   };
 
@@ -342,6 +352,7 @@ const defaultContext: NotificationContextType = {
   requestPermission: async () => false,
   markPromptAsShown: async () => {},
   registerForPushNotifications: async () => null,
+  markAsRegisteredWithNovu: () => {},
   clearNotificationState: async () => {},
 };
 

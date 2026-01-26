@@ -33,6 +33,7 @@ export default function NotificationSettingsScreen() {
     isPermissionLoading,
     requestPermission,
     registerForPushNotifications,
+    markAsRegisteredWithNovu,
     expoPushToken,
   } = useNotificationContextSafe();
 
@@ -225,6 +226,9 @@ export default function NotificationSettingsScreen() {
         setIsEnabling(false);
         return;
       }
+
+      // Mark as registered with Novu in context
+      markAsRegisteredWithNovu();
 
       // Step 5: Update preferences to enable push
       await updatePreferences.mutateAsync({ pushEnabled: true });

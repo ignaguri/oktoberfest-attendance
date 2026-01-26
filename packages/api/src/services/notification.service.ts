@@ -151,12 +151,23 @@ export class NotificationService {
       console.error("[NotificationService] Error subscribing user:", error);
 
       // Check if it's a 409 Conflict (subscriber already exists)
+      // First check for status code property (Novu SDK may include this)
+      const errorObj = error as {
+        statusCode?: number;
+        status?: number;
+        code?: number;
+        message?: string;
+      };
+      const statusCode =
+        errorObj.statusCode ?? errorObj.status ?? errorObj.code;
       const errorMessage =
         error instanceof Error ? error.message : String(error);
+
+      // Check for 409 status code first, then fall back to message matching
       const is409 =
+        statusCode === 409 ||
         errorMessage.includes("409") ||
-        errorMessage.toLowerCase().includes("already exists") ||
-        errorMessage.toLowerCase().includes("conflict");
+        errorMessage.toLowerCase().includes("already exists");
 
       if (is409) {
         // According to Novu SDK, calling create on an existing subscriber updates it

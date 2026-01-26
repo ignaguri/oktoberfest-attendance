@@ -7,9 +7,10 @@ import { join } from "path";
 import type { NextConfig } from "next";
 
 // Load .env.device if it exists (for physical device testing with local network IP)
+// Using override: false so it only fills missing values, not override existing .env settings
 const envDevicePath = join(__dirname, ".env.device");
 if (existsSync(envDevicePath)) {
-  config({ path: envDevicePath, override: true });
+  config({ path: envDevicePath, override: false });
 }
 
 // Read package.json to get version

@@ -273,8 +273,10 @@ export function QuickAttendanceSheet({
   const handleSave = useCallback(async () => {
     if (!festivalId) return;
 
-    // Must have at least a drink, photos, or tent change
-    if (!selectedDrinkType && pendingPhotos.length === 0 && !selectedTentId)
+    // Must have at least a drink, photos, or tent change (using same logic as hasChanges)
+    const hasTentChange =
+      selectedTentId && selectedTentId !== attendance?.tentIds?.[0];
+    if (!selectedDrinkType && pendingPhotos.length === 0 && !hasTentChange)
       return;
 
     setIsSaving(true);
