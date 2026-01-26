@@ -54,7 +54,8 @@
       "creating": "Creating...",
       "deleting": "Deleting...",
       "cancelling": "Cancelling...",
-      "info": "Info"
+      "info": "Info",
+      "authenticating": "Authenticating..."
     },
     "errors": {
       "title": "Error",
@@ -174,7 +175,13 @@
       "faceId": "Face ID",
       "touchId": "Touch ID",
       "enableButton": "Enable Biometric Login",
-      "skipButton": "Skip for now"
+      "skipButton": "Skip for now",
+      "prompt": "Sign in with {{biometricName}}",
+      "authenticate": "Use {{biometricName}}",
+      "usePassword": "Use password instead",
+      "enableTitle": "Enable {{biometricName}}?",
+      "enableDescription": "Sign in faster next time using {{biometricName}}",
+      "sessionExpired": "Session expired. Please sign in with your password."
     }
   },
   "groups": {
@@ -660,7 +667,16 @@
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
       "info": "You can change your notification preferences at any time",
-      "updateError": "Failed to update notification settings"
+      "updateError": "Failed to update notification settings",
+      "noToken": "Failed to get push notification token. Please try again.",
+      "subscribeFailed": "Failed to register with notification service.",
+      "tokenRegistrationFailed": "Failed to register device for push notifications.",
+      "enableFailed": "Failed to enable push notifications. Please try again.",
+      "permissionDenied": "Notifications Disabled",
+      "openSettings": "To enable notifications, please go to your device settings and allow notifications for ProstCounter.",
+      "goToSettings": "Open Settings",
+      "permissionDeniedHint": "Notifications are disabled. Tap the toggle to open settings.",
+      "registrationFailed": "Failed to register for push notifications"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -1068,6 +1084,13 @@
     "hotStreak": "Hot streak",
     "userProfile": "User Profile",
     "title": "Activity Feed"
+  },
+  "quickAttendance": {
+    "sheetTitle": "Today's Attendance",
+    "sheetDescription": "Add a drink, check in at tents, or upload photos for today.",
+    "save": "Save",
+    "drinkLogged": "Drink logged!",
+    "saved": "Saved!"
   },
   "home": {
     "festivalStatus": {

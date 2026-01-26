@@ -191,12 +191,22 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       throw new NotFoundError("Picture not found");
     }
 
-    // Extract file path from URL
-    const url = new URL(data.picture_url);
-    const pathParts = url.pathname.split("/");
-    const filePath = pathParts
-      .slice(pathParts.indexOf(this.BUCKET_NAME) + 1)
-      .join("/");
+    // picture_url now stores just the path (userId/festivalId/timestamp_filename)
+    // not a full URL, so we can use it directly
+    let filePath = data.picture_url;
+
+    // If for some reason it's still a full URL (legacy data), extract the path
+    if (filePath.startsWith("http")) {
+      try {
+        const url = new URL(filePath);
+        const pathParts = url.pathname.split("/");
+        filePath = pathParts
+          .slice(pathParts.indexOf(this.BUCKET_NAME) + 1)
+          .join("/");
+      } catch {
+        // If URL parsing fails, assume it's already a path
+      }
+    }
 
     // Delete from storage
     const { error: storageError } = await this.supabase.storage

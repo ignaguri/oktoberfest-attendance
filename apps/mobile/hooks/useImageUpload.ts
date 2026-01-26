@@ -38,6 +38,10 @@ export interface UseImageUploadOptions {
   allowMultiple?: boolean;
   /** Translation key for error message (defaults to "imageUpload.errors.uploadFailed") */
   errorMessageKey?: string;
+  /** Allow editing/cropping after selection (defaults to true for single images) */
+  allowEditing?: boolean;
+  /** Aspect ratio for cropping [width, height] - only used when allowEditing is true */
+  aspect?: [number, number];
 }
 
 /** Raw picked image before compression */
@@ -82,12 +86,16 @@ export function useImageUpload({
   compress = {},
   allowMultiple = false,
   errorMessageKey = "imageUpload.errors.uploadFailed",
+  allowEditing,
+  aspect = [1, 1],
 }: UseImageUploadOptions = {}): UseImageUploadReturn {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const compressOptions = { ...DEFAULT_COMPRESS_OPTIONS, ...compress };
+  // Default: allow editing for single images, disable for multiple
+  const shouldAllowEditing = allowEditing ?? !allowMultiple;
 
   function showError(err: Error) {
     setError(err);
@@ -111,10 +119,11 @@ export function useImageUpload({
       }
 
       // Launch picker
-      const result = await launchPicker(
-        source,
-        allowMultiple && source === "library",
-      );
+      const result = await launchPicker(source, {
+        allowMultiple: allowMultiple && source === "library",
+        allowEditing: shouldAllowEditing,
+        aspect,
+      });
       if (result.canceled || !result.assets?.length) {
         return null;
       }
@@ -150,10 +159,11 @@ export function useImageUpload({
       }
 
       // Launch picker
-      const result = await launchPicker(
-        source,
-        allowMultiple && source === "library",
-      );
+      const result = await launchPicker(source, {
+        allowMultiple: allowMultiple && source === "library",
+        allowEditing: shouldAllowEditing,
+        aspect,
+      });
       if (result.canceled || !result.assets?.length) {
         return null;
       }
@@ -221,14 +231,19 @@ async function requestPermission(
  */
 async function launchPicker(
   source: ImageSource,
-  allowMultiple: boolean,
+  pickerOptions: {
+    allowMultiple: boolean;
+    allowEditing: boolean;
+    aspect: [number, number];
+  },
 ): Promise<ImagePicker.ImagePickerResult> {
   const options: ImagePicker.ImagePickerOptions = {
     mediaTypes: ["images"] as ImagePicker.MediaType[],
-    allowsEditing: !allowMultiple, // Can't edit when selecting multiple
-    aspect: [1, 1],
+    // Can't edit when selecting multiple
+    allowsEditing: pickerOptions.allowEditing && !pickerOptions.allowMultiple,
+    aspect: pickerOptions.aspect,
     quality: 1, // We'll compress ourselves
-    allowsMultipleSelection: allowMultiple,
+    allowsMultipleSelection: pickerOptions.allowMultiple,
   };
 
   return source === "camera"
@@ -265,13 +280,15 @@ async function processImage(
 
 /**
  * Compress and convert image to specified format
+ * Only sets width to maintain aspect ratio
  */
 async function compressImage(
   uri: string,
   options: Required<CompressOptions>,
 ): Promise<string> {
   const context = ImageManipulator.manipulate(uri);
-  context.resize({ width: options.maxSize, height: options.maxSize });
+  // Only set width to maintain aspect ratio - height will scale proportionally
+  context.resize({ width: options.maxSize });
   const image = await context.renderAsync();
   const result = await image.saveAsync({
     format: options.format,

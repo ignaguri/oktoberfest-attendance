@@ -7,7 +7,7 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Bell, Clock, ExternalLink, Trophy, Users } from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -33,7 +33,8 @@ export default function NotificationSettingsScreen() {
     isPermissionLoading,
     requestPermission,
     registerForPushNotifications,
-    fcmToken,
+    markAsRegisteredWithNovu,
+    expoPushToken,
   } = useNotificationContextSafe();
 
   // Shared hooks for preferences
@@ -56,54 +57,10 @@ export default function NotificationSettingsScreen() {
   // Local state for permission prompt
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
 
-  // Track if we've already registered with Novu in this session
-  const hasRegisteredRef = useRef(false);
+  // Track if registration is in progress
+  const [isEnabling, setIsEnabling] = useState(false);
 
   const isLoading = isLoadingPreferences || isPermissionLoading;
-
-  // Auto-register with Novu when we have permission and token
-  useEffect(() => {
-    async function registerWithNovu() {
-      // Skip if already registered in this session
-      if (hasRegisteredRef.current) {
-        return;
-      }
-
-      // Only register if we have permission granted and a token
-      if (permissionStatus !== "granted" || !fcmToken || !profile) {
-        return;
-      }
-
-      // Skip if still loading
-      if (isLoading) {
-        return;
-      }
-
-      console.log("Auto-registering with Novu...");
-      hasRegisteredRef.current = true;
-
-      try {
-        // Subscribe user to Novu with profile data
-        await subscribeToNotifications.mutateAsync({
-          email: profile.email,
-          firstName: profile.full_name?.split(" ")[0],
-          lastName: profile.full_name?.split(" ").slice(1).join(" "),
-          avatar: profile.avatar_url || undefined,
-        });
-
-        // Register FCM token with Novu
-        await registerToken.mutateAsync(fcmToken);
-
-        console.log("Successfully registered with Novu");
-      } catch (error) {
-        console.error("Error auto-registering with Novu:", error);
-        // Don't show error to user for background registration
-      }
-    }
-
-    registerWithNovu();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [permissionStatus, fcmToken, profile, isLoading]);
 
   const onRefresh = useCallback(() => {
     refetch();
@@ -204,58 +161,90 @@ export default function NotificationSettingsScreen() {
   };
 
   const enablePushNotifications = async () => {
+    setIsEnabling(true);
+
     try {
-      // Request permission if needed
+      // Step 1: Request iOS permission
       const granted = await requestPermission();
       if (!granted) {
+        setIsEnabling(false);
         return;
       }
 
-      // Register for push notifications to get the FCM token
-      const registered = await registerForPushNotifications();
-      if (!registered) {
+      // Step 2: Register for push notifications to get the Expo push token
+      // registerForPushNotifications now returns the token directly
+      const token = await registerForPushNotifications();
+      if (!token) {
         Alert.alert(
           t("common.status.error", { defaultValue: "Error" }),
-          t("profile.notifications.registrationFailed", {
-            defaultValue: "Failed to register for push notifications",
+          t("profile.notifications.noToken", {
+            defaultValue:
+              "Failed to get push notification token. Please try again.",
           }),
         );
+        setIsEnabling(false);
         return;
       }
 
-      // Subscribe user to Novu with profile data
-      try {
-        await subscribeToNotifications.mutateAsync({
-          email: profile?.email,
-          firstName: profile?.full_name?.split(" ")[0],
-          lastName: profile?.full_name?.split(" ").slice(1).join(" "),
-          avatar: profile?.avatar_url || undefined,
-        });
-      } catch (subscribeError) {
-        console.error("Error subscribing to Novu:", subscribeError);
-        // Continue even if subscription fails
+      // Step 3: Subscribe user to Novu (creates subscriber)
+      const subscribeResult = await subscribeToNotifications.mutateAsync({
+        email: profile?.email,
+        firstName: profile?.full_name?.split(" ")[0],
+        lastName: profile?.full_name?.split(" ").slice(1).join(" "),
+        avatar: profile?.avatar_url || undefined,
+      });
+
+      if (!subscribeResult.success) {
+        console.error(
+          "Failed to subscribe to Novu:",
+          subscribeResult.error || "Unknown error",
+        );
+        Alert.alert(
+          t("common.status.error", { defaultValue: "Error" }),
+          t("profile.notifications.subscribeFailed", {
+            defaultValue: "Failed to register with notification service.",
+          }),
+        );
+        setIsEnabling(false);
+        return;
       }
 
-      // Register FCM token with Novu (if token exists)
-      if (fcmToken) {
-        try {
-          await registerToken.mutateAsync(fcmToken);
-        } catch (tokenError) {
-          console.error("Error registering FCM token:", tokenError);
-          // Continue even if token registration fails
-        }
+      // Step 4: Register token with Novu
+      const tokenResult = await registerToken.mutateAsync(token);
+
+      if (!tokenResult.success || !tokenResult.novuRegistered) {
+        console.error(
+          "Failed to register token with Novu:",
+          tokenResult.error || "Unknown error",
+        );
+        Alert.alert(
+          t("common.status.error", { defaultValue: "Error" }),
+          t("profile.notifications.tokenRegistrationFailed", {
+            defaultValue: "Failed to register device for push notifications.",
+          }),
+        );
+        setIsEnabling(false);
+        return;
       }
 
-      // Update preferences to enable push
+      // Mark as registered with Novu in context
+      markAsRegisteredWithNovu();
+
+      // Step 5: Update preferences to enable push
       await updatePreferences.mutateAsync({ pushEnabled: true });
+
+      console.log("Successfully enabled push notifications");
     } catch (error) {
       console.error("Error enabling push notifications:", error);
       Alert.alert(
         t("common.status.error", { defaultValue: "Error" }),
         t("profile.notifications.enableFailed", {
-          defaultValue: "Failed to enable push notifications",
+          defaultValue:
+            "Failed to enable push notifications. Please try again.",
         }),
       );
+    } finally {
+      setIsEnabling(false);
     }
   };
 
@@ -267,10 +256,11 @@ export default function NotificationSettingsScreen() {
     );
   }
 
-  // Push is enabled if device permission is granted
-  // The backend preference is secondary - device permission is the source of truth
-  const isPushEnabled = permissionStatus === "granted";
-  const isSaving = updatePreferences.loading;
+  // Push is enabled if device permission is granted AND backend preference is true
+  // Both conditions must be met for the switch to show ON
+  const isPushEnabled =
+    permissionStatus === "granted" && (preferences?.pushEnabled ?? false);
+  const isSaving = updatePreferences.loading || isEnabling;
 
   return (
     <>

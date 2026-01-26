@@ -8,16 +8,17 @@ import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { MapLinkButton } from "@/components/shared/map-link-button";
-import { QuickAttendanceCard } from "@/components/shared/quick-attendance-card";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 
 /**
  * Home screen displaying:
  * - Festival status (countdown/current day/ended)
- * - Quick attendance card for logging today's beers
  * - Map link button (if festival has map URL)
  * - Activity feed showing all user activities
+ *
+ * Quick attendance is now available via the FAB (Floating Action Button)
+ * on all tabs.
  *
  * Features pull-to-refresh to reload all data.
  */
@@ -61,14 +62,11 @@ export default function HomeScreen() {
           {/* Festival Status */}
           <FestivalStatus />
 
-          {/* Quick Attendance Card */}
-          <QuickAttendanceCard />
+          {/* Map Link Button (only shows if festival has mapUrl) */}
+          <MapLinkButton />
 
           {/* Activity Feed */}
           <ActivityFeed onRefresh={handleRefresh} />
-
-          {/* Map Link Button (only shows if festival has mapUrl) */}
-          <MapLinkButton />
         </VStack>
       </ScrollView>
     </SafeAreaView>

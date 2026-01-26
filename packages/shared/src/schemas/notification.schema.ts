@@ -15,6 +15,8 @@ export type RegisterFCMTokenInput = z.infer<typeof RegisterFCMTokenSchema>;
  */
 export const RegisterFCMTokenResponseSchema = z.object({
   success: z.boolean(),
+  novuRegistered: z.boolean().optional(),
+  error: z.string().optional(),
 });
 
 export type RegisterFCMTokenResponse = z.infer<
@@ -24,12 +26,15 @@ export type RegisterFCMTokenResponse = z.infer<
 /**
  * Subscribe user to Novu request
  * POST /api/v1/notifications/subscribe
+ *
+ * Note: email and avatar use union with empty string to handle optional fields
+ * that might receive empty strings from the client.
  */
 export const SubscribeUserSchema = z.object({
-  email: z.email().optional(),
+  email: z.union([z.email(), z.literal("")]).optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  avatar: z.url().optional(),
+  avatar: z.union([z.url(), z.literal("")]).optional(),
 });
 
 export type SubscribeUserInput = z.infer<typeof SubscribeUserSchema>;
@@ -39,6 +44,7 @@ export type SubscribeUserInput = z.infer<typeof SubscribeUserSchema>;
  */
 export const SubscribeUserResponseSchema = z.object({
   success: z.boolean(),
+  error: z.string().optional(),
 });
 
 export type SubscribeUserResponse = z.infer<typeof SubscribeUserResponseSchema>;

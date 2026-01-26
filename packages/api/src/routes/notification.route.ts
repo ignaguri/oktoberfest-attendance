@@ -60,12 +60,20 @@ app.openapi(registerTokenRoute, async (c) => {
   const supabase = c.var.supabase;
   const { token } = c.req.valid("json");
 
+  console.log("[Notification Route] Register token request:", {
+    userId: user.id,
+    tokenLength: token?.length,
+    tokenPrefix: token?.substring(0, 30),
+  });
+
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const success = await notificationService.registerFCMToken(user.id, token);
+  // Auto-detect token type (Expo push token or FCM token)
+  const result = await notificationService.registerPushToken(user.id, token);
 
-  return c.json({ success }, 200);
+  console.log("[Notification Route] Register token result:", result);
+  return c.json(result, 200);
 });
 
 // POST /notifications/subscribe - Subscribe user to Novu
@@ -114,10 +122,18 @@ app.openapi(subscribeUserRoute, async (c) => {
   const supabase = c.var.supabase;
   const { email, firstName, lastName, avatar } = c.req.valid("json");
 
+  console.log("[Notification Route] Subscribe request:", {
+    userId: user.id,
+    email: email || "(empty)",
+    firstName: firstName || "(empty)",
+    lastName: lastName || "(empty)",
+    avatar: avatar ? "present" : "(empty)",
+  });
+
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const success = await notificationService.subscribeUser(
+  const result = await notificationService.subscribeUser(
     user.id,
     email,
     firstName,
@@ -125,7 +141,8 @@ app.openapi(subscribeUserRoute, async (c) => {
     avatar,
   );
 
-  return c.json({ success }, 200);
+  console.log("[Notification Route] Subscribe result:", result);
+  return c.json(result, 200);
 });
 
 // GET /notifications/preferences - Get user notification preferences

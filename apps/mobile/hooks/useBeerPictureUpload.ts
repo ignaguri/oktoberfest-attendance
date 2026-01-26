@@ -65,6 +65,7 @@ export function useBeerPictureUpload({
   const { pickImagesRaw, compressImage, showError } = useImageUpload({
     onError,
     allowMultiple: true,
+    allowEditing: false, // Keep original aspect ratio for beer pictures
     compress: {
       maxSize: 1200, // Larger than avatars for better photo quality
       quality: 0.85,

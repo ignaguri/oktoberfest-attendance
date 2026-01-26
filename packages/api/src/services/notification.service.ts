@@ -45,6 +45,7 @@ export class NotificationService {
 
   /**
    * Register FCM device token with Novu subscriber
+   * @deprecated Use registerExpoPushToken for Expo apps
    */
   async registerFCMToken(userId: string, token: string): Promise<boolean> {
     try {
@@ -65,7 +66,58 @@ export class NotificationService {
   }
 
   /**
+   * Register Expo push token with Novu subscriber
+   * Expo push tokens look like: ExponentPushToken[xxxxx]
+   */
+  async registerExpoPushToken(
+    userId: string,
+    token: string,
+  ): Promise<{ success: boolean; novuRegistered: boolean; error?: string }> {
+    try {
+      await this.novu.subscribers.credentials.update(
+        {
+          providerId: ChatOrPushProviderEnum.Expo,
+          credentials: {
+            deviceTokens: [token],
+          },
+        },
+        userId,
+      );
+      return { success: true, novuRegistered: true };
+    } catch (error) {
+      console.error("Error registering Expo push token:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to register push token";
+      return { success: false, novuRegistered: false, error: errorMessage };
+    }
+  }
+
+  /**
+   * Register push token - auto-detects token type (Expo or FCM)
+   * Returns detailed result including whether Novu registration succeeded
+   */
+  async registerPushToken(
+    userId: string,
+    token: string,
+  ): Promise<{ success: boolean; novuRegistered: boolean; error?: string }> {
+    // Expo push tokens start with "ExponentPushToken["
+    if (token.startsWith("ExponentPushToken[")) {
+      return this.registerExpoPushToken(userId, token);
+    }
+    // Fallback to FCM for other token formats
+    const fcmResult = await this.registerFCMToken(userId, token);
+    return {
+      success: fcmResult,
+      novuRegistered: fcmResult,
+      error: fcmResult ? undefined : "Failed to register FCM token",
+    };
+  }
+
+  /**
    * Subscribe user to Novu notifications with full profile data
+   * Handles existing subscribers (409 Conflict) by updating instead
    */
   async subscribeUser(
     userId: string,
@@ -73,19 +125,67 @@ export class NotificationService {
     firstName?: string,
     lastName?: string,
     avatar?: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; error?: string }> {
+    console.log("[NotificationService] subscribeUser called:", {
+      userId,
+      userEmail,
+      firstName,
+      lastName,
+      avatar: avatar ? "present" : "null",
+    });
+
     try {
-      await this.novu.subscribers.create({
+      const result = await this.novu.subscribers.create({
         subscriberId: userId,
         email: userEmail,
         firstName,
         lastName,
         avatar,
       });
-      return true;
+      console.log(
+        "[NotificationService] Novu subscriber create result:",
+        result,
+      );
+      return { success: true };
     } catch (error) {
-      console.error("Error subscribing user:", error);
-      return false;
+      console.error("[NotificationService] Error subscribing user:", error);
+
+      // Check if it's a 409 Conflict (subscriber already exists)
+      // First check for status code property (Novu SDK may include this)
+      const errorObj = error as {
+        statusCode?: number;
+        status?: number;
+        code?: number;
+        message?: string;
+      };
+      const statusCode =
+        errorObj.statusCode ?? errorObj.status ?? errorObj.code;
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      // Check for 409 status code first, then fall back to message matching
+      const is409 =
+        statusCode === 409 ||
+        errorMessage.includes("409") ||
+        errorMessage.toLowerCase().includes("already exists");
+
+      if (is409) {
+        // According to Novu SDK, calling create on an existing subscriber updates it
+        // But some versions may throw 409. In that case, we consider it a success
+        // since the subscriber already exists and can receive notifications
+        console.log(
+          "[NotificationService] Subscriber already exists - treating as success",
+        );
+        return { success: true };
+      }
+
+      // Log full error details for non-409 errors
+      if (error instanceof Error) {
+        console.error("[NotificationService] Error name:", error.name);
+        console.error("[NotificationService] Error message:", error.message);
+        console.error("[NotificationService] Error stack:", error.stack);
+      }
+      return { success: false, error: errorMessage };
     }
   }
 

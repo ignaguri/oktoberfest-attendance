@@ -1,4 +1,6 @@
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import { Tabs } from "expo-router";
 import {
   CalendarDays,
@@ -9,7 +11,13 @@ import {
   User,
   Users,
 } from "lucide-react-native";
+import { useMemo, useState } from "react";
+import { View } from "react-native";
 
+import {
+  QuickAttendanceFab,
+  QuickAttendanceSheet,
+} from "@/components/quick-attendance";
 import { Colors } from "@/lib/constants/colors";
 
 interface TabIconProps {
@@ -24,88 +32,120 @@ function TabIcon({ Icon, color, focused }: TabIconProps) {
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const { currentFestival } = useFestival();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  // Check if we're within festival dates
+  const isFestivalActive = useMemo(() => {
+    if (!currentFestival?.startDate || !currentFestival?.endDate) {
+      return false;
+    }
+    const now = startOfDay(new Date());
+    const start = startOfDay(parseISO(currentFestival.startDate));
+    const end = startOfDay(parseISO(currentFestival.endDate));
+    return !isBefore(now, start) && !isAfter(now, end);
+  }, [currentFestival]);
+
+  // Hide FAB if no festival is selected
+  const showFab = !!currentFestival;
 
   return (
-    <Tabs
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: Colors.primary[500],
-        },
-        headerTintColor: Colors.black,
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
-        headerShadowVisible: true,
-        tabBarActiveTintColor: Colors.primary[500],
-        tabBarInactiveTintColor: Colors.gray[500],
-        tabBarStyle: {
-          backgroundColor: Colors.white,
-          borderTopColor: Colors.gray[200],
-          paddingTop: 6,
-          paddingBottom: 6,
-          height: 52,
-        },
-        tabBarShowLabel: false,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={Home} color={color} focused={focused} />
-          ),
+    <View style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: Colors.primary[500],
+          },
+          headerTintColor: Colors.black,
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+          headerShadowVisible: true,
+          tabBarActiveTintColor: Colors.primary[500],
+          tabBarInactiveTintColor: Colors.gray[500],
+          tabBarStyle: {
+            backgroundColor: Colors.white,
+            borderTopColor: Colors.gray[200],
+            paddingTop: 6,
+            paddingBottom: 6,
+            height: 52,
+          },
+          tabBarShowLabel: false,
         }}
-      />
-      <Tabs.Screen
-        name="attendance"
-        options={{
-          title: t("common.menu.attendance"),
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={CalendarDays} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="groups"
-        options={{
-          title: t("common.menu.groups"),
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={Users} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="leaderboard"
-        options={{
-          title: t("leaderboard.screenTitle"),
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={Trophy} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: t("common.menu.profile"),
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon Icon={User} color={color} focused={focused} />
-          ),
-        }}
-      />
-      {/* Dev-only Components showcase tab */}
-      {__DEV__ && (
+      >
         <Tabs.Screen
-          name="components"
+          name="index"
           options={{
-            title: "Components",
+            title: "Home",
+            headerShown: false,
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={Puzzle} color={color} focused={focused} />
+              <TabIcon Icon={Home} color={color} focused={focused} />
             ),
           }}
         />
+        <Tabs.Screen
+          name="attendance"
+          options={{
+            title: t("common.menu.attendance"),
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={CalendarDays} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="groups"
+          options={{
+            title: t("common.menu.groups"),
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={Users} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="leaderboard"
+          options={{
+            title: t("leaderboard.screenTitle"),
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={Trophy} color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: t("common.menu.profile"),
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon Icon={User} color={color} focused={focused} />
+            ),
+          }}
+        />
+        {/* Dev-only Components showcase tab */}
+        {__DEV__ && (
+          <Tabs.Screen
+            name="components"
+            options={{
+              title: "Components",
+              tabBarIcon: ({ color, focused }) => (
+                <TabIcon Icon={Puzzle} color={color} focused={focused} />
+              ),
+            }}
+          />
+        )}
+      </Tabs>
+
+      {/* Quick Attendance FAB */}
+      {showFab && (
+        <QuickAttendanceFab
+          onPress={() => setIsSheetOpen(true)}
+          disabled={!isFestivalActive}
+        />
       )}
-    </Tabs>
+
+      {/* Quick Attendance Sheet */}
+      <QuickAttendanceSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+      />
+    </View>
   );
 }
