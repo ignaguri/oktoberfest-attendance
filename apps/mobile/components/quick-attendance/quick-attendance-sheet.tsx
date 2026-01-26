@@ -338,7 +338,8 @@ export function QuickAttendanceSheet({
 
       // Close the sheet
       onClose();
-    } catch {
+    } catch (error) {
+      console.error("Error saving quick attendance:", error);
       toast.show({
         placement: "top",
         render: () => (

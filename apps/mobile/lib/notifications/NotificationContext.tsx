@@ -51,7 +51,7 @@ interface NotificationContextType {
     firstName?: string;
     lastName?: string;
     avatar?: string;
-  }) => Promise<boolean>;
+  }) => Promise<string | null>;
   clearNotificationState: () => Promise<void>;
 }
 
@@ -226,6 +226,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
    * Gets the Expo push token for use with Novu's Expo push provider.
    * Note: This only obtains the local token - actual registration with Novu
    * happens in the notifications settings screen via API hooks.
+   *
+   * @returns The Expo push token if successful, null if failed
    */
   const registerForPushNotifications = useCallback(
     async (_userProfile?: {
@@ -233,12 +235,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       firstName?: string;
       lastName?: string;
       avatar?: string;
-    }): Promise<boolean> => {
+    }): Promise<string | null> => {
       if (permissionStatus !== "granted") {
         console.warn(
           "Cannot register for push notifications without permission",
         );
-        return false;
+        return null;
       }
 
       setIsRegistering(true);
@@ -249,7 +251,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         if (!token) {
           console.error("Failed to get Expo push token");
-          return false;
+          return null;
         }
 
         console.log(
@@ -265,10 +267,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         // The actual registration with Novu happens in the notifications settings screen
         // isRegistered should be set after successful Novu registration
 
-        return true;
+        return token;
       } catch (error) {
         console.error("Error registering for push notifications:", error);
-        return false;
+        return null;
       } finally {
         setIsRegistering(false);
       }
@@ -339,7 +341,7 @@ const defaultContext: NotificationContextType = {
   isRegistering: false,
   requestPermission: async () => false,
   markPromptAsShown: async () => {},
-  registerForPushNotifications: async () => false,
+  registerForPushNotifications: async () => null,
   clearNotificationState: async () => {},
 };
 

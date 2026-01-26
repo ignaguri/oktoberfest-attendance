@@ -171,8 +171,9 @@ export default function NotificationSettingsScreen() {
       }
 
       // Step 2: Register for push notifications to get the Expo push token
-      const registered = await registerForPushNotifications();
-      if (!registered) {
+      // registerForPushNotifications now returns the token directly
+      const token = await registerForPushNotifications();
+      if (!token) {
         Alert.alert(
           t("common.status.error", { defaultValue: "Error" }),
           t("profile.notifications.noToken", {
@@ -182,16 +183,6 @@ export default function NotificationSettingsScreen() {
         );
         setIsEnabling(false);
         return;
-      }
-
-      // Get the token - need to wait a bit for it to be available
-      // The token is set in the context after registerForPushNotifications
-      let token = expoPushToken;
-      if (!token) {
-        // Small delay to allow context to update
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        // Re-check - if still no token, we need to fail
-        // The context should have updated by now
       }
 
       // Step 3: Subscribe user to Novu (creates subscriber)
@@ -218,32 +209,17 @@ export default function NotificationSettingsScreen() {
       }
 
       // Step 4: Register token with Novu
-      // Use the latest expoPushToken from context or the one we just registered
-      token = expoPushToken;
-      if (token) {
-        const tokenResult = await registerToken.mutateAsync(token);
+      const tokenResult = await registerToken.mutateAsync(token);
 
-        if (!tokenResult.success || !tokenResult.novuRegistered) {
-          console.error(
-            "Failed to register token with Novu:",
-            tokenResult.error || "Unknown error",
-          );
-          Alert.alert(
-            t("common.status.error", { defaultValue: "Error" }),
-            t("profile.notifications.tokenRegistrationFailed", {
-              defaultValue: "Failed to register device for push notifications.",
-            }),
-          );
-          setIsEnabling(false);
-          return;
-        }
-      } else {
-        console.error("No Expo push token available after registration");
+      if (!tokenResult.success || !tokenResult.novuRegistered) {
+        console.error(
+          "Failed to register token with Novu:",
+          tokenResult.error || "Unknown error",
+        );
         Alert.alert(
           t("common.status.error", { defaultValue: "Error" }),
-          t("profile.notifications.noToken", {
-            defaultValue:
-              "Failed to get push notification token. Please try again.",
+          t("profile.notifications.tokenRegistrationFailed", {
+            defaultValue: "Failed to register device for push notifications.",
           }),
         );
         setIsEnabling(false);
