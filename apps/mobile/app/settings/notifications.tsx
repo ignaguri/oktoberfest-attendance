@@ -33,7 +33,7 @@ export default function NotificationSettingsScreen() {
     isPermissionLoading,
     requestPermission,
     registerForPushNotifications,
-    fcmToken,
+    expoPushToken,
   } = useNotificationContextSafe();
 
   // Shared hooks for preferences
@@ -70,7 +70,7 @@ export default function NotificationSettingsScreen() {
       }
 
       // Only register if we have permission granted and a token
-      if (permissionStatus !== "granted" || !fcmToken || !profile) {
+      if (permissionStatus !== "granted" || !expoPushToken || !profile) {
         return;
       }
 
@@ -91,8 +91,8 @@ export default function NotificationSettingsScreen() {
           avatar: profile.avatar_url || undefined,
         });
 
-        // Register FCM token with Novu
-        await registerToken.mutateAsync(fcmToken);
+        // Register push token with Novu (auto-detects Expo or FCM)
+        await registerToken.mutateAsync(expoPushToken);
 
         console.log("Successfully registered with Novu");
       } catch (error) {
@@ -103,7 +103,7 @@ export default function NotificationSettingsScreen() {
 
     registerWithNovu();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [permissionStatus, fcmToken, profile, isLoading]);
+  }, [permissionStatus, expoPushToken, profile, isLoading]);
 
   const onRefresh = useCallback(() => {
     refetch();
@@ -211,7 +211,7 @@ export default function NotificationSettingsScreen() {
         return;
       }
 
-      // Register for push notifications to get the FCM token
+      // Register for push notifications to get the Expo push token
       const registered = await registerForPushNotifications();
       if (!registered) {
         Alert.alert(
@@ -236,12 +236,12 @@ export default function NotificationSettingsScreen() {
         // Continue even if subscription fails
       }
 
-      // Register FCM token with Novu (if token exists)
-      if (fcmToken) {
+      // Register Expo push token with Novu (if token exists)
+      if (expoPushToken) {
         try {
-          await registerToken.mutateAsync(fcmToken);
+          await registerToken.mutateAsync(expoPushToken);
         } catch (tokenError) {
-          console.error("Error registering FCM token:", tokenError);
+          console.error("Error registering Expo push token:", tokenError);
           // Continue even if token registration fails
         }
       }
@@ -267,9 +267,10 @@ export default function NotificationSettingsScreen() {
     );
   }
 
-  // Push is enabled if device permission is granted
-  // The backend preference is secondary - device permission is the source of truth
-  const isPushEnabled = permissionStatus === "granted";
+  // Push is enabled if device permission is granted AND backend preference is true
+  // Both conditions must be met for the switch to show ON
+  const isPushEnabled =
+    permissionStatus === "granted" && (preferences?.pushEnabled ?? false);
   const isSaving = updatePreferences.loading;
 
   return (

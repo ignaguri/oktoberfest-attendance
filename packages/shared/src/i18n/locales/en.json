@@ -54,7 +54,8 @@
       "creating": "Creating...",
       "deleting": "Deleting...",
       "cancelling": "Cancelling...",
-      "info": "Info"
+      "info": "Info",
+      "authenticating": "Authenticating..."
     },
     "errors": {
       "title": "Error",
@@ -174,7 +175,13 @@
       "faceId": "Face ID",
       "touchId": "Touch ID",
       "enableButton": "Enable Biometric Login",
-      "skipButton": "Skip for now"
+      "skipButton": "Skip for now",
+      "prompt": "Sign in with {{biometricName}}",
+      "authenticate": "Use {{biometricName}}",
+      "usePassword": "Use password instead",
+      "enableTitle": "Enable {{biometricName}}?",
+      "enableDescription": "Sign in faster next time using {{biometricName}}",
+      "sessionExpired": "Session expired. Please sign in with your password."
     }
   },
   "groups": {
@@ -1070,9 +1077,11 @@
     "title": "Activity Feed"
   },
   "quickAttendance": {
-    "sheetTitle": "Quick Add",
+    "sheetTitle": "Today's Attendance",
+    "sheetDescription": "Add a drink, check in at tents, or upload photos for today.",
     "save": "Save",
-    "drinkLogged": "Drink logged!"
+    "drinkLogged": "Drink logged!",
+    "saved": "Saved!"
   },
   "home": {
     "festivalStatus": {

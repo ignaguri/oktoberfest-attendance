@@ -1,9 +1,16 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import withSerwistInit from "@serwist/next";
-import { readFileSync } from "fs";
+import { config } from "dotenv";
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
 import type { NextConfig } from "next";
+
+// Load .env.device if it exists (for physical device testing with local network IP)
+const envDevicePath = join(__dirname, ".env.device");
+if (existsSync(envDevicePath)) {
+  config({ path: envDevicePath, override: true });
+}
 
 // Read package.json to get version
 const packageJson = JSON.parse(

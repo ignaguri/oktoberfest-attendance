@@ -29,7 +29,10 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { getStoredUserEmail } from "@/lib/auth/secure-storage";
+import {
+  getStoredSession,
+  getStoredUserEmail,
+} from "@/lib/auth/secure-storage";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function SignInScreen() {
@@ -113,18 +116,28 @@ export default function SignInScreen() {
 
   const handleBiometricAuth = async () => {
     setIsBiometricAuthenticating(true);
-    const { success, error } = await authenticateBiometric();
+    const { success, error: authError } = await authenticateBiometric();
     setIsBiometricAuthenticating(false);
 
-    if (success && storedEmail) {
-      // For biometric auth, we need the stored session
-      // The session should already be restored from secure storage
+    if (!success) {
+      if (authError) setError(authError);
       setShowBiometricPrompt(false);
-      router.replace("/(tabs)");
-    } else if (error) {
-      setShowBiometricPrompt(false);
-      setError(error);
+      return;
     }
+
+    // Check if we have a valid session
+    const session = await getStoredSession();
+    if (!session?.accessToken) {
+      // No valid session - need to re-authenticate with password
+      setError(t("auth.biometric.sessionExpired"));
+      setShowBiometricPrompt(false);
+      if (storedEmail) setValue("email", storedEmail);
+      return;
+    }
+
+    // Session valid, proceed to app
+    setShowBiometricPrompt(false);
+    router.replace("/(tabs)");
   };
 
   const handleUsePasword = () => {

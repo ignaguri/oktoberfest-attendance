@@ -263,29 +263,41 @@ export function QuickAttendanceSheet({
     setPendingPhotos((prev) => prev.filter((p) => p.id !== photoId));
   }, []);
 
+  // Check if there's anything to save
+  const hasChanges =
+    selectedDrinkType !== null ||
+    pendingPhotos.length > 0 ||
+    (selectedTentId && selectedTentId !== attendance?.tentIds?.[0]);
+
   // Handle save
   const handleSave = useCallback(async () => {
-    if (!festivalId || !selectedDrinkType) return;
+    if (!festivalId) return;
+
+    // Must have at least a drink, photos, or tent change
+    if (!selectedDrinkType && pendingPhotos.length === 0 && !selectedTentId)
+      return;
 
     setIsSaving(true);
 
     try {
-      // Log the consumption
-      // beerCost is in euros, we need cents
-      const priceCents = currentFestival?.beerCost
-        ? Math.round(currentFestival.beerCost * 100)
-        : 1620; // Default €16.20
+      // Log the consumption only if a drink is selected
+      if (selectedDrinkType) {
+        // beerCost is in euros, we need cents
+        const priceCents = currentFestival?.beerCost
+          ? Math.round(currentFestival.beerCost * 100)
+          : 1620; // Default €16.20
 
-      await logConsumption.mutateAsync({
-        festivalId,
-        date: today,
-        drinkType: selectedDrinkType,
-        tentId: selectedTentId,
-        pricePaidCents: priceCents,
-        volumeMl: 1000,
-      });
+        await logConsumption.mutateAsync({
+          festivalId,
+          date: today,
+          drinkType: selectedDrinkType,
+          tentId: selectedTentId,
+          pricePaidCents: priceCents,
+          volumeMl: 1000,
+        });
+      }
 
-      // Update attendance with tent (API handles appending to tent visits)
+      // Update attendance with tent or upload photos
       if (selectedTentId || pendingPhotos.length > 0) {
         const result = await updateAttendance.mutateAsync({
           festivalId,
@@ -309,17 +321,17 @@ export function QuickAttendanceSheet({
       // Refetch attendance data
       await refetchAttendance();
 
-      // Show success toast
+      // Show success toast with appropriate message
+      const toastMessage = selectedDrinkType
+        ? t("quickAttendance.drinkLogged", { defaultValue: "Drink logged!" })
+        : t("quickAttendance.saved", { defaultValue: "Saved!" });
+
       toast.show({
         placement: "top",
         render: () => (
           <HStack className="bg-success-500 items-center gap-2 rounded-lg px-4 py-3">
             <Check size={18} color={Colors.white} />
-            <Text className="font-medium text-white">
-              {t("quickAttendance.drinkLogged", {
-                defaultValue: "Drink logged!",
-              })}
-            </Text>
+            <Text className="font-medium text-white">{toastMessage}</Text>
           </HStack>
         ),
       });
@@ -375,14 +387,24 @@ export function QuickAttendanceSheet({
             style={{ paddingBottom: Math.max(insets.bottom, 16) }}
           >
             {/* Header */}
-            <HStack className="items-center justify-between">
-              <Text className="text-typography-900 text-lg font-semibold">
-                {t("quickAttendance.sheetTitle", { defaultValue: "Quick Add" })}
+            <VStack space="xs">
+              <HStack className="items-center justify-between">
+                <Text className="text-typography-900 text-lg font-semibold">
+                  {t("quickAttendance.sheetTitle", {
+                    defaultValue: "Today's Attendance",
+                  })}
+                </Text>
+                <Pressable onPress={onClose} hitSlop={8}>
+                  <X size={24} color={IconColors.default} />
+                </Pressable>
+              </HStack>
+              <Text className="text-typography-500 text-sm">
+                {t("quickAttendance.sheetDescription", {
+                  defaultValue:
+                    "Add a drink, change your tent, or upload photos for today.",
+                })}
               </Text>
-              <Pressable onPress={onClose} hitSlop={8}>
-                <X size={24} color={IconColors.default} />
-              </Pressable>
-            </HStack>
+            </VStack>
 
             {/* Drink Type Selector - Single Row */}
             <VStack space="sm" className="items-center">
@@ -552,7 +574,7 @@ export function QuickAttendanceSheet({
               action="primary"
               size="lg"
               onPress={handleSave}
-              isDisabled={!selectedDrinkType || isLoading}
+              isDisabled={!hasChanges || isLoading}
             >
               {isLoading && <ButtonSpinner color={Colors.white} />}
               <ButtonText>
