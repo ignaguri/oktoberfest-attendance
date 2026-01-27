@@ -67,3 +67,6 @@ WARP.md
 
 # Firebase certificates
 *firebase-*.json
+
+# Apple App Store Connect API keys
+apps/mobile/keys/
