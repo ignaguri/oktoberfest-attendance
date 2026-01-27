@@ -33,6 +33,9 @@ updates:
       # openapi-fetch 0.15 has breaking changes, pinned to 0.12.x
       - dependency-name: "openapi-fetch"
         versions: [">=0.13.0"]
+      # NativeWind requires Tailwind v3 for mobile — root hoists it
+      - dependency-name: "tailwindcss"
+        versions: [">=4.0.0"]
 
   # Web app
   - package-ecosystem: "npm"
@@ -62,6 +65,9 @@ updates:
       - dependency-name: "react-native-svg"
       - dependency-name: "expo"
       - dependency-name: "expo-*"
+      # NativeWind requires Tailwind v3 — v4 is not compatible with React Native
+      - dependency-name: "tailwindcss"
+        versions: [">=4.0.0"]
 
   # API package
   - package-ecosystem: "npm"
