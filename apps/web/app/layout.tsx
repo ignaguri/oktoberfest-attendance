@@ -10,7 +10,6 @@ import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
-import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Toaster } from "@/components/ui/sonner";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { WebFestivalProvider } from "@/contexts/WebFestivalProvider";
@@ -19,6 +18,8 @@ import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/lib/version";
+
+import { SerwistProvider } from "./serwist-provider";
 
 // do not cache this layout
 export const revalidate = 0;
@@ -121,23 +122,26 @@ export default async function RootLayout({
     <ViewTransitions>
       <html lang="en" data-version={APP_VERSION}>
         <body className="bg-slate-50">
-          <DataProvider>
-            <I18nProvider>
-              {isLoggedIn ? (
-                <WebFestivalProvider>
-                  <NotificationProvider>
-                    <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
-                  </NotificationProvider>
-                </WebFestivalProvider>
-              ) : (
-                <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
-              )}
-            </I18nProvider>
-          </DataProvider>
-          <ServiceWorkerRegistration />
-          <Toaster richColors closeButton />
-          <SpeedInsights />
-          {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
+          <SerwistProvider swUrl="/serwist/sw.js">
+            <DataProvider>
+              <I18nProvider>
+                {isLoggedIn ? (
+                  <WebFestivalProvider>
+                    <NotificationProvider>
+                      <AppContent isLoggedIn={isLoggedIn}>
+                        {children}
+                      </AppContent>
+                    </NotificationProvider>
+                  </WebFestivalProvider>
+                ) : (
+                  <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
+                )}
+              </I18nProvider>
+            </DataProvider>
+            <Toaster richColors closeButton />
+            <SpeedInsights />
+            {IS_PROD && <GoogleAnalytics gaId={GA_ID} />}
+          </SerwistProvider>
         </body>
       </html>
     </ViewTransitions>

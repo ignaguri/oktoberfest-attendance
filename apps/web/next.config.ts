@@ -1,5 +1,4 @@
 import { withSentryConfig } from "@sentry/nextjs";
-import withSerwistInit from "@serwist/next";
 import { config } from "dotenv";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
@@ -26,7 +25,7 @@ const nextConfig: NextConfig = {
   // Transpile shared packages for proper bundling
   transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
-  serverExternalPackages: [],
+  serverExternalPackages: ["esbuild-wasm"],
   async headers() {
     return [
       {
@@ -120,32 +119,6 @@ const sentryConfig = {
   },
 };
 
-const revision = crypto.randomUUID();
-// Initialize Serwist with enhanced configuration for PWA optimization
-const withSerwist = withSerwistInit({
-  swSrc: "app/sw.ts",
-  swDest: "public/sw.js",
-  cacheOnNavigation: true,
-  reloadOnOnline: true,
-  disable: process.env.NODE_ENV !== "production",
-  additionalPrecacheEntries: [
-    { url: "/offline", revision },
-    { url: "/", revision: revision + "-home" },
-    { url: "/home", revision: revision + "-home-page" },
-  ],
-  // Enhanced configuration for better performance
-  exclude: [
-    // Exclude non-essential files from precaching
-    /\.map$/,
-    /^manifest$/,
-    /\.DS_Store$/,
-    /^\.well-known\//,
-    // Exclude large files that should be cached on demand
-    /\.(mp4|webm|ogg|mp3|wav|flac|aac)$/,
-    /\.(zip|tar|gz|bz2)$/,
-  ],
-  maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
-});
-
-// Export the config with Serwist and Sentry wrappers
-export default withSentryConfig(withSerwist(nextConfig), sentryConfig);
+// Export the config with Sentry wrapper
+// Serwist is now handled via @serwist/turbopack route handler (app/serwist/[path]/route.ts)
+export default withSentryConfig(nextConfig, sentryConfig);
