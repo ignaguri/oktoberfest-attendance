@@ -48,9 +48,9 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .select()
       .single();
 
-    if (sessionError) {
+    if (sessionError || !session) {
       throw new DatabaseError(
-        `Failed to create location session: ${sessionError.message}`,
+        `Failed to create location session: ${sessionError?.message || "No data returned"}`,
       );
     }
 
@@ -77,12 +77,12 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .select()
       .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
+    if (error || !data) {
+      if (error?.code === "PGRST116") {
         throw new NotFoundError("Location session not found");
       }
       throw new DatabaseError(
-        `Failed to stop location session: ${error.message}`,
+        `Failed to stop location session: ${error?.message || "No data returned"}`,
       );
     }
 

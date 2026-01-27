@@ -38,8 +38,10 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .select("*, tents(name)")
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to create reservation: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to create reservation: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToReservation(data);
@@ -134,8 +136,10 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .select("*, tents(name)")
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to check in: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to check in: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToReservation(data);
@@ -153,8 +157,10 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .select("*, tents(name)")
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to cancel reservation: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to cancel reservation: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToReservation(data);
@@ -204,11 +210,13 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .select("*, tents(name)")
       .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
+    if (error || !data) {
+      if (error?.code === "PGRST116") {
         throw new NotFoundError("Reservation not found");
       }
-      throw new DatabaseError(`Failed to update reservation: ${error.message}`);
+      throw new DatabaseError(
+        `Failed to update reservation: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToReservation(data);

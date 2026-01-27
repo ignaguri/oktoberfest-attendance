@@ -12,12 +12,14 @@ import locationRoutes from "../location.route";
 
 // Mock the LocationService
 vi.mock("../../services/location.service", () => ({
-  LocationService: vi.fn().mockImplementation(() => ({
-    startSession: vi.fn(),
-    stopSession: vi.fn(),
-    updateLocation: vi.fn(),
-    getNearbyMembers: vi.fn(),
-  })),
+  LocationService: vi.fn().mockImplementation(function () {
+    return {
+      startSession: vi.fn(),
+      stopSession: vi.fn(),
+      updateLocation: vi.fn(),
+      getNearbyMembers: vi.fn(),
+    };
+  }),
 }));
 
 describe("Location Routes - Unit Tests", () => {
@@ -45,9 +47,9 @@ describe("Location Routes - Unit Tests", () => {
     };
 
     // Make the mocked constructor return our mock instance
-    vi.mocked(LocationService).mockImplementation(
-      () => mockLocationService as any,
-    );
+    vi.mocked(LocationService).mockImplementation(function () {
+      return mockLocationService as any;
+    });
 
     // Mock auth middleware by setting context directly - MUST come before route mounting
     app.use("*", async (c, next) => {

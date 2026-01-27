@@ -24,6 +24,10 @@ apps/**/out/
 .DS_Store
 .vscode
 *.pem
+*.bak
+
+# EAS generates this at root, but projectId is in apps/mobile/app.config.ts
+/app.json
 
 # debug
 npm-debug.log*

@@ -218,7 +218,7 @@ export default function ProfileScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Spinner size="large" />
       </View>
     );
@@ -227,7 +227,7 @@ export default function ProfileScreen() {
   // Error state
   if (profileError) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ErrorState error={profileError} onRetry={refetch} />
       </View>
     );
@@ -235,7 +235,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      className="bg-background-50 flex-1"
+      className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
       }

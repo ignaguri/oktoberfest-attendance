@@ -12,10 +12,12 @@ import wrappedRoutes from "../wrapped.route";
 
 // Mock the WrappedService
 vi.mock("../../services/wrapped.service", () => ({
-  WrappedService: vi.fn().mockImplementation(() => ({
-    getWrapped: vi.fn(),
-    generateWrapped: vi.fn(),
-  })),
+  WrappedService: vi.fn().mockImplementation(function () {
+    return {
+      getWrapped: vi.fn(),
+      generateWrapped: vi.fn(),
+    };
+  }),
 }));
 
 describe("Wrapped Routes - Unit Tests", () => {
@@ -39,9 +41,9 @@ describe("Wrapped Routes - Unit Tests", () => {
     };
 
     // Make the mocked constructor return our mock instance
-    vi.mocked(WrappedService).mockImplementation(
-      () => mockWrappedService as any,
-    );
+    vi.mocked(WrappedService).mockImplementation(function () {
+      return mockWrappedService as any;
+    });
 
     // Mock auth middleware by setting context directly - MUST come before route mounting
     app.use("*", async (c, next) => {

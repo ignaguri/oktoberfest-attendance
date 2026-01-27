@@ -159,7 +159,7 @@ export default function GroupDetailScreen() {
   // Loading state
   if (isLoading && !group) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Spinner size="large" />
       </View>
     );
@@ -168,7 +168,7 @@ export default function GroupDetailScreen() {
   // Error state
   if (groupError) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ErrorState error={groupError} onRetry={refetchGroup} />
       </View>
     );
@@ -177,9 +177,9 @@ export default function GroupDetailScreen() {
   // No group found
   if (!group) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center p-6">
+      <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="text-typography-500 mt-4 text-center">
+        <Text className="mt-4 text-center text-typography-500">
           {t("groups.detail.notFound")}
         </Text>
         <Button
@@ -200,7 +200,7 @@ export default function GroupDetailScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="bg-background-50 flex-1"
+        className="flex-1 bg-background-50"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -219,7 +219,7 @@ export default function GroupDetailScreen() {
                   </Heading>
                   <HStack space="sm" className="items-center">
                     <Users size={14} color={IconColors.muted} />
-                    <Text className="text-typography-500 text-sm">
+                    <Text className="text-sm text-typography-500">
                       {t("groups.memberCount", {
                         count: group.memberCount || 0,
                       })}
@@ -241,7 +241,7 @@ export default function GroupDetailScreen() {
 
               {/* Description */}
               {group.description && (
-                <Text className="text-typography-600 text-sm">
+                <Text className="text-sm text-typography-600">
                   {group.description}
                 </Text>
               )}
@@ -301,7 +301,7 @@ export default function GroupDetailScreen() {
           {/* Leaderboard Section */}
           <VStack space="sm">
             <HStack className="items-center justify-between">
-              <Text className="text-typography-700 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-700">
                 {t("groups.detail.leaderboard")}
               </Text>
               {isLoadingLeaderboard && <Spinner size="small" />}

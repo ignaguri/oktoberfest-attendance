@@ -36,9 +36,9 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
         .eq("id", attendanceId)
         .single();
 
-      if (attError) {
+      if (attError || !attendance) {
         throw new DatabaseError(
-          `Failed to fetch attendance: ${attError.message}`,
+          `Failed to fetch attendance: ${attError?.message || "No data returned"}`,
         );
       }
 
@@ -76,8 +76,10 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       .select()
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to create consumption: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to create consumption: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToConsumption(data);
@@ -133,9 +135,9 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       .eq("id", id)
       .single();
 
-    if (fetchError) {
+    if (fetchError || !consumption) {
       throw new DatabaseError(
-        `Failed to fetch consumption: ${fetchError.message}`,
+        `Failed to fetch consumption: ${fetchError?.message || "No data returned"}`,
       );
     }
 

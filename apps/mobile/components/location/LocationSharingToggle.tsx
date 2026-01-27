@@ -134,13 +134,13 @@ export function LocationSharingToggle({
               )}
             </View>
             <VStack>
-              <Text className="text-typography-900 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-900">
                 {isSharing
                   ? t("location.sharing.sharing")
                   : t("location.sharing.notSharing")}
               </Text>
               {isSharing && nearbyMembers.length > 0 && (
-                <Text className="text-typography-500 text-xs">
+                <Text className="text-xs text-typography-500">
                   {t("location.nearbyCount", { count: nearbyMembers.length })}
                 </Text>
               )}
@@ -186,10 +186,10 @@ export function LocationSharingToggle({
                 )}
               </View>
               <VStack>
-                <Text className="text-typography-900 font-semibold">
+                <Text className="font-semibold text-typography-900">
                   {t("location.sharing.title")}
                 </Text>
-                <Text className="text-typography-500 text-xs">
+                <Text className="text-xs text-typography-500">
                   {isSharing
                     ? t("location.sharingActive")
                     : t("location.sharingInactive")}

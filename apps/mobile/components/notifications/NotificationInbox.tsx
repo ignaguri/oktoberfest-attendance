@@ -30,7 +30,7 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
   return (
     <TouchableOpacity
       onPress={() => onPress(notification)}
-      className={`border-outline-100 flex-row border-b p-4 ${
+      className={`flex-row border-b border-outline-100 p-4 ${
         isRead ? "bg-white" : "bg-primary-50"
       }`}
       accessibilityLabel={notification.subject || notification.body}
@@ -39,7 +39,7 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
       {/* Unread indicator */}
       <View className="mr-3 justify-center">
         {!isRead ? (
-          <View className="bg-primary-500 h-2 w-2 rounded-full" />
+          <View className="h-2 w-2 rounded-full bg-primary-500" />
         ) : (
           <View className="h-2 w-2" />
         )}
@@ -48,18 +48,18 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
       {/* Content */}
       <View className="flex-1">
         {notification.subject && (
-          <Text className="text-typography-900 mb-1 font-semibold">
+          <Text className="mb-1 font-semibold text-typography-900">
             {notification.subject}
           </Text>
         )}
         <Text
-          className="text-typography-700 text-sm"
+          className="text-sm text-typography-700"
           numberOfLines={2}
           ellipsizeMode="tail"
         >
           {notification.body}
         </Text>
-        <Text className="text-typography-400 mt-1 text-xs">{timeAgo}</Text>
+        <Text className="mt-1 text-xs text-typography-400">{timeAgo}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -74,12 +74,12 @@ function EmptyState() {
   return (
     <View className="flex-1 items-center justify-center p-8">
       <Bell size={48} color={Colors.primary[500]} style={{ opacity: 0.4 }} />
-      <Text className="text-typography-500 mt-4 text-center">
+      <Text className="mt-4 text-center text-typography-500">
         {t("profile.notifications.empty", {
           defaultValue: "No notifications yet",
         })}
       </Text>
-      <Text className="text-typography-400 mt-2 text-center text-sm">
+      <Text className="mt-2 text-center text-sm text-typography-400">
         {t("profile.notifications.emptyHint", {
           defaultValue: "Your notifications will appear here",
         })}
@@ -183,8 +183,8 @@ export function NotificationInbox({
     <View className="flex-1 bg-white">
       {/* Header with mark all as read */}
       {unreadCount > 0 && (
-        <View className="border-outline-100 flex-row items-center justify-between border-b px-4 py-3">
-          <Text className="text-typography-600 text-sm">
+        <View className="flex-row items-center justify-between border-b border-outline-100 px-4 py-3">
+          <Text className="text-sm text-typography-600">
             {t("profile.notifications.unreadCount", {
               defaultValue: "{{count}} unread",
               count: unreadCount,
@@ -196,7 +196,7 @@ export function NotificationInbox({
             accessibilityLabel="Mark all as read"
           >
             <CheckCheck size={16} color={Colors.primary[500]} />
-            <Text className="text-primary-500 text-sm">
+            <Text className="text-sm text-primary-500">
               {t("profile.notifications.markAllRead", {
                 defaultValue: "Mark all read",
               })}

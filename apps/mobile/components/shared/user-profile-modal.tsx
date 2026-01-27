@@ -89,7 +89,7 @@ export function UserProfileModal({
           {loading ? (
             <VStack className="items-center py-8">
               <Spinner size="large" color={Colors.primary[500]} />
-              <Text className="text-typography-500 mt-2">
+              <Text className="mt-2 text-typography-500">
                 {t("common.loading")}
               </Text>
             </VStack>
@@ -115,12 +115,12 @@ export function UserProfileModal({
               {/* User Info */}
               <VStack space="xs" className="items-center">
                 {profile.username && (
-                  <Text className="text-typography-900 text-lg font-semibold">
+                  <Text className="text-lg font-semibold text-typography-900">
                     {profile.username}
                   </Text>
                 )}
                 {profile.fullName && (
-                  <Text className="text-typography-500 text-sm">
+                  <Text className="text-sm text-typography-500">
                     {profile.fullName}
                   </Text>
                 )}
@@ -132,33 +132,33 @@ export function UserProfileModal({
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <Calendar size={16} color={IconColors.muted} />
-                      <Text className="text-typography-900 text-xl font-bold">
+                      <Text className="text-xl font-bold text-typography-900">
                         {profile.stats.daysAttended}
                       </Text>
                     </HStack>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("leaderboard.stats.days")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <Beer size={16} color={IconColors.muted} />
-                      <Text className="text-typography-900 text-xl font-bold">
+                      <Text className="text-xl font-bold text-typography-900">
                         {profile.stats.totalBeers}
                       </Text>
                     </HStack>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("leaderboard.stats.drinks")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <TrendingUp size={16} color={IconColors.muted} />
-                      <Text className="text-typography-900 text-xl font-bold">
+                      <Text className="text-xl font-bold text-typography-900">
                         {profile.stats.avgBeers.toFixed(1)}
                       </Text>
                     </HStack>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("leaderboard.stats.avg")}
                     </Text>
                   </VStack>

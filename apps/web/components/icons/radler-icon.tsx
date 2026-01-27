@@ -24,7 +24,7 @@ export function RadlerIcon({ className }: RadlerIconProps) {
       <Beer className="h-5 w-5" />
 
       {/* Citrus Garnish - Positioned Top Right */}
-      <span className="absolute -right-1 -top-1 rounded-full bg-white p-[1px]">
+      <span className="absolute -top-1 -right-1 rounded-full bg-white p-[1px]">
         <Citrus className="h-3 w-3" />
       </span>
     </span>

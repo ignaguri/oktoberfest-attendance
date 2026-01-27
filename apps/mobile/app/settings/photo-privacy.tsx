@@ -134,7 +134,7 @@ export default function PhotoPrivacyScreen() {
 
   if (isLoading) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ActivityIndicator size="large" color={Colors.primary[500]} />
       </View>
     );
@@ -142,7 +142,7 @@ export default function PhotoPrivacyScreen() {
 
   return (
     <ScrollView
-      className="bg-background-50 flex-1"
+      className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
@@ -160,7 +160,7 @@ export default function PhotoPrivacyScreen() {
 
         {/* Global Settings */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="text-typography-900 mb-4 text-lg font-semibold">
+          <Text className="mb-4 text-lg font-semibold text-typography-900">
             {t("profile.photoPrivacy.globalSettings")}
           </Text>
 
@@ -175,7 +175,7 @@ export default function PhotoPrivacyScreen() {
                 <Text className="text-typography-900">
                   {t("profile.photoPrivacy.hideFromAll")}
                 </Text>
-                <Text className="text-typography-500 text-sm">
+                <Text className="text-sm text-typography-500">
                   {t("profile.photoPrivacy.hideFromAllDescription")}
                 </Text>
               </View>
@@ -195,17 +195,17 @@ export default function PhotoPrivacyScreen() {
 
         {/* Per-Group Settings */}
         <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="text-typography-900 mb-2 text-lg font-semibold">
+          <Text className="mb-2 text-lg font-semibold text-typography-900">
             {t("profile.photoPrivacy.perGroupSettings")}
           </Text>
-          <Text className="text-typography-500 mb-4 text-sm">
+          <Text className="mb-4 text-sm text-typography-500">
             {t("profile.photoPrivacy.perGroupDescription")}
           </Text>
 
           {settings.groups.length === 0 ? (
             <View className="items-center py-4">
               <Users size={48} color={Colors.gray[300]} />
-              <Text className="text-typography-500 mt-2 text-center">
+              <Text className="mt-2 text-center text-typography-500">
                 {t("profile.photoPrivacy.noGroups")}
               </Text>
             </View>
@@ -215,7 +215,7 @@ export default function PhotoPrivacyScreen() {
                 key={group.groupId}
                 className={`flex-row items-center justify-between py-3 ${
                   index < settings.groups.length - 1
-                    ? "border-outline-100 border-b"
+                    ? "border-b border-outline-100"
                     : ""
                 }`}
               >
@@ -231,7 +231,7 @@ export default function PhotoPrivacyScreen() {
                         group: group.groupName,
                       })}
                     </Text>
-                    <Text className="text-typography-500 text-sm">
+                    <Text className="text-sm text-typography-500">
                       {t("profile.photoPrivacy.hideFromGroupDescription")}
                     </Text>
                   </View>

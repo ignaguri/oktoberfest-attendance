@@ -398,7 +398,12 @@ describe("Attendance Routes - Unit Tests", () => {
         ),
       );
 
-      // Mock ownership check - different user
+      // Mock deleteByAttendanceId (photo cleanup)
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain(mockSupabaseSuccess(null)),
+      );
+
+      // Mock ownership check in delete() - different user
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess({ user_id: otherUserId })),
       );
@@ -412,7 +417,7 @@ describe("Attendance Routes - Unit Tests", () => {
         headers: req.headers,
       });
 
-      expect(res.status).toBe(500); // Repository throws DatabaseError
+      expect(res.status).toBe(500); // Repository throws DatabaseError for unauthorized
     });
 
     it("should validate UUID format for attendance ID", async () => {

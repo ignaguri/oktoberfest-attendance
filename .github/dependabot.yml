@@ -1,0 +1,48 @@
+version: 2
+updates:
+  # Root monorepo dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      eslint:
+        patterns:
+          - "@eslint/*"
+          - "eslint*"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@typescript-eslint/*"
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+
+  # Web app
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  # Mobile app
+  - package-ecosystem: "npm"
+    directory: "/apps/mobile"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  # API package
+  - package-ecosystem: "npm"
+    directory: "/packages/api"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  # Shared package
+  - package-ecosystem: "npm"
+    directory: "/packages/shared"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3

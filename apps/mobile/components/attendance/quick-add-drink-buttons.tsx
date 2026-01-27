@@ -164,7 +164,7 @@ export function QuickAddDrinkButtons({
                 ? "border-success-500 bg-success-50"
                 : isDisabled
                   ? "border-background-200 bg-background-100"
-                  : "border-background-200 active:bg-background-50 bg-white"
+                  : "border-background-200 bg-white active:bg-background-50"
             }`}
             accessibilityLabel={getLabel(type)}
             accessibilityRole="button"

@@ -304,14 +304,14 @@ export function ReservationTabContent({
 
         {/* Tent Selector */}
         <VStack space="sm">
-          <Text className="text-typography-700 text-sm font-medium">
+          <Text className="text-sm font-medium text-typography-700">
             {t("reservation.form.tent")}
           </Text>
           <Pressable
             onPress={() => !isEditMode && setShowTentSelector(true)}
             disabled={isEditMode}
             className={cn(
-              "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
+              "w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3",
               isEditMode && "opacity-50",
               errors.tentId && "border-error-500",
             )}
@@ -338,12 +338,12 @@ export function ReservationTabContent({
             </HStack>
           </Pressable>
           {errors.tentId && (
-            <Text className="text-error-600 text-sm">
+            <Text className="text-sm text-error-600">
               {t("validation.tentRequired")}
             </Text>
           )}
           {isEditMode && (
-            <Text className="text-typography-400 text-xs">
+            <Text className="text-xs text-typography-400">
               {t("reservation.form.tentCannotBeChanged")}
             </Text>
           )}
@@ -381,7 +381,7 @@ export function ReservationTabContent({
 
         {/* Notes Field */}
         <VStack space="sm">
-          <Text className="text-typography-700 text-sm font-medium">
+          <Text className="text-sm font-medium text-typography-700">
             {t("reservation.form.note")}
           </Text>
           <Controller
@@ -412,10 +412,10 @@ export function ReservationTabContent({
           render={({ field: { value, onChange } }) => (
             <HStack className="items-center justify-between">
               <VStack>
-                <Text className="text-typography-900 text-base font-medium">
+                <Text className="text-base font-medium text-typography-900">
                   {t("reservation.form.visibleToGroups")}
                 </Text>
-                <Text className="text-typography-500 text-sm">
+                <Text className="text-sm text-typography-500">
                   {t("reservation.form.visibleToGroupsDescription")}
                 </Text>
               </VStack>

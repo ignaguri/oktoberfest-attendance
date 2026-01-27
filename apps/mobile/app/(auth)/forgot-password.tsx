@@ -59,7 +59,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <SafeAreaView className="bg-background-0 flex-1">
+    <SafeAreaView className="flex-1 bg-background-0">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -75,20 +75,20 @@ export default function ForgotPasswordScreen() {
           </View>
 
           {/* Title */}
-          <Text className="text-typography-900 mb-2 text-center text-2xl font-bold">
+          <Text className="mb-2 text-center text-2xl font-bold text-typography-900">
             {t("auth.resetPassword.title")}
           </Text>
 
           {/* Description */}
-          <Text className="text-typography-500 mb-8 px-4 text-center">
+          <Text className="mb-8 px-4 text-center text-typography-500">
             {t("auth.resetPassword.description")}
           </Text>
 
           {/* Success State */}
           {success ? (
             <View className="items-center">
-              <View className="bg-success-50 mb-6 w-full rounded-lg p-4">
-                <Text className="text-success-700 text-center">
+              <View className="mb-6 w-full rounded-lg bg-success-50 p-4">
+                <Text className="text-center text-success-700">
                   {t("auth.resetPassword.success")}
                 </Text>
               </View>
@@ -107,8 +107,8 @@ export default function ForgotPasswordScreen() {
             <>
               {/* Error Message */}
               {error && (
-                <View className="bg-error-50 mb-4 rounded-lg p-3">
-                  <Text className="text-error-600 text-center">{error}</Text>
+                <View className="mb-4 rounded-lg bg-error-50 p-3">
+                  <Text className="text-center text-error-600">{error}</Text>
                 </View>
               )}
 
@@ -148,7 +148,7 @@ export default function ForgotPasswordScreen() {
           {/* Back to Sign In Link */}
           <View className="mt-8 items-center">
             <Pressable onPress={() => router.push("/(auth)/sign-in")}>
-              <Text className="text-primary-600 font-semibold">
+              <Text className="font-semibold text-primary-600">
                 {t("auth.resetPassword.backToSignIn")}
               </Text>
             </Pressable>

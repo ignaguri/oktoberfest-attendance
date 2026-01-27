@@ -418,7 +418,7 @@ export default function TentManagement() {
                     <div>
                       <Label htmlFor="beer-price">Beer Price (Optional)</Label>
                       <div className="relative">
-                        <Euro className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                        <Euro className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                         <Input
                           id="beer-price"
                           type="number"
@@ -630,7 +630,7 @@ function TentCard({
           {isEditing ? (
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Euro className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 transform text-gray-400" />
+                <Euro className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 transform text-gray-400" />
                 <Input
                   type="number"
                   step="0.01"

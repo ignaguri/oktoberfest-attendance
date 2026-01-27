@@ -45,8 +45,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .select()
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to create attendance: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to create attendance: ${error?.message || "No data returned"}`,
+      );
     }
 
     // Fetch the created attendance with totals
@@ -56,9 +58,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("id", data.id)
       .single();
 
-    if (fetchError) {
+    if (fetchError || !withTotals) {
       throw new DatabaseError(
-        `Failed to fetch attendance totals: ${fetchError.message}`,
+        `Failed to fetch attendance totals: ${fetchError?.message || "No data returned"}`,
       );
     }
 
@@ -77,6 +79,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
         return null; // Not found
       }
       throw new DatabaseError(`Failed to fetch attendance: ${error.message}`);
+    }
+
+    if (!data) {
+      return null; // Not found
     }
 
     return this.mapToAttendanceWithTotals(data);
@@ -176,6 +182,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError(
         `Failed to fetch attendance: ${fetchError.message}`,
       );
+    }
+
+    if (!attendance) {
+      throw new NotFoundError("Attendance not found");
     }
 
     if (attendance.user_id !== userId) {
@@ -292,6 +302,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError(`Failed to check festival: ${error.message}`);
     }
 
+    if (!data) {
+      return null;
+    }
+
     return data;
   }
 
@@ -316,6 +330,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError(
         `Failed to fetch attendance: ${attendanceError.message}`,
       );
+    }
+
+    if (!attendance) {
+      return null; // Not found
     }
 
     // Validate required fields from view

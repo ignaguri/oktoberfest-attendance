@@ -105,14 +105,14 @@ export default function SignUpScreen() {
   // Success state - show confirmation message
   if (success) {
     return (
-      <SafeAreaView className="bg-background-0 flex-1 items-center justify-center p-6">
+      <SafeAreaView className="flex-1 items-center justify-center bg-background-0 p-6">
         <AuthHeader size="sm" />
 
         <View className="mt-8 items-center">
-          <Text className="text-typography-900 mb-4 text-center text-2xl font-bold">
+          <Text className="mb-4 text-center text-2xl font-bold text-typography-900">
             {t("auth.signUp.accountCreated")}
           </Text>
-          <Text className="text-typography-500 mb-8 px-4 text-center">
+          <Text className="mb-8 px-4 text-center text-typography-500">
             {t("auth.signUp.success.checkEmail")}
           </Text>
           <Button
@@ -130,7 +130,7 @@ export default function SignUpScreen() {
   }
 
   return (
-    <SafeAreaView className="bg-background-0 flex-1">
+    <SafeAreaView className="flex-1 bg-background-0">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -146,14 +146,14 @@ export default function SignUpScreen() {
           </View>
 
           {/* Title */}
-          <Text className="text-typography-900 mb-6 text-center text-2xl font-bold">
+          <Text className="mb-6 text-center text-2xl font-bold text-typography-900">
             {t("auth.signUp.title")}
           </Text>
 
           {/* Error Message */}
           {error && (
-            <View className="bg-error-50 mb-4 rounded-lg p-3">
-              <Text className="text-error-600 text-center">{error}</Text>
+            <View className="mb-4 rounded-lg bg-error-50 p-3">
+              <Text className="text-center text-error-600">{error}</Text>
             </View>
           )}
 

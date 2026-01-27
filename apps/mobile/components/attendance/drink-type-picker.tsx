@@ -234,7 +234,7 @@ export function DrinkTypePicker({
                       className={cn(
                         "text-xs",
                         isSelected
-                          ? "text-typography-900 font-medium"
+                          ? "font-medium text-typography-900"
                           : "text-typography-500",
                       )}
                     >

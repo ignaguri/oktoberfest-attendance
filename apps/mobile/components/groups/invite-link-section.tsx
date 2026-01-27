@@ -86,7 +86,7 @@ export function InviteLinkSection({
       <VStack space="md">
         <HStack space="sm" className="items-center">
           <Link size={18} color={IconColors.primary} />
-          <Text className="text-typography-900 font-medium">
+          <Text className="font-medium text-typography-900">
             {t("groups.settings.inviteLink")}
           </Text>
         </HStack>
@@ -97,7 +97,7 @@ export function InviteLinkSection({
             <Input size="md" isReadOnly>
               <InputField
                 value={inviteUrl}
-                className="text-typography-600 text-sm"
+                className="text-sm text-typography-600"
                 numberOfLines={1}
               />
             </Input>
@@ -156,13 +156,13 @@ export function InviteLinkSection({
             </HStack>
 
             {/* Warning */}
-            <Text className="text-typography-400 text-xs">
+            <Text className="text-xs text-typography-400">
               {t("groups.settings.tokenWarning")}
             </Text>
           </>
         ) : (
           <VStack space="sm" className="items-center py-4">
-            <Text className="text-typography-500 text-center">
+            <Text className="text-center text-typography-500">
               {t("groups.settings.noToken")}
             </Text>
             <Button

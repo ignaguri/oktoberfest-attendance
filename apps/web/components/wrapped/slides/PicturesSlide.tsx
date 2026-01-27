@@ -129,7 +129,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
 
             <div className="relative h-96 w-full sm:h-[28rem] md:h-[32rem]">
               {/* Photo scattering container - centered below the text */}
-              <div className="absolute left-1/4 top-1/4 size-64 -translate-x-1/2 -translate-y-1/2 sm:size-80 md:size-96">
+              <div className="absolute top-1/4 left-1/4 size-64 -translate-x-1/2 -translate-y-1/2 sm:size-80 md:size-96">
                 {picturesToShow.map((picture, index) => {
                   const isLoaded = loadedImages.has(picture.id);
                   const filePath = extractFilePath(picture.picture_url);
@@ -175,7 +175,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                         />
 
                         {/* Subtle shadow overlay */}
-                        <div className="bg-black/1 absolute inset-0 rounded-lg" />
+                        <div className="absolute inset-0 rounded-lg bg-black/1" />
 
                         {/* Hover overlay with date */}
                         <motion.div
@@ -185,7 +185,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                           transition={{ duration: 0.3 }}
                         />
                         <motion.div
-                          className="absolute bottom-0 left-0 right-0 p-3"
+                          className="absolute right-0 bottom-0 left-0 p-3"
                           initial={{
                             background:
                               "linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2), transparent)",

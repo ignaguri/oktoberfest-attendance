@@ -414,7 +414,7 @@ export function AttendanceTabContent({
 
         {/* Drink Type Picker & Stepper */}
         <VStack space="md">
-          <Text className="text-typography-700 text-center text-sm font-medium">
+          <Text className="text-center text-sm font-medium text-typography-700">
             {t("attendance.howManyDrinks")}
           </Text>
 
@@ -433,11 +433,11 @@ export function AttendanceTabContent({
             disabled={isProcessing}
           />
 
-          <Text className="text-typography-500 text-center text-sm">
+          <Text className="text-center text-sm text-typography-500">
             {t("attendance.totalDrinks")}: {totalLocalDrinks}
           </Text>
           {errors.amount && (
-            <Text className="text-error-600 text-center text-sm">
+            <Text className="text-center text-sm text-error-600">
               {t(errors.amount.message || "validation.tent.required")}
             </Text>
           )}
@@ -445,12 +445,12 @@ export function AttendanceTabContent({
 
         {/* Tent Selector */}
         <VStack space="sm">
-          <Text className="text-typography-700 text-sm font-medium">
+          <Text className="text-sm font-medium text-typography-700">
             {t("attendance.table.visitedTents")}
           </Text>
           <Pressable
             onPress={() => setShowTentSelector(true)}
-            className="border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3"
+            className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
           >
             {combinedTentDisplay.length > 0 ? (
               <HStack className="flex-wrap gap-2">
@@ -470,13 +470,13 @@ export function AttendanceTabContent({
                 ))}
               </HStack>
             ) : (
-              <Text className="text-typography-400 text-base">
+              <Text className="text-base text-typography-400">
                 {t("attendance.form.selectTents")}
               </Text>
             )}
           </Pressable>
           {errors.tents && (
-            <Text className="text-error-600 text-sm">
+            <Text className="text-sm text-error-600">
               {t(errors.tents.message || "validation.required")}
             </Text>
           )}

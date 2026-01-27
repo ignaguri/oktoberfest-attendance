@@ -11,12 +11,14 @@ import notificationRoutes from "../notification.route";
 
 // Mock the NotificationService
 vi.mock("../../services/notification.service", () => ({
-  NotificationService: vi.fn().mockImplementation(() => ({
-    registerPushToken: vi.fn(),
-    subscribeUser: vi.fn(),
-    getUserNotificationPreferences: vi.fn(),
-    updateUserNotificationPreferences: vi.fn(),
-  })),
+  NotificationService: vi.fn().mockImplementation(function () {
+    return {
+      registerPushToken: vi.fn(),
+      subscribeUser: vi.fn(),
+      getUserNotificationPreferences: vi.fn(),
+      updateUserNotificationPreferences: vi.fn(),
+    };
+  }),
 }));
 
 describe("Notification Routes - Unit Tests", () => {
@@ -44,9 +46,9 @@ describe("Notification Routes - Unit Tests", () => {
     };
 
     // Make the mocked constructor return our mock instance
-    vi.mocked(NotificationService).mockImplementation(
-      () => mockNotificationService as any,
-    );
+    vi.mocked(NotificationService).mockImplementation(function () {
+      return mockNotificationService as any;
+    });
 
     // Set NOVU_API_KEY for service initialization
     process.env.NOVU_API_KEY = "test-api-key";
