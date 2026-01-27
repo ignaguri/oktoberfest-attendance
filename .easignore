@@ -1,11 +1,28 @@
 # EAS Build Ignore - Exclude files not needed for mobile builds
 # Paths are relative to the monorepo root.
 
+# Node modules - EAS runs pnpm install itself
+node_modules/
+
+# Next.js build output
+.next/
+
 # Documentation
 docs/
 
 # Web app (not needed for mobile builds)
 apps/web/
+
+# iOS Pods - EAS runs pod install itself
+apps/mobile/ios/Pods/
+apps/mobile/ios/build/
+
+# Expo local dev cache
+apps/mobile/.expo/
+
+# Android build cache
+apps/mobile/android/.gradle/
+apps/mobile/android/app/build/
 
 # Supabase local dev files
 supabase/
@@ -15,12 +32,18 @@ supabase/
 .husky/
 .vscode/
 .cursor/
+.claude/
+.vercel/
 
 # Test artifacts
 **/coverage/
 test-results/
 playwright-report/
 e2e/
+
+# Turborepo cache
+.turbo/
+**/tsconfig.tsbuildinfo
 
 # macOS metadata
 **/.DS_Store
