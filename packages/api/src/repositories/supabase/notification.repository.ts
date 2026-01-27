@@ -74,9 +74,9 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       .select()
       .single();
 
-    if (error) {
+    if (error || !data) {
       throw new DatabaseError(
-        `Failed to update notification preferences: ${error.message}`,
+        `Failed to update notification preferences: ${error?.message || "No data returned"}`,
       );
     }
 

@@ -173,13 +173,15 @@ export class SupabaseProfileRepository {
       .eq("id", userId)
       .single();
 
-    if (error) {
-      throw new Error(`Failed to get tutorial status: ${error.message}`);
+    if (error || !data) {
+      throw new Error(
+        `Failed to get tutorial status: ${error?.message || "No data returned"}`,
+      );
     }
 
     return {
-      tutorial_completed: data?.tutorial_completed ?? false,
-      tutorial_completed_at: data?.tutorial_completed_at ?? null,
+      tutorial_completed: data.tutorial_completed ?? false,
+      tutorial_completed_at: data.tutorial_completed_at ?? null,
     };
   }
 

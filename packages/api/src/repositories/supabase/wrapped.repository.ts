@@ -297,10 +297,10 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       .eq("id", userId)
       .single();
 
-    if (error) {
+    if (error || !profile) {
       return false;
     }
 
-    return profile?.is_super_admin === true;
+    return profile.is_super_admin === true;
   }
 }

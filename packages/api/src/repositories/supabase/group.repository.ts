@@ -140,11 +140,14 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .eq("id", id)
       .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
-        return null;
-      }
-      throw new DatabaseError(`Failed to fetch group: ${error.message}`);
+    if (error && error.code === "PGRST116") {
+      return null;
+    }
+
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to fetch group: ${error?.message || "No data returned"}`,
+      );
     }
 
     // Get member count
@@ -171,11 +174,14 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .eq("invite_token", inviteToken)
       .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
-        return null;
-      }
-      throw new DatabaseError(`Failed to fetch group: ${error.message}`);
+    if (error && error.code === "PGRST116") {
+      return null;
+    }
+
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to fetch group: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToGroup(data);
@@ -244,8 +250,10 @@ export class SupabaseGroupRepository implements IGroupRepository {
       )
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to update group: ${error.message}`);
+    if (error || !group) {
+      throw new DatabaseError(
+        `Failed to update group: ${error?.message || "No data returned"}`,
+      );
     }
 
     return this.mapToGroup(group);
@@ -258,11 +266,13 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .eq("id", groupId)
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to check creator: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to check creator: ${error?.message || "No data returned"}`,
+      );
     }
 
-    return data?.created_by === userId;
+    return data.created_by === userId;
   }
 
   async isMember(groupId: string, userId: string): Promise<boolean> {
@@ -355,8 +365,10 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .select("invite_token")
       .single();
 
-    if (error) {
-      throw new DatabaseError(`Failed to renew invite token: ${error.message}`);
+    if (error || !data) {
+      throw new DatabaseError(
+        `Failed to renew invite token: ${error?.message || "No data returned"}`,
+      );
     }
 
     if (!data.invite_token) {

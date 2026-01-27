@@ -12,12 +12,14 @@ import reservationRoutes from "../reservation.route";
 
 // Mock the ReservationService
 vi.mock("../../services/reservation.service", () => ({
-  ReservationService: vi.fn().mockImplementation(() => ({
-    createReservation: vi.fn(),
-    checkin: vi.fn(),
-    listReservations: vi.fn(),
-    cancelReservation: vi.fn(),
-  })),
+  ReservationService: vi.fn().mockImplementation(function () {
+    return {
+      createReservation: vi.fn(),
+      checkin: vi.fn(),
+      listReservations: vi.fn(),
+      cancelReservation: vi.fn(),
+    };
+  }),
 }));
 
 describe("Reservation Routes - Unit Tests", () => {
@@ -45,9 +47,9 @@ describe("Reservation Routes - Unit Tests", () => {
     };
 
     // Make the mocked constructor return our mock instance
-    vi.mocked(ReservationService).mockImplementation(
-      () => mockReservationService as any,
-    );
+    vi.mocked(ReservationService).mockImplementation(function () {
+      return mockReservationService as any;
+    });
 
     // Mock auth middleware by setting context directly - MUST come before route mounting
     app.use("*", async (c, next) => {

@@ -12,12 +12,14 @@ import photoRoutes from "../photo.route";
 
 // Mock the PhotoService
 vi.mock("../../services/photo.service", () => ({
-  PhotoService: vi.fn().mockImplementation(() => ({
-    getUploadUrl: vi.fn(),
-    confirmUpload: vi.fn(),
-    listPhotos: vi.fn(),
-    deletePhoto: vi.fn(),
-  })),
+  PhotoService: vi.fn().mockImplementation(function () {
+    return {
+      getUploadUrl: vi.fn(),
+      confirmUpload: vi.fn(),
+      listPhotos: vi.fn(),
+      deletePhoto: vi.fn(),
+    };
+  }),
 }));
 
 describe("Photo Routes - Unit Tests", () => {
@@ -45,7 +47,9 @@ describe("Photo Routes - Unit Tests", () => {
     };
 
     // Make the mocked constructor return our mock instance
-    vi.mocked(PhotoService).mockImplementation(() => mockPhotoService as any);
+    vi.mocked(PhotoService).mockImplementation(function () {
+      return mockPhotoService as any;
+    });
 
     // Mock auth middleware by setting context directly - MUST come before route mounting
     app.use("*", async (c, next) => {
