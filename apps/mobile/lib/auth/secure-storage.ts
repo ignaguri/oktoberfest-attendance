@@ -12,6 +12,10 @@ const KEYS = {
   NOTIFICATION_PROMPT_SHOWN: "prostcounter_notification_prompt_shown",
   NOTIFICATION_PERMISSION_STATUS: "prostcounter_notification_permission_status",
   FCM_TOKEN: "prostcounter_fcm_token",
+  // Location keys
+  LOCATION_PROMPT_SHOWN: "prostcounter_location_prompt_shown",
+  LOCATION_PERMISSION_STATUS: "prostcounter_location_permission_status",
+  LOCATION_SESSION_ID: "prostcounter_location_session_id",
 } as const;
 
 /**
@@ -189,5 +193,90 @@ export async function clearAllNotificationData(): Promise<void> {
     SecureStore.deleteItemAsync(KEYS.NOTIFICATION_PROMPT_SHOWN),
     SecureStore.deleteItemAsync(KEYS.NOTIFICATION_PERMISSION_STATUS),
     SecureStore.deleteItemAsync(KEYS.FCM_TOKEN),
+  ]);
+}
+
+// =============================================================================
+// Location Storage
+// =============================================================================
+
+/**
+ * Store whether location permission prompt has been shown
+ */
+export async function setLocationPromptShown(shown: boolean): Promise<void> {
+  await SecureStore.setItemAsync(
+    KEYS.LOCATION_PROMPT_SHOWN,
+    shown ? "true" : "false",
+  );
+}
+
+/**
+ * Check if location permission prompt has been shown
+ */
+export async function hasLocationPromptBeenShown(): Promise<boolean> {
+  const value = await SecureStore.getItemAsync(KEYS.LOCATION_PROMPT_SHOWN);
+  return value === "true";
+}
+
+/**
+ * Store location permission status
+ */
+export type LocationPermissionStatus =
+  | "undetermined"
+  | "foreground"
+  | "background"
+  | "denied";
+
+export async function setLocationPermissionStatus(
+  status: LocationPermissionStatus,
+): Promise<void> {
+  await SecureStore.setItemAsync(KEYS.LOCATION_PERMISSION_STATUS, status);
+}
+
+/**
+ * Get stored location permission status
+ */
+export async function getLocationPermissionStatus(): Promise<LocationPermissionStatus | null> {
+  const value = await SecureStore.getItemAsync(KEYS.LOCATION_PERMISSION_STATUS);
+  if (
+    value === "undetermined" ||
+    value === "foreground" ||
+    value === "background" ||
+    value === "denied"
+  ) {
+    return value;
+  }
+  return null;
+}
+
+/**
+ * Store active location session ID
+ */
+export async function storeLocationSessionId(sessionId: string): Promise<void> {
+  await SecureStore.setItemAsync(KEYS.LOCATION_SESSION_ID, sessionId);
+}
+
+/**
+ * Get stored location session ID
+ */
+export async function getStoredLocationSessionId(): Promise<string | null> {
+  return SecureStore.getItemAsync(KEYS.LOCATION_SESSION_ID);
+}
+
+/**
+ * Clear location session ID
+ */
+export async function clearLocationSessionId(): Promise<void> {
+  await SecureStore.deleteItemAsync(KEYS.LOCATION_SESSION_ID);
+}
+
+/**
+ * Clear all location-related stored data
+ */
+export async function clearAllLocationData(): Promise<void> {
+  await Promise.all([
+    SecureStore.deleteItemAsync(KEYS.LOCATION_PROMPT_SHOWN),
+    SecureStore.deleteItemAsync(KEYS.LOCATION_PERMISSION_STATUS),
+    SecureStore.deleteItemAsync(KEYS.LOCATION_SESSION_ID),
   ]);
 }

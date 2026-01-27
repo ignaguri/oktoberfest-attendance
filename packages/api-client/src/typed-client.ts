@@ -715,6 +715,44 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }
         return parseJsonResponse<ApiResponse<FestivalTent[]>>(response);
       },
+
+      /**
+       * Get nearby tents based on location
+       */
+      async getNearby(query: {
+        latitude: number;
+        longitude: number;
+        radiusMeters?: number;
+        festivalId?: string;
+      }): Promise<{
+        tents: Array<{
+          tentId: string;
+          tentName: string;
+          category: string | null;
+          latitude: number;
+          longitude: number;
+          distanceMeters: number;
+          beerPrice: number | null;
+        }>;
+        userLocation: { latitude: number; longitude: number };
+        radiusMeters: number;
+      }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams();
+        params.set("latitude", query.latitude.toString());
+        params.set("longitude", query.longitude.toString());
+        if (query.radiusMeters)
+          params.set("radiusMeters", query.radiusMeters.toString());
+        if (query.festivalId) params.set("festivalId", query.festivalId);
+        const response = await fetch(
+          `${baseUrl}/v1/tents/nearby?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch nearby tents: ${response.statusText}`);
+        }
+        return parseJsonResponse(response);
+      },
     },
 
     /**
@@ -1775,6 +1813,168 @@ export function createTypedApiClient(config: ApiClientConfig) {
             response,
           ).catch(() => ({ message: undefined }));
           throw new Error(error.message || "Failed to delete photo");
+        }
+        return parseJsonResponse(response);
+      },
+    },
+
+    /**
+     * Location API
+     */
+    location: {
+      /**
+       * Start a location sharing session
+       */
+      async startSession(data: {
+        festivalId: string;
+        durationMinutes?: number;
+        initialLocation?: {
+          latitude: number;
+          longitude: number;
+          accuracy?: number;
+          timestamp: string;
+        };
+      }): Promise<{
+        session: {
+          id: string;
+          userId: string;
+          festivalId: string;
+          isActive: boolean;
+          startedAt: string;
+          expiresAt: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+      }> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/location/sessions`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to start location session");
+        }
+        return parseJsonResponse(response);
+      },
+
+      /**
+       * Stop a location sharing session
+       */
+      async stopSession(sessionId: string): Promise<{
+        success: boolean;
+        session: {
+          id: string;
+          userId: string;
+          festivalId: string;
+          isActive: boolean;
+          startedAt: string;
+          expiresAt: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+      }> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(
+          `${baseUrl}/v1/location/sessions/${sessionId}`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to stop location session");
+        }
+        return parseJsonResponse(response);
+      },
+
+      /**
+       * Update location for an active session
+       */
+      async updateLocation(
+        sessionId: string,
+        location: {
+          latitude: number;
+          longitude: number;
+          accuracy?: number;
+          timestamp: string;
+        },
+      ): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetch(
+          `${baseUrl}/v1/location/sessions/${sessionId}`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify({ sessionId, location }),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to update location");
+        }
+        return parseJsonResponse(response);
+      },
+
+      /**
+       * Get nearby group members
+       */
+      async getNearbyMembers(query: {
+        festivalId: string;
+        latitude: number;
+        longitude: number;
+        radiusMeters?: number;
+        groupId?: string;
+      }): Promise<{
+        members: Array<{
+          sessionId: string;
+          userId: string;
+          username: string;
+          fullName: string | null;
+          avatarUrl: string | null;
+          groupId: string;
+          groupName: string;
+          lastLocation: {
+            latitude: number;
+            longitude: number;
+            accuracy?: number;
+            timestamp: string;
+          } | null;
+          distance: number | null;
+        }>;
+        userLocation: {
+          latitude: number;
+          longitude: number;
+          timestamp: string;
+        };
+        radiusMeters: number;
+      }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({
+          festivalId: query.festivalId,
+          latitude: query.latitude.toString(),
+          longitude: query.longitude.toString(),
+        });
+        if (query.radiusMeters)
+          params.set("radiusMeters", query.radiusMeters.toString());
+        if (query.groupId) params.set("groupId", query.groupId);
+
+        const response = await fetch(
+          `${baseUrl}/v1/location/nearby?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch nearby members: ${response.statusText}`,
+          );
         }
         return parseJsonResponse(response);
       },

@@ -1665,6 +1665,14 @@
                             "type": "string",
                             "nullable": true
                           },
+                          "latitude": {
+                            "type": "number",
+                            "nullable": true
+                          },
+                          "longitude": {
+                            "type": "number",
+                            "nullable": true
+                          },
                           "mapUrl": {
                             "type": "string",
                             "nullable": true,
@@ -1701,6 +1709,8 @@
                           "endDate",
                           "beerCost",
                           "location",
+                          "latitude",
+                          "longitude",
                           "mapUrl",
                           "isActive",
                           "status",
@@ -1775,6 +1785,14 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "latitude": {
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "longitude": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "mapUrl": {
                       "type": "string",
                       "nullable": true,
@@ -1811,6 +1829,8 @@
                     "endDate",
                     "beerCost",
                     "location",
+                    "latitude",
+                    "longitude",
                     "mapUrl",
                     "isActive",
                     "status",
@@ -1928,6 +1948,186 @@
                   },
                   "required": [
                     "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tents/nearby": {
+      "get": {
+        "tags": [
+          "tents"
+        ],
+        "summary": "Get nearby tents",
+        "description": "Returns tents near the user's location, sorted by distance. Uses PostGIS for efficient spatial queries.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "number",
+              "nullable": true,
+              "minimum": -90,
+              "maximum": 90
+            },
+            "required": false,
+            "name": "latitude",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "nullable": true,
+              "minimum": -180,
+              "maximum": 180
+            },
+            "required": false,
+            "name": "longitude",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 5000,
+              "default": 100
+            },
+            "required": false,
+            "name": "radiusMeters",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "festivalId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nearby tents retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tentId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "tentName": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "latitude": {
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "type": "number"
+                          },
+                          "distanceMeters": {
+                            "type": "number"
+                          },
+                          "beerPrice": {
+                            "type": "number",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "tentId",
+                          "tentName",
+                          "category",
+                          "latitude",
+                          "longitude",
+                          "distanceMeters",
+                          "beerPrice"
+                        ]
+                      }
+                    },
+                    "userLocation": {
+                      "type": "object",
+                      "properties": {
+                        "latitude": {
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "latitude",
+                        "longitude"
+                      ]
+                    },
+                    "radiusMeters": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "tents",
+                    "userLocation",
+                    "radiusMeters"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
                   ]
                 }
               }

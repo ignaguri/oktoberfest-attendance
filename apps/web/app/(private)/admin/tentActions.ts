@@ -2,7 +2,7 @@
 
 import "server-only";
 
-import type { Tables } from "@prostcounter/db";
+import type { Tables, TablesInsert } from "@prostcounter/db";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
 
@@ -18,7 +18,7 @@ export type TentWithPrice = {
   festival_tent_id?: string;
 };
 
-export type TentInsert = Omit<Tables<"tents">, "id">;
+export type TentInsert = Omit<TablesInsert<"tents">, "id">;
 export type FestivalTentInsert = {
   festival_id: string;
   tent_id: string;

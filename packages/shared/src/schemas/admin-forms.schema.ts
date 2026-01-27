@@ -90,6 +90,8 @@ export type AdminAddTentToFestivalForm = z.infer<
 export const AdminAddTentToFestivalFormSchema = z.object({
   name: z.string().min(1, { error: "validation.tent.nameRequired" }).trim(),
   category: z.string().optional(),
+  latitude: z.number().min(-90).max(90).optional().nullable(),
+  longitude: z.number().min(-180).max(180).optional().nullable(),
   beer_price: z
     .number()
     .positive({ error: "validation.price.positive" })

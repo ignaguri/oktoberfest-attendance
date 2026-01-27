@@ -954,12 +954,39 @@
     }
   },
   "location": {
+    "startSharing": "Start Sharing",
+    "stopSharing": "Stop Sharing",
+    "shareFor": "Share for {{duration}}",
+    "nearbyCount": "{{count}} friends nearby",
+    "sharingActive": "Your friends can see you on the map",
+    "sharingInactive": "Share your location with group members",
+    "noFriendsNearby": "No friends sharing their location nearby",
+    "noTentsNearby": "No tents within range",
+    "checkIn": "Check In",
+    "checkInAt": "Check in at {{tent}}",
+    "callout": {
+      "away": "away"
+    },
+    "map": {
+      "title": "Festival Map",
+      "label": "Festival map showing friends and tents",
+      "yourLocation": "Your location",
+      "loading": "Updating...",
+      "friendsNearby": "{{count}} friends",
+      "friendsNearby_one": "{{count}} friend",
+      "tentsNearby": "{{count}} tents",
+      "tentsNearby_one": "{{count}} tent"
+    },
+    "tabs": {
+      "friends": "Friends",
+      "tents": "Tents"
+    },
     "sharing": {
       "title": "Location Sharing",
       "enable": "Enable",
       "disable": "Disable",
-      "sharing": "Sharing",
-      "notSharing": "Not Sharing",
+      "sharing": "Sharing location",
+      "notSharing": "Not sharing location",
       "starting": "Starting...",
       "stopping": "Stopping...",
       "enableTooltip": "Start sharing your location with group members",
@@ -967,6 +994,12 @@
       "enabled": "Location sharing enabled! Group members can now see your location.",
       "trackingStarted": "Location tracking started! Enable location sharing for specific groups in your profile settings.",
       "noGroupsEnabled": "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first."
+    },
+    "duration": {
+      "30m": "30m",
+      "1h": "1h",
+      "2h": "2h",
+      "4h": "4h"
     },
     "privacy": {
       "title": "Location Sharing Preferences",

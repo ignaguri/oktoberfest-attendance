@@ -11,7 +11,7 @@ import {
   User,
   Users,
 } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { View } from "react-native";
 
 import {
@@ -19,6 +19,10 @@ import {
   QuickAttendanceSheet,
 } from "@/components/quick-attendance";
 import { Colors } from "@/lib/constants/colors";
+import {
+  QuickAttendanceProvider,
+  useQuickAttendance,
+} from "@/lib/quick-attendance";
 
 interface TabIconProps {
   Icon: LucideIcon;
@@ -30,10 +34,19 @@ function TabIcon({ Icon, color, focused }: TabIconProps) {
   return <Icon size={focused ? 28 : 24} color={color} />;
 }
 
-export default function TabsLayout() {
+/**
+ * Inner component that uses the quick attendance context
+ */
+function TabsLayoutContent() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const {
+    isOpen,
+    openSheet,
+    closeSheet,
+    preselectedTentId,
+    preselectedTentName,
+  } = useQuickAttendance();
 
   // Check if we're within festival dates
   const isFestivalActive = useMemo(() => {
@@ -136,16 +149,29 @@ export default function TabsLayout() {
       {/* Quick Attendance FAB */}
       {showFab && (
         <QuickAttendanceFab
-          onPress={() => setIsSheetOpen(true)}
+          onPress={() => openSheet()}
           disabled={!isFestivalActive}
         />
       )}
 
       {/* Quick Attendance Sheet */}
       <QuickAttendanceSheet
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
+        isOpen={isOpen}
+        onClose={closeSheet}
+        preselectedTentId={preselectedTentId}
+        preselectedTentName={preselectedTentName}
       />
     </View>
+  );
+}
+
+/**
+ * Tabs layout with quick attendance provider
+ */
+export default function TabsLayout() {
+  return (
+    <QuickAttendanceProvider>
+      <TabsLayoutContent />
+    </QuickAttendanceProvider>
   );
 }

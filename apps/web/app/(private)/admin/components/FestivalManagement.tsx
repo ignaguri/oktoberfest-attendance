@@ -33,6 +33,8 @@ interface FestivalFormData {
   short_name: string;
   festival_type: FestivalType;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
   start_date: string;
   end_date: string;
   map_url: string;
@@ -47,6 +49,8 @@ const initialFormData: FestivalFormData = {
   short_name: "",
   festival_type: "oktoberfest",
   location: "Munich, Germany",
+  latitude: null,
+  longitude: null,
   start_date: "",
   end_date: "",
   map_url: "https://wiesnmap.muenchen.de/",
@@ -113,6 +117,8 @@ export default function FestivalManagement() {
       short_name: festival.short_name,
       festival_type: festival.festival_type,
       location: festival.location,
+      latitude: festival.latitude ?? null,
+      longitude: festival.longitude ?? null,
       start_date: festival.start_date,
       end_date: festival.end_date,
       map_url: festival.map_url || "",
@@ -258,6 +264,44 @@ export default function FestivalManagement() {
                     }
                     placeholder="Munich, Germany"
                     required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="latitude">Latitude</Label>
+                  <Input
+                    id="latitude"
+                    type="number"
+                    step="0.0001"
+                    value={formData.latitude?.toString() ?? ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        latitude: e.target.value
+                          ? parseFloat(e.target.value)
+                          : null,
+                      })
+                    }
+                    placeholder="48.1314"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="longitude">Longitude</Label>
+                  <Input
+                    id="longitude"
+                    type="number"
+                    step="0.0001"
+                    value={formData.longitude?.toString() ?? ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        longitude: e.target.value
+                          ? parseFloat(e.target.value)
+                          : null,
+                      })
+                    }
+                    placeholder="11.5498"
                   />
                 </div>
 

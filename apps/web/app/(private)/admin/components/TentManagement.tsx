@@ -77,6 +77,8 @@ export default function TentManagement() {
     defaultValues: {
       name: "",
       category: "",
+      latitude: null,
+      longitude: null,
       beer_price: null,
     },
   });
@@ -143,7 +145,12 @@ export default function TentManagement() {
   const handleCreateTent = async (data: AdminAddTentToFestivalForm) => {
     try {
       await createTent(
-        { name: data.name, category: data.category || null },
+        {
+          name: data.name,
+          category: data.category || null,
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
+        },
         selectedFestival,
         data.beer_price,
       );
@@ -377,6 +384,36 @@ export default function TentManagement() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="tent-latitude">Latitude</Label>
+                        <Input
+                          id="tent-latitude"
+                          type="number"
+                          step="0.0001"
+                          placeholder="48.1314"
+                          {...createTentForm.register("latitude", {
+                            valueAsNumber: true,
+                            setValueAs: (value) =>
+                              value === "" ? null : value,
+                          })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="tent-longitude">Longitude</Label>
+                        <Input
+                          id="tent-longitude"
+                          type="number"
+                          step="0.0001"
+                          placeholder="11.5498"
+                          {...createTentForm.register("longitude", {
+                            valueAsNumber: true,
+                            setValueAs: (value) =>
+                              value === "" ? null : value,
+                          })}
+                        />
+                      </div>
                     </div>
                     <div>
                       <Label htmlFor="beer-price">Beer Price (Optional)</Label>
