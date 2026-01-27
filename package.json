@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "turbo dev",
     "dev:web": "turbo dev --filter=@prostcounter/web",
+    "dev:web:lan": "pnpm --filter @prostcounter/web dev:lan",
     "dev:mobile": "turbo dev --filter=@prostcounter/mobile",
+    "dev:mobile:device": "pnpm --filter @prostcounter/mobile dev:device",
     "build": "turbo build",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",

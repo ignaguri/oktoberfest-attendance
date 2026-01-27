@@ -1,5 +1,5 @@
 import type { Database } from "@prostcounter/db";
-import type { FestivalTent } from "@prostcounter/shared";
+import type { FestivalTent, NearbyTent } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
@@ -84,5 +84,33 @@ export class SupabaseTentRepository implements ITentRepository {
         category: tent.category,
       },
     };
+  }
+
+  async getNearbyTents(
+    latitude: number,
+    longitude: number,
+    radiusMeters: number = 100,
+    festivalId?: string,
+  ): Promise<NearbyTent[]> {
+    const { data, error } = await this.supabase.rpc("get_nearby_tents", {
+      input_latitude: latitude,
+      input_longitude: longitude,
+      radius_meters: radiusMeters,
+      input_festival_id: festivalId,
+    });
+
+    if (error) {
+      throw new DatabaseError(`Failed to get nearby tents: ${error.message}`);
+    }
+
+    return (data ?? []).map((row) => ({
+      tentId: row.tent_id,
+      tentName: row.tent_name,
+      category: row.category,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      distanceMeters: row.distance_meters,
+      beerPrice: row.beer_price ? Number(row.beer_price) : null,
+    }));
   }
 }

@@ -903,6 +903,8 @@ export interface paths {
                                 endDate: string;
                                 beerCost: number | null;
                                 location: string | null;
+                                latitude: number | null;
+                                longitude: number | null;
                                 /** Format: uri */
                                 mapUrl: string | null;
                                 isActive: boolean;
@@ -963,6 +965,8 @@ export interface paths {
                             endDate: string;
                             beerCost: number | null;
                             location: string | null;
+                            latitude: number | null;
+                            longitude: number | null;
                             /** Format: uri */
                             mapUrl: string | null;
                             isActive: boolean;
@@ -1040,6 +1044,90 @@ export interface paths {
                                     category: string | null;
                                 };
                             }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tents/nearby": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get nearby tents
+         * @description Returns tents near the user's location, sorted by distance. Uses PostGIS for efficient spatial queries.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    latitude?: number | null;
+                    longitude?: number | null;
+                    radiusMeters?: number;
+                    festivalId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Nearby tents retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            tents: {
+                                /** Format: uuid */
+                                tentId: string;
+                                tentName: string;
+                                category: string | null;
+                                latitude: number;
+                                longitude: number;
+                                distanceMeters: number;
+                                beerPrice: number | null;
+                            }[];
+                            userLocation: {
+                                latitude: number;
+                                longitude: number;
+                            };
+                            radiusMeters: number;
+                        };
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
                         };
                     };
                 };

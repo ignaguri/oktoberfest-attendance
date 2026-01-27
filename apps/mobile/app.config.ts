@@ -1,0 +1,110 @@
+import type { ExpoConfig, ConfigContext } from "expo/config";
+
+export default ({ config }: ConfigContext): ExpoConfig => ({
+  ...config,
+  name: "ProstCounter",
+  slug: "prostcounter",
+  version: "1.0.0",
+  orientation: "portrait",
+  scheme: "prostcounter",
+  icon: "./assets/images/logo.png",
+  userInterfaceStyle: "automatic",
+  newArchEnabled: true,
+  splash: {
+    image: "./assets/images/logo.png",
+    resizeMode: "contain",
+    backgroundColor: "#FBBF24",
+  },
+  ios: {
+    supportsTablet: true,
+    bundleIdentifier: "com.prostcounter.app",
+    usesAppleSignIn: true,
+    googleServicesFile: "./GoogleService-Info.plist",
+    infoPlist: {
+      NSFaceIDUsageDescription:
+        "Use Face ID to quickly sign in to your ProstCounter account",
+      NSPhotoLibraryUsageDescription:
+        "Allow ProstCounter to access your photos to share pictures",
+      NSCameraUsageDescription:
+        "Allow ProstCounter to use your camera to take pictures",
+      NSLocationWhenInUseUsageDescription:
+        "ProstCounter uses your location to share with friends and show nearby tents",
+      NSLocationAlwaysAndWhenInUseUsageDescription:
+        "Allow background location to keep sharing your location with friends while using other apps",
+      UIBackgroundModes: ["remote-notification", "location"],
+      NSAppTransportSecurity: {
+        NSAllowsLocalNetworking: true,
+        NSExceptionDomains: {
+          localhost: {
+            NSExceptionAllowsInsecureHTTPLoads: true,
+          },
+        },
+      },
+    },
+    config: {
+      usesNonExemptEncryption: false,
+    },
+    appleTeamId: "4Q9U9B3BKC",
+  },
+  android: {
+    adaptiveIcon: {
+      backgroundColor: "#FBBF24",
+    },
+    package: "com.prostcounter.app",
+    googleServicesFile: "./google-services.json",
+    config: {
+      googleMaps: {
+        apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
+      },
+    },
+    permissions: [
+      "android.permission.RECORD_AUDIO",
+      "android.permission.ACCESS_COARSE_LOCATION",
+      "android.permission.ACCESS_FINE_LOCATION",
+      "android.permission.ACCESS_BACKGROUND_LOCATION",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_LOCATION",
+    ],
+  },
+  web: {
+    bundler: "metro",
+    output: "static",
+  },
+  plugins: [
+    "expo-router",
+    "expo-secure-store",
+    "expo-localization",
+    "expo-web-browser",
+    "expo-apple-authentication",
+    "expo-image-picker",
+    [
+      "expo-notifications",
+      {
+        color: "#FBBF24",
+      },
+    ],
+    [
+      "expo-location",
+      {
+        locationAlwaysAndWhenInUsePermission:
+          "Allow ProstCounter to share your location with friends and detect nearby tents",
+        isIosBackgroundLocationEnabled: true,
+        isAndroidBackgroundLocationEnabled: true,
+      },
+    ],
+    "./plugins/withModularHeaders.js",
+    "expo-maps",
+  ],
+  experiments: {
+    typedRoutes: true,
+  },
+  extra: {
+    router: {
+      origin: false,
+    },
+    eas: {
+      projectId: "fca65703-ce2a-48b3-aec4-11a90fbb8996",
+    },
+  },
+  owner: "pepegrillo",
+});

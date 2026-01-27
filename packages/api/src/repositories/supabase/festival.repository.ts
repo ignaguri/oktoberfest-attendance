@@ -74,6 +74,8 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       endDate: data.end_date,
       beerCost: data.beer_cost,
       location: data.location,
+      latitude: data.latitude,
+      longitude: data.longitude,
       mapUrl: data.map_url,
       isActive: data.is_active,
       status: data.status,

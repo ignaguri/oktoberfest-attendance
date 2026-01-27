@@ -6,7 +6,7 @@ import type {
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
-import { ConflictError, ValidationError } from "../middleware/error";
+import { ValidationError } from "../middleware/error";
 import type { ILocationRepository } from "../repositories/interfaces";
 
 /**
@@ -39,14 +39,15 @@ export class LocationService {
       throw new ValidationError(ErrorCodes.INVALID_DURATION);
     }
 
-    // Check for existing active session
+    // Check for existing active session - return it if exists (idempotent)
     const existing = await this.locationRepo.getActiveSession(
       userId,
       data.festivalId,
     );
 
     if (existing) {
-      throw new ConflictError(ErrorCodes.LOCATION_SESSION_ALREADY_ACTIVE);
+      // Return existing session instead of erroring - makes API idempotent
+      return existing;
     }
 
     // Create session

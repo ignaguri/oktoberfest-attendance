@@ -59,6 +59,10 @@ import {
 interface QuickAttendanceSheetProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Tent ID to preselect (from map or proximity banner) */
+  preselectedTentId?: string;
+  /** Tent name for immediate display before data loads */
+  preselectedTentName?: string;
 }
 
 /**
@@ -141,6 +145,8 @@ function getDrinkColor(type: DrinkType): string {
 export function QuickAttendanceSheet({
   isOpen,
   onClose,
+  preselectedTentId,
+  preselectedTentName,
 }: QuickAttendanceSheetProps) {
   const { t } = useTranslation();
   const toast = useToast();
@@ -206,13 +212,20 @@ export function QuickAttendanceSheet({
 
   // Get selected tent name for display
   const selectedTentName = useMemo(() => {
-    if (!selectedTentId || !tentGroups) return null;
-    for (const group of tentGroups) {
-      const tent = group.options.find((t) => t.value === selectedTentId);
-      if (tent) return tent.label;
+    if (!selectedTentId) return null;
+    // First try to find in tent groups
+    if (tentGroups) {
+      for (const group of tentGroups) {
+        const tent = group.options.find((t) => t.value === selectedTentId);
+        if (tent) return tent.label;
+      }
+    }
+    // Fall back to preselectedTentName (from map) if tent data not loaded yet
+    if (selectedTentId === preselectedTentId && preselectedTentName) {
+      return preselectedTentName;
     }
     return null;
-  }, [selectedTentId, tentGroups]);
+  }, [selectedTentId, tentGroups, preselectedTentId, preselectedTentName]);
 
   // Get selected drink type label with plural support
   // Don't show +1 while saving to avoid double-counting after refetch
@@ -225,16 +238,16 @@ export function QuickAttendanceSheet({
     return `${count} ${drinkName}`;
   }, [selectedDrinkType, drinkCounts, isSaving, t]);
 
-  // Reset state when sheet opens, preselect tent from last attendance
+  // Reset state when sheet opens, preselect tent from prop or last attendance
   useEffect(() => {
     if (isOpen) {
       setSelectedDrinkType(null);
       setPendingPhotos([]);
-      // Preselect tent from today's attendance
-      const lastTentId = attendance?.tentIds?.[0];
-      setSelectedTentId(lastTentId);
+      // Prioritize: 1) preselectedTentId from map/banner, 2) today's attendance tent
+      const tentToSelect = preselectedTentId || attendance?.tentIds?.[0];
+      setSelectedTentId(tentToSelect);
     }
-  }, [isOpen, attendance?.tentIds]);
+  }, [isOpen, preselectedTentId, attendance?.tentIds]);
 
   // Handle drink type selection (toggle behavior)
   const handleDrinkTypeSelect = useCallback((type: DrinkType) => {

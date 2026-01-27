@@ -53,27 +53,33 @@ export function BiometricPrompt({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalBackdrop />
-      <ModalContent className="items-center">
-        <ModalBody className="items-center pt-6">
-          {isAuthenticating ? (
-            <ActivityIndicator size="large" color="#F59E0B" className="my-4" />
-          ) : (
-            <View className="bg-primary-100 mb-4 rounded-full p-4">
-              <BiometricIcon size={48} className="text-primary-600" />
-            </View>
-          )}
+      <ModalContent>
+        <ModalBody className="pt-6">
+          <View className="items-center">
+            {isAuthenticating ? (
+              <ActivityIndicator
+                size="large"
+                color="#F59E0B"
+                className="my-4"
+              />
+            ) : (
+              <View className="bg-primary-100 mb-4 rounded-full p-4">
+                <BiometricIcon size={48} className="text-primary-600" />
+              </View>
+            )}
 
-          <Text className="text-typography-900 text-center text-xl font-semibold">
-            {t("auth.biometric.prompt", {
-              biometricName,
-            })}
-          </Text>
+            <Text className="text-typography-900 text-center text-xl font-semibold">
+              {t("auth.biometric.prompt", {
+                biometricName,
+              })}
+            </Text>
 
-          <Text className="text-typography-500 mt-2 text-center">
-            {t("auth.biometric.description", {
-              biometricName,
-            })}
-          </Text>
+            <Text className="text-typography-500 mt-2 text-center">
+              {t("auth.biometric.description", {
+                biometricName,
+              })}
+            </Text>
+          </View>
         </ModalBody>
 
         <ModalFooter className="w-full flex-col gap-3 pb-6">
@@ -147,23 +153,25 @@ export function BiometricEnablePrompt({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalBackdrop />
-      <ModalContent className="items-center">
-        <ModalBody className="items-center pt-6">
-          <View className="bg-primary-100 mb-4 rounded-full p-4">
-            <BiometricIcon size={48} className="text-primary-600" />
+      <ModalContent>
+        <ModalBody className="pt-6">
+          <View className="items-center">
+            <View className="bg-primary-100 mb-4 rounded-full p-4">
+              <BiometricIcon size={48} className="text-primary-600" />
+            </View>
+
+            <Text className="text-typography-900 text-center text-xl font-semibold">
+              {t("auth.biometric.enableTitle", {
+                biometricName,
+              })}
+            </Text>
+
+            <Text className="text-typography-500 mt-2 text-center">
+              {t("auth.biometric.enableDescription", {
+                biometricName,
+              })}
+            </Text>
           </View>
-
-          <Text className="text-typography-900 text-center text-xl font-semibold">
-            {t("auth.biometric.enableTitle", {
-              biometricName,
-            })}
-          </Text>
-
-          <Text className="text-typography-500 mt-2 text-center">
-            {t("auth.biometric.enableDescription", {
-              biometricName,
-            })}
-          </Text>
         </ModalBody>
 
         <ModalFooter className="w-full flex-col gap-3 pb-6">

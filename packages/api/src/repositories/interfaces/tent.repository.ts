@@ -1,4 +1,4 @@
-import type { FestivalTent } from "@prostcounter/shared";
+import type { FestivalTent, NearbyTent } from "@prostcounter/shared";
 
 /**
  * Tent repository interface
@@ -22,4 +22,19 @@ export interface ITentRepository {
     festivalId: string,
     tentId: string,
   ): Promise<FestivalTent | null>;
+
+  /**
+   * Find tents near a given location using PostGIS
+   * @param latitude - User's latitude
+   * @param longitude - User's longitude
+   * @param radiusMeters - Search radius in meters (default 100)
+   * @param festivalId - Optional festival ID for pricing
+   * @returns Array of nearby tents sorted by distance
+   */
+  getNearbyTents(
+    latitude: number,
+    longitude: number,
+    radiusMeters?: number,
+    festivalId?: string,
+  ): Promise<NearbyTent[]>;
 }

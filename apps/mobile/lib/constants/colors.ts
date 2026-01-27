@@ -6,15 +6,27 @@
  * Use NativeWind classes whenever possible; only use these constants as a fallback.
  */
 export const Colors = {
-  // Primary brand colors (yellow)
+  // Primary brand colors (yellow/amber)
   primary: {
     500: "#F59E0B", // yellow-500 - main brand color
     600: "#D97706", // yellow-600 - darker brand
+    700: "#B45309", // yellow-700 - even darker brand
+  },
+
+  // Amber colors (for tent markers, badges)
+  amber: {
+    400: "#FBBF24", // amber-400 - light amber
+    500: "#F59E0B", // amber-500 - standard amber
+    600: "#D97706", // amber-600 - dark amber
   },
 
   // Neutral colors
   white: "#FFFFFF",
   black: "#000000",
+  neutral: {
+    200: "#E5E7EB", // neutral-200 - light backgrounds
+    400: "#9CA3AF", // neutral-400 - muted elements
+  },
 
   // Gray scale (for icons, muted elements)
   gray: {

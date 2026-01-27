@@ -17,6 +17,8 @@ export const FestivalSchema = z.object({
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   beerCost: z.number().int().nullable(),
   location: z.string().nullable(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
   mapUrl: z.url().nullable(),
   isActive: z.boolean(),
   status: FestivalStatusSchema,

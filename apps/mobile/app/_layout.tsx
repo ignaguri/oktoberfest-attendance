@@ -22,6 +22,7 @@ import { DataProvider } from "@/lib/data/query-client";
 import { OfflineDataProvider } from "@/lib/database/offline-provider";
 import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
+import { LocationProvider } from "@/lib/location";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 import {
   checkInitialNotification,
@@ -194,48 +195,50 @@ export default function RootLayout() {
                       <GluestackUIProvider mode="light">
                         <NotificationProvider>
                           <NovuProviderWrapper>
-                            <NavigationGuard>
-                              <NotificationPromptHandler />
-                              <Stack
-                                screenOptions={{
-                                  headerShown: false,
-                                  animation: "slide_from_right",
-                                  ...defaultScreenOptions,
-                                }}
-                              >
-                                <Stack.Screen name="(auth)" />
-                                <Stack.Screen name="(tabs)" />
-                                <Stack.Screen
-                                  name="settings"
-                                  options={{
+                            <LocationProvider>
+                              <NavigationGuard>
+                                <NotificationPromptHandler />
+                                <Stack
+                                  screenOptions={{
                                     headerShown: false,
-                                    presentation: "card",
+                                    animation: "slide_from_right",
+                                    ...defaultScreenOptions,
                                   }}
-                                />
-                                <Stack.Screen
-                                  name="groups"
-                                  options={{
-                                    headerShown: false,
-                                    presentation: "card",
-                                  }}
-                                />
-                                <Stack.Screen
-                                  name="achievements"
-                                  options={{
-                                    headerShown: false,
-                                    presentation: "card",
-                                  }}
-                                />
-                                <Stack.Screen
-                                  name="join-group/[token]"
-                                  options={{
-                                    headerShown: false,
-                                    presentation: "fullScreenModal",
-                                  }}
-                                />
-                                <Stack.Screen name="+not-found" />
-                              </Stack>
-                            </NavigationGuard>
+                                >
+                                  <Stack.Screen name="(auth)" />
+                                  <Stack.Screen name="(tabs)" />
+                                  <Stack.Screen
+                                    name="settings"
+                                    options={{
+                                      headerShown: false,
+                                      presentation: "card",
+                                    }}
+                                  />
+                                  <Stack.Screen
+                                    name="groups"
+                                    options={{
+                                      headerShown: false,
+                                      presentation: "card",
+                                    }}
+                                  />
+                                  <Stack.Screen
+                                    name="achievements"
+                                    options={{
+                                      headerShown: false,
+                                      presentation: "card",
+                                    }}
+                                  />
+                                  <Stack.Screen
+                                    name="join-group/[token]"
+                                    options={{
+                                      headerShown: false,
+                                      presentation: "fullScreenModal",
+                                    }}
+                                  />
+                                  <Stack.Screen name="+not-found" />
+                                </Stack>
+                              </NavigationGuard>
+                            </LocationProvider>
                           </NovuProviderWrapper>
                         </NotificationProvider>
                       </GluestackUIProvider>
