@@ -14,6 +14,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { GluestackUIProvider } from "@/components/ui";
+import { UpdateAvailablePrompt } from "@/components/update/UpdateAvailablePrompt";
+import { useAppUpdate } from "@/hooks/useAppUpdate";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { useFocusManager } from "@/lib/data/focus-manager-setup";
@@ -137,6 +139,29 @@ function NotificationPromptHandler() {
   );
 }
 
+// Show update prompt when an OTA update has been downloaded
+function UpdatePromptHandler() {
+  const { isUpdateReady, applyUpdate } = useAppUpdate();
+  const [dismissed, setDismissed] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
+
+  const showPrompt = isUpdateReady && !dismissed;
+
+  const handleUpdate = async () => {
+    setIsRestarting(true);
+    await applyUpdate();
+  };
+
+  return (
+    <UpdateAvailablePrompt
+      isOpen={showPrompt}
+      onClose={() => setDismissed(true)}
+      onUpdate={handleUpdate}
+      isLoading={isRestarting}
+    />
+  );
+}
+
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
@@ -198,6 +223,7 @@ export default function RootLayout() {
                             <LocationProvider>
                               <NavigationGuard>
                                 <NotificationPromptHandler />
+                                <UpdatePromptHandler />
                                 <Stack
                                   screenOptions={{
                                     headerShown: false,

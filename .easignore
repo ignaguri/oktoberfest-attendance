@@ -1,0 +1,30 @@
+# EAS Build Ignore - Exclude files not needed for mobile builds
+# Paths are relative to the monorepo root.
+
+# Documentation
+docs/
+*.md
+
+# Web app (not needed for mobile builds)
+apps/web/
+
+# Supabase local dev files
+supabase/
+
+# CI/CD and editor config
+.github/
+.husky/
+.vscode/
+.cursor/
+
+# Test artifacts
+**/coverage/
+test-results/
+playwright-report/
+e2e/
+
+# macOS metadata
+**/.DS_Store
+
+# Git directory
+.git/

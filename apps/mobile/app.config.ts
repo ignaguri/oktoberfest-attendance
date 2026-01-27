@@ -10,6 +10,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
+  runtimeVersion: {
+    policy: "fingerprint",
+  },
+  updates: {
+    url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
+  },
   splash: {
     image: "./assets/images/logo.png",
     resizeMode: "contain",
@@ -58,7 +64,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     },
     permissions: [
-      "android.permission.RECORD_AUDIO",
       "android.permission.ACCESS_COARSE_LOCATION",
       "android.permission.ACCESS_FINE_LOCATION",
       "android.permission.ACCESS_BACKGROUND_LOCATION",
@@ -94,6 +99,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     "./plugins/withModularHeaders.js",
     "expo-maps",
+    "expo-updates",
   ],
   experiments: {
     typedRoutes: true,
