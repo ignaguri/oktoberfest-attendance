@@ -18,6 +18,21 @@ updates:
       tanstack:
         patterns:
           - "@tanstack/*"
+    ignore:
+      # Locked by Expo SDK 54 — upgrade only when migrating Expo SDK
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-gesture-handler"
+      - dependency-name: "react-native-reanimated"
+      - dependency-name: "react-native-screens"
+      - dependency-name: "react-native-safe-area-context"
+      - dependency-name: "react-native-svg"
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
+      # openapi-fetch 0.15 has breaking changes, pinned to 0.12.x
+      - dependency-name: "openapi-fetch"
+        versions: [">=0.13.0"]
 
   # Web app
   - package-ecosystem: "npm"
@@ -25,6 +40,9 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
 
   # Mobile app
   - package-ecosystem: "npm"
@@ -32,6 +50,18 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 3
+    ignore:
+      # All locked by Expo SDK 54
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-gesture-handler"
+      - dependency-name: "react-native-reanimated"
+      - dependency-name: "react-native-screens"
+      - dependency-name: "react-native-safe-area-context"
+      - dependency-name: "react-native-svg"
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
 
   # API package
   - package-ecosystem: "npm"
@@ -39,6 +69,9 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
 
   # Shared package
   - package-ecosystem: "npm"
@@ -46,3 +79,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
