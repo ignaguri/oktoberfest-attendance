@@ -70,3 +70,7 @@ WARP.md
 
 # Apple App Store Connect API keys
 apps/mobile/keys/
+
+# EAS build credentials
+apps/mobile/credentials.json
+apps/mobile/credentials/
