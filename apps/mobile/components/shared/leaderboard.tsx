@@ -189,7 +189,7 @@ export function Leaderboard({
     return (
       <Card variant="outline" size="md" className="items-center bg-white p-6">
         <Trophy size={48} color={IconColors.disabled} />
-        <Text className="text-typography-500 mt-2 text-center">
+        <Text className="mt-2 text-center text-typography-500">
           {emptyMessage || t("leaderboard.empty")}
         </Text>
       </Card>
@@ -200,8 +200,8 @@ export function Leaderboard({
     <>
       <Card variant="outline" size="sm" className="bg-white p-0">
         {/* Header Row */}
-        <HStack className="border-outline-100 border-b px-3 py-2.5">
-          <Text className="text-typography-500 flex-1 text-sm font-medium">
+        <HStack className="border-b border-outline-100 px-3 py-2.5">
+          <Text className="flex-1 text-sm font-medium text-typography-500">
             {t("leaderboard.header.player")}
           </Text>
           <SortableHeader
@@ -253,7 +253,7 @@ export function Leaderboard({
                 <HStack
                   className={`items-center px-3 py-2.5 ${
                     isCurrentUser ? "bg-primary-50" : ""
-                  } ${!isLast ? "border-outline-50 border-b" : ""}`}
+                  } ${!isLast ? "border-b border-outline-50" : ""}`}
                 >
                   {/* Position + Avatar + Name */}
                   <HStack className="flex-1 items-center" space="sm">
@@ -270,7 +270,7 @@ export function Leaderboard({
                       </VStack>
                     ) : (
                       <VStack className="h-7 w-7 items-center justify-center">
-                        <Text className="text-typography-400 text-sm font-semibold">
+                        <Text className="text-sm font-semibold text-typography-400">
                           {displayPosition}
                         </Text>
                       </VStack>
@@ -297,14 +297,14 @@ export function Leaderboard({
                     <Text
                       className={`flex-1 text-sm ${
                         isCurrentUser
-                          ? "text-primary-700 font-semibold"
+                          ? "font-semibold text-primary-700"
                           : "text-typography-900"
                       }`}
                       numberOfLines={1}
                     >
                       {displayName}
                       {isCurrentUser && (
-                        <Text className="text-typography-500 text-xs">
+                        <Text className="text-xs text-typography-500">
                           {" "}
                           (You)
                         </Text>
@@ -386,12 +386,12 @@ export function Leaderboard({
                 {/* User Info */}
                 <VStack space="xs" className="items-center">
                   {selectedUser.fullName && (
-                    <Text className="text-typography-900 text-lg font-semibold">
+                    <Text className="text-lg font-semibold text-typography-900">
                       {selectedUser.fullName}
                     </Text>
                   )}
                   {selectedUser.username && (
-                    <Text className="text-typography-500 text-sm">
+                    <Text className="text-sm text-typography-500">
                       @{selectedUser.username}
                     </Text>
                   )}
@@ -402,35 +402,35 @@ export function Leaderboard({
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <Calendar size={16} color={IconColors.muted} />
-                      <Text className="text-typography-900 text-xl font-bold">
+                      <Text className="text-xl font-bold text-typography-900">
                         {selectedUser.daysAttended ?? 0}
                       </Text>
                     </HStack>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("leaderboard.stats.days")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <Beer size={16} color={IconColors.muted} />
-                      <Text className="text-typography-900 text-xl font-bold">
+                      <Text className="text-xl font-bold text-typography-900">
                         {selectedUser.totalBeers ?? 0}
                       </Text>
                     </HStack>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("leaderboard.stats.drinks")}
                     </Text>
                   </VStack>
                   <VStack className="items-center">
                     <HStack space="xs" className="items-center">
                       <TrendingUp size={16} color={IconColors.muted} />
-                      <Text className="text-typography-900 text-xl font-bold">
+                      <Text className="text-xl font-bold text-typography-900">
                         {typeof selectedUser.avgBeers === "number"
                           ? selectedUser.avgBeers.toFixed(1)
                           : "0.0"}
                       </Text>
                     </HStack>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("leaderboard.stats.avg")}
                     </Text>
                   </VStack>
@@ -454,7 +454,7 @@ export function Leaderboard({
                         }
                       />
                     )}
-                    <Text className="text-typography-800 text-sm font-medium">
+                    <Text className="text-sm font-medium text-typography-800">
                       #{selectedUser.position}
                     </Text>
                   </HStack>

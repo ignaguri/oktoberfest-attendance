@@ -70,7 +70,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     return (
       <div className={cn("relative", className)}>
         {showSearchIcon && (
-          <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         )}
         <Input
           ref={ref}
@@ -85,7 +85,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           )}
         />
         {isLoading && (
-          <Loader2 className="text-muted-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin" />
+          <Loader2 className="text-muted-foreground absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin" />
         )}
         {showClearButton && localValue && !isLoading && (
           <Button
@@ -93,7 +93,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             variant="ghost"
             size="sm"
             onClick={handleClear}
-            className="hover:bg-muted absolute right-1 top-1/2 -translate-y-1/2 p-0"
+            className="hover:bg-muted absolute top-1/2 right-1 -translate-y-1/2 p-0"
           >
             <X className="size-4" />
           </Button>

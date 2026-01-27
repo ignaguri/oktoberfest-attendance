@@ -164,7 +164,7 @@ export function TentSelectorSheet({
 
         {/* Header */}
         <HStack className="mb-3 w-full items-center justify-between px-2">
-          <Text className="text-typography-900 text-lg font-semibold">
+          <Text className="text-lg font-semibold text-typography-900">
             {mode === "single" ? "Select Tent" : "Select Tents"}
           </Text>
           <Pressable onPress={onClose} hitSlop={8}>
@@ -185,7 +185,7 @@ export function TentSelectorSheet({
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
             <ActivityIndicator size="large" color={IconColors.default} />
-            <Text className="text-typography-500 mt-2">Loading tents...</Text>
+            <Text className="mt-2 text-typography-500">Loading tents...</Text>
           </VStack>
         ) : error ? (
           <VStack className="items-center justify-center py-8">

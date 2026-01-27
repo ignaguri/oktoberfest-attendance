@@ -30,7 +30,7 @@ export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
         </VisuallyHidden>
 
         {/* Custom close button with high visibility */}
-        <DialogClose className="absolute right-4 top-4 z-50 rounded-full bg-white/90 p-2 transition-colors hover:bg-white">
+        <DialogClose className="absolute top-4 right-4 z-50 rounded-full bg-white/90 p-2 transition-colors hover:bg-white">
           <X className="size-5 text-black" />
           <span className="sr-only">Close</span>
         </DialogClose>

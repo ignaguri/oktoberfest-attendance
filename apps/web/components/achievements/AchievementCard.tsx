@@ -62,7 +62,7 @@ export function AchievementCard({
           <div className="min-w-0 flex-1">
             <CardTitle
               className={cn(
-                "text-lg font-semibold leading-tight",
+                "text-lg leading-tight font-semibold",
                 is_unlocked ? "text-green-800" : "text-gray-700",
               )}
             >

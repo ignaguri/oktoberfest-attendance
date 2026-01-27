@@ -104,10 +104,10 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
       >
         {/* Header */}
         <header className="text-center">
-          <p className="mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 bg-clip-text text-[140px] font-bold leading-tight text-transparent">
+          <p className="mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 bg-clip-text text-[140px] leading-tight font-bold text-transparent">
             My {shareData.festivalName}
           </p>
-          <p className="text-[100px] font-bold leading-tight text-yellow-800">
+          <p className="text-[100px] leading-tight font-bold text-yellow-800">
             Wrapped
           </p>
         </header>

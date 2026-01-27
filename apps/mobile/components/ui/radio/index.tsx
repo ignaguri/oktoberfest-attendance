@@ -39,7 +39,7 @@ cssInterop(PrimitiveIcon, {
 });
 
 const radioStyle = tva({
-  base: "group/radio web:cursor-pointer data-[disabled=true]:web:cursor-not-allowed flex-row items-center justify-start",
+  base: "group/radio flex-row items-center justify-start web:cursor-pointer data-[disabled=true]:web:cursor-not-allowed",
   variants: {
     size: {
       sm: "gap-1.5",
@@ -54,7 +54,7 @@ const radioGroupStyle = tva({
 });
 
 const radioIconStyle = tva({
-  base: "fill-primary-800 text-primary-800 items-center justify-center rounded-full",
+  base: "items-center justify-center rounded-full fill-primary-800 text-primary-800",
 
   parentVariants: {
     size: {
@@ -66,7 +66,7 @@ const radioIconStyle = tva({
 });
 
 const radioIndicatorStyle = tva({
-  base: "border-outline-400 data-[active=true]:border-primary-800 data-[checked=true]:border-primary-600 data-[disabled=true]:data-[checked=true]:border-outline-400 data-[disabled=true]:data-[invalid=true]:border-error-400 data-[hover=true]:border-outline-500 data-[hover=true]:data-[checked=true]:border-primary-700 data-[hover=true]:data-[disabled=true]:border-outline-400 data-[hover=true]:data-[disabled=true]:data-[invalid=true]:border-error-400 data-[hover=true]:data-[invalid=true]:border-error-700 data-[invalid=true]:border-error-700 data-[focus-visible=true]:web:outline data-[focus-visible=true]:web:outline-2 data-[focus-visible=true]:web:outline-primary-700 items-center justify-center rounded-full border-2 bg-transparent data-[active=true]:bg-transparent data-[checked=true]:bg-transparent data-[disabled=true]:data-[checked=true]:bg-transparent data-[hover=true]:bg-transparent data-[hover=true]:data-[checked=true]:bg-transparent data-[disabled=true]:opacity-40 data-[hover=true]:data-[disabled=true]:opacity-40",
+  base: "items-center justify-center rounded-full border-2 border-outline-400 bg-transparent data-[active=true]:border-primary-800 data-[checked=true]:border-primary-600 data-[disabled=true]:data-[checked=true]:border-outline-400 data-[disabled=true]:data-[invalid=true]:border-error-400 data-[hover=true]:border-outline-500 data-[hover=true]:data-[checked=true]:border-primary-700 data-[hover=true]:data-[disabled=true]:border-outline-400 data-[hover=true]:data-[disabled=true]:data-[invalid=true]:border-error-400 data-[hover=true]:data-[invalid=true]:border-error-700 data-[invalid=true]:border-error-700 data-[active=true]:bg-transparent data-[checked=true]:bg-transparent data-[disabled=true]:data-[checked=true]:bg-transparent data-[hover=true]:bg-transparent data-[hover=true]:data-[checked=true]:bg-transparent data-[disabled=true]:opacity-40 data-[hover=true]:data-[disabled=true]:opacity-40 data-[focus-visible=true]:web:outline data-[focus-visible=true]:web:outline-2 data-[focus-visible=true]:web:outline-primary-700",
   parentVariants: {
     size: {
       sm: "h-4 w-4",
@@ -77,7 +77,7 @@ const radioIndicatorStyle = tva({
 });
 
 const radioLabelStyle = tva({
-  base: "text-typography-600 data-[active=true]:data-[checked=true]:text-typography-900 data-[active=true]:text-typography-900 data-[checked=true]:text-typography-900 data-[hover=true]:data-[disabled=true]:data-[checked=true]:text-typography-900 data-[hover=true]:data-[disabled=true]:text-typography-600 data-[hover=true]:text-typography-900 web:select-none data-[disabled=true]:opacity-40",
+  base: "text-typography-600 data-[active=true]:data-[checked=true]:text-typography-900 data-[active=true]:text-typography-900 data-[checked=true]:text-typography-900 data-[hover=true]:data-[disabled=true]:data-[checked=true]:text-typography-900 data-[hover=true]:data-[disabled=true]:text-typography-600 data-[hover=true]:text-typography-900 data-[disabled=true]:opacity-40 web:select-none",
   parentVariants: {
     size: {
       "2xs": "text-2xs",

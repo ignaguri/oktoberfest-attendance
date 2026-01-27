@@ -69,10 +69,10 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
           <VStack space="sm" className="py-4">
             {[1, 2, 3].map((i) => (
               <HStack key={i} space="sm" className="items-center">
-                <View className="bg-background-200 h-8 w-8 rounded-full" />
+                <View className="h-8 w-8 rounded-full bg-background-200" />
                 <VStack className="flex-1" space="xs">
-                  <View className="bg-background-200 h-4 w-32 rounded" />
-                  <View className="bg-background-100 h-3 w-48 rounded" />
+                  <View className="h-4 w-32 rounded bg-background-200" />
+                  <View className="h-3 w-48 rounded bg-background-100" />
                 </VStack>
               </HStack>
             ))}
@@ -108,7 +108,7 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
           </HStack>
           <VStack className="items-center py-6">
             <Newspaper size={40} color={IconColors.disabled} />
-            <Text className="text-typography-500 mt-2 text-center">
+            <Text className="mt-2 text-center text-typography-500">
               {t("home.activityFeed.empty")}
             </Text>
           </VStack>
@@ -141,7 +141,7 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
               key={`${activity.user_id}-${activity.activity_time}-${index}`}
               className={
                 index < activities.length - 1
-                  ? "border-outline-100 border-b"
+                  ? "border-b border-outline-100"
                   : ""
               }
             >

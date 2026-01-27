@@ -344,7 +344,7 @@ export function QuickAttendanceSheet({
       toast.show({
         placement: "top",
         render: () => (
-          <HStack className="bg-success-500 items-center gap-2 rounded-lg px-4 py-3">
+          <HStack className="items-center gap-2 rounded-lg bg-success-500 px-4 py-3">
             <Check size={18} color={Colors.white} />
             <Text className="font-medium text-white">{toastMessage}</Text>
           </HStack>
@@ -358,7 +358,7 @@ export function QuickAttendanceSheet({
       toast.show({
         placement: "top",
         render: () => (
-          <HStack className="bg-error-500 items-center gap-2 rounded-lg px-4 py-3">
+          <HStack className="items-center gap-2 rounded-lg bg-error-500 px-4 py-3">
             <X size={18} color={Colors.white} />
             <Text className="font-medium text-white">
               {t("common.errors.generic")}
@@ -405,7 +405,7 @@ export function QuickAttendanceSheet({
             {/* Header */}
             <VStack space="xs">
               <HStack className="items-center justify-between">
-                <Text className="text-typography-900 text-lg font-semibold">
+                <Text className="text-lg font-semibold text-typography-900">
                   {t("quickAttendance.sheetTitle", {
                     defaultValue: "Today's Attendance",
                   })}
@@ -414,7 +414,7 @@ export function QuickAttendanceSheet({
                   <X size={24} color={IconColors.default} />
                 </Pressable>
               </HStack>
-              <Text className="text-typography-500 text-sm">
+              <Text className="text-sm text-typography-500">
                 {t("quickAttendance.sheetDescription", {
                   defaultValue:
                     "Add a drink, change your tent, or upload photos for today.",
@@ -483,7 +483,7 @@ export function QuickAttendanceSheet({
               {/* Selected drink type label */}
               {selectedDrinkLabel && (
                 <Text
-                  className="text-typography-700 text-center text-base font-medium"
+                  className="text-center text-base font-medium text-typography-700"
                   style={{
                     color: selectedDrinkType
                       ? getDrinkColor(selectedDrinkType)
@@ -498,7 +498,7 @@ export function QuickAttendanceSheet({
             {/* Tent Selector */}
             {festivalId && (
               <VStack space="xs">
-                <Text className="text-typography-600 text-sm font-medium">
+                <Text className="text-sm font-medium text-typography-600">
                   {t("home.quickAttendance.tent")}
                 </Text>
                 <Pressable
@@ -508,7 +508,7 @@ export function QuickAttendanceSheet({
                     "flex-row items-center justify-between rounded-lg border px-4 py-3",
                     isLoading
                       ? "border-background-200 bg-background-100"
-                      : "border-outline-200 active:bg-background-50 bg-white",
+                      : "border-outline-200 bg-white active:bg-background-50",
                   )}
                 >
                   <Text
@@ -530,7 +530,7 @@ export function QuickAttendanceSheet({
 
             {/* Photos Section */}
             <VStack space="xs">
-              <Text className="text-typography-600 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-600">
                 {t("home.quickAttendance.photos")}
               </Text>
               <HStack className="flex-wrap gap-2">
@@ -556,7 +556,7 @@ export function QuickAttendanceSheet({
                     ) : (
                       <Pressable
                         onPress={() => handleRemovePendingPhoto(photo.id)}
-                        className="bg-background-400 absolute -right-2 -top-2 h-5 w-5 items-center justify-center rounded-full"
+                        className="absolute -right-2 -top-2 h-5 w-5 items-center justify-center rounded-full bg-background-400"
                       >
                         <Minus size={12} color={IconColors.white} />
                       </Pressable>
@@ -566,7 +566,7 @@ export function QuickAttendanceSheet({
 
                 {/* Loading skeleton while picking */}
                 {isPicking && (
-                  <View className="bg-background-200 h-16 w-16 items-center justify-center rounded-lg">
+                  <View className="h-16 w-16 items-center justify-center rounded-lg bg-background-200">
                     <ActivityIndicator size="small" color={IconColors.muted} />
                   </View>
                 )}
@@ -576,7 +576,7 @@ export function QuickAttendanceSheet({
                   <Pressable
                     onPress={() => setIsSourcePickerOpen(true)}
                     disabled={isPicking}
-                    className="border-background-300 bg-background-50 h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed"
+                    className="h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-background-300 bg-background-50"
                   >
                     <Camera size={20} color={IconColors.muted} />
                   </Pressable>

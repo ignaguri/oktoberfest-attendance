@@ -24,10 +24,10 @@
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
     "date-fns": "^4.1.0",
-    "i18next": "^25.7.3",
+    "i18next": "^25.8.0",
     "react-dom": "19.1.0",
-    "react-i18next": "^16.5.1",
-    "zod": "^4.2.1"
+    "react-i18next": "^16.5.3",
+    "zod": "^4.3.6"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
@@ -39,8 +39,8 @@
     }
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.90.0",
+    "@tanstack/react-query": "^5.90.20",
     "react": "^19.1.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.9.3"
   }
 }

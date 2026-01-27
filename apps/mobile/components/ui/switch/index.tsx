@@ -12,7 +12,7 @@ const UISwitch = createSwitch({
 });
 
 const switchStyle = tva({
-  base: "data-[invalid=true]:border-error-700 data-[focus=true]:ring-indicator-primary web:cursor-pointer disabled:cursor-not-allowed data-[invalid=true]:rounded-xl data-[invalid=true]:border-2 data-[disabled=true]:opacity-40 data-[focus=true]:outline-0 data-[focus=true]:ring-2",
+  base: "disabled:cursor-not-allowed data-[invalid=true]:rounded-xl data-[invalid=true]:border-2 data-[invalid=true]:border-error-700 data-[disabled=true]:opacity-40 data-[focus=true]:outline-0 data-[focus=true]:ring-2 data-[focus=true]:ring-indicator-primary web:cursor-pointer",
 
   variants: {
     size: {

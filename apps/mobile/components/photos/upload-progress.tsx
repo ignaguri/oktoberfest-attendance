@@ -112,7 +112,7 @@ export function UploadProgressList({
         <HStack className="items-center justify-between">
           <HStack space="sm" className="items-center">
             <Upload size={ICON_SIZE} color={Colors.primary[500]} />
-            <Text className="text-typography-900 font-semibold">
+            <Text className="font-semibold text-typography-900">
               {t("photos.upload.title")}
             </Text>
           </HStack>
@@ -122,7 +122,7 @@ export function UploadProgressList({
             {completedCount > 0 && (
               <HStack space="xs" className="items-center">
                 <CheckCircle size={14} color={Colors.success[500]} />
-                <Text className="text-success-500 text-xs">
+                <Text className="text-xs text-success-500">
                   {completedCount}
                 </Text>
               </HStack>
@@ -130,13 +130,13 @@ export function UploadProgressList({
             {failedCount > 0 && (
               <HStack space="xs" className="items-center">
                 <AlertCircle size={14} color={Colors.error[500]} />
-                <Text className="text-error-500 text-xs">{failedCount}</Text>
+                <Text className="text-xs text-error-500">{failedCount}</Text>
               </HStack>
             )}
             {pendingCount > 0 && (
               <HStack space="xs" className="items-center">
                 <Clock size={14} color={Colors.gray[500]} />
-                <Text className="text-typography-500 text-xs">
+                <Text className="text-xs text-typography-500">
                   {pendingCount}
                 </Text>
               </HStack>
@@ -148,13 +148,13 @@ export function UploadProgressList({
         {isUploading && (
           <VStack space="xs">
             <HStack className="items-center justify-between">
-              <Text className="text-typography-600 text-sm">
+              <Text className="text-sm text-typography-600">
                 {t("photos.upload.uploading", {
                   current: completedCount + uploadingCount,
                   total: photos.length,
                 })}
               </Text>
-              <Text className="text-primary-500 text-sm font-medium">
+              <Text className="text-sm font-medium text-primary-500">
                 {totalProgress}%
               </Text>
             </HStack>
@@ -254,11 +254,11 @@ function PhotoProgressItem({ photo, onRetry }: PhotoProgressItemProps) {
   return (
     <HStack className="items-center justify-between">
       <HStack space="sm" className="flex-1 items-center">
-        <View className="bg-background-100 h-8 w-8 items-center justify-center rounded">
+        <View className="h-8 w-8 items-center justify-center rounded bg-background-100">
           <Image size={14} color={Colors.gray[500]} />
         </View>
         <VStack className="flex-1">
-          <Text className="text-typography-700 text-sm" numberOfLines={1}>
+          <Text className="text-sm text-typography-700" numberOfLines={1}>
             {photo.id.split("-").slice(-1)[0]}...
           </Text>
           {photo.status === "uploading" && (
@@ -267,7 +267,7 @@ function PhotoProgressItem({ photo, onRetry }: PhotoProgressItemProps) {
             </Progress>
           )}
           {photo.status === "failed" && photo.error && (
-            <Text className="text-error-500 text-xs" numberOfLines={1}>
+            <Text className="text-xs text-error-500" numberOfLines={1}>
               {photo.error}
             </Text>
           )}

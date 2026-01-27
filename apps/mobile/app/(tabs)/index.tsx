@@ -79,7 +79,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
       {/* Tent Proximity Banner - shows at top when near a tent */}
       {Platform.OS !== "web" && (
         <TentProximityBanner onCheckIn={handleTentCheckIn} threshold={50} />
@@ -113,14 +113,14 @@ export default function HomeScreen() {
                 />
                 <Pressable
                   onPress={() => setShowMapModal(true)}
-                  className="bg-primary-500 flex-row items-center gap-2 rounded-lg px-3 py-2"
+                  className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
                   accessibilityLabel="Open festival map"
                 >
                   <Map size={18} color={Colors.white} />
                   <Text className="text-sm font-medium text-white">Map</Text>
                   {isSharing && nearbyMembers.length > 0 && (
                     <View className="ml-1 rounded-full bg-white px-2 py-0.5">
-                      <Text className="text-primary-600 text-xs font-bold">
+                      <Text className="text-xs font-bold text-primary-600">
                         {nearbyMembers.length}
                       </Text>
                     </View>

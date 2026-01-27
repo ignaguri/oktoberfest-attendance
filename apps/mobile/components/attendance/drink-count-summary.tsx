@@ -111,14 +111,14 @@ export function DrinkCountSummary({
     return (
       <HStack space="md" className="flex-wrap items-center">
         {showTotal && (
-          <Text className="text-typography-700 text-sm font-medium">
+          <Text className="text-sm font-medium text-typography-700">
             {total}
           </Text>
         )}
         {visibleCounts.map(({ type, count }) => (
           <HStack key={type} space="xs" className="items-center">
             <DrinkIcon type={type} size={14} color={getDrinkColor(type)} />
-            <Text className="text-typography-600 text-xs">{count}</Text>
+            <Text className="text-xs text-typography-600">{count}</Text>
           </HStack>
         ))}
       </HStack>
@@ -128,7 +128,7 @@ export function DrinkCountSummary({
   return (
     <VStack space="xs" className="items-center">
       {showTotal && (
-        <Text className="text-typography-500 text-sm">
+        <Text className="text-sm text-typography-500">
           {t("attendance.totalDrinks", {
             count: total,
           })}
@@ -140,7 +140,7 @@ export function DrinkCountSummary({
           {visibleCounts.map(({ type, count }) => (
             <HStack key={type} space="xs" className="items-center">
               <DrinkIcon type={type} size={16} color={getDrinkColor(type)} />
-              <Text className="text-typography-700 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-700">
                 {count}
               </Text>
             </HStack>

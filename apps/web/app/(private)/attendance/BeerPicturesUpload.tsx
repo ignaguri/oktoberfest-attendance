@@ -45,7 +45,7 @@ const PicturePreview = ({
         <button
           type="button"
           onClick={onRemove}
-          className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1"
+          className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1"
         >
           <X size={16} className="text-white" />
         </button>

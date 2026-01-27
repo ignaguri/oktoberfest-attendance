@@ -244,7 +244,7 @@ export function OfflineBadge({ className = "" }: OfflineBadgeProps) {
         <Cloud size={12} color={getIconColor()} />
       )}
       {pendingCount > 0 && (
-        <Text className="text-primary-600 text-xs">{pendingCount}</Text>
+        <Text className="text-xs text-primary-600">{pendingCount}</Text>
       )}
     </HStack>
   );

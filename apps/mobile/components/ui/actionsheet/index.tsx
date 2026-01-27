@@ -102,20 +102,20 @@ cssInterop(PrimitiveIcon, {
   },
 });
 
-const actionsheetStyle = tva({ base: "web:pointer-events-none h-full w-full" });
+const actionsheetStyle = tva({ base: "h-full w-full web:pointer-events-none" });
 
 const actionsheetContentStyle = tva({
   // pb-5 provides minimum bottom padding for all devices (20px)
   // On devices with home indicator, individual sheets can add pb-safe className if needed
-  base: "border-outline-100 bg-background-0 shadow-hard-5 web:pointer-events-auto web:select-none items-center rounded-tl-3xl rounded-tr-3xl border border-b-0 p-5 pb-5 pt-2",
+  base: "items-center rounded-tl-3xl rounded-tr-3xl border border-b-0 border-outline-100 bg-background-0 p-5 pb-5 pt-2 shadow-hard-5 web:pointer-events-auto web:select-none",
 });
 
 const actionsheetItemStyle = tva({
-  base: "hover:bg-background-50 active:bg-background-100 data-[focus=true]:bg-background-100 data-[disabled=true]:web:pointer-events-auto data-[disabled=true]:web:cursor-not-allowed web:data-[focus-visible=true]:bg-background-100 web:data-[focus-visible=true]:outline-indicator-primary w-full flex-row items-center gap-2 rounded-sm p-3 data-[disabled=true]:opacity-40",
+  base: "w-full flex-row items-center gap-2 rounded-sm p-3 hover:bg-background-50 active:bg-background-100 data-[focus=true]:bg-background-100 data-[disabled=true]:opacity-40 data-[disabled=true]:web:pointer-events-auto data-[disabled=true]:web:cursor-not-allowed web:data-[focus-visible=true]:bg-background-100 web:data-[focus-visible=true]:outline-indicator-primary",
 });
 
 const actionsheetItemTextStyle = tva({
-  base: "font-body text-typography-700 font-normal",
+  base: "font-body font-normal text-typography-700",
   variants: {
     isTruncated: {
       true: "",
@@ -146,7 +146,7 @@ const actionsheetItemTextStyle = tva({
 });
 
 const actionsheetDragIndicatorStyle = tva({
-  base: "bg-background-400 h-1 w-16 rounded-full",
+  base: "h-1 w-16 rounded-full bg-background-400",
 });
 
 const actionsheetDragIndicatorWrapperStyle = tva({
@@ -154,7 +154,7 @@ const actionsheetDragIndicatorWrapperStyle = tva({
 });
 
 const actionsheetBackdropStyle = tva({
-  base: "bg-background-dark web:pointer-events-auto web:cursor-default absolute bottom-0 left-0 right-0 top-0",
+  base: "absolute bottom-0 left-0 right-0 top-0 bg-background-dark web:pointer-events-auto web:cursor-default",
 });
 
 const actionsheetScrollViewStyle = tva({
@@ -174,7 +174,7 @@ const actionsheetSectionListStyle = tva({
 });
 
 const actionsheetSectionHeaderTextStyle = tva({
-  base: "font-heading text-typography-500 my-0 p-3 font-bold uppercase leading-5",
+  base: "font-heading my-0 p-3 font-bold uppercase leading-5 text-typography-500",
   variants: {
     isTruncated: {
       true: "",
@@ -216,7 +216,7 @@ const actionsheetSectionHeaderTextStyle = tva({
 });
 
 const actionsheetIconStyle = tva({
-  base: "text-background-500 fill-none",
+  base: "fill-none text-background-500",
   variants: {
     size: {
       "2xs": "h-3 w-3",

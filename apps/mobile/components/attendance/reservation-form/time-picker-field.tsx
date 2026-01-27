@@ -78,14 +78,14 @@ export function TimePickerField({
   return (
     <VStack space="sm">
       {label && (
-        <Text className="text-typography-700 text-sm font-medium">{label}</Text>
+        <Text className="text-sm font-medium text-typography-700">{label}</Text>
       )}
 
       <Pressable
         onPress={handlePress}
         disabled={disabled}
         className={cn(
-          "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
+          "w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3",
           disabled && "opacity-50",
           error && "border-error-500",
         )}
@@ -107,7 +107,7 @@ export function TimePickerField({
       </Pressable>
 
       {/* Error message */}
-      {error && <Text className="text-error-600 text-sm">{error}</Text>}
+      {error && <Text className="text-sm text-error-600">{error}</Text>}
 
       {/* Native Time Picker */}
       {showPicker && (
@@ -125,7 +125,7 @@ export function TimePickerField({
       {showPicker && Platform.OS === "ios" && (
         <Pressable
           onPress={() => setShowPicker(false)}
-          className="bg-primary-500 mt-2 items-center rounded-lg py-2"
+          className="mt-2 items-center rounded-lg bg-primary-500 py-2"
         >
           <Text className="font-medium text-white">
             {t("common.buttons.done")}

@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
             <li>Group memberships and competition participation</li>
           </ul>
 
-          <h3 className="mb-3 mt-6 text-xl font-medium">
+          <h3 className="mt-6 mb-3 text-xl font-medium">
             2.2 Information from Social Login
           </h3>
           <p>When you sign in using Google or Facebook, we receive:</p>
@@ -69,7 +69,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h3 className="mb-3 mt-6 text-xl font-medium">
+          <h3 className="mt-6 mb-3 text-xl font-medium">
             2.3 Automatically Collected Information
           </h3>
           <ul className="ml-4 list-inside list-disc space-y-2">
@@ -112,7 +112,7 @@ export default function PrivacyPolicy() {
             parties, except:
           </p>
 
-          <h3 className="mb-3 mt-4 text-xl font-medium">
+          <h3 className="mt-4 mb-3 text-xl font-medium">
             4.1 Service Providers
           </h3>
           <p>We use the following trusted service providers:</p>
@@ -134,7 +134,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h3 className="mb-3 mt-6 text-xl font-medium">4.2 Within the App</h3>
+          <h3 className="mt-6 mb-3 text-xl font-medium">4.2 Within the App</h3>
           <ul className="ml-4 list-inside list-disc space-y-2">
             <li>
               Your username and statistics are visible to other users in
@@ -147,7 +147,7 @@ export default function PrivacyPolicy() {
             <li>Achievement information may be visible to other users</li>
           </ul>
 
-          <h3 className="mb-3 mt-6 text-xl font-medium">
+          <h3 className="mt-6 mb-3 text-xl font-medium">
             4.3 Legal Requirements
           </h3>
           <p>
@@ -192,7 +192,7 @@ export default function PrivacyPolicy() {
             You can permanently delete your account and all associated data at
             any time by following these steps:
           </p>
-          <ol className="ml-4 mt-4 list-inside list-decimal space-y-2">
+          <ol className="mt-4 ml-4 list-inside list-decimal space-y-2">
             <li>Sign in to your ProstCounter account</li>
             <li>
               Go to your <strong>Profile</strong> page (click your avatar in the

@@ -96,18 +96,18 @@ cssInterop(PrimitiveIcon, {
   },
 });
 
-const actionsheetStyle = tva({ base: "web:pointer-events-none h-full w-full" });
+const actionsheetStyle = tva({ base: "h-full w-full web:pointer-events-none" });
 
 const actionsheetContentStyle = tva({
-  base: "pb-safe bg-background-0 web:pointer-events-auto web:select-none items-center rounded-tl-3xl rounded-tr-3xl p-2 shadow-lg",
+  base: "pb-safe items-center rounded-tl-3xl rounded-tr-3xl bg-background-0 p-2 shadow-lg web:pointer-events-auto web:select-none",
 });
 
 const actionsheetItemStyle = tva({
-  base: "hover:bg-background-50 active:bg-background-100 data-[checked=true]:bg-background-100 data-[focus=true]:bg-background-100 data-[disabled=true]:web:pointer-events-auto data-[disabled=true]:web:cursor-not-allowed web:data-[focus-visible=true]:bg-background-100 w-full flex-row items-center rounded-sm p-3 data-[disabled=true]:opacity-40",
+  base: "w-full flex-row items-center rounded-sm p-3 hover:bg-background-50 active:bg-background-100 data-[checked=true]:bg-background-100 data-[focus=true]:bg-background-100 data-[disabled=true]:opacity-40 data-[disabled=true]:web:pointer-events-auto data-[disabled=true]:web:cursor-not-allowed web:data-[focus-visible=true]:bg-background-100",
 });
 
 const actionsheetItemTextStyle = tva({
-  base: "font-body tracking-md text-typography-700 mx-2 text-left font-normal",
+  base: "font-body tracking-md mx-2 text-left font-normal text-typography-700",
   variants: {
     isTruncated: {
       true: "",
@@ -141,7 +141,7 @@ const actionsheetItemTextStyle = tva({
 });
 
 const actionsheetDragIndicatorStyle = tva({
-  base: "bg-background-400 h-1 w-16 rounded-full",
+  base: "h-1 w-16 rounded-full bg-background-400",
 });
 
 const actionsheetDragIndicatorWrapperStyle = tva({
@@ -149,7 +149,7 @@ const actionsheetDragIndicatorWrapperStyle = tva({
 });
 
 const actionsheetBackdropStyle = tva({
-  base: "bg-background-dark web:pointer-events-auto web:cursor-default absolute bottom-0 left-0 right-0 top-0",
+  base: "absolute bottom-0 left-0 right-0 top-0 bg-background-dark web:pointer-events-auto web:cursor-default",
 });
 
 const actionsheetScrollViewStyle = tva({
@@ -169,7 +169,7 @@ const actionsheetSectionListStyle = tva({
 });
 
 const actionsheetSectionHeaderTextStyle = tva({
-  base: "font-heading text-typography-500 my-0 p-3 font-bold uppercase leading-5",
+  base: "font-heading my-0 p-3 font-bold uppercase leading-5 text-typography-500",
   variants: {
     isTruncated: {
       true: "",
