@@ -3,7 +3,6 @@
 
 # Documentation
 docs/
-*.md
 
 # Web app (not needed for mobile builds)
 apps/web/

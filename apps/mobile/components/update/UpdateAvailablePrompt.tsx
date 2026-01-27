@@ -75,7 +75,7 @@ export function UpdateAvailablePrompt({
             })}
           >
             {isLoading ? (
-              <ButtonSpinner color={Colors.primary[600]} />
+              <ButtonSpinner color="white" />
             ) : (
               <ButtonText>
                 {t("update.available.restartNow", {
