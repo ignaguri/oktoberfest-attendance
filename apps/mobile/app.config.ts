@@ -58,11 +58,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     package: "com.prostcounter.app",
     googleServicesFile: "./google-services.json",
-    config: {
-      googleMaps: {
-        apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
-      },
-    },
     permissions: [
       "android.permission.ACCESS_COARSE_LOCATION",
       "android.permission.ACCESS_FINE_LOCATION",
@@ -98,6 +93,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     "./plugins/withModularHeaders.js",
+    "./plugins/withGoogleMapsApiKey.js",
     "expo-maps",
     "expo-updates",
   ],
