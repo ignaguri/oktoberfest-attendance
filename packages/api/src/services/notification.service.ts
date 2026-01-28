@@ -4,6 +4,8 @@ import type { Database } from "@prostcounter/db";
 import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../lib/logger";
+
 type NotificationPreferences =
   Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -60,7 +62,7 @@ export class NotificationService {
       );
       return true;
     } catch (error) {
-      console.error("Error registering FCM token:", error);
+      logger.error({ error }, "Error registering FCM token");
       return false;
     }
   }
@@ -85,7 +87,7 @@ export class NotificationService {
       );
       return { success: true, novuRegistered: true };
     } catch (error) {
-      console.error("Error registering Expo push token:", error);
+      logger.error({ error }, "Error registering Expo push token");
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -126,13 +128,16 @@ export class NotificationService {
     lastName?: string,
     avatar?: string,
   ): Promise<{ success: boolean; error?: string }> {
-    console.log("[NotificationService] subscribeUser called:", {
-      userId,
-      userEmail,
-      firstName,
-      lastName,
-      avatar: avatar ? "present" : "null",
-    });
+    logger.debug(
+      {
+        userId,
+        userEmail,
+        firstName,
+        lastName,
+        avatar: avatar ? "present" : "null",
+      },
+      "subscribeUser called",
+    );
 
     try {
       const result = await this.novu.subscribers.create({
@@ -142,13 +147,10 @@ export class NotificationService {
         lastName,
         avatar,
       });
-      console.log(
-        "[NotificationService] Novu subscriber create result:",
-        result,
-      );
+      logger.debug({ result }, "Novu subscriber create result");
       return { success: true };
     } catch (error) {
-      console.error("[NotificationService] Error subscribing user:", error);
+      logger.error({ error }, "Error subscribing user");
 
       // Check if it's a 409 Conflict (subscriber already exists)
       // First check for status code property (Novu SDK may include this)
@@ -173,17 +175,20 @@ export class NotificationService {
         // According to Novu SDK, calling create on an existing subscriber updates it
         // But some versions may throw 409. In that case, we consider it a success
         // since the subscriber already exists and can receive notifications
-        console.log(
-          "[NotificationService] Subscriber already exists - treating as success",
-        );
+        logger.debug("Subscriber already exists - treating as success");
         return { success: true };
       }
 
       // Log full error details for non-409 errors
       if (error instanceof Error) {
-        console.error("[NotificationService] Error name:", error.name);
-        console.error("[NotificationService] Error message:", error.message);
-        console.error("[NotificationService] Error stack:", error.stack);
+        logger.error(
+          {
+            errorName: error.name,
+            errorMessage: error.message,
+            errorStack: error.stack,
+          },
+          "Error details",
+        );
       }
       return { success: false, error: errorMessage };
     }
@@ -202,7 +207,7 @@ export class NotificationService {
       .single();
 
     if (error) {
-      console.error("Error fetching notification preferences:", error);
+      logger.error({ error }, "Error fetching notification preferences");
       return null;
     }
 
@@ -234,7 +239,7 @@ export class NotificationService {
       );
 
     if (error) {
-      console.error("Error updating notification preferences:", error);
+      logger.error({ error }, "Error updating notification preferences");
       return false;
     }
 
@@ -266,7 +271,7 @@ export class NotificationService {
         payload,
       });
     } catch (error) {
-      console.error("Error sending reservation reminder:", error);
+      logger.error({ error }, "Error sending reservation reminder");
     }
   }
 
@@ -295,7 +300,7 @@ export class NotificationService {
         payload,
       });
     } catch (error) {
-      console.error("Error sending reservation prompt:", error);
+      logger.error({ error }, "Error sending reservation prompt");
     }
   }
 
@@ -325,7 +330,7 @@ export class NotificationService {
         payload,
       });
     } catch (error) {
-      console.error("Error sending achievement notification:", error);
+      logger.error({ error }, "Error sending achievement notification");
     }
   }
 
@@ -352,9 +357,11 @@ export class NotificationService {
         .in("user_id", recipientIds);
 
       if (error) {
-        console.error(
-          "Error fetching preferences for group achievement:",
-          error,
+        logger.error(
+          {
+            error,
+          },
+          "Error fetching preferences for group achievement",
         );
         return;
       }
@@ -376,7 +383,7 @@ export class NotificationService {
         ),
       );
     } catch (error) {
-      console.error("Error sending group achievement notification:", error);
+      logger.error({ error }, "Error sending group achievement notification");
     }
   }
 
@@ -438,7 +445,7 @@ export class NotificationService {
         payload,
       });
     } catch (error) {
-      console.error("Error sending group join notification:", error);
+      logger.error({ error }, "Error sending group join notification");
     }
   }
 
@@ -464,7 +471,10 @@ export class NotificationService {
         .single();
 
       if (userError || !user) {
-        console.error("Error fetching user for tent checkin:", userError);
+        logger.error(
+          { error: userError },
+          "Error fetching user for tent checkin",
+        );
         return;
       }
 
@@ -483,7 +493,7 @@ export class NotificationService {
         .neq("user_id", userId);
 
       if (membersError) {
-        console.error("Error fetching group members:", membersError);
+        logger.error({ error: membersError }, "Error fetching group members");
         return;
       }
 
@@ -502,7 +512,10 @@ export class NotificationService {
         .eq("checkin_enabled", true);
 
       if (prefsError) {
-        console.error("Error fetching member preferences:", prefsError);
+        logger.error(
+          { error: prefsError },
+          "Error fetching member preferences",
+        );
         return;
       }
 
@@ -539,7 +552,7 @@ export class NotificationService {
 
       await Promise.allSettled(notificationPromises);
     } catch (error) {
-      console.error("Error sending tent checkin notifications:", error);
+      logger.error({ error }, "Error sending tent checkin notifications");
     }
   }
 }

@@ -15,6 +15,7 @@ import {
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { NotFoundError, ValidationError } from "../middleware/error";
 import {
@@ -319,9 +320,11 @@ app.openapi(createAttendanceRoute, async (c) => {
         }
       } catch (notificationError) {
         // Don't fail the attendance operation if notification fails
-        console.error(
-          "Failed to send tent check-in notification:",
-          notificationError,
+        logger.error(
+          {
+            error: notificationError,
+          },
+          "Failed to send tent check-in notification",
         );
       }
     }

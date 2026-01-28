@@ -6,6 +6,7 @@ import {
   isBiometricEnabled,
   setBiometricEnabled as storeBiometricEnabled,
 } from "@/lib/auth/secure-storage";
+import { logger } from "@/lib/logger";
 
 export type BiometricType = "facial" | "fingerprint" | null;
 
@@ -56,7 +57,7 @@ export function useBiometrics(): UseBiometricsResult {
       setBiometricType(hardwareResult.type);
       setIsEnabled(enabledResult);
     } catch (error) {
-      console.error("Error loading biometric state:", error);
+      logger.error("Error loading biometric state:", error);
       setIsAvailable(false);
       setBiometricType(null);
       setIsEnabled(false);
@@ -118,7 +119,7 @@ export function useBiometrics(): UseBiometricsResult {
           };
       }
     } catch (error) {
-      console.error("Biometric authentication error:", error);
+      logger.error("Biometric authentication error:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Authentication failed",

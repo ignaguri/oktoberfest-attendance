@@ -25,6 +25,7 @@ import {
   useOfflineSafe,
   usePendingCount,
 } from "@/lib/database/offline-provider";
+import { logger } from "@/lib/logger";
 
 // =============================================================================
 // Types
@@ -102,7 +103,7 @@ export function OfflineIndicator({
       onPress();
     } else if (isOnline && syncStatus !== "syncing") {
       // Trigger manual sync
-      sync().catch(console.error);
+      sync().catch((error) => logger.error("Manual sync failed", error));
     }
   };
 

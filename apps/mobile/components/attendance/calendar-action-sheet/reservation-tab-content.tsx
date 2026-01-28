@@ -31,6 +31,7 @@ import { Text } from "@/components/ui/text";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors, SwitchColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
 import { ReminderOffsetSelect } from "../reservation-form/reminder-offset-select";
@@ -223,7 +224,7 @@ export function ReservationTabContent({
         onSuccess?.();
         onClose();
       } catch (error) {
-        console.error("Failed to save reservation:", error);
+        logger.error("Failed to save reservation:", error);
       }
     },
     [
@@ -263,7 +264,7 @@ export function ReservationTabContent({
       onSuccess?.();
       onClose();
     } catch (error) {
-      console.error("Failed to cancel reservation:", error);
+      logger.error("Failed to cancel reservation:", error);
     }
   }, [
     existingReservation?.id,

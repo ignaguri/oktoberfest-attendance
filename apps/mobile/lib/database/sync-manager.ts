@@ -15,6 +15,8 @@
 
 import type * as SQLite from "expo-sqlite";
 
+import { logger } from "@/lib/logger";
+
 import { apiClient } from "../api-client";
 import type {
   LocalAchievement,
@@ -177,7 +179,7 @@ export class SyncManager {
       result.duration = Date.now() - startTime;
     }
 
-    console.log(
+    logger.debug(
       `[SyncManager] Sync complete: pulled=${result.pulled}, pushed=${result.pushed}, failed=${result.failed}, duration=${result.duration}ms`,
     );
     return result;
@@ -195,7 +197,7 @@ export class SyncManager {
     const { festivalId, userId } = options;
 
     if (!festivalId) {
-      console.warn("[SyncManager] No festivalId provided, skipping pull");
+      logger.warn("[SyncManager] No festivalId provided, skipping pull");
       return results;
     }
 
@@ -203,7 +205,7 @@ export class SyncManager {
       // Disable foreign key checks during sync to avoid constraint failures
       // (e.g., attendances referencing user_ids not yet in local profiles table)
       await this.db.execAsync("PRAGMA foreign_keys = OFF");
-      console.log("[SyncManager] Foreign keys disabled for sync");
+      logger.debug("[SyncManager] Foreign keys disabled for sync");
 
       // Pull reference data first (festivals, tents, achievements)
       results.push(await this.pullFestivals());
@@ -219,12 +221,12 @@ export class SyncManager {
         results.push(await this.pullUserAchievements(festivalId));
       }
     } catch (error) {
-      console.error("[SyncManager] Pull failed:", error);
+      logger.error("[SyncManager] Pull failed:", error);
       throw error;
     } finally {
       // Re-enable foreign key checks
       await this.db.execAsync("PRAGMA foreign_keys = ON");
-      console.log("[SyncManager] Foreign keys re-enabled after sync");
+      logger.debug("[SyncManager] Foreign keys re-enabled after sync");
     }
 
     return results;
@@ -321,7 +323,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "festivals", now);
     } catch (error) {
-      console.error("[SyncManager] Pull festivals failed:", error);
+      logger.error("[SyncManager] Pull festivals failed:", error);
     }
 
     return result;
@@ -368,7 +370,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "tents", now);
     } catch (error) {
-      console.error("[SyncManager] Pull tents failed:", error);
+      logger.error("[SyncManager] Pull tents failed:", error);
     }
 
     return result;
@@ -444,7 +446,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "achievements", now);
     } catch (error) {
-      console.error("[SyncManager] Pull achievements failed:", error);
+      logger.error("[SyncManager] Pull achievements failed:", error);
     }
 
     return result;
@@ -510,7 +512,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "profiles", now);
     } catch (error) {
-      console.error("[SyncManager] Pull profile failed:", error);
+      logger.error("[SyncManager] Pull profile failed:", error);
     }
 
     return result;
@@ -578,7 +580,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "attendances", now);
     } catch (error) {
-      console.error("[SyncManager] Pull attendances failed:", error);
+      logger.error("[SyncManager] Pull attendances failed:", error);
     }
 
     return result;
@@ -671,7 +673,7 @@ export class SyncManager {
             }
           }
         } catch (error) {
-          console.error(
+          logger.error(
             `[SyncManager] Pull consumptions for ${att.date} failed:`,
             error,
           );
@@ -680,7 +682,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "consumptions", now);
     } catch (error) {
-      console.error("[SyncManager] Pull consumptions failed:", error);
+      logger.error("[SyncManager] Pull consumptions failed:", error);
     }
 
     return result;
@@ -751,7 +753,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "groups", now);
     } catch (error) {
-      console.error("[SyncManager] Pull groups failed:", error);
+      logger.error("[SyncManager] Pull groups failed:", error);
     }
 
     return result;
@@ -808,7 +810,7 @@ export class SyncManager {
 
       await updateLastSyncAt(this.db, "user_achievements", now);
     } catch (error) {
-      console.error("[SyncManager] Pull user achievements failed:", error);
+      logger.error("[SyncManager] Pull user achievements failed:", error);
     }
 
     return result;
@@ -826,7 +828,7 @@ export class SyncManager {
 
     // Get pending operations from queue
     const pendingOps = await getPendingOperations(this.db);
-    console.log(
+    logger.debug(
       `[SyncManager] Processing ${pendingOps.length} pending operations`,
     );
 
@@ -881,7 +883,7 @@ export class SyncManager {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
       await markOperationFailed(this.db, op.id, errorMsg);
       result.error = errorMsg;
-      console.error(`[SyncManager] Operation ${op.id} failed:`, error);
+      logger.error(`[SyncManager] Operation ${op.id} failed:`, error);
     }
 
     return result;
@@ -943,7 +945,7 @@ export class SyncManager {
         break;
       }
       default:
-        console.warn(`[SyncManager] No insert handler for table: ${tableName}`);
+        logger.warn(`[SyncManager] No insert handler for table: ${tableName}`);
     }
   }
 
@@ -971,7 +973,7 @@ export class SyncManager {
         });
         break;
       default:
-        console.warn(`[SyncManager] No update handler for table: ${tableName}`);
+        logger.warn(`[SyncManager] No update handler for table: ${tableName}`);
     }
   }
 
@@ -987,7 +989,7 @@ export class SyncManager {
         await apiClient.consumption.delete(recordId);
         break;
       default:
-        console.warn(`[SyncManager] No delete handler for table: ${tableName}`);
+        logger.warn(`[SyncManager] No delete handler for table: ${tableName}`);
     }
   }
 

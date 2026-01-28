@@ -33,6 +33,7 @@ import {
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 // Form validation schema
 const CreateGroupFormSchema = z.object({
@@ -105,7 +106,7 @@ export function CreateGroupSheet({
         reset();
         onSuccess(groupId);
       } catch (error) {
-        console.error("Failed to create group:", error);
+        logger.error("Failed to create group:", error);
         // Error handling is done via the hook's error state
       }
     },

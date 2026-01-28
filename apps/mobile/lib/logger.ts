@@ -74,7 +74,10 @@ function truncateData(data: unknown): unknown {
 }
 
 class Logger {
-  private isDev = __DEV__;
+  private isDev =
+    typeof __DEV__ !== "undefined"
+      ? __DEV__
+      : process.env.NODE_ENV !== "production";
 
   private formatMessage(
     level: LogLevel,

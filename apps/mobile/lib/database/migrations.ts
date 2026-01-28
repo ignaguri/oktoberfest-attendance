@@ -14,6 +14,7 @@
 
 import type * as SQLite from "expo-sqlite";
 
+import { logger } from "../logger";
 import { getSchemaVersion, initializeSchema, setSchemaVersion } from "./init";
 import { SCHEMA_VERSION } from "./schema";
 
@@ -55,15 +56,11 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   const targetVersion = SCHEMA_VERSION;
 
   if (currentVersion >= targetVersion) {
-    console.log(
-      `[Migrations] No migrations needed (current: v${currentVersion}, target: v${targetVersion})`,
-    );
+    logger.info("No migrations needed", { currentVersion, targetVersion });
     return;
   }
 
-  console.log(
-    `[Migrations] Running migrations from v${currentVersion} to v${targetVersion}`,
-  );
+  logger.info("Running migrations", { currentVersion, targetVersion });
 
   // Run each migration in sequence
   for (let version = currentVersion; version < targetVersion; version++) {
@@ -76,9 +73,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
       );
     }
 
-    console.log(
-      `[Migrations] Running migration v${version} -> v${version + 1}`,
-    );
+    logger.info("Running migration", { from: version, to: version + 1 });
 
     try {
       // Run migration in a transaction for atomicity
@@ -88,21 +83,20 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
 
       // Update schema version after successful migration
       await setSchemaVersion(db, version + 1);
-      console.log(`[Migrations] Completed migration to v${version + 1}`);
+      logger.info("Completed migration", { version: version + 1 });
     } catch (error) {
-      console.error(
-        `[Migrations] Migration v${version} -> v${version + 1} failed:`,
+      logger.error("Migration failed", {
         error,
-      );
+        from: version,
+        to: version + 1,
+      });
       throw new Error(
         `Migration failed at v${version} -> v${version + 1}: ${error}`,
       );
     }
   }
 
-  console.log(
-    `[Migrations] All migrations completed. Now at v${targetVersion}`,
-  );
+  logger.info("All migrations completed", { version: targetVersion });
 }
 
 /**
@@ -154,16 +148,14 @@ export async function addColumnIfNotExists(
   const columnExists = columns.some((col) => col.name === columnName);
 
   if (columnExists) {
-    console.log(
-      `[Migrations] Column ${tableName}.${columnName} already exists, skipping`,
-    );
+    logger.debug("Column already exists, skipping", { tableName, columnName });
     return false;
   }
 
   await db.execAsync(
     `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`,
   );
-  console.log(`[Migrations] Added column ${tableName}.${columnName}`);
+  logger.info("Added column", { tableName, columnName });
   return true;
 }
 
@@ -203,7 +195,7 @@ export async function renameTable(
   newName: string,
 ): Promise<void> {
   await db.execAsync(`ALTER TABLE ${oldName} RENAME TO ${newName}`);
-  console.log(`[Migrations] Renamed table ${oldName} -> ${newName}`);
+  logger.info("Renamed table", { oldName, newName });
 }
 
 /**
@@ -218,7 +210,7 @@ export async function backupTable(
   await db.execAsync(
     `CREATE TABLE ${backupName} AS SELECT * FROM ${tableName}`,
   );
-  console.log(`[Migrations] Created backup: ${backupName}`);
+  logger.info("Created backup", { backupName });
   return backupName;
 }
 
@@ -232,7 +224,7 @@ export async function restoreFromBackup(
 ): Promise<void> {
   await db.execAsync(`DROP TABLE IF EXISTS ${tableName}`);
   await db.execAsync(`ALTER TABLE ${backupName} RENAME TO ${tableName}`);
-  console.log(`[Migrations] Restored ${tableName} from ${backupName}`);
+  logger.info("Restored table from backup", { tableName, backupName });
 }
 
 /**
@@ -243,5 +235,5 @@ export async function dropBackup(
   backupName: string,
 ): Promise<void> {
   await db.execAsync(`DROP TABLE IF EXISTS ${backupName}`);
-  console.log(`[Migrations] Dropped backup: ${backupName}`);
+  logger.info("Dropped backup", { backupName });
 }

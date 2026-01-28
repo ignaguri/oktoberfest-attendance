@@ -10,6 +10,8 @@
 
 import type * as SQLite from "expo-sqlite";
 
+import { logger } from "@/lib/logger";
+
 import type { SyncQueueItem } from "./schema";
 import {
   getPendingOperations,
@@ -107,7 +109,7 @@ export class QueueProcessor {
    */
   async processQueue(): Promise<ProcessorResult> {
     if (this.isProcessing) {
-      console.log("[QueueProcessor] Already processing, skipping");
+      logger.debug("[QueueProcessor] Already processing, skipping");
       return {
         processed: 0,
         succeeded: 0,
@@ -131,12 +133,12 @@ export class QueueProcessor {
       const operations = await this.getReadyOperations();
       const total = operations.length;
 
-      console.log(`[QueueProcessor] Processing ${total} operations`);
+      logger.debug(`[QueueProcessor] Processing ${total} operations`);
 
       for (const op of operations) {
         // Check for abort signal
         if (this.options.signal?.aborted) {
-          console.log("[QueueProcessor] Aborted");
+          logger.debug("[QueueProcessor] Aborted");
           break;
         }
 
@@ -165,7 +167,7 @@ export class QueueProcessor {
       this.isProcessing = false;
     }
 
-    console.log(
+    logger.debug(
       `[QueueProcessor] Complete: succeeded=${result.succeeded}, failed=${result.failed}, skipped=${result.skipped}`,
     );
 
@@ -180,7 +182,7 @@ export class QueueProcessor {
   ): Promise<{ success: boolean; skipped?: boolean; error?: string }> {
     // Check if operation has exceeded max retries
     if (op.retry_count >= this.options.maxRetries) {
-      console.log(
+      logger.debug(
         `[QueueProcessor] Operation ${op.id} exceeded max retries, skipping`,
       );
       return { success: false, skipped: true, error: "Max retries exceeded" };
@@ -194,7 +196,7 @@ export class QueueProcessor {
       );
 
       if (dependency && dependency.status !== "completed") {
-        console.log(
+        logger.debug(
           `[QueueProcessor] Operation ${op.id} waiting for dependency ${op.depends_on}`,
         );
         return {
@@ -208,7 +210,7 @@ export class QueueProcessor {
     // Get handler for this operation type
     const handler = this.operationHandlers.get(op.operation);
     if (!handler) {
-      console.warn(
+      logger.warn(
         `[QueueProcessor] No handler for operation type: ${op.operation}`,
       );
       return { success: false, error: `No handler for ${op.operation}` };
@@ -234,7 +236,7 @@ export class QueueProcessor {
 
       // Schedule retry with backoff
       const delay = this.calculateBackoff(op.retry_count);
-      console.log(
+      logger.debug(
         `[QueueProcessor] Operation ${op.id} failed, will retry after ${delay}ms`,
       );
 
@@ -389,7 +391,7 @@ export async function withRetry<T>(
         );
 
         options.onRetry?.(attempt + 1, lastError);
-        console.log(
+        logger.debug(
           `[withRetry] Attempt ${attempt + 1} failed, retrying in ${delay}ms`,
         );
 

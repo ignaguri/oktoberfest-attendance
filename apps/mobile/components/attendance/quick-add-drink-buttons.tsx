@@ -11,6 +11,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
 import { Colors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 import { VISIBLE_DRINK_TYPES } from "./drink-type-picker";
 
@@ -128,7 +129,7 @@ export function QuickAddDrinkButtons({
         // Clear success after animation
         setTimeout(() => setSuccessType(null), 1500);
       } catch (error) {
-        console.error("Failed to log consumption:", error);
+        logger.error("Failed to log consumption:", error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       } finally {
         setLoadingType(null);

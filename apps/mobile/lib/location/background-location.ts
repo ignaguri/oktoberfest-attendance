@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 
+import { logger } from "@/lib/logger";
+
 /**
  * Background location task name
  */
@@ -74,7 +76,7 @@ export async function setBackgroundLocationData(
       await AsyncStorage.removeItem(BG_DATA_STORAGE_KEY);
     }
   } catch (err) {
-    console.error("[BackgroundLocation] Error persisting data:", err);
+    logger.error("Error persisting data", err);
   }
 }
 
@@ -89,7 +91,7 @@ async function getPersistedData(): Promise<BackgroundLocationData | null> {
       return JSON.parse(raw) as BackgroundLocationData;
     }
   } catch (err) {
-    console.error("[BackgroundLocation] Error reading persisted data:", err);
+    logger.error("Error reading persisted data", err);
   }
   return null;
 }
@@ -100,28 +102,29 @@ async function getPersistedData(): Promise<BackgroundLocationData | null> {
  */
 TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
   if (error) {
-    console.error("[BackgroundLocation] Task error:", error);
+    logger.error("Task error", error);
     return;
   }
 
   if (!data) {
-    console.warn("[BackgroundLocation] No data received");
+    logger.warn("No data received");
     return;
   }
 
   const { locations } = data as { locations: Location.LocationObject[] };
 
   if (!locations || locations.length === 0) {
-    console.warn("[BackgroundLocation] No locations in data");
+    logger.warn("No locations in data");
     return;
   }
 
   // Get the most recent location
   const latestLocation = locations[locations.length - 1];
 
-  console.log(
-    `[BackgroundLocation] Received location: ${latestLocation.coords.latitude}, ${latestLocation.coords.longitude}`,
-  );
+  logger.debug("Received location", {
+    latitude: latestLocation.coords.latitude,
+    longitude: latestLocation.coords.longitude,
+  });
 
   // Recover data from AsyncStorage if globals were cleared (cold start)
   if (!backgroundLocationData) {
@@ -134,23 +137,22 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
     try {
       await onBackgroundLocationUpdate(latestLocation, backgroundLocationData);
     } catch (err) {
-      console.error("[BackgroundLocation] Error in callback:", err);
+      logger.error("Error in callback", err);
     }
   } else {
     missingCallbackCount++;
-    console.warn(
-      `[BackgroundLocation] Callback or data missing (attempt ${missingCallbackCount}/${MAX_MISSING_CALLBACK})`,
-    );
+    logger.warn("Callback or data missing", {
+      attempt: missingCallbackCount,
+      max: MAX_MISSING_CALLBACK,
+    });
 
     // Stop updates if callback is consistently missing to save battery
     if (missingCallbackCount >= MAX_MISSING_CALLBACK) {
-      console.warn(
-        "[BackgroundLocation] Max missing callback attempts reached, stopping updates",
-      );
+      logger.warn("Max missing callback attempts reached, stopping updates");
       try {
         await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
       } catch (err) {
-        console.error("[BackgroundLocation] Error auto-stopping:", err);
+        logger.error("Error auto-stopping", err);
       }
     }
   }
@@ -171,7 +173,7 @@ export async function startBackgroundLocationUpdates(
     );
 
     if (isRunning) {
-      console.log("[BackgroundLocation] Task already running, stopping first");
+      logger.debug("Task already running, stopping first");
       await stopBackgroundLocationUpdates();
     }
 
@@ -194,10 +196,10 @@ export async function startBackgroundLocationUpdates(
       activityType: Location.ActivityType.Other,
     });
 
-    console.log("[BackgroundLocation] Started successfully");
+    logger.info("Started successfully");
     return true;
   } catch (error) {
-    console.error("[BackgroundLocation] Error starting:", error);
+    logger.error("Error starting", error);
     return false;
   }
 }
@@ -213,13 +215,13 @@ export async function stopBackgroundLocationUpdates(): Promise<void> {
 
     if (isRunning) {
       await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
-      console.log("[BackgroundLocation] Stopped successfully");
+      logger.info("Stopped successfully");
     }
 
     // Clear the data (including persisted)
     await setBackgroundLocationData(null);
   } catch (error) {
-    console.error("[BackgroundLocation] Error stopping:", error);
+    logger.error("Error stopping", error);
   }
 }
 
@@ -232,7 +234,7 @@ export async function isBackgroundLocationRunning(): Promise<boolean> {
       BACKGROUND_LOCATION_TASK,
     );
   } catch (error) {
-    console.error("[BackgroundLocation] Error checking status:", error);
+    logger.error("Error checking status", error);
     return false;
   }
 }

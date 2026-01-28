@@ -17,6 +17,7 @@ import {
   useBeerPictureUpload,
 } from "@/hooks/useBeerPictureUpload";
 import { IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 import { getBeerPictureUrl } from "@/lib/utils";
 
 interface BeerPicture {
@@ -74,7 +75,7 @@ export function BeerPicturesSection({
 
   const { pickImages, isPicking, error } = useBeerPictureUpload({
     onError: (err) => {
-      console.error("Photo selection failed:", err);
+      logger.error("Photo selection failed:", err);
     },
   });
 

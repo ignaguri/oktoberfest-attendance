@@ -25,6 +25,7 @@ import { OfflineDataProvider } from "@/lib/database/offline-provider";
 import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
 import { LocationProvider } from "@/lib/location";
+import { logger } from "@/lib/logger";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 import {
   checkInitialNotification,
@@ -180,7 +181,7 @@ export default function RootLayout() {
       try {
         await initMobileI18n();
       } catch (error) {
-        console.error("Failed to initialize app:", error);
+        logger.error("Failed to initialize app", { error });
       } finally {
         setIsReady(true);
         if (Platform.OS !== "web") {

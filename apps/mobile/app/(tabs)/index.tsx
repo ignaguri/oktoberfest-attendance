@@ -26,6 +26,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 import { useLocationContextSafe } from "@/lib/location";
+import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
 
 /**
@@ -60,7 +61,7 @@ export default function HomeScreen() {
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
       await queryClient.invalidateQueries({ queryKey: ["attendances"] });
     } catch (error) {
-      console.error("Failed to refresh:", error);
+      logger.error("Failed to refresh:", error);
     } finally {
       setIsRefreshing(false);
     }

@@ -15,6 +15,8 @@ import {
 } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 
+import { logger } from "@/lib/logger";
+
 import { OfflineContext } from "./offline-provider";
 import type {
   LocalAchievement,
@@ -108,7 +110,9 @@ export function useOfflineQuery<T = unknown[]>({
   // Trigger background sync after initial query
   useEffect(() => {
     if (syncAfterQuery && query.isSuccess && isReady) {
-      sync({ direction: "pull" }).catch(console.error);
+      sync({ direction: "pull" }).catch((error) =>
+        logger.error("Sync after query failed", error),
+      );
     }
   }, [syncAfterQuery, query.isSuccess, isReady]);
 

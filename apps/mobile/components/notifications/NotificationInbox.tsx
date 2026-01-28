@@ -103,7 +103,7 @@ interface NotificationInboxProps {
  * Usage:
  * ```tsx
  * <NovuProviderWrapper>
- *   <NotificationInbox onNotificationPress={(n) => console.log(n.id)} />
+ *   <NotificationInbox onNotificationPress={(n) => logger.debug(n.id)} />
  * </NovuProviderWrapper>
  * ```
  */

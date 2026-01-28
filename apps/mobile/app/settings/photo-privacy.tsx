@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { apiClient } from "@/lib/api-client";
 import { Colors, SwitchColorsDestructive } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 interface GroupPhotoSetting {
   groupId: string;
@@ -52,7 +53,7 @@ export default function PhotoPrivacyScreen() {
         groups: groupsResponse.settings ?? [],
       });
     } catch (error) {
-      console.error("Error fetching photo privacy settings:", error);
+      logger.error("Error fetching photo privacy settings:", error);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

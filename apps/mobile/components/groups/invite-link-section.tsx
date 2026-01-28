@@ -12,6 +12,7 @@ import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 interface InviteLinkSectionProps {
   groupId: string;
@@ -47,7 +48,7 @@ export function InviteLinkSection({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error("Failed to copy:", error);
+      logger.error("Failed to copy:", error);
     }
   }, [inviteUrl]);
 
@@ -65,7 +66,7 @@ export function InviteLinkSection({
         url: inviteUrl,
       });
     } catch (error) {
-      console.error("Failed to share:", error);
+      logger.error("Failed to share:", error);
     }
   }, [inviteUrl, groupName, t]);
 
@@ -75,7 +76,7 @@ export function InviteLinkSection({
       await renewToken.mutateAsync({ groupId });
       onTokenUpdated?.();
     } catch (error) {
-      console.error("Failed to regenerate token:", error);
+      logger.error("Failed to regenerate token:", error);
     }
   }, [groupId, renewToken, onTokenUpdated]);
 

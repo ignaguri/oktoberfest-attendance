@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppStateStatus } from "react-native";
 import { AppState, Platform } from "react-native";
 
+import { logger } from "@/lib/logger";
+
 interface AppUpdateState {
   isChecking: boolean;
   isDownloading: boolean;
@@ -68,7 +70,7 @@ export function useAppUpdate() {
         setState((prev) => ({ ...prev, isChecking: false }));
       }
     } catch (error) {
-      console.error("Error checking for update:", error);
+      logger.error("Error checking for update:", error);
       setState((prev) => ({
         ...prev,
         isChecking: false,

@@ -103,7 +103,7 @@ export const optionalAuthMiddleware = createMiddleware<
       }
     } catch (error) {
       // Silently fail for optional auth
-      logger.warn("Optional auth failed", { error });
+      logger.warn({ error }, "Optional auth failed");
     }
   }
 

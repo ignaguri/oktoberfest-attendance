@@ -6,6 +6,7 @@ import {
   type LocationPermissionStatus,
   setLocationPermissionStatus,
 } from "@/lib/auth/secure-storage";
+import { logger } from "@/lib/logger";
 
 /**
  * Location hook for managing device location and permissions
@@ -54,15 +55,16 @@ export function useLocation() {
 
         // Sync with stored status if different
         if (actualStatus !== storedStatus) {
-          console.log(
-            `[Location] Syncing permission status: stored=${storedStatus}, device=${actualStatus}`,
-          );
+          logger.debug("Syncing permission status", {
+            stored: storedStatus,
+            device: actualStatus,
+          });
           await setLocationPermissionStatus(actualStatus);
         }
 
         setPermissionStatusState(actualStatus);
       } catch (error) {
-        console.error("[Location] Error loading permission state:", error);
+        logger.error("Error loading permission state", error);
       } finally {
         setIsPermissionLoading(false);
       }
@@ -90,10 +92,7 @@ export function useLocation() {
         await setLocationPermissionStatus("denied");
         return false;
       } catch (error) {
-        console.error(
-          "[Location] Error requesting foreground permission:",
-          error,
-        );
+        logger.error("Error requesting foreground permission", error);
         return false;
       }
     }, []);
@@ -108,8 +107,8 @@ export function useLocation() {
         // Check if foreground permission is granted first
         const foreground = await Location.getForegroundPermissionsAsync();
         if (foreground.status !== "granted") {
-          console.warn(
-            "[Location] Must have foreground permission before requesting background",
+          logger.warn(
+            "Must have foreground permission before requesting background",
           );
           return false;
         }
@@ -125,10 +124,7 @@ export function useLocation() {
         // Keep foreground status if background was denied
         return false;
       } catch (error) {
-        console.error(
-          "[Location] Error requesting background permission:",
-          error,
-        );
+        logger.error("Error requesting background permission", error);
         return false;
       }
     }, []);
@@ -158,7 +154,7 @@ export function useLocation() {
         permissionStatus !== "foreground" &&
         permissionStatus !== "background"
       ) {
-        console.warn("[Location] Permission not granted");
+        logger.warn("Permission not granted");
         return null;
       }
 
@@ -176,7 +172,7 @@ export function useLocation() {
         const message =
           error instanceof Error ? error.message : "Failed to get location";
         setLocationError(message);
-        console.error("[Location] Error getting current location:", error);
+        logger.error("Error getting current location", error);
         return null;
       } finally {
         setIsLocationLoading(false);
@@ -201,7 +197,7 @@ export function useLocation() {
         permissionStatus !== "foreground" &&
         permissionStatus !== "background"
       ) {
-        console.warn("[Location] Permission not granted for watching");
+        logger.warn("Permission not granted for watching");
         return false;
       }
 
@@ -225,7 +221,7 @@ export function useLocation() {
 
         return true;
       } catch (error) {
-        console.error("[Location] Error starting location watch:", error);
+        logger.error("Error starting location watch", error);
         return false;
       }
     },
@@ -257,7 +253,7 @@ export function useLocation() {
       try {
         return await Location.hasServicesEnabledAsync();
       } catch (error) {
-        console.error("[Location] Error checking location services:", error);
+        logger.error("Error checking location services", error);
         return false;
       }
     }, []);

@@ -25,6 +25,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 type JoinMode = "search" | "token";
 
@@ -99,7 +100,7 @@ export function JoinGroupSheet({
 
       onSuccess();
     } catch (err: any) {
-      console.error("Failed to join group:", err);
+      logger.error("Failed to join group:", err);
       // Extract error message from API response
       const message =
         err?.response?.data?.message || err?.message || t("groups.join.error");

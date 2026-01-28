@@ -19,6 +19,7 @@ import { useCallback, useContext } from "react";
 
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
+import { logger } from "@/lib/logger";
 
 /**
  * Offline-aware hook to log a new consumption
@@ -59,10 +60,9 @@ export function useOfflineLogConsumption() {
 
       await refreshPendingCount();
 
-      console.log(
-        "[OfflineConsumption] Queued consumption locally:",
+      logger.debug("[OfflineConsumption] Queued consumption locally:", {
         consumptionId,
-      );
+      });
 
       // Return a mock consumption object for optimistic UI
       return {
@@ -87,11 +87,11 @@ export function useOfflineLogConsumption() {
     mutationFn: async (input: LogConsumptionInput) => {
       // If online or offline mode not available, use API
       if (isOnline || !context) {
-        console.log("[OfflineConsumption] Online - calling API");
+        logger.debug("[OfflineConsumption] Online - calling API");
         return apiMutation.mutateAsync(input);
       } else {
         // Offline: queue locally
-        console.log("[OfflineConsumption] Offline - queuing locally");
+        logger.debug("[OfflineConsumption] Offline - queuing locally");
         return logConsumptionOffline(input);
       }
     },
@@ -136,10 +136,9 @@ export function useOfflineDeleteConsumption() {
 
       await refreshPendingCount();
 
-      console.log(
-        "[OfflineConsumption] Queued deletion locally:",
+      logger.debug("[OfflineConsumption] Queued deletion locally:", {
         consumptionId,
-      );
+      });
     },
     [isReady, getDb, refreshPendingCount],
   );
@@ -148,11 +147,11 @@ export function useOfflineDeleteConsumption() {
     mutationFn: async (consumptionId: string) => {
       // If online or offline mode not available, use API
       if (isOnline || !context) {
-        console.log("[OfflineConsumption] Online - calling API for delete");
+        logger.debug("[OfflineConsumption] Online - calling API for delete");
         return apiMutation.mutateAsync(consumptionId);
       } else {
         // Offline: queue locally
-        console.log("[OfflineConsumption] Offline - queuing delete locally");
+        logger.debug("[OfflineConsumption] Offline - queuing delete locally");
         return deleteConsumptionOffline(consumptionId);
       }
     },

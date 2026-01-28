@@ -8,6 +8,7 @@ import {
   UpdateNotificationPreferencesSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { NotificationService } from "../services/notification.service";
 
@@ -60,11 +61,14 @@ app.openapi(registerTokenRoute, async (c) => {
   const supabase = c.var.supabase;
   const { token } = c.req.valid("json");
 
-  console.log("[Notification Route] Register token request:", {
-    userId: user.id,
-    tokenLength: token?.length,
-    tokenPrefix: token?.substring(0, 30),
-  });
+  logger.debug(
+    {
+      userId: user.id,
+      tokenLength: token?.length,
+      tokenPrefix: token?.substring(0, 30),
+    },
+    "Register token request",
+  );
 
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
@@ -72,7 +76,7 @@ app.openapi(registerTokenRoute, async (c) => {
   // Auto-detect token type (Expo push token or FCM token)
   const result = await notificationService.registerPushToken(user.id, token);
 
-  console.log("[Notification Route] Register token result:", result);
+  logger.debug(result, "Register token result");
   return c.json(result, 200);
 });
 
@@ -122,13 +126,16 @@ app.openapi(subscribeUserRoute, async (c) => {
   const supabase = c.var.supabase;
   const { email, firstName, lastName, avatar } = c.req.valid("json");
 
-  console.log("[Notification Route] Subscribe request:", {
-    userId: user.id,
-    email: email || "(empty)",
-    firstName: firstName || "(empty)",
-    lastName: lastName || "(empty)",
-    avatar: avatar ? "present" : "(empty)",
-  });
+  logger.debug(
+    {
+      userId: user.id,
+      email: email || "(empty)",
+      firstName: firstName || "(empty)",
+      lastName: lastName || "(empty)",
+      avatar: avatar ? "present" : "(empty)",
+    },
+    "Subscribe request",
+  );
 
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
@@ -141,7 +148,7 @@ app.openapi(subscribeUserRoute, async (c) => {
     avatar,
   );
 
-  console.log("[Notification Route] Subscribe result:", result);
+  logger.debug(result, "Subscribe result");
   return c.json(result, 200);
 });
 
