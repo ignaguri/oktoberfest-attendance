@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
+import { loggerMiddleware } from "./middleware/logger";
 // Import routes
 import achievementRoute from "./routes/achievement.route";
 import activityFeedRoute from "./routes/activity-feed.route";
@@ -24,6 +25,9 @@ export const app = new OpenAPIHono();
 
 // Register global error handler
 app.onError(errorHandler);
+
+// Register global logger middleware (logs all requests)
+app.use("*", loggerMiddleware);
 
 // Health check endpoint (public)
 app.get("/health", (c) => {
