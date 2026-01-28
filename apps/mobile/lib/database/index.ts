@@ -150,6 +150,17 @@ export type {
 // Type helpers
 export { isDeleted, isSynced, needsSync, stripOfflineFields } from "./types";
 
+// Background sync
+export {
+  BACKGROUND_SYNC_TASK,
+  BackgroundFetchResult,
+  getBackgroundFetchStatus,
+  isBackgroundSyncEnabled,
+  registerBackgroundSync,
+  setBackgroundSyncContext,
+  unregisterBackgroundSync,
+} from "./background-sync";
+
 // Constants
 export {
   CREATE_INDEXES_SQL,

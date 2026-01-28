@@ -70,6 +70,7 @@ interface LocationContextType {
   startSharing: (
     festivalId: string,
     durationMinutes?: number,
+    groupIds?: string[],
   ) => Promise<boolean>;
   stopSharing: () => Promise<boolean>;
   startLocalTracking: (festivalId?: string) => Promise<boolean>;
@@ -181,9 +182,16 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
   /**
    * Start location sharing
+   * @param festivalId - Festival to share location for
+   * @param durationMinutes - How long to share (default 2 hours)
+   * @param groupIds - Specific groups to share with (undefined = all groups)
    */
   const startSharing = useCallback(
-    async (festivalId: string, durationMinutes = 120): Promise<boolean> => {
+    async (
+      festivalId: string,
+      durationMinutes = 120,
+      groupIds?: string[],
+    ): Promise<boolean> => {
       if (!location.hasPermission) {
         logger.warn("No permission to start sharing");
         return false;
@@ -207,6 +215,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
                 timestamp: new Date(currentLoc.timestamp).toISOString(),
               }
             : undefined,
+          // Pass visibility and groupIds if specific groups selected
+          visibility: groupIds && groupIds.length > 0 ? "specific" : "groups",
+          groupIds: groupIds && groupIds.length > 0 ? groupIds : undefined,
         });
 
         if (!result?.session) {
@@ -658,7 +669,7 @@ const defaultContext: LocationContextType = {
   requestPermission: async () => false,
   requestBackgroundPermission: async () => false,
   markPromptAsShown: async () => {},
-  startSharing: async () => false,
+  startSharing: async (_festivalId, _durationMinutes?, _groupIds?) => false,
   stopSharing: async () => false,
   startLocalTracking: async () => false,
   stopLocalTracking: () => {},

@@ -13,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
+import { SyncStatusBar } from "@/components/sync";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdateAvailablePrompt } from "@/components/update/UpdateAvailablePrompt";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
@@ -21,6 +22,11 @@ import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { useFocusManager } from "@/lib/data/focus-manager-setup";
 import { useOnlineManager } from "@/lib/data/online-manager-setup";
 import { DataProvider } from "@/lib/data/query-client";
+import {
+  registerBackgroundSync,
+  setBackgroundSyncContext,
+  unregisterBackgroundSync,
+} from "@/lib/database/background-sync";
 import { OfflineDataProvider } from "@/lib/database/offline-provider";
 import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
@@ -88,6 +94,36 @@ function OfflineDataBridge({ children }: { children: React.ReactNode }) {
       {children}
     </OfflineDataProvider>
   );
+}
+
+// Background sync handler - registers/unregisters background sync based on auth state
+function BackgroundSyncHandler() {
+  const { user, isAuthenticated } = useAuth();
+  const { currentFestival } = useFestival();
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+
+    async function setupBackgroundSync() {
+      if (isAuthenticated && user?.id && currentFestival?.id) {
+        // Set context for background sync task
+        await setBackgroundSyncContext(user.id, currentFestival.id);
+        // Register background sync (15 minute interval)
+        const registered = await registerBackgroundSync(15 * 60);
+        if (registered) {
+          logger.info("[BackgroundSync] Registered successfully");
+        }
+      } else if (!isAuthenticated) {
+        // Unregister when user logs out
+        await setBackgroundSyncContext(null, null);
+        await unregisterBackgroundSync();
+      }
+    }
+
+    setupBackgroundSync();
+  }, [isAuthenticated, user?.id, currentFestival?.id]);
+
+  return null;
 }
 
 // Auto-show notification permission prompt after first login
@@ -229,8 +265,10 @@ export default function RootLayout() {
                           <NovuProviderWrapper>
                             <LocationProvider>
                               <NavigationGuard>
+                                <BackgroundSyncHandler />
                                 <NotificationPromptHandler />
                                 <UpdatePromptHandler />
+                                <SyncStatusBar />
                                 <Stack
                                   screenOptions={{
                                     headerShown: false,

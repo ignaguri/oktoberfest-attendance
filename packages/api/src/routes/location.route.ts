@@ -11,6 +11,7 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseLocationRepository } from "../repositories/supabase";
 import { LocationService } from "../services/location.service";
+import { NotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -87,6 +88,19 @@ app.openapi(startSessionRoute, async (c) => {
   const locationService = new LocationService(locationRepo);
 
   const session = await locationService.startSession(user.id, data);
+
+  // Notify group members about location sharing (fire and forget)
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (novuApiKey) {
+    const notificationService = new NotificationService(supabase, novuApiKey);
+    // Pass groupIds if specific visibility was selected
+    const groupIds = data.visibility === "specific" ? data.groupIds : undefined;
+    notificationService
+      .notifyLocationSharingStarted(user.id, data.festivalId, groupIds)
+      .catch(() => {
+        // Silently ignore notification errors - don't fail the session start
+      });
+  }
 
   return c.json({ session }, 200);
 });

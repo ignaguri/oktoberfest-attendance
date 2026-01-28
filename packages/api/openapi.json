@@ -2017,8 +2017,8 @@
             "schema": {
               "type": "integer",
               "minimum": 10,
-              "maximum": 5000,
-              "default": 100
+              "maximum": 2000,
+              "default": 250
             },
             "required": false,
             "name": "radiusMeters",
@@ -7730,6 +7730,21 @@
                       "longitude",
                       "timestamp"
                     ]
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "groups",
+                      "specific"
+                    ],
+                    "default": "groups"
+                  },
+                  "groupIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
                   }
                 },
                 "required": [
@@ -7780,6 +7795,14 @@
                         "updatedAt": {
                           "type": "string",
                           "format": "date-time"
+                        },
+                        "sharedGroupIds": {
+                          "type": "array",
+                          "nullable": true,
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
                         }
                       },
                       "required": [
@@ -7937,6 +7960,14 @@
                         "updatedAt": {
                           "type": "string",
                           "format": "date-time"
+                        },
+                        "sharedGroupIds": {
+                          "type": "array",
+                          "nullable": true,
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
                         }
                       },
                       "required": [

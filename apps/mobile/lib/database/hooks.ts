@@ -32,6 +32,7 @@ import {
   enqueueOperation,
   generateConsumptionIdempotencyKey,
   generateUUID,
+  getRecentConsumption,
 } from "./sync-queue";
 
 // =============================================================================
@@ -583,6 +584,8 @@ export interface LogConsumptionInput {
 
 /**
  * Hook to log a consumption.
+ * Includes deduplication: if the same drink type was logged within 30 seconds
+ * for the same attendance, returns the existing consumption instead of creating a duplicate.
  */
 export function useLocalLogConsumption() {
   const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
@@ -595,9 +598,26 @@ export function useLocalLogConsumption() {
       }
 
       const db = getDb();
+
+      // Check for recent duplicate consumption (within 30 seconds)
+      const recentConsumption = await getRecentConsumption<LocalConsumption>(
+        db,
+        input.attendanceId,
+        input.drinkType,
+        30, // seconds
+      );
+
+      if (recentConsumption) {
+        // Return existing consumption instead of creating a duplicate
+        logger.debug(
+          `[useLocalLogConsumption] Deduplication: returning existing consumption ${recentConsumption.id}`,
+        );
+        return recentConsumption;
+      }
+
       const now = new Date().toISOString();
       const id = generateUUID();
-      // Note: Using attendance_id as user_id placeholder since we don't have user context here
+      // Create unique idempotency key with timestamp for server sync
       const idempotencyKey = generateConsumptionIdempotencyKey(
         input.attendanceId, // userId placeholder
         input.festivalId,

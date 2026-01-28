@@ -13,6 +13,7 @@ import {
 } from "lucide-react-native";
 import { useMemo } from "react";
 import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   QuickAttendanceFab,
@@ -40,6 +41,7 @@ function TabIcon({ Icon, color, focused }: TabIconProps) {
 function TabsLayoutContent() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
+  const insets = useSafeAreaInsets();
   const {
     isOpen,
     openSheet,
@@ -79,10 +81,8 @@ function TabsLayoutContent() {
           tabBarStyle: {
             backgroundColor: Colors.white,
             borderTopColor: Colors.gray[200],
-            paddingTop: 6,
-            paddingBottom: 6,
-            height: 52,
           },
+          tabBarHideOnKeyboard: true,
           tabBarShowLabel: false,
         }}
       >

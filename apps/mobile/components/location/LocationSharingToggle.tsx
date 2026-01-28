@@ -1,5 +1,11 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { MapPin, Radio } from "lucide-react-native";
+import {
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+  Radio,
+  Users,
+} from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
 
@@ -12,6 +18,7 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useLocationContext } from "@/lib/location";
 
+import { GroupSelector } from "./GroupSelector";
 import { LocationPermissionPrompt } from "./LocationPermissionPrompt";
 
 interface LocationSharingToggleProps {
@@ -49,6 +56,9 @@ export function LocationSharingToggle({
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState(120);
   const [isToggling, setIsToggling] = useState(false);
+  const [isGroupSelectorOpen, setIsGroupSelectorOpen] = useState(false);
+  const [shareWithAll, setShareWithAll] = useState(true);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
   const handleToggle = useCallback(async () => {
     if (isSharing) {
@@ -74,7 +84,9 @@ export function LocationSharingToggle({
         const granted = await requestPermission();
         if (!granted) return;
       }
-      await startSharing(festivalId, selectedDuration);
+      // Pass groupIds only if not sharing with all groups
+      const groupIds = shareWithAll ? undefined : selectedGroupIds;
+      await startSharing(festivalId, selectedDuration, groupIds);
     } finally {
       setIsToggling(false);
     }
@@ -87,13 +99,17 @@ export function LocationSharingToggle({
     requestPermission,
     festivalId,
     selectedDuration,
+    shareWithAll,
+    selectedGroupIds,
   ]);
 
   const handleEnableFromPrompt = useCallback(async () => {
     await markPromptAsShown();
     const granted = await requestPermission();
     if (granted) {
-      await startSharing(festivalId, selectedDuration);
+      // Pass groupIds only if not sharing with all groups
+      const groupIds = shareWithAll ? undefined : selectedGroupIds;
+      await startSharing(festivalId, selectedDuration, groupIds);
     }
   }, [
     markPromptAsShown,
@@ -101,11 +117,36 @@ export function LocationSharingToggle({
     startSharing,
     festivalId,
     selectedDuration,
+    shareWithAll,
+    selectedGroupIds,
   ]);
 
   const handleSkipPrompt = useCallback(async () => {
     await markPromptAsShown();
   }, [markPromptAsShown]);
+
+  // Get display text for group selection
+  const getGroupSelectionText = () => {
+    if (shareWithAll) {
+      return t("location.groups.allGroups", {
+        defaultValue: "All groups",
+      });
+    }
+    if (selectedGroupIds.length === 0) {
+      return t("location.groups.noGroupsSelected", {
+        defaultValue: "No groups selected",
+      });
+    }
+    if (selectedGroupIds.length === 1) {
+      return t("location.groups.oneGroup", {
+        defaultValue: "1 group",
+      });
+    }
+    return t("location.groups.multipleGroups", {
+      defaultValue: "{{count}} groups",
+      count: selectedGroupIds.length,
+    });
+  };
 
   if (compact) {
     return (
@@ -199,29 +240,85 @@ export function LocationSharingToggle({
           </HStack>
 
           {!isSharing && (
-            <HStack space="sm" className="justify-center">
-              {DURATION_OPTIONS.map((option) => (
-                <Pressable
-                  key={option.value}
-                  onPress={() => setSelectedDuration(option.value)}
-                  className={`rounded-full px-4 py-2 ${
-                    selectedDuration === option.value
-                      ? "bg-primary-500"
-                      : "bg-background-100"
-                  }`}
-                >
-                  <Text
-                    className={
+            <>
+              {/* Duration selector */}
+              <HStack space="sm" className="justify-center">
+                {DURATION_OPTIONS.map((option) => (
+                  <Pressable
+                    key={option.value}
+                    onPress={() => setSelectedDuration(option.value)}
+                    className={`rounded-full px-4 py-2 ${
                       selectedDuration === option.value
-                        ? "font-medium text-white"
-                        : "text-typography-600"
-                    }
+                        ? "bg-primary-500"
+                        : "bg-background-100"
+                    }`}
                   >
-                    {t(option.labelKey)}
-                  </Text>
+                    <Text
+                      className={
+                        selectedDuration === option.value
+                          ? "font-medium text-white"
+                          : "text-typography-600"
+                      }
+                    >
+                      {t(option.labelKey)}
+                    </Text>
+                  </Pressable>
+                ))}
+              </HStack>
+
+              {/* Group selector accordion */}
+              <VStack className="rounded-xl border border-outline-200 bg-background-50">
+                {/* Accordion header */}
+                <Pressable
+                  onPress={() => setIsGroupSelectorOpen(!isGroupSelectorOpen)}
+                  className="active:bg-background-100"
+                  accessibilityLabel={t("location.groups.selectGroups")}
+                  accessibilityHint={
+                    isGroupSelectorOpen
+                      ? t("location.groups.collapseHint", {
+                          defaultValue: "Collapse group selection",
+                        })
+                      : t("location.groups.expandHint", {
+                          defaultValue: "Expand group selection",
+                        })
+                  }
+                >
+                  <HStack className="items-center justify-between p-3">
+                    <HStack space="sm" className="items-center">
+                      <Users size={18} color={IconColors.default} />
+                      <VStack>
+                        <Text className="text-sm font-medium text-typography-900">
+                          {t("location.groups.visibleTo", {
+                            defaultValue: "Visible to",
+                          })}
+                        </Text>
+                        <Text className="text-xs text-typography-500">
+                          {getGroupSelectionText()}
+                        </Text>
+                      </VStack>
+                    </HStack>
+                    {isGroupSelectorOpen ? (
+                      <ChevronUp size={20} color={IconColors.muted} />
+                    ) : (
+                      <ChevronDown size={20} color={IconColors.muted} />
+                    )}
+                  </HStack>
                 </Pressable>
-              ))}
-            </HStack>
+
+                {/* Accordion content */}
+                {isGroupSelectorOpen && (
+                  <View className="border-t border-outline-200 px-3 pb-3">
+                    <GroupSelector
+                      festivalId={festivalId}
+                      selectedGroupIds={selectedGroupIds}
+                      onSelectionChange={setSelectedGroupIds}
+                      shareWithAll={shareWithAll}
+                      onShareWithAllChange={setShareWithAll}
+                    />
+                  </View>
+                )}
+              </VStack>
+            </>
           )}
 
           <Button

@@ -1906,6 +1906,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           accuracy?: number;
           timestamp: string;
         };
+        /** Visibility: "groups" (all) or "specific" (selected groups) */
+        visibility?: "groups" | "specific";
+        /** Group IDs to share with when visibility is "specific" */
+        groupIds?: string[];
       }): Promise<{
         session: {
           id: string;
@@ -1916,6 +1920,8 @@ export function createTypedApiClient(config: ApiClientConfig) {
           expiresAt: string;
           createdAt: string;
           updatedAt: string;
+          /** Group IDs this session is shared with (null if all groups) */
+          sharedGroupIds?: string[] | null;
         };
       }> {
         const headers = await getAuthHeaders();
@@ -1947,6 +1953,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           expiresAt: string;
           createdAt: string;
           updatedAt: string;
+          sharedGroupIds?: string[] | null;
         };
       }> {
         const headers = await getAuthHeaders();
