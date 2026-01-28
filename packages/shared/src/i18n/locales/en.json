@@ -188,6 +188,7 @@
     "pageTitle": "Groups",
     "yourGroups": "Your Groups:",
     "noGroupsYet": "You are not a member of any group yet for this festival.",
+    "noFestival": "Please select a festival to view groups",
     "joinOrCreate": "Join or Create a Group",
     "memberCount": "{{count}} member",
     "memberCount_other": "{{count}} members",
