@@ -5,6 +5,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 
+import { logger } from "./logger";
+
 const supabaseUrl =
   Constants.expoConfig?.extra?.supabaseUrl ||
   (typeof process !== "undefined"
@@ -17,6 +19,16 @@ const supabaseAnonKey =
     ? process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
     : "") ||
   "";
+
+// Log Supabase configuration on startup
+logger.info("Supabase Client Configuration", {
+  supabaseUrl,
+  hasSupabaseUrl: !!supabaseUrl,
+  hasAnonKey: !!supabaseAnonKey,
+  anonKeyPrefix: supabaseAnonKey
+    ? `${supabaseAnonKey.substring(0, 20)}...`
+    : "MISSING",
+});
 
 // Lazily create the Supabase client to avoid SSR issues
 let _supabase: SupabaseClient<Database> | null = null;

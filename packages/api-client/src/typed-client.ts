@@ -49,6 +49,12 @@ export interface ApiClientConfig {
   baseUrl: string;
   /** Function to get auth headers for requests */
   getAuthHeaders: () => Promise<ApiHeaders>;
+  /** Optional callback for logging requests */
+  onRequest?: (method: string, url: string, headers: ApiHeaders) => void;
+  /** Optional callback for logging responses */
+  onResponse?: (method: string, url: string, status: number, data: unknown) => void;
+  /** Optional callback for logging errors */
+  onError?: (method: string, url: string, error: unknown) => void;
 }
 
 /**
@@ -95,7 +101,45 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
  * Create a typed API client with all endpoint methods
  */
 export function createTypedApiClient(config: ApiClientConfig) {
-  const { baseUrl, getAuthHeaders } = config;
+  const { baseUrl, getAuthHeaders, onRequest, onResponse, onError } = config;
+
+  /**
+   * Wrapper around fetch that includes logging
+   */
+  async function fetchWithLogging(
+    method: string,
+    url: string,
+    options: RequestInit,
+  ): Promise<Response> {
+    try {
+      // Log request
+      if (onRequest) {
+        onRequest(method, url, options.headers as ApiHeaders);
+      }
+
+      const response = await fetch(url, options);
+
+      // Log response
+      if (onResponse) {
+        const clonedResponse = response.clone();
+        try {
+          const data = await clonedResponse.json();
+          onResponse(method, url, response.status, data);
+        } catch {
+          // Response wasn't JSON, that's okay
+          onResponse(method, url, response.status, null);
+        }
+      }
+
+      return response;
+    } catch (error) {
+      // Log error
+      if (onError) {
+        onError(method, url, error);
+      }
+      throw error;
+    }
+  }
 
   return {
     /**
