@@ -46,6 +46,7 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 // Map winning criteria to numeric ID for the leaderboard hook
 const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
@@ -122,7 +123,7 @@ export default function GroupDetailScreen() {
         url: inviteUrl,
       });
     } catch (error) {
-      console.error("Failed to share:", error);
+      logger.error("Failed to share:", error);
     }
   }, [group, showDialog, t]);
 
