@@ -96,6 +96,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withGoogleMapsApiKey.js",
     "expo-maps",
     "expo-updates",
+    "sentry-expo",
   ],
   experiments: {
     typedRoutes: true,

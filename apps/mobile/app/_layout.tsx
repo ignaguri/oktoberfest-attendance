@@ -36,6 +36,12 @@ import {
   useNotificationContext,
 } from "@/lib/notifications/NotificationContext";
 import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
+import { initSentry } from "@/lib/sentry";
+
+// Initialize Sentry for error monitoring (native only)
+if (Platform.OS !== "web") {
+  initSentry();
+}
 
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {

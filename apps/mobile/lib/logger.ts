@@ -51,10 +51,34 @@ class Logger {
 
     console.error(this.formatMessage("error", message, errorContext));
 
-    // TODO: Send to Sentry or other monitoring service in production
-    // if (!this.isDev && typeof Sentry !== 'undefined') {
-    //   Sentry.captureException(error, { contexts: { custom: context } });
-    // }
+    // Send to Sentry in production
+    if (!this.isDev) {
+      try {
+        // Dynamic import to avoid issues if Sentry isn't initialized
+        const Sentry = require("./sentry").Sentry;
+
+        if (error instanceof Error) {
+          Sentry.captureException(error, {
+            contexts: {
+              custom: context,
+            },
+            tags: {
+              source: "logger",
+            },
+          });
+        } else {
+          Sentry.captureMessage(message, {
+            level: "error",
+            contexts: {
+              custom: errorContext,
+            },
+          });
+        }
+      } catch (e) {
+        // Fail silently if Sentry isn't available
+        console.warn("[Logger] Failed to send error to Sentry:", e);
+      }
+    }
   }
 
   logApiRequest(method: string, url: string, headers?: Record<string, string>) {
