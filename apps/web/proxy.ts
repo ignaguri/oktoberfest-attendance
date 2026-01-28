@@ -7,9 +7,7 @@ import { updateSession } from "@/utils/supabase/middleware";
 export async function proxy(request: NextRequest) {
   const publicPaths = [
     "/",
-    "/api/cron/scheduler",
-    "/api/novu",
-    "/api/v1", // API routes handle their own auth via Authorization header
+    "/api", // API routes handle their own auth via Authorization header
     "/auth",
     "/auth/callback",
     "/auth/confirm",
@@ -82,7 +80,7 @@ export async function proxy(request: NextRequest) {
   if (
     publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/r/") ||
-    request.nextUrl.pathname.startsWith("/api/v1/") || // API routes handle their own auth
+    request.nextUrl.pathname.startsWith("/api/") || // API routes handle their own auth
     request.nextUrl.pathname.startsWith("/serwist/") // Service worker assets
   ) {
     return NextResponse.next();
