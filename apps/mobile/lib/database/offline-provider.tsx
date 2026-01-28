@@ -24,6 +24,8 @@ import {
 import type { AppStateStatus } from "react-native";
 import { AppState, Platform } from "react-native";
 
+import { logger } from "@/lib/logger";
+
 import { initializeDatabase } from "./init";
 import type { SyncManager } from "./sync-manager";
 import {
@@ -133,13 +135,13 @@ export function OfflineDataProvider({
 
     async function init() {
       try {
-        console.log("[OfflineProvider] Initializing database...");
+        logger.debug("[OfflineProvider] Initializing database...");
         const db = await initializeDatabase();
 
         if (!mounted) {
           // Don't close the database - React Strict Mode will remount
           // and the new instance needs the database connection
-          console.log(
+          logger.debug(
             "[OfflineProvider] Unmounted during init, skipping setup",
           );
           return;
@@ -153,10 +155,10 @@ export function OfflineDataProvider({
         if (mounted) {
           setPendingCount(stats.pending + stats.failed);
           setIsReady(true);
-          console.log("[OfflineProvider] Database ready");
+          logger.debug("[OfflineProvider] Database ready");
         }
       } catch (err) {
-        console.error("[OfflineProvider] Initialization failed:", err);
+        logger.error("[OfflineProvider] Initialization failed:", err);
         if (mounted) {
           setError(
             err instanceof Error
@@ -184,7 +186,7 @@ export function OfflineDataProvider({
       const stats = await getQueueStats(dbRef.current);
       setPendingCount(stats.pending + stats.failed);
     } catch (err) {
-      console.error("[OfflineProvider] Failed to refresh pending count:", err);
+      logger.error("[OfflineProvider] Failed to refresh pending count:", err);
     }
   }, []);
 

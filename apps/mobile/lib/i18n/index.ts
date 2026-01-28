@@ -4,6 +4,8 @@ import {
   initI18n,
 } from "@prostcounter/shared/i18n";
 
+import { logger } from "../logger";
+
 const LANGUAGE_KEY = "@prostcounter/language";
 
 /**
@@ -36,7 +38,7 @@ export async function initMobileI18n() {
     initI18n(locale);
   } catch (error) {
     // Fallback to English if anything fails
-    console.warn("Failed to initialize i18n with locale detection:", error);
+    logger.warn("Failed to initialize i18n with locale detection", { error });
     initI18n("en");
   }
 }
@@ -53,7 +55,7 @@ export async function setLanguage(language: string) {
         require("@react-native-async-storage/async-storage").default;
       await AsyncStorage.setItem(LANGUAGE_KEY, language);
     } catch (error) {
-      console.warn("Failed to persist language:", error);
+      logger.warn("Failed to persist language", { error });
     }
   }
 

@@ -74,6 +74,7 @@ import {
 } from "@/components/ui";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 type ComponentType =
   | "buttons"
@@ -930,7 +931,7 @@ const DevToolsShowcase = () => {
         ),
       });
     } catch (error) {
-      console.error("Failed to clear auth cache:", error);
+      logger.error("Failed to clear auth cache", { error });
       toast.show({
         placement: "top",
         duration: 3000,
@@ -965,7 +966,7 @@ const DevToolsShowcase = () => {
         ),
       });
     } catch (error) {
-      console.error("Failed to clear storage:", error);
+      logger.error("Failed to clear storage", { error });
     } finally {
       setIsClearing(false);
     }

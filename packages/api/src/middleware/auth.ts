@@ -2,6 +2,7 @@ import type { User } from "@supabase/supabase-js";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createMiddleware } from "hono/factory";
 
+import { logger } from "../lib/logger";
 import { UnauthorizedError } from "./error";
 
 // Extend Hono context to include user
@@ -102,7 +103,7 @@ export const optionalAuthMiddleware = createMiddleware<
       }
     } catch (error) {
       // Silently fail for optional auth
-      console.warn("Optional auth failed:", error);
+      logger.warn({ error }, "Optional auth failed");
     }
   }
 

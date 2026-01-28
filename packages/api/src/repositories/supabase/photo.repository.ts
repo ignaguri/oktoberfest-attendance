@@ -10,6 +10,7 @@ import type {
 import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../../lib/logger";
 import {
   DatabaseError,
   ForbiddenError,
@@ -215,8 +216,11 @@ export class SupabasePhotoRepository implements IPhotoRepository {
 
     if (storageError) {
       // Log but don't fail - database record is more important
-      console.warn(
-        `Failed to delete file from storage: ${storageError.message}`,
+      logger.warn(
+        {
+          error: storageError,
+        },
+        "Failed to delete file from storage",
       );
     }
 

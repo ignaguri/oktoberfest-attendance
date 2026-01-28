@@ -19,6 +19,8 @@ import {
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import type * as SQLite from "expo-sqlite";
 
+import { logger } from "@/lib/logger";
+
 import type { LocalBeerPicture, PhotoVisibility } from "./schema";
 import { enqueueOperation } from "./sync-queue";
 
@@ -112,7 +114,9 @@ export async function ensurePendingUploadsDir(): Promise<void> {
 
   if (!dirInfo.exists) {
     await makeDirectoryAsync(dirPath, { intermediates: true });
-    console.log("[PhotoQueue] Created pending uploads directory:", dirPath);
+    logger.debug("[PhotoQueue] Created pending uploads directory:", {
+      dirPath,
+    });
   }
 }
 
@@ -164,7 +168,7 @@ export async function savePendingPhoto(
     to: permanentPath,
   });
 
-  console.log("[PhotoQueue] Saved photo to:", permanentPath);
+  logger.debug("[PhotoQueue] Saved photo to:", { permanentPath });
 
   const now = new Date().toISOString();
 
@@ -214,7 +218,7 @@ export async function savePendingPhotos(
       const result = await savePendingPhoto(db, input);
       results.push(result);
     } catch (error) {
-      console.error("[PhotoQueue] Failed to save pending photo:", error);
+      logger.error("[PhotoQueue] Failed to save pending photo:", error);
       // Continue with other photos even if one fails
     }
   }
@@ -422,7 +426,9 @@ export async function uploadPendingPhoto(
     await cleanupLocalPhoto(photo._local_uri);
     onProgress?.(photo.id, 1.0);
 
-    console.log("[PhotoQueue] Successfully uploaded photo:", photo.id);
+    logger.debug("[PhotoQueue] Successfully uploaded photo:", {
+      photoId: photo.id,
+    });
 
     return {
       id: photo.id,
@@ -430,7 +436,9 @@ export async function uploadPendingPhoto(
       success: true,
     };
   } catch (error) {
-    console.error("[PhotoQueue] Failed to upload photo:", photo.id, error);
+    logger.error("[PhotoQueue] Failed to upload photo:", error, {
+      photoId: photo.id,
+    });
 
     return {
       id: photo.id,
@@ -460,7 +468,9 @@ export async function processPendingPhotoUploads(
     };
   }
 
-  console.log(`[PhotoQueue] Processing ${pendingPhotos.length} pending photos`);
+  logger.debug(
+    `[PhotoQueue] Processing ${pendingPhotos.length} pending photos`,
+  );
 
   const results: PhotoUploadResult[] = [];
   let succeeded = 0;
@@ -477,7 +487,7 @@ export async function processPendingPhotoUploads(
     }
   }
 
-  console.log(
+  logger.debug(
     `[PhotoQueue] Upload complete: ${succeeded} succeeded, ${failed} failed`,
   );
 
@@ -501,14 +511,13 @@ export async function cleanupLocalPhoto(localUri: string): Promise<void> {
     const fileInfo = await getInfoAsync(localUri);
     if (fileInfo.exists) {
       await deleteAsync(localUri, { idempotent: true });
-      console.log("[PhotoQueue] Cleaned up local file:", localUri);
+      logger.debug("[PhotoQueue] Cleaned up local file:", { localUri });
     }
   } catch (error) {
-    console.warn(
-      "[PhotoQueue] Failed to clean up local file:",
+    logger.warn("[PhotoQueue] Failed to clean up local file:", {
       localUri,
       error,
-    );
+    });
     // Don't throw - cleanup failure shouldn't block upload success
   }
 }
@@ -543,7 +552,7 @@ export async function cleanupOrphanedPhotos(
   }
 
   if (cleaned > 0) {
-    console.log(`[PhotoQueue] Cleaned up ${cleaned} orphaned photos`);
+    logger.debug(`[PhotoQueue] Cleaned up ${cleaned} orphaned photos`);
   }
 
   return cleaned;
@@ -575,7 +584,7 @@ export async function deletePendingPhoto(
     await cleanupLocalPhoto(photo._local_uri);
   }
 
-  console.log("[PhotoQueue] Deleted pending photo:", photoId);
+  logger.debug("[PhotoQueue] Deleted pending photo:", { photoId });
 }
 
 // =============================================================================

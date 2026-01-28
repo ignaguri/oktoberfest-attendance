@@ -24,6 +24,7 @@ import {
   setLocationPromptShown,
   storeLocationSessionId,
 } from "@/lib/auth/secure-storage";
+import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
 
 import {
@@ -140,7 +141,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (error) {
-        console.error("[LocationContext] Error loading state:", error);
+        logger.error("Error loading state", error);
       } finally {
         setIsSessionLoading(false);
       }
@@ -172,7 +173,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           timestamp: new Date(loc.timestamp).toISOString(),
         });
       } catch (error) {
-        console.error("[LocationContext] Error updating location:", error);
+        logger.error("Error updating location", error);
       }
     },
     [activeSession],
@@ -184,7 +185,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const startSharing = useCallback(
     async (festivalId: string, durationMinutes = 120): Promise<boolean> => {
       if (!location.hasPermission) {
-        console.warn("[LocationContext] No permission to start sharing");
+        logger.warn("No permission to start sharing");
         return false;
       }
 
@@ -209,7 +210,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         });
 
         if (!result?.session) {
-          console.error("[LocationContext] Error starting session");
+          logger.error("Error starting session");
           return false;
         }
 
@@ -243,7 +244,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
                 timestamp: new Date(loc.timestamp).toISOString(),
               });
             } catch (err) {
-              console.error("[LocationContext] Background update error:", err);
+              logger.error("Background update error", err);
             }
           });
 
@@ -271,30 +272,18 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             error.message.includes("permission") ||
             error.message.includes("Location")
           ) {
-            console.error(
-              "[LocationContext] Permission error starting sharing:",
-              error.message,
-            );
+            logger.error("Permission error starting sharing", error);
           } else if (
             error.message.includes("network") ||
             error.message.includes("fetch") ||
             error.message.includes("timeout")
           ) {
-            console.error(
-              "[LocationContext] Network error starting sharing:",
-              error.message,
-            );
+            logger.error("Network error starting sharing", error);
           } else {
-            console.error(
-              "[LocationContext] API error starting sharing:",
-              error.message,
-            );
+            logger.error("API error starting sharing", error);
           }
         } else {
-          console.error(
-            "[LocationContext] Unknown error starting sharing:",
-            error,
-          );
+          logger.error("Unknown error starting sharing", error);
         }
         return false;
       } finally {
@@ -330,7 +319,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
       return true;
     } catch (error) {
-      console.error("[LocationContext] Error stopping sharing:", error);
+      logger.error("Error stopping sharing", error);
       return false;
     } finally {
       setIsSessionLoading(false);
@@ -388,7 +377,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           setNearbyMembers([]);
         }
       } catch (error) {
-        console.error("[LocationContext] Error refreshing nearby:", error);
+        logger.error("Error refreshing nearby", error);
       } finally {
         setIsNearbyLoading(false);
       }
@@ -443,10 +432,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
         return true;
       } catch (error) {
-        console.error(
-          "[LocationContext] Error starting local tracking:",
-          error,
-        );
+        logger.error("Error starting local tracking", error);
         localTrackingRef.current = false;
         setIsLocalTrackingActive(false);
         return false;

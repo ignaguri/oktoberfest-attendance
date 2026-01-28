@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 /**
  * External link button to open the festival map
@@ -29,7 +30,7 @@ export function MapLinkButton() {
     try {
       await WebBrowser.openBrowserAsync(currentFestival.mapUrl!);
     } catch (error) {
-      console.error("Failed to open map URL:", error);
+      logger.error("Failed to open map URL:", error);
     }
   };
 

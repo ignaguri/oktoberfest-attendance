@@ -6,6 +6,8 @@ import {
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 
+import { logger } from "../lib/logger";
+
 export class ApiError extends Error {
   public code: ErrorCode;
 
@@ -101,10 +103,21 @@ export class DatabaseError extends ApiError {
  * Catches and formats all errors consistently
  */
 export function errorHandler(err: Error, c: Context) {
-  console.error("API Error:", err);
+  const userId = c.get("userId") as string | undefined;
+  const userEmail = c.get("userEmail") as string | undefined;
 
   // Handle Hono HTTP exceptions
   if (err instanceof HTTPException) {
+    logger.warn({
+      type: "http_exception",
+      error: err.message,
+      status: err.status,
+      method: c.req.method,
+      path: c.req.path,
+      userId,
+      userEmail,
+    });
+
     return c.json(
       {
         error: {
@@ -119,6 +132,22 @@ export function errorHandler(err: Error, c: Context) {
 
   // Handle custom API errors
   if (err instanceof ApiError) {
+    const logLevel = err.statusCode >= 500 ? "error" : "warn";
+
+    logger[logLevel]({
+      type: "api_error",
+      error: err.message,
+      code: err.code,
+      status: err.statusCode,
+      method: c.req.method,
+      path: c.req.path,
+      userId,
+      userEmail,
+      ...(err instanceof ValidationError && err.errors
+        ? { validationErrors: err.errors }
+        : {}),
+    });
+
     return c.json(
       {
         error: {
@@ -133,6 +162,17 @@ export function errorHandler(err: Error, c: Context) {
       err.statusCode as any,
     );
   }
+
+  // Handle unknown errors - these are real bugs
+  logger.error({
+    type: "unknown_error",
+    error: err.message,
+    stack: err.stack,
+    method: c.req.method,
+    path: c.req.path,
+    userId,
+    userEmail,
+  });
 
   // Handle unknown errors
   return c.json(

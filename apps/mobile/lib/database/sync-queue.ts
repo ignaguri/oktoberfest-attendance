@@ -10,6 +10,8 @@
 
 import type * as SQLite from "expo-sqlite";
 
+import { logger } from "@/lib/logger";
+
 import type {
   SyncMetadata,
   SyncOperationType,
@@ -143,7 +145,9 @@ export async function enqueueOperation(
     ],
   );
 
-  console.log(`[SyncQueue] Enqueued ${operation} for ${tableName}/${recordId}`);
+  logger.debug(
+    `[SyncQueue] Enqueued ${operation} for ${tableName}/${recordId}`,
+  );
   return id;
 }
 
@@ -274,7 +278,7 @@ export async function cleanupCompletedOperations(
   );
 
   if (result.changes > 0) {
-    console.log(
+    logger.debug(
       `[SyncQueue] Cleaned up ${result.changes} completed operations`,
     );
   }

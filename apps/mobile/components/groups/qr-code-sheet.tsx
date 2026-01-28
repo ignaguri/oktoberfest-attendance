@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 interface QRCodeSheetProps {
   isOpen: boolean;
@@ -67,7 +68,7 @@ export function QRCodeSheet({
       const result = await renewToken.mutateAsync({ groupId });
       setCurrentToken(result.inviteToken);
     } catch (error) {
-      console.error("Failed to generate token:", error);
+      logger.error("Failed to generate token:", error);
     } finally {
       setIsGenerating(false);
     }

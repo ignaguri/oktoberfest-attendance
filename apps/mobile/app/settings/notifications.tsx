@@ -22,6 +22,7 @@ import { NotificationPermissionPrompt } from "@/components/notifications/Notific
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 import { useNotificationContextSafe } from "@/lib/notifications/NotificationContext";
 
 export default function NotificationSettingsScreen() {
@@ -195,7 +196,7 @@ export default function NotificationSettingsScreen() {
       });
 
       if (!subscribeResult.success) {
-        console.error(
+        logger.error(
           "Failed to subscribe to Novu:",
           subscribeResult.error || "Unknown error",
         );
@@ -213,7 +214,7 @@ export default function NotificationSettingsScreen() {
       const tokenResult = await registerToken.mutateAsync(token);
 
       if (!tokenResult.success || !tokenResult.novuRegistered) {
-        console.error(
+        logger.error(
           "Failed to register token with Novu:",
           tokenResult.error || "Unknown error",
         );
@@ -233,9 +234,9 @@ export default function NotificationSettingsScreen() {
       // Step 5: Update preferences to enable push
       await updatePreferences.mutateAsync({ pushEnabled: true });
 
-      console.log("Successfully enabled push notifications");
+      logger.debug("Successfully enabled push notifications");
     } catch (error) {
-      console.error("Error enabling push notifications:", error);
+      logger.error("Error enabling push notifications:", error);
       Alert.alert(
         t("common.status.error", { defaultValue: "Error" }),
         t("profile.notifications.enableFailed", {

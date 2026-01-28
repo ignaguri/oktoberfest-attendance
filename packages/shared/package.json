@@ -25,7 +25,7 @@
     "@date-fns/tz": "^1.4.1",
     "date-fns": "^4.1.0",
     "i18next": "^25.8.0",
-    "react-i18next": "^16.5.3",
+    "react-i18next": "^16.5.4",
     "zod": "^4.3.6"
   },
   "peerDependencies": {
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@tanstack/react-query": "^5.90.20",
-    "@types/react": "^19.2.9",
+    "@types/react": "^19.2.10",
     "react": "19.1.0",
     "typescript": "^5.9.3"
   }

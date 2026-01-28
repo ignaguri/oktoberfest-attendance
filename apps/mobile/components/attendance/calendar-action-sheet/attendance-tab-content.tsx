@@ -38,6 +38,7 @@ import { VStack } from "@/components/ui/vstack";
 import { type PendingPhoto } from "@/hooks/useBeerPictureUpload";
 import { useSaveAttendance } from "@/hooks/useSaveAttendance";
 import { IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
 import { BeerPicturesSection } from "../beer-pictures-section";
@@ -325,7 +326,7 @@ export function AttendanceTabContent({
         onSuccess?.();
         onClose();
       } catch (error) {
-        console.error("Failed to save attendance:", error);
+        logger.error("Failed to save attendance:", error);
       }
     },
     [
@@ -380,7 +381,7 @@ export function AttendanceTabContent({
       onSuccess?.();
       onClose();
     } catch (error) {
-      console.error("Failed to delete attendance:", error);
+      logger.error("Failed to delete attendance:", error);
     }
   }, [existingAttendance?.id, deleteAttendance, onSuccess, onClose]);
 

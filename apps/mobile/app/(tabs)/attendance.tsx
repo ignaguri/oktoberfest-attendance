@@ -34,6 +34,7 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { logger } from "@/lib/logger";
 import { isActiveReservation } from "@/lib/utils/reservation";
 
 export default function AttendanceScreen() {
@@ -213,7 +214,7 @@ export default function AttendanceScreen() {
       refetch();
       refetchReservations();
     } catch (error) {
-      console.error("Failed to check in:", error);
+      logger.error("Failed to check in:", error);
       showDialog(
         t("common.status.error"),
         t("reservation.checkIn.failedDescription"),

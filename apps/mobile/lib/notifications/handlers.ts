@@ -1,6 +1,8 @@
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 
+import { logger } from "@/lib/logger";
+
 /**
  * Notification data payload structure from Novu
  */
@@ -116,7 +118,10 @@ export function setupNotificationListeners(): () => void {
     Notifications.addNotificationReceivedListener((notification) => {
       // Notification received in foreground
       // The handler configured above will show it as an alert
-      console.log("Notification received in foreground:", notification);
+      logger.debug("Notification received in foreground:", {
+        identifier: notification.request.identifier,
+        content: notification.request.content,
+      });
     });
 
   // Listen for user interaction with notification

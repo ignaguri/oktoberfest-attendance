@@ -18,6 +18,8 @@ import {
 } from "expo-file-system/legacy";
 import type * as SQLite from "expo-sqlite";
 
+import { logger } from "@/lib/logger";
+
 import { closeDatabase, initializeDatabase } from "./init";
 import { cleanupOrphanedPhotos, getPhotoQueueStats } from "./photo-queue";
 import { DATABASE_NAME, MUTABLE_TABLES, SYNCABLE_TABLES } from "./schema";
@@ -331,10 +333,10 @@ export async function exportDatabase(): Promise<string | null> {
       to: exportPath,
     });
 
-    console.log("[Debug] Database exported to:", exportPath);
+    logger.debug("[Debug] Database exported to:", { exportPath });
     return exportPath;
   } catch (error) {
-    console.error("[Debug] Failed to export database:", error);
+    logger.error("[Debug] Failed to export database:", error);
     return null;
   }
 }
@@ -379,7 +381,7 @@ export async function exportDatabaseAsJson(
  * Preserves schema but deletes all records
  */
 export async function clearAllData(db: SQLite.SQLiteDatabase): Promise<void> {
-  console.log("[Debug] Clearing all data from database...");
+  logger.debug("[Debug] Clearing all data from database...");
 
   // Clear in reverse dependency order
   const tablesInOrder = [...SYNCABLE_TABLES].reverse();
@@ -387,9 +389,9 @@ export async function clearAllData(db: SQLite.SQLiteDatabase): Promise<void> {
   for (const tableName of tablesInOrder) {
     try {
       await db.runAsync(`DELETE FROM ${tableName}`);
-      console.log(`[Debug] Cleared table: ${tableName}`);
+      logger.debug(`[Debug] Cleared table: ${tableName}`);
     } catch (error) {
-      console.warn(`[Debug] Failed to clear table ${tableName}:`, error);
+      logger.warn(`[Debug] Failed to clear table ${tableName}:`, { error });
     }
   }
 
@@ -397,7 +399,7 @@ export async function clearAllData(db: SQLite.SQLiteDatabase): Promise<void> {
   await db.runAsync("DELETE FROM _sync_queue");
   await db.runAsync("DELETE FROM _sync_metadata");
 
-  console.log("[Debug] Database cleared");
+  logger.debug("[Debug] Database cleared");
 }
 
 /**
@@ -422,7 +424,7 @@ export async function cleanupOrphanedPhotoFiles(
  * Reset database completely (delete and recreate)
  */
 export async function resetDatabase(): Promise<void> {
-  console.log("[Debug] Resetting database...");
+  logger.debug("[Debug] Resetting database...");
 
   // Close existing connection
   await closeDatabase();
@@ -432,13 +434,13 @@ export async function resetDatabase(): Promise<void> {
     const dbPath = `${documentDirectory}SQLite/${DATABASE_NAME}`;
     await deleteAsync(dbPath, { idempotent: true });
   } catch (error) {
-    console.warn("[Debug] Failed to delete database file:", error);
+    logger.warn("[Debug] Failed to delete database file:", { error });
   }
 
   // Reinitialize
   await initializeDatabase();
 
-  console.log("[Debug] Database reset complete");
+  logger.debug("[Debug] Database reset complete");
 }
 
 // =============================================================================
@@ -565,38 +567,38 @@ export async function profileCommonQueries(
 export async function logDatabaseState(
   db: SQLite.SQLiteDatabase,
 ): Promise<void> {
-  console.log("=".repeat(60));
-  console.log("[Debug] DATABASE STATE");
-  console.log("=".repeat(60));
+  logger.debug("=".repeat(60));
+  logger.debug("[Debug] DATABASE STATE");
+  logger.debug("=".repeat(60));
 
   const stats = await getDatabaseStats(db);
 
-  console.log("\n📊 Table Statistics:");
+  logger.debug("\n📊 Table Statistics:");
   for (const table of stats.tables) {
     if (table.totalRows > 0 || table.dirtyRows > 0) {
-      console.log(
+      logger.debug(
         `  ${table.name}: ${table.totalRows} total, ${table.dirtyRows} dirty, ${table.deletedRows} deleted`,
       );
     }
   }
 
-  console.log("\n🔄 Sync Queue:");
-  console.log(`  Pending: ${stats.syncQueue.pending}`);
-  console.log(`  Processing: ${stats.syncQueue.processing}`);
-  console.log(`  Failed: ${stats.syncQueue.failed}`);
-  console.log(`  Completed: ${stats.syncQueue.completed}`);
+  logger.debug("\n🔄 Sync Queue:");
+  logger.debug(`  Pending: ${stats.syncQueue.pending}`);
+  logger.debug(`  Processing: ${stats.syncQueue.processing}`);
+  logger.debug(`  Failed: ${stats.syncQueue.failed}`);
+  logger.debug(`  Completed: ${stats.syncQueue.completed}`);
 
-  console.log("\n📷 Photos:");
-  console.log(`  Total: ${stats.photos.total}`);
-  console.log(`  Pending upload: ${stats.photos.pending}`);
-  console.log(
+  logger.debug("\n📷 Photos:");
+  logger.debug(`  Total: ${stats.photos.total}`);
+  logger.debug(`  Pending upload: ${stats.photos.pending}`);
+  logger.debug(
     `  Pending size: ${(stats.photos.pendingSizeBytes / 1024 / 1024).toFixed(2)} MB`,
   );
 
-  console.log("\n💾 Database Size:");
-  console.log(`  ${(stats.databaseSizeBytes / 1024 / 1024).toFixed(2)} MB`);
+  logger.debug("\n💾 Database Size:");
+  logger.debug(`  ${(stats.databaseSizeBytes / 1024 / 1024).toFixed(2)} MB`);
 
-  console.log("=".repeat(60));
+  logger.debug("=".repeat(60));
 }
 
 // =============================================================================

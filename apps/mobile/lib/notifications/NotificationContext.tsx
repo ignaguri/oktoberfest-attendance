@@ -18,6 +18,7 @@ import {
   setNotificationPromptShown,
   storeFCMToken as saveExpoPushToken,
 } from "@/lib/auth/secure-storage";
+import { logger } from "@/lib/logger";
 
 /**
  * Expo Project ID for push tokens
@@ -87,7 +88,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     try {
       // Validate EXPO_PROJECT_ID is set before attempting to get token
       if (!EXPO_PROJECT_ID) {
-        console.error(
+        logger.error(
           "EXPO_PUBLIC_EAS_PROJECT_ID is not set. Cannot get push token.",
         );
         return null;
@@ -99,7 +100,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
       return tokenData.data;
     } catch (error) {
-      console.error("Error getting Expo push token:", error);
+      logger.error("Error getting Expo push token:", error);
       return null;
     }
   }, []);
@@ -138,7 +139,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         // If device status differs from stored status, use device status (source of truth)
         if (actualStatus !== storedStatus) {
-          console.log(
+          logger.debug(
             `Syncing permission status: stored=${storedStatus}, device=${actualStatus}`,
           );
           setPermissionStatusState(actualStatus);
@@ -151,7 +152,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         // If permission is granted but no token stored, try to get one
         if (actualStatus === "granted" && !storedToken) {
-          console.log(
+          logger.debug(
             "Permission granted but no token, attempting to get Expo push token...",
           );
           const token = await getExpoPushToken();
@@ -159,14 +160,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             await saveExpoPushToken(token);
             setExpoPushToken(token);
             // Note: Don't auto-set isRegistered - token obtained but not registered with Novu yet
-            console.log(
-              "Successfully obtained and stored Expo push token:",
-              token.substring(0, 30) + "...",
-            );
+            logger.debug("Successfully obtained and stored Expo push token:", {
+              tokenPreview: token.substring(0, 30) + "...",
+            });
           }
         }
       } catch (error) {
-        console.error("Error loading notification state:", error);
+        logger.error("Error loading notification state:", error);
       } finally {
         setIsPermissionLoading(false);
         setIsTokenLoading(false);
@@ -214,7 +214,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       await setNotificationPermissionStatus("denied");
       return false;
     } catch (error) {
-      console.error("Error requesting notification permission:", error);
+      logger.error("Error requesting notification permission:", error);
       setPermissionStatusState("denied");
       await setNotificationPermissionStatus("denied");
       return false;
@@ -238,7 +238,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       avatar?: string;
     }): Promise<string | null> => {
       if (permissionStatus !== "granted") {
-        console.warn(
+        logger.warn(
           "Cannot register for push notifications without permission",
         );
         return null;
@@ -251,14 +251,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         const token = await getExpoPushToken();
 
         if (!token) {
-          console.error("Failed to get Expo push token");
+          logger.error("Failed to get Expo push token");
           return null;
         }
 
-        console.log(
-          "Expo push token obtained:",
-          token.substring(0, 30) + "...",
-        );
+        logger.debug("Expo push token obtained:", {
+          tokenPreview: token.substring(0, 30) + "...",
+        });
 
         // Store token locally
         await saveExpoPushToken(token);
@@ -270,7 +269,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         return token;
       } catch (error) {
-        console.error("Error registering for push notifications:", error);
+        logger.error("Error registering for push notifications:", error);
         return null;
       } finally {
         setIsRegistering(false);

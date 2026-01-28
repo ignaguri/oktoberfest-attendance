@@ -15,6 +15,7 @@ import {
   useOfflineLogConsumption,
 } from "@/hooks/useOfflineConsumption";
 import { IconColors } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 interface DrinkStepperProps {
   festivalId: string;
@@ -89,7 +90,7 @@ export function DrinkStepper({
       await deleteConsumption.mutateAsync(mostRecentConsumption.id);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
-      console.error("Failed to delete consumption:", error);
+      logger.error("Failed to delete consumption:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       onMutationEnd?.();
@@ -119,7 +120,7 @@ export function DrinkStepper({
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
-      console.error("Failed to log consumption:", error);
+      logger.error("Failed to log consumption:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       onMutationEnd?.();

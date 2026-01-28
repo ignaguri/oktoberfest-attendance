@@ -5,6 +5,7 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../../lib/logger";
 import { DatabaseError } from "../../middleware/error";
 import type { INotificationRepository } from "../interfaces/notification.repository";
 
@@ -15,8 +16,12 @@ export class SupabaseNotificationRepository implements INotificationRepository {
     // TODO: Implement FCM token storage once fcm_tokens table is added to schema
     // For now, FCM tokens are stored client-side
     // Future schema: CREATE TABLE fcm_tokens (id, user_id, token, last_used_at, is_active)
-    console.log(
-      `FCM token registration for user ${userId}: ${token.substring(0, 20)}...`,
+    logger.debug(
+      {
+        userId,
+        tokenPrefix: token.substring(0, 20),
+      },
+      "FCM token registration",
     );
   }
 
@@ -101,8 +106,12 @@ export class SupabaseNotificationRepository implements INotificationRepository {
 
   async removeFCMToken(userId: string, token: string): Promise<void> {
     // TODO: Implement once fcm_tokens table is added
-    console.log(
-      `FCM token removal for user ${userId}: ${token.substring(0, 20)}...`,
+    logger.debug(
+      {
+        userId,
+        tokenPrefix: token.substring(0, 20),
+      },
+      "FCM token removal",
     );
   }
 

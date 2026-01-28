@@ -22,6 +22,8 @@ import {
 } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 
+import { logger } from "@/lib/logger";
+
 import { closeDatabase, initializeDatabase, resetDatabase } from "./init";
 import { getMigrationStatus, runMigrations } from "./migrations";
 import { MUTABLE_TABLES } from "./schema";
@@ -82,7 +84,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
 
     async function init() {
       try {
-        console.log("[DatabaseProvider] Initializing...");
+        logger.debug("[DatabaseProvider] Initializing...");
 
         // Initialize database
         const database = await initializeDatabase();
@@ -99,10 +101,10 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
         if (mounted) {
           setDb(database);
           setIsInitialized(true);
-          console.log("[DatabaseProvider] Initialized successfully");
+          logger.debug("[DatabaseProvider] Initialized successfully");
         }
       } catch (error) {
-        console.error("[DatabaseProvider] Initialization failed:", error);
+        logger.error("[DatabaseProvider] Initialization failed:", error);
         if (mounted) {
           setLastError(
             error instanceof Error
@@ -148,19 +150,19 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       if (nextState === "background") {
         // Close database when app goes to background
         // This helps prevent database lock issues
-        console.log("[DatabaseProvider] App backgrounded, closing database");
+        logger.debug("[DatabaseProvider] App backgrounded, closing database");
         await closeDatabase();
         setDb(null);
         setIsInitialized(false);
       } else if (nextState === "active" && !isInitialized) {
         // Reinitialize when app comes back to foreground
-        console.log("[DatabaseProvider] App foregrounded, reinitializing");
+        logger.debug("[DatabaseProvider] App foregrounded, reinitializing");
         try {
           const database = await initializeDatabase();
           setDb(database);
           setIsInitialized(true);
         } catch (error) {
-          console.error("[DatabaseProvider] Reinitialization failed:", error);
+          logger.error("[DatabaseProvider] Reinitialization failed:", error);
           setLastError(
             error instanceof Error
               ? error.message
@@ -196,7 +198,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       // Clear error if we successfully refreshed
       setLastError(null);
     } catch (error) {
-      console.error("[DatabaseProvider] Status refresh failed:", error);
+      logger.error("[DatabaseProvider] Status refresh failed:", error);
       setLastError(
         error instanceof Error ? error.message : "Status refresh failed",
       );
@@ -233,9 +235,9 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       setPendingOperations(0);
       setDirtyRecords(0);
       setLastError(null);
-      console.log("[DatabaseProvider] Reset complete");
+      logger.debug("[DatabaseProvider] Reset complete");
     } catch (error) {
-      console.error("[DatabaseProvider] Reset failed:", error);
+      logger.error("[DatabaseProvider] Reset failed:", error);
       setLastError(
         error instanceof Error ? error.message : "Database reset failed",
       );

@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { useCallback, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
+import { logger } from "@/lib/logger";
 
 import {
   type PendingPhoto,
@@ -151,7 +152,10 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
               try {
                 await apiClient.photos.delete(photoId);
               } catch (deleteError) {
-                console.warn("Failed to delete photo:", photoId, deleteError);
+                logger.warn("Failed to delete photo:", {
+                  photoId,
+                  deleteError,
+                });
                 // Continue with other operations even if deletion fails
               }
             }),

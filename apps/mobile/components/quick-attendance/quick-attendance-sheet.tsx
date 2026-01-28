@@ -55,6 +55,7 @@ import {
   DrinkTypeColors,
   IconColors,
 } from "@/lib/constants/colors";
+import { logger } from "@/lib/logger";
 
 interface QuickAttendanceSheetProps {
   isOpen: boolean;
@@ -354,7 +355,7 @@ export function QuickAttendanceSheet({
       // Close the sheet
       onClose();
     } catch (error) {
-      console.error("Error saving quick attendance:", error);
+      logger.error("Error saving quick attendance:", error);
       toast.show({
         placement: "top",
         render: () => (

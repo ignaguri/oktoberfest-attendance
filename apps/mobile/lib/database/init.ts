@@ -7,6 +7,8 @@
 
 import * as SQLite from "expo-sqlite";
 
+import { logger } from "@/lib/logger";
+
 import {
   CREATE_INDEXES_SQL,
   CREATE_TABLES_SQL,
@@ -43,10 +45,12 @@ export async function openDatabase(): Promise<SQLite.SQLiteDatabase> {
     // Enable foreign keys
     await dbInstance.execAsync("PRAGMA foreign_keys = ON");
 
-    console.log("[Database] Opened successfully:", DATABASE_NAME);
+    logger.debug("[Database] Opened successfully:", {
+      databaseName: DATABASE_NAME,
+    });
     return dbInstance;
   } catch (error) {
-    console.error("[Database] Failed to open:", error);
+    logger.error("[Database] Failed to open:", error);
     throw error;
   }
 }
@@ -70,7 +74,7 @@ export async function closeDatabase(): Promise<void> {
   if (dbInstance) {
     await dbInstance.closeAsync();
     dbInstance = null;
-    console.log("[Database] Closed");
+    logger.debug("[Database] Closed");
   }
 }
 
@@ -81,7 +85,7 @@ export async function closeDatabase(): Promise<void> {
 export async function initializeSchema(
   db: SQLite.SQLiteDatabase,
 ): Promise<void> {
-  console.log("[Database] Initializing schema...");
+  logger.debug("[Database] Initializing schema...");
 
   try {
     // Create tables in dependency order
@@ -89,7 +93,7 @@ export async function initializeSchema(
       const sql = CREATE_TABLES_SQL[tableName];
       if (sql) {
         await db.execAsync(sql);
-        console.log(`[Database] Created table: ${tableName}`);
+        logger.debug(`[Database] Created table: ${tableName}`);
       }
     }
 
@@ -97,14 +101,14 @@ export async function initializeSchema(
     for (const indexSql of CREATE_INDEXES_SQL) {
       await db.execAsync(indexSql);
     }
-    console.log(`[Database] Created ${CREATE_INDEXES_SQL.length} indexes`);
+    logger.debug(`[Database] Created ${CREATE_INDEXES_SQL.length} indexes`);
 
     // Initialize sync metadata for all syncable tables
     await initializeSyncMetadata(db);
 
-    console.log("[Database] Schema initialized successfully");
+    logger.debug("[Database] Schema initialized successfully");
   } catch (error) {
-    console.error("[Database] Schema initialization failed:", error);
+    logger.error("[Database] Schema initialization failed:", error);
     throw error;
   }
 }
@@ -122,7 +126,7 @@ async function initializeSyncMetadata(
       [tableName, SCHEMA_VERSION],
     );
   }
-  console.log("[Database] Sync metadata initialized");
+  logger.debug("[Database] Sync metadata initialized");
 }
 
 /**
@@ -175,11 +179,11 @@ export async function checkDatabaseIntegrity(
     );
     const isHealthy = result?.integrity_check === "ok";
     if (!isHealthy) {
-      console.warn("[Database] Integrity check failed:", result);
+      logger.warn("[Database] Integrity check failed:", { result });
     }
     return isHealthy;
   } catch (error) {
-    console.error("[Database] Integrity check error:", error);
+    logger.error("[Database] Integrity check error:", error);
     return false;
   }
 }
@@ -235,7 +239,7 @@ export async function getDatabaseStats(
  * WARNING: This deletes all local data!
  */
 export async function resetDatabase(): Promise<void> {
-  console.warn("[Database] Resetting database - all local data will be lost!");
+  logger.warn("[Database] Resetting database - all local data will be lost!");
 
   if (dbInstance) {
     await closeDatabase();
@@ -243,13 +247,13 @@ export async function resetDatabase(): Promise<void> {
 
   // Delete the database file
   await SQLite.deleteDatabaseAsync(DATABASE_NAME);
-  console.log("[Database] Database deleted");
+  logger.debug("[Database] Database deleted");
 
   // Reinitialize
   const db = await openDatabase();
   await initializeSchema(db);
   await setSchemaVersion(db, SCHEMA_VERSION);
-  console.log("[Database] Database reset complete");
+  logger.debug("[Database] Database reset complete");
 }
 
 /**
@@ -260,27 +264,27 @@ export async function resetDatabase(): Promise<void> {
 export async function initializeDatabase(): Promise<SQLite.SQLiteDatabase> {
   // Return existing initialization if in progress (prevents race conditions)
   if (initPromise) {
-    console.log("[Database] Initialization already in progress, waiting...");
+    logger.debug("[Database] Initialization already in progress, waiting...");
     return initPromise;
   }
 
   // Return existing instance if already initialized
   if (dbInstance) {
-    console.log("[Database] Already initialized, returning existing instance");
+    logger.debug("[Database] Already initialized, returning existing instance");
     return dbInstance;
   }
 
   // Start initialization with lock
   initPromise = (async () => {
     try {
-      console.log("[Database] Starting initialization...");
+      logger.debug("[Database] Starting initialization...");
 
       const db = await openDatabase();
 
       // Check integrity first
       const isHealthy = await checkDatabaseIntegrity(db);
       if (!isHealthy) {
-        console.warn("[Database] Corruption detected, resetting...");
+        logger.warn("[Database] Corruption detected, resetting...");
         await resetDatabase();
         return openDatabase();
       }
@@ -291,19 +295,19 @@ export async function initializeDatabase(): Promise<SQLite.SQLiteDatabase> {
         // Fresh database
         await initializeSchema(db);
         await setSchemaVersion(db, SCHEMA_VERSION);
-        console.log("[Database] Fresh database initialized");
+        logger.debug("[Database] Fresh database initialized");
       } else if (version < SCHEMA_VERSION) {
         // Needs migration
-        console.log(
+        logger.debug(
           `[Database] Migration needed: v${version} -> v${SCHEMA_VERSION}`,
         );
         // Migrations will be handled by migrations.ts
       } else {
-        console.log(`[Database] Schema up to date (v${version})`);
+        logger.debug(`[Database] Schema up to date (v${version})`);
       }
 
       const stats = await getDatabaseStats(db);
-      console.log("[Database] Stats:", stats);
+      logger.debug("[Database] Stats:", stats);
 
       return db;
     } finally {
