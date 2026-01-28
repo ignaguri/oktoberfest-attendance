@@ -31,9 +31,8 @@ export function initSentry() {
     // Enable in production only
     enabled: !__DEV__,
 
-    // Capture 100% of transactions for performance monitoring in dev
-    // Adjust this for production based on your needs
-    tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+    // Sample 20% of transactions for performance monitoring in production
+    tracesSampleRate: 0.2,
 
     // Set environment
     environment: __DEV__ ? "development" : "production",

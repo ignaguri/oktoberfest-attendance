@@ -20,14 +20,12 @@ const supabaseAnonKey =
     : "") ||
   "";
 
-// Log Supabase configuration on startup
-logger.info("Supabase Client Configuration", {
-  supabaseUrl,
+// Log Supabase configuration status on startup (no sensitive values)
+logger.debug("Supabase Client Configuration", {
   hasSupabaseUrl: !!supabaseUrl,
   hasAnonKey: !!supabaseAnonKey,
-  anonKeyPrefix: supabaseAnonKey
-    ? `${supabaseAnonKey.substring(0, 20)}...`
-    : "MISSING",
+  urlConfigured: supabaseUrl.length > 0,
+  keyConfigured: supabaseAnonKey.length > 0,
 });
 
 // Lazily create the Supabase client to avoid SSR issues

@@ -9,6 +9,70 @@ interface LogContext {
   [key: string]: unknown;
 }
 
+// Sensitive header names to redact (case-insensitive)
+const SENSITIVE_HEADERS = [
+  "authorization",
+  "cookie",
+  "x-api-key",
+  "x-auth-token",
+  "x-access-token",
+  "x-refresh-token",
+];
+
+// Max size for logged data (in characters when serialized)
+const MAX_LOG_DATA_SIZE = 2000;
+
+/**
+ * Safely stringify data, handling circular references and large objects
+ */
+function safeStringify(data: unknown, indent = 2): string {
+  const seen = new WeakSet();
+
+  try {
+    const result = JSON.stringify(
+      data,
+      (key, value) => {
+        // Handle circular references
+        if (typeof value === "object" && value !== null) {
+          if (seen.has(value)) {
+            return "[Circular]";
+          }
+          seen.add(value);
+        }
+        return value;
+      },
+      indent,
+    );
+
+    // Truncate if too large
+    if (result && result.length > MAX_LOG_DATA_SIZE) {
+      return result.substring(0, MAX_LOG_DATA_SIZE) + "... [truncated]";
+    }
+
+    return result;
+  } catch {
+    return "[Unable to serialize]";
+  }
+}
+
+/**
+ * Truncate data for logging - handles strings, objects, and arrays
+ */
+function truncateData(data: unknown): unknown {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  if (typeof data === "string") {
+    return data.length > 500
+      ? `${data.substring(0, 500)}... [truncated]`
+      : data;
+  }
+
+  // For objects/arrays, let safeStringify handle truncation
+  return data;
+}
+
 class Logger {
   private isDev = __DEV__;
 
@@ -18,7 +82,7 @@ class Logger {
     context?: LogContext,
   ): string {
     const timestamp = new Date().toISOString();
-    const contextStr = context ? `\n${JSON.stringify(context, null, 2)}` : "";
+    const contextStr = context ? `\n${safeStringify(context)}` : "";
     return `[${timestamp}] [${level.toUpperCase()}] ${message}${contextStr}`;
   }
 
@@ -54,8 +118,15 @@ class Logger {
     // Send to Sentry in production
     if (!this.isDev) {
       try {
-        // Dynamic import to avoid issues if Sentry isn't initialized
+        // Dynamic import to avoid issues if Sentry isn't loaded
         const Sentry = require("./sentry").Sentry;
+
+        // Check if Sentry is initialized (has a client)
+        const client = Sentry.getClient?.();
+        if (!client) {
+          // Sentry not initialized yet, skip sending
+          return;
+        }
 
         if (error instanceof Error) {
           Sentry.captureException(error, {
@@ -74,9 +145,8 @@ class Logger {
             },
           });
         }
-      } catch (e) {
-        // Fail silently if Sentry isn't available
-        console.warn("[Logger] Failed to send error to Sentry:", e);
+      } catch {
+        // Fail silently if Sentry isn't available or not initialized
       }
     }
   }
@@ -94,10 +164,7 @@ class Logger {
       method,
       url,
       status,
-      data:
-        typeof data === "string" && data.length > 500
-          ? `${data.substring(0, 500)}...`
-          : data,
+      data: truncateData(data),
     });
   }
 
@@ -113,12 +180,18 @@ class Logger {
   ): Record<string, string> {
     if (!headers) return {};
 
-    const sanitized = { ...headers };
+    const sanitized: Record<string, string> = {};
 
-    // Mask sensitive headers
-    if (sanitized.Authorization) {
-      sanitized.Authorization =
-        sanitized.Authorization.substring(0, 20) + "...";
+    // Mask sensitive headers (case-insensitive check)
+    for (const [key, value] of Object.entries(headers)) {
+      const lowerKey = key.toLowerCase();
+      if (SENSITIVE_HEADERS.includes(lowerKey)) {
+        // Show first 10 chars to help with debugging, then mask
+        sanitized[key] =
+          value.length > 10 ? `${value.substring(0, 10)}...` : "[REDACTED]";
+      } else {
+        sanitized[key] = value;
+      }
     }
 
     return sanitized;

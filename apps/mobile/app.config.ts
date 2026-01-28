@@ -96,7 +96,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withGoogleMapsApiKey.js",
     "expo-maps",
     "expo-updates",
-    "sentry-expo",
+    [
+      "@sentry/react-native/expo",
+      {
+        organization: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
@@ -108,6 +114,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     eas: {
       projectId: "fca65703-ce2a-48b3-aec4-11a90fbb8996",
     },
+    // Environment variables for runtime config
+    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
+    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+    apiUrl: process.env.EXPO_PUBLIC_API_URL,
   },
   owner: "pepegrillo",
 });
