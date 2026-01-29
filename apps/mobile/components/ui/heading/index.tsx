@@ -52,7 +52,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
@@ -71,7 +71,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
@@ -90,7 +90,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
@@ -109,7 +109,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
@@ -128,7 +128,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
@@ -148,7 +148,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
@@ -167,7 +167,7 @@ const MappedHeading = memo(
                 class: className,
               })}
               {...props}
-              // @ts-expect-error : type issue
+              // @ts-ignore : type issue
               ref={ref}
             />
           );
