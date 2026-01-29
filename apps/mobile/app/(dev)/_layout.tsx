@@ -28,6 +28,12 @@ export default function DevLayout() {
           title: "Database Debug",
         }}
       />
+      <Stack.Screen
+        name="components"
+        options={{
+          title: "Components",
+        }}
+      />
     </Stack>
   );
 }

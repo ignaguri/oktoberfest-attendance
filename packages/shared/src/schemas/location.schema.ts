@@ -24,6 +24,11 @@ export const LocationSessionSchema = z.object({
   expiresAt: z.iso.datetime(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+  /**
+   * Group IDs this session is shared with (only populated when visibility is "specific")
+   * When null/undefined, session is shared with all user's groups
+   */
+  sharedGroupIds: z.array(z.uuid()).nullable().optional(),
 });
 
 export type LocationSession = z.infer<typeof LocationSessionSchema>;
@@ -46,14 +51,42 @@ export const LocationSessionMemberSchema = z.object({
 export type LocationSessionMember = z.infer<typeof LocationSessionMemberSchema>;
 
 /**
+ * Location session visibility - who can see the user's location
+ */
+export const LocationVisibilitySchema = z.enum(["groups", "specific"]);
+
+export type LocationVisibility = z.infer<typeof LocationVisibilitySchema>;
+
+/**
  * Start location session request
  * POST /api/v1/location/sessions
  */
-export const StartLocationSessionSchema = z.object({
-  festivalId: z.uuid({ error: "Invalid festival ID" }),
-  durationMinutes: z.number().int().min(5).max(480).optional().default(120), // 2 hours default, max 8 hours
-  initialLocation: LocationPointSchema.optional(),
-});
+export const StartLocationSessionSchema = z
+  .object({
+    festivalId: z.uuid({ error: "Invalid festival ID" }),
+    durationMinutes: z.number().int().min(5).max(480).optional().default(120), // 2 hours default, max 8 hours
+    initialLocation: LocationPointSchema.optional(),
+    /**
+     * Visibility setting:
+     * - "groups": Share with all groups the user belongs to in this festival (default)
+     * - "specific": Share only with specific groups (requires groupIds)
+     */
+    visibility: LocationVisibilitySchema.optional().default("groups"),
+    /**
+     * Group IDs to share with when visibility is "specific"
+     * Required when visibility is "specific", ignored when "groups"
+     */
+    groupIds: z.array(z.uuid({ error: "Invalid group ID" })).optional(),
+  })
+  .refine(
+    (data) =>
+      data.visibility !== "specific" ||
+      (data.groupIds && data.groupIds.length > 0),
+    {
+      message: "groupIds is required when visibility is 'specific'",
+      path: ["groupIds"],
+    },
+  );
 
 export type StartLocationSessionInput = z.infer<
   typeof StartLocationSessionSchema

@@ -54,12 +54,38 @@ export class SupabaseLocationRepository implements ILocationRepository {
       );
     }
 
+    // If specific groups are provided, populate location_session_members
+    let sharedGroupIds: string[] | null = null;
+    if (
+      input.visibility === "specific" &&
+      input.groupIds &&
+      input.groupIds.length > 0
+    ) {
+      const membersToInsert = input.groupIds.map((groupId) => ({
+        session_id: session.id,
+        group_id: groupId,
+      }));
+
+      const { error: membersError } = await this.supabase
+        .from("location_session_members")
+        .insert(membersToInsert);
+
+      if (membersError) {
+        // Log error but don't fail the session creation
+        console.error(
+          `Failed to insert location session members: ${membersError.message}`,
+        );
+      } else {
+        sharedGroupIds = input.groupIds;
+      }
+    }
+
     // If initial location provided, record it
     if (input.initialLocation) {
       await this.updateLocation(session.id, userId, input.initialLocation);
     }
 
-    return this.mapToSession(session);
+    return this.mapToSession(session, sharedGroupIds);
   }
 
   async stopSession(
@@ -233,7 +259,10 @@ export class SupabaseLocationRepository implements ILocationRepository {
     }
   }
 
-  private mapToSession(data: any): LocationSession {
+  private mapToSession(
+    data: any,
+    sharedGroupIds?: string[] | null,
+  ): LocationSession {
     return {
       id: data.id,
       userId: data.user_id,
@@ -243,6 +272,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       expiresAt: data.expires_at,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
+      sharedGroupIds: sharedGroupIds ?? null,
     };
   }
 }

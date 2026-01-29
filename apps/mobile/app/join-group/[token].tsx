@@ -83,7 +83,7 @@ export default function JoinGroupByTokenScreen() {
   };
 
   const handleGoHome = () => {
-    router.replace("/(tabs)");
+    router.replace("/index");
   };
 
   // Loading state

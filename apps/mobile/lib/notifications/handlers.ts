@@ -69,12 +69,12 @@ export function handleNotificationResponse(
       if (data.groupId) {
         router.push(`/groups/${data.groupId}`);
       } else {
-        router.push("/");
+        router.push("/index");
       }
       break;
 
     case "reminder":
-      router.push("/");
+      router.push("/index");
       break;
 
     case "reservation-reminder":
@@ -100,7 +100,7 @@ export function handleNotificationResponse(
           router.push(urlPath as never);
         } catch {
           // Invalid URL, go to home
-          router.push("/");
+          router.push("/index");
         }
       }
       break;

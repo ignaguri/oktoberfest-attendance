@@ -99,6 +99,13 @@
       "actions": "Actions"
     }
   },
+  "tabs": {
+    "home": "Home",
+    "attendance": "Attendance",
+    "groups": "Groups",
+    "ranking": "Ranking",
+    "profile": "Profile"
+  },
   "auth": {
     "signIn": {
       "title": "Sign In",
@@ -1007,6 +1014,15 @@
       "description": "Control who can see your location during the festival",
       "enableForGroup": "Enable location sharing for {{group}}",
       "disableForGroup": "Disable location sharing for {{group}}"
+    },
+    "groups": {
+      "noGroups": "You haven't joined any groups yet",
+      "shareWithAll": "Share with all groups",
+      "shareWithAllDescription": "All your groups can see your location",
+      "selectGroups": "Or select specific groups",
+      "selectedCount": "{{count}} group(s) selected",
+      "sharingWithAll": "Sharing with all groups",
+      "sharingWithSome": "Sharing with {{count}} group(s)"
     }
   },
   "photos": {
@@ -1490,6 +1506,38 @@
       "offlineWithPending": "You're offline. {{count}} changes will sync when connected.",
       "offline": "You're offline. Changes will sync when you reconnect.",
       "error": "Sync failed. Tap to retry."
+    }
+  },
+  "sync": {
+    "status": {
+      "syncing": "Syncing...",
+      "offline": "Offline",
+      "error": "Sync error",
+      "pending": "{{count}} pending",
+      "synced": "Synced"
+    },
+    "tapToRetry": "Tap to retry sync",
+    "tapToSync": "Tap to sync",
+    "retry": "Retry",
+    "dismiss": "Dismiss",
+    "table": {
+      "attendance": "Attendance",
+      "consumption": "Drink",
+      "profile": "Profile"
+    },
+    "operation": {
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete"
+    },
+    "failedOps": {
+      "title": "Failed Operations",
+      "noFailures": "No failed operations",
+      "description": "These operations failed to sync. You can retry or dismiss them.",
+      "unknownError": "Unknown error",
+      "attempts": "Attempts: {{count}}",
+      "dismissAll": "Dismiss All",
+      "retryAll": "Retry All"
     }
   }
 }

@@ -544,18 +544,36 @@ export class SyncManager {
         );
 
         if (existing) {
-          // Only update if not dirty
-          if (
-            existing._dirty === 0 &&
-            this.shouldUpdate(existing, att.updatedAt ?? att.createdAt)
-          ) {
+          // Use last-write-wins conflict resolution
+          const serverUpdatedAt = att.updatedAt ?? att.createdAt;
+          if (this.shouldUpdate(existing, serverUpdatedAt)) {
             await this.db.runAsync(
               `UPDATE attendances SET
-                beer_count = ?, updated_at = ?, _synced_at = ?
+                beer_count = ?, updated_at = ?, _synced_at = ?, _dirty = 0
               WHERE id = ?`,
-              [att.beerCount, att.updatedAt ?? att.createdAt, now, att.id],
+              [att.beerCount, serverUpdatedAt, now, att.id],
             );
             result.updated++;
+
+            // Log if there was a conflict (local had dirty changes)
+            if (existing._dirty === 1) {
+              this.logConflict(
+                "attendances",
+                att.id,
+                existing.updated_at,
+                serverUpdatedAt,
+                "server",
+              );
+            }
+          } else if (existing._dirty === 1) {
+            // Local wins - log the conflict
+            this.logConflict(
+              "attendances",
+              att.id,
+              existing.updated_at,
+              serverUpdatedAt,
+              "local",
+            );
           }
         } else {
           await this.db.runAsync(
@@ -621,12 +639,13 @@ export class SyncManager {
             );
 
             if (existing) {
-              if (existing._dirty === 0) {
+              // Use last-write-wins conflict resolution
+              if (this.shouldUpdate(existing, cons.updatedAt)) {
                 await this.db.runAsync(
                   `UPDATE consumptions SET
                     drink_type = ?, drink_name = ?, volume_ml = ?,
                     price_paid_cents = ?, base_price_cents = ?, tip_cents = ?,
-                    tent_id = ?, recorded_at = ?, updated_at = ?, _synced_at = ?
+                    tent_id = ?, recorded_at = ?, updated_at = ?, _synced_at = ?, _dirty = 0
                   WHERE id = ?`,
                   [
                     cons.drinkType,
@@ -643,6 +662,26 @@ export class SyncManager {
                   ],
                 );
                 result.updated++;
+
+                // Log if there was a conflict
+                if (existing._dirty === 1) {
+                  this.logConflict(
+                    "consumptions",
+                    cons.id,
+                    existing.updated_at,
+                    cons.updatedAt,
+                    "server",
+                  );
+                }
+              } else if (existing._dirty === 1) {
+                // Local wins
+                this.logConflict(
+                  "consumptions",
+                  cons.id,
+                  existing.updated_at,
+                  cons.updatedAt,
+                  "local",
+                );
               }
             } else {
               await this.db.runAsync(
@@ -966,6 +1005,48 @@ export class SyncManager {
           tents: payload.tents as string[] | undefined,
         });
         break;
+      case "consumptions": {
+        // For consumptions, we update by deleting and re-creating
+        // since the API doesn't have an update endpoint
+        const festivalId = (payload.festivalId ||
+          payload.festival_id) as string;
+        const date = payload.date as string;
+        const drinkType = (payload.drinkType || payload.drink_type) as
+          | "beer"
+          | "radler"
+          | "alcohol_free"
+          | "wine"
+          | "soft_drink"
+          | "other";
+        const pricePaidCents =
+          typeof payload.pricePaidCents === "number"
+            ? payload.pricePaidCents
+            : typeof payload.price_paid_cents === "number"
+              ? payload.price_paid_cents
+              : 0;
+        const volumeMl =
+          typeof payload.volumeMl === "number"
+            ? payload.volumeMl
+            : typeof payload.volume_ml === "number"
+              ? payload.volume_ml
+              : 1000;
+
+        // Delete existing and create new
+        try {
+          await apiClient.consumption.delete(recordId);
+        } catch {
+          // Ignore delete errors (record may not exist on server)
+        }
+        await apiClient.consumption.log({
+          festivalId,
+          date,
+          drinkType,
+          pricePaidCents,
+          volumeMl,
+          tentId: (payload.tentId || payload.tent_id) as string | undefined,
+        });
+        break;
+      }
       case "profiles":
         await apiClient.profile.update({
           username: payload.username as string | undefined,
@@ -1030,20 +1111,66 @@ export class SyncManager {
   // Helper Methods
   // ===========================================================================
 
+  // Clock drift tolerance for last-write-wins comparison (1 second)
+  private readonly CLOCK_DRIFT_TOLERANCE_MS = 1000;
+
   /**
-   * Check if a local record should be updated with server data
+   * Check if a local record should be updated with server data.
+   * Implements last-write-wins conflict resolution:
+   * - If local has uncommitted changes (_dirty=1), compare updated_at timestamps
+   * - Local wins if it was modified more recently than server
+   * - Server wins otherwise
    */
   private shouldUpdate(
-    local: { _synced_at: string | null },
+    local: {
+      updated_at?: string | null;
+      _synced_at: string | null;
+      _dirty?: number;
+    },
     serverUpdatedAt: string | null | undefined,
   ): boolean {
     if (!serverUpdatedAt) return false;
     if (!local._synced_at) return true;
 
     const serverTime = new Date(serverUpdatedAt).getTime();
-    const localSyncTime = new Date(local._synced_at).getTime();
 
-    return serverTime > localSyncTime;
+    // If local has uncommitted changes, use last-write-wins
+    if (local._dirty === 1 && local.updated_at) {
+      const localTime = new Date(local.updated_at).getTime();
+
+      // Local wins if it was modified more recently (with clock drift tolerance)
+      if (localTime > serverTime + this.CLOCK_DRIFT_TOLERANCE_MS) {
+        logger.debug(
+          `[SyncManager] Conflict resolved: keeping local (local=${local.updated_at} > server=${serverUpdatedAt})`,
+        );
+        return false; // Keep local, don't update from server
+      }
+
+      // Server wins - log the conflict
+      logger.debug(
+        `[SyncManager] Conflict resolved: server wins (server=${serverUpdatedAt} >= local=${local.updated_at})`,
+      );
+    }
+
+    const localSyncTime = new Date(local._synced_at).getTime();
+    return serverTime > localSyncTime - this.CLOCK_DRIFT_TOLERANCE_MS;
+  }
+
+  /**
+   * Log a sync conflict for debugging/analytics
+   */
+  private logConflict(
+    table: string,
+    recordId: string,
+    localUpdatedAt: string | null,
+    serverUpdatedAt: string | null,
+    winner: "local" | "server",
+  ): void {
+    logger.info(`[SyncManager] Sync conflict on ${table}/${recordId}`, {
+      localUpdatedAt,
+      serverUpdatedAt,
+      winner,
+    });
   }
 
   /**

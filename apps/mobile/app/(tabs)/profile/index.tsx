@@ -11,7 +11,7 @@ import {
   UpdateProfileSchema,
 } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
-import { Lock, LogOut } from "lucide-react-native";
+import { Lock, LogOut, Puzzle } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
@@ -320,6 +320,36 @@ export default function ProfileScreen() {
             </Button>
           </VStack>
         </Card>
+
+        {/* Dev-only Components Showcase Link */}
+        {__DEV__ && (
+          <Card
+            size="md"
+            variant="outline"
+            className="border-purple-200 bg-purple-50"
+          >
+            <VStack space="md" className="items-center">
+              <Text className="text-lg font-semibold text-purple-800">
+                Developer Tools
+              </Text>
+              <Text className="text-center text-sm text-purple-700">
+                UI Components showcase for development
+              </Text>
+              <Button
+                variant="outline"
+                action="secondary"
+                onPress={() => router.push("/(dev)/components")}
+                className="border-purple-400"
+                accessibilityLabel="Open Components Showcase"
+              >
+                <Puzzle size={18} color="#7c3aed" />
+                <ButtonText className="text-purple-700">
+                  Components Showcase
+                </ButtonText>
+              </Button>
+            </VStack>
+          </Card>
+        )}
 
         {/* Danger Zone - Delete Account */}
         <DangerZone

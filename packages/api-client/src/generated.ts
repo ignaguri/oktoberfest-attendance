@@ -4107,6 +4107,12 @@ export interface paths {
                             /** Format: date-time */
                             timestamp: string;
                         };
+                        /**
+                         * @default groups
+                         * @enum {string}
+                         */
+                        visibility?: "groups" | "specific";
+                        groupIds?: string[];
                     };
                 };
             };
@@ -4134,6 +4140,7 @@ export interface paths {
                                 createdAt: string;
                                 /** Format: date-time */
                                 updatedAt: string;
+                                sharedGroupIds?: string[] | null;
                             };
                         };
                     };
@@ -4308,6 +4315,7 @@ export interface paths {
                                 createdAt: string;
                                 /** Format: date-time */
                                 updatedAt: string;
+                                sharedGroupIds?: string[] | null;
                             };
                         };
                     };

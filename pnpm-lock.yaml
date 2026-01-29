@@ -192,6 +192,9 @@ importers:
       expo-auth-session:
         specifier: ~7.0.10
         version: 7.0.10(expo@54.0.32)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))(react@19.1.0)
+      expo-background-fetch:
+        specifier: ~14.0.9
+        version: 14.0.9(expo@54.0.32)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))
       expo-clipboard:
         specifier: ^8.0.8
         version: 8.0.8(expo@54.0.32)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))(react@19.1.0)
@@ -697,7 +700,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       react-i18next:
         specifier: ^16.5.4
-        version: 16.5.4(i18next@25.8.0(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.1.0)(typescript@5.9.3)
+        version: 16.5.4(i18next@25.8.0(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react-native@0.83.1(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -6855,6 +6858,11 @@ packages:
       react: '*'
       react-native: '*'
 
+  expo-background-fetch@14.0.9:
+    resolution: {integrity: sha512-IhdbjIu9EdsYaL7mCCvf/i48Qy4a5rpRy038/4KNUoa9xmsETRwFCdsoZj4VHg4dVt2D0kiDrgqVVlPBSSWt+Q==}
+    peerDependencies:
+      expo: '*'
+
   expo-clipboard@8.0.8:
     resolution: {integrity: sha512-VKoBkHIpZZDJTB0jRO4/PZskHdMNOEz3P/41tmM6fDuODMpqhvyWK053X0ebspkxiawJX9lX33JXHBCvVsTTOA==}
     peerDependencies:
@@ -9816,6 +9824,7 @@ packages:
   tar@7.5.6:
     resolution: {integrity: sha512-xqUeu2JAIJpXyvskvU3uvQW8PAmHrtXp2KDuMJwQqW8Sqq0CaZBAQ+dKS3RBXVhU4wC5NjAdKrmh84241gO9cA==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
@@ -18167,6 +18176,13 @@ snapshots:
       - expo
       - supports-color
 
+  expo-background-fetch@14.0.9(expo@54.0.32)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0)):
+    dependencies:
+      expo: 54.0.32(@babel/core@7.28.6)(@expo/metro-runtime@6.1.2)(expo-router@6.0.22)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))(react@19.1.0)
+      expo-task-manager: 14.0.9(expo@54.0.32)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))
+    transitivePeerDependencies:
+      - react-native
+
   expo-clipboard@8.0.8(expo@54.0.32)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))(react@19.1.0):
     dependencies:
       expo: 54.0.32(@babel/core@7.28.6)(@expo/metro-runtime@6.1.2)(expo-router@6.0.22)(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0))(react@19.1.0)
@@ -20611,17 +20627,6 @@ snapshots:
     optionalDependencies:
       react-dom: 19.1.0(react@19.1.0)
       react-native: 0.83.1(@babel/core@7.28.6)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.10)(react@19.1.0)
-      typescript: 5.9.3
-
-  react-i18next@16.5.4(i18next@25.8.0(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.1.0)(typescript@5.9.3):
-    dependencies:
-      '@babel/runtime': 7.28.6
-      html-parse-stringify: 3.0.1
-      i18next: 25.8.0(typescript@5.9.3)
-      react: 19.1.0
-      use-sync-external-store: 1.6.0(react@19.1.0)
-    optionalDependencies:
-      react-dom: 19.2.4(react@19.2.4)
       typescript: 5.9.3
 
   react-is@16.13.1: {}

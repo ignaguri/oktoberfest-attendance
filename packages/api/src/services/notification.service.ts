@@ -15,7 +15,7 @@ type NotificationPreferences =
  */
 export const NOTIFICATION_WORKFLOWS = {
   GROUP_JOIN: "group-join",
-  LOCATION_SHARING: "location-sharing-started",
+  LOCATION_SHARING: "location-sharing-notification",
   TENT_CHECKIN: "tent-check-in",
   RESERVATION_REMINDER: "reservation-reminder",
   RESERVATION_CHECKIN_PROMPT: "reservation-prompt",
@@ -384,6 +384,140 @@ export class NotificationService {
       );
     } catch (error) {
       logger.error({ error }, "Error sending group achievement notification");
+    }
+  }
+
+  /**
+   * Notify group members when someone starts sharing their location
+   * (respects checkin_enabled preference since it's similar to location tracking)
+   */
+  async notifyLocationSharingStarted(
+    userId: string,
+    festivalId: string,
+    groupIds?: string[],
+  ): Promise<void> {
+    try {
+      // Get user info
+      const { data: user, error: userError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", userId)
+        .single();
+
+      if (userError || !user) {
+        logger.error(
+          { error: userError },
+          "Error fetching user for location sharing notification",
+        );
+        return;
+      }
+
+      // If no specific groupIds provided, get all user's groups for this festival
+      let targetGroupIds: string[] = groupIds || [];
+      if (targetGroupIds.length === 0) {
+        const { data: userGroups, error: groupsError } = await this.supabase
+          .from("group_members")
+          .select("group_id, groups!inner(festival_id)")
+          .eq("user_id", userId)
+          .eq("groups.festival_id", festivalId);
+
+        if (groupsError) {
+          logger.error({ error: groupsError }, "Error fetching user groups");
+          return;
+        }
+
+        targetGroupIds =
+          userGroups
+            ?.map((g) => g.group_id)
+            .filter((id): id is string => id !== null) || [];
+      }
+
+      if (targetGroupIds.length === 0) {
+        return;
+      }
+
+      // Get all group members (excluding the user who started sharing)
+      const { data: groupMembers, error: membersError } = await this.supabase
+        .from("group_members")
+        .select(
+          `
+          user_id,
+          group_id,
+          groups!inner(name, festival_id)
+        `,
+        )
+        .in("group_id", targetGroupIds)
+        .eq("groups.festival_id", festivalId)
+        .neq("user_id", userId);
+
+      if (membersError) {
+        logger.error({ error: membersError }, "Error fetching group members");
+        return;
+      }
+
+      if (!groupMembers || groupMembers.length === 0) {
+        return;
+      }
+
+      // Get notification preferences for these members (checkin_enabled)
+      const memberIds = [
+        ...new Set(groupMembers.map((member) => member.user_id)),
+      ];
+
+      const { data: membersToNotify, error: prefsError } = await this.supabase
+        .from("user_notification_preferences")
+        .select("user_id, checkin_enabled, push_enabled")
+        .in("user_id", memberIds)
+        .eq("checkin_enabled", true);
+
+      if (prefsError) {
+        logger.error(
+          { error: prefsError },
+          "Error fetching member preferences",
+        );
+        return;
+      }
+
+      if (!membersToNotify || membersToNotify.length === 0) {
+        return;
+      }
+
+      const sharerName = user.username || user.full_name || "Someone";
+      const sharerAvatar = user.avatar_url || "";
+
+      // Send notifications to all eligible members
+      const notificationPromises = membersToNotify.map((member) => {
+        // Find groups this specific member shares with the sharing user
+        const memberGroupsData = groupMembers
+          .filter((gm) => gm.user_id === member.user_id)
+          .map((gm) => ({
+            name: (gm.groups as { name: string })?.name,
+            id: gm.group_id,
+          }))
+          .filter((g) => g.name);
+
+        const groupNamesText =
+          memberGroupsData.length > 0
+            ? memberGroupsData.map((g) => g.name).join(", ")
+            : "Group";
+        const firstGroupId = memberGroupsData[0]?.id || "";
+
+        return this.novu.trigger({
+          workflowId: NOTIFICATION_WORKFLOWS.LOCATION_SHARING,
+          to: member.user_id!,
+          payload: {
+            sharerName,
+            groupName: groupNamesText,
+            sharerAvatar,
+            groupId: firstGroupId,
+            action: "started" as const,
+          },
+        });
+      });
+
+      await Promise.allSettled(notificationPromises);
+    } catch (error) {
+      logger.error({ error }, "Error sending location sharing notifications");
     }
   }
 

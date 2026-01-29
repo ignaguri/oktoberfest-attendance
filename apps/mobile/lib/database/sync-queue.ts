@@ -430,15 +430,34 @@ export async function purgeDeletedRecords(
 
 /**
  * Generates an idempotency key for a consumption record.
+ * If timestamp is provided, creates a unique key.
+ * If timestamp is omitted, creates a deterministic key for deduplication.
  */
 export function generateConsumptionIdempotencyKey(
   userId: string,
   festivalId: string,
   date: string,
   drinkType: string,
-  timestamp: number,
+  timestamp?: number,
 ): string {
-  return `${userId}-${festivalId}-${date}-${drinkType}-${timestamp}`;
+  if (timestamp) {
+    return `${userId}-${festivalId}-${date}-${drinkType}-${timestamp}`;
+  }
+  // Deterministic key for deduplication (without timestamp)
+  return `${userId}-${festivalId}-${date}-${drinkType}`;
+}
+
+/**
+ * Generates a deduplication key for consumption (always deterministic).
+ * Used to check for duplicate consumptions of the same type within a short time window.
+ */
+export function generateConsumptionDedupeKey(
+  attendanceId: string,
+  drinkType: string,
+  recordedAtMinute: string,
+): string {
+  // Round to the nearest minute to allow for slight timing differences
+  return `consumption-${attendanceId}-${drinkType}-${recordedAtMinute}`;
 }
 
 /**
@@ -453,4 +472,28 @@ export async function idempotencyKeyExists(
     [key],
   );
   return (result?.count ?? 0) > 0;
+}
+
+/**
+ * Gets a recent consumption with the same drink type for an attendance.
+ * Used for deduplication - prevents rapid duplicate entries.
+ */
+export async function getRecentConsumption<T>(
+  db: SQLite.SQLiteDatabase,
+  attendanceId: string,
+  drinkType: string,
+  withinSeconds: number = 30,
+): Promise<T | null> {
+  const cutoff = new Date();
+  cutoff.setSeconds(cutoff.getSeconds() - withinSeconds);
+
+  const result = await db.getFirstAsync<T>(
+    `SELECT * FROM consumptions
+     WHERE attendance_id = ? AND drink_type = ? AND _deleted = 0
+       AND recorded_at > ?
+     ORDER BY recorded_at DESC
+     LIMIT 1`,
+    [attendanceId, drinkType, cutoff.toISOString()],
+  );
+  return result ?? null;
 }
