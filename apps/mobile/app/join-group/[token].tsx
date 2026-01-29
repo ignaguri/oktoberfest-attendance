@@ -83,7 +83,8 @@ export default function JoinGroupByTokenScreen() {
   };
 
   const handleGoHome = () => {
-    router.replace("/index");
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    router.replace("/");
   };
 
   // Loading state

@@ -227,7 +227,7 @@ const SelectIcon = React.forwardRef<
       />
     );
   } else if (
-    //@ts-expect-error : web only
+    //@ts-ignore : web only
     (props?.height !== undefined || props?.width !== undefined) &&
     size === undefined
   ) {

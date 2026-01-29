@@ -34,7 +34,7 @@ const Image = React.forwardRef<
       className={imageStyle({ size, class: className })}
       {...props}
       ref={ref}
-      // @ts-expect-error : web only
+      // @ts-ignore : web only
       style={
         Platform.OS === "web"
           ? { height: "revert-layer", width: "revert-layer" }

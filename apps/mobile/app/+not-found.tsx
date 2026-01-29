@@ -12,7 +12,8 @@ export default function NotFoundScreen() {
   const handleGoHome = () => {
     // Reset navigation stack and go to home
     router.dismissAll();
-    router.replace("/(tabs)/index");
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    router.replace("/");
   };
 
   return (

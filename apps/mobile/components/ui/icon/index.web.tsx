@@ -33,7 +33,7 @@ export const Icon = React.forwardRef<
   if (typeof size === "number") {
     return (
       <UIIcon
-        // @ts-expect-error : TODO: fix this
+        // @ts-ignore : TODO: fix this
         ref={ref}
         {...props}
         className={iconStyle({ class: className })}
@@ -46,7 +46,7 @@ export const Icon = React.forwardRef<
   ) {
     return (
       <UIIcon
-        // @ts-expect-error : TODO: fix this
+        // @ts-ignore : TODO: fix this
         ref={ref}
         {...props}
         className={iconStyle({ class: className })}
@@ -55,7 +55,7 @@ export const Icon = React.forwardRef<
   }
   return (
     <UIIcon
-      // @ts-expect-error : TODO: fix this
+      // @ts-ignore : TODO: fix this
       ref={ref}
       {...props}
       className={iconStyle({ size, class: className })}
@@ -88,7 +88,7 @@ const createIconUI = ({ ...props }: ParameterTypes) => {
     }, [className, inComingprops?.style]);
     return (
       <NewUIIcon
-        // @ts-expect-error : TODO: fix this
+        // @ts-ignore : TODO: fix this
         ref={ref}
         {...inComingprops}
         className={calculateClassName}

@@ -7,20 +7,15 @@ import {
   createGetAvatarUrl,
   createGetBeerPictureUrl,
 } from "@prostcounter/shared";
-import Constants from "expo-constants";
 
-/**
- * Get the Supabase URL from environment/constants
- */
-function getSupabaseUrl(): string {
-  return (
-    Constants.expoConfig?.extra?.supabaseUrl ||
-    process.env.EXPO_PUBLIC_SUPABASE_URL ||
-    "http://localhost:54321"
-  );
-}
+import { logger } from "./logger";
+import { supabaseUrl } from "./supabase";
 
-const supabaseUrl = getSupabaseUrl();
+// Log the supabaseUrl being used for image URLs
+logger.debug("Image URL Configuration", {
+  supabaseUrl,
+  urlLength: supabaseUrl?.length || 0,
+});
 
 /**
  * Gets the correct avatar URL for mobile
