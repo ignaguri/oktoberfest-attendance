@@ -77,7 +77,7 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated && !inAuthGroup) {
       router.replace("/(auth)/sign-in");
     } else if (isAuthenticated && inAuthGroup) {
-      router.replace("/(tabs)");
+      router.replace("/index");
     }
   }, [isAuthenticated, isLoading, segments]);
 

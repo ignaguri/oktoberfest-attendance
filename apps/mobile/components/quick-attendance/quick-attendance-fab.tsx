@@ -19,8 +19,12 @@ export function QuickAttendanceFab({
   disabled = false,
 }: QuickAttendanceFabProps) {
   const insets = useSafeAreaInsets();
-  // 50px tab bar content + 16px margin + bottom safe area
-  const bottomOffset = 50 + 16 + insets.bottom;
+  // Native floating tab bar (iOS 18+) is a compact pill
+  // Position FAB above it with margin for clearance
+  // Devices without home indicator (insets.bottom = 0) need extra margin
+  const floatingTabBarHeight = 50;
+  const margin = insets.bottom === 0 ? 40 : 24;
+  const bottomOffset = floatingTabBarHeight + margin + insets.bottom;
 
   return (
     <Fab

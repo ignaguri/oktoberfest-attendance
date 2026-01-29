@@ -1,5 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Link, Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Beer } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -7,6 +7,13 @@ import { Colors } from "@/lib/constants/colors";
 
 export default function NotFoundScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleGoHome = () => {
+    // Reset navigation stack and go to home
+    router.dismissAll();
+    router.replace("/(tabs)/index");
+  };
 
   return (
     <>
@@ -24,13 +31,14 @@ export default function NotFoundScreen() {
         <Text className="mt-2 text-center text-gray-500">
           {t("common.errors.notFound.description")}
         </Text>
-        <Link href="/(tabs)" asChild>
-          <TouchableOpacity className="mt-8 rounded-full bg-yellow-500 px-8 py-4 active:bg-yellow-600">
-            <Text className="text-center font-bold text-white">
-              {t("common.buttons.goHome")}
-            </Text>
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity
+          onPress={handleGoHome}
+          className="mt-8 rounded-full bg-yellow-500 px-8 py-4 active:bg-yellow-600"
+        >
+          <Text className="text-center font-bold text-white">
+            {t("common.buttons.goHome")}
+          </Text>
+        </TouchableOpacity>
       </View>
     </>
   );

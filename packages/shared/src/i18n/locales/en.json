@@ -99,6 +99,13 @@
       "actions": "Actions"
     }
   },
+  "tabs": {
+    "home": "Home",
+    "attendance": "Attendance",
+    "groups": "Groups",
+    "ranking": "Ranking",
+    "profile": "Profile"
+  },
   "auth": {
     "signIn": {
       "title": "Sign In",

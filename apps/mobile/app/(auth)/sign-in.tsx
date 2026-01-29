@@ -111,7 +111,7 @@ export default function SignInScreen() {
     }
 
     // Navigate to main app
-    router.replace("/(tabs)");
+    router.replace("/index");
   };
 
   const handleBiometricAuth = async () => {
@@ -137,7 +137,7 @@ export default function SignInScreen() {
 
     // Session valid, proceed to app
     setShowBiometricPrompt(false);
-    router.replace("/(tabs)");
+    router.replace("/index");
   };
 
   const handleUsePasword = () => {
@@ -150,12 +150,12 @@ export default function SignInScreen() {
   const handleEnableBiometric = async () => {
     await enableBiometrics();
     setShowBiometricEnablePrompt(false);
-    router.replace("/(tabs)");
+    router.replace("/index");
   };
 
   const handleSkipBiometric = () => {
     setShowBiometricEnablePrompt(false);
-    router.replace("/(tabs)");
+    router.replace("/index");
   };
 
   const handleGoogleSignIn = async () => {

@@ -1,19 +1,15 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
-import { Tabs } from "expo-router";
 import {
-  CalendarDays,
-  Home,
-  type LucideIcon,
-  Puzzle,
-  Trophy,
-  User,
-  Users,
-} from "lucide-react-native";
+  Icon,
+  Label,
+  NativeTabs,
+  VectorIcon,
+} from "expo-router/unstable-native-tabs";
 import { useMemo } from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   QuickAttendanceFab,
@@ -25,23 +21,12 @@ import {
   useQuickAttendance,
 } from "@/lib/quick-attendance";
 
-interface TabIconProps {
-  Icon: LucideIcon;
-  color: string;
-  focused: boolean;
-}
-
-function TabIcon({ Icon, color, focused }: TabIconProps) {
-  return <Icon size={focused ? 28 : 24} color={color} />;
-}
-
 /**
  * Inner component that uses the quick attendance context
  */
 function TabsLayoutContent() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const insets = useSafeAreaInsets();
   const {
     isOpen,
     openSheet,
@@ -66,85 +51,54 @@ function TabsLayoutContent() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Tabs
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: Colors.primary[500],
-          },
-          headerTintColor: Colors.black,
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
-          headerShadowVisible: true,
-          tabBarActiveTintColor: Colors.primary[500],
-          tabBarInactiveTintColor: Colors.gray[500],
-          tabBarStyle: {
-            backgroundColor: Colors.white,
-            borderTopColor: Colors.gray[200],
-          },
-          tabBarHideOnKeyboard: true,
-          tabBarShowLabel: false,
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={Home} color={color} focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="attendance"
-          options={{
-            title: t("common.menu.attendance"),
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={CalendarDays} color={color} focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="groups"
-          options={{
-            title: t("common.menu.groups"),
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={Users} color={color} focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="leaderboard"
-          options={{
-            title: t("leaderboard.screenTitle"),
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={Trophy} color={color} focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: t("common.menu.profile"),
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon Icon={User} color={color} focused={focused} />
-            ),
-          }}
-        />
-        {/* Dev-only Components showcase tab */}
-        {__DEV__ && (
-          <Tabs.Screen
-            name="components"
-            options={{
-              title: "Components",
-              tabBarIcon: ({ color, focused }) => (
-                <TabIcon Icon={Puzzle} color={color} focused={focused} />
-              ),
-            }}
+      <NativeTabs tintColor={Colors.primary[500]}>
+        {/* Home tab */}
+        <NativeTabs.Trigger name="index">
+          <Label>{t("tabs.home")}</Label>
+          <Icon
+            sf={{ default: "house", selected: "house.fill" }}
+            androidSrc={<VectorIcon family={Ionicons} name="home" />}
           />
-        )}
-      </Tabs>
+        </NativeTabs.Trigger>
+
+        {/* Attendance tab */}
+        <NativeTabs.Trigger name="attendance">
+          <Label>{t("tabs.attendance")}</Label>
+          <Icon
+            sf={{ default: "calendar", selected: "calendar" }}
+            androidSrc={<VectorIcon family={Ionicons} name="calendar" />}
+          />
+        </NativeTabs.Trigger>
+
+        {/* Groups tab */}
+        <NativeTabs.Trigger name="groups">
+          <Label>{t("tabs.groups")}</Label>
+          <Icon
+            sf={{ default: "person.2", selected: "person.2.fill" }}
+            androidSrc={<VectorIcon family={Ionicons} name="people" />}
+          />
+        </NativeTabs.Trigger>
+
+        {/* Leaderboard tab */}
+        <NativeTabs.Trigger name="leaderboard">
+          <Label>{t("tabs.ranking")}</Label>
+          <Icon
+            sf={{ default: "trophy", selected: "trophy.fill" }}
+            androidSrc={<VectorIcon family={Ionicons} name="trophy" />}
+          />
+        </NativeTabs.Trigger>
+
+        {/* Profile tab */}
+        <NativeTabs.Trigger name="profile">
+          <Label>{t("tabs.profile")}</Label>
+          <Icon
+            sf={{ default: "person", selected: "person.fill" }}
+            androidSrc={<VectorIcon family={Ionicons} name="person" />}
+          />
+        </NativeTabs.Trigger>
+
+        {/* Components tab removed - Native tabs have 5-tab limit and overflow creates "More" menu */}
+      </NativeTabs>
 
       {/* Quick Attendance FAB */}
       {showFab && (
@@ -167,6 +121,7 @@ function TabsLayoutContent() {
 
 /**
  * Tabs layout with quick attendance provider
+ * Uses Native Tabs for better performance and native appearance
  */
 export default function TabsLayout() {
   return (
