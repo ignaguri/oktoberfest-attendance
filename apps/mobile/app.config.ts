@@ -114,11 +114,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     eas: {
       projectId: "fca65703-ce2a-48b3-aec4-11a90fbb8996",
     },
-    // Environment variables for runtime config
-    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
-    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-    sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-    apiUrl: process.env.EXPO_PUBLIC_API_URL,
+    // Note: Environment variables (EXPO_PUBLIC_*) are accessed directly via process.env
+    // at build time. They're NOT included here to avoid fingerprint mismatches between
+    // local and EAS builds. See lib/supabase.ts, lib/api-client.ts, lib/sentry.ts
   },
   owner: "pepegrillo",
 });
