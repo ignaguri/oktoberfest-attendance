@@ -2,6 +2,7 @@
 
 import { TZDate } from "@date-fns/tz";
 import { TIMEZONE } from "@prostcounter/shared/constants";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { addMonths, format as formatDateFns, subMonths } from "date-fns";
 import { isAfter, isBefore } from "date-fns";
 import { CalendarPlusIcon } from "lucide-react";
@@ -38,6 +39,7 @@ export function AttendanceDatePicker({
   buttonClassName,
   calendarClassName,
 }: AttendanceDatePickerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   // Clamp the incoming value into the allowed festival range
   const clampedValue = useMemo(() => {
@@ -65,8 +67,10 @@ export function AttendanceDatePicker({
       </DrawerTrigger>
       <DrawerContent className="w-auto overflow-hidden p-0">
         <DrawerHeader className="sr-only">
-          <DrawerTitle>Select date</DrawerTitle>
-          <DrawerDescription>Set the date of your attendance</DrawerDescription>
+          <DrawerTitle>{t("home.datePicker.title")}</DrawerTitle>
+          <DrawerDescription>
+            {t("home.datePicker.description")}
+          </DrawerDescription>
         </DrawerHeader>
         <Calendar
           mode="single"

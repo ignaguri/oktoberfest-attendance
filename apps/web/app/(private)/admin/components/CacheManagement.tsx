@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -7,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiClient } from "@/lib/api-client";
-import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 
 const CacheManagement = () => {
@@ -54,7 +54,9 @@ const CacheManagement = () => {
 
       if (result.success) {
         toast.success(
-          `Successfully regenerated ${result.regeneratedCount || 0} wrapped cache entries`,
+          t("notifications.success.wrappedCacheRegenerated", {
+            count: result.regeneratedCount || 0,
+          }),
         );
         setUserId("");
         setFestivalId("");
@@ -77,16 +79,14 @@ const CacheManagement = () => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">Cache Management</h2>
+      <h2 className="mb-4 text-xl font-semibold">{t("admin.cache.title")}</h2>
       <div className="space-y-4">
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <h3 className="mb-2 font-medium text-blue-900 dark:text-blue-100">
-            New Caching System
+            {t("admin.cache.serviceWorker.title")}
           </h3>
           <p className="mb-3 text-sm text-blue-700 dark:text-blue-300">
-            The old NodeCache system has been replaced with modern HTTP caching
-            headers and Next.js unstable_cache for better performance and
-            serverless compatibility.
+            {t("admin.cache.serviceWorker.description")}
           </p>
           <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
             <li>• Images: HTTP headers with ETags and 30-day cache</li>
@@ -101,47 +101,48 @@ const CacheManagement = () => {
             onClick={handleClearServiceWorkerCache}
             className="w-full sm:w-auto"
           >
-            Clear Service Worker Caches
+            {t("admin.cache.serviceWorker.button")}
           </Button>
           <p className="text-muted-foreground mt-2 text-sm">
-            This will clear all PWA service worker caches and update the service
-            worker.
+            {t("admin.cache.serviceWorker.help")}
           </p>
         </div>
 
         <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
           <h3 className="mb-2 font-medium text-green-900 dark:text-green-100">
-            Wrapped Data Cache
+            {t("admin.cache.wrappedData.title")}
           </h3>
           <p className="mb-3 text-sm text-green-700 dark:text-green-300">
-            Wrapped data is automatically cached after first calculation. Use
-            this tool to manually regenerate cached data for specific users or
-            festivals.
+            {t("admin.cache.wrappedData.description")}
           </p>
 
           <div className="space-y-3">
             <div>
               <Label htmlFor="userId" className="text-sm font-medium">
-                User ID (optional)
+                {t("admin.cache.wrappedData.form.userId")}
               </Label>
               <Input
                 id="userId"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="Leave empty to regenerate all users"
+                placeholder={t(
+                  "admin.cache.wrappedData.form.userIdPlaceholder",
+                )}
                 className="mt-1"
               />
             </div>
 
             <div>
               <Label htmlFor="festivalId" className="text-sm font-medium">
-                Festival ID (optional)
+                {t("admin.cache.wrappedData.form.festivalId")}
               </Label>
               <Input
                 id="festivalId"
                 value={festivalId}
                 onChange={(e) => setFestivalId(e.target.value)}
-                placeholder="Leave empty to regenerate all festivals"
+                placeholder={t(
+                  "admin.cache.wrappedData.form.festivalIdPlaceholder",
+                )}
                 className="mt-1"
               />
             </div>
@@ -151,13 +152,13 @@ const CacheManagement = () => {
               disabled={isRegenerating}
               className="w-full bg-green-600 hover:bg-green-700 sm:w-auto"
             >
-              {isRegenerating ? "Regenerating..." : "Regenerate Wrapped Cache"}
+              {isRegenerating
+                ? t("admin.cache.wrappedData.buttons.regenerating")
+                : t("admin.cache.wrappedData.buttons.regenerate")}
             </Button>
 
             <p className="text-muted-foreground text-sm">
-              This will recalculate and cache wrapped data for the specified
-              user(s) and festival(s). Leave both fields empty to regenerate all
-              cached data.
+              {t("admin.cache.wrappedData.help")}
             </p>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { CalendarDays } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
@@ -13,6 +14,7 @@ import { PWAReloadButton } from "./PWAReloadButton";
 import { UserMenu } from "./UserMenu/UserMenu";
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const { data: profileData, loading } = useCurrentProfile();
 
   return (
@@ -68,7 +70,7 @@ export default function Navbar() {
         {!loading && !profileData && (
           <div className="flex h-10 items-center">
             <Link href="/sign-in" className="text-white">
-              Sign In
+              {t("auth.signIn.title")}
             </Link>
           </div>
         )}

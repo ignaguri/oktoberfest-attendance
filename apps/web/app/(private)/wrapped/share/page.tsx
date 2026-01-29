@@ -41,7 +41,7 @@ export default function ShareImagePage() {
     if (!shareImageRef.current || !wrappedData) return;
 
     setIsGenerating(true);
-    toast.loading("Generating your wrapped image...");
+    toast.loading(t("home.wrapped.generating"));
 
     try {
       // Preload fonts for better Safari compatibility
@@ -109,7 +109,7 @@ export default function ShareImagePage() {
   if (!wrappedData) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-600">Loading...</p>
+        <p className="text-lg text-gray-600">{t("common.status.loading")}</p>
       </div>
     );
   }
@@ -123,7 +123,9 @@ export default function ShareImagePage() {
         variant="yellow"
       >
         <Download className="mr-2 h-4 w-4" />
-        {isGenerating ? "Generating..." : "Download Again"}
+        {isGenerating
+          ? t("home.wrapped.generatingButton")
+          : t("home.wrapped.downloadAgain")}
       </Button>
 
       {/* Centered ShareImage at proper scale */}

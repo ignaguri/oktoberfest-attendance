@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { format, parseISO } from "date-fns";
 import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useTranslation } from "@/lib/i18n/client";
 import type { Festival, FestivalStatus, FestivalType } from "@/lib/types";
 
 import {
@@ -133,7 +133,7 @@ export default function FestivalManagement() {
   const handleDelete = async (festivalId: string, festivalName: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${festivalName}"? This action cannot be undone.`,
+        `${t("admin.festivals.confirmDelete")} "${festivalName}"? ${t("common.actions.cannotUndo")}`,
       )
     ) {
       return;
@@ -177,7 +177,7 @@ export default function FestivalManagement() {
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-center">Loading festivals...</p>
+          <p className="text-center">{t("admin.festivals.loading")}</p>
         </CardContent>
       </Card>
     );
@@ -186,10 +186,10 @@ export default function FestivalManagement() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Festival Management</h2>
+        <h2 className="text-xl font-semibold">{t("admin.festivals.title")}</h2>
         <Button onClick={handleNewFestival} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          New Festival
+          {t("admin.festivals.newFestival")}
         </Button>
       </div>
 
@@ -198,40 +198,46 @@ export default function FestivalManagement() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {editingFestival ? "Edit Festival" : "Create New Festival"}
+              {editingFestival
+                ? t("admin.festivals.editFestival")
+                : t("admin.festivals.createFestival")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <Label htmlFor="name">Festival Name</Label>
+                  <Label htmlFor="name">{t("admin.festivals.form.name")}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Oktoberfest 2025"
+                    placeholder={t("admin.festivals.form.namePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="short_name">Short Name</Label>
+                  <Label htmlFor="short_name">
+                    {t("admin.festivals.form.shortName")}
+                  </Label>
                   <Input
                     id="short_name"
                     value={formData.short_name}
                     onChange={(e) =>
                       setFormData({ ...formData, short_name: e.target.value })
                     }
-                    placeholder="oktoberfest-2025"
+                    placeholder={t("admin.festivals.form.shortNamePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="festival_type">Festival Type</Label>
+                  <Label htmlFor="festival_type">
+                    {t("admin.festivals.form.type")}
+                  </Label>
                   <Select
                     value={formData.festival_type}
                     onValueChange={(value: FestivalType) =>
@@ -242,33 +248,41 @@ export default function FestivalManagement() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="oktoberfest">Oktoberfest</SelectItem>
+                      <SelectItem value="oktoberfest">
+                        {t("admin.festivals.types.oktoberfest")}
+                      </SelectItem>
                       <SelectItem value="starkbierfest">
-                        Starkbierfest
+                        {t("admin.festivals.types.starkbierfest")}
                       </SelectItem>
                       <SelectItem value="fruehlingsfest">
-                        Frühlingsfest
+                        {t("admin.festivals.types.fruhlingsfest")}
                       </SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="other">
+                        {t("admin.festivals.types.other")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">
+                    {t("admin.festivals.form.location")}
+                  </Label>
                   <Input
                     id="location"
                     value={formData.location}
                     onChange={(e) =>
                       setFormData({ ...formData, location: e.target.value })
                     }
-                    placeholder="Munich, Germany"
+                    placeholder={t("admin.festivals.form.locationPlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="latitude">Latitude</Label>
+                  <Label htmlFor="latitude">
+                    {t("admin.festivals.form.latitude")}
+                  </Label>
                   <Input
                     id="latitude"
                     type="number"
@@ -282,12 +296,14 @@ export default function FestivalManagement() {
                           : null,
                       })
                     }
-                    placeholder="48.1314"
+                    placeholder={t("admin.festivals.form.latitudePlaceholder")}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="longitude">Longitude</Label>
+                  <Label htmlFor="longitude">
+                    {t("admin.festivals.form.longitude")}
+                  </Label>
                   <Input
                     id="longitude"
                     type="number"
@@ -301,12 +317,14 @@ export default function FestivalManagement() {
                           : null,
                       })
                     }
-                    placeholder="11.5498"
+                    placeholder={t("admin.festivals.form.longitudePlaceholder")}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="start_date">Start Date</Label>
+                  <Label htmlFor="start_date">
+                    {t("admin.festivals.form.startDate")}
+                  </Label>
                   <Input
                     id="start_date"
                     type="date"
@@ -319,7 +337,9 @@ export default function FestivalManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="end_date">End Date</Label>
+                  <Label htmlFor="end_date">
+                    {t("admin.festivals.form.endDate")}
+                  </Label>
                   <Input
                     id="end_date"
                     type="date"
@@ -332,7 +352,9 @@ export default function FestivalManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="map_url">Map URL</Label>
+                  <Label htmlFor="map_url">
+                    {t("admin.festivals.form.mapUrl")}
+                  </Label>
                   <Input
                     id="map_url"
                     type="url"
@@ -340,25 +362,29 @@ export default function FestivalManagement() {
                     onChange={(e) =>
                       setFormData({ ...formData, map_url: e.target.value })
                     }
-                    placeholder="https://wiesnmap.muenchen.de/"
+                    placeholder={t("admin.festivals.form.mapUrlPlaceholder")}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="timezone">Timezone</Label>
+                  <Label htmlFor="timezone">
+                    {t("admin.festivals.form.timezone")}
+                  </Label>
                   <Input
                     id="timezone"
                     value={formData.timezone}
                     onChange={(e) =>
                       setFormData({ ...formData, timezone: e.target.value })
                     }
-                    placeholder="Europe/Berlin"
+                    placeholder={t("admin.festivals.form.timezonePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">
+                    {t("admin.festivals.form.status")}
+                  </Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value: FestivalStatus) =>
@@ -369,9 +395,15 @@ export default function FestivalManagement() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="upcoming">Upcoming</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="ended">Ended</SelectItem>
+                      <SelectItem value="upcoming">
+                        {t("admin.festivals.statuses.upcoming")}
+                      </SelectItem>
+                      <SelectItem value="active">
+                        {t("admin.festivals.statuses.active")}
+                      </SelectItem>
+                      <SelectItem value="ended">
+                        {t("admin.festivals.statuses.ended")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -384,19 +416,23 @@ export default function FestivalManagement() {
                       setFormData({ ...formData, is_active: checked })
                     }
                   />
-                  <Label htmlFor="is_active">Mark as Active Festival</Label>
+                  <Label htmlFor="is_active">
+                    {t("admin.festivals.form.markActive")}
+                  </Label>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">
+                  {t("admin.festivals.form.description")}
+                </Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Optional festival description..."
+                  placeholder={t("admin.festivals.form.descriptionPlaceholder")}
                   rows={3}
                 />
               </div>
@@ -404,13 +440,13 @@ export default function FestivalManagement() {
               <div className="flex items-center gap-2 pt-4">
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting
-                    ? "Saving..."
+                    ? t("admin.festivals.buttons.saving")
                     : editingFestival
-                      ? "Update Festival"
-                      : "Create Festival"}
+                      ? t("admin.festivals.buttons.updateFestival")
+                      : t("admin.festivals.buttons.createFestival")}
                 </Button>
                 <Button type="button" variant="outline" onClick={handleCancel}>
-                  Cancel
+                  {t("admin.festivals.buttons.cancel")}
                 </Button>
               </div>
             </form>
@@ -434,7 +470,7 @@ export default function FestivalManagement() {
                     </span>
                     {festival.is_active && (
                       <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800">
-                        Active
+                        {t("admin.festivals.badges.active")}
                       </span>
                     )}
                   </div>
@@ -467,7 +503,7 @@ export default function FestivalManagement() {
                     className="flex items-center gap-1"
                   >
                     <Edit className="h-3 w-3" />
-                    Edit
+                    {t("admin.festivals.buttons.edit")}
                   </Button>
                   <Button
                     variant="destructive"
@@ -476,7 +512,7 @@ export default function FestivalManagement() {
                     className="flex items-center gap-1"
                   >
                     <Trash2 className="h-3 w-3" />
-                    Delete
+                    {t("admin.festivals.buttons.delete")}
                   </Button>
                 </div>
               </div>
@@ -487,9 +523,7 @@ export default function FestivalManagement() {
         {festivals.length === 0 && (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-gray-500">
-                No festivals found. Create your first festival!
-              </p>
+              <p className="text-gray-500">{t("admin.festivals.empty")}</p>
             </CardContent>
           </Card>
         )}

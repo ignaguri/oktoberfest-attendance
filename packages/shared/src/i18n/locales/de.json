@@ -1,0 +1,1544 @@
+{
+  "common": {
+    "buttons": {
+      "submit": "Absenden",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "close": "Schließen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "confirm": "Bestätigen",
+      "ok": "OK",
+      "retry": "Erneut versuchen",
+      "loading": "Lädt...",
+      "signIn": "Anmelden",
+      "signUp": "Registrieren",
+      "signOut": "Abmelden",
+      "continue": "Fortfahren",
+      "gotIt": "Verstanden",
+      "share": "Teilen",
+      "copy": "Kopieren",
+      "install": "Installieren",
+      "goHome": "Zur Startseite",
+      "tryAgain": "Erneut versuchen"
+    },
+    "actions": {
+      "retry": "Erneut versuchen",
+      "cancel": "Abbrechen",
+      "dismiss": "Verwerfen",
+      "pullToRefresh": "Zum Aktualisieren ziehen"
+    },
+    "labels": {
+      "name": "Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "status": "Status",
+      "description": "Beschreibung"
+    },
+    "status": {
+      "loading": "Lädt...",
+      "offline": "Du bist offline",
+      "online": "Online",
+      "error": "Ein Fehler ist aufgetreten",
+      "success": "Erfolg",
+      "added": "Hinzugefügt!",
+      "enabled": "aktiviert",
+      "disabled": "deaktiviert",
+      "saving": "Speichert...",
+      "saved": "Gespeichert",
+      "creating": "Erstellt...",
+      "deleting": "Löscht...",
+      "cancelling": "Bricht ab...",
+      "info": "Info",
+      "authenticating": "Authentifiziert..."
+    },
+    "errors": {
+      "title": "Fehler",
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "oops": "Hoppla!",
+      "notFound": {
+        "title": "Seite nicht gefunden",
+        "description": "Diese Seite hat sich wohl in ein anderes Zelt verirrt!"
+      },
+      "unauthorized": "Bitte melde dich an, um fortzufahren",
+      "forbidden": "Du hast keine Berechtigung dafür",
+      "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung."
+    },
+    "empty": {
+      "noResults": "Keine Ergebnisse gefunden",
+      "noData": "Keine Daten verfügbar"
+    },
+    "time": {
+      "justNow": "Gerade eben",
+      "minutesAgo": "vor {{count}} Minute",
+      "minutesAgo_other": "vor {{count}} Minuten",
+      "hoursAgo": "vor {{count}} Stunde",
+      "hoursAgo_other": "vor {{count}} Stunden",
+      "daysAgo": "vor {{count}} Tag",
+      "daysAgo_other": "vor {{count}} Tagen"
+    },
+    "menu": {
+      "attendance": "Meine Besuche",
+      "groups": "Gruppen",
+      "leaderboard": "Globale Rangliste",
+      "achievements": "Erfolge",
+      "profile": "Profileinstellungen",
+      "map": "Festivalplan",
+      "whatsNew": "Neuigkeiten ansehen",
+      "installApp": "App installieren",
+      "changeFestival": "Festival wechseln",
+      "share": "App teilen",
+      "signOut": "Abmelden",
+      "navigation": "Navigation",
+      "settingsTools": "Einstellungen & Werkzeuge",
+      "actions": "Aktionen"
+    }
+  },
+  "tabs": {
+    "home": "Start",
+    "attendance": "Besuche",
+    "groups": "Gruppen",
+    "ranking": "Rangliste",
+    "profile": "Profil"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Anmelden",
+      "subtitle": "Willkommen zurück!",
+      "tagline": "Verfolge dein Oktoberfest-Abenteuer",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "max@muster.de",
+      "passwordLabel": "Passwort",
+      "passwordPlaceholder": "dein Passwort",
+      "submit": "Anmelden",
+      "forgotPassword": "Passwort vergessen?",
+      "noAccount": "Noch kein Konto?",
+      "signUpLink": "Jetzt registrieren.",
+      "orContinueWith": "oder",
+      "continueWithGoogle": "Mit Google fortfahren",
+      "continueWithFacebook": "Mit Facebook fortfahren",
+      "continueWithApple": "Mit Apple fortfahren",
+      "errors": {
+        "invalidCredentials": "Ungültige E-Mail oder Passwort",
+        "failed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
+        "providerFailed": "Anmeldung mit {{provider}} fehlgeschlagen"
+      }
+    },
+    "signUp": {
+      "title": "Konto erstellen",
+      "subtitle": "Dabei sein beim Festival-Spaß!",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "max@muster.de",
+      "passwordLabel": "Passwort",
+      "passwordPlaceholder": "Passwort erstellen",
+      "confirmPasswordLabel": "Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Passwort bestätigen",
+      "submit": "Konto erstellen",
+      "hasAccount": "Bereits ein Konto?",
+      "signInLink": "Jetzt anmelden.",
+      "orContinueWith": "Oder fortfahren mit",
+      "accountCreated": "Konto erstellt",
+      "errors": {
+        "failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
+        "emailInUse": "Diese E-Mail wird bereits verwendet"
+      },
+      "success": {
+        "checkEmail": "Bitte überprüfe deine E-Mail zur Verifizierung."
+      }
+    },
+    "resetPassword": {
+      "title": "Passwort zurücksetzen",
+      "subtitle": "Gib deine E-Mail ein, um Anweisungen zu erhalten",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "max@muster.de",
+      "submit": "Anweisungen senden",
+      "backToSignIn": "Zurück zur Anmeldung",
+      "success": "Anweisungen gesendet. Überprüfe deine E-Mail.",
+      "errors": {
+        "failed": "Senden der Anweisungen fehlgeschlagen"
+      }
+    },
+    "updatePassword": {
+      "title": "Passwort aktualisieren",
+      "subtitle": "Gib dein neues Passwort ein",
+      "passwordLabel": "Neues Passwort",
+      "passwordPlaceholder": "Neues Passwort eingeben",
+      "confirmPasswordLabel": "Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Neues Passwort bestätigen",
+      "submit": "Passwort aktualisieren",
+      "success": "Passwort erfolgreich aktualisiert",
+      "errors": {
+        "failed": "Passwort-Aktualisierung fehlgeschlagen"
+      }
+    },
+    "biometric": {
+      "label": "Biometrische Anmeldung",
+      "description": "Schnelle Anmeldung mit Face ID oder Touch ID",
+      "faceId": "Face ID",
+      "touchId": "Touch ID",
+      "enableButton": "Biometrische Anmeldung aktivieren",
+      "skipButton": "Später",
+      "prompt": "Anmelden mit {{biometricName}}",
+      "authenticate": "{{biometricName}} verwenden",
+      "usePassword": "Stattdessen Passwort verwenden",
+      "enableTitle": "{{biometricName}} aktivieren?",
+      "enableDescription": "Melde dich beim nächsten Mal schneller mit {{biometricName}} an",
+      "sessionExpired": "Sitzung abgelaufen. Bitte melde dich mit deinem Passwort an."
+    }
+  },
+  "groups": {
+    "pageTitle": "Gruppen",
+    "yourGroups": "deine Gruppen:",
+    "noGroupsYet": "Du bist noch kein Mitglied einer Gruppe für dieses Festival.",
+    "noFestival": "Bitte wähle ein Festival aus, um Gruppen anzuzeigen",
+    "joinOrCreate": "Gruppe beitreten oder erstellen",
+    "memberCount": "{{count}} Mitglied",
+    "memberCount_other": "{{count}} Mitglieder",
+    "createSuccess": "Gruppe erfolgreich erstellt!",
+    "joinSuccess": "Gruppe erfolgreich beigetreten!",
+    "detail": {
+      "title": "Gruppendetails",
+      "notFound": "Gruppe nicht gefunden",
+      "location": "Standort",
+      "viewMembers": "Mitglieder anzeigen",
+      "leaderboard": "Rangliste",
+      "noMembers": "Noch keine Mitglieder"
+    },
+    "qrCode": {
+      "title": "QR-Code",
+      "description": "Teile diesen QR-Code mit Freunden, um sie zu {{name}} einzuladen",
+      "scanToJoin": "Scannen um {{groupName}} beizutreten",
+      "shareQR": "QR-Code teilen",
+      "generating": "QR-Code wird generiert...",
+      "helper": "Freunde können diesen Code scannen, um deiner Gruppe sofort beizutreten",
+      "regenerate": "QR-Code neu erstellen"
+    },
+    "create": {
+      "title": "Gruppe erstellen",
+      "nameLabel": "Gruppenname",
+      "namePlaceholder": "Gruppennamen eingeben",
+      "passwordLabel": "Gruppenpasswort (optional)",
+      "passwordPlaceholder": "Passwort eingeben",
+      "winningCriteria": "Gewinnkriterium",
+      "criteriaLabel": "Wettbewerbstyp",
+      "criteriaPlaceholder": "Wettbewerbstyp auswählen",
+      "criteriaHelp": "Wie wird der Gewinner ermittelt?",
+      "submit": "Gruppe erstellen",
+      "success": "Gruppe erfolgreich erstellt!",
+      "errors": {
+        "failed": "Gruppe konnte nicht erstellt werden"
+      }
+    },
+    "join": {
+      "title": "Gruppe beitreten",
+      "tokenLabel": "Einladungs-Token",
+      "tokenPlaceholder": "Einladungs-Token einfügen",
+      "namePlaceholder": "Gruppenname",
+      "passwordLabel": "Gruppenpasswort",
+      "passwordPlaceholder": "Gruppenpasswort",
+      "tokenPasswordPlaceholder": "Gruppenpasswort eingeben",
+      "linkTokenPlaceholder": "Einladungslink oder Token einfügen",
+      "clickToJoin": "Klicke unten, um <strong>{{groupName}}</strong> beizutreten",
+      "joining": "Trete bei...",
+      "searching": "Suche Gruppen...",
+      "submit": "Gruppe beitreten",
+      "success": "Gruppe erfolgreich beigetreten!",
+      "noResults": "Keine Gruppen gefunden",
+      "searchMode": "Nach Name suchen",
+      "tokenMode": "Mit Token beitreten",
+      "emptyDescription": "Suche eine Gruppe nach Namen",
+      "membersCount": "{{count}} Mitglieder",
+      "passwordHint": "Frage ein Gruppenmitglied nach dem Passwort",
+      "tokenHint": "Füge den mit dir geteilten Einladungslink ein",
+      "passwordHelp": "Frage ein Gruppenmitglied nach dem Passwort",
+      "tokenHelp": "Füge den mit dir geteilten Einladungslink ein",
+      "searchPlaceholder": "Nach Gruppenname suchen",
+      "searchPrompt": "Gib einen Gruppennamen ein",
+      "error": "Beitritt zur Gruppe fehlgeschlagen. Bitte überprüfe das Passwort und versuche es erneut.",
+      "errors": {
+        "failed": "Beitritt zur Gruppe fehlgeschlagen",
+        "invalidToken": "Ungültiges Einladungs-Token"
+      }
+    },
+    "settings": {
+      "title": "Gruppeneinstellungen",
+      "loading": "Lade Gruppeneinstellungen...",
+      "groupDetails": "Gruppendetails",
+      "descriptionLabel": "Gruppenbeschreibung",
+      "updateButton": "Gruppe aktualisieren",
+      "members": "Mitglieder",
+      "gallery": "Galerie",
+      "leaderboard": "Rangliste",
+      "inviteLink": "Einladungslink",
+      "inviteLinkDescription": "Teile diesen Link mit Personen, die du in deine Gruppe einladen möchten.",
+      "tokenExpiresTitle": "⏰ Token läuft in 7 Tagen ab",
+      "tokenExpiresDescription": "Erstellen du einen neuen Link, wenn der aktuelle abläuft, um sicherzustellen, dass deine Einladungen aktiv bleiben.",
+      "generatePrompt": "Neuen Einladungslink erstellen ↓",
+      "generateButton": "Neuen Einladungslink erstellen",
+      "copyLink": "Link kopieren",
+      "linkCopied": "Link kopiert!",
+      "renewToken": "Einladungslink neu erstellen",
+      "renewTokenSuccess": "Einladungslink neu erstellt",
+      "leave": "Gruppe verlassen",
+      "confirmLeave": "Bist du sicher, dass du diese Gruppe verlassen möchtest?",
+      "leaveSuccess": "du hast die Gruppe verlassen",
+      "removeMember": "Mitglied entfernen",
+      "confirmRemove": "Bist du sicher, dass du {{name}} aus der Gruppe entfernen möchten?",
+      "confirmRemoveTitle": "Entfernen bestätigen",
+      "confirmRemoveDescription": "Bist du sicher, dass du dieses Mitglied entfernen möchtest?",
+      "removeSuccess": "Mitglied erfolgreich entfernt",
+      "actions": "Aktionen",
+      "kickOut": "Entfernen",
+      "groupName": "Gruppenname",
+      "winningCriteria": "Wettbewerbstyp",
+      "deleteGroup": "Gruppe löschen",
+      "deleteGroupDescription": "Diese Gruppe und alle ihre Daten dauerhaft löschen",
+      "deleteConfirmTitle": "Gruppe löschen?",
+      "deleteConfirmMessage": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Gruppendaten werden dauerhaft gelöscht.",
+      "updating": "Aktualisiert...",
+      "updateSuccess": "Gruppeneinstellungen aktualisiert",
+      "updateError": "Aktualisierung der Gruppeneinstellungen fehlgeschlagen",
+      "deleteSuccess": "Gruppe erfolgreich gelöscht",
+      "deleteError": "Löschen der Gruppe fehlgeschlagen",
+      "dangerZone": "Gefahrenzone",
+      "details": "Details",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Füge eine Beschreibung für deine Gruppe hinzu...",
+      "removeMemberTitle": "Mitglied entfernen?",
+      "removeMemberMessage": "Bist du sicher, dass du {{name}} aus der Gruppe entfernen möchten?",
+      "leaveTitle": "Gruppe verlassen?",
+      "leaveMessage": "Bist du sicher, dass du diese Gruppe verlassen möchtest?",
+      "notFound": "Gruppe nicht gefunden",
+      "leaveCreatorWarning": "Als Ersteller wird das Verlassen die Gruppe für alle Mitglieder löschen",
+      "leaveWarning": "du benötigen eine neue Einladung, um dieser Gruppe erneut beizutreten",
+      "copied": "Kopiert!",
+      "copy": "Kopieren",
+      "regenerate": "Neu erstellen",
+      "tokenWarning": "Das Neu-Erstellen macht den vorherigen Einladungslink ungültig",
+      "noToken": "Kein Einladungslink verfügbar",
+      "generateLink": "Einladungslink erstellen"
+    },
+    "share": {
+      "title": "Mitglieder einladen",
+      "inviteLink": "Einladungslink",
+      "copyLink": "Link kopieren",
+      "shareLink": "Link teilen",
+      "linkCopied": "Link in Zwischenablage kopiert",
+      "message": "Tritt meiner Gruppe '{{groupName}}' auf ProstCounter bei! {{inviteUrl}}",
+      "noToken": "Kein Einladungs-Token verfügbar. Bitte erstelle den Einladungslink neu."
+    },
+    "winningCriteria": {
+      "days_attended": "Meiste Tage besucht",
+      "total_beers": "Meiste Biere getrunken",
+      "avg_beers": "Bester Durchschnitt pro Tag"
+    },
+    "criteria": {
+      "daysAttended": "Meiste Tage besucht",
+      "totalBeers": "Meiste Biere getrunken",
+      "avgBeers": "Bester Durchschnitt pro Tag"
+    },
+    "gallery": {
+      "title": "Gruppengalerie",
+      "titleWithName": "{{groupName}} Galerie",
+      "loading": "Lade Galerie...",
+      "empty": {
+        "title": "Noch keine Fotos",
+        "description": "Bierfotos der Gruppenmitglieder erscheinen hier"
+      }
+    },
+    "location": {
+      "title": "Live-Standort der Gruppe",
+      "shareDescription": "Teile deinen Standort, um Gruppenmitglieder in der Nähe zu sehen und sich von ihnen finden zu lassen.",
+      "controlNote": "Steuere, welche Gruppen deinen Standort sehen können in deinen"
+    },
+    "members": {
+      "title": "Mitglieder",
+      "empty": "Noch keine Mitglieder",
+      "you": "du",
+      "admin": "Admin",
+      "removeConfirmTitle": "Mitglied entfernen?",
+      "removeConfirmMessage": "Bist du sicher, dass du dieses Mitglied aus der Gruppe entfernen möchten?",
+      "joined": "Beigetreten am {{date}}"
+    },
+    "deepLink": {
+      "joining": "Trete Gruppe bei...",
+      "invalidToken": "Ungültiger Einladungslink. Das Token fehlt.",
+      "joinFailed": "Beitritt zur Gruppe fehlgeschlagen. Der Einladungslink ist möglicherweise ungültig oder abgelaufen.",
+      "successTitle": "Willkommen in der Gruppe!",
+      "successMessage": "du bist erfolgreich beigetreten",
+      "viewGroup": "Gruppe anzeigen",
+      "allGroups": "Alle Gruppen anzeigen",
+      "alreadyMemberTitle": "Bereits Mitglied",
+      "alreadyMemberMessage": "Du bist bereits Mitglied dieser Gruppe.",
+      "viewYourGroups": "deine Gruppen anzeigen",
+      "goHome": "Zur Startseite",
+      "errorTitle": "Beitritt nicht möglich",
+      "goToGroups": "Zu Gruppen"
+    },
+    "actions": {
+      "join": "Beitreten",
+      "create": "Erstellen",
+      "share": "Teilen",
+      "qrCode": "QR-Code",
+      "gallery": "Galerie",
+      "settings": "Einstellungen"
+    },
+    "empty": {
+      "title": "Noch keine Gruppen",
+      "description": "du bist noch keiner Gruppe für dieses Festival beigetreten. Erstellen du eine Gruppe oder trete einer bei, um mit Freunden zu konkurrieren!",
+      "action": "Gruppe erstellen oder beitreten"
+    }
+  },
+  "attendance": {
+    "pageTitle": "Meine Besuche",
+    "addNew": "Besuch hinzufügen",
+    "beerCount": "{{count}} Mass",
+    "beerCount_other": "{{count}} Mass",
+    "drinkCount": "{{count}} Getränk",
+    "drinkCount_other": "{{count}} Getränke",
+    "drinkTypes": {
+      "beer": "Mass",
+      "beer_other": "Mass",
+      "radler": "Radler",
+      "radler_other": "Radler",
+      "wine": "Wein",
+      "wine_other": "Weine",
+      "soft_drink": "Softdrink",
+      "soft_drink_other": "Softdrinks",
+      "alcohol_free": "Alkoholfrei",
+      "alcohol_free_other": "Alkoholfrei",
+      "other": "Sonstige",
+      "other_other": "Sonstige"
+    },
+    "quickAdd": {
+      "beer": "+1 Mass",
+      "radler": "+1 Radler",
+      "wine": "+1 Wein",
+      "soft_drink": "+1 Soft"
+    },
+    "howManyDrinks": "deine Getränke eintragen",
+    "totalDrinks": "Getränke gesamt",
+    "addDrink": "Getränk hinzufügen",
+    "removeDrink": "Getränk entfernen",
+    "added": "Hinzugefügt!",
+    "daysAttended": "{{count}} Tag besucht",
+    "daysAttended_other": "{{count}} Tage besucht",
+    "totalSpent": "Ausgaben gesamt",
+    "noAttendances": "Noch keine Besuche erfasst",
+    "noAttendancesDescription": "Beginne, deine Festivalbesuche zu erfassen!",
+    "registerOrUpdate": "Besuch erfassen oder aktualisieren",
+    "whenDidYouVisit": "Wann hast du die Wiesn besucht?",
+    "howManyBeers": "Wie viele 🍻 Mass hattest du?",
+    "selectAmount": "Anzahl wählen",
+    "whichTents": "Welche Zelte hast du besucht?",
+    "selectToEdit": "Wähle einen Besuch zum Bearbeiten aus",
+    "form": {
+      "dateLabel": "Datum",
+      "datePlaceholder": "Datum auswählen",
+      "beerCountLabel": "Anzahl Mass",
+      "tentLabel": "Zelt",
+      "tentPlaceholder": "Zelt auswählen",
+      "notesLabel": "Notizen",
+      "notesPlaceholder": "Optionale Notizen",
+      "submit": "Absenden",
+      "update": "Aktualisieren",
+      "editTitle": "Besuch bearbeiten",
+      "addTitle": "Besuch hinzufügen",
+      "selectTents": "Zelte auswählen...",
+      "photos": "Fotos",
+      "saving": "Speichert...",
+      "deleteConfirmTitle": "Besuch löschen?",
+      "deleteConfirmMessage": "Dies wird diesen Besuchseintrag dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "delete": {
+      "title": "Löschen bestätigen",
+      "confirm": "Bist du sicher, dass du diesen Besuch löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "success": "Besuch gelöscht",
+      "error": "Löschen des Besuchs fehlgeschlagen"
+    },
+    "pictures": {
+      "add": "Bilder hinzufügen",
+      "addMore": "Mehr Bilder",
+      "addAnother": "Weiteres hinzufügen",
+      "withBeer": "mit einem Bier",
+      "withDrink": "mit einem Getränk",
+      "chooseDifferent": "Ein anderes wählen",
+      "clickToView": "Klicke auf ein Bild, um es in voller Größe anzuzeigen",
+      "newToUpload": "Neue Bilder zum Hochladen",
+      "publicPhotos": "Öffentliche Fotos",
+      "privatePhotos": "Private Fotos",
+      "publicPhoto": "Öffentliches Foto",
+      "privatePhoto": "Privates Foto",
+      "upload": "{{count}} Bild(er) hochladen",
+      "viewInGallery": "du kannst alle deine Bilder in der Gruppengalerie oder in Meine Besuche ansehen"
+    },
+    "table": {
+      "date": "Datum",
+      "amount": "Anzahl",
+      "tents": "Zelte",
+      "visitedTents": "Besuchte Zelte",
+      "visitedTentsDescription": "Details der von dir besuchten Zelte.",
+      "noTentsRegistered": "An diesem Datum keine Zelte erfasst.",
+      "checkIn": "Check-in"
+    },
+    "errors": {
+      "invalidDate": "Bitte wähle ein gültiges Datum",
+      "dateOutsideFestival": "Das Datum muss innerhalb der Festivaldaten liegen"
+    },
+    "calendar": {
+      "tapToAddOrEdit": "Tippe auf einen Tag, um deinen Besuch hinzuzufügen oder zu bearbeiten",
+      "hasAttendance": "Hat Besuch",
+      "hasReservation": "Reservierung",
+      "selected": "Ausgewählt"
+    },
+    "tabs": {
+      "attendance": "Besuche",
+      "reservation": "Reservierung"
+    },
+    "saveSuccess": "Änderungen erfolgreich gespeichert",
+    "summary": {
+      "title": "Festival-Zusammenfassung",
+      "days": "Tage",
+      "beers": "Mass",
+      "drinks": "Getränke",
+      "avgPerDay": "Ø/Tag",
+      "spent": "Ausgaben",
+      "baseCost": "Basis",
+      "tips": "Trinkgeld"
+    },
+    "noFestival": "Bitte wähle ein Festival aus, um Besuche anzuzeigen",
+    "updateSuccess": "Besuch aktualisiert",
+    "createSuccess": "Besuch erfasst"
+  },
+  "achievements": {
+    "pageTitle": "Erfolge",
+    "loading": "Lade Erfolge...",
+    "totalPoints": "Gesamtpunkte",
+    "unlocked": "Freigeschaltet",
+    "locked": "Gesperrt",
+    "unlockedOn": "Freigeschaltet am {{date}}",
+    "progress": "{{current}} / {{target}}",
+    "selectFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
+    "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
+    "completed": "Abgeschlossen",
+    "inProgress": "In Bearbeitung",
+    "stats": {
+      "totalProgress": "Gesamtfortschritt",
+      "percentUnlocked": "{{percent}}% freigeschaltet",
+      "achievementPoints": "Erfolgspunkte",
+      "rarityBreakdown": "Seltenheitsverteilung",
+      "categories": "Kategorien"
+    },
+    "filter": {
+      "categoriesTitle": "Erfolgs-Kategorien",
+      "selectCategory": "Kategorie wählen",
+      "all": "Alle Erfolge",
+      "consumption": "Bier-Erfolge",
+      "attendance": "Tage-Erfolge",
+      "explorer": "Zelt-Erfolge",
+      "social": "Soziale Erfolge",
+      "competitive": "Wettbewerbs-Erfolge",
+      "special": "Spezielle Erfolge"
+    },
+    "empty": {
+      "title": "Keine Erfolge in dieser Kategorie",
+      "description": "Probiere eine andere Kategorie oder beginne mitzumachen, um Erfolge freizuschalten!"
+    },
+    "categories": {
+      "attendance": "Anwesenheit",
+      "consumption": "Konsum",
+      "social": "Sozial",
+      "explorer": "Entdecker",
+      "veteran": "Veteran",
+      "special": "Spezial",
+      "competitive": "Wettbewerb"
+    },
+    "rarity": {
+      "common": "Gewöhnlich",
+      "rare": "Selten",
+      "epic": "Episch",
+      "legendary": "Legendär"
+    },
+    "viewMyAchievements": "Meine Erfolge ansehen",
+    "viewProgress": "deinen Fortschritt und freigeschaltete Abzeichen ansehen",
+    "points": "Pkt",
+    "complete": "Abschließen"
+  },
+  "leaderboard": {
+    "screenTitle": "Erfolge & Rangliste",
+    "festivalLeaderboard": "{{festivalName}} Rangliste",
+    "pageTitle": "Rangliste",
+    "global": "Global",
+    "globalTitle": "Globale Rangliste",
+    "group": "Gruppe",
+    "groups": "Gruppen",
+    "rank": "Rang",
+    "player": "Spieler",
+    "days": "Tage",
+    "beers": "Mass",
+    "drinks": "Getränke",
+    "average": "Ø",
+    "yourPosition": "deine Position",
+    "notRanked": "Noch nicht platziert",
+    "viewAll": "Alle anzeigen",
+    "empty": "Noch keine Platzierungen",
+    "emptyDescription": "Seien du der Erste, der seine Besuche erfasst!",
+    "noName": "Kein Name",
+    "loading": "Lade Rangliste...",
+    "noFestival": "Bitte wähle ein Festival aus, um die Rangliste anzuzeigen",
+    "error": "Laden der Rangliste fehlgeschlagen",
+    "header": {
+      "player": "Spieler"
+    },
+    "userDetail": {
+      "title": "Benutzer-Statistiken"
+    },
+    "stats": {
+      "days": "Tage",
+      "drinks": "Getränke",
+      "avg": "Ø"
+    }
+  },
+  "profile": {
+    "pageTitle": "dein Profil",
+    "editButton": "Profil bearbeiten",
+    "username": "Benutzername",
+    "usernamePlaceholder": "Benutzernamen wählen",
+    "fullName": "Vollständiger Name",
+    "fullNamePlaceholder": "dein Name",
+    "email": "E-Mail",
+    "settings": "Einstellungen",
+    "language": "Sprache",
+    "languageDescription": "Wähle deine bevorzugte Sprache",
+    "selectLanguage": "Sprache wählen",
+    "updateSuccess": "Profil erfolgreich aktualisiert",
+    "updateError": "Profilaktualisierung fehlgeschlagen",
+    "sections": {
+      "account": "Konto",
+      "notifications": "Benachrichtigungen",
+      "privacy": "Privatsphäre",
+      "danger": "Gefahrenzone"
+    },
+    "account": {
+      "usernameLabel": "Benutzername",
+      "usernamePlaceholder": "Benutzernamen wählen",
+      "fullNameLabel": "Vollständiger Name",
+      "fullNamePlaceholder": "dein Name",
+      "avatarLabel": "Profilbild",
+      "changeAvatar": "Foto ändern",
+      "removeAvatar": "Foto entfernen",
+      "changePassword": "Passwort ändern",
+      "saveChanges": "Änderungen speichern",
+      "success": "Profil erfolgreich aktualisiert"
+    },
+    "avatar": {
+      "change": "Foto ändern",
+      "takePhoto": "Foto aufnehmen",
+      "chooseFromLibrary": "Aus Bibliothek wählen",
+      "uploading": "Lädt hoch...",
+      "uploadSuccess": "Profilbild aktualisiert",
+      "uploadError": "Aktualisierung des Profilbilds fehlgeschlagen",
+      "permissionDenied": "Berechtigung zum Zugriff auf Fotos erforderlich"
+    },
+    "biometric": {
+      "label": "Biometrische Anmeldung",
+      "description": "Schnelle Anmeldung mit Face ID oder Touch ID"
+    },
+    "changePassword": {
+      "title": "Passwort ändern",
+      "info": "Gib unten dein neues Passwort ein. Stelle sicher, dass es sicher und leicht zu merken ist.",
+      "newPassword": "Neues Passwort",
+      "newPasswordPlaceholder": "Neues Passwort eingeben",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Neues Passwort erneut eingeben",
+      "submit": "Passwort aktualisieren",
+      "success": "Passwort erfolgreich aktualisiert",
+      "error": "Passwortaktualisierung fehlgeschlagen"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Push-Benachrichtigungen konfigurieren",
+      "preferences": "Benachrichtigungseinstellungen",
+      "push": "Push-Benachrichtigungen",
+      "pushTitle": "Push-Benachrichtigungen",
+      "pushDescription": "Benachrichtigungen auch bei geschlossener App erhalten",
+      "pushComingSoon": "Push-Benachrichtigungen kommen bald!",
+      "achievements": "Erfolgs-Benachrichtigungen",
+      "achievementsDescription": "Benachrichtigung erhalten, wenn du Erfolge freischaltest",
+      "groups": "Gruppen-Benachrichtigungen",
+      "groupsDescription": "Benachrichtigungen von deinen Gruppen erhalten (Check-ins, Erfolge, etc.)",
+      "groupActivity": "Gruppen-Aktivität",
+      "reminders": "Erinnerungen",
+      "remindersDescription": "Reservierungserinnerungen und Check-in-Aufforderungen",
+      "info": "du kannst deine Benachrichtigungseinstellungen jederzeit ändern",
+      "updateError": "Aktualisierung der Benachrichtigungseinstellungen fehlgeschlagen",
+      "noToken": "Push-Benachrichtigungs-Token konnte nicht abgerufen werden. Bitte versuche es erneut.",
+      "subscribeFailed": "Registrierung beim Benachrichtigungsdienst fehlgeschlagen.",
+      "tokenRegistrationFailed": "Registrierung des Geräts für Push-Benachrichtigungen fehlgeschlagen.",
+      "enableFailed": "Aktivierung von Push-Benachrichtigungen fehlgeschlagen. Bitte versuche es erneut.",
+      "permissionDenied": "Benachrichtigungen deaktiviert",
+      "openSettings": "Um Benachrichtigungen zu aktivieren, gehe bitte zu deinen Geräteeinstellungen und erlaube Benachrichtigungen für ProstCounter.",
+      "goToSettings": "Einstellungen öffnen",
+      "permissionDeniedHint": "Benachrichtigungen sind deaktiviert. Tippe auf den Schalter, um die Einstellungen zu öffnen.",
+      "registrationFailed": "Registrierung für Push-Benachrichtigungen fehlgeschlagen"
+    },
+    "privacy": {
+      "title": "Privatsphäre-Einstellungen",
+      "locationSharing": "Standortfreigabe",
+      "profileVisibility": "Profil-Sichtbarkeit"
+    },
+    "photoPrivacy": {
+      "title": "Foto-Privatsphäre",
+      "description": "Steuere, wer deine Fotos in Gruppengalerien sehen kann. Einzelne Fotos können auch als privat markiert werden.",
+      "globalSettings": "Globale Einstellungen",
+      "perGroupSettings": "Gruppenspezifische Einstellungen",
+      "perGroupDescription": "Wähle, welche Gruppen deine Fotos sehen können. Diese Einstellungen gelten nur, wenn das globale Verbergen deaktiviert ist.",
+      "hideFromAll": "Fotos vor allen Gruppen verbergen",
+      "hideFromAllDescription": "Wenn aktiviert, erscheinen deine Fotos in keiner Gruppengalerie",
+      "hideFromGroup": "Fotos vor {{group}} verbergen",
+      "hideFromGroupDescription": "Wenn aktiviert, erscheinen deine Fotos nicht in der Galerie dieser Gruppe",
+      "noGroups": "Du bist noch kein Mitglied einer Gruppe.",
+      "globalWarning": "Gruppenspezifische Einstellungen sind deaktiviert, weil das globale Verbergen aktiviert ist.",
+      "updateError": "Aktualisierung der Foto-Privatsphäre-Einstellungen fehlgeschlagen",
+      "shortDescription": "Steuere, wer deine Fotos sehen kann"
+    },
+    "signOut": {
+      "title": "Abmelden",
+      "message": "Bist du sicher, dass du dich abmelden möchten?",
+      "button": "Abmelden",
+      "confirm": "Abmelden"
+    },
+    "tutorial": {
+      "title": "Tutorial",
+      "description": "Setze das App-Tutorial zurück, um es beim nächsten Besuch der Startseite erneut zu sehen.",
+      "button": "Tutorial zurücksetzen",
+      "resetButton": "Tutorial zurücksetzen",
+      "resetSuccess": "Das Tutorial wurde zurückgesetzt. du siehst es erneut, wenn du die Startseite besuchen.",
+      "resetError": "Zurücksetzen des Tutorials fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "languageSettings": {
+      "title": "Sprache",
+      "description": "Wähle deine bevorzugte App-Sprache",
+      "autoDetect": "Automatisch vom Browser erkennen",
+      "autoDetectCurrent": "Automatisch erkennen (aktuell: {{language}})",
+      "languages": {
+        "en": "English",
+        "de": "Deutsch",
+        "es": "Español",
+        "fr": "Français"
+      },
+      "updateSuccess": "Spracheinstellung aktualisiert",
+      "updateError": "Aktualisierung der Spracheinstellung fehlgeschlagen"
+    },
+    "deleteAccount": {
+      "title": "Konto löschen",
+      "description": "dein Konto und alle Daten dauerhaft löschen.",
+      "warning": "Dies wird dauerhaft alle deine Daten löschen, einschließlich Konsumaufzeichnungen, Fotos und Gruppenmitgliedschaften. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "finalWarning": "Dies ist deine letzte Warnung. dein Konto und alle Daten werden dauerhaft gelöscht.",
+      "confirm": "Konto löschen",
+      "confirmPrompt": "Bist du sicher? Dies wird dauerhaft alle deine Daten löschen, einschließlich:",
+      "confirmButton": "Ja, mein Konto löschen",
+      "button": "Konto löschen",
+      "error": "Kontolöschung fehlgeschlagen. Bitte versuche es erneut oder kontaktiere den Support.",
+      "dataList": {
+        "consumption": "Alle deine Bierkonsumaufzeichnungen",
+        "photos": "Fotos und Zeltbesuche",
+        "groups": "Gruppenmitgliedschaften und Erfolge",
+        "profile": "Profilinformationen"
+      }
+    }
+  },
+  "admin": {
+    "pageTitle": "Admin-Panel",
+    "dashboard": "Admin-Dashboard",
+    "tabs": {
+      "users": "Benutzer",
+      "groups": "Gruppen",
+      "festivals": "Festivals",
+      "tents": "Zelte",
+      "cache": "Cache-Verwaltung",
+      "imageConversion": "Bildkonvertierung"
+    },
+    "festivals": {
+      "title": "Festival-Verwaltung",
+      "create": "Festival erstellen",
+      "edit": "Festival bearbeiten",
+      "delete": "Festival löschen"
+    },
+    "tents": {
+      "title": "Zelt-Verwaltung",
+      "create": "Zelt erstellen",
+      "edit": "Zelt bearbeiten",
+      "delete": "Zelt löschen"
+    },
+    "users": {
+      "title": "Benutzer-Verwaltung",
+      "search": "Benutzer suchen",
+      "makeAdmin": "Zum Admin machen",
+      "removeAdmin": "Admin entfernen"
+    }
+  },
+  "joinGroup": {
+    "processing": "deine Einladung wird verarbeitet...",
+    "success": {
+      "title": "Willkommen in der Gruppe!",
+      "message": "du bist erfolgreich beigetreten",
+      "membershipNote": "du bist jetzt Mitglied dieser Gruppe und können am Ranglisten-Wettbewerb teilnehmen.",
+      "viewGroup": "Gruppe anzeigen",
+      "viewAllGroups": "Alle Gruppen anzeigen",
+      "goHome": "Zur Startseite",
+      "happyFestival": "Viel Spaß auf dem Festival!",
+      "reminder": "Vergessen du nicht, deine täglichen Besuche zu erfassen und den Wettbewerb zu genießen!"
+    },
+    "error": {
+      "expired": {
+        "title": "Einladung abgelaufen",
+        "message": "Die Einladung zur Gruppe \"{{group}}\" ist abgelaufen.",
+        "expiredOn": "Diese Einladung ist am {{date}} abgelaufen.",
+        "noLongerValid": "Diese Einladung ist nicht mehr gültig.",
+        "hint": "Einladungslinks laufen aus Sicherheitsgründen nach 7 Tagen ab.",
+        "needNew": "Benötigen du eine neue Einladung?",
+        "askMember": "Bitten du ein Gruppenmitglied, einen neuen Einladungslink für du zu erstellen."
+      },
+      "alreadyMember": {
+        "title": "Bereits Mitglied",
+        "message": "Du bist bereits Mitglied von \"{{group}}\".",
+        "noNeed": "du benötigen keinen Einladungslink, um auf diese Gruppe zuzugreifen."
+      },
+      "invalid": {
+        "title": "Ungültige Einladung",
+        "message": "Der verwendete Einladungslink ist nicht gültig.",
+        "detailedMessage": "Dies kann passieren, wenn der Link falsch oder abgelaufen war, die Gruppe nicht mehr existiert oder die Einladung storniert wurde.",
+        "possibleReasons": "Mögliche Gründe",
+        "reasons": {
+          "intro": "Dies kann passieren, wenn:",
+          "incorrect": "Der Einladungslink falsch war oder vertippt wurde",
+          "deleted": "Die Gruppe nicht mehr existiert",
+          "revoked": "Die Einladung vom Gruppenadministrator storniert wurde",
+          "expired": "Der Einladungslink abgelaufen ist"
+        }
+      },
+      "generic": {
+        "title": "Beitritt zur Gruppe nicht möglich",
+        "message": "Beim Beitritt zur Gruppe ist etwas schiefgelaufen.",
+        "tryAgainMessage": "Bitte versuche es erneut oder kontaktiere den Gruppenadministrator."
+      },
+      "tryAgain": "Erneut versuchen",
+      "goToGroups": "Zu Gruppen",
+      "goHome": "Zur Startseite",
+      "viewGroup": "Gruppe anzeigen",
+      "contactAdmin": "Gruppenadministrator kontaktieren",
+      "browseGroups": "Gruppen durchsuchen"
+    }
+  },
+  "tutorial": {
+    "welcome": {
+      "title": "Willkommen bei ProstCounter!",
+      "description": "Verfolge deine Bierfestival-Besuche und messen du dich mit Freunden!"
+    },
+    "step1": {
+      "title": "Besuche erfassen",
+      "description": "Tragen du jeden Tag ein, an dem du teilnehmen und wie viele Mass du genießen."
+    },
+    "step2": {
+      "title": "Gruppen beitreten",
+      "description": "Erstellen du Gruppen oder trete ihnen bei, um mit Freunden zu konkurrieren."
+    },
+    "step3": {
+      "title": "Erfolge freischalten",
+      "description": "Schalten du Abzeichen frei und steigen du in der Rangliste auf!"
+    },
+    "step4": {
+      "title": "Fotos teilen",
+      "description": "Halten du Erinnerungen in deiner Gruppengalerie fest."
+    },
+    "skip": "Tutorial überspringen",
+    "finish": "Los geht's"
+  },
+  "wrapped": {
+    "title": "dein Jahresrückblick",
+    "generating": "dein Rückblick wird erstellt...",
+    "loading": "Lade deinen Rückblick...",
+    "notAvailable": "Rückblick nicht verfügbar",
+    "loadError": "Laden deines Rückblicks fehlgeschlagen",
+    "notReady": "dein Rückblick ist noch nicht bereit. Schauen du nach dem Festival wieder vorbei!",
+    "share": "Meinen Rückblick teilen",
+    "downloadImage": "Bild herunterladen",
+    "slides": {
+      "totalBeers": "Mass gesamt",
+      "daysAttended": "Tage besucht",
+      "favoriteTent": "Lieblingszelt",
+      "topAchievement": "Top-Erfolg",
+      "groupRank": "Gruppenrang"
+    },
+    "personality": {
+      "explorer": {
+        "title": "Der Entdecker",
+        "description": "du hast die meisten verschiedenen Zelte besucht!"
+      },
+      "champion": {
+        "title": "Der Champion",
+        "description": "Spitze der Rangliste!"
+      },
+      "loyalist": {
+        "title": "Der Loyalist",
+        "description": "du hast ein Lieblingszelt!"
+      },
+      "social": {
+        "title": "Der soziale Schmetterling",
+        "description": "Immer mit Freunden unterwegs!"
+      }
+    },
+    "numbers": {
+      "title": "dein Festival in Zahlen",
+      "subtitle": "Das hast du erreicht",
+      "totalBeers": "Mass gesamt",
+      "daysAttended": "Tage besucht",
+      "avgPerDay": "Durchschnitt pro Tag",
+      "totalSpent": "Ausgaben gesamt"
+    }
+  },
+  "reservation": {
+    "dialog": {
+      "createTitle": "Neue Reservierung",
+      "editTitle": "Reservierung bearbeiten",
+      "description": "Erstellen oder bearbeiten du deine Zeltreservierung mit Datum, Uhrzeit und Erinnerungseinstellungen.",
+      "tent": "Zelt",
+      "selectTent": "dein Zelt auswählen",
+      "dateTime": "Datum & Uhrzeit",
+      "pickDateTime": "Datum und Uhrzeit wählen",
+      "reminder": "Erinnerung",
+      "noReminder": "Keine Erinnerung",
+      "minutesBefore": "{{count}} Minuten vorher",
+      "hourBefore": "1 Stunde vorher",
+      "hoursBefore": "{{count}} Stunden vorher",
+      "shareWithGroups": "Mit Gruppen teilen",
+      "visibleToGroups": "Für deine Gruppen sichtbar",
+      "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "save": "Speichern"
+    },
+    "form": {
+      "tent": "Zelt",
+      "selectTent": "Zelt auswählen",
+      "arrivalTime": "Ankunftszeit",
+      "selectTime": "Uhrzeit wählen",
+      "reminder": "Erinnerung",
+      "reminderOptions": {
+        "none": "Keine Erinnerung",
+        "30min": "30 Minuten vorher",
+        "1hour": "1 Stunde vorher",
+        "2hours": "2 Stunden vorher",
+        "1day": "1 Tag vorher"
+      },
+      "note": "Notiz (optional)",
+      "notePlaceholder": "Füge eine Notiz für deine Reservierung hinzu...",
+      "visibleToGroups": "Für Gruppen sichtbar",
+      "visibleToGroupsDescription": "Gruppenmitglieder können deine Reservierung sehen",
+      "tentCannotBeChanged": "Zelt kann nach Erstellung nicht geändert werden",
+      "createReservation": "Reservierung erstellen",
+      "cancelReservation": "Reservierung stornieren",
+      "saving": "Speichert...",
+      "cancelConfirmTitle": "Reservierung stornieren?",
+      "cancelConfirmMessage": "Bist du sicher, dass du diese Reservierung stornieren möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "checkIn": {
+      "title": "Zeit zum Einchecken!",
+      "description": "deine Reservierung ist bereit. Möchten du jetzt einchecken?",
+      "prompt": "Bist du schon da?",
+      "timeForReservation": "Es ist Zeit für deine Reservierung im {{tentName}}.",
+      "theTent": "dem Zelt",
+      "unknownTent": "Unbekanntes Zelt",
+      "note": "Notiz",
+      "notYet": "Noch nicht",
+      "notNow": "Jetzt nicht",
+      "checkInNow": "Jetzt einchecken",
+      "checking": "Checke ein...",
+      "failedDescription": "Check-in fehlgeschlagen. Bitte versuche es erneut."
+    }
+  },
+  "location": {
+    "startSharing": "Freigabe starten",
+    "stopSharing": "Freigabe beenden",
+    "shareFor": "Freigeben für {{duration}}",
+    "nearbyCount": "{{count}} Freunde in der Nähe",
+    "sharingActive": "deine Freunde kannst du auf der Karte sehen",
+    "sharingInactive": "Standort mit Gruppenmitgliedern teilen",
+    "noFriendsNearby": "Keine Freunde in der Nähe teilen ihren Standort",
+    "noTentsNearby": "Keine Zelte in Reichweite",
+    "checkIn": "Einchecken",
+    "checkInAt": "Einchecken im {{tent}}",
+    "callout": {
+      "away": "entfernt"
+    },
+    "map": {
+      "title": "Festival-Karte",
+      "label": "Festival-Karte mit Freunden und Zelten",
+      "yourLocation": "dein Standort",
+      "loading": "Aktualisiert...",
+      "friendsNearby": "{{count}} Freunde",
+      "friendsNearby_one": "{{count}} Freund",
+      "tentsNearby": "{{count}} Zelte",
+      "tentsNearby_one": "{{count}} Zelt"
+    },
+    "tabs": {
+      "friends": "Freunde",
+      "tents": "Zelte"
+    },
+    "sharing": {
+      "title": "Standortfreigabe",
+      "enable": "Aktivieren",
+      "disable": "Deaktivieren",
+      "sharing": "Standort wird geteilt",
+      "notSharing": "Standort wird nicht geteilt",
+      "starting": "Startet...",
+      "stopping": "Stoppt...",
+      "enableTooltip": "Standortfreigabe mit Gruppenmitgliedern starten",
+      "disableTooltip": "Standortfreigabe beenden",
+      "enabled": "Standortfreigabe aktiviert! Gruppenmitglieder können nun deinen Standort sehen.",
+      "trackingStarted": "Standortverfolgung gestartet! Aktiviere die Standortfreigabe für bestimmte Gruppen in deinen Profileinstellungen.",
+      "noGroupsEnabled": "Standortfreigabe ist für keine Gruppe aktiviert. Bitte aktiviere zuerst die Standortfreigabe für mindestens eine Gruppe in deinen Profileinstellungen."
+    },
+    "duration": {
+      "30m": "30 Min",
+      "1h": "1 Std",
+      "2h": "2 Std",
+      "4h": "4 Std"
+    },
+    "privacy": {
+      "title": "Standortfreigabe-Einstellungen",
+      "description": "Steuere, wer deinen Standort während des Festivals sehen kann",
+      "enableForGroup": "Standortfreigabe für {{group}} aktivieren",
+      "disableForGroup": "Standortfreigabe für {{group}} deaktivieren"
+    },
+    "groups": {
+      "noGroups": "du bist noch keiner Gruppe beigetreten",
+      "shareWithAll": "Mit allen Gruppen teilen",
+      "shareWithAllDescription": "Alle deine Gruppen können deinen Standort sehen",
+      "selectGroups": "Oder bestimmte Gruppen auswählen",
+      "selectedCount": "{{count}} Gruppe(n) ausgewählt",
+      "sharingWithAll": "Mit allen Gruppen teilen",
+      "sharingWithSome": "Mit {{count}} Gruppe(n) teilen"
+    }
+  },
+  "photos": {
+    "upload": {
+      "title": "Foto-Upload",
+      "uploading": "Lade {{current}} von {{total}} hoch...",
+      "start": "Jetzt hochladen",
+      "retry": "Fehlgeschlagene wiederholen",
+      "inProgress": "Lädt hoch...",
+      "pending": "{{count}} ausstehend",
+      "complete": "Alle Fotos hochgeladen",
+      "partial": "{{completed}} hochgeladen, {{failed}} fehlgeschlagen"
+    }
+  },
+  "photo": {
+    "privacy": {
+      "title": "Foto-Privatsphäre-Einstellungen",
+      "globalSettings": "Globale Einstellungen",
+      "perGroupSettings": "Gruppenspezifische Einstellungen",
+      "hideFromAll": "Fotos vor allen Gruppen verbergen",
+      "hideFromAllDescription": "Wenn aktiviert, erscheinen deine Fotos in keiner Gruppengalerie",
+      "showToAll": "Fotos allen Gruppen zeigen",
+      "hideFromGroup": "Fotos vor {{group}} verbergen",
+      "hideFromGroupDescription": "Wenn aktiviert, erscheinen deine Fotos nicht in der Galerie dieser Gruppe",
+      "showToGroup": "Fotos {{group}} zeigen",
+      "visibleToGroup": "deine Fotos sind jetzt für {{group}} sichtbar",
+      "hiddenFromGroup": "deine Fotos sind jetzt vor {{group}} verborgen",
+      "hiddenFromAll": "deine Fotos sind jetzt vor allen Gruppen verborgen",
+      "visibleToGroups": "deine Fotos sind jetzt für Gruppen sichtbar (abhängig von gruppenspezifischen Einstellungen)",
+      "description": "Steuere, wer deine Fotos in Gruppengalerien sehen kann. Einzelne Fotos können auch als privat markiert werden.",
+      "perGroupDescription": "Wähle, welche Gruppen deine Fotos sehen können. Diese Einstellungen gelten nur, wenn das globale Verbergen deaktiviert ist.",
+      "globalHidingWarning": "⚠️ Globales Foto-Verbergen ist aktiviert. Gruppenspezifische Einstellungen sind derzeit deaktiviert.",
+      "noGroupsYet": "Du bist noch kein Mitglied einer Gruppe. Treten du einer Gruppe bei, um gruppenspezifische Foto-Sichtbarkeitseinstellungen zu sehen.",
+      "defaultGroupName": "Gruppe",
+      "groupSettingsUpdated": "Gruppeneinstellungen aktualisiert",
+      "loadError": "Laden der Foto-Privatsphäre-Einstellungen fehlgeschlagen",
+      "updateError": "Aktualisierung der globalen Fotoeinstellungen fehlgeschlagen",
+      "updateGroupError": "Aktualisierung der Gruppen-Fotoeinstellungen fehlgeschlagen"
+    },
+    "visibility": {
+      "public": "Öffentlich",
+      "private": "Privat",
+      "toggle": "Sichtbarkeit umschalten"
+    }
+  },
+  "notificationSettings": {
+    "title": "Benachrichtigungseinstellungen",
+    "preferences": "Einstellungen",
+    "reminders": "Erinnerungen",
+    "achievementNotifications": "Erfolgs-Benachrichtigungen",
+    "groupNotifications": "Gruppen-Benachrichtigungen",
+    "pushNotifications": "Push-Benachrichtigungen",
+    "enablePush": "Push aktivieren",
+    "description": {
+      "achievements": "Benachrichtigung erhalten, wenn du Erfolge freischaltest",
+      "groups": "Benachrichtigungen von deinen Gruppen erhalten (Check-ins, Erfolge, etc.)",
+      "reminders": "Reservierungserinnerungen und Check-in-Aufforderungen",
+      "push": "Benachrichtigungen auch bei geschlossener App erhalten"
+    },
+    "status": {
+      "notSupported": "In diesem Browser nicht unterstützt",
+      "blocked": "Blockiert - In Browsereinstellungen aktivieren"
+    },
+    "errors": {
+      "updateFailed": "Aktualisierung der Benachrichtigungseinstellungen fehlgeschlagen. Bitte versuche es erneut.",
+      "pushFailed": "Aktivierung von Push-Benachrichtigungen fehlgeschlagen."
+    }
+  },
+  "calendar": {
+    "title": "Kalender",
+    "myCalendar": "Mein Kalender",
+    "groupCalendar": "Gruppenkalender",
+    "loading": "Lade Kalender...",
+    "loadError": "Laden der Kalenderereignisse fehlgeschlagen",
+    "selectDate": "Datum auswählen",
+    "clickToEdit": "Auf Reservierung klicken zum Bearbeiten",
+    "addReservation": "Reservierung hinzufügen",
+    "addAttendance": "Besuch hinzufügen",
+    "noEvents": "Keine Ereignisse",
+    "dailyTotal": "Tagesgesamt"
+  },
+  "activityFeed": {
+    "drankBeers": "trank {{count}} Mass",
+    "drankBeers_other": "trank {{count}} Mass",
+    "drankDrinks": "trank {{count}} Getränk",
+    "drankDrinks_other": "trank {{count}} Getränke",
+    "drank_beer": "trank {{count}} Mass",
+    "drank_beer_other": "trank {{count}} Mass",
+    "drank_radler": "trank {{count}} Radler",
+    "drank_radler_other": "trank {{count}} Radler",
+    "drank_wine": "trank {{count}} Wein",
+    "drank_wine_other": "trank {{count}} Weine",
+    "drank_soft_drink": "hatte {{count}} Softdrink",
+    "drank_soft_drink_other": "hatte {{count}} Softdrinks",
+    "drank_alcohol_free": "hatte {{count}} alkoholfreies Getränk",
+    "drank_alcohol_free_other": "hatte {{count}} alkoholfreie Getränke",
+    "drank_other": "hatte {{count}} Getränk",
+    "drank_other_other": "hatte {{count}} Getränke",
+    "checkedInto": "checkte ein im {{tent}}",
+    "uploadedPhoto": "lud ein Foto hoch",
+    "joinedGroup": "ist {{group}} beigetreten",
+    "unlockedAchievement": "hat einen Erfolg freigeschaltet",
+    "unlockedAchievementRarity": "hat einen Erfolg freigeschaltet ({{rarity}})",
+    "hadActivity": "hatte Aktivität",
+    "recently": "kürzlich",
+    "unknownUser": "Unbekannter Benutzer",
+    "aTent": "ein Zelt",
+    "aGroup": "eine Gruppe",
+    "hotStreak": "Heißer Lauf",
+    "userProfile": "Benutzerprofil",
+    "title": "Aktivitäts-Feed"
+  },
+  "quickAttendance": {
+    "sheetTitle": "Heutiger Besuch",
+    "sheetDescription": "Füge ein Getränk hinzu, checken du in Zelten ein oder laden du Fotos für heute hoch.",
+    "save": "Speichern",
+    "drinkLogged": "Getränk erfasst!",
+    "saved": "Gespeichert!"
+  },
+  "home": {
+    "festivalStatus": {
+      "currentDay": "Es ist Tag {{currentDay}} / {{totalDays}}",
+      "startsInOneDay": "Beginnt morgen!",
+      "startsInDays": "Beginnt in {{daysUntil}} Tagen",
+      "ended": "Festival ist beendet"
+    },
+    "quickAttendance": {
+      "title": "Was trinken du?",
+      "tent": "Wo sind du?",
+      "photos": "Fotos",
+      "uploadPhotos": "Fotos hochladen",
+      "selectTent": "Zelt auswählen",
+      "loading": "Lade Besuch...",
+      "outsideFestival": "Besuchserfassung ist nur während des Festivals verfügbar"
+    },
+    "activityFeed": {
+      "title": "Neueste Aktivitäten",
+      "empty": "Noch keine Aktivitäten. Beginne, deine Festival-Abenteuer zu erfassen!",
+      "loadMore": "Mehr laden",
+      "error": "Laden des Aktivitäts-Feeds fehlgeschlagen"
+    },
+    "festivalOver": "Leider ist das {{name}} vorbei. Bis zum nächsten Mal!",
+    "wrappedReady": {
+      "title": "dein Rückblick ist fertig!",
+      "subtitle": "Siehe deine personalisierte {{name}}-Geschichte",
+      "viewButton": "deinen Rückblick ansehen",
+      "footer": "deine Festival-Highlights, Statistiken und Persönlichkeit 🎉"
+    },
+    "latestActivities": "Neueste Aktivitäten",
+    "refreshFeed": "Aktivitäts-Feed aktualisieren",
+    "completeProfile": "Profil vervollständigen",
+    "profilePicture": "Profilbild",
+    "highlights": "Highlights",
+    "topGroups": "👑 du bist in den Top 3 dieser Gruppen:",
+    "stats": "🍻 Statistiken 📊",
+    "wentTimes": "du waren {{count}} mal da",
+    "hadBeers": "du hatten {{count}} Mass",
+    "spentOnBeers": "du hast ~€{{amount}} für Bier ausgegeben",
+    "globalLeaderboard": "🏆 Globale Rangliste",
+    "topPerformers": "Top {{count}} Teilnehmer",
+    "yourGroups": "deine Gruppen:",
+    "festivalMap": "{{name}} Karte",
+    "shareApp": "Diese App teilen",
+    "whatCanIDo": "Was kann ich mit Prost Counter machen?",
+    "baseCost": "Basis",
+    "tips": "Trinkgeld",
+    "mapLink": {
+      "title": "{{festivalName}} Karte"
+    }
+  },
+  "search": {
+    "users": {
+      "placeholder": "Benutzer nach Name, Benutzername oder E-Mail suchen...",
+      "superAdmin": "Super-Admin",
+      "hasCompleteProfile": "Hat vollständiges Profil",
+      "sortByName": "Nach Name sortieren",
+      "sortByCreated": "Nach Erstellung sortieren",
+      "sortByBeers": "Nach Mass sortieren"
+    },
+    "groups": {
+      "placeholder": "Gruppen nach Name oder Beschreibung suchen...",
+      "hasMembers": "Hat Mitglieder",
+      "sortByName": "Nach Name sortieren",
+      "sortByCreated": "Nach Erstellung sortieren",
+      "sortByMembers": "Nach Mitgliedern sortieren"
+    }
+  },
+  "festival": {
+    "selector": {
+      "title": "Festival auswählen",
+      "description": "Wähle aus, welches Festival du ansehen und an dem du teilnehmen möchtest.",
+      "currentFestival": "Aktuelles Festival",
+      "noFestival": "Kein Festival ausgewählt"
+    },
+    "status": {
+      "upcoming": "Demnächst",
+      "active": "Aktiv",
+      "ended": "Beendet"
+    }
+  },
+  "install": {
+    "error": "Installationsfehler",
+    "instructions": "Installationsanweisungen",
+    "cancelled": "Installation abgebrochen",
+    "success": "Erfolg",
+    "successMessage": "Die App wurde auf deinem Gerät installiert.",
+    "failed": "Installation fehlgeschlagen"
+  },
+  "imageUpload": {
+    "permissions": {
+      "cameraRequired": "Kameraberechtigung zum Aufnehmen von Fotos erforderlich",
+      "libraryRequired": "Fotobibliotheks-Berechtigung zum Auswählen von Fotos erforderlich"
+    },
+    "errors": {
+      "uploadFailed": "Hochladen des Bildes fehlgeschlagen",
+      "avatarUploadFailed": "Aktualisierung des Profilbilds fehlgeschlagen",
+      "photoUploadFailed": "Hochladen des Fotos fehlgeschlagen"
+    }
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich",
+    "email": {
+      "invalid": "Bitte geben du eine gültige E-Mail-Adresse ein",
+      "required": "E-Mail ist erforderlich"
+    },
+    "password": {
+      "required": "Passwort ist erforderlich",
+      "min": "Passwort muss mindestens 8 Zeichen haben oder leer lassen, um unverändert zu bleiben",
+      "minLength": "Passwort muss mindestens {{min}} Zeichen haben",
+      "mismatch": "Passwörter stimmen nicht überein",
+      "confirm": "Bitte bestätigen du dein Passwort",
+      "adminHint": "Passwort muss mindestens 8 Zeichen haben oder leer lassen, um unverändert zu bleiben"
+    },
+    "username": {
+      "required": "Benutzername ist erforderlich",
+      "min": "Benutzername muss mindestens 4 Zeichen haben",
+      "minLength": "Benutzername muss mindestens {{min}} Zeichen haben",
+      "maxLength": "Benutzername darf maximal {{max}} Zeichen haben",
+      "invalid": "Benutzername darf nur Buchstaben, Zahlen und Unterstriche enthalten"
+    },
+    "language": {
+      "invalid": "Ungültiger Sprachcode"
+    },
+    "groupName": {
+      "required": "Gruppenname ist erforderlich",
+      "maxLength": "Gruppenname darf maximal {{max}} Zeichen haben"
+    },
+    "groupPassword": {
+      "required": "Passwort ist erforderlich"
+    },
+    "winningCriteria": {
+      "required": "Gewinnkriterium ist erforderlich"
+    },
+    "date": {
+      "required": "Bitte wähle ein Datum",
+      "invalid": "Ungültiges Datum",
+      "festivalNotStarted": "Falsches Datum: Festival hat noch nicht begonnen",
+      "festivalEnded": "Falsches Datum: Leider ist es vorbei"
+    },
+    "beerCount": {
+      "required": "Bitte geben du die Anzahl der Mass ein",
+      "min": "Anzahl der Mass kann nicht negativ sein",
+      "max": "Das sind viele Mass! Bist du sicher?",
+      "negative": "Anzahl der Mass kann nicht negativ sein",
+      "wholeNumber": "Muss eine ganze Zahl sein",
+      "integer": "Muss eine ganze Zahl sein",
+      "tentRequired": "Mindestens ein Zelt muss ausgewählt werden, wenn die Anzahl der Mass 0 ist"
+    },
+    "photo": {
+      "required": "Mindestens ein Foto auswählen",
+      "selectOne": "Mindestens ein Foto auswählen",
+      "maxPhotos": "Maximal {{max}} Bilder erlaubt"
+    },
+    "file": {
+      "tooLarge": "Datei ist zu groß (max. 10 MB)",
+      "invalidType": "Nicht unterstütztes Dateiformat (verwende JPEG, PNG, GIF oder WebP)",
+      "invalidFormat": "Nicht unterstütztes Dateiformat (verwende JPEG, PNG, GIF oder WebP)",
+      "required": "Mindestens ein Bild ist erforderlich",
+      "tooMany": "Maximal 10 Bilder erlaubt",
+      "avatarTooLarge": "Dateigröße muss unter 5 MB sein",
+      "avatarInvalidFormat": "Datei muss ein JPEG-, PNG- oder WebP-Bild sein"
+    },
+    "reservation": {
+      "tentRequired": "Bitte wähle ein Zelt",
+      "dateTimeRequired": "Bitte wähle Datum und Uhrzeit",
+      "reminderNegative": "Erinnerungsversatz kann nicht negativ sein"
+    },
+    "reminder": {
+      "min": "Erinnerungsversatz kann nicht negativ sein"
+    },
+    "tent": {
+      "nameRequired": "Zeltname ist erforderlich",
+      "required": "Bitte wähle ein Zelt",
+      "minOne": "Mindestens ein Zelt muss ausgewählt werden",
+      "selected": "Mindestens ein Zelt muss ausgewählt werden"
+    },
+    "festival": {
+      "sourceRequired": "Quell-Festival ist erforderlich",
+      "targetRequired": "Ziel-Festival ist erforderlich"
+    },
+    "price": {
+      "positive": "Preis muss größer als 0 sein",
+      "tooHigh": "Preis scheint zu hoch"
+    }
+  },
+  "notifications": {
+    "success": {
+      "saved": "Änderungen erfolgreich gespeichert",
+      "deleted": "Erfolgreich gelöscht",
+      "copied": "In Zwischenablage kopiert",
+      "shared": "Erfolgreich geteilt",
+      "profileUpdated": "Profil erfolgreich aktualisiert!",
+      "groupCreated": "Gruppe erfolgreich erstellt!",
+      "groupUpdated": "Gruppe erfolgreich aktualisiert!",
+      "groupDeleted": "Gruppe erfolgreich gelöscht",
+      "joinedGroup": "Gruppe erfolgreich beigetreten!",
+      "leftGroup": "du hast die Gruppe verlassen",
+      "memberRemoved": "Mitglied erfolgreich entfernt!",
+      "tokenRegenerated": "Einladungs-Token neu erstellt!",
+      "linkCopied": "Einladungslink in Zwischenablage kopiert!",
+      "attendanceUpdated": "Besuch erfolgreich aktualisiert.",
+      "attendanceDeleted": "Besuch erfolgreich gelöscht.",
+      "pictureUploaded": "Bierfoto erfolgreich hochgeladen!",
+      "picturesUploaded": "{{count}} Bierfoto(s) erfolgreich hochgeladen!",
+      "avatarUploaded": "Bild erfolgreich hochgeladen!",
+      "passwordUpdated": "Passwort erfolgreich aktualisiert.",
+      "reservationCreated": "Reservierung erstellt",
+      "reservationUpdated": "Reservierung aktualisiert",
+      "checkedIn": "Eingecheckt!",
+      "settingsUpdated": "Einstellungen aktualisiert",
+      "pushEnabled": "Push-Benachrichtigungen aktiviert",
+      "photoVisibilityUpdated": "Foto-Sichtbarkeit aktualisiert",
+      "locationSharingDisabled": "Standortfreigabe deaktiviert.",
+      "imageDownloaded": "Bild erfolgreich heruntergeladen!",
+      "imageConverted": "Bild erfolgreich konvertiert.",
+      "swCacheCleared": "Service Worker-Caches erfolgreich geleert",
+      "festivalCreated": "Festival erfolgreich erstellt",
+      "festivalUpdated": "Festival erfolgreich aktualisiert",
+      "festivalDeleted": "Festival erfolgreich gelöscht",
+      "tentCreated": "Zelt erfolgreich erstellt",
+      "tentAddedToFestival": "Zelt zum Festival hinzugefügt",
+      "tentsAddedToFestival": "{{count}} Zelt(e) zum Festival hinzugefügt",
+      "tentRemovedFromFestival": "Zelt vom Festival entfernt",
+      "priceUpdated": "Preis erfolgreich aktualisiert",
+      "tentsCopied": "{{count}} Zelt(e) erfolgreich kopiert",
+      "userUpdated": "Benutzer erfolgreich aktualisiert",
+      "userDeleted": "Benutzer erfolgreich gelöscht"
+    },
+    "error": {
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
+      "saveFailed": "Speichern der Änderungen fehlgeschlagen",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "profileUpdateFailed": "Profilaktualisierung fehlgeschlagen. Bitte versuche es erneut.",
+      "tutorialResetFailed": "Zurücksetzen des Tutorials fehlgeschlagen. Bitte versuche es erneut.",
+      "attendanceLoadFailed": "Laden der Besuchsdaten fehlgeschlagen. Bitte versuche es erneut.",
+      "attendanceUpdateFailed": "Aktualisierung des Besuchs fehlgeschlagen. Bitte versuche es erneut.",
+      "attendanceDeleteFailed": "Löschen des Besuchs fehlgeschlagen. Bitte versuche es erneut.",
+      "leaderboardLoadFailed": "Laden des Gewinnkriteriums fehlgeschlagen. Bitte aktualisiere die Seite.",
+      "leaderboardFetchFailed": "Abrufen der Ranglistendaten fehlgeschlagen. Bitte versuche es erneut.",
+      "groupNotFound": "Gruppe nicht gefunden. Bitte überprüfe den Gruppennamen.",
+      "invalidGroup": "Ungültige Gruppe.",
+      "noFestivalSelected": "Kein Festival ausgewählt. Bitte wähle ein Festival.",
+      "reservationSaveFailed": "Speichern der Reservierung fehlgeschlagen",
+      "reservationNotFound": "Reservierung nicht gefunden oder bereits verarbeitet.",
+      "checkInFailed": "Check-in fehlgeschlagen",
+      "signUpFailed": "Registrierung fehlgeschlagen.",
+      "resetPasswordFailed": "Senden der Rücksetzanweisungen fehlgeschlagen",
+      "shareFailed": "Teilen fehlgeschlagen",
+      "copyFailed": "Kopieren in Zwischenablage fehlgeschlagen",
+      "qrError": "Erstellen des QR-Codes fehlgeschlagen",
+      "permissionDenied": "Berechtigung verweigert",
+      "geolocationNotSupported": "Geolokalisierung wird von diesem Browser nicht unterstützt",
+      "locationUnavailable": "Standortinformationen nicht verfügbar.",
+      "locationTimeout": "Zeitüberschreitung bei Standortanfrage. Bitte versuche es erneut.",
+      "imageLoadFailed": "Abrufen der Bilder fehlgeschlagen. Bitte versuche es erneut.",
+      "imageConvertFailed": "Konvertierung des Bildes fehlgeschlagen. Bitte versuche es erneut.",
+      "imageGenerateFailed": "Erstellen des Bildes fehlgeschlagen. Bitte versuche es erneut.",
+      "wrappedLoadFailed": "Laden der Rückblick-Daten fehlgeschlagen",
+      "wrappedNotFound": "Keine Rückblick-Daten gefunden",
+      "wrappedCacheRegenerateFailed": "Neu-Generierung des Rückblick-Caches fehlgeschlagen",
+      "festivalLoadFailed": "Laden der Festivals fehlgeschlagen",
+      "festivalDeleteFailed": "Löschen des Festivals fehlgeschlagen",
+      "tentLoadFailed": "Laden der Zeltdaten fehlgeschlagen",
+      "tentSourceLoadFailed": "Laden der Quell-Zelte fehlgeschlagen",
+      "invalidPrice": "Bitte geben du einen gültigen Preis zwischen 0 und 50 ein",
+      "groupLoadFailed": "Laden der Gruppendaten fehlgeschlagen",
+      "tokenRegenFailed": "Fehler beim Neu-Erstellen des Tokens",
+      "groupUpdateFailed": "Fehler beim Aktualisieren der Gruppe",
+      "groupDeleteFailed": "Löschen der Gruppe fehlgeschlagen",
+      "memberRemoveFailed": "Fehler beim Entfernen des Mitglieds",
+      "userLoadFailed": "Laden der Besuche fehlgeschlagen",
+      "userUpdateFailed": "Aktualisierung des Benutzers fehlgeschlagen",
+      "userDeleteFailed": "Löschen des Benutzers fehlgeschlagen",
+      "attendanceUpdateAdminFailed": "Aktualisierung des Besuchs fehlgeschlagen",
+      "attendanceDeleteAdminFailed": "Löschen des Besuchs fehlgeschlagen",
+      "swNotSupported": "Service Worker oder Caches nicht unterstützt",
+      "swClearFailed": "Leeren der Service Worker-Caches fehlgeschlagen"
+    },
+    "info": {
+      "loading": "Lädt...",
+      "processing": "Verarbeitet...",
+      "installInstructions": "Installationsanweisungen",
+      "installCancelled": "Installation abgebrochen",
+      "newVersionAvailable": "Neue Version verfügbar! 🚀"
+    },
+    "descriptions": {
+      "settingsUpdated": "deine Benachrichtigungseinstellungen wurden gespeichert.",
+      "pushEnabled": "du erhalten jetzt Push-Benachrichtigungen.",
+      "permissionDenied": "Bitte aktiviere Benachrichtigungen in deinen Browsereinstellungen.",
+      "checkYourEmail": "Bitte überprüfe deine E-Mail für weitere Anweisungen.",
+      "copySuccess": "Der Link wurde in deine Zwischenablage kopiert.",
+      "tokenRegenerated": "Teile den neuen Link mit anderen.",
+      "checkedIn": "Viel Spaß bei deinem Besuch!",
+      "installComplete": "Die App wurde auf deinem Gerät installiert.",
+      "photoVisibilityPublic": "dein Foto ist jetzt für Gruppenmitglieder sichtbar.",
+      "photoVisibilityPrivate": "dein Foto ist jetzt privat.",
+      "newVersionRefresh": "Klicke zum Aktualisieren und um die neuesten Funktionen zu erhalten."
+    }
+  },
+  "apiErrors": {
+    "INTERNAL_ERROR": "Ein interner Fehler ist aufgetreten. Bitte versuche es erneut.",
+    "VALIDATION_ERROR": "Bitte überprüfe deine Eingabe und versuche es erneut.",
+    "UNAUTHORIZED": "Bitte melde dich an, um fortzufahren.",
+    "FORBIDDEN": "Du hast keine Berechtigung dafür.",
+    "NOT_FOUND": "Die angeforderte Ressource wurde nicht gefunden.",
+    "CONFLICT": "Ein Konflikt ist aufgetreten. Bitte aktualisiere und versuche es erneut.",
+    "DATABASE_ERROR": "Ein Datenbankfehler ist aufgetreten. Bitte versuche es erneut.",
+    "INVALID_CREDENTIALS": "Ungültige E-Mail oder Passwort.",
+    "SESSION_EXPIRED": "deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+    "EMAIL_NOT_VERIFIED": "Bitte verifizieren du deine E-Mail-Adresse.",
+    "GROUP_NOT_FOUND": "Gruppe nicht gefunden.",
+    "NOT_GROUP_MEMBER": "du bist kein Mitglied dieser Gruppe.",
+    "NOT_GROUP_CREATOR": "Nur der Gruppenersteller kann dies tun.",
+    "ALREADY_GROUP_MEMBER": "Du bist bereits Mitglied dieser Gruppe.",
+    "INVALID_INVITE_TOKEN": "Ungültiges Einladungs-Token.",
+    "CANNOT_REMOVE_SELF": "du kannst dich nicht selbst entfernen. Verwende 'Gruppe verlassen'.",
+    "USER_NOT_GROUP_MEMBER": "Benutzer ist kein Mitglied dieser Gruppe.",
+    "ATTENDANCE_NOT_FOUND": "Besuchseintrag nicht gefunden.",
+    "DUPLICATE_ATTENDANCE": "du hast bereits einen Besuch für dieses Datum.",
+    "INVALID_DATE": "Ungültiges Datum.",
+    "INVALID_DATE_FORMAT": "Datum muss im Format JJJJ-MM-TT sein.",
+    "DATE_OUTSIDE_FESTIVAL": "Das Datum muss innerhalb der Festivaldaten liegen.",
+    "PRICE_BELOW_BASE": "Bezahlter Preis kann nicht unter dem Basispreis liegen.",
+    "FESTIVAL_NOT_FOUND": "Festival nicht gefunden.",
+    "NO_ACTIVE_FESTIVAL": "Kein aktives Festival gefunden.",
+    "TENT_NOT_FOUND": "Zelt nicht gefunden.",
+    "RESERVATION_NOT_FOUND": "Reservierung nicht gefunden.",
+    "RESERVATION_ALREADY_CHECKED_IN": "du hast bereits eingecheckt.",
+    "RESERVATION_CANCELLED": "Diese Reservierung wurde storniert.",
+    "RESERVATION_START_IN_PAST": "Reservierungsstart muss in der Zukunft liegen.",
+    "RESERVATION_END_BEFORE_START": "Endzeit muss nach der Startzeit liegen.",
+    "PHOTO_NOT_FOUND": "Foto nicht gefunden.",
+    "PHOTO_UPLOAD_FAILED": "Hochladen des Fotos fehlgeschlagen.",
+    "INVALID_FILE_TYPE": "Ungültiger Dateityp.",
+    "FILE_TOO_LARGE": "Dateigröße überschreitet maximales Limit.",
+    "FILE_NAME_TOO_LONG": "Dateiname zu lang (max. 255 Zeichen).",
+    "CAPTION_TOO_LONG": "Bildunterschrift zu lang (max. 500 Zeichen).",
+    "ACHIEVEMENT_NOT_FOUND": "Erfolg nicht gefunden.",
+    "LOCATION_SESSION_NOT_FOUND": "Standort-Sitzung nicht gefunden.",
+    "LOCATION_SESSION_EXPIRED": "Standort-Sitzung ist abgelaufen.",
+    "LOCATION_SESSION_ALREADY_ACTIVE": "du hast bereits eine aktive Standort-Sitzung für dieses Festival.",
+    "INVALID_DURATION": "Dauer muss zwischen 5 und 480 Minuten liegen.",
+    "INVALID_COORDINATES": "Ungültiger Breiten- oder Längengrad.",
+    "INVALID_RADIUS": "Radius muss zwischen 100 und 5000 Metern liegen.",
+    "INVALID_PAGINATION": "Ungültige Paginierungsparameter.",
+    "PROFILE_NOT_FOUND": "Profil nicht gefunden.",
+    "USERNAME_TAKEN": "Dieser Benutzername ist bereits vergeben.",
+    "WRAPPED_NOT_FOUND": "Rückblick-Daten nicht gefunden.",
+    "WRAPPED_NOT_READY": "dein Rückblick ist noch nicht bereit."
+  },
+  "offline": {
+    "status": {
+      "offline": "Offline",
+      "syncing": "Synchronisiert...",
+      "error": "Synchronisierungsfehler",
+      "pending": "{{count}} ausstehend",
+      "synced": "Synchronisiert"
+    },
+    "banner": {
+      "offlineWithPending": "Du bist offline. {{count}} Änderungen werden synchronisiert, wenn du verbunden bist.",
+      "offline": "Du bist offline. Änderungen werden synchronisiert, wenn du dich wieder verbinden.",
+      "error": "Synchronisierung fehlgeschlagen. Tippe zum Wiederholen."
+    }
+  },
+  "sync": {
+    "status": {
+      "syncing": "Synchronisiert...",
+      "offline": "Offline",
+      "error": "Synchronisierungsfehler",
+      "pending": "{{count}} ausstehend",
+      "synced": "Synchronisiert"
+    },
+    "tapToRetry": "Tippen um Synchronisierung zu wiederholen",
+    "tapToSync": "Tippen um zu synchronisieren",
+    "retry": "Wiederholen",
+    "dismiss": "Verwerfen",
+    "table": {
+      "attendance": "Besuch",
+      "consumption": "Getränk",
+      "profile": "Profil"
+    },
+    "operation": {
+      "create": "Erstellen",
+      "update": "Aktualisieren",
+      "delete": "Löschen"
+    },
+    "failedOps": {
+      "title": "Fehlgeschlagene Operationen",
+      "noFailures": "Keine fehlgeschlagenen Operationen",
+      "description": "Diese Operationen konnten nicht synchronisiert werden. du kannst sie wiederholen oder verwerfen.",
+      "unknownError": "Unbekannter Fehler",
+      "attempts": "Versuche: {{count}}",
+      "dismissAll": "Alle verwerfen",
+      "retryAll": "Alle wiederholen"
+    }
+  }
+}

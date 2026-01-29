@@ -4,6 +4,7 @@
  * A development-only screen for testing and previewing UI components.
  * This tab is only visible when __DEV__ is true.
  */
+import { useTranslation } from "@prostcounter/shared/i18n";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { ChevronDown, Database, Puzzle, Trash2, X } from "lucide-react-native";
@@ -1073,6 +1074,7 @@ const renderComponent = (component: ComponentType) => {
 };
 
 export default function ComponentsScreen() {
+  const { t } = useTranslation();
   const [selectedComponent, setSelectedComponent] =
     useState<ComponentType>("dev-tools");
 
@@ -1083,7 +1085,7 @@ export default function ComponentsScreen() {
         <Box className="items-center py-2">
           <Puzzle size={40} color={Colors.primary[500]} />
           <Heading size="lg" className="mt-1">
-            UI Components
+            {t("dev.components.title")}
           </Heading>
           <Text size="sm" className="text-gray-500">
             Development Preview
@@ -1096,7 +1098,10 @@ export default function ComponentsScreen() {
             if (Platform.OS === "ios") {
               ActionSheetIOS.showActionSheetWithOptions(
                 {
-                  options: ["Cancel", ...COMPONENT_OPTIONS.map((o) => o.label)],
+                  options: [
+                    t("dev.buttons.cancel"),
+                    ...COMPONENT_OPTIONS.map((o) => o.label),
+                  ],
                   cancelButtonIndex: 0,
                   title: "Select Component",
                 },

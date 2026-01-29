@@ -123,9 +123,7 @@ export function GroupSelectorSheet({
           {/* Header */}
           <HStack className="items-center justify-between">
             <Heading size="md" className="text-typography-900">
-              {t("location.groups.title", {
-                defaultValue: "Share with groups",
-              })}
+              {t("location.groups.title")}
             </Heading>
           </HStack>
 
@@ -137,15 +135,10 @@ export function GroupSelectorSheet({
             <VStack space="sm" className="items-center py-8">
               <Users size={40} color={IconColors.muted} />
               <Text className="text-center text-typography-500">
-                {t("location.groups.noGroups", {
-                  defaultValue: "You haven't joined any groups yet",
-                })}
+                {t("location.groups.noGroups")}
               </Text>
               <Text className="text-center text-sm text-typography-400">
-                {t("location.groups.noGroupsHint", {
-                  defaultValue:
-                    "Join a group to share your location with friends",
-                })}
+                {t("location.groups.noGroupsHint")}
               </Text>
             </VStack>
           ) : (
@@ -158,14 +151,10 @@ export function GroupSelectorSheet({
                 <HStack className="items-center justify-between rounded-lg bg-background-50 p-4">
                   <VStack className="flex-1">
                     <Text className="font-medium text-typography-900">
-                      {t("location.groups.shareWithAll", {
-                        defaultValue: "Share with all groups",
-                      })}
+                      {t("location.groups.shareWithAll")}
                     </Text>
                     <Text className="text-sm text-typography-500">
-                      {t("location.groups.shareWithAllDescription", {
-                        defaultValue: "All your groups can see your location",
-                      })}
+                      {t("location.groups.shareWithAllDescription")}
                     </Text>
                   </VStack>
                   <Switch
@@ -182,9 +171,7 @@ export function GroupSelectorSheet({
               {/* Group list */}
               <VStack space="xs">
                 <Text className="text-xs font-medium uppercase tracking-wide text-typography-500">
-                  {t("location.groups.selectGroups", {
-                    defaultValue: "Or select specific groups",
-                  })}
+                  {t("location.groups.selectGroups")}
                 </Text>
                 <ScrollView
                   style={{ maxHeight: 250 }}
@@ -225,8 +212,7 @@ export function GroupSelectorSheet({
                             </CheckboxLabel>
                           </Checkbox>
                           <Text className="text-xs text-typography-500">
-                            {group.memberCount || 0}{" "}
-                            {t("common.members", { defaultValue: "members" })}
+                            {group.memberCount || 0} {t("common.members")}
                           </Text>
                         </HStack>
                       );
@@ -239,11 +225,8 @@ export function GroupSelectorSheet({
               <View className="border-t border-outline-200 pt-4">
                 <Text className="text-center text-sm text-typography-600">
                   {shareWithAll
-                    ? t("location.groups.sharingWithAll", {
-                        defaultValue: "Sharing with all groups",
-                      })
+                    ? t("location.groups.sharingWithAll")
                     : t("location.groups.sharingWithSome", {
-                        defaultValue: "Sharing with {{count}} group(s)",
                         count: selectedGroupIds.length,
                       })}
                 </Text>
@@ -251,9 +234,7 @@ export function GroupSelectorSheet({
 
               {/* Done button */}
               <Button onPress={onClose} action="primary" className="mt-2">
-                <ButtonText>
-                  {t("common.buttons.done", { defaultValue: "Done" })}
-                </ButtonText>
+                <ButtonText>{t("common.buttons.done")}</ButtonText>
               </Button>
             </>
           )}

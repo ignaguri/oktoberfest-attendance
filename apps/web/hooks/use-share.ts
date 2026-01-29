@@ -1,3 +1,4 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -8,13 +9,18 @@ export interface UseShareOptions {
 }
 
 export function useShare(options: UseShareOptions = {}) {
-  const [copyButtonText, setCopyButtonText] = useState("Copy share text");
+  const { t } = useTranslation();
+  const [copyButtonText, setCopyButtonText] = useState(
+    t("groups.share.copyLink", { defaultValue: "Copy share text" }),
+  );
   const [showQRCode, setShowQRCode] = useState(false);
 
   const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
-  const defaultText =
-    "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends. Click here to join:";
+  const defaultText = t("home.shareApp", {
+    defaultValue:
+      "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends. Click here to join:",
+  });
 
   // Only append URL if the text doesn't already contain a URL
   const textContainsUrl =
@@ -44,9 +50,17 @@ export function useShare(options: UseShareOptions = {}) {
     } catch (error) {
       // User cancelled or error occurred, fallback to clipboard
       if ((error as Error).name !== "AbortError") {
-        toast.error("Share failed", {
-          description: "Native sharing failed. Copied to clipboard instead.",
-        });
+        toast.error(
+          t("notifications.error.shareFailed", {
+            defaultValue: "Share failed",
+          }),
+          {
+            description: t("notifications.error.copyFailed", {
+              defaultValue:
+                "Native sharing failed. Copied to clipboard instead.",
+            }),
+          },
+        );
       }
       await copyToClipboard();
     }
@@ -55,13 +69,19 @@ export function useShare(options: UseShareOptions = {}) {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareText);
-      setCopyButtonText("Copied!");
+      setCopyButtonText(
+        t("groups.share.linkCopied", { defaultValue: "Copied!" }),
+      );
       setTimeout(() => {
-        setCopyButtonText("Copy share text");
+        setCopyButtonText(
+          t("groups.share.copyLink", { defaultValue: "Copy share text" }),
+        );
       }, 3000);
     } catch {
-      toast.error("Error", {
-        description: "Failed to copy text to clipboard.",
+      toast.error(t("common.errors.title", { defaultValue: "Error" }), {
+        description: t("notifications.error.copyFailed", {
+          defaultValue: "Failed to copy text to clipboard.",
+        }),
       });
     }
   };
@@ -78,7 +98,9 @@ export function useShare(options: UseShareOptions = {}) {
   };
 
   const resetCopyButton = () => {
-    setCopyButtonText("Copy share text");
+    setCopyButtonText(
+      t("groups.share.copyLink", { defaultValue: "Copy share text" }),
+    );
   };
 
   return {

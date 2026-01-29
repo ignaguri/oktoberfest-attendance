@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Tables } from "@prostcounter/db";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AdminAttendanceForm,
   AdminUserUpdateForm,
@@ -45,7 +46,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { formatDateForDatabase } from "@/lib/date-utils";
-import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 
 import {
@@ -72,6 +72,7 @@ const UserEditForm = ({
   onFetchAttendances?: () => void;
   isFetchingAttendances?: boolean;
 }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -93,7 +94,7 @@ const UserEditForm = ({
         {/* Email display (read-only) */}
         <div>
           <Label htmlFor="email" className="block">
-            Email
+            {t("common.form.email")}
           </Label>
           <Input
             type="email"
@@ -104,13 +105,13 @@ const UserEditForm = ({
             readOnly
           />
           <p className="text-muted-foreground mt-1 text-sm">
-            Email cannot be changed
+            {t("admin.users.form.emailNote")}
           </p>
         </div>
 
         <div>
           <Label htmlFor="password" className="block">
-            New Password (leave blank to keep unchanged)
+            {t("admin.users.form.newPassword")}
           </Label>
           <Input
             type="password"
@@ -125,7 +126,7 @@ const UserEditForm = ({
         </div>
         <div>
           <Label htmlFor="full_name" className="block">
-            Full Name
+            {t("admin.users.form.fullName")}
           </Label>
           <Input
             type="text"
@@ -140,7 +141,7 @@ const UserEditForm = ({
         </div>
         <div>
           <Label htmlFor="username" className="block">
-            Username
+            {t("admin.users.form.username")}
           </Label>
           <Input
             type="text"
@@ -169,11 +170,11 @@ const UserEditForm = ({
             htmlFor="is_super_admin"
             className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            Is Super Admin
+            {t("admin.users.form.isSuperAdmin")}
           </Label>
         </div>
         <Button type="submit" disabled={isSubmitting}>
-          Update User
+          {t("admin.users.form.updateUser")}
         </Button>
       </form>
 
@@ -184,12 +185,14 @@ const UserEditForm = ({
               onClick={onFetchAttendances}
               className="text-left"
             >
-              User Attendances ({attendances?.length || "Not loaded yet"})
+              {t("admin.users.attendances.title", {
+                count: attendances?.length || 0,
+              })}
             </AccordionTrigger>
             <AccordionContent>
               {isFetchingAttendances ? (
                 <div className="text-muted-foreground py-4 text-center">
-                  Loading attendances...
+                  {t("admin.users.attendances.loading")}
                 </div>
               ) : attendances && onDeleteAttendance ? (
                 <AttendanceTable
@@ -198,7 +201,7 @@ const UserEditForm = ({
                 />
               ) : (
                 <div className="text-muted-foreground py-4 text-center">
-                  Click to load attendances
+                  {t("admin.users.attendances.clickToLoad")}
                 </div>
               )}
             </AccordionContent>
@@ -216,6 +219,7 @@ const AttendanceEditForm = ({
   attendance: AttendanceWithTents;
   onSubmit: (data: AdminAttendanceForm) => Promise<void>;
 }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -237,7 +241,7 @@ const AttendanceEditForm = ({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="date" className="block">
-          Date
+          {t("common.form.date")}
         </Label>
         <Input
           type="date"
@@ -255,7 +259,7 @@ const AttendanceEditForm = ({
       </div>
       <div>
         <Label htmlFor="beer_count" className="block">
-          Beer Count
+          {t("attendance.beerCount")}
         </Label>
         <Input
           type="number"
@@ -270,7 +274,7 @@ const AttendanceEditForm = ({
       </div>
       <div>
         <Label htmlFor="tents" className="block">
-          Tents
+          {t("common.tents")}
         </Label>
         <TentSelector
           selectedTents={watchedTentIds}
@@ -281,7 +285,7 @@ const AttendanceEditForm = ({
         )}
       </div>
       <Button type="submit" disabled={isSubmitting}>
-        Update Attendance
+        {t("attendance.updateAttendance")}
       </Button>
     </form>
   );
@@ -294,6 +298,7 @@ const AttendanceTable = ({
   attendances: AttendanceWithTents[];
   onDeleteAttendance: (attendanceId: string) => void;
 }) => {
+  const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAttendanceId, setSelectedAttendanceId] = useState<
     string | null
@@ -317,7 +322,10 @@ const AttendanceTable = ({
       {
         accessorKey: "date",
         header: ({ column }: any) => (
-          <DataTableColumnHeader column={column} title="Date" />
+          <DataTableColumnHeader
+            column={column}
+            title={t("admin.users.attendances.headers.date")}
+          />
         ),
         cell: ({ row }: any) =>
           formatDate(new Date(row.original.date), "dd/MM/yyyy"),
@@ -325,7 +333,10 @@ const AttendanceTable = ({
       {
         accessorKey: "beer_count",
         header: ({ column }: any) => (
-          <DataTableColumnHeader column={column} title="Beers" />
+          <DataTableColumnHeader
+            column={column}
+            title={t("admin.users.attendances.headers.beers")}
+          />
         ),
         cell: ({ row }: any) => (
           <div className="flex items-center justify-center gap-1">
@@ -337,7 +348,10 @@ const AttendanceTable = ({
       {
         accessorKey: "tent_ids",
         header: ({ column }: any) => (
-          <DataTableColumnHeader column={column} title="Tents" />
+          <DataTableColumnHeader
+            column={column}
+            title={t("admin.users.attendances.headers.tents")}
+          />
         ),
         cell: ({ row }: any) => (
           <div className="flex items-center justify-center gap-1">
@@ -362,13 +376,13 @@ const AttendanceTable = ({
         ),
       },
     ],
-    [handleDelete],
+    [handleDelete, t],
   );
 
   if (attendances.length === 0) {
     return (
       <div className="text-muted-foreground py-4 text-center">
-        No attendances found for this user.
+        {t("admin.users.attendances.empty")}
       </div>
     );
   }
@@ -381,10 +395,12 @@ const AttendanceTable = ({
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Attendance</DialogTitle>
+            <DialogTitle>
+              {t("admin.users.attendances.deleteTitle")}
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this attendance? This action
-              cannot be undone.
+              {t("admin.users.attendances.deleteConfirm")}{" "}
+              {t("common.actions.cannotUndo")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -393,11 +409,11 @@ const AttendanceTable = ({
                 variant="outline"
                 onClick={() => setIsDeleteDialogOpen(false)}
               >
-                Cancel
+                {t("admin.users.attendances.buttons.cancel")}
               </Button>
             </DialogClose>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete
+              {t("admin.users.attendances.buttons.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -557,7 +573,7 @@ const UserList = () => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">User List</h2>
+      <h2 className="mb-4 text-xl font-semibold">{t("admin.users.title")}</h2>
 
       {/* New Search System */}
       <UserSearch
@@ -573,8 +589,8 @@ const UserList = () => {
       <ResponsiveDialog
         open={isUserDialogOpen}
         onOpenChange={setIsUserDialogOpen}
-        title="Edit User"
-        description="Update user details"
+        title={t("admin.users.editUser")}
+        description={t("admin.users.editUserDescription")}
       >
         {selectedUser && (
           <UserEditForm
@@ -594,18 +610,21 @@ const UserList = () => {
       <ResponsiveDialog
         open={isAttendanceDialogOpen}
         onOpenChange={setIsAttendanceDialogOpen}
-        title="Edit Attendances"
-        description="Manage user attendances"
+        title={t("admin.users.editAttendances")}
+        description={t("admin.users.editAttendancesDescription")}
       >
         {selectedUser && (
           <div>
             <h2 className="mb-2 text-xl font-semibold">
-              Attendances for {selectedUser.profile?.full_name}
+              {t("admin.users.attendances.titleFor", {
+                name: selectedUser.profile?.full_name,
+              })}
             </h2>
             {attendances.map((attendance) => (
               <div key={attendance.id} className="mb-2">
                 <span>
-                  {attendance.date.toString()} - {attendance.beer_count} beers
+                  {attendance.date.toString()} - {attendance.beer_count}{" "}
+                  {t("common.beers")}
                 </span>
                 <Button
                   onClick={() => {
@@ -614,14 +633,14 @@ const UserList = () => {
                   }}
                   className="ml-2"
                 >
-                  Edit
+                  {t("admin.users.attendances.buttons.edit")}
                 </Button>
                 <Button
                   onClick={() => handleDeleteAttendance(attendance.id)}
                   className="ml-2"
                   variant="destructive"
                 >
-                  Delete
+                  {t("admin.users.attendances.buttons.delete")}
                 </Button>
               </div>
             ))}

@@ -91,10 +91,9 @@ export function TentProximityBanner({
 
   const distanceText =
     closestTent.distanceMeters < 10
-      ? t("location.proximity.veryClose", { defaultValue: "You're here!" })
+      ? t("location.proximity.veryClose")
       : t("location.proximity.distance", {
           meters: Math.round(closestTent.distanceMeters),
-          defaultValue: "{{meters}}m away",
         });
 
   return (
@@ -109,11 +108,8 @@ export function TentProximityBanner({
         accessibilityRole="button"
         accessibilityLabel={t("location.proximity.checkIn", {
           tent: closestTent.tentName,
-          defaultValue: `Check in at ${closestTent.tentName}`,
         })}
-        accessibilityHint={t("location.proximity.hint", {
-          defaultValue: "Tap to add this tent to your attendance",
-        })}
+        accessibilityHint={t("location.proximity.hint")}
       >
         <Animated.View
           entering={FadeIn.duration(200)}
@@ -147,9 +143,7 @@ export function TentProximityBanner({
             <HStack space="sm" className="items-center">
               <Box className="rounded-full bg-white/20 px-3 py-1">
                 <Text className="text-sm font-medium text-white">
-                  {t("location.proximity.checkInButton", {
-                    defaultValue: "Check in",
-                  })}
+                  {t("location.proximity.checkInButton")}
                 </Text>
               </Box>
               <ChevronRight size={20} color="white" />
@@ -169,7 +163,7 @@ export function TentProximityBanner({
           shadowRadius: 2,
           elevation: 3,
         }}
-        accessibilityLabel={t("common.dismiss", { defaultValue: "Dismiss" })}
+        accessibilityLabel={t("common.dismiss")}
       >
         <X size={16} color={IconColors.default} />
       </Pressable>

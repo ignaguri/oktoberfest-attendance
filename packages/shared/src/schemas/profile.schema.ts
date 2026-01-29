@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { SUPPORTED_LANGUAGES } from "../i18n/core";
+
 // Profile schemas
 export const ProfileSchema = z.object({
   id: z.string().uuid(),
@@ -31,7 +33,11 @@ export const UpdateProfileSchema = z.object({
     .string()
     .nullable()
     .refine(
-      (val) => val === null || ["en"].includes(val),
+      (val) =>
+        val === null ||
+        SUPPORTED_LANGUAGES.includes(
+          val as (typeof SUPPORTED_LANGUAGES)[number],
+        ),
       "Invalid language code",
     )
     .optional(),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useCallback } from "react";
@@ -14,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 
 import { convertAndUpdateImage, listNonWebPImages } from "../actions";
@@ -63,13 +63,13 @@ export function ImageConversion() {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">Non-WebP Images</h2>
+      <h2 className="mb-4 text-xl font-semibold">{t("admin.images.title")}</h2>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Image</TableHead>
-            <TableHead>Path</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead>{t("admin.images.headers.image")}</TableHead>
+            <TableHead>{t("admin.images.headers.path")}</TableHead>
+            <TableHead>{t("admin.images.headers.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -90,7 +90,9 @@ export function ImageConversion() {
                   onClick={() => handleConvert(image.path)}
                   disabled={converting === image.path}
                 >
-                  {converting === image.path ? "Converting..." : "Convert"}
+                  {converting === image.path
+                    ? t("admin.images.buttons.converting")
+                    : t("admin.images.buttons.convert")}
                 </Button>
               </TableCell>
             </TableRow>

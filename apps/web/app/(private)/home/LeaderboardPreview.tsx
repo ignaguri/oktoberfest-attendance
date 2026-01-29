@@ -2,6 +2,7 @@
 
 import type { LeaderboardEntry } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Crown } from "lucide-react";
 import { Link } from "next-view-transitions";
 
@@ -47,6 +48,7 @@ const getDisplayName = ({
 };
 
 const LeaderboardPreview = () => {
+  const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
 
   // Use default winning criteria (days_attended = ID 1)
@@ -73,10 +75,12 @@ const LeaderboardPreview = () => {
     <Card className="min-h-[280px] rounded-lg border border-gray-200 shadow-lg">
       <CardHeader>
         <CardTitle className="text-center text-xl font-bold">
-          🏆 Global Leaderboard
+          {t("home.leaderboard.title")}
         </CardTitle>
         <CardDescription className="text-center">
-          Top {LEADERBOARD_PREVIEW_LIMIT} performers
+          {t("home.leaderboard.description", {
+            limit: LEADERBOARD_PREVIEW_LIMIT,
+          })}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2">
@@ -90,11 +94,11 @@ const LeaderboardPreview = () => {
                   <TableHead>
                     <div className="flex items-center gap-1">
                       <Crown className="text-yellow-500" size={16} />
-                      <span>Days</span>
+                      <span>{t("home.leaderboard.headers.days")}</span>
                     </div>
                   </TableHead>
-                  <TableHead>Liters</TableHead>
-                  <TableHead>Avg.</TableHead>
+                  <TableHead>{t("home.leaderboard.headers.liters")}</TableHead>
+                  <TableHead>{t("home.leaderboard.headers.avg")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,7 +159,7 @@ const LeaderboardPreview = () => {
 
           <div className="flex justify-center">
             <Button asChild variant="outline" className="w-fit">
-              <Link href="/leaderboard">View Full Leaderboard</Link>
+              <Link href="/leaderboard">{t("home.leaderboard.viewFull")}</Link>
             </Button>
           </div>
         </div>

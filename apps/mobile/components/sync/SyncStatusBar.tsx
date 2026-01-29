@@ -85,31 +85,29 @@ export function SyncStatusBar({
 
   if (isSyncing) {
     icon = <Spinner size="small" color={Colors.primary[500]} />;
-    statusText = t("sync.status.syncing", { defaultValue: "Syncing..." });
+    statusText = t("sync.status.syncing");
     bgColor = "bg-primary-50";
     textColor = "text-primary-700";
   } else if (isOffline) {
     icon = <CloudOff size={16} color={IconColors.muted} />;
-    statusText = t("sync.status.offline", { defaultValue: "Offline" });
+    statusText = t("sync.status.offline");
     bgColor = "bg-background-100";
     textColor = "text-typography-500";
   } else if (hasError) {
     icon = <AlertCircle size={16} color={IconColors.error} />;
-    statusText =
-      error || t("sync.status.error", { defaultValue: "Sync error" });
+    statusText = error || t("sync.status.error");
     bgColor = "bg-error-50";
     textColor = "text-error-700";
   } else if (hasPending) {
     icon = <Cloud size={16} color={Colors.primary[500]} />;
     statusText = t("sync.status.pending", {
-      defaultValue: "{{count}} pending",
       count: pendingCount,
     });
     bgColor = "bg-primary-50";
     textColor = "text-primary-700";
   } else {
     icon = <CheckCircle size={16} color={IconColors.success} />;
-    statusText = t("sync.status.synced", { defaultValue: "Synced" });
+    statusText = t("sync.status.synced");
     bgColor = "bg-success-50";
     textColor = "text-success-700";
   }
@@ -144,9 +142,7 @@ export function SyncStatusBar({
         onPress={hasError ? (onViewErrors ?? handleRetry) : handleRetry}
         accessibilityRole="button"
         accessibilityLabel={
-          hasError
-            ? t("sync.tapToRetry", { defaultValue: "Tap to retry sync" })
-            : t("sync.tapToSync", { defaultValue: "Tap to sync" })
+          hasError ? t("sync.tapToRetry") : t("sync.tapToSync")
         }
         style={{ paddingTop: insets.top }}
         className={cn(bgColor)}

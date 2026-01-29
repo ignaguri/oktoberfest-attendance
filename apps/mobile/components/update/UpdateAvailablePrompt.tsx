@@ -48,19 +48,14 @@ export function UpdateAvailablePrompt({
             <Download size={40} color={Colors.primary[500]} />
           </View>
           <Heading size="lg" className="text-center">
-            {t("update.available.title", {
-              defaultValue: "Update Available",
-            })}
+            {t("update.available.title")}
           </Heading>
         </AlertDialogHeader>
 
         <AlertDialogBody>
           <VStack space="md">
             <Text className="text-center text-typography-600">
-              {t("update.available.description", {
-                defaultValue:
-                  "A new version of ProstCounter is ready. Restart to get the latest features and improvements.",
-              })}
+              {t("update.available.description")}
             </Text>
           </VStack>
         </AlertDialogBody>
@@ -70,18 +65,12 @@ export function UpdateAvailablePrompt({
             className="w-full"
             onPress={onUpdate}
             disabled={isLoading}
-            accessibilityLabel={t("update.available.restartNow", {
-              defaultValue: "Restart Now",
-            })}
+            accessibilityLabel={t("update.available.restartNow")}
           >
             {isLoading ? (
               <ButtonSpinner color="white" />
             ) : (
-              <ButtonText>
-                {t("update.available.restartNow", {
-                  defaultValue: "Restart Now",
-                })}
-              </ButtonText>
+              <ButtonText>{t("update.available.restartNow")}</ButtonText>
             )}
           </Button>
           <Button
@@ -89,14 +78,10 @@ export function UpdateAvailablePrompt({
             className="w-full"
             onPress={onClose}
             disabled={isLoading}
-            accessibilityLabel={t("update.available.later", {
-              defaultValue: "Maybe Later",
-            })}
+            accessibilityLabel={t("update.available.later")}
           >
             <ButtonText className="text-typography-500">
-              {t("update.available.later", {
-                defaultValue: "Maybe Later",
-              })}
+              {t("update.available.later")}
             </ButtonText>
           </Button>
         </AlertDialogFooter>

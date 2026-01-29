@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import Image from "next/image";
 
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
@@ -27,6 +28,7 @@ import MissingFields from "./MissingFields";
 import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 
 export default function Home() {
+  const { t } = useTranslation();
   const { data: tutorialStatus, loading: isTutorialStatusLoading } =
     useTutorialStatus();
 
@@ -90,15 +92,11 @@ export default function Home() {
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger className="px-2">
-              What can I do with Prost Counter?
+              {t("landing.features.title")}
             </AccordionTrigger>
             <AccordionContent className="max-w-80">
               <p className="text-center text-balance text-gray-600">
-                Compete with friends in different groups to see who visits beer
-                festivals more often and drinks the most beers!
-                <br />
-                Track your progress and become the ultimate beer festival
-                champion.
+                {t("landing.description")}
               </p>
             </AccordionContent>
           </AccordionItem>

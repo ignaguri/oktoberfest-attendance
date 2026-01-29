@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Share, SquarePlus, X } from "lucide-react";
 import { useState } from "react";
 
@@ -9,6 +10,7 @@ import { useInstallPWA } from "@/hooks/use-install-pwa";
 import { cn } from "@/lib/utils";
 
 export default function InstallPWA() {
+  const { t } = useTranslation();
   const { setInstallPWAVisible, canShowInstallPWA } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -68,19 +70,16 @@ export default function InstallPWA() {
           <X className="size-5" />
         </button>
         <div className="p-4">
-          <h1 className="text-lg font-medium">Install the App</h1>
+          <h1 className="text-lg font-medium">{t("pwa.install.title")}</h1>
           {showIOSInstructions ? (
             <div className="text-muted-foreground flex flex-col gap-3 text-left text-sm">
-              <p>
-                Install this app on your iOS device for a better experience
-                (must be done in <span className="font-bold">Safari</span>):
-              </p>
+              <p>{t("pwa.install.instructions.ios")}</p>
               <ol className="flex list-decimal flex-col gap-2 pl-4">
                 <li>
                   <div className="flex items-center gap-2">
                     <span>Tap the</span>
                     <Share className="size-4" />
-                    <span>Share button below</span>
+                    <span>button below</span>
                   </div>
                 </li>
                 <li>
@@ -92,23 +91,22 @@ export default function InstallPWA() {
                     </span>
                   </div>
                 </li>
-                <li>Tap &ldquo;Add&rdquo; to install the app</li>
+                <li>Tap &ldquo;Add&rdquo; to complete the installation</li>
               </ol>
             </div>
           ) : (
             <p className="text-muted-foreground text-left text-sm">
-              You can install this app on your device for a better experience.
-              Click the button below to install.
+              {t("pwa.install.message")}
             </p>
           )}
         </div>
         <div className="flex items-center justify-center gap-2 border-t p-4">
           {showIOSInstructions ? (
             <Button onClick={closePrompt} variant="outline">
-              Got it
+              {t("common.buttons.gotIt")}
             </Button>
           ) : (
-            <Button onClick={installPWA}>Install</Button>
+            <Button onClick={installPWA}>{t("pwa.install.button")}</Button>
           )}
         </div>
       </div>

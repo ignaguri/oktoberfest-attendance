@@ -159,9 +159,7 @@ export function FriendMap({
           longitude: currentLocation.coords.longitude,
         },
         title: t("location.map.yourLocation"),
-        snippet: isSharing
-          ? t("location.sharing.active", { defaultValue: "Sharing location" })
-          : undefined,
+        snippet: isSharing ? t("location.sharing.active") : undefined,
       });
     }
 

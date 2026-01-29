@@ -9,17 +9,16 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-import en from "./locales/en.json";
-
-export const defaultNS = "translation";
-
-export const resources = {
-  en: {
-    translation: en,
-  },
-} as const;
-
-export type TranslationResources = (typeof resources)["en"]["translation"];
+// Re-export all constants from core (single source of truth)
+export {
+  defaultNS,
+  LANGUAGE_NAMES,
+  resources,
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+  type TranslationResources,
+} from "./core";
+import { defaultNS, resources } from "./core";
 
 /**
  * Initialize i18n with React bindings
@@ -58,13 +57,6 @@ export function getCurrentLanguage(): string {
   return i18n.language || "en";
 }
 
-/**
- * Supported languages
- * TODO: Add more languages when translations are available (de, es, fr)
- */
-export const SUPPORTED_LANGUAGES = ["en"] as const;
-export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
-
 // Re-export react-i18next hooks and components (client-only)
-export { useTranslation, Trans, I18nextProvider } from "react-i18next";
+export { I18nextProvider, Trans, useTranslation } from "react-i18next";
 export { i18n };

@@ -1,3 +1,4 @@
+import { setLanguageStorage } from "@prostcounter/shared/hooks";
 import {
   changeLanguage as sharedChangeLanguage,
   i18n,
@@ -7,6 +8,17 @@ import {
 import { logger } from "../logger";
 
 const LANGUAGE_KEY = "@prostcounter/language";
+
+// Configure language storage for mobile (AsyncStorage)
+if (typeof window !== "undefined") {
+  import("@react-native-async-storage/async-storage").then((module) => {
+    setLanguageStorage({
+      getItem: (key: string) => module.default.getItem(key),
+      setItem: (key: string, value: string) =>
+        module.default.setItem(key, value),
+    });
+  });
+}
 
 /**
  * Initialize i18n for mobile

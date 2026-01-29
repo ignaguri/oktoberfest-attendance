@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Edit, Image as ImageIcon, User, UserCheck } from "lucide-react";
 import { Link } from "next-view-transitions";
 import type { ReactNode } from "react";
@@ -35,6 +36,7 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
 };
 
 export default function MissingFields() {
+  const { t } = useTranslation();
   const { data, loading } = useQuery(
     ["profile", "missing-fields"],
     () => apiClient.profile.getMissingFields(),
@@ -51,27 +53,27 @@ export default function MissingFields() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Complete Your Profile</CardTitle>
+        <CardTitle>{t("home.missingFields.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-2">
           {missingFields.full_name && (
             <MissingField
-              label="Name"
+              label={t("home.missingFields.name")}
               icon={<User className="h-4 w-4" />}
               link="/profile"
             />
           )}
           {missingFields.username && (
             <MissingField
-              label="Username"
+              label={t("home.missingFields.username")}
               icon={<UserCheck className="h-4 w-4" />}
               link="/profile"
             />
           )}
           {missingFields.avatar_url && (
             <MissingField
-              label="Profile picture"
+              label={t("home.missingFields.profilePicture")}
               icon={<ImageIcon className="h-4 w-4" />}
               link="/profile"
             />

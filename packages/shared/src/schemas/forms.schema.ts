@@ -1,7 +1,9 @@
-import { z } from "zod";
 import { TZDate } from "@date-fns/tz";
 import { add } from "date-fns";
+import { z } from "zod";
+
 import { DEFAULT_TIMEZONE } from "../constants/app";
+import { SUPPORTED_LANGUAGES } from "../i18n/core";
 
 /**
  * Shared form validation schemas for web and mobile
@@ -19,9 +21,16 @@ export const ProfileFormSchema = z.object({
   preferred_language: z
     .string()
     .nullable()
-    .refine((val) => val === null || ["en", "de", "es", "fr"].includes(val), {
-      error: "validation.language.invalid",
-    })
+    .refine(
+      (val) =>
+        val === null ||
+        SUPPORTED_LANGUAGES.includes(
+          val as (typeof SUPPORTED_LANGUAGES)[number],
+        ),
+      {
+        error: "validation.language.invalid",
+      },
+    )
     .optional(),
 });
 

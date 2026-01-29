@@ -99,10 +99,8 @@ export default function NotificationSettingsScreen() {
       await updatePreferences.mutateAsync({ [apiKey]: value });
     } catch (error) {
       Alert.alert(
-        t("common.status.error", { defaultValue: "Error" }),
-        t("profile.notifications.updateError", {
-          defaultValue: "Failed to update notification settings",
-        }),
+        t("common.status.error"),
+        t("profile.notifications.updateError"),
       );
     }
   };
@@ -116,22 +114,15 @@ export default function NotificationSettingsScreen() {
       } else if (permissionStatus === "denied") {
         // Permission was denied, direct to settings
         Alert.alert(
-          t("profile.notifications.permissionDenied", {
-            defaultValue: "Notifications Disabled",
-          }),
-          t("profile.notifications.openSettings", {
-            defaultValue:
-              "To enable notifications, please go to your device settings and allow notifications for ProstCounter.",
-          }),
+          t("profile.notifications.permissionDenied"),
+          t("profile.notifications.openSettings"),
           [
             {
-              text: t("common.action.cancel", { defaultValue: "Cancel" }),
+              text: t("common.action.cancel"),
               style: "cancel",
             },
             {
-              text: t("profile.notifications.goToSettings", {
-                defaultValue: "Open Settings",
-              }),
+              text: t("profile.notifications.goToSettings"),
               onPress: () => {
                 if (Platform.OS === "ios") {
                   Linking.openURL("app-settings:");
@@ -152,10 +143,8 @@ export default function NotificationSettingsScreen() {
         await updatePreferences.mutateAsync({ pushEnabled: false });
       } catch (error) {
         Alert.alert(
-          t("common.status.error", { defaultValue: "Error" }),
-          t("profile.notifications.updateError", {
-            defaultValue: "Failed to update notification settings",
-          }),
+          t("common.status.error"),
+          t("profile.notifications.updateError"),
         );
       }
     }
@@ -177,11 +166,8 @@ export default function NotificationSettingsScreen() {
       const token = await registerForPushNotifications();
       if (!token) {
         Alert.alert(
-          t("common.status.error", { defaultValue: "Error" }),
-          t("profile.notifications.noToken", {
-            defaultValue:
-              "Failed to get push notification token. Please try again.",
-          }),
+          t("common.status.error"),
+          t("profile.notifications.noToken"),
         );
         setIsEnabling(false);
         return;
@@ -201,10 +187,8 @@ export default function NotificationSettingsScreen() {
           subscribeResult.error || "Unknown error",
         );
         Alert.alert(
-          t("common.status.error", { defaultValue: "Error" }),
-          t("profile.notifications.subscribeFailed", {
-            defaultValue: "Failed to register with notification service.",
-          }),
+          t("common.status.error"),
+          t("profile.notifications.subscribeFailed"),
         );
         setIsEnabling(false);
         return;
@@ -219,10 +203,8 @@ export default function NotificationSettingsScreen() {
           tokenResult.error || "Unknown error",
         );
         Alert.alert(
-          t("common.status.error", { defaultValue: "Error" }),
-          t("profile.notifications.tokenRegistrationFailed", {
-            defaultValue: "Failed to register device for push notifications.",
-          }),
+          t("common.status.error"),
+          t("profile.notifications.tokenRegistrationFailed"),
         );
         setIsEnabling(false);
         return;
@@ -238,11 +220,8 @@ export default function NotificationSettingsScreen() {
     } catch (error) {
       logger.error("Error enabling push notifications:", error);
       Alert.alert(
-        t("common.status.error", { defaultValue: "Error" }),
-        t("profile.notifications.enableFailed", {
-          defaultValue:
-            "Failed to enable push notifications. Please try again.",
-        }),
+        t("common.status.error"),
+        t("profile.notifications.enableFailed"),
       );
     } finally {
       setIsEnabling(false);
@@ -278,9 +257,7 @@ export default function NotificationSettingsScreen() {
           {/* Preferences Section */}
           <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
             <Text className="mb-4 text-lg font-semibold text-typography-900">
-              {t("profile.notifications.preferences", {
-                defaultValue: "Notification Preferences",
-              })}
+              {t("profile.notifications.preferences")}
             </Text>
 
             {/* Reminders */}
@@ -289,15 +266,10 @@ export default function NotificationSettingsScreen() {
                 <Clock size={24} color={IconColors.default} />
                 <View className="flex-1">
                   <Text className="text-typography-900">
-                    {t("profile.notifications.reminders", {
-                      defaultValue: "Reminders",
-                    })}
+                    {t("profile.notifications.reminders")}
                   </Text>
                   <Text className="text-sm text-typography-500">
-                    {t("profile.notifications.remindersDescription", {
-                      defaultValue:
-                        "Reservation reminders and check-in prompts",
-                    })}
+                    {t("profile.notifications.remindersDescription")}
                   </Text>
                 </View>
               </View>
@@ -321,14 +293,10 @@ export default function NotificationSettingsScreen() {
                 <Trophy size={24} color={IconColors.default} />
                 <View className="flex-1">
                   <Text className="text-typography-900">
-                    {t("profile.notifications.achievements", {
-                      defaultValue: "Achievement Notifications",
-                    })}
+                    {t("profile.notifications.achievements")}
                   </Text>
                   <Text className="text-sm text-typography-500">
-                    {t("profile.notifications.achievementsDescription", {
-                      defaultValue: "Get notified when you unlock achievements",
-                    })}
+                    {t("profile.notifications.achievementsDescription")}
                   </Text>
                 </View>
               </View>
@@ -352,15 +320,10 @@ export default function NotificationSettingsScreen() {
                 <Users size={24} color={IconColors.default} />
                 <View className="flex-1">
                   <Text className="text-typography-900">
-                    {t("profile.notifications.groups", {
-                      defaultValue: "Group Notifications",
-                    })}
+                    {t("profile.notifications.groups")}
                   </Text>
                   <Text className="text-sm text-typography-500">
-                    {t("profile.notifications.groupsDescription", {
-                      defaultValue:
-                        "Get notifications from your groups (check-ins, achievements, etc.)",
-                    })}
+                    {t("profile.notifications.groupsDescription")}
                   </Text>
                 </View>
               </View>
@@ -382,9 +345,7 @@ export default function NotificationSettingsScreen() {
           {/* Push Notifications Section */}
           <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
             <Text className="mb-4 text-lg font-semibold text-typography-900">
-              {t("profile.notifications.pushTitle", {
-                defaultValue: "Push Notifications",
-              })}
+              {t("profile.notifications.pushTitle")}
             </Text>
 
             <View className="flex-row items-center justify-between py-3">
@@ -392,15 +353,10 @@ export default function NotificationSettingsScreen() {
                 <Bell size={24} color={IconColors.default} />
                 <View className="flex-1">
                   <Text className="text-typography-900">
-                    {t("profile.notifications.push", {
-                      defaultValue: "Push Notifications",
-                    })}
+                    {t("profile.notifications.push")}
                   </Text>
                   <Text className="text-sm text-typography-500">
-                    {t("profile.notifications.pushDescription", {
-                      defaultValue:
-                        "Receive notifications even when the app is closed",
-                    })}
+                    {t("profile.notifications.pushDescription")}
                   </Text>
                 </View>
               </View>
@@ -421,10 +377,7 @@ export default function NotificationSettingsScreen() {
               <View className="mt-2 flex-row items-center gap-2 rounded-lg bg-yellow-50 p-3">
                 <ExternalLink size={16} color={Colors.primary[600]} />
                 <Text className="flex-1 text-sm text-yellow-800">
-                  {t("profile.notifications.permissionDeniedHint", {
-                    defaultValue:
-                      "Notifications are disabled. Tap the toggle to open settings.",
-                  })}
+                  {t("profile.notifications.permissionDeniedHint")}
                 </Text>
               </View>
             )}

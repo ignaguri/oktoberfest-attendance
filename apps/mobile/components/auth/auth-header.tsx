@@ -1,3 +1,4 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import React from "react";
 import { Image, View } from "react-native";
 
@@ -17,6 +18,7 @@ interface AuthHeaderProps {
  * Used at the top of authentication screens.
  */
 export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
+  const { t } = useTranslation();
   const isLarge = size === "lg";
 
   return (
@@ -26,6 +28,7 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
         source={require("@/assets/images/logo.png")}
         className={isLarge ? "h-24 w-24" : "h-16 w-16"}
         resizeMode="contain"
+        accessibilityLabel={t("app.logo")}
       />
 
       {/* App Name with gradient-like styling */}
@@ -33,12 +36,12 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
         <Text
           className={`font-bold text-primary-600 ${isLarge ? "text-3xl" : "text-2xl"}`}
         >
-          Prost
+          {t("app.namePart1")}
         </Text>
         <Text
           className={`font-bold text-primary-500 ${isLarge ? "text-3xl" : "text-2xl"}`}
         >
-          Counter
+          {t("app.namePart2")}
         </Text>
       </View>
 

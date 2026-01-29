@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { usePathname } from "next/navigation";
 import { Link } from "next-view-transitions";
 import React, { useMemo } from "react";
@@ -36,16 +37,38 @@ interface BreadcrumbSegment {
 }
 
 export default function Breadcrumbs() {
+  const { t } = useTranslation();
   const pathname = usePathname();
 
   const breadcrumbs = useMemo(() => {
     const segments = pathname.split("/").filter((segment) => segment !== "");
     const newBreadcrumbs: BreadcrumbSegment[] = [];
 
+    // Translation key mapping for common segments
+    const getTranslatedTitle = (segment: string): string => {
+      const segmentLower = segment.toLowerCase();
+      const keyMap: Record<string, string> = {
+        groups: "navigation.breadcrumbs.groups",
+        profile: "navigation.breadcrumbs.profile",
+        attendance: "navigation.breadcrumbs.attendance",
+        achievements: "navigation.breadcrumbs.achievements",
+        settings: "navigation.breadcrumbs.settings",
+        calendar: "navigation.breadcrumbs.calendar",
+        leaderboard: "navigation.breadcrumbs.leaderboard",
+      };
+
+      if (keyMap[segmentLower]) {
+        return t(keyMap[segmentLower]);
+      }
+
+      // Fallback to formatted segment name for unknown segments
+      return formatSegmentName(segment);
+    };
+
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       const href = `/${segments.slice(0, i + 1).join("/")}`;
-      const title = formatSegmentName(segment);
+      const title = getTranslatedTitle(segment);
       const isLast = i === segments.length - 1;
       const isUUIDSegment = isUUID(segment);
 
@@ -60,7 +83,10 @@ export default function Breadcrumbs() {
 
     // Apply the existing filtering logic
     if (newBreadcrumbs.length > 0) {
-      if (newBreadcrumbs[0].title.toLowerCase() === "home") {
+      if (
+        newBreadcrumbs[0].title.toLowerCase() ===
+        t("navigation.breadcrumbs.home").toLowerCase()
+      ) {
         newBreadcrumbs.shift();
       } else if (newBreadcrumbs[0].title.toLowerCase() === "group settings") {
         const last = newBreadcrumbs.pop();
@@ -70,14 +96,14 @@ export default function Breadcrumbs() {
           last.href = last.href.replace("group-settings", "groups");
           newBreadcrumbs.push(last);
           secondLast.isLast = true;
-          secondLast.title = "Settings";
+          secondLast.title = t("navigation.breadcrumbs.settings");
           newBreadcrumbs.push(secondLast);
         }
       }
     }
 
     return newBreadcrumbs;
-  }, [pathname]);
+  }, [pathname, t]);
 
   if (breadcrumbs.length === 0) return null;
 
@@ -86,7 +112,7 @@ export default function Breadcrumbs() {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/">Home</Link>
+            <Link href="/">{t("navigation.breadcrumbs.home")}</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
@@ -114,14 +140,15 @@ function BreadcrumbSegment({
   groupId,
   showSeparator,
 }: BreadcrumbSegment & { showSeparator: boolean }) {
+  const { t } = useTranslation();
   const { data: groupName, loading, error } = useGroupName(groupId || "");
 
   const displayTitle = isUUID
     ? loading
-      ? "Loading..."
+      ? t("common.status.loading")
       : error
-        ? "Unknown Group"
-        : groupName || "Unknown Group"
+        ? t("common.status.unknownGroup")
+        : groupName || t("common.status.unknownGroup")
     : title;
 
   return (

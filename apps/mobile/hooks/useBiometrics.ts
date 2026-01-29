@@ -1,3 +1,4 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useEffect, useState } from "react";
 
@@ -35,6 +36,7 @@ interface UseBiometricsResult {
  * Provides biometric availability check, authentication, and enable/disable functionality.
  */
 export function useBiometrics(): UseBiometricsResult {
+  const { t } = useTranslation();
   const [isAvailable, setIsAvailable] = useState(false);
   const [biometricType, setBiometricType] = useState<BiometricType>(null);
   const [isEnabled, setIsEnabled] = useState(false);
@@ -91,10 +93,10 @@ export function useBiometrics(): UseBiometricsResult {
 
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Sign in to ProstCounter",
-        fallbackLabel: "Use password",
+        promptMessage: t("biometric.prompt.title"),
+        fallbackLabel: t("biometric.prompt.fallbackLabel"),
         disableDeviceFallback: false,
-        cancelLabel: "Cancel",
+        cancelLabel: t("biometric.prompt.cancelLabel"),
       });
 
       if (result.success) {

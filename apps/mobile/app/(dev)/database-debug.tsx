@@ -5,6 +5,7 @@
  * Only accessible in development mode.
  */
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   AlertCircle,
   CheckCircle,
@@ -43,6 +44,7 @@ import { useOfflineSafe } from "@/lib/database/offline-provider";
 // =============================================================================
 
 export default function DatabaseDebugScreen() {
+  const { t } = useTranslation();
   const {
     isReady,
     getDb,
@@ -126,7 +128,7 @@ export default function DatabaseDebugScreen() {
       "Delete Failed Operations",
       "This will permanently delete all failed sync operations. Are you sure?",
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("dev.buttons.cancel"), style: "cancel" },
         {
           text: "Delete",
           style: "destructive",
@@ -197,7 +199,7 @@ export default function DatabaseDebugScreen() {
       "Reset Database",
       "This will delete all local data. Are you sure?",
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("dev.buttons.cancel"), style: "cancel" },
         {
           text: "Reset",
           style: "destructive",

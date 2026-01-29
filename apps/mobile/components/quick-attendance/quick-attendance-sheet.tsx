@@ -339,8 +339,8 @@ export function QuickAttendanceSheet({
 
       // Show success toast with appropriate message
       const toastMessage = selectedDrinkType
-        ? t("quickAttendance.drinkLogged", { defaultValue: "Drink logged!" })
-        : t("quickAttendance.saved", { defaultValue: "Saved!" });
+        ? t("quickAttendance.drinkLogged")
+        : t("quickAttendance.saved");
 
       toast.show({
         placement: "top",
@@ -407,19 +407,14 @@ export function QuickAttendanceSheet({
             <VStack space="xs">
               <HStack className="items-center justify-between">
                 <Text className="text-lg font-semibold text-typography-900">
-                  {t("quickAttendance.sheetTitle", {
-                    defaultValue: "Today's Attendance",
-                  })}
+                  {t("quickAttendance.sheetTitle")}
                 </Text>
                 <Pressable onPress={onClose} hitSlop={8}>
                   <X size={24} color={IconColors.default} />
                 </Pressable>
               </HStack>
               <Text className="text-sm text-typography-500">
-                {t("quickAttendance.sheetDescription", {
-                  defaultValue:
-                    "Add a drink, change your tent, or upload photos for today.",
-                })}
+                {t("quickAttendance.sheetDescription")}
               </Text>
             </VStack>
 
@@ -597,7 +592,7 @@ export function QuickAttendanceSheet({
               <ButtonText>
                 {isLoading
                   ? t("common.status.saving")
-                  : t("quickAttendance.save", { defaultValue: "Save" })}
+                  : t("quickAttendance.save")}
               </ButtonText>
             </Button>
           </VStack>

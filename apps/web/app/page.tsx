@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
+import { getTranslations } from "@/lib/i18n/server";
 import { getUser } from "@/lib/sharedActions";
 import LogoImage from "@/public/android-chrome-512x512.png";
 
@@ -13,6 +14,7 @@ export default async function Root({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const t = getTranslations();
   // Check for OAuth code parameter and handle it
   const params = await searchParams;
   if (params.code) {
@@ -61,14 +63,11 @@ export default async function Root({
         </h1>
       </header>
       <p className="px-4 text-center text-gray-700">
-        Compete with friends in different groups to see who visits beer
-        festivals more often and drinks the most beers!
-        <br />
-        Track your progress and become the ultimate beer festival champion.
+        {t("landing.description")}
       </p>
       <div>
         <Button variant="yellow" asChild>
-          <Link href="/sign-in">Sign In</Link>
+          <Link href="/sign-in">{t("landing.signIn")}</Link>
         </Button>
       </div>
     </div>

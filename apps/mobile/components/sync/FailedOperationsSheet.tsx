@@ -160,15 +160,15 @@ export function FailedOperationsSheet({
 
   const getOperationLabel = (op: SyncQueueItem): string => {
     const tableLabels: Record<string, string> = {
-      attendances: t("sync.table.attendance", { defaultValue: "Attendance" }),
-      consumptions: t("sync.table.consumption", { defaultValue: "Drink" }),
-      profiles: t("sync.table.profile", { defaultValue: "Profile" }),
+      attendances: t("sync.table.attendance"),
+      consumptions: t("sync.table.consumption"),
+      profiles: t("sync.table.profile"),
     };
 
     const operationLabels: Record<string, string> = {
-      INSERT: t("sync.operation.create", { defaultValue: "Create" }),
-      UPDATE: t("sync.operation.update", { defaultValue: "Update" }),
-      DELETE: t("sync.operation.delete", { defaultValue: "Delete" }),
+      INSERT: t("sync.operation.create"),
+      UPDATE: t("sync.operation.update"),
+      DELETE: t("sync.operation.delete"),
     };
 
     const table = tableLabels[op.table_name] || op.table_name;
@@ -191,9 +191,7 @@ export function FailedOperationsSheet({
             <HStack space="sm" className="items-center">
               <AlertCircle size={20} color={IconColors.error} />
               <Heading size="md" className="text-typography-900">
-                {t("sync.failedOps.title", {
-                  defaultValue: "Failed Operations",
-                })}
+                {t("sync.failedOps.title")}
               </Heading>
             </HStack>
             <Pressable onPress={onClose} accessibilityLabel={t("common.close")}>
@@ -208,17 +206,13 @@ export function FailedOperationsSheet({
           ) : failedOps.length === 0 ? (
             <VStack className="items-center py-8">
               <Text className="text-typography-500">
-                {t("sync.failedOps.noFailures", {
-                  defaultValue: "No failed operations",
-                })}
+                {t("sync.failedOps.noFailures")}
               </Text>
             </VStack>
           ) : (
             <>
               <Text className="text-sm text-typography-500">
                 {t("sync.failedOps.description", {
-                  defaultValue:
-                    "These operations failed to sync. You can retry or dismiss them.",
                   count: failedOps.length,
                 })}
               </Text>
@@ -239,14 +233,10 @@ export function FailedOperationsSheet({
                           className="text-xs text-error-600"
                           numberOfLines={2}
                         >
-                          {op.last_error ||
-                            t("sync.failedOps.unknownError", {
-                              defaultValue: "Unknown error",
-                            })}
+                          {op.last_error || t("sync.failedOps.unknownError")}
                         </Text>
                         <Text className="text-xs text-typography-400">
                           {t("sync.failedOps.attempts", {
-                            defaultValue: "Attempts: {{count}}",
                             count: op.retry_count,
                           })}
                         </Text>
@@ -287,11 +277,7 @@ export function FailedOperationsSheet({
                   isDisabled={isLoading}
                 >
                   <ButtonIcon as={Trash2} />
-                  <ButtonText>
-                    {t("sync.failedOps.dismissAll", {
-                      defaultValue: "Dismiss All",
-                    })}
-                  </ButtonText>
+                  <ButtonText>{t("sync.failedOps.dismissAll")}</ButtonText>
                 </Button>
                 <Button
                   action="primary"
@@ -300,11 +286,7 @@ export function FailedOperationsSheet({
                   isDisabled={isLoading}
                 >
                   <ButtonIcon as={RefreshCw} />
-                  <ButtonText>
-                    {t("sync.failedOps.retryAll", {
-                      defaultValue: "Retry All",
-                    })}
-                  </ButtonText>
+                  <ButtonText>{t("sync.failedOps.retryAll")}</ButtonText>
                 </Button>
               </HStack>
             </>

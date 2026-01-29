@@ -1,6 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupWithMembers } from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
 
@@ -13,6 +14,7 @@ interface MyGroupsProps {
 }
 
 export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const {
     data: groups = [],
@@ -30,16 +32,16 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
 
   return (
     <div className="min-h-[120px]">
-      <h2 className="mb-2 text-xl font-bold">Your Groups:</h2>
+      <h2 className="mb-2 text-xl font-bold">{t("groups.yourGroups")}</h2>
       <div className="flex flex-wrap justify-center gap-2">
         {(error || !groups || groups.length === 0) && (
           <div className="px-2 text-center">
             <p className="mb-2 text-sm text-gray-500">
-              You are not a member of any group yet for this festival.
+              {t("groups.noGroupsYet")}
             </p>
             {showGroupsLink && (
               <Button asChild variant="yellow" size="sm">
-                <Link href="/groups">Join or Create a Group</Link>
+                <Link href="/groups">{t("groups.joinOrCreate")}</Link>
               </Button>
             )}
           </div>

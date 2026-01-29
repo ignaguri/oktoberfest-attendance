@@ -1,5 +1,11 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useTranslation } from "@prostcounter/shared/i18n";
+import { useLanguage } from "@prostcounter/shared/hooks";
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
+import {
+  LANGUAGE_NAMES,
+  SUPPORTED_LANGUAGES,
+  useTranslation,
+} from "@prostcounter/shared/i18n";
 import type { Festival } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import { format, parseISO } from "date-fns";
@@ -26,6 +32,7 @@ import {
   ActionsheetItemText,
 } from "@/components/ui/actionsheet";
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -76,11 +83,13 @@ export function SettingsSection({
   const { t } = useTranslation();
   const router = useRouter();
   const { currentFestival, festivals, setCurrentFestival } = useFestival();
+  const { currentLanguage, currentLanguageName, setLanguage } = useLanguage();
   const [showFestivalSheet, setShowFestivalSheet] = useState(false);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
 
   const getBiometricLabel = () => {
-    if (biometricType === "facial") return "Face ID";
-    if (biometricType === "fingerprint") return "Touch ID";
+    if (biometricType === "facial") return t("biometric.labels.faceId");
+    if (biometricType === "fingerprint") return t("biometric.labels.touchId");
     return t("profile.biometric.label");
   };
 
@@ -92,6 +101,14 @@ export function SettingsSection({
       setShowFestivalSheet(false);
     },
     [setCurrentFestival],
+  );
+
+  const handleLanguageSelect = useCallback(
+    (lang: SupportedLanguage) => {
+      setLanguage(lang as "en" | "de");
+      setShowLanguageSheet(false);
+    },
+    [setLanguage],
   );
 
   return (
@@ -257,16 +274,69 @@ export function SettingsSection({
         <ChevronRight size={24} color={IconColors.muted} />
       </Pressable>
 
-      {/* Language Display - Only English available for now */}
-      <View className="flex-row items-center justify-between py-3">
-        <View className="flex-row items-center gap-3">
+      {/* Language Selector */}
+      <Pressable
+        className="flex-row items-center justify-between py-3"
+        onPress={() => setShowLanguageSheet(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t("profile.language")}
+      >
+        <Box className="flex-row items-center gap-3">
           <Languages size={24} color={IconColors.default} />
-          <Text className="text-typography-900">{t("profile.language")}</Text>
-        </View>
-        <View className="flex-row items-center gap-1">
-          <Text className="text-typography-500">English</Text>
-        </View>
-      </View>
+          <Box>
+            <Text className="text-typography-900">{t("profile.language")}</Text>
+            <Text className="text-sm text-typography-500">
+              {currentLanguageName}
+            </Text>
+          </Box>
+        </Box>
+        <ChevronRight size={24} color={IconColors.muted} />
+      </Pressable>
+
+      {/* Language Selection Sheet */}
+      <Actionsheet
+        isOpen={showLanguageSheet}
+        onClose={() => setShowLanguageSheet(false)}
+      >
+        <ActionsheetBackdrop />
+        <ActionsheetContent className="pb-8">
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <VStack space="md" className="w-full px-4 pt-4">
+            <Heading size="md" className="text-center">
+              {t("profile.language")}
+            </Heading>
+            <Text className="text-center text-sm text-typography-500">
+              {t("profile.languageDescription")}
+            </Text>
+          </VStack>
+          {SUPPORTED_LANGUAGES.map((lang) => {
+            const isSelected = lang === currentLanguage;
+            return (
+              <ActionsheetItem
+                key={lang}
+                onPress={() => handleLanguageSelect(lang)}
+                className={cn(isSelected && "bg-primary-50")}
+              >
+                <Box className="flex-row items-center justify-between">
+                  <Text
+                    className={cn(
+                      "text-typography-900",
+                      isSelected && "font-semibold text-primary-600",
+                    )}
+                  >
+                    {LANGUAGE_NAMES[lang]}
+                  </Text>
+                  {isSelected && (
+                    <Check size={20} color={Colors.primary[500]} />
+                  )}
+                </Box>
+              </ActionsheetItem>
+            );
+          })}
+        </ActionsheetContent>
+      </Actionsheet>
     </Card>
   );
 }

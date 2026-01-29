@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Tables } from "@prostcounter/db";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AdminGroupForm } from "@prostcounter/shared/schemas";
 import { AdminGroupFormSchema } from "@prostcounter/shared/schemas";
 import { useQueryClient } from "@tanstack/react-query";
@@ -26,7 +27,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { apiClient } from "@/lib/api-client";
 import { searchKeys } from "@/lib/data/search-query-keys";
-import { useTranslation } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 import { getAvatarUrl } from "@/lib/utils";
 
@@ -58,6 +58,7 @@ const GroupEditForm = ({
   isGeneratingToken: boolean;
   copiedToClipboard: boolean;
 }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -79,7 +80,7 @@ const GroupEditForm = ({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="name" className="block">
-          Group Name
+          {t("admin.groups.form.name")}
         </Label>
         <Input
           type="text"
@@ -91,7 +92,7 @@ const GroupEditForm = ({
       </div>
       <div>
         <Label htmlFor="description" className="block">
-          Description
+          {t("admin.groups.form.description")}
         </Label>
         <Textarea
           id="description"
@@ -102,7 +103,7 @@ const GroupEditForm = ({
       </div>
       <div>
         <Label htmlFor="winning_criteria_id" className="block">
-          Winning Criteria
+          {t("admin.groups.form.winningCriteria")}
         </Label>
         <Select
           value={selectedCriteriaId?.toString()}
@@ -111,7 +112,9 @@ const GroupEditForm = ({
           }
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select winning criteria" />
+            <SelectValue
+              placeholder={t("admin.groups.form.winningCriteriaPlaceholder")}
+            />
           </SelectTrigger>
           <SelectContent>
             {winningCriteria.map((criteria) => (
@@ -129,11 +132,13 @@ const GroupEditForm = ({
       {/* Members Section */}
       <div>
         <Label className="mb-2 block font-semibold">
-          Members ({members.length})
+          {t("admin.groups.form.members", { count: members.length })}
         </Label>
         <div className="max-h-40 overflow-y-auto rounded-md border p-2">
           {members.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No members yet</p>
+            <p className="text-muted-foreground text-sm">
+              {t("admin.groups.form.membersEmpty")}
+            </p>
           ) : (
             <div className="space-y-2">
               {members.map((member) => (
@@ -164,10 +169,12 @@ const GroupEditForm = ({
                     <p className="text-sm font-medium">
                       {member.profiles.full_name ||
                         member.profiles.username ||
-                        "Unknown User"}
+                        t("common.unknownUser")}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Joined {new Date(member.joined_at).toLocaleDateString()}
+                      {t("admin.groups.form.joined", {
+                        date: new Date(member.joined_at).toLocaleDateString(),
+                      })}
                     </p>
                   </div>
                 </div>
@@ -179,7 +186,9 @@ const GroupEditForm = ({
 
       {/* Invite Token Section */}
       <div>
-        <Label className="mb-2 block font-semibold">Invite Link</Label>
+        <Label className="mb-2 block font-semibold">
+          {t("admin.groups.form.inviteLink")}
+        </Label>
 
         <div className="space-y-3">
           <div className="flex space-x-2">
@@ -188,11 +197,11 @@ const GroupEditForm = ({
               value={
                 inviteToken
                   ? `${typeof window !== "undefined" ? window.location.origin : ""}/join-group?token=${inviteToken}`
-                  : "Generate a new invite link"
+                  : t("admin.groups.form.inviteLinkPlaceholder")
               }
               readOnly
               className="flex-1"
-              placeholder="Generate a new invite link"
+              placeholder={t("admin.groups.form.inviteLinkPlaceholder")}
             />
             <Button
               type="button"
@@ -217,13 +226,15 @@ const GroupEditForm = ({
             className="flex items-center"
           >
             <Link className="mr-2 h-4 w-4" />
-            {isGeneratingToken ? "Generating..." : "Generate New Invite Link"}
+            {isGeneratingToken
+              ? t("admin.groups.buttons.generating")
+              : t("admin.groups.buttons.generateInvite")}
           </Button>
         </div>
       </div>
 
       <Button type="submit" disabled={isSubmitting}>
-        Update Group
+        {t("admin.groups.form.updateGroup")}
       </Button>
     </form>
   );
@@ -365,7 +376,7 @@ const GroupList = () => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">Group List</h2>
+      <h2 className="mb-4 text-xl font-semibold">{t("admin.groups.title")}</h2>
 
       {/* New Search System */}
       <GroupSearch
@@ -381,8 +392,8 @@ const GroupList = () => {
       <ResponsiveDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title="Edit Group"
-        description="Update group details and view members"
+        title={t("admin.groups.editGroup")}
+        description={t("admin.groups.editGroupDescription")}
       >
         {selectedGroup && (
           <GroupEditForm
@@ -399,7 +410,7 @@ const GroupList = () => {
         )}
         {isLoadingMembers && (
           <div className="flex items-center justify-center py-4">
-            <p className="text-muted-foreground">Loading group data...</p>
+            <p className="text-muted-foreground">{t("admin.groups.loading")}</p>
           </div>
         )}
       </ResponsiveDialog>

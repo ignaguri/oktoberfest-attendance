@@ -330,21 +330,21 @@ export default function ProfileScreen() {
           >
             <VStack space="md" className="items-center">
               <Text className="text-lg font-semibold text-purple-800">
-                Developer Tools
+                {t("dev.title")}
               </Text>
               <Text className="text-center text-sm text-purple-700">
-                UI Components showcase for development
+                {t("dev.description")}
               </Text>
               <Button
                 variant="outline"
                 action="secondary"
                 onPress={() => router.push("/(dev)/components")}
                 className="border-purple-400"
-                accessibilityLabel="Open Components Showcase"
+                accessibilityLabel={t("dev.components.openShowcase")}
               >
                 <Puzzle size={18} color="#7c3aed" />
                 <ButtonText className="text-purple-700">
-                  Components Showcase
+                  {t("dev.components.showcase")}
                 </ButtonText>
               </Button>
             </VStack>

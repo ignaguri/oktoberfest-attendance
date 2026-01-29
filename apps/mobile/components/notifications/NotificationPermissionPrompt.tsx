@@ -41,21 +41,15 @@ export function NotificationPermissionPrompt({
   const benefits = [
     {
       icon: Users,
-      text: t("profile.notifications.benefits.groups", {
-        defaultValue: "Know when friends check in at the festival",
-      }),
+      text: t("profile.notifications.benefits.groups"),
     },
     {
       icon: Trophy,
-      text: t("profile.notifications.benefits.achievements", {
-        defaultValue: "Celebrate when you unlock achievements",
-      }),
+      text: t("profile.notifications.benefits.achievements"),
     },
     {
       icon: Clock,
-      text: t("profile.notifications.benefits.reminders", {
-        defaultValue: "Get reminders for your reservations",
-      }),
+      text: t("profile.notifications.benefits.reminders"),
     },
   ];
 
@@ -71,19 +65,14 @@ export function NotificationPermissionPrompt({
             <Bell size={40} color={Colors.primary[500]} />
           </View>
           <Heading size="lg" className="text-center">
-            {t("profile.notifications.promptTitle", {
-              defaultValue: "Stay in the Loop",
-            })}
+            {t("profile.notifications.promptTitle")}
           </Heading>
         </AlertDialogHeader>
 
         <AlertDialogBody>
           <VStack space="md">
             <Text className="text-center text-typography-600">
-              {t("profile.notifications.promptDescription", {
-                defaultValue:
-                  "Enable notifications to get the most out of ProstCounter",
-              })}
+              {t("profile.notifications.promptDescription")}
             </Text>
 
             <VStack space="sm" className="py-4">
@@ -103,10 +92,7 @@ export function NotificationPermissionPrompt({
             </VStack>
 
             <Text className="text-center text-xs text-typography-500">
-              {t("profile.notifications.promptNote", {
-                defaultValue:
-                  "You can change your notification preferences at any time in Settings",
-              })}
+              {t("profile.notifications.promptNote")}
             </Text>
           </VStack>
         </AlertDialogBody>
@@ -118,15 +104,9 @@ export function NotificationPermissionPrompt({
               await onEnable();
               onClose();
             }}
-            accessibilityLabel={t("profile.notifications.enable", {
-              defaultValue: "Enable Notifications",
-            })}
+            accessibilityLabel={t("profile.notifications.enable")}
           >
-            <ButtonText>
-              {t("profile.notifications.enable", {
-                defaultValue: "Enable Notifications",
-              })}
-            </ButtonText>
+            <ButtonText>{t("profile.notifications.enable")}</ButtonText>
           </Button>
           <Button
             variant="link"
@@ -135,14 +115,10 @@ export function NotificationPermissionPrompt({
               onSkip();
               onClose();
             }}
-            accessibilityLabel={t("profile.notifications.skip", {
-              defaultValue: "Maybe Later",
-            })}
+            accessibilityLabel={t("profile.notifications.skip")}
           >
             <ButtonText className="text-typography-500">
-              {t("profile.notifications.skip", {
-                defaultValue: "Maybe Later",
-              })}
+              {t("profile.notifications.skip")}
             </ButtonText>
           </Button>
         </AlertDialogFooter>

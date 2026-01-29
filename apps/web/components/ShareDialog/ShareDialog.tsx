@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,11 @@ interface ShareDialogProps {
 export function ShareDialog({
   open,
   onOpenChange,
-  title = "Share ProstCounter App with friends!",
-  description = "Choose how you'd like to share the app:",
+  title,
+  description,
   className,
 }: ShareDialogProps) {
+  const { t } = useTranslation();
   const {
     copyButtonText,
     showQRCode,
@@ -39,8 +41,18 @@ export function ShareDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={className || "sm:max-w-[425px]"}>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle>
+            {title ||
+              t("home.shareApp", {
+                defaultValue: "Share ProstCounter App with friends!",
+              })}
+          </DialogTitle>
+          <DialogDescription>
+            {description ||
+              t("groups.share.title", {
+                defaultValue: "Choose how you'd like to share the app:",
+              })}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-2 p-8">
@@ -49,7 +61,9 @@ export function ShareDialog({
             onClick={shareViaWhatsApp}
             className="w-full"
           >
-            Share via WhatsApp
+            {t("groups.share.shareLink", {
+              defaultValue: "Share via WhatsApp",
+            })}
           </Button>
 
           <Button
@@ -61,7 +75,9 @@ export function ShareDialog({
           </Button>
 
           <Button variant="secondary" onClick={toggleQRCode} className="w-full">
-            {showQRCode ? "Hide QR Code" : "Show QR Code"}
+            {showQRCode
+              ? t("common.buttons.close", { defaultValue: "Hide QR Code" })
+              : t("groups.qrCode.title", { defaultValue: "Show QR Code" })}
           </Button>
 
           {showQRCode && (

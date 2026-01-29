@@ -37,6 +37,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env.device
+.env.production
 
 # vercel
 .vercel
@@ -64,6 +65,8 @@ packages/**/dist/
 
 # Coding agents
 WARP.md
+.claude/skills/
+.cursor/skills/
 
 # Claude MCP configuration
 .mcp.json

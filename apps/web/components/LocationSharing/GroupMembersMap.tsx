@@ -2,6 +2,7 @@
 
 import { DEFAULT_AVATAR_URL } from "@prostcounter/shared/constants";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Loader2, MapPin, Users } from "lucide-react";
 import { useMemo } from "react";
 
@@ -21,14 +22,17 @@ const formatDistance = (meters: number): string => {
   return `${(meters / 1000).toFixed(1)}km`;
 };
 
-const formatLastUpdated = (timestamp: string): string => {
+const formatLastUpdated = (
+  timestamp: string,
+  t: (key: string) => string,
+): string => {
   try {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return "Just now";
+    if (diffMins < 1) return t("common.time.justNow");
     if (diffMins < 60) return `${diffMins}m ago`;
 
     const diffHours = Math.floor(diffMins / 60);
@@ -44,6 +48,7 @@ export const GroupMembersMap = ({
   className,
   radiusMeters = 500,
 }: GroupMembersMapProps) => {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const { data, loading, error } = useNearbyGroupMembers(
     currentFestival?.id,
@@ -70,13 +75,20 @@ export const GroupMembersMap = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            Nearby Group Members
+            {t("location.map.friendsNearby", {
+              count: 0,
+              defaultValue: "Nearby Group Members",
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Finding nearby members...</span>
+            <span className="ml-2">
+              {t("location.map.loading", {
+                defaultValue: "Finding nearby members...",
+              })}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -89,13 +101,19 @@ export const GroupMembersMap = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            Nearby Group Members
+            {t("location.map.friendsNearby", {
+              count: 0,
+              defaultValue: "Nearby Group Members",
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="py-8 text-center">
             <p className="text-muted-foreground text-sm">
-              Failed to load nearby members. Please try again.
+              {t("common.errors.generic", {
+                defaultValue:
+                  "Failed to load nearby members. Please try again.",
+              })}
             </p>
           </div>
         </CardContent>
@@ -109,7 +127,10 @@ export const GroupMembersMap = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            Nearby Group Members
+            {t("location.map.friendsNearby", {
+              count: 0,
+              defaultValue: "Nearby Group Members",
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -117,10 +138,18 @@ export const GroupMembersMap = ({
             <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
             <p className="text-muted-foreground text-sm">
               {activeSharing
-                ? "No group members are sharing their location nearby."
-                : "Enable location sharing to see nearby group members."}
+                ? t("location.noFriendsNearby", {
+                    defaultValue:
+                      "No group members are sharing their location nearby.",
+                  })
+                : t("location.sharingInactive", {
+                    defaultValue:
+                      "Enable location sharing to see nearby group members.",
+                  })}
               <br />
-              Members within {formatDistance(radiusMeters)} will appear here.
+              {t("groups.join.passwordHelp", {
+                defaultValue: "Members within {{radius}} will appear here.",
+              }).replace("{{radius}}", formatDistance(radiusMeters))}
             </p>
           </div>
         </CardContent>
@@ -133,7 +162,10 @@ export const GroupMembersMap = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5" />
-          Nearby Group Members
+          {t("location.map.friendsNearby", {
+            count: sortedMembers.length,
+            defaultValue: "Nearby Group Members",
+          })}
           <span className="text-muted-foreground ml-1 text-sm font-normal">
             ({sortedMembers.length})
           </span>
@@ -143,7 +175,9 @@ export const GroupMembersMap = ({
         <div className="space-y-4">
           {sortedMembers.map((member) => {
             const displayName =
-              member.full_name || member.username || "Unknown User";
+              member.full_name ||
+              member.username ||
+              t("activityFeed.unknownUser", { defaultValue: "Unknown User" });
             const avatarSrc = member.avatar_url || DEFAULT_AVATAR_URL;
 
             return (
@@ -182,7 +216,7 @@ export const GroupMembersMap = ({
                       ))}
                     </div>
                     <span className="text-muted-foreground text-xs">
-                      {formatLastUpdated(member.last_updated)}
+                      {formatLastUpdated(member.last_updated, t)}
                     </span>
                   </div>
                 </div>
@@ -195,7 +229,9 @@ export const GroupMembersMap = ({
 
           <div className="pt-2 text-center">
             <p className="text-muted-foreground text-xs">
-              Showing members within {formatDistance(radiusMeters)}
+              {t("groups.join.passwordHelp", {
+                defaultValue: "Showing members within {{radius}}",
+              }).replace("{{radius}}", formatDistance(radiusMeters))}
             </p>
           </div>
         </div>

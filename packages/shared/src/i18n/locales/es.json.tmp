@@ -65,20 +65,9 @@
         "title": "Page Not Found",
         "description": "Looks like this page wandered off to another tent!"
       },
-      "pageNotFoundMessage": "The page you're looking for doesn't exist.",
-      "somethingWentWrong": "Something went wrong!",
       "unauthorized": "Please sign in to continue",
       "forbidden": "You don't have permission to do that",
-      "networkError": "Network error. Please check your connection.",
-      "unauthorized": {
-        "title": "Unauthorized Access",
-        "message": "Sorry, you do not have permission to access this page."
-      },
-      "offline": {
-        "title": "You're Offline",
-        "message": "Please check your internet connection and try again.",
-        "tryAgain": "Try Again"
-      }
+      "networkError": "Network error. Please check your connection."
     },
     "empty": {
       "noResults": "No results found",
@@ -108,17 +97,6 @@
       "navigation": "Navigation",
       "settingsTools": "Settings & Tools",
       "actions": "Actions"
-    },
-    "share": {
-      "title": "Share",
-      "copyLink": "Copy Link",
-      "copied": "Copied!"
-    },
-    "updates": {
-      "available": "New Version Available! 🚀",
-      "refresh": "Refresh to update",
-      "description": "A new version of the app is available. Please update to get the latest features and improvements.",
-      "updateNow": "Update Now"
     }
   },
   "tabs": {
@@ -376,20 +354,7 @@
     "location": {
       "title": "Group's live location",
       "shareDescription": "Share your location to see nearby group members and let them see you.",
-      "controlNote": "Control which groups can see your location in your",
-      "shareLocation": "Share Location",
-      "enablePrompt": "Enable location sharing to see where your friends are at Oktoberfest",
-      "privacyNotice": "Your location is only visible to group members while you're sharing",
-      "permissions": {
-        "requesting": "Requesting browser location permission...",
-        "denied": "Location permission denied. Please enable in browser settings.",
-        "checking": "Checking browser permission..."
-      },
-      "errors": {
-        "timeout": "Location request timed out",
-        "unavailable": "Location unavailable",
-        "generic": "Error getting location"
-      }
+      "controlNote": "Control which groups can see your location in your"
     },
     "members": {
       "title": "Members",
@@ -720,17 +685,7 @@
       "openSettings": "To enable notifications, please go to your device settings and allow notifications for ProstCounter.",
       "goToSettings": "Open Settings",
       "permissionDeniedHint": "Notifications are disabled. Tap the toggle to open settings.",
-      "registrationFailed": "Failed to register for push notifications",
-      "promptTitle": "Stay in the Loop",
-      "promptDescription": "Enable notifications to get the most out of ProstCounter",
-      "promptNote": "You can change your notification preferences at any time in Settings",
-      "benefits": {
-        "groups": "Know when friends check in at the festival",
-        "achievements": "Celebrate when you unlock achievements",
-        "reminders": "Get reminders for your reservations"
-      },
-      "enable": "Enable Notifications",
-      "skip": "Maybe Later"
+      "registrationFailed": "Failed to register for push notifications"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -751,14 +706,6 @@
       "globalWarning": "Per-group settings are disabled because global hiding is enabled.",
       "updateError": "Failed to update photo privacy settings",
       "shortDescription": "Control who can see your photos"
-    },
-    "privacy": {
-      "location": {
-        "title": "Location Privacy",
-        "description": "Control who can see your location",
-        "shareWithGroups": "Share location with groups",
-        "shareWithGroupsDescription": "Allow group members to see your real-time location"
-      }
     },
     "signOut": {
       "title": "Sign Out",
@@ -817,215 +764,23 @@
       "cache": "Cache Management",
       "imageConversion": "Image Conversion"
     },
-    "tents": {
-      "title": "Tent Management",
-      "createNew": "Create New Tent",
-      "copyFromFestival": "Copy from Another Festival",
-      "selectFestival": "Select Festival",
-      "chooseFestival": "Choose a festival",
-      "loading": "Loading tents...",
-      "stats": {
-        "total": "Total Tents",
-        "customPricing": "Custom Pricing",
-        "avgPrice": "Avg Price",
-        "categories": "Categories"
-      },
-      "form": {
-        "name": "Tent Name",
-        "namePlaceholder": "e.g., Hofbräu Festzelt",
-        "category": "Category",
-        "categoryPlaceholder": "Select category",
-        "latitude": "Latitude",
-        "latitudePlaceholder": "48.1314",
-        "longitude": "Longitude",
-        "longitudePlaceholder": "11.5498",
-        "beerPrice": "Beer Price (Optional)",
-        "beerPricePlaceholder": "Leave empty for festival default"
-      },
-      "categories": {
-        "traditional": "Traditional",
-        "modern": "Modern",
-        "brewery": "Brewery",
-        "small": "Small",
-        "family": "Family-Friendly"
-      },
-      "dialog": {
-        "createTitle": "Create New Tent",
-        "createDescription": "Add a new tent to the selected festival",
-        "copyTitle": "Copy Tents from Another Festival",
-        "copyDescription": "Select tents to copy to this festival",
-        "sourceFestival": "Source Festival",
-        "sourceFestivalPlaceholder": "Select festival to copy from",
-        "selectTentsToCopy": "Select Tents to Copy",
-        "copyTentPrices": "Copy tent-specific prices"
-      },
-      "buttons": {
-        "creating": "Creating...",
-        "createTent": "Create Tent",
-        "copying": "Copying...",
-        "copyTents": "Copy {{count}} Tent(s)",
-        "addAll": "Add All ({{count}})",
-        "save": "Save",
-        "cancel": "Cancel"
-      },
-      "badges": {
-        "default": "Default"
-      },
-      "empty": {
-        "noTents": "No tents configured",
-        "noTentsDescription": "Add tents to this festival to get started"
-      },
-      "sections": {
-        "tentsIn": "Tents in {{name}}",
-        "availableTents": "Available Tents",
-        "availableTentsDescription": "Tents not yet added to this festival"
-      }
-    },
     "festivals": {
       "title": "Festival Management",
-      "newFestival": "New Festival",
-      "editFestival": "Edit Festival",
-      "createFestival": "Create New Festival",
-      "loading": "Loading festivals...",
-      "form": {
-        "name": "Festival Name",
-        "namePlaceholder": "Oktoberfest 2025",
-        "shortName": "Short Name",
-        "shortNamePlaceholder": "oktoberfest-2025",
-        "type": "Festival Type",
-        "location": "Location",
-        "locationPlaceholder": "Munich, Germany",
-        "latitude": "Latitude",
-        "latitudePlaceholder": "48.1314",
-        "longitude": "Longitude",
-        "longitudePlaceholder": "11.5498",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "mapUrl": "Map URL",
-        "mapUrlPlaceholder": "https://wiesnmap.muenchen.de/",
-        "timezone": "Timezone",
-        "timezonePlaceholder": "Europe/Berlin",
-        "status": "Status",
-        "markActive": "Mark as Active Festival",
-        "description": "Description",
-        "descriptionPlaceholder": "Optional festival description..."
-      },
-      "types": {
-        "oktoberfest": "Oktoberfest",
-        "starkbierfest": "Starkbierfest",
-        "fruhlingsfest": "Frühlingsfest",
-        "other": "Other"
-      },
-      "statuses": {
-        "upcoming": "Upcoming",
-        "active": "Active",
-        "ended": "Ended"
-      },
-      "buttons": {
-        "saving": "Saving...",
-        "updateFestival": "Update Festival",
-        "createFestival": "Create Festival",
-        "cancel": "Cancel",
-        "edit": "Edit",
-        "delete": "Delete"
-      },
-      "badges": {
-        "active": "Active"
-      },
-      "confirmDelete": "Are you sure you want to delete this festival?",
-      "empty": "No festivals found. Create your first festival!"
+      "create": "Create Festival",
+      "edit": "Edit Festival",
+      "delete": "Delete Festival"
+    },
+    "tents": {
+      "title": "Tent Management",
+      "create": "Create Tent",
+      "edit": "Edit Tent",
+      "delete": "Delete Tent"
     },
     "users": {
-      "title": "User List",
-      "editUser": "Edit User",
-      "editUserDescription": "Update user details",
-      "editAttendances": "Edit Attendances",
-      "editAttendancesDescription": "Manage user attendances",
-      "form": {
-        "emailNote": "Email cannot be changed",
-        "newPassword": "New Password (leave blank to keep unchanged)",
-        "fullName": "Full Name",
-        "username": "Username",
-        "isSuperAdmin": "Is Super Admin",
-        "updateUser": "Update User"
-      },
-      "attendances": {
-        "title": "User Attendances ({{count}})",
-        "titleFor": "Attendances for {{name}}",
-        "headers": {
-          "date": "Date",
-          "beers": "Beers",
-          "tents": "Tents"
-        },
-        "loading": "Loading attendances...",
-        "clickToLoad": "Click to load attendances",
-        "empty": "No attendances found for this user.",
-        "deleteTitle": "Delete Attendance",
-        "deleteConfirm": "Are you sure you want to delete this attendance?",
-        "buttons": {
-          "edit": "Edit",
-          "delete": "Delete",
-          "cancel": "Cancel"
-        }
-      }
-    },
-    "groups": {
-      "title": "Group List",
-      "editGroup": "Edit Group",
-      "editGroupDescription": "Update group details and view members",
-      "loading": "Loading group data...",
-      "form": {
-        "name": "Group Name",
-        "description": "Description",
-        "winningCriteria": "Winning Criteria",
-        "winningCriteriaPlaceholder": "Select winning criteria",
-        "members": "Members ({{count}})",
-        "membersEmpty": "No members yet",
-        "inviteLink": "Invite Link",
-        "inviteLinkPlaceholder": "Generate a new invite link",
-        "joined": "Joined {{date}}",
-        "updateGroup": "Update Group"
-      },
-      "buttons": {
-        "generating": "Generating...",
-        "generateInvite": "Generate New Invite Link"
-      }
-    },
-    "cache": {
-      "title": "Cache Management",
-      "serviceWorker": {
-        "title": "Service Worker Caches",
-        "description": "The app uses service workers to cache resources for offline use. Clear these caches to force fresh downloads of all assets.",
-        "button": "Clear Service Worker Caches",
-        "help": "This will clear all cached assets including images, scripts, and stylesheets. The app will download fresh copies on next load."
-      },
-      "wrappedData": {
-        "title": "Wrapped Data Cache",
-        "description": "The Wrapped feature pre-calculates and caches user statistics. Use this to regenerate the cache when data changes.",
-        "form": {
-          "userId": "User ID (optional)",
-          "userIdPlaceholder": "Leave empty to regenerate all users",
-          "festivalId": "Festival ID (optional)",
-          "festivalIdPlaceholder": "Leave empty to regenerate all festivals"
-        },
-        "buttons": {
-          "regenerating": "Regenerating...",
-          "regenerate": "Regenerate Wrapped Cache"
-        },
-        "help": "This will recalculate statistics for all users. This can take several minutes for large datasets."
-      }
-    },
-    "images": {
-      "title": "Non-WebP Images",
-      "headers": {
-        "image": "Image",
-        "path": "Path",
-        "action": "Action"
-      },
-      "buttons": {
-        "converting": "Converting...",
-        "convert": "Convert"
-      }
+      "title": "User Management",
+      "search": "Search users",
+      "makeAdmin": "Make Admin",
+      "removeAdmin": "Remove Admin"
     }
   },
   "joinGroup": {
@@ -1437,31 +1192,6 @@
     "tips": "Tips",
     "mapLink": {
       "title": "{{festivalName}} Map"
-    },
-    "missingFields": {
-      "title": "Complete Your Profile",
-      "name": "Name",
-      "username": "Username",
-      "profilePicture": "Profile picture"
-    },
-    "leaderboard": {
-      "title": "🏆 Global Leaderboard",
-      "description": "Top {{limit}} performers",
-      "headers": {
-        "days": "Days",
-        "liters": "Liters",
-        "avg": "Avg."
-      },
-      "viewFull": "View Full Leaderboard"
-    },
-    "datePicker": {
-      "title": "Select date",
-      "description": "Set the date of your attendance"
-    },
-    "wrapped": {
-      "generating": "Generating your wrapped image...",
-      "generatingButton": "Generating...",
-      "downloadAgain": "Download Again"
     }
   },
   "search": {
@@ -1809,96 +1539,6 @@
       "attempts": "Attempts: {{count}}",
       "dismissAll": "Dismiss All",
       "retryAll": "Retry All"
-    }
-  },
-  "pwa": {
-    "install": {
-      "title": "Install ProstCounter",
-      "message": "Install our app for a better experience",
-      "button": "Install",
-      "later": "Maybe later",
-      "instructions": {
-        "ios": "Tap Share → Add to Home Screen",
-        "android": "Tap menu → Install app",
-        "desktop": "Click install in address bar"
-      }
-    }
-  },
-  "navigation": {
-    "breadcrumbs": {
-      "home": "Home",
-      "groups": "Groups",
-      "profile": "Profile",
-      "attendance": "Attendance",
-      "achievements": "Achievements"
-    }
-  },
-  "landing": {
-    "signIn": "Sign In",
-    "description": "Compete with friends and track your progress at Oktoberfest",
-    "features": {
-      "title": "What can I do with Prost Counter?",
-      "trackBeer": "Track daily beer consumption",
-      "competeWithFriends": "Compete with friends in groups",
-      "earnAchievements": "Earn achievements",
-      "viewStatistics": "View statistics and leaderboards"
-    }
-  },
-  "biometric": {
-    "labels": {
-      "faceId": "Face ID",
-      "touchId": "Touch ID",
-      "fingerprint": "Fingerprint"
-    },
-    "prompt": {
-      "title": "Sign in to ProstCounter",
-      "fallbackLabel": "Use password",
-      "cancelLabel": "Cancel"
-    }
-  },
-  "app": {
-    "name": "ProstCounter",
-    "namePart1": "Prost",
-    "namePart2": "Counter",
-    "logo": "ProstCounter Logo"
-  },
-  "dev": {
-    "title": "Developer Tools",
-    "description": "UI Components showcase for development",
-    "components": {
-      "title": "UI Components",
-      "openShowcase": "Open Components Showcase",
-      "showcase": "Components Showcase"
-    },
-    "buttons": {
-      "cancel": "Cancel"
-    },
-    "database": {
-      "title": "Database Debug",
-      "clearAll": "Clear All Data",
-      "confirmClear": "Are you sure? This will delete all local data."
-    }
-  },
-  "footer": {
-    "madeWith": "Made with",
-    "by": "by",
-    "buyMeA": "Buy me a",
-    "buyMeABeer": "Buy me a beer",
-    "reportBug": "Report a bug",
-    "requestFeature": "Request a feature",
-    "links": {
-      "privacy": "Privacy",
-      "terms": "Terms",
-      "contact": "Contact"
-    },
-    "copyright": "© 2024 ProstCounter. All rights reserved."
-  },
-  "update": {
-    "available": {
-      "title": "Update Available",
-      "description": "A new version of ProstCounter is ready. Restart to get the latest features and improvements.",
-      "restartNow": "Restart Now",
-      "later": "Maybe Later"
     }
   }
 }

@@ -104,7 +104,7 @@ export function GroupSelector({
       <HStack className="items-center justify-center py-4">
         <Spinner size="small" color={Colors.primary[500]} />
         <Text className="ml-2 text-sm text-typography-500">
-          {t("common.loading", { defaultValue: "Loading..." })}
+          {t("common.loading")}
         </Text>
       </HStack>
     );
@@ -115,9 +115,7 @@ export function GroupSelector({
       <HStack space="sm" className="items-center py-3">
         <Users size={16} color={IconColors.muted} />
         <Text className="text-sm text-typography-500">
-          {t("location.groups.noGroups", {
-            defaultValue: "You haven't joined any groups yet",
-          })}
+          {t("location.groups.noGroups")}
         </Text>
       </HStack>
     );
@@ -132,9 +130,7 @@ export function GroupSelector({
       >
         <HStack className="items-center justify-between rounded-lg bg-background-0 p-2">
           <Text className="text-sm text-typography-700">
-            {t("location.groups.shareWithAll", {
-              defaultValue: "Share with all groups",
-            })}
+            {t("location.groups.shareWithAll")}
           </Text>
           <Switch
             size="sm"
@@ -151,9 +147,7 @@ export function GroupSelector({
       {/* Divider with text */}
       <HStack className="items-center py-1">
         <Text className="flex-1 text-center text-xs text-typography-400">
-          {t("location.groups.orSelectSpecific", {
-            defaultValue: "or select specific groups",
-          })}
+          {t("location.groups.orSelectSpecific")}
         </Text>
       </HStack>
 
