@@ -7,7 +7,7 @@ import { Platform } from "react-native";
 
 import { logger } from "./logger";
 
-const supabaseUrl =
+export const supabaseUrl =
   Constants.expoConfig?.extra?.supabaseUrl ||
   (typeof process !== "undefined"
     ? process.env.EXPO_PUBLIC_SUPABASE_URL
