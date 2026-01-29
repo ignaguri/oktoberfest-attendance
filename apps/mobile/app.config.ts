@@ -81,6 +81,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-web-browser",
     "expo-apple-authentication",
     "expo-image-picker",
+    "expo-font",
     [
       "expo-notifications",
       {
