@@ -83,7 +83,7 @@ export default function JoinGroupByTokenScreen() {
   };
 
   const handleGoHome = () => {
-    // @ts-expect-error - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
     router.replace("/");
   };
 

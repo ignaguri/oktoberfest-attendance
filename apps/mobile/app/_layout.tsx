@@ -77,7 +77,7 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated && !inAuthGroup) {
       router.replace("/(auth)/sign-in");
     } else if (isAuthenticated && inAuthGroup) {
-      // @ts-expect-error - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+      // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
       router.replace("/");
     }
   }, [isAuthenticated, isLoading, segments]);

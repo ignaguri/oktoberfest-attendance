@@ -111,7 +111,7 @@ export default function SignInScreen() {
     }
 
     // Navigate to main app
-    // @ts-expect-error - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
     router.replace("/");
   };
 
@@ -138,7 +138,7 @@ export default function SignInScreen() {
 
     // Session valid, proceed to app
     setShowBiometricPrompt(false);
-    // @ts-expect-error - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
     router.replace("/");
   };
 
@@ -152,13 +152,13 @@ export default function SignInScreen() {
   const handleEnableBiometric = async () => {
     await enableBiometrics();
     setShowBiometricEnablePrompt(false);
-    // @ts-expect-error - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
     router.replace("/");
   };
 
   const handleSkipBiometric = () => {
     setShowBiometricEnablePrompt(false);
-    // @ts-expect-error - Root route "/" works at runtime but isn't in typed routes with NativeTabs
+    // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
     router.replace("/");
   };
 
