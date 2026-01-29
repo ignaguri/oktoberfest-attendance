@@ -2,30 +2,21 @@ import "react-native-url-polyfill/auto";
 
 import type { Database } from "@prostcounter/db";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 import { logger } from "./logger";
 
-export const supabaseUrl =
-  Constants.expoConfig?.extra?.supabaseUrl ||
-  (typeof process !== "undefined"
-    ? process.env.EXPO_PUBLIC_SUPABASE_URL
-    : "") ||
-  "";
-const supabaseAnonKey =
-  Constants.expoConfig?.extra?.supabaseAnonKey ||
-  (typeof process !== "undefined"
-    ? process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
-    : "") ||
-  "";
+// Metro bundler replaces process.env.EXPO_PUBLIC_* at build time
+export const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "";
 
-// Log Supabase configuration status on startup (no sensitive values)
+// Log Supabase configuration status on startup
 logger.debug("Supabase Client Configuration", {
   hasSupabaseUrl: !!supabaseUrl,
   hasAnonKey: !!supabaseAnonKey,
   urlConfigured: supabaseUrl.length > 0,
   keyConfigured: supabaseAnonKey.length > 0,
+  supabaseUrl, // Log actual URL for debugging
 });
 
 // Lazily create the Supabase client to avoid SSR issues
