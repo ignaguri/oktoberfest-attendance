@@ -38,6 +38,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       NSLocationAlwaysAndWhenInUseUsageDescription:
         "Allow background location to keep sharing your location with friends while using other apps",
       UIBackgroundModes: ["remote-notification", "location", "fetch", "processing"],
+      BGTaskSchedulerPermittedIdentifiers: [
+        "PROSTCOUNTER_BACKGROUND_SYNC",
+        "PROSTCOUNTER_BACKGROUND_LOCATION",
+      ],
       NSAppTransportSecurity: {
         NSAllowsLocalNetworking: true,
         NSExceptionDomains: {
