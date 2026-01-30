@@ -604,7 +604,217 @@
     "viewMyAchievements": "See my achievements",
     "viewProgress": "View your progress and unlocked badges",
     "points": "pts",
-    "complete": "Complete"
+    "complete": "Complete",
+    "items": {
+      "firstDrop": {
+        "name": "First Drop",
+        "description": "Record your first beer at the festival"
+      },
+      "beerRookie": {
+        "name": "Beer Rookie",
+        "description": "Reach 3 total beers"
+      },
+      "halfwayThere": {
+        "name": "Halfway There",
+        "description": "Reach 5 total beers in a festival"
+      },
+      "seriousSession": {
+        "name": "Serious Session",
+        "description": "Drink 3+ beers in a single day"
+      },
+      "seriousDrinker": {
+        "name": "Serious Drinker",
+        "description": "Reach 8 total beers"
+      },
+      "doubleDigits": {
+        "name": "Double Digits",
+        "description": "Reach 10 total beers in a festival"
+      },
+      "dailyDouble": {
+        "name": "Daily Double",
+        "description": "Drink 4+ beers in a single day"
+      },
+      "beerEnthusiast": {
+        "name": "Beer Enthusiast",
+        "description": "Reach 15 total beers"
+      },
+      "powerHour": {
+        "name": "Power Hour",
+        "description": "Drink 6+ beers in a single day"
+      },
+      "marathonDrinker": {
+        "name": "Marathon Drinker",
+        "description": "Reach 20+ beers in a single festival"
+      },
+      "centuryClub": {
+        "name": "Century Club",
+        "description": "Reach 30 beers across all festivals"
+      },
+      "legendStatus": {
+        "name": "Legend Status",
+        "description": "Reach 50+ beers across all festivals"
+      },
+      "festivalNewcomer": {
+        "name": "Festival Newcomer",
+        "description": "Attend your first day"
+      },
+      "regular": {
+        "name": "Regular",
+        "description": "Attend 3 different days"
+      },
+      "earlyBird": {
+        "name": "Early Bird",
+        "description": "Attend the first day of the festival"
+      },
+      "dedicated": {
+        "name": "Dedicated",
+        "description": "Attend 5 different days"
+      },
+      "streakMaster": {
+        "name": "Streak Master",
+        "description": "Attend 3 consecutive days"
+      },
+      "weekendWarrior": {
+        "name": "Weekend Warrior",
+        "description": "Attend all weekends during the festival"
+      },
+      "festivalWarrior": {
+        "name": "Festival Warrior",
+        "description": "Perfect attendance - attend all festival days"
+      },
+      "tentCurious": {
+        "name": "Tent Curious",
+        "description": "Visit 3 different tents"
+      },
+      "tentExplorer": {
+        "name": "Tent Explorer",
+        "description": "Visit 5 different tents"
+      },
+      "tentMaster": {
+        "name": "Tent Master",
+        "description": "Visit 10 different tents"
+      },
+      "tentGuide": {
+        "name": "Tent Guide",
+        "description": "Visit 15 different tents"
+      },
+      "tentConnoisseur": {
+        "name": "Tent Connoisseur",
+        "description": "Visit all major tents"
+      },
+      "socialButterfly": {
+        "name": "Social Butterfly",
+        "description": "Join 3 groups"
+      },
+      "groupLeader": {
+        "name": "Group Leader",
+        "description": "Create your first group"
+      },
+      "topThree": {
+        "name": "Top Three",
+        "description": "Reach top 3 in a group leaderboard"
+      },
+      "groupChampion": {
+        "name": "Group Champion",
+        "description": "Reach #1 in a group leaderboard"
+      },
+      "multiGroupChampion": {
+        "name": "Multi-Group Champion",
+        "description": "Reach #1 in 3 different groups"
+      },
+      "photographer": {
+        "name": "Photographer",
+        "description": "Upload your first photo"
+      },
+      "photoAlbum": {
+        "name": "Photo Album",
+        "description": "Upload 10 photos"
+      },
+      "festivalVeteran": {
+        "name": "Festival Veteran",
+        "description": "Attend 2 different festivals"
+      },
+      "seasoned": {
+        "name": "Seasoned",
+        "description": "Attend 3 different festivals"
+      },
+      "bigSpender": {
+        "name": "Big Spender",
+        "description": "Spend €100 on beers in a single festival"
+      },
+      "consistency": {
+        "name": "Consistency",
+        "description": "Maintain an average of 2+ beers per visit"
+      },
+      "perfectDay": {
+        "name": "Perfect Day",
+        "description": "Check in, drink, and upload a photo in one day"
+      },
+      "closingTime": {
+        "name": "Closing Time",
+        "description": "Attend the last day of the festival"
+      },
+      "tentHopper": {
+        "name": "Tent Hopper",
+        "description": "Visit 5 different tents"
+      },
+      "wiesnWanderer": {
+        "name": "Wiesn Wanderer",
+        "description": "Visit all tent categories"
+      },
+      "localGuide": {
+        "name": "Local Guide",
+        "description": "Visit 10+ different tents"
+      },
+      "teamPlayer": {
+        "name": "Team Player",
+        "description": "Join your first group"
+      },
+      "photoEnthusiast": {
+        "name": "Photo Enthusiast",
+        "description": "Upload 10+ photos"
+      },
+      "topContributor": {
+        "name": "Top Contributor",
+        "description": "Finish in top 3 of a group"
+      },
+      "memoryKeeper": {
+        "name": "Memory Keeper",
+        "description": "Upload 25+ photos"
+      },
+      "risingStar": {
+        "name": "Rising Star",
+        "description": "Finish in top 5 of global leaderboard"
+      },
+      "multiGroupChampion": {
+        "name": "Multi-Group Champion",
+        "description": "Win competitions in 2+ different groups"
+      },
+      "leaderboardLegend": {
+        "name": "Leaderboard Legend",
+        "description": "Finish in top 3 of global leaderboard"
+      },
+      "openingDayLegend": {
+        "name": "Opening Day Legend",
+        "description": "Attend the very first day of your first festival"
+      },
+      "consistencyKing": {
+        "name": "Consistency King",
+        "description": "Same beer count 3+ days in a row"
+      },
+      "photoPerfect": {
+        "name": "Photo Perfect",
+        "description": "Upload at least one photo every day attended"
+      },
+      "highRoller": {
+        "name": "High Roller",
+        "description": "Spend 500+ euros on beers in a single festival"
+      },
+      "multiYearChampion": {
+        "name": "Multi-Year Champion",
+        "description": "Win group competitions in 2+ festivals"
+      }
+    }
   },
   "leaderboard": {
     "screenTitle": "Achievements & Leaderboard",

@@ -4,6 +4,7 @@ import type {
   AchievementWithProgress,
 } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
+import { cn } from "@prostcounter/ui";
 import { parseISO } from "date-fns";
 import { useMemo } from "react";
 import { View } from "react-native";
@@ -90,14 +91,14 @@ const RARITY_STYLES: Record<
   },
 };
 
-// Category labels
-const CATEGORY_LABELS: Record<string, string> = {
-  consumption: "Beer",
-  attendance: "Days",
-  explorer: "Explorer",
-  social: "Social",
-  competitive: "Compete",
-  special: "Special",
+// Category translation keys
+const CATEGORY_KEYS: Record<string, string> = {
+  consumption: "achievements.categories.consumption",
+  attendance: "achievements.categories.attendance",
+  explorer: "achievements.categories.explorer",
+  social: "achievements.categories.social",
+  competitive: "achievements.categories.competitive",
+  special: "achievements.categories.special",
 };
 
 interface AchievementCardProps {
@@ -127,7 +128,15 @@ export function AchievementCard({
 
   const displayIcon = ICON_MAP[icon] || "🏆";
   const rarityStyle = RARITY_STYLES[rarity];
-  const categoryLabel = CATEGORY_LABELS[category] || category;
+  const categoryKey = CATEGORY_KEYS[category] || category;
+
+  // Translate name and description (they are now i18n keys from database)
+  const displayName = t(name, { defaultValue: name });
+  const displayDescription = t(description, { defaultValue: description });
+  const displayRarity = t(`achievements.rarity.${rarity}`, {
+    defaultValue: rarity,
+  });
+  const displayCategory = t(categoryKey, { defaultValue: category });
 
   // Format unlock date
   const formattedUnlockDate = useMemo(() => {
@@ -143,20 +152,21 @@ export function AchievementCard({
     <Card
       variant="outline"
       size="sm"
-      className={
+      className={cn(
         is_unlocked
           ? "border-green-200 bg-green-50"
-          : "border-gray-200 bg-white"
-      }
+          : "border-gray-200 bg-white",
+      )}
     >
       <VStack space="sm" className="p-3">
         {/* Header: Icon + Name/Description + Rarity */}
         <HStack space="sm" className="items-start">
           {/* Icon */}
           <View
-            className={`items-center justify-center rounded-lg p-2 ${
-              is_unlocked ? "bg-green-100" : "bg-gray-100"
-            }`}
+            className={cn(
+              "items-center justify-center rounded-lg p-2",
+              is_unlocked ? "bg-green-100" : "bg-gray-100",
+            )}
           >
             <Text className="text-2xl">{displayIcon}</Text>
           </View>
@@ -164,25 +174,30 @@ export function AchievementCard({
           {/* Name and Description */}
           <VStack className="flex-1" space="xs">
             <Text
-              className={`text-base font-semibold ${
-                is_unlocked ? "text-green-800" : "text-gray-700"
-              }`}
+              className={cn(
+                "text-base font-semibold",
+                is_unlocked ? "text-green-800" : "text-gray-700",
+              )}
             >
-              {name}
+              {displayName}
             </Text>
             <Text className="text-sm text-typography-500" numberOfLines={2}>
-              {description}
+              {displayDescription}
             </Text>
           </VStack>
 
           {/* Rarity Badge */}
           <View
-            className={`rounded-md px-2 py-1 ${rarityStyle.bg} ${rarityStyle.border} border`}
+            className={cn(
+              "rounded-md border px-2 py-1",
+              rarityStyle.bg,
+              rarityStyle.border,
+            )}
           >
             <Text
-              className={`text-xs font-medium capitalize ${rarityStyle.text}`}
+              className={cn("text-xs font-medium capitalize", rarityStyle.text)}
             >
-              {rarity}
+              {displayRarity}
             </Text>
           </View>
         </HStack>
@@ -192,7 +207,7 @@ export function AchievementCard({
           <HStack space="sm" className="items-center">
             {/* Category Badge */}
             <Badge action="muted" variant="outline" size="sm">
-              <BadgeText className="normal-case">{categoryLabel}</BadgeText>
+              <BadgeText className="normal-case">{displayCategory}</BadgeText>
             </Badge>
 
             {/* Points */}

@@ -604,7 +604,217 @@
     "viewMyAchievements": "Ver mis logros",
     "viewProgress": "Mirá tu progreso y medallas desbloqueadas",
     "points": "pts",
-    "complete": "Completar"
+    "complete": "Completar",
+    "items": {
+      "firstDrop": {
+        "name": "Primera Gota",
+        "description": "Registrá tu primera birra en el festival"
+      },
+      "beerRookie": {
+        "name": "Novato Cervecero",
+        "description": "Llegá a 3 birras en total"
+      },
+      "halfwayThere": {
+        "name": "A Mitad de Camino",
+        "description": "Llegá a 5 birras en un festival"
+      },
+      "seriousSession": {
+        "name": "Sesión Seria",
+        "description": "Tomá 3+ birras en un solo día"
+      },
+      "seriousDrinker": {
+        "name": "Tomador Serio",
+        "description": "Llegá a 8 birras en total"
+      },
+      "doubleDigits": {
+        "name": "Doble Dígito",
+        "description": "Llegá a 10 birras en un festival"
+      },
+      "dailyDouble": {
+        "name": "Doble Diario",
+        "description": "Tomá 4+ birras en un solo día"
+      },
+      "beerEnthusiast": {
+        "name": "Entusiasta Cervecero",
+        "description": "Llegá a 15 birras en total"
+      },
+      "powerHour": {
+        "name": "Hora de Poder",
+        "description": "Tomá 6+ birras en un solo día"
+      },
+      "marathonDrinker": {
+        "name": "Maratonista",
+        "description": "Llegá a 20+ birras en un festival"
+      },
+      "centuryClub": {
+        "name": "Club del Siglo",
+        "description": "Llegá a 30 birras en todos los festivales"
+      },
+      "legendStatus": {
+        "name": "Estado Legendario",
+        "description": "Llegá a 50+ birras en todos los festivales"
+      },
+      "festivalNewcomer": {
+        "name": "Novato del Festival",
+        "description": "Asistí a tu primer día"
+      },
+      "regular": {
+        "name": "Habitual",
+        "description": "Asistí 3 días diferentes"
+      },
+      "earlyBird": {
+        "name": "Madrugador",
+        "description": "Asistí el primer día del festival"
+      },
+      "dedicated": {
+        "name": "Dedicado",
+        "description": "Asistí 5 días diferentes"
+      },
+      "streakMaster": {
+        "name": "Maestro de Rachas",
+        "description": "Asistí 3 días consecutivos"
+      },
+      "weekendWarrior": {
+        "name": "Guerrero de Fin de Semana",
+        "description": "Asistí todos los fines de semana del festival"
+      },
+      "festivalWarrior": {
+        "name": "Guerrero del Festival",
+        "description": "Asistencia perfecta - asistí todos los días del festival"
+      },
+      "tentCurious": {
+        "name": "Curioso de Carpas",
+        "description": "Visitá 3 carpas diferentes"
+      },
+      "tentExplorer": {
+        "name": "Explorador de Carpas",
+        "description": "Visitá 5 carpas diferentes"
+      },
+      "tentMaster": {
+        "name": "Maestro de Carpas",
+        "description": "Visitá 10 carpas diferentes"
+      },
+      "tentGuide": {
+        "name": "Guía de Carpas",
+        "description": "Visitá 15 carpas diferentes"
+      },
+      "tentConnoisseur": {
+        "name": "Conocedor de Carpas",
+        "description": "Visitá todas las carpas principales"
+      },
+      "socialButterfly": {
+        "name": "Mariposa Social",
+        "description": "Unite a 3 grupos"
+      },
+      "groupLeader": {
+        "name": "Líder de Grupo",
+        "description": "Creá tu primer grupo"
+      },
+      "topThree": {
+        "name": "Top Tres",
+        "description": "Llegá al top 3 en un ranking de grupo"
+      },
+      "groupChampion": {
+        "name": "Campeón de Grupo",
+        "description": "Llegá al #1 en un ranking de grupo"
+      },
+      "multiGroupChampion": {
+        "name": "Campeón Multi-Grupo",
+        "description": "Llegá al #1 en 3 grupos diferentes"
+      },
+      "photographer": {
+        "name": "Fotógrafo",
+        "description": "Subí tu primera foto"
+      },
+      "photoAlbum": {
+        "name": "Álbum de Fotos",
+        "description": "Subí 10 fotos"
+      },
+      "festivalVeteran": {
+        "name": "Veterano de Festivales",
+        "description": "Asistí a 2 festivales diferentes"
+      },
+      "seasoned": {
+        "name": "Experimentado",
+        "description": "Asistí a 3 festivales diferentes"
+      },
+      "bigSpender": {
+        "name": "Gran Gastador",
+        "description": "Gastá €100 en birras en un festival"
+      },
+      "consistency": {
+        "name": "Consistencia",
+        "description": "Mantené un promedio de 2+ birras por visita"
+      },
+      "perfectDay": {
+        "name": "Día Perfecto",
+        "description": "Hacé check-in, tomá y subí una foto en un día"
+      },
+      "closingTime": {
+        "name": "Hora de Cierre",
+        "description": "Asistí al último día del festival"
+      },
+      "tentHopper": {
+        "name": "Saltador de Carpas",
+        "description": "Visitá 5 carpas diferentes"
+      },
+      "wiesnWanderer": {
+        "name": "Viajero de la Wiesn",
+        "description": "Visitá todas las categorías de carpas"
+      },
+      "localGuide": {
+        "name": "Guía Local",
+        "description": "Visitá 10+ carpas diferentes"
+      },
+      "teamPlayer": {
+        "name": "Jugador de Equipo",
+        "description": "Unite a tu primer grupo"
+      },
+      "photoEnthusiast": {
+        "name": "Entusiasta de Fotos",
+        "description": "Subí 10+ fotos"
+      },
+      "topContributor": {
+        "name": "Top Contribuidor",
+        "description": "Terminá en el top 3 de un grupo"
+      },
+      "memoryKeeper": {
+        "name": "Guardián de Recuerdos",
+        "description": "Subí 25+ fotos"
+      },
+      "risingStar": {
+        "name": "Estrella en Ascenso",
+        "description": "Terminá en el top 5 del ranking global"
+      },
+      "multiGroupChampion": {
+        "name": "Campeón Multi-Grupo",
+        "description": "Ganá competencias en 2+ grupos diferentes"
+      },
+      "leaderboardLegend": {
+        "name": "Leyenda del Ranking",
+        "description": "Terminá en el top 3 del ranking global"
+      },
+      "openingDayLegend": {
+        "name": "Leyenda del Día de Apertura",
+        "description": "Asistí al primer día de tu primer festival"
+      },
+      "consistencyKing": {
+        "name": "Rey de la Consistencia",
+        "description": "Misma cantidad de birras 3+ días seguidos"
+      },
+      "photoPerfect": {
+        "name": "Foto Perfecta",
+        "description": "Subí al menos una foto cada día que asististe"
+      },
+      "highRoller": {
+        "name": "Gran Apostador",
+        "description": "Gastá 500+ euros en birras en un festival"
+      },
+      "multiYearChampion": {
+        "name": "Campeón Multi-Año",
+        "description": "Ganá competencias de grupo en 2+ festivales"
+      }
+    }
   },
   "leaderboard": {
     "screenTitle": "Logros y ranking",
