@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { login, signInWithOAuth } from "./actions";
-import { FacebookIcon, GoogleIcon } from "./SocialIcons";
+import { AppleIcon, GoogleIcon } from "./SocialIcons";
 
 export default function SignIn() {
   const { t } = useTranslation();
@@ -66,7 +66,7 @@ export default function SignIn() {
     }
   };
 
-  const handleOAuthSignIn = async (provider: "google" | "facebook") => {
+  const handleOAuthSignIn = async (provider: "google" | "apple") => {
     try {
       await signInWithOAuth(provider, redirect);
     } catch (error: any) {
@@ -153,12 +153,12 @@ export default function SignIn() {
         <Button
           type="button"
           variant="outline"
-          onClick={() => handleOAuthSignIn("facebook")}
+          onClick={() => handleOAuthSignIn("apple")}
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#166FE5]"
+          className="flex w-full items-center justify-center gap-2 border-black bg-black text-white hover:bg-gray-800"
         >
-          <FacebookIcon className="size-5" />
-          {t("auth.signIn.continueWithFacebook")}
+          <AppleIcon className="size-5" />
+          {t("auth.signIn.continueWithApple")}
         </Button>
       </div>
 
