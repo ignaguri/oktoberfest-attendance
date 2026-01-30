@@ -3,7 +3,8 @@ import type {
   AchievementRarity,
   AchievementWithProgress,
 } from "@prostcounter/shared/schemas";
-import { format, parseISO } from "date-fns";
+import { formatLocalized } from "@prostcounter/shared/utils";
+import { parseISO } from "date-fns";
 import { useMemo } from "react";
 import { View } from "react-native";
 
@@ -132,7 +133,7 @@ export function AchievementCard({
   const formattedUnlockDate = useMemo(() => {
     if (!unlocked_at) return null;
     try {
-      return format(parseISO(unlocked_at), "MMM d, yyyy HH:mm");
+      return formatLocalized(parseISO(unlocked_at), "MMM d, yyyy HH:mm");
     } catch {
       return null;
     }

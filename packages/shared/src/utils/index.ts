@@ -6,6 +6,8 @@ export {
   formatDateForDatabase,
   formatTimestampForDatabase,
   formatRelativeTime,
+  getDateLocale,
+  formatLocalized,
 } from "./date-utils";
 
 // Image URL utilities

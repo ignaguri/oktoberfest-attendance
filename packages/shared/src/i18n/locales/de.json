@@ -329,7 +329,7 @@
       "copyLink": "Link kopieren",
       "shareLink": "Link teilen",
       "linkCopied": "Link in Zwischenablage kopiert",
-      "message": "Tritt meiner Gruppe '{{groupName}}' auf ProstCounter bei! {{inviteUrl}}",
+      "message": "Tritt meiner Gruppe '{{name}}' auf ProstCounter bei!",
       "noToken": "Kein Einladungs-Token verfügbar. Bitte erstelle den Einladungslink neu."
     },
     "winningCriteria": {
@@ -524,6 +524,8 @@
     "unlockedOn": "Freigeschaltet am {{date}}",
     "progress": "{{current}} / {{target}}",
     "selectFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
+    "noFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
+    "error": "Fehler beim Laden der Erfolge. Zum Aktualisieren nach unten ziehen.",
     "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
@@ -984,7 +986,8 @@
       "friendsNearby": "{{count}} Freunde",
       "friendsNearby_one": "{{count}} Freund",
       "tentsNearby": "{{count}} Zelte",
-      "tentsNearby_one": "{{count}} Zelt"
+      "tentsNearby_one": "{{count}} Zelt",
+      "button": "Karte"
     },
     "tabs": {
       "friends": "Freunde",
@@ -1023,7 +1026,15 @@
       "selectGroups": "Oder bestimmte Gruppen auswählen",
       "selectedCount": "{{count}} Gruppe(n) ausgewählt",
       "sharingWithAll": "Mit allen Gruppen teilen",
-      "sharingWithSome": "Mit {{count}} Gruppe(n) teilen"
+      "sharingWithSome": "Mit {{count}} Gruppe(n) teilen",
+      "visibleTo": "Sichtbar für",
+      "allGroups": "Alle Gruppen",
+      "noGroupsSelected": "Keine Gruppen ausgewählt",
+      "oneGroup": "1 Gruppe",
+      "multipleGroups": "{{count}} Gruppen",
+      "collapseHint": "Tippe zum Zuklappen",
+      "expandHint": "Tippe zum Aufklappen",
+      "orSelectSpecific": "Oder bestimmte Gruppen auswählen"
     }
   },
   "photos": {

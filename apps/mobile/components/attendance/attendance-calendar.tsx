@@ -1,5 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Reservation } from "@prostcounter/shared/schemas";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import {
   addDays,
@@ -59,7 +60,7 @@ const getWeekdayHeaders = () => {
     weekStartsOn: WEEK_STARTS_ON,
   });
   return Array.from({ length: 7 }, (_, i) =>
-    format(addDays(weekStart, i), "EEE"),
+    formatLocalized(addDays(weekStart, i), "EEE"),
   );
 };
 
@@ -317,7 +318,7 @@ export function AttendanceCalendar({
         </Pressable>
 
         <Text className="text-lg font-semibold text-typography-900">
-          {format(currentMonth, "MMMM yyyy")}
+          {formatLocalized(currentMonth, "MMMM yyyy")}
         </Text>
 
         <Pressable

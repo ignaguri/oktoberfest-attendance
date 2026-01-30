@@ -1,7 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupMember } from "@prostcounter/shared/schemas";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { format } from "date-fns";
 import { Crown, UserMinus, Users } from "lucide-react-native";
 
 import {
@@ -62,7 +62,7 @@ export function GroupMembersList({
 
         const canRemove = isCreator && !isMemberCreator && !isCurrentUser;
         const joinedDate = member.joinedAt
-          ? format(new Date(member.joinedAt), "MMM d, yyyy")
+          ? formatLocalized(new Date(member.joinedAt), "MMM d, yyyy")
           : null;
 
         return (

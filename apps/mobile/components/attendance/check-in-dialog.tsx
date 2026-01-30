@@ -1,6 +1,7 @@
 import { useTents } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Reservation } from "@prostcounter/shared/schemas";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { format, parseISO } from "date-fns";
 import { CalendarClock, Clock, MapPin, StickyNote } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
@@ -63,7 +64,7 @@ export function CheckInDialog({
   // Format reservation date
   const formattedDate = useMemo(() => {
     if (!reservation) return "";
-    return format(parseISO(reservation.startAt), "EEEE, MMMM d");
+    return formatLocalized(parseISO(reservation.startAt), "EEEE, MMMM d");
   }, [reservation]);
 
   const handleCheckIn = useCallback(() => {

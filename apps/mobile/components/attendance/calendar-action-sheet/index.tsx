@@ -3,7 +3,8 @@ import type {
   AttendanceWithTotals,
   Reservation,
 } from "@prostcounter/shared/schemas";
-import { endOfDay, format, isAfter, isBefore, startOfDay } from "date-fns";
+import { formatLocalized } from "@prostcounter/shared/utils";
+import { endOfDay, isAfter, isBefore, startOfDay } from "date-fns";
 import { X } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -136,7 +137,7 @@ export function CalendarActionSheet({
   // Format date for display
   const formattedDate =
     selectedDate && !isNaN(selectedDate.getTime())
-      ? format(selectedDate, "EEEE, MMMM d, yyyy")
+      ? formatLocalized(selectedDate, "EEEE, MMMM d, yyyy")
       : t("common.labels.selectDate");
 
   return (
