@@ -105,7 +105,7 @@ export async function updatePassword(formData: { password: string }) {
 }
 
 export async function signInWithOAuth(
-  provider: "google" | "facebook",
+  provider: "google" | "facebook" | "apple",
   redirectTo?: string | null,
 ) {
   const supabase = await createClient();

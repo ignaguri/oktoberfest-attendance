@@ -1,4 +1,5 @@
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import { Map } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -41,6 +42,7 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
  * Features pull-to-refresh to reload all data.
  */
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival(); // Ensure festival context is initialized
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -118,7 +120,9 @@ export default function HomeScreen() {
                   accessibilityLabel="Open festival map"
                 >
                   <Map size={18} color={Colors.white} />
-                  <Text className="text-sm font-medium text-white">Map</Text>
+                  <Text className="text-sm font-medium text-white">
+                    {t("location.map.button")}
+                  </Text>
                   {isSharing && nearbyMembers.length > 0 && (
                     <View className="ml-1 rounded-full bg-white px-2 py-0.5">
                       <Text className="text-xs font-bold text-primary-600">

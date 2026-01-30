@@ -76,6 +76,9 @@ function AppleIcon({ size = 20 }: { size?: number }) {
   );
 }
 
+// Set to true to show Facebook login button (currently disabled due to domain config issues)
+const SHOW_FACEBOOK_LOGIN = false;
+
 /**
  * OAuth Buttons Component
  *
@@ -117,25 +120,27 @@ export function OAuthButtons({
         )}
       </Button>
 
-      {/* Facebook Button */}
-      <Button
-        variant="solid"
-        size="lg"
-        onPress={onFacebookPress}
-        disabled={disabled || isAnyLoading}
-        className="border-0 bg-[#1877F2]"
-      >
-        {isFacebookLoading ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
-        ) : (
-          <>
-            <FacebookIcon />
-            <ButtonText className="ml-2 text-white">
-              {t("auth.signIn.continueWithFacebook")}
-            </ButtonText>
-          </>
-        )}
-      </Button>
+      {/* Facebook Button - temporarily hidden */}
+      {SHOW_FACEBOOK_LOGIN && (
+        <Button
+          variant="solid"
+          size="lg"
+          onPress={onFacebookPress}
+          disabled={disabled || isAnyLoading}
+          className="border-0 bg-[#1877F2]"
+        >
+          {isFacebookLoading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <>
+              <FacebookIcon />
+              <ButtonText className="ml-2 text-white">
+                {t("auth.signIn.continueWithFacebook")}
+              </ButtonText>
+            </>
+          )}
+        </Button>
+      )}
 
       {/* Apple Button - iOS only */}
       {Platform.OS === "ios" && (

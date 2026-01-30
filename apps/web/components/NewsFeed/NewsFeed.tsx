@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SkeletonNewsFeed } from "@/components/ui/skeleton-cards";
 import { useActivityFeedItems } from "@/hooks/useActivityFeed";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 import { ActivityItem } from "./ActivityItem";
@@ -24,33 +25,39 @@ const NewsFeedHeader = ({
   isRefreshing?: boolean;
   _isError?: boolean;
   _isEmpty?: boolean;
-}) => (
-  <CardHeader>
-    <CardTitle className="flex items-center justify-center gap-2 text-center text-lg font-bold">
-      <RadioTower className="size-5" />
-      Latest activities
-      {activitiesCount !== undefined && (
-        <span className="text-muted-foreground text-sm font-normal">
-          ({activitiesCount})
-        </span>
-      )}
-      {onRefresh && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className="size-8"
-          title="Refresh activity feed"
-        >
-          <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
-        </Button>
-      )}
-    </CardTitle>
-  </CardHeader>
-);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <CardHeader>
+      <CardTitle className="flex items-center justify-center gap-2 text-center text-lg font-bold">
+        <RadioTower className="size-5" />
+        {t("home.latestActivities")}
+        {activitiesCount !== undefined && (
+          <span className="text-muted-foreground text-sm font-normal">
+            ({activitiesCount})
+          </span>
+        )}
+        {onRefresh && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="size-8"
+            title={t("home.refreshFeed")}
+          >
+            <RefreshCw
+              className={cn("size-4", isRefreshing && "animate-spin")}
+            />
+          </Button>
+        )}
+      </CardTitle>
+    </CardHeader>
+  );
+};
 
 const NewsFeed = () => {
+  const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const {
     activities,
@@ -147,10 +154,10 @@ const NewsFeed = () => {
                 {isFetchingNextPage ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading more...
+                    {t("common.status.loading")}
                   </>
                 ) : (
-                  "Load more activities"
+                  t("home.activityFeed.loadMore")
                 )}
               </Button>
             </div>

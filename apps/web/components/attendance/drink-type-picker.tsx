@@ -59,6 +59,8 @@ interface DrinkTypePickerProps {
   showLabels?: boolean;
   /** Use responsive 2x2 grid on small screens */
   responsive?: boolean;
+  /** Hide the selected type label underneath */
+  hideSelectedLabel?: boolean;
   className?: string;
 }
 
@@ -127,6 +129,7 @@ export function DrinkTypePicker({
   disabled = false,
   showLabels = false,
   responsive = false,
+  hideSelectedLabel = false,
   className,
 }: DrinkTypePickerProps) {
   const { t } = useTranslation();
@@ -199,8 +202,8 @@ export function DrinkTypePicker({
           {VISIBLE_DRINK_TYPES.map(renderButton)}
         </div>
       )}
-      {/* Selected type label - hide in responsive mode since label is shown elsewhere */}
-      {!responsive && (
+      {/* Selected type label - hide in responsive mode or when hideSelectedLabel is true */}
+      {!responsive && !hideSelectedLabel && (
         <span className="text-muted-foreground text-sm font-medium">
           {getDrinkTypeLabel(selectedType, t)}
         </span>

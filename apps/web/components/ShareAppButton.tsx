@@ -2,15 +2,18 @@
 
 import { Share2 } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useState } from "react";
 
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
+import { useTranslation } from "@/lib/i18n/client";
 
 const ICON_SIZE = 20;
 
 export default function ShareAppButton() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const {
     showQRCode,
@@ -20,31 +23,35 @@ export default function ShareAppButton() {
     toggleQRCode,
   } = useShare({
     title: "ProstCounter App",
-    text: "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends.",
+    text: t("home.shareAppDialog.shareText"),
   });
 
-  const title = "Share ProstCounter App with friends!";
-  const description = "Choose how you'd like to share the app:";
+  const title = t("home.shareAppDialog.title");
+  const description = t("home.shareAppDialog.description");
 
   const ButtonsGroup = useMemo(
     () => (
       <div className="flex flex-col items-center gap-2 p-8">
         <Button variant="yellow" onClick={shareViaNative}>
-          {isWebShareSupported ? "Share App" : "Copy to Clipboard"}
+          {isWebShareSupported
+            ? t("home.shareAppDialog.shareButton")
+            : t("home.shareAppDialog.copyToClipboard")}
         </Button>
         {!isWebShareSupported && (
           <Button variant="yellow" onClick={shareViaWhatsApp}>
-            Share via WhatsApp
+            {t("home.shareAppDialog.shareViaWhatsApp")}
           </Button>
         )}
         <Button variant="secondary" onClick={toggleQRCode}>
-          {showQRCode ? "Hide QR Code" : "Show QR Code"}
+          {showQRCode
+            ? t("home.shareAppDialog.hideQRCode")
+            : t("home.shareAppDialog.showQRCode")}
         </Button>
         {showQRCode && (
           <div className="mt-4">
             <Image
               src="/images/qrcode.svg"
-              alt="QR Code"
+              alt={t("home.shareAppDialog.qrCodeAlt")}
               className="object-fill"
               width={270}
               height={270}
@@ -59,6 +66,7 @@ export default function ShareAppButton() {
       toggleQRCode,
       isWebShareSupported,
       showQRCode,
+      t,
     ],
   );
 
@@ -71,7 +79,7 @@ export default function ShareAppButton() {
       trigger={
         <Button variant="yellowOutline" className="flex items-center">
           <Share2 size={ICON_SIZE} />
-          <span className="ml-2">Share this app</span>
+          <span className="ml-2">{t("home.shareApp")}</span>
         </Button>
       }
       className="sm:max-w-[425px]"

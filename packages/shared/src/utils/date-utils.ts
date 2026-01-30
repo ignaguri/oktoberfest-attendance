@@ -4,10 +4,54 @@
  */
 
 import { TZDate } from "@date-fns/tz";
-import { format } from "date-fns";
+import { format, type Locale } from "date-fns";
+import { de, enUS, es } from "date-fns/locale";
 
 import { TIMEZONE } from "../constants/app";
 import { getCurrentLanguage } from "../i18n/core";
+
+/**
+ * Map of supported language codes to date-fns locales
+ */
+const localeMap: Record<string, Locale> = {
+  en: enUS,
+  de: de,
+  es: es,
+};
+
+/**
+ * Gets the date-fns locale for the current i18n language
+ * Falls back to English if the language is not supported
+ *
+ * @returns date-fns Locale object for the current language
+ */
+export function getDateLocale(): Locale {
+  const language = getCurrentLanguage();
+  return localeMap[language] || enUS;
+}
+
+/**
+ * Formats a date with localization support
+ * Uses the current i18n language for localized month/day names
+ *
+ * @param date - The date to format
+ * @param formatStr - The format string (date-fns format)
+ * @returns Formatted date string with localized names
+ *
+ * @example
+ * ```ts
+ * // With German language active
+ * formatLocalized(new Date(), "EEEE, MMMM d")
+ * // Returns: "Montag, September 15"
+ *
+ * // With Spanish language active
+ * formatLocalized(new Date(), "EEEE, MMMM d")
+ * // Returns: "lunes, septiembre 15"
+ * ```
+ */
+export function formatLocalized(date: Date, formatStr: string): string {
+  return format(date, formatStr, { locale: getDateLocale() });
+}
 
 /**
  * Formats a date for database storage in YYYY-MM-DD format

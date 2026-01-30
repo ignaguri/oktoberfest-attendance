@@ -15,6 +15,7 @@ import {
   type DetailedAttendanceForm,
   type DrinkType,
 } from "@prostcounter/shared/schemas";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { format, parseISO } from "date-fns";
 import { Calendar, Trash2, X } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -456,8 +457,8 @@ export function AttendanceFormSheet({
   // Format date for display - guard against invalid dates
   const formattedDate =
     selectedDate && !isNaN(selectedDate.getTime())
-      ? format(selectedDate, "EEEE, MMMM d, yyyy")
-      : "Select a date";
+      ? formatLocalized(selectedDate, "EEEE, MMMM d, yyyy")
+      : t("common.labels.selectDate");
 
   return (
     <>

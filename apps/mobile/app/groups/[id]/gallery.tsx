@@ -2,8 +2,8 @@ import { TZDate } from "@date-fns/tz";
 import { TIMEZONE } from "@prostcounter/shared/constants";
 import { useGroupGallery, useGroupName } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { getInitials } from "@prostcounter/ui";
-import { format } from "date-fns";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Camera, X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
@@ -86,7 +86,10 @@ function groupGalleryData(photos: GalleryPhoto[]): GroupedGallery[] {
     .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
     .map(([date, users]) => ({
       date,
-      formattedDate: format(new TZDate(date, TIMEZONE), "EEEE, MMMM d"),
+      formattedDate: formatLocalized(
+        new TZDate(date, TIMEZONE),
+        "EEEE, MMMM d",
+      ),
       users: Object.entries(users).map(([userId, userPhotos]) => ({
         userId,
         username: userPhotos[0].username,

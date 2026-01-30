@@ -38,7 +38,8 @@
       "date": "Datum",
       "time": "Uhrzeit",
       "status": "Status",
-      "description": "Beschreibung"
+      "description": "Beschreibung",
+      "selectDate": "Datum auswählen"
     },
     "status": {
       "loading": "Lädt...",
@@ -329,7 +330,7 @@
       "copyLink": "Link kopieren",
       "shareLink": "Link teilen",
       "linkCopied": "Link in Zwischenablage kopiert",
-      "message": "Tritt meiner Gruppe '{{groupName}}' auf ProstCounter bei! {{inviteUrl}}",
+      "message": "Tritt meiner Gruppe '{{name}}' auf ProstCounter bei!",
       "noToken": "Kein Einladungs-Token verfügbar. Bitte erstelle den Einladungslink neu."
     },
     "winningCriteria": {
@@ -524,6 +525,8 @@
     "unlockedOn": "Freigeschaltet am {{date}}",
     "progress": "{{current}} / {{target}}",
     "selectFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
+    "noFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
+    "error": "Fehler beim Laden der Erfolge. Zum Aktualisieren nach unten ziehen.",
     "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
@@ -564,10 +567,225 @@
       "epic": "Episch",
       "legendary": "Legendär"
     },
+    "card": {
+      "points": "Punkte",
+      "completed": "Abgeschlossen!",
+      "progress": "Fortschritt",
+      "percentComplete": "% abgeschlossen"
+    },
+    "highlight": {
+      "recent": "Letzte Erfolge"
+    },
     "viewMyAchievements": "Meine Erfolge ansehen",
     "viewProgress": "deinen Fortschritt und freigeschaltete Abzeichen ansehen",
     "points": "Pkt",
-    "complete": "Abschließen"
+    "complete": "Abschließen",
+    "items": {
+      "firstDrop": {
+        "name": "Erster Schluck",
+        "description": "Erfasse dein erstes Bier auf dem Fest"
+      },
+      "beerRookie": {
+        "name": "Bier-Anfänger",
+        "description": "Erreiche 3 Biere insgesamt"
+      },
+      "halfwayThere": {
+        "name": "Auf halbem Weg",
+        "description": "Erreiche 5 Biere auf einem Fest"
+      },
+      "seriousSession": {
+        "name": "Ernste Sitzung",
+        "description": "Trinke 3+ Biere an einem Tag"
+      },
+      "seriousDrinker": {
+        "name": "Ernsthafter Trinker",
+        "description": "Erreiche 8 Biere insgesamt"
+      },
+      "doubleDigits": {
+        "name": "Zweistellig",
+        "description": "Erreiche 10 Biere auf einem Fest"
+      },
+      "dailyDouble": {
+        "name": "Tägliches Doppel",
+        "description": "Trinke 4+ Biere an einem Tag"
+      },
+      "beerEnthusiast": {
+        "name": "Bier-Enthusiast",
+        "description": "Erreiche 15 Biere insgesamt"
+      },
+      "powerHour": {
+        "name": "Power-Stunde",
+        "description": "Trinke 6+ Biere an einem Tag"
+      },
+      "marathonDrinker": {
+        "name": "Marathon-Trinker",
+        "description": "Erreiche 20+ Biere auf einem Fest"
+      },
+      "centuryClub": {
+        "name": "Jahrhundert-Club",
+        "description": "Erreiche 30 Biere über alle Feste"
+      },
+      "legendStatus": {
+        "name": "Legendenstatus",
+        "description": "Erreiche 50+ Biere über alle Feste"
+      },
+      "festivalNewcomer": {
+        "name": "Fest-Neuling",
+        "description": "Besuche deinen ersten Tag"
+      },
+      "regular": {
+        "name": "Stammgast",
+        "description": "Besuche 3 verschiedene Tage"
+      },
+      "earlyBird": {
+        "name": "Früher Vogel",
+        "description": "Besuche den ersten Tag des Festes"
+      },
+      "dedicated": {
+        "name": "Engagiert",
+        "description": "Besuche 5 verschiedene Tage"
+      },
+      "streakMaster": {
+        "name": "Serien-Meister",
+        "description": "Besuche 3 aufeinanderfolgende Tage"
+      },
+      "weekendWarrior": {
+        "name": "Wochenend-Krieger",
+        "description": "Besuche alle Wochenenden während des Festes"
+      },
+      "festivalWarrior": {
+        "name": "Fest-Krieger",
+        "description": "Perfekte Anwesenheit - besuche alle Festtage"
+      },
+      "tentCurious": {
+        "name": "Zelt-Neugierig",
+        "description": "Besuche 3 verschiedene Zelte"
+      },
+      "tentExplorer": {
+        "name": "Zelt-Entdecker",
+        "description": "Besuche 5 verschiedene Zelte"
+      },
+      "tentMaster": {
+        "name": "Zelt-Meister",
+        "description": "Besuche 10 verschiedene Zelte"
+      },
+      "tentGuide": {
+        "name": "Zelt-Führer",
+        "description": "Besuche 15 verschiedene Zelte"
+      },
+      "tentConnoisseur": {
+        "name": "Zelt-Kenner",
+        "description": "Besuche alle großen Zelte"
+      },
+      "socialButterfly": {
+        "name": "Sozialer Schmetterling",
+        "description": "Trete 3 Gruppen bei"
+      },
+      "groupLeader": {
+        "name": "Gruppenleiter",
+        "description": "Erstelle deine erste Gruppe"
+      },
+      "topThree": {
+        "name": "Top Drei",
+        "description": "Erreiche die Top 3 in einer Gruppen-Rangliste"
+      },
+      "groupChampion": {
+        "name": "Gruppen-Champion",
+        "description": "Erreiche #1 in einer Gruppen-Rangliste"
+      },
+      "multiGroupChampion": {
+        "name": "Multi-Gruppen-Champion",
+        "description": "Erreiche #1 in 3 verschiedenen Gruppen"
+      },
+      "photographer": {
+        "name": "Fotograf",
+        "description": "Lade dein erstes Foto hoch"
+      },
+      "photoAlbum": {
+        "name": "Fotoalbum",
+        "description": "Lade 10 Fotos hoch"
+      },
+      "festivalVeteran": {
+        "name": "Fest-Veteran",
+        "description": "Besuche 2 verschiedene Feste"
+      },
+      "seasoned": {
+        "name": "Erfahren",
+        "description": "Besuche 3 verschiedene Feste"
+      },
+      "bigSpender": {
+        "name": "Großer Spender",
+        "description": "Gib €100 für Biere auf einem Fest aus"
+      },
+      "consistency": {
+        "name": "Beständigkeit",
+        "description": "Halte einen Durchschnitt von 2+ Bieren pro Besuch"
+      },
+      "perfectDay": {
+        "name": "Perfekter Tag",
+        "description": "Einchecken, trinken und ein Foto hochladen an einem Tag"
+      },
+      "closingTime": {
+        "name": "Zapfenstreich",
+        "description": "Besuche den letzten Tag des Festes"
+      },
+      "tentHopper": {
+        "name": "Zelt-Hopper",
+        "description": "Besuche 5 verschiedene Zelte"
+      },
+      "wiesnWanderer": {
+        "name": "Wiesn-Wanderer",
+        "description": "Besuche alle Zeltkategorien"
+      },
+      "localGuide": {
+        "name": "Lokaler Führer",
+        "description": "Besuche 10+ verschiedene Zelte"
+      },
+      "teamPlayer": {
+        "name": "Teamspieler",
+        "description": "Trete deiner ersten Gruppe bei"
+      },
+      "photoEnthusiast": {
+        "name": "Foto-Enthusiast",
+        "description": "Lade 10+ Fotos hoch"
+      },
+      "topContributor": {
+        "name": "Top-Beitragender",
+        "description": "Erreiche die Top 3 einer Gruppe"
+      },
+      "memoryKeeper": {
+        "name": "Erinnerungsbewahrer",
+        "description": "Lade 25+ Fotos hoch"
+      },
+      "risingStar": {
+        "name": "Aufsteigender Stern",
+        "description": "Erreiche die Top 5 der globalen Rangliste"
+      },
+      "leaderboardLegend": {
+        "name": "Ranglisten-Legende",
+        "description": "Erreiche die Top 3 der globalen Rangliste"
+      },
+      "openingDayLegend": {
+        "name": "Eröffnungstag-Legende",
+        "description": "Besuche den allerersten Tag deines ersten Festes"
+      },
+      "consistencyKing": {
+        "name": "König der Beständigkeit",
+        "description": "Gleiche Bieranzahl 3+ Tage hintereinander"
+      },
+      "photoPerfect": {
+        "name": "Foto-Perfekt",
+        "description": "Lade mindestens ein Foto an jedem besuchten Tag hoch"
+      },
+      "highRoller": {
+        "name": "Großverdiener",
+        "description": "Gib 500+ Euro für Biere auf einem Fest aus"
+      },
+      "multiYearChampion": {
+        "name": "Mehrjahres-Champion",
+        "description": "Gewinne Gruppenwettbewerbe auf 2+ Festen"
+      }
+    }
   },
   "leaderboard": {
     "screenTitle": "Erfolge & Rangliste",
@@ -984,7 +1202,8 @@
       "friendsNearby": "{{count}} Freunde",
       "friendsNearby_one": "{{count}} Freund",
       "tentsNearby": "{{count}} Zelte",
-      "tentsNearby_one": "{{count}} Zelt"
+      "tentsNearby_one": "{{count}} Zelt",
+      "button": "Karte"
     },
     "tabs": {
       "friends": "Freunde",
@@ -1023,7 +1242,15 @@
       "selectGroups": "Oder bestimmte Gruppen auswählen",
       "selectedCount": "{{count}} Gruppe(n) ausgewählt",
       "sharingWithAll": "Mit allen Gruppen teilen",
-      "sharingWithSome": "Mit {{count}} Gruppe(n) teilen"
+      "sharingWithSome": "Mit {{count}} Gruppe(n) teilen",
+      "visibleTo": "Sichtbar für",
+      "allGroups": "Alle Gruppen",
+      "noGroupsSelected": "Keine Gruppen ausgewählt",
+      "oneGroup": "1 Gruppe",
+      "multipleGroups": "{{count}} Gruppen",
+      "collapseHint": "Tippe zum Zuklappen",
+      "expandHint": "Tippe zum Aufklappen",
+      "orSelectSpecific": "Oder bestimmte Gruppen auswählen"
     }
   },
   "photos": {
@@ -1157,7 +1384,9 @@
       "uploadPhotos": "Fotos hochladen",
       "selectTent": "Zelt auswählen",
       "loading": "Lade Besuch...",
-      "outsideFestival": "Besuchserfassung ist nur während des Festivals verfügbar"
+      "outsideFestival": "Besuchserfassung ist nur während des Festivals verfügbar",
+      "drinksToday": "{{count}} Getränk heute",
+      "drinksToday_other": "{{count}} Getränke heute"
     },
     "activityFeed": {
       "title": "Neueste Aktivitäten",
@@ -1192,6 +1421,35 @@
     "tips": "Trinkgeld",
     "mapLink": {
       "title": "{{festivalName}} Karte"
+    },
+    "leaderboard": {
+      "title": "🏆 Globale Rangliste",
+      "description": "Top {{limit}} Teilnehmer",
+      "headers": {
+        "name": "Name",
+        "days": "Tage",
+        "liters": "Liter",
+        "avg": "Ø"
+      },
+      "viewFull": "Komplette Rangliste anzeigen"
+    },
+    "missingFields": {
+      "title": "Vervollständige dein Profil",
+      "name": "Name",
+      "username": "Benutzername",
+      "profilePicture": "Profilbild",
+      "edit": "Bearbeiten"
+    },
+    "shareAppDialog": {
+      "title": "Teile die ProstCounter App mit Freunden!",
+      "description": "Wähle, wie du die App teilen möchtest:",
+      "shareText": "Schau dir die ProstCounter App an! Verfolge deine Oktoberfest-Besuche und tritt gegen Freunde an.",
+      "shareButton": "App teilen",
+      "copyToClipboard": "In Zwischenablage kopieren",
+      "shareViaWhatsApp": "Über WhatsApp teilen",
+      "showQRCode": "QR-Code anzeigen",
+      "hideQRCode": "QR-Code ausblenden",
+      "qrCodeAlt": "QR-Code"
     }
   },
   "search": {
