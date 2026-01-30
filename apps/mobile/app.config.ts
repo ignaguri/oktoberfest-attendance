@@ -10,9 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
-  runtimeVersion: {
-    policy: "fingerprint",
-  },
+  runtimeVersion: "1.0.0",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
