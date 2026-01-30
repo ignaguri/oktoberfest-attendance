@@ -38,7 +38,8 @@
       "date": "Datum",
       "time": "Uhrzeit",
       "status": "Status",
-      "description": "Beschreibung"
+      "description": "Beschreibung",
+      "selectDate": "Datum auswählen"
     },
     "status": {
       "loading": "Lädt...",
@@ -759,10 +760,6 @@
       "risingStar": {
         "name": "Aufsteigender Stern",
         "description": "Erreiche die Top 5 der globalen Rangliste"
-      },
-      "multiGroupChampion": {
-        "name": "Multi-Gruppen-Champion",
-        "description": "Gewinne Wettbewerbe in 2+ verschiedenen Gruppen"
       },
       "leaderboardLegend": {
         "name": "Ranglisten-Legende",

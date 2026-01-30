@@ -38,7 +38,8 @@
       "date": "Date",
       "time": "Time",
       "status": "Status",
-      "description": "Description"
+      "description": "Description",
+      "selectDate": "Select a date"
     },
     "status": {
       "loading": "Loading...",
@@ -794,10 +795,6 @@
       "risingStar": {
         "name": "Rising Star",
         "description": "Finish in top 5 of global leaderboard"
-      },
-      "multiGroupChampion": {
-        "name": "Multi-Group Champion",
-        "description": "Win competitions in 2+ different groups"
       },
       "leaderboardLegend": {
         "name": "Leaderboard Legend",
