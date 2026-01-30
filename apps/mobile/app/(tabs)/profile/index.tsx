@@ -10,6 +10,7 @@ import {
   type UpdateProfileInput,
   UpdateProfileSchema,
 } from "@prostcounter/shared/schemas";
+import * as Application from "expo-application";
 import { useRouter } from "expo-router";
 import { Lock, LogOut, Puzzle } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -358,6 +359,12 @@ export default function ProfileScreen() {
           onDeletePress={handleDeleteAccount}
           onCancelDelete={handleCancelDeleteConfirm}
         />
+
+        {/* App Version */}
+        <Text className="text-center text-xs text-typography-400">
+          v{Application.nativeApplicationVersion} (
+          {Application.nativeBuildVersion})
+        </Text>
       </VStack>
 
       {/* Avatar Picker */}
