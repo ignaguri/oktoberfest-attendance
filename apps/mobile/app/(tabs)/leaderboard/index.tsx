@@ -163,11 +163,11 @@ export default function LeaderboardScreen() {
           accessibilityRole="button"
         >
           <HStack className="items-center justify-between">
-            <HStack space="md" className="items-center">
+            <HStack space="md" className="flex-1 items-center">
               <Box className="rounded-full bg-primary-200 p-2">
                 <Award size={24} color={Colors.primary[600]} />
               </Box>
-              <VStack>
+              <VStack className="flex-1">
                 <Text className="text-base font-semibold text-primary-800">
                   {t("achievements.viewMyAchievements")}
                 </Text>

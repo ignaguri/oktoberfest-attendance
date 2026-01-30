@@ -3,6 +3,7 @@
 import type { AchievementProgress as AchievementProgressType } from "@prostcounter/shared/schemas";
 
 import { Progress } from "@/components/ui/progress";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 interface AchievementProgressProps {
@@ -16,6 +17,7 @@ export function AchievementProgress({
   className,
   showLabel = true,
 }: AchievementProgressProps) {
+  const { t } = useTranslation();
   const { current_value, target_value, percentage } = progress;
 
   const clampedPercentage = Math.min(100, Math.max(0, percentage));
@@ -24,7 +26,9 @@ export function AchievementProgress({
     <div className={cn("space-y-2", className)}>
       {showLabel && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Progress</span>
+          <span className="text-gray-600">
+            {t("achievements.card.progress")}
+          </span>
           <span className="font-medium text-gray-900">
             {current_value} / {target_value}
           </span>
@@ -35,7 +39,8 @@ export function AchievementProgress({
         <Progress value={clampedPercentage} className="h-2" />
 
         <div className="text-right text-xs text-gray-500">
-          {Math.round(clampedPercentage)}% complete
+          {Math.round(clampedPercentage)}
+          {t("achievements.card.percentComplete")}
         </div>
       </div>
     </div>

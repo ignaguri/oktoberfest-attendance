@@ -566,6 +566,15 @@
       "epic": "Episch",
       "legendary": "Legendär"
     },
+    "card": {
+      "points": "Punkte",
+      "completed": "Abgeschlossen!",
+      "progress": "Fortschritt",
+      "percentComplete": "% abgeschlossen"
+    },
+    "highlight": {
+      "recent": "Letzte Erfolge"
+    },
     "viewMyAchievements": "Meine Erfolge ansehen",
     "viewProgress": "deinen Fortschritt und freigeschaltete Abzeichen ansehen",
     "points": "Pkt",
@@ -1378,7 +1387,9 @@
       "uploadPhotos": "Fotos hochladen",
       "selectTent": "Zelt auswählen",
       "loading": "Lade Besuch...",
-      "outsideFestival": "Besuchserfassung ist nur während des Festivals verfügbar"
+      "outsideFestival": "Besuchserfassung ist nur während des Festivals verfügbar",
+      "drinksToday": "{{count}} Getränk heute",
+      "drinksToday_other": "{{count}} Getränke heute"
     },
     "activityFeed": {
       "title": "Neueste Aktivitäten",
@@ -1413,6 +1424,35 @@
     "tips": "Trinkgeld",
     "mapLink": {
       "title": "{{festivalName}} Karte"
+    },
+    "leaderboard": {
+      "title": "🏆 Globale Rangliste",
+      "description": "Top {{limit}} Teilnehmer",
+      "headers": {
+        "name": "Name",
+        "days": "Tage",
+        "liters": "Liter",
+        "avg": "Ø"
+      },
+      "viewFull": "Komplette Rangliste anzeigen"
+    },
+    "missingFields": {
+      "title": "Vervollständige dein Profil",
+      "name": "Name",
+      "username": "Benutzername",
+      "profilePicture": "Profilbild",
+      "edit": "Bearbeiten"
+    },
+    "shareAppDialog": {
+      "title": "Teile die ProstCounter App mit Freunden!",
+      "description": "Wähle, wie du die App teilen möchtest:",
+      "shareText": "Schau dir die ProstCounter App an! Verfolge deine Oktoberfest-Besuche und tritt gegen Freunde an.",
+      "shareButton": "App teilen",
+      "copyToClipboard": "In Zwischenablage kopieren",
+      "shareViaWhatsApp": "Über WhatsApp teilen",
+      "showQRCode": "QR-Code anzeigen",
+      "hideQRCode": "QR-Code ausblenden",
+      "qrCodeAlt": "QR-Code"
     }
   },
   "search": {

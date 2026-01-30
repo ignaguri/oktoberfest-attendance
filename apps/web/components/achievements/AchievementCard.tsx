@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 import { AchievementBadge } from "./AchievementBadge";
@@ -21,11 +22,22 @@ interface AchievementCardProps {
   showProgress?: boolean;
 }
 
+// Map category values to translation keys
+const CATEGORY_KEYS: Record<string, string> = {
+  consumption: "achievements.categories.consumption",
+  attendance: "achievements.categories.attendance",
+  explorer: "achievements.categories.explorer",
+  social: "achievements.categories.social",
+  competitive: "achievements.categories.competitive",
+  special: "achievements.categories.special",
+};
+
 export function AchievementCard({
   achievement,
   className,
   showProgress = true,
 }: AchievementCardProps) {
+  const { t, i18n } = useTranslation();
   const {
     name,
     description,
@@ -38,14 +50,14 @@ export function AchievementCard({
     user_progress,
   } = achievement;
 
-  const categoryLabels = {
-    consumption: "Beer Consumption",
-    attendance: "Festival Attendance",
-    explorer: "Explorer",
-    social: "Social",
-    competitive: "Competitive",
-    special: "Special",
-  };
+  // Translate name and description (they are now i18n keys from database)
+  const displayName = t(name, { defaultValue: name });
+  const displayDescription = t(description, { defaultValue: description });
+  const displayRarity = t(`achievements.rarity.${rarity}`, {
+    defaultValue: rarity,
+  });
+  const categoryKey = CATEGORY_KEYS[category] || category;
+  const displayCategory = t(categoryKey, { defaultValue: category });
 
   return (
     <Card
@@ -66,10 +78,10 @@ export function AchievementCard({
                 is_unlocked ? "text-green-800" : "text-gray-700",
               )}
             >
-              {name}
+              {displayName}
             </CardTitle>
             <CardDescription className="mt-1 text-sm">
-              {description}
+              {displayDescription}
             </CardDescription>
           </div>
 
@@ -85,7 +97,7 @@ export function AchievementCard({
             />
 
             <Badge variant="outline" className="text-xs">
-              {categoryLabels[category]}
+              {displayCategory}
             </Badge>
           </div>
         </div>
@@ -95,7 +107,7 @@ export function AchievementCard({
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">
-              Points:{" "}
+              {t("achievements.card.points")}:{" "}
               <span className="font-medium text-gray-900">{points}</span>
             </span>
             <span
@@ -107,7 +119,7 @@ export function AchievementCard({
                 rarity === "legendary" && "text-yellow-600",
               )}
             >
-              {rarity}
+              {displayRarity}
             </span>
           </div>
 
@@ -119,10 +131,12 @@ export function AchievementCard({
                 <div className="rounded-lg border border-green-200 bg-green-100 p-2">
                   <div className="flex items-center gap-2 text-sm text-green-800">
                     <span className="text-base">✅</span>
-                    <span className="font-medium">Completed!</span>
+                    <span className="font-medium">
+                      {t("achievements.card.completed")}
+                    </span>
                   </div>
                   <div className="mt-1 text-xs text-green-600">
-                    {new Date(unlocked_at).toLocaleDateString("en-US", {
+                    {new Date(unlocked_at).toLocaleDateString(i18n.language, {
                       year: "numeric",
                       month: "short",
                       day: "numeric",

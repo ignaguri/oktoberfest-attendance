@@ -601,6 +601,15 @@
       "epic": "Epic",
       "legendary": "Legendary"
     },
+    "card": {
+      "points": "Points",
+      "completed": "Completed!",
+      "progress": "Progress",
+      "percentComplete": "% complete"
+    },
+    "highlight": {
+      "recent": "Recent achievements"
+    },
     "viewMyAchievements": "See my achievements",
     "viewProgress": "View your progress and unlocked badges",
     "points": "pts",
@@ -1623,7 +1632,9 @@
       "uploadPhotos": "Upload Photos",
       "selectTent": "Select a tent",
       "loading": "Loading attendance...",
-      "outsideFestival": "Attendance logging is only available during the festival"
+      "outsideFestival": "Attendance logging is only available during the festival",
+      "drinksToday": "{{count}} drink today",
+      "drinksToday_other": "{{count}} drinks today"
     },
     "activityFeed": {
       "title": "Latest Activities",
@@ -1663,12 +1674,25 @@
       "title": "Complete Your Profile",
       "name": "Name",
       "username": "Username",
-      "profilePicture": "Profile picture"
+      "profilePicture": "Profile picture",
+      "edit": "Edit"
+    },
+    "shareAppDialog": {
+      "title": "Share ProstCounter App with friends!",
+      "description": "Choose how you'd like to share the app:",
+      "shareText": "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends.",
+      "shareButton": "Share App",
+      "copyToClipboard": "Copy to Clipboard",
+      "shareViaWhatsApp": "Share via WhatsApp",
+      "showQRCode": "Show QR Code",
+      "hideQRCode": "Hide QR Code",
+      "qrCodeAlt": "QR Code"
     },
     "leaderboard": {
       "title": "🏆 Global Leaderboard",
       "description": "Top {{limit}} performers",
       "headers": {
+        "name": "Name",
         "days": "Days",
         "liters": "Liters",
         "avg": "Avg."

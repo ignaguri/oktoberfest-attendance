@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslation } from "@prostcounter/shared/i18n";
 import { Edit, Image as ImageIcon, User, UserCheck } from "lucide-react";
 import { Link } from "next-view-transitions";
 import type { ReactNode } from "react";
@@ -10,14 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/lib/data/react-query-provider";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface MissingFieldProps {
   label: string;
   icon: ReactNode;
   link: string;
+  editLabel: string;
 }
 
-const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
+const MissingField: FC<MissingFieldProps> = ({
+  label,
+  icon,
+  link,
+  editLabel,
+}) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center justify-center gap-2">
@@ -27,7 +33,7 @@ const MissingField: FC<MissingFieldProps> = ({ label, icon, link }) => {
         <span className="grow text-gray-700">{label}</span>
       </div>
       <Button asChild variant="ghost">
-        <Link href={link} aria-label="Edit">
+        <Link href={link} aria-label={editLabel}>
           <Edit className="h-4 w-4" />
         </Link>
       </Button>
@@ -62,6 +68,7 @@ export default function MissingFields() {
               label={t("home.missingFields.name")}
               icon={<User className="h-4 w-4" />}
               link="/profile"
+              editLabel={t("home.missingFields.edit")}
             />
           )}
           {missingFields.username && (
@@ -69,6 +76,7 @@ export default function MissingFields() {
               label={t("home.missingFields.username")}
               icon={<UserCheck className="h-4 w-4" />}
               link="/profile"
+              editLabel={t("home.missingFields.edit")}
             />
           )}
           {missingFields.avatar_url && (
@@ -76,6 +84,7 @@ export default function MissingFields() {
               label={t("home.missingFields.profilePicture")}
               icon={<ImageIcon className="h-4 w-4" />}
               link="/profile"
+              editLabel={t("home.missingFields.edit")}
             />
           )}
         </div>

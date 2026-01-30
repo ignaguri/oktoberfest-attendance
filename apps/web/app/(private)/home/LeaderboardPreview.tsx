@@ -2,7 +2,6 @@
 
 import type { LeaderboardEntry } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useTranslation } from "@prostcounter/shared/i18n";
 import { Crown } from "lucide-react";
 import { Link } from "next-view-transitions";
 
@@ -26,25 +25,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGlobalLeaderboard } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 // Configurable constant for easy modification
 const LEADERBOARD_PREVIEW_LIMIT = 3;
 
-const getDisplayName = ({
-  username,
-  full_name,
-}: {
-  username?: string | null;
-  full_name?: string | null;
-}) => {
+const getDisplayName = (
+  {
+    username,
+    full_name,
+  }: {
+    username?: string | null;
+    full_name?: string | null;
+  },
+  fallback: string,
+) => {
   if (username) {
     return username;
   }
   if (full_name) {
     return full_name;
   }
-  return "No name";
+  return fallback;
 };
 
 const LeaderboardPreview = () => {
@@ -90,7 +93,7 @@ const LeaderboardPreview = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-8">#</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>{t("home.leaderboard.headers.name")}</TableHead>
                   <TableHead>
                     <div className="flex items-center gap-1">
                       <Crown className="text-yellow-500" size={16} />
@@ -134,10 +137,13 @@ const LeaderboardPreview = () => {
                             size="small"
                           />
                           <span className="truncate font-medium">
-                            {getDisplayName({
-                              username: user.username,
-                              full_name: user.fullName,
-                            })}
+                            {getDisplayName(
+                              {
+                                username: user.username,
+                                full_name: user.fullName,
+                              },
+                              t("leaderboard.noName"),
+                            )}
                           </span>
                         </div>
                       </ProfilePreview>

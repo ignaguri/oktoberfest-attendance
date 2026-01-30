@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslation } from "@prostcounter/shared/i18n";
 import Image from "next/image";
 
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { useTutorialStatus } from "@/hooks/useProfile";
+import { useTranslation } from "@/lib/i18n/client";
 import LogoImage from "@/public/android-chrome-512x512.png";
 
 import FestivalStatus from "./FestivalStatus";
@@ -41,7 +41,7 @@ export default function Home() {
         <header className="flex flex-row items-center gap-4">
           <Image
             src={LogoImage}
-            alt="Prost Counter Logo"
+            alt={t("app.logo")}
             className="inline-block size-20 sm:size-24"
           />
           <h1 className="text-4xl font-extrabold sm:text-5xl" translate="no">

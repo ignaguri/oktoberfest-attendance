@@ -41,6 +41,11 @@ export default function Breadcrumbs() {
   const pathname = usePathname();
 
   const breadcrumbs = useMemo(() => {
+    // Don't show breadcrumbs on home page
+    if (pathname === "/" || pathname === "/home") {
+      return [];
+    }
+
     const segments = pathname.split("/").filter((segment) => segment !== "");
     const newBreadcrumbs: BreadcrumbSegment[] = [];
 

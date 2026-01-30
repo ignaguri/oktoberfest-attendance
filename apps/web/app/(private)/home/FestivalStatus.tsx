@@ -15,26 +15,29 @@ import {
   getFestivalConstants,
   getFestivalStatus,
 } from "@/lib/festivalConstants";
+import { useTranslation } from "@/lib/i18n/client";
 
 import { WrappedCTA } from "./WrappedCTA";
 
 export default function FestivalStatus() {
+  const { t } = useTranslation();
   const { currentFestival, isLoading } = useFestival();
 
   if (isLoading || !currentFestival) {
     return <SkeletonFestivalStatus />;
   }
 
-  const { festivalStartDate, festivalEndDate, festivalName } =
+  const { festivalStartDate, festivalEndDate } =
     getFestivalConstants(currentFestival);
   const today = new Date();
   let status = "";
 
   if (isBefore(today, festivalStartDate)) {
     const daysRemaining = differenceInDays(festivalStartDate, today);
-    status = `${festivalName} starts in ${
-      daysRemaining <= 1 ? "a day" : `${daysRemaining} days`
-    }!`;
+    status =
+      daysRemaining <= 1
+        ? t("home.festivalStatus.startsInOneDay")
+        : t("home.festivalStatus.startsInDays", { daysUntil: daysRemaining });
   } else if (
     isWithinInterval(today, {
       start: festivalStartDate,
@@ -43,9 +46,9 @@ export default function FestivalStatus() {
   ) {
     const currentDay = differenceInDays(today, festivalStartDate) + 1;
     const totalDays = differenceInDays(festivalEndDate, festivalStartDate) + 1;
-    status = `It's day ${currentDay} / ${totalDays} of ${festivalName}!`;
+    status = t("home.festivalStatus.currentDay", { currentDay, totalDays });
   } else {
-    status = `Sadly, ${festivalName} is over. See you next time!`;
+    status = t("home.festivalStatus.ended");
   }
 
   const festivalStatus = getFestivalStatus(currentFestival);
@@ -69,6 +72,8 @@ export default function FestivalStatus() {
             <CalendarCheck className="size-5" />
           )}
           <span className="font-semibold">{status}</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="font-bold">{currentFestival.name}</span>
         </AlertDescription>
       </Alert>
       {festivalStatus === "ended" && <WrappedCTA />}

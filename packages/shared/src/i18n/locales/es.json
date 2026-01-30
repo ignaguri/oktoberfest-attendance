@@ -601,6 +601,15 @@
       "epic": "Épico",
       "legendary": "Legendario"
     },
+    "card": {
+      "points": "Puntos",
+      "completed": "¡Completado!",
+      "progress": "Progreso",
+      "percentComplete": "% completado"
+    },
+    "highlight": {
+      "recent": "Logros recientes"
+    },
     "viewMyAchievements": "Ver mis logros",
     "viewProgress": "Mirá tu progreso y medallas desbloqueadas",
     "points": "pts",
@@ -1623,7 +1632,9 @@
       "uploadPhotos": "Subir fotos",
       "selectTent": "Seleccioná una carpa",
       "loading": "Cargando asistencia...",
-      "outsideFestival": "El registro de asistencia solo está disponible durante el festival"
+      "outsideFestival": "El registro de asistencia solo está disponible durante el festival",
+      "drinksToday": "{{count}} bebida hoy",
+      "drinksToday_other": "{{count}} bebidas hoy"
     },
     "activityFeed": {
       "title": "Últimas actividades",
@@ -1663,12 +1674,25 @@
       "title": "Completá tu perfil",
       "name": "Nombre",
       "username": "Nombre de usuario",
-      "profilePicture": "Foto de perfil"
+      "profilePicture": "Foto de perfil",
+      "edit": "Editar"
+    },
+    "shareAppDialog": {
+      "title": "¡Compartí la app ProstCounter con tus amigos!",
+      "description": "Elegí cómo querés compartir la app:",
+      "shareText": "¡Mirá la app ProstCounter! Registrá tu asistencia al Oktoberfest y competí con amigos.",
+      "shareButton": "Compartir app",
+      "copyToClipboard": "Copiar al portapapeles",
+      "shareViaWhatsApp": "Compartir por WhatsApp",
+      "showQRCode": "Mostrar código QR",
+      "hideQRCode": "Ocultar código QR",
+      "qrCodeAlt": "Código QR"
     },
     "leaderboard": {
       "title": "🏆 Ranking global",
       "description": "Los mejores {{limit}} participantes",
       "headers": {
+        "name": "Nombre",
         "days": "Días",
         "liters": "Litros",
         "avg": "Prom."

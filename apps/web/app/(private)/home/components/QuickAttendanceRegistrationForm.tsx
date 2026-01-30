@@ -215,35 +215,38 @@ export const QuickAttendanceRegistrationForm = ({
             </h3>
             {drinkSummary.total > 0 && (
               <span className="text-muted-foreground text-sm">
-                {drinkSummary.total}{" "}
-                {drinkSummary.total === 1 ? "drink" : "drinks"} today
+                {t("home.quickAttendance.drinksToday", {
+                  count: drinkSummary.total,
+                })}
               </span>
             )}
           </div>
 
-          {/* Drink Type Selector + Stepper (horizontal layout like mobile) */}
-          <div className="flex items-center justify-between gap-4">
-            <DrinkTypePicker
-              selectedType={selectedDrinkType}
-              onSelect={setSelectedDrinkType}
-              counts={drinkSummary.counts}
+          {/* Drink Type Selector */}
+          <DrinkTypePicker
+            selectedType={selectedDrinkType}
+            onSelect={setSelectedDrinkType}
+            counts={drinkSummary.counts}
+            disabled={isSubmitting}
+            hideSelectedLabel
+          />
+
+          {/* Stepper (underneath drink types like mobile) */}
+          <div className="flex flex-col items-center gap-1">
+            <DrinkStepper
+              festivalId={currentFestival.id}
+              date={todayString}
+              drinkType={selectedDrinkType}
+              tentId={tentId || undefined}
+              consumptions={consumptions}
               disabled={isSubmitting}
-              responsive
+              onSuccess={triggerConfetti}
             />
-            <div className="flex flex-col items-center gap-1">
-              <DrinkStepper
-                festivalId={currentFestival.id}
-                date={todayString}
-                drinkType={selectedDrinkType}
-                tentId={tentId || undefined}
-                consumptions={consumptions}
-                disabled={isSubmitting}
-                onSuccess={triggerConfetti}
-              />
-              <span className="text-muted-foreground text-xs">
-                {t(`attendance.drinkTypes.${selectedDrinkType}`)}
-              </span>
-            </div>
+            <span className="text-muted-foreground text-xs">
+              {t(`attendance.drinkTypes.${selectedDrinkType}`, {
+                count: drinkSummary.counts[selectedDrinkType] || 0,
+              })}
+            </span>
           </div>
 
           {/* Tent selector section */}
@@ -270,7 +273,7 @@ export const QuickAttendanceRegistrationForm = ({
           {/* Photo upload section */}
           {renderPhotoUpload && (
             <div className="flex flex-col">
-              <span className="text-muted-foreground text-sm font-medium">
+              <span className="text-muted-foreground mb-1 text-sm font-medium">
                 {t("home.quickAttendance.photos")}
               </span>
               {renderPhotoUpload(attendanceId)}

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { SkeletonAchievements } from "@/components/ui/skeleton-cards";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 import { AchievementBadge } from "./AchievementBadge";
@@ -23,6 +24,7 @@ interface AchievementHighlightProps {
 }
 
 export function AchievementHighlight({ className }: AchievementHighlightProps) {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const { data, loading: isLoading } = useAchievementsWithProgress(
     currentFestival?.id,
@@ -63,29 +65,34 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
     >
       <CardHeader>
         <CardTitle className="flex items-center justify-center gap-2 text-center text-xl font-bold">
-          🎖️ Achievements
+          🎖️ {t("achievements.pageTitle")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Progress:</span>
+            <span className="text-gray-600">
+              {t("achievements.card.progress")}:
+            </span>
             <span className="font-semibold">
-              {unlockedAchievements.length} / {achievements.length} unlocked
+              {unlockedAchievements.length} / {achievements.length}{" "}
+              {t("achievements.unlocked").toLowerCase()}
             </span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Points:</span>
+            <span className="text-gray-600">
+              {t("achievements.card.points")}:
+            </span>
             <span className="font-semibold text-yellow-600">
-              {totalPoints} pts
+              {totalPoints} {t("achievements.points")}
             </span>
           </div>
 
           {recentAchievements.length > 0 && (
             <div className="space-y-2">
               <CardDescription className="font-semibold">
-                🎉 Recent achievements:
+                🎉 {t("achievements.highlight.recent")}:
               </CardDescription>
               <div className="space-y-2">
                 {recentAchievements.map(
@@ -95,7 +102,9 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
                       className="flex flex-col items-center gap-2"
                     >
                       <AchievementBadge
-                        name={achievement.name}
+                        name={t(achievement.name, {
+                          defaultValue: achievement.name,
+                        })}
                         icon={achievement.icon}
                         rarity={achievement.rarity}
                         points={achievement.points}
@@ -111,7 +120,9 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
           )}
 
           <Button asChild variant="outline" className="w-fit">
-            <Link href="/achievements">View All Achievements</Link>
+            <Link href="/achievements">
+              {t("achievements.viewMyAchievements")}
+            </Link>
           </Button>
         </div>
       </CardContent>
