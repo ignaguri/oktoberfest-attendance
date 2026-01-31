@@ -14,6 +14,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { SyncStatusBar } from "@/components/sync";
+import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdateAvailablePrompt } from "@/components/update/UpdateAvailablePrompt";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
@@ -44,6 +45,7 @@ import {
 } from "@/lib/notifications/NotificationContext";
 import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
 import { initSentry } from "@/lib/sentry";
+import { TutorialProvider } from "@/lib/tutorial";
 
 // Initialize Sentry for error monitoring (native only)
 if (Platform.OS !== "web") {
@@ -257,64 +259,67 @@ export default function RootLayout() {
               <ApiClientProvider client={apiClient}>
                 <AuthProvider>
                   <FestivalProvider storage={mobileFestivalStorage}>
-                    {/* OfflineDataBridge must wrap GluestackUIProvider so that
-                        portal-rendered content (Actionsheets, Modals) have access
-                        to the OfflineDataProvider context */}
-                    <OfflineDataBridge>
-                      <GluestackUIProvider mode="light">
-                        <NotificationProvider>
-                          <NovuProviderWrapper>
-                            <LocationProvider>
-                              <NavigationGuard>
-                                <BackgroundSyncHandler />
-                                <NotificationPromptHandler />
-                                <UpdatePromptHandler />
-                                <SyncStatusBar />
-                                <Stack
-                                  screenOptions={{
-                                    headerShown: false,
-                                    animation: "slide_from_right",
-                                    ...defaultScreenOptions,
-                                  }}
-                                >
-                                  <Stack.Screen name="(auth)" />
-                                  <Stack.Screen name="(tabs)" />
-                                  <Stack.Screen
-                                    name="settings"
-                                    options={{
+                    <TutorialProvider>
+                      {/* OfflineDataBridge must wrap GluestackUIProvider so that
+                          portal-rendered content (Actionsheets, Modals) have access
+                          to the OfflineDataProvider context */}
+                      <OfflineDataBridge>
+                        <GluestackUIProvider mode="light">
+                          <NotificationProvider>
+                            <NovuProviderWrapper>
+                              <LocationProvider>
+                                <NavigationGuard>
+                                  <BackgroundSyncHandler />
+                                  <NotificationPromptHandler />
+                                  <UpdatePromptHandler />
+                                  <TutorialOverlay />
+                                  <SyncStatusBar />
+                                  <Stack
+                                    screenOptions={{
                                       headerShown: false,
-                                      presentation: "card",
+                                      animation: "slide_from_right",
+                                      ...defaultScreenOptions,
                                     }}
-                                  />
-                                  <Stack.Screen
-                                    name="groups"
-                                    options={{
-                                      headerShown: false,
-                                      presentation: "card",
-                                    }}
-                                  />
-                                  <Stack.Screen
-                                    name="achievements"
-                                    options={{
-                                      headerShown: false,
-                                      presentation: "card",
-                                    }}
-                                  />
-                                  <Stack.Screen
-                                    name="join-group/[token]"
-                                    options={{
-                                      headerShown: false,
-                                      presentation: "fullScreenModal",
-                                    }}
-                                  />
-                                  <Stack.Screen name="+not-found" />
-                                </Stack>
-                              </NavigationGuard>
-                            </LocationProvider>
-                          </NovuProviderWrapper>
-                        </NotificationProvider>
-                      </GluestackUIProvider>
-                    </OfflineDataBridge>
+                                  >
+                                    <Stack.Screen name="(auth)" />
+                                    <Stack.Screen name="(tabs)" />
+                                    <Stack.Screen
+                                      name="settings"
+                                      options={{
+                                        headerShown: false,
+                                        presentation: "card",
+                                      }}
+                                    />
+                                    <Stack.Screen
+                                      name="groups"
+                                      options={{
+                                        headerShown: false,
+                                        presentation: "card",
+                                      }}
+                                    />
+                                    <Stack.Screen
+                                      name="achievements"
+                                      options={{
+                                        headerShown: false,
+                                        presentation: "card",
+                                      }}
+                                    />
+                                    <Stack.Screen
+                                      name="join-group/[token]"
+                                      options={{
+                                        headerShown: false,
+                                        presentation: "fullScreenModal",
+                                      }}
+                                    />
+                                    <Stack.Screen name="+not-found" />
+                                  </Stack>
+                                </NavigationGuard>
+                              </LocationProvider>
+                            </NovuProviderWrapper>
+                          </NotificationProvider>
+                        </GluestackUIProvider>
+                      </OfflineDataBridge>
+                    </TutorialProvider>
                   </FestivalProvider>
                 </AuthProvider>
               </ApiClientProvider>

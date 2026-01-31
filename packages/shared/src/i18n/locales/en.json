@@ -1323,6 +1323,35 @@
     "skip": "Skip Tutorial",
     "finish": "Get Started"
   },
+  "mobileTutorial": {
+    "welcome": {
+      "title": "Welcome to ProstCounter!",
+      "description": "Let's take a quick tour to help you get started."
+    },
+    "festivalStatus": {
+      "title": "Festival Status",
+      "description": "See the countdown to the festival, which day it is, or when it has ended."
+    },
+    "locationSharing": {
+      "title": "Find Your Friends",
+      "description": "Share your location and see group members on the map."
+    },
+    "quickAttendance": {
+      "title": "Log Your Drinks",
+      "description": "Tap this button anytime to quickly log what you're drinking!"
+    },
+    "complete": {
+      "title": "You're All Set!",
+      "description": "Enjoy the festival! Reset this tutorial anytime in Profile settings."
+    },
+    "buttons": {
+      "next": "Next",
+      "previous": "Previous",
+      "skip": "Skip",
+      "getStarted": "Get Started!"
+    },
+    "progress": "Step {{current}} of {{total}}"
+  },
   "wrapped": {
     "title": "Your Year in Review",
     "generating": "Generating your wrapped...",

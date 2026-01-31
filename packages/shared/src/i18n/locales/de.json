@@ -1078,6 +1078,35 @@
     "skip": "Tutorial überspringen",
     "finish": "Los geht's"
   },
+  "mobileTutorial": {
+    "welcome": {
+      "title": "Willkommen bei ProstCounter!",
+      "description": "Lass uns eine kurze Tour machen, um dir den Einstieg zu erleichtern."
+    },
+    "festivalStatus": {
+      "title": "Festival-Status",
+      "description": "Sieh den Countdown zum Festival, welcher Tag es ist oder wann es vorbei ist."
+    },
+    "locationSharing": {
+      "title": "Finde deine Freunde",
+      "description": "Teile deinen Standort und sieh Gruppenmitglieder auf der Karte."
+    },
+    "quickAttendance": {
+      "title": "Getränke erfassen",
+      "description": "Tippe jederzeit auf diesen Button, um schnell zu erfassen, was du trinkst!"
+    },
+    "complete": {
+      "title": "Du bist bereit!",
+      "description": "Genieße das Festival! Du kannst dieses Tutorial jederzeit in den Profileinstellungen zurücksetzen."
+    },
+    "buttons": {
+      "next": "Weiter",
+      "previous": "Zurück",
+      "skip": "Überspringen",
+      "getStarted": "Los geht's!"
+    },
+    "progress": "Schritt {{current}} von {{total}}"
+  },
   "wrapped": {
     "title": "dein Jahresrückblick",
     "generating": "dein Rückblick wird erstellt...",

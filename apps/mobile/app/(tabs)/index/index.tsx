@@ -21,6 +21,7 @@ import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { MapLinkButton } from "@/components/shared/map-link-button";
+import { TutorialTarget } from "@/components/tutorial";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
@@ -104,35 +105,39 @@ export default function HomeScreen() {
           <AppHeader />
 
           {/* Festival Status */}
-          <FestivalStatus />
+          <TutorialTarget stepId="festival-status">
+            <FestivalStatus />
+          </TutorialTarget>
 
           {/* Location Sharing Card (native only) */}
           {Platform.OS !== "web" && currentFestival?.id && (
-            <Card size="md" variant="elevated" className="p-3">
-              <HStack className="items-center justify-between">
-                <LocationSharingToggle
-                  festivalId={currentFestival.id}
-                  compact
-                />
-                <Pressable
-                  onPress={() => setShowMapModal(true)}
-                  className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
-                  accessibilityLabel="Open festival map"
-                >
-                  <Map size={18} color={Colors.white} />
-                  <Text className="text-sm font-medium text-white">
-                    {t("location.map.button")}
-                  </Text>
-                  {isSharing && nearbyMembers.length > 0 && (
-                    <View className="ml-1 rounded-full bg-white px-2 py-0.5">
-                      <Text className="text-xs font-bold text-primary-600">
-                        {nearbyMembers.length}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              </HStack>
-            </Card>
+            <TutorialTarget stepId="location-sharing">
+              <Card size="md" variant="elevated" className="p-3">
+                <HStack className="items-center justify-between">
+                  <LocationSharingToggle
+                    festivalId={currentFestival.id}
+                    compact
+                  />
+                  <Pressable
+                    onPress={() => setShowMapModal(true)}
+                    className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
+                    accessibilityLabel="Open festival map"
+                  >
+                    <Map size={18} color={Colors.white} />
+                    <Text className="text-sm font-medium text-white">
+                      {t("location.map.button")}
+                    </Text>
+                    {isSharing && nearbyMembers.length > 0 && (
+                      <View className="ml-1 rounded-full bg-white px-2 py-0.5">
+                        <Text className="text-xs font-bold text-primary-600">
+                          {nearbyMembers.length}
+                        </Text>
+                      </View>
+                    )}
+                  </Pressable>
+                </HStack>
+              </Card>
+            </TutorialTarget>
           )}
 
           {/* Map Link Button (only shows if festival has mapUrl) */}

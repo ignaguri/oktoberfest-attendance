@@ -15,6 +15,7 @@ import {
   QuickAttendanceFab,
   QuickAttendanceSheet,
 } from "@/components/quick-attendance";
+import { TutorialTarget } from "@/components/tutorial";
 import { Colors } from "@/lib/constants/colors";
 import {
   QuickAttendanceProvider,
@@ -102,10 +103,12 @@ function TabsLayoutContent() {
 
       {/* Quick Attendance FAB */}
       {showFab && (
-        <QuickAttendanceFab
-          onPress={() => openSheet()}
-          disabled={!isFestivalActive}
-        />
+        <TutorialTarget stepId="quick-attendance-fab">
+          <QuickAttendanceFab
+            onPress={() => openSheet()}
+            disabled={!isFestivalActive}
+          />
+        </TutorialTarget>
       )}
 
       {/* Quick Attendance Sheet */}
