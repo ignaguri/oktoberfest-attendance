@@ -34,11 +34,17 @@ import {
 
 /** Measurement data for a target component */
 export interface TargetMeasurement {
+  /** Horizontal position in screen coordinates */
   x: number;
+  /** Vertical position in screen coordinates */
   y: number;
+  /** Width of the target in pixels */
   width: number;
+  /** Height of the target in pixels */
   height: number;
+  /** Alias for x (compatibility with measurement APIs) */
   pageX: number;
+  /** Alias for y (compatibility with measurement APIs) */
   pageY: number;
 }
 
@@ -98,10 +104,12 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
   // Auto-start tutorial for new users (only once per session)
   useEffect(() => {
     // Safety check: only auto-start if we have valid tutorial status data
+    // Explicitly check tutorialStatus is defined (not just truthy)
     if (
       isAuthenticated &&
       !isLoading &&
-      tutorialStatus && // Ensure data is loaded
+      tutorialStatus !== undefined &&
+      tutorialStatus !== null &&
       !isCompleted &&
       !hasAutoStarted &&
       !isActive
@@ -216,11 +224,8 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     setCurrentStepIndex(0);
   }, [completeTutorial]);
 
-  const endTutorial = useCallback(() => {
-    completeTutorial.mutate();
-    setIsActive(false);
-    setCurrentStepIndex(0);
-  }, [completeTutorial]);
+  // endTutorial is an alias for skipTutorial (both complete the tutorial)
+  const endTutorial = skipTutorial;
 
   const startTutorial = useCallback(() => {
     setIsActive(true);

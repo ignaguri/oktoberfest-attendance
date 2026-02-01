@@ -19,6 +19,9 @@ import {
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
+// Create AnimatedSvg outside component to avoid recreation on each render
+const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+
 interface TutorialSpotlightProps {
   /** Measurement of the target to highlight (null for centered steps) */
   targetMeasurement: TargetMeasurement | null;
@@ -31,7 +34,6 @@ export function TutorialSpotlight({
   visible,
 }: TutorialSpotlightProps) {
   const opacityAnim = useRef(new Animated.Value(0)).current;
-  const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
   useEffect(() => {
     Animated.timing(opacityAnim, {

@@ -7,24 +7,25 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useEffect, useRef } from "react";
-import { Animated, Dimensions, StyleSheet, View } from "react-native";
+import { Animated, Dimensions } from "react-native";
 
+import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { Colors } from "@/lib/constants/colors";
 import {
   type TargetMeasurement,
   type TooltipPosition,
   TUTORIAL_SIZING,
   TUTORIAL_TIMING,
+  TUTORIAL_Z_INDEX,
   type TutorialStep,
 } from "@/lib/tutorial";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface TutorialTooltipProps {
   /** Current tutorial step */
@@ -101,8 +102,11 @@ export function TutorialTooltip({
   return (
     <Animated.View
       style={[
-        styles.container,
-        tooltipStyle,
+        {
+          position: "absolute",
+          zIndex: TUTORIAL_Z_INDEX.TOOLTIP,
+          ...tooltipStyle,
+        },
         {
           opacity: opacityAnim,
           transform: [{ scale: scaleAnim }],
@@ -125,12 +129,13 @@ export function TutorialTooltip({
           {/* Progress indicator */}
           <HStack className="items-center justify-center">
             {Array.from({ length: totalSteps }).map((_, index) => (
-              <View
+              <Box
                 key={index}
-                style={[
-                  styles.progressDot,
-                  index === currentIndex && styles.progressDotActive,
-                ]}
+                className={`mx-1 h-2 rounded-full ${
+                  index === currentIndex
+                    ? "w-6 bg-primary-500"
+                    : "w-2 bg-gray-300"
+                }`}
               />
             ))}
           </HStack>
@@ -150,7 +155,7 @@ export function TutorialTooltip({
                 </ButtonText>
               </Button>
             ) : (
-              <View style={styles.buttonPlaceholder} />
+              <Box className="w-15" />
             )}
 
             {/* Previous/Next buttons (right side) */}
@@ -244,26 +249,5 @@ function calculateTooltipPosition(
     right: margin,
   };
 }
-
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    zIndex: 1001,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.gray[300],
-    marginHorizontal: 4,
-  },
-  progressDotActive: {
-    backgroundColor: Colors.primary[500],
-    width: 24,
-  },
-  buttonPlaceholder: {
-    width: 60, // Approximate width of skip button
-  },
-});
 
 TutorialTooltip.displayName = "TutorialTooltip";

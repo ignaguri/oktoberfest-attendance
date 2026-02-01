@@ -6,8 +6,9 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { Modal, StyleSheet, View } from "react-native";
+import { Modal } from "react-native";
 
+import { Box } from "@/components/ui/box";
 import { logger } from "@/lib/logger";
 import { type TargetMeasurement, useTutorial } from "@/lib/tutorial";
 
@@ -38,29 +39,46 @@ export function TutorialOverlay() {
       return;
     }
 
+    let isCancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     const measureTarget = async () => {
       setIsReady(false);
 
       try {
         if (currentStep.targetId) {
           // Small delay to allow layout to settle
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise<void>((resolve) => {
+            timeoutId = setTimeout(resolve, 100);
+          });
+          if (isCancelled) return;
+
           const measurement = await getTargetMeasurement(currentStep.targetId);
+          if (isCancelled) return;
+
           setTargetMeasurement(measurement);
         } else {
           // Centered steps have no target
           setTargetMeasurement(null);
         }
       } catch (error) {
+        if (isCancelled) return;
         logger.warn("Failed to measure tutorial target", { error });
         // Continue with null measurement (will show centered)
         setTargetMeasurement(null);
       }
 
-      setIsReady(true);
+      if (!isCancelled) {
+        setIsReady(true);
+      }
     };
 
     measureTarget();
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [isActive, currentStep, getTargetMeasurement]);
 
   const handleNext = useCallback(() => {
@@ -93,7 +111,7 @@ export function TutorialOverlay() {
       statusBarTranslucent
       onRequestClose={handleSkip}
     >
-      <View style={styles.container} pointerEvents="box-none">
+      <Box className="flex-1" pointerEvents="box-none">
         {/* Dark overlay with spotlight cutout */}
         <TutorialSpotlight
           targetMeasurement={targetMeasurement}
@@ -113,15 +131,9 @@ export function TutorialOverlay() {
           isLastStep={isLastStep}
           visible={isReady}
         />
-      </View>
+      </Box>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 TutorialOverlay.displayName = "TutorialOverlay";

@@ -6,6 +6,7 @@ export {
   TUTORIAL_OPACITY,
   TUTORIAL_SIZING,
   TUTORIAL_TIMING,
+  TUTORIAL_Z_INDEX,
 } from "./constants";
 export {
   type TargetMeasurement,

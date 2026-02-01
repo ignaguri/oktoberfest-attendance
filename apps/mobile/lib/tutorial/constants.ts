@@ -37,3 +37,11 @@ export const TUTORIAL_OPACITY = {
   /** Background overlay opacity (0-1) */
   OVERLAY_OPACITY: 0.7,
 } as const;
+
+// Z-index constants for layering
+export const TUTORIAL_Z_INDEX = {
+  /** Z-index for the overlay backdrop */
+  OVERLAY: 1000,
+  /** Z-index for the tooltip card (above overlay) */
+  TOOLTIP: 1001,
+} as const;
