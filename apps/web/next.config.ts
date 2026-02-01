@@ -25,7 +25,15 @@ const nextConfig: NextConfig = {
   // Transpile shared packages for proper bundling
   transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
-  serverExternalPackages: ["esbuild-wasm"],
+  serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64"],
+  // Turbopack configuration
+  turbopack: {
+    resolveAlias: {
+      // Prevent Turbopack from trying to bundle esbuild binaries
+      esbuild: "esbuild-wasm",
+    },
+    resolveExtensions: [".js", ".jsx", ".ts", ".tsx", ".json", ".mjs", ".cjs"],
+  },
   async headers() {
     return [
       {

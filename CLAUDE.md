@@ -156,6 +156,8 @@ GestureHandlerRootView
 - Web: shadcn/ui + Tailwind CSS
 - Mobile: Gluestack UI + NativeWind
 
+**IMPORTANT (Mobile)**: Always use Gluestack UI components and NativeWind (Tailwind classes via `className`) for styling. Do NOT use React Native `StyleSheet` or inline style objects.
+
 ## API Layer
 
 - **Hono REST API** in `packages/api/` with OpenAPI spec generation
@@ -321,6 +323,8 @@ import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 
 - **Database Testing**: Always reset local DB (`pnpm sup:db:reset`) to test migrations
 - **RLS Policies**: All tables have Row Level Security - test with real Supabase
+- **Before Committing**: Always run `pnpm lint` and `pnpm type-check` on the whole project and ensure there are no errors
+- **Do NOT Push**: Do not push commits to the remote repository unless explicitly asked
 
 ## Additional Documentation
 
