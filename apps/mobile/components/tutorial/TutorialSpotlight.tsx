@@ -5,7 +5,7 @@
  * while dimming the rest of the screen.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { Animated, Dimensions, StyleSheet } from "react-native";
 import Svg, { Defs, Mask, Rect } from "react-native-svg";
 
@@ -33,7 +33,7 @@ export function TutorialSpotlight({
   targetMeasurement,
   visible,
 }: TutorialSpotlightProps) {
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const opacityAnim = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
     Animated.timing(opacityAnim, {

@@ -33,9 +33,8 @@ export function TutorialOverlay() {
 
   // Measure the target when step changes
   useEffect(() => {
+    // Skip measurement when tutorial is inactive (component won't render anyway)
     if (!isActive || !currentStep) {
-      setTargetMeasurement(null);
-      setIsReady(false);
       return;
     }
 
@@ -78,6 +77,9 @@ export function TutorialOverlay() {
     return () => {
       isCancelled = true;
       clearTimeout(timeoutId);
+      // Reset state on cleanup to prepare for next activation
+      setTargetMeasurement(null);
+      setIsReady(false);
     };
   }, [isActive, currentStep, getTargetMeasurement]);
 

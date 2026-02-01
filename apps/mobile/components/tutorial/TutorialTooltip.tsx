@@ -6,7 +6,7 @@
  */
 
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { Animated, Dimensions } from "react-native";
 
 import { Box } from "@/components/ui/box";
@@ -63,8 +63,8 @@ export function TutorialTooltip({
   visible,
 }: TutorialTooltipProps) {
   const { t } = useTranslation();
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const opacityAnim = useMemo(() => new Animated.Value(0), []);
+  const scaleAnim = useMemo(() => new Animated.Value(0.9), []);
 
   useEffect(() => {
     if (visible) {
