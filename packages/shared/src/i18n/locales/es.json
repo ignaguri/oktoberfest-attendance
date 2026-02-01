@@ -1340,6 +1340,22 @@
       "title": "Registrá tus bebidas",
       "description": "¡Tocá este botón en cualquier momento para registrar rápidamente lo que estás tomando!"
     },
+    "attendanceTab": {
+      "title": "Seguí tu asistencia",
+      "description": "Usá la pestaña Asistencia para ver tu calendario del festival. Tocá cualquier fecha para registrar bebidas, agregar fotos y controlar tus gastos."
+    },
+    "groupsTab": {
+      "title": "Unite a la competencia",
+      "description": "Creá o unite a grupos para competir con amigos. Compará estadísticas, compartí fotos y mirá quién asiste más!"
+    },
+    "leaderboardTab": {
+      "title": "Mirá el ranking",
+      "description": "Mirá cómo te posicionás entre todos los asistentes. Ordená por bebidas totales, días o promedio. ¡Desbloqueá logros mientras avanzás!"
+    },
+    "profileTab": {
+      "title": "Tu perfil y configuración",
+      "description": "Personalizá tu perfil, activá login biométrico y gestioná tu cuenta. Podés reiniciar este tutorial en cualquier momento desde acá."
+    },
     "complete": {
       "title": "¡Estás listo!",
       "description": "¡Disfrutá el festival! Podés reiniciar este tutorial en cualquier momento desde la configuración del perfil."

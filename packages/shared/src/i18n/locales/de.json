@@ -1095,6 +1095,22 @@
       "title": "Getränke erfassen",
       "description": "Tippe jederzeit auf diesen Button, um schnell zu erfassen, was du trinkst!"
     },
+    "attendanceTab": {
+      "title": "Verfolge deine Besuche",
+      "description": "Nutze den Besuche-Tab um deinen Festivalkalender zu sehen. Tippe auf ein Datum um Getränke zu erfassen, Fotos hinzuzufügen und Ausgaben zu verfolgen."
+    },
+    "groupsTab": {
+      "title": "Nimm am Wettbewerb teil",
+      "description": "Erstelle oder tritt Gruppen bei, um mit Freunden zu konkurrieren. Vergleiche Statistiken, teile Fotos und sieh wer am meisten dabei ist!"
+    },
+    "leaderboardTab": {
+      "title": "Sieh die Rangliste",
+      "description": "Sieh wie du im Vergleich zu allen Festivalbesuchern abschneidest. Sortiere nach Getränken, Besuchstagen oder Durchschnitt. Schalte Erfolge frei!"
+    },
+    "profileTab": {
+      "title": "Dein Profil & Einstellungen",
+      "description": "Passe dein Profil an, aktiviere biometrische Anmeldung und verwalte dein Konto. Du kannst dieses Tutorial jederzeit hier neu starten."
+    },
     "complete": {
       "title": "Du bist bereit!",
       "description": "Genieße das Festival! Du kannst dieses Tutorial jederzeit in den Profileinstellungen zurücksetzen."

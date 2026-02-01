@@ -1340,6 +1340,22 @@
       "title": "Log Your Drinks",
       "description": "Tap this button anytime to quickly log what you're drinking!"
     },
+    "attendanceTab": {
+      "title": "Track Your Attendance",
+      "description": "Use the Attendance tab to view your festival calendar. Tap any date to log drinks, add photos, and track your spending."
+    },
+    "groupsTab": {
+      "title": "Join the Competition",
+      "description": "Create or join groups to compete with friends. Compare stats, share photos, and see who attends the most!"
+    },
+    "leaderboardTab": {
+      "title": "Check the Rankings",
+      "description": "See how you rank against all festival-goers. Sort by total drinks, days attended, or average. Unlock achievements as you go!"
+    },
+    "profileTab": {
+      "title": "Your Profile & Settings",
+      "description": "Customize your profile, enable biometric login, and manage your account. You can restart this tutorial anytime from here."
+    },
     "complete": {
       "title": "You're All Set!",
       "description": "Enjoy the festival! Reset this tutorial anytime in Profile settings."

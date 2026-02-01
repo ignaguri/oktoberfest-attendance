@@ -9,6 +9,7 @@ import {
   useCompleteTutorial,
   useTutorialStatus,
 } from "@prostcounter/shared/hooks";
+import { type Href, useRouter } from "expo-router";
 import {
   createContext,
   type ReactNode,
@@ -82,6 +83,7 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
   const { isAuthenticated } = useAuth();
   const { data: tutorialStatus, loading: isLoading } = useTutorialStatus();
   const completeTutorial = useCompleteTutorial();
+  const router = useRouter();
 
   // Tutorial state
   const [isActive, setIsActive] = useState(false);
@@ -121,17 +123,28 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     isActive,
   ]);
 
-  // Reset hasAutoStarted when tutorial is reset (completed becomes false)
-  useEffect(() => {
-    if (!isCompleted && !isLoading) {
-      setHasAutoStarted(false);
-    }
-  }, [isCompleted, isLoading]);
-
   const currentStep = useMemo(
     () => TUTORIAL_STEPS[currentStepIndex] ?? null,
     [currentStepIndex],
   );
+
+  // Navigate to the appropriate tab when the step changes
+  useEffect(() => {
+    const tabRoute = currentStep?.tabRoute;
+    if (!isActive || !tabRoute) return;
+
+    // Small delay to allow the UI to settle before navigation
+    const timer = setTimeout(() => {
+      try {
+        // Use navigate with the tab route
+        router.navigate(tabRoute as Href);
+      } catch (error) {
+        logger.warn("Failed to navigate during tutorial", { error });
+      }
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [isActive, currentStep?.tabRoute, router]);
 
   const registerTarget = useCallback((stepId: string, ref: View | null) => {
     if (ref) {

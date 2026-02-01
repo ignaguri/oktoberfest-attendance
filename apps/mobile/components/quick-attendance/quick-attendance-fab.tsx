@@ -1,11 +1,16 @@
 import { Beer, Plus } from "lucide-react-native";
+import { useEffect, useRef } from "react";
+import type { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fab, FabIcon } from "@/components/ui/fab";
+import { useTutorialSafe } from "@/lib/tutorial";
 
 interface QuickAttendanceFabProps {
   onPress: () => void;
   disabled?: boolean;
+  /** Tutorial step ID for self-registration (bypasses TutorialTarget wrapper issues with absolute positioning) */
+  tutorialStepId?: string;
 }
 
 /**
@@ -13,12 +18,27 @@ interface QuickAttendanceFabProps {
  *
  * Positioned above the tab bar, accounting for safe area (home indicator)
  * Shows Plus + Beer icons, disabled when festival is inactive
+ *
+ * Note: This component self-registers with the tutorial context because
+ * the TutorialTarget wrapper doesn't work with absolutely positioned elements
+ * (the wrapper View has 0x0 dimensions).
  */
 export function QuickAttendanceFab({
   onPress,
   disabled = false,
+  tutorialStepId,
 }: QuickAttendanceFabProps) {
   const insets = useSafeAreaInsets();
+  const tutorial = useTutorialSafe();
+  const fabRef = useRef<View>(null);
+
+  // Self-register with tutorial context for highlighting
+  useEffect(() => {
+    if (!tutorial || !tutorialStepId) return;
+    tutorial.registerTarget(tutorialStepId, fabRef.current);
+    return () => tutorial.unregisterTarget(tutorialStepId);
+  }, [tutorial, tutorialStepId]);
+
   // Native floating tab bar (iOS 18+) is a compact pill
   // Position FAB above it with margin for clearance
   // Devices without home indicator (insets.bottom = 0) need extra margin
@@ -28,6 +48,7 @@ export function QuickAttendanceFab({
 
   return (
     <Fab
+      ref={fabRef}
       size="lg"
       placement="bottom right"
       onPress={onPress}
