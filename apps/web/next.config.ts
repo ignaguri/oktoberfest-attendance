@@ -52,6 +52,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+    optimizePackageImports: ["zod", "@hookform/resolvers"],
   },
   images: {
     localPatterns: [
