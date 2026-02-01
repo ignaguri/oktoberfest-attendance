@@ -1301,27 +1301,48 @@
   },
   "tutorial": {
     "welcome": {
-      "title": "Welcome to ProstCounter!",
-      "description": "Track your beer festival attendance and compete with friends!"
+      "title": "Welcome to ProstCounter! 🍻",
+      "description": "Let's take a quick guided tour of the app to help you get started with tracking your beer festival adventures."
     },
-    "step1": {
-      "title": "Track Your Visits",
-      "description": "Log each day you attend and how many beers you enjoy."
+    "festivalStatus": {
+      "title": "Festival Status",
+      "description": "This shows you the current status of the festival and whether you can log attendances."
     },
-    "step2": {
-      "title": "Join Groups",
-      "description": "Create or join groups to compete with friends."
+    "quickAttendance": {
+      "title": "Quick Attendance",
+      "description": "Log your daily beer consumption here. This is the main feature of the app!"
     },
-    "step3": {
-      "title": "Earn Achievements",
-      "description": "Unlock badges and climb the leaderboard!"
+    "highlights": {
+      "title": "Your Stats & Leaderboard",
+      "description": "View your personal statistics, achievements, highlights, and see how you rank against other users in the global leaderboard."
     },
-    "step4": {
-      "title": "Share Photos",
-      "description": "Capture memories with your group gallery."
+    "groups": {
+      "title": "Groups",
+      "description": "Join or create groups to compete with friends during the festival."
     },
-    "skip": "Skip Tutorial",
-    "finish": "Get Started"
+    "calendarNav": {
+      "title": "Calendar",
+      "description": "Click the calendar icon to view your attendance calendar and manage your schedule."
+    },
+    "userMenu": {
+      "title": "Navigation Menu",
+      "description": "Click on your avatar or name to open the menu with all navigation options like Profile, Groups, Leaderboard, and more."
+    },
+    "mapShare": {
+      "title": "Map & Share",
+      "description": "Access the festival map and share the app with friends."
+    },
+    "complete": {
+      "title": "Tutorial Complete! 🎉",
+      "description": "You've seen the main features of ProstCounter! You can always reset this tutorial in your profile settings if you want to see it again. Now go enjoy the festival and track those beers!"
+    },
+    "buttons": {
+      "next": "Next",
+      "previous": "Previous",
+      "skip": "Skip",
+      "getStarted": "Get Started! 🍻"
+    },
+    "progress": "Step {{current}} of {{total}}"
   },
   "mobileTutorial": {
     "welcome": {

@@ -6,6 +6,7 @@
  */
 
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { useEffect, useMemo } from "react";
 import { Animated, Dimensions } from "react-native";
 
@@ -131,11 +132,12 @@ export function TutorialTooltip({
             {Array.from({ length: totalSteps }).map((_, index) => (
               <Box
                 key={index}
-                className={`mx-1 h-2 rounded-full ${
+                className={cn(
+                  "mx-1 h-2 rounded-full",
                   index === currentIndex
                     ? "w-6 bg-primary-500"
-                    : "w-2 bg-gray-300"
-                }`}
+                    : "w-2 bg-gray-300",
+                )}
               />
             ))}
           </HStack>

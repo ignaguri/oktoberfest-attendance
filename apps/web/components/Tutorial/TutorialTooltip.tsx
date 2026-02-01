@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { ChevronLeft, ChevronRight, SkipForward, X } from "lucide-react";
 import { startTransition, useEffect, useRef, useState } from "react";
 
@@ -34,9 +35,14 @@ export function TutorialTooltip({
   currentStepIndex,
   totalSteps,
 }: TutorialTooltipProps) {
+  const { t } = useTranslation();
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // Get translated content
+  const title = t(`${step.translationKey}.title`);
+  const description = t(`${step.translationKey}.description`);
 
   useEffect(() => {
     if (!isActive) {
@@ -233,7 +239,10 @@ export function TutorialTooltip({
       {/* Progress indicator */}
       <div className="mb-4 flex items-center justify-between">
         <div className="text-sm text-gray-500">
-          Step {currentStepIndex + 1} of {totalSteps}
+          {t("tutorial.progress", {
+            current: currentStepIndex + 1,
+            total: totalSteps,
+          })}
         </div>
         <Button variant="ghost" size="sm" onClick={onClose} className="p-0">
           <X className="size-4" />
@@ -242,12 +251,8 @@ export function TutorialTooltip({
 
       {/* Content */}
       <div className="mb-6">
-        <h3 className="mb-2 text-lg font-semibold text-gray-900">
-          {step.title}
-        </h3>
-        <p className="text-sm leading-relaxed text-gray-600">
-          {step.description}
-        </p>
+        <h3 className="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
+        <p className="text-sm leading-relaxed text-gray-600">{description}</p>
       </div>
 
       {/* Action buttons */}
@@ -261,11 +266,11 @@ export function TutorialTooltip({
             className="h-8"
           >
             <ChevronLeft className="mr-1 size-4" />
-            Previous
+            {t("tutorial.buttons.previous")}
           </Button>
           <Button variant="outline" size="sm" onClick={onSkip} className="h-8">
             <SkipForward className="mr-1 size-4" />
-            Skip
+            {t("tutorial.buttons.skip")}
           </Button>
         </div>
 
@@ -275,11 +280,11 @@ export function TutorialTooltip({
         >
           {canGoNext ? (
             <>
-              Next
+              {t("tutorial.buttons.next")}
               <ChevronRight className="ml-1 size-4" />
             </>
           ) : (
-            "Get Started! 🍻"
+            t("tutorial.buttons.getStarted")
           )}
         </Button>
       </div>
