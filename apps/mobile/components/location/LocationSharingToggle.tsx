@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import {
   ChevronDown,
   ChevronUp,
@@ -247,11 +248,12 @@ export function LocationSharingToggle({
                   <Pressable
                     key={option.value}
                     onPress={() => setSelectedDuration(option.value)}
-                    className={`rounded-full px-4 py-2 ${
+                    className={cn(
+                      "rounded-full px-4 py-2",
                       selectedDuration === option.value
                         ? "bg-primary-500"
-                        : "bg-background-100"
-                    }`}
+                        : "bg-background-100",
+                    )}
                   >
                     <Text
                       className={

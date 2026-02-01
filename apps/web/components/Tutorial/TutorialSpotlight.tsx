@@ -88,6 +88,28 @@ export function TutorialSpotlight({
     return null;
   }
 
+  // Calculate the spotlight cutout dimensions with padding
+  const padding = TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET;
+  const cutoutX = position.x - padding;
+  const cutoutY = position.y - padding;
+  const cutoutWidth = position.width + padding * 2;
+  const cutoutHeight = position.height + padding * 2;
+
+  // Create clip-path polygon for rectangular cutout
+  // This creates a full-screen overlay with a rectangular hole
+  const clipPath = `polygon(
+    0% 0%,
+    0% 100%,
+    ${cutoutX}px 100%,
+    ${cutoutX}px ${cutoutY}px,
+    ${cutoutX + cutoutWidth}px ${cutoutY}px,
+    ${cutoutX + cutoutWidth}px ${cutoutY + cutoutHeight}px,
+    ${cutoutX}px ${cutoutY + cutoutHeight}px,
+    ${cutoutX}px 100%,
+    100% 100%,
+    100% 0%
+  )`;
+
   return (
     <div
       ref={spotlightRef}
@@ -95,20 +117,18 @@ export function TutorialSpotlight({
         "pointer-events-none fixed inset-0 z-50 transition-all duration-300",
         className,
       )}
-      style={{
-        background: `radial-gradient(circle at ${position.x + position.width / 2}px ${position.y + position.height / 2}px, transparent 0px, transparent ${Math.max(position.width, position.height) / 2 + TUTORIAL_CONSTANTS.SPOTLIGHT_GRADIENT_OFFSET}px, rgba(0, 0, 0, 0.5) ${Math.max(position.width, position.height) / 2 + TUTORIAL_CONSTANTS.SPOTLIGHT_GRADIENT_FADE}px)`,
-      }}
     >
+      {/* Dark overlay with rectangular cutout */}
+      <div className="absolute inset-0 bg-black/50" style={{ clipPath }} />
+
       {/* Highlight border around the element */}
       <div
         className="absolute animate-pulse rounded-lg border-2 border-yellow-400 shadow-lg shadow-yellow-400/50"
         style={{
-          left: position.x - TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET,
-          top: position.y - TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET,
-          width:
-            position.width + TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET * 2,
-          height:
-            position.height + TUTORIAL_CONSTANTS.SPOTLIGHT_BORDER_OFFSET * 2,
+          left: cutoutX,
+          top: cutoutY,
+          width: cutoutWidth,
+          height: cutoutHeight,
         }}
       />
     </div>

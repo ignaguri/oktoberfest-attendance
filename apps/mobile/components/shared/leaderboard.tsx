@@ -1,7 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WinningCriteria } from "@prostcounter/shared/schemas";
 import type { LeaderboardEntry } from "@prostcounter/shared/schemas";
-import { getInitials } from "@prostcounter/ui";
+import { cn, getInitials } from "@prostcounter/ui";
 import {
   Beer,
   Calendar,
@@ -94,14 +94,14 @@ function SortableHeader({
 
   if (!sortable) {
     return (
-      <HStack className={`${width} items-center justify-center`} space="xs">
+      <HStack className={cn(width, "items-center justify-center")} space="xs">
         <Icon size={14} color={IconColors.muted} />
       </HStack>
     );
   }
 
   return (
-    <Pressable onPress={onPress} className={`${width} py-1`}>
+    <Pressable onPress={onPress} className={cn(width, "py-1")}>
       <HStack className="items-center justify-center" space="xs">
         <Icon
           size={14}
@@ -251,16 +251,21 @@ export function Leaderboard({
                 onPress={() => handleUserPress(entry)}
               >
                 <HStack
-                  className={`items-center px-3 py-2.5 ${
-                    isCurrentUser ? "bg-primary-50" : ""
-                  } ${!isLast ? "border-b border-outline-50" : ""}`}
+                  className={cn(
+                    "items-center px-3 py-2.5",
+                    isCurrentUser && "bg-primary-50",
+                    !isLast && "border-b border-outline-50",
+                  )}
                 >
                   {/* Position + Avatar + Name */}
                   <HStack className="flex-1 items-center" space="sm">
                     {/* Position indicator */}
                     {isTopThree ? (
                       <VStack
-                        className={`h-7 w-7 items-center justify-center rounded-full ${positionStyle?.bg}`}
+                        className={cn(
+                          "h-7 w-7 items-center justify-center rounded-full",
+                          positionStyle?.bg,
+                        )}
                       >
                         {displayPosition === 1 ? (
                           <Trophy size={14} color={positionStyle?.icon} />
@@ -295,11 +300,12 @@ export function Leaderboard({
 
                     {/* Name */}
                     <Text
-                      className={`flex-1 text-sm ${
+                      className={cn(
+                        "flex-1 text-sm",
                         isCurrentUser
                           ? "font-semibold text-primary-700"
-                          : "text-typography-900"
-                      }`}
+                          : "text-typography-900",
+                      )}
                       numberOfLines={1}
                     >
                       {displayName}
@@ -314,29 +320,32 @@ export function Leaderboard({
 
                   {/* Stats - aligned with headers */}
                   <Text
-                    className={`w-14 text-center text-sm font-semibold ${
+                    className={cn(
+                      "w-14 text-center text-sm font-semibold",
                       currentSortColumn === "days_attended"
                         ? "text-primary-700"
-                        : "text-typography-800"
-                    }`}
+                        : "text-typography-800",
+                    )}
                   >
                     {entry.daysAttended ?? 0}
                   </Text>
                   <Text
-                    className={`w-14 text-center text-sm font-semibold ${
+                    className={cn(
+                      "w-14 text-center text-sm font-semibold",
                       currentSortColumn === "total_beers"
                         ? "text-primary-700"
-                        : "text-typography-800"
-                    }`}
+                        : "text-typography-800",
+                    )}
                   >
                     {entry.totalBeers ?? 0}
                   </Text>
                   <Text
-                    className={`w-12 text-center text-sm font-semibold ${
+                    className={cn(
+                      "w-12 text-center text-sm font-semibold",
                       currentSortColumn === "avg_beers"
                         ? "text-primary-700"
-                        : "text-typography-800"
-                    }`}
+                        : "text-typography-800",
+                    )}
                   >
                     {typeof entry.avgBeers === "number"
                       ? entry.avgBeers.toFixed(1)
@@ -440,9 +449,10 @@ export function Leaderboard({
                 {selectedUser.position <= 3 && (
                   <HStack
                     space="xs"
-                    className={`mt-2 items-center rounded-full px-3 py-1 ${
-                      POSITION_COLORS[selectedUser.position as 1 | 2 | 3]?.bg
-                    }`}
+                    className={cn(
+                      "mt-2 items-center rounded-full px-3 py-1",
+                      POSITION_COLORS[selectedUser.position as 1 | 2 | 3]?.bg,
+                    )}
                   >
                     {selectedUser.position === 1 ? (
                       <Trophy size={16} color={POSITION_COLORS[1].icon} />

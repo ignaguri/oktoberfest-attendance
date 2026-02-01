@@ -1301,27 +1301,93 @@
   },
   "tutorial": {
     "welcome": {
+      "title": "¡Bienvenido a ProstCounter! 🍻",
+      "description": "Hagamos un tour rápido por la app para ayudarte a empezar a registrar tus aventuras en el festival de cerveza."
+    },
+    "festivalStatus": {
+      "title": "Estado del Festival",
+      "description": "Acá podés ver el estado actual del festival y si podés registrar asistencias."
+    },
+    "quickAttendance": {
+      "title": "Registro Rápido",
+      "description": "Registrá tu consumo diario de cerveza acá. ¡Esta es la función principal de la app!"
+    },
+    "highlights": {
+      "title": "Tus Estadísticas y Ranking",
+      "description": "Mirá tus estadísticas personales, logros, destacados y compará tu posición contra otros usuarios en el ranking global."
+    },
+    "groups": {
+      "title": "Grupos",
+      "description": "Unite o creá grupos para competir con amigos durante el festival."
+    },
+    "calendarNav": {
+      "title": "Calendario",
+      "description": "Hacé clic en el ícono del calendario para ver tu calendario de asistencia y gestionar tu agenda."
+    },
+    "userMenu": {
+      "title": "Menú de Navegación",
+      "description": "Hacé clic en tu avatar o nombre para abrir el menú con todas las opciones de navegación como Perfil, Grupos, Ranking y más."
+    },
+    "mapShare": {
+      "title": "Mapa y Compartir",
+      "description": "Accedé al mapa del festival y compartí la app con amigos."
+    },
+    "complete": {
+      "title": "¡Tutorial Completado! 🎉",
+      "description": "¡Viste las principales funciones de ProstCounter! Podés reiniciar este tutorial en cualquier momento desde los ajustes de tu perfil. ¡Ahora andá a disfrutar el festival y contá esas birras!"
+    },
+    "buttons": {
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "skip": "Omitir",
+      "getStarted": "¡Empezar! 🍻"
+    },
+    "progress": "Paso {{current}} de {{total}}"
+  },
+  "mobileTutorial": {
+    "welcome": {
       "title": "¡Bienvenido a ProstCounter!",
-      "description": "¡Seguí tu asistencia a festivales de cerveza y competí con amigos!"
+      "description": "Hagamos un tour rápido para ayudarte a empezar."
     },
-    "step1": {
-      "title": "Registrá tus visitas",
-      "description": "Registrá cada día que asistís y cuántas cervezas disfrutás."
+    "festivalStatus": {
+      "title": "Estado del festival",
+      "description": "Mirá la cuenta regresiva del festival, qué día es o cuándo terminó."
     },
-    "step2": {
-      "title": "Unite a grupos",
-      "description": "Creá o unite a grupos para competir con amigos."
+    "locationSharing": {
+      "title": "Encontrá a tus amigos",
+      "description": "Compartí tu ubicación y mirá a los miembros del grupo en el mapa."
     },
-    "step3": {
-      "title": "Conseguí logros",
-      "description": "¡Desbloqueá medallas y subí en el ranking!"
+    "quickAttendance": {
+      "title": "Registrá tus bebidas",
+      "description": "¡Tocá este botón en cualquier momento para registrar rápidamente lo que estás tomando!"
     },
-    "step4": {
-      "title": "Compartí fotos",
-      "description": "Capturá recuerdos con la galería de tu grupo."
+    "attendanceTab": {
+      "title": "Seguí tu asistencia",
+      "description": "Usá la pestaña Asistencia para ver tu calendario del festival. Tocá cualquier fecha para registrar bebidas, agregar fotos y controlar tus gastos."
     },
-    "skip": "Omitir tutorial",
-    "finish": "Empezar"
+    "groupsTab": {
+      "title": "Unite a la competencia",
+      "description": "Creá o unite a grupos para competir con amigos. Compará estadísticas, compartí fotos y mirá quién asiste más!"
+    },
+    "leaderboardTab": {
+      "title": "Mirá el ranking",
+      "description": "Mirá cómo te posicionás entre todos los asistentes. Ordená por bebidas totales, días o promedio. ¡Desbloqueá logros mientras avanzás!"
+    },
+    "profileTab": {
+      "title": "Tu perfil y configuración",
+      "description": "Personalizá tu perfil, activá login biométrico y gestioná tu cuenta. Podés reiniciar este tutorial en cualquier momento desde acá."
+    },
+    "complete": {
+      "title": "¡Estás listo!",
+      "description": "¡Disfrutá el festival! Podés reiniciar este tutorial en cualquier momento desde la configuración del perfil."
+    },
+    "buttons": {
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "skip": "Omitir",
+      "getStarted": "¡Empezar!"
+    },
+    "progress": "Paso {{current}} de {{total}}"
   },
   "wrapped": {
     "title": "Tu año en retrospectiva",

@@ -1,11 +1,13 @@
 # Internationalization Implementation Plan
 
 ## Overview
+
 Replace 75-85 hardcoded strings across web app with translation keys. Current i18n coverage is 60-70%, with comprehensive translation files already in place (1544 lines).
 
 ## Priority-Based Implementation
 
 ### Phase 1: Critical Navigation & Error Handling
+
 **Impact**: User authentication, navigation, error states
 
 1. **apps/web/components/navbar.tsx**
@@ -26,6 +28,7 @@ Replace 75-85 hardcoded strings across web app with translation keys. Current i1
      - `common.buttons.goHome`
 
 ### Phase 2: High-Priority User Features
+
 **Impact**: Core functionality, sharing, privacy
 
 4. **apps/web/components/groups/GroupMembersMap.tsx (LocationSharing)**
@@ -105,6 +108,7 @@ Replace 75-85 hardcoded strings across web app with translation keys. Current i1
 ## New Translation Keys Required
 
 ### common namespace
+
 ```typescript
 common: {
   errors: {
@@ -129,6 +133,7 @@ common: {
 ```
 
 ### groups.location namespace (new)
+
 ```typescript
 groups: {
   location: {
@@ -153,6 +158,7 @@ groups: {
 ```
 
 ### pwa namespace (new)
+
 ```typescript
 pwa: {
   install: {
@@ -170,6 +176,7 @@ pwa: {
 ```
 
 ### navigation namespace (new)
+
 ```typescript
 navigation: {
   breadcrumbs: {
@@ -183,6 +190,7 @@ navigation: {
 ```
 
 ### footer namespace (new)
+
 ```typescript
 footer: {
   links: {
@@ -195,6 +203,7 @@ footer: {
 ```
 
 ### settings.privacy.location namespace (new)
+
 ```typescript
 settings: {
   privacy: {
@@ -233,11 +242,13 @@ settings: {
 ## Files to Modify
 
 ### Translation Files (3 files)
+
 - packages/shared/src/i18n/locales/en.json
 - packages/shared/src/i18n/locales/de.json
 - packages/shared/src/i18n/locales/es.json
 
 ### Web Components (13-15 files)
+
 - apps/web/components/navbar.tsx
 - apps/web/app/error.tsx
 - apps/web/app/not-found.tsx
@@ -255,6 +266,7 @@ settings: {
 - (Additional form components as needed)
 
 ## Estimated Effort
+
 - Phase 1: 30 minutes (3 files, ~6 keys)
 - Phase 2: 1.5 hours (6 files, ~35 keys)
 - Phase 3: 45 minutes (5 files, ~15 keys)
@@ -262,6 +274,7 @@ settings: {
 - **Total: ~3-4 hours**
 
 ## Success Criteria
+
 - Zero hardcoded user-facing strings in web components
 - All new keys translated to German
 - Language switcher works seamlessly across all pages

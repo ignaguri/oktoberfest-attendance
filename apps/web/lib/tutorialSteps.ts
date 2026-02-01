@@ -1,8 +1,8 @@
 export interface TutorialStep {
   id: string;
   target: string; // CSS selector or data attribute
-  title: string;
-  description: string;
+  /** Translation key for this step (e.g., "tutorial.welcome") */
+  translationKey: string;
   position: "top" | "bottom" | "left" | "right" | "center";
   action?: "click" | "scroll" | "wait";
   required?: boolean;
@@ -13,80 +13,63 @@ export const tutorialSteps: TutorialStep[] = [
   {
     id: "welcome",
     target: "body",
-    title: "Welcome to ProstCounter! 🍻",
-    description:
-      "Let's take a quick guided tour of the app to help you get started with tracking your beer festival adventures.",
+    translationKey: "tutorial.welcome",
     position: "center",
     delay: 0,
   },
   {
     id: "festival-status",
     target: '[data-tutorial="festival-status"]',
-    title: "Festival Status",
-    description:
-      "This shows you the current status of the festival and whether you can log attendances.",
+    translationKey: "tutorial.festivalStatus",
     position: "bottom",
     delay: 500,
   },
   {
     id: "quick-attendance",
     target: '[data-tutorial="quick-attendance"]',
-    title: "Quick Attendance",
-    description:
-      "Log your daily beer consumption here. This is the main feature of the app!",
+    translationKey: "tutorial.quickAttendance",
     position: "bottom",
     delay: 300,
   },
   {
     id: "highlights",
     target: '[data-tutorial="highlights"]',
-    title: "Your Stats & Leaderboard",
-    description:
-      "View your personal statistics, achievements, highlights, and see how you rank against other users in the global leaderboard.",
+    translationKey: "tutorial.highlights",
     position: "top",
     delay: 300,
   },
   {
     id: "groups",
     target: '[data-tutorial="groups"]',
-    title: "Groups",
-    description:
-      "Join or create groups to compete with friends during the festival.",
+    translationKey: "tutorial.groups",
     position: "top",
     delay: 300,
   },
   {
     id: "calendar-nav",
     target: '[data-tutorial="calendar-nav"]',
-    title: "Calendar",
-    description:
-      "Click the calendar icon to view your attendance calendar and manage your schedule.",
+    translationKey: "tutorial.calendarNav",
     position: "bottom",
     delay: 300,
   },
   {
     id: "user-menu",
     target: '[data-tutorial="user-menu"]',
-    title: "Navigation Menu",
-    description:
-      "Click on your avatar or name to open the menu with all navigation options like Profile, Groups, Leaderboard, and more.",
+    translationKey: "tutorial.userMenu",
     position: "bottom",
     delay: 300,
   },
   {
     id: "map-share",
     target: '[data-tutorial="map-share"]',
-    title: "Map & Share",
-    description: "Access the festival map and share the app with friends.",
+    translationKey: "tutorial.mapShare",
     position: "top",
     delay: 300,
   },
   {
     id: "tutorial-complete",
     target: "body",
-    title: "Tutorial Complete! 🎉",
-    description:
-      "You've seen the main features of ProstCounter! You can always reset this tutorial in your profile settings if you want to see it again. Now go enjoy the festival and track those beers!",
+    translationKey: "tutorial.complete",
     position: "center",
     delay: 300,
   },

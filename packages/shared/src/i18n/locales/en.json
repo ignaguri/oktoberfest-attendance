@@ -1301,27 +1301,93 @@
   },
   "tutorial": {
     "welcome": {
+      "title": "Welcome to ProstCounter! 🍻",
+      "description": "Let's take a quick guided tour of the app to help you get started with tracking your beer festival adventures."
+    },
+    "festivalStatus": {
+      "title": "Festival Status",
+      "description": "This shows you the current status of the festival and whether you can log attendances."
+    },
+    "quickAttendance": {
+      "title": "Quick Attendance",
+      "description": "Log your daily beer consumption here. This is the main feature of the app!"
+    },
+    "highlights": {
+      "title": "Your Stats & Leaderboard",
+      "description": "View your personal statistics, achievements, highlights, and see how you rank against other users in the global leaderboard."
+    },
+    "groups": {
+      "title": "Groups",
+      "description": "Join or create groups to compete with friends during the festival."
+    },
+    "calendarNav": {
+      "title": "Calendar",
+      "description": "Click the calendar icon to view your attendance calendar and manage your schedule."
+    },
+    "userMenu": {
+      "title": "Navigation Menu",
+      "description": "Click on your avatar or name to open the menu with all navigation options like Profile, Groups, Leaderboard, and more."
+    },
+    "mapShare": {
+      "title": "Map & Share",
+      "description": "Access the festival map and share the app with friends."
+    },
+    "complete": {
+      "title": "Tutorial Complete! 🎉",
+      "description": "You've seen the main features of ProstCounter! You can always reset this tutorial in your profile settings if you want to see it again. Now go enjoy the festival and track those beers!"
+    },
+    "buttons": {
+      "next": "Next",
+      "previous": "Previous",
+      "skip": "Skip",
+      "getStarted": "Get Started! 🍻"
+    },
+    "progress": "Step {{current}} of {{total}}"
+  },
+  "mobileTutorial": {
+    "welcome": {
       "title": "Welcome to ProstCounter!",
-      "description": "Track your beer festival attendance and compete with friends!"
+      "description": "Let's take a quick tour to help you get started."
     },
-    "step1": {
-      "title": "Track Your Visits",
-      "description": "Log each day you attend and how many beers you enjoy."
+    "festivalStatus": {
+      "title": "Festival Status",
+      "description": "See the countdown to the festival, which day it is, or when it has ended."
     },
-    "step2": {
-      "title": "Join Groups",
-      "description": "Create or join groups to compete with friends."
+    "locationSharing": {
+      "title": "Find Your Friends",
+      "description": "Share your location and see group members on the map."
     },
-    "step3": {
-      "title": "Earn Achievements",
-      "description": "Unlock badges and climb the leaderboard!"
+    "quickAttendance": {
+      "title": "Log Your Drinks",
+      "description": "Tap this button anytime to quickly log what you're drinking!"
     },
-    "step4": {
-      "title": "Share Photos",
-      "description": "Capture memories with your group gallery."
+    "attendanceTab": {
+      "title": "Track Your Attendance",
+      "description": "Use the Attendance tab to view your festival calendar. Tap any date to log drinks, add photos, and track your spending."
     },
-    "skip": "Skip Tutorial",
-    "finish": "Get Started"
+    "groupsTab": {
+      "title": "Join the Competition",
+      "description": "Create or join groups to compete with friends. Compare stats, share photos, and see who attends the most!"
+    },
+    "leaderboardTab": {
+      "title": "Check the Rankings",
+      "description": "See how you rank against all festival-goers. Sort by total drinks, days attended, or average. Unlock achievements as you go!"
+    },
+    "profileTab": {
+      "title": "Your Profile & Settings",
+      "description": "Customize your profile, enable biometric login, and manage your account. You can restart this tutorial anytime from here."
+    },
+    "complete": {
+      "title": "You're All Set!",
+      "description": "Enjoy the festival! Reset this tutorial anytime in Profile settings."
+    },
+    "buttons": {
+      "next": "Next",
+      "previous": "Previous",
+      "skip": "Skip",
+      "getStarted": "Get Started!"
+    },
+    "progress": "Step {{current}} of {{total}}"
   },
   "wrapped": {
     "title": "Your Year in Review",

@@ -1,4 +1,5 @@
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import { cn } from "@prostcounter/ui";
 import React, { forwardRef } from "react";
 import { Animated, Easing, Platform, View } from "react-native";
 
@@ -64,10 +65,13 @@ const Skeleton = forwardRef<
     return (
       <Animated.View
         style={{ opacity: pulseAnim }}
-        className={`${startColor} ${skeletonStyle({
-          variant,
-          class: className,
-        })}`}
+        className={cn(
+          startColor,
+          skeletonStyle({
+            variant,
+            class: className,
+          }),
+        )}
         {...props}
         ref={ref}
       />
@@ -98,17 +102,22 @@ const SkeletonText = forwardRef<
     if (_lines) {
       return (
         <View
-          className={`${skeletonTextStyle({
-            gap,
-          })}`}
+          className={cn(
+            skeletonTextStyle({
+              gap,
+            }),
+          )}
           ref={ref}
         >
           {Array.from({ length: _lines }).map((_, index) => (
             <Skeleton
               key={index}
-              className={`${startColor} ${skeletonTextStyle({
-                class: className,
-              })}`}
+              className={cn(
+                startColor,
+                skeletonTextStyle({
+                  class: className,
+                }),
+              )}
               {...props}
             />
           ))}
@@ -117,9 +126,12 @@ const SkeletonText = forwardRef<
     } else {
       return (
         <Skeleton
-          className={`${startColor} ${skeletonTextStyle({
-            class: className,
-          })}`}
+          className={cn(
+            startColor,
+            skeletonTextStyle({
+              class: className,
+            }),
+          )}
           {...props}
           ref={ref}
         />

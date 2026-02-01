@@ -100,11 +100,12 @@ function TabsLayoutContent() {
         {/* Components tab removed - Native tabs have 5-tab limit and overflow creates "More" menu */}
       </NativeTabs>
 
-      {/* Quick Attendance FAB */}
+      {/* Quick Attendance FAB - self-registers with tutorial context */}
       {showFab && (
         <QuickAttendanceFab
           onPress={() => openSheet()}
           disabled={!isFestivalActive}
+          tutorialStepId="quick-attendance-fab"
         />
       )}
 

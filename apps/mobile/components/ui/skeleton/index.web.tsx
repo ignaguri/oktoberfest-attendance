@@ -1,4 +1,5 @@
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import { cn } from "@prostcounter/ui";
 import React from "react";
 
 import { skeletonStyle, skeletonTextStyle } from "./styles";
@@ -26,11 +27,15 @@ const Skeleton = React.forwardRef<HTMLDivElement, ISkeletonProps>(
       return (
         <div
           ref={ref}
-          className={`animate-pulse ${startColor} ${skeletonStyle({
-            variant,
-            speed,
-            class: className,
-          })}`}
+          className={cn(
+            "animate-pulse",
+            startColor,
+            skeletonStyle({
+              variant,
+              speed,
+              class: className,
+            }),
+          )}
           {...props}
         />
       );
@@ -65,16 +70,23 @@ const SkeletonText = React.forwardRef<HTMLDivElement, ISkeletonTextProps>(
         return (
           <div
             ref={ref}
-            className={`flex flex-col ${skeletonTextStyle({
-              gap,
-            })}`}
+            className={cn(
+              "flex flex-col",
+              skeletonTextStyle({
+                gap,
+              }),
+            )}
           >
             {Array.from({ length: _lines }).map((_, index) => (
               <div
                 key={index}
-                className={`animate-pulse ${startColor} ${skeletonTextStyle({
-                  class: className,
-                })}`}
+                className={cn(
+                  "animate-pulse",
+                  startColor,
+                  skeletonTextStyle({
+                    class: className,
+                  }),
+                )}
                 {...props}
               />
             ))}
@@ -84,9 +96,13 @@ const SkeletonText = React.forwardRef<HTMLDivElement, ISkeletonTextProps>(
         return (
           <div
             ref={ref}
-            className={`animate-pulse ${startColor} ${skeletonTextStyle({
-              class: className,
-            })}`}
+            className={cn(
+              "animate-pulse",
+              startColor,
+              skeletonTextStyle({
+                class: className,
+              }),
+            )}
             {...props}
           />
         );

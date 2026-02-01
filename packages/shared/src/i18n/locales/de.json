@@ -1056,27 +1056,93 @@
   },
   "tutorial": {
     "welcome": {
+      "title": "Willkommen bei ProstCounter! 🍻",
+      "description": "Lass uns eine kurze Tour durch die App machen, um dir den Einstieg in die Verfolgung deiner Bierfestival-Abenteuer zu erleichtern."
+    },
+    "festivalStatus": {
+      "title": "Festival-Status",
+      "description": "Hier siehst du den aktuellen Status des Festivals und ob du Besuche eintragen kannst."
+    },
+    "quickAttendance": {
+      "title": "Schnelle Erfassung",
+      "description": "Trage hier deinen täglichen Bierkonsum ein. Das ist die Hauptfunktion der App!"
+    },
+    "highlights": {
+      "title": "Deine Statistiken & Rangliste",
+      "description": "Sieh dir deine persönlichen Statistiken, Erfolge, Highlights an und vergleiche dich mit anderen Nutzern in der globalen Rangliste."
+    },
+    "groups": {
+      "title": "Gruppen",
+      "description": "Tritt Gruppen bei oder erstelle eigene, um mit Freunden während des Festivals zu konkurrieren."
+    },
+    "calendarNav": {
+      "title": "Kalender",
+      "description": "Klicke auf das Kalender-Symbol, um deinen Besuchskalender anzuzeigen und deinen Zeitplan zu verwalten."
+    },
+    "userMenu": {
+      "title": "Navigationsmenü",
+      "description": "Klicke auf dein Avatar oder deinen Namen, um das Menü mit allen Navigationsoptionen wie Profil, Gruppen, Rangliste und mehr zu öffnen."
+    },
+    "mapShare": {
+      "title": "Karte & Teilen",
+      "description": "Greife auf die Festival-Karte zu und teile die App mit Freunden."
+    },
+    "complete": {
+      "title": "Tutorial abgeschlossen! 🎉",
+      "description": "Du hast die Hauptfunktionen von ProstCounter gesehen! Du kannst dieses Tutorial jederzeit in deinen Profileinstellungen zurücksetzen. Genieße das Festival und zähle die Mass!"
+    },
+    "buttons": {
+      "next": "Weiter",
+      "previous": "Zurück",
+      "skip": "Überspringen",
+      "getStarted": "Los geht's! 🍻"
+    },
+    "progress": "Schritt {{current}} von {{total}}"
+  },
+  "mobileTutorial": {
+    "welcome": {
       "title": "Willkommen bei ProstCounter!",
-      "description": "Verfolge deine Bierfestival-Besuche und messen du dich mit Freunden!"
+      "description": "Lass uns eine kurze Tour machen, um dir den Einstieg zu erleichtern."
     },
-    "step1": {
-      "title": "Besuche erfassen",
-      "description": "Tragen du jeden Tag ein, an dem du teilnehmen und wie viele Mass du genießen."
+    "festivalStatus": {
+      "title": "Festival-Status",
+      "description": "Sieh den Countdown zum Festival, welcher Tag es ist oder wann es vorbei ist."
     },
-    "step2": {
-      "title": "Gruppen beitreten",
-      "description": "Erstellen du Gruppen oder trete ihnen bei, um mit Freunden zu konkurrieren."
+    "locationSharing": {
+      "title": "Finde deine Freunde",
+      "description": "Teile deinen Standort und sieh Gruppenmitglieder auf der Karte."
     },
-    "step3": {
-      "title": "Erfolge freischalten",
-      "description": "Schalten du Abzeichen frei und steigen du in der Rangliste auf!"
+    "quickAttendance": {
+      "title": "Getränke erfassen",
+      "description": "Tippe jederzeit auf diesen Button, um schnell zu erfassen, was du trinkst!"
     },
-    "step4": {
-      "title": "Fotos teilen",
-      "description": "Halten du Erinnerungen in deiner Gruppengalerie fest."
+    "attendanceTab": {
+      "title": "Verfolge deine Besuche",
+      "description": "Nutze den Besuche-Tab um deinen Festivalkalender zu sehen. Tippe auf ein Datum um Getränke zu erfassen, Fotos hinzuzufügen und Ausgaben zu verfolgen."
     },
-    "skip": "Tutorial überspringen",
-    "finish": "Los geht's"
+    "groupsTab": {
+      "title": "Nimm am Wettbewerb teil",
+      "description": "Erstelle oder tritt Gruppen bei, um mit Freunden zu konkurrieren. Vergleiche Statistiken, teile Fotos und sieh wer am meisten dabei ist!"
+    },
+    "leaderboardTab": {
+      "title": "Sieh die Rangliste",
+      "description": "Sieh wie du im Vergleich zu allen Festivalbesuchern abschneidest. Sortiere nach Getränken, Besuchstagen oder Durchschnitt. Schalte Erfolge frei!"
+    },
+    "profileTab": {
+      "title": "Dein Profil & Einstellungen",
+      "description": "Passe dein Profil an, aktiviere biometrische Anmeldung und verwalte dein Konto. Du kannst dieses Tutorial jederzeit hier neu starten."
+    },
+    "complete": {
+      "title": "Du bist bereit!",
+      "description": "Genieße das Festival! Du kannst dieses Tutorial jederzeit in den Profileinstellungen zurücksetzen."
+    },
+    "buttons": {
+      "next": "Weiter",
+      "previous": "Zurück",
+      "skip": "Überspringen",
+      "getStarted": "Los geht's!"
+    },
+    "progress": "Schritt {{current}} von {{total}}"
   },
   "wrapped": {
     "title": "dein Jahresrückblick",

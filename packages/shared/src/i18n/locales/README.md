@@ -9,6 +9,7 @@
 ## Adding Translations
 
 When adding Spanish translations:
+
 1. Use `de.json` as a reference for structure
 2. Translate all keys while keeping:
    - Placeholder syntax intact (e.g., `{{count}}`, `{{name}}`)
@@ -19,6 +20,7 @@ When adding Spanish translations:
 ## Future Languages
 
 To add more languages:
+
 1. Add language code to `SUPPORTED_LANGUAGES` in `../core.ts`
 2. Add display name to `LANGUAGE_NAMES` in `../core.ts`
 3. Import the translation file in `../core.ts` resources
