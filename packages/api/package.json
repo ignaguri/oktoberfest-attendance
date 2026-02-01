@@ -33,7 +33,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.1.0",
     "@vitest/coverage-v8": "^4.0.18",
     "dotenv": "^17.2.3",
     "pino-pretty": "^13.1.3",
