@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       // Prevent Turbopack from trying to bundle esbuild binaries
       esbuild: "esbuild-wasm",
+      // Fix Zod v4 subpath exports for @hookform/resolvers compatibility
+      "zod/v4/core": "zod/v4/core/index.js",
+      "zod/v4/mini": "zod/v4/mini/index.js",
+      "zod/v4": "zod/v4/index.js",
     },
   },
   async headers() {
