@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   // Transpile shared packages for proper bundling
-  transpilePackages: ["@prostcounter/ui", "@hookform/resolvers", "zod"],
+  transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
   serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64"],
   // Turbopack configuration
@@ -31,11 +31,6 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       // Prevent Turbopack from trying to bundle esbuild binaries
       esbuild: "esbuild-wasm",
-      // Resolve zod v4 subpath exports for Turbopack compatibility
-      // These map subpath imports to direct file imports within the zod package
-      "zod/v4/core": "zod/v4/core/index.js",
-      "zod/v4/mini": "zod/v4/mini/index.js",
-      "zod/v4": "zod/v4/index.js",
     },
     resolveExtensions: [".js", ".jsx", ".ts", ".tsx", ".json", ".mjs", ".cjs"],
   },
@@ -57,7 +52,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
-    optimizePackageImports: ["zod", "@hookform/resolvers"],
   },
   images: {
     localPatterns: [
