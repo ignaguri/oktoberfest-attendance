@@ -74,7 +74,13 @@ export type NearbyTent = z.infer<typeof NearbyTentSchema>;
 export const GetNearbyTentsQuerySchema = z.object({
   latitude: z.coerce.number().min(-90).max(90),
   longitude: z.coerce.number().min(-180).max(180),
-  radiusMeters: z.coerce.number().int().min(10).max(2000).optional().default(250),
+  radiusMeters: z.coerce
+    .number()
+    .int()
+    .min(10)
+    .max(2000)
+    .optional()
+    .default(250),
   festivalId: z.uuid({ error: "Invalid festival ID" }).optional(),
 });
 
@@ -92,4 +98,6 @@ export const GetNearbyTentsResponseSchema = z.object({
   radiusMeters: z.number().int(),
 });
 
-export type GetNearbyTentsResponse = z.infer<typeof GetNearbyTentsResponseSchema>;
+export type GetNearbyTentsResponse = z.infer<
+  typeof GetNearbyTentsResponseSchema
+>;

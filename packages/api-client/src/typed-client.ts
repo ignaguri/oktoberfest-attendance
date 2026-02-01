@@ -52,7 +52,12 @@ export interface ApiClientConfig {
   /** Optional callback for logging requests */
   onRequest?: (method: string, url: string, headers: ApiHeaders) => void;
   /** Optional callback for logging responses */
-  onResponse?: (method: string, url: string, status: number, data: unknown) => void;
+  onResponse?: (
+    method: string,
+    url: string,
+    status: number,
+    data: unknown,
+  ) => void;
   /** Optional callback for logging errors */
   onError?: (method: string, url: string, error: unknown) => void;
 }
@@ -193,11 +198,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         amount?: number;
       }): Promise<{ attendanceId: string; tentsChanged: boolean }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/attendance`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -221,11 +230,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         tentsRemoved: string[];
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance/personal`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/attendance/personal`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -295,11 +308,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
     consumption: {
       async log(data: LogConsumptionInput): Promise<AttendanceWithTotals> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/consumption`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/consumption`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -318,9 +335,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
           festivalId: query.festivalId,
           date: query.date,
         });
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/consumption?${params}`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/consumption?${params}`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch consumptions: ${response.statusText}`,
@@ -396,9 +417,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async get(groupId: string): Promise<ApiResponse<GroupWithMembers>> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/groups/${groupId}`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/${groupId}`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(`Failed to fetch group: ${response.statusText}`);
         }
@@ -412,11 +437,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         winningCriteria?: string;
       }): Promise<ApiResponse<Group>> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/groups`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -432,11 +461,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         inviteToken?: string,
       ): Promise<GroupActionResponse> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/groups/${groupId}/join`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ inviteToken }),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/${groupId}/join`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ inviteToken }),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -448,10 +481,14 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async leave(groupId: string): Promise<GroupActionResponse> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/groups/${groupId}/leave`, {
-          method: "POST",
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/${groupId}/leave`,
+          {
+            method: "POST",
+            headers,
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -487,11 +524,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         },
       ): Promise<Group> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("PUT", `${baseUrl}/v1/groups/${groupId}`, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "PUT",
+          `${baseUrl}/v1/groups/${groupId}`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -606,11 +647,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         group: Group;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/groups/join-by-token`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ inviteToken }),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/join-by-token`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ inviteToken }),
+          },
+        );
         if (!response.ok) {
           const errorResponse = await parseJsonResponse<{
             error?: { message?: string; code?: string; statusCode?: number };
@@ -694,11 +739,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         festivalId?: string,
       ): Promise<EvaluateAchievementsResponse> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/achievements/evaluate`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ festivalId }),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/achievements/evaluate`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ festivalId }),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -740,9 +789,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async available(): Promise<ListAvailableAchievementsResponse> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/achievements/available`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/achievements/available`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch available achievements: ${response.statusText}`,
@@ -804,7 +857,9 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch nearby tents: ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch nearby tents: ${response.statusText}`,
+          );
         }
         return parseJsonResponse(response);
       },
@@ -833,9 +888,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async get(festivalId: string): Promise<GetFestivalResponse> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/festivals/${festivalId}`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/festivals/${festivalId}`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(`Failed to fetch festival: ${response.statusText}`);
         }
@@ -884,7 +943,11 @@ export function createTypedApiClient(config: ApiClientConfig) {
     profile: {
       async get(): Promise<{ profile: ProfileShort }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/profile`, { headers });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/profile`,
+          { headers },
+        );
         if (!response.ok) {
           throw new Error(`Failed to fetch profile: ${response.statusText}`);
         }
@@ -896,11 +959,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         full_name?: string;
       }): Promise<{ profile: Profile }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("PUT", `${baseUrl}/v1/profile`, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "PUT",
+          `${baseUrl}/v1/profile`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -912,10 +979,14 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async delete(): Promise<{ success: boolean; message: string }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/profile`, {
-          method: "DELETE",
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/profile`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -929,9 +1000,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async getTutorialStatus(): Promise<{ status: TutorialStatus }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/profile/tutorial`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/profile/tutorial`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch tutorial status: ${response.statusText}`,
@@ -960,10 +1035,14 @@ export function createTypedApiClient(config: ApiClientConfig) {
 
       async resetTutorial(): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/profile/tutorial/reset`, {
-          method: "POST",
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/profile/tutorial/reset`,
+          {
+            method: "POST",
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(`Failed to reset tutorial: ${response.statusText}`);
         }
@@ -975,9 +1054,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         hasMissingFields: boolean;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/profile/missing-fields`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/profile/missing-fields`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch missing fields: ${response.statusText}`,
@@ -1038,11 +1121,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         fileName: string;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/profile/avatar/confirm`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ fileName }),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/profile/avatar/confirm`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ fileName }),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1126,9 +1213,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         if (query?.limit) params.set("limit", query.limit.toString());
         if (query?.offset) params.set("offset", query.offset.toString());
 
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/reservations?${params}`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/reservations?${params}`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch reservations: ${response.statusText}`,
@@ -1216,11 +1307,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         };
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/reservations`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/reservations`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1361,9 +1456,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         if (query.cursor) params.set("cursor", query.cursor);
         if (query.limit) params.set("limit", query.limit.toString());
 
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/activity-feed?${params}`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/activity-feed?${params}`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch activity feed: ${response.statusText}`,
@@ -1379,11 +1478,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
     notifications: {
       async registerToken(token: string): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/notifications/token`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ token }),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/notifications/token`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ token }),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1400,11 +1503,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         avatar?: string;
       }): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/notifications/subscribe`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/notifications/subscribe`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1498,9 +1605,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         cached: boolean;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/${festivalId}`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/wrapped/${festivalId}`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch wrapped data: ${response.statusText}`,
@@ -1586,9 +1697,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }>;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/festivals`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/wrapped/festivals`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch available wrapped festivals: ${response.statusText}`,
@@ -1606,11 +1721,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         error?: string;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/wrapped/regenerate`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data || {}),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/wrapped/regenerate`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data || {}),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1632,9 +1751,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         hidePhotosFromAllGroups: boolean;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/photos/settings/global`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/photos/settings/global`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch global photo settings: ${response.statusText}`,
@@ -1647,11 +1770,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         hidePhotosFromAllGroups: boolean;
       }): Promise<{ userId: string; hidePhotosFromAllGroups: boolean }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("PUT", `${baseUrl}/v1/photos/settings/global`, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "PUT",
+          `${baseUrl}/v1/photos/settings/global`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1672,9 +1799,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }>;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/photos/settings/groups`, {
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/photos/settings/groups`,
+          {
+            headers,
+          },
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to fetch group photo settings: ${response.statusText}`,
@@ -1760,11 +1891,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         visibility: "public" | "private",
       ): Promise<{ success: boolean; updatedCount: number }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("PUT", `${baseUrl}/v1/photos/visibility`, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({ photoIds, visibility }),
-        });
+        const response = await fetchWithLogging(
+          "PUT",
+          `${baseUrl}/v1/photos/visibility`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify({ photoIds, visibility }),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1876,10 +2011,14 @@ export function createTypedApiClient(config: ApiClientConfig) {
        */
       async delete(pictureId: string): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/photos/${pictureId}`, {
-          method: "DELETE",
-          headers,
-        });
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/photos/${pictureId}`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,
@@ -1925,11 +2064,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         };
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/location/sessions`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(data),
-        });
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/location/sessions`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
         if (!response.ok) {
           const error = await parseJsonResponse<{ message?: string }>(
             response,

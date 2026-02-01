@@ -22,9 +22,7 @@
   "paths": {
     "/v1/consumption": {
       "post": {
-        "tags": [
-          "consumption"
-        ],
+        "tags": ["consumption"],
         "summary": "Log a new beer or drink consumption",
         "description": "Records a consumption and updates the attendance record with computed totals",
         "security": [
@@ -88,11 +86,7 @@
                     "maxLength": 255
                   }
                 },
-                "required": [
-                  "festivalId",
-                  "date",
-                  "pricePaidCents"
-                ]
+                "required": ["festivalId", "date", "pricePaidCents"]
               }
             }
           }
@@ -165,11 +159,7 @@
                             "nullable": true
                           }
                         },
-                        "required": [
-                          "tentId",
-                          "visitDate",
-                          "tentName"
-                        ]
+                        "required": ["tentId", "visitDate", "tentName"]
                       }
                     }
                   },
@@ -206,10 +196,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -228,10 +215,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -239,9 +223,7 @@
         }
       },
       "get": {
-        "tags": [
-          "consumption"
-        ],
+        "tags": ["consumption"],
         "summary": "List consumptions for a date",
         "description": "Get all consumptions for the authenticated user on a specific date",
         "security": [
@@ -354,9 +336,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "consumptions"
-                  ]
+                  "required": ["consumptions"]
                 }
               }
             }
@@ -375,10 +355,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -397,10 +374,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -410,9 +384,7 @@
     },
     "/v1/consumption/{id}": {
       "delete": {
-        "tags": [
-          "consumption"
-        ],
+        "tags": ["consumption"],
         "summary": "Delete a consumption",
         "description": "Delete a consumption record by ID",
         "security": [
@@ -446,10 +418,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -468,10 +437,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -490,10 +456,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -512,10 +475,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -525,9 +485,7 @@
     },
     "/v1/attendance": {
       "get": {
-        "tags": [
-          "attendance"
-        ],
+        "tags": ["attendance"],
         "summary": "List user's attendance records",
         "description": "Returns paginated list of attendance records with computed totals",
         "security": [
@@ -641,11 +599,7 @@
                                   "nullable": true
                                 }
                               },
-                              "required": [
-                                "tentId",
-                                "visitDate",
-                                "tentName"
-                              ]
+                              "required": ["tentId", "visitDate", "tentName"]
                             }
                           }
                         },
@@ -676,12 +630,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "data",
-                    "total",
-                    "limit",
-                    "offset"
-                  ]
+                  "required": ["data", "total", "limit", "offset"]
                 }
               }
             }
@@ -700,10 +649,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -711,9 +657,7 @@
         }
       },
       "post": {
-        "tags": [
-          "attendance"
-        ],
+        "tags": ["attendance"],
         "summary": "Create or update attendance with tents",
         "description": "Creates or updates an attendance record with tent visits. Triggers tent check-in notifications for group members.",
         "security": [
@@ -749,10 +693,7 @@
                     "default": 0
                   }
                 },
-                "required": [
-                  "festivalId",
-                  "date"
-                ]
+                "required": ["festivalId", "date"]
               }
             }
           }
@@ -773,10 +714,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "attendanceId",
-                    "tentsChanged"
-                  ]
+                  "required": ["attendanceId", "tentsChanged"]
                 }
               }
             }
@@ -795,10 +733,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -817,10 +752,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -830,9 +762,7 @@
     },
     "/v1/attendance/by-date": {
       "get": {
-        "tags": [
-          "attendance"
-        ],
+        "tags": ["attendance"],
         "summary": "Get attendance for a specific date",
         "description": "Returns attendance record for a specific date with tent IDs and picture URLs",
         "security": [
@@ -932,11 +862,7 @@
                                 "nullable": true
                               }
                             },
-                            "required": [
-                              "tentId",
-                              "visitDate",
-                              "tentName"
-                            ]
+                            "required": ["tentId", "visitDate", "tentName"]
                           }
                         },
                         "tentIds": {
@@ -965,10 +891,7 @@
                                 "type": "string"
                               }
                             },
-                            "required": [
-                              "id",
-                              "pictureUrl"
-                            ]
+                            "required": ["id", "pictureUrl"]
                           }
                         }
                       },
@@ -992,9 +915,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "attendance"
-                  ]
+                  "required": ["attendance"]
                 }
               }
             }
@@ -1013,10 +934,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1026,9 +944,7 @@
     },
     "/v1/attendance/{id}": {
       "delete": {
-        "tags": [
-          "attendance"
-        ],
+        "tags": ["attendance"],
         "summary": "Delete an attendance record",
         "description": "Deletes an attendance and all its associated consumptions (cascading delete)",
         "security": [
@@ -1062,10 +978,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -1084,10 +997,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1106,10 +1016,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1119,9 +1026,7 @@
     },
     "/v1/attendance/personal": {
       "post": {
-        "tags": [
-          "attendance"
-        ],
+        "tags": ["attendance"],
         "summary": "Update personal attendance",
         "description": "Updates personal attendance without triggering group notifications. Preserves existing tent visit timestamps.",
         "security": [
@@ -1157,10 +1062,7 @@
                     "default": 0
                   }
                 },
-                "required": [
-                  "festivalId",
-                  "date"
-                ]
+                "required": ["festivalId", "date"]
               }
             }
           }
@@ -1192,11 +1094,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "attendanceId",
-                    "tentsAdded",
-                    "tentsRemoved"
-                  ]
+                  "required": ["attendanceId", "tentsAdded", "tentsRemoved"]
                 }
               }
             }
@@ -1215,10 +1113,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1237,10 +1132,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1250,9 +1142,7 @@
     },
     "/v1/attendance/check-in/{reservationId}": {
       "post": {
-        "tags": [
-          "attendance"
-        ],
+        "tags": ["attendance"],
         "summary": "Check in from a reservation",
         "description": "Creates an attendance record from a scheduled reservation, adds tent visit, and marks the reservation as completed.",
         "security": [
@@ -1290,10 +1180,7 @@
                       "format": "uuid"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -1312,10 +1199,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1334,10 +1218,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1347,9 +1228,7 @@
     },
     "/v1/calendar/personal": {
       "get": {
-        "tags": [
-          "calendar"
-        ],
+        "tags": ["calendar"],
         "summary": "Get personal calendar events",
         "description": "Returns calendar events for the authenticated user including attendances, tent visits, and reservations",
         "security": [
@@ -1404,12 +1283,7 @@
                             ]
                           }
                         },
-                        "required": [
-                          "id",
-                          "title",
-                          "from",
-                          "type"
-                        ]
+                        "required": ["id", "title", "from", "type"]
                       }
                     },
                     "festivalId": {
@@ -1425,10 +1299,7 @@
                       "nullable": true
                     }
                   },
-                  "required": [
-                    "events",
-                    "festivalId"
-                  ]
+                  "required": ["events", "festivalId"]
                 }
               }
             }
@@ -1447,10 +1318,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1460,9 +1328,7 @@
     },
     "/v1/calendar/group/{groupId}": {
       "get": {
-        "tags": [
-          "calendar"
-        ],
+        "tags": ["calendar"],
         "summary": "Get group calendar events",
         "description": "Returns calendar events for all members of a group including attendances, tent visits, and reservations",
         "security": [
@@ -1517,12 +1383,7 @@
                             ]
                           }
                         },
-                        "required": [
-                          "id",
-                          "title",
-                          "from",
-                          "type"
-                        ]
+                        "required": ["id", "title", "from", "type"]
                       }
                     },
                     "festivalId": {
@@ -1538,10 +1399,7 @@
                       "nullable": true
                     }
                   },
-                  "required": [
-                    "events",
-                    "festivalId"
-                  ]
+                  "required": ["events", "festivalId"]
                 }
               }
             }
@@ -1560,10 +1418,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1582,10 +1437,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1595,9 +1447,7 @@
     },
     "/v1/festivals": {
       "get": {
-        "tags": [
-          "festivals"
-        ],
+        "tags": ["festivals"],
         "summary": "List all festivals",
         "description": "Returns list of festivals with optional filtering by status or active state",
         "security": [
@@ -1609,11 +1459,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "upcoming",
-                "active",
-                "ended"
-              ]
+              "enum": ["upcoming", "active", "ended"]
             },
             "required": false,
             "name": "status",
@@ -1683,11 +1529,7 @@
                           },
                           "status": {
                             "type": "string",
-                            "enum": [
-                              "upcoming",
-                              "active",
-                              "ended"
-                            ]
+                            "enum": ["upcoming", "active", "ended"]
                           },
                           "timezone": {
                             "type": "string",
@@ -1721,9 +1563,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -1733,9 +1573,7 @@
     },
     "/v1/festivals/{id}": {
       "get": {
-        "tags": [
-          "festivals"
-        ],
+        "tags": ["festivals"],
         "summary": "Get festival by ID",
         "description": "Returns a single festival by its ID",
         "security": [
@@ -1803,11 +1641,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "upcoming",
-                        "active",
-                        "ended"
-                      ]
+                      "enum": ["upcoming", "active", "ended"]
                     },
                     "timezone": {
                       "type": "string",
@@ -1856,10 +1690,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1869,9 +1700,7 @@
     },
     "/v1/tents": {
       "get": {
-        "tags": [
-          "tents"
-        ],
+        "tags": ["tents"],
         "summary": "List tents for a festival",
         "description": "Returns list of tents with festival-specific pricing and availability",
         "security": [
@@ -1930,11 +1759,7 @@
                                 "nullable": true
                               }
                             },
-                            "required": [
-                              "id",
-                              "name",
-                              "category"
-                            ]
+                            "required": ["id", "name", "category"]
                           }
                         },
                         "required": [
@@ -1946,9 +1771,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -1967,10 +1790,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -1980,9 +1800,7 @@
     },
     "/v1/tents/nearby": {
       "get": {
-        "tags": [
-          "tents"
-        ],
+        "tags": ["tents"],
         "summary": "Get nearby tents",
         "description": "Returns tents near the user's location, sorted by distance. Uses PostGIS for efficient spatial queries.",
         "security": [
@@ -2093,20 +1911,13 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "latitude",
-                        "longitude"
-                      ]
+                      "required": ["latitude", "longitude"]
                     },
                     "radiusMeters": {
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "tents",
-                    "userLocation",
-                    "radiusMeters"
-                  ]
+                  "required": ["tents", "userLocation", "radiusMeters"]
                 }
               }
             }
@@ -2125,10 +1936,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2147,10 +1955,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2160,9 +1965,7 @@
     },
     "/v1/groups": {
       "post": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Create a new group",
         "description": "Creates a group and automatically adds the creator as the first member",
         "security": [
@@ -2187,18 +1990,11 @@
                   },
                   "winningCriteria": {
                     "type": "string",
-                    "enum": [
-                      "days_attended",
-                      "total_beers",
-                      "avg_beers"
-                    ],
+                    "enum": ["days_attended", "total_beers", "avg_beers"],
                     "default": "total_beers"
                   }
                 },
-                "required": [
-                  "name",
-                  "festivalId"
-                ]
+                "required": ["name", "festivalId"]
               }
             }
           }
@@ -2228,11 +2024,7 @@
                     },
                     "winningCriteria": {
                       "type": "string",
-                      "enum": [
-                        "days_attended",
-                        "total_beers",
-                        "avg_beers"
-                      ]
+                      "enum": ["days_attended", "total_beers", "avg_beers"]
                     },
                     "inviteToken": {
                       "type": "string"
@@ -2278,10 +2070,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2289,9 +2078,7 @@
         }
       },
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "List user's groups",
         "description": "Returns all groups the user is a member of",
         "security": [
@@ -2382,9 +2169,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -2403,10 +2188,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2416,9 +2198,7 @@
     },
     "/v1/groups/search": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Search groups by name",
         "description": "Search for groups by name. Returns public group info (no invite tokens).",
         "security": [
@@ -2485,18 +2265,11 @@
                             "type": "integer"
                           }
                         },
-                        "required": [
-                          "id",
-                          "name",
-                          "festivalId",
-                          "memberCount"
-                        ]
+                        "required": ["id", "name", "festivalId", "memberCount"]
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -2515,10 +2288,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2528,9 +2298,7 @@
     },
     "/v1/groups/{id}": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Get group details",
         "description": "Returns group information including member count",
         "security": [
@@ -2574,11 +2342,7 @@
                     },
                     "winningCriteria": {
                       "type": "string",
-                      "enum": [
-                        "days_attended",
-                        "total_beers",
-                        "avg_beers"
-                      ]
+                      "enum": ["days_attended", "total_beers", "avg_beers"]
                     },
                     "inviteToken": {
                       "type": "string"
@@ -2631,10 +2395,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2653,10 +2414,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2675,10 +2433,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2686,9 +2441,7 @@
         }
       },
       "put": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Update group settings",
         "description": "Update group name, winning criteria, or description. Only the group creator can update.",
         "security": [
@@ -2758,11 +2511,7 @@
                     },
                     "winningCriteria": {
                       "type": "string",
-                      "enum": [
-                        "days_attended",
-                        "total_beers",
-                        "avg_beers"
-                      ]
+                      "enum": ["days_attended", "total_beers", "avg_beers"]
                     },
                     "inviteToken": {
                       "type": "string"
@@ -2808,10 +2557,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2830,10 +2576,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2852,10 +2595,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2865,9 +2605,7 @@
     },
     "/v1/groups/{id}/join": {
       "post": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Join a group",
         "description": "Join a group using an optional invite token",
         "security": [
@@ -2915,10 +2653,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -2937,10 +2672,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2959,10 +2691,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -2981,10 +2710,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3003,10 +2729,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3016,9 +2739,7 @@
     },
     "/v1/groups/{id}/leave": {
       "post": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Leave a group",
         "description": "Remove yourself from a group",
         "security": [
@@ -3052,10 +2773,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -3074,10 +2792,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3096,10 +2811,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3118,10 +2830,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3131,9 +2840,7 @@
     },
     "/v1/groups/{id}/members": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "List group members",
         "description": "Returns all members of a group with their profile information",
         "security": [
@@ -3196,9 +2903,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -3217,10 +2922,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3239,10 +2941,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3261,10 +2960,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3274,9 +2970,7 @@
     },
     "/v1/groups/{id}/members/{userId}": {
       "delete": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Remove a member from group",
         "description": "Remove a user from the group. Only the group creator can do this.",
         "security": [
@@ -3319,10 +3013,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -3341,10 +3032,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3363,10 +3051,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3385,10 +3070,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3398,9 +3080,7 @@
     },
     "/v1/groups/{id}/token/renew": {
       "post": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Regenerate invite token",
         "description": "Generate a new invite token for the group. Only the group creator can do this.",
         "security": [
@@ -3431,9 +3111,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "inviteToken"
-                  ]
+                  "required": ["inviteToken"]
                 }
               }
             }
@@ -3452,10 +3130,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3474,10 +3149,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3496,10 +3168,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3509,9 +3178,7 @@
     },
     "/v1/groups/{id}/gallery": {
       "get": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Get group photo gallery",
         "description": "Returns all public photos shared by group members for the group's festival",
         "security": [
@@ -3591,10 +3258,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "data",
-                    "total"
-                  ]
+                  "required": ["data", "total"]
                 }
               }
             }
@@ -3613,10 +3277,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3635,10 +3296,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3657,10 +3315,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3670,9 +3325,7 @@
     },
     "/v1/groups/join-by-token": {
       "post": {
-        "tags": [
-          "groups"
-        ],
+        "tags": ["groups"],
         "summary": "Join a group by invite token",
         "description": "Join a group using only the invite token, without knowing the group ID",
         "security": [
@@ -3691,9 +3344,7 @@
                     "minLength": 1
                   }
                 },
-                "required": [
-                  "inviteToken"
-                ]
+                "required": ["inviteToken"]
               }
             }
           }
@@ -3732,11 +3383,7 @@
                         },
                         "winningCriteria": {
                           "type": "string",
-                          "enum": [
-                            "days_attended",
-                            "total_beers",
-                            "avg_beers"
-                          ]
+                          "enum": ["days_attended", "total_beers", "avg_beers"]
                         },
                         "inviteToken": {
                           "type": "string"
@@ -3766,11 +3413,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "success",
-                    "message",
-                    "group"
-                  ]
+                  "required": ["success", "message", "group"]
                 }
               }
             }
@@ -3789,10 +3432,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3811,10 +3451,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3833,10 +3470,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3846,9 +3480,7 @@
     },
     "/v1/leaderboard/winning-criteria": {
       "get": {
-        "tags": [
-          "leaderboard"
-        ],
+        "tags": ["leaderboard"],
         "summary": "List winning criteria options",
         "description": "Returns all available winning criteria for group competitions",
         "security": [
@@ -3876,16 +3508,11 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "id",
-                          "name"
-                        ]
+                        "required": ["id", "name"]
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -3904,10 +3531,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -3917,9 +3541,7 @@
     },
     "/v1/leaderboard": {
       "get": {
-        "tags": [
-          "leaderboard"
-        ],
+        "tags": ["leaderboard"],
         "summary": "Get global leaderboard",
         "description": "Returns ranked list of all users for a festival with pagination",
         "security": [
@@ -3940,11 +3562,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "days_attended",
-                "total_beers",
-                "avg_beers"
-              ],
+              "enum": ["days_attended", "total_beers", "avg_beers"],
               "default": "total_beers"
             },
             "required": false,
@@ -4041,12 +3659,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "data",
-                    "total",
-                    "limit",
-                    "offset"
-                  ]
+                  "required": ["data", "total", "limit", "offset"]
                 }
               }
             }
@@ -4065,10 +3678,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -4078,9 +3688,7 @@
     },
     "/v1/groups/{id}/leaderboard": {
       "get": {
-        "tags": [
-          "leaderboard"
-        ],
+        "tags": ["leaderboard"],
         "summary": "Get group leaderboard",
         "description": "Returns ranked list of group members",
         "security": [
@@ -4101,11 +3709,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "days_attended",
-                "total_beers",
-                "avg_beers"
-              ]
+              "enum": ["days_attended", "total_beers", "avg_beers"]
             },
             "required": false,
             "name": "sortBy",
@@ -4170,9 +3774,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -4191,10 +3793,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -4213,10 +3812,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -4235,10 +3831,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -4248,9 +3841,7 @@
     },
     "/v1/achievements": {
       "get": {
-        "tags": [
-          "achievements"
-        ],
+        "tags": ["achievements"],
         "summary": "List user's achievements",
         "description": "Returns all achievements unlocked by the user for a festival",
         "security": [
@@ -4316,12 +3907,7 @@
                           },
                           "rarity": {
                             "type": "string",
-                            "enum": [
-                              "common",
-                              "rare",
-                              "epic",
-                              "legendary"
-                            ]
+                            "enum": ["common", "rare", "epic", "legendary"]
                           },
                           "unlockedAt": {
                             "type": "string",
@@ -4369,12 +3955,7 @@
                               },
                               "rarity": {
                                 "type": "string",
-                                "enum": [
-                                  "common",
-                                  "rare",
-                                  "epic",
-                                  "legendary"
-                                ]
+                                "enum": ["common", "rare", "epic", "legendary"]
                               },
                               "condition": {
                                 "type": "object",
@@ -4432,9 +4013,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -4453,10 +4032,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -4466,9 +4042,7 @@
     },
     "/v1/achievements/evaluate": {
       "post": {
-        "tags": [
-          "achievements"
-        ],
+        "tags": ["achievements"],
         "summary": "Evaluate achievements",
         "description": "Manually triggers achievement evaluation for the user. Returns newly unlocked achievements.",
         "security": [
@@ -4487,9 +4061,7 @@
                     "format": "uuid"
                   }
                 },
-                "required": [
-                  "festivalId"
-                ]
+                "required": ["festivalId"]
               }
             }
           }
@@ -4525,12 +4097,7 @@
                           },
                           "rarity": {
                             "type": "string",
-                            "enum": [
-                              "common",
-                              "rare",
-                              "epic",
-                              "legendary"
-                            ]
+                            "enum": ["common", "rare", "epic", "legendary"]
                           },
                           "unlockedAt": {
                             "type": "string",
@@ -4578,12 +4145,7 @@
                               },
                               "rarity": {
                                 "type": "string",
-                                "enum": [
-                                  "common",
-                                  "rare",
-                                  "epic",
-                                  "legendary"
-                                ]
+                                "enum": ["common", "rare", "epic", "legendary"]
                               },
                               "condition": {
                                 "type": "object",
@@ -4644,10 +4206,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "newAchievements",
-                    "totalPoints"
-                  ]
+                  "required": ["newAchievements", "totalPoints"]
                 }
               }
             }
@@ -4666,10 +4225,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -4679,9 +4235,7 @@
     },
     "/v1/achievements/with-progress": {
       "get": {
-        "tags": [
-          "achievements"
-        ],
+        "tags": ["achievements"],
         "summary": "Get all achievements with progress",
         "description": "Returns all achievements (locked and unlocked) with user progress for a festival",
         "security": [
@@ -4758,12 +4312,7 @@
                           },
                           "rarity": {
                             "type": "string",
-                            "enum": [
-                              "common",
-                              "rare",
-                              "epic",
-                              "legendary"
-                            ]
+                            "enum": ["common", "rare", "epic", "legendary"]
                           },
                           "conditions": {
                             "type": "object",
@@ -4855,11 +4404,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "attendance": {
                               "type": "object",
@@ -4874,11 +4419,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "explorer": {
                               "type": "object",
@@ -4893,11 +4434,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "social": {
                               "type": "object",
@@ -4912,11 +4449,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "competitive": {
                               "type": "object",
@@ -4931,11 +4464,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "special": {
                               "type": "object",
@@ -4950,11 +4479,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             }
                           }
                         },
@@ -4974,11 +4499,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "rare": {
                               "type": "object",
@@ -4993,11 +4514,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "epic": {
                               "type": "object",
@@ -5012,11 +4529,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             },
                             "legendary": {
                               "type": "object",
@@ -5031,11 +4544,7 @@
                                   "type": "integer"
                                 }
                               },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
+                              "required": ["total", "unlocked", "points"]
                             }
                           }
                         }
@@ -5049,10 +4558,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "data",
-                    "stats"
-                  ]
+                  "required": ["data", "stats"]
                 }
               }
             }
@@ -5071,10 +4577,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5084,9 +4587,7 @@
     },
     "/v1/achievements/leaderboard": {
       "get": {
-        "tags": [
-          "achievements"
-        ],
+        "tags": ["achievements"],
         "summary": "Get achievement leaderboard",
         "description": "Returns the achievement leaderboard for a festival",
         "security": [
@@ -5168,9 +4669,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -5189,10 +4688,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5202,9 +4698,7 @@
     },
     "/v1/achievements/available": {
       "get": {
-        "tags": [
-          "achievements"
-        ],
+        "tags": ["achievements"],
         "summary": "List all available achievements",
         "description": "Returns all active achievements that can be unlocked",
         "security": [
@@ -5254,12 +4748,7 @@
                           },
                           "rarity": {
                             "type": "string",
-                            "enum": [
-                              "common",
-                              "rare",
-                              "epic",
-                              "legendary"
-                            ]
+                            "enum": ["common", "rare", "epic", "legendary"]
                           },
                           "is_active": {
                             "type": "boolean"
@@ -5278,9 +4767,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "data"
-                  ]
+                  "required": ["data"]
                 }
               }
             }
@@ -5299,10 +4786,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5312,9 +4796,7 @@
     },
     "/v1/notifications/token": {
       "post": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "summary": "Register FCM device token",
         "description": "Registers a Firebase Cloud Messaging device token with Novu for push notifications",
         "security": [
@@ -5333,9 +4815,7 @@
                     "minLength": 1
                   }
                 },
-                "required": [
-                  "token"
-                ]
+                "required": ["token"]
               }
             }
           }
@@ -5358,9 +4838,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -5379,10 +4857,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5392,9 +4867,7 @@
     },
     "/v1/notifications/subscribe": {
       "post": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "summary": "Subscribe user to Novu",
         "description": "Subscribes a user to Novu notification system with their profile data",
         "security": [
@@ -5416,9 +4889,7 @@
                       },
                       {
                         "type": "string",
-                        "enum": [
-                          ""
-                        ]
+                        "enum": [""]
                       }
                     ]
                   },
@@ -5436,9 +4907,7 @@
                       },
                       {
                         "type": "string",
-                        "enum": [
-                          ""
-                        ]
+                        "enum": [""]
                       }
                     ]
                   }
@@ -5462,9 +4931,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -5483,10 +4950,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5496,9 +4960,7 @@
     },
     "/v1/notifications/preferences": {
       "get": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "summary": "Get notification preferences",
         "description": "Retrieves the user's notification preferences",
         "security": [
@@ -5584,10 +5046,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5595,9 +5054,7 @@
         }
       },
       "put": {
-        "tags": [
-          "notifications"
-        ],
+        "tags": ["notifications"],
         "summary": "Update notification preferences",
         "description": "Updates the user's notification preferences",
         "security": [
@@ -5646,9 +5103,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -5667,10 +5122,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5680,9 +5132,7 @@
     },
     "/v1/wrapped/{festivalId}": {
       "get": {
-        "tags": [
-          "wrapped"
-        ],
+        "tags": ["wrapped"],
         "summary": "Get wrapped year-in-review data",
         "description": "Returns cached wrapped statistics for a user and festival. Returns null if not yet generated.",
         "parameters": [
@@ -5743,11 +5193,7 @@
                               "type": "integer"
                             }
                           },
-                          "required": [
-                            "id",
-                            "name",
-                            "visitCount"
-                          ]
+                          "required": ["id", "name", "visitCount"]
                         },
                         "topDrinkType": {
                           "type": "string",
@@ -5770,11 +5216,7 @@
                                 "format": "date-time"
                               }
                             },
-                            "required": [
-                              "id",
-                              "name",
-                              "unlockedAt"
-                            ]
+                            "required": ["id", "name", "unlockedAt"]
                           }
                         },
                         "globalRank": {
@@ -5797,11 +5239,7 @@
                                 "type": "integer"
                               }
                             },
-                            "required": [
-                              "groupId",
-                              "groupName",
-                              "rank"
-                            ]
+                            "required": ["groupId", "groupName", "rank"]
                           }
                         },
                         "firstVisitDate": {
@@ -5844,10 +5282,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "wrapped",
-                    "cached"
-                  ]
+                  "required": ["wrapped", "cached"]
                 }
               }
             }
@@ -5866,10 +5301,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5888,10 +5320,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -5901,9 +5330,7 @@
     },
     "/v1/wrapped/{festivalId}/generate": {
       "post": {
-        "tags": [
-          "wrapped"
-        ],
+        "tags": ["wrapped"],
         "summary": "Generate wrapped year-in-review data",
         "description": "Generates or regenerates wrapped statistics for a user and festival. Set force=true to regenerate even if cached.",
         "parameters": [
@@ -5979,11 +5406,7 @@
                               "type": "integer"
                             }
                           },
-                          "required": [
-                            "id",
-                            "name",
-                            "visitCount"
-                          ]
+                          "required": ["id", "name", "visitCount"]
                         },
                         "topDrinkType": {
                           "type": "string",
@@ -6006,11 +5429,7 @@
                                 "format": "date-time"
                               }
                             },
-                            "required": [
-                              "id",
-                              "name",
-                              "unlockedAt"
-                            ]
+                            "required": ["id", "name", "unlockedAt"]
                           }
                         },
                         "globalRank": {
@@ -6033,11 +5452,7 @@
                                 "type": "integer"
                               }
                             },
-                            "required": [
-                              "groupId",
-                              "groupName",
-                              "rank"
-                            ]
+                            "required": ["groupId", "groupName", "rank"]
                           }
                         },
                         "firstVisitDate": {
@@ -6080,10 +5495,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "wrapped",
-                    "regenerated"
-                  ]
+                  "required": ["wrapped", "regenerated"]
                 }
               }
             }
@@ -6102,10 +5514,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6124,10 +5533,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6137,9 +5543,7 @@
     },
     "/v1/wrapped/{festivalId}/access": {
       "get": {
-        "tags": [
-          "wrapped"
-        ],
+        "tags": ["wrapped"],
         "summary": "Check wrapped access",
         "description": "Checks if the user is allowed to access wrapped data for a specific festival.",
         "security": [
@@ -6182,9 +5586,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "allowed"
-                  ]
+                  "required": ["allowed"]
                 }
               }
             }
@@ -6203,10 +5605,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6216,9 +5615,7 @@
     },
     "/v1/wrapped/festivals": {
       "get": {
-        "tags": [
-          "wrapped"
-        ],
+        "tags": ["wrapped"],
         "summary": "Get available wrapped festivals",
         "description": "Returns a list of festivals for which wrapped data is available for the user.",
         "security": [
@@ -6256,19 +5653,11 @@
                             "type": "boolean"
                           }
                         },
-                        "required": [
-                          "id",
-                          "name",
-                          "year",
-                          "status",
-                          "hasData"
-                        ]
+                        "required": ["id", "name", "year", "status", "hasData"]
                       }
                     }
                   },
-                  "required": [
-                    "festivals"
-                  ]
+                  "required": ["festivals"]
                 }
               }
             }
@@ -6287,10 +5676,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6300,9 +5686,7 @@
     },
     "/v1/wrapped/regenerate": {
       "post": {
-        "tags": [
-          "wrapped"
-        ],
+        "tags": ["wrapped"],
         "summary": "Regenerate wrapped cache (admin only)",
         "description": "Admin function to regenerate cached wrapped data for specific users or festivals.",
         "security": [
@@ -6348,9 +5732,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -6369,10 +5751,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6391,10 +5770,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6404,9 +5780,7 @@
     },
     "/v1/reservations": {
       "post": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Create a tent reservation",
         "description": "Creates a new reservation for a specific tent and time. Optionally schedule reminders.",
         "security": [
@@ -6455,11 +5829,7 @@
                     "default": 30
                   }
                 },
-                "required": [
-                  "festivalId",
-                  "tentId",
-                  "startAt"
-                ]
+                "required": ["festivalId", "tentId", "startAt"]
               }
             }
           }
@@ -6571,9 +5941,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "reservation"
-                  ]
+                  "required": ["reservation"]
                 }
               }
             }
@@ -6592,10 +5960,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6614,10 +5979,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6625,9 +5987,7 @@
         }
       },
       "get": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "List user reservations",
         "description": "Retrieves all reservations for the authenticated user with optional filters",
         "security": [
@@ -6811,12 +6171,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "reservations",
-                    "total",
-                    "limit",
-                    "offset"
-                  ]
+                  "required": ["reservations", "total", "limit", "offset"]
                 }
               }
             }
@@ -6835,10 +6190,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -6848,9 +6200,7 @@
     },
     "/v1/reservations/{id}/checkin": {
       "post": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Check in to a reservation",
         "description": "Marks a reservation as checked in. Optionally creates an attendance record if auto_checkin is enabled.",
         "security": [
@@ -6987,15 +6337,10 @@
                           "format": "date"
                         }
                       },
-                      "required": [
-                        "id",
-                        "date"
-                      ]
+                      "required": ["id", "date"]
                     }
                   },
-                  "required": [
-                    "reservation"
-                  ]
+                  "required": ["reservation"]
                 }
               }
             }
@@ -7014,10 +6359,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7036,10 +6378,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7058,10 +6397,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7071,9 +6407,7 @@
     },
     "/v1/reservations/{id}": {
       "delete": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Cancel a reservation",
         "description": "Cancels an existing reservation",
         "security": [
@@ -7199,9 +6533,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "reservation"
-                  ]
+                  "required": ["reservation"]
                 }
               }
             }
@@ -7220,10 +6552,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7242,10 +6571,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7253,9 +6579,7 @@
         }
       },
       "get": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Get a reservation by ID",
         "description": "Retrieves a single reservation by its ID",
         "security": [
@@ -7381,9 +6705,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "reservation"
-                  ]
+                  "required": ["reservation"]
                 }
               }
             }
@@ -7402,10 +6724,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7424,10 +6743,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7435,9 +6751,7 @@
         }
       },
       "put": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Update a reservation",
         "description": "Updates an existing reservation. Only provided fields will be updated.",
         "security": [
@@ -7599,9 +6913,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "reservation"
-                  ]
+                  "required": ["reservation"]
                 }
               }
             }
@@ -7620,10 +6932,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7642,10 +6951,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7664,10 +6970,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7677,9 +6980,7 @@
     },
     "/v1/location/sessions": {
       "post": {
-        "tags": [
-          "location"
-        ],
+        "tags": ["location"],
         "summary": "Start location sharing session",
         "description": "Creates a new location sharing session for a festival. User can only have one active session per festival.",
         "security": [
@@ -7725,18 +7026,11 @@
                         "format": "date-time"
                       }
                     },
-                    "required": [
-                      "latitude",
-                      "longitude",
-                      "timestamp"
-                    ]
+                    "required": ["latitude", "longitude", "timestamp"]
                   },
                   "visibility": {
                     "type": "string",
-                    "enum": [
-                      "groups",
-                      "specific"
-                    ],
+                    "enum": ["groups", "specific"],
                     "default": "groups"
                   },
                   "groupIds": {
@@ -7747,9 +7041,7 @@
                     }
                   }
                 },
-                "required": [
-                  "festivalId"
-                ]
+                "required": ["festivalId"]
               }
             }
           }
@@ -7817,9 +7109,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "session"
-                  ]
+                  "required": ["session"]
                 }
               }
             }
@@ -7838,10 +7128,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7860,10 +7147,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7882,10 +7166,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -7895,9 +7176,7 @@
     },
     "/v1/location/sessions/{id}": {
       "delete": {
-        "tags": [
-          "location"
-        ],
+        "tags": ["location"],
         "summary": "Stop location sharing session",
         "description": "Stops an active location sharing session",
         "security": [
@@ -7982,10 +7261,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "success",
-                    "session"
-                  ]
+                  "required": ["success", "session"]
                 }
               }
             }
@@ -8004,10 +7280,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8026,10 +7299,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8037,9 +7307,7 @@
         }
       },
       "put": {
-        "tags": [
-          "location"
-        ],
+        "tags": ["location"],
         "summary": "Update location for session",
         "description": "Updates the current location for an active location sharing session",
         "security": [
@@ -8090,17 +7358,10 @@
                         "format": "date-time"
                       }
                     },
-                    "required": [
-                      "latitude",
-                      "longitude",
-                      "timestamp"
-                    ]
+                    "required": ["latitude", "longitude", "timestamp"]
                   }
                 },
-                "required": [
-                  "sessionId",
-                  "location"
-                ]
+                "required": ["sessionId", "location"]
               }
             }
           }
@@ -8117,9 +7378,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -8138,10 +7397,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8160,10 +7416,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8182,10 +7435,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8195,9 +7445,7 @@
     },
     "/v1/location/nearby": {
       "get": {
-        "tags": [
-          "location"
-        ],
+        "tags": ["location"],
         "summary": "Get nearby group members",
         "description": "Retrieves group members currently sharing their location near the user's position",
         "security": [
@@ -8321,11 +7569,7 @@
                                 "format": "date-time"
                               }
                             },
-                            "required": [
-                              "latitude",
-                              "longitude",
-                              "timestamp"
-                            ]
+                            "required": ["latitude", "longitude", "timestamp"]
                           },
                           "distance": {
                             "type": "number",
@@ -8367,21 +7611,13 @@
                           "format": "date-time"
                         }
                       },
-                      "required": [
-                        "latitude",
-                        "longitude",
-                        "timestamp"
-                      ]
+                      "required": ["latitude", "longitude", "timestamp"]
                     },
                     "radiusMeters": {
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "members",
-                    "userLocation",
-                    "radiusMeters"
-                  ]
+                  "required": ["members", "userLocation", "radiusMeters"]
                 }
               }
             }
@@ -8400,10 +7636,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8422,10 +7655,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8435,9 +7665,7 @@
     },
     "/v1/photos/upload-url": {
       "get": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Get signed upload URL for photo",
         "description": "Returns a signed upload URL for uploading a beer picture. Validates file type, size, and attendance ownership.",
         "security": [
@@ -8542,10 +7770,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8564,10 +7789,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8586,10 +7808,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8599,9 +7818,7 @@
     },
     "/v1/photos/{id}/confirm": {
       "post": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Confirm photo upload",
         "description": "Confirms that a photo was successfully uploaded to storage and marks it as confirmed in the database.",
         "security": [
@@ -8651,18 +7868,10 @@
                           "format": "date-time"
                         }
                       },
-                      "required": [
-                        "id",
-                        "url",
-                        "attendanceId",
-                        "uploadedAt"
-                      ]
+                      "required": ["id", "url", "attendanceId", "uploadedAt"]
                     }
                   },
-                  "required": [
-                    "success",
-                    "picture"
-                  ]
+                  "required": ["success", "picture"]
                 }
               }
             }
@@ -8681,10 +7890,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8703,10 +7909,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8716,9 +7919,7 @@
     },
     "/v1/photos": {
       "get": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "List user photos",
         "description": "Retrieves all beer pictures for the authenticated user with optional filters",
         "security": [
@@ -8808,10 +8009,7 @@
                           },
                           "visibility": {
                             "type": "string",
-                            "enum": [
-                              "public",
-                              "private"
-                            ]
+                            "enum": ["public", "private"]
                           },
                           "createdAt": {
                             "type": "string",
@@ -8838,12 +8036,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "photos",
-                    "total",
-                    "limit",
-                    "offset"
-                  ]
+                  "required": ["photos", "total", "limit", "offset"]
                 }
               }
             }
@@ -8862,10 +8055,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8884,10 +8074,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8897,9 +8084,7 @@
     },
     "/v1/photos/{id}": {
       "delete": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Delete a photo",
         "description": "Deletes a beer picture from both storage and database",
         "security": [
@@ -8930,9 +8115,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -8951,10 +8134,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8973,10 +8153,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -8986,9 +8163,7 @@
     },
     "/v1/photos/settings/global": {
       "get": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Get global photo privacy settings",
         "description": "Returns user's global photo visibility settings",
         "security": [
@@ -9012,10 +8187,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "userId",
-                    "hidePhotosFromAllGroups"
-                  ]
+                  "required": ["userId", "hidePhotosFromAllGroups"]
                 }
               }
             }
@@ -9034,10 +8206,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9045,9 +8214,7 @@
         }
       },
       "put": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Update global photo privacy settings",
         "description": "Updates user's global photo visibility settings",
         "security": [
@@ -9065,9 +8232,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "hidePhotosFromAllGroups"
-                ]
+                "required": ["hidePhotosFromAllGroups"]
               }
             }
           }
@@ -9088,10 +8253,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "userId",
-                    "hidePhotosFromAllGroups"
-                  ]
+                  "required": ["userId", "hidePhotosFromAllGroups"]
                 }
               }
             }
@@ -9110,10 +8272,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9123,9 +8282,7 @@
     },
     "/v1/photos/settings/groups": {
       "get": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Get all group photo privacy settings",
         "description": "Returns user's photo visibility settings for all groups",
         "security": [
@@ -9170,9 +8327,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "settings"
-                  ]
+                  "required": ["settings"]
                 }
               }
             }
@@ -9191,10 +8346,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9204,9 +8356,7 @@
     },
     "/v1/photos/settings/groups/{groupId}": {
       "get": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Get group photo privacy settings",
         "description": "Returns user's photo visibility settings for a specific group",
         "security": [
@@ -9272,10 +8422,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9283,9 +8430,7 @@
         }
       },
       "put": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Update group photo privacy settings",
         "description": "Updates user's photo visibility settings for a specific group",
         "security": [
@@ -9314,9 +8459,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "hidePhotosFromGroup"
-                ]
+                "required": ["hidePhotosFromGroup"]
               }
             }
           }
@@ -9368,10 +8511,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9381,9 +8521,7 @@
     },
     "/v1/photos/{id}/visibility": {
       "put": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Update photo visibility",
         "description": "Updates visibility setting for a specific photo",
         "security": [
@@ -9410,15 +8548,10 @@
                 "properties": {
                   "visibility": {
                     "type": "string",
-                    "enum": [
-                      "public",
-                      "private"
-                    ]
+                    "enum": ["public", "private"]
                   }
                 },
-                "required": [
-                  "visibility"
-                ]
+                "required": ["visibility"]
               }
             }
           }
@@ -9435,9 +8568,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -9456,10 +8587,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9478,10 +8606,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9491,9 +8616,7 @@
     },
     "/v1/photos/visibility": {
       "put": {
-        "tags": [
-          "photos"
-        ],
+        "tags": ["photos"],
         "summary": "Bulk update photo visibility",
         "description": "Updates visibility setting for multiple photos",
         "security": [
@@ -9517,16 +8640,10 @@
                   },
                   "visibility": {
                     "type": "string",
-                    "enum": [
-                      "public",
-                      "private"
-                    ]
+                    "enum": ["public", "private"]
                   }
                 },
-                "required": [
-                  "photoIds",
-                  "visibility"
-                ]
+                "required": ["photoIds", "visibility"]
               }
             }
           }
@@ -9546,10 +8663,7 @@
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "success",
-                    "updatedCount"
-                  ]
+                  "required": ["success", "updatedCount"]
                 }
               }
             }
@@ -9568,10 +8682,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9590,10 +8701,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9603,9 +8711,7 @@
     },
     "/v1/profile": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Get current user's profile",
         "description": "Returns the profile data for the authenticated user",
         "security": [
@@ -9653,9 +8759,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "profile"
-                  ]
+                  "required": ["profile"]
                 }
               }
             }
@@ -9674,10 +8778,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9685,9 +8786,7 @@
         }
       },
       "put": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Update current user's profile",
         "description": "Updates the profile data for the authenticated user",
         "security": [
@@ -9771,9 +8870,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "profile"
-                  ]
+                  "required": ["profile"]
                 }
               }
             }
@@ -9792,10 +8889,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9803,9 +8897,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Delete current user's account",
         "description": "Permanently deletes the user's account and all associated data",
         "security": [
@@ -9828,10 +8920,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -9850,10 +8939,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9863,9 +8949,7 @@
     },
     "/v1/profiles/{userId}": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Get public profile of a user",
         "description": "Returns public profile information for any user. Optionally includes festival stats when festivalId is provided.",
         "security": [
@@ -9934,24 +9018,13 @@
                               "type": "number"
                             }
                           },
-                          "required": [
-                            "daysAttended",
-                            "totalBeers",
-                            "avgBeers"
-                          ]
+                          "required": ["daysAttended", "totalBeers", "avgBeers"]
                         }
                       },
-                      "required": [
-                        "id",
-                        "username",
-                        "fullName",
-                        "avatarUrl"
-                      ]
+                      "required": ["id", "username", "fullName", "avatarUrl"]
                     }
                   },
-                  "required": [
-                    "profile"
-                  ]
+                  "required": ["profile"]
                 }
               }
             }
@@ -9970,10 +9043,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -9992,10 +9062,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10005,9 +9072,7 @@
     },
     "/v1/profile/tutorial": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Get tutorial status",
         "description": "Returns the tutorial completion status for the user",
         "security": [
@@ -10040,9 +9105,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "status"
-                  ]
+                  "required": ["status"]
                 }
               }
             }
@@ -10061,10 +9124,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10074,9 +9134,7 @@
     },
     "/v1/profile/tutorial/complete": {
       "post": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Complete tutorial",
         "description": "Marks the tutorial as completed for the user",
         "security": [
@@ -10096,9 +9154,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -10117,10 +9173,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10130,9 +9183,7 @@
     },
     "/v1/profile/tutorial/reset": {
       "post": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Reset tutorial",
         "description": "Resets the tutorial status for the user",
         "security": [
@@ -10152,9 +9203,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ]
+                  "required": ["success"]
                 }
               }
             }
@@ -10173,10 +9222,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10186,9 +9232,7 @@
     },
     "/v1/profile/missing-fields": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Get missing profile fields",
         "description": "Returns which profile fields are not yet filled in",
         "security": [
@@ -10217,20 +9261,13 @@
                           "type": "boolean"
                         }
                       },
-                      "required": [
-                        "username",
-                        "full_name",
-                        "avatar_url"
-                      ]
+                      "required": ["username", "full_name", "avatar_url"]
                     },
                     "hasMissingFields": {
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "missingFields",
-                    "hasMissingFields"
-                  ]
+                  "required": ["missingFields", "hasMissingFields"]
                 }
               }
             }
@@ -10249,10 +9286,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10262,9 +9296,7 @@
     },
     "/v1/profile/highlights": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Get user highlights",
         "description": "Returns statistics and highlights for the user's festival attendance",
         "security": [
@@ -10360,9 +9392,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "highlights"
-                  ]
+                  "required": ["highlights"]
                 }
               }
             }
@@ -10381,10 +9411,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10394,9 +9421,7 @@
     },
     "/v1/profile/avatar/upload-url": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Get signed upload URL for avatar",
         "description": "Returns a signed upload URL for uploading a user avatar. Client uploads directly to storage.",
         "security": [
@@ -10453,11 +9478,7 @@
                       "type": "integer"
                     }
                   },
-                  "required": [
-                    "uploadUrl",
-                    "fileName",
-                    "expiresIn"
-                  ]
+                  "required": ["uploadUrl", "fileName", "expiresIn"]
                 }
               }
             }
@@ -10476,10 +9497,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10498,10 +9516,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10511,9 +9526,7 @@
     },
     "/v1/profile/avatar/confirm": {
       "post": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["profile"],
         "summary": "Confirm avatar upload",
         "description": "Confirms that an avatar was successfully uploaded to storage and updates the user's profile.",
         "security": [
@@ -10532,9 +9545,7 @@
                     "minLength": 1
                   }
                 },
-                "required": [
-                  "fileName"
-                ]
+                "required": ["fileName"]
               }
             }
           }
@@ -10554,10 +9565,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "success",
-                    "fileName"
-                  ]
+                  "required": ["success", "fileName"]
                 }
               }
             }
@@ -10576,10 +9584,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
@@ -10589,9 +9594,7 @@
     },
     "/v1/activity-feed": {
       "get": {
-        "tags": [
-          "activity-feed"
-        ],
+        "tags": ["activity-feed"],
         "summary": "Get activity feed",
         "description": "Returns activity feed items for a festival with cursor-based pagination",
         "security": [
@@ -10702,11 +9705,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "activities",
-                    "nextCursor",
-                    "hasMore"
-                  ]
+                  "required": ["activities", "nextCursor", "hasMore"]
                 }
               }
             }
@@ -10725,10 +9724,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
+                  "required": ["error", "message"]
                 }
               }
             }
