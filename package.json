@@ -61,7 +61,7 @@
     "next": "16.1.6",
     "prettier": "3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "supabase": "2.72.9",
+    "supabase": "2.74.5",
     "tsx": "^4.21.0",
     "turbo": "^2.7.6",
     "typescript": "5.9.3",
@@ -87,7 +87,8 @@
       "patch-package": "8.0.1",
       "esbuild": ">=0.25.0",
       "seroval": ">=1.4.1",
-      "tar": ">=7.5.4",
+      "tar": ">=7.5.7",
+      "fast-xml-parser": ">=5.3.4",
       "react": "19.2.4",
       "react-dom": "19.2.4"
     }
