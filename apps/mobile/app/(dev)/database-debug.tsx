@@ -6,6 +6,7 @@
  */
 
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import {
   AlertCircle,
   CheckCircle,
@@ -512,13 +513,14 @@ export default function DatabaseDebugScreen() {
                       {record.table}/{record.id.substring(0, 8)}...
                     </Text>
                     <Text
-                      className={`text-xs ${
+                      className={cn(
+                        "text-xs",
                         record.operation === "DELETE"
                           ? "text-error-500"
                           : record.operation === "INSERT"
                             ? "text-success-500"
-                            : "text-primary-500"
-                      }`}
+                            : "text-primary-500",
+                      )}
                     >
                       {record.operation}
                     </Text>
@@ -561,7 +563,7 @@ function SyncStatusBadge({ status }: { status: string }) {
 
   return (
     <Text
-      className={`rounded-full px-2 py-1 text-xs font-medium ${getColor()}`}
+      className={cn("rounded-full px-2 py-1 text-xs font-medium", getColor())}
     >
       {status}
     </Text>
@@ -587,7 +589,7 @@ function StatBadge({
         : "bg-background-100";
 
   return (
-    <VStack className={`items-center rounded-lg p-2 ${bgColor}`}>
+    <VStack className={cn("items-center rounded-lg p-2", bgColor)}>
       {icon}
       <Text className="text-lg font-semibold">{value}</Text>
       <Text className="text-xs text-typography-500">{label}</Text>

@@ -1,3 +1,4 @@
+import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { Minus, Plus } from "lucide-react-native";
 import { useCallback } from "react";
@@ -54,11 +55,12 @@ export function BeerStepper({
       <Pressable
         onPress={handleDecrement}
         disabled={!canDecrement}
-        className={`h-12 w-12 items-center justify-center rounded-full border-2 ${
+        className={cn(
+          "h-12 w-12 items-center justify-center rounded-full border-2",
           canDecrement
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
-            : "border-background-300 bg-background-100"
-        }`}
+            : "border-background-300 bg-background-100",
+        )}
       >
         <Minus
           size={24}
@@ -68,9 +70,10 @@ export function BeerStepper({
 
       {/* Count display */}
       <Text
-        className={`min-w-[60px] text-center text-4xl font-bold ${
-          disabled ? "text-typography-400" : "text-typography-900"
-        }`}
+        className={cn(
+          "min-w-[60px] text-center text-4xl font-bold",
+          disabled ? "text-typography-400" : "text-typography-900",
+        )}
       >
         {value}
       </Text>
@@ -79,11 +82,12 @@ export function BeerStepper({
       <Pressable
         onPress={handleIncrement}
         disabled={!canIncrement}
-        className={`h-12 w-12 items-center justify-center rounded-full border-2 ${
+        className={cn(
+          "h-12 w-12 items-center justify-center rounded-full border-2",
           canIncrement
             ? "border-primary-500 bg-primary-50 active:bg-primary-100"
-            : "border-background-300 bg-background-100"
-        }`}
+            : "border-background-300 bg-background-100",
+        )}
       >
         <Plus
           size={24}

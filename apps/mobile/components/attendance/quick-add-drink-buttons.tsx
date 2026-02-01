@@ -1,5 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { Beer, Check, CupSoda, Wine } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -160,13 +161,14 @@ export function QuickAddDrinkButtons({
             key={type}
             onPress={() => handleQuickAdd(type)}
             disabled={isDisabled}
-            className={`min-w-[70px] max-w-[90px] flex-1 items-center justify-center rounded-xl border-2 px-2 py-3 ${
+            className={cn(
+              "min-w-[70px] max-w-[90px] flex-1 items-center justify-center rounded-xl border-2 px-2 py-3",
               isSuccess
                 ? "border-success-500 bg-success-50"
                 : isDisabled
                   ? "border-background-200 bg-background-100"
-                  : "border-background-200 bg-white active:bg-background-50"
-            }`}
+                  : "border-background-200 bg-white active:bg-background-50",
+            )}
             accessibilityLabel={getLabel(type)}
             accessibilityRole="button"
             accessibilityState={{ disabled: isDisabled }}
@@ -184,13 +186,14 @@ export function QuickAddDrinkButtons({
                 />
               )}
               <Text
-                className={`text-xs font-medium ${
+                className={cn(
+                  "text-xs font-medium",
                   isSuccess
                     ? "text-success-600"
                     : isDisabled
                       ? "text-typography-400"
-                      : "text-typography-700"
-                }`}
+                      : "text-typography-700",
+                )}
                 numberOfLines={1}
               >
                 {isSuccess ? t("common.status.added") : getLabel(type)}

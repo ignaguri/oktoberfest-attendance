@@ -2,6 +2,7 @@ import type { Notification } from "@novu/js";
 import { useCounts, useNotifications } from "@novu/react-native";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
+import { cn } from "@prostcounter/ui";
 import { Bell, CheckCheck } from "lucide-react-native";
 import { useCallback } from "react";
 import {
@@ -30,9 +31,10 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
   return (
     <TouchableOpacity
       onPress={() => onPress(notification)}
-      className={`flex-row border-b border-outline-100 p-4 ${
-        isRead ? "bg-white" : "bg-primary-50"
-      }`}
+      className={cn(
+        "flex-row border-b border-outline-100 p-4",
+        isRead ? "bg-white" : "bg-primary-50",
+      )}
       accessibilityLabel={notification.subject || notification.body}
       accessibilityHint="Tap to view notification details"
     >

@@ -7,6 +7,7 @@
 
 import { useUserGroups } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { Check, Users } from "lucide-react-native";
 import { useCallback, useEffect } from "react";
 import { ScrollView } from "react-native";
@@ -164,9 +165,10 @@ export function GroupSelector({
               <HStack
                 key={group.id}
                 space="sm"
-                className={`items-center rounded-lg bg-background-0 p-2 ${
-                  shareWithAll ? "opacity-50" : ""
-                }`}
+                className={cn(
+                  "items-center rounded-lg bg-background-0 p-2",
+                  shareWithAll && "opacity-50",
+                )}
               >
                 <Checkbox
                   value={group.id}
@@ -180,11 +182,12 @@ export function GroupSelector({
                     <CheckboxIcon as={Check} />
                   </CheckboxIndicator>
                   <CheckboxLabel
-                    className={`flex-1 text-sm ${
+                    className={cn(
+                      "flex-1 text-sm",
                       isSelected && !shareWithAll
                         ? "font-medium text-primary-700"
-                        : "text-typography-700"
-                    }`}
+                        : "text-typography-700",
+                    )}
                   >
                     {group.name}
                   </CheckboxLabel>

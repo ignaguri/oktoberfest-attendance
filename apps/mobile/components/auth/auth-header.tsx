@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import React from "react";
 import { Image, View } from "react-native";
 
@@ -34,12 +35,18 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
       {/* App Name with gradient-like styling */}
       <View className="mt-3 flex-row">
         <Text
-          className={`font-bold text-primary-600 ${isLarge ? "text-3xl" : "text-2xl"}`}
+          className={cn(
+            "font-bold text-primary-600",
+            isLarge ? "text-3xl" : "text-2xl",
+          )}
         >
           {t("app.namePart1")}
         </Text>
         <Text
-          className={`font-bold text-primary-500 ${isLarge ? "text-3xl" : "text-2xl"}`}
+          className={cn(
+            "font-bold text-primary-500",
+            isLarge ? "text-3xl" : "text-2xl",
+          )}
         >
           {t("app.namePart2")}
         </Text>

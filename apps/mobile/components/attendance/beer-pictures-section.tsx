@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { ImagePlus, Minus, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
@@ -121,7 +122,10 @@ export function BeerPicturesSection({
               >
                 <Image
                   source={{ uri: imageUrl }}
-                  className={`h-20 w-20 rounded-lg ${isMarkedForRemoval ? "opacity-40" : ""}`}
+                  className={cn(
+                    "h-20 w-20 rounded-lg",
+                    isMarkedForRemoval && "opacity-40",
+                  )}
                   resizeMode="cover"
                 />
                 {isMarkedForRemoval && (
@@ -148,7 +152,10 @@ export function BeerPicturesSection({
             <Pressable onPress={() => handleImagePreview(photo.localUri)}>
               <Image
                 source={{ uri: photo.localUri }}
-                className={`h-20 w-20 rounded-lg ${isUploading ? "opacity-60" : ""}`}
+                className={cn(
+                  "h-20 w-20 rounded-lg",
+                  isUploading && "opacity-60",
+                )}
                 resizeMode="cover"
               />
             </Pressable>

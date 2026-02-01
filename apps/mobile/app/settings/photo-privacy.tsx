@@ -1,3 +1,4 @@
+import { cn } from "@prostcounter/ui";
 import { Eye, EyeOff, Info, Users } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -214,11 +215,11 @@ export default function PhotoPrivacyScreen() {
             settings.groups.map((group, index) => (
               <View
                 key={group.groupId}
-                className={`flex-row items-center justify-between py-3 ${
-                  index < settings.groups.length - 1
-                    ? "border-b border-outline-100"
-                    : ""
-                }`}
+                className={cn(
+                  "flex-row items-center justify-between py-3",
+                  index < settings.groups.length - 1 &&
+                    "border-b border-outline-100",
+                )}
               >
                 <View className="flex-1 flex-row items-center gap-3">
                   {group.hidePhotosFromGroup ? (

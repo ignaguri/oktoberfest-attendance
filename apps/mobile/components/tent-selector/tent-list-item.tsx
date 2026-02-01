@@ -1,3 +1,4 @@
+import { cn } from "@prostcounter/ui";
 import { Check } from "lucide-react-native";
 
 import {
@@ -51,13 +52,18 @@ export function TentListItem({
   return (
     <Pressable
       onPress={handlePress}
-      className={`px-4 py-3 ${isSelected ? "bg-primary-100" : ""}`}
+      className={cn("px-4 py-3", isSelected && "bg-primary-100")}
       accessibilityRole="radio"
       accessibilityState={{ checked: isSelected }}
     >
       <HStack className="items-center justify-between">
         <Text
-          className={`flex-1 ${isSelected ? "font-semibold text-primary-700" : "text-typography-700"}`}
+          className={cn(
+            "flex-1",
+            isSelected
+              ? "font-semibold text-primary-700"
+              : "text-typography-700",
+          )}
         >
           {tentName}
         </Text>
