@@ -22,6 +22,7 @@ import { NotificationPermissionPrompt } from "@/components/notifications/Notific
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/image-urls";
 import { logger } from "@/lib/logger";
 import { useNotificationContextSafe } from "@/lib/notifications/NotificationContext";
 
@@ -185,6 +186,10 @@ export default function NotificationSettingsScreen() {
 
       // Step 3: Subscribe user to Novu (creates subscriber)
       logger.info("[Push] Step 3: Subscribing to Novu...");
+
+      // Get full avatar URL using the utility (constructs Supabase storage URL)
+      const fullAvatarUrl = getAvatarUrl(profile?.avatar_url);
+
       const subscribePayload = {
         ...(profile?.email && { email: profile.email }),
         ...(profile?.full_name?.split(" ")[0] && {
@@ -193,7 +198,7 @@ export default function NotificationSettingsScreen() {
         ...(profile?.full_name?.split(" ").slice(1).join(" ") && {
           lastName: profile.full_name.split(" ").slice(1).join(" "),
         }),
-        ...(profile?.avatar_url && { avatar: profile.avatar_url }),
+        ...(fullAvatarUrl && { avatar: fullAvatarUrl }),
       };
       logger.info(
         "[Push] Subscribe payload: " + JSON.stringify(subscribePayload),
