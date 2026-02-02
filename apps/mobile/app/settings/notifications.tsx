@@ -231,7 +231,7 @@ export default function NotificationSettingsScreen() {
       logger.error("[Push] Exception: " + errorMessage);
       Alert.alert(
         t("common.status.error"),
-        t("profile.notifications.enableFailed"),
+        `Failed to enable push notifications: ${errorMessage}`,
       );
     } finally {
       setIsEnabling(false);
