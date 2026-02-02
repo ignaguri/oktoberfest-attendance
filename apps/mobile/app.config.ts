@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
-  runtimeVersion: "1.0.1-b",
+  runtimeVersion: "1.0.1-c",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -124,6 +124,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     "./plugins/withModularHeaders.js",
+    "./plugins/withFirebaseNotificationColor.js",
     "./plugins/withGoogleMapsApiKey.js",
     "expo-maps",
     "expo-updates",
