@@ -185,12 +185,21 @@ export default function NotificationSettingsScreen() {
 
       // Step 3: Subscribe user to Novu (creates subscriber)
       logger.info("[Push] Step 3: Subscribing to Novu...");
-      const subscribeResult = await subscribeToNotifications.mutateAsync({
-        email: profile?.email || "",
-        firstName: profile?.full_name?.split(" ")[0] || "",
-        lastName: profile?.full_name?.split(" ").slice(1).join(" ") || "",
-        avatar: profile?.avatar_url || "",
-      });
+      const subscribePayload = {
+        ...(profile?.email && { email: profile.email }),
+        ...(profile?.full_name?.split(" ")[0] && {
+          firstName: profile.full_name.split(" ")[0],
+        }),
+        ...(profile?.full_name?.split(" ").slice(1).join(" ") && {
+          lastName: profile.full_name.split(" ").slice(1).join(" "),
+        }),
+        ...(profile?.avatar_url && { avatar: profile.avatar_url }),
+      };
+      logger.info(
+        "[Push] Subscribe payload: " + JSON.stringify(subscribePayload),
+      );
+      const subscribeResult =
+        await subscribeToNotifications.mutateAsync(subscribePayload);
 
       if (!subscribeResult.success) {
         const errorMsg = subscribeResult.error || "Unknown error";
