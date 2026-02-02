@@ -608,8 +608,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(hono@4.11.7)(zod@4.3.6)
       '@novu/api':
-        specifier: ^3.13.0
-        version: 3.13.0
+        specifier: ^3.12.0
+        version: 3.12.0
       '@prostcounter/db':
         specifier: workspace:*
         version: link:../db
@@ -2571,6 +2571,9 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@novu/api@3.12.0':
+    resolution: {integrity: sha512-bCN7HgKlgdA4UVfum03MayQKb8O5AkPGsSJKlHmEzL1q6nxvC0XhEiuUkhsJN96eXo9nydeiastqRZDDnbb/Vw==}
 
   '@novu/api@3.13.0':
     resolution: {integrity: sha512-xsaepsSHGUH7xV245uARpV3ld9inwSGQJqutE1mxep1+K2ZjAq1AWAErc+IqJd03BjkFHT9YtywPCVaXmQpwnw==}
@@ -12822,6 +12825,10 @@ snapshots:
       fastq: 1.20.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@novu/api@3.12.0':
+    dependencies:
+      zod: 4.3.6
 
   '@novu/api@3.13.0':
     dependencies:
