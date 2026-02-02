@@ -140,23 +140,26 @@ export class NotificationService {
     );
 
     try {
-      logger.info(
-        {
-          subscriberId: userId,
-          email: userEmail,
-          firstName,
-          lastName,
-          avatar,
-        },
-        "About to call Novu subscribers.create",
-      );
-      const result = await this.novu.subscribers.create({
+      // Build payload with only defined values
+      // Novu SDK rejects undefined values, so we must omit them
+      const payload: Record<string, unknown> = {
         subscriberId: userId,
-        email: userEmail,
-        firstName,
-        lastName,
-        avatar,
-      });
+      };
+      if (userEmail !== undefined) payload.email = userEmail;
+      if (firstName !== undefined) payload.firstName = firstName;
+      if (lastName !== undefined) payload.lastName = lastName;
+      if (avatar !== undefined) payload.avatar = avatar;
+
+      logger.info(payload, "About to call Novu subscribers.create");
+      const result = await this.novu.subscribers.create(
+        payload as {
+          subscriberId: string;
+          email?: string;
+          firstName?: string;
+          lastName?: string;
+          avatar?: string;
+        },
+      );
       logger.info({ result }, "Novu subscriber create SUCCESS");
       return { success: true };
     } catch (error) {
