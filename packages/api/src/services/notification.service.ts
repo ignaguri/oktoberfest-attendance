@@ -140,6 +140,16 @@ export class NotificationService {
     );
 
     try {
+      logger.info(
+        {
+          subscriberId: userId,
+          email: userEmail,
+          firstName,
+          lastName,
+          avatar,
+        },
+        "About to call Novu subscribers.create",
+      );
       const result = await this.novu.subscribers.create({
         subscriberId: userId,
         email: userEmail,
@@ -147,10 +157,17 @@ export class NotificationService {
         lastName,
         avatar,
       });
-      logger.debug({ result }, "Novu subscriber create result");
+      logger.info({ result }, "Novu subscriber create SUCCESS");
       return { success: true };
     } catch (error) {
-      logger.error({ error }, "Error subscribing user");
+      logger.error(
+        {
+          error,
+          errorString: String(error),
+          errorJSON: JSON.stringify(error, null, 2),
+        },
+        "Novu subscriber create FAILED",
+      );
 
       // Check if it's a 409 Conflict (subscriber already exists)
       // First check for status code property (Novu SDK may include this)
