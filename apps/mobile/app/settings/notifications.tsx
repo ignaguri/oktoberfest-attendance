@@ -155,18 +155,18 @@ export default function NotificationSettingsScreen() {
 
     try {
       // Step 1: Request iOS permission
-      logger.debug("[Push] Step 1: Requesting iOS permission...");
+      logger.info("[Push] Step 1: Requesting iOS permission...");
       const granted = await requestPermission();
       if (!granted) {
-        logger.debug("[Push] Step 1 failed: Permission not granted");
+        logger.info("[Push] Step 1 failed: Permission not granted");
         setIsEnabling(false);
         return;
       }
-      logger.debug("[Push] Step 1 complete: Permission granted");
+      logger.info("[Push] Step 1 complete: Permission granted");
 
       // Step 2: Register for push notifications to get the Expo push token
       // registerForPushNotifications now returns the token directly
-      logger.debug("[Push] Step 2: Getting Expo push token...");
+      logger.info("[Push] Step 2: Getting Expo push token...");
       const token = await registerForPushNotifications();
       if (!token) {
         logger.error("[Push] Step 2 failed: No token returned");
@@ -177,23 +177,24 @@ export default function NotificationSettingsScreen() {
         setIsEnabling(false);
         return;
       }
-      logger.debug("[Push] Step 2 complete: Token obtained", {
-        tokenPreview: token.substring(0, 30) + "...",
-      });
+      logger.info(
+        "[Push] Step 2 complete: Token obtained: " +
+          token.substring(0, 30) +
+          "...",
+      );
 
       // Step 3: Subscribe user to Novu (creates subscriber)
-      logger.debug("[Push] Step 3: Subscribing to Novu...");
+      logger.info("[Push] Step 3: Subscribing to Novu...");
       const subscribeResult = await subscribeToNotifications.mutateAsync({
-        email: profile?.email,
-        firstName: profile?.full_name?.split(" ")[0],
-        lastName: profile?.full_name?.split(" ").slice(1).join(" "),
-        avatar: profile?.avatar_url || undefined,
+        email: profile?.email || "",
+        firstName: profile?.full_name?.split(" ")[0] || "",
+        lastName: profile?.full_name?.split(" ").slice(1).join(" ") || "",
+        avatar: profile?.avatar_url || "",
       });
 
       if (!subscribeResult.success) {
         logger.error(
-          "[Push] Step 3 failed: Subscribe to Novu failed:",
-          subscribeResult.error || "Unknown error",
+          "[Push] Step 3 failed: " + (subscribeResult.error || "Unknown error"),
         );
         Alert.alert(
           t("common.status.error"),
@@ -202,16 +203,15 @@ export default function NotificationSettingsScreen() {
         setIsEnabling(false);
         return;
       }
-      logger.debug("[Push] Step 3 complete: Subscribed to Novu");
+      logger.info("[Push] Step 3 complete: Subscribed to Novu");
 
       // Step 4: Register token with Novu
-      logger.debug("[Push] Step 4: Registering token with Novu...");
+      logger.info("[Push] Step 4: Registering token with Novu...");
       const tokenResult = await registerToken.mutateAsync(token);
 
       if (!tokenResult.success || !tokenResult.novuRegistered) {
         logger.error(
-          "[Push] Step 4 failed: Token registration failed:",
-          tokenResult.error || "Unknown error",
+          "[Push] Step 4 failed: " + (tokenResult.error || "Unknown error"),
         );
         Alert.alert(
           t("common.status.error"),
@@ -220,24 +220,20 @@ export default function NotificationSettingsScreen() {
         setIsEnabling(false);
         return;
       }
-      logger.debug("[Push] Step 4 complete: Token registered with Novu");
+      logger.info("[Push] Step 4 complete: Token registered with Novu");
 
       // Mark as registered with Novu in context
       markAsRegisteredWithNovu();
 
       // Step 5: Update preferences to enable push
-      logger.debug("[Push] Step 5: Updating preferences...");
+      logger.info("[Push] Step 5: Updating preferences...");
       await updatePreferences.mutateAsync({ pushEnabled: true });
 
-      logger.debug("[Push] All steps complete: Push notifications enabled!");
+      logger.info("[Push] All steps complete: Push notifications enabled!");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      const errorStack = error instanceof Error ? error.stack : undefined;
-      logger.error("[Push] Exception caught:", {
-        message: errorMessage,
-        stack: errorStack,
-      });
+      logger.error("[Push] Exception: " + errorMessage);
       Alert.alert(
         t("common.status.error"),
         t("profile.notifications.enableFailed"),
