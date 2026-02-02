@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import type { ReactNode } from "react";
 import {
@@ -22,9 +23,9 @@ import { logger } from "@/lib/logger";
 
 /**
  * Expo Project ID for push tokens
- * This should be set in your EAS project configuration
+ * Read from app.config.ts via Constants.expoConfig
  */
-const EXPO_PROJECT_ID = process.env.EXPO_PUBLIC_EAS_PROJECT_ID;
+const EXPO_PROJECT_ID = Constants.expoConfig?.extra?.eas?.projectId;
 
 /**
  * Notification Context Type
@@ -89,7 +90,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // Validate EXPO_PROJECT_ID is set before attempting to get token
       if (!EXPO_PROJECT_ID) {
         logger.error(
-          "EXPO_PUBLIC_EAS_PROJECT_ID is not set. Cannot get push token.",
+          "EAS project ID is not configured in app.config.ts. Cannot get push token.",
         );
         return null;
       }
