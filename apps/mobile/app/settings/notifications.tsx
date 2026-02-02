@@ -193,13 +193,9 @@ export default function NotificationSettingsScreen() {
       });
 
       if (!subscribeResult.success) {
-        logger.error(
-          "[Push] Step 3 failed: " + (subscribeResult.error || "Unknown error"),
-        );
-        Alert.alert(
-          t("common.status.error"),
-          t("profile.notifications.subscribeFailed"),
-        );
+        const errorMsg = subscribeResult.error || "Unknown error";
+        logger.error("[Push] Step 3 failed: " + errorMsg);
+        Alert.alert(t("common.status.error"), `Subscribe failed: ${errorMsg}`);
         setIsEnabling(false);
         return;
       }
@@ -210,12 +206,11 @@ export default function NotificationSettingsScreen() {
       const tokenResult = await registerToken.mutateAsync(token);
 
       if (!tokenResult.success || !tokenResult.novuRegistered) {
-        logger.error(
-          "[Push] Step 4 failed: " + (tokenResult.error || "Unknown error"),
-        );
+        const errorMsg = tokenResult.error || "Unknown error";
+        logger.error("[Push] Step 4 failed: " + errorMsg);
         Alert.alert(
           t("common.status.error"),
-          t("profile.notifications.tokenRegistrationFailed"),
+          `Token registration failed: ${errorMsg}`,
         );
         setIsEnabling(false);
         return;
