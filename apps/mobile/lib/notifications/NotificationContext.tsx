@@ -238,7 +238,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       lastName?: string;
       avatar?: string;
     }): Promise<string | null> => {
-      if (permissionStatus !== "granted") {
+      // Check actual device permission status (not React state which may be stale)
+      const { status } = await Notifications.getPermissionsAsync();
+      if (status !== "granted") {
         logger.warn(
           "Cannot register for push notifications without permission",
         );
@@ -276,7 +278,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         setIsRegistering(false);
       }
     },
-    [permissionStatus, getExpoPushToken],
+    [getExpoPushToken],
   );
 
   /**
