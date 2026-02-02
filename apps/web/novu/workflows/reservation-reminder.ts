@@ -10,6 +10,10 @@ export const reservationReminderPayloadSchema = z.object({
   reservationTime: z.string().describe("Time of the reservation"),
   tableNumber: z.string().optional().describe("Table number if assigned"),
   partySize: z.number().describe("Number of people in the party"),
+  reservationId: z
+    .string()
+    .optional()
+    .describe("ID of the reservation for deep linking"),
 });
 
 export type ReservationReminderPayload = z.infer<
@@ -76,6 +80,10 @@ export const reservationReminderWorkflow = workflow(
           body:
             controls.pushBody ||
             `Your table at ${payload.tentName} is ready at ${payload.reservationTime}`,
+          data: {
+            type: "reservation-reminder",
+            reservationId: payload.reservationId,
+          },
         };
       },
       {

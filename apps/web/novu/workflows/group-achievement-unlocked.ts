@@ -46,6 +46,9 @@ export const groupAchievementUnlockedWorkflow = workflow(
       return {
         subject: "Group Achievement!",
         body: `${payload.groupName} unlocked "${payload.achievementName}"`,
+        data: {
+          type: "achievement-unlocked",
+        },
       };
     });
   },

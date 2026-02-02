@@ -53,6 +53,10 @@ export const groupJoinWorkflow = workflow(
           body:
             controls.pushBody ||
             `${payload.joinerName} joined ${payload.groupName}`,
+          data: {
+            type: "group-join",
+            groupId: payload.groupId,
+          },
         };
       },
       {

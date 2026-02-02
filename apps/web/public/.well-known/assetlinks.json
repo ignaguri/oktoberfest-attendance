@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.prostcounter.app",
+      "sha256_cert_fingerprints": [
+        "A2:A6:F3:0C:A8:01:33:56:B3:8F:5C:EB:A6:4D:B4:9E:64:58:47:C9:B1:0C:55:F9:9C:83:6F:3E:AC:E4:7E:00"
+      ]
+    }
+  }
+]

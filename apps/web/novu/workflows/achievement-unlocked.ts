@@ -79,6 +79,9 @@ export const achievementUnlockedWorkflow = workflow(
           subject: controls.pushSubject || `${icon} Achievement Unlocked!`,
           body:
             controls.pushBody || `You've unlocked "${payload.achievementName}"`,
+          data: {
+            type: "achievement-unlocked",
+          },
         };
       },
       {

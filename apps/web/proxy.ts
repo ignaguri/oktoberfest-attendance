@@ -81,7 +81,8 @@ export async function proxy(request: NextRequest) {
     publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/r/") ||
     request.nextUrl.pathname.startsWith("/api/") || // API routes handle their own auth
-    request.nextUrl.pathname.startsWith("/serwist/") // Service worker assets
+    request.nextUrl.pathname.startsWith("/serwist/") || // Service worker assets
+    request.nextUrl.pathname.startsWith("/.well-known/") // Universal Links / App Links
   ) {
     return NextResponse.next();
   }

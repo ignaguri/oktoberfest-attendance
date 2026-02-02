@@ -24,6 +24,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.prostcounter.app",
     usesAppleSignIn: true,
     googleServicesFile: "./GoogleService-Info.plist",
+    associatedDomains: [
+      "applinks:prostcounter.fun",
+      "applinks:www.prostcounter.fun",
+    ],
     infoPlist: {
       NSFaceIDUsageDescription:
         "Use Face ID to quickly sign in to your ProstCounter account",
@@ -71,6 +75,25 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "android.permission.ACCESS_BACKGROUND_LOCATION",
       "android.permission.FOREGROUND_SERVICE",
       "android.permission.FOREGROUND_SERVICE_LOCATION",
+    ],
+    intentFilters: [
+      {
+        action: "VIEW",
+        autoVerify: true,
+        data: [
+          {
+            scheme: "https",
+            host: "prostcounter.fun",
+            pathPrefix: "/join-group",
+          },
+          {
+            scheme: "https",
+            host: "www.prostcounter.fun",
+            pathPrefix: "/join-group",
+          },
+        ],
+        category: ["BROWSABLE", "DEFAULT"],
+      },
     ],
   },
   web: {

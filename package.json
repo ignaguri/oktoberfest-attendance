@@ -40,7 +40,9 @@
     "cron:trigger": "tsx scripts/trigger-cron.ts",
     "e2e": "playwright test",
     "e2e:headed": "playwright test --headed",
-    "e2e:install-browsers": "playwright install --with-deps"
+    "e2e:install-browsers": "playwright install --with-deps",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.2",
@@ -100,5 +102,10 @@
   "packageManager": "pnpm@10.14.0",
   "engines": {
     "node": ">=20 <25"
+  },
+  "dependencies": {
+    "expo": "~54.0.33",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

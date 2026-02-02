@@ -65,6 +65,10 @@ export const locationSharingWorkflow = workflow(
           body:
             controls.pushBody ||
             `${payload.sharerName} ${actionText} sharing location in ${payload.groupName}`,
+          data: {
+            type: "group-check-in",
+            groupId: payload.groupId,
+          },
         };
       },
       {

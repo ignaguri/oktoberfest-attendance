@@ -1,0 +1,18 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "4Q9U9B3BKC.com.prostcounter.app",
+        "paths": [
+          "/join-group",
+          "/join-group/*",
+          "/groups/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["4Q9U9B3BKC.com.prostcounter.app"]
+  }
+}

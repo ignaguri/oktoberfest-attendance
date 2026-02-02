@@ -46,6 +46,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/.well-known/:path*",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/json",
+          },
+        ],
+      },
     ];
   },
   experimental: {

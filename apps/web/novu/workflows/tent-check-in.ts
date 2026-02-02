@@ -57,6 +57,9 @@ export const tentCheckinWorkflow = workflow(
           body:
             controls.pushBody ||
             `${payload.userName} is at ${payload.tentName} with ${payload.beersCount}${emoji}`,
+          data: {
+            type: "tent-check-in",
+          },
         };
       },
       {
