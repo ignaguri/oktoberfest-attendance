@@ -28,6 +28,23 @@
     "production": {
       "channel": "production",
       "autoIncrement": true
+    },
+    "production-apk": {
+      "channel": "production-apk",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://jdmhjakxhtghsbnstyou.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkbWhqYWt4aHRnaHNibnN0eW91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyOTA2NjEsImV4cCI6MjA1Njg2NjY2MX0.ep_qWmBgtZgeE64XoHnTL0ihyEuYzEubOxREKFtjYnw",
+        "EXPO_PUBLIC_API_URL": "https://www.prostcounter.fun/api",
+        "EXPO_PUBLIC_NOVU_APP_ID": "fPu3xSqblpBQ",
+        "EXPO_PUBLIC_EAS_PROJECT_ID": "fca65703-ce2a-48b3-aec4-11a90fbb8996",
+        "EXPO_PUBLIC_SENTRY_DSN": "https://976065906ffaab22c65cb37405653cea@o4507997605527552.ingest.de.sentry.io/4507997611098192",
+        "SENTRY_ORG": "prostcounter",
+        "SENTRY_PROJECT": "prost-counter"
+      }
     }
   },
   "submit": {

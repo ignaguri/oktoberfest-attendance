@@ -35,6 +35,15 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 - `pnpm sup:db:types` - Generate TypeScript types from DB schema
 - `pnpm sup:mig:new` - Create new migration file
 
+### Mobile Build Commands
+
+- `eas build --profile development --platform android` - Development build with local backend
+- `eas build --profile preview --platform android` - Preview build (APK) for internal testing
+- `eas build --profile production-apk --platform android` - Production environment APK for pre-release testing
+- `eas build --profile production --platform android` - Production AAB for Play Store submission
+
+**Note**: The `production-apk` profile builds an APK (not AAB) with production environment values, suitable for sharing with testers before Play Store release. It uses the "production-apk" OTA update channel to avoid conflicts with Play Store builds.
+
 ### Test Users (Local Development)
 
 Seed data creates users `user1@example.com` through `user10@example.com` with password `password`.
@@ -326,6 +335,7 @@ import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 - **Before Committing**: Always run `pnpm lint` and `pnpm type-check` on the whole project and ensure there are no errors
 - **Work on Branches**: Never commit directly to main. Always create a feature branch for changes and submit via pull request
 - **Do NOT Push**: Do not push commits to the remote repository unless explicitly asked
+- **Production APK Testing**: Use `eas build --profile production-apk --platform android` to create a production-environment APK for testing before Play Store release. Download the APK from the EAS dashboard and share directly with testers
 
 ## Additional Documentation
 
