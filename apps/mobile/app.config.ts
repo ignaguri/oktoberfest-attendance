@@ -104,6 +104,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-secure-store",
     "expo-localization",
+    "expo-local-authentication",
     "expo-web-browser",
     "expo-apple-authentication",
     "expo-image-picker",
