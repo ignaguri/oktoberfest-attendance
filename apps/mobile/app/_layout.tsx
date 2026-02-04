@@ -18,6 +18,7 @@ import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdateAvailablePrompt } from "@/components/update/UpdateAvailablePrompt";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
+import { GlobalAlertProvider } from "@/lib/alerts";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import { useFocusManager } from "@/lib/data/focus-manager-setup";
@@ -265,58 +266,60 @@ export default function RootLayout() {
                           to the OfflineDataProvider context */}
                       <OfflineDataBridge>
                         <GluestackUIProvider mode="light">
-                          <NotificationProvider>
-                            <NovuProviderWrapper>
-                              <LocationProvider>
-                                <NavigationGuard>
-                                  <BackgroundSyncHandler />
-                                  <NotificationPromptHandler />
-                                  <UpdatePromptHandler />
-                                  <TutorialOverlay />
-                                  <SyncStatusBar />
-                                  <Stack
-                                    screenOptions={{
-                                      headerShown: false,
-                                      animation: "slide_from_right",
-                                      ...defaultScreenOptions,
-                                    }}
-                                  >
-                                    <Stack.Screen name="(auth)" />
-                                    <Stack.Screen name="(tabs)" />
-                                    <Stack.Screen
-                                      name="settings"
-                                      options={{
+                          <GlobalAlertProvider>
+                            <NotificationProvider>
+                              <NovuProviderWrapper>
+                                <LocationProvider>
+                                  <NavigationGuard>
+                                    <BackgroundSyncHandler />
+                                    <NotificationPromptHandler />
+                                    <UpdatePromptHandler />
+                                    <TutorialOverlay />
+                                    <SyncStatusBar />
+                                    <Stack
+                                      screenOptions={{
                                         headerShown: false,
-                                        presentation: "card",
+                                        animation: "slide_from_right",
+                                        ...defaultScreenOptions,
                                       }}
-                                    />
-                                    <Stack.Screen
-                                      name="groups"
-                                      options={{
-                                        headerShown: false,
-                                        presentation: "card",
-                                      }}
-                                    />
-                                    <Stack.Screen
-                                      name="achievements"
-                                      options={{
-                                        headerShown: false,
-                                        presentation: "card",
-                                      }}
-                                    />
-                                    <Stack.Screen
-                                      name="join-group/[token]"
-                                      options={{
-                                        headerShown: false,
-                                        presentation: "fullScreenModal",
-                                      }}
-                                    />
-                                    <Stack.Screen name="+not-found" />
-                                  </Stack>
-                                </NavigationGuard>
-                              </LocationProvider>
-                            </NovuProviderWrapper>
-                          </NotificationProvider>
+                                    >
+                                      <Stack.Screen name="(auth)" />
+                                      <Stack.Screen name="(tabs)" />
+                                      <Stack.Screen
+                                        name="settings"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "card",
+                                        }}
+                                      />
+                                      <Stack.Screen
+                                        name="groups"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "card",
+                                        }}
+                                      />
+                                      <Stack.Screen
+                                        name="achievements"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "card",
+                                        }}
+                                      />
+                                      <Stack.Screen
+                                        name="join-group/[token]"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "fullScreenModal",
+                                        }}
+                                      />
+                                      <Stack.Screen name="+not-found" />
+                                    </Stack>
+                                  </NavigationGuard>
+                                </LocationProvider>
+                              </NovuProviderWrapper>
+                            </NotificationProvider>
+                          </GlobalAlertProvider>
                         </GluestackUIProvider>
                       </OfflineDataBridge>
                     </TutorialProvider>

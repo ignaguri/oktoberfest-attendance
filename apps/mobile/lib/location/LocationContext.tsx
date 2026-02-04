@@ -290,11 +290,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
               error: bgError,
             });
             backgroundWarning =
-              "Background location could not be started. Location will only update while the app is open.";
+              "Background location could not be started. Location will only update while the app is open. You can enable background location in your device's Settings app.";
           }
         } else if (!location.hasBackgroundPermission) {
           backgroundWarning =
-            "Background location permission not granted. Location will only update while the app is open.";
+            "Background location permission not granted. Location will only update while the app is open. You can grant background location access in your device's Settings app.";
         }
 
         // Start foreground watching as well
