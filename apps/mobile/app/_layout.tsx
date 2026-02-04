@@ -307,6 +307,13 @@ export default function RootLayout() {
                                         }}
                                       />
                                       <Stack.Screen
+                                        name="map"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "card",
+                                        }}
+                                      />
+                                      <Stack.Screen
                                         name="join-group/[token]"
                                         options={{
                                           headerShown: false,
