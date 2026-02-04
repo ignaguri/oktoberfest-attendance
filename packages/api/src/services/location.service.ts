@@ -206,16 +206,35 @@ export class LocationService {
   // Admin methods
 
   /**
+   * Check if user is admin
+   *
+   * @param userId - User ID to check
+   * @returns True if user is admin
+   */
+  async isAdmin(userId: string): Promise<boolean> {
+    return this.locationRepo.isAdmin(userId);
+  }
+
+  /**
    * Get all active sessions for admin view
    *
+   * @param adminUserId - Admin user ID (for authorization)
    * @param filters - Optional filters
    * @returns Array of all active sessions with user and festival info
    */
-  async getActiveSessionsAdmin(filters?: {
-    festivalId?: string;
-    userId?: string;
-    includeExpired?: boolean;
-  }) {
+  async getActiveSessionsAdmin(
+    adminUserId: string,
+    filters?: {
+      festivalId?: string;
+      userId?: string;
+      includeExpired?: boolean;
+    },
+  ) {
+    const isAdmin = await this.isAdmin(adminUserId);
+    if (!isAdmin) {
+      throw new ValidationError(ErrorCodes.UNAUTHORIZED);
+    }
+
     return this.locationRepo.getActiveSessionsAdmin(filters);
   }
 
@@ -223,19 +242,34 @@ export class LocationService {
    * Force stop a session (admin only)
    * Bypasses user ownership check
    *
+   * @param adminUserId - Admin user ID (for authorization)
    * @param sessionId - Session ID to stop
    * @returns Updated session
    */
-  async forceStopSession(sessionId: string): Promise<LocationSession> {
+  async forceStopSession(
+    adminUserId: string,
+    sessionId: string,
+  ): Promise<LocationSession> {
+    const isAdmin = await this.isAdmin(adminUserId);
+    if (!isAdmin) {
+      throw new ValidationError(ErrorCodes.UNAUTHORIZED);
+    }
+
     return this.locationRepo.forceStopSession(sessionId);
   }
 
   /**
    * Cleanup all expired sessions (admin only)
    *
+   * @param adminUserId - Admin user ID (for authorization)
    * @returns Number of sessions cleaned up
    */
-  async cleanupExpiredSessions(): Promise<number> {
+  async cleanupExpiredSessions(adminUserId: string): Promise<number> {
+    const isAdmin = await this.isAdmin(adminUserId);
+    if (!isAdmin) {
+      throw new ValidationError(ErrorCodes.UNAUTHORIZED);
+    }
+
     return this.locationRepo.cleanupExpiredSessions();
   }
 }

@@ -213,7 +213,8 @@
       "usePassword": "Use password instead",
       "enableTitle": "Enable {{biometricName}}?",
       "enableDescription": "Sign in faster next time using {{biometricName}}",
-      "sessionExpired": "Session expired. Please sign in with your password."
+      "sessionExpired": "Your session has expired. Please sign in with your password.",
+      "restoreFailed": "Could not restore your session. Please sign in again."
     }
   },
   "groups": {
@@ -1582,6 +1583,10 @@
       "collapseHint": "Tap to collapse",
       "expandHint": "Tap to expand",
       "orSelectSpecific": "Or select specific groups"
+    },
+    "errors": {
+      "startFailed": "Failed to start sharing. Please try again.",
+      "stopFailed": "Failed to stop sharing. Please try again."
     }
   },
   "photos": {
@@ -2183,6 +2188,14 @@
       "title": "Sign in to ProstCounter",
       "fallbackLabel": "Use password",
       "cancelLabel": "Cancel"
+    },
+    "errors": {
+      "noHardware": "This device doesn't support biometric authentication",
+      "notEnrolled": "No biometric data enrolled. Please set up Face ID or Touch ID in Settings.",
+      "cancelled": "Authentication cancelled",
+      "fallback": "User chose password fallback",
+      "lockout": "Too many failed attempts. Please try again later.",
+      "failed": "Authentication failed"
     }
   },
   "app": {

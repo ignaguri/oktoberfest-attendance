@@ -213,7 +213,8 @@
       "usePassword": "Usar contraseña en su lugar",
       "enableTitle": "¿Activar {{biometricName}}?",
       "enableDescription": "Iniciá sesión más rápido la próxima vez usando {{biometricName}}",
-      "sessionExpired": "Sesión expirada. Por favor, iniciá sesión con tu contraseña."
+      "sessionExpired": "Tu sesión ha expirado. Por favor, iniciá sesión con tu contraseña.",
+      "restoreFailed": "No se pudo restaurar tu sesión. Por favor, iniciá sesión nuevamente."
     }
   },
   "groups": {
@@ -1582,6 +1583,10 @@
       "collapseHint": "Tocá para contraer",
       "expandHint": "Tocá para expandir",
       "orSelectSpecific": "O seleccioná grupos específicos"
+    },
+    "errors": {
+      "startFailed": "No se pudo iniciar el compartir. Por favor, intentá de nuevo.",
+      "stopFailed": "No se pudo detener el compartir. Por favor, intentá de nuevo."
     }
   },
   "photos": {
@@ -2183,6 +2188,14 @@
       "title": "Iniciar sesión en ProstCounter",
       "fallbackLabel": "Usar contraseña",
       "cancelLabel": "Cancelar"
+    },
+    "errors": {
+      "noHardware": "Este dispositivo no admite autenticación biométrica",
+      "notEnrolled": "No hay datos biométricos registrados. Por favor, configurá Face ID o Touch ID en Ajustes.",
+      "cancelled": "Autenticación cancelada",
+      "fallback": "El usuario eligió usar la contraseña",
+      "lockout": "Demasiados intentos fallidos. Por favor, intentá de nuevo más tarde.",
+      "failed": "Autenticación fallida"
     }
   },
   "app": {

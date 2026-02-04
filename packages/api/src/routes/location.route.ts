@@ -383,18 +383,29 @@ const adminGetSessionsRoute = createRoute({
         },
       },
     },
+    403: {
+      description: "Forbidden - User is not an admin",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
   },
   security: [{ bearerAuth: [] }],
 });
 
 app.openapi(adminGetSessionsRoute, async (c) => {
-  const { supabase } = c.var;
+  const { user, supabase } = c.var;
   const query = c.req.valid("query");
 
   const locationRepo = new SupabaseLocationRepository(supabase);
   const locationService = new LocationService(locationRepo);
 
-  const sessions = await locationService.getActiveSessionsAdmin({
+  const sessions = await locationService.getActiveSessionsAdmin(user.id, {
     festivalId: query.festivalId,
     userId: query.userId,
     includeExpired: query.includeExpired,
@@ -446,6 +457,17 @@ const adminForceStopSessionRoute = createRoute({
         },
       },
     },
+    403: {
+      description: "Forbidden - User is not an admin",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
     404: {
       description: "Session not found",
       content: {
@@ -462,13 +484,13 @@ const adminForceStopSessionRoute = createRoute({
 });
 
 app.openapi(adminForceStopSessionRoute, async (c) => {
-  const { supabase } = c.var;
+  const { user, supabase } = c.var;
   const { id } = c.req.valid("param");
 
   const locationRepo = new SupabaseLocationRepository(supabase);
   const locationService = new LocationService(locationRepo);
 
-  const session = await locationService.forceStopSession(id);
+  const session = await locationService.forceStopSession(user.id, id);
 
   return c.json({ success: true, session }, 200);
 });
@@ -503,17 +525,28 @@ const adminCleanupSessionsRoute = createRoute({
         },
       },
     },
+    403: {
+      description: "Forbidden - User is not an admin",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
   },
   security: [{ bearerAuth: [] }],
 });
 
 app.openapi(adminCleanupSessionsRoute, async (c) => {
-  const { supabase } = c.var;
+  const { user, supabase } = c.var;
 
   const locationRepo = new SupabaseLocationRepository(supabase);
   const locationService = new LocationService(locationRepo);
 
-  const cleanedCount = await locationService.cleanupExpiredSessions();
+  const cleanedCount = await locationService.cleanupExpiredSessions(user.id);
 
   return c.json({ success: true, cleanedCount }, 200);
 });

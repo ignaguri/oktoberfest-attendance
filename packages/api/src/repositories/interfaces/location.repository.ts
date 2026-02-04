@@ -116,4 +116,11 @@ export interface ILocationRepository {
    * @returns Number of sessions cleaned up
    */
   cleanupExpiredSessions(): Promise<number>;
+
+  /**
+   * Check if user is admin
+   * @param userId - User ID
+   * @returns True if user is admin
+   */
+  isAdmin(userId: string): Promise<boolean>;
 }

@@ -345,28 +345,16 @@ export class SupabaseLocationRepository implements ILocationRepository {
   }
 
   async cleanupExpiredSessions(): Promise<number> {
-    // First, count how many we'll update
-    const { count, error: countError } = await this.supabase
-      .from("location_sessions")
-      .select("*", { count: "exact", head: true })
-      .eq("is_active", true)
-      .lt("expires_at", new Date().toISOString());
-
-    if (countError) {
-      throw new DatabaseError(
-        `Failed to count expired sessions: ${countError.message}`,
-      );
-    }
-
-    // Update all expired sessions
-    const { error } = await this.supabase
+    // Update expired sessions and get count of affected rows
+    const { data, error } = await this.supabase
       .from("location_sessions")
       .update({
         is_active: false,
         updated_at: new Date().toISOString(),
       })
       .eq("is_active", true)
-      .lt("expires_at", new Date().toISOString());
+      .lt("expires_at", new Date().toISOString())
+      .select("id");
 
     if (error) {
       throw new DatabaseError(
@@ -374,7 +362,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       );
     }
 
-    return count || 0;
+    return data?.length || 0;
   }
 
   private mapToSession(
@@ -392,5 +380,19 @@ export class SupabaseLocationRepository implements ILocationRepository {
       updatedAt: data.updated_at,
       sharedGroupIds: sharedGroupIds ?? null,
     };
+  }
+
+  async isAdmin(userId: string): Promise<boolean> {
+    const { data: profile, error } = await this.supabase
+      .from("profiles")
+      .select("is_super_admin")
+      .eq("id", userId)
+      .single();
+
+    if (error || !profile) {
+      return false;
+    }
+
+    return profile.is_super_admin === true;
   }
 }
