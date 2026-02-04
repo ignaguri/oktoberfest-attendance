@@ -22,7 +22,8 @@
       "copy": "Copiar",
       "install": "Instalar",
       "goHome": "Ir al inicio",
-      "tryAgain": "Intentar de nuevo"
+      "tryAgain": "Intentar de nuevo",
+      "done": "Listo"
     },
     "actions": {
       "retry": "Reintentar",
@@ -120,7 +121,8 @@
       "refresh": "Actualizá para obtenerla",
       "description": "Una nueva versión de la app está disponible. Por favor, actualizá para obtener las últimas funciones y mejoras.",
       "updateNow": "Actualizar ahora"
-    }
+    },
+    "members": "miembros"
   },
   "tabs": {
     "home": "Inicio",
@@ -133,7 +135,7 @@
     "signIn": {
       "title": "Iniciar sesión",
       "subtitle": "¡Bienvenido de nuevo!",
-      "tagline": "Seguí tu aventura en el Oktoberfest",
+      "tagline": "Seguí tu aventura en el festival",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "passwordLabel": "Contraseña",
@@ -379,7 +381,7 @@
       "shareDescription": "Compartí tu ubicación para ver a los miembros del grupo cercanos y que ellos te vean a vos.",
       "controlNote": "Controlá qué grupos pueden ver tu ubicación en tu",
       "shareLocation": "Compartir ubicación",
-      "enablePrompt": "Activá el compartir ubicación para ver dónde están tus amigos en el Oktoberfest",
+      "enablePrompt": "Activá el compartir ubicación para ver dónde están tus amigos en el festival",
       "privacyNotice": "Tu ubicación solo es visible para los miembros del grupo mientras la estés compartiendo",
       "permissions": {
         "requesting": "Solicitando permiso de ubicación del navegador...",
@@ -1033,7 +1035,25 @@
       "festivals": "Festivales",
       "tents": "Carpas",
       "cache": "Gestión de caché",
-      "imageConversion": "Conversión de imágenes"
+      "imageConversion": "Conversión de imágenes",
+      "location": "Ubicación"
+    },
+    "location": {
+      "title": "Sesiones de ubicación",
+      "noSessions": "No hay sesiones de ubicación activas",
+      "forceStop": "Forzar parada",
+      "cleanupExpired": "Limpiar expiradas",
+      "cleanupSuccess": "Se limpiaron {{count}} sesiones expiradas",
+      "stopSuccess": "Sesión detenida exitosamente",
+      "stopError": "No se pudo detener la sesión",
+      "loading": "Cargando sesiones...",
+      "columns": {
+        "user": "Usuario",
+        "festival": "Festival",
+        "startedAt": "Iniciada",
+        "expiresAt": "Expira",
+        "actions": "Acciones"
+      }
     },
     "tents": {
       "title": "Gestión de carpas",
@@ -1664,6 +1684,7 @@
     "uploadedPhoto": "subió una foto",
     "joinedGroup": "se unió a {{group}}",
     "unlockedAchievement": "desbloqueó un logro",
+    "unlockedAchievementName": "desbloqueó {{name}}",
     "unlockedAchievementRarity": "desbloqueó un logro ({{rarity}})",
     "hadActivity": "tuvo actividad",
     "recently": "recientemente",
@@ -1743,7 +1764,7 @@
     "shareAppDialog": {
       "title": "¡Compartí la app ProstCounter con tus amigos!",
       "description": "Elegí cómo querés compartir la app:",
-      "shareText": "¡Mirá la app ProstCounter! Registrá tu asistencia al Oktoberfest y competí con amigos.",
+      "shareText": "¡Mirá la app ProstCounter! Registrá tu asistencia al festival y competí con amigos.",
       "shareButton": "Compartir app",
       "copyToClipboard": "Copiar al portapapeles",
       "shareViaWhatsApp": "Compartir por WhatsApp",
@@ -2143,7 +2164,7 @@
   },
   "landing": {
     "signIn": "Iniciar sesión",
-    "description": "Competí con amigos y seguí tu progreso en el Oktoberfest",
+    "description": "Competí con amigos y seguí tu progreso en el festival",
     "features": {
       "title": "¿Qué puedo hacer con Prost Counter?",
       "trackBeer": "Registrar el consumo diario de cerveza",

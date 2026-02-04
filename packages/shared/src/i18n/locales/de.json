@@ -22,7 +22,8 @@
       "copy": "Kopieren",
       "install": "Installieren",
       "goHome": "Zur Startseite",
-      "tryAgain": "Erneut versuchen"
+      "tryAgain": "Erneut versuchen",
+      "done": "Fertig"
     },
     "actions": {
       "retry": "Erneut versuchen",
@@ -98,7 +99,8 @@
       "navigation": "Navigation",
       "settingsTools": "Einstellungen & Werkzeuge",
       "actions": "Aktionen"
-    }
+    },
+    "members": "Mitglieder"
   },
   "tabs": {
     "home": "Start",
@@ -111,7 +113,7 @@
     "signIn": {
       "title": "Anmelden",
       "subtitle": "Willkommen zurück!",
-      "tagline": "Verfolge dein Oktoberfest-Abenteuer",
+      "tagline": "Verfolge dein Volksfest-Abenteuer",
       "emailLabel": "E-Mail",
       "emailPlaceholder": "max@muster.de",
       "passwordLabel": "Passwort",
@@ -980,7 +982,25 @@
       "festivals": "Festivals",
       "tents": "Zelte",
       "cache": "Cache-Verwaltung",
-      "imageConversion": "Bildkonvertierung"
+      "imageConversion": "Bildkonvertierung",
+      "location": "Standort"
+    },
+    "location": {
+      "title": "Standort-Sitzungen",
+      "noSessions": "Keine aktiven Standort-Sitzungen",
+      "forceStop": "Stoppen erzwingen",
+      "cleanupExpired": "Abgelaufene bereinigen",
+      "cleanupSuccess": "{{count}} abgelaufene Sitzungen bereinigt",
+      "stopSuccess": "Sitzung erfolgreich gestoppt",
+      "stopError": "Sitzung konnte nicht gestoppt werden",
+      "loading": "Sitzungen werden geladen...",
+      "columns": {
+        "user": "Benutzer",
+        "festival": "Festival",
+        "startedAt": "Gestartet",
+        "expiresAt": "Läuft ab",
+        "actions": "Aktionen"
+      }
     },
     "festivals": {
       "title": "Festival-Verwaltung",
@@ -1419,6 +1439,7 @@
     "uploadedPhoto": "lud ein Foto hoch",
     "joinedGroup": "ist {{group}} beigetreten",
     "unlockedAchievement": "hat einen Erfolg freigeschaltet",
+    "unlockedAchievementName": "hat {{name}} freigeschaltet",
     "unlockedAchievementRarity": "hat einen Erfolg freigeschaltet ({{rarity}})",
     "hadActivity": "hatte Aktivität",
     "recently": "kürzlich",
@@ -1509,7 +1530,7 @@
     "shareAppDialog": {
       "title": "Teile die ProstCounter App mit Freunden!",
       "description": "Wähle, wie du die App teilen möchtest:",
-      "shareText": "Schau dir die ProstCounter App an! Verfolge deine Oktoberfest-Besuche und tritt gegen Freunde an.",
+      "shareText": "Schau dir die ProstCounter App an! Verfolge deine Volksfest-Besuche und tritt gegen Freunde an.",
       "shareButton": "App teilen",
       "copyToClipboard": "In Zwischenablage kopieren",
       "shareViaWhatsApp": "Über WhatsApp teilen",

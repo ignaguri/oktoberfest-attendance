@@ -22,7 +22,8 @@
       "copy": "Copy",
       "install": "Install",
       "goHome": "Go to Home",
-      "tryAgain": "Try Again"
+      "tryAgain": "Try Again",
+      "done": "Done"
     },
     "actions": {
       "retry": "Retry",
@@ -120,7 +121,8 @@
       "refresh": "Refresh to update",
       "description": "A new version of the app is available. Please update to get the latest features and improvements.",
       "updateNow": "Update Now"
-    }
+    },
+    "members": "members"
   },
   "tabs": {
     "home": "Home",
@@ -133,7 +135,7 @@
     "signIn": {
       "title": "Sign In",
       "subtitle": "Welcome back!",
-      "tagline": "Track your Oktoberfest adventure",
+      "tagline": "Track your festival adventure",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "passwordLabel": "Password",
@@ -379,7 +381,7 @@
       "shareDescription": "Share your location to see nearby group members and let them see you.",
       "controlNote": "Control which groups can see your location in your",
       "shareLocation": "Share Location",
-      "enablePrompt": "Enable location sharing to see where your friends are at Oktoberfest",
+      "enablePrompt": "Enable location sharing to see where your friends are at the festival",
       "privacyNotice": "Your location is only visible to group members while you're sharing",
       "permissions": {
         "requesting": "Requesting browser location permission...",
@@ -1033,7 +1035,25 @@
       "festivals": "Festivals",
       "tents": "Tents",
       "cache": "Cache Management",
-      "imageConversion": "Image Conversion"
+      "imageConversion": "Image Conversion",
+      "location": "Location"
+    },
+    "location": {
+      "title": "Location Sessions",
+      "noSessions": "No active location sessions",
+      "forceStop": "Force Stop",
+      "cleanupExpired": "Cleanup Expired",
+      "cleanupSuccess": "Cleaned up {{count}} expired sessions",
+      "stopSuccess": "Session stopped successfully",
+      "stopError": "Failed to stop session",
+      "loading": "Loading sessions...",
+      "columns": {
+        "user": "User",
+        "festival": "Festival",
+        "startedAt": "Started",
+        "expiresAt": "Expires",
+        "actions": "Actions"
+      }
     },
     "tents": {
       "title": "Tent Management",
@@ -1664,6 +1684,7 @@
     "uploadedPhoto": "uploaded a photo",
     "joinedGroup": "joined {{group}}",
     "unlockedAchievement": "unlocked an achievement",
+    "unlockedAchievementName": "unlocked {{name}}",
     "unlockedAchievementRarity": "unlocked an achievement ({{rarity}})",
     "hadActivity": "had some activity",
     "recently": "recently",
@@ -1743,7 +1764,7 @@
     "shareAppDialog": {
       "title": "Share ProstCounter App with friends!",
       "description": "Choose how you'd like to share the app:",
-      "shareText": "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends.",
+      "shareText": "Check out the ProstCounter app! Track your festival attendance and compete with friends.",
       "shareButton": "Share App",
       "copyToClipboard": "Copy to Clipboard",
       "shareViaWhatsApp": "Share via WhatsApp",
@@ -2143,7 +2164,7 @@
   },
   "landing": {
     "signIn": "Sign In",
-    "description": "Compete with friends and track your progress at Oktoberfest",
+    "description": "Compete with friends and track your progress at the festival",
     "features": {
       "title": "What can I do with Prost Counter?",
       "trackBeer": "Track daily beer consumption",

@@ -1,6 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import {
+  AlertTriangle,
   ChevronDown,
   ChevronUp,
   MapPin,
@@ -15,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useLocationContext } from "@/lib/location";
@@ -42,6 +44,7 @@ export function LocationSharingToggle({
   compact = false,
 }: LocationSharingToggleProps) {
   const { t } = useTranslation();
+  const toast = useToast();
   const {
     isSharing,
     isSessionLoading,
@@ -61,11 +64,56 @@ export function LocationSharingToggle({
   const [shareWithAll, setShareWithAll] = useState(true);
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
+  /**
+   * Show a warning toast with the given message
+   */
+  const showWarningToast = useCallback(
+    (message: string) => {
+      toast.show({
+        placement: "top",
+        duration: 5000,
+        render: () => (
+          <HStack className="items-center gap-2 rounded-lg bg-warning-500 px-4 py-3">
+            <AlertTriangle size={20} color="white" />
+            <Text className="font-medium text-white">{message}</Text>
+          </HStack>
+        ),
+      });
+    },
+    [toast],
+  );
+
+  /**
+   * Show an error toast with the given message
+   */
+  const showErrorToast = useCallback(
+    (message: string) => {
+      toast.show({
+        placement: "top",
+        duration: 4000,
+        render: () => (
+          <HStack className="items-center gap-2 rounded-lg bg-error-500 px-4 py-3">
+            <AlertTriangle size={20} color="white" />
+            <Text className="font-medium text-white">{message}</Text>
+          </HStack>
+        ),
+      });
+    },
+    [toast],
+  );
+
   const handleToggle = useCallback(async () => {
     if (isSharing) {
       setIsToggling(true);
       try {
-        await stopSharing();
+        const stopped = await stopSharing();
+        if (!stopped) {
+          showErrorToast(
+            t("location.errors.stopFailed", {
+              defaultValue: "Failed to stop sharing. Please try again.",
+            }),
+          );
+        }
       } finally {
         setIsToggling(false);
       }
@@ -87,7 +135,19 @@ export function LocationSharingToggle({
       }
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(festivalId, selectedDuration, groupIds);
+
+      if (!result.success) {
+        showErrorToast(
+          result.warning ||
+            t("location.errors.startFailed", {
+              defaultValue: "Failed to start sharing. Please try again.",
+            }),
+        );
+      } else if (result.warning) {
+        // Session started but with a warning (e.g., background location not enabled)
+        showWarningToast(result.warning);
+      }
     } finally {
       setIsToggling(false);
     }
@@ -102,6 +162,9 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    showErrorToast,
+    showWarningToast,
+    t,
   ]);
 
   const handleEnableFromPrompt = useCallback(async () => {
@@ -110,7 +173,19 @@ export function LocationSharingToggle({
     if (granted) {
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(festivalId, selectedDuration, groupIds);
+
+      if (!result.success) {
+        showErrorToast(
+          result.warning ||
+            t("location.errors.startFailed", {
+              defaultValue: "Failed to start sharing. Please try again.",
+            }),
+        );
+      } else if (result.warning) {
+        // Session started but with a warning
+        showWarningToast(result.warning);
+      }
     }
   }, [
     markPromptAsShown,
@@ -120,6 +195,9 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    showErrorToast,
+    showWarningToast,
+    t,
   ]);
 
   const handleSkipPrompt = useCallback(async () => {

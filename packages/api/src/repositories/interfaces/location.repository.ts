@@ -83,4 +83,37 @@ export interface ILocationRepository {
    * Cleanup function to mark expired sessions as inactive
    */
   expireOldSessions(): Promise<void>;
+
+  // Admin methods
+
+  /**
+   * Get all active location sessions (admin only)
+   * @param filters - Optional filters for festival, user, etc.
+   * @returns Array of all active sessions with user info
+   */
+  getActiveSessionsAdmin(filters?: {
+    festivalId?: string;
+    userId?: string;
+    includeExpired?: boolean;
+  }): Promise<
+    Array<
+      LocationSession & {
+        user: { id: string; username: string; fullName: string | null };
+        festival: { id: string; name: string };
+      }
+    >
+  >;
+
+  /**
+   * Force stop a session (admin only, bypasses user ownership)
+   * @param sessionId - Session ID to stop
+   * @returns Updated session
+   */
+  forceStopSession(sessionId: string): Promise<LocationSession>;
+
+  /**
+   * Cleanup expired sessions (admin only)
+   * @returns Number of sessions cleaned up
+   */
+  cleanupExpiredSessions(): Promise<number>;
 }

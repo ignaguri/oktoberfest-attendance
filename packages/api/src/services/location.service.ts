@@ -202,4 +202,40 @@ export class LocationService {
   async expireOldSessions(): Promise<void> {
     await this.locationRepo.expireOldSessions();
   }
+
+  // Admin methods
+
+  /**
+   * Get all active sessions for admin view
+   *
+   * @param filters - Optional filters
+   * @returns Array of all active sessions with user and festival info
+   */
+  async getActiveSessionsAdmin(filters?: {
+    festivalId?: string;
+    userId?: string;
+    includeExpired?: boolean;
+  }) {
+    return this.locationRepo.getActiveSessionsAdmin(filters);
+  }
+
+  /**
+   * Force stop a session (admin only)
+   * Bypasses user ownership check
+   *
+   * @param sessionId - Session ID to stop
+   * @returns Updated session
+   */
+  async forceStopSession(sessionId: string): Promise<LocationSession> {
+    return this.locationRepo.forceStopSession(sessionId);
+  }
+
+  /**
+   * Cleanup all expired sessions (admin only)
+   *
+   * @returns Number of sessions cleaned up
+   */
+  async cleanupExpiredSessions(): Promise<number> {
+    return this.locationRepo.cleanupExpiredSessions();
+  }
 }
