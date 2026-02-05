@@ -18,6 +18,7 @@ import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdateAvailablePrompt } from "@/components/update/UpdateAvailablePrompt";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
+import { useSentryUserContext } from "@/hooks/useSentryUserContext";
 import { GlobalAlertProvider } from "@/lib/alerts";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
@@ -209,6 +210,12 @@ function UpdatePromptHandler() {
   );
 }
 
+// Enrich Sentry user context with profile data (username)
+function SentryUserContextHandler() {
+  useSentryUserContext();
+  return null;
+}
+
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
@@ -272,6 +279,7 @@ export default function RootLayout() {
                                 <LocationProvider>
                                   <NavigationGuard>
                                     <BackgroundSyncHandler />
+                                    <SentryUserContextHandler />
                                     <NotificationPromptHandler />
                                     <UpdatePromptHandler />
                                     <TutorialOverlay />

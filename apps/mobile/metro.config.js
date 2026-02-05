@@ -1,4 +1,4 @@
-const { getDefaultConfig } = require("expo/metro-config");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const { withNativeWind } = require("nativewind/metro");
 const path = require("path");
 
@@ -6,8 +6,9 @@ const path = require("path");
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, "../..");
 
+// Get base Sentry Expo config (includes Metro plugin for Debug IDs)
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(projectRoot);
+const config = getSentryExpoConfig(projectRoot);
 
 // 1. Watch all files within the monorepo (extend defaults, don't replace)
 config.watchFolders = [...(config.watchFolders || []), monorepoRoot];

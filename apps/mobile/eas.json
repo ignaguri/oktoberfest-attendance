@@ -23,11 +23,20 @@
       },
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "SENTRY_ORG": "prostcounter",
+        "SENTRY_PROJECT": "prost-counter"
       }
     },
     "production": {
       "channel": "production",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SENTRY_DSN": "https://976065906ffaab22c65cb37405653cea@o4507997605527552.ingest.de.sentry.io/4507997611098192",
+        "SENTRY_ORG": "prostcounter",
+        "SENTRY_PROJECT": "prost-counter"
+      }
     },
     "production-apk": {
       "channel": "production-apk",
