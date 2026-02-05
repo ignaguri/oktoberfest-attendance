@@ -22,14 +22,19 @@
       "copy": "Kopieren",
       "install": "Installieren",
       "goHome": "Zur Startseite",
+      "goBack": "Zurück",
       "tryAgain": "Erneut versuchen",
       "done": "Fertig"
+    },
+    "action": {
+      "cancel": "Abbrechen"
     },
     "actions": {
       "retry": "Erneut versuchen",
       "cancel": "Abbrechen",
       "dismiss": "Verwerfen",
-      "pullToRefresh": "Zum Aktualisieren ziehen"
+      "pullToRefresh": "Zum Aktualisieren ziehen",
+      "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden"
     },
     "labels": {
       "name": "Name",
@@ -41,6 +46,10 @@
       "status": "Status",
       "description": "Beschreibung",
       "selectDate": "Datum auswählen"
+    },
+    "form": {
+      "date": "Datum",
+      "email": "E-Mail"
     },
     "status": {
       "loading": "Lädt...",
@@ -57,11 +66,13 @@
       "deleting": "Löscht...",
       "cancelling": "Bricht ab...",
       "info": "Info",
-      "authenticating": "Authentifiziert..."
+      "authenticating": "Authentifiziert...",
+      "unknownGroup": "Unbekannte Gruppe"
     },
     "errors": {
       "title": "Fehler",
       "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten",
       "oops": "Hoppla!",
       "notFound": {
         "title": "Seite nicht gefunden",
@@ -100,7 +111,13 @@
       "settingsTools": "Einstellungen & Werkzeuge",
       "actions": "Aktionen"
     },
-    "members": "Mitglieder"
+    "members": "Mitglieder",
+    "beers": "Biere",
+    "close": "Schließen",
+    "dismiss": "Verwerfen",
+    "loading": "Wird geladen",
+    "tents": "Zelte",
+    "unknownUser": "Unbekannter Benutzer"
   },
   "tabs": {
     "home": "Start",
@@ -148,15 +165,22 @@
       "accountCreated": "Konto erstellt",
       "errors": {
         "failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
-        "emailInUse": "Diese E-Mail wird bereits verwendet"
+        "emailInUse": "Diese E-Mail wird bereits verwendet",
+        "generic": "Fehler beim Erstellen des Kontos. Bitte versuchen Sie es erneut."
       },
       "success": {
         "checkEmail": "Bitte überprüfe deine E-Mail zur Verifizierung."
       }
     },
+    "forgotPassword": {
+      "errors": {
+        "generic": "Fehler beim Senden der Zurücksetzungs-E-Mail. Bitte versuchen Sie es erneut."
+      }
+    },
     "resetPassword": {
       "title": "Passwort zurücksetzen",
       "subtitle": "Gib deine E-Mail ein, um Anweisungen zu erhalten",
+      "description": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen Anweisungen zum Zurücksetzen Ihres Passworts",
       "emailLabel": "E-Mail",
       "emailPlaceholder": "max@muster.de",
       "submit": "Anweisungen senden",
@@ -423,7 +447,8 @@
       "beer": "+1 Mass",
       "radler": "+1 Radler",
       "wine": "+1 Wein",
-      "soft_drink": "+1 Soft"
+      "soft_drink": "+1 Soft",
+      "alcohol_free": "+1 Alkoholfrei"
     },
     "howManyDrinks": "deine Getränke eintragen",
     "totalDrinks": "Getränke gesamt",
@@ -517,7 +542,12 @@
     },
     "noFestival": "Bitte wähle ein Festival aus, um Besuche anzuzeigen",
     "updateSuccess": "Besuch aktualisiert",
-    "createSuccess": "Besuch erfasst"
+    "createSuccess": "Besuch erfasst",
+    "price": "Preis",
+    "tent": {
+      "selectTents": "Zelte auswählen"
+    },
+    "updateAttendance": "Anwesenheit aktualisieren"
   },
   "achievements": {
     "pageTitle": "Erfolge",
@@ -530,6 +560,7 @@
     "selectFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
     "noFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
     "error": "Fehler beim Laden der Erfolge. Zum Aktualisieren nach unten ziehen.",
+    "empty": "Keine Erfolge verfügbar",
     "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
@@ -859,6 +890,7 @@
     },
     "avatar": {
       "change": "Foto ändern",
+      "changeHint": "Tippen zum Ändern",
       "takePhoto": "Foto aufnehmen",
       "chooseFromLibrary": "Aus Bibliothek wählen",
       "uploading": "Lädt hoch...",
@@ -932,7 +964,8 @@
       "title": "Abmelden",
       "message": "Bist du sicher, dass du dich abmelden möchten?",
       "button": "Abmelden",
-      "confirm": "Abmelden"
+      "confirm": "Abmelden",
+      "error": "Fehler beim Abmelden"
     },
     "tutorial": {
       "title": "Tutorial",
@@ -1324,6 +1357,8 @@
     },
     "groups": {
       "noGroups": "du bist noch keiner Gruppe beigetreten",
+      "noGroupsHint": "Sie sind noch in keinen Gruppen",
+      "title": "Gruppen",
       "shareWithAll": "Mit allen Gruppen teilen",
       "shareWithAllDescription": "Alle deine Gruppen können deinen Standort sehen",
       "selectGroups": "Oder bestimmte Gruppen auswählen",
@@ -1338,6 +1373,14 @@
       "collapseHint": "Tippe zum Zuklappen",
       "expandHint": "Tippe zum Aufklappen",
       "orSelectSpecific": "Oder bestimmte Gruppen auswählen"
+    },
+    "proximity": {
+      "veryClose": "Sehr nah",
+      "hint": "Tippen, um auf Karte anzuzeigen und einzuchecken",
+      "checkInButton": "Einchecken"
+    },
+    "sharing": {
+      "active": "Standortfreigabe aktiv"
     },
     "errors": {
       "startFailed": "Freigabe konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
@@ -1453,7 +1496,9 @@
     "aGroup": "eine Gruppe",
     "hotStreak": "Heißer Lauf",
     "userProfile": "Benutzerprofil",
-    "title": "Aktivitäts-Feed"
+    "title": "Aktivitäts-Feed",
+    "profileNotFound": "Profil nicht gefunden",
+    "viewProfile": "Profil anzeigen"
   },
   "quickAttendance": {
     "sheetTitle": "Heutiger Besuch",
@@ -1506,6 +1551,12 @@
     "globalLeaderboard": "🏆 Globale Rangliste",
     "topPerformers": "Top {{count}} Teilnehmer",
     "yourGroups": "deine Gruppen:",
+    "quickAdd": {
+      "beer": "Bier",
+      "radler": "Radler",
+      "soft": "Softdrink",
+      "wine": "Wein"
+    },
     "festivalMap": "{{name}} Karte",
     "shareApp": "Diese App teilen",
     "whatCanIDo": "Was kann ich mit Prost Counter machen?",
@@ -1677,7 +1728,8 @@
     "price": {
       "positive": "Preis muss größer als 0 sein",
       "tooHigh": "Preis scheint zu hoch"
-    }
+    },
+    "tentRequired": "Bitte wählen Sie ein Zelt"
   },
   "notifications": {
     "success": {
@@ -1909,6 +1961,11 @@
       "fallback": "Benutzer hat sich für Passwort entschieden",
       "lockout": "Zu viele Fehlversuche. Bitte versuchen Sie es später erneut.",
       "failed": "Authentifizierung fehlgeschlagen"
+    }
+  },
+  "navigation": {
+    "breadcrumbs": {
+      "settings": "Einstellungen"
     }
   }
 }

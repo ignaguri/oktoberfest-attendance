@@ -21,6 +21,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { getBeerPictureUrl } from "@/lib/utils";
 
 import { ImagePreviewModal } from "./image-preview-modal";
 import { TappableAvatar, UserProfileModal } from "./user-profile-modal";
@@ -226,6 +227,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
     "picture_url",
     undefined,
   );
+  const fullPictureUrl = pictureUrl ? getBeerPictureUrl(pictureUrl) : undefined;
 
   return (
     <>
@@ -256,13 +258,13 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
           <Text className="text-sm text-typography-500">{description}</Text>
 
           {/* Photo thumbnail for photo uploads */}
-          {activity_type === "photo_upload" && pictureUrl && (
+          {activity_type === "photo_upload" && fullPictureUrl && (
             <Pressable
-              onPress={() => handleImagePress(pictureUrl)}
+              onPress={() => handleImagePress(fullPictureUrl)}
               className="mt-2"
             >
               <Image
-                source={{ uri: pictureUrl }}
+                source={{ uri: fullPictureUrl }}
                 className="h-16 w-16 rounded-lg"
                 resizeMode="cover"
                 accessibilityLabel={t("activityFeed.uploadedPhoto")}

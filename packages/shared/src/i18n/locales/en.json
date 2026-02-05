@@ -22,14 +22,19 @@
       "copy": "Copy",
       "install": "Install",
       "goHome": "Go to Home",
+      "goBack": "Go Back",
       "tryAgain": "Try Again",
       "done": "Done"
+    },
+    "action": {
+      "cancel": "Cancel"
     },
     "actions": {
       "retry": "Retry",
       "cancel": "Cancel",
       "dismiss": "Dismiss",
-      "pullToRefresh": "Pull to refresh"
+      "pullToRefresh": "Pull to refresh",
+      "cannotUndo": "This action cannot be undone"
     },
     "labels": {
       "name": "Name",
@@ -41,6 +46,10 @@
       "status": "Status",
       "description": "Description",
       "selectDate": "Select a date"
+    },
+    "form": {
+      "date": "Date",
+      "email": "Email"
     },
     "status": {
       "loading": "Loading...",
@@ -57,11 +66,13 @@
       "deleting": "Deleting...",
       "cancelling": "Cancelling...",
       "info": "Info",
-      "authenticating": "Authenticating..."
+      "authenticating": "Authenticating...",
+      "unknownGroup": "Unknown Group"
     },
     "errors": {
       "title": "Error",
       "generic": "Something went wrong. Please try again.",
+      "unexpected": "An unexpected error occurred",
       "oops": "Oops!",
       "notFound": {
         "title": "Page Not Found",
@@ -122,7 +133,13 @@
       "description": "A new version of the app is available. Please update to get the latest features and improvements.",
       "updateNow": "Update Now"
     },
-    "members": "members"
+    "members": "members",
+    "beers": "Beers",
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "loading": "Loading",
+    "tents": "Tents",
+    "unknownUser": "Unknown User"
   },
   "tabs": {
     "home": "Home",
@@ -170,15 +187,22 @@
       "accountCreated": "Account created",
       "errors": {
         "failed": "Sign up failed. Please try again.",
-        "emailInUse": "This email is already in use"
+        "emailInUse": "This email is already in use",
+        "generic": "Failed to create account. Please try again."
       },
       "success": {
         "checkEmail": "Please check your email for verification."
       }
     },
+    "forgotPassword": {
+      "errors": {
+        "generic": "Failed to send reset email. Please try again."
+      }
+    },
     "resetPassword": {
       "title": "Reset Password",
       "subtitle": "Enter your email to receive reset instructions",
+      "description": "Enter your email and we'll send you instructions to reset your password",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "submit": "Send Reset Instructions",
@@ -458,7 +482,8 @@
       "beer": "+1 Beer",
       "radler": "+1 Radler",
       "wine": "+1 Wine",
-      "soft_drink": "+1 Soft"
+      "soft_drink": "+1 Soft",
+      "alcohol_free": "+1 Non-alcoholic"
     },
     "howManyDrinks": "Log Your Drinks",
     "totalDrinks": "Total Drinks",
@@ -552,7 +577,12 @@
     },
     "noFestival": "Please select a festival to view attendance",
     "updateSuccess": "Attendance updated",
-    "createSuccess": "Attendance recorded"
+    "createSuccess": "Attendance recorded",
+    "price": "Price",
+    "tent": {
+      "selectTents": "Select tents"
+    },
+    "updateAttendance": "Update Attendance"
   },
   "achievements": {
     "pageTitle": "Achievements",
@@ -565,6 +595,7 @@
     "selectFestival": "Please select a festival to view achievements.",
     "noFestival": "Please select a festival to view achievements.",
     "error": "Failed to load achievements. Pull to refresh.",
+    "empty": "No achievements available",
     "trackProgress": "Track your progress and unlock achievements at {{festival}}",
     "completed": "Completed",
     "inProgress": "In Progress",
@@ -894,6 +925,7 @@
     },
     "avatar": {
       "change": "Change Photo",
+      "changeHint": "Tap to change",
       "takePhoto": "Take Photo",
       "chooseFromLibrary": "Choose from Library",
       "uploading": "Uploading...",
@@ -985,7 +1017,8 @@
       "title": "Sign Out",
       "message": "Are you sure you want to sign out?",
       "button": "Sign Out",
-      "confirm": "Sign Out"
+      "confirm": "Sign Out",
+      "error": "Failed to sign out"
     },
     "tutorial": {
       "title": "Tutorial",
@@ -1553,7 +1586,8 @@
       "disableTooltip": "Stop sharing your location",
       "enabled": "Location sharing enabled! Group members can now see your location.",
       "trackingStarted": "Location tracking started! Enable location sharing for specific groups in your profile settings.",
-      "noGroupsEnabled": "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first."
+      "noGroupsEnabled": "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first.",
+      "active": "Location sharing active"
     },
     "duration": {
       "30m": "30m",
@@ -1569,6 +1603,8 @@
     },
     "groups": {
       "noGroups": "You haven't joined any groups yet",
+      "noGroupsHint": "You're not in any groups yet",
+      "title": "Groups",
       "shareWithAll": "Share with all groups",
       "shareWithAllDescription": "All your groups can see your location",
       "selectGroups": "Or select specific groups",
@@ -1583,6 +1619,11 @@
       "collapseHint": "Tap to collapse",
       "expandHint": "Tap to expand",
       "orSelectSpecific": "Or select specific groups"
+    },
+    "proximity": {
+      "veryClose": "Very close",
+      "hint": "Tap to view on map and check in",
+      "checkInButton": "Check In"
     },
     "errors": {
       "startFailed": "Failed to start sharing. Please try again.",
@@ -1698,7 +1739,9 @@
     "aGroup": "a group",
     "hotStreak": "Hot streak",
     "userProfile": "User Profile",
-    "title": "Activity Feed"
+    "title": "Activity Feed",
+    "profileNotFound": "Profile not found",
+    "viewProfile": "View Profile"
   },
   "quickAttendance": {
     "sheetTitle": "Today's Attendance",
@@ -1713,6 +1756,12 @@
       "startsInOneDay": "Starts tomorrow!",
       "startsInDays": "Starts in {{daysUntil}} days",
       "ended": "Festival has ended"
+    },
+    "quickAdd": {
+      "beer": "Beer",
+      "radler": "Radler",
+      "soft": "Soft Drink",
+      "wine": "Wine"
     },
     "quickAttendance": {
       "title": "What are you having?",
@@ -1931,7 +1980,8 @@
     "price": {
       "positive": "Price must be greater than 0",
       "tooHigh": "Price seems too high"
-    }
+    },
+    "tentRequired": "Please select a tent"
   },
   "notifications": {
     "success": {
@@ -2164,7 +2214,8 @@
       "groups": "Groups",
       "profile": "Profile",
       "attendance": "Attendance",
-      "achievements": "Achievements"
+      "achievements": "Achievements",
+      "settings": "Settings"
     }
   },
   "landing": {

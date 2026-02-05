@@ -22,14 +22,19 @@
       "copy": "Copiar",
       "install": "Instalar",
       "goHome": "Ir al inicio",
+      "goBack": "Volver",
       "tryAgain": "Intentar de nuevo",
       "done": "Listo"
+    },
+    "action": {
+      "cancel": "Cancelar"
     },
     "actions": {
       "retry": "Reintentar",
       "cancel": "Cancelar",
       "dismiss": "Descartar",
-      "pullToRefresh": "Deslizá para actualizar"
+      "pullToRefresh": "Deslizá para actualizar",
+      "cannotUndo": "Esta acción no se puede deshacer"
     },
     "labels": {
       "name": "Nombre",
@@ -41,6 +46,10 @@
       "status": "Estado",
       "description": "Descripción",
       "selectDate": "Seleccioná una fecha"
+    },
+    "form": {
+      "date": "Fecha",
+      "email": "Email"
     },
     "status": {
       "loading": "Cargando...",
@@ -57,11 +66,13 @@
       "deleting": "Eliminando...",
       "cancelling": "Cancelando...",
       "info": "Info",
-      "authenticating": "Autenticando..."
+      "authenticating": "Autenticando...",
+      "unknownGroup": "Grupo desconocido"
     },
     "errors": {
       "title": "Error",
       "generic": "Algo salió mal. Por favor, intentá de nuevo.",
+      "unexpected": "Ocurrió un error inesperado",
       "oops": "¡Ups!",
       "notFound": {
         "title": "Página no encontrada",
@@ -122,7 +133,13 @@
       "description": "Una nueva versión de la app está disponible. Por favor, actualizá para obtener las últimas funciones y mejoras.",
       "updateNow": "Actualizar ahora"
     },
-    "members": "miembros"
+    "members": "miembros",
+    "beers": "Cervezas",
+    "close": "Cerrar",
+    "dismiss": "Descartar",
+    "loading": "Cargando",
+    "tents": "Carpas",
+    "unknownUser": "Usuario desconocido"
   },
   "tabs": {
     "home": "Inicio",
@@ -170,15 +187,22 @@
       "accountCreated": "Cuenta creada",
       "errors": {
         "failed": "Error al registrarse. Por favor, intentá de nuevo.",
-        "emailInUse": "Este email ya está en uso"
+        "emailInUse": "Este email ya está en uso",
+        "generic": "Error al crear la cuenta. Intentá de nuevo."
       },
       "success": {
         "checkEmail": "Por favor, revisá tu email para verificar tu cuenta."
       }
     },
+    "forgotPassword": {
+      "errors": {
+        "generic": "Error al enviar el email de restablecimiento. Intentá de nuevo."
+      }
+    },
     "resetPassword": {
       "title": "Restablecer contraseña",
       "subtitle": "Ingresá tu email para recibir instrucciones",
+      "description": "Ingresá tu email y te enviaremos instrucciones para restablecer tu contraseña",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "submit": "Enviar instrucciones",
@@ -458,7 +482,8 @@
       "beer": "+1 Cerveza",
       "radler": "+1 Radler",
       "wine": "+1 Vino",
-      "soft_drink": "+1 Refresco"
+      "soft_drink": "+1 Refresco",
+      "alcohol_free": "+1 Sin alcohol"
     },
     "howManyDrinks": "Registrá tus bebidas",
     "totalDrinks": "Total de bebidas",
@@ -552,7 +577,12 @@
     },
     "noFestival": "Por favor, seleccioná un festival para ver las asistencias",
     "updateSuccess": "Asistencia actualizada",
-    "createSuccess": "Asistencia registrada"
+    "createSuccess": "Asistencia registrada",
+    "price": "Precio",
+    "tent": {
+      "selectTents": "Seleccionar carpas"
+    },
+    "updateAttendance": "Actualizar asistencia"
   },
   "achievements": {
     "pageTitle": "Logros",
@@ -565,6 +595,7 @@
     "selectFestival": "Por favor, seleccioná un festival para ver los logros.",
     "noFestival": "Por favor, seleccioná un festival para ver los logros.",
     "error": "Error al cargar los logros. Deslizá hacia abajo para actualizar.",
+    "empty": "No hay logros disponibles",
     "trackProgress": "Seguí tu progreso y desbloqueá logros en {{festival}}",
     "completed": "Completado",
     "inProgress": "En progreso",
@@ -894,6 +925,7 @@
     },
     "avatar": {
       "change": "Cambiar foto",
+      "changeHint": "Tocá para cambiar",
       "takePhoto": "Tomar foto",
       "chooseFromLibrary": "Elegir de la galería",
       "uploading": "Subiendo...",
@@ -985,7 +1017,8 @@
       "title": "Cerrar sesión",
       "message": "¿Estás seguro de que querés cerrar sesión?",
       "button": "Cerrar sesión",
-      "confirm": "Cerrar sesión"
+      "confirm": "Cerrar sesión",
+      "error": "Error al cerrar sesión"
     },
     "tutorial": {
       "title": "Tutorial",
@@ -1553,7 +1586,8 @@
       "disableTooltip": "Dejá de compartir tu ubicación",
       "enabled": "¡Compartir ubicación activado! Los miembros del grupo ahora pueden ver tu ubicación.",
       "trackingStarted": "¡Seguimiento de ubicación iniciado! Activá el compartir ubicación para grupos específicos en la configuración de tu perfil.",
-      "noGroupsEnabled": "El compartir ubicación no está activado para ningún grupo. Por favor, activá el compartir ubicación para al menos un grupo en la configuración de tu perfil primero."
+      "noGroupsEnabled": "El compartir ubicación no está activado para ningún grupo. Por favor, activá el compartir ubicación para al menos un grupo en la configuración de tu perfil primero.",
+      "active": "Compartición de ubicación activa"
     },
     "duration": {
       "30m": "30m",
@@ -1569,6 +1603,8 @@
     },
     "groups": {
       "noGroups": "Todavía no te uniste a ningún grupo",
+      "noGroupsHint": "Aún no estás en ningún grupo",
+      "title": "Grupos",
       "shareWithAll": "Compartir con todos los grupos",
       "shareWithAllDescription": "Todos tus grupos pueden ver tu ubicación",
       "selectGroups": "O seleccioná grupos específicos",
@@ -1583,6 +1619,11 @@
       "collapseHint": "Tocá para contraer",
       "expandHint": "Tocá para expandir",
       "orSelectSpecific": "O seleccioná grupos específicos"
+    },
+    "proximity": {
+      "veryClose": "Muy cerca",
+      "hint": "Tocá para ver en el mapa y registrarte",
+      "checkInButton": "Registrarse"
     },
     "errors": {
       "startFailed": "No se pudo iniciar el compartir. Por favor, intentá de nuevo.",
@@ -1698,7 +1739,9 @@
     "aGroup": "un grupo",
     "hotStreak": "Racha caliente",
     "userProfile": "Perfil del usuario",
-    "title": "Feed de actividad"
+    "title": "Feed de actividad",
+    "profileNotFound": "Perfil no encontrado",
+    "viewProfile": "Ver perfil"
   },
   "quickAttendance": {
     "sheetTitle": "Asistencia de hoy",
@@ -1713,6 +1756,12 @@
       "startsInOneDay": "¡Empieza mañana!",
       "startsInDays": "Empieza en {{daysUntil}} días",
       "ended": "El festival terminó"
+    },
+    "quickAdd": {
+      "beer": "Cerveza",
+      "radler": "Radler",
+      "soft": "Refresco",
+      "wine": "Vino"
     },
     "quickAttendance": {
       "title": "¿Qué estás tomando?",
@@ -1931,7 +1980,8 @@
     "price": {
       "positive": "El precio debe ser mayor que 0",
       "tooHigh": "El precio parece demasiado alto"
-    }
+    },
+    "tentRequired": "Por favor seleccioná una carpa"
   },
   "notifications": {
     "success": {
@@ -2164,7 +2214,8 @@
       "groups": "Grupos",
       "profile": "Perfil",
       "attendance": "Asistencia",
-      "achievements": "Logros"
+      "achievements": "Logros",
+      "settings": "Configuración"
     }
   },
   "landing": {
