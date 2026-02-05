@@ -21,6 +21,7 @@ import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { MapLinkButton } from "@/components/shared/map-link-button";
+import { HomeSkeleton } from "@/components/skeletons";
 import { TutorialTarget } from "@/components/tutorial";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -44,7 +45,7 @@ import { logger } from "@/lib/logger";
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { currentFestival } = useFestival(); // Ensure festival context is initialized
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -65,6 +66,20 @@ export default function HomeScreen() {
       setIsRefreshing(false);
     }
   }, [queryClient]);
+
+  // Loading state - show skeleton while festival is loading
+  if (festivalLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+        <ScrollView className="flex-1">
+          <VStack space="md" className="p-4 pb-8">
+            <AppHeader />
+            <HomeSkeleton />
+          </VStack>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>

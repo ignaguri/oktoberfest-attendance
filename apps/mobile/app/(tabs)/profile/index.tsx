@@ -21,6 +21,7 @@ import { ImageSourcePicker } from "@/components/image-source-picker";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
+import { ProfileSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -35,7 +36,6 @@ import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -219,9 +219,9 @@ export default function ProfileScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
-      </View>
+      <ScrollView className="flex-1 bg-background-50">
+        <ProfileSkeleton />
+      </ScrollView>
     );
   }
 

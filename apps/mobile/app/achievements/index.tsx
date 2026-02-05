@@ -4,10 +4,11 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 import { Award } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView } from "react-native";
+import { RefreshControl, ScrollView } from "react-native";
 
 import { AchievementCard } from "@/components/achievements/achievement-card";
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
+import { AchievementsSkeleton } from "@/components/skeletons";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -63,12 +64,7 @@ export default function AchievementsScreen() {
   if (festivalLoading || (loading && achievements.length === 0)) {
     return (
       <ScrollView className="flex-1 bg-background-50">
-        <VStack space="md" className="items-center justify-center p-4 py-20">
-          <ActivityIndicator size="large" color={Colors.primary[500]} />
-          <Text className="text-typography-500">
-            {t("achievements.loading")}
-          </Text>
-        </VStack>
+        <AchievementsSkeleton />
       </ScrollView>
     );
   }

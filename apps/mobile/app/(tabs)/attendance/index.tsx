@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
 import { CalendarActionSheet } from "@/components/attendance/calendar-action-sheet";
 import { CheckInDialog } from "@/components/attendance/check-in-dialog";
+import { AttendanceSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -31,7 +32,6 @@ import {
 import { Button, ButtonText } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { logger } from "@/lib/logger";
@@ -39,7 +39,7 @@ import { isActiveReservation } from "@/lib/utils/reservation";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
-  const { currentFestival } = useFestival();
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const router = useRouter();
   const { checkInReservationId } = useLocalSearchParams<{
     checkInReservationId?: string;
@@ -230,22 +230,22 @@ export default function AttendanceScreen() {
     t,
   ]);
 
-  // No festival selected
+  // Loading state - festival or initial data load
+  if (festivalLoading || ((isLoading || reservationsLoading) && !attendances)) {
+    return (
+      <View className="flex-1 bg-background-50">
+        <AttendanceSkeleton />
+      </View>
+    );
+  }
+
+  // No festival (rare - API returned no festivals)
   if (!currentFestival) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <Text className="text-center text-typography-500">
           {t("attendance.noFestival")}
         </Text>
-      </View>
-    );
-  }
-
-  // Loading state
-  if (isLoading || reservationsLoading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
       </View>
     );
   }

@@ -5,14 +5,10 @@ import type { WinningCriteria } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { Award, ChevronRight, Trophy } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { Leaderboard, type SortOrder } from "@/components/shared/leaderboard";
+import { LeaderboardSkeleton } from "@/components/skeletons";
 import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -79,12 +75,7 @@ export default function LeaderboardScreen() {
   if (festivalLoading || (loading && entries.length === 0)) {
     return (
       <ScrollView className="flex-1 bg-background-50">
-        <VStack space="md" className="items-center justify-center p-4 py-20">
-          <ActivityIndicator size="large" color={Colors.primary[500]} />
-          <Text className="text-typography-500">
-            {t("leaderboard.loading")}
-          </Text>
-        </VStack>
+        <LeaderboardSkeleton />
       </ScrollView>
     );
   }

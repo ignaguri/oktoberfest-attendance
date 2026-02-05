@@ -12,6 +12,7 @@ import { CreateGroupSheet } from "@/components/groups/create-group-sheet";
 import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
 import { GroupListItem } from "@/components/groups/group-list-item";
 import { JoinGroupSheet } from "@/components/groups/join-group-sheet";
+import { GroupsSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -25,7 +26,6 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -34,7 +34,7 @@ import { IconColors } from "@/lib/constants/colors";
 export default function GroupsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { currentFestival } = useFestival();
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
 
   // Dialog state
   const { dialog, showDialog, closeDialog } = useAlertDialog();
@@ -89,22 +89,22 @@ export default function GroupsScreen() {
     refetch();
   }, [refetch]);
 
-  // No festival selected
+  // Loading state - festival or initial data load
+  if (festivalLoading || (isLoading && !groups)) {
+    return (
+      <View className="flex-1 bg-background-50">
+        <GroupsSkeleton />
+      </View>
+    );
+  }
+
+  // No festival (rare - API returned no festivals)
   if (!currentFestival) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <Text className="text-center text-typography-500">
           {t("groups.noFestival")}
         </Text>
-      </View>
-    );
-  }
-
-  // Loading state - only show full-page spinner on initial load
-  if (isLoading && !groups) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
       </View>
     );
   }
