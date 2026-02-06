@@ -208,9 +208,13 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
           "achievement_name",
           undefined,
         );
-        return achievementName
+        // Achievement name is stored as an i18n key, so translate it
+        const translatedName = achievementName
+          ? t(achievementName, { defaultValue: achievementName })
+          : undefined;
+        return translatedName
           ? t("activityFeed.unlockedAchievementName", {
-              name: achievementName,
+              name: translatedName,
             })
           : t("activityFeed.unlockedAchievement");
       }

@@ -57,6 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           },
         },
       },
+      LSApplicationQueriesSchemes: ["whatsapp"],
     },
     config: {
       usesNonExemptEncryption: false,

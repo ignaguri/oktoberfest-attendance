@@ -9,9 +9,13 @@ import type {
   LeaderboardEntry,
   WinningCriteria,
 } from "@prostcounter/shared/schemas";
+import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
+  Copy,
   Image,
+  MessageCircle,
+  MoreHorizontal,
   QrCode,
   Settings,
   Share2,
@@ -19,12 +23,21 @@ import {
   Users,
 } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { RefreshControl, ScrollView, Share } from "react-native";
+import { Linking, RefreshControl, ScrollView, Share } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { QRCodeSheet } from "@/components/groups/qr-code-sheet";
 import type { SortOrder } from "@/components/shared/leaderboard";
 import { Leaderboard } from "@/components/shared/leaderboard";
+import {
+  Actionsheet,
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetItem,
+  ActionsheetItemText,
+} from "@/components/ui/actionsheet";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -99,33 +112,87 @@ export default function GroupDetailScreen() {
   // QR Code sheet state
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
 
+  // Share action sheet state
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
+
   // Sorting state for leaderboard
   const [sortColumn, setSortColumn] = useState<WinningCriteria | undefined>(
     undefined,
   );
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
-  // Handle share
-  const handleShare = useCallback(async () => {
+  // Handle share - opens custom action sheet
+  const handleShare = useCallback(() => {
     if (!group?.inviteToken) {
       showDialog(t("common.status.error"), t("groups.share.noToken"));
       return;
     }
+    setIsShareSheetOpen(true);
+  }, [group, showDialog, t]);
+
+  // Share via WhatsApp directly
+  const shareViaWhatsApp = useCallback(async () => {
+    if (!group?.inviteToken) return;
 
     const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
-    const message = t("groups.share.message", {
-      name: group.name,
-    });
+    const message = t("groups.share.message", { name: group.name });
+    const shareText = `${message}\n\n${inviteUrl}`;
+
+    const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+
+    try {
+      const canOpen = await Linking.canOpenURL(whatsappUrl);
+      if (canOpen) {
+        await Linking.openURL(whatsappUrl);
+        setIsShareSheetOpen(false);
+      } else {
+        showDialog(
+          t("common.status.error"),
+          "WhatsApp is not installed on this device",
+        );
+      }
+    } catch (error) {
+      logger.error("Failed to open WhatsApp:", error);
+      showDialog(t("common.status.error"), "Failed to open WhatsApp");
+    }
+  }, [group, showDialog, t]);
+
+  // Copy to clipboard
+  const copyToClipboard = useCallback(async () => {
+    if (!group?.inviteToken) return;
+
+    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
+    const message = t("groups.share.message", { name: group.name });
+    const shareText = `${message}\n\n${inviteUrl}`;
+
+    try {
+      await Clipboard.setStringAsync(shareText);
+      setIsShareSheetOpen(false);
+      showDialog(t("common.status.success"), t("groups.share.linkCopied"));
+    } catch (error) {
+      logger.error("Failed to copy to clipboard:", error);
+      showDialog(t("common.status.error"), "Failed to copy to clipboard");
+    }
+  }, [group, showDialog, t]);
+
+  // Open native share sheet
+  const openNativeShare = useCallback(async () => {
+    if (!group?.inviteToken) return;
+
+    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
+    const message = t("groups.share.message", { name: group.name });
+    const shareText = `${message}\n\n${inviteUrl}`;
 
     try {
       await Share.share({
-        message: `${message}\n\n${inviteUrl}`,
-        url: inviteUrl,
+        message: shareText,
+        title: message,
       });
+      setIsShareSheetOpen(false);
     } catch (error) {
       logger.error("Failed to share:", error);
     }
-  }, [group, showDialog, t]);
+  }, [group, t]);
 
   // Handle settings navigation
   const handleSettings = useCallback(() => {
@@ -361,6 +428,36 @@ export default function GroupDetailScreen() {
           inviteToken={group.inviteToken}
         />
       )}
+
+      {/* Share Action Sheet */}
+      <Actionsheet
+        isOpen={isShareSheetOpen}
+        onClose={() => setIsShareSheetOpen(false)}
+      >
+        <ActionsheetBackdrop />
+        <ActionsheetContent>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <VStack space="md" className="w-full">
+            <Text className="px-3 text-lg font-semibold text-typography-900">
+              {t("groups.actions.share")}
+            </Text>
+            <ActionsheetItem onPress={shareViaWhatsApp}>
+              <MessageCircle size={20} color={IconColors.primary} />
+              <ActionsheetItemText>Share via WhatsApp</ActionsheetItemText>
+            </ActionsheetItem>
+            <ActionsheetItem onPress={copyToClipboard}>
+              <Copy size={20} color={IconColors.default} />
+              <ActionsheetItemText>Copy to Clipboard</ActionsheetItemText>
+            </ActionsheetItem>
+            <ActionsheetItem onPress={openNativeShare}>
+              <MoreHorizontal size={20} color={IconColors.default} />
+              <ActionsheetItemText>More Options...</ActionsheetItemText>
+            </ActionsheetItem>
+          </VStack>
+        </ActionsheetContent>
+      </Actionsheet>
     </GestureHandlerRootView>
   );
 }

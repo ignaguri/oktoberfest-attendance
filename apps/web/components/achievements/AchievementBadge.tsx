@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/lib/i18n/client";
 import type { AchievementRarity } from "@/lib/types/achievements";
 import { cn } from "@/lib/utils";
 
@@ -103,8 +104,12 @@ export function AchievementBadge({
   showPoints = false,
   className,
 }: AchievementBadgeProps) {
+  const { t } = useTranslation();
   const config = rarityConfig[rarity];
   const displayIcon = iconMap[icon as keyof typeof iconMap] || "🏆";
+
+  // Achievement name is stored as an i18n key, so translate it
+  const translatedName = t(name, { defaultValue: name });
 
   const sizeStyles = {
     sm: "text-xs px-1.5 py-0.5",
@@ -128,7 +133,7 @@ export function AchievementBadge({
         {displayIcon}
       </span>
 
-      <span className="truncate">{name}</span>
+      <span className="truncate">{translatedName}</span>
 
       {showPoints && (
         <span
