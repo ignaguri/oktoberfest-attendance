@@ -59,7 +59,7 @@ const LocationSessionManagement = () => {
         return;
       }
 
-      const response = await fetch("/api/admin/location/sessions", {
+      const response = await fetch("/api/v1/admin/location/sessions", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -97,7 +97,7 @@ const LocationSessionManagement = () => {
       }
 
       const response = await fetch(
-        `/api/admin/location/sessions/${sessionId}`,
+        `/api/v1/admin/location/sessions/${sessionId}`,
         {
           method: "DELETE",
           headers: {
@@ -133,7 +133,7 @@ const LocationSessionManagement = () => {
         return;
       }
 
-      const response = await fetch("/api/admin/location/sessions/cleanup", {
+      const response = await fetch("/api/v1/admin/location/sessions/cleanup", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${session.access_token}`,
