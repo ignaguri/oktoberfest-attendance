@@ -14,11 +14,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
-  splash: {
-    image: "./assets/images/logo.png",
-    resizeMode: "contain",
-    backgroundColor: "#FBBF24",
-  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.prostcounter.app",
@@ -102,6 +97,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     output: "static",
   },
   plugins: [
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/images/splash-screen.png",
+        backgroundColor: "#FBBF24",
+        resizeMode: "cover",
+        enableFullScreenImage_legacy: true,
+      },
+    ],
     "expo-router",
     "expo-secure-store",
     "expo-localization",
