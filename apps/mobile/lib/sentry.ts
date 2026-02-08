@@ -38,7 +38,7 @@ export function initSentry() {
     environment: __DEV__ ? "development" : "production",
 
     // Release version from app config (format: slug@version+buildNumber)
-    release: `${Constants.expoConfig?.slug}@${Constants.expoConfig?.version}+${
+    release: `${Constants.expoConfig?.slug || "prostcounter"}@${Constants.expoConfig?.version || "0.0.0"}+${
       Constants.expoConfig?.ios?.buildNumber ||
       Constants.expoConfig?.android?.versionCode?.toString() ||
       "1"

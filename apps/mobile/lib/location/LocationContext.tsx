@@ -3,6 +3,7 @@ import type {
   LocationSessionMember,
   NearbyTent,
 } from "@prostcounter/shared";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import * as Location from "expo-location";
 import type { ReactNode } from "react";
@@ -103,6 +104,7 @@ const LocationContext = createContext<LocationContextType | undefined>(
  * Uses Supabase Realtime for live friend location updates.
  */
 export function LocationProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const location = useLocation();
 
   // Prompt state
@@ -208,7 +210,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         return {
           success: false,
           backgroundEnabled: false,
-          warning: "Location permission not granted",
+          warning: t("location.warnings.permissionNotGranted"),
         };
       }
 
@@ -289,12 +291,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             logger.warn("Failed to start background location updates", {
               error: bgError,
             });
-            backgroundWarning =
-              "Background location could not be started. Location will only update while the app is open. You can enable background location in your device's Settings app.";
+            backgroundWarning = t("location.warnings.backgroundNotStarted");
           }
         } else if (!location.hasBackgroundPermission) {
-          backgroundWarning =
-            "Background location permission not granted. Location will only update while the app is open. You can grant background location access in your device's Settings app.";
+          backgroundWarning = t(
+            "location.warnings.backgroundPermissionNotGranted",
+          );
         }
 
         // Start foreground watching as well
@@ -348,7 +350,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         setIsSessionLoading(false);
       }
     },
-    [location, updateLocationOnServer],
+    [location, updateLocationOnServer, t],
   );
 
   /**

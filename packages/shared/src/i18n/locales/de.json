@@ -80,7 +80,8 @@
       },
       "unauthorized": "Bitte melde dich an, um fortzufahren",
       "forbidden": "Du hast keine Berechtigung dafür",
-      "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung."
+      "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
+      "notAuthenticated": "Nicht authentifiziert"
     },
     "empty": {
       "noResults": "Keine Ergebnisse gefunden",
@@ -358,7 +359,13 @@
       "shareLink": "Link teilen",
       "linkCopied": "Link in Zwischenablage kopiert",
       "message": "Tritt meiner Gruppe '{{name}}' auf ProstCounter bei!",
-      "noToken": "Kein Einladungs-Token verfügbar. Bitte erstelle den Einladungslink neu."
+      "noToken": "Kein Einladungs-Token verfügbar. Bitte erstelle den Einladungslink neu.",
+      "viaWhatsApp": "Über WhatsApp teilen",
+      "copyToClipboard": "In Zwischenablage kopieren",
+      "moreOptions": "Weitere Optionen...",
+      "whatsappNotInstalled": "WhatsApp ist auf diesem Gerät nicht installiert",
+      "whatsappFailed": "WhatsApp konnte nicht geöffnet werden",
+      "copyFailed": "In Zwischenablage kopieren fehlgeschlagen"
     },
     "winningCriteria": {
       "days_attended": "Meiste Tage besucht",
@@ -1035,6 +1042,11 @@
       "stopSuccess": "Sitzung erfolgreich gestoppt",
       "stopError": "Sitzung konnte nicht gestoppt werden",
       "loading": "Sitzungen werden geladen...",
+      "refresh": "Aktualisieren",
+      "stopping": "Wird gestoppt...",
+      "cleaning": "Wird bereinigt...",
+      "loadError": "Sitzungen konnten nicht geladen werden",
+      "cleanupError": "Bereinigung der Sitzungen fehlgeschlagen",
       "columns": {
         "user": "Benutzer",
         "festival": "Festival",
@@ -1392,6 +1404,11 @@
     "errors": {
       "startFailed": "Freigabe konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
       "stopFailed": "Freigabe konnte nicht gestoppt werden. Bitte versuchen Sie es erneut."
+    },
+    "warnings": {
+      "permissionNotGranted": "Standortberechtigung nicht erteilt",
+      "backgroundNotStarted": "Hintergrund-Standort konnte nicht gestartet werden. Der Standort wird nur aktualisiert, während die App geöffnet ist. Du kannst den Hintergrund-Standort in den Einstellungen deines Geräts aktivieren.",
+      "backgroundPermissionNotGranted": "Berechtigung für Hintergrund-Standort nicht erteilt. Der Standort wird nur aktualisiert, während die App geöffnet ist. Du kannst den Zugriff auf den Hintergrund-Standort in den Einstellungen deines Geräts gewähren."
     }
   },
   "photos": {

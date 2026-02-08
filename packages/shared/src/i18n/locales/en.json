@@ -91,7 +91,8 @@
         "title": "You're Offline",
         "message": "Please check your internet connection and try again.",
         "tryAgain": "Try Again"
-      }
+      },
+      "notAuthenticated": "Not authenticated"
     },
     "empty": {
       "noResults": "No results found",
@@ -380,7 +381,13 @@
       "shareLink": "Share Link",
       "linkCopied": "Link copied to clipboard",
       "message": "Join my group '{{name}}' on ProstCounter!",
-      "noToken": "No invite token available. Please regenerate the invite link."
+      "noToken": "No invite token available. Please regenerate the invite link.",
+      "viaWhatsApp": "Share via WhatsApp",
+      "copyToClipboard": "Copy to Clipboard",
+      "moreOptions": "More Options...",
+      "whatsappNotInstalled": "WhatsApp is not installed on this device",
+      "whatsappFailed": "Failed to open WhatsApp",
+      "copyFailed": "Failed to copy to clipboard"
     },
     "winningCriteria": {
       "days_attended": "Most Days Attended",
@@ -1088,6 +1095,11 @@
       "stopSuccess": "Session stopped successfully",
       "stopError": "Failed to stop session",
       "loading": "Loading sessions...",
+      "refresh": "Refresh",
+      "stopping": "Stopping...",
+      "cleaning": "Cleaning...",
+      "loadError": "Failed to load sessions",
+      "cleanupError": "Failed to cleanup sessions",
       "columns": {
         "user": "User",
         "festival": "Festival",
@@ -1631,6 +1643,11 @@
       "veryClose": "Very close",
       "hint": "Tap to view on map and check in",
       "checkInButton": "Check In"
+    },
+    "warnings": {
+      "permissionNotGranted": "Location permission not granted",
+      "backgroundNotStarted": "Background location could not be started. Location will only update while the app is open. You can enable background location in your device's Settings app.",
+      "backgroundPermissionNotGranted": "Background location permission not granted. Location will only update while the app is open. You can grant background location access in your device's Settings app."
     },
     "errors": {
       "startFailed": "Failed to start sharing. Please try again.",

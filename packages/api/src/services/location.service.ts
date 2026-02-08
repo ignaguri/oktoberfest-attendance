@@ -6,7 +6,7 @@ import type {
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
-import { ValidationError } from "../middleware/error";
+import { ForbiddenError, ValidationError } from "../middleware/error";
 import type { ILocationRepository } from "../repositories/interfaces";
 
 /**
@@ -232,7 +232,7 @@ export class LocationService {
   ) {
     const isAdmin = await this.isAdmin(adminUserId);
     if (!isAdmin) {
-      throw new ValidationError(ErrorCodes.UNAUTHORIZED);
+      throw new ForbiddenError(ErrorCodes.FORBIDDEN);
     }
 
     return this.locationRepo.getActiveSessionsAdmin(filters);
@@ -252,7 +252,7 @@ export class LocationService {
   ): Promise<LocationSession> {
     const isAdmin = await this.isAdmin(adminUserId);
     if (!isAdmin) {
-      throw new ValidationError(ErrorCodes.UNAUTHORIZED);
+      throw new ForbiddenError(ErrorCodes.FORBIDDEN);
     }
 
     return this.locationRepo.forceStopSession(sessionId);
@@ -267,7 +267,7 @@ export class LocationService {
   async cleanupExpiredSessions(adminUserId: string): Promise<number> {
     const isAdmin = await this.isAdmin(adminUserId);
     if (!isAdmin) {
-      throw new ValidationError(ErrorCodes.UNAUTHORIZED);
+      throw new ForbiddenError(ErrorCodes.FORBIDDEN);
     }
 
     return this.locationRepo.cleanupExpiredSessions();

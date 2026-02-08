@@ -55,7 +55,7 @@ const LocationSessionManagement = () => {
       } = await supabase.auth.getSession();
 
       if (!session?.access_token) {
-        toast.error("Not authenticated");
+        toast.error(t("common.errors.notAuthenticated"));
         return;
       }
 
@@ -73,7 +73,7 @@ const LocationSessionManagement = () => {
       setSessions(data.sessions || []);
     } catch (error) {
       console.error("Error fetching sessions:", error);
-      toast.error("Failed to load sessions");
+      toast.error(t("admin.location.loadError"));
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +92,7 @@ const LocationSessionManagement = () => {
       } = await supabase.auth.getSession();
 
       if (!session?.access_token) {
-        toast.error("Not authenticated");
+        toast.error(t("common.errors.notAuthenticated"));
         return;
       }
 
@@ -129,7 +129,7 @@ const LocationSessionManagement = () => {
       } = await supabase.auth.getSession();
 
       if (!session?.access_token) {
-        toast.error("Not authenticated");
+        toast.error(t("common.errors.notAuthenticated"));
         return;
       }
 
@@ -151,7 +151,7 @@ const LocationSessionManagement = () => {
       fetchSessions();
     } catch (error) {
       console.error("Error cleaning up sessions:", error);
-      toast.error("Failed to cleanup sessions");
+      toast.error(t("admin.location.cleanupError"));
     } finally {
       setIsCleaningUp(false);
     }
@@ -183,7 +183,7 @@ const LocationSessionManagement = () => {
             <RefreshCw
               className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
             />
-            Refresh
+            {t("admin.location.refresh")}
           </Button>
           <Button
             variant="outline"
@@ -191,7 +191,9 @@ const LocationSessionManagement = () => {
             onClick={handleCleanupExpired}
             disabled={isCleaningUp}
           >
-            {isCleaningUp ? "Cleaning..." : t("admin.location.cleanupExpired")}
+            {isCleaningUp
+              ? t("admin.location.cleaning")
+              : t("admin.location.cleanupExpired")}
           </Button>
         </div>
       </div>
@@ -253,7 +255,7 @@ const LocationSessionManagement = () => {
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       {stoppingSessionId === session.id
-                        ? "Stopping..."
+                        ? t("admin.location.stopping")
                         : t("admin.location.forceStop")}
                     </Button>
                   </TableCell>

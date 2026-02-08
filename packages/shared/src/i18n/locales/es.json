@@ -83,6 +83,7 @@
       "unauthorized": "Iniciá sesión para continuar",
       "forbidden": "No tenés permiso para hacer eso",
       "networkError": "Error de red. Por favor, revisá tu conexión.",
+      "notAuthenticated": "No autenticado",
       "unauthorized": {
         "title": "Acceso no autorizado",
         "message": "Lo sentimos, no tenés permiso para acceder a esta página."
@@ -380,7 +381,13 @@
       "shareLink": "Compartir enlace",
       "linkCopied": "Enlace copiado al portapapeles",
       "message": "¡Unite a mi grupo '{{name}}' en ProstCounter!",
-      "noToken": "No hay token de invitación disponible. Por favor, regenerá el enlace de invitación."
+      "noToken": "No hay token de invitación disponible. Por favor, regenerá el enlace de invitación.",
+      "viaWhatsApp": "Compartir por WhatsApp",
+      "copyToClipboard": "Copiar al portapapeles",
+      "moreOptions": "Más opciones...",
+      "whatsappNotInstalled": "WhatsApp no está instalado en este dispositivo",
+      "whatsappFailed": "No se pudo abrir WhatsApp",
+      "copyFailed": "No se pudo copiar al portapapeles"
     },
     "winningCriteria": {
       "days_attended": "Más días asistidos",
@@ -1088,6 +1095,11 @@
       "stopSuccess": "Sesión detenida exitosamente",
       "stopError": "No se pudo detener la sesión",
       "loading": "Cargando sesiones...",
+      "refresh": "Actualizar",
+      "stopping": "Deteniendo...",
+      "cleaning": "Limpiando...",
+      "loadError": "No se pudieron cargar las sesiones",
+      "cleanupError": "No se pudieron limpiar las sesiones",
       "columns": {
         "user": "Usuario",
         "festival": "Festival",
@@ -1635,6 +1647,11 @@
     "errors": {
       "startFailed": "No se pudo iniciar el compartir. Por favor, intentá de nuevo.",
       "stopFailed": "No se pudo detener el compartir. Por favor, intentá de nuevo."
+    },
+    "warnings": {
+      "permissionNotGranted": "Permiso de ubicación no otorgado",
+      "backgroundNotStarted": "No se pudo iniciar la ubicación en segundo plano. La ubicación solo se actualizará mientras la app esté abierta. Podés habilitar la ubicación en segundo plano en los Ajustes de tu dispositivo.",
+      "backgroundPermissionNotGranted": "Permiso de ubicación en segundo plano no otorgado. La ubicación solo se actualizará mientras la app esté abierta. Podés otorgar acceso a la ubicación en segundo plano en los Ajustes de tu dispositivo."
     }
   },
   "photos": {
