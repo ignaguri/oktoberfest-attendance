@@ -51,7 +51,7 @@
     "@novu/api": "^3.13.0",
     "@playwright/test": "^1.58.1",
     "@typescript-eslint/eslint-plugin": "8.54.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.2.4",
     "eslint": "9.39.2",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "10.1.8",
