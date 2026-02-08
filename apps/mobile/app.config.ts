@@ -15,7 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
   ios: {
-    supportsTablet: true,
+    supportsTablet: false,
     bundleIdentifier: "com.prostcounter.app",
     usesAppleSignIn: true,
     googleServicesFile: "./GoogleService-Info.plist",
