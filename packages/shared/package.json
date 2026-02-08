@@ -24,7 +24,7 @@
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
     "date-fns": "^4.1.0",
-    "i18next": "^25.8.0",
+    "i18next": "^25.8.4",
     "react-i18next": "^16.5.4",
     "zod": "^4.3.6"
   },
