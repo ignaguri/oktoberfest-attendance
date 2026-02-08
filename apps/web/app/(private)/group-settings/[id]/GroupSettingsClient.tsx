@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import type { GroupSettingsForm } from "@prostcounter/shared/schemas";
 import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
 import { GroupSettingsFormSchema } from "@prostcounter/shared/schemas";
@@ -87,7 +90,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
     watch,
     formState: { errors },
   } = useForm<GroupSettingsForm>({
-    resolver: zodResolver(GroupSettingsFormSchema),
+    resolver: standardSchemaResolver(GroupSettingsFormSchema),
     defaultValues: {
       name: group.name,
       description: group.description || "",

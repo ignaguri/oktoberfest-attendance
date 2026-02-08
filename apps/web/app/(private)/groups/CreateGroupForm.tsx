@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
 import type { CreateGroupForm as CreateGroupFormData } from "@prostcounter/shared/schemas";
 import { CreateGroupFormSchema } from "@prostcounter/shared/schemas";
@@ -27,7 +30,7 @@ export const CreateGroupForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<CreateGroupFormData>({
-    resolver: zodResolver(CreateGroupFormSchema),
+    resolver: standardSchemaResolver(CreateGroupFormSchema),
   });
 
   const onSubmit = async (data: CreateGroupFormData) => {

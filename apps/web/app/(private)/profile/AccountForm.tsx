@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { changeLanguage } from "@prostcounter/shared/i18n";
 import type { ProfileForm } from "@prostcounter/shared/schemas";
 import { ProfileFormSchema } from "@prostcounter/shared/schemas";
@@ -50,7 +53,7 @@ export default function AccountForm() {
     reset,
     formState: { errors },
   } = useForm<ProfileForm>({
-    resolver: zodResolver(ProfileFormSchema),
+    resolver: standardSchemaResolver(ProfileFormSchema),
     defaultValues: {
       fullname: "",
       username: "",

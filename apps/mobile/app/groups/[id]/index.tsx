@@ -148,12 +148,12 @@ export default function GroupDetailScreen() {
       } else {
         showDialog(
           t("common.status.error"),
-          "WhatsApp is not installed on this device",
+          t("groups.share.whatsappNotInstalled"),
         );
       }
     } catch (error) {
       logger.error("Failed to open WhatsApp:", error);
-      showDialog(t("common.status.error"), "Failed to open WhatsApp");
+      showDialog(t("common.status.error"), t("groups.share.whatsappFailed"));
     }
   }, [group, showDialog, t]);
 
@@ -171,7 +171,7 @@ export default function GroupDetailScreen() {
       showDialog(t("common.status.success"), t("groups.share.linkCopied"));
     } catch (error) {
       logger.error("Failed to copy to clipboard:", error);
-      showDialog(t("common.status.error"), "Failed to copy to clipboard");
+      showDialog(t("common.status.error"), t("groups.share.copyFailed"));
     }
   }, [group, showDialog, t]);
 
@@ -445,15 +445,21 @@ export default function GroupDetailScreen() {
             </Text>
             <ActionsheetItem onPress={shareViaWhatsApp}>
               <MessageCircle size={20} color={IconColors.primary} />
-              <ActionsheetItemText>Share via WhatsApp</ActionsheetItemText>
+              <ActionsheetItemText>
+                {t("groups.share.viaWhatsApp")}
+              </ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={copyToClipboard}>
               <Copy size={20} color={IconColors.default} />
-              <ActionsheetItemText>Copy to Clipboard</ActionsheetItemText>
+              <ActionsheetItemText>
+                {t("groups.share.copyToClipboard")}
+              </ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={openNativeShare}>
               <MoreHorizontal size={20} color={IconColors.default} />
-              <ActionsheetItemText>More Options...</ActionsheetItemText>
+              <ActionsheetItemText>
+                {t("groups.share.moreOptions")}
+              </ActionsheetItemText>
             </ActionsheetItem>
           </VStack>
         </ActionsheetContent>

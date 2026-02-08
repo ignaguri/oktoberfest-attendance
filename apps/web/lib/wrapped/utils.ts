@@ -126,7 +126,10 @@ export function getTopTents(
 export function generateShareText(data: WrappedData): string {
   const { total_beers, days_attended } = data.basic_stats;
   // Generate hashtag from festival name by removing spaces and special characters
-  const festivalHashtag = data.festival_info.name.replace(/[^a-zA-Z0-9]/g, "");
+  const festivalHashtag = data.festival_info.name.replace(
+    /[^\p{L}\p{N}]/gu,
+    "",
+  );
 
   return (
     `My ${data.festival_info.name} Wrapped 🍻\n\n` +
