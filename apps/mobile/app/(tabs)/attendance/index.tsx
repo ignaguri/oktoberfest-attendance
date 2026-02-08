@@ -270,7 +270,7 @@ export default function AttendanceScreen() {
           />
         }
       >
-        <View className="p-4">
+        <View className="p-4 pb-32">
           {/* Calendar */}
           <AttendanceCalendar
             festivalStartDate={festivalStartDate}

@@ -133,7 +133,7 @@ export default function GroupsScreen() {
         }
       >
         {hasGroups ? (
-          <VStack space="md" className="p-4">
+          <VStack space="md" className="p-4 pb-32">
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
               <Text className="text-sm text-typography-500">

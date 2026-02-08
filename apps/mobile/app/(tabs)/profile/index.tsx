@@ -242,7 +242,7 @@ export default function ProfileScreen() {
         <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
       }
     >
-      <VStack space="lg" className="p-4 pb-40">
+      <VStack space="lg" className="p-4 pb-32">
         {/* Profile Header */}
         <ProfileHeader
           profile={profile}
