@@ -1042,6 +1042,13 @@
       "updateSuccess": "Language preference updated",
       "updateError": "Failed to update language preference"
     },
+    "about": {
+      "title": "About & Support",
+      "privacy": "Privacy Policy",
+      "reportBug": "Report a Bug",
+      "requestFeature": "Request a Feature",
+      "buyMeABeer": "Buy Me a Beer"
+    },
     "deleteAccount": {
       "title": "Delete Account",
       "description": "Permanently delete your account and all data.",

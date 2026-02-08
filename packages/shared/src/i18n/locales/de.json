@@ -989,6 +989,13 @@
       "updateSuccess": "Spracheinstellung aktualisiert",
       "updateError": "Aktualisierung der Spracheinstellung fehlgeschlagen"
     },
+    "about": {
+      "title": "Über & Support",
+      "privacy": "Datenschutz",
+      "reportBug": "Fehler melden",
+      "requestFeature": "Funktion vorschlagen",
+      "buyMeABeer": "Kauf mir ein Bier"
+    },
     "deleteAccount": {
       "title": "Konto löschen",
       "description": "dein Konto und alle Daten dauerhaft löschen.",

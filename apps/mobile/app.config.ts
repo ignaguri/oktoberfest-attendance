@@ -108,7 +108,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-local-authentication",
     "expo-web-browser",
     "expo-apple-authentication",
-    "expo-image-picker",
+    [
+      "expo-image-picker",
+      {
+        microphonePermission: false,
+      },
+    ],
     "expo-font",
     [
       "expo-notifications",

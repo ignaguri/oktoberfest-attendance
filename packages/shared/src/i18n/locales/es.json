@@ -1042,6 +1042,13 @@
       "updateSuccess": "Preferencia de idioma actualizada",
       "updateError": "Error al actualizar la preferencia de idioma"
     },
+    "about": {
+      "title": "Acerca de y Soporte",
+      "privacy": "Privacidad",
+      "reportBug": "Reportar un error",
+      "requestFeature": "Solicitar una función",
+      "buyMeABeer": "Comprame una cerveza"
+    },
     "deleteAccount": {
       "title": "Eliminar cuenta",
       "description": "Eliminar permanentemente tu cuenta y todos los datos.",

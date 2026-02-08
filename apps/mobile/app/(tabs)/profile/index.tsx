@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
 
 import { ImageSourcePicker } from "@/components/image-source-picker";
+import { AboutSection } from "@/components/profile/about-section";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
@@ -241,7 +242,7 @@ export default function ProfileScreen() {
         <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
       }
     >
-      <VStack space="lg" className="p-4">
+      <VStack space="lg" className="p-4 pb-40">
         {/* Profile Header */}
         <ProfileHeader
           profile={profile}
@@ -351,6 +352,9 @@ export default function ProfileScreen() {
             </VStack>
           </Card>
         )}
+
+        {/* About & Support */}
+        <AboutSection />
 
         {/* Danger Zone - Delete Account */}
         <DangerZone
