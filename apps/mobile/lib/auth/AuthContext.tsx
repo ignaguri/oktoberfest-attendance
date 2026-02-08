@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react-native";
 import type { Session, User } from "@supabase/supabase-js";
 import {
   createContext,
@@ -18,6 +19,7 @@ import {
 import {
   clearAllAuthData,
   clearSession,
+  getStoredSession,
   storeSession,
   storeUserEmail,
 } from "./secure-storage";
@@ -32,6 +34,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
+  /** Restore session from stored tokens (for biometric auth) */
+  restoreSession: () => Promise<{ error: Error | null }>;
   // OAuth methods
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signInWithFacebook: () => Promise<{ error: Error | null }>;
@@ -50,6 +54,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setIsLoading(false);
 
+      // Set Sentry user context for initial session
+      if (session?.user) {
+        Sentry.setUser({
+          id: session.user.id,
+          email: session.user.email,
+        });
+      }
+
       // Store session tokens if available
       if (session?.access_token && session?.refresh_token) {
         storeSession(session.access_token, session.refresh_token);
@@ -64,6 +76,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+
+      // Set Sentry user context for error tracking
+      if (session?.user) {
+        Sentry.setUser({
+          id: session.user.id,
+          email: session.user.email,
+        });
+      } else {
+        Sentry.setUser(null);
+      }
 
       // Update stored tokens on auth changes
       if (session?.access_token && session?.refresh_token) {
@@ -112,6 +134,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null };
   }, []);
 
+  const restoreSession = useCallback(async () => {
+    const { accessToken, refreshToken } = await getStoredSession();
+    if (!accessToken || !refreshToken) {
+      return { error: new Error("No stored session") };
+    }
+
+    const { error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    return { error: error as Error | null };
+  }, []);
+
   const signInWithGoogle = useCallback(async () => {
     return googleSignIn();
   }, []);
@@ -136,6 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         resetPassword,
         updatePassword,
+        restoreSession,
         signInWithGoogle,
         signInWithFacebook,
         signInWithApple,

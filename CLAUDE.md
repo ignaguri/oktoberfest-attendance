@@ -44,6 +44,10 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 
 **Note**: The `production-apk` profile builds an APK (not AAB) with production environment values, suitable for sharing with testers before Play Store release. It uses the "production-apk" OTA update channel to avoid conflicts with Play Store builds.
 
+**Important - Runtime Version**: Before building a new release, update the `runtimeVersion` in `apps/mobile/app.config.ts` to generate a new fingerprint:
+- For fixes/adjustments within the same version: increment the letter suffix (e.g., `1.0.1-c` → `1.0.1-d`)
+- For new feature releases: update to a new version number (e.g., `1.0.1-d` → `1.0.2-a`)
+
 ### Test Users (Local Development)
 
 Seed data creates users `user1@example.com` through `user10@example.com` with password `password`.

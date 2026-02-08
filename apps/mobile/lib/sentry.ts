@@ -37,8 +37,12 @@ export function initSentry() {
     // Set environment
     environment: __DEV__ ? "development" : "production",
 
-    // Release version from app config
-    release: Constants.expoConfig?.version || "1.0.0",
+    // Release version from app config (format: slug@version+buildNumber)
+    release: `${Constants.expoConfig?.slug}@${Constants.expoConfig?.version}+${
+      Constants.expoConfig?.ios?.buildNumber ||
+      Constants.expoConfig?.android?.versionCode?.toString() ||
+      "1"
+    }`,
 
     // Distribution (build number)
     dist:

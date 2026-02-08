@@ -321,4 +321,234 @@ app.openapi(getNearbyMembersRoute, async (c) => {
   );
 });
 
+// Admin Routes
+
+// GET /admin/location/sessions - List all active location sessions (admin)
+const adminGetSessionsRoute = createRoute({
+  method: "get",
+  path: "/admin/location/sessions",
+  tags: ["admin", "location"],
+  summary: "List all active location sessions (admin)",
+  description:
+    "Retrieves all active location sessions with user and festival information. Admin only.",
+  request: {
+    query: z.object({
+      festivalId: z.string().uuid().optional(),
+      userId: z.string().uuid().optional(),
+      includeExpired: z
+        .string()
+        .transform((v) => v === "true")
+        .optional(),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Sessions retrieved successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            sessions: z.array(
+              z.object({
+                id: z.string().uuid(),
+                userId: z.string().uuid(),
+                festivalId: z.string().uuid(),
+                isActive: z.boolean(),
+                startedAt: z.string(),
+                expiresAt: z.string(),
+                createdAt: z.string(),
+                updatedAt: z.string(),
+                user: z.object({
+                  id: z.string().uuid(),
+                  username: z.string(),
+                  fullName: z.string().nullable(),
+                }),
+                festival: z.object({
+                  id: z.string().uuid(),
+                  name: z.string(),
+                }),
+              }),
+            ),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - User is not an admin",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(adminGetSessionsRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const query = c.req.valid("query");
+
+  const locationRepo = new SupabaseLocationRepository(supabase);
+  const locationService = new LocationService(locationRepo);
+
+  const sessions = await locationService.getActiveSessionsAdmin(user.id, {
+    festivalId: query.festivalId,
+    userId: query.userId,
+    includeExpired: query.includeExpired,
+  });
+
+  return c.json({ sessions }, 200);
+});
+
+// DELETE /admin/location/sessions/:id - Force stop a location session (admin)
+const adminForceStopSessionRoute = createRoute({
+  method: "delete",
+  path: "/admin/location/sessions/{id}",
+  tags: ["admin", "location"],
+  summary: "Force stop a location session (admin)",
+  description:
+    "Forcefully stops a location session regardless of ownership. Admin only.",
+  request: {
+    params: z.object({
+      id: z.uuid({ error: "Invalid session ID" }),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Session stopped successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean(),
+            session: z.object({
+              id: z.string().uuid(),
+              userId: z.string().uuid(),
+              festivalId: z.string().uuid(),
+              isActive: z.boolean(),
+              startedAt: z.string(),
+              expiresAt: z.string(),
+            }),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - User is not an admin",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Session not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(adminForceStopSessionRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const { id } = c.req.valid("param");
+
+  const locationRepo = new SupabaseLocationRepository(supabase);
+  const locationService = new LocationService(locationRepo);
+
+  const session = await locationService.forceStopSession(user.id, id);
+
+  return c.json({ success: true, session }, 200);
+});
+
+// POST /admin/location/sessions/cleanup - Cleanup expired sessions (admin)
+const adminCleanupSessionsRoute = createRoute({
+  method: "post",
+  path: "/admin/location/sessions/cleanup",
+  tags: ["admin", "location"],
+  summary: "Cleanup expired location sessions (admin)",
+  description: "Marks all expired location sessions as inactive. Admin only.",
+  responses: {
+    200: {
+      description: "Cleanup completed",
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean(),
+            cleanedCount: z.number(),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - User is not an admin",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(adminCleanupSessionsRoute, async (c) => {
+  const { user, supabase } = c.var;
+
+  const locationRepo = new SupabaseLocationRepository(supabase);
+  const locationService = new LocationService(locationRepo);
+
+  const cleanedCount = await locationService.cleanupExpiredSessions(user.id);
+
+  return c.json({ success: true, cleanedCount }, 200);
+});
+
 export default app;

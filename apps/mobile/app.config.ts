@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
-  runtimeVersion: "1.0.1-c",
+  runtimeVersion: "1.0.1-f",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -57,6 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           },
         },
       },
+      LSApplicationQueriesSchemes: ["whatsapp"],
     },
     config: {
       usesNonExemptEncryption: false,
@@ -104,9 +105,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-secure-store",
     "expo-localization",
+    "expo-local-authentication",
     "expo-web-browser",
     "expo-apple-authentication",
-    "expo-image-picker",
+    [
+      "expo-image-picker",
+      {
+        microphonePermission: false,
+      },
+    ],
     "expo-font",
     [
       "expo-notifications",

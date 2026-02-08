@@ -93,7 +93,8 @@
       "tar": ">=7.5.7",
       "fast-xml-parser": ">=5.3.4",
       "react": "19.1.0",
-      "react-dom": "19.1.0"
+      "react-dom": "19.1.0",
+      "@isaacs/brace-expansion": "5.0.1"
     },
     "patchedDependencies": {
       "@react-native-community/netinfo": "patches/@react-native-community__netinfo.patch"

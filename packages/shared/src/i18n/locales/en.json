@@ -22,13 +22,19 @@
       "copy": "Copy",
       "install": "Install",
       "goHome": "Go to Home",
-      "tryAgain": "Try Again"
+      "goBack": "Go Back",
+      "tryAgain": "Try Again",
+      "done": "Done"
+    },
+    "action": {
+      "cancel": "Cancel"
     },
     "actions": {
       "retry": "Retry",
       "cancel": "Cancel",
       "dismiss": "Dismiss",
-      "pullToRefresh": "Pull to refresh"
+      "pullToRefresh": "Pull to refresh",
+      "cannotUndo": "This action cannot be undone"
     },
     "labels": {
       "name": "Name",
@@ -40,6 +46,10 @@
       "status": "Status",
       "description": "Description",
       "selectDate": "Select a date"
+    },
+    "form": {
+      "date": "Date",
+      "email": "Email"
     },
     "status": {
       "loading": "Loading...",
@@ -56,11 +66,13 @@
       "deleting": "Deleting...",
       "cancelling": "Cancelling...",
       "info": "Info",
-      "authenticating": "Authenticating..."
+      "authenticating": "Authenticating...",
+      "unknownGroup": "Unknown Group"
     },
     "errors": {
       "title": "Error",
       "generic": "Something went wrong. Please try again.",
+      "unexpected": "An unexpected error occurred",
       "oops": "Oops!",
       "notFound": {
         "title": "Page Not Found",
@@ -120,7 +132,14 @@
       "refresh": "Refresh to update",
       "description": "A new version of the app is available. Please update to get the latest features and improvements.",
       "updateNow": "Update Now"
-    }
+    },
+    "members": "members",
+    "beers": "Beers",
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "loading": "Loading",
+    "tents": "Tents",
+    "unknownUser": "Unknown User"
   },
   "tabs": {
     "home": "Home",
@@ -133,7 +152,7 @@
     "signIn": {
       "title": "Sign In",
       "subtitle": "Welcome back!",
-      "tagline": "Track your Oktoberfest adventure",
+      "tagline": "Track your festival adventure",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "passwordLabel": "Password",
@@ -168,15 +187,22 @@
       "accountCreated": "Account created",
       "errors": {
         "failed": "Sign up failed. Please try again.",
-        "emailInUse": "This email is already in use"
+        "emailInUse": "This email is already in use",
+        "generic": "Failed to create account. Please try again."
       },
       "success": {
         "checkEmail": "Please check your email for verification."
       }
     },
+    "forgotPassword": {
+      "errors": {
+        "generic": "Failed to send reset email. Please try again."
+      }
+    },
     "resetPassword": {
       "title": "Reset Password",
       "subtitle": "Enter your email to receive reset instructions",
+      "description": "Enter your email and we'll send you instructions to reset your password",
       "emailLabel": "Email",
       "emailPlaceholder": "jane@acme.com",
       "submit": "Send Reset Instructions",
@@ -211,7 +237,8 @@
       "usePassword": "Use password instead",
       "enableTitle": "Enable {{biometricName}}?",
       "enableDescription": "Sign in faster next time using {{biometricName}}",
-      "sessionExpired": "Session expired. Please sign in with your password."
+      "sessionExpired": "Your session has expired. Please sign in with your password.",
+      "restoreFailed": "Could not restore your session. Please sign in again."
     }
   },
   "groups": {
@@ -379,7 +406,7 @@
       "shareDescription": "Share your location to see nearby group members and let them see you.",
       "controlNote": "Control which groups can see your location in your",
       "shareLocation": "Share Location",
-      "enablePrompt": "Enable location sharing to see where your friends are at Oktoberfest",
+      "enablePrompt": "Enable location sharing to see where your friends are at the festival",
       "privacyNotice": "Your location is only visible to group members while you're sharing",
       "permissions": {
         "requesting": "Requesting browser location permission...",
@@ -455,7 +482,8 @@
       "beer": "+1 Beer",
       "radler": "+1 Radler",
       "wine": "+1 Wine",
-      "soft_drink": "+1 Soft"
+      "soft_drink": "+1 Soft",
+      "alcohol_free": "+1 Non-alcoholic"
     },
     "howManyDrinks": "Log Your Drinks",
     "totalDrinks": "Total Drinks",
@@ -549,7 +577,12 @@
     },
     "noFestival": "Please select a festival to view attendance",
     "updateSuccess": "Attendance updated",
-    "createSuccess": "Attendance recorded"
+    "createSuccess": "Attendance recorded",
+    "price": "Price",
+    "tent": {
+      "selectTents": "Select tents"
+    },
+    "updateAttendance": "Update Attendance"
   },
   "achievements": {
     "pageTitle": "Achievements",
@@ -562,6 +595,7 @@
     "selectFestival": "Please select a festival to view achievements.",
     "noFestival": "Please select a festival to view achievements.",
     "error": "Failed to load achievements. Pull to refresh.",
+    "empty": "No achievements available",
     "trackProgress": "Track your progress and unlock achievements at {{festival}}",
     "completed": "Completed",
     "inProgress": "In Progress",
@@ -891,6 +925,7 @@
     },
     "avatar": {
       "change": "Change Photo",
+      "changeHint": "Tap to change",
       "takePhoto": "Take Photo",
       "chooseFromLibrary": "Choose from Library",
       "uploading": "Uploading...",
@@ -982,7 +1017,8 @@
       "title": "Sign Out",
       "message": "Are you sure you want to sign out?",
       "button": "Sign Out",
-      "confirm": "Sign Out"
+      "confirm": "Sign Out",
+      "error": "Failed to sign out"
     },
     "tutorial": {
       "title": "Tutorial",
@@ -1005,6 +1041,13 @@
       },
       "updateSuccess": "Language preference updated",
       "updateError": "Failed to update language preference"
+    },
+    "about": {
+      "title": "About & Support",
+      "privacy": "Privacy Policy",
+      "reportBug": "Report a Bug",
+      "requestFeature": "Request a Feature",
+      "buyMeABeer": "Buy Me a Beer"
     },
     "deleteAccount": {
       "title": "Delete Account",
@@ -1033,7 +1076,25 @@
       "festivals": "Festivals",
       "tents": "Tents",
       "cache": "Cache Management",
-      "imageConversion": "Image Conversion"
+      "imageConversion": "Image Conversion",
+      "location": "Location"
+    },
+    "location": {
+      "title": "Location Sessions",
+      "noSessions": "No active location sessions",
+      "forceStop": "Force Stop",
+      "cleanupExpired": "Cleanup Expired",
+      "cleanupSuccess": "Cleaned up {{count}} expired sessions",
+      "stopSuccess": "Session stopped successfully",
+      "stopError": "Failed to stop session",
+      "loading": "Loading sessions...",
+      "columns": {
+        "user": "User",
+        "festival": "Festival",
+        "startedAt": "Started",
+        "expiresAt": "Expires",
+        "actions": "Actions"
+      }
     },
     "tents": {
       "title": "Tent Management",
@@ -1532,7 +1593,8 @@
       "disableTooltip": "Stop sharing your location",
       "enabled": "Location sharing enabled! Group members can now see your location.",
       "trackingStarted": "Location tracking started! Enable location sharing for specific groups in your profile settings.",
-      "noGroupsEnabled": "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first."
+      "noGroupsEnabled": "Location sharing is not enabled for any groups. Please enable location sharing for at least one group in your profile settings first.",
+      "active": "Location sharing active"
     },
     "duration": {
       "30m": "30m",
@@ -1548,6 +1610,8 @@
     },
     "groups": {
       "noGroups": "You haven't joined any groups yet",
+      "noGroupsHint": "You're not in any groups yet",
+      "title": "Groups",
       "shareWithAll": "Share with all groups",
       "shareWithAllDescription": "All your groups can see your location",
       "selectGroups": "Or select specific groups",
@@ -1562,6 +1626,15 @@
       "collapseHint": "Tap to collapse",
       "expandHint": "Tap to expand",
       "orSelectSpecific": "Or select specific groups"
+    },
+    "proximity": {
+      "veryClose": "Very close",
+      "hint": "Tap to view on map and check in",
+      "checkInButton": "Check In"
+    },
+    "errors": {
+      "startFailed": "Failed to start sharing. Please try again.",
+      "stopFailed": "Failed to stop sharing. Please try again."
     }
   },
   "photos": {
@@ -1664,6 +1737,7 @@
     "uploadedPhoto": "uploaded a photo",
     "joinedGroup": "joined {{group}}",
     "unlockedAchievement": "unlocked an achievement",
+    "unlockedAchievementName": "unlocked {{name}}",
     "unlockedAchievementRarity": "unlocked an achievement ({{rarity}})",
     "hadActivity": "had some activity",
     "recently": "recently",
@@ -1672,7 +1746,9 @@
     "aGroup": "a group",
     "hotStreak": "Hot streak",
     "userProfile": "User Profile",
-    "title": "Activity Feed"
+    "title": "Activity Feed",
+    "profileNotFound": "Profile not found",
+    "viewProfile": "View Profile"
   },
   "quickAttendance": {
     "sheetTitle": "Today's Attendance",
@@ -1687,6 +1763,12 @@
       "startsInOneDay": "Starts tomorrow!",
       "startsInDays": "Starts in {{daysUntil}} days",
       "ended": "Festival has ended"
+    },
+    "quickAdd": {
+      "beer": "Beer",
+      "radler": "Radler",
+      "soft": "Soft Drink",
+      "wine": "Wine"
     },
     "quickAttendance": {
       "title": "What are you having?",
@@ -1743,7 +1825,7 @@
     "shareAppDialog": {
       "title": "Share ProstCounter App with friends!",
       "description": "Choose how you'd like to share the app:",
-      "shareText": "Check out the ProstCounter app! Track your Oktoberfest attendance and compete with friends.",
+      "shareText": "Check out the ProstCounter app! Track your festival attendance and compete with friends.",
       "shareButton": "Share App",
       "copyToClipboard": "Copy to Clipboard",
       "shareViaWhatsApp": "Share via WhatsApp",
@@ -1905,7 +1987,8 @@
     "price": {
       "positive": "Price must be greater than 0",
       "tooHigh": "Price seems too high"
-    }
+    },
+    "tentRequired": "Please select a tent"
   },
   "notifications": {
     "success": {
@@ -2138,12 +2221,13 @@
       "groups": "Groups",
       "profile": "Profile",
       "attendance": "Attendance",
-      "achievements": "Achievements"
+      "achievements": "Achievements",
+      "settings": "Settings"
     }
   },
   "landing": {
     "signIn": "Sign In",
-    "description": "Compete with friends and track your progress at Oktoberfest",
+    "description": "Compete with friends and track your progress at the festival",
     "features": {
       "title": "What can I do with Prost Counter?",
       "trackBeer": "Track daily beer consumption",
@@ -2162,6 +2246,14 @@
       "title": "Sign in to ProstCounter",
       "fallbackLabel": "Use password",
       "cancelLabel": "Cancel"
+    },
+    "errors": {
+      "noHardware": "This device doesn't support biometric authentication",
+      "notEnrolled": "No biometric data enrolled. Please set up Face ID or Touch ID in Settings.",
+      "cancelled": "Authentication cancelled",
+      "fallback": "User chose password fallback",
+      "lockout": "Too many failed attempts. Please try again later.",
+      "failed": "Authentication failed"
     }
   },
   "app": {

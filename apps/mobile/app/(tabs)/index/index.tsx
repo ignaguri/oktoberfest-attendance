@@ -1,6 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import {
@@ -13,7 +14,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-  LocationMapModal,
   LocationSharingToggle,
   TentProximityBanner,
 } from "@/components/location";
@@ -21,6 +21,7 @@ import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { MapLinkButton } from "@/components/shared/map-link-button";
+import { HomeSkeleton } from "@/components/skeletons";
 import { TutorialTarget } from "@/components/tutorial";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -29,7 +30,6 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
-import { useQuickAttendance } from "@/lib/quick-attendance";
 
 /**
  * Home screen displaying:
@@ -44,16 +44,13 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
  */
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { currentFestival } = useFestival(); // Ensure festival context is initialized
+  const router = useRouter();
+  const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showMapModal, setShowMapModal] = useState(false);
 
   // Location state (safe hook works outside provider too)
   const { isSharing, nearbyMembers } = useLocationContextSafe();
-
-  // Quick attendance context for opening FAB with preselected tent
-  const { openSheet } = useQuickAttendance();
 
   // Handle pull-to-refresh
   const handleRefresh = useCallback(async () => {
@@ -70,24 +67,24 @@ export default function HomeScreen() {
     }
   }, [queryClient]);
 
-  const handleTentCheckIn = useCallback(
-    (tentId: string, tentName: string) => {
-      // Close the map modal and open the quick attendance sheet with preselected tent
-      setShowMapModal(false);
-      // Small delay to allow modal close animation before opening sheet
-      setTimeout(() => {
-        openSheet({ tentId, tentName });
-      }, 150);
-    },
-    [openSheet],
-  );
+  // Loading state - show skeleton while festival is loading
+  if (festivalLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+        <ScrollView className="flex-1">
+          <VStack space="md" className="p-4 pb-8">
+            <AppHeader />
+            <HomeSkeleton />
+          </VStack>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
       {/* Tent Proximity Banner - shows at top when near a tent */}
-      {Platform.OS !== "web" && (
-        <TentProximityBanner onCheckIn={handleTentCheckIn} threshold={50} />
-      )}
+      {Platform.OS !== "web" && <TentProximityBanner threshold={50} />}
 
       <ScrollView
         className="flex-1"
@@ -119,7 +116,7 @@ export default function HomeScreen() {
                     compact
                   />
                   <Pressable
-                    onPress={() => setShowMapModal(true)}
+                    onPress={() => router.push("/map")}
                     className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
                     accessibilityLabel="Open festival map"
                   >
@@ -147,16 +144,6 @@ export default function HomeScreen() {
           <ActivityFeed onRefresh={handleRefresh} />
         </VStack>
       </ScrollView>
-
-      {/* Full-screen Map Modal */}
-      {Platform.OS !== "web" && currentFestival?.id && (
-        <LocationMapModal
-          visible={showMapModal}
-          onClose={() => setShowMapModal(false)}
-          festivalId={currentFestival.id}
-          onTentSelect={handleTentCheckIn}
-        />
-      )}
     </SafeAreaView>
   );
 }

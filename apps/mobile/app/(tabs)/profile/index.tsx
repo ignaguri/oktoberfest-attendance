@@ -18,9 +18,11 @@ import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
 
 import { ImageSourcePicker } from "@/components/image-source-picker";
+import { AboutSection } from "@/components/profile/about-section";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
+import { ProfileSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -35,7 +37,6 @@ import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -219,9 +220,9 @@ export default function ProfileScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
-      </View>
+      <ScrollView className="flex-1 bg-background-50">
+        <ProfileSkeleton />
+      </ScrollView>
     );
   }
 
@@ -241,7 +242,7 @@ export default function ProfileScreen() {
         <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
       }
     >
-      <VStack space="lg" className="p-4">
+      <VStack space="lg" className="p-4 pb-40">
         {/* Profile Header */}
         <ProfileHeader
           profile={profile}
@@ -351,6 +352,9 @@ export default function ProfileScreen() {
             </VStack>
           </Card>
         )}
+
+        {/* About & Support */}
+        <AboutSection />
 
         {/* Danger Zone - Delete Account */}
         <DangerZone

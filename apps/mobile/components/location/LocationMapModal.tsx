@@ -183,7 +183,7 @@ export function LocationMapModal({
         >
           {/* Sharing toggle */}
           <Box className="px-3 py-1">
-            <LocationSharingToggle festivalId={festivalId} />
+            <LocationSharingToggle festivalId={festivalId} useInlineWarnings />
           </Box>
 
           {/* Tabs */}

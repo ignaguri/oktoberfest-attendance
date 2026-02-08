@@ -37,6 +37,16 @@ import {
 import { useLocation } from "./useLocation";
 
 /**
+ * Result type for startSharing operation
+ */
+export interface StartSharingResult {
+  success: boolean;
+  session?: LocationSession;
+  backgroundEnabled: boolean;
+  warning?: string;
+}
+
+/**
  * Location Context Type
  */
 interface LocationContextType {
@@ -71,7 +81,7 @@ interface LocationContextType {
     festivalId: string,
     durationMinutes?: number,
     groupIds?: string[],
-  ) => Promise<boolean>;
+  ) => Promise<StartSharingResult>;
   stopSharing: () => Promise<boolean>;
   startLocalTracking: (festivalId?: string) => Promise<boolean>;
   stopLocalTracking: () => void;
@@ -185,16 +195,21 @@ export function LocationProvider({ children }: { children: ReactNode }) {
    * @param festivalId - Festival to share location for
    * @param durationMinutes - How long to share (default 2 hours)
    * @param groupIds - Specific groups to share with (undefined = all groups)
+   * @returns Result object with success status, session, and background status
    */
   const startSharing = useCallback(
     async (
       festivalId: string,
       durationMinutes = 120,
       groupIds?: string[],
-    ): Promise<boolean> => {
+    ): Promise<StartSharingResult> => {
       if (!location.hasPermission) {
         logger.warn("No permission to start sharing");
-        return false;
+        return {
+          success: false,
+          backgroundEnabled: false,
+          warning: "Location permission not granted",
+        };
       }
 
       try {
@@ -222,7 +237,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
         if (!result?.session) {
           logger.error("Error starting session");
-          return false;
+          return {
+            success: false,
+            backgroundEnabled: false,
+            warning: "Failed to create session on server",
+          };
         }
 
         const session = result.session;
@@ -231,6 +250,10 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
         // Get user info from Supabase for background task
         const { data: userData } = await supabase.auth.getUser();
+
+        // Track whether background location was successfully started
+        let backgroundEnabled = false;
+        let backgroundWarning: string | undefined;
 
         // Start background location updates
         if (location.hasBackgroundPermission && userData?.user) {
@@ -259,7 +282,19 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             }
           });
 
-          await startBackgroundLocationUpdates(backgroundData);
+          try {
+            await startBackgroundLocationUpdates(backgroundData);
+            backgroundEnabled = true;
+          } catch (bgError) {
+            logger.warn("Failed to start background location updates", {
+              error: bgError,
+            });
+            backgroundWarning =
+              "Background location could not be started. Location will only update while the app is open. You can enable background location in your device's Settings app.";
+          }
+        } else if (!location.hasBackgroundPermission) {
+          backgroundWarning =
+            "Background location permission not granted. Location will only update while the app is open. You can grant background location access in your device's Settings app.";
         }
 
         // Start foreground watching as well
@@ -275,28 +310,40 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           },
         );
 
-        return true;
+        return {
+          success: true,
+          session,
+          backgroundEnabled,
+          warning: backgroundWarning,
+        };
       } catch (error) {
         // Differentiate error types for better debugging
+        let errorMessage = "Failed to start location sharing";
         if (error instanceof Error) {
           if (
             error.message.includes("permission") ||
             error.message.includes("Location")
           ) {
             logger.error("Permission error starting sharing", error);
+            errorMessage = "Location permission error";
           } else if (
             error.message.includes("network") ||
             error.message.includes("fetch") ||
             error.message.includes("timeout")
           ) {
             logger.error("Network error starting sharing", error);
+            errorMessage = "Network error. Please check your connection.";
           } else {
             logger.error("API error starting sharing", error);
           }
         } else {
           logger.error("Unknown error starting sharing", error);
         }
-        return false;
+        return {
+          success: false,
+          backgroundEnabled: false,
+          warning: errorMessage,
+        };
       } finally {
         setIsSessionLoading(false);
       }
@@ -306,11 +353,27 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
   /**
    * Stop location sharing
+   * Only clears local state after successfully stopping the server session
+   * to prevent desync between local and server state.
    */
   const stopSharing = useCallback(async (): Promise<boolean> => {
     try {
       setIsSessionLoading(true);
 
+      // First, try to stop the server session
+      // If this fails, we don't clear local state to prevent desync
+      if (activeSession) {
+        try {
+          await apiClient.location.stopSession(activeSession.id);
+        } catch (apiError) {
+          logger.error("Failed to stop server session", apiError);
+          // Don't clear local state if server call failed
+          // User can try again later
+          return false;
+        }
+      }
+
+      // Server session stopped successfully, now clear local state
       // Stop background updates
       await stopBackgroundLocationUpdates();
       setBackgroundLocationCallback(null);
@@ -318,11 +381,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       // Stop foreground watching
       location.stopWatching();
       locationWatchActive.current = false;
-
-      // Stop session via API
-      if (activeSession) {
-        await apiClient.location.stopSession(activeSession.id);
-      }
 
       // Clear local state
       setActiveSession(null);
@@ -669,7 +727,10 @@ const defaultContext: LocationContextType = {
   requestPermission: async () => false,
   requestBackgroundPermission: async () => false,
   markPromptAsShown: async () => {},
-  startSharing: async (_festivalId, _durationMinutes?, _groupIds?) => false,
+  startSharing: async (_festivalId, _durationMinutes?, _groupIds?) => ({
+    success: false,
+    backgroundEnabled: false,
+  }),
   stopSharing: async () => false,
   startLocalTracking: async () => false,
   stopLocalTracking: () => {},

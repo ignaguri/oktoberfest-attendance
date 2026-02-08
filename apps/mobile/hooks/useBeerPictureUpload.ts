@@ -11,6 +11,7 @@
  * 3. API: Get signed upload URL → Upload to storage → Confirm upload
  */
 
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import { useCallback, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
@@ -153,7 +154,12 @@ export function useBeerPictureUpload({
           });
 
           // Step 3: Upload compressed image directly to storage
-          const uploadResponse = await fetch(uploadUrl, {
+          // Fix URL for local dev: replace localhost with the mobile client's Supabase host
+          const fixedUploadUrl = replaceLocalhostInUrl(
+            uploadUrl,
+            process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+          );
+          const uploadResponse = await fetch(fixedUploadUrl, {
             method: "PUT",
             headers: {
               "Content-Type": compressedImage.mimeType,
