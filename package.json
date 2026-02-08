@@ -63,9 +63,9 @@
     "next": "16.1.6",
     "prettier": "3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "supabase": "2.74.5",
+    "supabase": "2.76.4",
     "tsx": "^4.21.0",
-    "turbo": "^2.8.1",
+    "turbo": "^2.8.3",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.54.0"
   },
@@ -93,7 +93,8 @@
       "tar": ">=7.5.7",
       "fast-xml-parser": ">=5.3.4",
       "react": "19.1.0",
-      "react-dom": "19.1.0"
+      "react-dom": "19.1.0",
+      "@isaacs/brace-expansion": "5.0.1"
     },
     "patchedDependencies": {
       "@react-native-community/netinfo": "patches/@react-native-community__netinfo.patch"

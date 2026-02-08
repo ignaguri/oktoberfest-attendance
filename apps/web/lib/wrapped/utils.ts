@@ -124,14 +124,18 @@ export function getTopTents(
  * Generate share text for social media
  */
 export function generateShareText(data: WrappedData): string {
-  const year = getFestivalYear(data.festival_info);
   const { total_beers, days_attended } = data.basic_stats;
+  // Generate hashtag from festival name by removing spaces and special characters
+  const festivalHashtag = data.festival_info.name.replace(
+    /[^\p{L}\p{N}]/gu,
+    "",
+  );
 
   return (
     `My ${data.festival_info.name} Wrapped 🍻\n\n` +
     `${total_beers} beers across ${days_attended} days!\n` +
     `Festival personality: ${data.personality.type}\n\n` +
-    `#Oktoberfest${year} #ProstCounter`
+    `#${festivalHashtag} #ProstCounter`
   );
 }
 

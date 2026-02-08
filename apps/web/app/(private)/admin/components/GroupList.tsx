@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import type { Tables } from "@prostcounter/db";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AdminGroupForm } from "@prostcounter/shared/schemas";
@@ -66,7 +69,7 @@ const GroupEditForm = ({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<AdminGroupForm>({
-    resolver: zodResolver(AdminGroupFormSchema),
+    resolver: standardSchemaResolver(AdminGroupFormSchema),
     defaultValues: {
       name: group.name,
       description: group.description || "",

@@ -4,7 +4,7 @@ import {
   signInSchema,
 } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
@@ -29,22 +29,25 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
-import {
-  getStoredSession,
-  getStoredUserEmail,
-} from "@/lib/auth/secure-storage";
+import { getStoredUserEmail } from "@/lib/auth/secure-storage";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function SignInScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { signIn, signInWithGoogle, signInWithFacebook, signInWithApple } =
-    useAuth();
+  const {
+    signIn,
+    signInWithGoogle,
+    signInWithFacebook,
+    signInWithApple,
+    restoreSession,
+  } = useAuth();
 
   const {
     isAvailable: isBiometricAvailable,
     biometricType,
     isEnabled: isBiometricEnabled,
+    isLoading: isBiometricLoading,
     authenticate: authenticateBiometric,
     enableBiometrics,
   } = useBiometrics();
@@ -63,6 +66,9 @@ export default function SignInScreen() {
     useState(false);
   const [storedEmail, setStoredEmail] = useState<string | null>(null);
 
+  // Track if biometric check has been performed to avoid race conditions
+  const hasCheckedBiometric = useRef(false);
+
   const {
     control,
     handleSubmit,
@@ -78,6 +84,12 @@ export default function SignInScreen() {
 
   // Check for stored email and biometric availability on mount
   useEffect(() => {
+    // Only run once when biometric state is loaded
+    if (hasCheckedBiometric.current) return;
+    if (isBiometricLoading) return; // Wait for loading to complete
+
+    hasCheckedBiometric.current = true;
+
     const checkBiometric = async () => {
       const email = await getStoredUserEmail();
       setStoredEmail(email);
@@ -89,7 +101,7 @@ export default function SignInScreen() {
     };
 
     checkBiometric();
-  }, [isBiometricAvailable, isBiometricEnabled]);
+  }, [isBiometricAvailable, isBiometricEnabled, isBiometricLoading]);
 
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
@@ -117,26 +129,45 @@ export default function SignInScreen() {
 
   const handleBiometricAuth = async () => {
     setIsBiometricAuthenticating(true);
+    setError(null);
+
     const { success, error: authError } = await authenticateBiometric();
-    setIsBiometricAuthenticating(false);
 
     if (!success) {
+      setIsBiometricAuthenticating(false);
       if (authError) setError(authError);
       setShowBiometricPrompt(false);
       return;
     }
 
-    // Check if we have a valid session
-    const session = await getStoredSession();
-    if (!session?.accessToken) {
-      // No valid session - need to re-authenticate with password
-      setError(t("auth.biometric.sessionExpired"));
+    // Restore session to Supabase using stored tokens
+    const { error: sessionError } = await restoreSession();
+    setIsBiometricAuthenticating(false);
+
+    if (sessionError) {
+      // Check if it's an expired token error
+      const isExpired =
+        sessionError.message?.includes("expired") ||
+        sessionError.message?.includes("invalid") ||
+        sessionError.message?.includes("No stored session");
+
+      setError(
+        isExpired
+          ? t("auth.biometric.sessionExpired", {
+              defaultValue:
+                "Your session has expired. Please sign in with your password.",
+            })
+          : t("auth.biometric.restoreFailed", {
+              defaultValue:
+                "Could not restore your session. Please sign in again.",
+            }),
+      );
       setShowBiometricPrompt(false);
       if (storedEmail) setValue("email", storedEmail);
       return;
     }
 
-    // Session valid, proceed to app
+    // Session restored, proceed to app
     setShowBiometricPrompt(false);
     // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
     router.replace("/");

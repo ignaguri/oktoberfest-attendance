@@ -11,10 +11,19 @@ import CacheManagement from "./components/CacheManagement";
 import FestivalManagement from "./components/FestivalManagement";
 import GroupList from "./components/GroupList";
 import ImageConversion from "./components/ImageConversion";
+import LocationSessionManagement from "./components/LocationSessionManagement";
 import TentManagement from "./components/TentManagement";
 import UserList from "./components/UserList";
 
-const tabValues = ["users", "groups", "festivals", "tents", "cache", "images"];
+const tabValues = [
+  "users",
+  "groups",
+  "festivals",
+  "tents",
+  "cache",
+  "images",
+  "location",
+];
 
 export default function AdminPage() {
   const { t } = useTranslation();
@@ -61,6 +70,7 @@ export default function AdminPage() {
           <TabsTrigger value="images">
             {t("admin.tabs.imageConversion")}
           </TabsTrigger>
+          <TabsTrigger value="location">{t("admin.tabs.location")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -85,6 +95,10 @@ export default function AdminPage() {
 
         <TabsContent value="images">
           <ImageConversion />
+        </TabsContent>
+
+        <TabsContent value="location">
+          <LocationSessionManagement />
         </TabsContent>
       </Tabs>
     </div>

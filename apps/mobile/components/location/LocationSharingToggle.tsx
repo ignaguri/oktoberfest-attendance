@@ -1,11 +1,13 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import {
+  AlertTriangle,
   ChevronDown,
   ChevronUp,
   MapPin,
   Radio,
   Users,
+  X,
 } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
@@ -16,6 +18,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useGlobalAlert } from "@/lib/alerts";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useLocationContext } from "@/lib/location";
 
@@ -25,6 +28,8 @@ import { LocationPermissionPrompt } from "./LocationPermissionPrompt";
 interface LocationSharingToggleProps {
   festivalId: string;
   compact?: boolean;
+  /** When true, warnings are shown inline instead of as modal dialogs. Use inside Modals. */
+  useInlineWarnings?: boolean;
 }
 
 const DURATION_OPTIONS = [
@@ -36,12 +41,16 @@ const DURATION_OPTIONS = [
 
 /**
  * Toggle component for location sharing with duration selector.
+ *
+ * Background location warnings are shown inline within the component.
  */
 export function LocationSharingToggle({
   festivalId,
   compact = false,
+  useInlineWarnings = false,
 }: LocationSharingToggleProps) {
   const { t } = useTranslation();
+  const { showAlert } = useGlobalAlert();
   const {
     isSharing,
     isSessionLoading,
@@ -60,12 +69,24 @@ export function LocationSharingToggle({
   const [isGroupSelectorOpen, setIsGroupSelectorOpen] = useState(false);
   const [shareWithAll, setShareWithAll] = useState(true);
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  // Inline warning message (shown when background location has issues)
+  const [inlineWarning, setInlineWarning] = useState<string | null>(null);
 
   const handleToggle = useCallback(async () => {
     if (isSharing) {
       setIsToggling(true);
+      setInlineWarning(null);
       try {
-        await stopSharing();
+        const stopped = await stopSharing();
+        if (!stopped) {
+          showAlert(
+            t("common.status.error", { defaultValue: "Error" }),
+            t("location.errors.stopFailed", {
+              defaultValue: "Failed to stop sharing. Please try again.",
+            }),
+            "error",
+          );
+        }
       } finally {
         setIsToggling(false);
       }
@@ -80,6 +101,7 @@ export function LocationSharingToggle({
 
     // If we have permission or prompt was already shown, try to start
     setIsToggling(true);
+    setInlineWarning(null);
     try {
       if (!hasPermission) {
         const granted = await requestPermission();
@@ -87,7 +109,29 @@ export function LocationSharingToggle({
       }
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(festivalId, selectedDuration, groupIds);
+
+      if (!result.success) {
+        showAlert(
+          t("common.status.error", { defaultValue: "Error" }),
+          result.warning ||
+            t("location.errors.startFailed", {
+              defaultValue: "Failed to start sharing. Please try again.",
+            }),
+          "error",
+        );
+      } else if (result.warning) {
+        // Show warning inline (for modals) or as dialog (for regular screens)
+        if (useInlineWarnings) {
+          setInlineWarning(result.warning);
+        } else {
+          showAlert(
+            t("common.status.info", { defaultValue: "Info" }),
+            result.warning,
+            "warning",
+          );
+        }
+      }
     } finally {
       setIsToggling(false);
     }
@@ -102,6 +146,9 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    showAlert,
+    useInlineWarnings,
+    t,
   ]);
 
   const handleEnableFromPrompt = useCallback(async () => {
@@ -110,7 +157,29 @@ export function LocationSharingToggle({
     if (granted) {
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(festivalId, selectedDuration, groupIds);
+
+      if (!result.success) {
+        showAlert(
+          t("common.status.error", { defaultValue: "Error" }),
+          result.warning ||
+            t("location.errors.startFailed", {
+              defaultValue: "Failed to start sharing. Please try again.",
+            }),
+          "error",
+        );
+      } else if (result.warning) {
+        // Show warning inline (for modals) or as dialog (for regular screens)
+        if (useInlineWarnings) {
+          setInlineWarning(result.warning);
+        } else {
+          showAlert(
+            t("common.status.info", { defaultValue: "Info" }),
+            result.warning,
+            "warning",
+          );
+        }
+      }
     }
   }, [
     markPromptAsShown,
@@ -120,11 +189,18 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    showAlert,
+    useInlineWarnings,
+    t,
   ]);
 
   const handleSkipPrompt = useCallback(async () => {
     await markPromptAsShown();
   }, [markPromptAsShown]);
+
+  const dismissWarning = useCallback(() => {
+    setInlineWarning(null);
+  }, []);
 
   // Get display text for group selection
   const getGroupSelectionText = () => {
@@ -149,46 +225,71 @@ export function LocationSharingToggle({
     });
   };
 
+  // Inline warning banner component
+  const WarningBanner = inlineWarning ? (
+    <View
+      className="mt-2 rounded-lg p-3"
+      style={{ backgroundColor: `${Colors.amber[500]}15` }}
+    >
+      <HStack space="sm" className="items-start">
+        <AlertTriangle size={18} color={Colors.amber[600]} />
+        <Text className="flex-1 text-sm text-typography-700">
+          {inlineWarning}
+        </Text>
+        <Pressable
+          onPress={dismissWarning}
+          hitSlop={8}
+          accessibilityLabel={t("common.buttons.close")}
+        >
+          <X size={16} color={IconColors.muted} />
+        </Pressable>
+      </HStack>
+    </View>
+  ) : null;
+
   if (compact) {
     return (
       <>
-        <Pressable
-          onPress={handleToggle}
-          disabled={isToggling || isSessionLoading}
-          className="active:opacity-70"
-          accessibilityLabel={
-            isSharing ? t("location.stopSharing") : t("location.startSharing")
-          }
-        >
-          <HStack space="sm" className="items-center">
-            <View
-              className="rounded-full p-2"
-              style={{
-                backgroundColor: isSharing
-                  ? Colors.success[500]
-                  : Colors.neutral[200],
-              }}
-            >
-              {isSharing ? (
-                <Radio size={16} color="white" />
-              ) : (
-                <MapPin size={16} color={IconColors.default} />
-              )}
-            </View>
-            <VStack>
-              <Text className="text-sm font-medium text-typography-900">
-                {isSharing
-                  ? t("location.sharing.sharing")
-                  : t("location.sharing.notSharing")}
-              </Text>
-              {isSharing && nearbyMembers.length > 0 && (
-                <Text className="text-xs text-typography-500">
-                  {t("location.nearbyCount", { count: nearbyMembers.length })}
+        <VStack>
+          <Pressable
+            onPress={handleToggle}
+            disabled={isToggling || isSessionLoading}
+            className="active:opacity-70"
+            accessibilityLabel={
+              isSharing ? t("location.stopSharing") : t("location.startSharing")
+            }
+          >
+            <HStack space="sm" className="items-center">
+              <View
+                className="rounded-full p-2"
+                style={{
+                  backgroundColor: isSharing
+                    ? Colors.success[500]
+                    : Colors.neutral[200],
+                }}
+              >
+                {isSharing ? (
+                  <Radio size={16} color="white" />
+                ) : (
+                  <MapPin size={16} color={IconColors.default} />
+                )}
+              </View>
+              <VStack>
+                <Text className="text-sm font-medium text-typography-900">
+                  {isSharing
+                    ? t("location.sharing.sharing")
+                    : t("location.sharing.notSharing")}
                 </Text>
-              )}
-            </VStack>
-          </HStack>
-        </Pressable>
+                {isSharing && nearbyMembers.length > 0 && (
+                  <Text className="text-xs text-typography-500">
+                    {t("location.nearbyCount", { count: nearbyMembers.length })}
+                  </Text>
+                )}
+              </VStack>
+            </HStack>
+          </Pressable>
+          {WarningBanner}
+        </VStack>
 
         <LocationPermissionPrompt
           isOpen={showPermissionPrompt}
@@ -239,6 +340,9 @@ export function LocationSharingToggle({
               </VStack>
             </HStack>
           </HStack>
+
+          {/* Inline warning banner */}
+          {WarningBanner}
 
           {!isSharing && (
             <>

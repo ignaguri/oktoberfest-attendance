@@ -23,6 +23,8 @@ import {
   VirtualizedList,
 } from "react-native";
 
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
+
 const ItemWrapper = React.forwardRef<
   React.ComponentRef<typeof Pressable>,
   PressableProps
@@ -424,14 +426,24 @@ const ActionsheetBackdrop = React.forwardRef<
 const ActionsheetScrollView = React.forwardRef<
   React.ComponentRef<typeof UIActionsheet.ScrollView>,
   IActionsheetScrollViewProps
->(function ActionsheetScrollView({ className, ...props }, ref) {
+>(function ActionsheetScrollView(
+  { className, contentContainerStyle, ...props },
+  ref,
+) {
+  const { keyboardHeight } = useKeyboardHeight();
+
   return (
     <UIActionsheet.ScrollView
       className={actionsheetScrollViewStyle({
         class: className,
       })}
       ref={ref}
+      keyboardShouldPersistTaps="handled"
       {...props}
+      contentContainerStyle={[
+        contentContainerStyle,
+        keyboardHeight > 0 ? { paddingBottom: keyboardHeight } : undefined,
+      ]}
     />
   );
 });

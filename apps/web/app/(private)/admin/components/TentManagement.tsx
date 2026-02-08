@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   type AdminAddTentToFestivalForm,
@@ -73,7 +76,7 @@ export default function TentManagement() {
 
   // Forms
   const createTentForm = useForm<AdminAddTentToFestivalForm>({
-    resolver: zodResolver(AdminAddTentToFestivalFormSchema),
+    resolver: standardSchemaResolver(AdminAddTentToFestivalFormSchema),
     defaultValues: {
       name: "",
       category: "",
@@ -84,7 +87,7 @@ export default function TentManagement() {
   });
 
   const copyTentsForm = useForm<AdminCopyTentsForm>({
-    resolver: zodResolver(AdminCopyTentsFormSchema),
+    resolver: standardSchemaResolver(AdminCopyTentsFormSchema),
     defaultValues: {
       sourceFestivalId: "",
       targetFestivalId: selectedFestival,

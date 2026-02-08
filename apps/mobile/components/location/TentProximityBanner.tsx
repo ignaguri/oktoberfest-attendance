@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { useRouter } from "expo-router";
 import { Beer, ChevronRight, X } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Animated, {
@@ -41,6 +42,7 @@ export function TentProximityBanner({
   hasCheckedIn = false,
 }: TentProximityBannerProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const { closestTent, isSharing } = useLocationContext();
   const [dismissed, setDismissed] = useState(false);
   const dismissTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -68,10 +70,16 @@ export function TentProximityBanner({
   }, []);
 
   const handlePress = useCallback(() => {
-    if (closestTent && onCheckIn) {
-      onCheckIn(closestTent.tentId, closestTent.tentName);
+    if (closestTent) {
+      if (onCheckIn) {
+        // Use callback if provided (backward compatibility)
+        onCheckIn(closestTent.tentId, closestTent.tentName);
+      } else {
+        // Navigate to map page (new default behavior)
+        router.push("/map");
+      }
     }
-  }, [closestTent, onCheckIn]);
+  }, [closestTent, onCheckIn, router]);
 
   // Don't show if:
   // - Not sharing location

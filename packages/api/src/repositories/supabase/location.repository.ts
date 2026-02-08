@@ -259,6 +259,112 @@ export class SupabaseLocationRepository implements ILocationRepository {
     }
   }
 
+  // Admin methods
+
+  async getActiveSessionsAdmin(filters?: {
+    festivalId?: string;
+    userId?: string;
+    includeExpired?: boolean;
+  }): Promise<
+    Array<
+      LocationSession & {
+        user: { id: string; username: string; fullName: string | null };
+        festival: { id: string; name: string };
+      }
+    >
+  > {
+    let query = this.supabase
+      .from("location_sessions")
+      .select(
+        `
+        *,
+        profiles!inner(id, username, full_name),
+        festivals!inner(id, name)
+      `,
+      )
+      .eq("is_active", true)
+      .order("started_at", { ascending: false });
+
+    // Apply filters
+    if (filters?.festivalId) {
+      query = query.eq("festival_id", filters.festivalId);
+    }
+
+    if (filters?.userId) {
+      query = query.eq("user_id", filters.userId);
+    }
+
+    // Only filter by expiry if not including expired
+    if (!filters?.includeExpired) {
+      query = query.gt("expires_at", new Date().toISOString());
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to fetch active sessions: ${error.message}`,
+      );
+    }
+
+    return (data || []).map((s: any) => ({
+      ...this.mapToSession(s),
+      user: {
+        id: s.profiles.id,
+        username: s.profiles.username,
+        fullName: s.profiles.full_name,
+      },
+      festival: {
+        id: s.festivals.id,
+        name: s.festivals.name,
+      },
+    }));
+  }
+
+  async forceStopSession(sessionId: string): Promise<LocationSession> {
+    const { data, error } = await this.supabase
+      .from("location_sessions")
+      .update({
+        is_active: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", sessionId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      if (error?.code === "PGRST116") {
+        throw new NotFoundError("Location session not found");
+      }
+      throw new DatabaseError(
+        `Failed to force stop location session: ${error?.message || "No data returned"}`,
+      );
+    }
+
+    return this.mapToSession(data);
+  }
+
+  async cleanupExpiredSessions(): Promise<number> {
+    // Update expired sessions and get count of affected rows
+    const { data, error } = await this.supabase
+      .from("location_sessions")
+      .update({
+        is_active: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("is_active", true)
+      .lt("expires_at", new Date().toISOString())
+      .select("id");
+
+    if (error) {
+      throw new DatabaseError(
+        `Failed to cleanup expired sessions: ${error.message}`,
+      );
+    }
+
+    return data?.length || 0;
+  }
+
   private mapToSession(
     data: any,
     sharedGroupIds?: string[] | null,
@@ -274,5 +380,19 @@ export class SupabaseLocationRepository implements ILocationRepository {
       updatedAt: data.updated_at,
       sharedGroupIds: sharedGroupIds ?? null,
     };
+  }
+
+  async isAdmin(userId: string): Promise<boolean> {
+    const { data: profile, error } = await this.supabase
+      .from("profiles")
+      .select("is_super_admin")
+      .eq("id", userId)
+      .single();
+
+    if (error || !profile) {
+      return false;
+    }
+
+    return profile.is_super_admin === true;
   }
 }

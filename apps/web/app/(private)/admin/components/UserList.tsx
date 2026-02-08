@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import type { Tables } from "@prostcounter/db";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
@@ -79,7 +82,7 @@ const UserEditForm = ({
     control,
     formState: { errors, isSubmitting },
   } = useForm<AdminUserUpdateForm>({
-    resolver: zodResolver(AdminUserUpdateFormSchema),
+    resolver: standardSchemaResolver(AdminUserUpdateFormSchema),
     defaultValues: {
       password: "",
       full_name: user.profile?.full_name || "",
@@ -227,7 +230,7 @@ const AttendanceEditForm = ({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<AdminAttendanceForm>({
-    resolver: zodResolver(AdminAttendanceFormSchema),
+    resolver: standardSchemaResolver(AdminAttendanceFormSchema),
     defaultValues: {
       date: new Date(attendance.date),
       beer_count: attendance.beer_count,

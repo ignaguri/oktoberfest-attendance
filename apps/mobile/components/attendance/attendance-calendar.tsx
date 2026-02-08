@@ -14,6 +14,7 @@ import {
   isSameDay,
   isSameMonth,
   isWithinInterval,
+  min,
   startOfMonth,
   startOfWeek,
   subMonths,
@@ -84,12 +85,14 @@ export function AttendanceCalendar({
 }: AttendanceCalendarProps) {
   const { t } = useTranslation();
 
-  // Current displayed month (starts at festival start month)
-  const [currentMonth, setCurrentMonth] = useState(() =>
-    startOfMonth(festivalStartDate),
-  );
-
   const today = useMemo(() => new Date(), []);
+
+  // Current displayed month (starts at today's month, or latest festival day if in the past)
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    // Use today's date, but cap it at the festival end date if festival is in the past
+    const initialDate = min([today, festivalEndDate]);
+    return startOfMonth(initialDate);
+  });
 
   // Generate weekday headers - memoized since it's static
   const weekdayHeaders = useMemo(() => getWeekdayHeaders(), []);

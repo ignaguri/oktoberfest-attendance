@@ -1,6 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// Use standardSchemaResolver instead of zodResolver to avoid Turbopack build failures
+// caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
+// See: https://github.com/colinhacks/zod/issues/4879
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Camera, Eye, EyeOff, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -70,7 +73,7 @@ export function BeerPicturesUpload({
     watch,
     reset,
   } = useForm<BeerPicturesFormData>({
-    resolver: zodResolver(beerPicturesSchema),
+    resolver: standardSchemaResolver(beerPicturesSchema),
     defaultValues: {
       pictures: [],
       visibility: "public",

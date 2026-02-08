@@ -82,12 +82,23 @@ export function useBiometrics(): UseBiometricsResult {
   }> {
     // Check current availability (avoid stale closure)
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
-    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-    if (!hasHardware || !isEnrolled) {
+    if (!hasHardware) {
       return {
         success: false,
-        error: "Biometric authentication not available",
+        error: t("biometric.errors.noHardware", {
+          defaultValue: "This device doesn't support biometric authentication",
+        }),
+      };
+    }
+
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!isEnrolled) {
+      return {
+        success: false,
+        error: t("biometric.errors.notEnrolled", {
+          defaultValue:
+            "No biometric data enrolled. Please set up Face ID or Touch ID in Settings.",
+        }),
       };
     }
 
@@ -106,18 +117,34 @@ export function useBiometrics(): UseBiometricsResult {
       // Handle different error cases
       switch (result.error) {
         case "user_cancel":
-          return { success: false, error: "Authentication cancelled" };
+          return {
+            success: false,
+            error: t("biometric.errors.cancelled", {
+              defaultValue: "Authentication cancelled",
+            }),
+          };
         case "user_fallback":
-          return { success: false, error: "User chose password fallback" };
+          return {
+            success: false,
+            error: t("biometric.errors.fallback", {
+              defaultValue: "User chose password fallback",
+            }),
+          };
         case "lockout":
           return {
             success: false,
-            error: "Too many failed attempts. Please try again later.",
+            error: t("biometric.errors.lockout", {
+              defaultValue: "Too many failed attempts. Please try again later.",
+            }),
           };
         default:
           return {
             success: false,
-            error: result.error || "Authentication failed",
+            error:
+              result.error ||
+              t("biometric.errors.failed", {
+                defaultValue: "Authentication failed",
+              }),
           };
       }
     } catch (error) {

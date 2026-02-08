@@ -208,6 +208,7 @@ export function TentSelectorSheet({
               keyExtractor={keyExtractor}
               stickySectionHeadersEnabled
               showsVerticalScrollIndicator
+              keyboardShouldPersistTaps="handled"
             />
           </View>
         )}

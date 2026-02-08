@@ -7,6 +7,7 @@
 
 import { useInvalidateQueries } from "@prostcounter/shared/data";
 import { QueryKeys } from "@prostcounter/shared/data";
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 
 import { apiClient } from "@/lib/api-client";
 
@@ -60,7 +61,12 @@ export function useAvatarUpload({
         });
 
       // Step 2: Upload compressed image directly to storage
-      const uploadResponse = await fetch(uploadUrl, {
+      // Fix URL for local dev: replace localhost with the mobile client's Supabase host
+      const fixedUploadUrl = replaceLocalhostInUrl(
+        uploadUrl,
+        process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+      );
+      const uploadResponse = await fetch(fixedUploadUrl, {
         method: "PUT",
         headers: {
           "Content-Type": image.mimeType,
