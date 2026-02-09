@@ -89,7 +89,8 @@ export function SettingsSection({
 
   const getBiometricLabel = () => {
     if (biometricType === "facial") return t("biometric.labels.faceId");
-    if (biometricType === "fingerprint") return t("biometric.labels.touchId");
+    if (biometricType === "fingerprint")
+      return t("biometric.labels.fingerprint");
     return t("profile.biometric.label");
   };
 

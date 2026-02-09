@@ -47,8 +47,8 @@ export function BiometricPrompt({
   const BiometricIcon = biometricType === "facial" ? ScanFace : Fingerprint;
   const biometricName =
     biometricType === "facial"
-      ? t("auth.biometric.faceId")
-      : t("auth.biometric.touchId");
+      ? t("biometric.labels.faceId")
+      : t("biometric.labels.fingerprint");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -147,8 +147,8 @@ export function BiometricEnablePrompt({
   const BiometricIcon = biometricType === "facial" ? ScanFace : Fingerprint;
   const biometricName =
     biometricType === "facial"
-      ? t("auth.biometric.faceId")
-      : t("auth.biometric.touchId");
+      ? t("biometric.labels.faceId")
+      : t("biometric.labels.fingerprint");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">

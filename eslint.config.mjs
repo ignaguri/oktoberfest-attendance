@@ -1,12 +1,10 @@
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tseslint from "typescript-eslint";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
 import nextVitals from "eslint-config-next/core-web-vitals";
-// import nextTs from "eslint-config-next/typescript";
 import prettierConfigRecommended from "eslint-plugin-prettier/recommended";
 
-const config = [
+export default tseslint.config(
   // Ignore patterns must come first in flat config
   {
     ignores: [
@@ -27,11 +25,9 @@ const config = [
     ],
   },
   ...nextVitals,
-  // ...nextTs, // Commented out because it's too strict for this project
   {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
-      parser: tseslint.parser,
       parserOptions: {
         project: true,
         tsconfigRootDir: import.meta.dirname,
@@ -42,7 +38,6 @@ const config = [
       },
     },
     plugins: {
-      "@typescript-eslint": typescriptEslint,
       "simple-import-sort": simpleImportSort,
       "unused-imports": unusedImports,
     },
@@ -76,13 +71,10 @@ const config = [
   {
     files: ["e2e/**/*.ts", "e2e/**/*.tsx"],
     languageOptions: {
-      parser: tseslint.parser,
       parserOptions: {
         project: "./tsconfig.eslint.json",
       },
     },
   },
   prettierConfigRecommended,
-];
-
-export default config;
+);
