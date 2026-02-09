@@ -228,7 +228,7 @@
     },
     "biometric": {
       "label": "Biometric Login",
-      "description": "Quick sign-in with Face ID or Touch ID",
+      "description": "Quick sign-in with biometrics",
       "faceId": "Face ID",
       "touchId": "Touch ID",
       "enableButton": "Enable Biometric Login",
@@ -942,7 +942,7 @@
     },
     "biometric": {
       "label": "Biometric Login",
-      "description": "Quick sign-in with Face ID or Touch ID"
+      "description": "Quick sign-in with biometrics"
     },
     "changePassword": {
       "title": "Change Password",
@@ -2398,7 +2398,7 @@
     },
     "errors": {
       "noHardware": "This device doesn't support biometric authentication",
-      "notEnrolled": "No biometric data enrolled. Please set up Face ID or Touch ID in Settings.",
+      "notEnrolled": "No biometric data enrolled. Please set up biometrics in Settings.",
       "cancelled": "Authentication cancelled",
       "fallback": "User chose password fallback",
       "lockout": "Too many failed attempts. Please try again later.",

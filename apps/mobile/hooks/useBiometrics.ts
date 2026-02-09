@@ -85,9 +85,7 @@ export function useBiometrics(): UseBiometricsResult {
     if (!hasHardware) {
       return {
         success: false,
-        error: t("biometric.errors.noHardware", {
-          defaultValue: "This device doesn't support biometric authentication",
-        }),
+        error: t("biometric.errors.noHardware"),
       };
     }
 
@@ -95,10 +93,7 @@ export function useBiometrics(): UseBiometricsResult {
     if (!isEnrolled) {
       return {
         success: false,
-        error: t("biometric.errors.notEnrolled", {
-          defaultValue:
-            "No biometric data enrolled. Please set up Face ID or Touch ID in Settings.",
-        }),
+        error: t("biometric.errors.notEnrolled"),
       };
     }
 
@@ -119,32 +114,22 @@ export function useBiometrics(): UseBiometricsResult {
         case "user_cancel":
           return {
             success: false,
-            error: t("biometric.errors.cancelled", {
-              defaultValue: "Authentication cancelled",
-            }),
+            error: t("biometric.errors.cancelled"),
           };
         case "user_fallback":
           return {
             success: false,
-            error: t("biometric.errors.fallback", {
-              defaultValue: "User chose password fallback",
-            }),
+            error: t("biometric.errors.fallback"),
           };
         case "lockout":
           return {
             success: false,
-            error: t("biometric.errors.lockout", {
-              defaultValue: "Too many failed attempts. Please try again later.",
-            }),
+            error: t("biometric.errors.lockout"),
           };
         default:
           return {
             success: false,
-            error:
-              result.error ||
-              t("biometric.errors.failed", {
-                defaultValue: "Authentication failed",
-              }),
+            error: result.error || t("biometric.errors.failed"),
           };
       }
     } catch (error) {

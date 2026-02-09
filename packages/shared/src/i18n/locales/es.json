@@ -228,7 +228,7 @@
     },
     "biometric": {
       "label": "Inicio de sesión biométrico",
-      "description": "Inicio rápido con Face ID o Touch ID",
+      "description": "Inicio rápido con biometría",
       "faceId": "Face ID",
       "touchId": "Touch ID",
       "enableButton": "Activar inicio biométrico",
@@ -942,7 +942,7 @@
     },
     "biometric": {
       "label": "Inicio de sesión biométrico",
-      "description": "Inicio rápido con Face ID o Touch ID"
+      "description": "Inicio rápido con biometría"
     },
     "changePassword": {
       "title": "Cambiar contraseña",
@@ -2398,7 +2398,7 @@
     },
     "errors": {
       "noHardware": "Este dispositivo no admite autenticación biométrica",
-      "notEnrolled": "No hay datos biométricos registrados. Por favor, configurá Face ID o Touch ID en Ajustes.",
+      "notEnrolled": "No hay datos biométricos registrados. Por favor, configurá la biometría en Ajustes.",
       "cancelled": "Autenticación cancelada",
       "fallback": "El usuario eligió usar la contraseña",
       "lockout": "Demasiados intentos fallidos. Por favor, intentá de nuevo más tarde.",

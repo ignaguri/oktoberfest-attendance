@@ -206,7 +206,7 @@
     },
     "biometric": {
       "label": "Biometrische Anmeldung",
-      "description": "Schnelle Anmeldung mit Face ID oder Touch ID",
+      "description": "Schnelle Anmeldung mit Biometrie",
       "faceId": "Face ID",
       "touchId": "Touch ID",
       "enableButton": "Biometrische Anmeldung aktivieren",
@@ -907,7 +907,7 @@
     },
     "biometric": {
       "label": "Biometrische Anmeldung",
-      "description": "Schnelle Anmeldung mit Face ID oder Touch ID"
+      "description": "Schnelle Anmeldung mit Biometrie"
     },
     "changePassword": {
       "title": "Passwort ändern",
@@ -2100,7 +2100,7 @@
     },
     "errors": {
       "noHardware": "Dieses Gerät unterstützt keine biometrische Authentifizierung",
-      "notEnrolled": "Keine biometrischen Daten hinterlegt. Bitte richten Sie Face ID oder Touch ID in den Einstellungen ein.",
+      "notEnrolled": "Keine biometrischen Daten hinterlegt. Bitte richte die Biometrie in den Einstellungen ein.",
       "cancelled": "Authentifizierung abgebrochen",
       "fallback": "Benutzer hat sich für Passwort entschieden",
       "lockout": "Zu viele Fehlversuche. Bitte versuchen Sie es später erneut.",
