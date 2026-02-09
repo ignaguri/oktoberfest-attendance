@@ -1544,7 +1544,8 @@
     "pictures": {
       "title": "Tus momentos",
       "subtitle": "Recuerdos capturados",
-      "count": "Capturaste {{count}} momentos"
+      "count": "Capturaste {{count}} momentos",
+      "count_one": "Capturaste {{count}} momento"
     },
     "achievements": {
       "title": "Logros",
@@ -1603,8 +1604,11 @@
       "sharing": "Creando tu imagen para compartir...",
       "summary": {
         "beers": "cervezas",
+        "beers_one": "cerveza",
         "tents": "carpas",
-        "days": "días"
+        "tents_one": "carpa",
+        "days": "días",
+        "days_one": "día"
       }
     },
     "shareImage": {

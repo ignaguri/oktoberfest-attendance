@@ -1521,13 +1521,18 @@
       "subtitle": "Your tent adventures",
       "uniqueTents": "Unique tents",
       "diversity": "Tent diversity",
-      "favorite": "Favorite tent"
+      "favorite": "Favorite tent",
+      "visits": "visits",
+      "visits_one": "visit"
     },
     "peakMoment": {
       "title": "Peak moment",
       "subtitle": "Your biggest day",
       "bestDay": "Best day",
-      "maxSession": "Max in one session"
+      "maxSession": "Max in one session",
+      "beers": "beers",
+      "beers_one": "beer",
+      "spent": "spent"
     },
     "social": {
       "title": "Social stats",
@@ -1538,7 +1543,9 @@
     },
     "pictures": {
       "title": "Your moments",
-      "subtitle": "Captured memories"
+      "subtitle": "Captured memories",
+      "count": "You captured {{count}} moments",
+      "count_one": "You captured {{count}} moment"
     },
     "achievements": {
       "title": "Achievements",
@@ -1594,7 +1601,15 @@
       "title": "Thanks for the memories!",
       "subtitle": "See you next year",
       "share": "Share Your Wrapped",
-      "sharing": "Creating your share image..."
+      "sharing": "Creating your share image...",
+      "summary": {
+        "beers": "beers",
+        "beers_one": "beer",
+        "tents": "tents",
+        "tents_one": "tent",
+        "days": "days",
+        "days_one": "day"
+      }
     },
     "shareImage": {
       "title": "My Festival Wrapped",

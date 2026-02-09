@@ -1258,6 +1258,126 @@
       "daysAttended": "Tage besucht",
       "avgPerDay": "Durchschnitt pro Tag",
       "totalSpent": "Ausgaben gesamt"
+    },
+    "tentExplorer": {
+      "title": "Zelt-Entdecker",
+      "subtitle": "deine Zeltabenteuer",
+      "uniqueTents": "Einzigartige Zelte",
+      "diversity": "Zeltvielfalt",
+      "favorite": "Lieblingszelt",
+      "visits": "Besuche",
+      "visits_one": "Besuch"
+    },
+    "peakMoment": {
+      "title": "Höhepunkt",
+      "subtitle": "dein größter Tag",
+      "bestDay": "Bester Tag",
+      "maxSession": "Maximum in einer Sitzung",
+      "beers": "Maß",
+      "beers_one": "Maß",
+      "spent": "ausgegeben"
+    },
+    "social": {
+      "title": "Soziale Statistiken",
+      "subtitle": "deine Festival-Community",
+      "groups": "Gruppen beigetreten",
+      "photos": "Fotos hochgeladen",
+      "friends": "Festival-Freunde"
+    },
+    "pictures": {
+      "title": "deine Momente",
+      "subtitle": "Festgehaltene Erinnerungen",
+      "count": "Du hast {{count}} Momente festgehalten",
+      "count_one": "Du hast {{count}} Moment festgehalten"
+    },
+    "achievements": {
+      "title": "Erfolge",
+      "subtitle": "Verdiente Abzeichen",
+      "totalPoints": "Gesamtpunkte"
+    },
+    "personalitySlide": {
+      "title": "deine Festival-Persönlichkeit",
+      "subtitle": "Basierend auf deinem Verhalten",
+      "traits": "deine Eigenschaften"
+    },
+    "personalityTypes": {
+      "Explorer": "Entdecker",
+      "Champion": "Champion",
+      "Loyalist": "Loyalist",
+      "Social Butterfly": "Sozialer Schmetterling",
+      "Consistent": "Beständig",
+      "Casual Enjoyer": "Gelegentlicher Genießer"
+    },
+    "personalityDescriptions": {
+      "Explorer": "Du bist ein Abenteurer im Herzen! Du hast eine Vielzahl von Zelten erkundet und während des Festivals vielfältige Erfahrungen gemacht.",
+      "Champion": "Du bist ein wahrer Champion! dein beeindruckender Bierkonsum zeigt, dass du den Festivalgeist wirklich angenommen hast.",
+      "Loyalist": "Du bist engagiert und beständig! deine häufige Teilnahme zeigt echte Festivaltreue.",
+      "Social Butterfly": "Du bist wegen der Atmosphäre hier! Du hast viele Tage teilgenommen und es leicht gehalten, wobei du dich auf das soziale Erlebnis konzentriert hast.",
+      "Consistent": "Du bist stetig und verlässlich! dein bemerkenswert konsistentes Muster zeigt, dass du deine Grenzen kennst und dich daran hältst.",
+      "Casual Enjoyer": "Du hast das Festival in deinem eigenen Tempo genossen! Ein ausgewogener Ansatz für Bier und Spaß."
+    },
+    "personalityTraits": {
+      "Early Bird": "Frühaufsteher",
+      "Steady Pace": "Gleichmäßiges Tempo",
+      "Variable": "Variabel",
+      "Tent Explorer": "Zelt-Entdecker",
+      "Tent Loyalist": "Zelt-Loyalist",
+      "Heavy Hitter": "Kraftprotz",
+      "Moderate": "Moderat",
+      "Light Drinker": "Leichttrinker"
+    },
+    "rankings": {
+      "title": "deine Platzierungen",
+      "subtitle": "Wie du abgeschnitten hast",
+      "groupRankings": "Gruppenrankings",
+      "globalRankings": "Globale Position"
+    },
+    "comparisons": {
+      "title": "Wie du im Vergleich abschneidest",
+      "vsFestivalAvg": "vs Festivaldurchschnitt",
+      "vsLastYear": "vs Letztes Jahr",
+      "vs": "vs",
+      "beers": "Maß",
+      "days": "Tage"
+    },
+    "outro": {
+      "title": "Danke für die Erinnerungen!",
+      "subtitle": "Bis nächstes Jahr",
+      "share": "deinen Rückblick teilen",
+      "sharing": "Erstelle dein Teilbild...",
+      "summary": {
+        "beers": "Maß",
+        "beers_one": "Maß",
+        "tents": "Zelte",
+        "tents_one": "Zelt",
+        "days": "Tage",
+        "days_one": "Tag"
+      }
+    },
+    "shareImage": {
+      "title": "Mein Festival-Rückblick",
+      "daysAttended": "Besuchte Tage",
+      "beersDrunk": "Getrunkene Maß",
+      "tentsVisited": "Besuchte Zelte",
+      "podiumFinishes": "Podiumsplätze",
+      "bestGlobalRank": "Bester globaler Rang",
+      "criteriaLabels": {
+        "days_attended": "Besuchte Tage",
+        "total_beers": "Gesamte Maß",
+        "avg_beers": "Durchschnittliche Maß"
+      }
+    },
+    "shareText": {
+      "title": "Mein {{festivalName}}-Rückblick",
+      "stats": "{{beers}} Maß über {{days}} Tage!",
+      "personality": "Festival-Persönlichkeit: {{type}}"
+    },
+    "cta": {
+      "ready": "dein Rückblick ist fertig!",
+      "preparing": "dein Festival wird zusammengefasst!",
+      "readyDescription": "Siehe deine personalisierte {{festivalName}}-Geschichte",
+      "preparingDescription": "Wir bereiten deine personalisierte {{festivalName}}-Geschichte vor. Lade deine letzte Teilnahme hoch!",
+      "viewButton": "deinen Rückblick ansehen"
     }
   },
   "reservation": {
