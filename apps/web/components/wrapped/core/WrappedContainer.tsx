@@ -5,13 +5,13 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/virtual";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { hasWrappedData } from "@prostcounter/shared/wrapped";
 import { useEffect, useMemo, useRef } from "react";
 import { Keyboard, Mousewheel, Pagination, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
-import type { WrappedData } from "@/lib/wrapped/types";
-import { hasWrappedData } from "@/lib/wrapped/utils";
 
 // Import slides
 import {

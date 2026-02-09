@@ -1,5 +1,8 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { CHART_CONFIG } from "@prostcounter/shared/wrapped";
+import { prepareTimelineData } from "@prostcounter/shared/wrapped";
 import {
   CartesianGrid,
   Line,
@@ -9,10 +12,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-import { CHART_CONFIG } from "@/lib/wrapped/config";
-import type { WrappedData } from "@/lib/wrapped/types";
-import { prepareTimelineData } from "@/lib/wrapped/utils";
 
 import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 

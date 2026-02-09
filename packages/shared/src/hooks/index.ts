@@ -145,3 +145,11 @@ export {
   setLanguageStorage,
   useLanguage,
 } from "./useLanguage";
+
+// Wrapped hooks
+export {
+  useAvailableWrappedFestivals,
+  useGenerateWrapped,
+  useWrappedAccess,
+  useWrappedDataApi,
+} from "./useWrapped";

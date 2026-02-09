@@ -1,5 +1,5 @@
 /**
- * Personality calculation logic
+ * Personality calculation logic (shared between web and mobile)
  * Determines user's festival personality type based on behavior patterns
  */
 
@@ -147,13 +147,13 @@ export function getPersonalityBadge(type: string): {
   color: string;
 } {
   const badges: Record<string, { emoji: string; color: string }> = {
-    Explorer: { emoji: "🗺️", color: "#10B981" }, // green
-    Champion: { emoji: "🏆", color: "#F59E0B" }, // yellow
-    Loyalist: { emoji: "💪", color: "#3B82F6" }, // blue
-    "Social Butterfly": { emoji: "🦋", color: "#EC4899" }, // pink
-    Consistent: { emoji: "📊", color: "#8B5CF6" }, // purple
-    "Casual Enjoyer": { emoji: "😎", color: "#6B7280" }, // gray
+    Explorer: { emoji: "\u{1F5FA}\u{FE0F}", color: "#10B981" }, // green
+    Champion: { emoji: "\u{1F3C6}", color: "#F59E0B" }, // yellow
+    Loyalist: { emoji: "\u{1F4AA}", color: "#3B82F6" }, // blue
+    "Social Butterfly": { emoji: "\u{1F98B}", color: "#EC4899" }, // pink
+    Consistent: { emoji: "\u{1F4CA}", color: "#8B5CF6" }, // purple
+    "Casual Enjoyer": { emoji: "\u{1F60E}", color: "#6B7280" }, // gray
   };
 
-  return badges[type] || { emoji: "🍺", color: "#F59E0B" };
+  return badges[type] || { emoji: "\u{1F37A}", color: "#F59E0B" };
 }

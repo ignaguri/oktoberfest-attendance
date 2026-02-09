@@ -1,10 +1,12 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { getPersonalityDescription } from "@prostcounter/shared/wrapped";
+import {
+  getPersonalityEmoji,
+  getTraitEmoji,
+} from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
-
-import { getPersonalityDescription } from "@/lib/wrapped/personality";
-import type { WrappedData } from "@/lib/wrapped/types";
-import { getPersonalityEmoji, getTraitEmoji } from "@/lib/wrapped/utils";
 
 import {
   BaseSlide,

@@ -1,9 +1,8 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { getTopTents } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
-
-import type { WrappedData } from "@/lib/wrapped/types";
-import { getTopTents } from "@/lib/wrapped/utils";
 
 import {
   BaseSlide,

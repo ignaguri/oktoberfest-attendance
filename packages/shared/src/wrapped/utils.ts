@@ -1,18 +1,19 @@
 /**
- * Wrapped utility functions
+ * Wrapped utility functions (shared between web and mobile)
  * Helper functions for data transformation and formatting
  */
 
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 
+import { formatLocalized } from "../utils/date-utils";
 import type { WrappedData } from "./types";
 
 /**
- * Format date for display
+ * Format date for display with localization
  */
 export function formatWrappedDate(dateString: string): string {
   try {
-    return format(parseISO(dateString), "d MMMM yyyy");
+    return formatLocalized(parseISO(dateString), "d MMMM yyyy");
   } catch {
     return dateString;
   }
@@ -70,11 +71,12 @@ export function calculateTotalPoints(
  */
 export function hasWrappedData(data: WrappedData | null): boolean {
   if (!data) return false;
+  if (!data.basic_stats) return false;
 
   return (
     data.basic_stats.total_beers > 0 ||
     data.basic_stats.days_attended > 0 ||
-    data.achievements.length > 0
+    (data.achievements && data.achievements.length > 0)
   );
 }
 
@@ -100,7 +102,7 @@ export function getComparisonText(
  */
 export function prepareTimelineData(timeline: WrappedData["timeline"]) {
   return timeline.map((day) => ({
-    date: format(parseISO(day.date), "d MMMM"),
+    date: formatLocalized(parseISO(day.date), "d MMMM"),
     fullDate: day.date,
     beers: day.beer_count,
     spent: day.spent,
@@ -132,7 +134,7 @@ export function generateShareText(data: WrappedData): string {
   );
 
   return (
-    `My ${data.festival_info.name} Wrapped 🍻\n\n` +
+    `My ${data.festival_info.name} Wrapped\n\n` +
     `${total_beers} beers across ${days_attended} days!\n` +
     `Festival personality: ${data.personality.type}\n\n` +
     `#${festivalHashtag} #ProstCounter`
@@ -144,15 +146,15 @@ export function generateShareText(data: WrappedData): string {
  */
 export function getPersonalityEmoji(type: string): string {
   const emojiMap: Record<string, string> = {
-    Explorer: "🗺️",
-    Champion: "🏆",
-    Loyalist: "💪",
-    "Social Butterfly": "🦋",
-    Consistent: "📊",
-    "Casual Enjoyer": "😎",
+    Explorer: "\u{1F5FA}\u{FE0F}",
+    Champion: "\u{1F3C6}",
+    Loyalist: "\u{1F4AA}",
+    "Social Butterfly": "\u{1F98B}",
+    Consistent: "\u{1F4CA}",
+    "Casual Enjoyer": "\u{1F60E}",
   };
 
-  return emojiMap[type] || "🍺";
+  return emojiMap[type] || "\u{1F37A}";
 }
 
 /**
@@ -160,17 +162,17 @@ export function getPersonalityEmoji(type: string): string {
  */
 export function getTraitEmoji(trait: string): string {
   const emojiMap: Record<string, string> = {
-    "Early Bird": "🌅",
-    "Steady Pace": "⚖️",
-    Variable: "📈",
-    "Tent Explorer": "🎪",
-    "Tent Loyalist": "🏠",
-    "Heavy Hitter": "💪",
-    Moderate: "👌",
-    "Light Drinker": "🌱",
+    "Early Bird": "\u{1F305}",
+    "Steady Pace": "\u{2696}\u{FE0F}",
+    Variable: "\u{1F4C8}",
+    "Tent Explorer": "\u{1F3AA}",
+    "Tent Loyalist": "\u{1F3E0}",
+    "Heavy Hitter": "\u{1F4AA}",
+    Moderate: "\u{1F44C}",
+    "Light Drinker": "\u{1F331}",
   };
 
-  return emojiMap[trait] || "✨";
+  return emojiMap[trait] || "\u{2728}";
 }
 
 /**

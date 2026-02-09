@@ -1,12 +1,13 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useWrappedAccess } from "@prostcounter/shared/hooks";
 
 import {
   WrappedContainer,
   WrappedError,
 } from "@/components/wrapped/core/WrappedContainer";
-import { useWrappedAccess, useWrappedData } from "@/hooks/useWrapped";
+import { useWrappedData } from "@/hooks/useWrapped";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function WrappedPage() {

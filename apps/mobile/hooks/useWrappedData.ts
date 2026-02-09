@@ -1,25 +1,26 @@
 /**
- * Web-specific business logic hooks for wrapped data
+ * Mobile-specific hook for fetching wrapped data
  *
- * useWrappedData uses direct Supabase RPC for full data format needed by web slides.
- * Access and festival hooks have been moved to @prostcounter/shared/hooks.
+ * Uses direct Supabase RPC call to get the full WrappedData format
+ * needed by the wrapped slides (same approach as web).
+ * The REST API endpoint returns a slimmer format that doesn't include
+ * all the data needed for the slide components.
  */
 
 import { QueryKeys } from "@prostcounter/shared/data";
+import { useQuery } from "@prostcounter/shared/data";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 
-import { useQuery } from "@/lib/data/react-query-provider";
-import { createSupabaseBrowserClient } from "@/utils/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 /**
- * Hook to fetch wrapped data for a specific festival
- * Uses direct Supabase call to preserve DB format for wrapped slides
+ * Hook to fetch wrapped data for a specific festival via Supabase RPC
+ * Returns the full WrappedData format with all stats needed for slides
  */
 export function useWrappedData(festivalId?: string) {
   return useQuery(
     QueryKeys.wrapped(festivalId || ""),
     async (): Promise<WrappedData | null> => {
-      const supabase = createSupabaseBrowserClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -36,13 +37,20 @@ export function useWrappedData(festivalId?: string) {
         return null;
       }
 
+      console.log(
+        "[WrappedData] RPC response type:",
+        typeof data,
+        "keys:",
+        data ? Object.keys(data) : "null",
+      );
+
       return data as unknown as WrappedData;
     },
     {
       enabled: !!festivalId,
-      staleTime: 10 * 60 * 1000, // 10 minutes - wrapped data doesn't change often
-      gcTime: 30 * 60 * 1000, // 30 minutes cache
-      retry: 2, // Retry failed requests twice
+      staleTime: 10 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      retry: 2,
     },
   );
 }
