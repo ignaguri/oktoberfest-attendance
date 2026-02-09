@@ -1591,7 +1591,10 @@
     "comparisons": {
       "title": "Cómo te comparás",
       "vsFestivalAvg": "vs Promedio del Festival",
-      "vsLastYear": "vs Año Pasado"
+      "vsLastYear": "vs Año Pasado",
+      "vs": "vs",
+      "beers": "Cervezas",
+      "days": "Días"
     },
     "outro": {
       "title": "¡Gracias por los recuerdos!",
@@ -1603,6 +1606,24 @@
         "tents": "carpas",
         "days": "días"
       }
+    },
+    "shareImage": {
+      "title": "Mi Festival Wrapped",
+      "daysAttended": "Días asistidos",
+      "beersDrunk": "Cervezas tomadas",
+      "tentsVisited": "Carpas visitadas",
+      "podiumFinishes": "Podios logrados",
+      "bestGlobalRank": "Mejor Ranking Global",
+      "criteriaLabels": {
+        "days_attended": "Días Asistidos",
+        "total_beers": "Total de Cervezas",
+        "avg_beers": "Promedio de Cervezas"
+      }
+    },
+    "shareText": {
+      "title": "Mi {{festivalName}} Wrapped",
+      "stats": "{{beers}} cervezas en {{days}} días!",
+      "personality": "Personalidad del festival: {{type}}"
     },
     "cta": {
       "ready": "¡Tu Wrapped está listo!",

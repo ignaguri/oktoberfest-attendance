@@ -11,6 +11,7 @@ import { QueryKeys } from "@prostcounter/shared/data";
 import { useQuery } from "@prostcounter/shared/data";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 
+import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
 
 /**
@@ -33,16 +34,14 @@ export function useWrappedData(festivalId?: string) {
       });
 
       if (error) {
-        console.error("Failed to fetch wrapped data:", error);
+        logger.error("Failed to fetch wrapped data", error);
         return null;
       }
 
-      console.log(
-        "[WrappedData] RPC response type:",
-        typeof data,
-        "keys:",
-        data ? Object.keys(data) : "null",
-      );
+      logger.debug("[WrappedData] RPC response", {
+        type: typeof data,
+        keys: data ? Object.keys(data) : null,
+      });
 
       return data as unknown as WrappedData;
     },

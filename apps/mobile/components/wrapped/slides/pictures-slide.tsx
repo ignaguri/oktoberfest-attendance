@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { Dimensions, Image, Text, View } from "react-native";
 
 import { VStack } from "@/components/ui/vstack";
-import { Colors } from "@/lib/constants/colors";
+import { BackgroundColors, Colors } from "@/lib/constants/colors";
 import { getBeerPictureUrl } from "@/lib/image-urls";
 
 import { BaseSlide, SlideSubtitle, SlideTitle } from "./base-slide";
@@ -54,7 +54,7 @@ function PictureItem({
             width: size,
             height: size,
             borderRadius: 12,
-            backgroundColor: "#f3f4f6",
+            backgroundColor: BackgroundColors[100],
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -101,7 +101,6 @@ export function PicturesSlide({ data, isActive }: PicturesSlideProps) {
         <Text className="mt-2 text-center text-sm text-gray-500">
           {t("wrapped.pictures.count", {
             count: data.social_stats?.pictures?.length ?? 0,
-            defaultValue: `You captured ${data.social_stats?.pictures?.length ?? 0} moments`,
           })}
         </Text>
 

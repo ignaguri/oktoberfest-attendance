@@ -90,7 +90,7 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
                     {t(`achievements.rarity.${achievement.rarity}`)}
                   </Text>
                   <Text className="text-xs text-gray-400">
-                    {achievement.points} pts
+                    {achievement.points} {t("achievements.points")}
                   </Text>
                 </HStack>
               </VStack>

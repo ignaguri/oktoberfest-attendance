@@ -81,23 +81,6 @@ export function hasWrappedData(data: WrappedData | null): boolean {
 }
 
 /**
- * Get comparison text for vs average
- */
-export function getComparisonText(
-  diffPct: number,
-  metric: "beers" | "days",
-): string {
-  if (Math.abs(diffPct) < 5) {
-    return `About average`;
-  }
-
-  const direction = diffPct > 0 ? "more" : "fewer";
-  const metricText = metric === "beers" ? "beers" : "days";
-
-  return `${Math.abs(diffPct).toFixed(0)}% ${direction} ${metricText} than average`;
-}
-
-/**
  * Transform wrapped data for timeline chart
  */
 export function prepareTimelineData(timeline: WrappedData["timeline"]) {
@@ -120,25 +103,6 @@ export function getTopTents(
   return tentBreakdown
     .sort((a, b) => b.visit_count - a.visit_count)
     .slice(0, limit);
-}
-
-/**
- * Generate share text for social media
- */
-export function generateShareText(data: WrappedData): string {
-  const { total_beers, days_attended } = data.basic_stats;
-  // Generate hashtag from festival name by removing spaces and special characters
-  const festivalHashtag = data.festival_info.name.replace(
-    /[^\p{L}\p{N}]/gu,
-    "",
-  );
-
-  return (
-    `My ${data.festival_info.name} Wrapped\n\n` +
-    `${total_beers} beers across ${days_attended} days!\n` +
-    `Festival personality: ${data.personality.type}\n\n` +
-    `#${festivalHashtag} #ProstCounter`
-  );
 }
 
 /**

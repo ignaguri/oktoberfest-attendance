@@ -1,3 +1,4 @@
+import { cn } from "@prostcounter/ui";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -17,11 +18,10 @@ export function PaginationDots({ total, current }: PaginationDotsProps) {
       {Array.from({ length: total }).map((_, index) => (
         <View
           key={index}
-          className={`rounded-full ${
-            index === current
-              ? "h-2.5 w-2.5 bg-yellow-500"
-              : "h-2 w-2 bg-white/40"
-          }`}
+          className={cn("rounded-full", {
+            "h-2.5 w-2.5 bg-yellow-500": index === current,
+            "h-2 w-2 bg-white/40": index !== current,
+          })}
         />
       ))}
     </View>

@@ -1,4 +1,5 @@
 import { Motion } from "@legendapp/motion";
+import { cn } from "@prostcounter/ui";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -23,7 +24,7 @@ export function BaseSlide({
 
   return (
     <View
-      className={`flex-1 ${backgroundClassName}`}
+      className={cn("flex-1", backgroundClassName)}
       style={{
         paddingTop: insets.top + 16,
         paddingBottom: insets.bottom + 40,
@@ -120,7 +121,7 @@ interface SlideContentProps {
 
 export function SlideContent({ children, className = "" }: SlideContentProps) {
   return (
-    <VStack space="md" className={`flex-1 justify-center ${className}`}>
+    <VStack space="md" className={cn("flex-1 justify-center", className)}>
       {children}
     </VStack>
   );
