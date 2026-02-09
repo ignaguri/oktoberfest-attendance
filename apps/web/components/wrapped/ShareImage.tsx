@@ -1,13 +1,13 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { prepareShareImageData } from "@prostcounter/shared/wrapped";
 import type { LucideIcon } from "lucide-react";
 import { Award, Beer, CalendarDays, Tent, Trophy } from "lucide-react";
 import { forwardRef } from "react";
 
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
-import type { WrappedData } from "@/lib/wrapped/types";
-import { prepareShareImageData } from "@/lib/wrapped/utils";
 import LogoImage from "@/public/android-chrome-512x512.png";
 
 interface ShareImageProps {

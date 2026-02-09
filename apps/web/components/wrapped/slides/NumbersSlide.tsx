@@ -1,5 +1,7 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { formatCurrency, formatNumber } from "@prostcounter/shared/wrapped";
 import {
   Beer,
   CalendarDays,
@@ -8,9 +10,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useMemo } from "react";
-
-import type { WrappedData } from "@/lib/wrapped/types";
-import { formatCurrency, formatNumber } from "@/lib/wrapped/utils";
 
 import {
   BaseSlide,

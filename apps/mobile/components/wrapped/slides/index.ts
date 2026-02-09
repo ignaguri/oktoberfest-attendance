@@ -1,0 +1,12 @@
+export { AchievementsSlide } from "./achievements-slide";
+export { ComparisonsSlide } from "./comparisons-slide";
+export { IntroSlide } from "./intro-slide";
+export { JourneySlide } from "./journey-slide";
+export { NumbersSlide } from "./numbers-slide";
+export { OutroSlide } from "./outro-slide";
+export { PeakMomentSlide } from "./peak-moment-slide";
+export { PersonalitySlide } from "./personality-slide";
+export { PicturesSlide } from "./pictures-slide";
+export { RankingsSlide } from "./rankings-slide";
+export { SocialSlide } from "./social-slide";
+export { TentExplorerSlide } from "./tent-explorer-slide";

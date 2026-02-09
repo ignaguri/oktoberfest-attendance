@@ -1,0 +1,60 @@
+/**
+ * Wrapped feature configuration (shared between web and mobile)
+ * Centralized configuration for themes and shared constants
+ */
+
+import type { ThemeConfig } from "./types";
+
+/**
+ * Brand theme configuration (yellow theme)
+ */
+export const WRAPPED_THEME: ThemeConfig = {
+  primaryColor: "#F59E0B", // yellow-500
+  secondaryColor: "#D97706", // yellow-600
+  backgroundColor: "#FFFFFF",
+  textColor: "#1F2937", // gray-800
+};
+
+/**
+ * Personality type descriptions
+ */
+export const PERSONALITY_DESCRIPTIONS: Record<string, string> = {
+  Explorer:
+    "You're an adventurer at heart! You explored most tents and tried different experiences throughout the festival.",
+  Champion:
+    "You're a true champion! Your beer consumption was impressive and you really embraced the festival spirit.",
+  Loyalist:
+    "You're dedicated and consistent! You attended most days and showed true festival loyalty.",
+  "Social Butterfly":
+    "You're here for the vibes! You attended many days but kept it light, focusing on the social experience.",
+  Consistent:
+    "You're steady and reliable! Your consumption pattern was remarkably consistent throughout the festival.",
+  "Casual Enjoyer":
+    "You enjoyed the festival at your own pace! A balanced approach to beer and fun.",
+};
+
+/**
+ * Rarity color mapping for achievements
+ */
+export const RARITY_COLORS: Record<string, string> = {
+  common: "#9CA3AF", // gray-400
+  rare: "#60A5FA", // blue-400
+  epic: "#A78BFA", // purple-400
+  legendary: "#FBBF24", // yellow-400
+};
+
+/**
+ * Chart configuration for timeline visualization
+ */
+export const CHART_CONFIG = {
+  colors: {
+    primary: "#F59E0B", // yellow-500
+    secondary: "#D97706", // yellow-600
+    grid: "#E5E7EB", // gray-200
+    text: "#6B7280", // gray-500
+  },
+  dimensions: {
+    height: 300,
+    margin: { top: 20, right: 30, left: 20, bottom: 50 },
+  },
+};

@@ -1503,6 +1503,134 @@
       "daysAttended": "Días asistidos",
       "avgPerDay": "Promedio por día",
       "totalSpent": "Total gastado"
+    },
+    "close": "Cerrar",
+    "swipeToBegin": "Deslizá para comenzar",
+    "error": "Algo salió mal al cargar tu resumen",
+    "accessDenied": "Tu resumen todavía no está disponible",
+    "intro": {
+      "title": "Festival Wrap",
+      "subtitle": "Los momentos destacados del festival de {{username}}"
+    },
+    "journey": {
+      "title": "Tu recorrido",
+      "subtitle": "Día por día"
+    },
+    "tentExplorer": {
+      "title": "Explorador de carpas",
+      "subtitle": "Tus aventuras en carpas",
+      "uniqueTents": "Carpas únicas",
+      "diversity": "Diversidad de carpas",
+      "favorite": "Carpa favorita",
+      "visits": "visitas",
+      "visits_one": "visita"
+    },
+    "peakMoment": {
+      "title": "Momento cumbre",
+      "subtitle": "Tu mejor día",
+      "bestDay": "Mejor día",
+      "maxSession": "Máximo en una sesión",
+      "beers": "cervezas",
+      "beers_one": "cerveza",
+      "spent": "gastado"
+    },
+    "social": {
+      "title": "Estadísticas sociales",
+      "subtitle": "Tu comunidad del festival",
+      "groups": "Grupos unidos",
+      "photos": "Fotos subidas",
+      "friends": "Amigos del festival"
+    },
+    "pictures": {
+      "title": "Tus momentos",
+      "subtitle": "Recuerdos capturados",
+      "count": "Capturaste {{count}} momentos"
+    },
+    "achievements": {
+      "title": "Logros",
+      "subtitle": "Insignias ganadas",
+      "totalPoints": "Puntos totales"
+    },
+    "personalitySlide": {
+      "title": "Tu personalidad del festival",
+      "subtitle": "Basado en tu comportamiento",
+      "traits": "Tus rasgos"
+    },
+    "personalityTypes": {
+      "Explorer": "Explorador",
+      "Champion": "Campeón",
+      "Loyalist": "Leal",
+      "Social Butterfly": "Mariposa Social",
+      "Consistent": "Consistente",
+      "Casual Enjoyer": "Disfrutador Casual"
+    },
+    "personalityDescriptions": {
+      "Explorer": "¡Sos un aventurero de corazón! Exploraste una gran variedad de carpas y te sumergiste en experiencias diversas durante todo el festival.",
+      "Champion": "¡Sos un verdadero campeón! Tu impresionante consumo de cerveza demuestra que realmente abrazaste el espíritu del festival.",
+      "Loyalist": "¡Sos dedicado y consistente! Tu asistencia frecuente demuestra tu verdadera lealtad al festival.",
+      "Social Butterfly": "¡Estás aquí por el ambiente! Asististe muchos días manteniéndolo tranquilo, enfocándote en la experiencia social.",
+      "Consistent": "¡Sos estable y confiable! Tu patrón notablemente consistente demuestra que conocés tus límites y los respetás.",
+      "Casual Enjoyer": "¡Disfrutaste el festival a tu propio ritmo! Un enfoque equilibrado entre cerveza y diversión."
+    },
+    "personalityTraits": {
+      "Early Bird": "Madrugador",
+      "Steady Pace": "Ritmo Constante",
+      "Variable": "Variable",
+      "Tent Explorer": "Explorador de Carpas",
+      "Tent Loyalist": "Leal a una Carpa",
+      "Heavy Hitter": "Consumidor Intenso",
+      "Moderate": "Moderado",
+      "Light Drinker": "Bebedor Ligero"
+    },
+    "rankings": {
+      "title": "Tus rankings",
+      "subtitle": "Cómo quedaste",
+      "groupRankings": "Rankings de grupo",
+      "globalRankings": "Posición global"
+    },
+    "comparisons": {
+      "title": "Cómo te comparás",
+      "vsFestivalAvg": "vs Promedio del Festival",
+      "vsLastYear": "vs Año Pasado",
+      "vs": "vs",
+      "beers": "Cervezas",
+      "days": "Días"
+    },
+    "outro": {
+      "title": "¡Gracias por los recuerdos!",
+      "subtitle": "Nos vemos el año que viene",
+      "share": "Compartir Tu Wrapped",
+      "sharing": "Creando tu imagen para compartir...",
+      "summary": {
+        "beers": "cervezas",
+        "tents": "carpas",
+        "days": "días"
+      }
+    },
+    "shareImage": {
+      "title": "Mi Festival Wrapped",
+      "daysAttended": "Días asistidos",
+      "beersDrunk": "Cervezas tomadas",
+      "tentsVisited": "Carpas visitadas",
+      "podiumFinishes": "Podios logrados",
+      "bestGlobalRank": "Mejor Ranking Global",
+      "criteriaLabels": {
+        "days_attended": "Días Asistidos",
+        "total_beers": "Total de Cervezas",
+        "avg_beers": "Promedio de Cervezas"
+      }
+    },
+    "shareText": {
+      "title": "Mi {{festivalName}} Wrapped",
+      "stats": "{{beers}} cervezas en {{days}} días!",
+      "personality": "Personalidad del festival: {{type}}"
+    },
+    "cta": {
+      "ready": "¡Tu Wrapped está listo!",
+      "preparing": "¡Preparando tu festival!",
+      "readyDescription": "Mirá tu historia personalizada de {{festivalName}}",
+      "preparingDescription": "Estamos preparando tu historia personalizada de {{festivalName}}. ¡Subí tu asistencia final!",
+      "viewButton": "Ver Tu Wrapped"
     }
   },
   "reservation": {

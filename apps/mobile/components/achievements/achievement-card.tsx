@@ -18,7 +18,7 @@ import { VStack } from "@/components/ui/vstack";
 import { AchievementProgressBar } from "./achievement-progress-bar";
 
 // Icon mapping from achievement icon key to emoji
-const ICON_MAP: Record<string, string> = {
+export const ICON_MAP: Record<string, string> = {
   // Consumption
   first_beer: "🍺",
   beer_mug: "🍺",

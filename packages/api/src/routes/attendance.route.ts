@@ -21,6 +21,7 @@ import { NotFoundError, ValidationError } from "../middleware/error";
 import {
   SupabaseAttendanceRepository,
   SupabasePhotoRepository,
+  SupabaseWrappedRepository,
 } from "../repositories/supabase";
 import { NotificationService } from "../services/notification.service";
 
@@ -197,6 +198,17 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   // Delete the attendance
   await attendanceRepo.delete(id, user.id);
 
+  // Invalidate wrapped data cache (attendance changes affect wrapped stats)
+  try {
+    const wrappedRepo = new SupabaseWrappedRepository(supabase);
+    await wrappedRepo.invalidateCache(user.id, attendance.festivalId);
+  } catch (cacheError) {
+    logger.error(
+      { error: cacheError },
+      "Failed to invalidate wrapped cache after attendance delete",
+    );
+  }
+
   return c.json(
     {
       success: true,
@@ -273,6 +285,17 @@ app.openapi(createAttendanceRoute, async (c) => {
 
   // Create/update attendance with tents
   const result = await attendanceRepo.createWithTents(user.id, data);
+
+  // Invalidate wrapped data cache (attendance changes affect wrapped stats)
+  try {
+    const wrappedRepo = new SupabaseWrappedRepository(supabase);
+    await wrappedRepo.invalidateCache(user.id, data.festivalId);
+  } catch (cacheError) {
+    logger.error(
+      { error: cacheError },
+      "Failed to invalidate wrapped cache after attendance create",
+    );
+  }
 
   // Trigger tent check-in notifications only if tents were actually changed
   if (data.tents && data.tents.length > 0 && result.tentsChanged) {
@@ -400,6 +423,17 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
 
   // Update personal attendance
   const result = await attendanceRepo.updatePersonal(user.id, data);
+
+  // Invalidate wrapped data cache (attendance changes affect wrapped stats)
+  try {
+    const wrappedRepo = new SupabaseWrappedRepository(supabase);
+    await wrappedRepo.invalidateCache(user.id, data.festivalId);
+  } catch (cacheError) {
+    logger.error(
+      { error: cacheError },
+      "Failed to invalidate wrapped cache after personal attendance update",
+    );
+  }
 
   return c.json(result, 200);
 });
@@ -556,6 +590,17 @@ app.openapi(checkInFromReservationRoute, async (c) => {
 
   if (updateError) {
     throw new Error("Error updating reservation status");
+  }
+
+  // Invalidate wrapped data cache (check-in affects wrapped stats)
+  try {
+    const wrappedRepo = new SupabaseWrappedRepository(supabase);
+    await wrappedRepo.invalidateCache(user.id, reservation.festival_id);
+  } catch (cacheError) {
+    logger.error(
+      { error: cacheError },
+      "Failed to invalidate wrapped cache after reservation check-in",
+    );
   }
 
   return c.json(

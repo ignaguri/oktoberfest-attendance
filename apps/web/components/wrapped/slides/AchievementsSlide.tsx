@@ -1,11 +1,14 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import {
+  calculateTotalPoints,
+  sortAchievements,
+} from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 
 import { AchievementBadge } from "@/components/achievements/AchievementBadge";
 import type { AchievementRarity } from "@/lib/types/achievements";
-import type { WrappedData } from "@/lib/wrapped/types";
-import { calculateTotalPoints, sortAchievements } from "@/lib/wrapped/utils";
 
 import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 

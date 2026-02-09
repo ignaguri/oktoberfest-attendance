@@ -322,6 +322,13 @@ export default function RootLayout() {
                                         }}
                                       />
                                       <Stack.Screen
+                                        name="wrapped"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "fullScreenModal",
+                                        }}
+                                      />
+                                      <Stack.Screen
                                         name="join-group/[token]"
                                         options={{
                                           headerShown: false,

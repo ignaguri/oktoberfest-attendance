@@ -1,11 +1,11 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { Beer, Download, Heart, HeartHandshake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
-import type { WrappedData } from "@/lib/wrapped/types";
 
 import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 

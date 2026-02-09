@@ -1,8 +1,7 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { Camera, Users, UserSearch } from "lucide-react";
-
-import type { WrappedData } from "@/lib/wrapped/types";
 
 import {
   BaseSlide,

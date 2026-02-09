@@ -27,6 +27,7 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { WrappedCTA } from "@/components/wrapped/wrapped-cta";
 import { Colors } from "@/lib/constants/colors";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
@@ -105,6 +106,9 @@ export default function HomeScreen() {
           <TutorialTarget stepId="festival-status">
             <FestivalStatus />
           </TutorialTarget>
+
+          {/* Wrapped CTA */}
+          <WrappedCTA />
 
           {/* Location Sharing Card (native only) */}
           {Platform.OS !== "web" && currentFestival?.id && (

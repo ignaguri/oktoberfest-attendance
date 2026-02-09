@@ -1,9 +1,8 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 import { Beer, CalendarDays, DiamondPercent, Globe, Users } from "lucide-react";
-
-import type { WrappedData } from "@/lib/wrapped/types";
 
 import { BaseSlide, SlideTitle } from "./BaseSlide";
 

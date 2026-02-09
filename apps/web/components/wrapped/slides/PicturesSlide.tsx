@@ -1,12 +1,12 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 import { Camera, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { cn, shuffleArray } from "@/lib/utils";
-import type { WrappedData } from "@/lib/wrapped/types";
 
 /**
  * Extract file path from a full Supabase storage URL or return the path as-is

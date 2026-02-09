@@ -1465,12 +1465,16 @@
   "wrapped": {
     "title": "Your Year in Review",
     "generating": "Generating your wrapped...",
-    "loading": "Loading your wrapped...",
+    "loading": "Preparing your wrapped...",
     "notAvailable": "Wrapped Not Available",
-    "loadError": "Failed to load your wrapped",
+    "loadError": "Something went wrong loading your wrapped",
     "notReady": "Your wrapped isn't ready yet. Check back after the festival!",
+    "accessDenied": "Your wrapped isn't available yet",
     "share": "Share My Wrapped",
     "downloadImage": "Download Image",
+    "close": "Close",
+    "swipeToBegin": "Swipe to begin",
+    "error": "Something went wrong loading your wrapped",
     "slides": {
       "totalBeers": "Total Beers",
       "daysAttended": "Days Attended",
@@ -1496,6 +1500,10 @@
         "description": "Always with friends!"
       }
     },
+    "intro": {
+      "title": "Festival Wrap",
+      "subtitle": "{{username}}'s festival highlights"
+    },
     "numbers": {
       "title": "Your festival in numbers",
       "subtitle": "Here's what you did",
@@ -1503,6 +1511,115 @@
       "daysAttended": "Days attended",
       "avgPerDay": "Average per day",
       "totalSpent": "Total spent"
+    },
+    "journey": {
+      "title": "Your journey",
+      "subtitle": "Day by day"
+    },
+    "tentExplorer": {
+      "title": "Tent explorer",
+      "subtitle": "Your tent adventures",
+      "uniqueTents": "Unique tents",
+      "diversity": "Tent diversity",
+      "favorite": "Favorite tent"
+    },
+    "peakMoment": {
+      "title": "Peak moment",
+      "subtitle": "Your biggest day",
+      "bestDay": "Best day",
+      "maxSession": "Max in one session"
+    },
+    "social": {
+      "title": "Social stats",
+      "subtitle": "Your festival community",
+      "groups": "Groups joined",
+      "photos": "Photos uploaded",
+      "friends": "Festival friends"
+    },
+    "pictures": {
+      "title": "Your moments",
+      "subtitle": "Captured memories"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "subtitle": "Badges earned",
+      "totalPoints": "Total points"
+    },
+    "personalitySlide": {
+      "title": "Your festival personality",
+      "subtitle": "Based on your behavior",
+      "traits": "Your traits"
+    },
+    "personalityTypes": {
+      "Explorer": "Explorer",
+      "Champion": "Champion",
+      "Loyalist": "Loyalist",
+      "Social Butterfly": "Social Butterfly",
+      "Consistent": "Consistent",
+      "Casual Enjoyer": "Casual Enjoyer"
+    },
+    "personalityDescriptions": {
+      "Explorer": "You're an adventurer at heart! You explored a wide variety of tents and embraced diverse experiences throughout the festival.",
+      "Champion": "You're a true champion! Your impressive beer consumption shows you really embraced the festival spirit.",
+      "Loyalist": "You're dedicated and consistent! Your frequent attendance demonstrates true festival loyalty.",
+      "Social Butterfly": "You're here for the vibes! You attended many days while keeping it light, focusing on the social experience.",
+      "Consistent": "You're steady and reliable! Your remarkably consistent pattern shows you know your limits and stick to them.",
+      "Casual Enjoyer": "You enjoyed the festival at your own pace! A balanced approach to beer and fun."
+    },
+    "personalityTraits": {
+      "Early Bird": "Early Bird",
+      "Steady Pace": "Steady Pace",
+      "Variable": "Variable",
+      "Tent Explorer": "Tent Explorer",
+      "Tent Loyalist": "Tent Loyalist",
+      "Heavy Hitter": "Heavy Hitter",
+      "Moderate": "Moderate",
+      "Light Drinker": "Light Drinker"
+    },
+    "rankings": {
+      "title": "Your rankings",
+      "subtitle": "How you placed",
+      "groupRankings": "Group rankings",
+      "globalRankings": "Global position"
+    },
+    "comparisons": {
+      "title": "How you compare",
+      "vsFestivalAvg": "vs Festival Average",
+      "vsLastYear": "vs Last Year",
+      "vs": "vs",
+      "beers": "Beers",
+      "days": "Days"
+    },
+    "outro": {
+      "title": "Thanks for the memories!",
+      "subtitle": "See you next year",
+      "share": "Share Your Wrapped",
+      "sharing": "Creating your share image..."
+    },
+    "shareImage": {
+      "title": "My Festival Wrapped",
+      "daysAttended": "Days attended",
+      "beersDrunk": "Beers drunk",
+      "tentsVisited": "Tents visited",
+      "podiumFinishes": "Podium finishes",
+      "bestGlobalRank": "Best Global Rank",
+      "criteriaLabels": {
+        "days_attended": "Days Attended",
+        "total_beers": "Total Beers",
+        "avg_beers": "Average Beers"
+      }
+    },
+    "shareText": {
+      "title": "My {{festivalName}} Wrapped",
+      "stats": "{{beers}} beers across {{days}} days!",
+      "personality": "Festival personality: {{type}}"
+    },
+    "cta": {
+      "ready": "Your Wrapped is ready!",
+      "preparing": "Wrapping up your festival!",
+      "readyDescription": "See your personalized {{festivalName}} story",
+      "preparingDescription": "We're preparing your personalized {{festivalName}} story. Upload your final attendance!",
+      "viewButton": "View Your Wrapped"
     }
   },
   "reservation": {

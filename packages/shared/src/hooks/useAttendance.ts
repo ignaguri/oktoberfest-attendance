@@ -55,6 +55,8 @@ export function useDeleteAttendance() {
         invalidateQueries(["leaderboard"]);
         // Invalidate highlights as they depend on attendance
         invalidateQueries(["highlights"]);
+        // Invalidate wrapped data cache (attendance changes affect wrapped stats)
+        invalidateQueries(["wrapped"]);
       },
     },
   );
@@ -111,6 +113,8 @@ export function useUpdatePersonalAttendance() {
         invalidateQueries(["leaderboard"]);
         // Invalidate highlights
         invalidateQueries(["highlights"]);
+        // Invalidate wrapped data cache (attendance changes affect wrapped stats)
+        invalidateQueries(["wrapped"]);
       },
     },
   );

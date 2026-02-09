@@ -1,13 +1,16 @@
 "use client";
 
+import type { WrappedData } from "@prostcounter/shared/wrapped";
+import {
+  formatCurrency,
+  formatWrappedDate,
+} from "@prostcounter/shared/wrapped";
 import { Beer, BicepsFlexed, Tent } from "lucide-react";
 import { useEffect } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 
 import { useConfetti } from "@/hooks/useConfetti";
 import { ANIMATION_DELAYS } from "@/lib/wrapped/config";
-import type { WrappedData } from "@/lib/wrapped/types";
-import { formatCurrency, formatWrappedDate } from "@/lib/wrapped/utils";
 
 import { BaseSlide, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
