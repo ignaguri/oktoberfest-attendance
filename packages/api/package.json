@@ -21,7 +21,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^1.2.1",
+    "@hono/zod-openapi": "^1.2.2",
     "@novu/api": "^3.13.0",
     "@prostcounter/db": "workspace:*",
     "@prostcounter/shared": "workspace:*",
