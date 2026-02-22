@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
-  runtimeVersion: "1.0.1-g",
+  runtimeVersion: "1.0.1-h",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -27,9 +27,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       NSFaceIDUsageDescription:
         "Use Face ID to quickly sign in to your ProstCounter account",
       NSPhotoLibraryUsageDescription:
-        "Allow ProstCounter to access your photos to share pictures",
+        "ProstCounter needs access to your photo library to let you upload beer pictures to your daily attendance log and share them with your group members in the gallery. For example, you can select a photo of your beer to document your Oktoberfest experience.",
       NSCameraUsageDescription:
-        "Allow ProstCounter to use your camera to take pictures",
+        "ProstCounter needs access to your camera to let you take photos of your beers and add them to your daily attendance records. For example, you can take a picture of your beer to share with friends in your group's photo gallery.",
       NSLocationWhenInUseUsageDescription:
         "ProstCounter uses your location to share with friends and show nearby tents",
       NSLocationAlwaysAndWhenInUseUsageDescription:
