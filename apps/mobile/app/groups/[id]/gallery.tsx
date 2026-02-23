@@ -139,7 +139,7 @@ export default function GroupGalleryScreen() {
   // Loading state
   if (isLoading && !galleryData) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Stack.Screen
           options={{
             title: t("groups.gallery.title"),
@@ -153,7 +153,7 @@ export default function GroupGalleryScreen() {
   // Error state
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Stack.Screen
           options={{
             title: t("groups.gallery.title"),
@@ -177,7 +177,7 @@ export default function GroupGalleryScreen() {
       />
 
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -191,13 +191,13 @@ export default function GroupGalleryScreen() {
             <Card
               variant="outline"
               size="md"
-              className="items-center bg-white p-8"
+              className="bg-white p-8 items-center"
             >
               <Camera size={48} color={IconColors.disabled} />
-              <Text className="mt-4 text-center text-lg font-medium text-typography-700">
+              <Text className="mt-4 text-lg font-medium text-typography-700 text-center">
                 {t("groups.gallery.empty.title")}
               </Text>
-              <Text className="mt-2 text-center text-sm text-typography-500">
+              <Text className="mt-2 text-sm text-typography-500 text-center">
                 {t("groups.gallery.empty.description")}
               </Text>
             </Card>
@@ -263,7 +263,7 @@ export default function GroupGalleryScreen() {
                               resizeMode="cover"
                             />
                           ) : (
-                            <View className="h-full w-full items-center justify-center bg-gray-200">
+                            <View className="bg-gray-200 h-full w-full items-center justify-center">
                               <Camera size={24} color={IconColors.disabled} />
                             </View>
                           )}
@@ -285,11 +285,11 @@ export default function GroupGalleryScreen() {
         animationType="fade"
         onRequestClose={handleCloseModal}
       >
-        <View className="flex-1 bg-black">
+        <View className="bg-black flex-1">
           {/* Close Button */}
           <Pressable
             onPress={handleCloseModal}
-            className="absolute right-4 top-12 z-10 rounded-full bg-black/50 p-2"
+            className="right-4 top-12 bg-black/50 p-2 absolute z-10 rounded-full"
           >
             <X size={24} color="#FFFFFF" />
           </Pressable>

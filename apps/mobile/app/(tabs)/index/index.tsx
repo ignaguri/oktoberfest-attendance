@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { CrowdStatusSummary } from "@/components/crowd";
 import {
   LocationSharingToggle,
   TentProximityBanner,
@@ -61,6 +62,7 @@ export default function HomeScreen() {
       await queryClient.invalidateQueries({ queryKey: ["attendanceByDate"] });
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
       await queryClient.invalidateQueries({ queryKey: ["attendances"] });
+      await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
     } finally {
@@ -71,7 +73,7 @@ export default function HomeScreen() {
   // Loading state - show skeleton while festival is loading
   if (festivalLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+      <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
         <ScrollView className="flex-1">
           <VStack space="md" className="p-4 pb-32">
             <AppHeader />
@@ -83,7 +85,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+    <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
       {/* Tent Proximity Banner - shows at top when near a tent */}
       {Platform.OS !== "web" && <TentProximityBanner threshold={50} />}
 
@@ -121,7 +123,7 @@ export default function HomeScreen() {
                   />
                   <Pressable
                     onPress={() => router.push("/map")}
-                    className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
+                    className="gap-2 rounded-lg bg-primary-500 px-3 py-2 flex-row items-center"
                     accessibilityLabel="Open festival map"
                   >
                     <Map size={18} color={Colors.white} />
@@ -129,7 +131,7 @@ export default function HomeScreen() {
                       {t("location.map.button")}
                     </Text>
                     {isSharing && nearbyMembers.length > 0 && (
-                      <View className="ml-1 rounded-full bg-white px-2 py-0.5">
+                      <View className="ml-1 bg-white px-2 py-0.5 rounded-full">
                         <Text className="text-xs font-bold text-primary-600">
                           {nearbyMembers.length}
                         </Text>
@@ -139,6 +141,11 @@ export default function HomeScreen() {
                 </HStack>
               </Card>
             </TutorialTarget>
+          )}
+
+          {/* Crowd Status Summary */}
+          {currentFestival?.id && (
+            <CrowdStatusSummary festivalId={currentFestival.id} />
           )}
 
           {/* Map Link Button (only shows if festival has mapUrl) */}

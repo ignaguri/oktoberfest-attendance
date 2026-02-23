@@ -146,6 +146,13 @@ export {
   useLanguage,
 } from "./useLanguage";
 
+// Crowd report hooks
+export {
+  useSubmitCrowdReport,
+  useTentCrowdReports,
+  useTentCrowdStatus,
+} from "./useCrowdReports";
+
 // Wrapped hooks
 export {
   useAvailableWrappedFestivals,

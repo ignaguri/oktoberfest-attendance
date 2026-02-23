@@ -2,6 +2,7 @@
 export * from "./achievement.repository";
 export * from "./attendance.repository";
 export * from "./consumption.repository";
+export * from "./crowd-report.repository";
 export * from "./festival.repository";
 export * from "./group.repository";
 export * from "./leaderboard.repository";

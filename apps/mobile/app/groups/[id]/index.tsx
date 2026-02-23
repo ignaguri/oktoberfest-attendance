@@ -227,7 +227,7 @@ export default function GroupDetailScreen() {
   // Loading state
   if (isLoading && !group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
       </View>
     );
@@ -236,7 +236,7 @@ export default function GroupDetailScreen() {
   // Error state
   if (groupError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={groupError} onRetry={refetchGroup} />
       </View>
     );
@@ -245,9 +245,9 @@ export default function GroupDetailScreen() {
   // No group found
   if (!group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 p-6 flex-1 items-center justify-center">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="mt-4 text-center text-typography-500">
+        <Text className="mt-4 text-typography-500 text-center">
           {t("groups.detail.notFound")}
         </Text>
         <Button
@@ -268,7 +268,7 @@ export default function GroupDetailScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}

@@ -1,6 +1,7 @@
 import {
   type TentGroup,
   type TentOption,
+  useTentCrowdStatus,
   useTents,
 } from "@prostcounter/shared/hooks";
 import { X } from "lucide-react-native";
@@ -72,7 +73,25 @@ export function TentSelectorSheet({
 }: TentSelectorSheetProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { tents, isLoading, error } = useTents(festivalId);
+  const { crowdStatuses } = useTentCrowdStatus(festivalId);
   const insets = useSafeAreaInsets();
+
+  // Create a map of tentId -> crowd status for quick lookup
+  const crowdMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { crowdLevel: string | null; avgWaitMinutes: number | null }
+    >();
+    for (const status of crowdStatuses) {
+      if (status.reportCount > 0) {
+        map.set(status.tentId, {
+          crowdLevel: status.crowdLevel,
+          avgWaitMinutes: status.avgWaitMinutes,
+        });
+      }
+    }
+    return map;
+  }, [crowdStatuses]);
 
   // Filter tents based on search query
   const filteredSections: SectionData[] = useMemo(() => {
@@ -136,16 +155,21 @@ export function TentSelectorSheet({
 
   // Render tent item
   const renderItem = useCallback(
-    ({ item }: SectionListRenderItemInfo<TentOption, SectionData>) => (
-      <TentListItem
-        tentId={item.value}
-        tentName={item.label}
-        isSelected={isTentSelected(item.value)}
-        onToggle={handleTentToggle}
-        mode={mode}
-      />
-    ),
-    [isTentSelected, handleTentToggle, mode],
+    ({ item }: SectionListRenderItemInfo<TentOption, SectionData>) => {
+      const crowd = crowdMap.get(item.value);
+      return (
+        <TentListItem
+          tentId={item.value}
+          tentName={item.label}
+          isSelected={isTentSelected(item.value)}
+          onToggle={handleTentToggle}
+          mode={mode}
+          crowdLevel={crowd?.crowdLevel as any}
+          avgWaitMinutes={crowd?.avgWaitMinutes}
+        />
+      );
+    },
+    [isTentSelected, handleTentToggle, mode, crowdMap],
   );
 
   // Key extractor
@@ -163,7 +187,7 @@ export function TentSelectorSheet({
         </ActionsheetDragIndicatorWrapper>
 
         {/* Header */}
-        <HStack className="mb-3 w-full items-center justify-between px-2">
+        <HStack className="mb-3 px-2 w-full items-center justify-between">
           <Text className="text-lg font-semibold text-typography-900">
             {mode === "single" ? "Select Tent" : "Select Tents"}
           </Text>
@@ -173,7 +197,7 @@ export function TentSelectorSheet({
         </HStack>
 
         {/* Search Input */}
-        <View className="mb-3 w-full px-2">
+        <View className="mb-3 px-2 w-full">
           <TentSearchInput
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -183,16 +207,16 @@ export function TentSelectorSheet({
 
         {/* Content */}
         {isLoading ? (
-          <VStack className="items-center justify-center py-8">
+          <VStack className="py-8 items-center justify-center">
             <ActivityIndicator size="large" color={IconColors.default} />
             <Text className="mt-2 text-typography-500">Loading tents...</Text>
           </VStack>
         ) : error ? (
-          <VStack className="items-center justify-center py-8">
+          <VStack className="py-8 items-center justify-center">
             <Text className="text-error-600">Failed to load tents</Text>
           </VStack>
         ) : filteredSections.length === 0 ? (
-          <VStack className="items-center justify-center py-8">
+          <VStack className="py-8 items-center justify-center">
             <Text className="text-typography-500">
               {searchQuery
                 ? "No tents match your search"
@@ -216,7 +240,7 @@ export function TentSelectorSheet({
         {/* Footer (multi-select only) */}
         {mode === "multi" && (
           <HStack
-            className="w-full gap-3 pt-3"
+            className="gap-3 pt-3 w-full"
             style={{ paddingBottom: Math.max(insets.bottom, 16) + 8 }}
           >
             <Button

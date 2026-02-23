@@ -107,6 +107,12 @@ export class QueryKeys {
   static publicProfile = (userId: string, festivalId?: string) =>
     ["public-profile", userId, festivalId ?? "no-festival"] as const;
 
+  // Crowd report queries
+  static crowdStatus = (festivalId: string) =>
+    ["crowd-status", festivalId] as const;
+  static tentCrowdReports = (tentId: string, festivalId: string) =>
+    ["crowd-reports", tentId, festivalId] as const;
+
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }

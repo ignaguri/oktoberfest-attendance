@@ -2111,5 +2111,32 @@
     "breadcrumbs": {
       "settings": "Einstellungen"
     }
+  },
+  "crowdReport": {
+    "title": "Auslastungsbericht",
+    "status": "Auslastungsstatus",
+    "reportCrowd": "Auslastung melden",
+    "submitReport": "Bericht senden",
+    "noReports": "Keine Berichte",
+    "recentReport": "Du hast vor {{minutes}} Min. gemeldet",
+    "reportCount": "{{count}} Bericht",
+    "reportCount_plural": "{{count}} Berichte",
+    "lastReported": "Zuletzt gemeldet {{time}}",
+    "waitTime": "~{{minutes}} Min. Wartezeit",
+    "noWaitData": "Keine Wartezeitdaten",
+    "levels": {
+      "empty": "Leer",
+      "moderate": "Moderat",
+      "crowded": "Voll",
+      "full": "Komplett voll"
+    },
+    "selectLevel": "Wie voll ist es?",
+    "waitTimeLabel": "Geschaetzte Wartezeit (Minuten)",
+    "waitTimeOptional": "Optional",
+    "success": "Bericht gesendet!",
+    "error": "Bericht konnte nicht gesendet werden",
+    "rateLimited": "Du kannst in wenigen Minuten erneut melden",
+    "mostAvailable": "Am wenigsten volle Zelte",
+    "currentLevels": "Aktuelle Auslastung"
   }
 }
