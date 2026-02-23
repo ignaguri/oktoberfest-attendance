@@ -474,7 +474,40 @@
       "share": "Compartir",
       "qrCode": "Código QR",
       "gallery": "Galería",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "messages": "Mensajes"
+    },
+    "messages": {
+      "title": "Mensajes",
+      "titleWithName": "Mensajes de {{groupName}}",
+      "empty": {
+        "title": "Todavia no hay mensajes",
+        "description": "Se el primero en publicar un mensaje en este grupo"
+      },
+      "compose": {
+        "title": "Nuevo mensaje",
+        "placeholder": "Escribi un mensaje...",
+        "send": "Enviar",
+        "sending": "Enviando...",
+        "typeMessage": "Mensaje",
+        "typeAlert": "Alerta",
+        "charCount": "{{count}}/{{max}}",
+        "success": "Mensaje publicado",
+        "error": "No se pudo publicar el mensaje"
+      },
+      "feed": {
+        "title": "Mensajes de grupos",
+        "empty": "Todavia no hay mensajes de tus grupos",
+        "viewAll": "Ver todos"
+      },
+      "item": {
+        "pinned": "Fijado",
+        "alert": "Alerta",
+        "deleteConfirmTitle": "Eliminar mensaje?",
+        "deleteConfirmMessage": "Este mensaje se eliminara permanentemente.",
+        "deleteSuccess": "Mensaje eliminado",
+        "deleteError": "No se pudo eliminar el mensaje"
+      }
     },
     "empty": {
       "title": "Todavía no hay grupos",

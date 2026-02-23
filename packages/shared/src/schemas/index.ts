@@ -18,6 +18,7 @@ export * from "./photo-social.schema";
 export * from "./calendar.schema";
 export * from "./profile.schema";
 export * from "./activity-feed.schema";
+export * from "./group-message.schema";
 export * from "./pricing.schema";
 export * from "./crowd-report.schema";
 

@@ -439,7 +439,40 @@
       "share": "Teilen",
       "qrCode": "QR-Code",
       "gallery": "Galerie",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "messages": "Nachrichten"
+    },
+    "messages": {
+      "title": "Nachrichten",
+      "titleWithName": "{{groupName}} Nachrichten",
+      "empty": {
+        "title": "Noch keine Nachrichten",
+        "description": "Sei der Erste, der eine Nachricht in dieser Gruppe postet"
+      },
+      "compose": {
+        "title": "Neue Nachricht",
+        "placeholder": "Nachricht schreiben...",
+        "send": "Senden",
+        "sending": "Wird gesendet...",
+        "typeMessage": "Nachricht",
+        "typeAlert": "Hinweis",
+        "charCount": "{{count}}/{{max}}",
+        "success": "Nachricht gepostet",
+        "error": "Nachricht konnte nicht gepostet werden"
+      },
+      "feed": {
+        "title": "Gruppennachrichten",
+        "empty": "Noch keine Nachrichten aus deinen Gruppen",
+        "viewAll": "Alle anzeigen"
+      },
+      "item": {
+        "pinned": "Angepinnt",
+        "alert": "Hinweis",
+        "deleteConfirmTitle": "Nachricht loeschen?",
+        "deleteConfirmMessage": "Diese Nachricht wird dauerhaft geloescht.",
+        "deleteSuccess": "Nachricht geloescht",
+        "deleteError": "Nachricht konnte nicht geloescht werden"
+      }
     },
     "empty": {
       "title": "Noch keine Gruppen",

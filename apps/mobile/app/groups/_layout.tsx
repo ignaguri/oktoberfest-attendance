@@ -20,6 +20,12 @@ export default function GroupsLayout() {
           title: t("groups.settings.title"),
         }}
       />
+      <Stack.Screen
+        name="[id]/messages"
+        options={{
+          title: t("groups.messages.title"),
+        }}
+      />
     </Stack>
   );
 }

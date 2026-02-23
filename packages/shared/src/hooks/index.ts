@@ -98,6 +98,15 @@ export {
   useUpdateReservation,
 } from "./useReservations";
 
+// Group message hooks
+export {
+  useGroupMessages,
+  useMessageFeed,
+  usePostMessage,
+  useUpdateMessage,
+  useDeleteMessage,
+} from "./useGroupMessages";
+
 // Activity feed hooks
 export {
   type ActivityFeedItem,
