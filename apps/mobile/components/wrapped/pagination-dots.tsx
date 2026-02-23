@@ -12,7 +12,7 @@ export function PaginationDots({ total, current }: PaginationDotsProps) {
 
   return (
     <View
-      className="absolute bottom-0 left-0 right-0 flex-row items-center justify-center gap-1.5 py-2"
+      className="absolute right-0 bottom-0 left-0 flex-row items-center justify-center gap-1.5 py-2"
       style={{ paddingBottom: insets.bottom + 8 }}
     >
       {Array.from({ length: total }).map((_, index) => (

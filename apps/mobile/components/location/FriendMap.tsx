@@ -352,8 +352,8 @@ export function FriendMap({
 
       {/* Loading indicator */}
       {isNearbyLoading && (
-        <View className="absolute left-2.5 top-2.5 rounded-2xl bg-white/90 px-3 py-1.5">
-          <Text className="text-sm text-typography-500">
+        <View className="absolute top-2.5 left-2.5 rounded-2xl bg-white/90 px-3 py-1.5">
+          <Text className="text-typography-500 text-sm">
             {t("location.map.loading")}
           </Text>
         </View>

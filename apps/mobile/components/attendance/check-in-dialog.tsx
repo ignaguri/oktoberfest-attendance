@@ -86,7 +86,7 @@ export function CheckInDialog({
           </HStack>
         </AlertDialogHeader>
 
-        <AlertDialogBody className="mb-4 mt-3">
+        <AlertDialogBody className="mt-3 mb-4">
           <VStack space="md">
             <Text className="text-typography-600">
               {t("reservation.checkIn.description")}
@@ -95,13 +95,13 @@ export function CheckInDialog({
             {/* Reservation Details */}
             <VStack
               space="sm"
-              className="rounded-lg border border-background-200 bg-background-50 p-3"
+              className="border-background-200 bg-background-50 rounded-lg border p-3"
             >
               {/* Tent */}
               {tentName && (
                 <HStack space="sm" className="items-center">
                   <MapPin size={16} color={IconColors.muted} />
-                  <Text className="font-medium text-typography-800">
+                  <Text className="text-typography-800 font-medium">
                     {tentName}
                   </Text>
                 </HStack>
@@ -119,7 +119,7 @@ export function CheckInDialog({
               {reservation.note && (
                 <HStack space="sm" className="items-start">
                   <StickyNote size={16} color={IconColors.muted} />
-                  <Text className="flex-1 text-sm text-typography-500">
+                  <Text className="text-typography-500 flex-1 text-sm">
                     {reservation.note}
                   </Text>
                 </HStack>

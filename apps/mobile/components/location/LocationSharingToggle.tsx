@@ -233,7 +233,7 @@ export function LocationSharingToggle({
     >
       <HStack space="sm" className="items-start">
         <AlertTriangle size={18} color={Colors.amber[600]} />
-        <Text className="flex-1 text-sm text-typography-700">
+        <Text className="text-typography-700 flex-1 text-sm">
           {inlineWarning}
         </Text>
         <Pressable
@@ -275,13 +275,13 @@ export function LocationSharingToggle({
                 )}
               </View>
               <VStack>
-                <Text className="text-sm font-medium text-typography-900">
+                <Text className="text-typography-900 text-sm font-medium">
                   {isSharing
                     ? t("location.sharing.sharing")
                     : t("location.sharing.notSharing")}
                 </Text>
                 {isSharing && nearbyMembers.length > 0 && (
-                  <Text className="text-xs text-typography-500">
+                  <Text className="text-typography-500 text-xs">
                     {t("location.nearbyCount", { count: nearbyMembers.length })}
                   </Text>
                 )}
@@ -329,10 +329,10 @@ export function LocationSharingToggle({
                 )}
               </View>
               <VStack>
-                <Text className="font-semibold text-typography-900">
+                <Text className="text-typography-900 font-semibold">
                   {t("location.sharing.title")}
                 </Text>
-                <Text className="text-xs text-typography-500">
+                <Text className="text-typography-500 text-xs">
                   {isSharing
                     ? t("location.sharingActive")
                     : t("location.sharingInactive")}
@@ -373,7 +373,7 @@ export function LocationSharingToggle({
               </HStack>
 
               {/* Group selector accordion */}
-              <VStack className="rounded-xl border border-outline-200 bg-background-50">
+              <VStack className="border-outline-200 bg-background-50 rounded-xl border">
                 {/* Accordion header */}
                 <Pressable
                   onPress={() => setIsGroupSelectorOpen(!isGroupSelectorOpen)}
@@ -393,12 +393,12 @@ export function LocationSharingToggle({
                     <HStack space="sm" className="items-center">
                       <Users size={18} color={IconColors.default} />
                       <VStack>
-                        <Text className="text-sm font-medium text-typography-900">
+                        <Text className="text-typography-900 text-sm font-medium">
                           {t("location.groups.visibleTo", {
                             defaultValue: "Visible to",
                           })}
                         </Text>
-                        <Text className="text-xs text-typography-500">
+                        <Text className="text-typography-500 text-xs">
                           {getGroupSelectionText()}
                         </Text>
                       </VStack>
@@ -413,7 +413,7 @@ export function LocationSharingToggle({
 
                 {/* Accordion content */}
                 {isGroupSelectorOpen && (
-                  <View className="border-t border-outline-200 px-3 pb-3">
+                  <View className="border-outline-200 border-t px-3 pb-3">
                     <GroupSelector
                       festivalId={festivalId}
                       selectedGroupIds={selectedGroupIds}

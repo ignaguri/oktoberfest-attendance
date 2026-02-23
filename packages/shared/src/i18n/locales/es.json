@@ -406,6 +406,24 @@
       "empty": {
         "title": "Todavía no hay fotos",
         "description": "Las fotos de cerveza de los miembros del grupo aparecerán acá"
+      },
+      "photoDetail": {
+        "reactions": "Reacciones",
+        "comments": "Comentarios",
+        "noComments": "Todavia no hay comentarios. Se el primero!",
+        "addComment": "Agregar un comentario...",
+        "send": "Enviar",
+        "deleteComment": "Eliminar",
+        "deleteCommentConfirm": "Estas seguro de que queres eliminar este comentario?",
+        "commentAdded": "Comentario agregado",
+        "commentDeleted": "Comentario eliminado",
+        "commentError": "No se pudo agregar el comentario",
+        "deleteError": "No se pudo eliminar el comentario",
+        "reactionError": "No se pudo actualizar la reaccion",
+        "justNow": "Ahora",
+        "minutesAgo": "hace {{count}}m",
+        "hoursAgo": "hace {{count}}h",
+        "daysAgo": "hace {{count}}d"
       }
     },
     "location": {

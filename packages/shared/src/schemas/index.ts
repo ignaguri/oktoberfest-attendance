@@ -14,6 +14,7 @@ export * from "./wrapped.schema";
 export * from "./reservation.schema";
 export * from "./location.schema";
 export * from "./photo.schema";
+export * from "./photo-social.schema";
 export * from "./calendar.schema";
 export * from "./profile.schema";
 export * from "./activity-feed.schema";

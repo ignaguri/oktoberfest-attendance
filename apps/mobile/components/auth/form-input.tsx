@@ -102,9 +102,9 @@ export function FormInput<T extends FieldValues>({
 
   return (
     <View className="mb-4 w-full">
-      <Text className="mb-1.5 font-medium text-typography-700">{label}</Text>
+      <Text className="text-typography-700 mb-1.5 font-medium">{label}</Text>
       <Controller control={control} name={name} render={renderInput} />
-      {error && <Text className="mt-1 text-sm text-error-600">{error}</Text>}
+      {error && <Text className="text-error-600 mt-1 text-sm">{error}</Text>}
     </View>
   );
 }

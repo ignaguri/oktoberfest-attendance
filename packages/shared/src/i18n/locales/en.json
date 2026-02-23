@@ -406,6 +406,24 @@
       "empty": {
         "title": "No photos yet",
         "description": "Group members' beer photos will appear here"
+      },
+      "photoDetail": {
+        "reactions": "Reactions",
+        "comments": "Comments",
+        "noComments": "No comments yet. Be the first!",
+        "addComment": "Add a comment...",
+        "send": "Send",
+        "deleteComment": "Delete",
+        "deleteCommentConfirm": "Are you sure you want to delete this comment?",
+        "commentAdded": "Comment added",
+        "commentDeleted": "Comment deleted",
+        "commentError": "Failed to add comment",
+        "deleteError": "Failed to delete comment",
+        "reactionError": "Failed to update reaction",
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
       }
     },
     "location": {

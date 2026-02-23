@@ -227,7 +227,7 @@ export default function GroupDetailScreen() {
   // Loading state
   if (isLoading && !group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <Spinner size="large" />
       </View>
     );
@@ -236,7 +236,7 @@ export default function GroupDetailScreen() {
   // Error state
   if (groupError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={groupError} onRetry={refetchGroup} />
       </View>
     );
@@ -245,9 +245,9 @@ export default function GroupDetailScreen() {
   // No group found
   if (!group) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="mt-4 text-center text-typography-500">
+        <Text className="text-typography-500 mt-4 text-center">
           {t("groups.detail.notFound")}
         </Text>
         <Button
@@ -268,7 +268,7 @@ export default function GroupDetailScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -287,7 +287,7 @@ export default function GroupDetailScreen() {
                   </Heading>
                   <HStack space="sm" className="items-center">
                     <Users size={14} color={IconColors.muted} />
-                    <Text className="text-sm text-typography-500">
+                    <Text className="text-typography-500 text-sm">
                       {t("groups.memberCount", {
                         count: group.memberCount || 0,
                       })}
@@ -309,7 +309,7 @@ export default function GroupDetailScreen() {
 
               {/* Description */}
               {group.description && (
-                <Text className="text-sm text-typography-600">
+                <Text className="text-typography-600 text-sm">
                   {group.description}
                 </Text>
               )}
@@ -369,7 +369,7 @@ export default function GroupDetailScreen() {
           {/* Leaderboard Section */}
           <VStack space="sm">
             <HStack className="items-center justify-between">
-              <Text className="text-sm font-medium text-typography-700">
+              <Text className="text-typography-700 text-sm font-medium">
                 {t("groups.detail.leaderboard")}
               </Text>
               {isLoadingLeaderboard && <Spinner size="small" />}
@@ -405,7 +405,7 @@ export default function GroupDetailScreen() {
               {dialog.title}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mb-4 mt-3">
+          <AlertDialogBody className="mt-3 mb-4">
             <Text size="sm" className="text-typography-500">
               {dialog.message}
             </Text>
@@ -440,7 +440,7 @@ export default function GroupDetailScreen() {
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
           <VStack space="md" className="w-full">
-            <Text className="px-3 text-lg font-semibold text-typography-900">
+            <Text className="text-typography-900 px-3 text-lg font-semibold">
               {t("groups.actions.share")}
             </Text>
             <ActionsheetItem onPress={shareViaWhatsApp}>

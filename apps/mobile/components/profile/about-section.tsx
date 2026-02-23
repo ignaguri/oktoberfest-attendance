@@ -79,7 +79,7 @@ export function AboutSection() {
 
   return (
     <Card size="md" variant="elevated">
-      <Text className="mb-2 text-lg font-semibold text-typography-900">
+      <Text className="text-typography-900 mb-2 text-lg font-semibold">
         {t("profile.about.title")}
       </Text>
 
@@ -89,7 +89,7 @@ export function AboutSection() {
             key={link.key}
             className={
               index < LINKS.length - 1
-                ? "border-b border-outline-100"
+                ? "border-outline-100 border-b"
                 : undefined
             }
           >

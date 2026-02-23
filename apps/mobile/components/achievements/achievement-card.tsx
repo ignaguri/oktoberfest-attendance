@@ -181,7 +181,7 @@ export function AchievementCard({
             >
               {displayName}
             </Text>
-            <Text className="text-sm text-typography-500" numberOfLines={2}>
+            <Text className="text-typography-500 text-sm" numberOfLines={2}>
               {displayDescription}
             </Text>
           </VStack>
@@ -211,7 +211,7 @@ export function AchievementCard({
             </Badge>
 
             {/* Points */}
-            <Text className="text-sm text-typography-600">
+            <Text className="text-typography-600 text-sm">
               {points} {t("achievements.points")}
             </Text>
           </HStack>
@@ -234,7 +234,7 @@ export function AchievementCard({
                   progress={user_progress}
                   showLabel={false}
                 />
-                <Text className="mt-1 text-center text-xs text-typography-400">
+                <Text className="text-typography-400 mt-1 text-center text-xs">
                   {Math.round(user_progress.percentage)}%
                 </Text>
               </View>

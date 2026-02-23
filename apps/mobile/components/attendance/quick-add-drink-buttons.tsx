@@ -162,12 +162,12 @@ export function QuickAddDrinkButtons({
             onPress={() => handleQuickAdd(type)}
             disabled={isDisabled}
             className={cn(
-              "min-w-[70px] max-w-[90px] flex-1 items-center justify-center rounded-xl border-2 px-2 py-3",
+              "max-w-[90px] min-w-[70px] flex-1 items-center justify-center rounded-xl border-2 px-2 py-3",
               isSuccess
                 ? "border-success-500 bg-success-50"
                 : isDisabled
                   ? "border-background-200 bg-background-100"
-                  : "border-background-200 bg-white active:bg-background-50",
+                  : "border-background-200 active:bg-background-50 bg-white",
             )}
             accessibilityLabel={getLabel(type)}
             accessibilityRole="button"

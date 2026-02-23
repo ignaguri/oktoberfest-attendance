@@ -79,7 +79,7 @@ export function LocationPermissionPrompt({
 
         <AlertDialogBody>
           <VStack space="md">
-            <Text className="text-center text-typography-600">
+            <Text className="text-typography-600 text-center">
               {t("location.promptDescription", {
                 defaultValue:
                   "Enable location sharing to find friends and discover nearby tents",
@@ -95,14 +95,14 @@ export function LocationPermissionPrompt({
                   >
                     <benefit.icon size={20} color={Colors.primary[500]} />
                   </View>
-                  <Text className="flex-1 text-sm text-typography-700">
+                  <Text className="text-typography-700 flex-1 text-sm">
                     {benefit.text}
                   </Text>
                 </HStack>
               ))}
             </VStack>
 
-            <Text className="text-center text-xs text-typography-500">
+            <Text className="text-typography-500 text-center text-xs">
               {t("location.promptNote", {
                 defaultValue: "You can turn off location sharing at any time",
               })}

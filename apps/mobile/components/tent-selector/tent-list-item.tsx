@@ -61,7 +61,7 @@ export function TentListItem({
           className={cn(
             "flex-1",
             isSelected
-              ? "font-semibold text-primary-700"
+              ? "text-primary-700 font-semibold"
               : "text-typography-700",
           )}
         >

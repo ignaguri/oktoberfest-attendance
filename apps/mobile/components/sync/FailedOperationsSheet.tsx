@@ -211,7 +211,7 @@ export function FailedOperationsSheet({
             </VStack>
           ) : (
             <>
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 {t("sync.failedOps.description", {
                   count: failedOps.length,
                 })}
@@ -223,19 +223,19 @@ export function FailedOperationsSheet({
                   {failedOps.map((op) => (
                     <HStack
                       key={op.id}
-                      className="items-center justify-between rounded-lg border border-outline-200 bg-background-50 p-3"
+                      className="border-outline-200 bg-background-50 items-center justify-between rounded-lg border p-3"
                     >
                       <VStack className="flex-1">
-                        <Text className="font-medium text-typography-900">
+                        <Text className="text-typography-900 font-medium">
                           {getOperationLabel(op)}
                         </Text>
                         <Text
-                          className="text-xs text-error-600"
+                          className="text-error-600 text-xs"
                           numberOfLines={2}
                         >
                           {op.last_error || t("sync.failedOps.unknownError")}
                         </Text>
-                        <Text className="text-xs text-typography-400">
+                        <Text className="text-typography-400 text-xs">
                           {t("sync.failedOps.attempts", {
                             count: op.retry_count,
                           })}
@@ -246,7 +246,7 @@ export function FailedOperationsSheet({
                           onPress={() => handleRetryOne(op.id)}
                           disabled={retryingIds.has(op.id)}
                           accessibilityLabel={t("sync.retry")}
-                          className="rounded-full bg-primary-100 p-2"
+                          className="bg-primary-100 rounded-full p-2"
                         >
                           {retryingIds.has(op.id) ? (
                             <Spinner size="small" color={Colors.primary[500]} />
@@ -257,7 +257,7 @@ export function FailedOperationsSheet({
                         <Pressable
                           onPress={() => handleDeleteOne(op.id)}
                           accessibilityLabel={t("sync.dismiss")}
-                          className="rounded-full bg-error-100 p-2"
+                          className="bg-error-100 rounded-full p-2"
                         >
                           <Trash2 size={16} color={Colors.error[600]} />
                         </Pressable>

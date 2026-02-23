@@ -150,7 +150,7 @@ export function CalendarActionSheet({
 
         {/* Header with close button */}
         <HStack className="mb-2 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 text-lg font-semibold">
             {formattedDate}
           </Text>
           <Pressable onPress={onClose} hitSlop={8}>

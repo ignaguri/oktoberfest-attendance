@@ -22,10 +22,10 @@ export function AppHeader() {
         accessibilityLabel={t("app.logo")}
       />
       <HStack>
-        <Text className="text-3xl font-extrabold text-primary-600">
+        <Text className="text-primary-600 text-3xl font-extrabold">
           {t("app.namePart1")}
         </Text>
-        <Text className="text-3xl font-extrabold text-primary-500">
+        <Text className="text-primary-500 text-3xl font-extrabold">
           {t("app.namePart2")}
         </Text>
       </HStack>

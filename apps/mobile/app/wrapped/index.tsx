@@ -51,7 +51,7 @@ export default function WrappedScreen() {
           </Text>
           <Pressable
             onPress={handleClose}
-            className="rounded-lg bg-primary-500 px-6 py-3"
+            className="bg-primary-500 rounded-lg px-6 py-3"
           >
             <Text className="font-semibold text-white">
               {t("wrapped.close")}
@@ -72,7 +72,7 @@ export default function WrappedScreen() {
           </Text>
           <Pressable
             onPress={handleClose}
-            className="rounded-lg bg-primary-500 px-6 py-3"
+            className="bg-primary-500 rounded-lg px-6 py-3"
           >
             <Text className="font-semibold text-white">
               {t("wrapped.close")}
