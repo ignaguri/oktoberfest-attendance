@@ -5,19 +5,18 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { getInitials } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { Camera, X } from "lucide-react-native";
+import { Camera } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   Dimensions,
   Image,
-  Modal,
   Pressable,
   RefreshControl,
   ScrollView,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
 import {
   Avatar,
   AvatarFallbackText,
@@ -103,8 +102,10 @@ function groupGalleryData(photos: GalleryPhoto[]): GroupedGallery[] {
 export default function GroupGalleryScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState(true);
+  const [selectedPhoto, setSelectedPhoto] = useState<{
+    id: string;
+    url: string;
+  } | null>(null);
 
   // Fetch gallery data
   const {
@@ -126,14 +127,12 @@ export default function GroupGalleryScreen() {
 
   const hasPhotos = groupedGallery.length > 0;
 
-  const handleImagePress = useCallback((imageUrl: string) => {
-    setImageLoading(true);
-    setSelectedImage(imageUrl);
+  const handleImagePress = useCallback((photoId: string, imageUrl: string) => {
+    setSelectedPhoto({ id: photoId, url: imageUrl });
   }, []);
 
   const handleCloseModal = useCallback(() => {
-    setSelectedImage(null);
-    setImageLoading(true);
+    setSelectedPhoto(null);
   }, []);
 
   // Loading state
@@ -244,7 +243,11 @@ export default function GroupGalleryScreen() {
                       return (
                         <Pressable
                           key={photo.id}
-                          onPress={() => imageUrl && handleImagePress(imageUrl)}
+                          onPress={() =>
+                            imageUrl && handleImagePress(photo.id, imageUrl)
+                          }
+                          accessibilityLabel={`Photo by ${userGroup.username}`}
+                          accessibilityHint="Tap to view photo details, reactions, and comments"
                           style={{
                             width: IMAGE_SIZE,
                             height: IMAGE_SIZE,
@@ -278,47 +281,14 @@ export default function GroupGalleryScreen() {
         </VStack>
       </ScrollView>
 
-      {/* Full-size Image Modal */}
-      <Modal
-        visible={!!selectedImage}
-        transparent
-        animationType="fade"
-        onRequestClose={handleCloseModal}
-      >
-        <View className="flex-1 bg-black">
-          {/* Close Button */}
-          <Pressable
-            onPress={handleCloseModal}
-            className="absolute right-4 top-12 z-10 rounded-full bg-black/50 p-2"
-          >
-            <X size={24} color="#FFFFFF" />
-          </Pressable>
-
-          {/* Image */}
-          <Pressable
-            onPress={handleCloseModal}
-            className="flex-1 items-center justify-center"
-          >
-            {imageLoading && (
-              <View className="absolute">
-                <ActivityIndicator size="large" color="#FFFFFF" />
-              </View>
-            )}
-            {selectedImage && (
-              <Image
-                source={{ uri: selectedImage }}
-                style={{
-                  width: SCREEN_WIDTH,
-                  height: SCREEN_WIDTH,
-                }}
-                resizeMode="contain"
-                onLoadStart={() => setImageLoading(true)}
-                onLoadEnd={() => setImageLoading(false)}
-              />
-            )}
-          </Pressable>
-        </View>
-      </Modal>
+      {/* Photo Detail Modal with Reactions & Comments */}
+      <PhotoDetailModal
+        visible={!!selectedPhoto}
+        photoId={selectedPhoto?.id || null}
+        photoUrl={selectedPhoto?.url || null}
+        groupId={id || ""}
+        onClose={handleCloseModal}
+      />
     </GestureHandlerRootView>
   );
 }

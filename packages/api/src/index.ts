@@ -15,6 +15,7 @@ import leaderboardRoute from "./routes/leaderboard.route";
 import locationRoute from "./routes/location.route";
 import notificationRoute from "./routes/notification.route";
 import photoRoute from "./routes/photo.route";
+import photoSocialRoute from "./routes/photo-social.route";
 import profileRoute from "./routes/profile.route";
 import reservationRoute from "./routes/reservation.route";
 import tentRoute from "./routes/tent.route";
@@ -54,6 +55,7 @@ apiV1.route("/", wrappedRoute);
 apiV1.route("/", reservationRoute);
 apiV1.route("/", locationRoute);
 apiV1.route("/", photoRoute);
+apiV1.route("/", photoSocialRoute);
 apiV1.route("/", profileRoute);
 apiV1.route("/", activityFeedRoute);
 

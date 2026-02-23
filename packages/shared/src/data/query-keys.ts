@@ -107,6 +107,12 @@ export class QueryKeys {
   static publicProfile = (userId: string, festivalId?: string) =>
     ["public-profile", userId, festivalId ?? "no-festival"] as const;
 
+  // Photo social queries
+  static photoReactions = (photoId: string, groupId: string) =>
+    ["photo-reactions", photoId, groupId] as const;
+  static photoComments = (photoId: string, groupId: string) =>
+    ["photo-comments", photoId, groupId] as const;
+
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }

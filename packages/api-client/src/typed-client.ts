@@ -2204,6 +2204,165 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse(response);
       },
     },
+
+    /**
+     * Photo Social API (Reactions & Comments)
+     */
+    photoSocial: {
+      async getReactions(
+        photoId: string,
+        groupId: string,
+      ): Promise<{
+        reactions: Array<{
+          emoji: string;
+          count: number;
+          users: Array<{
+            userId: string;
+            username: string;
+            avatarUrl: string | null;
+          }>;
+        }>;
+        userReactions: string[];
+      }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({ groupId });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/photos/${photoId}/reactions?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch photo reactions: ${response.statusText}`,
+          );
+        }
+        return parseJsonResponse(response);
+      },
+
+      async addReaction(
+        photoId: string,
+        groupId: string,
+        emoji: string,
+      ): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/photos/${photoId}/reactions`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ groupId, emoji }),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to add reaction");
+        }
+        return parseJsonResponse(response);
+      },
+
+      async removeReaction(
+        photoId: string,
+        groupId: string,
+        emoji: string,
+      ): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/photos/${photoId}/reactions`,
+          {
+            method: "DELETE",
+            headers,
+            body: JSON.stringify({ groupId, emoji }),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to remove reaction");
+        }
+        return parseJsonResponse(response);
+      },
+
+      async getComments(
+        photoId: string,
+        groupId: string,
+      ): Promise<{
+        comments: Array<{
+          id: string;
+          userId: string;
+          username: string;
+          avatarUrl: string | null;
+          content: string;
+          createdAt: string;
+        }>;
+      }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({ groupId });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/photos/${photoId}/comments?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch photo comments: ${response.statusText}`,
+          );
+        }
+        return parseJsonResponse(response);
+      },
+
+      async addComment(
+        photoId: string,
+        groupId: string,
+        content: string,
+      ): Promise<{
+        comment: { id: string; content: string; createdAt: string };
+      }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/photos/${photoId}/comments`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ groupId, content }),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to add comment");
+        }
+        return parseJsonResponse(response);
+      },
+
+      async deleteComment(
+        photoId: string,
+        commentId: string,
+      ): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/photos/${photoId}/comments/${commentId}`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to delete comment");
+        }
+        return parseJsonResponse(response);
+      },
+    },
   };
 }
 

@@ -384,6 +384,24 @@
       "empty": {
         "title": "Noch keine Fotos",
         "description": "Bierfotos der Gruppenmitglieder erscheinen hier"
+      },
+      "photoDetail": {
+        "reactions": "Reaktionen",
+        "comments": "Kommentare",
+        "noComments": "Noch keine Kommentare. Sei der Erste!",
+        "addComment": "Kommentar hinzufuegen...",
+        "send": "Senden",
+        "deleteComment": "Loeschen",
+        "deleteCommentConfirm": "Bist du sicher, dass du diesen Kommentar loeschen moechtest?",
+        "commentAdded": "Kommentar hinzugefuegt",
+        "commentDeleted": "Kommentar geloescht",
+        "commentError": "Kommentar konnte nicht hinzugefuegt werden",
+        "deleteError": "Kommentar konnte nicht geloescht werden",
+        "reactionError": "Reaktion konnte nicht aktualisiert werden",
+        "justNow": "Gerade eben",
+        "minutesAgo": "vor {{count}}m",
+        "hoursAgo": "vor {{count}}h",
+        "daysAgo": "vor {{count}}t"
       }
     },
     "location": {

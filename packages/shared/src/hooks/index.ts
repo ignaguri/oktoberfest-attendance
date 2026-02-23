@@ -146,6 +146,16 @@ export {
   useLanguage,
 } from "./useLanguage";
 
+// Photo social hooks
+export {
+  useAddComment,
+  useAddReaction,
+  useDeleteComment,
+  usePhotoComments,
+  usePhotoReactions,
+  useRemoveReaction,
+} from "./usePhotoSocial";
+
 // Wrapped hooks
 export {
   useAvailableWrappedFestivals,
