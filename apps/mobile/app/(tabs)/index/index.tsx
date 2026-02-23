@@ -17,6 +17,7 @@ import {
   LocationSharingToggle,
   TentProximityBanner,
 } from "@/components/location";
+import { MessageFeed } from "@/components/messages/message-feed";
 import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
@@ -61,6 +62,7 @@ export default function HomeScreen() {
       await queryClient.invalidateQueries({ queryKey: ["attendanceByDate"] });
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
       await queryClient.invalidateQueries({ queryKey: ["attendances"] });
+      await queryClient.invalidateQueries({ queryKey: ["message-feed"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
     } finally {
@@ -143,6 +145,9 @@ export default function HomeScreen() {
 
           {/* Map Link Button (only shows if festival has mapUrl) */}
           <MapLinkButton />
+
+          {/* Group Messages Feed */}
+          <MessageFeed onRefresh={handleRefresh} />
 
           {/* Activity Feed */}
           <ActivityFeed onRefresh={handleRefresh} />

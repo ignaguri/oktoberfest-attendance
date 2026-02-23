@@ -218,6 +218,11 @@ export default function GroupDetailScreen() {
     router.push(`/groups/${id}/gallery`);
   }, [router, id]);
 
+  // Handle messages navigation
+  const handleMessages = useCallback(() => {
+    router.push(`/groups/${id}/messages`);
+  }, [router, id]);
+
   // Handle refresh
   const onRefresh = useCallback(() => {
     refetchGroup();
@@ -347,6 +352,17 @@ export default function GroupDetailScreen() {
                   <Image size={16} color={IconColors.default} />
                   <ButtonText className="ml-1">
                     {t("groups.actions.gallery")}
+                  </ButtonText>
+                </Button>
+                <Button
+                  variant="outline"
+                  action="secondary"
+                  size="sm"
+                  onPress={handleMessages}
+                >
+                  <MessageCircle size={16} color={IconColors.default} />
+                  <ButtonText className="ml-1">
+                    {t("groups.actions.messages")}
                   </ButtonText>
                 </Button>
                 {isCreator && (

@@ -34,6 +34,12 @@ import type {
   TutorialStatus,
   MissingProfileFields,
   Highlights,
+  GetGroupMessagesResponse,
+  GetMessageFeedResponse,
+  CreateGroupMessageResponse,
+  UpdateGroupMessageResponse,
+  DeleteGroupMessageResponse,
+  GroupMessageType,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -2202,6 +2208,131 @@ export function createTypedApiClient(config: ApiClientConfig) {
           );
         }
         return parseJsonResponse(response);
+      },
+    },
+
+    /**
+     * Group Messages API
+     */
+    groupMessages: {
+      async list(
+        groupId: string,
+        query?: { limit?: number; cursor?: string },
+      ): Promise<GetGroupMessagesResponse> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams();
+        if (query?.limit) params.set("limit", query.limit.toString());
+        if (query?.cursor) params.set("cursor", query.cursor);
+
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/${groupId}/messages?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch group messages: ${response.statusText}`,
+          );
+        }
+        return parseJsonResponse<GetGroupMessagesResponse>(response);
+      },
+
+      async feed(query: {
+        festivalId: string;
+        limit?: number;
+        cursor?: string;
+      }): Promise<GetMessageFeedResponse> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({
+          festivalId: query.festivalId,
+        });
+        if (query.limit) params.set("limit", query.limit.toString());
+        if (query.cursor) params.set("cursor", query.cursor);
+
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/messages/feed?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch message feed: ${response.statusText}`,
+          );
+        }
+        return parseJsonResponse<GetMessageFeedResponse>(response);
+      },
+
+      async create(
+        groupId: string,
+        data: { content: string; messageType?: GroupMessageType },
+      ): Promise<CreateGroupMessageResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/${groupId}/messages`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to create message");
+        }
+        return parseJsonResponse<CreateGroupMessageResponse>(response);
+      },
+
+      async update(
+        groupId: string,
+        messageId: string,
+        data: {
+          content?: string;
+          messageType?: GroupMessageType;
+          pinned?: boolean;
+        },
+      ): Promise<UpdateGroupMessageResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "PUT",
+          `${baseUrl}/v1/groups/${groupId}/messages/${messageId}`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to update message");
+        }
+        return parseJsonResponse<UpdateGroupMessageResponse>(response);
+      },
+
+      async delete(
+        groupId: string,
+        messageId: string,
+      ): Promise<DeleteGroupMessageResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/groups/${groupId}/messages/${messageId}`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to delete message");
+        }
+        return parseJsonResponse<DeleteGroupMessageResponse>(response);
       },
     },
   };

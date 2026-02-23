@@ -456,7 +456,40 @@
       "share": "Share",
       "qrCode": "QR Code",
       "gallery": "Gallery",
-      "settings": "Settings"
+      "settings": "Settings",
+      "messages": "Messages"
+    },
+    "messages": {
+      "title": "Messages",
+      "titleWithName": "{{groupName}} Messages",
+      "empty": {
+        "title": "No messages yet",
+        "description": "Be the first to post a message in this group"
+      },
+      "compose": {
+        "title": "New Message",
+        "placeholder": "Write a message...",
+        "send": "Send",
+        "sending": "Sending...",
+        "typeMessage": "Message",
+        "typeAlert": "Alert",
+        "charCount": "{{count}}/{{max}}",
+        "success": "Message posted",
+        "error": "Failed to post message"
+      },
+      "feed": {
+        "title": "Group Messages",
+        "empty": "No messages from your groups yet",
+        "viewAll": "View All"
+      },
+      "item": {
+        "pinned": "Pinned",
+        "alert": "Alert",
+        "deleteConfirmTitle": "Delete Message?",
+        "deleteConfirmMessage": "This message will be permanently deleted.",
+        "deleteSuccess": "Message deleted",
+        "deleteError": "Failed to delete message"
+      }
     },
     "empty": {
       "title": "No groups yet",
