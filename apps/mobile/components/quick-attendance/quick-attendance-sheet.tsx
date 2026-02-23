@@ -56,6 +56,7 @@ import {
   IconColors,
 } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
+import { useQuickAttendance } from "@/lib/quick-attendance";
 
 interface QuickAttendanceSheetProps {
   isOpen: boolean;
@@ -154,6 +155,7 @@ export function QuickAttendanceSheet({
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
+  const { setPendingCrowdReport } = useQuickAttendance();
 
   // Get today's date
   const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
@@ -352,6 +354,11 @@ export function QuickAttendanceSheet({
         ),
       });
 
+      // Signal crowd report prompt if tents were selected
+      if (selectedTentId) {
+        setPendingCrowdReport({ tentIds: [selectedTentId] });
+      }
+
       // Close the sheet
       onClose();
     } catch (error) {
@@ -384,6 +391,7 @@ export function QuickAttendanceSheet({
     refetchAttendance,
     toast,
     onClose,
+    setPendingCrowdReport,
     t,
   ]);
 

@@ -1,9 +1,11 @@
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useAttendanceByDate, useTents } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -13,7 +15,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { CrowdStatusSummary } from "@/components/crowd";
+import {
+  CrowdReportFab,
+  CrowdReportPrompt,
+  CrowdStatusSummary,
+} from "@/components/crowd";
 import {
   LocationSharingToggle,
   TentProximityBanner,
@@ -32,6 +38,7 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
+import { useQuickAttendance } from "@/lib/quick-attendance";
 
 /**
  * Home screen displaying:
@@ -53,6 +60,78 @@ export default function HomeScreen() {
 
   // Location state (safe hook works outside provider too)
   const { isSharing, nearbyMembers } = useLocationContextSafe();
+
+  // Quick attendance context (for crowd report prompt after save)
+  const { pendingCrowdReport, setPendingCrowdReport } = useQuickAttendance();
+
+  // Crowd report prompt state
+  const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);
+  const [crowdPromptTents, setCrowdPromptTents] = useState<
+    { id: string; name: string }[]
+  >([]);
+
+  // Today's date for querying attendance
+  const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  const festivalId = currentFestival?.id || "";
+
+  // Fetch today's attendance to know which tents the user visited
+  const { data: todayAttendance } = useAttendanceByDate(festivalId, today);
+
+  // Fetch tent data for name lookup
+  const { tents: tentGroups } = useTents(festivalId);
+
+  // Resolve tent IDs to { id, name } pairs
+  const resolveTentNames = useCallback(
+    (tentIds: string[]): { id: string; name: string }[] => {
+      const allOptions = tentGroups.flatMap((group) => group.options);
+      return tentIds
+        .map((id) => {
+          const option = allOptions.find((opt) => opt.value === id);
+          return option ? { id, name: option.label } : null;
+        })
+        .filter((t): t is { id: string; name: string } => t !== null);
+    },
+    [tentGroups],
+  );
+
+  // Today's visited tents (for the crowd FAB)
+  const todayVisitedTents = useMemo(() => {
+    const tentIds = todayAttendance?.tentIds ?? [];
+    if (tentIds.length === 0) return [];
+    return resolveTentNames(tentIds);
+  }, [todayAttendance?.tentIds, resolveTentNames]);
+
+  // Handle pending crowd report from QuickAttendanceSheet
+  // Note: no cleanup function — clearing pendingCrowdReport triggers a re-run
+  // and a cleanup would cancel the timeout before it fires.
+  useEffect(() => {
+    if (!pendingCrowdReport || pendingCrowdReport.tentIds.length === 0) return;
+
+    const resolved = resolveTentNames(pendingCrowdReport.tentIds);
+    // Consume immediately so we don't re-trigger
+    setPendingCrowdReport(null);
+
+    if (resolved.length > 0) {
+      setCrowdPromptTents(resolved);
+      // Small delay so the quick attendance sheet close animation finishes
+      setTimeout(() => {
+        setShowCrowdPrompt(true);
+      }, 500);
+    }
+  }, [pendingCrowdReport, resolveTentNames, setPendingCrowdReport]);
+
+  // Handle crowd FAB press
+  const handleCrowdFabPress = useCallback(() => {
+    if (todayVisitedTents.length === 0) return;
+    setCrowdPromptTents(todayVisitedTents);
+    setShowCrowdPrompt(true);
+  }, [todayVisitedTents]);
+
+  // Handle crowd prompt close
+  const handleCrowdPromptClose = useCallback(() => {
+    setShowCrowdPrompt(false);
+    setCrowdPromptTents([]);
+  }, []);
 
   // Handle pull-to-refresh
   const handleRefresh = useCallback(async () => {
@@ -159,6 +238,21 @@ export default function HomeScreen() {
           <ActivityFeed onRefresh={handleRefresh} />
         </VStack>
       </ScrollView>
+
+      {/* Crowd Report FAB - only visible when tents visited today */}
+      {todayVisitedTents.length > 0 && (
+        <CrowdReportFab onPress={handleCrowdFabPress} />
+      )}
+
+      {/* Crowd Report Prompt - after attendance save or from FAB */}
+      {currentFestival?.id && crowdPromptTents.length > 0 && (
+        <CrowdReportPrompt
+          isOpen={showCrowdPrompt}
+          onClose={handleCrowdPromptClose}
+          tents={crowdPromptTents}
+          festivalId={currentFestival.id}
+        />
+      )}
     </SafeAreaView>
   );
 }

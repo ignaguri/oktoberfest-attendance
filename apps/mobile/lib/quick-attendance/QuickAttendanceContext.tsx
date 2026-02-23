@@ -14,6 +14,10 @@ interface OpenSheetOptions {
   tentName?: string;
 }
 
+export interface PendingCrowdReport {
+  tentIds: string[];
+}
+
 interface QuickAttendanceContextType {
   /** Whether the sheet is currently open */
   isOpen: boolean;
@@ -25,6 +29,10 @@ interface QuickAttendanceContextType {
   openSheet: (options?: OpenSheetOptions) => void;
   /** Close the quick attendance sheet */
   closeSheet: () => void;
+  /** Pending crowd report after attendance save (set by QuickAttendanceSheet) */
+  pendingCrowdReport: PendingCrowdReport | null;
+  /** Set pending crowd report data */
+  setPendingCrowdReport: (data: PendingCrowdReport | null) => void;
 }
 
 const QuickAttendanceContext = createContext<QuickAttendanceContextType | null>(
@@ -49,6 +57,8 @@ export function QuickAttendanceProvider({
   const [preselectedTentName, setPreselectedTentName] = useState<
     string | undefined
   >();
+  const [pendingCrowdReport, setPendingCrowdReport] =
+    useState<PendingCrowdReport | null>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup timeout on unmount
@@ -92,8 +102,17 @@ export function QuickAttendanceProvider({
       preselectedTentName,
       openSheet,
       closeSheet,
+      pendingCrowdReport,
+      setPendingCrowdReport,
     }),
-    [isOpen, preselectedTentId, preselectedTentName, openSheet, closeSheet],
+    [
+      isOpen,
+      preselectedTentId,
+      preselectedTentName,
+      openSheet,
+      closeSheet,
+      pendingCrowdReport,
+    ],
   );
 
   return (

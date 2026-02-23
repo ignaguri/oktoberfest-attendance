@@ -45,13 +45,18 @@ import { BeerPicturesSection } from "../beer-pictures-section";
 import { DrinkTypePicker } from "../drink-type-picker";
 import { LocalDrinkStepper } from "../local-drink-stepper";
 
+export interface AttendanceSuccessData {
+  date: Date;
+  tentIds: string[];
+}
+
 interface AttendanceTabContentProps {
   festivalId: string;
   festivalStartDate: Date;
   festivalEndDate: Date;
   selectedDate: Date;
   existingAttendance?: AttendanceWithTotals | null;
-  onSuccess?: () => void;
+  onSuccess?: (data: AttendanceSuccessData) => void;
   onClose: () => void;
   prefillTentId?: string;
 }
@@ -323,7 +328,7 @@ export function AttendanceTabContent({
           existingConsumptions: consumptions,
         });
 
-        onSuccess?.();
+        onSuccess?.({ date: data.date, tentIds: data.tents });
         onClose();
       } catch (error) {
         logger.error("Failed to save attendance:", error);
@@ -378,7 +383,7 @@ export function AttendanceTabContent({
     try {
       await deleteAttendance.mutateAsync(existingAttendance.id);
       setShowDeleteConfirm(false);
-      onSuccess?.();
+      onSuccess?.({ date: selectedDate, tentIds: [] });
       onClose();
     } catch (error) {
       logger.error("Failed to delete attendance:", error);
