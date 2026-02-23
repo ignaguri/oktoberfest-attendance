@@ -1,6 +1,7 @@
 import {
   type TentGroup,
   type TentOption,
+  useTentCrowdStatus,
   useTents,
 } from "@prostcounter/shared/hooks";
 import { X } from "lucide-react-native";
@@ -72,7 +73,25 @@ export function TentSelectorSheet({
 }: TentSelectorSheetProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { tents, isLoading, error } = useTents(festivalId);
+  const { crowdStatuses } = useTentCrowdStatus(festivalId);
   const insets = useSafeAreaInsets();
+
+  // Create a map of tentId -> crowd status for quick lookup
+  const crowdMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { crowdLevel: string | null; avgWaitMinutes: number | null }
+    >();
+    for (const status of crowdStatuses) {
+      if (status.reportCount > 0) {
+        map.set(status.tentId, {
+          crowdLevel: status.crowdLevel,
+          avgWaitMinutes: status.avgWaitMinutes,
+        });
+      }
+    }
+    return map;
+  }, [crowdStatuses]);
 
   // Filter tents based on search query
   const filteredSections: SectionData[] = useMemo(() => {
@@ -136,16 +155,21 @@ export function TentSelectorSheet({
 
   // Render tent item
   const renderItem = useCallback(
-    ({ item }: SectionListRenderItemInfo<TentOption, SectionData>) => (
-      <TentListItem
-        tentId={item.value}
-        tentName={item.label}
-        isSelected={isTentSelected(item.value)}
-        onToggle={handleTentToggle}
-        mode={mode}
-      />
-    ),
-    [isTentSelected, handleTentToggle, mode],
+    ({ item }: SectionListRenderItemInfo<TentOption, SectionData>) => {
+      const crowd = crowdMap.get(item.value);
+      return (
+        <TentListItem
+          tentId={item.value}
+          tentName={item.label}
+          isSelected={isTentSelected(item.value)}
+          onToggle={handleTentToggle}
+          mode={mode}
+          crowdLevel={crowd?.crowdLevel as any}
+          avgWaitMinutes={crowd?.avgWaitMinutes}
+        />
+      );
+    },
+    [isTentSelected, handleTentToggle, mode, crowdMap],
   );
 
   // Key extractor

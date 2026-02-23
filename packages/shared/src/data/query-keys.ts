@@ -113,6 +113,12 @@ export class QueryKeys {
   static photoComments = (photoId: string, groupId: string) =>
     ["photo-comments", photoId, groupId] as const;
 
+  // Crowd report queries
+  static crowdStatus = (festivalId: string) =>
+    ["crowd-status", festivalId] as const;
+  static tentCrowdReports = (tentId: string, festivalId: string) =>
+    ["crowd-reports", tentId, festivalId] as const;
+
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }

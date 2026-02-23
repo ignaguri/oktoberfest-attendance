@@ -2467,5 +2467,32 @@
       "restartNow": "Restart Now",
       "later": "Maybe Later"
     }
+  },
+  "crowdReport": {
+    "title": "Crowd Report",
+    "status": "Crowd Status",
+    "reportCrowd": "Report Crowd",
+    "submitReport": "Submit Report",
+    "noReports": "No reports",
+    "recentReport": "You reported {{minutes}} min ago",
+    "reportCount": "{{count}} report",
+    "reportCount_plural": "{{count}} reports",
+    "lastReported": "Last reported {{time}}",
+    "waitTime": "~{{minutes}} min wait",
+    "noWaitData": "No wait data",
+    "levels": {
+      "empty": "Empty",
+      "moderate": "Moderate",
+      "crowded": "Crowded",
+      "full": "Full"
+    },
+    "selectLevel": "How crowded is it?",
+    "waitTimeLabel": "Estimated wait time (minutes)",
+    "waitTimeOptional": "Optional",
+    "success": "Report submitted!",
+    "error": "Failed to submit report",
+    "rateLimited": "You can report again in a few minutes",
+    "mostAvailable": "Most Available Tents",
+    "currentLevels": "Current Crowd Levels"
   }
 }

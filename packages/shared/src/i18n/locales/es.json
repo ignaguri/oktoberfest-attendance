@@ -2467,5 +2467,32 @@
       "restartNow": "Reiniciar ahora",
       "later": "Tal vez más tarde"
     }
+  },
+  "crowdReport": {
+    "title": "Reporte de multitud",
+    "status": "Estado de multitud",
+    "reportCrowd": "Reportar multitud",
+    "submitReport": "Enviar reporte",
+    "noReports": "Sin reportes",
+    "recentReport": "Reportaste hace {{minutes}} min",
+    "reportCount": "{{count}} reporte",
+    "reportCount_plural": "{{count}} reportes",
+    "lastReported": "Ultimo reporte {{time}}",
+    "waitTime": "~{{minutes}} min de espera",
+    "noWaitData": "Sin datos de espera",
+    "levels": {
+      "empty": "Vacio",
+      "moderate": "Moderado",
+      "crowded": "Lleno",
+      "full": "Completamente lleno"
+    },
+    "selectLevel": "Que tan lleno esta?",
+    "waitTimeLabel": "Tiempo de espera estimado (minutos)",
+    "waitTimeOptional": "Opcional",
+    "success": "Reporte enviado!",
+    "error": "No se pudo enviar el reporte",
+    "rateLimited": "Podes reportar de nuevo en unos minutos",
+    "mostAvailable": "Carpas mas disponibles",
+    "currentLevels": "Niveles de multitud actuales"
   }
 }

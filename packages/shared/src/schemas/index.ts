@@ -19,6 +19,7 @@ export * from "./calendar.schema";
 export * from "./profile.schema";
 export * from "./activity-feed.schema";
 export * from "./pricing.schema";
+export * from "./crowd-report.schema";
 
 // Form schemas (client-side form validation)
 export * from "./forms.schema";

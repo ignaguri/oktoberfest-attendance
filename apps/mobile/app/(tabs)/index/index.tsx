@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { CrowdStatusSummary } from "@/components/crowd";
 import {
   LocationSharingToggle,
   TentProximityBanner,
@@ -61,6 +62,7 @@ export default function HomeScreen() {
       await queryClient.invalidateQueries({ queryKey: ["attendanceByDate"] });
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
       await queryClient.invalidateQueries({ queryKey: ["attendances"] });
+      await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
     } finally {
@@ -139,6 +141,11 @@ export default function HomeScreen() {
                 </HStack>
               </Card>
             </TutorialTarget>
+          )}
+
+          {/* Crowd Status Summary */}
+          {currentFestival?.id && (
+            <CrowdStatusSummary festivalId={currentFestival.id} />
           )}
 
           {/* Map Link Button (only shows if festival has mapUrl) */}

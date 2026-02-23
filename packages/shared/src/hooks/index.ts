@@ -156,6 +156,13 @@ export {
   useRemoveReaction,
 } from "./usePhotoSocial";
 
+// Crowd report hooks
+export {
+  useSubmitCrowdReport,
+  useTentCrowdReports,
+  useTentCrowdStatus,
+} from "./useCrowdReports";
+
 // Wrapped hooks
 export {
   useAvailableWrappedFestivals,

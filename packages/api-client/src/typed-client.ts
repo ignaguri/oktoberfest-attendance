@@ -34,6 +34,10 @@ import type {
   TutorialStatus,
   MissingProfileFields,
   Highlights,
+  GetCrowdStatusResponse,
+  GetTentCrowdReportsResponse,
+  SubmitCrowdReportResponse,
+  CrowdLevel,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -862,6 +866,83 @@ export function createTypedApiClient(config: ApiClientConfig) {
           );
         }
         return parseJsonResponse(response);
+      },
+
+      /**
+       * Get current crowd status for all tents in a festival
+       */
+      async getCrowdStatus(query: {
+        festivalId: string;
+      }): Promise<GetCrowdStatusResponse> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({
+          festivalId: query.festivalId,
+        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/tents/crowd-status?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch crowd status: ${response.statusText}`,
+          );
+        }
+        return parseJsonResponse<GetCrowdStatusResponse>(response);
+      },
+
+      /**
+       * Get recent crowd reports for a specific tent
+       */
+      async getCrowdReports(
+        tentId: string,
+        query: { festivalId: string },
+      ): Promise<GetTentCrowdReportsResponse> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({
+          festivalId: query.festivalId,
+        });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/tents/${tentId}/crowd-reports?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch crowd reports: ${response.statusText}`,
+          );
+        }
+        return parseJsonResponse<GetTentCrowdReportsResponse>(response);
+      },
+
+      /**
+       * Submit a crowd report for a tent
+       */
+      async submitCrowdReport(
+        tentId: string,
+        data: {
+          festivalId: string;
+          crowdLevel: CrowdLevel;
+          waitTimeMinutes?: number;
+        },
+      ): Promise<SubmitCrowdReportResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/tents/${tentId}/crowd-report`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
+        if (!response.ok) {
+          const error = await parseJsonResponse<{ message?: string }>(
+            response,
+          ).catch(() => ({ message: undefined }));
+          throw new Error(error.message || "Failed to submit crowd report");
+        }
+        return parseJsonResponse<SubmitCrowdReportResponse>(response);
       },
     },
 

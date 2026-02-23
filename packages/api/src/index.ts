@@ -9,6 +9,7 @@ import activityFeedRoute from "./routes/activity-feed.route";
 import attendanceRoute from "./routes/attendance.route";
 import calendarRoute from "./routes/calendar.route";
 import consumptionRoute from "./routes/consumption.route";
+import crowdReportRoute from "./routes/crowd-report.route";
 import festivalRoute from "./routes/festival.route";
 import groupRoute from "./routes/group.route";
 import leaderboardRoute from "./routes/leaderboard.route";
@@ -58,6 +59,7 @@ apiV1.route("/", photoRoute);
 apiV1.route("/", photoSocialRoute);
 apiV1.route("/", profileRoute);
 apiV1.route("/", activityFeedRoute);
+apiV1.route("/", crowdReportRoute);
 
 // Mount v1 routes under /v1 prefix
 app.route("/v1", apiV1);
