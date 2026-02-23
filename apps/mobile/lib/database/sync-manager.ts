@@ -24,6 +24,7 @@ import type {
   LocalConsumption,
   LocalFestival,
   LocalGroup,
+  LocalGroupMember,
   LocalProfile,
   LocalTent,
   LocalUserAchievement,
@@ -218,6 +219,7 @@ export class SyncManager {
         results.push(await this.pullAttendances(festivalId));
         results.push(await this.pullConsumptions(festivalId));
         results.push(await this.pullGroups(festivalId));
+        results.push(await this.pullGroupMembers(festivalId));
         results.push(await this.pullUserAchievements(festivalId));
       }
     } catch (error) {
@@ -793,6 +795,86 @@ export class SyncManager {
       await updateLastSyncAt(this.db, "groups", now);
     } catch (error) {
       logger.error("[SyncManager] Pull groups failed:", error);
+    }
+
+    return result;
+  }
+
+  /**
+   * Pull group members from server for all local groups.
+   * Fetches members per group via the groups API.
+   */
+  async pullGroupMembers(festivalId: string): Promise<PullResult> {
+    const result: PullResult = {
+      table: "group_members",
+      inserted: 0,
+      updated: 0,
+      deleted: 0,
+    };
+
+    try {
+      // Get all local groups for this festival
+      const groups = await this.db.getAllAsync<LocalGroup>(
+        "SELECT * FROM groups WHERE festival_id = ? AND _deleted = 0",
+        [festivalId],
+      );
+
+      const now = new Date().toISOString();
+
+      for (const group of groups) {
+        try {
+          const response = await apiClient.groups.getMembers(group.id);
+          const members = response.data;
+
+          for (const member of members) {
+            const existing = await this.db.getFirstAsync<LocalGroupMember>(
+              "SELECT * FROM group_members WHERE group_id = ? AND user_id = ?",
+              [group.id, member.userId],
+            );
+
+            if (existing) {
+              await this.db.runAsync(
+                `UPDATE group_members SET
+                  joined_at = ?, _synced_at = ?, _dirty = 0
+                WHERE id = ?`,
+                [member.joinedAt ?? now, now, existing.id],
+              );
+              result.updated++;
+            } else {
+              const id = generateUUID();
+              await this.db.runAsync(
+                `INSERT INTO group_members (
+                  id, group_id, user_id, joined_at,
+                  _synced_at, _dirty, _deleted
+                ) VALUES (?, ?, ?, ?, ?, 0, 0)`,
+                [id, group.id, member.userId, member.joinedAt ?? now, now],
+              );
+              result.inserted++;
+            }
+          }
+
+          // Remove members no longer on server (soft delete)
+          const serverUserIds = members.map((m) => m.userId);
+          if (serverUserIds.length > 0) {
+            const placeholders = serverUserIds.map(() => "?").join(",");
+            await this.db.runAsync(
+              `UPDATE group_members SET _deleted = 1, _synced_at = ?
+               WHERE group_id = ? AND user_id NOT IN (${placeholders}) AND _deleted = 0`,
+              [now, group.id, ...serverUserIds],
+            );
+          }
+        } catch (error) {
+          // Log per-group error but continue with other groups
+          logger.error(
+            `[SyncManager] Pull members for group ${group.id} failed:`,
+            error,
+          );
+        }
+      }
+
+      await updateLastSyncAt(this.db, "group_members", now);
+    } catch (error) {
+      logger.error("[SyncManager] Pull group members failed:", error);
     }
 
     return result;

@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  useCurrentProfile,
   useDeleteProfile,
   useResetTutorial,
   useUpdateProfile,
@@ -44,6 +43,7 @@ import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useAdaptedProfile } from "@/lib/database/adapted-hooks";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -60,14 +60,14 @@ export default function ProfileScreen() {
   // Dialog state (using reusable hook)
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
-  // Data hooks
+  // Data hooks (offline-first: reads from local SQLite)
   const {
     data: profile,
     loading: isLoading,
     error: profileError,
     refetch,
     isRefetching = false,
-  } = useCurrentProfile();
+  } = useAdaptedProfile(user?.id);
   const updateProfileMutation = useUpdateProfile();
   const deleteProfileMutation = useDeleteProfile();
   const resetTutorialMutation = useResetTutorial();

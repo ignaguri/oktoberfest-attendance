@@ -1,7 +1,6 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
-  useAttendances,
   useCheckInReservation,
   useReservations,
 } from "@prostcounter/shared/hooks";
@@ -34,6 +33,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { useAdaptedAttendances } from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 import { isActiveReservation } from "@/lib/utils/reservation";
 
@@ -48,14 +48,14 @@ export default function AttendanceScreen() {
   // Dialog state
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
-  // Data hooks
+  // Data hooks (offline-first: reads from local SQLite)
   const {
     data: attendances,
     loading: isLoading,
     error: attendancesError,
     refetch,
     isRefetching,
-  } = useAttendances(currentFestival?.id ?? "");
+  } = useAdaptedAttendances(currentFestival?.id);
 
   const {
     data: reservationsData,

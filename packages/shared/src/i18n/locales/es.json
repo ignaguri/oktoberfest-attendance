@@ -94,6 +94,11 @@
         "tryAgain": "Intentar de nuevo"
       }
     },
+    "offline": {
+      "title": "Estás sin conexión",
+      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conectate para ver el ranking.",
+      "achievementsUnavailable": "Los logros requieren conexión a internet. Conectate para ver tu progreso."
+    },
     "empty": {
       "noResults": "No se encontraron resultados",
       "noData": "No hay datos disponibles"

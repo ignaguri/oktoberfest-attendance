@@ -1,9 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  useAttendanceByDate,
   useConsumptions,
   useDeleteAttendance,
-  useTents,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
@@ -38,6 +36,10 @@ import { VStack } from "@/components/ui/vstack";
 import { type PendingPhoto } from "@/hooks/useBeerPictureUpload";
 import { useSaveAttendance } from "@/hooks/useSaveAttendance";
 import { IconColors } from "@/lib/constants/colors";
+import {
+  useAdaptedAttendanceByDate,
+  useAdaptedTents,
+} from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
@@ -103,7 +105,7 @@ export function AttendanceTabContent({
   });
 
   const isEditMode = !!existingAttendance;
-  const { tents } = useTents(festivalId);
+  const { tents } = useAdaptedTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
   const deleteAttendance = useDeleteAttendance();
 
@@ -147,10 +149,10 @@ export function AttendanceTabContent({
   const hasInitializedRef = useRef(false);
   const lastDateRef = useRef<string | null>(null);
 
-  // Fetch complete attendance data with beer pictures when editing
-  const { data: attendanceWithPhotos } = useAttendanceByDate(
-    isEditMode ? festivalId : "",
-    isEditMode ? dateString : "",
+  // Fetch complete attendance data with beer pictures when editing (offline-first)
+  const { data: attendanceWithPhotos } = useAdaptedAttendanceByDate(
+    isEditMode ? festivalId : undefined,
+    isEditMode ? dateString : undefined,
   );
 
   // Create dynamic schema based on festival dates

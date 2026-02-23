@@ -83,6 +83,11 @@
       "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
       "notAuthenticated": "Nicht authentifiziert"
     },
+    "offline": {
+      "title": "Du bist offline",
+      "leaderboardUnavailable": "Die Bestenliste benötigt eine Internetverbindung. Verbinde dich, um die Rangliste zu sehen.",
+      "achievementsUnavailable": "Erfolge benötigen eine Internetverbindung. Verbinde dich, um deinen Fortschritt zu sehen."
+    },
     "empty": {
       "noResults": "Keine Ergebnisse gefunden",
       "noData": "Keine Daten verfügbar"

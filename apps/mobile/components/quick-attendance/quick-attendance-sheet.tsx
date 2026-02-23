@@ -1,8 +1,6 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
-  useAttendanceByDate,
   useConsumptions,
-  useTents,
   useUpdatePersonalAttendance,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -55,6 +53,10 @@ import {
   DrinkTypeColors,
   IconColors,
 } from "@/lib/constants/colors";
+import {
+  useAdaptedAttendanceByDate,
+  useAdaptedTents,
+} from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
 
@@ -160,17 +162,15 @@ export function QuickAttendanceSheet({
   // Get today's date
   const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
 
-  // Fetch today's attendance (for tent preselection)
-  const { data: attendance, refetch: refetchAttendance } = useAttendanceByDate(
-    festivalId || "",
-    today,
-  );
+  // Fetch today's attendance (offline-first, for tent preselection)
+  const { data: attendance, refetch: refetchAttendance } =
+    useAdaptedAttendanceByDate(festivalId, today);
 
   // Fetch today's consumptions (for drink counts)
   const { data: consumptionsData } = useConsumptions(festivalId || "", today);
 
-  // Fetch tents for name lookup
-  const { tents: tentGroups } = useTents(festivalId);
+  // Fetch tents for name lookup (offline-first)
+  const { tents: tentGroups } = useAdaptedTents(festivalId);
 
   // Mutations
   const logConsumption = useOfflineLogConsumption();

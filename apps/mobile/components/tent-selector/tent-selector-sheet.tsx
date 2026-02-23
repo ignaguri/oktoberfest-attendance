@@ -2,7 +2,6 @@ import {
   type TentGroup,
   type TentOption,
   useTentCrowdStatus,
-  useTents,
 } from "@prostcounter/shared/hooks";
 import { X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
@@ -29,6 +28,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useAdaptedTents } from "@/lib/database/adapted-hooks";
 
 import { TentListItem } from "./tent-list-item";
 import { TentSearchInput } from "./tent-search-input";
@@ -72,7 +72,7 @@ export function TentSelectorSheet({
   onSelectTents,
 }: TentSelectorSheetProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const { tents, isLoading, error } = useTents(festivalId);
+  const { tents, isLoading, error } = useAdaptedTents(festivalId);
   const { crowdStatuses } = useTentCrowdStatus(festivalId);
   const insets = useSafeAreaInsets();
 

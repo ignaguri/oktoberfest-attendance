@@ -94,6 +94,11 @@
       },
       "notAuthenticated": "Not authenticated"
     },
+    "offline": {
+      "title": "You're Offline",
+      "leaderboardUnavailable": "The leaderboard requires an internet connection. Connect to see rankings.",
+      "achievementsUnavailable": "Achievements require an internet connection. Connect to see your progress."
+    },
     "empty": {
       "noResults": "No results found",
       "noData": "No data available"

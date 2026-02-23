@@ -1,5 +1,4 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useUserGroups } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupWithMembers } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
@@ -30,6 +29,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useAdaptedGroups } from "@/lib/database/adapted-hooks";
 
 export default function GroupsScreen() {
   const { t } = useTranslation();
@@ -43,14 +43,14 @@ export default function GroupsScreen() {
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [isJoinSheetOpen, setIsJoinSheetOpen] = useState(false);
 
-  // Data hooks
+  // Data hooks (offline-first: reads from local SQLite)
   const {
     data: groups,
     loading: isLoading,
     error: groupsError,
     refetch,
     isRefetching,
-  } = useUserGroups(currentFestival?.id ?? "");
+  } = useAdaptedGroups(currentFestival?.id);
 
   // Handlers
   const handleGroupPress = useCallback(

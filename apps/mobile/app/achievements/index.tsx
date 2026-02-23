@@ -2,9 +2,10 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
-import { Award } from "lucide-react-native";
+import { Award, WifiOff } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AchievementCard } from "@/components/achievements/achievement-card";
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
@@ -14,6 +15,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useOfflineSafe } from "@/lib/database/offline-provider";
 
 /**
  * Achievements screen showing user's achievement progress
@@ -27,6 +29,7 @@ import { Colors, IconColors } from "@/lib/constants/colors";
 export default function AchievementsScreen() {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const { isOnline } = useOfflineSafe();
 
   // Fetch achievements with progress
   const {
@@ -59,6 +62,23 @@ export default function AchievementsScreen() {
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Offline state — achievements require server-side progress calculation
+  if (!isOnline) {
+    return (
+      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+        <VStack className="flex-1 items-center justify-center p-6">
+          <WifiOff size={48} color={IconColors.disabled} />
+          <Text className="mt-4 text-center text-lg font-semibold text-typography-700">
+            {t("common.offline.title")}
+          </Text>
+          <Text className="mt-2 text-center text-typography-500">
+            {t("common.offline.achievementsUnavailable")}
+          </Text>
+        </VStack>
+      </SafeAreaView>
+    );
+  }
 
   // Loading state (initial or festival loading)
   if (festivalLoading || (loading && achievements.length === 0)) {

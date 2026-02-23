@@ -1,5 +1,4 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useAttendanceByDate, useTents } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -36,6 +35,10 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
+import {
+  useAdaptedAttendanceByDate,
+  useAdaptedTents,
+} from "@/lib/database/adapted-hooks";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
@@ -74,11 +77,14 @@ export default function HomeScreen() {
   const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
   const festivalId = currentFestival?.id || "";
 
-  // Fetch today's attendance to know which tents the user visited
-  const { data: todayAttendance } = useAttendanceByDate(festivalId, today);
+  // Fetch today's attendance to know which tents the user visited (offline-first)
+  const { data: todayAttendance } = useAdaptedAttendanceByDate(
+    festivalId,
+    today,
+  );
 
-  // Fetch tent data for name lookup
-  const { tents: tentGroups } = useTents(festivalId);
+  // Fetch tent data for name lookup (offline-first)
+  const { tents: tentGroups } = useAdaptedTents(festivalId);
 
   // Resolve tent IDs to { id, name } pairs
   const resolveTentNames = useCallback(
@@ -137,12 +143,13 @@ export default function HomeScreen() {
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      // Invalidate all relevant queries
-      await queryClient.invalidateQueries({ queryKey: ["attendanceByDate"] });
+      // Invalidate API-backed queries (activity feed, crowd status, messages)
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
-      await queryClient.invalidateQueries({ queryKey: ["attendances"] });
       await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
       await queryClient.invalidateQueries({ queryKey: ["message-feed"] });
+      // Invalidate local SQLite-backed queries to re-read after sync
+      await queryClient.invalidateQueries({ queryKey: ["local-attendances"] });
+      await queryClient.invalidateQueries({ queryKey: ["local-tents"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
     } finally {
