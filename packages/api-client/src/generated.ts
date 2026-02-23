@@ -2155,6 +2155,417 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/groups/{groupId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List messages for a group
+         * @description Returns messages for a group with cursor-based pagination. Pinned messages come first.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    cursor?: string;
+                };
+                header?: never;
+                path: {
+                    groupId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Messages retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            messages: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                groupId: string;
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                content: string;
+                                /** @enum {string} */
+                                messageType: "message" | "alert";
+                                pinned: boolean;
+                                createdAt: string;
+                                updatedAt: string;
+                            }[];
+                            nextCursor: string | null;
+                            hasMore: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - Not a group member */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Post a new message to a group
+         * @description Create a new message or alert in a group
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    groupId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        content: string;
+                        /**
+                         * @default message
+                         * @enum {string}
+                         */
+                        messageType?: "message" | "alert";
+                    };
+                };
+            };
+            responses: {
+                /** @description Message created successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                groupId: string;
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                content: string;
+                                /** @enum {string} */
+                                messageType: "message" | "alert";
+                                pinned: boolean;
+                                createdAt: string;
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - Not a group member */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get message feed across all groups
+         * @description Returns recent messages from all groups the user belongs to, for a given festival
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                    limit?: number;
+                    cursor?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Message feed retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            messages: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                groupId: string;
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                content: string;
+                                /** @enum {string} */
+                                messageType: "message" | "alert";
+                                pinned: boolean;
+                                createdAt: string;
+                                updatedAt: string;
+                                groupName: string;
+                            }[];
+                            nextCursor: string | null;
+                            hasMore: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/groups/{groupId}/messages/{messageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update own message
+         * @description Update the content, type, or pinned state of a message you posted
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    groupId: string;
+                    messageId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        content?: string;
+                        /** @enum {string} */
+                        messageType?: "message" | "alert";
+                        pinned?: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Message updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                groupId: string;
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                content: string;
+                                /** @enum {string} */
+                                messageType: "message" | "alert";
+                                pinned: boolean;
+                                createdAt: string;
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - Not the message author */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Message not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * Delete own message
+         * @description Delete a message you posted
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    groupId: string;
+                    messageId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Message deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - Not the message author */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Message not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/leaderboard/winning-criteria": {
         parameters: {
             query?: never;
@@ -6559,6 +6970,229 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tents/crowd-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current crowd status for all tents
+         * @description Returns aggregated crowd status from the last 30 minutes for all tents in a festival
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Crowd status retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                tentId: string;
+                                tentName: string;
+                                /** Format: uuid */
+                                festivalId: string | null;
+                                reportCount: number;
+                                /** @enum {string|null} */
+                                crowdLevel: "empty" | "moderate" | "crowded" | "full" | null;
+                                avgWaitMinutes: number | null;
+                                lastReportedAt: string | null;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tents/{tentId}/crowd-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get recent crowd reports for a tent
+         * @description Returns individual crowd reports from the last 30 minutes for a specific tent, ordered by most recent first
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                };
+                header?: never;
+                path: {
+                    tentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Crowd reports retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                tentId: string;
+                                /** Format: uuid */
+                                festivalId: string;
+                                /** Format: uuid */
+                                userId: string;
+                                /** @enum {string} */
+                                crowdLevel: "empty" | "moderate" | "crowded" | "full";
+                                waitTimeMinutes: number | null;
+                                createdAt: string;
+                                username: string;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tents/{tentId}/crowd-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit a crowd report for a tent
+         * @description Submit a crowd level and optional wait time report. Rate limited to 1 report per tent per user per 5 minutes.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    tentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        festivalId: string;
+                        /** @enum {string} */
+                        crowdLevel: "empty" | "moderate" | "crowded" | "full";
+                        waitTimeMinutes?: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Crowd report submitted successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            report: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                crowdLevel: "empty" | "moderate" | "crowded" | "full";
+                                waitTimeMinutes: number | null;
+                                createdAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Rate limited - recent report exists */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;

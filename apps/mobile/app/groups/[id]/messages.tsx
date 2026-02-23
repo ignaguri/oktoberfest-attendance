@@ -1,3 +1,4 @@
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useDeleteMessage,
   useGroupMessages,
@@ -37,6 +38,7 @@ export default function GroupMessagesScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
+  const { currentFestival } = useFestival();
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
   const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -194,6 +196,7 @@ export default function GroupMessagesScreen() {
                       message={message}
                       currentUserId={user?.id}
                       onDelete={handleDeleteRequest}
+                      festivalId={currentFestival?.id}
                     />
                   </View>
                 ))}
@@ -218,6 +221,7 @@ export default function GroupMessagesScreen() {
                       message={message}
                       currentUserId={user?.id}
                       onDelete={handleDeleteRequest}
+                      festivalId={currentFestival?.id}
                     />
                   </View>
                 ))}

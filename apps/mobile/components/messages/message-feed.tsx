@@ -153,6 +153,7 @@ export function MessageFeed({ onRefresh }: MessageFeedProps) {
                   message={message}
                   currentUserId={user?.id}
                   showGroupName
+                  festivalId={currentFestival?.id}
                 />
               </View>
             </Pressable>

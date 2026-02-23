@@ -18,17 +18,15 @@ import {
 export function usePhotoReactions(photoId: string, groupId: string) {
   const apiClient = useApiClient();
 
+  const enabled = !!photoId && !!groupId;
+
   return useQuery(
     QueryKeys.photoReactions(photoId, groupId),
     async () => {
-      const response = await apiClient.photoSocial.getReactions(
-        photoId,
-        groupId,
-      );
-      return response;
+      return await apiClient.photoSocial.getReactions(photoId, groupId);
     },
     {
-      enabled: !!photoId && !!groupId,
+      enabled,
       staleTime: 30 * 1000, // 30 seconds - reactions change frequently
       gcTime: 5 * 60 * 1000, // 5 minutes cache
     },
@@ -95,17 +93,16 @@ export function useRemoveReaction() {
 export function usePhotoComments(photoId: string, groupId: string) {
   const apiClient = useApiClient();
 
+  const enabled = !!photoId && !!groupId;
+
   return useQuery(
     QueryKeys.photoComments(photoId, groupId),
     async () => {
-      const response = await apiClient.photoSocial.getComments(
-        photoId,
-        groupId,
-      );
+      const response = await apiClient.photoSocial.getComments(photoId, groupId);
       return response.comments;
     },
     {
-      enabled: !!photoId && !!groupId,
+      enabled,
       staleTime: 30 * 1000, // 30 seconds
       gcTime: 5 * 60 * 1000, // 5 minutes cache
     },

@@ -84,7 +84,7 @@ app.openapi(getReactionsRoute, async (c) => {
       `
       emoji,
       user_id,
-      profiles!photo_reactions_user_id_fkey (
+      profiles!photo_reactions_user_id_profiles_fkey (
         username,
         avatar_url
       )
@@ -344,7 +344,7 @@ app.openapi(getCommentsRoute, async (c) => {
       user_id,
       content,
       created_at,
-      profiles!photo_comments_user_id_fkey (
+      profiles!photo_comments_user_id_profiles_fkey (
         username,
         avatar_url
       )

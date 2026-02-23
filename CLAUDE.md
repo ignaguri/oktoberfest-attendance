@@ -29,11 +29,12 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 
 - `pnpm sup:start` - Start local Supabase (requires Docker)
 - `pnpm sup:stop` - Stop local Supabase
-- `pnpm sup:db:reset` - Reset DB and run migrations (use this to test migrations)
+- `pnpm sup:db:reset` - Reset DB and run migrations (full reset, useful for final validation)
 - `pnpm sup:db:pull` - Pull remote DB changes
-- **Note**: We don't push DB changes; we reset the local DB to test if migrations work properly
+- **Note**: We don't push DB changes; we reset the local DB to verify the full migration chain works properly
 - `pnpm sup:db:types` - Generate TypeScript types from DB schema
 - `pnpm sup:mig:new` - Create new migration file
+- **During development**: There's no need to reset the database every time you create or modify a migration. Instead, apply your migration SQL directly using the Supabase MCP `execute_sql` tool or by running the SQL file as a script against the local database. Only use `pnpm sup:db:reset` when you need to verify the full migration chain from scratch. This is especially important when multiple agents work in parallel, since they share the same local Supabase instance and a reset would wipe other agents' applied migrations.
 
 ### Mobile Build Commands
 

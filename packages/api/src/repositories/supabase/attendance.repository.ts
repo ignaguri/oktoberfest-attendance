@@ -138,15 +138,15 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       const attendance = this.mapToAttendanceWithTotals(item);
       const attendanceDate = new Date(attendance.date);
 
-      // Filter tent visits for this attendance date
+      // Filter tent visits for this attendance date (UTC to avoid timezone shift)
       const visitsForDate = (tentVisits || [])
         .filter((visit) => {
           if (!visit.visit_date) return false;
           const visitDate = new Date(visit.visit_date);
           return (
-            visitDate.getFullYear() === attendanceDate.getFullYear() &&
-            visitDate.getMonth() === attendanceDate.getMonth() &&
-            visitDate.getDate() === attendanceDate.getDate()
+            visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
+            visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
+            visitDate.getUTCDate() === attendanceDate.getUTCDate()
           );
         })
         .map((visit) => ({
@@ -208,13 +208,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     input: CreateAttendanceInput,
   ): Promise<CreateAttendanceResponse> {
     // Convert date string to ISO timestamp for the RPC function
+    // Use setUTCHours to avoid timezone shifting the date
+    // (new Date("YYYY-MM-DD") creates UTC midnight; setHours uses local time
+    // and can shift the date back in Western Hemisphere timezones)
     const dateWithTime = new Date(input.date);
     const now = new Date();
-    dateWithTime.setHours(
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds(),
+    dateWithTime.setUTCHours(
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds(),
+      now.getUTCMilliseconds(),
     );
 
     const { data, error } = await this.supabase.rpc(
@@ -249,13 +252,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     input: UpdatePersonalAttendanceInput,
   ): Promise<UpdatePersonalAttendanceResponse> {
     // Convert date string to ISO timestamp for the RPC function
+    // Use setUTCHours to avoid timezone shifting the date
+    // (new Date("YYYY-MM-DD") creates UTC midnight; setHours uses local time
+    // and can shift the date back in Western Hemisphere timezones)
     const dateWithTime = new Date(input.date);
     const now = new Date();
-    dateWithTime.setHours(
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds(),
+    dateWithTime.setUTCHours(
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds(),
+      now.getUTCMilliseconds(),
     );
 
     const { data, error } = await this.supabase.rpc(
@@ -362,14 +368,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     }
 
     // Filter tent visits for this specific date
+    // Use UTC methods to avoid timezone shifting the date comparison
+    // (new Date("YYYY-MM-DD") creates UTC midnight; getDate() uses local time)
     const tentIdsForDate = (tentVisits || [])
       .filter((visit) => {
         if (!visit.visit_date) return false;
         const visitDate = new Date(visit.visit_date);
         return (
-          visitDate.getFullYear() === attendanceDate.getFullYear() &&
-          visitDate.getMonth() === attendanceDate.getMonth() &&
-          visitDate.getDate() === attendanceDate.getDate()
+          visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
+          visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
+          visitDate.getUTCDate() === attendanceDate.getUTCDate()
         );
       })
       .map((visit) => visit.tent_id);
@@ -398,15 +406,15 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     // Keep pictureUrls for backward compatibility
     const pictureUrls = pictures.map((pic) => pic.pictureUrl);
 
-    // Build tent visits array for the schema
+    // Build tent visits array for the schema (same UTC date comparison)
     const visitsForDate = (tentVisits || [])
       .filter((visit) => {
         if (!visit.visit_date) return false;
         const visitDate = new Date(visit.visit_date);
         return (
-          visitDate.getFullYear() === attendanceDate.getFullYear() &&
-          visitDate.getMonth() === attendanceDate.getMonth() &&
-          visitDate.getDate() === attendanceDate.getDate()
+          visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
+          visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
+          visitDate.getUTCDate() === attendanceDate.getUTCDate()
         );
       })
       .map((visit) => ({

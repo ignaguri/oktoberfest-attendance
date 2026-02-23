@@ -11,6 +11,7 @@ import {
   ActionsheetContent,
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
+  ActionsheetScrollView,
 } from "@/components/ui/actionsheet";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -85,116 +86,118 @@ export function ComposeMessage({
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
 
-        <VStack space="md" className="w-full px-2 pt-2">
-          <Heading size="md" className="text-typography-900">
-            {t("groups.messages.compose.title")}
-          </Heading>
+        <ActionsheetScrollView className="w-full">
+          <VStack space="md" className="px-2 pb-4 pt-2">
+            <Heading size="md" className="text-typography-900">
+              {t("groups.messages.compose.title")}
+            </Heading>
 
-          {/* Message type toggle */}
-          <HStack space="sm">
-            <Pressable
-              onPress={() => setMessageType("message")}
-              className={`flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2 ${
-                messageType === "message"
-                  ? "border-primary-500 bg-primary-50"
-                  : "border-outline-200 bg-white"
-              }`}
-              accessibilityLabel={t("groups.messages.compose.typeMessage")}
-            >
-              <MessageSquare
-                size={18}
-                color={
+            {/* Message type toggle */}
+            <HStack space="sm">
+              <Pressable
+                onPress={() => setMessageType("message")}
+                className={`flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2 ${
                   messageType === "message"
-                    ? Colors.primary[500]
-                    : IconColors.muted
-                }
-              />
-              <Text
-                className={`text-sm font-medium ${
-                  messageType === "message"
-                    ? "text-primary-600"
-                    : "text-typography-500"
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-outline-200 bg-white"
                 }`}
+                accessibilityLabel={t("groups.messages.compose.typeMessage")}
               >
-                {t("groups.messages.compose.typeMessage")}
-              </Text>
-            </Pressable>
+                <MessageSquare
+                  size={18}
+                  color={
+                    messageType === "message"
+                      ? Colors.primary[500]
+                      : IconColors.muted
+                  }
+                />
+                <Text
+                  className={`text-sm font-medium ${
+                    messageType === "message"
+                      ? "text-primary-600"
+                      : "text-typography-500"
+                  }`}
+                >
+                  {t("groups.messages.compose.typeMessage")}
+                </Text>
+              </Pressable>
 
-            <Pressable
-              onPress={() => setMessageType("alert")}
-              className={`flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2 ${
-                messageType === "alert"
-                  ? "border-primary-500 bg-amber-50"
-                  : "border-outline-200 bg-white"
-              }`}
-              accessibilityLabel={t("groups.messages.compose.typeAlert")}
-            >
-              <AlertTriangle
-                size={18}
-                color={
+              <Pressable
+                onPress={() => setMessageType("alert")}
+                className={`flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2 ${
                   messageType === "alert"
-                    ? Colors.primary[500]
-                    : IconColors.muted
-                }
-              />
-              <Text
-                className={`text-sm font-medium ${
-                  messageType === "alert"
-                    ? "text-primary-600"
-                    : "text-typography-500"
+                    ? "border-primary-500 bg-amber-50"
+                    : "border-outline-200 bg-white"
                 }`}
+                accessibilityLabel={t("groups.messages.compose.typeAlert")}
               >
-                {t("groups.messages.compose.typeAlert")}
-              </Text>
-            </Pressable>
-          </HStack>
-
-          {/* Text input */}
-          <VStack space="xs">
-            <TextInput
-              value={content}
-              onChangeText={setContent}
-              placeholder={t("groups.messages.compose.placeholder")}
-              multiline
-              numberOfLines={4}
-              maxLength={MAX_CHARS + 50} // Allow slightly over for UX
-              className="min-h-[100px] rounded-lg border border-outline-200 bg-white p-3 text-sm text-typography-900"
-              textAlignVertical="top"
-              autoFocus
-            />
-            <HStack className="items-center justify-between">
-              <Text
-                className={`text-xs ${
-                  isOverLimit ? "text-error-500" : "text-typography-400"
-                }`}
-              >
-                {t("groups.messages.compose.charCount", {
-                  count: charCount,
-                  max: MAX_CHARS,
-                })}
-              </Text>
+                <AlertTriangle
+                  size={18}
+                  color={
+                    messageType === "alert"
+                      ? Colors.primary[500]
+                      : IconColors.muted
+                  }
+                />
+                <Text
+                  className={`text-sm font-medium ${
+                    messageType === "alert"
+                      ? "text-primary-600"
+                      : "text-typography-500"
+                  }`}
+                >
+                  {t("groups.messages.compose.typeAlert")}
+                </Text>
+              </Pressable>
             </HStack>
-          </VStack>
 
-          {/* Send button */}
-          <Button
-            action="primary"
-            onPress={handleSend}
-            disabled={!canSend || postMessage.loading}
-            className="w-full"
-          >
-            {postMessage.loading ? (
-              <ButtonSpinner color={Colors.white} />
-            ) : (
-              <Send size={18} color={Colors.white} />
-            )}
-            <ButtonText className="ml-2">
-              {postMessage.loading
-                ? t("groups.messages.compose.sending")
-                : t("groups.messages.compose.send")}
-            </ButtonText>
-          </Button>
-        </VStack>
+            {/* Text input */}
+            <VStack space="xs">
+              <TextInput
+                value={content}
+                onChangeText={setContent}
+                placeholder={t("groups.messages.compose.placeholder")}
+                multiline
+                numberOfLines={4}
+                maxLength={MAX_CHARS + 50} // Allow slightly over for UX
+                className="min-h-[100px] rounded-lg border border-outline-200 bg-white p-3 text-sm text-typography-900"
+                textAlignVertical="top"
+                autoFocus
+              />
+              <HStack className="items-center justify-between">
+                <Text
+                  className={`text-xs ${
+                    isOverLimit ? "text-error-500" : "text-typography-400"
+                  }`}
+                >
+                  {t("groups.messages.compose.charCount", {
+                    count: charCount,
+                    max: MAX_CHARS,
+                  })}
+                </Text>
+              </HStack>
+            </VStack>
+
+            {/* Send button */}
+            <Button
+              action="primary"
+              onPress={handleSend}
+              disabled={!canSend || postMessage.loading}
+              className="w-full"
+            >
+              {postMessage.loading ? (
+                <ButtonSpinner color={Colors.white} />
+              ) : (
+                <Send size={18} color={Colors.white} />
+              )}
+              <ButtonText className="ml-2">
+                {postMessage.loading
+                  ? t("groups.messages.compose.sending")
+                  : t("groups.messages.compose.send")}
+              </ButtonText>
+            </Button>
+          </VStack>
+        </ActionsheetScrollView>
       </ActionsheetContent>
     </Actionsheet>
   );
