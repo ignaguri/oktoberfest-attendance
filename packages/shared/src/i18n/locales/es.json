@@ -96,8 +96,8 @@
     },
     "offline": {
       "title": "Estás sin conexión",
-      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conectate para ver el ranking.",
-      "achievementsUnavailable": "Los logros requieren conexión a internet. Conectate para ver tu progreso."
+      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conéctate para ver el ranking.",
+      "achievementsUnavailable": "Los logros requieren conexión a internet. Conéctate para ver tu progreso."
     },
     "empty": {
       "noResults": "No se encontraron resultados",
@@ -415,7 +415,7 @@
       "photoDetail": {
         "reactions": "Reacciones",
         "comments": "Comentarios",
-        "noComments": "Todavia no hay comentarios. Se el primero!",
+        "noComments": "Todavía no hay comentarios. Sé el primero!",
         "addComment": "Agregar un comentario...",
         "send": "Enviar",
         "deleteComment": "Eliminar",
@@ -486,8 +486,8 @@
       "title": "Mensajes",
       "titleWithName": "Mensajes de {{groupName}}",
       "empty": {
-        "title": "Todavia no hay mensajes",
-        "description": "Se el primero en publicar un mensaje en este grupo"
+        "title": "Todavía no hay mensajes",
+        "description": "Sé el primero en publicar un mensaje en este grupo"
       },
       "compose": {
         "title": "Nuevo mensaje",
@@ -502,7 +502,7 @@
       },
       "feed": {
         "title": "Mensajes de grupos",
-        "empty": "Todavia no hay mensajes de tus grupos",
+        "empty": "Todavía no hay mensajes de tus grupos",
         "viewAll": "Ver todos"
       },
       "item": {
@@ -2531,6 +2531,10 @@
     "error": "No se pudo enviar el reporte",
     "rateLimited": "Podes reportar de nuevo en unos minutos",
     "mostAvailable": "Carpas mas disponibles",
-    "currentLevels": "Niveles de multitud actuales"
+    "currentLevels": "Niveles de multitud actuales",
+    "fab": {
+      "accessibilityLabel": "Reportar nivel de multitud",
+      "accessibilityHint": "Reportar qué tan llenas están las carpas"
+    }
   }
 }

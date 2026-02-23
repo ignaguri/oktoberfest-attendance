@@ -394,7 +394,7 @@
         "reactions": "Reaktionen",
         "comments": "Kommentare",
         "noComments": "Noch keine Kommentare. Sei der Erste!",
-        "addComment": "Kommentar hinzufuegen...",
+        "addComment": "Kommentar hinzufügen...",
         "send": "Senden",
         "deleteComment": "Loeschen",
         "deleteCommentConfirm": "Bist du sicher, dass du diesen Kommentar loeschen moechtest?",
@@ -2193,6 +2193,10 @@
     "error": "Bericht konnte nicht gesendet werden",
     "rateLimited": "Du kannst in wenigen Minuten erneut melden",
     "mostAvailable": "Am wenigsten volle Zelte",
-    "currentLevels": "Aktuelle Auslastung"
+    "currentLevels": "Aktuelle Auslastung",
+    "fab": {
+      "accessibilityLabel": "Auslastung melden",
+      "accessibilityHint": "Melde, wie voll die Zelte sind"
+    }
   }
 }

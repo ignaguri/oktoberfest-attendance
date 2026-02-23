@@ -16,8 +16,14 @@ import type {
   GroupWithMembers,
   WinningCriteria,
 } from "@prostcounter/shared/schemas";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { useContext, useMemo } from "react";
+import {
+  useQuery,
+  useQueryClient,
+  type UseQueryResult,
+} from "@tanstack/react-query";
+import { useCallback, useContext, useMemo } from "react";
+
+import { logger } from "@/lib/logger";
 
 import { useLocalProfile, useLocalTents } from "./hooks";
 import { OfflineContext } from "./offline-provider";
@@ -103,6 +109,64 @@ function mapWinningCriteria(value: string | number): WinningCriteria {
     default:
       return "total_beers";
   }
+}
+
+// =============================================================================
+// Sync + Refresh Hook
+// =============================================================================
+
+/**
+ * All local query key prefixes used by adapted hooks.
+ * Invalidating these forces TanStack Query to re-read from SQLite.
+ */
+const LOCAL_QUERY_KEY_PREFIXES = [
+  "local-attendances",
+  "local-tents",
+  "local-groups",
+  "local-profile",
+  "local-festivals",
+];
+
+/**
+ * Hook that provides a "sync then refresh" function for pull-to-refresh.
+ *
+ * The adapted hooks read from local SQLite, so pull-to-refresh must:
+ * 1. Pull fresh data from the API into SQLite (via SyncManager)
+ * 2. Invalidate all local TanStack Query caches so hooks re-read from SQLite
+ *
+ * Use this in any screen that uses adapted hooks and supports pull-to-refresh.
+ *
+ * @example
+ * const { syncAndRefresh, isSyncing } = useSyncRefresh();
+ * <RefreshControl refreshing={isSyncing} onRefresh={syncAndRefresh} />
+ */
+export function useSyncRefresh() {
+  const context = useContext(OfflineContext);
+  const queryClient = useQueryClient();
+
+  const syncAndRefresh = useCallback(async () => {
+    try {
+      // Step 1: Pull fresh data from API into SQLite
+      if (context?.isOnline && context?.sync) {
+        await context.sync({ direction: "pull" });
+      }
+    } catch (error) {
+      logger.error("[useSyncRefresh] Sync pull failed:", error);
+    }
+
+    // Step 2: Invalidate all local query caches (always, even if sync fails)
+    // This forces adapted hooks to re-read current SQLite state
+    await Promise.all(
+      LOCAL_QUERY_KEY_PREFIXES.map((prefix) =>
+        queryClient.invalidateQueries({ queryKey: [prefix] }),
+      ),
+    );
+  }, [context, queryClient]);
+
+  return {
+    syncAndRefresh,
+    isSyncing: context?.syncStatus === "syncing",
+  };
 }
 
 // =============================================================================

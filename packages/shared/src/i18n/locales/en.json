@@ -2531,6 +2531,10 @@
     "error": "Failed to submit report",
     "rateLimited": "You can report again in a few minutes",
     "mostAvailable": "Most Available Tents",
-    "currentLevels": "Current Crowd Levels"
+    "currentLevels": "Current Crowd Levels",
+    "fab": {
+      "accessibilityLabel": "Report crowd level",
+      "accessibilityHint": "Report how crowded tents are"
+    }
   }
 }

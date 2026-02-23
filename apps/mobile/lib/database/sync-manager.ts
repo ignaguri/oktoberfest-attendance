@@ -835,7 +835,7 @@ export class SyncManager {
             if (existing) {
               await this.db.runAsync(
                 `UPDATE group_members SET
-                  joined_at = ?, _synced_at = ?, _dirty = 0
+                  joined_at = ?, _synced_at = ?, _dirty = 0, _deleted = 0
                 WHERE id = ?`,
                 [member.joinedAt ?? now, now, existing.id],
               );
@@ -857,11 +857,20 @@ export class SyncManager {
           const serverUserIds = members.map((m) => m.userId);
           if (serverUserIds.length > 0) {
             const placeholders = serverUserIds.map(() => "?").join(",");
-            await this.db.runAsync(
+            const deleteResult = await this.db.runAsync(
               `UPDATE group_members SET _deleted = 1, _synced_at = ?
                WHERE group_id = ? AND user_id NOT IN (${placeholders}) AND _deleted = 0`,
               [now, group.id, ...serverUserIds],
             );
+            result.deleted += deleteResult.changes;
+          } else {
+            // Server returned empty list — soft-delete all local members for this group
+            const deleteResult = await this.db.runAsync(
+              `UPDATE group_members SET _deleted = 1, _synced_at = ?
+               WHERE group_id = ? AND _deleted = 0`,
+              [now, group.id],
+            );
+            result.deleted += deleteResult.changes;
           }
         } catch (error) {
           // Log per-group error but continue with other groups

@@ -29,7 +29,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { useAdaptedGroups } from "@/lib/database/adapted-hooks";
+import { useAdaptedGroups, useSyncRefresh } from "@/lib/database/adapted-hooks";
 
 export default function GroupsScreen() {
   const { t } = useTranslation();
@@ -49,8 +49,8 @@ export default function GroupsScreen() {
     loading: isLoading,
     error: groupsError,
     refetch,
-    isRefetching,
   } = useAdaptedGroups(currentFestival?.id);
+  const { syncAndRefresh, isSyncing } = useSyncRefresh();
 
   // Handlers
   const handleGroupPress = useCallback(
@@ -69,25 +69,27 @@ export default function GroupsScreen() {
   }, []);
 
   const handleCreateSuccess = useCallback(
-    (groupId: string) => {
-      refetch();
+    async (groupId: string) => {
       setIsCreateSheetOpen(false);
       showDialog(t("common.status.success"), t("groups.createSuccess"));
+      // Sync to pull the new group into local SQLite, then refresh
+      await syncAndRefresh();
       // Navigate to the new group
       router.push(`/groups/${groupId}`);
     },
-    [refetch, showDialog, t, router],
+    [syncAndRefresh, showDialog, t, router],
   );
 
-  const handleJoinSuccess = useCallback(() => {
-    refetch();
+  const handleJoinSuccess = useCallback(async () => {
     setIsJoinSheetOpen(false);
     showDialog(t("common.status.success"), t("groups.joinSuccess"));
-  }, [refetch, showDialog, t]);
+    // Sync to pull the joined group into local SQLite, then refresh
+    await syncAndRefresh();
+  }, [syncAndRefresh, showDialog, t]);
 
   const onRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    syncAndRefresh();
+  }, [syncAndRefresh]);
 
   // Loading state - festival or initial data load
   if (festivalLoading || (isLoading && !groups)) {
@@ -126,10 +128,7 @@ export default function GroupsScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={
-          <RefreshControl
-            refreshing={isRefetching ?? false}
-            onRefresh={onRefresh}
-          />
+          <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
         }
       >
         {hasGroups ? (

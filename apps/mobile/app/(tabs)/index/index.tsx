@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -38,6 +38,7 @@ import { Colors } from "@/lib/constants/colors";
 import {
   useAdaptedAttendanceByDate,
   useAdaptedTents,
+  useSyncRefresh,
 } from "@/lib/database/adapted-hooks";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
@@ -59,7 +60,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { syncAndRefresh, isSyncing } = useSyncRefresh();
 
   // Location state (safe hook works outside provider too)
   const { isSharing, nearbyMembers } = useLocationContextSafe();
@@ -108,8 +109,19 @@ export default function HomeScreen() {
   }, [todayAttendance?.tentIds, resolveTentNames]);
 
   // Handle pending crowd report from QuickAttendanceSheet
-  // Note: no cleanup function — clearing pendingCrowdReport triggers a re-run
-  // and a cleanup would cancel the timeout before it fires.
+  const crowdPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (crowdPromptTimerRef.current) {
+        clearTimeout(crowdPromptTimerRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!pendingCrowdReport || pendingCrowdReport.tentIds.length === 0) return;
 
@@ -118,9 +130,11 @@ export default function HomeScreen() {
     setPendingCrowdReport(null);
 
     if (resolved.length > 0) {
-      setCrowdPromptTents(resolved);
-      // Small delay so the quick attendance sheet close animation finishes
-      setTimeout(() => {
+      // Small delay so the quick attendance sheet close animation finishes.
+      // Defer state updates to avoid synchronous setState in effect.
+      crowdPromptTimerRef.current = setTimeout(() => {
+        crowdPromptTimerRef.current = null;
+        setCrowdPromptTents(resolved);
         setShowCrowdPrompt(true);
       }, 500);
     }
@@ -141,21 +155,17 @@ export default function HomeScreen() {
 
   // Handle pull-to-refresh
   const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
     try {
-      // Invalidate API-backed queries (activity feed, crowd status, messages)
+      // Sync local SQLite from API, then invalidate local query caches
+      await syncAndRefresh();
+      // Also invalidate API-only queries (activity feed, crowd status, messages)
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
       await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
       await queryClient.invalidateQueries({ queryKey: ["message-feed"] });
-      // Invalidate local SQLite-backed queries to re-read after sync
-      await queryClient.invalidateQueries({ queryKey: ["local-attendances"] });
-      await queryClient.invalidateQueries({ queryKey: ["local-tents"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
-    } finally {
-      setIsRefreshing(false);
     }
-  }, [queryClient]);
+  }, [syncAndRefresh, queryClient]);
 
   // Loading state - show skeleton while festival is loading
   if (festivalLoading) {
@@ -180,7 +190,7 @@ export default function HomeScreen() {
         className="flex-1"
         refreshControl={
           <RefreshControl
-            refreshing={isRefreshing}
+            refreshing={isSyncing}
             onRefresh={handleRefresh}
             tintColor={Colors.primary[500]}
             colors={[Colors.primary[500]]}

@@ -1,3 +1,4 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Users } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -13,6 +14,7 @@ interface CrowdReportFabProps {
  * Uses Users icon to indicate crowd reporting.
  */
 export function CrowdReportFab({ onPress }: CrowdReportFabProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   // Match the same positioning logic as QuickAttendanceFab
@@ -30,8 +32,8 @@ export function CrowdReportFab({ onPress }: CrowdReportFabProps) {
       onPress={onPress}
       style={{ bottom: crowdFabBottomOffset }}
       className="bg-amber-600 px-3 py-3 hover:bg-amber-700 active:bg-amber-800"
-      accessibilityLabel="Report crowd level"
-      accessibilityHint="Report how crowded tents are"
+      accessibilityLabel={t("crowdReport.fab.accessibilityLabel")}
+      accessibilityHint={t("crowdReport.fab.accessibilityHint")}
     >
       <FabIcon as={Users} size="md" />
     </Fab>
