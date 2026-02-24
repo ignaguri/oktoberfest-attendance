@@ -1,5 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { View } from "react-native";
 
 import { HStack } from "@/components/ui/hstack";
@@ -50,7 +51,7 @@ export function CrowdLevelBadge({
     if (compact) return null;
     return (
       <Text className="text-xs text-typography-400">
-        {t("crowdReport.noReports", { defaultValue: "No reports" })}
+        {t("crowdReport.noReports")}
       </Text>
     );
   }
@@ -61,16 +62,14 @@ export function CrowdLevelBadge({
 
   return (
     <HStack space="xs" className="items-center">
-      <View className={`rounded-full px-2 py-0.5 ${bgClass}`}>
+      <View className={cn("rounded-full px-2 py-0.5", bgClass)}>
         <HStack space="xs" className="items-center">
           <View
             className="h-2 w-2 rounded-full"
             style={{ backgroundColor: dotColor }}
           />
-          <Text className={`text-xs font-medium ${textClass}`}>
-            {t(`crowdReport.levels.${crowdLevel}`, {
-              defaultValue: crowdLevel,
-            })}
+          <Text className={cn("text-xs font-medium", textClass)}>
+            {t(`crowdReport.levels.${crowdLevel}`)}
           </Text>
         </HStack>
       </View>
@@ -78,7 +77,6 @@ export function CrowdLevelBadge({
         <Text className="text-xs text-typography-500">
           {t("crowdReport.waitTime", {
             minutes: avgWaitMinutes,
-            defaultValue: `~${avgWaitMinutes} min wait`,
           })}
         </Text>
       )}

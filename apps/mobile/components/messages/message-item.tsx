@@ -5,6 +5,7 @@ import type {
   GroupMessageFeedItem,
   GroupMessageItem,
 } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { AlertTriangle, Pin, Trash2 } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
@@ -88,7 +89,7 @@ export function MessageItem({
     <>
       <VStack
         space="xs"
-        className={`px-3 py-3 ${isAlert ? "rounded-lg bg-amber-50" : ""}`}
+        className={cn("px-3 py-3", isAlert && "rounded-lg bg-amber-50")}
       >
         <HStack space="sm" className="items-start">
           {/* Avatar - Tappable to show profile */}

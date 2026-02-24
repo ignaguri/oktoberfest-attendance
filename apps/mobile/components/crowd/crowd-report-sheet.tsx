@@ -4,6 +4,7 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { CircleAlert, Send, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
@@ -132,9 +133,7 @@ export function CrowdReportSheet({
           <HStack className="w-full items-center justify-between">
             <VStack>
               <Text className="text-lg font-semibold text-typography-900">
-                {t("crowdReport.reportCrowd", {
-                  defaultValue: "Report Crowd",
-                })}
+                {t("crowdReport.reportCrowd")}
               </Text>
               <Text className="text-sm text-typography-500">{tentName}</Text>
             </VStack>
@@ -153,7 +152,6 @@ export function CrowdReportSheet({
               <Text className="text-sm text-yellow-700">
                 {t("crowdReport.recentReport", {
                   minutes: minutesSinceLastReport,
-                  defaultValue: `You reported ${minutesSinceLastReport} min ago`,
                 })}
               </Text>
             </HStack>
@@ -163,9 +161,7 @@ export function CrowdReportSheet({
           {showSuccess && (
             <View className="rounded-lg bg-green-50 px-4 py-3">
               <Text className="text-center font-medium text-green-700">
-                {t("crowdReport.success", {
-                  defaultValue: "Report submitted!",
-                })}
+                {t("crowdReport.success")}
               </Text>
             </View>
           )}
@@ -175,9 +171,7 @@ export function CrowdReportSheet({
               {/* Crowd Level Selection */}
               <VStack space="sm">
                 <Text className="text-sm font-medium text-typography-700">
-                  {t("crowdReport.selectLevel", {
-                    defaultValue: "How crowded is it?",
-                  })}
+                  {t("crowdReport.selectLevel")}
                 </Text>
                 <HStack space="sm" className="w-full">
                   {CROWD_LEVELS.map((level) => {
@@ -187,14 +181,13 @@ export function CrowdReportSheet({
                       <Pressable
                         key={level}
                         onPress={() => setSelectedLevel(level)}
-                        className={`flex-1 items-center rounded-xl border-2 px-2 py-3 ${
+                        className={cn(
+                          "flex-1 items-center rounded-xl border-2 px-2 py-3",
                           isSelected
                             ? "border-primary-500 bg-primary-50"
-                            : "border-outline-200 bg-background-50"
-                        }`}
-                        accessibilityLabel={t(`crowdReport.levels.${level}`, {
-                          defaultValue: level,
-                        })}
+                            : "border-outline-200 bg-background-50",
+                        )}
+                        accessibilityLabel={t(`crowdReport.levels.${level}`)}
                         accessibilityRole="radio"
                         accessibilityState={{ checked: isSelected }}
                       >
@@ -203,15 +196,14 @@ export function CrowdReportSheet({
                           style={{ backgroundColor: color }}
                         />
                         <Text
-                          className={`text-center text-xs font-medium ${
+                          className={cn(
+                            "text-center text-xs font-medium",
                             isSelected
                               ? "text-primary-700"
-                              : "text-typography-600"
-                          }`}
+                              : "text-typography-600",
+                          )}
                         >
-                          {t(`crowdReport.levels.${level}`, {
-                            defaultValue: level,
-                          })}
+                          {t(`crowdReport.levels.${level}`)}
                         </Text>
                       </Pressable>
                     );
@@ -223,14 +215,10 @@ export function CrowdReportSheet({
               <VStack space="sm">
                 <HStack className="items-center justify-between">
                   <Text className="text-sm font-medium text-typography-700">
-                    {t("crowdReport.waitTimeLabel", {
-                      defaultValue: "Estimated wait time (minutes)",
-                    })}
+                    {t("crowdReport.waitTimeLabel")}
                   </Text>
                   <Text className="text-xs text-typography-400">
-                    {t("crowdReport.waitTimeOptional", {
-                      defaultValue: "Optional",
-                    })}
+                    {t("crowdReport.waitTimeOptional")}
                   </Text>
                 </HStack>
                 <View className="flex-row flex-wrap gap-2">
@@ -242,23 +230,27 @@ export function CrowdReportSheet({
                         onPress={() =>
                           setWaitTimeMinutes(isSelected ? undefined : minutes)
                         }
-                        className={`rounded-lg border px-3 py-2 ${
+                        className={cn(
+                          "rounded-lg border px-3 py-2",
                           isSelected
                             ? "border-primary-500 bg-primary-50"
-                            : "border-outline-200 bg-background-50"
-                        }`}
-                        accessibilityLabel={`${minutes} minutes`}
+                            : "border-outline-200 bg-background-50",
+                        )}
+                        accessibilityLabel={t("crowdReport.waitTimeMinutes", {
+                          count: minutes,
+                        })}
                         accessibilityRole="radio"
                         accessibilityState={{ checked: isSelected }}
                       >
                         <Text
-                          className={`text-sm ${
+                          className={cn(
+                            "text-sm",
                             isSelected
                               ? "font-medium text-primary-700"
-                              : "text-typography-600"
-                          }`}
+                              : "text-typography-600",
+                          )}
                         >
-                          {minutes === 0 ? "0" : minutes}
+                          {minutes}
                         </Text>
                       </Pressable>
                     );
@@ -270,12 +262,8 @@ export function CrowdReportSheet({
               {error && (
                 <Text className="text-sm text-error-600">
                   {error.includes("5 minutes")
-                    ? t("crowdReport.rateLimited", {
-                        defaultValue: "You can report again in a few minutes",
-                      })
-                    : t("crowdReport.error", {
-                        defaultValue: "Failed to submit report",
-                      })}
+                    ? t("crowdReport.rateLimited")
+                    : t("crowdReport.error")}
                 </Text>
               )}
 
@@ -293,9 +281,7 @@ export function CrowdReportSheet({
                   <>
                     <Send size={18} color={IconColors.white} />
                     <ButtonText className="ml-2">
-                      {t("crowdReport.submitReport", {
-                        defaultValue: "Submit Report",
-                      })}
+                      {t("crowdReport.submitReport")}
                     </ButtonText>
                   </>
                 )}

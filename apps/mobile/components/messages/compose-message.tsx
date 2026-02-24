@@ -1,6 +1,7 @@
 import { usePostMessage } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupMessageType } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { AlertTriangle, MessageSquare, Send } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { TextInput } from "react-native";
@@ -96,11 +97,12 @@ export function ComposeMessage({
             <HStack space="sm">
               <Pressable
                 onPress={() => setMessageType("message")}
-                className={`flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2 ${
+                className={cn(
+                  "flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2",
                   messageType === "message"
                     ? "border-primary-500 bg-primary-50"
-                    : "border-outline-200 bg-white"
-                }`}
+                    : "border-outline-200 bg-white",
+                )}
                 accessibilityLabel={t("groups.messages.compose.typeMessage")}
               >
                 <MessageSquare
@@ -112,11 +114,12 @@ export function ComposeMessage({
                   }
                 />
                 <Text
-                  className={`text-sm font-medium ${
+                  className={cn(
+                    "text-sm font-medium",
                     messageType === "message"
                       ? "text-primary-600"
-                      : "text-typography-500"
-                  }`}
+                      : "text-typography-500",
+                  )}
                 >
                   {t("groups.messages.compose.typeMessage")}
                 </Text>
@@ -124,11 +127,12 @@ export function ComposeMessage({
 
               <Pressable
                 onPress={() => setMessageType("alert")}
-                className={`flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2 ${
+                className={cn(
+                  "flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 px-3 py-2",
                   messageType === "alert"
                     ? "border-primary-500 bg-amber-50"
-                    : "border-outline-200 bg-white"
-                }`}
+                    : "border-outline-200 bg-white",
+                )}
                 accessibilityLabel={t("groups.messages.compose.typeAlert")}
               >
                 <AlertTriangle
@@ -140,11 +144,12 @@ export function ComposeMessage({
                   }
                 />
                 <Text
-                  className={`text-sm font-medium ${
+                  className={cn(
+                    "text-sm font-medium",
                     messageType === "alert"
                       ? "text-primary-600"
-                      : "text-typography-500"
-                  }`}
+                      : "text-typography-500",
+                  )}
                 >
                   {t("groups.messages.compose.typeAlert")}
                 </Text>
@@ -166,9 +171,10 @@ export function ComposeMessage({
               />
               <HStack className="items-center justify-between">
                 <Text
-                  className={`text-xs ${
-                    isOverLimit ? "text-error-500" : "text-typography-400"
-                  }`}
+                  className={cn(
+                    "text-xs",
+                    isOverLimit ? "text-error-500" : "text-typography-400",
+                  )}
                 >
                   {t("groups.messages.compose.charCount", {
                     count: charCount,

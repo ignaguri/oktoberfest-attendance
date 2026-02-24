@@ -428,7 +428,11 @@
         "justNow": "Just now",
         "minutesAgo": "{{count}}m ago",
         "hoursAgo": "{{count}}h ago",
-        "daysAgo": "{{count}}d ago"
+        "daysAgo": "{{count}}d ago",
+        "close": "Close",
+        "reactWith": "React with {{emoji}}",
+        "tapToReact": "Tap to react",
+        "tapToRemoveReaction": "Tap to remove reaction"
       }
     },
     "location": {
@@ -1046,7 +1050,12 @@
         "reminders": "Get reminders for your reservations"
       },
       "enable": "Enable Notifications",
-      "skip": "Maybe Later"
+      "skip": "Maybe Later",
+      "empty": "No notifications yet",
+      "emptyHint": "Your notifications will appear here",
+      "unreadCount": "{{count}} unread",
+      "markAllRead": "Mark all read",
+      "tapToView": "Tap to view notification details"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -1763,6 +1772,16 @@
     "noTentsNearby": "No tents within range",
     "checkIn": "Check In",
     "checkInAt": "Check in at {{tent}}",
+    "benefits": {
+      "findFriends": "Find your friends on the festival map",
+      "nearbyTents": "Get suggestions when you're near a tent",
+      "privacy": "Only visible to your group members"
+    },
+    "promptTitle": "Share Your Location",
+    "promptDescription": "Enable location sharing to find friends and discover nearby tents",
+    "promptNote": "You can turn off location sharing at any time",
+    "enable": "Enable Location",
+    "skip": "Maybe Later",
     "callout": {
       "away": "away"
     },
@@ -2532,9 +2551,12 @@
     "rateLimited": "You can report again in a few minutes",
     "mostAvailable": "Most Available Tents",
     "currentLevels": "Current Crowd Levels",
+    "moreTents": "+{{count}} more",
     "fab": {
       "accessibilityLabel": "Report crowd level",
       "accessibilityHint": "Report how crowded tents are"
-    }
+    },
+    "promptDescription": "You visited multiple tents. Select one to report its crowd level.",
+    "waitTimeMinutes": "{{count}} minutes"
   }
 }

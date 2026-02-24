@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   type SignInFormData,
   signInSchema,
@@ -6,7 +7,6 @@ import {
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -153,14 +153,8 @@ export default function SignInScreen() {
 
       setError(
         isExpired
-          ? t("auth.biometric.sessionExpired", {
-              defaultValue:
-                "Your session has expired. Please sign in with your password.",
-            })
-          : t("auth.biometric.restoreFailed", {
-              defaultValue:
-                "Could not restore your session. Please sign in again.",
-            }),
+          ? t("auth.biometric.sessionExpired")
+          : t("auth.biometric.restoreFailed"),
       );
       setShowBiometricPrompt(false);
       if (storedEmail) setValue("email", storedEmail);
@@ -173,7 +167,7 @@ export default function SignInScreen() {
     router.replace("/");
   };
 
-  const handleUsePasword = () => {
+  const handleUsePassword = () => {
     setShowBiometricPrompt(false);
     if (storedEmail) {
       setValue("email", storedEmail);
@@ -336,7 +330,7 @@ export default function SignInScreen() {
           isOpen={showBiometricPrompt}
           onClose={() => setShowBiometricPrompt(false)}
           onAuthenticate={handleBiometricAuth}
-          onUsePassword={handleUsePasword}
+          onUsePassword={handleUsePassword}
           biometricType={biometricType}
           isAuthenticating={isBiometricAuthenticating}
         />

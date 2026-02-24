@@ -80,10 +80,8 @@ export function LocationSharingToggle({
         const stopped = await stopSharing();
         if (!stopped) {
           showAlert(
-            t("common.status.error", { defaultValue: "Error" }),
-            t("location.errors.stopFailed", {
-              defaultValue: "Failed to stop sharing. Please try again.",
-            }),
+            t("common.status.error"),
+            t("location.errors.stopFailed"),
             "error",
           );
         }
@@ -113,11 +111,8 @@ export function LocationSharingToggle({
 
       if (!result.success) {
         showAlert(
-          t("common.status.error", { defaultValue: "Error" }),
-          result.warning ||
-            t("location.errors.startFailed", {
-              defaultValue: "Failed to start sharing. Please try again.",
-            }),
+          t("common.status.error"),
+          result.warning || t("location.errors.startFailed"),
           "error",
         );
       } else if (result.warning) {
@@ -125,11 +120,7 @@ export function LocationSharingToggle({
         if (useInlineWarnings) {
           setInlineWarning(result.warning);
         } else {
-          showAlert(
-            t("common.status.info", { defaultValue: "Info" }),
-            result.warning,
-            "warning",
-          );
+          showAlert(t("common.status.info"), result.warning, "warning");
         }
       }
     } finally {
@@ -161,11 +152,8 @@ export function LocationSharingToggle({
 
       if (!result.success) {
         showAlert(
-          t("common.status.error", { defaultValue: "Error" }),
-          result.warning ||
-            t("location.errors.startFailed", {
-              defaultValue: "Failed to start sharing. Please try again.",
-            }),
+          t("common.status.error"),
+          result.warning || t("location.errors.startFailed"),
           "error",
         );
       } else if (result.warning) {
@@ -173,11 +161,7 @@ export function LocationSharingToggle({
         if (useInlineWarnings) {
           setInlineWarning(result.warning);
         } else {
-          showAlert(
-            t("common.status.info", { defaultValue: "Info" }),
-            result.warning,
-            "warning",
-          );
+          showAlert(t("common.status.info"), result.warning, "warning");
         }
       }
     }
@@ -205,22 +189,15 @@ export function LocationSharingToggle({
   // Get display text for group selection
   const getGroupSelectionText = () => {
     if (shareWithAll) {
-      return t("location.groups.allGroups", {
-        defaultValue: "All groups",
-      });
+      return t("location.groups.allGroups");
     }
     if (selectedGroupIds.length === 0) {
-      return t("location.groups.noGroupsSelected", {
-        defaultValue: "No groups selected",
-      });
+      return t("location.groups.noGroupsSelected");
     }
     if (selectedGroupIds.length === 1) {
-      return t("location.groups.oneGroup", {
-        defaultValue: "1 group",
-      });
+      return t("location.groups.oneGroup");
     }
     return t("location.groups.multipleGroups", {
-      defaultValue: "{{count}} groups",
       count: selectedGroupIds.length,
     });
   };
@@ -381,12 +358,8 @@ export function LocationSharingToggle({
                   accessibilityLabel={t("location.groups.selectGroups")}
                   accessibilityHint={
                     isGroupSelectorOpen
-                      ? t("location.groups.collapseHint", {
-                          defaultValue: "Collapse group selection",
-                        })
-                      : t("location.groups.expandHint", {
-                          defaultValue: "Expand group selection",
-                        })
+                      ? t("location.groups.collapseHint")
+                      : t("location.groups.expandHint")
                   }
                 >
                   <HStack className="items-center justify-between p-3">
@@ -394,9 +367,7 @@ export function LocationSharingToggle({
                       <Users size={18} color={IconColors.default} />
                       <VStack>
                         <Text className="text-sm font-medium text-typography-900">
-                          {t("location.groups.visibleTo", {
-                            defaultValue: "Visible to",
-                          })}
+                          {t("location.groups.visibleTo")}
                         </Text>
                         <Text className="text-xs text-typography-500">
                           {getGroupSelectionText()}

@@ -8,7 +8,8 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { ALLOWED_EMOJIS } from "@prostcounter/shared/schemas";
-import { getInitials } from "@prostcounter/ui";
+import { formatRelativeTime } from "@prostcounter/shared/utils";
+import { cn, getInitials } from "@prostcounter/ui";
 import { Send, Trash2, X } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import {
@@ -22,6 +23,7 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   Avatar,
@@ -46,43 +48,6 @@ interface PhotoDetailModalProps {
   onClose: () => void;
 }
 
-/**
- * Format a relative time string from a date
- */
-function formatRelativeTime(
-  dateStr: string,
-  t: (key: string, options?: Record<string, unknown>) => string,
-): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffMinutes < 1) {
-    return t("groups.gallery.photoDetail.justNow", {
-      defaultValue: "Just now",
-    });
-  }
-  if (diffMinutes < 60) {
-    return t("groups.gallery.photoDetail.minutesAgo", {
-      count: diffMinutes,
-      defaultValue: `${diffMinutes}m ago`,
-    });
-  }
-  if (diffHours < 24) {
-    return t("groups.gallery.photoDetail.hoursAgo", {
-      count: diffHours,
-      defaultValue: `${diffHours}h ago`,
-    });
-  }
-  return t("groups.gallery.photoDetail.daysAgo", {
-    count: diffDays,
-    defaultValue: `${diffDays}d ago`,
-  });
-}
-
 export function PhotoDetailModal({
   visible,
   photoId,
@@ -92,6 +57,7 @@ export function PhotoDetailModal({
 }: PhotoDetailModalProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [imageLoading, setImageLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
 
@@ -198,7 +164,7 @@ export function PhotoDetailModal({
                   {item.username}
                 </Text>
                 <Text className="text-xs text-typography-400">
-                  {formatRelativeTime(item.createdAt, t)}
+                  {formatRelativeTime(new Date(item.createdAt))}
                 </Text>
               </HStack>
               {isOwnComment && (
@@ -206,7 +172,6 @@ export function PhotoDetailModal({
                   onPress={() => handleDeleteComment(item.id)}
                   accessibilityLabel={t(
                     "groups.gallery.photoDetail.deleteComment",
-                    { defaultValue: "Delete" },
                   )}
                   className="p-1"
                 >
@@ -237,15 +202,16 @@ export function PhotoDetailModal({
       >
         <View className="flex-1 bg-white">
           {/* Header with close button */}
-          <View className="flex-row items-center justify-between border-b border-outline-200 px-4 pb-2 pt-12">
+          <View
+            className="flex-row items-center justify-between border-b border-outline-200 px-4 pb-2"
+            style={{ paddingTop: Math.max(insets.top, 12) }}
+          >
             <Text className="text-lg font-semibold text-typography-900">
-              {t("groups.gallery.photoDetail.reactions", {
-                defaultValue: "Reactions",
-              })}
+              {t("groups.gallery.photoDetail.reactions")}
             </Text>
             <Pressable
               onPress={onClose}
-              accessibilityLabel="Close"
+              accessibilityLabel={t("groups.gallery.photoDetail.close")}
               className="rounded-full p-2"
             >
               <X size={24} color={IconColors.default} />
@@ -282,24 +248,31 @@ export function PhotoDetailModal({
                   <Pressable
                     key={emoji}
                     onPress={() => handleToggleReaction(emoji)}
-                    accessibilityLabel={`React with ${emoji}`}
+                    accessibilityLabel={t(
+                      "groups.gallery.photoDetail.reactWith",
+                      { emoji },
+                    )}
                     accessibilityHint={
-                      hasReacted ? "Tap to remove reaction" : "Tap to react"
+                      hasReacted
+                        ? t("groups.gallery.photoDetail.tapToRemoveReaction")
+                        : t("groups.gallery.photoDetail.tapToReact")
                     }
-                    className={`flex-row items-center rounded-full px-3 py-1.5 ${
+                    className={cn(
+                      "flex-row items-center rounded-full px-3 py-1.5",
                       hasReacted
                         ? "border-2 border-primary-500 bg-primary-50"
-                        : "border border-outline-200 bg-background-50"
-                    }`}
+                        : "border border-outline-200 bg-background-50",
+                    )}
                   >
                     <Text className="text-lg">{emoji}</Text>
                     {count > 0 && (
                       <Text
-                        className={`ml-1 text-xs font-semibold ${
+                        className={cn(
+                          "ml-1 text-xs font-semibold",
                           hasReacted
                             ? "text-primary-600"
-                            : "text-typography-500"
-                        }`}
+                            : "text-typography-500",
+                        )}
                       >
                         {count}
                       </Text>
@@ -314,9 +287,7 @@ export function PhotoDetailModal({
           <View className="flex-1">
             <View className="border-b border-outline-200 px-4 py-2">
               <Text className="text-sm font-semibold text-typography-700">
-                {t("groups.gallery.photoDetail.comments", {
-                  defaultValue: "Comments",
-                })}
+                {t("groups.gallery.photoDetail.comments")}
               </Text>
             </View>
 
@@ -331,23 +302,22 @@ export function PhotoDetailModal({
             ) : (
               <View className="flex-1 items-center justify-center p-8">
                 <Text className="text-center text-sm text-typography-400">
-                  {t("groups.gallery.photoDetail.noComments", {
-                    defaultValue: "No comments yet. Be the first!",
-                  })}
+                  {t("groups.gallery.photoDetail.noComments")}
                 </Text>
               </View>
             )}
           </View>
 
           {/* Comment Input */}
-          <View className="border-t border-outline-200 px-4 py-3 pb-8">
+          <View
+            className="border-t border-outline-200 px-4 py-3"
+            style={{ paddingBottom: Math.max(insets.bottom, 8) }}
+          >
             <HStack space="sm" className="items-center">
               <TextInput
                 value={commentText}
                 onChangeText={setCommentText}
-                placeholder={t("groups.gallery.photoDetail.addComment", {
-                  defaultValue: "Add a comment...",
-                })}
+                placeholder={t("groups.gallery.photoDetail.addComment")}
                 placeholderTextColor={Colors.gray[400]}
                 maxLength={500}
                 multiline
@@ -356,12 +326,11 @@ export function PhotoDetailModal({
               <Pressable
                 onPress={handleAddComment}
                 disabled={!commentText.trim() || addComment.loading}
-                accessibilityLabel={t("groups.gallery.photoDetail.send", {
-                  defaultValue: "Send",
-                })}
-                className={`rounded-full p-2 ${
-                  commentText.trim() ? "bg-primary-500" : "bg-background-200"
-                }`}
+                accessibilityLabel={t("groups.gallery.photoDetail.send")}
+                className={cn(
+                  "rounded-full p-2",
+                  commentText.trim() ? "bg-primary-500" : "bg-background-200",
+                )}
               >
                 {addComment.loading ? (
                   <ActivityIndicator size="small" color={Colors.white} />

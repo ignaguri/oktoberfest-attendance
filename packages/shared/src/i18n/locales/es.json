@@ -419,16 +419,20 @@
         "addComment": "Agregar un comentario...",
         "send": "Enviar",
         "deleteComment": "Eliminar",
-        "deleteCommentConfirm": "Estas seguro de que queres eliminar este comentario?",
+        "deleteCommentConfirm": "¿Estás seguro de que querés eliminar este comentario?",
         "commentAdded": "Comentario agregado",
         "commentDeleted": "Comentario eliminado",
         "commentError": "No se pudo agregar el comentario",
         "deleteError": "No se pudo eliminar el comentario",
-        "reactionError": "No se pudo actualizar la reaccion",
+        "reactionError": "No se pudo actualizar la reacción",
         "justNow": "Ahora",
         "minutesAgo": "hace {{count}}m",
         "hoursAgo": "hace {{count}}h",
-        "daysAgo": "hace {{count}}d"
+        "daysAgo": "hace {{count}}d",
+        "close": "Cerrar",
+        "reactWith": "Reaccionar con {{emoji}}",
+        "tapToReact": "Tocar para reaccionar",
+        "tapToRemoveReaction": "Tocar para quitar la reacción"
       }
     },
     "location": {
@@ -1046,7 +1050,12 @@
         "reminders": "Recibí recordatorios para tus reservas"
       },
       "enable": "Activar notificaciones",
-      "skip": "Tal vez más tarde"
+      "skip": "Tal vez más tarde",
+      "empty": "Todavía no hay notificaciones",
+      "emptyHint": "Tus notificaciones aparecerán acá",
+      "unreadCount": "{{count}} sin leer",
+      "markAllRead": "Marcar todas como leídas",
+      "tapToView": "Tocá para ver los detalles"
     },
     "privacy": {
       "title": "Configuración de privacidad",
@@ -1840,7 +1849,17 @@
       "permissionNotGranted": "Permiso de ubicación no otorgado",
       "backgroundNotStarted": "No se pudo iniciar la ubicación en segundo plano. La ubicación solo se actualizará mientras la app esté abierta. Podés habilitar la ubicación en segundo plano en los Ajustes de tu dispositivo.",
       "backgroundPermissionNotGranted": "Permiso de ubicación en segundo plano no otorgado. La ubicación solo se actualizará mientras la app esté abierta. Podés otorgar acceso a la ubicación en segundo plano en los Ajustes de tu dispositivo."
-    }
+    },
+    "benefits": {
+      "findFriends": "Encontrá a tus amigos en el mapa del festival",
+      "nearbyTents": "Recibí sugerencias cuando estés cerca de una carpa",
+      "privacy": "Solo visible para los miembros de tu grupo"
+    },
+    "promptTitle": "Compartí tu ubicación",
+    "promptDescription": "Activá la ubicación para encontrar amigos y descubrir carpas cercanas",
+    "promptNote": "Podés desactivar la ubicación en cualquier momento",
+    "enable": "Activar ubicación",
+    "skip": "Quizás después"
   },
   "photos": {
     "upload": {
@@ -2515,26 +2534,29 @@
     "recentReport": "Reportaste hace {{minutes}} min",
     "reportCount": "{{count}} reporte",
     "reportCount_plural": "{{count}} reportes",
-    "lastReported": "Ultimo reporte {{time}}",
+    "lastReported": "Último reporte {{time}}",
     "waitTime": "~{{minutes}} min de espera",
     "noWaitData": "Sin datos de espera",
     "levels": {
-      "empty": "Vacio",
+      "empty": "Vacío",
       "moderate": "Moderado",
       "crowded": "Lleno",
       "full": "Completamente lleno"
     },
-    "selectLevel": "Que tan lleno esta?",
+    "selectLevel": "¿Qué tan lleno está?",
     "waitTimeLabel": "Tiempo de espera estimado (minutos)",
     "waitTimeOptional": "Opcional",
     "success": "Reporte enviado!",
     "error": "No se pudo enviar el reporte",
     "rateLimited": "Podes reportar de nuevo en unos minutos",
-    "mostAvailable": "Carpas mas disponibles",
+    "mostAvailable": "Carpas más disponibles",
     "currentLevels": "Niveles de multitud actuales",
+    "moreTents": "+{{count}} más",
     "fab": {
       "accessibilityLabel": "Reportar nivel de multitud",
       "accessibilityHint": "Reportar qué tan llenas están las carpas"
-    }
+    },
+    "promptDescription": "Visitaste varias carpas. Seleccioná una para reportar el nivel de gente.",
+    "waitTimeMinutes": "{{count}} minutos"
   }
 }

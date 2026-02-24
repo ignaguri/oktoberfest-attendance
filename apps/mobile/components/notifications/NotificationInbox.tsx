@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  TouchableOpacity,
   View,
 } from "react-native";
 
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
 
@@ -25,18 +25,19 @@ interface NotificationItemProps {
  * Single notification item component
  */
 function NotificationItem({ notification, onPress }: NotificationItemProps) {
+  const { t } = useTranslation();
   const timeAgo = formatRelativeTime(new Date(notification.createdAt));
   const isRead = notification.isRead;
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={() => onPress(notification)}
       className={cn(
         "flex-row border-b border-outline-100 p-4",
         isRead ? "bg-white" : "bg-primary-50",
       )}
       accessibilityLabel={notification.subject || notification.body}
-      accessibilityHint="Tap to view notification details"
+      accessibilityHint={t("profile.notifications.tapToView")}
     >
       {/* Unread indicator */}
       <View className="mr-3 justify-center">
@@ -63,7 +64,7 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
         </Text>
         <Text className="mt-1 text-xs text-typography-400">{timeAgo}</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -77,14 +78,10 @@ function EmptyState() {
     <View className="flex-1 items-center justify-center p-8">
       <Bell size={48} color={Colors.primary[500]} style={{ opacity: 0.4 }} />
       <Text className="mt-4 text-center text-typography-500">
-        {t("profile.notifications.empty", {
-          defaultValue: "No notifications yet",
-        })}
+        {t("profile.notifications.empty")}
       </Text>
       <Text className="mt-2 text-center text-sm text-typography-400">
-        {t("profile.notifications.emptyHint", {
-          defaultValue: "Your notifications will appear here",
-        })}
+        {t("profile.notifications.emptyHint")}
       </Text>
     </View>
   );
@@ -188,22 +185,19 @@ export function NotificationInbox({
         <View className="flex-row items-center justify-between border-b border-outline-100 px-4 py-3">
           <Text className="text-sm text-typography-600">
             {t("profile.notifications.unreadCount", {
-              defaultValue: "{{count}} unread",
               count: unreadCount,
             })}
           </Text>
-          <TouchableOpacity
+          <Pressable
             onPress={handleMarkAllAsRead}
             className="flex-row items-center gap-1"
-            accessibilityLabel="Mark all as read"
+            accessibilityLabel={t("profile.notifications.markAllRead")}
           >
             <CheckCheck size={16} color={Colors.primary[500]} />
             <Text className="text-sm text-primary-500">
-              {t("profile.notifications.markAllRead", {
-                defaultValue: "Mark all read",
-              })}
+              {t("profile.notifications.markAllRead")}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
 

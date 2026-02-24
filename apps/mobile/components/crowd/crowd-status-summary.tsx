@@ -48,7 +48,7 @@ export function CrowdStatusSummary({ festivalId }: CrowdStatusSummaryProps) {
         <HStack space="sm" className="items-center justify-center py-2">
           <ActivityIndicator size="small" color={Colors.primary[500]} />
           <Text className="text-sm text-typography-500">
-            {t("common.buttons.loading", { defaultValue: "Loading..." })}
+            {t("common.buttons.loading")}
           </Text>
         </HStack>
       </Card>
@@ -66,9 +66,7 @@ export function CrowdStatusSummary({ festivalId }: CrowdStatusSummaryProps) {
         <HStack space="sm" className="items-center">
           <Users size={18} color={IconColors.primary} />
           <Text className="text-base font-semibold text-typography-900">
-            {t("crowdReport.currentLevels", {
-              defaultValue: "Current Crowd Levels",
-            })}
+            {t("crowdReport.currentLevels")}
           </Text>
         </HStack>
 
@@ -97,7 +95,7 @@ export function CrowdStatusSummary({ festivalId }: CrowdStatusSummaryProps) {
 
         {tentsWithReports.length > 5 && (
           <Text className="text-center text-xs text-typography-400">
-            +{tentsWithReports.length - 5} more
+            {t("crowdReport.moreTents", { count: tentsWithReports.length - 5 })}
           </Text>
         )}
       </VStack>
