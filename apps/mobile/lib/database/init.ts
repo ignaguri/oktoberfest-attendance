@@ -81,6 +81,10 @@ export async function closeDatabase(): Promise<void> {
 /**
  * Initializes the database schema.
  * Creates all tables and indexes if they don't exist.
+ *
+ * @deprecated Use `runMigrations()` from `migrations.ts` instead.
+ * This function is kept for backwards compatibility but will be removed
+ * in a future version. It uses legacy DDL constants instead of Drizzle migrations.
  */
 export async function initializeSchema(
   db: SQLite.SQLiteDatabase,
@@ -249,10 +253,11 @@ export async function resetDatabase(): Promise<void> {
   await SQLite.deleteDatabaseAsync(DATABASE_NAME);
   logger.debug("[Database] Database deleted");
 
-  // Reinitialize
+  // Reinitialize with migrations
   const db = await openDatabase();
-  await initializeSchema(db);
-  await setSchemaVersion(db, SCHEMA_VERSION);
+  // Import here to avoid circular dependency
+  const { runMigrations } = await import("./migrations");
+  await runMigrations(db);
   logger.debug("[Database] Database reset complete");
 }
 
@@ -289,19 +294,15 @@ export async function initializeDatabase(): Promise<SQLite.SQLiteDatabase> {
         return openDatabase();
       }
 
-      // Check if we need to initialize schema
+      // Check if we need to run migrations
       const version = await getSchemaVersion(db);
-      if (version === 0) {
-        // Fresh database
-        await initializeSchema(db);
-        await setSchemaVersion(db, SCHEMA_VERSION);
-        logger.debug("[Database] Fresh database initialized");
-      } else if (version < SCHEMA_VERSION) {
-        // Needs migration
+      if (version < SCHEMA_VERSION) {
+        // Fresh database or needs migration
+        const { runMigrations } = await import("./migrations");
+        await runMigrations(db);
         logger.debug(
-          `[Database] Migration needed: v${version} -> v${SCHEMA_VERSION}`,
+          `[Database] Migrations complete: v${version} -> v${SCHEMA_VERSION}`,
         );
-        // Migrations will be handled by migrations.ts
       } else {
         logger.debug(`[Database] Schema up to date (v${version})`);
       }

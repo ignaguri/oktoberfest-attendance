@@ -41,21 +41,15 @@ export function LocationPermissionPrompt({
   const benefits = [
     {
       icon: Users,
-      text: t("location.benefits.findFriends", {
-        defaultValue: "Find your friends on the festival map",
-      }),
+      text: t("location.benefits.findFriends"),
     },
     {
       icon: Navigation,
-      text: t("location.benefits.nearbyTents", {
-        defaultValue: "Get suggestions when you're near a tent",
-      }),
+      text: t("location.benefits.nearbyTents"),
     },
     {
       icon: Shield,
-      text: t("location.benefits.privacy", {
-        defaultValue: "Only visible to your group members",
-      }),
+      text: t("location.benefits.privacy"),
     },
   ];
 
@@ -71,19 +65,14 @@ export function LocationPermissionPrompt({
             <MapPin size={40} color={Colors.primary[500]} />
           </View>
           <Heading size="lg" className="text-center">
-            {t("location.promptTitle", {
-              defaultValue: "Share Your Location",
-            })}
+            {t("location.promptTitle")}
           </Heading>
         </AlertDialogHeader>
 
         <AlertDialogBody>
           <VStack space="md">
             <Text className="text-center text-typography-600">
-              {t("location.promptDescription", {
-                defaultValue:
-                  "Enable location sharing to find friends and discover nearby tents",
-              })}
+              {t("location.promptDescription")}
             </Text>
 
             <VStack space="sm" className="py-4">
@@ -103,9 +92,7 @@ export function LocationPermissionPrompt({
             </VStack>
 
             <Text className="text-center text-xs text-typography-500">
-              {t("location.promptNote", {
-                defaultValue: "You can turn off location sharing at any time",
-              })}
+              {t("location.promptNote")}
             </Text>
           </VStack>
         </AlertDialogBody>
@@ -117,15 +104,9 @@ export function LocationPermissionPrompt({
               await onEnable();
               onClose();
             }}
-            accessibilityLabel={t("location.enable", {
-              defaultValue: "Enable Location",
-            })}
+            accessibilityLabel={t("location.enable")}
           >
-            <ButtonText>
-              {t("location.enable", {
-                defaultValue: "Enable Location",
-              })}
-            </ButtonText>
+            <ButtonText>{t("location.enable")}</ButtonText>
           </Button>
           <Button
             variant="link"
@@ -134,14 +115,10 @@ export function LocationPermissionPrompt({
               onSkip();
               onClose();
             }}
-            accessibilityLabel={t("location.skip", {
-              defaultValue: "Maybe Later",
-            })}
+            accessibilityLabel={t("location.skip")}
           >
             <ButtonText className="text-typography-500">
-              {t("location.skip", {
-                defaultValue: "Maybe Later",
-              })}
+              {t("location.skip")}
             </ButtonText>
           </Button>
         </AlertDialogFooter>

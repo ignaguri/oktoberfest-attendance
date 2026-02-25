@@ -51,11 +51,17 @@ export function useOfflineLogConsumption() {
       // 2. The schema requires fields we don't have offline
       // The sync manager will call the API when back online
 
-      // Queue for sync
+      // Queue for sync (snake_case to match push handler expectations)
       await enqueueOperation(db, "INSERT", "consumptions", consumptionId, {
-        ...input,
-        id: consumptionId,
-        recordedAt: now,
+        festival_id: input.festivalId,
+        date: input.date,
+        drink_type: input.drinkType,
+        drink_name: input.drinkName,
+        volume_ml: input.volumeMl ?? 1000,
+        price_paid_cents: input.pricePaidCents,
+        base_price_cents: input.basePriceCents,
+        tent_id: input.tentId,
+        recorded_at: now,
       });
 
       await refreshPendingCount();

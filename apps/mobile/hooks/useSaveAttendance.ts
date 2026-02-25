@@ -10,7 +10,6 @@
  */
 
 import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
-import { useUpdatePersonalAttendance } from "@prostcounter/shared/hooks";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
 import { useCallback, useState } from "react";
@@ -23,6 +22,7 @@ import {
   useBeerPictureUpload,
 } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
+import { useOfflineUpdateAttendance } from "./useOfflineAttendance";
 import {
   useOfflineDeleteConsumption,
   useOfflineLogConsumption,
@@ -51,7 +51,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const updateAttendance = useUpdatePersonalAttendance();
+  const updateAttendance = useOfflineUpdateAttendance();
   const logConsumption = useOfflineLogConsumption();
   const deleteConsumption = useOfflineDeleteConsumption();
   const { uploadPendingPhotos } = useBeerPictureUpload();

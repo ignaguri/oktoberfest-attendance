@@ -83,6 +83,11 @@
       "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
       "notAuthenticated": "Nicht authentifiziert"
     },
+    "offline": {
+      "title": "Du bist offline",
+      "leaderboardUnavailable": "Die Bestenliste benötigt eine Internetverbindung. Verbinde dich, um die Rangliste zu sehen.",
+      "achievementsUnavailable": "Erfolge benötigen eine Internetverbindung. Verbinde dich, um deinen Fortschritt zu sehen."
+    },
     "empty": {
       "noResults": "Keine Ergebnisse gefunden",
       "noData": "Keine Daten verfügbar"
@@ -118,7 +123,8 @@
     "dismiss": "Verwerfen",
     "loading": "Wird geladen",
     "tents": "Zelte",
-    "unknownUser": "Unbekannter Benutzer"
+    "unknownUser": "Unbekannter Benutzer",
+    "unknown": "Unbekannt"
   },
   "tabs": {
     "home": "Start",
@@ -384,6 +390,32 @@
       "empty": {
         "title": "Noch keine Fotos",
         "description": "Bierfotos der Gruppenmitglieder erscheinen hier"
+      },
+      "photoDetail": {
+        "reactions": "Reaktionen",
+        "comments": "Kommentare",
+        "noComments": "Noch keine Kommentare. Sei der Erste!",
+        "addComment": "Kommentar hinzufügen...",
+        "send": "Senden",
+        "deleteComment": "Löschen",
+        "deleteCommentConfirm": "Bist du sicher, dass du diesen Kommentar löschen möchtest?",
+        "commentAdded": "Kommentar hinzugefügt",
+        "commentDeleted": "Kommentar gelöscht",
+        "commentError": "Kommentar konnte nicht hinzugefügt werden",
+        "deleteError": "Kommentar konnte nicht gelöscht werden",
+        "reactionError": "Reaktion konnte nicht aktualisiert werden",
+        "justNow": "Gerade eben",
+        "minutesAgo": "vor {{count}}m",
+        "hoursAgo": "vor {{count}}h",
+        "daysAgo": "vor {{count}}t",
+        "close": "Schließen",
+        "reactWith": "Mit {{emoji}} reagieren",
+        "tapToReact": "Zum Reagieren tippen",
+        "tapToRemoveReaction": "Reaktion entfernen"
+      },
+      "accessibility": {
+        "photoBy": "Foto von {{username}}",
+        "tapToView": "Tippen, um Fotodetails, Reaktionen und Kommentare anzuzeigen"
       }
     },
     "location": {
@@ -421,7 +453,40 @@
       "share": "Teilen",
       "qrCode": "QR-Code",
       "gallery": "Galerie",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "messages": "Nachrichten"
+    },
+    "messages": {
+      "title": "Nachrichten",
+      "titleWithName": "{{groupName}} Nachrichten",
+      "empty": {
+        "title": "Noch keine Nachrichten",
+        "description": "Sei der Erste, der eine Nachricht in dieser Gruppe postet"
+      },
+      "compose": {
+        "title": "Neue Nachricht",
+        "placeholder": "Nachricht schreiben...",
+        "send": "Senden",
+        "sending": "Wird gesendet...",
+        "typeMessage": "Nachricht",
+        "typeAlert": "Hinweis",
+        "charCount": "{{count}}/{{max}}",
+        "success": "Nachricht gepostet",
+        "error": "Nachricht konnte nicht gepostet werden"
+      },
+      "feed": {
+        "title": "Gruppennachrichten",
+        "empty": "Noch keine Nachrichten aus deinen Gruppen",
+        "viewAll": "Alle anzeigen"
+      },
+      "item": {
+        "pinned": "Angepinnt",
+        "alert": "Hinweis",
+        "deleteConfirmTitle": "Nachricht löschen?",
+        "deleteConfirmMessage": "Diese Nachricht wird dauerhaft gelöscht.",
+        "deleteSuccess": "Nachricht gelöscht",
+        "deleteError": "Nachricht konnte nicht gelöscht werden"
+      }
     },
     "empty": {
       "title": "Noch keine Gruppen",
@@ -945,7 +1010,22 @@
       "openSettings": "Um Benachrichtigungen zu aktivieren, gehe bitte zu deinen Geräteeinstellungen und erlaube Benachrichtigungen für ProstCounter.",
       "goToSettings": "Einstellungen öffnen",
       "permissionDeniedHint": "Benachrichtigungen sind deaktiviert. Tippe auf den Schalter, um die Einstellungen zu öffnen.",
-      "registrationFailed": "Registrierung für Push-Benachrichtigungen fehlgeschlagen"
+      "registrationFailed": "Registrierung für Push-Benachrichtigungen fehlgeschlagen",
+      "promptTitle": "Bleib auf dem Laufenden",
+      "promptDescription": "Aktiviere Benachrichtigungen, um das Beste aus ProstCounter herauszuholen",
+      "promptNote": "Du kannst deine Benachrichtigungseinstellungen jederzeit in den Einstellungen ändern",
+      "benefits": {
+        "groups": "Erfahre, wenn Freunde auf dem Festival einchecken",
+        "achievements": "Feiere, wenn du Erfolge freischaltest",
+        "reminders": "Erhalte Erinnerungen für deine Reservierungen"
+      },
+      "enable": "Benachrichtigungen aktivieren",
+      "skip": "Vielleicht später",
+      "empty": "Noch keine Benachrichtigungen",
+      "emptyHint": "Deine Benachrichtigungen werden hier erscheinen",
+      "unreadCount": "{{count}} ungelesen",
+      "markAllRead": "Alle als gelesen markieren",
+      "tapToView": "Tippe, um Details anzuzeigen"
     },
     "privacy": {
       "title": "Privatsphäre-Einstellungen",
@@ -1462,7 +1542,8 @@
       "friendsNearby_one": "{{count}} Freund",
       "tentsNearby": "{{count}} Zelte",
       "tentsNearby_one": "{{count}} Zelt",
-      "button": "Karte"
+      "button": "Karte",
+      "openAccessibility": "Festivalplan öffnen"
     },
     "tabs": {
       "friends": "Freunde",
@@ -1495,8 +1576,8 @@
       "disableForGroup": "Standortfreigabe für {{group}} deaktivieren"
     },
     "groups": {
-      "noGroups": "du bist noch keiner Gruppe beigetreten",
-      "noGroupsHint": "Sie sind noch in keinen Gruppen",
+      "noGroups": "Du bist noch keiner Gruppe beigetreten",
+      "noGroupsHint": "Du bist noch in keinen Gruppen",
       "title": "Gruppen",
       "shareWithAll": "Mit allen Gruppen teilen",
       "shareWithAllDescription": "Alle deine Gruppen können deinen Standort sehen",
@@ -1529,7 +1610,17 @@
       "permissionNotGranted": "Standortberechtigung nicht erteilt",
       "backgroundNotStarted": "Hintergrund-Standort konnte nicht gestartet werden. Der Standort wird nur aktualisiert, während die App geöffnet ist. Du kannst den Hintergrund-Standort in den Einstellungen deines Geräts aktivieren.",
       "backgroundPermissionNotGranted": "Berechtigung für Hintergrund-Standort nicht erteilt. Der Standort wird nur aktualisiert, während die App geöffnet ist. Du kannst den Zugriff auf den Hintergrund-Standort in den Einstellungen deines Geräts gewähren."
-    }
+    },
+    "benefits": {
+      "findFriends": "Finde deine Freunde auf der Festivalkarte",
+      "nearbyTents": "Bekomme Vorschläge, wenn du in der Nähe eines Zelts bist",
+      "privacy": "Nur für Gruppenmitglieder sichtbar"
+    },
+    "promptTitle": "Standort teilen",
+    "promptDescription": "Aktiviere Standortfreigabe, um Freunde zu finden und Zelte in der Nähe zu entdecken",
+    "promptNote": "Du kannst die Standortfreigabe jederzeit deaktivieren",
+    "enable": "Standort aktivieren",
+    "skip": "Vielleicht später"
   },
   "photos": {
     "upload": {
@@ -2111,5 +2202,51 @@
     "breadcrumbs": {
       "settings": "Einstellungen"
     }
+  },
+  "crowdReport": {
+    "title": "Auslastungsbericht",
+    "status": "Auslastungsstatus",
+    "reportCrowd": "Auslastung melden",
+    "submitReport": "Bericht senden",
+    "noReports": "Keine Berichte",
+    "recentReport": "Du hast vor {{minutes}} Min. gemeldet",
+    "reportCount": "{{count}} Bericht",
+    "reportCount_plural": "{{count}} Berichte",
+    "lastReported": "Zuletzt gemeldet {{time}}",
+    "waitTime": "~{{minutes}} Min. Wartezeit",
+    "noWaitData": "Keine Wartezeitdaten",
+    "levels": {
+      "empty": "Leer",
+      "moderate": "Moderat",
+      "crowded": "Voll",
+      "full": "Komplett voll"
+    },
+    "selectLevel": "Wie voll ist es?",
+    "waitTimeLabel": "Geschätzte Wartezeit (Minuten)",
+    "waitTimeOptional": "Optional",
+    "success": "Bericht gesendet!",
+    "error": "Bericht konnte nicht gesendet werden",
+    "rateLimited": "Du kannst in wenigen Minuten erneut melden",
+    "mostAvailable": "Am wenigsten volle Zelte",
+    "currentLevels": "Aktuelle Auslastung",
+    "moreTents": "+{{count}} weitere",
+    "fab": {
+      "accessibilityLabel": "Auslastung melden",
+      "accessibilityHint": "Melde, wie voll die Zelte sind"
+    },
+    "promptDescription": "Du hast mehrere Zelte besucht. Wähle eines aus, um den Andrang zu melden.",
+    "waitTimeMinutes": "{{count}} Minuten",
+    "tentCrowdLevel": "{{tentName}} - {{crowdLevel}}"
+  },
+  "tentSelector": {
+    "titleSingle": "Zelt auswählen",
+    "titleMulti": "Zelte auswählen",
+    "searchPlaceholder": "Zelte suchen...",
+    "loading": "Zelte werden geladen...",
+    "error": "Zelte konnten nicht geladen werden",
+    "noMatch": "Keine Zelte gefunden",
+    "noTents": "Keine Zelte verfügbar",
+    "clear": "Zurücksetzen",
+    "doneCount": "Fertig ({{count}})"
   }
 }

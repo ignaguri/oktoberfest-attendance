@@ -42,6 +42,10 @@ export class QueryKeys {
     ["groups", "search", name, festivalId] as const;
   static groupGallery = (groupId: string) =>
     ["group", groupId, "gallery"] as const;
+  static groupMessages = (groupId: string) =>
+    ["group-messages", groupId] as const;
+  static messageFeed = (festivalId: string) =>
+    ["message-feed", festivalId] as const;
 
   // Leaderboard queries
   static globalLeaderboard = (criteriaId: number, festivalId: string) =>
@@ -106,6 +110,18 @@ export class QueryKeys {
     ["highlights", festivalId] as const;
   static publicProfile = (userId: string, festivalId?: string) =>
     ["public-profile", userId, festivalId ?? "no-festival"] as const;
+
+  // Photo social queries
+  static photoReactions = (photoId: string, groupId: string) =>
+    ["photo-reactions", photoId, groupId] as const;
+  static photoComments = (photoId: string, groupId: string) =>
+    ["photo-comments", photoId, groupId] as const;
+
+  // Crowd report queries
+  static crowdStatus = (festivalId: string) =>
+    ["crowd-status", festivalId] as const;
+  static tentCrowdReports = (tentId: string, festivalId: string) =>
+    ["crowd-reports", tentId, festivalId] as const;
 
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;

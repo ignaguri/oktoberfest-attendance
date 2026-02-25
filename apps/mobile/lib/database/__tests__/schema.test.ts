@@ -61,7 +61,7 @@ describe("Table Categorization", () => {
   });
 
   it("should have no overlap between mutable and reference tables", () => {
-    const mutableSet = new Set(MUTABLE_TABLES);
+    const mutableSet = new Set<string>(MUTABLE_TABLES);
     for (const table of REFERENCE_TABLES) {
       expect(mutableSet.has(table)).toBe(false);
     }

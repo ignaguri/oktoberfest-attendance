@@ -12,7 +12,7 @@ import type * as SQLite from "expo-sqlite";
 
 import { logger } from "@/lib/logger";
 
-import type { SyncQueueItem } from "./schema";
+import type { SyncableTable, SyncQueueItem } from "./schema";
 import {
   getPendingOperations,
   getQueueStats,
@@ -226,7 +226,12 @@ export class QueueProcessor {
       // Mark the record as clean if this was a data operation
       if (op.operation !== "UPLOAD_FILE") {
         const now = new Date().toISOString();
-        await markRecordClean(this.db, op.table_name, op.record_id, now);
+        await markRecordClean(
+          this.db,
+          op.table_name as SyncableTable,
+          op.record_id,
+          now,
+        );
       }
 
       return { success: true };

@@ -1,8 +1,10 @@
 import {
   type TentGroup,
   type TentOption,
-  useTents,
+  useTentCrowdStatus,
 } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -28,6 +30,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useAdaptedTents } from "@/lib/database/adapted-hooks";
 
 import { TentListItem } from "./tent-list-item";
 import { TentSearchInput } from "./tent-search-input";
@@ -70,9 +73,28 @@ export function TentSelectorSheet({
   selectedTents = [],
   onSelectTents,
 }: TentSelectorSheetProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
-  const { tents, isLoading, error } = useTents(festivalId);
+  const { tents, isLoading, error } = useAdaptedTents(festivalId);
+  const { crowdStatuses } = useTentCrowdStatus(festivalId);
   const insets = useSafeAreaInsets();
+
+  // Create a map of tentId -> crowd status for quick lookup
+  const crowdMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { crowdLevel: string | null; avgWaitMinutes: number | null }
+    >();
+    for (const status of crowdStatuses) {
+      if (status.reportCount > 0) {
+        map.set(status.tentId, {
+          crowdLevel: status.crowdLevel,
+          avgWaitMinutes: status.avgWaitMinutes,
+        });
+      }
+    }
+    return map;
+  }, [crowdStatuses]);
 
   // Filter tents based on search query
   const filteredSections: SectionData[] = useMemo(() => {
@@ -136,16 +158,21 @@ export function TentSelectorSheet({
 
   // Render tent item
   const renderItem = useCallback(
-    ({ item }: SectionListRenderItemInfo<TentOption, SectionData>) => (
-      <TentListItem
-        tentId={item.value}
-        tentName={item.label}
-        isSelected={isTentSelected(item.value)}
-        onToggle={handleTentToggle}
-        mode={mode}
-      />
-    ),
-    [isTentSelected, handleTentToggle, mode],
+    ({ item }: SectionListRenderItemInfo<TentOption, SectionData>) => {
+      const crowd = crowdMap.get(item.value);
+      return (
+        <TentListItem
+          tentId={item.value}
+          tentName={item.label}
+          isSelected={isTentSelected(item.value)}
+          onToggle={handleTentToggle}
+          mode={mode}
+          crowdLevel={crowd?.crowdLevel as CrowdLevel | null}
+          avgWaitMinutes={crowd?.avgWaitMinutes}
+        />
+      );
+    },
+    [isTentSelected, handleTentToggle, mode, crowdMap],
   );
 
   // Key extractor
@@ -165,7 +192,9 @@ export function TentSelectorSheet({
         {/* Header */}
         <HStack className="mb-3 w-full items-center justify-between px-2">
           <Text className="text-lg font-semibold text-typography-900">
-            {mode === "single" ? "Select Tent" : "Select Tents"}
+            {mode === "single"
+              ? t("tentSelector.titleSingle")
+              : t("tentSelector.titleMulti")}
           </Text>
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={IconColors.default} />
@@ -177,7 +206,7 @@ export function TentSelectorSheet({
           <TentSearchInput
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search tents..."
+            placeholder={t("tentSelector.searchPlaceholder")}
           />
         </View>
 
@@ -185,18 +214,20 @@ export function TentSelectorSheet({
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
             <ActivityIndicator size="large" color={IconColors.default} />
-            <Text className="mt-2 text-typography-500">Loading tents...</Text>
+            <Text className="mt-2 text-typography-500">
+              {t("tentSelector.loading")}
+            </Text>
           </VStack>
         ) : error ? (
           <VStack className="items-center justify-center py-8">
-            <Text className="text-error-600">Failed to load tents</Text>
+            <Text className="text-error-600">{t("tentSelector.error")}</Text>
           </VStack>
         ) : filteredSections.length === 0 ? (
           <VStack className="items-center justify-center py-8">
             <Text className="text-typography-500">
               {searchQuery
-                ? "No tents match your search"
-                : "No tents available"}
+                ? t("tentSelector.noMatch")
+                : t("tentSelector.noTents")}
             </Text>
           </VStack>
         ) : (
@@ -226,7 +257,7 @@ export function TentSelectorSheet({
               onPress={handleClear}
               isDisabled={selectedTents.length === 0}
             >
-              <ButtonText>Clear</ButtonText>
+              <ButtonText>{t("tentSelector.clear")}</ButtonText>
             </Button>
             <Button
               variant="solid"
@@ -235,8 +266,9 @@ export function TentSelectorSheet({
               onPress={onClose}
             >
               <ButtonText>
-                Done
-                {selectedTents.length > 0 ? ` (${selectedTents.length})` : ""}
+                {selectedTents.length > 0
+                  ? t("tentSelector.doneCount", { count: selectedTents.length })
+                  : t("common.buttons.done")}
               </ButtonText>
             </Button>
           </HStack>

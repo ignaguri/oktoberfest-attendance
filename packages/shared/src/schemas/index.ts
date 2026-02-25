@@ -14,10 +14,13 @@ export * from "./wrapped.schema";
 export * from "./reservation.schema";
 export * from "./location.schema";
 export * from "./photo.schema";
+export * from "./photo-social.schema";
 export * from "./calendar.schema";
 export * from "./profile.schema";
 export * from "./activity-feed.schema";
+export * from "./group-message.schema";
 export * from "./pricing.schema";
+export * from "./crowd-report.schema";
 
 // Form schemas (client-side form validation)
 export * from "./forms.schema";

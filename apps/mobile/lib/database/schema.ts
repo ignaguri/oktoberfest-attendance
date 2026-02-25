@@ -1,268 +1,188 @@
 /**
- * SQLite Schema for Offline-First Storage
+ * SQLite Schema — Compatibility Layer
  *
- * Mirrors the Supabase schema with additional offline-specific fields:
- * - _synced_at: Last sync timestamp (ISO 8601)
- * - _deleted: Soft delete flag (0=active, 1=deleted)
- * - _dirty: Pending changes flag (0=synced, 1=needs push)
- * - _pending_upload: For photos - local file not yet uploaded
- * - _local_uri: For photos - local file path for pending uploads
+ * This file re-exports types from the Drizzle ORM schema definitions and
+ * maintains backward-compatible type aliases (Local*) for existing consumers.
+ *
+ * The source of truth for table definitions is now in ./schema/ directory.
+ * DDL constants (CREATE_TABLES_SQL, CREATE_INDEXES_SQL) remain here temporarily
+ * until init.ts migrates to Drizzle-managed migrations.
  */
 
 // =============================================================================
-// Enums (mirroring Supabase enums)
+// Type re-exports from Drizzle schema (source of truth)
 // =============================================================================
 
-export type DrinkType =
-  | "beer"
-  | "radler"
-  | "alcohol_free"
-  | "wine"
-  | "soft_drink"
-  | "other";
+// Enums
+export type {
+  AchievementCategory,
+  AchievementRarity,
+  DrinkType,
+  FestivalStatus,
+  FestivalType,
+  PhotoVisibility,
+  SyncOperationType,
+  SyncStatus,
+} from "./schema/enums";
 
-export type PhotoVisibility = "public" | "private";
-
-export type FestivalStatus = "upcoming" | "active" | "ended";
-
-export type FestivalType =
-  | "oktoberfest"
-  | "starkbierfest"
-  | "fruehlingsfest"
-  | "other";
-
-export type AchievementCategory =
-  | "consumption"
-  | "attendance"
-  | "explorer"
-  | "social"
-  | "competitive"
-  | "special";
-
-export type AchievementRarity = "common" | "rare" | "epic" | "legendary";
-
-export type SyncOperationType = "INSERT" | "UPDATE" | "DELETE" | "UPLOAD_FILE";
-
-export type SyncStatus = "pending" | "processing" | "failed" | "completed";
+// Drizzle table objects (for use in Drizzle queries)
+export { achievements, userAchievements } from "./schema/achievements";
+export { attendances } from "./schema/attendances";
+export { beerPictures } from "./schema/beer-pictures";
+export { consumptions } from "./schema/consumptions";
+export { festivals } from "./schema/festivals";
+export { groupMembers, groups } from "./schema/groups";
+export { profiles } from "./schema/profiles";
+export { syncMetadata, syncQueue } from "./schema/sync-tables";
+export {
+  drinkTypePrices,
+  festivalTents,
+  tents,
+  tentVisits,
+} from "./schema/tents";
+export { winningCriteria } from "./schema/winning-criteria";
 
 // =============================================================================
-// Base Offline Fields (added to all synced tables)
+// Backward-compatible type aliases (Local* → Drizzle inferred types)
+// These are used by consumers that haven't migrated to Drizzle queries yet.
 // =============================================================================
 
+import type { Achievement, UserAchievement } from "./schema/achievements";
+import type { Attendance } from "./schema/attendances";
+import type { BeerPicture } from "./schema/beer-pictures";
+import type { Consumption } from "./schema/consumptions";
+import type { Festival } from "./schema/festivals";
+import type { Group, GroupMember } from "./schema/groups";
+import type { Profile } from "./schema/profiles";
+import type { SyncMetadataRow, SyncQueueRow } from "./schema/sync-tables";
+import type {
+  DrinkTypePrice,
+  FestivalTent,
+  Tent,
+  TentVisit,
+} from "./schema/tents";
+import type { WinningCriteriaRow } from "./schema/winning-criteria";
+
+export type LocalFestival = Festival;
+export type LocalProfile = Profile;
+export type LocalAttendance = Attendance;
+export type LocalConsumption = Consumption;
+export type LocalBeerPicture = BeerPicture;
+export type LocalAchievement = Achievement;
+export type LocalUserAchievement = UserAchievement;
+export type LocalGroup = Group;
+export type LocalGroupMember = GroupMember;
+export type LocalTent = Tent;
+export type LocalFestivalTent = FestivalTent;
+export type LocalDrinkTypePrice = DrinkTypePrice;
+export type LocalTentVisit = TentVisit;
+export type LocalWinningCriteria = WinningCriteriaRow;
+export type SyncMetadata = SyncMetadataRow;
+export type SyncQueueItem = SyncQueueRow;
+
+/**
+ * Base offline fields interface.
+ * For new code, prefer using `offlineColumns` from ./schema/common.ts with Drizzle.
+ */
 export interface OfflineFields {
   _synced_at: string | null;
-  _deleted: number; // 0 = active, 1 = deleted
-  _dirty: number; // 0 = synced, 1 = needs push
+  _deleted: number;
+  _dirty: number;
 }
 
 // =============================================================================
-// Priority 1: Core Tables (Must Work Offline)
+// Table Name Safety
 // =============================================================================
 
-export interface LocalFestival extends OfflineFields {
-  id: string;
-  name: string;
-  short_name: string;
-  description: string | null;
-  location: string;
-  start_date: string;
-  end_date: string;
-  festival_type: FestivalType;
-  status: FestivalStatus;
-  is_active: number; // SQLite boolean
-  beer_cost: number | null;
-  default_beer_price_cents: number | null;
-  timezone: string;
-  map_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+/** All syncable table names as a union type */
+export type SyncableTable =
+  | "festivals"
+  | "profiles"
+  | "tents"
+  | "achievements"
+  | "winning_criteria"
+  | "festival_tents"
+  | "drink_type_prices"
+  | "groups"
+  | "group_members"
+  | "attendances"
+  | "tent_visits"
+  | "consumptions"
+  | "beer_pictures"
+  | "user_achievements";
 
-export interface LocalProfile extends OfflineFields {
-  id: string;
-  username: string | null;
-  full_name: string | null;
-  avatar_url: string | null;
-  website: string | null;
-  preferred_language: string | null;
-  tutorial_completed: number | null; // SQLite boolean
-  tutorial_completed_at: string | null;
-  is_super_admin: number | null; // SQLite boolean
-  updated_at: string | null;
-}
-
-export interface LocalAttendance extends OfflineFields {
-  id: string;
-  user_id: string;
-  festival_id: string;
-  date: string;
-  beer_count: number;
-  created_at: string | null;
-  updated_at: string | null;
-}
-
-export interface LocalConsumption extends OfflineFields {
-  id: string;
-  attendance_id: string;
-  drink_type: DrinkType;
-  drink_name: string | null;
-  volume_ml: number | null;
-  price_paid_cents: number;
-  base_price_cents: number;
-  tip_cents: number | null;
-  tent_id: string | null;
-  recorded_at: string;
-  idempotency_key: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface LocalBeerPicture extends OfflineFields {
-  id: string;
-  attendance_id: string;
-  user_id: string;
-  picture_url: string | null; // null when pending upload
-  visibility: PhotoVisibility;
-  created_at: string;
-  // Photo-specific offline fields
-  _pending_upload: number; // 0 = uploaded, 1 = pending
-  _local_uri: string | null; // Local file path for pending uploads
-}
-
-export interface LocalAchievement extends OfflineFields {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: AchievementCategory;
-  rarity: AchievementRarity;
-  points: number;
-  conditions: string; // JSON string
-  is_active: number; // SQLite boolean
-  created_at: string;
-  updated_at: string;
-}
-
-export interface LocalUserAchievement extends OfflineFields {
-  id: string;
-  user_id: string;
-  achievement_id: string;
-  festival_id: string;
-  unlocked_at: string;
-  progress: string | null; // JSON string
-}
+/** Tables that support user mutations (can be dirty) */
+export type MutableTable =
+  | "profiles"
+  | "attendances"
+  | "consumptions"
+  | "beer_pictures"
+  | "tent_visits"
+  | "group_members"
+  | "user_achievements";
 
 // =============================================================================
-// Priority 2: Group Features
+// Constants
 // =============================================================================
 
-export interface LocalGroup extends OfflineFields {
-  id: string;
-  name: string;
-  description: string | null;
-  festival_id: string;
-  created_by: string | null;
-  password: string;
-  invite_token: string | null;
-  token_expiration: string | null;
-  winning_criteria_id: number;
-  created_at: string | null;
-}
-
-export interface LocalGroupMember extends OfflineFields {
-  id: string;
-  group_id: string;
-  user_id: string;
-  joined_at: string | null;
-}
-
-// =============================================================================
-// Priority 3: Reference/Settings Data
-// =============================================================================
-
-export interface LocalTent extends OfflineFields {
-  id: string;
-  name: string;
-  category: string | null;
-}
-
-export interface LocalFestivalTent extends OfflineFields {
-  id: string;
-  festival_id: string;
-  tent_id: string;
-  beer_price: number | null;
-  beer_price_cents: number | null;
-  created_at: string | null;
-  updated_at: string | null;
-}
-
-export interface LocalDrinkTypePrice extends OfflineFields {
-  id: string;
-  drink_type: DrinkType;
-  price_cents: number;
-  festival_id: string | null;
-  festival_tent_id: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface LocalTentVisit extends OfflineFields {
-  id: string;
-  user_id: string;
-  tent_id: string;
-  festival_id: string;
-  visit_date: string | null;
-}
-
-export interface LocalWinningCriteria extends OfflineFields {
-  id: number;
-  name: string;
-}
-
-// =============================================================================
-// Sync Metadata Tables
-// =============================================================================
-
-export interface SyncMetadata {
-  table_name: string;
-  last_sync_at: string | null;
-  last_pull_cursor: string | null;
-  schema_version: number;
-}
-
-export interface SyncQueueItem {
-  id: string;
-  operation: SyncOperationType;
-  table_name: string;
-  record_id: string;
-  payload: string; // JSON string
-  idempotency_key: string | null;
-  depends_on: string | null; // FK to sync_queue.id
-  status: SyncStatus;
-  retry_count: number;
-  last_error: string | null;
-  created_at: string;
-}
-
-// =============================================================================
-// SQL Schema Definitions
-// =============================================================================
-
-/**
- * Current schema version - increment when making breaking changes
- */
 export const SCHEMA_VERSION = 1;
-
-/**
- * Database file name
- */
 export const DATABASE_NAME = "prostcounter.db";
 
-/**
- * SQL statements to create all tables
- */
+export const SYNCABLE_TABLES: readonly SyncableTable[] = [
+  "festivals",
+  "profiles",
+  "tents",
+  "achievements",
+  "winning_criteria",
+  "festival_tents",
+  "drink_type_prices",
+  "groups",
+  "group_members",
+  "attendances",
+  "tent_visits",
+  "consumptions",
+  "beer_pictures",
+  "user_achievements",
+];
+
+export const MUTABLE_TABLES: readonly MutableTable[] = [
+  "profiles",
+  "attendances",
+  "consumptions",
+  "beer_pictures",
+  "tent_visits",
+  "group_members",
+  "user_achievements",
+];
+
+export const REFERENCE_TABLES: readonly string[] = [
+  "festivals",
+  "tents",
+  "achievements",
+  "winning_criteria",
+  "festival_tents",
+  "drink_type_prices",
+  "groups",
+];
+
+/** Runtime validation for table names used in dynamic SQL */
+const VALID_TABLE_NAMES = new Set<string>([
+  ...SYNCABLE_TABLES,
+  "_sync_metadata",
+  "_sync_queue",
+]);
+
+export function assertValidTable(name: string): asserts name is SyncableTable {
+  if (!VALID_TABLE_NAMES.has(name)) {
+    throw new Error(`Invalid table name: ${name}`);
+  }
+}
+
+// =============================================================================
+// DDL Constants (will be replaced by Drizzle migrations)
+// =============================================================================
+
 export const CREATE_TABLES_SQL: Record<string, string> = {
-  // Sync metadata tables
   _sync_metadata: `
     CREATE TABLE IF NOT EXISTS _sync_metadata (
       table_name TEXT PRIMARY KEY,
@@ -288,7 +208,6 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
     )
   `,
 
-  // Priority 1: Core tables
   festivals: `
     CREATE TABLE IF NOT EXISTS festivals (
       id TEXT PRIMARY KEY,
@@ -418,7 +337,6 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
     )
   `,
 
-  // Priority 2: Group tables
   groups: `
     CREATE TABLE IF NOT EXISTS groups (
       id TEXT PRIMARY KEY,
@@ -450,7 +368,6 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
     )
   `,
 
-  // Priority 3: Reference tables
   tents: `
     CREATE TABLE IF NOT EXISTS tents (
       id TEXT PRIMARY KEY,
@@ -518,72 +435,27 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
   `,
 };
 
-/**
- * Indexes for better query performance
- */
 export const CREATE_INDEXES_SQL: string[] = [
-  // Sync queue indexes
   "CREATE INDEX IF NOT EXISTS idx_sync_queue_status ON _sync_queue(status, created_at)",
   "CREATE INDEX IF NOT EXISTS idx_sync_queue_depends ON _sync_queue(depends_on)",
-
-  // Attendance indexes
   "CREATE INDEX IF NOT EXISTS idx_attendances_user_festival ON attendances(user_id, festival_id)",
   "CREATE INDEX IF NOT EXISTS idx_attendances_date ON attendances(date)",
   "CREATE INDEX IF NOT EXISTS idx_attendances_dirty ON attendances(_dirty) WHERE _dirty = 1",
-
-  // Consumption indexes
   "CREATE INDEX IF NOT EXISTS idx_consumptions_attendance ON consumptions(attendance_id)",
   "CREATE INDEX IF NOT EXISTS idx_consumptions_idempotency ON consumptions(idempotency_key)",
   "CREATE INDEX IF NOT EXISTS idx_consumptions_dirty ON consumptions(_dirty) WHERE _dirty = 1",
-
-  // Beer pictures indexes
   "CREATE INDEX IF NOT EXISTS idx_beer_pictures_attendance ON beer_pictures(attendance_id)",
   "CREATE INDEX IF NOT EXISTS idx_beer_pictures_pending ON beer_pictures(_pending_upload) WHERE _pending_upload = 1",
-
-  // Group member indexes
   "CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members(user_id)",
   "CREATE INDEX IF NOT EXISTS idx_group_members_group ON group_members(group_id)",
-
-  // User achievements indexes
   "CREATE INDEX IF NOT EXISTS idx_user_achievements_user ON user_achievements(user_id, festival_id)",
-
-  // Tent visits indexes
   "CREATE INDEX IF NOT EXISTS idx_tent_visits_user_festival ON tent_visits(user_id, festival_id)",
-
-  // Festival tents indexes
   "CREATE INDEX IF NOT EXISTS idx_festival_tents_festival ON festival_tents(festival_id)",
 ];
 
-/**
- * Order for table creation (respects foreign key dependencies)
- */
 export const TABLE_CREATION_ORDER: string[] = [
-  // Metadata tables first
   "_sync_metadata",
   "_sync_queue",
-  // Reference tables (no dependencies)
-  "festivals",
-  "profiles",
-  "tents",
-  "achievements",
-  "winning_criteria",
-  // Tables with dependencies on reference tables
-  "festival_tents",
-  "drink_type_prices",
-  "groups",
-  "attendances",
-  // Tables with deeper dependencies
-  "group_members",
-  "tent_visits",
-  "consumptions",
-  "beer_pictures",
-  "user_achievements",
-];
-
-/**
- * Tables that should be synced (in dependency order)
- */
-export const SYNCABLE_TABLES: string[] = [
   "festivals",
   "profiles",
   "tents",
@@ -592,36 +464,10 @@ export const SYNCABLE_TABLES: string[] = [
   "festival_tents",
   "drink_type_prices",
   "groups",
-  "group_members",
   "attendances",
+  "group_members",
   "tent_visits",
   "consumptions",
   "beer_pictures",
   "user_achievements",
-];
-
-/**
- * Tables that support user mutations (can be dirty)
- */
-export const MUTABLE_TABLES: string[] = [
-  "profiles",
-  "attendances",
-  "consumptions",
-  "beer_pictures",
-  "tent_visits",
-  "group_members",
-  "user_achievements",
-];
-
-/**
- * Reference tables that are read-only on client
- */
-export const REFERENCE_TABLES: string[] = [
-  "festivals",
-  "tents",
-  "achievements",
-  "winning_criteria",
-  "festival_tents",
-  "drink_type_prices",
-  "groups",
 ];

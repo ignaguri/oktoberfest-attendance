@@ -11,9 +11,11 @@ import { AchievementStatsSummary } from "@/components/achievements/achievement-s
 import { AchievementsSkeleton } from "@/components/skeletons";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { OfflineScreen } from "@/components/ui/offline-screen";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useOfflineSafe } from "@/lib/database/offline-provider";
 
 /**
  * Achievements screen showing user's achievement progress
@@ -27,6 +29,7 @@ import { Colors, IconColors } from "@/lib/constants/colors";
 export default function AchievementsScreen() {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const { isOnline } = useOfflineSafe();
 
   // Fetch achievements with progress
   const {
@@ -59,6 +62,13 @@ export default function AchievementsScreen() {
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Offline state — achievements require server-side progress calculation
+  if (!isOnline) {
+    return (
+      <OfflineScreen messageKey="common.offline.achievementsUnavailable" />
+    );
+  }
 
   // Loading state (initial or festival loading)
   if (festivalLoading || (loading && achievements.length === 0)) {

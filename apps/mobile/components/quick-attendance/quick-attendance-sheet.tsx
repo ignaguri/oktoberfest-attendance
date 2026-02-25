@@ -1,8 +1,6 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
-  useAttendanceByDate,
   useConsumptions,
-  useTents,
   useUpdatePersonalAttendance,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -55,7 +53,12 @@ import {
   DrinkTypeColors,
   IconColors,
 } from "@/lib/constants/colors";
+import {
+  useAdaptedAttendanceByDate,
+  useAdaptedTents,
+} from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
+import { useQuickAttendance } from "@/lib/quick-attendance";
 
 interface QuickAttendanceSheetProps {
   isOpen: boolean;
@@ -154,21 +157,25 @@ export function QuickAttendanceSheet({
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
+  const { setPendingCrowdReport } = useQuickAttendance();
 
-  // Get today's date
-  const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  // Get today's date (recalculated each time sheet opens to handle midnight rollover)
+  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  useEffect(() => {
+    if (isOpen) {
+      setToday(format(new Date(), "yyyy-MM-dd"));
+    }
+  }, [isOpen]);
 
-  // Fetch today's attendance (for tent preselection)
-  const { data: attendance, refetch: refetchAttendance } = useAttendanceByDate(
-    festivalId || "",
-    today,
-  );
+  // Fetch today's attendance (offline-first, for tent preselection)
+  const { data: attendance, refetch: refetchAttendance } =
+    useAdaptedAttendanceByDate(festivalId, today);
 
   // Fetch today's consumptions (for drink counts)
   const { data: consumptionsData } = useConsumptions(festivalId || "", today);
 
-  // Fetch tents for name lookup
-  const { tents: tentGroups } = useTents(festivalId);
+  // Fetch tents for name lookup (offline-first)
+  const { tents: tentGroups } = useAdaptedTents(festivalId);
 
   // Mutations
   const logConsumption = useOfflineLogConsumption();
@@ -323,7 +330,7 @@ export function QuickAttendanceSheet({
 
         // If we have pending photos, upload them
         if (pendingPhotos.length > 0) {
-          const attendanceId = result?.attendance?.id || attendance?.id;
+          const attendanceId = result?.attendanceId || attendance?.id;
           if (attendanceId) {
             await uploadPendingPhotos({
               festivalId,
@@ -351,6 +358,11 @@ export function QuickAttendanceSheet({
           </HStack>
         ),
       });
+
+      // Signal crowd report prompt if tents were selected
+      if (selectedTentId) {
+        setPendingCrowdReport({ tentIds: [selectedTentId] });
+      }
 
       // Close the sheet
       onClose();
@@ -384,6 +396,7 @@ export function QuickAttendanceSheet({
     refetchAttendance,
     toast,
     onClose,
+    setPendingCrowdReport,
     t,
   ]);
 

@@ -27,12 +27,12 @@ import { AppState, Platform } from "react-native";
 import { logger } from "@/lib/logger";
 
 import { initializeDatabase } from "./init";
-import type { SyncManager } from "./sync-manager";
+import type { SyncManager } from "./sync/sync-manager";
 import {
   createSyncManager,
   type SyncOptions,
   type SyncResult,
-} from "./sync-manager";
+} from "./sync/sync-manager";
 import { getQueueStats } from "./sync-queue";
 
 // =============================================================================
@@ -229,6 +229,11 @@ export function OfflineDataProvider({
 
         if (result.success) {
           setSyncStatus("idle");
+        } else if (
+          result.errors.length === 1 &&
+          result.errors[0] === "Sync already in progress"
+        ) {
+          // Concurrent sync attempt is not a real error — silently ignore
         } else {
           setSyncStatus("error");
           setError(result.errors.join(", ") || "Sync failed");

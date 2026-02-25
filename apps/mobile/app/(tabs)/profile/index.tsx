@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  useCurrentProfile,
   useDeleteProfile,
   useResetTutorial,
   useUpdateProfile,
@@ -44,6 +43,10 @@ import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import {
+  useAdaptedProfile,
+  useSyncRefresh,
+} from "@/lib/database/adapted-hooks";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -60,14 +63,13 @@ export default function ProfileScreen() {
   // Dialog state (using reusable hook)
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
-  // Data hooks
+  // Data hooks (offline-first: reads from local SQLite)
   const {
     data: profile,
     loading: isLoading,
     error: profileError,
-    refetch,
-    isRefetching = false,
-  } = useCurrentProfile();
+  } = useAdaptedProfile(user?.id);
+  const { syncAndRefresh, isSyncing } = useSyncRefresh();
   const updateProfileMutation = useUpdateProfile();
   const deleteProfileMutation = useDeleteProfile();
   const resetTutorialMutation = useResetTutorial();
@@ -75,7 +77,7 @@ export default function ProfileScreen() {
   // Avatar upload
   const { pickImage, isUploading: isAvatarUploading } = useAvatarUpload({
     onSuccess: () => {
-      refetch();
+      syncAndRefresh();
       showDialog(t("common.status.success"), t("profile.avatar.uploadSuccess"));
     },
     onError: () => {
@@ -106,8 +108,8 @@ export default function ProfileScreen() {
 
   // Memoized handlers
   const onRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    syncAndRefresh();
+  }, [syncAndRefresh]);
 
   const onSave = useCallback(
     async (data: UpdateProfileInput) => {
@@ -230,7 +232,7 @@ export default function ProfileScreen() {
   if (profileError) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <ErrorState error={profileError} onRetry={refetch} />
+        <ErrorState error={profileError} onRetry={syncAndRefresh} />
       </View>
     );
   }
@@ -239,7 +241,7 @@ export default function ProfileScreen() {
     <ScrollView
       className="flex-1 bg-background-50"
       refreshControl={
-        <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
       }
     >
       <VStack space="lg" className="p-4 pb-32">

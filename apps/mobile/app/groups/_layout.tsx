@@ -1,5 +1,5 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Stack } from "expo-router";
-import { useTranslation } from "react-i18next";
 
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 
@@ -18,6 +18,12 @@ export default function GroupsLayout() {
         name="[id]/settings"
         options={{
           title: t("groups.settings.title"),
+        }}
+      />
+      <Stack.Screen
+        name="[id]/messages"
+        options={{
+          title: t("groups.messages.title"),
         }}
       />
     </Stack>

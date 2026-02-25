@@ -2,22 +2,34 @@
  * Offline Database Hooks
  *
  * Custom hooks for offline-first data access:
- * - useOfflineQuery: Query local SQLite with background sync
  * - useOfflineMutation: Optimistic mutations with queue
  * - Table-specific hooks for attendances, consumptions, etc.
+ *
+ * All read queries use Drizzle ORM via centralized query helpers (queries.ts).
+ * All query keys are managed via localKeys (query-keys.ts).
  */
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  type UseQueryOptions,
-} from "@tanstack/react-query";
-import { useContext, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
 
 import { logger } from "@/lib/logger";
 
+import { createDrizzleDb } from "./db";
 import { OfflineContext } from "./offline-provider";
+import {
+  queryAchievements,
+  queryAttendanceByDate,
+  queryAttendancesByFestival,
+  queryConsumptionsByAttendance,
+  queryConsumptionsByDate,
+  queryFestivalById,
+  queryFestivals,
+  queryGroupsByFestival,
+  queryProfileById,
+  queryTents,
+  queryUserAchievementsByFestival,
+} from "./queries";
+import { localKeys } from "./query-keys";
 import type {
   LocalAchievement,
   LocalAttendance,
@@ -27,6 +39,7 @@ import type {
   LocalProfile,
   LocalTent,
   LocalUserAchievement,
+  SyncableTable,
 } from "./schema";
 import {
   enqueueOperation,
@@ -36,97 +49,12 @@ import {
 } from "./sync-queue";
 
 // =============================================================================
-// Types
-// =============================================================================
-
-export type QueryKeyPrefix =
-  | "local-festivals"
-  | "local-tents"
-  | "local-attendances"
-  | "local-consumptions"
-  | "local-profile"
-  | "local-groups"
-  | "local-achievements"
-  | "local-user-achievements";
-
-// =============================================================================
-// Generic Offline Query Hook
-// =============================================================================
-
-interface UseOfflineQueryOptions<T> extends Omit<
-  UseQueryOptions<T, Error>,
-  "queryKey" | "queryFn"
-> {
-  /** Query key prefix for cache management */
-  queryKeyPrefix: QueryKeyPrefix;
-  /** Additional query key parts */
-  queryKeyParts?: (string | number | undefined)[];
-  /** SQL query to execute */
-  sql: string;
-  /** SQL parameters */
-  params?: (string | number | null | undefined)[];
-  /** Transform function for query result */
-  transform?: (rows: unknown[]) => T;
-  /** Whether to trigger background sync after query */
-  syncAfterQuery?: boolean;
-}
-
-/**
- * Hook for querying local SQLite database with optional background sync.
- * Falls back to empty array if database is not ready.
- */
-export function useOfflineQuery<T = unknown[]>({
-  queryKeyPrefix,
-  queryKeyParts = [],
-  sql,
-  params = [],
-  transform,
-  syncAfterQuery = false,
-  ...options
-}: UseOfflineQueryOptions<T>) {
-  const { isReady, getDb, sync } = useOfflineWithContext();
-
-  const queryKey = [queryKeyPrefix, ...queryKeyParts.filter(Boolean)];
-
-  const query = useQuery<T, Error>({
-    queryKey,
-    queryFn: async () => {
-      if (!isReady) {
-        return (transform ? transform([]) : []) as T;
-      }
-
-      const db = getDb();
-      const rows = await db.getAllAsync(
-        sql,
-        params as (string | number | null)[],
-      );
-
-      return (transform ? transform(rows) : rows) as T;
-    },
-    enabled: isReady,
-    staleTime: Infinity, // Local data never goes stale - we control invalidation
-    ...options,
-  });
-
-  // Trigger background sync after initial query
-  useEffect(() => {
-    if (syncAfterQuery && query.isSuccess && isReady) {
-      sync({ direction: "pull" }).catch((error) =>
-        logger.error("Sync after query failed", error),
-      );
-    }
-  }, [syncAfterQuery, query.isSuccess, isReady]);
-
-  return query;
-}
-
-// =============================================================================
 // Generic Offline Mutation Hook
 // =============================================================================
 
 interface UseOfflineMutationOptions<TData, TVariables> {
   /** Table name for sync queue */
-  tableName: string;
+  tableName: SyncableTable;
   /** Operation type */
   operation: "INSERT" | "UPDATE" | "DELETE";
   /** Function to execute local database operation */
@@ -279,10 +207,17 @@ function useOfflineWithContext() {
  * Hook to get all festivals from local database.
  */
 export function useLocalFestivals() {
-  return useOfflineQuery<LocalFestival[]>({
-    queryKeyPrefix: "local-festivals",
-    sql: "SELECT * FROM festivals WHERE _deleted = 0 ORDER BY start_date DESC",
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalFestival[], Error>({
+    queryKey: localKeys.festivals.all,
+    queryFn: async () => {
+      if (!isReady) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryFestivals(drizzleDb);
+    },
+    enabled: isReady,
+    staleTime: Infinity,
   });
 }
 
@@ -293,15 +228,13 @@ export function useLocalFestival(festivalId: string | undefined) {
   const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalFestival | null, Error>({
-    queryKey: ["local-festivals", festivalId],
+    queryKey: festivalId
+      ? localKeys.festivals.byId(festivalId)
+      : localKeys.festivals.all,
     queryFn: async () => {
       if (!isReady || !festivalId) return null;
-
-      const db = getDb();
-      return await db.getFirstAsync<LocalFestival>(
-        "SELECT * FROM festivals WHERE id = ? AND _deleted = 0",
-        [festivalId],
-      );
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryFestivalById(drizzleDb, festivalId);
     },
     enabled: isReady && !!festivalId,
     staleTime: Infinity,
@@ -316,12 +249,17 @@ export function useLocalFestival(festivalId: string | undefined) {
  * Hook to get tents for a festival.
  */
 export function useLocalTents(festivalId: string | undefined) {
-  return useOfflineQuery<LocalTent[]>({
-    queryKeyPrefix: "local-tents",
-    queryKeyParts: [festivalId],
-    sql: "SELECT * FROM tents WHERE _deleted = 0 ORDER BY name ASC",
-    enabled: !!festivalId,
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalTent[], Error>({
+    queryKey: localKeys.tents.all(festivalId),
+    queryFn: async () => {
+      if (!isReady) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryTents(drizzleDb);
+    },
+    enabled: isReady && !!festivalId,
+    staleTime: Infinity,
   });
 }
 
@@ -333,15 +271,17 @@ export function useLocalTents(festivalId: string | undefined) {
  * Hook to get attendances for a festival.
  */
 export function useLocalAttendances(festivalId: string | undefined) {
-  return useOfflineQuery<LocalAttendance[]>({
-    queryKeyPrefix: "local-attendances",
-    queryKeyParts: [festivalId],
-    sql: `SELECT * FROM attendances
-          WHERE festival_id = ? AND _deleted = 0
-          ORDER BY date DESC`,
-    params: [festivalId],
-    enabled: !!festivalId,
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalAttendance[], Error>({
+    queryKey: localKeys.attendances.all(festivalId),
+    queryFn: async () => {
+      if (!isReady || !festivalId) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryAttendancesByFestival(drizzleDb, festivalId);
+    },
+    enabled: isReady && !!festivalId,
+    staleTime: Infinity,
   });
 }
 
@@ -355,15 +295,14 @@ export function useLocalAttendanceByDate(
   const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalAttendance | null, Error>({
-    queryKey: ["local-attendances", festivalId, date],
+    queryKey:
+      festivalId && date
+        ? localKeys.attendances.byDate(festivalId, date)
+        : ["local-attendances"],
     queryFn: async () => {
       if (!isReady || !festivalId || !date) return null;
-
-      const db = getDb();
-      return await db.getFirstAsync<LocalAttendance>(
-        "SELECT * FROM attendances WHERE festival_id = ? AND date = ? AND _deleted = 0",
-        [festivalId, date],
-      );
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryAttendanceByDate(drizzleDb, festivalId, date);
     },
     enabled: isReady && !!festivalId && !!date,
     staleTime: Infinity,
@@ -457,10 +396,10 @@ export function useLocalSaveAttendance() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["local-attendances", data.festival_id],
+        queryKey: localKeys.attendances.all(data.festival_id),
       });
       queryClient.invalidateQueries({
-        queryKey: ["local-attendances", data.festival_id, data.date],
+        queryKey: localKeys.attendances.byDate(data.festival_id, data.date),
       });
     },
   });
@@ -502,10 +441,10 @@ export function useLocalDeleteAttendance() {
       },
       onSuccess: (_, { festivalId }) => {
         queryClient.invalidateQueries({
-          queryKey: ["local-attendances", festivalId],
+          queryKey: localKeys.attendances.all(festivalId),
         });
         queryClient.invalidateQueries({
-          queryKey: ["local-consumptions", festivalId],
+          queryKey: ["local-consumptions"],
         });
       },
     },
@@ -520,14 +459,17 @@ export function useLocalDeleteAttendance() {
  * Hook to get consumptions for an attendance.
  */
 export function useLocalConsumptions(attendanceId: string | undefined) {
-  return useOfflineQuery<LocalConsumption[]>({
-    queryKeyPrefix: "local-consumptions",
-    queryKeyParts: [attendanceId],
-    sql: `SELECT * FROM consumptions
-          WHERE attendance_id = ? AND _deleted = 0
-          ORDER BY recorded_at DESC`,
-    params: [attendanceId],
-    enabled: !!attendanceId,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalConsumption[], Error>({
+    queryKey: localKeys.consumptions.byAttendance(attendanceId),
+    queryFn: async () => {
+      if (!isReady || !attendanceId) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryConsumptionsByAttendance(drizzleDb, attendanceId);
+    },
+    enabled: isReady && !!attendanceId,
+    staleTime: Infinity,
   });
 }
 
@@ -541,18 +483,18 @@ export function useLocalConsumptionsByDate(
   const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalConsumption[], Error>({
-    queryKey: ["local-consumptions", festivalId, date],
+    queryKey:
+      festivalId && date
+        ? localKeys.consumptions.byDate(festivalId, date)
+        : ["local-consumptions"],
     queryFn: async () => {
       if (!isReady || !festivalId || !date) return [];
 
-      const db = getDb();
-      // Join with attendances to filter by festival and date
-      const consumptions = await db.getAllAsync<LocalConsumption>(
-        `SELECT c.* FROM consumptions c
-         INNER JOIN attendances a ON c.attendance_id = a.id
-         WHERE a.festival_id = ? AND a.date = ? AND c._deleted = 0
-         ORDER BY c.recorded_at DESC`,
-        [festivalId, date],
+      const drizzleDb = createDrizzleDb(getDb());
+      const consumptions = await queryConsumptionsByDate(
+        drizzleDb,
+        festivalId,
+        date,
       );
       return consumptions;
     },
@@ -694,7 +636,7 @@ export function useLocalLogConsumption() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["local-consumptions", data.attendance_id],
+        queryKey: localKeys.consumptions.byAttendance(data.attendance_id),
       });
     },
   });
@@ -733,7 +675,7 @@ export function useLocalDeleteConsumption() {
     },
     onSuccess: (_, { attendanceId }) => {
       queryClient.invalidateQueries({
-        queryKey: ["local-consumptions", attendanceId],
+        queryKey: localKeys.consumptions.byAttendance(attendanceId),
       });
     },
   });
@@ -747,14 +689,17 @@ export function useLocalDeleteConsumption() {
  * Hook to get the current user's profile.
  */
 export function useLocalProfile(userId: string | undefined) {
-  return useOfflineQuery<LocalProfile | null>({
-    queryKeyPrefix: "local-profile",
-    queryKeyParts: [userId],
-    sql: "SELECT * FROM profiles WHERE id = ? AND _deleted = 0",
-    params: [userId],
-    enabled: !!userId,
-    transform: (rows) => (rows[0] as LocalProfile) ?? null,
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalProfile | null, Error>({
+    queryKey: localKeys.profile.current,
+    queryFn: async () => {
+      if (!isReady || !userId) return null;
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryProfileById(drizzleDb, userId);
+    },
+    enabled: isReady && !!userId,
+    staleTime: Infinity,
   });
 }
 
@@ -766,10 +711,17 @@ export function useLocalProfile(userId: string | undefined) {
  * Hook to get all achievements.
  */
 export function useLocalAchievements() {
-  return useOfflineQuery<LocalAchievement[]>({
-    queryKeyPrefix: "local-achievements",
-    sql: "SELECT * FROM achievements WHERE _deleted = 0 AND is_active = 1 ORDER BY points DESC",
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalAchievement[], Error>({
+    queryKey: localKeys.achievements.all,
+    queryFn: async () => {
+      if (!isReady) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryAchievements(drizzleDb);
+    },
+    enabled: isReady,
+    staleTime: Infinity,
   });
 }
 
@@ -777,15 +729,17 @@ export function useLocalAchievements() {
  * Hook to get user's unlocked achievements.
  */
 export function useLocalUserAchievements(festivalId: string | undefined) {
-  return useOfflineQuery<LocalUserAchievement[]>({
-    queryKeyPrefix: "local-user-achievements",
-    queryKeyParts: [festivalId],
-    sql: `SELECT * FROM user_achievements
-          WHERE festival_id = ? AND _deleted = 0
-          ORDER BY unlocked_at DESC`,
-    params: [festivalId],
-    enabled: !!festivalId,
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalUserAchievement[], Error>({
+    queryKey: localKeys.userAchievements.all(festivalId),
+    queryFn: async () => {
+      if (!isReady || !festivalId) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryUserAchievementsByFestival(drizzleDb, festivalId);
+    },
+    enabled: isReady && !!festivalId,
+    staleTime: Infinity,
   });
 }
 
@@ -797,14 +751,16 @@ export function useLocalUserAchievements(festivalId: string | undefined) {
  * Hook to get groups for a festival.
  */
 export function useLocalGroups(festivalId: string | undefined) {
-  return useOfflineQuery<LocalGroup[]>({
-    queryKeyPrefix: "local-groups",
-    queryKeyParts: [festivalId],
-    sql: `SELECT * FROM groups
-          WHERE festival_id = ? AND _deleted = 0
-          ORDER BY created_at DESC`,
-    params: [festivalId],
-    enabled: !!festivalId,
-    syncAfterQuery: true,
+  const { isReady, getDb } = useOfflineWithContext();
+
+  return useQuery<LocalGroup[], Error>({
+    queryKey: localKeys.groups.all(festivalId),
+    queryFn: async () => {
+      if (!isReady || !festivalId) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      return await queryGroupsByFestival(drizzleDb, festivalId);
+    },
+    enabled: isReady && !!festivalId,
+    staleTime: Infinity,
   });
 }

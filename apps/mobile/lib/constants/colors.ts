@@ -46,6 +46,14 @@ export const Colors = {
     500: "#22C55E", // green-500 - success states
   },
 
+  // Additional Tailwind colors (for badges, indicators)
+  yellow: {
+    500: "#EAB308", // yellow-500
+  },
+  orange: {
+    500: "#F97316", // orange-500
+  },
+
   // Teal colors (for reservations)
   teal: {
     500: "#14B8A6", // teal-500
@@ -76,6 +84,14 @@ export const SwitchColorsDestructive = {
   trackOn: Colors.error[500],
   trackOff: Colors.gray[300],
   thumb: Colors.white,
+} as const;
+
+// Crowd level colors for badges and indicators
+export const CrowdColors = {
+  empty: Colors.success[500], // green-500
+  moderate: Colors.yellow[500], // yellow-500
+  crowded: Colors.orange[500], // orange-500
+  full: Colors.error[500], // red-500
 } as const;
 
 // Drink type colors for icons and backgrounds

@@ -11,7 +11,7 @@ pnpm run lint:fix
 
 # Add only files that were modified by lint:fix (new changes after pre-lint state)
 echo "�� Adding lint-fixed files..."
-git diff --name-only | grep -v -f /tmp/pre-lint-changes.txt | xargs -r git add
+git diff --name-only | grep -v -f /tmp/pre-lint-changes.txt | xargs -r git add || true
 
 # Clean up temp file
 rm -f /tmp/pre-lint-changes.txt

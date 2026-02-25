@@ -22,7 +22,10 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
-import { AttendanceTabContent } from "./attendance-tab-content";
+import {
+  type AttendanceSuccessData,
+  AttendanceTabContent,
+} from "./attendance-tab-content";
 import { ReservationTabContent } from "./reservation-tab-content";
 import { type Tab, TabBar } from "./tab-bar";
 
@@ -37,7 +40,7 @@ export interface CalendarActionSheetProps {
   selectedDate: Date;
   existingAttendance?: AttendanceWithTotals | null;
   existingReservation?: Reservation | null;
-  onSuccess?: () => void;
+  onSuccess?: (data: AttendanceSuccessData) => void;
   // Check-in mode: pre-fill tent from reservation
   checkInMode?: boolean;
   prefillTentId?: string;
@@ -134,6 +137,11 @@ export function CalendarActionSheet({
     setActiveTab(key as TabKey);
   }, []);
 
+  // Wrapper for reservation success (doesn't pass tent data)
+  const handleReservationSuccess = useCallback(() => {
+    onSuccess?.({ date: selectedDate, tentIds: [] });
+  }, [onSuccess, selectedDate]);
+
   // Format date for display
   const formattedDate =
     selectedDate && !isNaN(selectedDate.getTime())
@@ -187,7 +195,7 @@ export function CalendarActionSheet({
               festivalId={festivalId}
               selectedDate={selectedDate}
               existingReservation={existingReservation}
-              onSuccess={onSuccess}
+              onSuccess={onSuccess ? handleReservationSuccess : undefined}
               onClose={onClose}
             />
           )}
@@ -200,4 +208,5 @@ export function CalendarActionSheet({
 CalendarActionSheet.displayName = "CalendarActionSheet";
 
 // Re-export types for convenience
+export type { AttendanceSuccessData } from "./attendance-tab-content";
 export type { Tab } from "./tab-bar";

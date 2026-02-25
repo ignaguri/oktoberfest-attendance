@@ -1,4 +1,3 @@
-import { useTents } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Reservation } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
@@ -20,6 +19,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useAdaptedTents } from "@/lib/database/adapted-hooks";
 
 interface CheckInDialogProps {
   isOpen: boolean;
@@ -45,7 +45,7 @@ export function CheckInDialog({
   isLoading = false,
 }: CheckInDialogProps) {
   const { t } = useTranslation();
-  const { tents } = useTents(festivalId);
+  const { tents } = useAdaptedTents(festivalId);
 
   // Get tent name
   const tentName = useMemo(() => {

@@ -29,11 +29,12 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 
 - `pnpm sup:start` - Start local Supabase (requires Docker)
 - `pnpm sup:stop` - Stop local Supabase
-- `pnpm sup:db:reset` - Reset DB and run migrations (use this to test migrations)
+- `pnpm sup:db:reset` - Reset DB and run migrations (full reset, useful for final validation)
 - `pnpm sup:db:pull` - Pull remote DB changes
-- **Note**: We don't push DB changes; we reset the local DB to test if migrations work properly
+- **Note**: We don't push DB changes; we reset the local DB to verify the full migration chain works properly
 - `pnpm sup:db:types` - Generate TypeScript types from DB schema
 - `pnpm sup:mig:new` - Create new migration file
+- **During development**: There's no need to reset the database every time you create or modify a migration. Instead, apply your migration SQL directly using the Supabase MCP `execute_sql` tool or by running the SQL file as a script against the local database. Only use `pnpm sup:db:reset` when you need to verify the full migration chain from scratch. This is especially important when multiple agents work in parallel, since they share the same local Supabase instance and a reset would wipe other agents' applied migrations.
 
 ### Mobile Build Commands
 
@@ -309,7 +310,7 @@ export default function ScreenName() {
 1. **Componentization**: Extract reusable sections to `components/[feature]/`
 2. **Color constants**: Use `Colors` and `IconColors` from `@/lib/constants/colors` for icon props
 3. **Icons**: Use `lucide-react-native` with `IconColors.default`, `IconColors.white`, etc.
-4. **Translations**: Always use `t()` with `defaultValue` fallback for new keys
+4. **Translations**: Never use `defaultValue` in `t()` calls. Always add keys to **all 3 locale files** (`en.json`, `de.json`, `es.json`) with proper translations (correct umlauts for German, accents/punctuation for Spanish)
 5. **Layout**: Use `VStack`/`HStack` with `space` prop instead of margin
 6. **Cards**: Use `Card` component with `size` and `variant` props
 7. **Forms**: Use `useForm` with `values` option (not `defaultValues` + useEffect)
@@ -340,6 +341,9 @@ import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 - **Work on Branches**: Never commit directly to main. Always create a feature branch for changes and submit via pull request
 - **Do NOT Push**: Do not push commits to the remote repository unless explicitly asked
 - **Production APK Testing**: Use `eas build --profile production-apk --platform android` to create a production-environment APK for testing before Play Store release. Download the APK from the EAS dashboard and share directly with testers
+- **No `defaultValue` in translations**: Never use `defaultValue` fallbacks in `t()` calls. Always add translation keys to all 3 locale files (`en.json`, `de.json`, `es.json`). Use proper characters: umlauts (ä, ö, ü, ß) for German, accents and inverted punctuation (á, é, í, ó, ú, ñ, ¿, ¡) for Spanish
+- **No className string interpolation**: Never use template literals or string concatenation for dynamic `className` values. Use the `cn()` utility from `@prostcounter/ui` (`packages/ui/src/utils/cn.ts`) for conditional/dynamic class combinations
+- **Use shared utilities**: Before writing new utility functions, check `packages/shared/src/utils/` for existing implementations. Key utilities: `formatRelativeTime` (locale-aware via `Intl.RelativeTimeFormat`), `formatLocalized`, `formatDateForDatabase`, `formatTimestampForDatabase`
 
 ## Additional Documentation
 

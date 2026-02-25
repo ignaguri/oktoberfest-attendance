@@ -13,11 +13,13 @@ import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { OfflineScreen } from "@/components/ui/offline-screen";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { useOfflineSafe } from "@/lib/database/offline-provider";
 
 // Map WinningCriteria to API criteria IDs
 const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
@@ -40,6 +42,7 @@ export default function LeaderboardScreen() {
   const { user } = useAuth();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const router = useRouter();
+  const { isOnline } = useOfflineSafe();
 
   // Sort state - default to total_beers, descending
   const [sortBy, setSortBy] = useState<WinningCriteria>("total_beers");
@@ -70,6 +73,11 @@ export default function LeaderboardScreen() {
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Offline state — leaderboard requires server aggregation
+  if (!isOnline) {
+    return <OfflineScreen messageKey="common.offline.leaderboardUnavailable" />;
+  }
 
   // Loading state (initial or festival loading)
   if (festivalLoading || (loading && entries.length === 0)) {

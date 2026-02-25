@@ -1,9 +1,10 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { format } from "date-fns";
+import { useFocusEffect, useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -14,9 +15,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
+  CrowdReportFab,
+  CrowdReportPrompt,
+  CrowdStatusSummary,
+} from "@/components/crowd";
+import {
   LocationSharingToggle,
   TentProximityBanner,
 } from "@/components/location";
+import { MessageFeed } from "@/components/messages/message-feed";
 import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
@@ -27,10 +34,15 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { WrappedCTA } from "@/components/wrapped/wrapped-cta";
 import { Colors } from "@/lib/constants/colors";
+import {
+  useAdaptedAttendanceByDate,
+  useAdaptedTents,
+  useSyncRefresh,
+} from "@/lib/database/adapted-hooks";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
+import { useQuickAttendance } from "@/lib/quick-attendance";
 
 /**
  * Home screen displaying:
@@ -48,25 +60,117 @@ export default function HomeScreen() {
   const router = useRouter();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { syncAndRefresh, isSyncing } = useSyncRefresh();
 
   // Location state (safe hook works outside provider too)
   const { isSharing, nearbyMembers } = useLocationContextSafe();
 
+  // Quick attendance context (for crowd report prompt after save)
+  const { pendingCrowdReport, setPendingCrowdReport } = useQuickAttendance();
+
+  // Crowd report prompt state
+  const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);
+  const [crowdPromptTents, setCrowdPromptTents] = useState<
+    { id: string; name: string }[]
+  >([]);
+
+  // Today's date for querying attendance (recalculated on screen focus to handle midnight rollover)
+  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  useFocusEffect(
+    useCallback(() => {
+      setToday(format(new Date(), "yyyy-MM-dd"));
+    }, []),
+  );
+  const festivalId = currentFestival?.id || "";
+
+  // Fetch today's attendance to know which tents the user visited (offline-first)
+  const { data: todayAttendance } = useAdaptedAttendanceByDate(
+    festivalId,
+    today,
+  );
+
+  // Fetch tent data for name lookup (offline-first)
+  const { tents: tentGroups } = useAdaptedTents(festivalId);
+
+  // Resolve tent IDs to { id, name } pairs
+  const resolveTentNames = useCallback(
+    (tentIds: string[]): { id: string; name: string }[] => {
+      const allOptions = tentGroups.flatMap((group) => group.options);
+      return tentIds
+        .map((id) => {
+          const option = allOptions.find((opt) => opt.value === id);
+          return option ? { id, name: option.label } : null;
+        })
+        .filter((t): t is { id: string; name: string } => t !== null);
+    },
+    [tentGroups],
+  );
+
+  // Today's visited tents (for the crowd FAB)
+  const todayVisitedTents = useMemo(() => {
+    const tentIds = todayAttendance?.tentIds ?? [];
+    if (tentIds.length === 0) return [];
+    return resolveTentNames(tentIds);
+  }, [todayAttendance?.tentIds, resolveTentNames]);
+
+  // Handle pending crowd report from QuickAttendanceSheet
+  const crowdPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (crowdPromptTimerRef.current) {
+        clearTimeout(crowdPromptTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pendingCrowdReport || pendingCrowdReport.tentIds.length === 0) return;
+
+    const resolved = resolveTentNames(pendingCrowdReport.tentIds);
+    // Consume immediately so we don't re-trigger
+    setPendingCrowdReport(null);
+
+    if (resolved.length > 0) {
+      // Small delay so the quick attendance sheet close animation finishes.
+      // Defer state updates to avoid synchronous setState in effect.
+      crowdPromptTimerRef.current = setTimeout(() => {
+        crowdPromptTimerRef.current = null;
+        setCrowdPromptTents(resolved);
+        setShowCrowdPrompt(true);
+      }, 500);
+    }
+  }, [pendingCrowdReport, resolveTentNames, setPendingCrowdReport]);
+
+  // Handle crowd FAB press
+  const handleCrowdFabPress = useCallback(() => {
+    if (todayVisitedTents.length === 0) return;
+    setCrowdPromptTents(todayVisitedTents);
+    setShowCrowdPrompt(true);
+  }, [todayVisitedTents]);
+
+  // Handle crowd prompt close
+  const handleCrowdPromptClose = useCallback(() => {
+    setShowCrowdPrompt(false);
+    setCrowdPromptTents([]);
+  }, []);
+
   // Handle pull-to-refresh
   const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
     try {
-      // Invalidate all relevant queries
-      await queryClient.invalidateQueries({ queryKey: ["attendanceByDate"] });
+      // Sync local SQLite from API, then invalidate local query caches
+      await syncAndRefresh();
+      // Also invalidate API-only queries (activity feed, crowd status, messages)
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
-      await queryClient.invalidateQueries({ queryKey: ["attendances"] });
+      await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
+      await queryClient.invalidateQueries({ queryKey: ["message-feed"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
-    } finally {
-      setIsRefreshing(false);
     }
-  }, [queryClient]);
+  }, [syncAndRefresh, queryClient]);
 
   // Loading state - show skeleton while festival is loading
   if (festivalLoading) {
@@ -91,7 +195,7 @@ export default function HomeScreen() {
         className="flex-1"
         refreshControl={
           <RefreshControl
-            refreshing={isRefreshing}
+            refreshing={isSyncing}
             onRefresh={handleRefresh}
             tintColor={Colors.primary[500]}
             colors={[Colors.primary[500]]}
@@ -107,8 +211,8 @@ export default function HomeScreen() {
             <FestivalStatus />
           </TutorialTarget>
 
-          {/* Wrapped CTA */}
-          <WrappedCTA />
+          {/* Wrapped CTA - hidden for now */}
+          {/* <WrappedCTA /> */}
 
           {/* Location Sharing Card (native only) */}
           {Platform.OS !== "web" && currentFestival?.id && (
@@ -122,7 +226,7 @@ export default function HomeScreen() {
                   <Pressable
                     onPress={() => router.push("/map")}
                     className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
-                    accessibilityLabel="Open festival map"
+                    accessibilityLabel={t("location.map.openAccessibility")}
                   >
                     <Map size={18} color={Colors.white} />
                     <Text className="text-sm font-medium text-white">
@@ -141,13 +245,36 @@ export default function HomeScreen() {
             </TutorialTarget>
           )}
 
+          {/* Crowd Status Summary */}
+          {currentFestival?.id && (
+            <CrowdStatusSummary festivalId={currentFestival.id} />
+          )}
+
           {/* Map Link Button (only shows if festival has mapUrl) */}
           <MapLinkButton />
+
+          {/* Group Messages Feed */}
+          <MessageFeed onRefresh={handleRefresh} />
 
           {/* Activity Feed */}
           <ActivityFeed onRefresh={handleRefresh} />
         </VStack>
       </ScrollView>
+
+      {/* Crowd Report FAB - only visible when tents visited today */}
+      {todayVisitedTents.length > 0 && (
+        <CrowdReportFab onPress={handleCrowdFabPress} />
+      )}
+
+      {/* Crowd Report Prompt - after attendance save or from FAB */}
+      {currentFestival?.id && crowdPromptTents.length > 0 && (
+        <CrowdReportPrompt
+          isOpen={showCrowdPrompt}
+          onClose={handleCrowdPromptClose}
+          tents={crowdPromptTents}
+          festivalId={currentFestival.id}
+        />
+      )}
     </SafeAreaView>
   );
 }

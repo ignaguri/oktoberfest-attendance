@@ -21,7 +21,7 @@ import { Platform } from "react-native";
 import { logger } from "@/lib/logger";
 
 import { initializeDatabase } from "./init";
-import { createSyncManager, type SyncResult } from "./sync-manager";
+import { createSyncManager, type SyncResult } from "./sync/sync-manager";
 
 // Task name constant
 export const BACKGROUND_SYNC_TASK = "PROSTCOUNTER_BACKGROUND_SYNC";

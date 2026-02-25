@@ -1,7 +1,6 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
-  useAttendances,
   useCheckInReservation,
   useReservations,
 } from "@prostcounter/shared/hooks";
@@ -34,6 +33,10 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import {
+  useAdaptedAttendances,
+  useSyncRefresh,
+} from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 import { isActiveReservation } from "@/lib/utils/reservation";
 
@@ -48,14 +51,14 @@ export default function AttendanceScreen() {
   // Dialog state
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
-  // Data hooks
+  // Data hooks (offline-first: reads from local SQLite)
   const {
     data: attendances,
     loading: isLoading,
     error: attendancesError,
     refetch,
-    isRefetching,
-  } = useAttendances(currentFestival?.id ?? "");
+  } = useAdaptedAttendances(currentFestival?.id);
+  const { syncAndRefresh, isSyncing } = useSyncRefresh();
 
   const {
     data: reservationsData,
@@ -168,16 +171,16 @@ export default function AttendanceScreen() {
     // Keep selectedDate so calendar shows selection
   }, []);
 
-  const handleFormSuccess = useCallback(() => {
-    refetch();
-    refetchReservations();
+  const handleFormSuccess = useCallback(async () => {
     showDialog(t("common.status.success"), t("attendance.saveSuccess"));
-  }, [refetch, refetchReservations, showDialog, t]);
-
-  const onRefresh = useCallback(() => {
-    refetch();
+    await syncAndRefresh();
     refetchReservations();
-  }, [refetch, refetchReservations]);
+  }, [syncAndRefresh, refetchReservations, showDialog, t]);
+
+  const onRefresh = useCallback(async () => {
+    await syncAndRefresh();
+    refetchReservations();
+  }, [syncAndRefresh, refetchReservations]);
 
   // Handle check-in dialog close
   const handleCheckInDialogClose = useCallback(() => {
@@ -210,8 +213,8 @@ export default function AttendanceScreen() {
       // Clear the check-in reservation
       setPendingCheckInReservation(null);
 
-      // Refresh data
-      refetch();
+      // Refresh data — sync from API then invalidate local caches
+      await syncAndRefresh();
       refetchReservations();
     } catch (error) {
       logger.error("Failed to check in:", error);
@@ -224,7 +227,7 @@ export default function AttendanceScreen() {
     pendingCheckInReservation,
     currentFestival,
     checkInReservation,
-    refetch,
+    syncAndRefresh,
     refetchReservations,
     showDialog,
     t,
@@ -264,10 +267,7 @@ export default function AttendanceScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={
-          <RefreshControl
-            refreshing={isRefetching ?? false}
-            onRefresh={onRefresh}
-          />
+          <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
         }
       >
         <View className="p-4 pb-32">

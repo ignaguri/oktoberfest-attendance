@@ -94,6 +94,11 @@
       },
       "notAuthenticated": "Not authenticated"
     },
+    "offline": {
+      "title": "You're Offline",
+      "leaderboardUnavailable": "The leaderboard requires an internet connection. Connect to see rankings.",
+      "achievementsUnavailable": "Achievements require an internet connection. Connect to see your progress."
+    },
     "empty": {
       "noResults": "No results found",
       "noData": "No data available"
@@ -140,7 +145,8 @@
     "dismiss": "Dismiss",
     "loading": "Loading",
     "tents": "Tents",
-    "unknownUser": "Unknown User"
+    "unknownUser": "Unknown User",
+    "unknown": "Unknown"
   },
   "tabs": {
     "home": "Home",
@@ -406,6 +412,32 @@
       "empty": {
         "title": "No photos yet",
         "description": "Group members' beer photos will appear here"
+      },
+      "photoDetail": {
+        "reactions": "Reactions",
+        "comments": "Comments",
+        "noComments": "No comments yet. Be the first!",
+        "addComment": "Add a comment...",
+        "send": "Send",
+        "deleteComment": "Delete",
+        "deleteCommentConfirm": "Are you sure you want to delete this comment?",
+        "commentAdded": "Comment added",
+        "commentDeleted": "Comment deleted",
+        "commentError": "Failed to add comment",
+        "deleteError": "Failed to delete comment",
+        "reactionError": "Failed to update reaction",
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "close": "Close",
+        "reactWith": "React with {{emoji}}",
+        "tapToReact": "Tap to react",
+        "tapToRemoveReaction": "Tap to remove reaction"
+      },
+      "accessibility": {
+        "photoBy": "Photo by {{username}}",
+        "tapToView": "Tap to view photo details, reactions, and comments"
       }
     },
     "location": {
@@ -456,7 +488,40 @@
       "share": "Share",
       "qrCode": "QR Code",
       "gallery": "Gallery",
-      "settings": "Settings"
+      "settings": "Settings",
+      "messages": "Messages"
+    },
+    "messages": {
+      "title": "Messages",
+      "titleWithName": "{{groupName}} Messages",
+      "empty": {
+        "title": "No messages yet",
+        "description": "Be the first to post a message in this group"
+      },
+      "compose": {
+        "title": "New Message",
+        "placeholder": "Write a message...",
+        "send": "Send",
+        "sending": "Sending...",
+        "typeMessage": "Message",
+        "typeAlert": "Alert",
+        "charCount": "{{count}}/{{max}}",
+        "success": "Message posted",
+        "error": "Failed to post message"
+      },
+      "feed": {
+        "title": "Group Messages",
+        "empty": "No messages from your groups yet",
+        "viewAll": "View All"
+      },
+      "item": {
+        "pinned": "Pinned",
+        "alert": "Alert",
+        "deleteConfirmTitle": "Delete Message?",
+        "deleteConfirmMessage": "This message will be permanently deleted.",
+        "deleteSuccess": "Message deleted",
+        "deleteError": "Failed to delete message"
+      }
     },
     "empty": {
       "title": "No groups yet",
@@ -990,7 +1055,12 @@
         "reminders": "Get reminders for your reservations"
       },
       "enable": "Enable Notifications",
-      "skip": "Maybe Later"
+      "skip": "Maybe Later",
+      "empty": "No notifications yet",
+      "emptyHint": "Your notifications will appear here",
+      "unreadCount": "{{count}} unread",
+      "markAllRead": "Mark all read",
+      "tapToView": "Tap to view notification details"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -1707,6 +1777,16 @@
     "noTentsNearby": "No tents within range",
     "checkIn": "Check In",
     "checkInAt": "Check in at {{tent}}",
+    "benefits": {
+      "findFriends": "Find your friends on the festival map",
+      "nearbyTents": "Get suggestions when you're near a tent",
+      "privacy": "Only visible to your group members"
+    },
+    "promptTitle": "Share Your Location",
+    "promptDescription": "Enable location sharing to find friends and discover nearby tents",
+    "promptNote": "You can turn off location sharing at any time",
+    "enable": "Enable Location",
+    "skip": "Maybe Later",
     "callout": {
       "away": "away"
     },
@@ -1719,7 +1799,8 @@
       "friendsNearby_one": "{{count}} friend",
       "tentsNearby": "{{count}} tents",
       "tentsNearby_one": "{{count}} tent",
-      "button": "Map"
+      "button": "Map",
+      "openAccessibility": "Open festival map"
     },
     "tabs": {
       "friends": "Friends",
@@ -2449,5 +2530,51 @@
       "restartNow": "Restart Now",
       "later": "Maybe Later"
     }
+  },
+  "crowdReport": {
+    "title": "Crowd Report",
+    "status": "Crowd Status",
+    "reportCrowd": "Report Crowd",
+    "submitReport": "Submit Report",
+    "noReports": "No reports",
+    "recentReport": "You reported {{minutes}} min ago",
+    "reportCount": "{{count}} report",
+    "reportCount_plural": "{{count}} reports",
+    "lastReported": "Last reported {{time}}",
+    "waitTime": "~{{minutes}} min wait",
+    "noWaitData": "No wait data",
+    "levels": {
+      "empty": "Empty",
+      "moderate": "Moderate",
+      "crowded": "Crowded",
+      "full": "Full"
+    },
+    "selectLevel": "How crowded is it?",
+    "waitTimeLabel": "Estimated wait time (minutes)",
+    "waitTimeOptional": "Optional",
+    "success": "Report submitted!",
+    "error": "Failed to submit report",
+    "rateLimited": "You can report again in a few minutes",
+    "mostAvailable": "Most Available Tents",
+    "currentLevels": "Current Crowd Levels",
+    "moreTents": "+{{count}} more",
+    "fab": {
+      "accessibilityLabel": "Report crowd level",
+      "accessibilityHint": "Report how crowded tents are"
+    },
+    "promptDescription": "You visited multiple tents. Select one to report its crowd level.",
+    "waitTimeMinutes": "{{count}} minutes",
+    "tentCrowdLevel": "{{tentName}} - {{crowdLevel}}"
+  },
+  "tentSelector": {
+    "titleSingle": "Select Tent",
+    "titleMulti": "Select Tents",
+    "searchPlaceholder": "Search tents...",
+    "loading": "Loading tents...",
+    "error": "Failed to load tents",
+    "noMatch": "No tents match your search",
+    "noTents": "No tents available",
+    "clear": "Clear",
+    "doneCount": "Done ({{count}})"
   }
 }

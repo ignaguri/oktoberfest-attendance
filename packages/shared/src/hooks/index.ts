@@ -98,6 +98,15 @@ export {
   useUpdateReservation,
 } from "./useReservations";
 
+// Group message hooks
+export {
+  useGroupMessages,
+  useMessageFeed,
+  usePostMessage,
+  useUpdateMessage,
+  useDeleteMessage,
+} from "./useGroupMessages";
+
 // Activity feed hooks
 export {
   type ActivityFeedItem,
@@ -145,6 +154,23 @@ export {
   setLanguageStorage,
   useLanguage,
 } from "./useLanguage";
+
+// Photo social hooks
+export {
+  useAddComment,
+  useAddReaction,
+  useDeleteComment,
+  usePhotoComments,
+  usePhotoReactions,
+  useRemoveReaction,
+} from "./usePhotoSocial";
+
+// Crowd report hooks
+export {
+  useSubmitCrowdReport,
+  useTentCrowdReports,
+  useTentCrowdStatus,
+} from "./useCrowdReports";
 
 // Wrapped hooks
 export {

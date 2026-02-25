@@ -21,7 +21,7 @@ import {
   XCircle,
 } from "lucide-react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, RefreshControl, ScrollView, Switch } from "react-native";
+import { Alert, RefreshControl, ScrollView } from "react-native";
 
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -361,34 +361,21 @@ export default function DatabaseDebugScreen() {
 
             <Divider className="my-2" />
 
-            {/* Simulate Offline Toggle */}
-            <HStack className="items-center justify-between py-2">
-              <HStack space="sm" className="items-center">
-                <WifiOff
-                  size={18}
-                  color={
-                    isSimulatingOffline ? Colors.error[500] : IconColors.default
-                  }
-                />
-                <VStack>
-                  <Text className="font-medium">Simulate Offline</Text>
-                  <Text size="xs" className="text-typography-500">
-                    {isSimulatingOffline
-                      ? "Network blocked for testing"
-                      : "Toggle to test offline mode"}
-                  </Text>
-                </VStack>
-              </HStack>
-              <Switch
-                value={isSimulatingOffline}
-                onValueChange={(value) => {
-                  console.log("[Debug] Simulate Offline toggled to:", value);
-                  setSimulateOffline(value);
-                }}
-                trackColor={{ false: "#d1d5db", true: Colors.error[500] }}
-                thumbColor={isSimulatingOffline ? "#fff" : "#f4f3f4"}
+            {/* Simulate Offline Button (v2) */}
+            <Button
+              size="sm"
+              action={isSimulatingOffline ? "negative" : "secondary"}
+              variant={isSimulatingOffline ? "solid" : "outline"}
+              onPress={() => setSimulateOffline(!isSimulatingOffline)}
+            >
+              <WifiOff
+                size={14}
+                color={isSimulatingOffline ? Colors.white : IconColors.default}
               />
-            </HStack>
+              <ButtonText className="ml-1">
+                {isSimulatingOffline ? "Go Online" : "Go Offline"}
+              </ButtonText>
+            </Button>
 
             <Divider className="my-2" />
 

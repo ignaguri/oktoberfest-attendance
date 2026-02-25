@@ -5,6 +5,10 @@
  *
  * Provides the current festival selection across the app.
  * Uses platform-specific storage via FestivalStorage interface.
+ *
+ * Supports offline cold start: when the API fails to load festivals
+ * (e.g. device is offline), falls back to a cached festival object
+ * stored in platform-specific storage.
  */
 
 import {
@@ -13,6 +17,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -37,15 +42,26 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
     null,
   );
   const [storedFestivalId, setStoredFestivalId] = useState<string | null>(null);
+  const [cachedFestival, setCachedFestivalState] = useState<Festival | null>(
+    null,
+  );
   const [storageLoaded, setStorageLoaded] = useState(false);
 
-  // Load stored festival ID on mount
+  // Track whether we have already applied the cache fallback to avoid
+  // re-applying it if the API later succeeds
+  const cacheAppliedRef = useRef(false);
+
+  // Load stored festival ID and cached festival on mount
   useEffect(() => {
     let mounted = true;
 
-    storage.getSelectedFestivalId().then((id) => {
+    Promise.all([
+      storage.getSelectedFestivalId(),
+      storage.getCachedFestival(),
+    ]).then(([id, cached]) => {
       if (mounted) {
         setStoredFestivalId(id);
+        setCachedFestivalState(cached);
         setStorageLoaded(true);
       }
     });
@@ -76,14 +92,44 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
     const selected = selectFestival(festivalsData, storedFestivalId);
     if (selected) {
       setCurrentFestivalState(selected);
+      // Update the cache whenever we select a festival from fresh API data
+      storage.setCachedFestival(selected);
+      cacheAppliedRef.current = false; // Reset since we have live data
     }
-  }, [festivalsData, storedFestivalId, storageLoaded]);
+  }, [festivalsData, storedFestivalId, storageLoaded, storage]);
+
+  // Fallback: use cached festival when API returns no data (offline cold start)
+  useEffect(() => {
+    if (!storageLoaded || isLoadingFestivals) {
+      return;
+    }
+
+    // Only apply fallback if API returned no data AND we have no current festival
+    const apiHasNoData = !festivalsData || festivalsData.length === 0;
+    if (
+      apiHasNoData &&
+      !currentFestival &&
+      cachedFestival &&
+      !cacheAppliedRef.current
+    ) {
+      setCurrentFestivalState(cachedFestival);
+      cacheAppliedRef.current = true;
+    }
+  }, [
+    storageLoaded,
+    isLoadingFestivals,
+    festivalsData,
+    currentFestival,
+    cachedFestival,
+  ]);
 
   // Handler to change the current festival
   const setCurrentFestival = useCallback(
     async (festival: Festival) => {
       setCurrentFestivalState(festival);
       await storage.setSelectedFestivalId(festival.id);
+      // Also cache the full festival object for offline fallback
+      await storage.setCachedFestival(festival);
     },
     [storage],
   );
