@@ -2,7 +2,7 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -74,8 +74,13 @@ export default function HomeScreen() {
     { id: string; name: string }[]
   >([]);
 
-  // Today's date for querying attendance
-  const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  // Today's date for querying attendance (recalculated on screen focus to handle midnight rollover)
+  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  useFocusEffect(
+    useCallback(() => {
+      setToday(format(new Date(), "yyyy-MM-dd"));
+    }, []),
+  );
   const festivalId = currentFestival?.id || "";
 
   // Fetch today's attendance to know which tents the user visited (offline-first)
@@ -221,7 +226,7 @@ export default function HomeScreen() {
                   <Pressable
                     onPress={() => router.push("/map")}
                     className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
-                    accessibilityLabel="Open festival map"
+                    accessibilityLabel={t("location.map.openAccessibility")}
                   >
                     <Map size={18} color={Colors.white} />
                     <Text className="text-sm font-medium text-white">

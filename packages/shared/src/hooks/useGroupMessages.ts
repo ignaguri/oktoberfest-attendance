@@ -72,7 +72,6 @@ export function useGroupMessages(groupId: string) {
       setCursor(null);
       setHasLoadedMore(false);
       await query.refetch();
-      await new Promise((resolve) => setTimeout(resolve, 800));
     } catch {
       setCursor(null);
       setHasLoadedMore(false);
@@ -143,7 +142,6 @@ export function useMessageFeed(festivalId?: string) {
       setCursor(null);
       setHasLoadedMore(false);
       await query.refetch();
-      await new Promise((resolve) => setTimeout(resolve, 800));
     } catch {
       setCursor(null);
       setHasLoadedMore(false);

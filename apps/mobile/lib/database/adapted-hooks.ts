@@ -438,6 +438,8 @@ export function useAdaptedGroups(
         inviteToken: row.invite_token ?? "",
         createdBy: row.created_by ?? "",
         createdAt: row.created_at ?? new Date().toISOString(),
+        // Note: local SQLite `groups` table does not store `updated_at`;
+        // falling back to `created_at` as an approximation.
         updatedAt: row.created_at ?? new Date().toISOString(),
         memberCount: row.member_count ?? 0,
       }));

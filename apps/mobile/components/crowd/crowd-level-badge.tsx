@@ -5,16 +5,7 @@ import { View } from "react-native";
 
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
-
-/**
- * Color mapping for crowd levels
- */
-const CROWD_COLORS: Record<CrowdLevel, string> = {
-  empty: "#22C55E", // green-500
-  moderate: "#EAB308", // yellow-500
-  crowded: "#F97316", // orange-500
-  full: "#EF4444", // red-500
-};
+import { CrowdColors } from "@/lib/constants/colors";
 
 const CROWD_BG_CLASSES: Record<CrowdLevel, string> = {
   empty: "bg-green-100",
@@ -56,7 +47,7 @@ export function CrowdLevelBadge({
     );
   }
 
-  const dotColor = CROWD_COLORS[crowdLevel];
+  const dotColor = CrowdColors[crowdLevel];
   const bgClass = CROWD_BG_CLASSES[crowdLevel];
   const textClass = CROWD_TEXT_CLASSES[crowdLevel];
 
@@ -85,5 +76,3 @@ export function CrowdLevelBadge({
 }
 
 CrowdLevelBadge.displayName = "CrowdLevelBadge";
-
-export { CROWD_COLORS };

@@ -145,7 +145,8 @@
     "dismiss": "Descartar",
     "loading": "Cargando",
     "tents": "Carpas",
-    "unknownUser": "Usuario desconocido"
+    "unknownUser": "Usuario desconocido",
+    "unknown": "Desconocido"
   },
   "tabs": {
     "home": "Inicio",
@@ -415,7 +416,7 @@
       "photoDetail": {
         "reactions": "Reacciones",
         "comments": "Comentarios",
-        "noComments": "Todavía no hay comentarios. Sé el primero!",
+        "noComments": "Todavía no hay comentarios. ¡Sé el primero!",
         "addComment": "Agregar un comentario...",
         "send": "Enviar",
         "deleteComment": "Eliminar",
@@ -433,6 +434,10 @@
         "reactWith": "Reaccionar con {{emoji}}",
         "tapToReact": "Tocar para reaccionar",
         "tapToRemoveReaction": "Tocar para quitar la reacción"
+      },
+      "accessibility": {
+        "photoBy": "Foto de {{username}}",
+        "tapToView": "Tocar para ver detalles, reacciones y comentarios de la foto"
       }
     },
     "location": {
@@ -491,11 +496,11 @@
       "titleWithName": "Mensajes de {{groupName}}",
       "empty": {
         "title": "Todavía no hay mensajes",
-        "description": "Sé el primero en publicar un mensaje en este grupo"
+        "description": "¡Sé el primero en publicar un mensaje en este grupo!"
       },
       "compose": {
         "title": "Nuevo mensaje",
-        "placeholder": "Escribi un mensaje...",
+        "placeholder": "Escribí un mensaje...",
         "send": "Enviar",
         "sending": "Enviando...",
         "typeMessage": "Mensaje",
@@ -512,8 +517,8 @@
       "item": {
         "pinned": "Fijado",
         "alert": "Alerta",
-        "deleteConfirmTitle": "Eliminar mensaje?",
-        "deleteConfirmMessage": "Este mensaje se eliminara permanentemente.",
+        "deleteConfirmTitle": "¿Eliminar mensaje?",
+        "deleteConfirmMessage": "Este mensaje se eliminará permanentemente.",
         "deleteSuccess": "Mensaje eliminado",
         "deleteError": "No se pudo eliminar el mensaje"
       }
@@ -1784,7 +1789,8 @@
       "friendsNearby_one": "{{count}} amigo",
       "tentsNearby": "{{count}} carpas",
       "tentsNearby_one": "{{count}} carpa",
-      "button": "Mapa"
+      "button": "Mapa",
+      "openAccessibility": "Abrir mapa del festival"
     },
     "tabs": {
       "friends": "Amigos",
@@ -2546,9 +2552,9 @@
     "selectLevel": "¿Qué tan lleno está?",
     "waitTimeLabel": "Tiempo de espera estimado (minutos)",
     "waitTimeOptional": "Opcional",
-    "success": "Reporte enviado!",
+    "success": "¡Reporte enviado!",
     "error": "No se pudo enviar el reporte",
-    "rateLimited": "Podes reportar de nuevo en unos minutos",
+    "rateLimited": "Podés reportar de nuevo en unos minutos",
     "mostAvailable": "Carpas más disponibles",
     "currentLevels": "Niveles de multitud actuales",
     "moreTents": "+{{count}} más",
@@ -2557,6 +2563,18 @@
       "accessibilityHint": "Reportar qué tan llenas están las carpas"
     },
     "promptDescription": "Visitaste varias carpas. Seleccioná una para reportar el nivel de gente.",
-    "waitTimeMinutes": "{{count}} minutos"
+    "waitTimeMinutes": "{{count}} minutos",
+    "tentCrowdLevel": "{{tentName}} - {{crowdLevel}}"
+  },
+  "tentSelector": {
+    "titleSingle": "Seleccionar carpa",
+    "titleMulti": "Seleccionar carpas",
+    "searchPlaceholder": "Buscar carpas...",
+    "loading": "Cargando carpas...",
+    "error": "No se pudieron cargar las carpas",
+    "noMatch": "Ninguna carpa coincide con tu búsqueda",
+    "noTents": "No hay carpas disponibles",
+    "clear": "Limpiar",
+    "doneCount": "Listo ({{count}})"
   }
 }

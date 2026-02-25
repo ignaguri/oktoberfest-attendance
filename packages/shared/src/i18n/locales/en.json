@@ -145,7 +145,8 @@
     "dismiss": "Dismiss",
     "loading": "Loading",
     "tents": "Tents",
-    "unknownUser": "Unknown User"
+    "unknownUser": "Unknown User",
+    "unknown": "Unknown"
   },
   "tabs": {
     "home": "Home",
@@ -433,6 +434,10 @@
         "reactWith": "React with {{emoji}}",
         "tapToReact": "Tap to react",
         "tapToRemoveReaction": "Tap to remove reaction"
+      },
+      "accessibility": {
+        "photoBy": "Photo by {{username}}",
+        "tapToView": "Tap to view photo details, reactions, and comments"
       }
     },
     "location": {
@@ -1794,7 +1799,8 @@
       "friendsNearby_one": "{{count}} friend",
       "tentsNearby": "{{count}} tents",
       "tentsNearby_one": "{{count}} tent",
-      "button": "Map"
+      "button": "Map",
+      "openAccessibility": "Open festival map"
     },
     "tabs": {
       "friends": "Friends",
@@ -2557,6 +2563,18 @@
       "accessibilityHint": "Report how crowded tents are"
     },
     "promptDescription": "You visited multiple tents. Select one to report its crowd level.",
-    "waitTimeMinutes": "{{count}} minutes"
+    "waitTimeMinutes": "{{count}} minutes",
+    "tentCrowdLevel": "{{tentName}} - {{crowdLevel}}"
+  },
+  "tentSelector": {
+    "titleSingle": "Select Tent",
+    "titleMulti": "Select Tents",
+    "searchPlaceholder": "Search tents...",
+    "loading": "Loading tents...",
+    "error": "Failed to load tents",
+    "noMatch": "No tents match your search",
+    "noTents": "No tents available",
+    "clear": "Clear",
+    "doneCount": "Done ({{count}})"
   }
 }

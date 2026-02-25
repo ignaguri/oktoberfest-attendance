@@ -123,7 +123,8 @@
     "dismiss": "Verwerfen",
     "loading": "Wird geladen",
     "tents": "Zelte",
-    "unknownUser": "Unbekannter Benutzer"
+    "unknownUser": "Unbekannter Benutzer",
+    "unknown": "Unbekannt"
   },
   "tabs": {
     "home": "Start",
@@ -411,6 +412,10 @@
         "reactWith": "Mit {{emoji}} reagieren",
         "tapToReact": "Zum Reagieren tippen",
         "tapToRemoveReaction": "Reaktion entfernen"
+      },
+      "accessibility": {
+        "photoBy": "Foto von {{username}}",
+        "tapToView": "Tippen, um Fotodetails, Reaktionen und Kommentare anzuzeigen"
       }
     },
     "location": {
@@ -1537,7 +1542,8 @@
       "friendsNearby_one": "{{count}} Freund",
       "tentsNearby": "{{count}} Zelte",
       "tentsNearby_one": "{{count}} Zelt",
-      "button": "Karte"
+      "button": "Karte",
+      "openAccessibility": "Festivalplan öffnen"
     },
     "tabs": {
       "friends": "Freunde",
@@ -2229,6 +2235,18 @@
       "accessibilityHint": "Melde, wie voll die Zelte sind"
     },
     "promptDescription": "Du hast mehrere Zelte besucht. Wähle eines aus, um den Andrang zu melden.",
-    "waitTimeMinutes": "{{count}} Minuten"
+    "waitTimeMinutes": "{{count}} Minuten",
+    "tentCrowdLevel": "{{tentName}} - {{crowdLevel}}"
+  },
+  "tentSelector": {
+    "titleSingle": "Zelt auswählen",
+    "titleMulti": "Zelte auswählen",
+    "searchPlaceholder": "Zelte suchen...",
+    "loading": "Zelte werden geladen...",
+    "error": "Zelte konnten nicht geladen werden",
+    "noMatch": "Keine Zelte gefunden",
+    "noTents": "Keine Zelte verfügbar",
+    "clear": "Zurücksetzen",
+    "doneCount": "Fertig ({{count}})"
   }
 }

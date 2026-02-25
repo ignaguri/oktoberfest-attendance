@@ -1,5 +1,5 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import { Stack } from "expo-router";
-import { useTranslation } from "react-i18next";
 
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 

@@ -222,7 +222,7 @@ export function PhotoDetailModal({
           <View className="items-center bg-black">
             {imageLoading && (
               <View className="absolute inset-0 items-center justify-center">
-                <ActivityIndicator size="large" color="#FFFFFF" />
+                <ActivityIndicator size="large" color={Colors.white} />
               </View>
             )}
             <Image

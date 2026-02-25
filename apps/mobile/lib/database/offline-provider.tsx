@@ -229,6 +229,11 @@ export function OfflineDataProvider({
 
         if (result.success) {
           setSyncStatus("idle");
+        } else if (
+          result.errors.length === 1 &&
+          result.errors[0] === "Sync already in progress"
+        ) {
+          // Concurrent sync attempt is not a real error — silently ignore
         } else {
           setSyncStatus("error");
           setError(result.errors.join(", ") || "Sync failed");

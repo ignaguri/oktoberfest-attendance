@@ -29,7 +29,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
-import { IconColors } from "@/lib/constants/colors";
+import { BackgroundColors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl, getBeerPictureUrl } from "@/lib/utils";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -231,7 +231,9 @@ export default function GroupGalleryScreen() {
                       )}
                     </Avatar>
                     <Text className="text-sm font-medium text-typography-700">
-                      {userGroup.username || userGroup.fullName || "Unknown"}
+                      {userGroup.username ||
+                        userGroup.fullName ||
+                        t("common.unknown")}
                     </Text>
                   </HStack>
 
@@ -246,14 +248,19 @@ export default function GroupGalleryScreen() {
                           onPress={() =>
                             imageUrl && handleImagePress(photo.id, imageUrl)
                           }
-                          accessibilityLabel={`Photo by ${userGroup.username}`}
-                          accessibilityHint="Tap to view photo details, reactions, and comments"
+                          accessibilityLabel={t(
+                            "groups.gallery.accessibility.photoBy",
+                            { username: userGroup.username },
+                          )}
+                          accessibilityHint={t(
+                            "groups.gallery.accessibility.tapToView",
+                          )}
                           style={{
                             width: IMAGE_SIZE,
                             height: IMAGE_SIZE,
                             borderRadius: 8,
                             overflow: "hidden",
-                            backgroundColor: "#f3f4f6",
+                            backgroundColor: BackgroundColors[100],
                           }}
                         >
                           {imageUrl ? (

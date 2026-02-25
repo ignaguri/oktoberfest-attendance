@@ -159,8 +159,13 @@ export function QuickAttendanceSheet({
   const festivalId = currentFestival?.id;
   const { setPendingCrowdReport } = useQuickAttendance();
 
-  // Get today's date
-  const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  // Get today's date (recalculated each time sheet opens to handle midnight rollover)
+  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  useEffect(() => {
+    if (isOpen) {
+      setToday(format(new Date(), "yyyy-MM-dd"));
+    }
+  }, [isOpen]);
 
   // Fetch today's attendance (offline-first, for tent preselection)
   const { data: attendance, refetch: refetchAttendance } =
@@ -325,7 +330,7 @@ export function QuickAttendanceSheet({
 
         // If we have pending photos, upload them
         if (pendingPhotos.length > 0) {
-          const attendanceId = result?.attendance?.id || attendance?.id;
+          const attendanceId = result?.attendanceId || attendance?.id;
           if (attendanceId) {
             await uploadPendingPhotos({
               festivalId,

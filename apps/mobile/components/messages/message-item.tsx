@@ -66,7 +66,8 @@ export function MessageItem({
     }
   }, [message.createdAt]);
 
-  const displayName = message.username || message.fullName || "Unknown";
+  const displayName =
+    message.username || message.fullName || t("common.unknown");
 
   const handleDelete = useCallback(() => {
     onDelete?.(message.id);

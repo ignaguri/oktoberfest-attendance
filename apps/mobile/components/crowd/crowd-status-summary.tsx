@@ -76,7 +76,10 @@ export function CrowdStatusSummary({ festivalId }: CrowdStatusSummaryProps) {
             <View
               key={tent.tentId}
               className="rounded-lg px-2 py-2"
-              accessibilityLabel={`${tent.tentName} - ${tent.crowdLevel}`}
+              accessibilityLabel={t("crowdReport.tentCrowdLevel", {
+                tentName: tent.tentName,
+                crowdLevel: tent.crowdLevel,
+              })}
             >
               <HStack className="items-center justify-between">
                 <Text className="flex-1 text-sm text-typography-700">

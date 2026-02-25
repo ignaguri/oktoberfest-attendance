@@ -338,7 +338,7 @@ const createGroupMessageRoute = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: "Message created successfully",
       content: {
         "application/json": {
@@ -431,7 +431,7 @@ app.openapi(createGroupMessageRoute, async (c) => {
     updatedAt: newMessage.updated_at,
   };
 
-  return c.json({ message }, 200);
+  return c.json({ message }, 201);
 });
 
 // -------------------------------------------------------------------

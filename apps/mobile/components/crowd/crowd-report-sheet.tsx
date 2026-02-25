@@ -6,7 +6,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import { CircleAlert, Send, X } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -22,9 +22,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { Colors, IconColors } from "@/lib/constants/colors";
-
-import { CROWD_COLORS } from "./crowd-level-badge";
+import { Colors, CrowdColors, IconColors } from "@/lib/constants/colors";
 
 const CROWD_LEVELS: CrowdLevel[] = ["empty", "moderate", "crowded", "full"];
 
@@ -75,6 +73,18 @@ export function CrowdReportSheet({
   const { submitReport, isSubmitting, error, reset } = useSubmitCrowdReport();
   const { reports } = useTentCrowdReports(tentId, festivalId);
 
+  // Ref to track the success auto-close timeout so we can clean up on unmount
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current);
+      }
+    };
+  }, []);
+
   // Derive minutes since last report (uses current time at render)
   // eslint-disable-next-line react-hooks/purity -- Date.now() is intentionally impure; we want the current time each render
   const minutesSinceLastReport = getMinutesSinceLastReport(reports, Date.now());
@@ -90,7 +100,8 @@ export function CrowdReportSheet({
         waitTimeMinutes,
       });
       setShowSuccess(true);
-      setTimeout(() => {
+      successTimerRef.current = setTimeout(() => {
+        successTimerRef.current = null;
         setShowSuccess(false);
         setSelectedLevel(null);
         setWaitTimeMinutes(undefined);
@@ -176,7 +187,7 @@ export function CrowdReportSheet({
                 <HStack space="sm" className="w-full">
                   {CROWD_LEVELS.map((level) => {
                     const isSelected = selectedLevel === level;
-                    const color = CROWD_COLORS[level];
+                    const color = CrowdColors[level];
                     return (
                       <Pressable
                         key={level}

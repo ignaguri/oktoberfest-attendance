@@ -1,6 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useMessageFeed } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import { MessageSquare, RefreshCw } from "lucide-react-native";
 import { useCallback } from "react";
@@ -143,11 +144,10 @@ export function MessageFeed({ onRefresh }: MessageFeedProps) {
               onPress={() => handleViewGroupMessages(message.groupId)}
             >
               <View
-                className={
-                  index < Math.min(messages.length, 5) - 1
-                    ? "border-b border-outline-100"
-                    : ""
-                }
+                className={cn(
+                  index < Math.min(messages.length, 5) - 1 &&
+                    "border-b border-outline-100",
+                )}
               >
                 <MessageItem
                   message={message}

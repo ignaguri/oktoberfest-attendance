@@ -337,11 +337,11 @@ export function LocationSharingToggle({
                     )}
                   >
                     <Text
-                      className={
+                      className={cn(
                         selectedDuration === option.value
                           ? "font-medium text-white"
-                          : "text-typography-600"
-                      }
+                          : "text-typography-600",
+                      )}
                     >
                       {t(option.labelKey)}
                     </Text>

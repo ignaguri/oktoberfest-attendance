@@ -3,6 +3,8 @@ import {
   type TentOption,
   useTentCrowdStatus,
 } from "@prostcounter/shared/hooks";
+import { useTranslation } from "@prostcounter/shared/i18n";
+import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -71,6 +73,7 @@ export function TentSelectorSheet({
   selectedTents = [],
   onSelectTents,
 }: TentSelectorSheetProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const { tents, isLoading, error } = useAdaptedTents(festivalId);
   const { crowdStatuses } = useTentCrowdStatus(festivalId);
@@ -164,7 +167,7 @@ export function TentSelectorSheet({
           isSelected={isTentSelected(item.value)}
           onToggle={handleTentToggle}
           mode={mode}
-          crowdLevel={crowd?.crowdLevel as any}
+          crowdLevel={crowd?.crowdLevel as CrowdLevel | null}
           avgWaitMinutes={crowd?.avgWaitMinutes}
         />
       );
@@ -189,7 +192,9 @@ export function TentSelectorSheet({
         {/* Header */}
         <HStack className="mb-3 w-full items-center justify-between px-2">
           <Text className="text-lg font-semibold text-typography-900">
-            {mode === "single" ? "Select Tent" : "Select Tents"}
+            {mode === "single"
+              ? t("tentSelector.titleSingle")
+              : t("tentSelector.titleMulti")}
           </Text>
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={IconColors.default} />
@@ -201,7 +206,7 @@ export function TentSelectorSheet({
           <TentSearchInput
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search tents..."
+            placeholder={t("tentSelector.searchPlaceholder")}
           />
         </View>
 
@@ -209,18 +214,20 @@ export function TentSelectorSheet({
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
             <ActivityIndicator size="large" color={IconColors.default} />
-            <Text className="mt-2 text-typography-500">Loading tents...</Text>
+            <Text className="mt-2 text-typography-500">
+              {t("tentSelector.loading")}
+            </Text>
           </VStack>
         ) : error ? (
           <VStack className="items-center justify-center py-8">
-            <Text className="text-error-600">Failed to load tents</Text>
+            <Text className="text-error-600">{t("tentSelector.error")}</Text>
           </VStack>
         ) : filteredSections.length === 0 ? (
           <VStack className="items-center justify-center py-8">
             <Text className="text-typography-500">
               {searchQuery
-                ? "No tents match your search"
-                : "No tents available"}
+                ? t("tentSelector.noMatch")
+                : t("tentSelector.noTents")}
             </Text>
           </VStack>
         ) : (
@@ -250,7 +257,7 @@ export function TentSelectorSheet({
               onPress={handleClear}
               isDisabled={selectedTents.length === 0}
             >
-              <ButtonText>Clear</ButtonText>
+              <ButtonText>{t("tentSelector.clear")}</ButtonText>
             </Button>
             <Button
               variant="solid"
@@ -259,8 +266,9 @@ export function TentSelectorSheet({
               onPress={onClose}
             >
               <ButtonText>
-                Done
-                {selectedTents.length > 0 ? ` (${selectedTents.length})` : ""}
+                {selectedTents.length > 0
+                  ? t("tentSelector.doneCount", { count: selectedTents.length })
+                  : t("common.buttons.done")}
               </ButtonText>
             </Button>
           </HStack>
