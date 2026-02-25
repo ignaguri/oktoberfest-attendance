@@ -15,8 +15,11 @@
 import type * as SQLite from "expo-sqlite";
 
 import { logger } from "../logger";
-import { getSchemaVersion, initializeSchema, setSchemaVersion } from "./init";
-import { SCHEMA_VERSION } from "./schema";
+import { getSchemaVersion, setSchemaVersion } from "./init";
+import { SCHEMA_VERSION, SYNCABLE_TABLES } from "./schema";
+
+// Import Drizzle-generated migrations
+const drizzleMigrations = require("../../drizzle/migrations.js");
 
 /**
  * Migration function type.
@@ -31,11 +34,35 @@ type MigrationFn = (db: SQLite.SQLiteDatabase) => Promise<void>;
  * IMPORTANT: Never modify existing migrations. Only append new ones.
  */
 const MIGRATIONS: MigrationFn[] = [
-  // v0 -> v1: Initial schema (handled by initializeSchema)
+  // v0 -> v1: Initial schema from Drizzle
   async (db) => {
-    // This is a special case - if coming from v0 (no schema),
-    // we just initialize the full schema rather than migrating
-    await initializeSchema(db);
+    // Execute Drizzle-generated migration SQL
+    const migration = drizzleMigrations.migrations[0];
+    if (!migration) {
+      throw new Error("Drizzle migration 0000 not found");
+    }
+
+    logger.debug(`[Migrations] Applying Drizzle migration: ${migration.name}`);
+
+    // Split SQL by statement separator and execute
+    const statements = migration.sql
+      .split("--> statement-breakpoint")
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0);
+
+    for (const statement of statements) {
+      await db.execAsync(statement);
+    }
+
+    // Initialize sync metadata for all syncable tables
+    for (const tableName of SYNCABLE_TABLES) {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO _sync_metadata (table_name, schema_version) VALUES (?, ?)`,
+        [tableName, SCHEMA_VERSION],
+      );
+    }
+
+    logger.debug("[Migrations] Initial schema created from Drizzle migration");
   },
 
   // Future migrations go here:

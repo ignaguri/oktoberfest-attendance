@@ -25,8 +25,15 @@ import { useCallback, useContext, useMemo } from "react";
 
 import { logger } from "@/lib/logger";
 
+import { createDrizzleDb } from "./db";
 import { useLocalProfile, useLocalTents } from "./hooks";
 import { OfflineContext } from "./offline-provider";
+import {
+  queryAttendanceByDateWithTotals,
+  queryAttendancesWithTotals,
+  queryGroupsWithMemberCount,
+} from "./queries";
+import { ALL_LOCAL_PREFIXES, localKeys } from "./query-keys";
 import type { LocalProfile, LocalTent } from "./schema";
 
 // =============================================================================
@@ -119,13 +126,7 @@ function mapWinningCriteria(value: string | number): WinningCriteria {
  * All local query key prefixes used by adapted hooks.
  * Invalidating these forces TanStack Query to re-read from SQLite.
  */
-const LOCAL_QUERY_KEY_PREFIXES = [
-  "local-attendances",
-  "local-tents",
-  "local-groups",
-  "local-profile",
-  "local-festivals",
-];
+const LOCAL_QUERY_KEY_PREFIXES = ALL_LOCAL_PREFIXES;
 
 /**
  * Hook that provides a "sync then refresh" function for pull-to-refresh.
@@ -240,21 +241,6 @@ function rowToAttendanceWithTotals(row: AttendanceRow): AttendanceWithTotals {
   };
 }
 
-const ATTENDANCES_WITH_TOTALS_SQL = `
-  SELECT
-    a.id, a.user_id, a.festival_id, a.date, a.beer_count,
-    a.created_at, a.updated_at,
-    COALESCE(COUNT(c.id), 0) as drinkCount,
-    COALESCE(SUM(c.price_paid_cents), 0) as totalSpentCents,
-    COALESCE(SUM(c.base_price_cents), 0) as totalBaseCents,
-    COALESCE(SUM(c.tip_cents), 0) as totalTipCents
-  FROM attendances a
-  LEFT JOIN consumptions c ON c.attendance_id = a.id AND c._deleted = 0
-  WHERE a.festival_id = ? AND a._deleted = 0
-  GROUP BY a.id
-  ORDER BY a.date DESC
-`;
-
 /**
  * Offline-first replacement for useAttendances().
  * Reads from local SQLite with JOIN to compute consumption totals.
@@ -265,14 +251,11 @@ export function useAdaptedAttendances(
   const { isReady, getDb } = useOfflineContext();
 
   const query = useQuery<AttendanceWithTotals[], Error>({
-    queryKey: ["local-attendances", festivalId, "adapted"],
+    queryKey: localKeys.attendances.adapted(festivalId),
     queryFn: async () => {
       if (!isReady || !getDb || !festivalId) return [];
-      const db = getDb();
-      const rows = await db.getAllAsync<AttendanceRow>(
-        ATTENDANCES_WITH_TOTALS_SQL,
-        [festivalId],
-      );
+      const drizzleDb = createDrizzleDb(getDb());
+      const rows = await queryAttendancesWithTotals(drizzleDb, festivalId);
       return rows.map(rowToAttendanceWithTotals);
     },
     enabled: isReady && !!festivalId,
@@ -293,25 +276,20 @@ export function useAdaptedAttendanceByDate(
   const { isReady, getDb } = useOfflineContext();
 
   const query = useQuery<AttendanceByDate | null, Error>({
-    queryKey: ["local-attendances", festivalId, date, "adapted-bydate"],
+    queryKey:
+      festivalId && date
+        ? localKeys.attendances.adaptedByDate(festivalId, date)
+        : ["local-attendances"],
     queryFn: async () => {
       if (!isReady || !getDb || !festivalId || !date) return null;
       const db = getDb();
+      const drizzleDb = createDrizzleDb(db);
 
-      // Get attendance with consumption totals
-      const row = await db.getFirstAsync<AttendanceRow>(
-        `SELECT
-          a.id, a.user_id, a.festival_id, a.date, a.beer_count,
-          a.created_at, a.updated_at,
-          COALESCE(COUNT(c.id), 0) as drinkCount,
-          COALESCE(SUM(c.price_paid_cents), 0) as totalSpentCents,
-          COALESCE(SUM(c.base_price_cents), 0) as totalBaseCents,
-          COALESCE(SUM(c.tip_cents), 0) as totalTipCents
-        FROM attendances a
-        LEFT JOIN consumptions c ON c.attendance_id = a.id AND c._deleted = 0
-        WHERE a.festival_id = ? AND a.date = ? AND a._deleted = 0
-        GROUP BY a.id`,
-        [festivalId, date],
+      // Get attendance with consumption totals (Drizzle query)
+      const row = await queryAttendanceByDateWithTotals(
+        drizzleDb,
+        festivalId,
+        date,
       );
 
       if (!row) return null;
@@ -414,20 +392,12 @@ export function useAdaptedGroups(
   const { isReady, getDb } = useOfflineContext();
 
   const query = useQuery<GroupWithMembers[], Error>({
-    queryKey: ["local-groups", festivalId, "adapted"],
+    queryKey: localKeys.groups.adapted(festivalId),
     queryFn: async () => {
       if (!isReady || !getDb || !festivalId) return [];
-      const db = getDb();
+      const drizzleDb = createDrizzleDb(getDb());
 
-      const rows = await db.getAllAsync<GroupRow>(
-        `SELECT g.*,
-          COALESCE((SELECT COUNT(*) FROM group_members gm
-                    WHERE gm.group_id = g.id AND gm._deleted = 0), 0) as member_count
-        FROM groups g
-        WHERE g.festival_id = ? AND g._deleted = 0
-        ORDER BY g.created_at DESC`,
-        [festivalId],
-      );
+      const rows = await queryGroupsWithMemberCount(drizzleDb, festivalId);
 
       return rows.map((row) => ({
         id: row.id,

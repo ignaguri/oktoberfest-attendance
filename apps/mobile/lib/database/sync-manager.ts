@@ -1036,44 +1036,22 @@ export class SyncManager {
           tents: payload.tents as string[] | undefined,
         });
         break;
-      case "consumptions": {
-        // Support both camelCase (from useOfflineConsumption) and snake_case (from local DB sync)
-        const festivalId = (payload.festivalId ||
-          payload.festival_id) as string;
-        const date = payload.date as string;
-        const drinkType = (payload.drinkType || payload.drink_type) as
-          | "beer"
-          | "radler"
-          | "alcohol_free"
-          | "wine"
-          | "soft_drink"
-          | "other";
-        const tentId = (payload.tentId || payload.tent_id) as
-          | string
-          | undefined;
-        const pricePaidCents =
-          typeof payload.pricePaidCents === "number"
-            ? payload.pricePaidCents
-            : typeof payload.price_paid_cents === "number"
-              ? payload.price_paid_cents
-              : 0;
-        const volumeMl =
-          typeof payload.volumeMl === "number"
-            ? payload.volumeMl
-            : typeof payload.volume_ml === "number"
-              ? payload.volume_ml
-              : 1000; // Default to 1L (Mass)
-
+      case "consumptions":
         await apiClient.consumption.log({
-          festivalId,
-          date,
-          drinkType,
-          tentId,
-          pricePaidCents,
-          volumeMl,
+          festivalId: payload.festival_id as string,
+          date: payload.date as string,
+          drinkType: payload.drink_type as
+            | "beer"
+            | "radler"
+            | "alcohol_free"
+            | "wine"
+            | "soft_drink"
+            | "other",
+          tentId: payload.tent_id as string | undefined,
+          pricePaidCents: (payload.price_paid_cents as number) ?? 0,
+          volumeMl: (payload.volume_ml as number) ?? 1000,
         });
         break;
-      }
       default:
         logger.warn(`[SyncManager] No insert handler for table: ${tableName}`);
     }

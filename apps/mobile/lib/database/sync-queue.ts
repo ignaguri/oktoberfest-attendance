@@ -13,6 +13,7 @@ import type * as SQLite from "expo-sqlite";
 import { logger } from "@/lib/logger";
 
 import type {
+  SyncableTable,
   SyncMetadata,
   SyncOperationType,
   SyncQueueItem,
@@ -50,7 +51,7 @@ export function generateUUID(): string {
  */
 export async function getSyncMetadata(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
 ): Promise<SyncMetadata | null> {
   const result = await db.getFirstAsync<SyncMetadata>(
     `SELECT * FROM _sync_metadata WHERE table_name = ?`,
@@ -64,7 +65,7 @@ export async function getSyncMetadata(
  */
 export async function updateLastSyncAt(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
   timestamp: string,
 ): Promise<void> {
   await db.runAsync(
@@ -78,7 +79,7 @@ export async function updateLastSyncAt(
  */
 export async function updatePullCursor(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
   cursor: string,
 ): Promise<void> {
   await db.runAsync(
@@ -101,7 +102,7 @@ export async function getAllSyncMetadata(
  */
 export async function clearSyncMetadata(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
 ): Promise<void> {
   await db.runAsync(
     `UPDATE _sync_metadata SET last_sync_at = NULL, last_pull_cursor = NULL WHERE table_name = ?`,
@@ -119,7 +120,7 @@ export async function clearSyncMetadata(
 export async function enqueueOperation(
   db: SQLite.SQLiteDatabase,
   operation: SyncOperationType,
-  tableName: string,
+  tableName: SyncableTable,
   recordId: string,
   payload: Record<string, unknown>,
   options?: {
@@ -340,7 +341,7 @@ export async function getQueueStats(db: SQLite.SQLiteDatabase): Promise<{
  */
 export async function markRecordDirty(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
   recordId: string,
 ): Promise<void> {
   await db.runAsync(`UPDATE ${tableName} SET _dirty = 1 WHERE id = ?`, [
@@ -353,7 +354,7 @@ export async function markRecordDirty(
  */
 export async function markRecordClean(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
   recordId: string,
   syncedAt: string,
 ): Promise<void> {
@@ -368,7 +369,7 @@ export async function markRecordClean(
  */
 export async function getDirtyRecords<T>(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
 ): Promise<T[]> {
   return db.getAllAsync<T>(
     `SELECT * FROM ${tableName} WHERE _dirty = 1 AND _deleted = 0`,
@@ -380,7 +381,7 @@ export async function getDirtyRecords<T>(
  */
 export async function getDirtyRecordCount(
   db: SQLite.SQLiteDatabase,
-  tables: string[],
+  tables: readonly string[],
 ): Promise<number> {
   let total = 0;
   for (const tableName of tables) {
@@ -401,7 +402,7 @@ export async function getDirtyRecordCount(
  */
 export async function softDeleteRecord(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
   recordId: string,
 ): Promise<void> {
   await db.runAsync(
@@ -416,7 +417,7 @@ export async function softDeleteRecord(
  */
 export async function purgeDeletedRecords(
   db: SQLite.SQLiteDatabase,
-  tableName: string,
+  tableName: SyncableTable,
 ): Promise<number> {
   const result = await db.runAsync(
     `DELETE FROM ${tableName} WHERE _deleted = 1 AND _dirty = 0`,
