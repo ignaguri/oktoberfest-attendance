@@ -2,16 +2,16 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
-import { Award, WifiOff } from "lucide-react-native";
+import { Award } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AchievementCard } from "@/components/achievements/achievement-card";
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
 import { AchievementsSkeleton } from "@/components/skeletons";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { OfflineScreen } from "@/components/ui/offline-screen";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
@@ -66,17 +66,7 @@ export default function AchievementsScreen() {
   // Offline state — achievements require server-side progress calculation
   if (!isOnline) {
     return (
-      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
-        <VStack className="flex-1 items-center justify-center p-6">
-          <WifiOff size={48} color={IconColors.disabled} />
-          <Text className="mt-4 text-center text-lg font-semibold text-typography-700">
-            {t("common.offline.title")}
-          </Text>
-          <Text className="mt-2 text-center text-typography-500">
-            {t("common.offline.achievementsUnavailable")}
-          </Text>
-        </VStack>
-      </SafeAreaView>
+      <OfflineScreen messageKey="common.offline.achievementsUnavailable" />
     );
   }
 

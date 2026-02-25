@@ -5,6 +5,7 @@ import {
   useGroupName,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { MessageSquare, Plus } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -186,11 +187,10 @@ export default function GroupMessagesScreen() {
                 {pinnedMessages.map((message, index) => (
                   <View
                     key={message.id}
-                    className={
-                      index < pinnedMessages.length - 1
-                        ? "border-b border-outline-100"
-                        : ""
-                    }
+                    className={cn(
+                      index < pinnedMessages.length - 1 &&
+                        "border-b border-outline-100",
+                    )}
                   >
                     <MessageItem
                       message={message}
@@ -211,11 +211,10 @@ export default function GroupMessagesScreen() {
                 {regularMessages.map((message, index) => (
                   <View
                     key={message.id}
-                    className={
-                      index < regularMessages.length - 1
-                        ? "border-b border-outline-100"
-                        : ""
-                    }
+                    className={cn(
+                      index < regularMessages.length - 1 &&
+                        "border-b border-outline-100",
+                    )}
                   >
                     <MessageItem
                       message={message}

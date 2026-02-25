@@ -3,10 +3,9 @@ import { useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WinningCriteria } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
-import { Award, ChevronRight, Trophy, WifiOff } from "lucide-react-native";
+import { Award, ChevronRight, Trophy } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Leaderboard, type SortOrder } from "@/components/shared/leaderboard";
 import { LeaderboardSkeleton } from "@/components/skeletons";
@@ -14,6 +13,7 @@ import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { OfflineScreen } from "@/components/ui/offline-screen";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -76,19 +76,7 @@ export default function LeaderboardScreen() {
 
   // Offline state — leaderboard requires server aggregation
   if (!isOnline) {
-    return (
-      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
-        <VStack className="flex-1 items-center justify-center p-6">
-          <WifiOff size={48} color={IconColors.disabled} />
-          <Text className="mt-4 text-center text-lg font-semibold text-typography-700">
-            {t("common.offline.title")}
-          </Text>
-          <Text className="mt-2 text-center text-typography-500">
-            {t("common.offline.leaderboardUnavailable")}
-          </Text>
-        </VStack>
-      </SafeAreaView>
-    );
+    return <OfflineScreen messageKey="common.offline.leaderboardUnavailable" />;
   }
 
   // Loading state (initial or festival loading)

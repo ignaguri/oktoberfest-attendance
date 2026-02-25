@@ -66,6 +66,7 @@ packages/**/dist/
 # Coding agents
 WARP.md
 .claude/skills/
+.claude/worktrees/
 .cursor/skills/
 
 # Claude MCP configuration
