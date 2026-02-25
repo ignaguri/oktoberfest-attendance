@@ -27,12 +27,12 @@ import { AppState, Platform } from "react-native";
 import { logger } from "@/lib/logger";
 
 import { initializeDatabase } from "./init";
-import type { SyncManager } from "./sync-manager";
+import type { SyncManager } from "./sync/sync-manager";
 import {
   createSyncManager,
   type SyncOptions,
   type SyncResult,
-} from "./sync-manager";
+} from "./sync/sync-manager";
 import { getQueueStats } from "./sync-queue";
 
 // =============================================================================

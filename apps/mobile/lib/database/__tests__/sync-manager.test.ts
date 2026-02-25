@@ -1,7 +1,7 @@
 /**
  * Sync Manager Tests
  *
- * Tests for the SyncManager class.
+ * Tests for the SyncManager class and standalone pull functions.
  * Run with: pnpm test --filter=@prostcounter/mobile
  *
  * Note: These tests mock the database and API client to test sync logic.
@@ -9,7 +9,14 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createSyncManager, SyncManager } from "../sync-manager";
+import { pullGroups, pullUserAchievements } from "../sync/pull-groups";
+import {
+  pullAchievements,
+  pullFestivals,
+  pullTents,
+} from "../sync/pull-reference";
+import { pullAttendances, pullProfile } from "../sync/pull-user-data";
+import { createSyncManager, SyncManager } from "../sync/sync-manager";
 
 // Mock the API client
 vi.mock("../../api-client", () => ({
@@ -229,9 +236,11 @@ function createMockDb() {
   };
 }
 
+type MockDb = ReturnType<typeof createMockDb>;
+
 describe("SyncManager", () => {
   let syncManager: SyncManager;
-  let mockDb: ReturnType<typeof createMockDb>;
+  let mockDb: MockDb;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -327,10 +336,20 @@ describe("SyncManager", () => {
       expect(status).toHaveProperty("lastSyncAt");
     });
   });
+});
+
+describe("Pull functions", () => {
+  let mockDb: MockDb;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = createMockDb();
+  });
 
   describe("pullFestivals", () => {
     it("should pull festivals from API", async () => {
-      const result = await syncManager.pullFestivals();
+      const db = mockDb as unknown as Parameters<typeof pullFestivals>[0];
+      const result = await pullFestivals(db);
 
       expect(result.table).toBe("festivals");
       expect(result.inserted).toBeGreaterThanOrEqual(0);
@@ -339,7 +358,8 @@ describe("SyncManager", () => {
 
   describe("pullTents", () => {
     it("should pull tents from API", async () => {
-      const result = await syncManager.pullTents("festival-1");
+      const db = mockDb as unknown as Parameters<typeof pullTents>[0];
+      const result = await pullTents(db, "festival-1");
 
       expect(result.table).toBe("tents");
     });
@@ -347,7 +367,8 @@ describe("SyncManager", () => {
 
   describe("pullAchievements", () => {
     it("should pull achievements from API", async () => {
-      const result = await syncManager.pullAchievements();
+      const db = mockDb as unknown as Parameters<typeof pullAchievements>[0];
+      const result = await pullAchievements(db);
 
       expect(result.table).toBe("achievements");
     });
@@ -355,7 +376,8 @@ describe("SyncManager", () => {
 
   describe("pullProfile", () => {
     it("should pull user profile from API", async () => {
-      const result = await syncManager.pullProfile("user-1");
+      const db = mockDb as unknown as Parameters<typeof pullProfile>[0];
+      const result = await pullProfile(db, "user-1");
 
       expect(result.table).toBe("profiles");
     });
@@ -363,7 +385,8 @@ describe("SyncManager", () => {
 
   describe("pullAttendances", () => {
     it("should pull attendances from API", async () => {
-      const result = await syncManager.pullAttendances("festival-1");
+      const db = mockDb as unknown as Parameters<typeof pullAttendances>[0];
+      const result = await pullAttendances(db, "festival-1");
 
       expect(result.table).toBe("attendances");
     });
@@ -371,7 +394,8 @@ describe("SyncManager", () => {
 
   describe("pullGroups", () => {
     it("should pull groups from API", async () => {
-      const result = await syncManager.pullGroups("festival-1");
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+      const result = await pullGroups(db, "festival-1");
 
       expect(result.table).toBe("groups");
     });
@@ -379,7 +403,10 @@ describe("SyncManager", () => {
 
   describe("pullUserAchievements", () => {
     it("should pull unlocked achievements", async () => {
-      const result = await syncManager.pullUserAchievements("festival-1");
+      const db = mockDb as unknown as Parameters<
+        typeof pullUserAchievements
+      >[0];
+      const result = await pullUserAchievements(db, "festival-1");
 
       expect(result.table).toBe("user_achievements");
     });
