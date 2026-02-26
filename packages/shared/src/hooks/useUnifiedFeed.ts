@@ -88,9 +88,15 @@ export function useUnifiedFeed(festivalId?: string) {
     const actTail = activityItems[activityItems.length - 1]?.timestamp;
     const msgTail = messageItems[messageItems.length - 1]?.timestamp;
 
+    const actTailTime = actTail ? new Date(actTail).getTime() : undefined;
+    const msgTailTime = msgTail ? new Date(msgTail).getTime() : undefined;
+
     if (activities.hasNextPage && messages.hasNextPage) {
       // Fetch from the source whose oldest item is newer (more to catch up)
-      if (!actTail || (msgTail && msgTail > actTail)) {
+      if (
+        actTailTime === undefined ||
+        (msgTailTime !== undefined && msgTailTime > actTailTime)
+      ) {
         messages.fetchNextPage();
       } else {
         activities.fetchNextPage();
@@ -110,13 +116,16 @@ export function useUnifiedFeed(festivalId?: string) {
     messageItems,
   ]);
 
-  const loading = activities.loading && messages.loading;
+  const loading =
+    (activities.loading || messages.loading) &&
+    activityItems.length === 0 &&
+    messageItems.length === 0;
   const isRefreshing = activities.isRefreshing || messages.isRefreshing;
   const error = activities.error || messages.error;
 
   const refresh = useCallback(async () => {
     await Promise.all([activities.refresh(), messages.refresh()]);
-  }, [activities.refresh, messages.refresh]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activities.refresh, messages.refresh]);
 
   return {
     feedItems,
