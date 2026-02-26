@@ -7,14 +7,13 @@
  */
 
 import { and, desc, eq, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/sqlite-core";
 
 import type { DrizzleDb } from "./db";
 import { achievements, userAchievements } from "./schema/achievements";
 import { attendances } from "./schema/attendances";
 import { consumptions } from "./schema/consumptions";
 import { festivals } from "./schema/festivals";
-import { groupMembers, groups } from "./schema/groups";
+import { groups } from "./schema/groups";
 import { profiles } from "./schema/profiles";
 import { tents } from "./schema/tents";
 
@@ -124,9 +123,6 @@ export async function queryGroupsWithMemberCount(
   db: DrizzleDb,
   festivalId: string,
 ) {
-  // Create alias for subquery
-  const gm = alias(groupMembers, "gm");
-
   const result = await db
     .select({
       id: groups.id,
@@ -137,10 +133,13 @@ export async function queryGroupsWithMemberCount(
       invite_token: groups.invite_token,
       created_by: groups.created_by,
       created_at: groups.created_at,
-      // Subquery for member count
+      // Correlated subquery for member count
+      // Note: Drizzle column refs in sql`` templates lose table qualification
+      // (e.g. ${groups.id} → "id" instead of "groups"."id"), so we use raw
+      // SQL strings for the correlated subquery to ensure correct references.
       member_count: sql<number>`COALESCE(
-        (SELECT COUNT(*) FROM ${groupMembers} ${gm}
-         WHERE ${gm.group_id} = ${groups.id} AND ${gm._deleted} = 0),
+        (SELECT COUNT(*) FROM "group_members" AS "gm"
+         WHERE "gm"."group_id" = "groups"."id" AND "gm"."_deleted" = 0),
         0
       )`,
     })

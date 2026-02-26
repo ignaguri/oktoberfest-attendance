@@ -59,7 +59,9 @@ export default function Home() {
           </div>
         </div>
 
-        <NewsFeed />
+        <div data-tutorial="news-feed" className="w-full">
+          <NewsFeed />
+        </div>
 
         <div className="flex flex-col gap-4">
           <MissingFields />

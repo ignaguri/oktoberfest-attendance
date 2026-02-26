@@ -1083,7 +1083,8 @@
       "privacy": "Datenschutz",
       "reportBug": "Fehler melden",
       "requestFeature": "Funktion vorschlagen",
-      "buyMeABeer": "Kauf mir ein Bier"
+      "buyMeABeer": "Kauf mir ein Bier",
+      "whatsNew": "Was ist neu"
     },
     "deleteAccount": {
       "title": "Konto löschen",
@@ -1222,6 +1223,10 @@
       "title": "Schnelle Erfassung",
       "description": "Trage hier deinen täglichen Bierkonsum ein. Das ist die Hauptfunktion der App!"
     },
+    "newsFeed": {
+      "title": "Aktivitäts-Feed",
+      "description": "Bleib auf dem Laufenden mit den neuesten Aktivitäten deiner Gruppen — Nachrichten, Fotos und Anwesenheitsupdates an einem Ort."
+    },
     "highlights": {
       "title": "Deine Statistiken & Rangliste",
       "description": "Sieh dir deine persönlichen Statistiken, Erfolge, Highlights an und vergleiche dich mit anderen Nutzern in der globalen Rangliste."
@@ -1266,6 +1271,10 @@
     "locationSharing": {
       "title": "Finde deine Freunde",
       "description": "Teile deinen Standort und sieh Gruppenmitglieder auf der Karte."
+    },
+    "unifiedFeed": {
+      "title": "Aktivitäts-Feed",
+      "description": "Sieh alle Aktivitäten deiner Gruppen an einem Ort — Nachrichten, Fotos und Anwesenheitsupdates."
     },
     "quickAttendance": {
       "title": "Getränke erfassen",
@@ -2257,5 +2266,10 @@
     "noTents": "Keine Zelte verfügbar",
     "clear": "Zurücksetzen",
     "doneCount": "Fertig ({{count}})"
+  },
+  "whatsNew": {
+    "title": "Was ist neu",
+    "currentVersion": "Aktuelle Version: {{version}}",
+    "versionLabel": "Version {{version}}"
   }
 }

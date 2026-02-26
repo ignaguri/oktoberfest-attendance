@@ -10,6 +10,7 @@
 
 import type { NetInfoState } from "@react-native-community/netinfo";
 import NetInfo from "@react-native-community/netinfo";
+import { useQueryClient } from "@tanstack/react-query";
 import type * as SQLite from "expo-sqlite";
 import {
   createContext,
@@ -27,6 +28,7 @@ import { AppState, Platform } from "react-native";
 import { logger } from "@/lib/logger";
 
 import { initializeDatabase } from "./init";
+import { ALL_LOCAL_PREFIXES } from "./query-keys";
 import type { SyncManager } from "./sync/sync-manager";
 import {
   createSyncManager,
@@ -110,6 +112,8 @@ export function OfflineDataProvider({
   userId,
   disableAutoSync = false,
 }: OfflineDataProviderProps) {
+  const queryClient = useQueryClient();
+
   // State
   const [isReady, setIsReady] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -229,6 +233,12 @@ export function OfflineDataProvider({
 
         if (result.success) {
           setSyncStatus("idle");
+          // Invalidate local query caches so adapted hooks re-read from SQLite
+          await Promise.all(
+            ALL_LOCAL_PREFIXES.map((prefix) =>
+              queryClient.invalidateQueries({ queryKey: [prefix] }),
+            ),
+          );
         } else if (
           result.errors.length === 1 &&
           result.errors[0] === "Sync already in progress"
@@ -260,7 +270,7 @@ export function OfflineDataProvider({
         };
       }
     },
-    [effectiveIsOnline, refreshPendingCount],
+    [effectiveIsOnline, refreshPendingCount, queryClient],
   );
 
   // Manual sync trigger

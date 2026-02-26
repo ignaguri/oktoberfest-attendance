@@ -249,7 +249,9 @@ export default function HomeScreen() {
           )}
 
           {/* Unified Feed (activities + messages interleaved) */}
-          <UnifiedFeed onRefresh={handleRefresh} />
+          <TutorialTarget stepId="unified-feed">
+            <UnifiedFeed onRefresh={handleRefresh} />
+          </TutorialTarget>
         </VStack>
       </ScrollView>
 

@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
 import {
@@ -7,6 +8,7 @@ import {
   ChevronRight,
   Lightbulb,
   Shield,
+  Sparkles,
 } from "lucide-react-native";
 import { useCallback } from "react";
 
@@ -76,6 +78,7 @@ function LinkRow({
 
 export function AboutSection() {
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <Card size="md" variant="elevated">
@@ -84,6 +87,23 @@ export function AboutSection() {
       </Text>
 
       <VStack>
+        <View className="border-b border-outline-100">
+          <Pressable
+            className="flex-row items-center justify-between py-3"
+            onPress={() => router.push("/settings/whats-new")}
+            accessibilityRole="button"
+            accessibilityLabel={t("profile.about.whatsNew")}
+          >
+            <View className="flex-row items-center gap-3">
+              <Sparkles size={20} color={IconColors.default} />
+              <Text className="text-typography-900">
+                {t("profile.about.whatsNew")}
+              </Text>
+            </View>
+            <ChevronRight size={20} color={IconColors.muted} />
+          </Pressable>
+        </View>
+
         {LINKS.map((link, index) => (
           <View
             key={link.key}

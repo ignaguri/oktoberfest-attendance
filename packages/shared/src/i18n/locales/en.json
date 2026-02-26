@@ -1126,7 +1126,8 @@
       "privacy": "Privacy Policy",
       "reportBug": "Report a Bug",
       "requestFeature": "Request a Feature",
-      "buyMeABeer": "Buy Me a Beer"
+      "buyMeABeer": "Buy Me a Beer",
+      "whatsNew": "What's New"
     },
     "deleteAccount": {
       "title": "Delete Account",
@@ -1457,6 +1458,10 @@
       "title": "Quick Attendance",
       "description": "Log your daily beer consumption here. This is the main feature of the app!"
     },
+    "newsFeed": {
+      "title": "Activity Feed",
+      "description": "Stay up to date with the latest activity from your groups — messages, photos, and attendance updates all in one place."
+    },
     "highlights": {
       "title": "Your Stats & Leaderboard",
       "description": "View your personal statistics, achievements, highlights, and see how you rank against other users in the global leaderboard."
@@ -1501,6 +1506,10 @@
     "locationSharing": {
       "title": "Find Your Friends",
       "description": "Share your location and see group members on the map."
+    },
+    "unifiedFeed": {
+      "title": "Activity Feed",
+      "description": "See all your groups' activity in one place — messages, photos, and attendance updates."
     },
     "quickAttendance": {
       "title": "Log Your Drinks",
@@ -2585,5 +2594,10 @@
     "noTents": "No tents available",
     "clear": "Clear",
     "doneCount": "Done ({{count}})"
+  },
+  "whatsNew": {
+    "title": "What's New",
+    "currentVersion": "Current version: {{version}}",
+    "versionLabel": "Version {{version}}"
   }
 }

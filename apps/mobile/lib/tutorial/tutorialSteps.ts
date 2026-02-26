@@ -36,8 +36,9 @@ export interface TutorialStep {
  * 1. Welcome - centered intro message
  * 2. Festival Status - highlight the festival status card
  * 3. Location Sharing - highlight the location sharing card
- * 4. Quick Attendance FAB - highlight the floating action button
- * 5. Attendance Tab - centered explanation of the calendar tab
+ * 4. Unified Feed - highlight the activity feed
+ * 5. Quick Attendance FAB - highlight the floating action button
+ * 6. Attendance Tab - centered explanation of the calendar tab
  * 6. Groups Tab - centered explanation of groups/competitions
  * 7. Leaderboard Tab - centered explanation of rankings
  * 8. Profile Tab - centered explanation of settings and tutorial reset
@@ -63,6 +64,13 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     translationKey: "mobileTutorial.locationSharing",
     targetId: "location-sharing",
     tooltipPosition: "bottom",
+    tabRoute: "/(tabs)", // Home tab
+  },
+  {
+    id: "unified-feed",
+    translationKey: "mobileTutorial.unifiedFeed",
+    targetId: "unified-feed",
+    tooltipPosition: "top",
     tabRoute: "/(tabs)", // Home tab
   },
   {

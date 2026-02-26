@@ -32,6 +32,13 @@ export const tutorialSteps: TutorialStep[] = [
     delay: 300,
   },
   {
+    id: "news-feed",
+    target: '[data-tutorial="news-feed"]',
+    translationKey: "tutorial.newsFeed",
+    position: "top",
+    delay: 300,
+  },
+  {
     id: "highlights",
     target: '[data-tutorial="highlights"]',
     translationKey: "tutorial.highlights",

@@ -1126,7 +1126,8 @@
       "privacy": "Privacidad",
       "reportBug": "Reportar un error",
       "requestFeature": "Solicitar una función",
-      "buyMeABeer": "Comprame una cerveza"
+      "buyMeABeer": "Comprame una cerveza",
+      "whatsNew": "Novedades"
     },
     "deleteAccount": {
       "title": "Eliminar cuenta",
@@ -1457,6 +1458,10 @@
       "title": "Registro Rápido",
       "description": "Registrá tu consumo diario de cerveza acá. ¡Esta es la función principal de la app!"
     },
+    "newsFeed": {
+      "title": "Feed de Actividad",
+      "description": "Mantenete al día con la última actividad de tus grupos — mensajes, fotos y actualizaciones de asistencia, todo en un solo lugar."
+    },
     "highlights": {
       "title": "Tus Estadísticas y Ranking",
       "description": "Mirá tus estadísticas personales, logros, destacados y compará tu posición contra otros usuarios en el ranking global."
@@ -1501,6 +1506,10 @@
     "locationSharing": {
       "title": "Encontrá a tus amigos",
       "description": "Compartí tu ubicación y mirá a los miembros del grupo en el mapa."
+    },
+    "unifiedFeed": {
+      "title": "Feed de Actividad",
+      "description": "Mirá toda la actividad de tus grupos en un solo lugar — mensajes, fotos y actualizaciones de asistencia."
     },
     "quickAttendance": {
       "title": "Registrá tus bebidas",
@@ -2585,5 +2594,10 @@
     "noTents": "No hay carpas disponibles",
     "clear": "Limpiar",
     "doneCount": "Listo ({{count}})"
+  },
+  "whatsNew": {
+    "title": "Novedades",
+    "currentVersion": "Versión actual: {{version}}",
+    "versionLabel": "Versión {{version}}"
   }
 }
