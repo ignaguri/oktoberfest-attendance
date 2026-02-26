@@ -88,10 +88,7 @@ export function MessageItem({
 
   return (
     <>
-      <HStack
-        space="sm"
-        className={cn("py-3", isAlert && "rounded-lg bg-amber-50 px-3")}
-      >
+      <HStack space="sm" className={cn("py-3", isAlert && "bg-amber-50")}>
         {/* Avatar - Tappable to show profile */}
         <TappableAvatar
           avatarUrl={message.avatarUrl}

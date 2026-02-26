@@ -36,7 +36,7 @@ export const MessageItem = ({ message, festivalId }: MessageItemProps) => {
     <div
       className={cn(
         "border-border/50 flex items-start gap-3 border-b py-2 last:border-b-0",
-        isAlert && "rounded-lg bg-amber-50 px-2",
+        isAlert && "bg-amber-50",
       )}
     >
       {/* User Avatar */}
