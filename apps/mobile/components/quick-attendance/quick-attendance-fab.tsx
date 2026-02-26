@@ -1,6 +1,6 @@
 import { Beer, Plus } from "lucide-react-native";
 import { useEffect, useRef } from "react";
-import type { View } from "react-native";
+import { Platform, type View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fab, FabIcon } from "@/components/ui/fab";
@@ -39,10 +39,10 @@ export function QuickAttendanceFab({
     return () => tutorial.unregisterTarget(tutorialStepId);
   }, [tutorial, tutorialStepId]);
 
-  // Native floating tab bar (iOS 18+) is a compact pill
-  // Position FAB above it with margin for clearance
-  // Devices without home indicator (insets.bottom = 0) need extra margin
-  const floatingTabBarHeight = 50;
+  // Position FAB above the native tab bar with clearance.
+  // iOS 18+: compact floating pill (~50px)
+  // Android: Material bottom navigation bar (~80px including labels)
+  const floatingTabBarHeight = Platform.OS === "android" ? 80 : 50;
   const margin = insets.bottom === 0 ? 40 : 24;
   const bottomOffset = floatingTabBarHeight + margin + insets.bottom;
 
