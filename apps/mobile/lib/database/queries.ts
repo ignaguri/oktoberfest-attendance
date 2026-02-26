@@ -6,14 +6,14 @@
  * and improve maintainability.
  */
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, getTableName, sql } from "drizzle-orm";
 
 import type { DrizzleDb } from "./db";
 import { achievements, userAchievements } from "./schema/achievements";
 import { attendances } from "./schema/attendances";
 import { consumptions } from "./schema/consumptions";
 import { festivals } from "./schema/festivals";
-import { groups } from "./schema/groups";
+import { groupMembers, groups } from "./schema/groups";
 import { profiles } from "./schema/profiles";
 import { tents } from "./schema/tents";
 
@@ -133,13 +133,13 @@ export async function queryGroupsWithMemberCount(
       invite_token: groups.invite_token,
       created_by: groups.created_by,
       created_at: groups.created_at,
-      // Correlated subquery for member count
-      // Note: Drizzle column refs in sql`` templates lose table qualification
-      // (e.g. ${groups.id} → "id" instead of "groups"."id"), so we use raw
-      // SQL strings for the correlated subquery to ensure correct references.
+      // Correlated subquery for member count.
+      // Drizzle column refs in sql`` templates lose table qualification
+      // (e.g. ${groups.id} → "id" instead of "groups"."id"), so we derive
+      // identifiers from the schema objects to stay refactoring-safe.
       member_count: sql<number>`COALESCE(
-        (SELECT COUNT(*) FROM "group_members" AS "gm"
-         WHERE "gm"."group_id" = "groups"."id" AND "gm"."_deleted" = 0),
+        (SELECT COUNT(*) FROM ${sql.identifier(getTableName(groupMembers))} AS "gm"
+         WHERE "gm".${sql.identifier(groupMembers.group_id.name)} = ${sql.identifier(getTableName(groups))}.${sql.identifier(groups.id.name)} AND "gm".${sql.identifier(groupMembers._deleted.name)} = 0),
         0
       )`,
     })
