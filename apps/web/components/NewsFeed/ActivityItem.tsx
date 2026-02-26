@@ -179,11 +179,11 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-yellow-600">
-              {getActivityIcon(activity_type)}
-            </span>
             <span className="truncate text-sm font-medium transition-colors hover:text-yellow-600">
               {displayName}
+            </span>
+            <span className="text-yellow-600">
+              {getActivityIcon(activity_type)}
             </span>
           </div>
           <span className="text-muted-foreground text-xs">{timeAgo}</span>

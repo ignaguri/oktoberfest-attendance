@@ -23,11 +23,9 @@ import {
   LocationSharingToggle,
   TentProximityBanner,
 } from "@/components/location";
-import { MessageFeed } from "@/components/messages/message-feed";
-import { ActivityFeed } from "@/components/shared/activity-feed";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
-import { MapLinkButton } from "@/components/shared/map-link-button";
+import { UnifiedFeed } from "@/components/shared/unified-feed";
 import { HomeSkeleton } from "@/components/skeletons";
 import { TutorialTarget } from "@/components/tutorial";
 import { Card } from "@/components/ui/card";
@@ -250,14 +248,8 @@ export default function HomeScreen() {
             <CrowdStatusSummary festivalId={currentFestival.id} />
           )}
 
-          {/* Map Link Button (only shows if festival has mapUrl) */}
-          <MapLinkButton />
-
-          {/* Group Messages Feed */}
-          <MessageFeed onRefresh={handleRefresh} />
-
-          {/* Activity Feed */}
-          <ActivityFeed onRefresh={handleRefresh} />
+          {/* Unified Feed (activities + messages interleaved) */}
+          <UnifiedFeed onRefresh={handleRefresh} />
         </VStack>
       </ScrollView>
 

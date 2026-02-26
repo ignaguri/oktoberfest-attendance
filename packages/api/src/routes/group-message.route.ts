@@ -1,14 +1,14 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  CreateGroupMessageResponseSchema,
-  CreateGroupMessageSchema,
+  CreateMessageResponseSchema,
+  CreateMessageSchema,
   DeleteGroupMessageResponseSchema,
   GetGroupMessagesQuerySchema,
   GetGroupMessagesResponseSchema,
   GetMessageFeedQuerySchema,
   GetMessageFeedResponseSchema,
   GroupMessageGroupIdParamSchema,
-  GroupMessageParamSchema,
+  MessageIdParamSchema,
   UpdateGroupMessageResponseSchema,
   UpdateGroupMessageSchema,
 } from "@prostcounter/shared";
@@ -19,16 +19,50 @@ import { ForbiddenError, NotFoundError } from "../middleware/error";
 // Create router
 const app = new OpenAPIHono<AuthContext>();
 
+// Helper: map a raw DB message row + profile to the API response shape
+function mapMessageResponse(
+  m: {
+    id: string;
+    user_id: string;
+    content: string;
+    message_type: string;
+    pinned: boolean;
+    visibility: string;
+    created_at: string;
+    updated_at: string;
+  },
+  profile?: {
+    id: string;
+    username: string | null;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null,
+) {
+  return {
+    id: m.id,
+    userId: m.user_id,
+    username: profile?.username ?? null,
+    fullName: profile?.full_name ?? null,
+    avatarUrl: profile?.avatar_url ?? null,
+    content: m.content,
+    messageType: m.message_type as "message" | "alert",
+    pinned: m.pinned,
+    visibility: m.visibility as "groups" | "public",
+    createdAt: m.created_at,
+    updatedAt: m.updated_at,
+  };
+}
+
 // -------------------------------------------------------------------
-// GET /groups/:groupId/messages - List messages for a group
+// GET /groups/:groupId/messages - List messages from group members
 // -------------------------------------------------------------------
 const listGroupMessagesRoute = createRoute({
   method: "get",
   path: "/groups/{groupId}/messages",
   tags: ["group-messages"],
-  summary: "List messages for a group",
+  summary: "List messages from group members",
   description:
-    "Returns messages for a group with cursor-based pagination. Pinned messages come first.",
+    "Returns messages posted by members of this group, with cursor-based pagination. Pinned messages come first.",
   request: {
     params: GroupMessageGroupIdParamSchema,
     query: GetGroupMessagesQuerySchema,
@@ -67,8 +101,7 @@ app.openapi(listGroupMessagesRoute, async (c) => {
   const { groupId } = c.req.valid("param");
   const { limit, cursor } = c.req.valid("query");
 
-  // Check membership via RLS - if user is not a member, the query returns empty
-  // But we want to explicitly check for a 403
+  // Check membership
   const { data: membership } = await supabase
     .from("group_members")
     .select("user_id")
@@ -80,22 +113,45 @@ app.openapi(listGroupMessagesRoute, async (c) => {
     throw new ForbiddenError("You are not a member of this group");
   }
 
+  // Get group's festival_id and all member user IDs
+  const { data: group } = await supabase
+    .from("groups")
+    .select("festival_id")
+    .eq("id", groupId)
+    .single();
+
+  if (!group) {
+    throw new NotFoundError("Group not found");
+  }
+
+  const { data: members } = await supabase
+    .from("group_members")
+    .select("user_id")
+    .eq("group_id", groupId);
+
+  const memberIds = (members || []).map((m) => m.user_id);
+
+  if (memberIds.length === 0) {
+    return c.json({ messages: [], nextCursor: null, hasMore: false }, 200);
+  }
+
+  const messageSelect = `
+    id,
+    user_id,
+    content,
+    message_type,
+    pinned,
+    visibility,
+    created_at,
+    updated_at
+  `;
+
   // Fetch pinned messages first (always shown at top)
   const { data: pinnedMessages, error: pinnedError } = await supabase
     .from("group_messages")
-    .select(
-      `
-      id,
-      group_id,
-      user_id,
-      content,
-      message_type,
-      pinned,
-      created_at,
-      updated_at
-    `,
-    )
-    .eq("group_id", groupId)
+    .select(messageSelect)
+    .eq("festival_id", group.festival_id)
+    .in("user_id", memberIds)
     .eq("pinned", true)
     .order("created_at", { ascending: false });
 
@@ -106,19 +162,9 @@ app.openapi(listGroupMessagesRoute, async (c) => {
   // Fetch non-pinned messages with pagination
   let query = supabase
     .from("group_messages")
-    .select(
-      `
-      id,
-      group_id,
-      user_id,
-      content,
-      message_type,
-      pinned,
-      created_at,
-      updated_at
-    `,
-    )
-    .eq("group_id", groupId)
+    .select(messageSelect)
+    .eq("festival_id", group.festival_id)
+    .in("user_id", memberIds)
     .eq("pinned", false)
     .order("created_at", { ascending: false })
     .limit(limit + 1);
@@ -153,36 +199,25 @@ app.openapi(listGroupMessagesRoute, async (c) => {
   const userIds = [...new Set(allMessages.map((m) => m.user_id))];
 
   // Fetch user profiles
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, username, full_name, avatar_url")
-    .in("id", userIds);
+  const { data: profiles } =
+    userIds.length > 0
+      ? await supabase
+          .from("profiles")
+          .select("id, username, full_name, avatar_url")
+          .in("id", userIds)
+      : { data: [] };
 
   const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-  // Map messages with profile info
-  const messages = allMessages.map((m) => {
-    const profile = profileMap.get(m.user_id);
-    return {
-      id: m.id,
-      groupId: m.group_id,
-      userId: m.user_id,
-      username: profile?.username ?? null,
-      fullName: profile?.full_name ?? null,
-      avatarUrl: profile?.avatar_url ?? null,
-      content: m.content,
-      messageType: m.message_type as "message" | "alert",
-      pinned: m.pinned,
-      createdAt: m.created_at,
-      updatedAt: m.updated_at,
-    };
-  });
+  const messages = allMessages.map((m) =>
+    mapMessageResponse(m, profileMap.get(m.user_id)),
+  );
 
   return c.json({ messages, nextCursor, hasMore }, 200);
 });
 
 // -------------------------------------------------------------------
-// GET /messages/feed - Get messages from all user's groups
+// GET /messages/feed - Get messages from co-members across groups
 // -------------------------------------------------------------------
 const getMessageFeedRoute = createRoute({
   method: "get",
@@ -190,7 +225,7 @@ const getMessageFeedRoute = createRoute({
   tags: ["group-messages"],
   summary: "Get message feed across all groups",
   description:
-    "Returns recent messages from all groups the user belongs to, for a given festival",
+    "Returns recent messages from users who share groups with the current user for a given festival",
   request: {
     query: GetMessageFeedQuerySchema,
   },
@@ -222,7 +257,7 @@ app.openapi(getMessageFeedRoute, async (c) => {
   // Get user's group IDs for this festival
   const { data: userGroups, error: groupsError } = await supabase
     .from("group_members")
-    .select("group_id, groups!inner(id, name, festival_id)")
+    .select("group_id, groups!inner(id, festival_id)")
     .eq("user_id", user.id)
     .eq("groups.festival_id", festivalId);
 
@@ -236,33 +271,35 @@ app.openapi(getMessageFeedRoute, async (c) => {
 
   const groupIds = userGroups.map((g) => g.group_id);
 
-  // Build group name map
-  const groupNameMap = new Map<string, string>();
-  for (const g of userGroups) {
-    const groupData = g.groups as unknown as {
-      id: string;
-      name: string;
-      festival_id: string;
-    };
-    groupNameMap.set(g.group_id, groupData.name);
+  // Get all co-member user IDs (users who share groups with current user)
+  const { data: coMembers } = await supabase
+    .from("group_members")
+    .select("user_id")
+    .in("group_id", groupIds);
+
+  const coMemberIds = [...new Set((coMembers || []).map((m) => m.user_id))];
+
+  if (coMemberIds.length === 0) {
+    return c.json({ messages: [], nextCursor: null, hasMore: false }, 200);
   }
 
-  // Fetch messages across all groups
+  const messageSelect = `
+    id,
+    user_id,
+    content,
+    message_type,
+    pinned,
+    visibility,
+    created_at,
+    updated_at
+  `;
+
+  // Fetch messages from co-members in this festival
   let query = supabase
     .from("group_messages")
-    .select(
-      `
-      id,
-      group_id,
-      user_id,
-      content,
-      message_type,
-      pinned,
-      created_at,
-      updated_at
-    `,
-    )
-    .in("group_id", groupIds)
+    .select(messageSelect)
+    .eq("festival_id", festivalId)
+    .in("user_id", coMemberIds)
     .order("created_at", { ascending: false })
     .limit(limit + 1);
 
@@ -289,50 +326,38 @@ app.openapi(getMessageFeedRoute, async (c) => {
   const userIds = [...new Set(resultMessages.map((m) => m.user_id))];
 
   // Fetch user profiles
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, username, full_name, avatar_url")
-    .in("id", userIds);
+  const { data: profiles } =
+    userIds.length > 0
+      ? await supabase
+          .from("profiles")
+          .select("id, username, full_name, avatar_url")
+          .in("id", userIds)
+      : { data: [] };
 
   const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-  // Map messages with profile and group info
-  const feedMessages = resultMessages.map((m) => {
-    const profile = profileMap.get(m.user_id);
-    return {
-      id: m.id,
-      groupId: m.group_id,
-      userId: m.user_id,
-      username: profile?.username ?? null,
-      fullName: profile?.full_name ?? null,
-      avatarUrl: profile?.avatar_url ?? null,
-      content: m.content,
-      messageType: m.message_type as "message" | "alert",
-      pinned: m.pinned,
-      createdAt: m.created_at,
-      updatedAt: m.updated_at,
-      groupName: groupNameMap.get(m.group_id) || "Unknown Group",
-    };
-  });
+  const feedMessages = resultMessages.map((m) =>
+    mapMessageResponse(m, profileMap.get(m.user_id)),
+  );
 
   return c.json({ messages: feedMessages, nextCursor, hasMore }, 200);
 });
 
 // -------------------------------------------------------------------
-// POST /groups/:groupId/messages - Post a new message
+// POST /messages - Post a new message (visible to all user's groups)
 // -------------------------------------------------------------------
-const createGroupMessageRoute = createRoute({
+const createMessageRoute = createRoute({
   method: "post",
-  path: "/groups/{groupId}/messages",
+  path: "/messages",
   tags: ["group-messages"],
-  summary: "Post a new message to a group",
-  description: "Create a new message or alert in a group",
+  summary: "Post a new message",
+  description:
+    "Create a new message visible to all groups the user belongs to in the given festival",
   request: {
-    params: GroupMessageGroupIdParamSchema,
     body: {
       content: {
         "application/json": {
-          schema: CreateGroupMessageSchema,
+          schema: CreateMessageSchema,
         },
       },
     },
@@ -342,7 +367,7 @@ const createGroupMessageRoute = createRoute({
       description: "Message created successfully",
       content: {
         "application/json": {
-          schema: CreateGroupMessageResponseSchema,
+          schema: CreateMessageResponseSchema,
         },
       },
     },
@@ -355,7 +380,7 @@ const createGroupMessageRoute = createRoute({
       },
     },
     403: {
-      description: "Forbidden - Not a group member",
+      description: "Forbidden - Not a member of any group in this festival",
       content: {
         "application/json": {
           schema: z.object({ error: z.string(), message: z.string() }),
@@ -366,40 +391,42 @@ const createGroupMessageRoute = createRoute({
   security: [{ bearerAuth: [] }],
 });
 
-app.openapi(createGroupMessageRoute, async (c) => {
+app.openapi(createMessageRoute, async (c) => {
   const { supabase, user } = c.var;
-  const { groupId } = c.req.valid("param");
-  const { content, messageType } = c.req.valid("json");
+  const { content, messageType, festivalId } = c.req.valid("json");
 
-  // Check membership
+  // Verify user is member of at least one group in this festival
   const { data: membership } = await supabase
     .from("group_members")
-    .select("user_id")
-    .eq("group_id", groupId)
+    .select("group_id, groups!inner(id, festival_id)")
     .eq("user_id", user.id)
+    .eq("groups.festival_id", festivalId)
+    .limit(1)
     .single();
 
   if (!membership) {
-    throw new ForbiddenError("You are not a member of this group");
+    throw new ForbiddenError(
+      "You must be a member of at least one group in this festival to post messages",
+    );
   }
 
   // Insert message
   const { data: newMessage, error } = await supabase
     .from("group_messages")
     .insert({
-      group_id: groupId,
       user_id: user.id,
+      festival_id: festivalId,
       content,
       message_type: messageType,
     })
     .select(
       `
       id,
-      group_id,
       user_id,
       content,
       message_type,
       pinned,
+      visibility,
       created_at,
       updated_at
     `,
@@ -417,35 +444,23 @@ app.openapi(createGroupMessageRoute, async (c) => {
     .eq("id", user.id)
     .single();
 
-  const message = {
-    id: newMessage.id,
-    groupId: newMessage.group_id,
-    userId: newMessage.user_id,
-    username: profile?.username ?? null,
-    fullName: profile?.full_name ?? null,
-    avatarUrl: profile?.avatar_url ?? null,
-    content: newMessage.content,
-    messageType: newMessage.message_type as "message" | "alert",
-    pinned: newMessage.pinned,
-    createdAt: newMessage.created_at,
-    updatedAt: newMessage.updated_at,
-  };
+  const message = mapMessageResponse(newMessage, profile);
 
   return c.json({ message }, 201);
 });
 
 // -------------------------------------------------------------------
-// PUT /groups/:groupId/messages/:messageId - Update own message
+// PUT /messages/:messageId - Update own message
 // -------------------------------------------------------------------
-const updateGroupMessageRoute = createRoute({
+const updateMessageRoute = createRoute({
   method: "put",
-  path: "/groups/{groupId}/messages/{messageId}",
+  path: "/messages/{messageId}",
   tags: ["group-messages"],
   summary: "Update own message",
   description:
     "Update the content, type, or pinned state of a message you posted",
   request: {
-    params: GroupMessageParamSchema,
+    params: MessageIdParamSchema,
     body: {
       content: {
         "application/json": {
@@ -491,17 +506,16 @@ const updateGroupMessageRoute = createRoute({
   security: [{ bearerAuth: [] }],
 });
 
-app.openapi(updateGroupMessageRoute, async (c) => {
+app.openapi(updateMessageRoute, async (c) => {
   const { supabase, user } = c.var;
-  const { groupId, messageId } = c.req.valid("param");
+  const { messageId } = c.req.valid("param");
   const updates = c.req.valid("json");
 
   // Check message exists and belongs to user
   const { data: existing } = await supabase
     .from("group_messages")
-    .select("id, user_id, group_id")
+    .select("id, user_id")
     .eq("id", messageId)
-    .eq("group_id", groupId)
     .single();
 
   if (!existing) {
@@ -528,11 +542,11 @@ app.openapi(updateGroupMessageRoute, async (c) => {
     .select(
       `
       id,
-      group_id,
       user_id,
       content,
       message_type,
       pinned,
+      visibility,
       created_at,
       updated_at
     `,
@@ -550,34 +564,22 @@ app.openapi(updateGroupMessageRoute, async (c) => {
     .eq("id", user.id)
     .single();
 
-  const message = {
-    id: updated.id,
-    groupId: updated.group_id,
-    userId: updated.user_id,
-    username: profile?.username ?? null,
-    fullName: profile?.full_name ?? null,
-    avatarUrl: profile?.avatar_url ?? null,
-    content: updated.content,
-    messageType: updated.message_type as "message" | "alert",
-    pinned: updated.pinned,
-    createdAt: updated.created_at,
-    updatedAt: updated.updated_at,
-  };
+  const message = mapMessageResponse(updated, profile);
 
   return c.json({ message }, 200);
 });
 
 // -------------------------------------------------------------------
-// DELETE /groups/:groupId/messages/:messageId - Delete own message
+// DELETE /messages/:messageId - Delete own message
 // -------------------------------------------------------------------
-const deleteGroupMessageRoute = createRoute({
+const deleteMessageRoute = createRoute({
   method: "delete",
-  path: "/groups/{groupId}/messages/{messageId}",
+  path: "/messages/{messageId}",
   tags: ["group-messages"],
   summary: "Delete own message",
   description: "Delete a message you posted",
   request: {
-    params: GroupMessageParamSchema,
+    params: MessageIdParamSchema,
   },
   responses: {
     200: {
@@ -616,16 +618,15 @@ const deleteGroupMessageRoute = createRoute({
   security: [{ bearerAuth: [] }],
 });
 
-app.openapi(deleteGroupMessageRoute, async (c) => {
+app.openapi(deleteMessageRoute, async (c) => {
   const { supabase, user } = c.var;
-  const { groupId, messageId } = c.req.valid("param");
+  const { messageId } = c.req.valid("param");
 
   // Check message exists and belongs to user
   const { data: existing } = await supabase
     .from("group_messages")
-    .select("id, user_id, group_id")
+    .select("id, user_id")
     .eq("id", messageId)
-    .eq("group_id", groupId)
     .single();
 
   if (!existing) {

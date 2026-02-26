@@ -40,7 +40,7 @@ import type {
   CrowdLevel,
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
-  CreateGroupMessageResponse,
+  CreateMessageResponse,
   UpdateGroupMessageResponse,
   DeleteGroupMessageResponse,
   GroupMessageType,
@@ -2502,14 +2502,15 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse<GetMessageFeedResponse>(response);
       },
 
-      async create(
-        groupId: string,
-        data: { content: string; messageType?: GroupMessageType },
-      ): Promise<CreateGroupMessageResponse> {
+      async create(data: {
+        content: string;
+        messageType?: GroupMessageType;
+        festivalId: string;
+      }): Promise<CreateMessageResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(
           "POST",
-          `${baseUrl}/v1/groups/${groupId}/messages`,
+          `${baseUrl}/v1/messages`,
           {
             method: "POST",
             headers,
@@ -2522,11 +2523,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           ).catch(() => ({ message: undefined }));
           throw new Error(error.message || "Failed to create message");
         }
-        return parseJsonResponse<CreateGroupMessageResponse>(response);
+        return parseJsonResponse<CreateMessageResponse>(response);
       },
 
       async update(
-        groupId: string,
         messageId: string,
         data: {
           content?: string;
@@ -2537,7 +2537,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(
           "PUT",
-          `${baseUrl}/v1/groups/${groupId}/messages/${messageId}`,
+          `${baseUrl}/v1/messages/${messageId}`,
           {
             method: "PUT",
             headers,
@@ -2553,14 +2553,11 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse<UpdateGroupMessageResponse>(response);
       },
 
-      async delete(
-        groupId: string,
-        messageId: string,
-      ): Promise<DeleteGroupMessageResponse> {
+      async delete(messageId: string): Promise<DeleteGroupMessageResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(
           "DELETE",
-          `${baseUrl}/v1/groups/${groupId}/messages/${messageId}`,
+          `${baseUrl}/v1/messages/${messageId}`,
           {
             method: "DELETE",
             headers,

@@ -500,7 +500,9 @@
       },
       "compose": {
         "title": "New Message",
-        "placeholder": "Write a message...",
+        "subtitleMessage": "Share a message with your friends",
+        "subtitleAlert": "Alert your friends about something important",
+        "placeholder": "Share something with your groups...",
         "send": "Send",
         "sending": "Sending...",
         "typeMessage": "Message",
@@ -2016,6 +2018,13 @@
       "empty": "No activities yet. Start logging your festival adventures!",
       "loadMore": "Load More",
       "error": "Failed to load activity feed"
+    },
+    "unifiedFeed": {
+      "title": "What's Happening",
+      "empty": "No activity yet. Start logging your festival adventures!",
+      "loadMore": "Load More",
+      "error": "Failed to load feed",
+      "compose": "New Message"
     },
     "festivalOver": "Sadly, {{name}} is over. See you next time!",
     "wrappedReady": {

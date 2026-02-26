@@ -500,7 +500,9 @@
       },
       "compose": {
         "title": "Nuevo mensaje",
-        "placeholder": "Escribí un mensaje...",
+        "subtitleMessage": "Compartí un mensaje con tus amigos",
+        "subtitleAlert": "Alertá a tus amigos sobre algo importante",
+        "placeholder": "Compartí algo con tus grupos...",
         "send": "Enviar",
         "sending": "Enviando...",
         "typeMessage": "Mensaje",
@@ -2016,6 +2018,13 @@
       "empty": "Todavía no hay actividades. ¡Empezá a registrar tus aventuras en el festival!",
       "loadMore": "Cargar más",
       "error": "Error al cargar el feed de actividad"
+    },
+    "unifiedFeed": {
+      "title": "Novedades",
+      "empty": "Aún no hay actividad. ¡Comenzá a documentar tu experiencia en el festival!",
+      "loadMore": "Cargar más",
+      "error": "No se pudo cargar el feed",
+      "compose": "Nuevo mensaje"
     },
     "festivalOver": "Lamentablemente, {{name}} terminó. ¡Nos vemos la próxima!",
     "wrappedReady": {
