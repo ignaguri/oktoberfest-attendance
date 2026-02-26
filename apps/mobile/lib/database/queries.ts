@@ -6,8 +6,7 @@
  * and improve maintainability.
  */
 
-import { and, desc, eq, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/sqlite-core";
+import { and, desc, eq, getTableName, sql } from "drizzle-orm";
 
 import type { DrizzleDb } from "./db";
 import { achievements, userAchievements } from "./schema/achievements";
@@ -124,9 +123,6 @@ export async function queryGroupsWithMemberCount(
   db: DrizzleDb,
   festivalId: string,
 ) {
-  // Create alias for subquery
-  const gm = alias(groupMembers, "gm");
-
   const result = await db
     .select({
       id: groups.id,
@@ -137,10 +133,13 @@ export async function queryGroupsWithMemberCount(
       invite_token: groups.invite_token,
       created_by: groups.created_by,
       created_at: groups.created_at,
-      // Subquery for member count
+      // Correlated subquery for member count.
+      // Drizzle column refs in sql`` templates lose table qualification
+      // (e.g. ${groups.id} → "id" instead of "groups"."id"), so we derive
+      // identifiers from the schema objects to stay refactoring-safe.
       member_count: sql<number>`COALESCE(
-        (SELECT COUNT(*) FROM ${groupMembers} ${gm}
-         WHERE ${gm.group_id} = ${groups.id} AND ${gm._deleted} = 0),
+        (SELECT COUNT(*) FROM ${sql.identifier(getTableName(groupMembers))} AS "gm"
+         WHERE "gm".${sql.identifier(groupMembers.group_id.name)} = ${sql.identifier(getTableName(groups))}.${sql.identifier(groups.id.name)} AND "gm".${sql.identifier(groupMembers._deleted.name)} = 0),
         0
       )`,
     })

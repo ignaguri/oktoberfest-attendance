@@ -26,6 +26,12 @@ export default function SettingsLayout() {
           title: t("profile.changePassword.title"),
         }}
       />
+      <Stack.Screen
+        name="whats-new"
+        options={{
+          title: t("whatsNew.title"),
+        }}
+      />
     </Stack>
   );
 }

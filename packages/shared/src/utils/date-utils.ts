@@ -127,19 +127,39 @@ export function formatRelativeTime(
   const tzDate = new TZDate(date, timezone);
   const diffInSeconds = Math.floor((now.getTime() - tzDate.getTime()) / 1000);
 
-  // Use provided locale, or fall back to current i18n language
-  const language = locale ?? getCurrentLanguage();
-  const rtf = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
+  // Intl.RelativeTimeFormat is not available in Hermes (React Native Android).
+  // Use it when available, otherwise fall back to simple English strings.
+  if (typeof Intl?.RelativeTimeFormat === "function") {
+    const language = locale ?? getCurrentLanguage();
+    const rtf = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
 
+    if (diffInSeconds < 60) {
+      return rtf.format(-diffInSeconds, "second");
+    } else if (diffInSeconds < 3600) {
+      return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
+    } else if (diffInSeconds < 86400) {
+      return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
+    } else if (diffInSeconds < 604800) {
+      return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
+    } else {
+      return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
+    }
+  }
+
+  // Fallback for runtimes without Intl.RelativeTimeFormat (e.g. Hermes)
   if (diffInSeconds < 60) {
-    return rtf.format(-diffInSeconds, "second");
+    return diffInSeconds <= 1 ? "just now" : `${diffInSeconds}s ago`;
   } else if (diffInSeconds < 3600) {
-    return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
+    const mins = Math.floor(diffInSeconds / 60);
+    return mins === 1 ? "1 min ago" : `${mins} min ago`;
   } else if (diffInSeconds < 86400) {
-    return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
+    const hours = Math.floor(diffInSeconds / 3600);
+    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
   } else if (diffInSeconds < 604800) {
-    return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
+    const days = Math.floor(diffInSeconds / 86400);
+    return days === 1 ? "1 day ago" : `${days} days ago`;
   } else {
-    return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
+    const weeks = Math.floor(diffInSeconds / 604800);
+    return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
   }
 }

@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { View } from "react-native";
+import { Platform, StatusBar, type View } from "react-native";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { logger } from "@/lib/logger";
@@ -182,13 +182,20 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
               resolve(null);
               return;
             }
+            // On Android, measureInWindow returns coordinates relative to the
+            // app window (below the status bar), but our Modal uses
+            // statusBarTranslucent which renders from the very top of the
+            // screen. We must add the status bar height to align the spotlight.
+            const statusBarOffset =
+              Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0;
+            const adjustedY = y + statusBarOffset;
             resolve({
               x,
-              y,
+              y: adjustedY,
               width,
               height,
               pageX: x,
-              pageY: y,
+              pageY: adjustedY,
             });
           });
         } catch (error) {
