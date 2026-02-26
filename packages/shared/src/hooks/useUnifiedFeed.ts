@@ -8,8 +8,7 @@
 
 import { useCallback, useMemo } from "react";
 
-import type { ActivityFeedItem } from "../schemas";
-import type { GroupMessageFeedItem } from "../schemas";
+import type { ActivityFeedItem, GroupMessageItem } from "../schemas";
 
 import { useActivityFeedItems } from "./useActivityFeed";
 import { useMessageFeed } from "./useGroupMessages";
@@ -30,7 +29,7 @@ type ActivityFeedEntry = UnifiedFeedItemBase & {
 
 type MessageFeedEntry = UnifiedFeedItemBase & {
   feedType: "message";
-  data: GroupMessageFeedItem;
+  data: GroupMessageItem;
 };
 
 // Add future feed types here, e.g.:

@@ -465,7 +465,9 @@
       },
       "compose": {
         "title": "Neue Nachricht",
-        "placeholder": "Nachricht schreiben...",
+        "subtitleMessage": "Teile eine Nachricht mit deinen Freunden",
+        "subtitleAlert": "Warne deine Freunde über etwas Wichtiges",
+        "placeholder": "Teile etwas mit deinen Gruppen...",
         "send": "Senden",
         "sending": "Wird gesendet...",
         "typeMessage": "Nachricht",
@@ -1770,7 +1772,8 @@
       "title": "Was passiert",
       "empty": "Noch keine Aktivitäten. Beginne dein Festivalerlebnis zu dokumentieren!",
       "loadMore": "Mehr laden",
-      "error": "Feed konnte nicht geladen werden"
+      "error": "Feed konnte nicht geladen werden",
+      "compose": "Neue Nachricht"
     },
     "festivalOver": "Leider ist das {{name}} vorbei. Bis zum nächsten Mal!",
     "wrappedReady": {

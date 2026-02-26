@@ -27,12 +27,14 @@ const MAX_CHARS = 1000;
 interface ComposeMessageProps {
   isOpen: boolean;
   onClose: () => void;
-  groupId: string;
+  festivalId: string;
   onSuccess?: () => void;
 }
 
 /**
  * Bottom sheet for composing a new message
+ *
+ * Messages are posted to the festival (visible to all user's groups).
  *
  * Features:
  * - Text input with character counter
@@ -42,7 +44,7 @@ interface ComposeMessageProps {
 export function ComposeMessage({
   isOpen,
   onClose,
-  groupId,
+  festivalId,
   onSuccess,
 }: ComposeMessageProps) {
   const { t } = useTranslation();
@@ -52,13 +54,13 @@ export function ComposeMessage({
   const postMessage = usePostMessage();
 
   const handleSend = useCallback(async () => {
-    if (!content.trim()) return;
+    if (!content.trim() || !festivalId) return;
 
     try {
       await postMessage.mutateAsync({
-        groupId,
         content: content.trim(),
         messageType,
+        festivalId,
       });
       setContent("");
       setMessageType("message");
@@ -67,7 +69,7 @@ export function ComposeMessage({
     } catch {
       // Error is handled by the mutation
     }
-  }, [content, messageType, groupId, postMessage, onClose, onSuccess]);
+  }, [content, messageType, festivalId, postMessage, onClose, onSuccess]);
 
   const handleClose = useCallback(() => {
     setContent("");
@@ -89,9 +91,16 @@ export function ComposeMessage({
 
         <ActionsheetScrollView className="w-full">
           <VStack space="md" className="px-2 pb-4 pt-2">
-            <Heading size="md" className="text-typography-900">
-              {t("groups.messages.compose.title")}
-            </Heading>
+            <VStack space="xs">
+              <Heading size="md" className="text-typography-900">
+                {t("groups.messages.compose.title")}
+              </Heading>
+              <Text className="text-sm text-typography-500">
+                {messageType === "alert"
+                  ? t("groups.messages.compose.subtitleAlert")
+                  : t("groups.messages.compose.subtitleMessage")}
+              </Text>
+            </VStack>
 
             {/* Message type toggle */}
             <HStack space="sm">

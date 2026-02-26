@@ -5,8 +5,13 @@ import {
   type UnifiedFeedItem,
   useUnifiedFeed,
 } from "@prostcounter/shared/hooks";
-import { Loader2, RadioTower, RefreshCw } from "lucide-react";
-import { useCallback } from "react";
+import {
+  Loader2,
+  MessageSquarePlus,
+  RadioTower,
+  RefreshCw,
+} from "lucide-react";
+import { useCallback, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,42 +20,59 @@ import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 import { ActivityItem } from "./ActivityItem";
+import { ComposeMessageDialog } from "./ComposeMessageDialog";
 import { MessageItem } from "./MessageItem";
 
 const NewsFeedHeader = ({
   itemCount,
   onRefresh,
   isRefreshing,
+  onCompose,
 }: {
   itemCount?: number;
   onRefresh?: () => void;
   isRefreshing?: boolean;
+  onCompose?: () => void;
 }) => {
   const { t } = useTranslation();
   return (
     <CardHeader>
-      <CardTitle className="flex items-center justify-center gap-2 text-center text-lg font-bold">
-        <RadioTower className="size-5" />
-        {t("home.unifiedFeed.title")}
-        {itemCount !== undefined && (
-          <span className="text-muted-foreground text-sm font-normal">
-            ({itemCount})
-          </span>
-        )}
-        {onRefresh && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className="size-8"
-            title={t("home.refreshFeed")}
-          >
-            <RefreshCw
-              className={cn("size-4", isRefreshing && "animate-spin")}
-            />
-          </Button>
-        )}
+      <CardTitle className="flex items-center justify-between text-lg font-bold">
+        <div className="flex items-center gap-2">
+          {t("home.unifiedFeed.title")}
+          {itemCount !== undefined && (
+            <span className="text-muted-foreground text-sm font-normal">
+              ({itemCount})
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          {onCompose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onCompose}
+              className="size-8"
+              title={t("home.unifiedFeed.compose")}
+            >
+              <MessageSquarePlus className="size-4 text-yellow-500" />
+            </Button>
+          )}
+          {onRefresh && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="size-8"
+              title={t("home.refreshFeed")}
+            >
+              <RefreshCw
+                className={cn("size-4", isRefreshing && "animate-spin")}
+              />
+            </Button>
+          )}
+        </div>
       </CardTitle>
     </CardHeader>
   );
@@ -76,6 +98,7 @@ function FeedItemRenderer({
 const NewsFeed = () => {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
   const {
     feedItems,
     loading,
@@ -98,6 +121,14 @@ const NewsFeed = () => {
     await refresh();
   }, [isRefreshing, refresh]);
 
+  const handleCompose = useCallback(() => {
+    setIsComposeOpen(true);
+  }, []);
+
+  const handleComposeSuccess = useCallback(async () => {
+    await refresh();
+  }, [refresh]);
+
   if (loading || festivalLoading) {
     return <SkeletonNewsFeed />;
   }
@@ -105,7 +136,11 @@ const NewsFeed = () => {
   if (error) {
     return (
       <Card className="w-full">
-        <NewsFeedHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+        <NewsFeedHeader
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          onCompose={handleCompose}
+        />
         <CardContent>
           <div className="py-8 text-center">
             <p className="text-muted-foreground text-sm">
@@ -113,6 +148,14 @@ const NewsFeed = () => {
             </p>
           </div>
         </CardContent>
+        {currentFestival?.id && (
+          <ComposeMessageDialog
+            open={isComposeOpen}
+            onOpenChange={setIsComposeOpen}
+            festivalId={currentFestival.id}
+            onSuccess={handleComposeSuccess}
+          />
+        )}
       </Card>
     );
   }
@@ -120,7 +163,11 @@ const NewsFeed = () => {
   if (feedItems.length === 0) {
     return (
       <Card className="w-full">
-        <NewsFeedHeader onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+        <NewsFeedHeader
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          onCompose={handleCompose}
+        />
         <CardContent>
           <div className="py-8 text-center">
             <RadioTower className="text-muted-foreground mx-auto mb-4 size-12" />
@@ -129,6 +176,14 @@ const NewsFeed = () => {
             </p>
           </div>
         </CardContent>
+        {currentFestival?.id && (
+          <ComposeMessageDialog
+            open={isComposeOpen}
+            onOpenChange={setIsComposeOpen}
+            festivalId={currentFestival.id}
+            onSuccess={handleComposeSuccess}
+          />
+        )}
       </Card>
     );
   }
@@ -139,6 +194,7 @@ const NewsFeed = () => {
         itemCount={feedItems.length}
         onRefresh={handleRefresh}
         isRefreshing={isRefreshing}
+        onCompose={handleCompose}
       />
       <CardContent>
         <div className="flex flex-col gap-4">
@@ -171,6 +227,14 @@ const NewsFeed = () => {
           )}
         </div>
       </CardContent>
+      {currentFestival?.id && (
+        <ComposeMessageDialog
+          open={isComposeOpen}
+          onOpenChange={setIsComposeOpen}
+          festivalId={currentFestival.id}
+          onSuccess={handleComposeSuccess}
+        />
+      )}
     </Card>
   );
 };

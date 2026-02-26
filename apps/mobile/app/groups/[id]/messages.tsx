@@ -79,12 +79,11 @@ export default function GroupMessagesScreen() {
 
   // Confirm delete
   const handleConfirmDelete = useCallback(async () => {
-    if (!deleteTargetId || !id) return;
+    if (!deleteTargetId) return;
     closeDialog();
 
     try {
       await deleteMutation.mutateAsync({
-        groupId: id,
         messageId: deleteTargetId,
       });
     } catch {
@@ -95,7 +94,7 @@ export default function GroupMessagesScreen() {
     } finally {
       setDeleteTargetId(null);
     }
-  }, [deleteTargetId, id, deleteMutation, closeDialog, showDialog, t]);
+  }, [deleteTargetId, deleteMutation, closeDialog, showDialog, t]);
 
   // Handle compose success
   const handleComposeSuccess = useCallback(() => {
@@ -263,7 +262,7 @@ export default function GroupMessagesScreen() {
       <ComposeMessage
         isOpen={isComposeOpen}
         onClose={() => setIsComposeOpen(false)}
-        groupId={id || ""}
+        festivalId={currentFestival?.id || ""}
         onSuccess={handleComposeSuccess}
       />
 

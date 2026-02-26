@@ -4,11 +4,11 @@ import {
   useUnifiedFeed,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { useRouter } from "expo-router";
-import { Newspaper, RefreshCw } from "lucide-react-native";
-import { useCallback } from "react";
+import { MessageSquarePlus, Newspaper, RefreshCw } from "lucide-react-native";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
+import { ComposeMessage } from "@/components/messages/compose-message";
 import { MessageItem } from "@/components/messages/message-item";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -29,14 +29,16 @@ interface UnifiedFeedProps {
 /**
  * Unified feed combining activities and group messages in chronological order.
  *
- * Renders different item types via switch on feedType,
- * reusing existing ActivityItem and MessageItem renderers.
+ * Features:
+ * - Compose button to post new messages from the home feed
+ * - Renders different item types via switch on feedType
+ * - Reuses existing ActivityItem and MessageItem renderers
  */
 export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
   const { t } = useTranslation();
-  const router = useRouter();
   const { currentFestival } = useFestival();
   const { user } = useAuth();
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
 
   const {
     feedItems,
@@ -60,12 +62,9 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleViewGroupMessages = useCallback(
-    (groupId: string) => {
-      router.push(`/groups/${groupId}/messages`);
-    },
-    [router],
-  );
+  const handleComposeSuccess = useCallback(() => {
+    refresh();
+  }, [refresh]);
 
   // Loading state
   if (loading && feedItems.length === 0) {
@@ -116,6 +115,14 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
             <Heading size="sm" className="text-typography-900">
               {t("home.unifiedFeed.title")}
             </Heading>
+            <HStack space="sm">
+              <Pressable
+                onPress={() => setIsComposeOpen(true)}
+                accessibilityLabel={t("home.unifiedFeed.compose")}
+              >
+                <MessageSquarePlus size={18} color={Colors.primary[500]} />
+              </Pressable>
+            </HStack>
           </HStack>
           <VStack className="items-center py-6">
             <Newspaper size={40} color={IconColors.disabled} />
@@ -124,6 +131,15 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
             </Text>
           </VStack>
         </VStack>
+
+        {currentFestival?.id && (
+          <ComposeMessage
+            isOpen={isComposeOpen}
+            onClose={() => setIsComposeOpen(false)}
+            festivalId={currentFestival.id}
+            onSuccess={handleComposeSuccess}
+          />
+        )}
       </Card>
     );
   }
@@ -136,13 +152,21 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
           <Heading size="sm" className="text-typography-900">
             {t("home.unifiedFeed.title")}
           </Heading>
-          <Pressable onPress={handleRefresh} disabled={isRefreshing}>
-            {isRefreshing ? (
-              <ActivityIndicator size="small" color={Colors.primary[500]} />
-            ) : (
-              <RefreshCw size={18} color={IconColors.muted} />
-            )}
-          </Pressable>
+          <HStack space="sm">
+            <Pressable
+              onPress={() => setIsComposeOpen(true)}
+              accessibilityLabel={t("home.unifiedFeed.compose")}
+            >
+              <MessageSquarePlus size={18} color={Colors.primary[500]} />
+            </Pressable>
+            <Pressable onPress={handleRefresh} disabled={isRefreshing}>
+              {isRefreshing ? (
+                <ActivityIndicator size="small" color={Colors.primary[500]} />
+              ) : (
+                <RefreshCw size={18} color={IconColors.muted} />
+              )}
+            </Pressable>
+          </HStack>
         </HStack>
 
         {/* Feed Items */}
@@ -160,7 +184,6 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
                 item={item}
                 festivalId={currentFestival?.id}
                 currentUserId={user?.id}
-                onViewGroupMessages={handleViewGroupMessages}
               />
             </View>
           ))}
@@ -185,6 +208,16 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
           </Button>
         )}
       </VStack>
+
+      {/* Compose Message Sheet */}
+      {currentFestival?.id && (
+        <ComposeMessage
+          isOpen={isComposeOpen}
+          onClose={() => setIsComposeOpen(false)}
+          festivalId={currentFestival.id}
+          onSuccess={handleComposeSuccess}
+        />
+      )}
     </Card>
   );
 }
@@ -197,28 +230,23 @@ interface FeedItemRendererProps {
   item: UnifiedFeedItem;
   festivalId?: string;
   currentUserId?: string;
-  onViewGroupMessages: (groupId: string) => void;
 }
 
 function FeedItemRenderer({
   item,
   festivalId,
   currentUserId,
-  onViewGroupMessages,
 }: FeedItemRendererProps) {
   switch (item.feedType) {
     case "activity":
       return <ActivityItem activity={item.data} festivalId={festivalId} />;
     case "message":
       return (
-        <Pressable onPress={() => onViewGroupMessages(item.data.groupId)}>
-          <MessageItem
-            message={item.data}
-            currentUserId={currentUserId}
-            showGroupName
-            festivalId={festivalId}
-          />
-        </Pressable>
+        <MessageItem
+          message={item.data}
+          currentUserId={currentUserId}
+          festivalId={festivalId}
+        />
       );
     default:
       return null;

@@ -1,7 +1,7 @@
 "use client";
 
-import type { GroupMessageFeedItem } from "@prostcounter/shared/schemas";
-import { AlertTriangle, Pin } from "lucide-react";
+import type { GroupMessageItem } from "@prostcounter/shared/schemas";
+import { AlertTriangle, Globe, Pin, Users } from "lucide-react";
 import { useMemo } from "react";
 
 import Avatar from "@/components/Avatar/Avatar";
@@ -12,7 +12,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 interface MessageItemProps {
-  message: GroupMessageFeedItem;
+  message: GroupMessageItem;
   festivalId?: string;
 }
 
@@ -65,13 +65,11 @@ export const MessageItem = ({ message, festivalId }: MessageItemProps) => {
             <span className="truncate text-sm font-medium transition-colors hover:text-yellow-600">
               {displayName}
             </span>
-            {message.groupName && (
-              <Badge
-                variant="outline"
-                className="text-muted-foreground text-xs"
-              >
-                {message.groupName}
-              </Badge>
+            {/* Visibility indicator */}
+            {message.visibility === "public" ? (
+              <Globe className="text-muted-foreground size-3" />
+            ) : (
+              <Users className="text-muted-foreground size-3" />
             )}
             {isAlert && <AlertTriangle className="size-3.5 text-yellow-600" />}
             {isPinned && <Pin className="text-muted-foreground size-3" />}

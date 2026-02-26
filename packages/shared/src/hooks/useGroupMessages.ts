@@ -1,6 +1,9 @@
 /**
  * Shared hooks for group messages
  *
+ * Messages are no longer scoped to a single group. They belong to a user + festival
+ * and are visible to all groups the user is a member of.
+ *
  * Uses ApiClientContext to get the platform-specific API client
  */
 
@@ -23,7 +26,8 @@ import type {
 } from "../schemas";
 
 /**
- * Hook to fetch messages for a specific group with pagination
+ * Hook to fetch messages for a specific group with pagination.
+ * Returns messages from all members of the group (not just messages posted to the group).
  */
 export function useGroupMessages(groupId: string) {
   const apiClient = useApiClient();
@@ -162,7 +166,7 @@ export function useMessageFeed(festivalId?: string) {
 }
 
 /**
- * Hook to post a new message
+ * Hook to post a new message (visible to all user's groups in the festival)
  */
 export function usePostMessage() {
   const apiClient = useApiClient();
@@ -170,22 +174,24 @@ export function usePostMessage() {
 
   return useMutation(
     async ({
-      groupId,
       content,
       messageType,
+      festivalId,
     }: {
-      groupId: string;
       content: string;
       messageType?: GroupMessageType;
+      festivalId: string;
     }) => {
-      return await apiClient.groupMessages.create(groupId, {
+      return await apiClient.groupMessages.create({
         content,
         messageType,
+        festivalId,
       });
     },
     {
-      onSuccess: (_data, variables) => {
-        invalidateQueries(["group-messages", variables.groupId]);
+      onSuccess: () => {
+        // Invalidate all group message caches since the message is visible everywhere
+        invalidateQueries(["group-messages"]);
         invalidateQueries(["message-feed"]);
       },
     },
@@ -201,11 +207,9 @@ export function useUpdateMessage() {
 
   return useMutation(
     async ({
-      groupId,
       messageId,
       updates,
     }: {
-      groupId: string;
       messageId: string;
       updates: {
         content?: string;
@@ -213,15 +217,11 @@ export function useUpdateMessage() {
         pinned?: boolean;
       };
     }) => {
-      return await apiClient.groupMessages.update(
-        groupId,
-        messageId,
-        updates,
-      );
+      return await apiClient.groupMessages.update(messageId, updates);
     },
     {
-      onSuccess: (_data, variables) => {
-        invalidateQueries(["group-messages", variables.groupId]);
+      onSuccess: () => {
+        invalidateQueries(["group-messages"]);
         invalidateQueries(["message-feed"]);
       },
     },
@@ -236,18 +236,12 @@ export function useDeleteMessage() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async ({
-      groupId,
-      messageId,
-    }: {
-      groupId: string;
-      messageId: string;
-    }) => {
-      return await apiClient.groupMessages.delete(groupId, messageId);
+    async ({ messageId }: { messageId: string }) => {
+      return await apiClient.groupMessages.delete(messageId);
     },
     {
-      onSuccess: (_data, variables) => {
-        invalidateQueries(["group-messages", variables.groupId]);
+      onSuccess: () => {
+        invalidateQueries(["group-messages"]);
         invalidateQueries(["message-feed"]);
       },
     },

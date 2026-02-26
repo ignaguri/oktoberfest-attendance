@@ -1,12 +1,9 @@
 import { formatRelativeTime } from "@prostcounter/shared";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  GroupMessageFeedItem,
-  GroupMessageItem,
-} from "@prostcounter/shared/schemas";
+import type { GroupMessageItem } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
-import { AlertTriangle, Pin, Trash2 } from "lucide-react-native";
+import { AlertTriangle, Globe, Pin, Trash2, Users } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
 import {
@@ -21,9 +18,8 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
 interface MessageItemProps {
-  message: GroupMessageItem | GroupMessageFeedItem;
+  message: GroupMessageItem;
   currentUserId?: string;
-  showGroupName?: boolean;
   onDelete?: (messageId: string) => void;
   festivalId?: string;
 }
@@ -36,13 +32,12 @@ interface MessageItemProps {
  * - Message content with timestamp
  * - Alert styling for alert-type messages
  * - Pin indicator for pinned messages
- * - Group name badge for cross-group feed
+ * - Visibility indicator (groups/public)
  * - Delete action for own messages
  */
 export function MessageItem({
   message,
   currentUserId,
-  showGroupName = false,
   onDelete,
   festivalId,
 }: MessageItemProps) {
@@ -81,11 +76,6 @@ export function MessageItem({
     setSelectedUserId(null);
   }, []);
 
-  const groupName =
-    showGroupName && "groupName" in message
-      ? (message as GroupMessageFeedItem).groupName
-      : null;
-
   return (
     <>
       <HStack space="sm" className={cn("py-3", isAlert && "bg-amber-50")}>
@@ -107,11 +97,11 @@ export function MessageItem({
               >
                 {displayName}
               </Text>
-              {/* Group name badge inline with username */}
-              {groupName && (
-                <Badge action="muted" variant="outline" size="sm">
-                  <BadgeText className="text-xs">{groupName}</BadgeText>
-                </Badge>
+              {/* Visibility indicator */}
+              {message.visibility === "public" ? (
+                <Globe size={12} color={IconColors.muted} />
+              ) : (
+                <Users size={12} color={IconColors.muted} />
               )}
               {isAlert && (
                 <AlertTriangle size={14} color={Colors.primary[500]} />
