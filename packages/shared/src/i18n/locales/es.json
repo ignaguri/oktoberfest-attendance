@@ -2017,6 +2017,12 @@
       "loadMore": "Cargar más",
       "error": "Error al cargar el feed de actividad"
     },
+    "unifiedFeed": {
+      "title": "Novedades",
+      "empty": "Aún no hay actividad. ¡Comenzá a documentar tu experiencia en el festival!",
+      "loadMore": "Cargar más",
+      "error": "No se pudo cargar el feed"
+    },
     "festivalOver": "Lamentablemente, {{name}} terminó. ¡Nos vemos la próxima!",
     "wrappedReady": {
       "title": "¡Tu resumen está listo!",

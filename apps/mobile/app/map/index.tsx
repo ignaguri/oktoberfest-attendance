@@ -4,7 +4,14 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { Beer, MapPin, RefreshCw } from "lucide-react-native";
+import * as WebBrowser from "expo-web-browser";
+import {
+  Beer,
+  ExternalLink,
+  Map,
+  MapPin,
+  RefreshCw,
+} from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -24,6 +31,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useLocationContext } from "@/lib/location";
+import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
 
 /**
@@ -157,6 +165,33 @@ export default function MapScreen() {
       <Box className="px-3 py-1">
         <LocationSharingToggle festivalId={currentFestival.id} />
       </Box>
+
+      {/* External festival map link */}
+      {currentFestival.mapUrl && (
+        <Pressable
+          onPress={async () => {
+            try {
+              await WebBrowser.openBrowserAsync(currentFestival.mapUrl!);
+            } catch (error) {
+              logger.error("Failed to open map URL:", error);
+            }
+          }}
+          className="mx-3 flex-row items-center justify-between rounded-lg bg-background-100 px-4 py-3"
+          accessibilityLabel={t("home.mapLink.title", {
+            festivalName: currentFestival.name,
+          })}
+        >
+          <HStack space="sm" className="items-center">
+            <Map size={18} color={IconColors.primary} />
+            <Text className="font-medium text-typography-900">
+              {t("home.mapLink.title", {
+                festivalName: currentFestival.name,
+              })}
+            </Text>
+          </HStack>
+          <ExternalLink size={16} color={IconColors.muted} />
+        </Pressable>
+      )}
 
       {/* Tabs */}
       <HStack className="px-3 py-1" space="sm">

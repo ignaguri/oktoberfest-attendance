@@ -9,6 +9,9 @@ import {
   useState,
 } from "react";
 
+import { clearAllData } from "@/lib/database/debug";
+import { getDatabase } from "@/lib/database/init";
+import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
 
 import {
@@ -118,6 +121,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     await clearAllAuthData();
+    // Clear local SQLite data to avoid stale data from previous user session
+    try {
+      const db = getDatabase();
+      await clearAllData(db);
+    } catch (error) {
+      logger.error("[Auth] Failed to clear database on sign out:", error);
+    }
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {

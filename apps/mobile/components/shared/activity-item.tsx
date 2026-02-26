@@ -248,13 +248,13 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         <VStack className="flex-1">
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
-              {getActivityIcon(activity_type, activity_data)}
               <Text
-                className="flex-1 text-sm font-medium text-typography-900"
+                className="text-sm font-medium text-typography-900"
                 numberOfLines={1}
               >
                 {displayName}
               </Text>
+              {getActivityIcon(activity_type, activity_data)}
             </HStack>
             <Text className="text-xs text-typography-400">{timeAgo}</Text>
           </HStack>

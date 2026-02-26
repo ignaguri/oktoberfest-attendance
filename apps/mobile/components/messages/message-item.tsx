@@ -88,75 +88,71 @@ export function MessageItem({
 
   return (
     <>
-      <VStack
-        space="xs"
-        className={cn("px-3 py-3", isAlert && "rounded-lg bg-amber-50")}
+      <HStack
+        space="sm"
+        className={cn("py-3", isAlert && "rounded-lg bg-amber-50 px-3")}
       >
-        <HStack space="sm" className="items-start">
-          {/* Avatar - Tappable to show profile */}
-          <TappableAvatar
-            avatarUrl={message.avatarUrl}
-            username={message.username}
-            fullName={message.fullName}
-            onPress={handleAvatarPress}
-          />
+        {/* Avatar - Tappable to show profile */}
+        <TappableAvatar
+          avatarUrl={message.avatarUrl}
+          username={message.username}
+          fullName={message.fullName}
+          onPress={handleAvatarPress}
+        />
 
-          {/* Content */}
-          <VStack className="flex-1">
-            <HStack className="items-center justify-between">
-              <HStack space="xs" className="flex-1 items-center">
-                {isAlert && (
-                  <AlertTriangle size={14} color={Colors.primary[500]} />
-                )}
-                <Text
-                  className="text-sm font-semibold text-typography-900"
-                  numberOfLines={1}
-                >
-                  {displayName}
-                </Text>
-                {/* Group name badge inline with username */}
-                {groupName && (
-                  <Badge action="muted" variant="outline" size="sm">
-                    <BadgeText className="text-xs">{groupName}</BadgeText>
-                  </Badge>
-                )}
-                {isPinned && <Pin size={12} color={IconColors.muted} />}
-              </HStack>
-              <Text className="text-xs text-typography-400">{timeAgo}</Text>
-            </HStack>
-
-            {/* Message content */}
-            <Text className="mt-1 text-sm text-typography-700">
-              {message.content}
-            </Text>
-
-            {/* Alert badge */}
-            {isAlert && (
-              <Badge
-                action="warning"
-                variant="solid"
-                size="sm"
-                className="mr-auto mt-1 bg-primary-500"
+        {/* Content */}
+        <VStack className="flex-1">
+          <HStack className="items-center justify-between">
+            <HStack space="xs" className="flex-1 items-center">
+              <Text
+                className="text-sm font-medium text-typography-900"
+                numberOfLines={1}
               >
-                <BadgeText className="text-xs text-white">
-                  {t("groups.messages.item.alert")}
-                </BadgeText>
-              </Badge>
-            )}
-          </VStack>
+                {displayName}
+              </Text>
+              {/* Group name badge inline with username */}
+              {groupName && (
+                <Badge action="muted" variant="outline" size="sm">
+                  <BadgeText className="text-xs">{groupName}</BadgeText>
+                </Badge>
+              )}
+              {isAlert && (
+                <AlertTriangle size={14} color={Colors.primary[500]} />
+              )}
+              {isPinned && <Pin size={12} color={IconColors.muted} />}
+            </HStack>
+            <Text className="text-xs text-typography-400">{timeAgo}</Text>
+          </HStack>
 
-          {/* Delete button for own messages */}
-          {isOwn && onDelete && (
-            <Pressable
-              onPress={handleDelete}
-              className="mt-1 p-1"
-              accessibilityLabel={t("common.buttons.delete")}
+          {/* Message content */}
+          <Text className="text-sm text-typography-500">{message.content}</Text>
+
+          {/* Alert badge */}
+          {isAlert && (
+            <Badge
+              action="warning"
+              variant="solid"
+              size="sm"
+              className="mr-auto mt-1 bg-primary-500"
             >
-              <Trash2 size={16} color={IconColors.muted} />
-            </Pressable>
+              <BadgeText className="text-xs text-white">
+                {t("groups.messages.item.alert")}
+              </BadgeText>
+            </Badge>
           )}
-        </HStack>
-      </VStack>
+        </VStack>
+
+        {/* Delete button for own messages */}
+        {isOwn && onDelete && (
+          <Pressable
+            onPress={handleDelete}
+            className="mt-1 p-1"
+            accessibilityLabel={t("common.buttons.delete")}
+          >
+            <Trash2 size={16} color={IconColors.muted} />
+          </Pressable>
+        )}
+      </HStack>
 
       {/* User Profile Modal */}
       <UserProfileModal

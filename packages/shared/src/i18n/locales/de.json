@@ -1766,6 +1766,12 @@
       "loadMore": "Mehr laden",
       "error": "Laden des Aktivitäts-Feeds fehlgeschlagen"
     },
+    "unifiedFeed": {
+      "title": "Was passiert",
+      "empty": "Noch keine Aktivitäten. Beginne dein Festivalerlebnis zu dokumentieren!",
+      "loadMore": "Mehr laden",
+      "error": "Feed konnte nicht geladen werden"
+    },
     "festivalOver": "Leider ist das {{name}} vorbei. Bis zum nächsten Mal!",
     "wrappedReady": {
       "title": "dein Rückblick ist fertig!",

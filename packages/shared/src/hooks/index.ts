@@ -165,6 +165,9 @@ export {
   useRemoveReaction,
 } from "./usePhotoSocial";
 
+// Unified feed hooks
+export { type UnifiedFeedItem, useUnifiedFeed } from "./useUnifiedFeed";
+
 // Crowd report hooks
 export {
   useSubmitCrowdReport,

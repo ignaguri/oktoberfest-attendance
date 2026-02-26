@@ -2017,6 +2017,12 @@
       "loadMore": "Load More",
       "error": "Failed to load activity feed"
     },
+    "unifiedFeed": {
+      "title": "What's Happening",
+      "empty": "No activity yet. Start logging your festival adventures!",
+      "loadMore": "Load More",
+      "error": "Failed to load feed"
+    },
     "festivalOver": "Sadly, {{name}} is over. See you next time!",
     "wrappedReady": {
       "title": "Your Wrapped is ready!",
