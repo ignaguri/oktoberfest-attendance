@@ -108,6 +108,19 @@
     "use-sync-external-store": "^1.2.0",
     "zod": "^4.3.6"
   },
+  "expo": {
+    "install": {
+      "exclude": [
+        "react-native-pager-view",
+        "@react-native-community/datetimepicker",
+        "@react-native-community/netinfo",
+        "@react-native-picker/picker",
+        "@sentry/react-native",
+        "react-native-svg",
+        "@types/react"
+      ]
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@react-native-community/cli": "^20.1.1",
