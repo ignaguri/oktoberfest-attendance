@@ -9,8 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: "prostcounter",
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
-  newArchEnabled: true,
-  runtimeVersion: "1.0.1-i",
+  runtimeVersion: "1.0.1-j",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },

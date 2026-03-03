@@ -19,7 +19,4 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, "node_modules"),
 ];
 
-// 3. Force Metro to resolve (sub)dependencies only from the project's node_modules
-config.resolver.disableHierarchicalLookup = true;
-
 module.exports = withNativeWind(config, { input: "./global.css" });

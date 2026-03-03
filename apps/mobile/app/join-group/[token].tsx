@@ -74,7 +74,7 @@ export default function JoinGroupByTokenScreen() {
 
   const handleViewGroup = () => {
     if (result.groupId) {
-      router.replace(`/groups/${result.groupId}`);
+      router.replace(`/group-detail/${result.groupId}`);
     }
   };
 

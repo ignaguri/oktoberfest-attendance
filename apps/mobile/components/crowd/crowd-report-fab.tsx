@@ -18,10 +18,10 @@ export function CrowdReportFab({ onPress }: CrowdReportFabProps) {
   const insets = useSafeAreaInsets();
 
   // Match the same positioning logic as QuickAttendanceFab
-  // but add extra offset to sit above it
-  const floatingTabBarHeight = 50;
-  const margin = insets.bottom === 0 ? 40 : 24;
-  const beerFabBottomOffset = floatingTabBarHeight + margin + insets.bottom;
+  // but add extra offset to sit above it.
+  // SDK 55+ NativeTabs handles its own safe area.
+  const margin = 16;
+  const beerFabBottomOffset = insets.bottom + margin;
   // Beer FAB is ~56px tall (lg size with px-5 py-5). Add gap of 12px.
   const crowdFabBottomOffset = beerFabBottomOffset + 56 + 12;
 

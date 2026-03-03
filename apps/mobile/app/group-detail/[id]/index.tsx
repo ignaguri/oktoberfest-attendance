@@ -196,7 +196,7 @@ export default function GroupDetailScreen() {
 
   // Handle settings navigation
   const handleSettings = useCallback(() => {
-    router.push(`/groups/${id}/settings`);
+    router.push(`/group-detail/${id}/settings`);
   }, [router, id]);
 
   // Handle QR code
@@ -215,12 +215,12 @@ export default function GroupDetailScreen() {
 
   // Handle gallery navigation
   const handleGallery = useCallback(() => {
-    router.push(`/groups/${id}/gallery`);
+    router.push(`/group-detail/${id}/gallery`);
   }, [router, id]);
 
   // Handle messages navigation
   const handleMessages = useCallback(() => {
-    router.push(`/groups/${id}/messages`);
+    router.push(`/group-detail/${id}/messages`);
   }, [router, id]);
 
   // Handle refresh

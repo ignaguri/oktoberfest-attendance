@@ -55,7 +55,7 @@ export default function GroupsScreen() {
   // Handlers
   const handleGroupPress = useCallback(
     (groupId: string) => {
-      router.push(`/groups/${groupId}`);
+      router.push(`/group-detail/${groupId}`);
     },
     [router],
   );
@@ -75,7 +75,7 @@ export default function GroupsScreen() {
       // Sync to pull the new group into local SQLite, then refresh
       await syncAndRefresh();
       // Navigate to the new group
-      router.push(`/groups/${groupId}`);
+      router.push(`/group-detail/${groupId}`);
     },
     [syncAndRefresh, showDialog, t, router],
   );
@@ -132,7 +132,7 @@ export default function GroupsScreen() {
         }
       >
         {hasGroups ? (
-          <VStack space="md" className="p-4 pb-32">
+          <VStack space="md" className="p-4 pb-20">
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
               <Text className="text-sm text-typography-500">

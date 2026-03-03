@@ -2,7 +2,7 @@
  * Background Sync
  *
  * Implements background data synchronization using expo-task-manager
- * and expo-background-fetch.
+ * and expo-background-task (replaces deprecated expo-background-fetch in SDK 55).
  *
  * Background sync allows the app to periodically synchronize data
  * even when the app is not in the foreground, ensuring data
@@ -10,11 +10,14 @@
  *
  * Requirements:
  * - expo-task-manager (already installed)
- * - expo-background-fetch (needs to be installed: npx expo install expo-background-fetch)
+ * - expo-background-task
  * - iOS: UIBackgroundModes includes "fetch" and "processing" in app.config.ts
  * - Android: Permissions for RECEIVE_BOOT_COMPLETED (auto-configured)
  */
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as BackgroundTask from "expo-background-task";
+import { BackgroundTaskResult } from "expo-background-task";
 import * as TaskManager from "expo-task-manager";
 import { Platform } from "react-native";
 
@@ -26,109 +29,81 @@ import { createSyncManager, type SyncResult } from "./sync/sync-manager";
 // Task name constant
 export const BACKGROUND_SYNC_TASK = "PROSTCOUNTER_BACKGROUND_SYNC";
 
-// Result type for background fetch (matches expo-background-fetch)
-export enum BackgroundFetchResult {
-  NoData = 1,
-  NewData = 2,
-  Failed = 3,
-}
+// Guard flag to ensure TaskManager.defineTask() is only called once
+let taskDefined = false;
 
 /**
- * Helper to safely load expo-background-fetch.
- * Returns null if the module is not installed.
+ * Ensures the background sync task is defined with TaskManager.
+ * Uses a guard flag to prevent multiple definitions.
+ * Must be called before registering the task.
  */
+function ensureTaskDefined() {
+  if (taskDefined) return;
+  taskDefined = true;
 
-function getBackgroundFetchModule(): any | null {
-  try {
-    // Use require to avoid TypeScript module resolution errors
+  TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
+    logger.info("[BackgroundSync] Task started");
 
-    return require("expo-background-fetch");
-  } catch {
-    return null;
-  }
+    try {
+      // Initialize database (may already be initialized)
+      const db = await initializeDatabase();
+      const syncManager = createSyncManager(db);
+
+      // Get festival and user IDs from storage
+      const festivalId = await AsyncStorage.getItem("current_festival_id");
+      const userId = await AsyncStorage.getItem("current_user_id");
+
+      if (!festivalId || !userId) {
+        logger.debug(
+          "[BackgroundSync] No festival or user ID found, skipping sync",
+        );
+        return BackgroundTaskResult.Success;
+      }
+
+      // Perform sync
+      const result: SyncResult = await syncManager.sync({
+        direction: "both",
+        festivalId,
+        userId,
+      });
+
+      logger.info("[BackgroundSync] Sync completed", {
+        pulled: result.pulled,
+        pushed: result.pushed,
+        failed: result.failed,
+      });
+
+      if (result.failed > 0) {
+        return BackgroundTaskResult.Failed;
+      }
+
+      return BackgroundTaskResult.Success;
+    } catch (error) {
+      logger.error("[BackgroundSync] Task failed:", error);
+      return BackgroundTaskResult.Failed;
+    }
+  });
 }
-
-/**
- * Define the background sync task.
- * This must be called at the module level (before app renders).
- */
-TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
-  logger.info("[BackgroundSync] Task started");
-
-  try {
-    // Initialize database (may already be initialized)
-    const db = await initializeDatabase();
-    const syncManager = createSyncManager(db);
-
-    // Get festival and user IDs from storage
-    const AsyncStorage =
-      await import("@react-native-async-storage/async-storage").then(
-        (m) => m.default,
-      );
-
-    const festivalId = await AsyncStorage.getItem("current_festival_id");
-    const userId = await AsyncStorage.getItem("current_user_id");
-
-    if (!festivalId || !userId) {
-      logger.debug(
-        "[BackgroundSync] No festival or user ID found, skipping sync",
-      );
-      return BackgroundFetchResult.NoData;
-    }
-
-    // Perform sync
-    const result: SyncResult = await syncManager.sync({
-      direction: "both",
-      festivalId,
-      userId,
-    });
-
-    logger.info("[BackgroundSync] Sync completed", {
-      pulled: result.pulled,
-      pushed: result.pushed,
-      failed: result.failed,
-    });
-
-    if (result.failed > 0) {
-      return BackgroundFetchResult.Failed;
-    }
-
-    if (result.pulled > 0 || result.pushed > 0) {
-      return BackgroundFetchResult.NewData;
-    }
-
-    return BackgroundFetchResult.NoData;
-  } catch (error) {
-    logger.error("[BackgroundSync] Task failed:", error);
-    return BackgroundFetchResult.Failed;
-  }
-});
 
 /**
  * Register the background sync task with the system.
  * Call this once when the app initializes (after user is authenticated).
  *
- * @param minimumIntervalSeconds - Minimum time between background fetches (default: 15 minutes)
+ * @param minimumIntervalMinutes - Minimum time between background tasks (default: 15 minutes)
  * @returns Promise<boolean> - Whether registration was successful
  */
 export async function registerBackgroundSync(
-  minimumIntervalSeconds: number = 15 * 60,
+  minimumIntervalMinutes: number = 15,
 ): Promise<boolean> {
-  // Background fetch only available on native platforms
+  // Background task only available on native platforms
   if (Platform.OS === "web") {
     logger.debug("[BackgroundSync] Not available on web");
     return false;
   }
 
   try {
-    const BackgroundFetch = getBackgroundFetchModule();
-
-    if (!BackgroundFetch) {
-      logger.warn(
-        "[BackgroundSync] expo-background-fetch not installed. Run: npx expo install expo-background-fetch",
-      );
-      return false;
-    }
+    // Ensure the task is defined before registering
+    ensureTaskDefined();
 
     // Check if task is already registered
     const isRegistered =
@@ -138,15 +113,13 @@ export async function registerBackgroundSync(
       return true;
     }
 
-    // Register the background fetch task
-    await BackgroundFetch.registerTaskAsync(BACKGROUND_SYNC_TASK, {
-      minimumInterval: minimumIntervalSeconds,
-      stopOnTerminate: false,
-      startOnBoot: true,
+    // Register the background task
+    await BackgroundTask.registerTaskAsync(BACKGROUND_SYNC_TASK, {
+      minimumInterval: minimumIntervalMinutes,
     });
 
     logger.info("[BackgroundSync] Task registered successfully", {
-      minimumIntervalSeconds,
+      minimumIntervalMinutes,
     });
     return true;
   } catch (error) {
@@ -171,10 +144,7 @@ export async function unregisterBackgroundSync(): Promise<boolean> {
       return true;
     }
 
-    const BackgroundFetch = getBackgroundFetchModule();
-    if (BackgroundFetch) {
-      await BackgroundFetch.unregisterTaskAsync(BACKGROUND_SYNC_TASK);
-    }
+    await BackgroundTask.unregisterTaskAsync(BACKGROUND_SYNC_TASK);
 
     logger.info("[BackgroundSync] Task unregistered");
     return true;
@@ -200,20 +170,16 @@ export async function isBackgroundSyncEnabled(): Promise<boolean> {
 }
 
 /**
- * Get the status of background fetch (iOS only).
- * Returns the system's background fetch status.
+ * Get the status of background task.
+ * Returns the system's background task status.
  */
-export async function getBackgroundFetchStatus(): Promise<number | null> {
+export async function getBackgroundTaskStatus(): Promise<number | null> {
   if (Platform.OS !== "ios") {
     return null;
   }
 
   try {
-    const BackgroundFetch = getBackgroundFetchModule();
-    if (!BackgroundFetch) {
-      return null;
-    }
-    return await BackgroundFetch.getStatusAsync();
+    return await BackgroundTask.getStatusAsync();
   } catch {
     return null;
   }
@@ -227,12 +193,10 @@ export async function setBackgroundSyncContext(
   userId: string | null,
   festivalId: string | null,
 ): Promise<void> {
-  try {
-    const AsyncStorage =
-      await import("@react-native-async-storage/async-storage").then(
-        (m) => m.default,
-      );
+  // Ensure the task is defined before setting context
+  ensureTaskDefined();
 
+  try {
     if (userId) {
       await AsyncStorage.setItem("current_user_id", userId);
     } else {

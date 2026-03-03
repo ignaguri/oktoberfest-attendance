@@ -175,7 +175,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
         <ScrollView className="flex-1">
-          <VStack space="md" className="p-4 pb-32">
+          <VStack space="md" className="p-4 pb-20">
             <AppHeader />
             <HomeSkeleton />
           </VStack>
@@ -200,7 +200,7 @@ export default function HomeScreen() {
           />
         }
       >
-        <VStack space="md" className="p-4 pb-32">
+        <VStack space="md" className="p-4 pb-20">
           {/* App Header with logo and name */}
           <AppHeader />
 

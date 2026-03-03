@@ -1,6 +1,5 @@
 import { Beer, Plus } from "lucide-react-native";
 import { useEffect, useRef } from "react";
-import { Platform, type View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fab, FabIcon } from "@/components/ui/fab";
@@ -30,7 +29,8 @@ export function QuickAttendanceFab({
 }: QuickAttendanceFabProps) {
   const insets = useSafeAreaInsets();
   const tutorial = useTutorialSafe();
-  const fabRef = useRef<View>(null);
+
+  const fabRef = useRef<any>(null);
 
   // Self-register with tutorial context for highlighting
   useEffect(() => {
@@ -40,11 +40,10 @@ export function QuickAttendanceFab({
   }, [tutorial, tutorialStepId]);
 
   // Position FAB above the native tab bar with clearance.
-  // iOS 18+: compact floating pill (~50px)
-  // Android: Material bottom navigation bar (~80px including labels)
-  const floatingTabBarHeight = Platform.OS === "android" ? 80 : 50;
-  const margin = insets.bottom === 0 ? 40 : 24;
-  const bottomOffset = floatingTabBarHeight + margin + insets.bottom;
+  // SDK 55+ NativeTabs handles its own safe area, so we only need
+  // clearance from the bottom edge + home indicator.
+  const margin = 16;
+  const bottomOffset = insets.bottom + margin;
 
   return (
     <Fab

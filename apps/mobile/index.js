@@ -1,4 +1,10 @@
-// Register background location task before app loads (required by Expo TaskManager)
-import "./lib/location/background-location";
+import { LogBox } from "react-native";
+
+// Suppress warnings from third-party dependencies and simulator limitations
+LogBox.ignoreLogs([
+  "SafeAreaView has been deprecated",
+  "EXTaskService: Cannot restore task",
+  "Background tasks are not supported on iOS simulators",
+]);
 
 import "expo-router/entry";

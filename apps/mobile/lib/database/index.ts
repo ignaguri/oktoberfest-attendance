@@ -153,8 +153,7 @@ export { isDeleted, isSynced, needsSync, stripOfflineFields } from "./types";
 // Background sync
 export {
   BACKGROUND_SYNC_TASK,
-  BackgroundFetchResult,
-  getBackgroundFetchStatus,
+  getBackgroundTaskStatus,
   isBackgroundSyncEnabled,
   registerBackgroundSync,
   setBackgroundSyncContext,
