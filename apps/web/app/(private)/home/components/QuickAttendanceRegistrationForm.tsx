@@ -29,12 +29,14 @@ import { useTranslation } from "@/lib/i18n/client";
 
 interface QuickAttendanceRegistrationFormProps {
   onAttendanceIdReceived: (attendanceId: string) => void;
+  onTentSelected?: (tentId: string) => void;
   attendanceId: string | null;
   renderPhotoUpload?: (attendanceId: string | null) => React.ReactNode;
 }
 
 export const QuickAttendanceRegistrationForm = ({
   onAttendanceIdReceived,
+  onTentSelected,
   attendanceId,
   renderPhotoUpload,
 }: QuickAttendanceRegistrationFormProps) => {
@@ -183,6 +185,11 @@ export const QuickAttendanceRegistrationForm = ({
       }
 
       toast.success(t("notifications.success.attendanceUpdated"));
+
+      // Prompt crowd report if a new tent was selected
+      if (tentsToSend.length > 0 && onTentSelected) {
+        onTentSelected(tentsToSend[0]);
+      }
     } catch {
       toast.error(t("notifications.error.attendanceUpdateFailed"));
     }
