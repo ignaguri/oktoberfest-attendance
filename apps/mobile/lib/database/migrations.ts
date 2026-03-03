@@ -15,8 +15,12 @@
 import type * as SQLite from "expo-sqlite";
 
 import { logger } from "../logger";
-import { getSchemaVersion, setSchemaVersion } from "./init";
-import { SCHEMA_VERSION, SYNCABLE_TABLES } from "./schema";
+import {
+  getSchemaVersion,
+  SCHEMA_VERSION,
+  setSchemaVersion,
+  SYNCABLE_TABLES,
+} from "./schema";
 
 // Import Drizzle-generated migrations
 const drizzleMigrations = require("../../drizzle/migrations.js");
