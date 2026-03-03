@@ -37,7 +37,7 @@
     "@gorhom/bottom-sheet": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@legendapp/motion": "^2.5.3",
-    "@novu/js": "^3.13.0",
+    "@novu/js": "^3.14.1",
     "@novu/react-native": "^3.13.0",
     "@prostcounter/api-client": "workspace:*",
     "@prostcounter/db": "workspace:*",

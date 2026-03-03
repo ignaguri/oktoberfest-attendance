@@ -152,8 +152,8 @@ importers:
         specifier: ^2.5.3
         version: 2.5.3(nativewind@4.2.1(7633e2f3970bb4c480c1d73f8b94cdb6))(react-native@0.83.2(@babel/core@7.29.0)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       '@novu/js':
-        specifier: ^3.13.0
-        version: 3.13.0
+        specifier: ^3.14.1
+        version: 3.14.1(react@19.2.0)
       '@novu/react-native':
         specifier: ^3.13.0
         version: 3.13.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -433,7 +433,7 @@ importers:
         version: 10.38.0(@opentelemetry/context-async-hooks@2.5.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.5.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.5.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(webpack@5.104.1(esbuild@0.27.2))
       '@serwist/turbopack':
         specifier: ^9.5.6
-        version: 9.5.6(@swc/helpers@0.5.18)(esbuild-wasm@0.27.3)(esbuild@0.27.2)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+        version: 9.5.6(@swc/helpers@0.5.19)(esbuild-wasm@0.27.3)(esbuild@0.27.2)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       '@supabase/auth-ui-react':
         specifier: 0.4.7
         version: 0.4.7(@supabase/supabase-js@2.95.3)
@@ -2102,17 +2102,11 @@ packages:
   '@firebase/webchannel-wrapper@1.0.5':
     resolution: {integrity: sha512-+uGNN7rkfn41HLO0vekTFhTxk61eKa8mTpRGLO0QSqlQdKvIoGAvLp3ppdVIWbTGYJWM6Kp0iN+PjMIOcnVqTw==}
 
-  '@floating-ui/core@1.7.3':
-    resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
+  '@floating-ui/core@1.7.5':
+    resolution: {integrity: sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==}
 
-  '@floating-ui/core@1.7.4':
-    resolution: {integrity: sha512-C3HlIdsBxszvm5McXlB8PeOEWfBhcGBTZGkGlWc2U0KFY5IwG5OQEuQ8rq52DZmcHDlPLd+YFBK+cZcytwIFWg==}
-
-  '@floating-ui/dom@1.7.4':
-    resolution: {integrity: sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA==}
-
-  '@floating-ui/dom@1.7.5':
-    resolution: {integrity: sha512-N0bD2kIPInNHUHehXhMke1rBGs1dwqvC9O9KYMyyjK7iXt7GAhnro7UlcuYcGdS/yYOlq0MAVgrow8IbWJwyqg==}
+  '@floating-ui/dom@1.7.6':
+    resolution: {integrity: sha512-9gZSAI5XM36880PPMm//9dfiEngYoC6Am2izES1FF406YFsjvyBMmeJ2g4SAju3xWwtuynNRFL2s9hgxpLI5SQ==}
 
   '@floating-ui/react-dom@2.1.6':
     resolution: {integrity: sha512-4JX6rEatQEvlmgU80wZyq9RT96HZJa88q8hp0pBd+LrczeDI4o6uA2M+uvxngVHo4Ihr8uibXxH6+70zhAFrVw==}
@@ -2128,6 +2122,9 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@floating-ui/utils@0.2.11':
+    resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
   '@formatjs/ecma402-abstract@2.3.6':
     resolution: {integrity: sha512-HJnTFeRM2kVFVr5gr5kH1XP6K0JcJtE7Lzvtr3FS/so5f1kpsqqqxy5JF+FRaO6H2qmcMfAUIox7AJteieRtVw==}
@@ -2453,8 +2450,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@internationalized/date@3.10.1':
-    resolution: {integrity: sha512-oJrXtQiAXLvT9clCf1K4kxp3eKsQhIaZqxEyowkBcsvZDdZkbWrVmnGknxs5flTD0VGsxrxKgBCZty1EzoiMzA==}
+  '@internationalized/date@3.11.0':
+    resolution: {integrity: sha512-BOx5huLAWhicM9/ZFs84CzP+V3gBW6vlpM02yzsdYC7TGlZJX1OJiEEHcSayF00Z+3jLlm4w79amvSt6RqKN3Q==}
 
   '@internationalized/message@3.1.8':
     resolution: {integrity: sha512-Rwk3j/TlYZhn3HQ6PyXUV0XP9Uv42jqZGNegt0BXlxjE6G3+LwHjbQZAGHhCnCPdaA6Tvd3ma/7QzLlLkJxAWA==}
@@ -2690,6 +2687,9 @@ packages:
 
   '@novu/js@3.13.0':
     resolution: {integrity: sha512-aTjVQK9r0qAFJjAmfjNdXsipnbQC7z0fNcZhDH+kDuYYzclLY+WOImZxoL1OXh/irysRrTstYDR6dL12YPmHyQ==}
+
+  '@novu/js@3.14.1':
+    resolution: {integrity: sha512-Og9IrPPunw3XleaMl8nkV0vSu0rGXE75CO/CP/upEQWpbK+KvMZbN6rF9+KTrcO1EDG6DwNjI+jhZO83KaIQNg==}
 
   '@novu/nextjs@3.13.0':
     resolution: {integrity: sha512-L6as6uMgvpo4TF7qX7FKWVNHKYyIXp0jOZketLPeBxknFcftfw3SKPV/J6H87e9SEjCWam+J4+Nv5KAOtk6YTg==}
@@ -4910,8 +4910,8 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
-  '@solid-primitives/event-listener@2.4.3':
-    resolution: {integrity: sha512-h4VqkYFv6Gf+L7SQj+Y6puigL/5DIi7x5q07VZET7AWcS+9/G3WfIE9WheniHWJs51OEkRB43w6lDys5YeFceg==}
+  '@solid-primitives/event-listener@2.4.5':
+    resolution: {integrity: sha512-nwRV558mIabl4yVAhZKY8cb6G+O1F0M6Z75ttTu5hk+SxdOnKSGj+eetDIu7Oax1P138ZdUU01qnBPR8rnxaEA==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -4925,33 +4925,33 @@ packages:
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/media@2.3.3':
-    resolution: {integrity: sha512-hQ4hLOGvfbugQi5Eu1BFWAIJGIAzztq9x0h02xgBGl2l0Jaa3h7tg6bz5tV1NSuNYVGio4rPoa7zVQQLkkx9dA==}
+  '@solid-primitives/media@2.3.5':
+    resolution: {integrity: sha512-LX9fB5WDaK87FMDtUB1qokBOfT2et9Uobv/zZaKLH9caFSz4+P70MBKEIBHcZQy+9MV5M2XvGYLTbLskjkzMjA==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/props@3.2.2':
-    resolution: {integrity: sha512-lZOTwFJajBrshSyg14nBMEP0h8MXzPowGO0s3OeiR3z6nXHTfj0FhzDtJMv+VYoRJKQHG2QRnJTgCzK6erARAw==}
+  '@solid-primitives/props@3.2.3':
+    resolution: {integrity: sha512-XzG6en9gSFwmvbKcATm2BxL63HegZ+BAG5fmHi8jyBppQHcaths7ffz+6vYvwYy3nlgLa20ufJLj7tst+PcHFA==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/refs@1.1.2':
-    resolution: {integrity: sha512-K7tf2thy7L+YJjdqXspXOg5xvNEOH8tgEWsp0+1mQk3obHBRD6hEjYZk7p7FlJphSZImS35je3UfmWuD7MhDfg==}
+  '@solid-primitives/refs@1.1.3':
+    resolution: {integrity: sha512-aam02fjNKpBteewF/UliPSQCVJsIIGOLEWQOh+ll6R/QePzBOOBMcC4G+5jTaO75JuUS1d/14Q1YXT3X0Ow6iA==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/resize-observer@2.1.3':
-    resolution: {integrity: sha512-zBLje5E06TgOg93S7rGPldmhDnouNGhvfZVKOp+oG2XU8snA+GoCSSCz1M+jpNAg5Ek2EakU5UVQqL152WmdXQ==}
+  '@solid-primitives/resize-observer@2.1.5':
+    resolution: {integrity: sha512-AiyTknKcNBaKHbcSMuxtSNM8FjIuiSuFyFghdD0TcCMU9hKi9EmsC5pjfjDwxE+5EueB1a+T/34PLRI5vbBbKw==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/rootless@1.5.2':
-    resolution: {integrity: sha512-9HULb0QAzL2r47CCad0M+NKFtQ+LrGGNHZfteX/ThdGvKIg2o2GYhBooZubTCd/RTu2l2+Nw4s+dEfiDGvdrrQ==}
+  '@solid-primitives/rootless@1.5.3':
+    resolution: {integrity: sha512-N8cIDAHbWcLahNRLr0knAAQvXyEdEMoAZvIMZKmhNb1mlx9e2UOv9BRD5YNwQUJwbNoYVhhLwFOEOcVXFx0HqA==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/static-store@0.1.2':
-    resolution: {integrity: sha512-ReK+5O38lJ7fT+L6mUFvUr6igFwHBESZF+2Ug842s7fvlVeBdIVEdTCErygff6w7uR6+jrr7J8jQo+cYrEq4Iw==}
+  '@solid-primitives/static-store@0.1.3':
+    resolution: {integrity: sha512-uxez7SXnr5GiRnzqO2IEDjOJRIXaG+0LZLBizmUA1FwSi+hrpuMzVBwyk70m4prcl8X6FDDXUl9O8hSq8wHbBQ==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -4960,13 +4960,13 @@ packages:
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/trigger@1.2.2':
-    resolution: {integrity: sha512-IWoptVc0SWYgmpBPpCMehS5b07+tpFcvw15tOQ3QbXedSYn6KP8zCjPkHNzMxcOvOicTneleeZDP7lqmz+PQ6g==}
+  '@solid-primitives/trigger@1.2.3':
+    resolution: {integrity: sha512-Za2JebEiDyfamjmDwRaESYqBBYOlgYGzB8kHYH0QrkXyLf2qNADlKdGN+z3vWSLCTDcKxChS43Kssjuc0OZhng==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/utils@6.3.2':
-    resolution: {integrity: sha512-hZ/M/qr25QOCcwDPOHtGjxTD8w2mNyVAYvcfgwzBHq2RwNqHNdDNsMZYap20+ruRwW4A3Cdkczyoz0TSxLCAPQ==}
+  '@solid-primitives/utils@6.4.0':
+    resolution: {integrity: sha512-AeGTBg8Wtkh/0s+evyLtP8piQoS4wyqqQaAFs2HJcFMMjYAtUgo+ZPduRXLjPlqKVc2ejeR544oeqpbn8Egn8A==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -5095,6 +5095,9 @@ packages:
 
   '@swc/helpers@0.5.18':
     resolution: {integrity: sha512-TXTnIcNJQEKwThMMqBXsZ4VGAza6bvN4pa41Rkqoio6QBKMvo+5lexeTMScGCIxtzgQJzElcvIltani+adC5PQ==}
+
+  '@swc/helpers@0.5.19':
+    resolution: {integrity: sha512-QamiFeIK3txNjgUTNppE6MiG3p7TdninpZu0E0PbqVh1a9FNLT2FRhisaa4NcaX52XVhA5l7Pk58Ft7Sqi/2sA==}
 
   '@swc/types@0.1.25':
     resolution: {integrity: sha512-iAoY/qRhNH8a/hBvm3zKj9qQ4oc2+3w1unPJa2XvTK3XjeLXtzcCingVPw/9e5mn1+0yPqxcBGp9Jf0pkfMb1g==}
@@ -5817,6 +5820,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  acorn@8.16.0:
+    resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -5843,6 +5851,9 @@ packages:
 
   ajv@8.17.1:
     resolution: {integrity: sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==}
+
+  ajv@8.18.0:
+    resolution: {integrity: sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==}
 
   anser@1.4.10:
     resolution: {integrity: sha512-hCv9AqTQ8ycjpSd3upOJd7vFwW1JaoYQ7tpham03GJ1ca8/65rqn0RpaWpItOAd6ylW9wAw6luXYPJIyPFVOww==}
@@ -6788,8 +6799,8 @@ packages:
     resolution: {integrity: sha512-LgQMM4WXU3QI+SYgEc2liRgznaD5ojbmY3sb8LxyguVkIg5FxdpTkvk72te2R38/TGKxH634oLxXRGY6d7AP+Q==}
     engines: {node: '>=10.13.0'}
 
-  enhanced-resolve@5.19.0:
-    resolution: {integrity: sha512-phv3E1Xl4tQOShqSte26C7Fl84EwUdZsyOuSSk9qtAGyyQs2s3jJzComh+Abf4g187lUUAvH+H26omrqia2aGg==}
+  enhanced-resolve@5.20.0:
+    resolution: {integrity: sha512-/ce7+jQ1PQ6rVXwe+jKEg5hW5ciicHwIQUagZkp6IufBoY3YDgdTTY1azVs0qoRgVmvsNB+rbjLJxDAeHHtwsQ==}
     engines: {node: '>=10.13.0'}
 
   entities@4.5.0:
@@ -8839,8 +8850,13 @@ packages:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
 
-  partysocket@1.1.11:
-    resolution: {integrity: sha512-P0EtOQiAwvLriqLgdThcSaREfz3bP77LkLSdmXq680BosPKvGSoGTh/d0g3S+UNmaqcw89Ad7JXHHKyRx3xU9Q==}
+  partysocket@1.1.16:
+    resolution: {integrity: sha512-d7xFv+ZC7x0p/DAHWJ5FhxQhimIx+ucyZY+kxL0cKddLBmK9c4p2tEA/L+dOOrWm6EYrRwrBjKQV0uSzOY9x1w==}
+    peerDependencies:
+      react: 19.2.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   patch-package@8.0.1:
     resolution: {integrity: sha512-VsKRIA8f5uqHQ7NGhwIna6Bx6D9s/1iXlA1hthBVBEbkq+t4kXD0HHt+rJhf/Z+Ci0F/HCB2hvn0qLdLG+Qxlw==}
@@ -9174,9 +9190,6 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
-
-  randombytes@2.1.0:
-    resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -9638,9 +9651,6 @@ packages:
     resolution: {integrity: sha512-ghgmKt5o4Tly5yEG/UJp8qTd0AN7Xalw4XBtDEKP655B699qMEtra1WlXeE6WIvdEG481JvRxULKsInq/iNysw==}
     engines: {node: '>=0.10.0'}
 
-  serialize-javascript@6.0.2:
-    resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}
-
   seroval-plugins@1.5.0:
     resolution: {integrity: sha512-EAHqADIQondwRZIdeW2I636zgsODzoBDwb3PT/+7TLDWyw1Dy/Xv7iGUIEXXav7usHDE9HVhOU61irI3EnyyHA==}
     engines: {node: '>=10'}
@@ -10052,13 +10062,14 @@ packages:
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   terminal-link@2.1.1:
     resolution: {integrity: sha512-un0FmiRUQNr5PJqy9kP7c40F5BOfpGlYTrxonDChEZB7pzZxRNp/bt+ymiy9/npwXya9KH99nJ/GXFIiUkYGFQ==}
     engines: {node: '>=8'}
 
-  terser-webpack-plugin@5.3.16:
-    resolution: {integrity: sha512-h9oBFCWrq78NyWWVcSwZarJkZ01c2AyGrzs1crmHZO3QUg9D61Wu4NPjBy69n7JqylFF5y+CsUZYmYEIZ3mR+Q==}
+  terser-webpack-plugin@5.3.17:
+    resolution: {integrity: sha512-YR7PtUp6GMU91BgSJmlaX/rS2lGDbAF7D+Wtq7hRO+MiljNmodYvqslzCFiYVAgW+Qoaaia/QUIP4lGXufjdZw==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
       '@swc/core': '*'
@@ -10506,6 +10517,10 @@ packages:
 
   webpack-sources@3.3.3:
     resolution: {integrity: sha512-yd1RBzSGanHkitROoPFd6qsrxt+oFhg/129YzheDGqeustzX0vTZJZsSsQjVQC4yzBQ56K55XU8gaNCtIzOnTg==}
+    engines: {node: '>=10.13.0'}
+
+  webpack-sources@3.3.4:
+    resolution: {integrity: sha512-7tP1PdV4vF+lYPnkMR0jMY5/la2ub5Fc/8VQrrU+lXkiM6C4TjVfGw7iKfyhnTQOsD+6Q/iKw0eFciziRgD58Q==}
     engines: {node: '>=10.13.0'}
 
   webpack-virtual-modules@0.5.0:
@@ -11545,7 +11560,7 @@ snapshots:
 
   '@corvu/utils@0.4.2(solid-js@1.9.11)':
     dependencies:
-      '@floating-ui/dom': 1.7.5
+      '@floating-ui/dom': 1.7.6
       solid-js: 1.9.11
 
   '@date-fns/tz@1.4.1': {}
@@ -12739,27 +12754,18 @@ snapshots:
 
   '@firebase/webchannel-wrapper@1.0.5': {}
 
-  '@floating-ui/core@1.7.3':
+  '@floating-ui/core@1.7.5':
     dependencies:
-      '@floating-ui/utils': 0.2.10
+      '@floating-ui/utils': 0.2.11
 
-  '@floating-ui/core@1.7.4':
+  '@floating-ui/dom@1.7.6':
     dependencies:
-      '@floating-ui/utils': 0.2.10
-
-  '@floating-ui/dom@1.7.4':
-    dependencies:
-      '@floating-ui/core': 1.7.3
-      '@floating-ui/utils': 0.2.10
-
-  '@floating-ui/dom@1.7.5':
-    dependencies:
-      '@floating-ui/core': 1.7.4
-      '@floating-ui/utils': 0.2.10
+      '@floating-ui/core': 1.7.5
+      '@floating-ui/utils': 0.2.11
 
   '@floating-ui/react-dom@2.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@floating-ui/dom': 1.7.4
+      '@floating-ui/dom': 1.7.6
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
@@ -12772,6 +12778,8 @@ snapshots:
       tabbable: 6.4.0
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@floating-ui/utils@0.2.11': {}
 
   '@formatjs/ecma402-abstract@2.3.6':
     dependencies:
@@ -13113,9 +13121,9 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@internationalized/date@3.10.1':
+  '@internationalized/date@3.11.0':
     dependencies:
-      '@swc/helpers': 0.5.18
+      '@swc/helpers': 0.5.19
 
   '@internationalized/message@3.1.8':
     dependencies:
@@ -13124,7 +13132,7 @@ snapshots:
 
   '@internationalized/number@3.6.5':
     dependencies:
-      '@swc/helpers': 0.5.18
+      '@swc/helpers': 0.5.19
 
   '@internationalized/string@3.2.7':
     dependencies:
@@ -13234,25 +13242,25 @@ snapshots:
 
   '@kobalte/core@0.13.11(solid-js@1.9.11)':
     dependencies:
-      '@floating-ui/dom': 1.7.5
-      '@internationalized/date': 3.10.1
+      '@floating-ui/dom': 1.7.6
+      '@internationalized/date': 3.11.0
       '@internationalized/number': 3.6.5
       '@kobalte/utils': 0.9.1(solid-js@1.9.11)
-      '@solid-primitives/props': 3.2.2(solid-js@1.9.11)
-      '@solid-primitives/resize-observer': 2.1.3(solid-js@1.9.11)
+      '@solid-primitives/props': 3.2.3(solid-js@1.9.11)
+      '@solid-primitives/resize-observer': 2.1.5(solid-js@1.9.11)
       solid-js: 1.9.11
       solid-presence: 0.1.8(solid-js@1.9.11)
       solid-prevent-scroll: 0.1.10(solid-js@1.9.11)
 
   '@kobalte/utils@0.9.1(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.3(solid-js@1.9.11)
+      '@solid-primitives/event-listener': 2.4.5(solid-js@1.9.11)
       '@solid-primitives/keyed': 1.5.3(solid-js@1.9.11)
       '@solid-primitives/map': 0.4.13(solid-js@1.9.11)
-      '@solid-primitives/media': 2.3.3(solid-js@1.9.11)
-      '@solid-primitives/props': 3.2.2(solid-js@1.9.11)
-      '@solid-primitives/refs': 1.1.2(solid-js@1.9.11)
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/media': 2.3.5(solid-js@1.9.11)
+      '@solid-primitives/props': 3.2.3(solid-js@1.9.11)
+      '@solid-primitives/refs': 1.1.3(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
   '@legendapp/motion@2.5.3(nativewind@4.2.1(7633e2f3970bb4c480c1d73f8b94cdb6))(react-native@0.83.2(@babel/core@7.29.0)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)':
@@ -13381,23 +13389,45 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@novu/js@3.13.0':
+  '@novu/js@3.13.0(react@19.2.0)':
     dependencies:
-      '@floating-ui/dom': 1.7.5
+      '@floating-ui/dom': 1.7.6
       '@kobalte/core': 0.13.11(solid-js@1.9.11)
       '@types/json-logic-js': 2.0.8
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       event-target-polyfill: 0.0.4
       mitt: 3.0.1
-      partysocket: 1.1.11
+      partysocket: 1.1.16(react@19.2.0)
       socket.io-client: 4.7.2
-      solid-floating-ui: 0.3.1(@floating-ui/dom@1.7.5)(solid-js@1.9.11)
+      solid-floating-ui: 0.3.1(@floating-ui/dom@1.7.6)(solid-js@1.9.11)
       solid-js: 1.9.11
       solid-motionone: 1.0.4(solid-js@1.9.11)
       tailwind-merge: 2.6.1
     transitivePeerDependencies:
       - bufferutil
+      - react
+      - supports-color
+      - utf-8-validate
+
+  '@novu/js@3.14.1(react@19.2.0)':
+    dependencies:
+      '@floating-ui/dom': 1.7.6
+      '@kobalte/core': 0.13.11(solid-js@1.9.11)
+      '@types/json-logic-js': 2.0.8
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      event-target-polyfill: 0.0.4
+      mitt: 3.0.1
+      partysocket: 1.1.16(react@19.2.0)
+      socket.io-client: 4.7.2
+      solid-floating-ui: 0.3.1(@floating-ui/dom@1.7.6)(solid-js@1.9.11)
+      solid-js: 1.9.11
+      solid-motionone: 1.0.4(solid-js@1.9.11)
+      tailwind-merge: 2.6.1
+    transitivePeerDependencies:
+      - bufferutil
+      - react
       - supports-color
       - utf-8-validate
 
@@ -13425,7 +13455,7 @@ snapshots:
 
   '@novu/react@3.13.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@novu/js': 3.13.0
+      '@novu/js': 3.13.0(react@19.2.0)
       react: 19.2.0
     optionalDependencies:
       react-dom: 19.2.0(react@19.2.0)
@@ -14655,7 +14685,7 @@ snapshots:
 
   '@react-aria/calendar@3.9.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@react-aria/i18n': 3.12.14(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@react-aria/interactions': 3.26.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@react-aria/live-announcer': 3.4.4
@@ -14738,7 +14768,7 @@ snapshots:
 
   '@react-aria/datepicker@3.15.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@internationalized/number': 3.6.5
       '@internationalized/string': 3.2.7
       '@react-aria/focus': 3.21.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -14851,7 +14881,7 @@ snapshots:
 
   '@react-aria/i18n@3.12.14(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@internationalized/message': 3.1.8
       '@internationalized/number': 3.6.5
       '@internationalized/string': 3.2.7
@@ -15176,7 +15206,7 @@ snapshots:
       '@react-stately/toggle': 3.9.3(react@19.2.0)
       '@react-types/checkbox': 3.10.2(react@19.2.0)
       '@react-types/shared': 3.32.1(react@19.2.0)
-      '@swc/helpers': 0.5.18
+      '@swc/helpers': 0.5.19
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
@@ -15753,7 +15783,7 @@ snapshots:
 
   '@react-stately/calendar@3.9.1(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@react-stately/utils': 3.11.0(react@19.2.0)
       '@react-types/calendar': 3.8.1(react@19.2.0)
       '@react-types/shared': 3.32.1(react@19.2.0)
@@ -15808,7 +15838,7 @@ snapshots:
 
   '@react-stately/datepicker@3.15.3(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@internationalized/string': 3.2.7
       '@react-stately/form': 3.2.2(react@19.2.0)
       '@react-stately/overlays': 3.6.21(react@19.2.0)
@@ -15996,7 +16026,7 @@ snapshots:
 
   '@react-types/calendar@3.8.1(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@react-types/shared': 3.32.1(react@19.2.0)
       react: 19.2.0
 
@@ -16018,7 +16048,7 @@ snapshots:
 
   '@react-types/datepicker@3.13.3(react@19.2.0)':
     dependencies:
-      '@internationalized/date': 3.10.1
+      '@internationalized/date': 3.11.0
       '@react-types/calendar': 3.8.1(react@19.2.0)
       '@react-types/overlays': 3.9.2(react@19.2.0)
       '@react-types/shared': 3.32.1(react@19.2.0)
@@ -16522,12 +16552,12 @@ snapshots:
     transitivePeerDependencies:
       - browserslist
 
-  '@serwist/turbopack@9.5.6(@swc/helpers@0.5.18)(esbuild-wasm@0.27.3)(esbuild@0.27.2)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)':
+  '@serwist/turbopack@9.5.6(@swc/helpers@0.5.19)(esbuild-wasm@0.27.3)(esbuild@0.27.2)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)':
     dependencies:
       '@serwist/build': 9.5.6(browserslist@4.28.1)(typescript@5.9.3)
       '@serwist/utils': 9.5.6(browserslist@4.28.1)
       '@serwist/window': 9.5.6(browserslist@4.28.1)(typescript@5.9.3)
-      '@swc/core': 1.15.11(@swc/helpers@0.5.18)
+      '@swc/core': 1.15.11(@swc/helpers@0.5.19)
       browserslist: 4.28.1
       kolorist: 1.8.0
       next: 16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -16575,9 +16605,9 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@solid-primitives/event-listener@2.4.3(solid-js@1.9.11)':
+  '@solid-primitives/event-listener@2.4.5(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
   '@solid-primitives/keyed@1.5.3(solid-js@1.9.11)':
@@ -16586,55 +16616,55 @@ snapshots:
 
   '@solid-primitives/map@0.4.13(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/trigger': 1.2.2(solid-js@1.9.11)
+      '@solid-primitives/trigger': 1.2.3(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/media@2.3.3(solid-js@1.9.11)':
+  '@solid-primitives/media@2.3.5(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.3(solid-js@1.9.11)
-      '@solid-primitives/rootless': 1.5.2(solid-js@1.9.11)
-      '@solid-primitives/static-store': 0.1.2(solid-js@1.9.11)
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/event-listener': 2.4.5(solid-js@1.9.11)
+      '@solid-primitives/rootless': 1.5.3(solid-js@1.9.11)
+      '@solid-primitives/static-store': 0.1.3(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/props@3.2.2(solid-js@1.9.11)':
+  '@solid-primitives/props@3.2.3(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/refs@1.1.2(solid-js@1.9.11)':
+  '@solid-primitives/refs@1.1.3(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/resize-observer@2.1.3(solid-js@1.9.11)':
+  '@solid-primitives/resize-observer@2.1.5(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.3(solid-js@1.9.11)
-      '@solid-primitives/rootless': 1.5.2(solid-js@1.9.11)
-      '@solid-primitives/static-store': 0.1.2(solid-js@1.9.11)
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/event-listener': 2.4.5(solid-js@1.9.11)
+      '@solid-primitives/rootless': 1.5.3(solid-js@1.9.11)
+      '@solid-primitives/static-store': 0.1.3(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/rootless@1.5.2(solid-js@1.9.11)':
+  '@solid-primitives/rootless@1.5.3(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/static-store@0.1.2(solid-js@1.9.11)':
+  '@solid-primitives/static-store@0.1.3(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
   '@solid-primitives/transition-group@1.1.2(solid-js@1.9.11)':
     dependencies:
       solid-js: 1.9.11
 
-  '@solid-primitives/trigger@1.2.2(solid-js@1.9.11)':
+  '@solid-primitives/trigger@1.2.3(solid-js@1.9.11)':
     dependencies:
-      '@solid-primitives/utils': 6.3.2(solid-js@1.9.11)
+      '@solid-primitives/utils': 6.4.0(solid-js@1.9.11)
       solid-js: 1.9.11
 
-  '@solid-primitives/utils@6.3.2(solid-js@1.9.11)':
+  '@solid-primitives/utils@6.4.0(solid-js@1.9.11)':
     dependencies:
       solid-js: 1.9.11
 
@@ -16730,7 +16760,7 @@ snapshots:
   '@swc/core-win32-x64-msvc@1.15.11':
     optional: true
 
-  '@swc/core@1.15.11(@swc/helpers@0.5.18)':
+  '@swc/core@1.15.11(@swc/helpers@0.5.19)':
     dependencies:
       '@swc/counter': 0.1.3
       '@swc/types': 0.1.25
@@ -16745,7 +16775,7 @@ snapshots:
       '@swc/core-win32-arm64-msvc': 1.15.11
       '@swc/core-win32-ia32-msvc': 1.15.11
       '@swc/core-win32-x64-msvc': 1.15.11
-      '@swc/helpers': 0.5.18
+      '@swc/helpers': 0.5.19
 
   '@swc/counter@0.1.3': {}
 
@@ -16754,6 +16784,10 @@ snapshots:
       tslib: 2.8.1
 
   '@swc/helpers@0.5.18':
+    dependencies:
+      tslib: 2.8.1
+
+  '@swc/helpers@0.5.19':
     dependencies:
       tslib: 2.8.1
 
@@ -17542,15 +17576,17 @@ snapshots:
     dependencies:
       acorn: 8.15.0
 
-  acorn-import-phases@1.0.4(acorn@8.15.0):
+  acorn-import-phases@1.0.4(acorn@8.16.0):
     dependencies:
-      acorn: 8.15.0
+      acorn: 8.16.0
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
       acorn: 8.15.0
 
   acorn@8.15.0: {}
+
+  acorn@8.16.0: {}
 
   agent-base@6.0.2:
     dependencies:
@@ -17564,9 +17600,13 @@ snapshots:
     optionalDependencies:
       ajv: 8.17.1
 
-  ajv-keywords@5.1.0(ajv@8.17.1):
+  ajv-formats@2.1.1(ajv@8.18.0):
+    optionalDependencies:
+      ajv: 8.18.0
+
+  ajv-keywords@5.1.0(ajv@8.18.0):
     dependencies:
-      ajv: 8.17.1
+      ajv: 8.18.0
       fast-deep-equal: 3.1.3
 
   ajv@6.12.6:
@@ -17577,6 +17617,13 @@ snapshots:
       uri-js: 4.4.1
 
   ajv@8.17.1:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      fast-uri: 3.1.0
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+
+  ajv@8.18.0:
     dependencies:
       fast-deep-equal: 3.1.3
       fast-uri: 3.1.0
@@ -18502,7 +18549,7 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.3.0
 
-  enhanced-resolve@5.19.0:
+  enhanced-resolve@5.20.0:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.0
@@ -21129,9 +21176,11 @@ snapshots:
 
   parseurl@1.3.3: {}
 
-  partysocket@1.1.11:
+  partysocket@1.1.16(react@19.2.0):
     dependencies:
       event-target-polyfill: 0.0.4
+    optionalDependencies:
+      react: 19.2.0
 
   patch-package@8.0.1:
     dependencies:
@@ -21475,10 +21524,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
-  randombytes@2.1.0:
-    dependencies:
-      safe-buffer: 5.2.1
 
   range-parser@1.2.1: {}
 
@@ -22085,9 +22130,9 @@ snapshots:
   schema-utils@4.3.3:
     dependencies:
       '@types/json-schema': 7.0.15
-      ajv: 8.17.1
-      ajv-formats: 2.1.1(ajv@8.17.1)
-      ajv-keywords: 5.1.0(ajv@8.17.1)
+      ajv: 8.18.0
+      ajv-formats: 2.1.1(ajv@8.18.0)
+      ajv-keywords: 5.1.0(ajv@8.18.0)
 
   secure-json-parse@4.1.0: {}
 
@@ -22118,10 +22163,6 @@ snapshots:
       - supports-color
 
   serialize-error@2.1.0: {}
-
-  serialize-javascript@6.0.2:
-    dependencies:
-      randombytes: 2.1.0
 
   seroval-plugins@1.5.0(seroval@1.5.0):
     dependencies:
@@ -22297,9 +22338,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  solid-floating-ui@0.3.1(@floating-ui/dom@1.7.5)(solid-js@1.9.11):
+  solid-floating-ui@0.3.1(@floating-ui/dom@1.7.6)(solid-js@1.9.11):
     dependencies:
-      '@floating-ui/dom': 1.7.5
+      '@floating-ui/dom': 1.7.6
       solid-js: 1.9.11
 
   solid-js@1.9.11:
@@ -22312,8 +22353,8 @@ snapshots:
     dependencies:
       '@motionone/dom': 10.18.0
       '@motionone/utils': 10.18.0
-      '@solid-primitives/props': 3.2.2(solid-js@1.9.11)
-      '@solid-primitives/refs': 1.1.2(solid-js@1.9.11)
+      '@solid-primitives/props': 3.2.3(solid-js@1.9.11)
+      '@solid-primitives/refs': 1.1.3(solid-js@1.9.11)
       '@solid-primitives/transition-group': 1.1.2(solid-js@1.9.11)
       csstype: 3.2.3
       solid-js: 1.9.11
@@ -22604,12 +22645,11 @@ snapshots:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
 
-  terser-webpack-plugin@5.3.16(esbuild@0.27.2)(webpack@5.104.1(esbuild@0.27.2)):
+  terser-webpack-plugin@5.3.17(esbuild@0.27.2)(webpack@5.104.1(esbuild@0.27.2)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
-      serialize-javascript: 6.0.2
       terser: 5.46.0
       webpack: 5.104.1(esbuild@0.27.2)
     optionalDependencies:
@@ -23104,6 +23144,8 @@ snapshots:
 
   webpack-sources@3.3.3: {}
 
+  webpack-sources@3.3.4: {}
+
   webpack-virtual-modules@0.5.0: {}
 
   webpack@5.104.1(esbuild@0.27.2):
@@ -23114,11 +23156,11 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@webassemblyjs/wasm-edit': 1.14.1
       '@webassemblyjs/wasm-parser': 1.14.1
-      acorn: 8.15.0
-      acorn-import-phases: 1.0.4(acorn@8.15.0)
+      acorn: 8.16.0
+      acorn-import-phases: 1.0.4(acorn@8.16.0)
       browserslist: 4.28.1
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.19.0
+      enhanced-resolve: 5.20.0
       es-module-lexer: 2.0.0
       eslint-scope: 5.1.1
       events: 3.3.0
@@ -23130,9 +23172,9 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.3.16(esbuild@0.27.2)(webpack@5.104.1(esbuild@0.27.2))
+      terser-webpack-plugin: 5.3.17(esbuild@0.27.2)(webpack@5.104.1(esbuild@0.27.2))
       watchpack: 2.5.1
-      webpack-sources: 3.3.3
+      webpack-sources: 3.3.4
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
