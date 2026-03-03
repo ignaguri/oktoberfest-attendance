@@ -1,7 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import { CalendarDays, Images } from "lucide-react";
+import { CalendarDays, Images, MessageSquare } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Link } from "next-view-transitions";
 
@@ -143,7 +143,7 @@ export default function GroupPage() {
         />
 
         <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <Button asChild variant="outline">
               <Link href={`/groups/${groupId}/calendar`}>
                 <CalendarDays size={24} />
@@ -154,6 +154,12 @@ export default function GroupPage() {
               <Link href={`/groups/${groupId}/gallery`}>
                 <Images size={24} />
                 <span className="ml-2">{t("groups.settings.gallery")}</span>
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href={`/groups/${groupId}/messages`}>
+                <MessageSquare size={24} />
+                <span className="ml-2">{t("groups.messages.title")}</span>
               </Link>
             </Button>
           </div>
