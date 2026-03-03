@@ -19,9 +19,10 @@ export function CrowdReportFab({ onPress }: CrowdReportFabProps) {
 
   // Match the same positioning logic as QuickAttendanceFab
   // but add extra offset to sit above it.
-  // SDK 55+ NativeTabs handles its own safe area.
-  const margin = 16;
-  const beerFabBottomOffset = insets.bottom + margin;
+  // iOS native tab bar is ~50px; use larger margin when no home indicator.
+  const nativeTabBarHeight = 50;
+  const margin = insets.bottom === 0 ? 40 : 24;
+  const beerFabBottomOffset = nativeTabBarHeight + margin + insets.bottom;
   // Beer FAB is ~56px tall (lg size with px-5 py-5). Add gap of 12px.
   const crowdFabBottomOffset = beerFabBottomOffset + 56 + 12;
 

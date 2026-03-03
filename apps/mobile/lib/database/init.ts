@@ -9,6 +9,7 @@ import * as SQLite from "expo-sqlite";
 
 import { logger } from "@/lib/logger";
 
+import { runMigrations } from "./migrations";
 import {
   CREATE_INDEXES_SQL,
   CREATE_TABLES_SQL,
@@ -255,8 +256,6 @@ export async function resetDatabase(): Promise<void> {
 
   // Reinitialize with migrations
   const db = await openDatabase();
-  // Import here to avoid circular dependency
-  const { runMigrations } = await import("./migrations");
   await runMigrations(db);
   logger.debug("[Database] Database reset complete");
 }
@@ -298,7 +297,6 @@ export async function initializeDatabase(): Promise<SQLite.SQLiteDatabase> {
       const version = await getSchemaVersion(db);
       if (version < SCHEMA_VERSION) {
         // Fresh database or needs migration
-        const { runMigrations } = await import("./migrations");
         await runMigrations(db);
         logger.debug(
           `[Database] Migrations complete: v${version} -> v${SCHEMA_VERSION}`,

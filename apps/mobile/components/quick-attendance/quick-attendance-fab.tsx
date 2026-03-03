@@ -40,10 +40,10 @@ export function QuickAttendanceFab({
   }, [tutorial, tutorialStepId]);
 
   // Position FAB above the native tab bar with clearance.
-  // SDK 55+ NativeTabs handles its own safe area, so we only need
-  // clearance from the bottom edge + home indicator.
-  const margin = 16;
-  const bottomOffset = insets.bottom + margin;
+  // iOS native tab bar is ~50px; use larger margin when no home indicator.
+  const nativeTabBarHeight = 50;
+  const margin = insets.bottom === 0 ? 40 : 24;
+  const bottomOffset = nativeTabBarHeight + margin + insets.bottom;
 
   return (
     <Fab
