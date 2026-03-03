@@ -9,10 +9,12 @@ import * as SQLite from "expo-sqlite";
 
 import { logger } from "@/lib/logger";
 
+import { runMigrations } from "./migrations";
 import {
   CREATE_INDEXES_SQL,
   CREATE_TABLES_SQL,
   DATABASE_NAME,
+  getSchemaVersion,
   SCHEMA_VERSION,
   SYNCABLE_TABLES,
   TABLE_CREATION_ORDER,
@@ -133,42 +135,8 @@ async function initializeSyncMetadata(
   logger.debug("[Database] Sync metadata initialized");
 }
 
-/**
- * Gets the current schema version from the database.
- * Returns 0 if no version is set.
- */
-export async function getSchemaVersion(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
-  try {
-    const result = await db.getFirstAsync<{ user_version: number }>(
-      "PRAGMA user_version",
-    );
-    return result?.user_version ?? 0;
-  } catch {
-    return 0;
-  }
-}
-
-/**
- * Sets the schema version in the database.
- */
-export async function setSchemaVersion(
-  db: SQLite.SQLiteDatabase,
-  version: number,
-): Promise<void> {
-  await db.execAsync(`PRAGMA user_version = ${version}`);
-}
-
-/**
- * Checks if the database needs migration.
- */
-export async function needsMigration(
-  db: SQLite.SQLiteDatabase,
-): Promise<boolean> {
-  const currentVersion = await getSchemaVersion(db);
-  return currentVersion < SCHEMA_VERSION;
-}
+// getSchemaVersion and setSchemaVersion live in schema.ts to avoid
+// circular dependency with migrations.ts
 
 /**
  * Runs a database integrity check.
@@ -255,8 +223,6 @@ export async function resetDatabase(): Promise<void> {
 
   // Reinitialize with migrations
   const db = await openDatabase();
-  // Import here to avoid circular dependency
-  const { runMigrations } = await import("./migrations");
   await runMigrations(db);
   logger.debug("[Database] Database reset complete");
 }
@@ -298,7 +264,6 @@ export async function initializeDatabase(): Promise<SQLite.SQLiteDatabase> {
       const version = await getSchemaVersion(db);
       if (version < SCHEMA_VERSION) {
         // Fresh database or needs migration
-        const { runMigrations } = await import("./migrations");
         await runMigrations(db);
         logger.debug(
           `[Database] Migrations complete: v${version} -> v${SCHEMA_VERSION}`,

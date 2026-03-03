@@ -44,13 +44,10 @@ export {
   closeDatabase,
   getDatabase,
   getDatabaseStats,
-  getSchemaVersion,
   initializeDatabase,
   initializeSchema,
-  needsMigration,
   openDatabase,
   resetDatabase,
-  setSchemaVersion,
 } from "./init";
 
 // Migration utilities
@@ -61,6 +58,7 @@ export {
   dropBackup,
   dropIndexIfExists,
   getMigrationStatus,
+  needsMigration,
   renameTable,
   restoreFromBackup,
   runMigrations,
@@ -153,22 +151,23 @@ export { isDeleted, isSynced, needsSync, stripOfflineFields } from "./types";
 // Background sync
 export {
   BACKGROUND_SYNC_TASK,
-  BackgroundFetchResult,
-  getBackgroundFetchStatus,
+  getBackgroundTaskStatus,
   isBackgroundSyncEnabled,
   registerBackgroundSync,
   setBackgroundSyncContext,
   unregisterBackgroundSync,
 } from "./background-sync";
 
-// Constants
+// Constants and schema utilities
 export {
   CREATE_INDEXES_SQL,
   CREATE_TABLES_SQL,
   DATABASE_NAME,
+  getSchemaVersion,
   MUTABLE_TABLES,
   REFERENCE_TABLES,
   SCHEMA_VERSION,
+  setSchemaVersion,
   SYNCABLE_TABLES,
   TABLE_CREATION_ORDER,
 } from "./schema";

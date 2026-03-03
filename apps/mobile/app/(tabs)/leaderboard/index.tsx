@@ -153,7 +153,7 @@ export default function LeaderboardScreen() {
         />
       }
     >
-      <VStack space="md" className="p-4 pb-32">
+      <VStack space="md" className="p-4 pb-20">
         {/* Achievements Section */}
         <Pressable
           onPress={() => router.push("/achievements")}

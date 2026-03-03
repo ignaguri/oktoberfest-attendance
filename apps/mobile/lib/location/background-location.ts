@@ -46,6 +46,76 @@ let missingCallbackCount = 0;
 const MAX_MISSING_CALLBACK = 5;
 
 /**
+ * Ensures the background location task is defined with TaskManager.
+ * Uses TaskManager.isTaskDefined() to prevent duplicate registrations
+ * across HMR reloads and re-evaluations.
+ */
+function ensureTaskDefined() {
+  if (TaskManager.isTaskDefined(BACKGROUND_LOCATION_TASK)) return;
+
+  TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
+    if (error) {
+      logger.error("Task error", error);
+      return;
+    }
+
+    if (!data) {
+      logger.warn("No data received");
+      return;
+    }
+
+    const { locations } = data as { locations: Location.LocationObject[] };
+
+    if (!locations || locations.length === 0) {
+      logger.warn("No locations in data");
+      return;
+    }
+
+    // Get the most recent location
+    const latestLocation = locations[locations.length - 1];
+
+    logger.debug("Received location", {
+      latitude: latestLocation.coords.latitude,
+      longitude: latestLocation.coords.longitude,
+    });
+
+    // Recover data from AsyncStorage if globals were cleared (cold start)
+    if (!backgroundLocationData) {
+      backgroundLocationData = await getPersistedData();
+    }
+
+    // Call the callback if set
+    if (onBackgroundLocationUpdate && backgroundLocationData) {
+      missingCallbackCount = 0;
+      try {
+        await onBackgroundLocationUpdate(
+          latestLocation,
+          backgroundLocationData,
+        );
+      } catch (err) {
+        logger.error("Error in callback", err);
+      }
+    } else {
+      missingCallbackCount++;
+      logger.warn("Callback or data missing", {
+        attempt: missingCallbackCount,
+        max: MAX_MISSING_CALLBACK,
+      });
+
+      // Stop updates if callback is consistently missing to save battery
+      if (missingCallbackCount >= MAX_MISSING_CALLBACK) {
+        logger.warn("Max missing callback attempts reached, stopping updates");
+        try {
+          await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
+        } catch (err) {
+          logger.error("Error auto-stopping", err);
+        }
+      }
+    }
+  });
+}
+
+/**
  * Set the callback for background location updates
  */
 export function setBackgroundLocationCallback(
@@ -56,6 +126,7 @@ export function setBackgroundLocationCallback(
       ) => Promise<void>)
     | null,
 ) {
+  ensureTaskDefined();
   onBackgroundLocationUpdate = callback;
   if (callback) {
     missingCallbackCount = 0;
@@ -97,68 +168,6 @@ async function getPersistedData(): Promise<BackgroundLocationData | null> {
 }
 
 /**
- * Define the background location task
- * This must be called at the top level of the app (outside of React components)
- */
-TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
-  if (error) {
-    logger.error("Task error", error);
-    return;
-  }
-
-  if (!data) {
-    logger.warn("No data received");
-    return;
-  }
-
-  const { locations } = data as { locations: Location.LocationObject[] };
-
-  if (!locations || locations.length === 0) {
-    logger.warn("No locations in data");
-    return;
-  }
-
-  // Get the most recent location
-  const latestLocation = locations[locations.length - 1];
-
-  logger.debug("Received location", {
-    latitude: latestLocation.coords.latitude,
-    longitude: latestLocation.coords.longitude,
-  });
-
-  // Recover data from AsyncStorage if globals were cleared (cold start)
-  if (!backgroundLocationData) {
-    backgroundLocationData = await getPersistedData();
-  }
-
-  // Call the callback if set
-  if (onBackgroundLocationUpdate && backgroundLocationData) {
-    missingCallbackCount = 0;
-    try {
-      await onBackgroundLocationUpdate(latestLocation, backgroundLocationData);
-    } catch (err) {
-      logger.error("Error in callback", err);
-    }
-  } else {
-    missingCallbackCount++;
-    logger.warn("Callback or data missing", {
-      attempt: missingCallbackCount,
-      max: MAX_MISSING_CALLBACK,
-    });
-
-    // Stop updates if callback is consistently missing to save battery
-    if (missingCallbackCount >= MAX_MISSING_CALLBACK) {
-      logger.warn("Max missing callback attempts reached, stopping updates");
-      try {
-        await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
-      } catch (err) {
-        logger.error("Error auto-stopping", err);
-      }
-    }
-  }
-});
-
-/**
  * Start background location updates
  * @param data Session data for the background task
  * @returns true if started successfully
@@ -167,6 +176,8 @@ export async function startBackgroundLocationUpdates(
   data: BackgroundLocationData,
 ): Promise<boolean> {
   try {
+    ensureTaskDefined();
+
     // Check if background location task is already running
     const isRunning = await Location.hasStartedLocationUpdatesAsync(
       BACKGROUND_LOCATION_TASK,

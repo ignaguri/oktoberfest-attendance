@@ -54,7 +54,7 @@ export function handleNotificationResponse(
     case "group-join":
     case "group-member-joined":
       if (data.groupId) {
-        router.push(`/groups/${data.groupId}`);
+        router.push(`/group-detail/${data.groupId}`);
       } else {
         router.push("/groups");
       }
@@ -67,14 +67,14 @@ export function handleNotificationResponse(
     case "tent-check-in":
     case "group-check-in":
       if (data.groupId) {
-        router.push(`/groups/${data.groupId}`);
+        router.push(`/group-detail/${data.groupId}`);
       } else {
-        router.push("/index");
+        router.push("/home");
       }
       break;
 
     case "reminder":
-      router.push("/index");
+      router.push("/home");
       break;
 
     case "reservation-reminder":
@@ -100,7 +100,7 @@ export function handleNotificationResponse(
           router.push(urlPath as never);
         } catch {
           // Invalid URL, go to home
-          router.push("/index");
+          router.push("/home");
         }
       }
       break;

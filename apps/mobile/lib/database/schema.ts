@@ -128,6 +128,40 @@ export type MutableTable =
 export const SCHEMA_VERSION = 1;
 export const DATABASE_NAME = "prostcounter.db";
 
+// =============================================================================
+// Schema Version Helpers
+// Placed here (not in init.ts) to avoid circular deps with migrations.ts
+// =============================================================================
+
+import type * as SQLite from "expo-sqlite";
+
+/**
+ * Gets the current schema version from the database.
+ * Returns 0 if no version is set.
+ */
+export async function getSchemaVersion(
+  db: SQLite.SQLiteDatabase,
+): Promise<number> {
+  try {
+    const result = await db.getFirstAsync<{ user_version: number }>(
+      "PRAGMA user_version",
+    );
+    return result?.user_version ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Sets the schema version in the database.
+ */
+export async function setSchemaVersion(
+  db: SQLite.SQLiteDatabase,
+  version: number,
+): Promise<void> {
+  await db.execAsync(`PRAGMA user_version = ${version}`);
+}
+
 export const SYNCABLE_TABLES: readonly SyncableTable[] = [
   "festivals",
   "profiles",

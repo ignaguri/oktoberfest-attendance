@@ -1,6 +1,6 @@
 import { Beer, Plus } from "lucide-react-native";
 import { useEffect, useRef } from "react";
-import { Platform, type View } from "react-native";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fab, FabIcon } from "@/components/ui/fab";
@@ -30,7 +30,8 @@ export function QuickAttendanceFab({
 }: QuickAttendanceFabProps) {
   const insets = useSafeAreaInsets();
   const tutorial = useTutorialSafe();
-  const fabRef = useRef<View>(null);
+
+  const fabRef = useRef<any>(null); // Gluestack Fab forwardRef type doesn't align with RN View expected by tutorial
 
   // Self-register with tutorial context for highlighting
   useEffect(() => {
@@ -40,11 +41,10 @@ export function QuickAttendanceFab({
   }, [tutorial, tutorialStepId]);
 
   // Position FAB above the native tab bar with clearance.
-  // iOS 18+: compact floating pill (~50px)
-  // Android: Material bottom navigation bar (~80px including labels)
-  const floatingTabBarHeight = Platform.OS === "android" ? 80 : 50;
+  // iOS native tab bar is ~50px; Android Material 3 bottom nav is ~100px.
+  const nativeTabBarHeight = Platform.OS === "android" ? 100 : 50;
   const margin = insets.bottom === 0 ? 40 : 24;
-  const bottomOffset = floatingTabBarHeight + margin + insets.bottom;
+  const bottomOffset = nativeTabBarHeight + margin + insets.bottom;
 
   return (
     <Fab

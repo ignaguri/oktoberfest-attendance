@@ -270,7 +270,7 @@ export default function AttendanceScreen() {
           <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
         }
       >
-        <View className="p-4 pb-32">
+        <View className="p-4 pb-20">
           {/* Calendar */}
           <AttendanceCalendar
             festivalStartDate={festivalStartDate}

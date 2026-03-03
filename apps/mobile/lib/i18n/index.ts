@@ -9,35 +9,21 @@ import { logger } from "../logger";
 
 const LANGUAGE_KEY = "@prostcounter/language";
 
-// Configure language storage for mobile (AsyncStorage)
-if (typeof window !== "undefined") {
-  import("@react-native-async-storage/async-storage").then((module) => {
-    setLanguageStorage({
-      getItem: (key: string) => module.default.getItem(key),
-      setItem: (key: string, value: string) =>
-        module.default.setItem(key, value),
-    });
-  });
-}
-
 /**
  * Initialize i18n for mobile
  * Detects device language and loads saved preference
  */
 export async function initMobileI18n() {
-  // Check if we're on the server (SSR)
-  const isServer = typeof window === "undefined";
-
-  if (isServer) {
-    // On server, just initialize with English
-    initI18n("en");
-    return;
-  }
-
   try {
-    // Client-side: use AsyncStorage and expo-localization
     const AsyncStorage =
       require("@react-native-async-storage/async-storage").default;
+
+    // Configure language storage for mobile (must be called before initI18n)
+    setLanguageStorage({
+      getItem: (key: string) => AsyncStorage.getItem(key),
+      setItem: (key: string, value: string) => AsyncStorage.setItem(key, value),
+    });
+
     const Localization = require("expo-localization");
 
     // Get saved language preference
@@ -59,16 +45,12 @@ export async function initMobileI18n() {
  * Change language and persist to storage
  */
 export async function setLanguage(language: string) {
-  const isServer = typeof window === "undefined";
-
-  if (!isServer) {
-    try {
-      const AsyncStorage =
-        require("@react-native-async-storage/async-storage").default;
-      await AsyncStorage.setItem(LANGUAGE_KEY, language);
-    } catch (error) {
-      logger.warn("Failed to persist language", { error });
-    }
+  try {
+    const AsyncStorage =
+      require("@react-native-async-storage/async-storage").default;
+    await AsyncStorage.setItem(LANGUAGE_KEY, language);
+  } catch (error) {
+    logger.warn("Failed to persist language", { error });
   }
 
   await sharedChangeLanguage(language);

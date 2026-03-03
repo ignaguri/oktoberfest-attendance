@@ -2,12 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
-import {
-  Icon,
-  Label,
-  NativeTabs,
-  VectorIcon,
-} from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useMemo } from "react";
 import { View } from "react-native";
 
@@ -53,47 +48,68 @@ function TabsLayoutContent() {
     <View style={{ flex: 1 }}>
       <NativeTabs tintColor={Colors.primary[500]}>
         {/* Home tab */}
-        <NativeTabs.Trigger name="index">
-          <Label>{t("tabs.home")}</Label>
-          <Icon
+        <NativeTabs.Trigger name="home">
+          <NativeTabs.Trigger.Label>{t("tabs.home")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
             sf={{ default: "house", selected: "house.fill" }}
-            androidSrc={<VectorIcon family={Ionicons} name="home" />}
+            src={
+              <NativeTabs.Trigger.VectorIcon family={Ionicons} name="home" />
+            }
           />
         </NativeTabs.Trigger>
 
         {/* Attendance tab */}
         <NativeTabs.Trigger name="attendance">
-          <Label>{t("tabs.attendance")}</Label>
-          <Icon
+          <NativeTabs.Trigger.Label>
+            {t("tabs.attendance")}
+          </NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
             sf={{ default: "calendar", selected: "calendar" }}
-            androidSrc={<VectorIcon family={Ionicons} name="calendar" />}
+            src={
+              <NativeTabs.Trigger.VectorIcon
+                family={Ionicons}
+                name="calendar"
+              />
+            }
           />
         </NativeTabs.Trigger>
 
         {/* Groups tab */}
         <NativeTabs.Trigger name="groups">
-          <Label>{t("tabs.groups")}</Label>
-          <Icon
+          <NativeTabs.Trigger.Label>
+            {t("tabs.groups")}
+          </NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
             sf={{ default: "person.2", selected: "person.2.fill" }}
-            androidSrc={<VectorIcon family={Ionicons} name="people" />}
+            src={
+              <NativeTabs.Trigger.VectorIcon family={Ionicons} name="people" />
+            }
           />
         </NativeTabs.Trigger>
 
         {/* Leaderboard tab */}
         <NativeTabs.Trigger name="leaderboard">
-          <Label>{t("tabs.ranking")}</Label>
-          <Icon
+          <NativeTabs.Trigger.Label>
+            {t("tabs.ranking")}
+          </NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
             sf={{ default: "trophy", selected: "trophy.fill" }}
-            androidSrc={<VectorIcon family={Ionicons} name="trophy" />}
+            src={
+              <NativeTabs.Trigger.VectorIcon family={Ionicons} name="trophy" />
+            }
           />
         </NativeTabs.Trigger>
 
         {/* Profile tab */}
         <NativeTabs.Trigger name="profile">
-          <Label>{t("tabs.profile")}</Label>
-          <Icon
+          <NativeTabs.Trigger.Label>
+            {t("tabs.profile")}
+          </NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
             sf={{ default: "person", selected: "person.fill" }}
-            androidSrc={<VectorIcon family={Ionicons} name="person" />}
+            src={
+              <NativeTabs.Trigger.VectorIcon family={Ionicons} name="person" />
+            }
           />
         </NativeTabs.Trigger>
 

@@ -114,7 +114,7 @@ function BackgroundSyncHandler() {
         // Set context for background sync task
         await setBackgroundSyncContext(user.id, currentFestival.id);
         // Register background sync (15 minute interval)
-        const registered = await registerBackgroundSync(15 * 60);
+        const registered = await registerBackgroundSync(15);
         if (registered) {
           logger.info("[BackgroundSync] Registered successfully");
         }
@@ -301,7 +301,7 @@ export default function RootLayout() {
                                         }}
                                       />
                                       <Stack.Screen
-                                        name="groups"
+                                        name="group-detail"
                                         options={{
                                           headerShown: false,
                                           presentation: "card",

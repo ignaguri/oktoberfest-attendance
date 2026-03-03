@@ -338,6 +338,7 @@ import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 - **Database Testing**: Always reset local DB (`pnpm sup:db:reset`) to test migrations
 - **RLS Policies**: All tables have Row Level Security - test with real Supabase
 - **Before Committing**: Always run `pnpm lint` and `pnpm type-check` on the whole project and ensure there are no errors
+- **Commit Message Title**: Max 72 characters. The pre-commit hook enforces this limit
 - **Work on Branches**: Never commit directly to main. Always create a feature branch for changes and submit via pull request
 - **Do NOT Push**: Do not push commits to the remote repository unless explicitly asked
 - **Production APK Testing**: Use `eas build --profile production-apk --platform android` to create a production-environment APK for testing before Play Store release. Download the APK from the EAS dashboard and share directly with testers
