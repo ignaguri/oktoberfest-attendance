@@ -1,5 +1,6 @@
 import { Beer, Plus } from "lucide-react-native";
 import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fab, FabIcon } from "@/components/ui/fab";
@@ -40,8 +41,8 @@ export function QuickAttendanceFab({
   }, [tutorial, tutorialStepId]);
 
   // Position FAB above the native tab bar with clearance.
-  // iOS native tab bar is ~50px; use larger margin when no home indicator.
-  const nativeTabBarHeight = 50;
+  // iOS native tab bar is ~50px; Android Material 3 bottom nav is ~100px.
+  const nativeTabBarHeight = Platform.OS === "android" ? 100 : 50;
   const margin = insets.bottom === 0 ? 40 : 24;
   const bottomOffset = nativeTabBarHeight + margin + insets.bottom;
 

@@ -1,5 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Users } from "lucide-react-native";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fab, FabIcon } from "@/components/ui/fab";
@@ -19,8 +20,8 @@ export function CrowdReportFab({ onPress }: CrowdReportFabProps) {
 
   // Match the same positioning logic as QuickAttendanceFab
   // but add extra offset to sit above it.
-  // iOS native tab bar is ~50px; use larger margin when no home indicator.
-  const nativeTabBarHeight = 50;
+  // iOS native tab bar is ~50px; Android Material 3 bottom nav is ~100px.
+  const nativeTabBarHeight = Platform.OS === "android" ? 100 : 50;
   const margin = insets.bottom === 0 ? 40 : 24;
   const beerFabBottomOffset = nativeTabBarHeight + margin + insets.bottom;
   // Beer FAB is ~56px tall (lg size with px-5 py-5). Add gap of 12px.
