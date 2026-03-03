@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
 import {
-  Beer,
   Bug,
   ChevronRight,
   Lightbulb,
@@ -35,11 +34,6 @@ const LINKS = [
     key: "requestFeature" as const,
     url: "https://prostcounter.canny.io/feature-requests",
     Icon: Lightbulb,
-  },
-  {
-    key: "buyMeABeer" as const,
-    url: "https://www.paypal.me/ignacioguri",
-    Icon: Beer,
   },
 ] satisfies { key: string; url: string; Icon: LucideIcon }[];
 
