@@ -48,10 +48,14 @@ import { ImageModal } from "./ImageModal";
 
 interface GalleryGridProps {
   galleryData: GalleryData;
+  groupId: string;
 }
 
-export function GalleryGrid({ galleryData }: GalleryGridProps) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+export function GalleryGrid({ galleryData, groupId }: GalleryGridProps) {
+  const [selectedImage, setSelectedImage] = useState<{
+    url: string;
+    photoId: string;
+  } | null>(null);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
 
   // Check if there are any photos
@@ -98,7 +102,12 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
                       <div
                         key={image.id}
                         className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg"
-                        onClick={() => setSelectedImage(imageUrl)}
+                        onClick={() =>
+                          setSelectedImage({
+                            url: imageUrl,
+                            photoId: image.id,
+                          })
+                        }
                       >
                         {/* Skeleton placeholder while loading */}
                         {!isLoaded && (
@@ -135,7 +144,9 @@ export function GalleryGrid({ galleryData }: GalleryGridProps) {
         ))}
       </div>
       <ImageModal
-        imageUrl={selectedImage}
+        imageUrl={selectedImage?.url ?? null}
+        photoId={selectedImage?.photoId ?? null}
+        groupId={groupId}
         onClose={() => setSelectedImage(null)}
       />
     </>
