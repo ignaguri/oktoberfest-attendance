@@ -30,7 +30,7 @@ export function QuickAttendanceFab({
   const insets = useSafeAreaInsets();
   const tutorial = useTutorialSafe();
 
-  const fabRef = useRef<any>(null);
+  const fabRef = useRef<any>(null); // Gluestack Fab forwardRef type doesn't align with RN View expected by tutorial
 
   // Self-register with tutorial context for highlighting
   useEffect(() => {

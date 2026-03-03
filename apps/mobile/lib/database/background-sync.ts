@@ -29,17 +29,14 @@ import { createSyncManager, type SyncResult } from "./sync/sync-manager";
 // Task name constant
 export const BACKGROUND_SYNC_TASK = "PROSTCOUNTER_BACKGROUND_SYNC";
 
-// Guard flag to ensure TaskManager.defineTask() is only called once
-let taskDefined = false;
-
 /**
  * Ensures the background sync task is defined with TaskManager.
- * Uses a guard flag to prevent multiple definitions.
+ * Uses TaskManager.isTaskDefined() to prevent duplicate registrations
+ * across HMR reloads and re-evaluations.
  * Must be called before registering the task.
  */
 function ensureTaskDefined() {
-  if (taskDefined) return;
-  taskDefined = true;
+  if (TaskManager.isTaskDefined(BACKGROUND_SYNC_TASK)) return;
 
   TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
     logger.info("[BackgroundSync] Task started");

@@ -45,16 +45,13 @@ let backgroundLocationData: BackgroundLocationData | null = null;
 let missingCallbackCount = 0;
 const MAX_MISSING_CALLBACK = 5;
 
-// Guard flag to ensure TaskManager.defineTask() is only called once
-let taskDefined = false;
-
 /**
  * Ensures the background location task is defined with TaskManager.
- * Uses a guard flag to prevent multiple definitions.
+ * Uses TaskManager.isTaskDefined() to prevent duplicate registrations
+ * across HMR reloads and re-evaluations.
  */
 function ensureTaskDefined() {
-  if (taskDefined) return;
-  taskDefined = true;
+  if (TaskManager.isTaskDefined(BACKGROUND_LOCATION_TASK)) return;
 
   TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
     if (error) {
