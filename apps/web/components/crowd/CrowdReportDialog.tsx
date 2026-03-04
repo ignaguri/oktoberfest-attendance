@@ -107,8 +107,9 @@ export function CrowdReportDialog({
       setSelectedLevel(null);
       setWaitTimeMinutes(undefined);
       onOpenChange(false);
-    } catch {
-      if (!error?.includes("5 minutes")) {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (!message.includes("5 minutes")) {
         toast.error(t("crowdReport.error"));
       }
     }
@@ -121,7 +122,6 @@ export function CrowdReportDialog({
     onOpenChange,
     preselectedTentId,
     t,
-    error,
   ]);
 
   const handleOpenChange = useCallback(
@@ -180,13 +180,19 @@ export function CrowdReportDialog({
             <label className="text-sm font-medium">
               {t("crowdReport.selectLevel")}
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div
+              className="grid grid-cols-4 gap-2"
+              role="radiogroup"
+              aria-label={t("crowdReport.selectLevel")}
+            >
               {CROWD_LEVELS.map((level) => {
                 const isSelected = selectedLevel === level;
                 return (
                   <button
                     key={level}
                     type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     onClick={() => setSelectedLevel(level)}
                     className={cn(
                       "flex flex-col items-center gap-1 rounded-xl border-2 px-2 py-3 transition-colors",
@@ -225,13 +231,18 @@ export function CrowdReportDialog({
                 {t("crowdReport.waitTimeOptional")}
               </span>
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div
+              className="flex flex-wrap gap-1.5"
+              role="group"
+              aria-label={t("crowdReport.waitTimeLabel")}
+            >
               {WAIT_TIME_OPTIONS.map((minutes) => {
                 const isSelected = waitTimeMinutes === minutes;
                 return (
                   <button
                     key={minutes}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() =>
                       setWaitTimeMinutes(isSelected ? undefined : minutes)
                     }

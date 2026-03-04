@@ -17,7 +17,7 @@ A card on the home page showing current crowd levels across tents, with a "Repor
 - Each tent row: tent name + colored CrowdLevelBadge (green/yellow/orange/red)
 - Max 5 tents shown, "+N more" link if overflow
 - "Report Crowd Level" button opens CrowdReportDialog
-- Returns null when no reports exist (same as mobile behavior)
+- Shows empty state message with "Report Crowd Level" button when no reports exist
 - Only shown during active festivals
 
 ### CrowdReportDialog
