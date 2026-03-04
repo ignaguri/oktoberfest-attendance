@@ -1,13 +1,14 @@
 "use client";
 
 import { useCurrentProfile } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupMessageItem } from "@prostcounter/shared/schemas";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { AlertTriangle, Pin, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 interface MessageItemProps {
@@ -20,6 +21,14 @@ export function MessageItem({ message, onDelete }: MessageItemProps) {
   const { data: profile } = useCurrentProfile();
   const isOwn = profile?.id === message.userId;
   const displayName = message.username || message.fullName || "Unknown";
+
+  const relativeTime = useMemo(() => {
+    try {
+      return formatRelativeTime(new Date(message.createdAt));
+    } catch {
+      return "";
+    }
+  }, [message.createdAt]);
 
   return (
     <div
@@ -40,9 +49,7 @@ export function MessageItem({ message, onDelete }: MessageItemProps) {
           <span className="text-sm font-medium text-gray-900">
             {displayName}
           </span>
-          <span className="text-xs text-gray-400">
-            {formatRelativeTime(new Date(message.createdAt))}
-          </span>
+          <span className="text-xs text-gray-400">{relativeTime}</span>
           {message.pinned && <Pin className="size-3 text-yellow-600" />}
           {message.messageType === "alert" && (
             <Badge
@@ -58,6 +65,7 @@ export function MessageItem({ message, onDelete }: MessageItemProps) {
               type="button"
               onClick={() => onDelete(message.id)}
               className="ml-auto text-gray-400 hover:text-red-500"
+              aria-label={t("common.buttons.delete")}
             >
               <Trash2 className="size-3.5" />
             </button>

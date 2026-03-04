@@ -1,18 +1,19 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useDeleteMessage, useGroupMessages } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupMessageItem } from "@prostcounter/shared/schemas";
 import { MessageSquare, Plus } from "lucide-react";
 import { use, useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { ComposeMessageDialog } from "@/components/messages/ComposeMessageDialog";
 import { MessageItem } from "@/components/messages/MessageItem";
+import { ComposeMessageDialog } from "@/components/NewsFeed/ComposeMessageDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface MessagesPageProps {
   params: Promise<{ id: string }>;
@@ -21,6 +22,7 @@ interface MessagesPageProps {
 export default function MessagesPage({ params }: MessagesPageProps) {
   const { t } = useTranslation();
   const { id: groupId } = use(params);
+  const { currentFestival } = useFestival();
 
   const { messages, loading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useGroupMessages(groupId);
@@ -106,17 +108,19 @@ export default function MessagesPage({ params }: MessagesPageProps) {
           )}
 
           {/* Regular messages */}
-          <Card>
-            <CardContent className="flex flex-col gap-1 p-2">
-              {regularMessages.map((msg: GroupMessageItem) => (
-                <MessageItem
-                  key={msg.id}
-                  message={msg}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </CardContent>
-          </Card>
+          {regularMessages.length > 0 && (
+            <Card>
+              <CardContent className="flex flex-col gap-1 p-2">
+                {regularMessages.map((msg: GroupMessageItem) => (
+                  <MessageItem
+                    key={msg.id}
+                    message={msg}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Load more */}
           {hasNextPage && (
@@ -134,7 +138,11 @@ export default function MessagesPage({ params }: MessagesPageProps) {
         </div>
       )}
 
-      <ComposeMessageDialog open={composeOpen} onOpenChange={setComposeOpen} />
+      <ComposeMessageDialog
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+        festivalId={currentFestival?.id ?? ""}
+      />
     </div>
   );
 }
