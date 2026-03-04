@@ -128,7 +128,7 @@ export function ImageModal({
       <DialogContent
         className={cn(
           "flex max-h-[90vh] flex-col overflow-hidden border-none bg-black/95 p-0",
-          hasSocial ? "sm:max-w-[90vw]" : "sm:max-w-[90vw]",
+          "sm:max-w-[90vw]",
         )}
         showCloseButton={false}
       >
@@ -181,6 +181,10 @@ export function ImageModal({
                         key={emoji}
                         type="button"
                         onClick={() => handleReaction(emoji)}
+                        aria-label={t("groups.gallery.photoDetail.reactWith", {
+                          emoji,
+                        })}
+                        aria-pressed={isReacted}
                         className={cn(
                           "flex items-center gap-1 rounded-full border px-2.5 py-1 text-sm transition-colors",
                           isReacted
@@ -225,7 +229,14 @@ export function ImageModal({
                       (comment: PhotoComment) => (
                         <div key={comment.id} className="flex gap-2">
                           <Avatar className="size-7 flex-shrink-0">
-                            <AvatarImage src={comment.avatarUrl ?? undefined} />
+                            <AvatarImage
+                              src={comment.avatarUrl ?? undefined}
+                              alt={
+                                comment.username
+                                  ? `${comment.username}'s avatar`
+                                  : ""
+                              }
+                            />
                             <AvatarFallback className="text-xs">
                               {comment.username?.[0]?.toUpperCase() ?? "?"}
                             </AvatarFallback>
@@ -247,6 +258,9 @@ export function ImageModal({
                                     handleDeleteComment(comment.id)
                                   }
                                   className="ml-auto text-gray-400 hover:text-red-500"
+                                  aria-label={t(
+                                    "groups.gallery.photoDetail.deleteComment",
+                                  )}
                                 >
                                   <Trash2 className="size-3" />
                                 </button>
@@ -271,7 +285,11 @@ export function ImageModal({
                     className="flex-1 text-sm"
                     maxLength={500}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
+                      if (
+                        e.key === "Enter" &&
+                        !e.shiftKey &&
+                        !isAddingComment
+                      ) {
                         e.preventDefault();
                         handleAddComment();
                       }
@@ -282,6 +300,7 @@ export function ImageModal({
                     variant="ghost"
                     onClick={handleAddComment}
                     disabled={!commentText.trim() || isAddingComment}
+                    aria-label={t("groups.gallery.photoDetail.send")}
                   >
                     <Send className="size-4" />
                   </Button>
