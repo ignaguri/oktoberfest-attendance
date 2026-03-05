@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 interface ImageModalProps {
   imageUrl: string | null;
@@ -230,7 +230,7 @@ export function ImageModal({
                         <div key={comment.id} className="flex gap-2">
                           <Avatar className="size-7 flex-shrink-0">
                             <AvatarImage
-                              src={comment.avatarUrl ?? undefined}
+                              src={getAvatarUrl(comment.avatarUrl)}
                               alt={
                                 comment.username
                                   ? `${comment.username}'s avatar`
