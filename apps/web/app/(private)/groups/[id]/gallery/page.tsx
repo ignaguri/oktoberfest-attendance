@@ -43,7 +43,7 @@ export default function GalleryPage({ params }: GalleryPageProps) {
   return (
     <div className="container mx-auto max-w-xl p-4">
       <h1 className="mb-4 text-2xl font-bold">{t("groups.gallery.title")}</h1>
-      <GalleryGrid galleryData={galleryData} />
+      <GalleryGrid galleryData={galleryData} groupId={groupId} />
     </div>
   );
 }
