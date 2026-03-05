@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.0] - 2026-03-05
+
+### ✨ Features
+
+- 👥 View live crowd levels per tent directly on the home screen
+- 📢 Report crowd levels and wait times for any tent
+- 🎭 React to photos in your group gallery
+- 💬 Comment on photos in your group gallery
+
 ## [0.7.0] - 2025-09-28
 
 ### 🐛 Bug Fixes
