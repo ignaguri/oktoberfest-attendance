@@ -60,12 +60,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div data-tutorial="news-feed" className="w-full">
-          <NewsFeed />
-        </div>
-
         <div className="w-full">
           <CrowdStatusCard />
+        </div>
+
+        <div data-tutorial="news-feed" className="w-full">
+          <NewsFeed />
         </div>
 
         <div className="flex flex-col gap-4">

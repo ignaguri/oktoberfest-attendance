@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { AlertCircle, Send } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { SingleSelect } from "@/components/Select/SingleSelect";
@@ -75,13 +75,20 @@ export function CrowdReportDialog({
   const { tents } = useTents(festivalId);
   const { submitReport, isSubmitting, error, reset } = useSubmitCrowdReport();
 
-  const [selectedTentId, setSelectedTentId] = useState<string | null>(
-    preselectedTentId ?? null,
-  );
+  const [selectedTentId, setSelectedTentId] = useState<string | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<CrowdLevel | null>(null);
   const [waitTimeMinutes, setWaitTimeMinutes] = useState<number | undefined>(
     undefined,
   );
+
+  // Sync preselectedTentId into state when the dialog opens. The dialog is
+  // always mounted (just hidden), so useState only runs once — prop changes
+  // after mount don't update state without this effect.
+  useEffect(() => {
+    if (open && preselectedTentId) {
+      setSelectedTentId(preselectedTentId);
+    }
+  }, [open, preselectedTentId]);
 
   // Check rate limit for selected tent
   const { reports } = useTentCrowdReports(
@@ -103,7 +110,7 @@ export function CrowdReportDialog({
         waitTimeMinutes,
       });
       toast.success(t("crowdReport.success"));
-      setSelectedTentId(preselectedTentId ?? null);
+      setSelectedTentId(null);
       setSelectedLevel(null);
       setWaitTimeMinutes(undefined);
       onOpenChange(false);
@@ -120,21 +127,20 @@ export function CrowdReportDialog({
     waitTimeMinutes,
     submitReport,
     onOpenChange,
-    preselectedTentId,
     t,
   ]);
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
       if (!newOpen) {
-        setSelectedTentId(preselectedTentId ?? null);
+        setSelectedTentId(null);
         setSelectedLevel(null);
         setWaitTimeMinutes(undefined);
         reset();
       }
       onOpenChange(newOpen);
     },
-    [onOpenChange, preselectedTentId, reset],
+    [onOpenChange, reset],
   );
 
   return (
