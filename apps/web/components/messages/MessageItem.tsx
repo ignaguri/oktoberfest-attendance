@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 interface MessageItemProps {
   message: GroupMessageItem;
@@ -38,7 +38,7 @@ export function MessageItem({ message, onDelete }: MessageItemProps) {
       )}
     >
       <Avatar className="size-8 flex-shrink-0">
-        <AvatarImage src={message.avatarUrl ?? undefined} />
+        <AvatarImage src={getAvatarUrl(message.avatarUrl ?? null)} />
         <AvatarFallback className="text-xs">
           {displayName[0]?.toUpperCase() ?? "?"}
         </AvatarFallback>
