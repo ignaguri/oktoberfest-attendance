@@ -186,9 +186,10 @@ export const QuickAttendanceRegistrationForm = ({
 
       toast.success(t("notifications.success.attendanceUpdated"));
 
-      // Prompt crowd report if a new tent was selected
-      if (tentsToSend.length > 0 && onTentSelected) {
-        onTentSelected(tentsToSend[0]);
+      // Prompt crowd report whenever a tent is selected (new or existing),
+      // so users can always report the current conditions.
+      if (data.tentId && onTentSelected) {
+        onTentSelected(data.tentId);
       }
     } catch {
       toast.error(t("notifications.error.attendanceUpdateFailed"));
