@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
+import { CrowdStatusCard } from "@/components/crowd/CrowdStatusCard";
 import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
 import { NewsFeed } from "@/components/NewsFeed";
@@ -57,6 +58,10 @@ export default function Home() {
           <div data-tutorial="quick-attendance" className="w-full">
             <QuickAttendanceWrapper />
           </div>
+        </div>
+
+        <div className="w-full">
+          <CrowdStatusCard />
         </div>
 
         <div data-tutorial="news-feed" className="w-full">
