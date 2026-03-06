@@ -52,7 +52,7 @@
     "@playwright/test": "^1.58.2",
     "@typescript-eslint/eslint-plugin": "8.56.0",
     "dotenv": "^17.3.1",
-    "eslint": "9.39.2",
+    "eslint": "9.39.3",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
@@ -94,10 +94,8 @@
       "fast-xml-parser": ">=5.3.4",
       "react": "19.2.0",
       "react-dom": "19.2.0",
-      "@isaacs/brace-expansion": "5.0.1"
-    },
-    "patchedDependencies": {
-      "@react-native-community/netinfo": "patches/@react-native-community__netinfo.patch"
+      "@isaacs/brace-expansion": "5.0.1",
+      "eslint": "9.39.3"
     }
   },
   "packageManager": "pnpm@10.14.0",
