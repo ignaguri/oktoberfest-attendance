@@ -54,6 +54,15 @@ if (Platform.OS !== "web") {
   initSentry();
 }
 
+// Initialize Vexo analytics (native only, production only)
+if (Platform.OS !== "web" && !__DEV__) {
+  const { vexo } = require("vexo-analytics");
+  const vexoApiKey = process.env.EXPO_PUBLIC_VEXO_API_KEY;
+  if (vexoApiKey) {
+    vexo(vexoApiKey);
+  }
+}
+
 // Prevent splash screen from auto-hiding (only on native)
 if (Platform.OS !== "web") {
   const SplashScreen = require("expo-splash-screen");
