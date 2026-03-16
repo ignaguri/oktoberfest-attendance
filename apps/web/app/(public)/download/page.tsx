@@ -19,7 +19,7 @@ export default async function DownloadPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen flex-col items-center bg-gray-50">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-6 flex flex-col items-center gap-3">
           <span className="text-6xl">🍺</span>
@@ -41,7 +41,7 @@ export default async function DownloadPage() {
 
           <div className="flex flex-col items-center gap-2">
             <Image
-              src="/images/qrcode.svg"
+              src="/images/qrcode-download.svg"
               alt="QR Code"
               width={200}
               height={200}

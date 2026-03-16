@@ -83,9 +83,14 @@ export async function updateSession(request: NextRequest) {
     });
   } else if (
     !user &&
-    !["/auth", "/sign-in", "/sign-up", "/reset-password", "/error"].includes(
-      request.nextUrl.pathname,
-    )
+    ![
+      "/auth",
+      "/sign-in",
+      "/sign-up",
+      "/reset-password",
+      "/error",
+      "/download",
+    ].includes(request.nextUrl.pathname)
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
