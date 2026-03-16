@@ -1705,6 +1705,20 @@
         "avg_beers": "Average Beers"
       }
     },
+    "drinkBreakdown": {
+      "title": "What you drank",
+      "subtitle": "Your drink breakdown",
+      "totalDrinks": "Total drinks",
+      "topDrink": "Most popular",
+      "drinkTypes": {
+        "beer": "Beer",
+        "radler": "Radler",
+        "wine": "Wine",
+        "soft_drink": "Soft Drink",
+        "alcohol_free": "Alcohol-Free",
+        "other": "Other"
+      }
+    },
     "shareText": {
       "title": "My {{festivalName}} Wrapped",
       "stats": "{{beers}} beers across {{days}} days!",
@@ -2460,6 +2474,10 @@
         "ios": "Tap Share → Add to Home Screen",
         "android": "Tap menu → Install app",
         "desktop": "Click install in address bar"
+      },
+      "appStore": {
+        "message": "ProstCounter is now on the App Store! Get the full experience.",
+        "button": "Download on the App Store"
       }
     }
   },

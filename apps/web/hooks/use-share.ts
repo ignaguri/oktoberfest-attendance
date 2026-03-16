@@ -28,7 +28,7 @@ export function useShare(options: UseShareOptions = {}) {
     (options.text.includes("http") || options.text.includes("www."));
   const shareText = textContainsUrl
     ? options.text || defaultText
-    : `${options.text || defaultText} ${options.url || APP_URL}`;
+    : `${options.text || defaultText} ${options.url || `${APP_URL}/download`}`;
 
   // Check if Web Share API is supported
   const isWebShareSupported =
@@ -45,7 +45,7 @@ export function useShare(options: UseShareOptions = {}) {
       await navigator.share({
         title: options.title || "ProstCounter App",
         text: textContainsUrl ? options.text : options.text || defaultText,
-        url: textContainsUrl ? undefined : options.url || APP_URL,
+        url: textContainsUrl ? undefined : options.url || `${APP_URL}/download`,
       });
     } catch (error) {
       // User cancelled or error occurred, fallback to clipboard

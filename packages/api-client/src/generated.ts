@@ -2163,8 +2163,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List messages for a group
-         * @description Returns messages for a group with cursor-based pagination. Pinned messages come first.
+         * List messages from group members
+         * @description Returns messages posted by members of this group, with cursor-based pagination. Pinned messages come first.
          */
         get: {
             parameters: {
@@ -2191,8 +2191,6 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 /** Format: uuid */
-                                groupId: string;
-                                /** Format: uuid */
                                 userId: string;
                                 username: string | null;
                                 fullName: string | null;
@@ -2201,6 +2199,8 @@ export interface paths {
                                 /** @enum {string} */
                                 messageType: "message" | "alert";
                                 pinned: boolean;
+                                /** @enum {string} */
+                                visibility: "groups" | "public";
                                 createdAt: string;
                                 updatedAt: string;
                             }[];
@@ -2236,85 +2236,7 @@ export interface paths {
             };
         };
         put?: never;
-        /**
-         * Post a new message to a group
-         * @description Create a new message or alert in a group
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    groupId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        content: string;
-                        /**
-                         * @default message
-                         * @enum {string}
-                         */
-                        messageType?: "message" | "alert";
-                    };
-                };
-            };
-            responses: {
-                /** @description Message created successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            message: {
-                                /** Format: uuid */
-                                id: string;
-                                /** Format: uuid */
-                                groupId: string;
-                                /** Format: uuid */
-                                userId: string;
-                                username: string | null;
-                                fullName: string | null;
-                                avatarUrl: string | null;
-                                content: string;
-                                /** @enum {string} */
-                                messageType: "message" | "alert";
-                                pinned: boolean;
-                                createdAt: string;
-                                updatedAt: string;
-                            };
-                        };
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
-                    };
-                };
-                /** @description Forbidden - Not a group member */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
-                    };
-                };
-            };
-        };
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2330,7 +2252,7 @@ export interface paths {
         };
         /**
          * Get message feed across all groups
-         * @description Returns recent messages from all groups the user belongs to, for a given festival
+         * @description Returns recent messages from users who share groups with the current user for a given festival
          */
         get: {
             parameters: {
@@ -2356,8 +2278,6 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 /** Format: uuid */
-                                groupId: string;
-                                /** Format: uuid */
                                 userId: string;
                                 username: string | null;
                                 fullName: string | null;
@@ -2366,9 +2286,10 @@ export interface paths {
                                 /** @enum {string} */
                                 messageType: "message" | "alert";
                                 pinned: boolean;
+                                /** @enum {string} */
+                                visibility: "groups" | "public";
                                 createdAt: string;
                                 updatedAt: string;
-                                groupName: string;
                             }[];
                             nextCursor: string | null;
                             hasMore: boolean;
@@ -2397,7 +2318,101 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/groups/{groupId}/messages/{messageId}": {
+    "/v1/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post a new message
+         * @description Create a new message visible to all groups the user belongs to in the given festival
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        content: string;
+                        /**
+                         * @default message
+                         * @enum {string}
+                         */
+                        messageType?: "message" | "alert";
+                        /** Format: uuid */
+                        festivalId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Message created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                content: string;
+                                /** @enum {string} */
+                                messageType: "message" | "alert";
+                                pinned: boolean;
+                                /** @enum {string} */
+                                visibility: "groups" | "public";
+                                createdAt: string;
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - Not a member of any group in this festival */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/{messageId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -2414,7 +2429,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    groupId: string;
                     messageId: string;
                 };
                 cookie?: never;
@@ -2441,8 +2455,6 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 /** Format: uuid */
-                                groupId: string;
-                                /** Format: uuid */
                                 userId: string;
                                 username: string | null;
                                 fullName: string | null;
@@ -2451,6 +2463,8 @@ export interface paths {
                                 /** @enum {string} */
                                 messageType: "message" | "alert";
                                 pinned: boolean;
+                                /** @enum {string} */
+                                visibility: "groups" | "public";
                                 createdAt: string;
                                 updatedAt: string;
                             };
@@ -2505,7 +2519,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    groupId: string;
                     messageId: string;
                 };
                 cookie?: never;
@@ -3528,6 +3541,15 @@ export interface paths {
                                     visitCount: number;
                                 } | null;
                                 topDrinkType: string | null;
+                                drinkStats?: {
+                                    total_drinks: number;
+                                    top_drink_type: string | null;
+                                    breakdown: {
+                                        drink_type: string;
+                                        count: number;
+                                        percentage: number;
+                                    }[];
+                                };
                                 achievements: {
                                     /** Format: uuid */
                                     id: string;
@@ -3642,6 +3664,15 @@ export interface paths {
                                     visitCount: number;
                                 } | null;
                                 topDrinkType: string | null;
+                                drinkStats?: {
+                                    total_drinks: number;
+                                    top_drink_type: string | null;
+                                    breakdown: {
+                                        drink_type: string;
+                                        count: number;
+                                        percentage: number;
+                                    }[];
+                                };
                                 achievements: {
                                     /** Format: uuid */
                                     id: string;

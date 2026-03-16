@@ -1458,6 +1458,20 @@
         "avg_beers": "Durchschnittliche Maß"
       }
     },
+    "drinkBreakdown": {
+      "title": "Was du getrunken hast",
+      "subtitle": "Deine Getränkeübersicht",
+      "totalDrinks": "Getränke gesamt",
+      "topDrink": "Beliebtestes Getränk",
+      "drinkTypes": {
+        "beer": "Bier",
+        "radler": "Radler",
+        "wine": "Wein",
+        "soft_drink": "Softdrink",
+        "alcohol_free": "Alkoholfrei",
+        "other": "Sonstiges"
+      }
+    },
     "shareText": {
       "title": "Mein {{festivalName}}-Rückblick",
       "stats": "{{beers}} Maß über {{days}} Tage!",
@@ -2214,6 +2228,23 @@
       "fallback": "Benutzer hat sich für Passwort entschieden",
       "lockout": "Zu viele Fehlversuche. Bitte versuchen Sie es später erneut.",
       "failed": "Authentifizierung fehlgeschlagen"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "ProstCounter installieren",
+      "message": "Installiere unsere App für ein besseres Erlebnis",
+      "button": "Installieren",
+      "later": "Vielleicht später",
+      "instructions": {
+        "ios": "Tippe auf Teilen → Zum Home-Bildschirm",
+        "android": "Tippe auf Menü → App installieren",
+        "desktop": "Klicke auf Installieren in der Adressleiste"
+      },
+      "appStore": {
+        "message": "ProstCounter ist jetzt im App Store! Hol dir das volle Erlebnis.",
+        "button": "Im App Store laden"
+      }
     }
   },
   "navigation": {

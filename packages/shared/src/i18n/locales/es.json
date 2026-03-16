@@ -1705,6 +1705,20 @@
         "avg_beers": "Promedio de Cervezas"
       }
     },
+    "drinkBreakdown": {
+      "title": "Lo que bebiste",
+      "subtitle": "Desglose de bebidas",
+      "totalDrinks": "Bebidas totales",
+      "topDrink": "Bebida más popular",
+      "drinkTypes": {
+        "beer": "Cerveza",
+        "radler": "Radler",
+        "wine": "Vino",
+        "soft_drink": "Refresco",
+        "alcohol_free": "Sin alcohol",
+        "other": "Otro"
+      }
+    },
     "shareText": {
       "title": "Mi {{festivalName}} Wrapped",
       "stats": "{{beers}} cervezas en {{days}} días!",
@@ -2460,6 +2474,10 @@
         "ios": "Tocá Compartir → Agregar a pantalla de inicio",
         "android": "Tocá menú → Instalar app",
         "desktop": "Hacé click en instalar en la barra de direcciones"
+      },
+      "appStore": {
+        "message": "¡ProstCounter ya está en el App Store! Obtén la experiencia completa.",
+        "button": "Descargar en el App Store"
       }
     }
   },

@@ -19,6 +19,15 @@ export const WrappedDataSchema = z.object({
     })
     .nullable(),
   topDrinkType: z.string().nullable(),
+  drinkStats: z.object({
+    total_drinks: z.number().int(),
+    top_drink_type: z.string().nullable(),
+    breakdown: z.array(z.object({
+      drink_type: z.string(),
+      count: z.number().int(),
+      percentage: z.number(),
+    })),
+  }).optional(),
   achievements: z.array(
     z.object({
       id: z.uuid(),

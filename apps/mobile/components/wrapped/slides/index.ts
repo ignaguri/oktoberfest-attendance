@@ -1,5 +1,6 @@
 export { AchievementsSlide } from "./achievements-slide";
 export { ComparisonsSlide } from "./comparisons-slide";
+export { DrinkBreakdownSlide } from "./drink-breakdown-slide";
 export { IntroSlide } from "./intro-slide";
 export { JourneySlide } from "./journey-slide";
 export { NumbersSlide } from "./numbers-slide";
