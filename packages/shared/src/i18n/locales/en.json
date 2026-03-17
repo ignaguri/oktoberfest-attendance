@@ -1606,17 +1606,21 @@
       "uniqueTents": "Unique tents",
       "diversity": "Tent diversity",
       "favorite": "Favorite tent",
-      "visits": "Top visits",
-      "visits_one": "Top visit"
+      "visits": "{{count}} visits",
+      "visits_one": "{{count}} visit",
+      "topTents": "Top tents"
     },
     "peakMoment": {
       "title": "Peak moment",
       "subtitle": "Your biggest day",
       "bestDay": "Best day",
       "maxSession": "Max in one session",
+      "maxSessionDesc": "Most beers in a single session",
       "beers": "{{count}} beers",
       "beers_one": "{{count}} beer",
-      "spent": "spent"
+      "spent": "spent",
+      "tents": "{{count}} tents",
+      "tents_one": "{{count}} tent"
     },
     "social": {
       "title": "Social stats",
@@ -1693,7 +1697,7 @@
         "tents_one": "{{count}} tent",
         "days": "{{count}} days",
         "days_one": "{{count}} day",
-        "across": "across {{days}} unforgettable at {{festival}}"
+        "across": "across {{days}} of fun at {{festival}}"
       }
     },
     "shareImage": {

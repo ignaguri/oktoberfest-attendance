@@ -1606,17 +1606,21 @@
       "uniqueTents": "Carpas únicas",
       "diversity": "Diversidad de carpas",
       "favorite": "Carpa favorita",
-      "visits": "Visitas destacadas",
-      "visits_one": "Visita destacada"
+      "visits": "{{count}} visitas",
+      "visits_one": "{{count}} visita",
+      "topTents": "Mejores carpas"
     },
     "peakMoment": {
       "title": "Momento cumbre",
       "subtitle": "Tu mejor día",
       "bestDay": "Mejor día",
       "maxSession": "Máximo en una sesión",
+      "maxSessionDesc": "Más cervezas en una sola sesión",
       "beers": "{{count}} cervezas",
       "beers_one": "{{count}} cerveza",
-      "spent": "gastado"
+      "spent": "gastado",
+      "tents": "{{count}} carpas",
+      "tents_one": "{{count}} carpa"
     },
     "social": {
       "title": "Estadísticas sociales",
@@ -1693,7 +1697,7 @@
         "tents_one": "{{count}} carpa",
         "days": "{{count}} días",
         "days_one": "{{count}} día",
-        "across": "en {{days}} inolvidables en {{festival}}"
+        "across": "en {{days}} de diversión en {{festival}}"
       }
     },
     "shareImage": {

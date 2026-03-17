@@ -66,7 +66,7 @@ export function TentExplorerSlide({
         {topTents.length > 0 && (
           <div>
             <h3 className="mb-3 text-center text-lg font-semibold text-gray-700">
-              {t("wrapped.tentExplorer.visits", { count: 2 })}
+              {t("wrapped.tentExplorer.topTents")}
             </h3>
             <div className="space-y-2">
               {topTents.map((tent, index) => (

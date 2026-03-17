@@ -1359,17 +1359,21 @@
       "uniqueTents": "Einzigartige Zelte",
       "diversity": "Zeltvielfalt",
       "favorite": "Lieblingszelt",
-      "visits": "Top-Besuche",
-      "visits_one": "Top-Besuch"
+      "visits": "{{count}} Besuche",
+      "visits_one": "{{count}} Besuch",
+      "topTents": "Top-Zelte"
     },
     "peakMoment": {
       "title": "Höhepunkt",
       "subtitle": "dein größter Tag",
       "bestDay": "Bester Tag",
       "maxSession": "Maximum in einer Sitzung",
+      "maxSessionDesc": "Meiste Maß in einer einzigen Sitzung",
       "beers": "{{count}} Maß",
       "beers_one": "{{count}} Maß",
-      "spent": "ausgegeben"
+      "spent": "ausgegeben",
+      "tents": "{{count}} Zelte",
+      "tents_one": "{{count}} Zelt"
     },
     "social": {
       "title": "Soziale Statistiken",
@@ -1446,7 +1450,7 @@
         "tents_one": "{{count}} Zelt",
         "days": "{{count}} Tage",
         "days_one": "{{count}} Tag",
-        "across": "in {{days}} unvergesslichen beim {{festival}}"
+        "across": "in {{days}} voller Spaß beim {{festival}}"
       }
     },
     "shareImage": {

@@ -85,7 +85,7 @@ export function PeakMomentSlide({
                   {best_day.tents_visited}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {t("wrapped.outro.summary.tents", {
+                  {t("wrapped.peakMoment.tents", {
                     count: best_day.tents_visited,
                   })}
                 </p>
@@ -107,7 +107,7 @@ export function PeakMomentSlide({
             {t("wrapped.peakMoment.beers", { count: max_single_session })}
           </p>
           <p className="text-sm text-gray-500">
-            {t("wrapped.peakMoment.subtitle")}
+            {t("wrapped.peakMoment.maxSessionDesc")}
           </p>
         </div>
       </div>
