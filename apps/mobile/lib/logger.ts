@@ -163,12 +163,26 @@ class Logger {
   }
 
   logApiResponse(method: string, url: string, status: number, data?: unknown) {
-    this.debug(`API Response: ${method} ${url} - ${status}`, {
-      method,
-      url,
-      status,
-      data: truncateData(data),
-    });
+    if (status >= 400) {
+      // Log error responses at error level so they're always visible
+      this.error(
+        `API Error Response: ${method} ${url} - ${status}`,
+        undefined,
+        {
+          method,
+          url,
+          status,
+          data: truncateData(data),
+        },
+      );
+    } else {
+      this.debug(`API Response: ${method} ${url} - ${status}`, {
+        method,
+        url,
+        status,
+        data: truncateData(data),
+      });
+    }
   }
 
   logApiError(method: string, url: string, error: unknown) {
