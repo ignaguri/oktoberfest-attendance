@@ -71,4 +71,5 @@ BEGIN
         ELSE 1620
     END;
 END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = public;

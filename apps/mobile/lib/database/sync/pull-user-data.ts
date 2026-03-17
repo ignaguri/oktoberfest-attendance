@@ -162,21 +162,36 @@ export async function pullAttendances(
         if (byNaturalKey && byNaturalKey.id !== att.id) {
           // Local record exists with a different ID — update ID to match server
           // so future API calls (delete, etc.) use the correct server ID.
-          // Also update any consumptions referencing the old local ID.
+          // Wrap in a transaction to avoid partial reconciliation.
           const oldId = byNaturalKey.id;
           const serverUpdatedAt = att.updatedAt ?? att.createdAt;
 
-          await db.runAsync(
-            `UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`,
-            [att.id, oldId],
-          );
+          await db.withTransactionAsync(async () => {
+            // Update all dependent tables referencing the old local ID
+            await db.runAsync(
+              `UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`,
+              [att.id, oldId],
+            );
 
-          await db.runAsync(
-            `UPDATE attendances SET
-              id = ?, beer_count = ?, updated_at = ?, _synced_at = ?, _dirty = 0
-            WHERE id = ?`,
-            [att.id, att.beerCount, serverUpdatedAt, now, oldId],
-          );
+            await db.runAsync(
+              `UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`,
+              [att.id, oldId],
+            );
+
+            // Update pending sync queue entries that reference the old ID
+            await db.runAsync(
+              `UPDATE _sync_queue SET record_id = ? WHERE record_id = ? AND table_name = 'attendances' AND status IN ('pending', 'failed')`,
+              [att.id, oldId],
+            );
+
+            // Update the attendance ID itself
+            await db.runAsync(
+              `UPDATE attendances SET
+                id = ?, beer_count = ?, updated_at = ?, _synced_at = ?, _dirty = 0
+              WHERE id = ?`,
+              [att.id, att.beerCount, serverUpdatedAt, now, oldId],
+            );
+          });
 
           logger.info(
             `[SyncManager] Reconciled attendance ID: ${oldId} → ${att.id}`,

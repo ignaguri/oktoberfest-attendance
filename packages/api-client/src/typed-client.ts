@@ -124,9 +124,9 @@ async function extractApiError(
     error?: { message?: string; code?: string; statusCode?: number };
   }>(response).catch(() => ({ error: undefined }));
   throw new ApiError(
-    body?.error?.code || "UNKNOWN_ERROR",
-    body?.error?.message || fallbackMessage,
-    body?.error?.statusCode || response.status,
+    body?.error?.code ?? "UNKNOWN_ERROR",
+    body?.error?.message ?? fallbackMessage,
+    body?.error?.statusCode ?? response.status,
   );
 }
 
@@ -193,9 +193,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/attendance?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch attendances: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch attendances");
         }
         return parseJsonResponse<ListAttendancesResponse>(response);
       },
@@ -310,7 +308,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch attendance: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch attendance");
         }
         return parseJsonResponse<{ attendance: AttendanceByDate | null }>(
           response,
@@ -356,9 +354,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch consumptions: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch consumptions");
         }
         return parseJsonResponse<{ consumptions: Consumption[] }>(response);
       },
@@ -396,7 +392,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/groups?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(`Failed to fetch groups: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch groups");
         }
         return parseJsonResponse<ListGroupsResponse>(response);
       },
@@ -420,7 +416,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/groups/search?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(`Failed to search groups: ${response.statusText}`);
+          await extractApiError(response, "Failed to search groups");
         }
         return parseJsonResponse(response);
       },
@@ -435,7 +431,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch group: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch group");
         }
         const group = await parseJsonResponse<GroupWithMembers>(response);
         return { data: group };
@@ -509,9 +505,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch group leaderboard: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch group leaderboard");
         }
         return parseJsonResponse<LeaderboardResponse>(response);
       },
@@ -674,9 +668,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/leaderboard?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch global leaderboard: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch global leaderboard");
         }
         return parseJsonResponse<LeaderboardResponse>(response);
       },
@@ -691,9 +683,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch winning criteria: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch winning criteria");
         }
         return parseJsonResponse<WinningCriteriaListResponse>(response);
       },
@@ -714,9 +704,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/achievements?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch achievements: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch achievements");
         }
         return parseJsonResponse<ListAchievementsResponse>(response);
       },
@@ -748,9 +736,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/achievements/with-progress?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch achievements with progress: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch achievements with progress");
         }
         return parseJsonResponse<GetAchievementsWithProgressResponse>(response);
       },
@@ -763,9 +749,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/achievements/leaderboard?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch achievement leaderboard: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch achievement leaderboard");
         }
         return parseJsonResponse<GetAchievementLeaderboardResponse>(response);
       },
@@ -780,9 +764,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch available achievements: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch available achievements");
         }
         return parseJsonResponse<ListAvailableAchievementsResponse>(response);
       },
@@ -801,7 +783,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/tents?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(`Failed to fetch tents: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch tents");
         }
         return parseJsonResponse<ApiResponse<FestivalTent[]>>(response);
       },
@@ -840,9 +822,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch nearby tents: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch nearby tents");
         }
         return parseJsonResponse(response);
       },
@@ -863,9 +843,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch crowd status: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch crowd status");
         }
         return parseJsonResponse<GetCrowdStatusResponse>(response);
       },
@@ -887,9 +865,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch crowd reports: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch crowd reports");
         }
         return parseJsonResponse<GetTentCrowdReportsResponse>(response);
       },
@@ -938,7 +914,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/festivals?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(`Failed to fetch festivals: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch festivals");
         }
         return parseJsonResponse<ListFestivalsResponse>(response);
       },
@@ -953,7 +929,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch festival: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch festival");
         }
         return parseJsonResponse<GetFestivalResponse>(response);
       },
@@ -969,9 +945,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/calendar/personal?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch personal calendar: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch personal calendar");
         }
         return parseJsonResponse<GetCalendarEventsResponse>(response);
       },
@@ -986,9 +960,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch group calendar: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch group calendar");
         }
         return parseJsonResponse<GetCalendarEventsResponse>(response);
       },
@@ -1006,7 +978,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch profile: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch profile");
         }
         return parseJsonResponse<{ profile: ProfileShort }>(response);
       },
@@ -1059,9 +1031,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch tutorial status: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch tutorial status");
         }
         return parseJsonResponse<{ status: TutorialStatus }>(response);
       },
@@ -1077,9 +1047,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to complete tutorial: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to complete tutorial");
         }
         return parseJsonResponse<{ success: boolean }>(response);
       },
@@ -1095,7 +1063,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(`Failed to reset tutorial: ${response.statusText}`);
+          await extractApiError(response, "Failed to reset tutorial");
         }
         return parseJsonResponse<{ success: boolean }>(response);
       },
@@ -1113,9 +1081,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch missing fields: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch missing fields");
         }
         return parseJsonResponse(response);
       },
@@ -1133,7 +1099,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch highlights: ${response.statusText}`);
+          await extractApiError(response, "Failed to fetch highlights");
         }
         return parseJsonResponse<{ highlights: Highlights }>(response);
       },
@@ -1197,9 +1163,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/profiles/${userId}${queryString ? `?${queryString}` : ""}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch public profile: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch public profile");
         }
         return parseJsonResponse<{ profile: PublicProfile }>(response);
       },
@@ -1266,9 +1230,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch reservations: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch reservations");
         }
         return parseJsonResponse(response);
       },
@@ -1494,9 +1456,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch activity feed: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch activity feed");
         }
         return parseJsonResponse(response);
       },
@@ -1565,9 +1525,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch notification preferences: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch notification preferences");
         }
         return parseJsonResponse(response);
       },
@@ -1634,9 +1592,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch wrapped data: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch wrapped data");
         }
         return parseJsonResponse(response);
       },
@@ -1698,9 +1654,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to check wrapped access: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to check wrapped access");
         }
         return parseJsonResponse(response);
       },
@@ -1723,9 +1677,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch available wrapped festivals: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch available wrapped festivals");
         }
         return parseJsonResponse(response);
       },
@@ -1772,9 +1724,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch global photo settings: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch global photo settings");
         }
         return parseJsonResponse(response);
       },
@@ -1815,9 +1765,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch group photo settings: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch group photo settings");
         }
         return parseJsonResponse(response);
       },
@@ -1835,9 +1783,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch group photo settings: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch group photo settings");
         }
         return parseJsonResponse(response);
       },
@@ -2177,9 +2123,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch nearby members: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch nearby members");
         }
         return parseJsonResponse(response);
       },
@@ -2212,9 +2156,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch photo reactions: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch photo reactions");
         }
         return parseJsonResponse(response);
       },
@@ -2282,9 +2224,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch photo comments: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch photo comments");
         }
         return parseJsonResponse(response);
       },
@@ -2351,9 +2291,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch group messages: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch group messages");
         }
         return parseJsonResponse<GetGroupMessagesResponse>(response);
       },
@@ -2376,9 +2314,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch message feed: ${response.statusText}`,
-          );
+          await extractApiError(response, "Failed to fetch message feed");
         }
         return parseJsonResponse<GetMessageFeedResponse>(response);
       },
