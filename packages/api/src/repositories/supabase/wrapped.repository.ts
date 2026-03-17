@@ -17,7 +17,6 @@ import type { IWrappedRepository } from "../interfaces/wrapped.repository";
  * Access control configuration for wrapped feature
  */
 const ACCESS_CONFIG = {
-  allowInDev: false,
   requireFestivalEnded: true,
   minAttendanceDays: 0,
   allowedUsers: [] as string[],
@@ -164,11 +163,6 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       return { allowed: true };
     }
 
-    // Allow in development environment
-    if (ACCESS_CONFIG.allowInDev && process.env.NODE_ENV === "development") {
-      return { allowed: true };
-    }
-
     // Get festival to check status
     const { data: festival, error: festivalError } = await this.supabase
       .from("festivals")
@@ -226,18 +220,12 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
   async getAvailableFestivals(
     userId: string,
   ): Promise<AvailableWrappedFestival[]> {
-    // In development, show all festivals
-    // In production, only show ended festivals
-    let festivalQuery = this.supabase
+    // Only show ended festivals
+    const { data: festivals, error: festivalsError } = await this.supabase
       .from("festivals")
       .select("id, name, start_date, status")
+      .eq("status", "ended")
       .order("start_date", { ascending: false });
-
-    if (!ACCESS_CONFIG.allowInDev || process.env.NODE_ENV !== "development") {
-      festivalQuery = festivalQuery.eq("status", "ended");
-    }
-
-    const { data: festivals, error: festivalsError } = await festivalQuery;
 
     if (festivalsError || !festivals) {
       throw new DatabaseError(
