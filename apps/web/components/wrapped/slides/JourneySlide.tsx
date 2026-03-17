@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { CHART_CONFIG } from "@prostcounter/shared/wrapped";
 import { prepareTimelineData } from "@prostcounter/shared/wrapped";
@@ -21,6 +22,7 @@ interface JourneySlideProps {
 }
 
 export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
+  const { t } = useTranslation();
   const timelineData = prepareTimelineData(data.timeline);
 
   if (timelineData.length === 0) {
@@ -29,7 +31,7 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
         isActive={isActive}
         className="bg-gradient-to-br from-purple-50 to-pink-50"
       >
-        <SlideTitle>Your beer journey</SlideTitle>
+        <SlideTitle>{t("wrapped.journey.title")}</SlideTitle>
         <p className="text-gray-600">No timeline data available</p>
       </BaseSlide>
     );
@@ -40,8 +42,8 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
       isActive={isActive}
       className="bg-gradient-to-br from-purple-50 to-pink-50"
     >
-      <SlideTitle>Your beer journey</SlideTitle>
-      <SlideSubtitle>Day by day progression</SlideSubtitle>
+      <SlideTitle>{t("wrapped.journey.title")}</SlideTitle>
+      <SlideSubtitle>{t("wrapped.journey.subtitle")}</SlideSubtitle>
 
       <div className="w-full max-w-3xl">
         <ResponsiveContainer
@@ -84,13 +86,19 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
 
         <div className="mt-6 grid grid-cols-2 gap-4 text-center">
           <div className="rounded-lg bg-white p-3 shadow">
-            <p className="text-sm text-gray-600">Peak day</p>
+            <p className="text-sm text-gray-600">
+              {t("wrapped.peakMoment.bestDay")}
+            </p>
             <p className="text-xl font-bold text-yellow-600">
-              {Math.max(...timelineData.map((d) => d.beers))} beers
+              {t("wrapped.peakMoment.beers", {
+                count: Math.max(...timelineData.map((d) => d.beers)),
+              })}
             </p>
           </div>
           <div className="rounded-lg bg-white p-3 shadow">
-            <p className="text-sm text-gray-600">Total days</p>
+            <p className="text-sm text-gray-600">
+              {t("wrapped.numbers.daysAttended")}
+            </p>
             <p className="text-xl font-bold text-yellow-600">
               {timelineData.length}
             </p>

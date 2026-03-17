@@ -97,7 +97,6 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
                 </Text>
               </HStack>
               <Text className="text-sm text-gray-500">
-                {tent.visit_count}{" "}
                 {t("wrapped.tentExplorer.visits", { count: tent.visit_count })}
               </Text>
             </Motion.View>

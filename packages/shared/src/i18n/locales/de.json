@@ -1345,10 +1345,13 @@
     "numbers": {
       "title": "dein Festival in Zahlen",
       "subtitle": "Das hast du erreicht",
-      "totalBeers": "Mass gesamt",
+      "totalBeers": "Getränke gesamt",
       "daysAttended": "Tage besucht",
       "avgPerDay": "Durchschnitt pro Tag",
-      "totalSpent": "Ausgaben gesamt"
+      "totalSpent": "Ausgaben gesamt",
+      "finalMessageLotsOfProst": "Das ist eine Menge Prost!",
+      "finalMessageLotsOfDays": "Das sind viele Tage!",
+      "finalMessageNotBad": "Das ist gar nicht so schlecht!"
     },
     "tentExplorer": {
       "title": "Zelt-Entdecker",
@@ -1356,16 +1359,16 @@
       "uniqueTents": "Einzigartige Zelte",
       "diversity": "Zeltvielfalt",
       "favorite": "Lieblingszelt",
-      "visits": "Besuche",
-      "visits_one": "Besuch"
+      "visits": "Top-Besuche",
+      "visits_one": "Top-Besuch"
     },
     "peakMoment": {
       "title": "Höhepunkt",
       "subtitle": "dein größter Tag",
       "bestDay": "Bester Tag",
       "maxSession": "Maximum in einer Sitzung",
-      "beers": "Maß",
-      "beers_one": "Maß",
+      "beers": "{{count}} Maß",
+      "beers_one": "{{count}} Maß",
       "spent": "ausgegeben"
     },
     "social": {
@@ -1437,12 +1440,13 @@
       "share": "deinen Rückblick teilen",
       "sharing": "Erstelle dein Teilbild...",
       "summary": {
-        "beers": "Maß",
-        "beers_one": "Maß",
-        "tents": "Zelte",
-        "tents_one": "Zelt",
-        "days": "Tage",
-        "days_one": "Tag"
+        "beers": "{{count}} Maß",
+        "beers_one": "{{count}} Maß",
+        "tents": "{{count}} Zelte",
+        "tents_one": "{{count}} Zelt",
+        "days": "{{count}} Tage",
+        "days_one": "{{count}} Tag",
+        "across": "in {{days}} unvergesslichen beim {{festival}}"
       }
     },
     "shareImage": {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 import { Beer, CalendarDays, DiamondPercent, Globe, Users } from "lucide-react";
@@ -12,6 +13,7 @@ interface RankingsSlideProps {
 }
 
 export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
+  const { t } = useTranslation();
   const { top_3_rankings } = data.social_stats;
   const { days_attended, total_beers, avg_beers } =
     data.global_leaderboard_positions;
@@ -26,8 +28,8 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
         isActive={isActive}
         className="bg-gradient-to-br from-orange-50 to-red-50"
       >
-        <SlideTitle>Your rankings</SlideTitle>
-        <p className="text-gray-600">No rankings available yet</p>
+        <SlideTitle>{t("wrapped.rankings.title")}</SlideTitle>
+        <p className="text-gray-600">{t("wrapped.rankings.subtitle")}</p>
       </BaseSlide>
     );
   }
@@ -44,7 +46,7 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
       isActive={isActive}
       className="bg-gradient-to-br from-orange-50 to-red-50"
     >
-      <SlideTitle>Your rankings</SlideTitle>
+      <SlideTitle>{t("wrapped.rankings.title")}</SlideTitle>
 
       <div className="flex w-full max-w-2xl flex-col gap-6">
         {/* Group Rankings Section */}
@@ -52,7 +54,7 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
           <div className="flex flex-col gap-2">
             <h3 className="flex items-center justify-center gap-2 text-lg font-semibold text-gray-800">
               <Users className="size-5" />
-              Group rankings
+              {t("wrapped.rankings.groupRankings")}
             </h3>
             <div className="flex flex-col gap-2">
               {top_3_rankings.slice(0, 3).map((ranking, index) => (
@@ -87,7 +89,7 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
           <div className="flex flex-col gap-2">
             <h3 className="flex items-center justify-center gap-2 text-lg font-semibold text-gray-800">
               <Globe className="size-5" />
-              Global rankings
+              {t("wrapped.rankings.globalRankings")}
             </h3>
             <div className="flex flex-col gap-2">
               {days_attended !== null && (

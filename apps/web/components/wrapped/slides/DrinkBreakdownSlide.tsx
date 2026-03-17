@@ -72,7 +72,10 @@ export function DrinkBreakdownSlide({
                     {t(`wrapped.drinkBreakdown.drinkTypes.${item.drink_type}`)}
                   </span>
                   <span className="font-bold text-amber-600">
-                    {item.percentage}%
+                    {item.count}{" "}
+                    <span className="font-normal text-gray-500">
+                      ({item.percentage}%)
+                    </span>
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-amber-100">

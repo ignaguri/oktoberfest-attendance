@@ -1,5 +1,6 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import Image from "next/image";
 
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { useTutorialStatus } from "@/hooks/useProfile";
+import { getFestivalStatus } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 import LogoImage from "@/public/android-chrome-512x512.png";
 
@@ -30,8 +32,12 @@ import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 
 export default function Home() {
   const { t } = useTranslation();
+  const { currentFestival } = useFestival();
   const { data: tutorialStatus, loading: isTutorialStatusLoading } =
     useTutorialStatus();
+
+  const isActive =
+    currentFestival && getFestivalStatus(currentFestival) === "active";
 
   return (
     <TutorialProvider
@@ -60,9 +66,11 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full">
-          <CrowdStatusCard />
-        </div>
+        {isActive && (
+          <div className="w-full">
+            <CrowdStatusCard />
+          </div>
+        )}
 
         <div data-tutorial="news-feed" className="w-full">
           <NewsFeed />

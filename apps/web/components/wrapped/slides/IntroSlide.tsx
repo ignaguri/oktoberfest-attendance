@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import Image from "next/image";
 import { useEffect } from "react";
@@ -17,6 +18,7 @@ interface IntroSlideProps {
 }
 
 export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
+  const { t } = useTranslation();
   const { isExploding, triggerConfetti } = useConfetti();
   const username = data.user_info.username || data.user_info.full_name || "You";
 
@@ -64,17 +66,17 @@ export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
         </SlideTitle>
 
         <SlideSubtitle className="text-2xl font-semibold">
-          Festival Wrap
+          {t("wrapped.intro.title")}
         </SlideSubtitle>
 
         <div className="mt-4 rounded-lg bg-white px-6 py-3 shadow-md">
           <p className="text-xl font-medium text-gray-700">
-            {username}&apos;s festival highlights
+            {t("wrapped.intro.subtitle", { username })}
           </p>
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Swipe to see your wrap →</p>
+          <p>{t("wrapped.swipeToBegin")}</p>
         </div>
       </div>
     </BaseSlide>

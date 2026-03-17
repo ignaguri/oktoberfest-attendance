@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import {
   formatCurrency,
@@ -23,6 +24,7 @@ export function PeakMomentSlide({
   data,
   isActive = false,
 }: PeakMomentSlideProps) {
+  const { t } = useTranslation();
   const { isExploding, triggerConfetti } = useConfetti();
   const { best_day, max_single_session } = data.peak_moments;
 
@@ -53,8 +55,8 @@ export function PeakMomentSlide({
         </div>
       )}
 
-      <SlideTitle>Peak moments</SlideTitle>
-      <SlideSubtitle>Your best performances</SlideSubtitle>
+      <SlideTitle>{t("wrapped.peakMoment.title")}</SlideTitle>
+      <SlideSubtitle>{t("wrapped.peakMoment.subtitle")}</SlideSubtitle>
 
       <div className="z-10 flex w-full max-w-2xl flex-col gap-4">
         {best_day && (
@@ -63,25 +65,35 @@ export function PeakMomentSlide({
               <Beer className="size-10" />
               <Tent className="size-10" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-700">Best day</h3>
+            <h3 className="text-lg font-semibold text-gray-700">
+              {t("wrapped.peakMoment.bestDay")}
+            </h3>
             <div className="flex items-center justify-center gap-4">
               <div className="text-center">
                 <p className="text-3xl font-bold text-yellow-600">
                   {best_day.beer_count}
                 </p>
-                <p className="text-xs text-gray-500">beers</p>
+                <p className="text-xs text-gray-500">
+                  {t("wrapped.peakMoment.beers", {
+                    count: best_day.beer_count,
+                  })}
+                </p>
               </div>
               <div className="text-2xl text-gray-400">+</div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-green-700">
                   {best_day.tents_visited}
                 </p>
-                <p className="text-xs text-gray-500">tents</p>
+                <p className="text-xs text-gray-500">
+                  {t("wrapped.outro.summary.tents", {
+                    count: best_day.tents_visited,
+                  })}
+                </p>
               </div>
             </div>
             <p className="text-gray-600">{formatWrappedDate(best_day.date)}</p>
             <p className="text-sm text-gray-500">
-              {formatCurrency(best_day.spent)} spent
+              {formatCurrency(best_day.spent)} {t("wrapped.peakMoment.spent")}
             </p>
           </div>
         )}
@@ -89,12 +101,14 @@ export function PeakMomentSlide({
         <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-6 shadow-lg">
           <BicepsFlexed className="size-10" />
           <h3 className="text-lg font-semibold text-gray-700">
-            Biggest session
+            {t("wrapped.peakMoment.maxSession")}
           </h3>
           <p className="text-4xl font-bold text-yellow-600">
-            {max_single_session} beers
+            {t("wrapped.peakMoment.beers", { count: max_single_session })}
           </p>
-          <p className="text-sm text-gray-500">most beers in a single day</p>
+          <p className="text-sm text-gray-500">
+            {t("wrapped.peakMoment.subtitle")}
+          </p>
         </div>
       </div>
     </BaseSlide>

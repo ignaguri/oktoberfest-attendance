@@ -67,7 +67,6 @@ export function PeakMomentSlide({ data, isActive }: PeakMomentSlideProps) {
               {formatWrappedDate(bestDay.date)}
             </Text>
             <Text className="mt-2 text-3xl font-bold text-yellow-600">
-              {bestDay.beer_count}{" "}
               {t("wrapped.peakMoment.beers", { count: bestDay.beer_count })}
             </Text>
             <Text className="mt-1 text-sm text-gray-500">

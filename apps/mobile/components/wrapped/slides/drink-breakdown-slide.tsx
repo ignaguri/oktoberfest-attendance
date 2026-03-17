@@ -59,7 +59,10 @@ export function DrinkBreakdownSlide({
                         )}
                       </Text>
                       <Text className="text-sm font-bold text-amber-600">
-                        {item.percentage}%
+                        {item.count}{" "}
+                        <Text className="text-sm font-normal text-gray-500">
+                          ({item.percentage}%)
+                        </Text>
                       </Text>
                     </View>
                     <View className="h-2 rounded-full bg-amber-100">

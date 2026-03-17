@@ -1,3 +1,20 @@
+-- Migrate get_wrapped_data to use consumptions table instead of legacy beer_count.
+-- Uses COALESCE(NULLIF(consumptions_count, 0), beer_count) for backwards compatibility
+-- with attendances that don't yet have consumptions rows.
+
+-- Helper function: get effective drink count for an attendance
+-- Returns consumptions count if > 0, otherwise falls back to legacy beer_count
+CREATE OR REPLACE FUNCTION _get_effective_drink_count(p_attendance_id UUID)
+RETURNS INT
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT COALESCE(
+    NULLIF((SELECT COUNT(*)::int FROM consumptions WHERE attendance_id = p_attendance_id), 0),
+    (SELECT beer_count FROM attendances WHERE id = p_attendance_id)
+  );
+$$;
+
 CREATE OR REPLACE FUNCTION "public"."get_wrapped_data"("p_user_id" "uuid", "p_festival_id" "uuid") RETURNS "jsonb"
     LANGUAGE "plpgsql"
     AS $$
@@ -47,19 +64,25 @@ BEGIN
     )
   );
 
-  -- Calculate basic stats
-  -- Using festival beer cost for simplified calculation (fallback: festival -> global default)
-  WITH attendance_agg AS (
+  -- Calculate basic stats using consumptions (with beer_count fallback)
+  WITH attendance_drinks AS (
     SELECT
-      COUNT(DISTINCT a.date) AS days_attended,
-      COALESCE(SUM(a.beer_count), 0) AS total_beers,
-      CASE
-        WHEN COUNT(DISTINCT a.date) > 0 THEN
-          ROUND(COALESCE(SUM(a.beer_count), 0)::NUMERIC / COUNT(DISTINCT a.date)::NUMERIC, 2)
-        ELSE 0
-      END AS avg_beers
+      a.id,
+      a.date,
+      _get_effective_drink_count(a.id) AS drink_count
     FROM attendances a
     WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
+  ),
+  attendance_agg AS (
+    SELECT
+      COUNT(DISTINCT ad.date) AS days_attended,
+      COALESCE(SUM(ad.drink_count), 0) AS total_beers,
+      CASE
+        WHEN COUNT(DISTINCT ad.date) > 0 THEN
+          ROUND(COALESCE(SUM(ad.drink_count), 0)::NUMERIC / COUNT(DISTINCT ad.date)::NUMERIC, 2)
+        ELSE 0
+      END AS avg_beers
+    FROM attendance_drinks ad
   )
   SELECT jsonb_build_object(
     'total_beers', total_beers,
@@ -72,7 +95,7 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('basic_stats', v_basic_stats);
 
-  -- Calculate tent stats (FIXED VERSION - added festival_id filter)
+  -- Calculate tent stats
   WITH tent_stats AS (
     SELECT
       tv.tent_id,
@@ -120,15 +143,14 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('tent_stats', v_tent_stats);
 
-  -- Calculate peak moments
-  -- Best day now uses combined score (beers + tents_visited) for more comprehensive performance metric
+  -- Calculate peak moments using consumptions (with beer_count fallback)
   WITH daily_scores AS (
     SELECT
       a.date,
-      a.beer_count,
+      _get_effective_drink_count(a.id) AS drink_count,
       COALESCE(tv.tent_count, 0) as tents_visited,
-      (a.beer_count + COALESCE(tv.tent_count, 0)) as combined_score,
-      ROUND(a.beer_count * v_beer_cost, 2) AS spent
+      (_get_effective_drink_count(a.id) + COALESCE(tv.tent_count, 0)) as combined_score,
+      ROUND(_get_effective_drink_count(a.id) * v_beer_cost, 2) AS spent
     FROM attendances a
     LEFT JOIN (
       SELECT
@@ -144,7 +166,7 @@ BEGIN
   best_day AS (
     SELECT
       ds.date,
-      ds.beer_count,
+      ds.drink_count,
       ds.tents_visited,
       ds.spent
     FROM daily_scores ds
@@ -152,17 +174,17 @@ BEGIN
     LIMIT 1
   ),
   max_session AS (
-    SELECT COALESCE(MAX(a.beer_count), 0) AS max_beers
+    SELECT COALESCE(MAX(_get_effective_drink_count(a.id)), 0) AS max_beers
     FROM attendances a
     WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
   ),
   most_expensive AS (
     SELECT
       a.date,
-      ROUND(a.beer_count * v_beer_cost, 2) AS amount
+      ROUND(_get_effective_drink_count(a.id) * v_beer_cost, 2) AS amount
     FROM attendances a
     WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
-    ORDER BY (a.beer_count * v_beer_cost) DESC
+    ORDER BY (_get_effective_drink_count(a.id) * v_beer_cost) DESC
     LIMIT 1
   )
   SELECT jsonb_build_object(
@@ -170,7 +192,7 @@ BEGIN
       WHEN bd.date IS NOT NULL THEN
         jsonb_build_object(
           'date', bd.date,
-          'beer_count', bd.beer_count,
+          'beer_count', bd.drink_count,
           'tents_visited', bd.tents_visited,
           'spent', bd.spent
         )
@@ -190,7 +212,7 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('peak_moments', v_peak_moments);
 
-  -- Calculate social stats
+  -- Calculate social stats (rankings use consumptions via helper)
   WITH user_groups AS (
     SELECT
       COUNT(DISTINCT gm.group_id) AS groups_joined,
@@ -220,12 +242,12 @@ BEGIN
           WHEN wc.name = 'total_beers' THEN
             ROW_NUMBER() OVER (
               PARTITION BY g.id
-              ORDER BY COALESCE(SUM(a.beer_count), 0) DESC, p.username ASC
+              ORDER BY COALESCE(SUM(_get_effective_drink_count(a.id)), 0) DESC, p.username ASC
             )
           WHEN wc.name = 'avg_beers' THEN
             ROW_NUMBER() OVER (
               PARTITION BY g.id
-              ORDER BY COALESCE(AVG(a.beer_count), 0) DESC, p.username ASC
+              ORDER BY COALESCE(AVG(_get_effective_drink_count(a.id)), 0) DESC, p.username ASC
             )
           ELSE 1
         END AS user_rank
@@ -261,7 +283,7 @@ BEGIN
       AND a.date <= v_festival.end_date
       AND a.festival_id = p_festival_id
     ORDER BY bp.created_at DESC
-    LIMIT 20 -- Limit to prevent excessive data
+    LIMIT 20
   )
   SELECT jsonb_build_object(
     'groups_joined', ug.groups_joined,
@@ -285,6 +307,7 @@ BEGIN
   v_result := v_result || jsonb_build_object('social_stats', v_social_stats);
 
   -- Calculate global leaderboard positions for days_attended, total_beers, and avg_beers
+  -- Note: get_global_leaderboard uses its own logic; wrapped-specific positions calculated here
   WITH global_positions AS (
     SELECT
       'days_attended' as criteria,
@@ -343,13 +366,13 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('achievements', v_achievements);
 
-  -- Build timeline (daily progression)
+  -- Build timeline (daily progression) using consumptions
   SELECT COALESCE(
     jsonb_agg(
       jsonb_build_object(
         'date', a.date,
-        'beer_count', a.beer_count,
-        'spent', ROUND(a.beer_count * v_beer_cost, 2),
+        'beer_count', _get_effective_drink_count(a.id),
+        'spent', ROUND(_get_effective_drink_count(a.id) * v_beer_cost, 2),
         'tents_visited', (
           SELECT COUNT(DISTINCT tent_id)
           FROM tent_visits tv
@@ -366,19 +389,19 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('timeline', v_timeline);
 
-  -- Calculate comparisons
+  -- Calculate comparisons using consumptions
   WITH festival_avg AS (
     SELECT
-      ROUND(AVG(total_beers), 2) AS avg_beers,
+      ROUND(AVG(total_drinks), 2) AS avg_beers,
       ROUND(AVG(days_attended), 2) AS avg_days
     FROM (
       SELECT
-        user_id,
-        COUNT(DISTINCT date) AS days_attended,
-        SUM(beer_count) AS total_beers
-      FROM attendances
-      WHERE festival_id = p_festival_id
-      GROUP BY user_id
+        a.user_id,
+        COUNT(DISTINCT a.date) AS days_attended,
+        SUM(_get_effective_drink_count(a.id)) AS total_drinks
+      FROM attendances a
+      WHERE a.festival_id = p_festival_id
+      GROUP BY a.user_id
     ) user_stats
   ),
   user_current AS (
@@ -391,8 +414,8 @@ BEGIN
       f.id as festival_id,
       f.name as festival_name,
       COUNT(DISTINCT a.date) AS prev_days,
-      COALESCE(SUM(a.beer_count), 0) AS prev_beers,
-      COALESCE(SUM(a.beer_count) * v_beer_cost, 0) AS prev_spent
+      COALESCE(SUM(_get_effective_drink_count(a.id)), 0) AS prev_beers,
+      COALESCE(SUM(_get_effective_drink_count(a.id)) * v_beer_cost, 0) AS prev_spent
     FROM attendances a
     JOIN festivals f ON a.festival_id = f.id
     WHERE a.user_id = p_user_id
@@ -433,29 +456,33 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('comparisons', v_comparisons);
 
-  -- Calculate personality type
-  WITH user_patterns AS (
+  -- Calculate personality type using consumptions
+  WITH attendance_drinks AS (
+    SELECT
+      a.id,
+      a.date,
+      _get_effective_drink_count(a.id) AS drink_count
+    FROM attendances a
+    WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
+  ),
+  user_patterns AS (
     SELECT
       (v_basic_stats->>'total_beers')::INT AS total_beers,
       (v_basic_stats->>'days_attended')::INT AS days_attended,
       (v_basic_stats->>'avg_beers')::NUMERIC AS avg_beers,
       (v_tent_stats->>'unique_tents')::INT AS unique_tents,
       (SELECT COUNT(*) FROM tents) AS total_tents,
-      -- Check if early bird (attended first day)
       EXISTS (
         SELECT 1 FROM attendances
         WHERE user_id = p_user_id
           AND festival_id = p_festival_id
           AND date = v_festival.start_date
       ) AS attended_first_day,
-      -- Check consistency (variance in daily beers)
-      COALESCE(STDDEV(beer_count), 0) AS beer_variance
-    FROM attendances
-    WHERE user_id = p_user_id AND festival_id = p_festival_id
+      COALESCE(STDDEV(ad.drink_count), 0) AS beer_variance
+    FROM attendance_drinks ad
   )
   SELECT jsonb_build_object(
     'type', CASE
-      -- Determine primary personality type
       WHEN up.unique_tents >= up.total_tents * 0.7 THEN 'Explorer'
       WHEN up.avg_beers >= 8 THEN 'Champion'
       WHEN up.days_attended >= (v_festival.end_date - v_festival.start_date + 1) * 0.8 THEN 'Loyalist'
@@ -470,13 +497,13 @@ BEGIN
       CASE WHEN up.avg_beers >= 6 THEN 'Heavy Hitter'
            WHEN up.avg_beers >= 4 THEN 'Moderate'
            ELSE 'Light Drinker' END
-    ) - ARRAY[NULL]::TEXT[] -- Remove nulls
+    ) - ARRAY[NULL]::TEXT[]
   ) INTO v_personality
   FROM user_patterns up;
 
   v_result := v_result || jsonb_build_object('personality', v_personality);
 
-  -- Calculate drink stats from consumptions table
+  -- Calculate drink stats from consumptions table (type breakdown)
   WITH drink_breakdown AS (
     SELECT
       c.drink_type::text AS drink_type,
@@ -509,28 +536,8 @@ BEGIN
 
   v_result := v_result || jsonb_build_object('drink_stats', v_drink_stats);
 
-  -- If consumptions data exists, override basic_stats totals with consumptions-derived values.
-  -- beer_count in attendances is legacy; consumptions is the source of truth going forward.
-  IF (v_drink_stats->>'total_drinks')::INT > 0 THEN
-    DECLARE
-      v_consumptions_total INT := (v_drink_stats->>'total_drinks')::INT;
-      v_days INT := (v_basic_stats->>'days_attended')::INT;
-      v_beer_cost_val NUMERIC := (v_basic_stats->>'beer_cost')::NUMERIC;
-    BEGIN
-      v_result := v_result || jsonb_build_object(
-        'basic_stats', (v_result->'basic_stats') || jsonb_build_object(
-          'total_beers', v_consumptions_total,
-          'avg_beers', CASE WHEN v_days > 0
-            THEN ROUND(v_consumptions_total::NUMERIC / v_days::NUMERIC, 2)
-            ELSE 0 END,
-          'total_spent', ROUND(v_consumptions_total * v_beer_cost_val, 2)
-        )
-      );
-    END;
-  END IF;
-
   RETURN v_result;
 END;
 $$;
 
-COMMENT ON FUNCTION "public"."get_wrapped_data"("p_user_id" "uuid", "p_festival_id" "uuid") IS 'Returns comprehensive wrapped statistics for a user''s festival experience including basic stats, tent exploration, peak moments, social stats, achievements, timeline, comparisons, personality insights, and drink stats by type.';
+COMMENT ON FUNCTION "public"."get_wrapped_data"("p_user_id" "uuid", "p_festival_id" "uuid") IS 'Returns comprehensive wrapped statistics for a user''s festival experience. Uses consumptions table as source of truth for drink counts, with fallback to legacy attendances.beer_count for backwards compatibility.';

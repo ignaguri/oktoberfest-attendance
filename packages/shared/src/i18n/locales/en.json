@@ -1588,10 +1588,13 @@
     "numbers": {
       "title": "Your festival in numbers",
       "subtitle": "Here's what you did",
-      "totalBeers": "Total beers",
+      "totalBeers": "Total drinks",
       "daysAttended": "Days attended",
       "avgPerDay": "Average per day",
-      "totalSpent": "Total spent"
+      "totalSpent": "Total spent",
+      "finalMessageLotsOfProst": "That's a lot of Prost!",
+      "finalMessageLotsOfDays": "That's a lot of days!",
+      "finalMessageNotBad": "That's not too bad!"
     },
     "journey": {
       "title": "Your journey",
@@ -1603,16 +1606,16 @@
       "uniqueTents": "Unique tents",
       "diversity": "Tent diversity",
       "favorite": "Favorite tent",
-      "visits": "visits",
-      "visits_one": "visit"
+      "visits": "Top visits",
+      "visits_one": "Top visit"
     },
     "peakMoment": {
       "title": "Peak moment",
       "subtitle": "Your biggest day",
       "bestDay": "Best day",
       "maxSession": "Max in one session",
-      "beers": "beers",
-      "beers_one": "beer",
+      "beers": "{{count}} beers",
+      "beers_one": "{{count}} beer",
       "spent": "spent"
     },
     "social": {
@@ -1684,12 +1687,13 @@
       "share": "Share Your Wrapped",
       "sharing": "Creating your share image...",
       "summary": {
-        "beers": "beers",
-        "beers_one": "beer",
-        "tents": "tents",
-        "tents_one": "tent",
-        "days": "days",
-        "days_one": "day"
+        "beers": "{{count}} beers",
+        "beers_one": "{{count}} beer",
+        "tents": "{{count}} tents",
+        "tents_one": "{{count}} tent",
+        "days": "{{count}} days",
+        "days_one": "{{count}} day",
+        "across": "across {{days}} unforgettable at {{festival}}"
       }
     },
     "shareImage": {

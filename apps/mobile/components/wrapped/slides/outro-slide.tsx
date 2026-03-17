@@ -69,15 +69,14 @@ export function OutroSlide({ data, isActive, onClose }: OutroSlideProps) {
             {data.festival_info?.name ?? ""}
           </Text>
           <Text className="mt-1 text-lg font-bold text-gray-800">
-            {data.basic_stats?.total_beers ?? 0}{" "}
             {t("wrapped.outro.summary.beers", {
               count: data.basic_stats?.total_beers ?? 0,
             })}{" "}
-            {"\u{1F37A}"} {"\u{00B7}"} {data.tent_stats?.unique_tents ?? 0}{" "}
+            {"\u{1F37A}"} {"\u{00B7}"}{" "}
             {t("wrapped.outro.summary.tents", {
               count: data.tent_stats?.unique_tents ?? 0,
             })}{" "}
-            {"\u{1F3AA}"} {"\u{00B7}"} {data.basic_stats?.days_attended ?? 0}{" "}
+            {"\u{1F3AA}"} {"\u{00B7}"}{" "}
             {t("wrapped.outro.summary.days", {
               count: data.basic_stats?.days_attended ?? 0,
             })}

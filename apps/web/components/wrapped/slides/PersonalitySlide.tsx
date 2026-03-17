@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { getPersonalityDescription } from "@prostcounter/shared/wrapped";
 import {
@@ -24,6 +25,7 @@ export function PersonalitySlide({
   data,
   isActive = false,
 }: PersonalitySlideProps) {
+  const { t } = useTranslation();
   const { type, traits } = data.personality;
   const description = getPersonalityDescription(type, traits);
   const emoji = getPersonalityEmoji(type);
@@ -33,8 +35,8 @@ export function PersonalitySlide({
       isActive={isActive}
       className="bg-gradient-to-br from-pink-50 to-rose-50"
     >
-      <SlideTitle>Your festival personality</SlideTitle>
-      <SlideSubtitle>Based on your behavior</SlideSubtitle>
+      <SlideTitle>{t("wrapped.personalitySlide.title")}</SlideTitle>
+      <SlideSubtitle>{t("wrapped.personalitySlide.subtitle")}</SlideSubtitle>
 
       <SlideContent className="flex flex-col gap-4">
         {/* Personality Type */}
@@ -52,7 +54,7 @@ export function PersonalitySlide({
         {/* Traits */}
         <div>
           <h3 className="mb-2 text-center text-lg font-semibold text-gray-700">
-            Your traits
+            {t("wrapped.personalitySlide.traits")}
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {traits
