@@ -510,6 +510,7 @@ export class NotificationService {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Fcm,
+          integrationIdentifier: "",
           credentials: {
             deviceTokens: [token],
           },
@@ -534,6 +535,7 @@ export class NotificationService {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Fcm,
+          integrationIdentifier: "",
           credentials: {
             deviceTokens: tokens,
           },

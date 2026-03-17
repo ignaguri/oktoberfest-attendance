@@ -913,7 +913,7 @@ const DevToolsShowcase = () => {
       );
 
       if (authKeys.length > 0) {
-        await AsyncStorage.multiRemove(authKeys);
+        await AsyncStorage.removeMany(authKeys);
       }
 
       // Sign out to clear any in-memory auth state
