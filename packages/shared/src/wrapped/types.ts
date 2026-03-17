@@ -161,10 +161,10 @@ export interface WrappedData {
     type: string;
     traits: string[];
   };
-  drink_stats?: {
-    total_drinks: number;
-    top_drink_type: string | null;
-    breakdown: { drink_type: string; count: number; percentage: number }[];
+  drinkStats?: {
+    totalDrinks: number;
+    topDrinkType: string | null;
+    breakdown: { drinkType: string; count: number; percentage: number }[];
   };
 }
 

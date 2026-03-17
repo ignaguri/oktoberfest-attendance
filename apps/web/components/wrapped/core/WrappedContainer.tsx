@@ -42,7 +42,7 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     () => [
       { key: "intro", component: IntroSlide },
       { key: "numbers", component: NumbersSlide },
-      ...(data.drink_stats?.breakdown && data.drink_stats.breakdown.length > 0
+      ...(data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0
         ? [{ key: "drink_breakdown", component: DrinkBreakdownSlide }]
         : []),
       { key: "journey", component: JourneySlide },

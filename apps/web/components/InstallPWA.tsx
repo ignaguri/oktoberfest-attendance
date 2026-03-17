@@ -78,16 +78,15 @@ export default function InstallPWA() {
               <p className="text-muted-foreground">
                 {t("pwa.install.appStore.message")}
               </p>
-              <a
-                href={APP_STORE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full"
-              >
-                <Button className="w-full">
+              <Button asChild className="w-full">
+                <a
+                  href={APP_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {t("pwa.install.appStore.button")}
-                </Button>
-              </a>
+                </a>
+              </Button>
             </div>
           ) : (
             <p className="text-muted-foreground text-left text-sm">

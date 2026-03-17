@@ -19,9 +19,8 @@ export function DrinkBreakdownSlide({
   isActive,
 }: DrinkBreakdownSlideProps) {
   const { t } = useTranslation();
-  const breakdown = data.drink_stats?.breakdown?.slice(0, 4) ?? [];
-  const topDrink = data.drink_stats?.top_drink_type;
-  const totalDrinks = data.drink_stats?.total_drinks ?? 0;
+  const breakdown = data.drinkStats?.breakdown?.slice(0, 4) ?? [];
+  const topDrink = data.drinkStats?.topDrinkType;
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-amber-50">
@@ -49,13 +48,13 @@ export function DrinkBreakdownSlide({
               <VStack space="sm">
                 {breakdown.map((item, index) => (
                   <View
-                    key={item.drink_type}
+                    key={item.drinkType}
                     className="rounded-lg bg-white p-3 shadow-sm"
                   >
                     <View className="mb-1 flex-row items-center justify-between">
                       <Text className="text-sm font-medium text-gray-700">
                         {t(
-                          `wrapped.drinkBreakdown.drinkTypes.${item.drink_type}`,
+                          `wrapped.drinkBreakdown.drinkTypes.${item.drinkType}`,
                         )}
                       </Text>
                       <Text className="text-sm font-bold text-amber-600">

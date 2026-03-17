@@ -144,13 +144,11 @@ BEGIN
   v_result := v_result || jsonb_build_object('tent_stats', v_tent_stats);
 
   -- Calculate peak moments using consumptions (with beer_count fallback)
-  WITH daily_scores AS (
+  WITH daily_base AS (
     SELECT
       a.date,
       _get_effective_drink_count(a.id) AS drink_count,
-      COALESCE(tv.tent_count, 0) as tents_visited,
-      (_get_effective_drink_count(a.id) + COALESCE(tv.tent_count, 0)) as combined_score,
-      ROUND(_get_effective_drink_count(a.id) * v_beer_cost, 2) AS spent
+      COALESCE(tv.tent_count, 0) as tents_visited
     FROM attendances a
     LEFT JOIN (
       SELECT
@@ -163,6 +161,15 @@ BEGIN
     ) tv ON a.date = tv.date
     WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
   ),
+  daily_scores AS (
+    SELECT
+      db.date,
+      db.drink_count,
+      db.tents_visited,
+      (db.drink_count + db.tents_visited) as combined_score,
+      ROUND(db.drink_count * v_beer_cost, 2) AS spent
+    FROM daily_base db
+  ),
   best_day AS (
     SELECT
       ds.date,
@@ -174,17 +181,15 @@ BEGIN
     LIMIT 1
   ),
   max_session AS (
-    SELECT COALESCE(MAX(_get_effective_drink_count(a.id)), 0) AS max_beers
-    FROM attendances a
-    WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
+    SELECT COALESCE(MAX(ds.drink_count), 0) AS max_beers
+    FROM daily_scores ds
   ),
   most_expensive AS (
     SELECT
-      a.date,
-      ROUND(_get_effective_drink_count(a.id) * v_beer_cost, 2) AS amount
-    FROM attendances a
-    WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
-    ORDER BY (_get_effective_drink_count(a.id) * v_beer_cost) DESC
+      ds.date,
+      ds.spent AS amount
+    FROM daily_scores ds
+    ORDER BY ds.spent DESC
     LIMIT 1
   )
   SELECT jsonb_build_object(

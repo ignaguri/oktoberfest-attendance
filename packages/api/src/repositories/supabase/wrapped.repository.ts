@@ -135,9 +135,13 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       topDrinkType: data.top_drink_type || null,
       drinkStats: data.drink_stats
         ? {
-            total_drinks: data.drink_stats.total_drinks || 0,
-            top_drink_type: data.drink_stats.top_drink_type || null,
-            breakdown: data.drink_stats.breakdown || [],
+            totalDrinks: data.drink_stats.total_drinks || 0,
+            topDrinkType: data.drink_stats.top_drink_type || null,
+            breakdown: (data.drink_stats.breakdown || []).map((b: any) => ({
+              drinkType: b.drink_type,
+              count: b.count,
+              percentage: b.percentage,
+            })),
           }
         : undefined,
       achievements: data.achievements || [],

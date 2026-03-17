@@ -232,7 +232,7 @@ export default function DetailedAttendanceForm({
     setValue("amount", totalLocalDrinks);
     setValue("date", currentDate);
     setValue("tents", existingAttendance?.tentIds || []);
-  }, [existingAttendance, currentDate, setValue]);
+  }, [existingAttendance, currentDate, setValue, totalLocalDrinks]);
 
   const onSubmit = async (data: DetailedAttendanceForm) => {
     try {

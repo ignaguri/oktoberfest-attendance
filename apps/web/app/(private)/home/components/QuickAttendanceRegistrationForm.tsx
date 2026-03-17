@@ -154,24 +154,22 @@ export const QuickAttendanceRegistrationForm = ({
           amount: 0,
         });
 
-      // Update the local state with the new tent ID if it was added
-      const updatedTentIds =
-        tentsToSend.length > 0
-          ? [...(attendanceData?.tentIds ?? []), ...tentsToSend]
-          : (attendanceData?.tentIds ?? []);
-
-      const updatedAttendance: AttendanceByDate = {
-        ...attendanceData!,
-        id: newAttendanceId,
-        tentIds: updatedTentIds,
-      };
-      setAttendanceData(updatedAttendance);
       onAttendanceIdReceived(newAttendanceId);
 
+      // Refetch attendance to get the full object from the server
+      const { attendance: freshAttendance } =
+        await apiClient.attendance.getByDate({
+          festivalId: currentFestival.id,
+          date: dateString,
+        });
+      if (freshAttendance) {
+        setAttendanceData(freshAttendance);
+      }
+
       // Update the tent selection to show the current tent (last tent in the array)
-      if (updatedTentIds.length > 0) {
-        const currentTentId = updatedTentIds[updatedTentIds.length - 1];
-        setValue("tentId", currentTentId);
+      const currentTentIds = freshAttendance?.tentIds ?? [];
+      if (currentTentIds.length > 0) {
+        setValue("tentId", currentTentIds[currentTentIds.length - 1]);
       }
 
       toast.success(t("notifications.success.attendanceUpdated"));

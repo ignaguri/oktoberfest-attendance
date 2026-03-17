@@ -50,7 +50,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     });
 
     // Drink breakdown (if consumptions data exists)
-    if (data.drink_stats?.breakdown && data.drink_stats.breakdown.length > 0) {
+    if (data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0) {
       slideList.push({
         key: "drink_breakdown",
         render: (isActive) => (

@@ -492,7 +492,7 @@ BEGIN
   )
   SELECT jsonb_build_object(
     'total_drinks', COALESCE((SELECT total FROM totals), 0),
-    'top_drink_type', (SELECT drink_type FROM drink_breakdown ORDER BY count DESC LIMIT 1),
+    'top_drink_type', (SELECT drink_type FROM drink_breakdown ORDER BY count DESC, drink_type ASC LIMIT 1),
     'breakdown', COALESCE(
       (SELECT jsonb_agg(
          jsonb_build_object(
@@ -501,7 +501,7 @@ BEGIN
            'percentage', CASE WHEN t.total > 0
              THEN ROUND((db.count::numeric / t.total::numeric) * 100, 1)
              ELSE 0 END
-         ) ORDER BY db.count DESC
+         ) ORDER BY db.count DESC, db.drink_type ASC
        ) FROM drink_breakdown db, totals t),
       '[]'::jsonb
     )

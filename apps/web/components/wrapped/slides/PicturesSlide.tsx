@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 import { Camera, ImageIcon } from "lucide-react";
@@ -7,6 +8,13 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { cn, shuffleArray } from "@/lib/utils";
+
+import {
+  BaseSlide,
+  SlideContent,
+  SlideSubtitle,
+  SlideTitle,
+} from "./BaseSlide";
 
 /**
  * Extract file path from a full Supabase storage URL or return the path as-is
@@ -32,15 +40,6 @@ function extractFilePath(urlOrPath: string): string {
     return urlOrPath;
   }
 }
-
-import { useTranslation } from "@prostcounter/shared/i18n";
-
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-} from "./BaseSlide";
 
 interface PicturesSlideProps {
   data: WrappedData;

@@ -21,9 +21,9 @@ export function DrinkBreakdownSlide({
   isActive = false,
 }: DrinkBreakdownSlideProps) {
   const { t } = useTranslation();
-  const breakdown = data.drink_stats?.breakdown?.slice(0, 4) ?? [];
-  const topDrinkType = data.drink_stats?.top_drink_type;
-  const totalDrinks = data.drink_stats?.total_drinks ?? 0;
+  const breakdown = data.drinkStats?.breakdown?.slice(0, 4) ?? [];
+  const topDrinkType = data.drinkStats?.topDrinkType;
+  const totalDrinks = data.drinkStats?.totalDrinks ?? 0;
 
   return (
     <BaseSlide
@@ -57,7 +57,7 @@ export function DrinkBreakdownSlide({
           <div className="space-y-2">
             {breakdown.map((item, index) => (
               <motion.div
-                key={item.drink_type}
+                key={item.drinkType}
                 variants={{
                   hidden: { x: -20, opacity: 0 },
                   visible: { x: 0, opacity: 1 },
@@ -69,7 +69,7 @@ export function DrinkBreakdownSlide({
               >
                 <div className="mb-2 flex items-center justify-between">
                   <span className="font-medium text-gray-700">
-                    {t(`wrapped.drinkBreakdown.drinkTypes.${item.drink_type}`)}
+                    {t(`wrapped.drinkBreakdown.drinkTypes.${item.drinkType}`)}
                   </span>
                   <span className="font-bold text-amber-600">
                     {item.count}{" "}

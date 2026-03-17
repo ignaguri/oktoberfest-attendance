@@ -319,7 +319,7 @@ export function useLocalSaveAttendance() {
   return useMutation<
     LocalAttendance,
     Error,
-    { festivalId: string; userId: string; date: string; beerCount: number }
+    { festivalId: string; userId: string; date: string }
   >({
     mutationFn: async ({ festivalId, userId, date }) => {
       if (!isReady) {
