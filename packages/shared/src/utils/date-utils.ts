@@ -127,22 +127,28 @@ export function formatRelativeTime(
   const tzDate = new TZDate(date, timezone);
   const diffInSeconds = Math.floor((now.getTime() - tzDate.getTime()) / 1000);
 
-  // Intl.RelativeTimeFormat is not available in Hermes (React Native Android).
+  // Intl.RelativeTimeFormat may not be fully available in Hermes (React Native).
+  // On Android it's typically missing; on iOS it may pass the typeof check but
+  // crash on instantiation ("Cannot read property 'prototype' of undefined").
   // Use it when available, otherwise fall back to simple English strings.
   if (typeof Intl?.RelativeTimeFormat === "function") {
-    const language = locale ?? getCurrentLanguage();
-    const rtf = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
+    try {
+      const language = locale ?? getCurrentLanguage();
+      const rtf = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
 
-    if (diffInSeconds < 60) {
-      return rtf.format(-diffInSeconds, "second");
-    } else if (diffInSeconds < 3600) {
-      return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
-    } else if (diffInSeconds < 86400) {
-      return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
-    } else if (diffInSeconds < 604800) {
-      return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
-    } else {
-      return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
+      if (diffInSeconds < 60) {
+        return rtf.format(-diffInSeconds, "second");
+      } else if (diffInSeconds < 3600) {
+        return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
+      } else if (diffInSeconds < 86400) {
+        return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
+      } else if (diffInSeconds < 604800) {
+        return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
+      } else {
+        return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
+      }
+    } catch {
+      // Fall through to fallback below (Hermes may expose but not fully implement this API)
     }
   }
 
