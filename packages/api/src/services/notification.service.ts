@@ -21,6 +21,7 @@ export const NOTIFICATION_WORKFLOWS = {
   RESERVATION_CHECKIN_PROMPT: "reservation-prompt",
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
+  FRIEND_REQUEST: "friend-request",
 } as const;
 
 export type NotificationWorkflowId =
@@ -54,6 +55,8 @@ export class NotificationService {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Fcm,
+          // Empty string = use Novu's default integration for this provider
+          integrationIdentifier: "",
           credentials: {
             deviceTokens: [token],
           },
@@ -79,6 +82,8 @@ export class NotificationService {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Expo,
+          // Empty string = use Novu's default integration for this provider
+          integrationIdentifier: "",
           credentials: {
             deviceTokens: [token],
           },
@@ -600,6 +605,55 @@ export class NotificationService {
       });
     } catch (error) {
       logger.error({ error }, "Error sending group join notification");
+    }
+  }
+
+  /**
+   * Notify a user when they receive a friend request
+   * (respects push_enabled preference)
+   */
+  async notifyFriendRequest(
+    requesterId: string,
+    addresseeId: string,
+  ): Promise<void> {
+    try {
+      // Get requester's profile info
+      const { data: requester, error: requesterError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", requesterId)
+        .single();
+
+      if (requesterError || !requester) {
+        logger.error(
+          { error: requesterError },
+          "Error fetching requester profile for friend request notification",
+        );
+        return;
+      }
+
+      // Check addressee's notification preferences
+      const prefs = await this.getUserNotificationPreferences(addresseeId);
+
+      if (prefs && prefs.push_enabled === false) {
+        return;
+      }
+
+      const requesterName =
+        requester.username || requester.full_name || "Someone";
+      const requesterAvatar = requester.avatar_url || "";
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.FRIEND_REQUEST,
+        to: addresseeId,
+        payload: {
+          requesterName,
+          requesterAvatar,
+          requesterId,
+        },
+      });
+    } catch (error) {
+      logger.error({ error }, "Error sending friend request notification");
     }
   }
 
