@@ -17,6 +17,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   AchievementsSlide,
   ComparisonsSlide,
+  DrinkBreakdownSlide,
   IntroSlide,
   JourneySlide,
   NumbersSlide,
@@ -41,6 +42,9 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     () => [
       { key: "intro", component: IntroSlide },
       { key: "numbers", component: NumbersSlide },
+      ...(data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0
+        ? [{ key: "drink_breakdown", component: DrinkBreakdownSlide }]
+        : []),
       { key: "journey", component: JourneySlide },
       { key: "tent_explorer", component: TentExplorerSlide },
       { key: "peak_moment", component: PeakMomentSlide },

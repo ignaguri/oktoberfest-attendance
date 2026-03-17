@@ -1588,10 +1588,13 @@
     "numbers": {
       "title": "Your festival in numbers",
       "subtitle": "Here's what you did",
-      "totalBeers": "Total beers",
+      "totalBeers": "Total drinks",
       "daysAttended": "Days attended",
       "avgPerDay": "Average per day",
-      "totalSpent": "Total spent"
+      "totalSpent": "Total spent",
+      "finalMessageLotsOfProst": "That's a lot of Prost!",
+      "finalMessageLotsOfDays": "That's a lot of days!",
+      "finalMessageNotBad": "That's not too bad!"
     },
     "journey": {
       "title": "Your journey",
@@ -1603,17 +1606,21 @@
       "uniqueTents": "Unique tents",
       "diversity": "Tent diversity",
       "favorite": "Favorite tent",
-      "visits": "visits",
-      "visits_one": "visit"
+      "visits": "{{count}} visits",
+      "visits_one": "{{count}} visit",
+      "topTents": "Top tents"
     },
     "peakMoment": {
       "title": "Peak moment",
       "subtitle": "Your biggest day",
       "bestDay": "Best day",
       "maxSession": "Max in one session",
-      "beers": "beers",
-      "beers_one": "beer",
-      "spent": "spent"
+      "maxSessionDesc": "Most beers in a single session",
+      "beers": "{{count}} beers",
+      "beers_one": "{{count}} beer",
+      "spent": "spent",
+      "tents": "{{count}} tents",
+      "tents_one": "{{count}} tent"
     },
     "social": {
       "title": "Social stats",
@@ -1684,12 +1691,13 @@
       "share": "Share Your Wrapped",
       "sharing": "Creating your share image...",
       "summary": {
-        "beers": "beers",
-        "beers_one": "beer",
-        "tents": "tents",
-        "tents_one": "tent",
-        "days": "days",
-        "days_one": "day"
+        "beers": "{{count}} beers",
+        "beers_one": "{{count}} beer",
+        "tents": "{{count}} tents",
+        "tents_one": "{{count}} tent",
+        "days": "{{count}} days",
+        "days_one": "{{count}} day",
+        "across": "across {{days}} of fun at {{festival}}"
       }
     },
     "shareImage": {
@@ -1703,6 +1711,20 @@
         "days_attended": "Days Attended",
         "total_beers": "Total Beers",
         "avg_beers": "Average Beers"
+      }
+    },
+    "drinkBreakdown": {
+      "title": "What you drank",
+      "subtitle": "Your drink breakdown",
+      "totalDrinks": "Total drinks",
+      "topDrink": "Most popular",
+      "drinkTypes": {
+        "beer": "Beer",
+        "radler": "Radler",
+        "wine": "Wine",
+        "soft_drink": "Soft Drink",
+        "alcohol_free": "Alcohol-Free",
+        "other": "Other"
       }
     },
     "shareText": {
@@ -2460,6 +2482,10 @@
         "ios": "Tap Share → Add to Home Screen",
         "android": "Tap menu → Install app",
         "desktop": "Click install in address bar"
+      },
+      "appStore": {
+        "message": "ProstCounter is now on the App Store! Get the full experience.",
+        "button": "Download on the App Store"
       }
     }
   },

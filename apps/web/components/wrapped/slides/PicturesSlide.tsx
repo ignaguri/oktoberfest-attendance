@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 import { Camera, ImageIcon } from "lucide-react";
@@ -7,6 +8,13 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { cn, shuffleArray } from "@/lib/utils";
+
+import {
+  BaseSlide,
+  SlideContent,
+  SlideSubtitle,
+  SlideTitle,
+} from "./BaseSlide";
 
 /**
  * Extract file path from a full Supabase storage URL or return the path as-is
@@ -33,19 +41,13 @@ function extractFilePath(urlOrPath: string): string {
   }
 }
 
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-} from "./BaseSlide";
-
 interface PicturesSlideProps {
   data: WrappedData;
   isActive?: boolean;
 }
 
 export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
+  const { t } = useTranslation();
   const { pictures } = data.social_stats;
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
@@ -116,15 +118,17 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
       isActive={isActive}
       className="bg-gradient-to-br from-green-50 to-emerald-50"
     >
-      <SlideTitle>Your festival memories</SlideTitle>
-      <SlideSubtitle>Your captured moments</SlideSubtitle>
+      <SlideTitle>{t("wrapped.pictures.title")}</SlideTitle>
+      <SlideSubtitle>{t("wrapped.pictures.subtitle")}</SlideSubtitle>
 
       <SlideContent className="flex flex-col items-center justify-center">
         {pictures.length > 0 ? (
           <div className="w-full max-w-4xl">
             <div className="mb-6 flex items-center justify-center gap-2 text-lg text-gray-700">
               <Camera className="size-5" />
-              <span>You captured {pictures.length} moments</span>
+              <span>
+                {t("wrapped.pictures.count", { count: pictures.length })}
+              </span>
             </div>
 
             <div className="relative h-96 w-full sm:h-[28rem] md:h-[32rem]">

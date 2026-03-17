@@ -3849,8 +3849,8 @@
         "tags": [
           "group-messages"
         ],
-        "summary": "List messages for a group",
-        "description": "Returns messages for a group with cursor-based pagination. Pinned messages come first.",
+        "summary": "List messages from group members",
+        "description": "Returns messages posted by members of this group, with cursor-based pagination. Pinned messages come first.",
         "security": [
           {
             "bearerAuth": []
@@ -3903,10 +3903,6 @@
                             "type": "string",
                             "format": "uuid"
                           },
-                          "groupId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
                           "userId": {
                             "type": "string",
                             "format": "uuid"
@@ -3936,6 +3932,13 @@
                           "pinned": {
                             "type": "boolean"
                           },
+                          "visibility": {
+                            "type": "string",
+                            "enum": [
+                              "groups",
+                              "public"
+                            ]
+                          },
                           "createdAt": {
                             "type": "string"
                           },
@@ -3945,7 +3948,6 @@
                         },
                         "required": [
                           "id",
-                          "groupId",
                           "userId",
                           "username",
                           "fullName",
@@ -3953,6 +3955,7 @@
                           "content",
                           "messageType",
                           "pinned",
+                          "visibility",
                           "createdAt",
                           "updatedAt"
                         ]
@@ -4020,178 +4023,6 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": [
-          "group-messages"
-        ],
-        "summary": "Post a new message to a group",
-        "description": "Create a new message or alert in a group",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "required": true,
-            "name": "groupId",
-            "in": "path"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "content": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 1000
-                  },
-                  "messageType": {
-                    "type": "string",
-                    "enum": [
-                      "message",
-                      "alert"
-                    ],
-                    "default": "message"
-                  }
-                },
-                "required": [
-                  "content"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Message created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "groupId": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "userId": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "username": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "fullName": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "avatarUrl": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "content": {
-                          "type": "string"
-                        },
-                        "messageType": {
-                          "type": "string",
-                          "enum": [
-                            "message",
-                            "alert"
-                          ]
-                        },
-                        "pinned": {
-                          "type": "boolean"
-                        },
-                        "createdAt": {
-                          "type": "string"
-                        },
-                        "updatedAt": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "groupId",
-                        "userId",
-                        "username",
-                        "fullName",
-                        "avatarUrl",
-                        "content",
-                        "messageType",
-                        "pinned",
-                        "createdAt",
-                        "updatedAt"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Not a group member",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "error",
-                    "message"
-                  ]
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/v1/messages/feed": {
@@ -4200,7 +4031,7 @@
           "group-messages"
         ],
         "summary": "Get message feed across all groups",
-        "description": "Returns recent messages from all groups the user belongs to, for a given festival",
+        "description": "Returns recent messages from users who share groups with the current user for a given festival",
         "security": [
           {
             "bearerAuth": []
@@ -4253,10 +4084,6 @@
                             "type": "string",
                             "format": "uuid"
                           },
-                          "groupId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
                           "userId": {
                             "type": "string",
                             "format": "uuid"
@@ -4286,19 +4113,22 @@
                           "pinned": {
                             "type": "boolean"
                           },
+                          "visibility": {
+                            "type": "string",
+                            "enum": [
+                              "groups",
+                              "public"
+                            ]
+                          },
                           "createdAt": {
                             "type": "string"
                           },
                           "updatedAt": {
                             "type": "string"
-                          },
-                          "groupName": {
-                            "type": "string"
                           }
                         },
                         "required": [
                           "id",
-                          "groupId",
                           "userId",
                           "username",
                           "fullName",
@@ -4306,9 +4136,9 @@
                           "content",
                           "messageType",
                           "pinned",
+                          "visibility",
                           "createdAt",
-                          "updatedAt",
-                          "groupName"
+                          "updatedAt"
                         ]
                       }
                     },
@@ -4354,7 +4184,178 @@
         }
       }
     },
-    "/v1/groups/{groupId}/messages/{messageId}": {
+    "/v1/messages": {
+      "post": {
+        "tags": [
+          "group-messages"
+        ],
+        "summary": "Post a new message",
+        "description": "Create a new message visible to all groups the user belongs to in the given festival",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  },
+                  "messageType": {
+                    "type": "string",
+                    "enum": [
+                      "message",
+                      "alert"
+                    ],
+                    "default": "message"
+                  },
+                  "festivalId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "content",
+                  "festivalId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "messageType": {
+                          "type": "string",
+                          "enum": [
+                            "message",
+                            "alert"
+                          ]
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        },
+                        "visibility": {
+                          "type": "string",
+                          "enum": [
+                            "groups",
+                            "public"
+                          ]
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "userId",
+                        "username",
+                        "fullName",
+                        "avatarUrl",
+                        "content",
+                        "messageType",
+                        "pinned",
+                        "visibility",
+                        "createdAt",
+                        "updatedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not a member of any group in this festival",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/{messageId}": {
       "put": {
         "tags": [
           "group-messages"
@@ -4367,15 +4368,6 @@
           }
         ],
         "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "required": true,
-            "name": "groupId",
-            "in": "path"
-          },
           {
             "schema": {
               "type": "string",
@@ -4427,10 +4419,6 @@
                           "type": "string",
                           "format": "uuid"
                         },
-                        "groupId": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
                         "userId": {
                           "type": "string",
                           "format": "uuid"
@@ -4460,6 +4448,13 @@
                         "pinned": {
                           "type": "boolean"
                         },
+                        "visibility": {
+                          "type": "string",
+                          "enum": [
+                            "groups",
+                            "public"
+                          ]
+                        },
                         "createdAt": {
                           "type": "string"
                         },
@@ -4469,7 +4464,6 @@
                       },
                       "required": [
                         "id",
-                        "groupId",
                         "userId",
                         "username",
                         "fullName",
@@ -4477,6 +4471,7 @@
                         "content",
                         "messageType",
                         "pinned",
+                        "visibility",
                         "createdAt",
                         "updatedAt"
                       ]
@@ -4569,15 +4564,6 @@
           }
         ],
         "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "required": true,
-            "name": "groupId",
-            "in": "path"
-          },
           {
             "schema": {
               "type": "string",
@@ -6585,6 +6571,45 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "drinkStats": {
+                          "type": "object",
+                          "properties": {
+                            "total_drinks": {
+                              "type": "integer"
+                            },
+                            "top_drink_type": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "breakdown": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "drink_type": {
+                                    "type": "string"
+                                  },
+                                  "count": {
+                                    "type": "integer"
+                                  },
+                                  "percentage": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "drink_type",
+                                  "count",
+                                  "percentage"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "total_drinks",
+                            "top_drink_type",
+                            "breakdown"
+                          ]
+                        },
                         "achievements": {
                           "type": "array",
                           "items": {
@@ -6820,6 +6845,45 @@
                         "topDrinkType": {
                           "type": "string",
                           "nullable": true
+                        },
+                        "drinkStats": {
+                          "type": "object",
+                          "properties": {
+                            "total_drinks": {
+                              "type": "integer"
+                            },
+                            "top_drink_type": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "breakdown": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "drink_type": {
+                                    "type": "string"
+                                  },
+                                  "count": {
+                                    "type": "integer"
+                                  },
+                                  "percentage": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "drink_type",
+                                  "count",
+                                  "percentage"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "total_drinks",
+                            "top_drink_type",
+                            "breakdown"
+                          ]
                         },
                         "achievements": {
                           "type": "array",

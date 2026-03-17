@@ -16,6 +16,7 @@ export type SlideType =
   | "achievements"
   | "personality"
   | "rankings"
+  | "drink_breakdown"
   | "comparisons"
   | "outro";
 
@@ -159,6 +160,11 @@ export interface WrappedData {
   personality: {
     type: string;
     traits: string[];
+  };
+  drinkStats?: {
+    totalDrinks: number;
+    topDrinkType: string | null;
+    breakdown: { drinkType: string; count: number; percentage: number }[];
   };
 }
 

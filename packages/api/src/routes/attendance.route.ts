@@ -548,7 +548,6 @@ app.openapi(checkInFromReservationRoute, async (c) => {
         user_id: user.id,
         festival_id: reservation.festival_id,
         date: festivalDate,
-        beer_count: 0,
       })
       .select("id")
       .single();

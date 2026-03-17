@@ -229,21 +229,21 @@ export default function DetailedAttendanceForm({
 
   // Update form values when existingAttendance or currentDate changes
   useEffect(() => {
-    setValue("amount", existingAttendance?.beerCount || 0);
+    setValue("amount", totalLocalDrinks);
     setValue("date", currentDate);
     setValue("tents", existingAttendance?.tentIds || []);
-  }, [existingAttendance, currentDate, setValue]);
+  }, [existingAttendance, currentDate, setValue, totalLocalDrinks]);
 
   const onSubmit = async (data: DetailedAttendanceForm) => {
     try {
       const submitDateString = formatDateForDatabase(data.date);
 
-      // Update attendance with tent info
+      // Update attendance with tent info (amount no longer written; consumptions are the source of truth)
       await apiClient.attendance.updatePersonal({
         festivalId: currentFestival!.id,
         date: submitDateString,
         tents: data.tents,
-        amount: totalLocalDrinks,
+        amount: 0,
       });
 
       // Sync consumptions: calculate delta and create/delete as needed

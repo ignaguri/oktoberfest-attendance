@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { getTopTents } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
@@ -20,6 +21,7 @@ export function TentExplorerSlide({
   data,
   isActive = false,
 }: TentExplorerSlideProps) {
+  const { t } = useTranslation();
   const { unique_tents, favorite_tent, tent_diversity_pct, tent_breakdown } =
     data.tent_stats;
   const topTents = getTopTents(tent_breakdown, 3);
@@ -29,26 +31,32 @@ export function TentExplorerSlide({
       isActive={isActive}
       className="bg-gradient-to-br from-green-50 to-emerald-50"
     >
-      <SlideTitle>Tent explorer</SlideTitle>
-      <SlideSubtitle>Your favorite spots</SlideSubtitle>
+      <SlideTitle>{t("wrapped.tentExplorer.title")}</SlideTitle>
+      <SlideSubtitle>{t("wrapped.tentExplorer.subtitle")}</SlideSubtitle>
 
       <SlideContent className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-white p-4 text-center shadow">
             <p className="text-3xl font-bold text-yellow-600">{unique_tents}</p>
-            <p className="text-sm text-gray-600">Tents visited</p>
+            <p className="text-sm text-gray-600">
+              {t("wrapped.tentExplorer.uniqueTents")}
+            </p>
           </div>
           <div className="rounded-lg bg-white p-4 text-center shadow">
             <p className="text-3xl font-bold text-yellow-600">
               {tent_diversity_pct.toFixed(0)}%
             </p>
-            <p className="text-sm text-gray-600">Diversity</p>
+            <p className="text-sm text-gray-600">
+              {t("wrapped.tentExplorer.diversity")}
+            </p>
           </div>
         </div>
 
         {favorite_tent && (
           <div className="rounded-lg bg-white p-4 text-center shadow">
-            <p className="mb-1 text-sm text-gray-600">Favorite tent</p>
+            <p className="mb-1 text-sm text-gray-600">
+              {t("wrapped.tentExplorer.favorite")}
+            </p>
             <p className="text-2xl font-bold text-yellow-600">
               {favorite_tent}
             </p>
@@ -58,7 +66,7 @@ export function TentExplorerSlide({
         {topTents.length > 0 && (
           <div>
             <h3 className="mb-3 text-center text-lg font-semibold text-gray-700">
-              Most visited
+              {t("wrapped.tentExplorer.topTents")}
             </h3>
             <div className="space-y-2">
               {topTents.map((tent, index) => (

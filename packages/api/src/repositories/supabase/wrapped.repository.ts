@@ -17,7 +17,7 @@ import type { IWrappedRepository } from "../interfaces/wrapped.repository";
  * Access control configuration for wrapped feature
  */
 const ACCESS_CONFIG = {
-  allowInDev: true,
+  allowInDev: false,
   requireFestivalEnded: true,
   minAttendanceDays: 0,
   allowedUsers: [] as string[],
@@ -133,6 +133,17 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
           }
         : null,
       topDrinkType: data.top_drink_type || null,
+      drinkStats: data.drink_stats
+        ? {
+            totalDrinks: data.drink_stats.total_drinks || 0,
+            topDrinkType: data.drink_stats.top_drink_type || null,
+            breakdown: (data.drink_stats.breakdown || []).map((b: any) => ({
+              drinkType: b.drink_type,
+              count: b.count,
+              percentage: b.percentage,
+            })),
+          }
+        : undefined,
       achievements: data.achievements || [],
       globalRank: data.global_rank || null,
       groupRanks: data.group_ranks || [],

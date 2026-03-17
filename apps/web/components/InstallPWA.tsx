@@ -1,13 +1,15 @@
 "use client";
 
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Share, SquarePlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useInstallPWA } from "@/hooks/use-install-pwa";
 import { cn } from "@/lib/utils";
+
+const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
 export default function InstallPWA() {
   const { t } = useTranslation();
@@ -72,27 +74,19 @@ export default function InstallPWA() {
         <div className="p-4">
           <h1 className="text-lg font-medium">{t("pwa.install.title")}</h1>
           {showIOSInstructions ? (
-            <div className="text-muted-foreground flex flex-col gap-3 text-left text-sm">
-              <p>{t("pwa.install.instructions.ios")}</p>
-              <ol className="flex list-decimal flex-col gap-2 pl-4">
-                <li>
-                  <div className="flex items-center gap-2">
-                    <span>Tap the</span>
-                    <Share className="size-4" />
-                    <span>button below</span>
-                  </div>
-                </li>
-                <li>
-                  <div className="flex flex-col gap-2">
-                    <span>Scroll down and tap</span>
-                    <span className="flex items-center gap-2">
-                      <span>&ldquo;Add to Home Screen&rdquo;</span>
-                      <SquarePlus className="size-4" />
-                    </span>
-                  </div>
-                </li>
-                <li>Tap &ldquo;Add&rdquo; to complete the installation</li>
-              </ol>
+            <div className="flex flex-col gap-3 text-left text-sm">
+              <p className="text-muted-foreground">
+                {t("pwa.install.appStore.message")}
+              </p>
+              <Button asChild className="w-full">
+                <a
+                  href={APP_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("pwa.install.appStore.button")}
+                </a>
+              </Button>
             </div>
           ) : (
             <p className="text-muted-foreground text-left text-sm">

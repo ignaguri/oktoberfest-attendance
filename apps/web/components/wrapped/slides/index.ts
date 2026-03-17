@@ -4,6 +4,7 @@
 
 export { AchievementsSlide } from "./AchievementsSlide";
 export { ComparisonsSlide } from "./ComparisonsSlide";
+export { DrinkBreakdownSlide } from "./DrinkBreakdownSlide";
 export { IntroSlide } from "./IntroSlide";
 export { JourneySlide } from "./JourneySlide";
 export { NumbersSlide } from "./NumbersSlide";

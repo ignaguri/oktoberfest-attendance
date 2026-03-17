@@ -2,6 +2,7 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { isAfter, parseISO, startOfDay } from "date-fns";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -32,6 +33,7 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { WrappedCTA } from "@/components/wrapped/wrapped-cta";
 import { Colors } from "@/lib/constants/colors";
 import {
   useAdaptedAttendanceByDate,
@@ -59,6 +61,14 @@ export default function HomeScreen() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
+
+  // Determine if festival is currently active (not ended)
+  const isFestivalActive = useMemo(() => {
+    if (!currentFestival) return false;
+    const today = startOfDay(new Date());
+    const endDate = startOfDay(parseISO(currentFestival.endDate));
+    return !isAfter(today, endDate);
+  }, [currentFestival]);
 
   // Location state (safe hook works outside provider too)
   const { isSharing, nearbyMembers } = useLocationContextSafe();
@@ -186,8 +196,10 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
-      {/* Tent Proximity Banner - shows at top when near a tent */}
-      {Platform.OS !== "web" && <TentProximityBanner threshold={50} />}
+      {/* Tent Proximity Banner - shows at top when near a tent (active festival only) */}
+      {isFestivalActive && Platform.OS !== "web" && (
+        <TentProximityBanner threshold={50} />
+      )}
 
       <ScrollView
         className="flex-1"
@@ -209,11 +221,11 @@ export default function HomeScreen() {
             <FestivalStatus />
           </TutorialTarget>
 
-          {/* Wrapped CTA - hidden for now */}
-          {/* <WrappedCTA /> */}
+          {/* Wrapped CTA */}
+          <WrappedCTA />
 
-          {/* Location Sharing Card (native only) */}
-          {Platform.OS !== "web" && currentFestival?.id && (
+          {/* Location Sharing Card (native only, active festival only) */}
+          {isFestivalActive && Platform.OS !== "web" && currentFestival?.id && (
             <TutorialTarget stepId="location-sharing">
               <Card size="md" variant="elevated" className="p-3">
                 <HStack className="items-center justify-between">
@@ -243,8 +255,8 @@ export default function HomeScreen() {
             </TutorialTarget>
           )}
 
-          {/* Crowd Status Summary */}
-          {currentFestival?.id && (
+          {/* Crowd Status Summary (active festival only) */}
+          {isFestivalActive && currentFestival?.id && (
             <CrowdStatusSummary festivalId={currentFestival.id} />
           )}
 
@@ -255,20 +267,22 @@ export default function HomeScreen() {
         </VStack>
       </ScrollView>
 
-      {/* Crowd Report FAB - only visible when tents visited today */}
-      {todayVisitedTents.length > 0 && (
+      {/* Crowd Report FAB - only visible when tents visited today and festival active */}
+      {isFestivalActive && todayVisitedTents.length > 0 && (
         <CrowdReportFab onPress={handleCrowdFabPress} />
       )}
 
       {/* Crowd Report Prompt - after attendance save or from FAB */}
-      {currentFestival?.id && crowdPromptTents.length > 0 && (
-        <CrowdReportPrompt
-          isOpen={showCrowdPrompt}
-          onClose={handleCrowdPromptClose}
-          tents={crowdPromptTents}
-          festivalId={currentFestival.id}
-        />
-      )}
+      {isFestivalActive &&
+        currentFestival?.id &&
+        crowdPromptTents.length > 0 && (
+          <CrowdReportPrompt
+            isOpen={showCrowdPrompt}
+            onClose={handleCrowdPromptClose}
+            tents={crowdPromptTents}
+            festivalId={currentFestival.id}
+          />
+        )}
     </SafeAreaView>
   );
 }

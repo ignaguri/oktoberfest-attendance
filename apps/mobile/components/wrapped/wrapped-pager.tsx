@@ -8,6 +8,7 @@ import { PaginationDots } from "./pagination-dots";
 import {
   AchievementsSlide,
   ComparisonsSlide,
+  DrinkBreakdownSlide,
   IntroSlide,
   JourneySlide,
   NumbersSlide,
@@ -47,6 +48,16 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
       key: "numbers",
       render: (isActive) => <NumbersSlide data={data} isActive={isActive} />,
     });
+
+    // Drink breakdown (if consumptions data exists)
+    if (data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0) {
+      slideList.push({
+        key: "drink_breakdown",
+        render: (isActive) => (
+          <DrinkBreakdownSlide data={data} isActive={isActive} />
+        ),
+      });
+    }
 
     // Always include journey (if timeline data exists)
     if (data.timeline && data.timeline.length > 0) {

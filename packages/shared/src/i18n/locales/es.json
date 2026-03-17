@@ -1580,10 +1580,13 @@
     "numbers": {
       "title": "Tu festival en números",
       "subtitle": "Esto es lo que hiciste",
-      "totalBeers": "Total de cervezas",
+      "totalBeers": "Total de bebidas",
       "daysAttended": "Días asistidos",
       "avgPerDay": "Promedio por día",
-      "totalSpent": "Total gastado"
+      "totalSpent": "Total gastado",
+      "finalMessageLotsOfProst": "¡Eso es mucho Prost!",
+      "finalMessageLotsOfDays": "¡Son muchos días!",
+      "finalMessageNotBad": "¡No está nada mal!"
     },
     "close": "Cerrar",
     "swipeToBegin": "Deslizá para comenzar",
@@ -1603,17 +1606,21 @@
       "uniqueTents": "Carpas únicas",
       "diversity": "Diversidad de carpas",
       "favorite": "Carpa favorita",
-      "visits": "visitas",
-      "visits_one": "visita"
+      "visits": "{{count}} visitas",
+      "visits_one": "{{count}} visita",
+      "topTents": "Mejores carpas"
     },
     "peakMoment": {
       "title": "Momento cumbre",
       "subtitle": "Tu mejor día",
       "bestDay": "Mejor día",
       "maxSession": "Máximo en una sesión",
-      "beers": "cervezas",
-      "beers_one": "cerveza",
-      "spent": "gastado"
+      "maxSessionDesc": "Más cervezas en una sola sesión",
+      "beers": "{{count}} cervezas",
+      "beers_one": "{{count}} cerveza",
+      "spent": "gastado",
+      "tents": "{{count}} carpas",
+      "tents_one": "{{count}} carpa"
     },
     "social": {
       "title": "Estadísticas sociales",
@@ -1684,12 +1691,13 @@
       "share": "Compartir Tu Wrapped",
       "sharing": "Creando tu imagen para compartir...",
       "summary": {
-        "beers": "cervezas",
-        "beers_one": "cerveza",
-        "tents": "carpas",
-        "tents_one": "carpa",
-        "days": "días",
-        "days_one": "día"
+        "beers": "{{count}} cervezas",
+        "beers_one": "{{count}} cerveza",
+        "tents": "{{count}} carpas",
+        "tents_one": "{{count}} carpa",
+        "days": "{{count}} días",
+        "days_one": "{{count}} día",
+        "across": "en {{days}} de diversión en {{festival}}"
       }
     },
     "shareImage": {
@@ -1703,6 +1711,20 @@
         "days_attended": "Días Asistidos",
         "total_beers": "Total de Cervezas",
         "avg_beers": "Promedio de Cervezas"
+      }
+    },
+    "drinkBreakdown": {
+      "title": "Lo que bebiste",
+      "subtitle": "Desglose de bebidas",
+      "totalDrinks": "Bebidas totales",
+      "topDrink": "Bebida más popular",
+      "drinkTypes": {
+        "beer": "Cerveza",
+        "radler": "Radler",
+        "wine": "Vino",
+        "soft_drink": "Refresco",
+        "alcohol_free": "Sin alcohol",
+        "other": "Otro"
       }
     },
     "shareText": {
@@ -2460,6 +2482,10 @@
         "ios": "Tocá Compartir → Agregar a pantalla de inicio",
         "android": "Tocá menú → Instalar app",
         "desktop": "Hacé click en instalar en la barra de direcciones"
+      },
+      "appStore": {
+        "message": "¡ProstCounter ya está en el App Store! Obtén la experiencia completa.",
+        "button": "Descargar en el App Store"
       }
     }
   },
