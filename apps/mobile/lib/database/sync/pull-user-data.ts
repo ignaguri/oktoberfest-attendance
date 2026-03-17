@@ -149,23 +149,59 @@ export async function pullAttendances(
           );
         }
       } else {
-        await db.runAsync(
-          `INSERT INTO attendances (
-            id, user_id, festival_id, date, beer_count,
-            created_at, updated_at, _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)`,
-          [
-            att.id,
-            att.userId,
-            att.festivalId,
-            att.date,
-            att.beerCount,
-            att.createdAt,
-            att.updatedAt ?? att.createdAt,
-            now,
-          ],
+        // No local record with this server ID — check if one exists with a
+        // different (client-generated) ID for the same natural key.
+        // This happens when attendance was created offline with a local UUID
+        // and synced via updatePersonal (which uses natural key, not ID).
+        const byNaturalKey = await db.getFirstAsync<LocalAttendance>(
+          `SELECT * FROM attendances
+           WHERE user_id = ? AND festival_id = ? AND date = ? AND _deleted = 0`,
+          [att.userId, att.festivalId, att.date],
         );
-        result.inserted++;
+
+        if (byNaturalKey && byNaturalKey.id !== att.id) {
+          // Local record exists with a different ID — update ID to match server
+          // so future API calls (delete, etc.) use the correct server ID.
+          // Also update any consumptions referencing the old local ID.
+          const oldId = byNaturalKey.id;
+          const serverUpdatedAt = att.updatedAt ?? att.createdAt;
+
+          await db.runAsync(
+            `UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`,
+            [att.id, oldId],
+          );
+
+          await db.runAsync(
+            `UPDATE attendances SET
+              id = ?, beer_count = ?, updated_at = ?, _synced_at = ?, _dirty = 0
+            WHERE id = ?`,
+            [att.id, att.beerCount, serverUpdatedAt, now, oldId],
+          );
+
+          logger.info(
+            `[SyncManager] Reconciled attendance ID: ${oldId} → ${att.id}`,
+          );
+          result.updated++;
+        } else if (!byNaturalKey) {
+          await db.runAsync(
+            `INSERT INTO attendances (
+              id, user_id, festival_id, date, beer_count,
+              created_at, updated_at, _synced_at, _dirty, _deleted
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)`,
+            [
+              att.id,
+              att.userId,
+              att.festivalId,
+              att.date,
+              att.beerCount,
+              att.createdAt,
+              att.updatedAt ?? att.createdAt,
+              now,
+            ],
+          );
+          result.inserted++;
+        }
+        // If byNaturalKey exists with matching ID, it was already handled above
       }
     }
 
