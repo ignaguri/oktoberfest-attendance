@@ -321,7 +321,7 @@ export function useLocalSaveAttendance() {
     Error,
     { festivalId: string; userId: string; date: string; beerCount: number }
   >({
-    mutationFn: async ({ festivalId, userId, date, beerCount }) => {
+    mutationFn: async ({ festivalId, userId, date }) => {
       if (!isReady) {
         throw new Error("Database not ready");
       }
@@ -338,17 +338,17 @@ export function useLocalSaveAttendance() {
       let attendance: LocalAttendance;
 
       if (existing) {
-        // Update existing
+        // Update existing (beer_count always 0; consumptions are source of truth)
         await db.runAsync(
           `UPDATE attendances SET
-            beer_count = ?, updated_at = ?, _dirty = 1
+            beer_count = 0, updated_at = ?, _dirty = 1
           WHERE id = ?`,
-          [beerCount, now, existing.id],
+          [now, existing.id],
         );
 
         attendance = {
           ...existing,
-          beer_count: beerCount,
+          beer_count: 0,
           updated_at: now,
           _dirty: 1,
         };
@@ -357,7 +357,7 @@ export function useLocalSaveAttendance() {
         await enqueueOperation(db, "UPDATE", "attendances", existing.id, {
           festival_id: festivalId,
           date,
-          beer_count: beerCount,
+          beer_count: 0,
         });
       } else {
         // Insert new
@@ -366,8 +366,8 @@ export function useLocalSaveAttendance() {
           `INSERT INTO attendances (
             id, user_id, festival_id, date, beer_count,
             created_at, updated_at, _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, 1, 0)`,
-          [id, userId, festivalId, date, beerCount, now, now],
+          ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
+          [id, userId, festivalId, date, now, now],
         );
 
         attendance = {
@@ -375,7 +375,7 @@ export function useLocalSaveAttendance() {
           user_id: userId,
           festival_id: festivalId,
           date,
-          beer_count: beerCount,
+          beer_count: 0,
           created_at: now,
           updated_at: now,
           _synced_at: null,
@@ -387,7 +387,7 @@ export function useLocalSaveAttendance() {
         await enqueueOperation(db, "INSERT", "attendances", id, {
           festival_id: festivalId,
           date,
-          beer_count: beerCount,
+          beer_count: 0,
         });
       }
 

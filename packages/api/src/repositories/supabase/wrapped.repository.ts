@@ -17,7 +17,7 @@ import type { IWrappedRepository } from "../interfaces/wrapped.repository";
  * Access control configuration for wrapped feature
  */
 const ACCESS_CONFIG = {
-  allowInDev: true,
+  allowInDev: false,
   requireFestivalEnded: true,
   minAttendanceDays: 0,
   allowedUsers: [] as string[],

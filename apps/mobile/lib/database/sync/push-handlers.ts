@@ -22,7 +22,7 @@ export async function pushInsert(
       await apiClient.attendance.updatePersonal({
         festivalId: payload.festival_id as string,
         date: payload.date as string,
-        amount: payload.beer_count as number,
+        amount: 0,
         tents: payload.tents as string[] | undefined,
       });
       break;
@@ -60,7 +60,7 @@ export async function pushUpdate(
       await apiClient.attendance.updatePersonal({
         festivalId: payload.festival_id as string,
         date: payload.date as string,
-        amount: payload.beer_count as number,
+        amount: 0,
         tents: payload.tents as string[] | undefined,
       });
       break;

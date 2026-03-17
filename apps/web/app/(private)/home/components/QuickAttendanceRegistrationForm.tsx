@@ -98,7 +98,6 @@ export const QuickAttendanceRegistrationForm = ({
   });
 
   const tentId = watch("tentId");
-  const beerCount = watch("beerCount");
 
   useEffect(() => {
     const loadAttendance = async () => {
@@ -119,7 +118,6 @@ export const QuickAttendanceRegistrationForm = ({
             "tentId",
             attendance.tentIds[attendance.tentIds.length - 1] || "",
           );
-          setValue("beerCount", attendance.beerCount || 0);
         }
       } catch {
         toast.error(t("notifications.error.attendanceLoadFailed"));
@@ -136,8 +134,6 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
-      const previousBeerCount = attendanceData?.beerCount ?? 0;
-
       // Only send the new tent ID if it's different from the last one and not empty
       // This prevents duplicate tent visits in the database
       const tentsToSend =
@@ -155,13 +151,8 @@ export const QuickAttendanceRegistrationForm = ({
           festivalId: currentFestival.id,
           date: dateString,
           tents: tentsToSend,
-          amount: data.beerCount,
+          amount: 0,
         });
-
-      // Trigger confetti only if beer count increased
-      if (data.beerCount > previousBeerCount) {
-        triggerConfetti();
-      }
 
       // Update the local state with the new tent ID if it was added
       const updatedTentIds =
@@ -172,7 +163,6 @@ export const QuickAttendanceRegistrationForm = ({
       const updatedAttendance: AttendanceByDate = {
         ...attendanceData!,
         id: newAttendanceId,
-        beerCount: data.beerCount,
         tentIds: updatedTentIds,
       };
       setAttendanceData(updatedAttendance);

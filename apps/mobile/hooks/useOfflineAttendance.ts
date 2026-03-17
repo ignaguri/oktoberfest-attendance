@@ -75,22 +75,21 @@ export function useOfflineUpdateAttendance() {
         attendanceId = existing.id;
         await db.runAsync(
           `UPDATE attendances SET
-            beer_count = ?, updated_at = ?, _dirty = 1
+            beer_count = 0, updated_at = ?, _dirty = 1
           WHERE id = ?`,
-          [input.amount, now, existing.id],
+          [now, existing.id],
         );
 
         // Enqueue update operation for sync
         await enqueueOperation(db, "UPDATE", "attendances", existing.id, {
           festival_id: input.festivalId,
           date: input.date,
-          beer_count: input.amount,
+          beer_count: 0,
           tents: input.tents,
         });
 
         logger.debug("[OfflineAttendance] Updated existing attendance:", {
           attendanceId,
-          beerCount: input.amount,
         });
       } else {
         // Insert new attendance
@@ -99,29 +98,20 @@ export function useOfflineUpdateAttendance() {
           `INSERT INTO attendances (
             id, user_id, festival_id, date, beer_count,
             created_at, updated_at, _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, 1, 0)`,
-          [
-            attendanceId,
-            userId,
-            input.festivalId,
-            input.date,
-            input.amount,
-            now,
-            now,
-          ],
+          ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
+          [attendanceId, userId, input.festivalId, input.date, now, now],
         );
 
         // Enqueue insert operation for sync
         await enqueueOperation(db, "INSERT", "attendances", attendanceId, {
           festival_id: input.festivalId,
           date: input.date,
-          beer_count: input.amount,
+          beer_count: 0,
           tents: input.tents,
         });
 
         logger.debug("[OfflineAttendance] Created new attendance:", {
           attendanceId,
-          beerCount: input.amount,
         });
       }
 

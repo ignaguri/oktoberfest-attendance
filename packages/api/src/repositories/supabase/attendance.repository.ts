@@ -224,7 +224,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       "add_or_update_attendance_with_tents",
       {
         p_user_id: userId,
-        p_beer_count: input.amount,
+        p_beer_count: 0,
         p_tent_ids: input.tents,
         p_date: dateWithTime.toISOString(),
         p_festival_id: input.festivalId,
@@ -269,7 +269,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       {
         p_user_id: userId,
         p_date: dateWithTime.toISOString(),
-        p_beer_count: input.amount,
+        p_beer_count: 0,
         p_tent_ids: input.tents.length > 0 ? input.tents : [],
         p_festival_id: input.festivalId,
       },
