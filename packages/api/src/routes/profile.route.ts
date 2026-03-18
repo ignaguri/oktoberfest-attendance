@@ -113,14 +113,18 @@ const getPublicProfileRoute = createRoute({
 });
 
 app.openapi(getPublicProfileRoute, async (c) => {
-  const { supabase } = c.var;
+  const { supabase, user } = c.var;
   const { userId } = c.req.valid("param");
   const { festivalId } = c.req.valid("query");
 
   const profileRepo = new SupabaseProfileRepository(supabase);
 
   try {
-    const profile = await profileRepo.getPublicProfile(userId, festivalId);
+    const profile = await profileRepo.getPublicProfile(
+      userId,
+      festivalId,
+      user?.id,
+    );
     return c.json({ profile }, 200);
   } catch {
     return c.json({ error: "Not Found", message: "User not found" }, 404);

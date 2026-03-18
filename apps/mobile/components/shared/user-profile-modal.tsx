@@ -1,13 +1,30 @@
+import {
+  useAcceptFriendRequest,
+  useFriendshipStatus,
+  useSendFriendRequest,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { getInitials } from "@prostcounter/ui";
-import { Beer, Calendar, TrendingUp, X } from "lucide-react-native";
+import {
+  Beer,
+  Calendar,
+  Check,
+  Clock,
+  TrendingUp,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react-native";
 import type { ReactNode } from "react";
+import { useCallback } from "react";
 
 import {
   Avatar,
   AvatarFallbackText,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import {
@@ -34,6 +51,14 @@ export interface UserProfileData {
     totalBeers: number;
     avgBeers: number;
   } | null;
+  friendshipStatus?:
+    | "friends"
+    | "pending_sent"
+    | "pending_received"
+    | "none"
+    | "self"
+    | null;
+  sharedGroups?: number | null;
 }
 
 interface UserProfileModalProps {
@@ -47,6 +72,8 @@ interface UserProfileModalProps {
   loading?: boolean;
   /** Custom title for the modal */
   title?: string;
+  /** User ID for friendship actions */
+  userId?: string;
 }
 
 /**
@@ -68,6 +95,7 @@ export function UserProfileModal({
   profile,
   loading = false,
   title,
+  userId,
 }: UserProfileModalProps) {
   const { t } = useTranslation();
 
@@ -126,6 +154,15 @@ export function UserProfileModal({
                 )}
               </VStack>
 
+              {/* Friendship badge / action button */}
+              {profile.friendshipStatus &&
+                profile.friendshipStatus !== "self" && (
+                  <MobileFriendshipBadge
+                    status={profile.friendshipStatus}
+                    userId={userId}
+                  />
+                )}
+
               {/* Stats - only shown if we have stats */}
               {profile.stats && (
                 <HStack space="lg" className="mt-2">
@@ -164,6 +201,18 @@ export function UserProfileModal({
                   </VStack>
                 </HStack>
               )}
+
+              {/* Shared groups */}
+              {profile.sharedGroups != null &&
+                profile.sharedGroups > 0 &&
+                profile.friendshipStatus !== "self" && (
+                  <HStack space="xs" className="items-center">
+                    <Users size={14} color={IconColors.muted} />
+                    <Text className="text-sm text-typography-500">
+                      {profile.sharedGroups} {t("friends.sharedGroups")}
+                    </Text>
+                  </HStack>
+                )}
             </VStack>
           ) : (
             <VStack className="items-center py-4">
@@ -176,6 +225,90 @@ export function UserProfileModal({
       </ModalContent>
     </Modal>
   );
+}
+
+function MobileFriendshipBadge({
+  status,
+  userId,
+}: {
+  status: "friends" | "pending_sent" | "pending_received" | "none";
+  userId?: string;
+}) {
+  const { t } = useTranslation();
+  const sendRequest = useSendFriendRequest();
+  const { data: statusData } = useFriendshipStatus(
+    status === "pending_received" ? userId : undefined,
+  );
+  const acceptRequest = useAcceptFriendRequest();
+  const friendshipId = statusData?.friendshipId;
+
+  const handleSendRequest = useCallback(() => {
+    if (!userId) return;
+    sendRequest.mutate(userId);
+  }, [sendRequest, userId]);
+
+  const handleAcceptRequest = useCallback(() => {
+    if (!friendshipId) return;
+    acceptRequest.mutate(friendshipId);
+  }, [acceptRequest, friendshipId]);
+
+  switch (status) {
+    case "friends":
+      return (
+        <Badge action="success" variant="outline" size="md">
+          <BadgeIcon as={Check} className="mr-1" />
+          <BadgeText>{t("friends.profileBadge.friends")}</BadgeText>
+        </Badge>
+      );
+
+    case "pending_sent":
+      return (
+        <Badge action="muted" variant="outline" size="md">
+          <BadgeIcon as={Clock} className="mr-1" />
+          <BadgeText>{t("friends.profileBadge.requestSent")}</BadgeText>
+        </Badge>
+      );
+
+    case "pending_received":
+      return (
+        <Button
+          variant="solid"
+          action="primary"
+          size="sm"
+          onPress={handleAcceptRequest}
+          isDisabled={acceptRequest.loading || !friendshipId}
+        >
+          {acceptRequest.loading ? (
+            <ButtonSpinner color={IconColors.white} />
+          ) : (
+            <>
+              <Check size={14} color={IconColors.white} />
+              <ButtonText>{t("friends.profileBadge.acceptRequest")}</ButtonText>
+            </>
+          )}
+        </Button>
+      );
+
+    case "none":
+      return (
+        <Button
+          variant="solid"
+          action="primary"
+          size="sm"
+          onPress={handleSendRequest}
+          isDisabled={sendRequest.loading}
+        >
+          {sendRequest.loading ? (
+            <ButtonSpinner color={IconColors.white} />
+          ) : (
+            <>
+              <UserPlus size={14} color={IconColors.white} />
+              <ButtonText>{t("friends.profileBadge.addFriend")}</ButtonText>
+            </>
+          )}
+        </Button>
+      );
+  }
 }
 
 interface TappableAvatarProps {

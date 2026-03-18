@@ -168,6 +168,22 @@ export {
 // Unified feed hooks
 export { type UnifiedFeedItem, useUnifiedFeed } from "./useUnifiedFeed";
 
+// Friend hooks
+export {
+  useAcceptFriendRequest,
+  useCancelFriendRequest,
+  useDeclineFriendRequest,
+  useFriendRequestCount,
+  useFriendRequests,
+  useFriends,
+  useFriendshipStatus,
+  useFriendSuggestions,
+  useOutgoingFriendRequests,
+  useSearchUsers,
+  useSendFriendRequest,
+  useUnfriend,
+} from "./useFriends";
+
 // Crowd report hooks
 export {
   useSubmitCrowdReport,

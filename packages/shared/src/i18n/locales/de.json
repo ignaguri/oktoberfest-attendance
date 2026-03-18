@@ -104,6 +104,7 @@
     "menu": {
       "attendance": "Meine Besuche",
       "groups": "Gruppen",
+      "friends": "Freunde",
       "leaderboard": "Globale Rangliste",
       "achievements": "Erfolge",
       "profile": "Profileinstellungen",
@@ -2310,5 +2311,56 @@
     "title": "Was ist neu",
     "currentVersion": "Aktuelle Version: {{version}}",
     "versionLabel": "Version {{version}}"
+  },
+  "friends": {
+    "title": "Freunde",
+    "myFriends": "Meine Freunde",
+    "requests": "Anfragen",
+    "requestsCount": "Anfragen ({{count}})",
+    "suggestions": {
+      "title": "Personen, die du kennen könntest",
+      "sharedGroups": "{{count}} gemeinsame Gruppe",
+      "sharedGroupsPlural": "{{count}} gemeinsame Gruppen"
+    },
+    "search": {
+      "title": "Freunde finden",
+      "placeholder": "Nach Benutzername oder Name suchen",
+      "noResults": "Keine Benutzer gefunden"
+    },
+    "request": {
+      "send": "Hinzufügen",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "cancel": "Anfrage zurückziehen",
+      "sent": "Anfrage gesendet",
+      "pending": "Ausstehend",
+      "accepted": "Anfrage angenommen"
+    },
+    "unfriend": "Entfreunden",
+    "unfriendConfirm": "Bist du sicher, dass du {{name}} entfreunden möchtest?",
+    "empty": "Noch keine Freunde. Suche nach Benutzern oder schau dir Vorschläge an!",
+    "emptyDescription": "Nutze die Suche, um Leute zu finden, die du kennst",
+    "requestsEmpty": "Keine ausstehenden Freundschaftsanfragen",
+    "friendsSince": "Freunde seit {{date}}",
+    "notification": {
+      "requestReceived": "{{name}} hat dir eine Freundschaftsanfrage gesendet"
+    },
+    "status": {
+      "friends": "Freunde",
+      "pendingSent": "Ausstehend",
+      "pendingReceived": "Antworten",
+      "none": "Freund hinzufügen"
+    },
+    "qr": {
+      "title": "Freund hinzufügen",
+      "description": "Scanne diesen QR-Code, um mich als Freund hinzuzufügen"
+    },
+    "profileBadge": {
+      "friends": "Freunde",
+      "requestSent": "Anfrage gesendet",
+      "acceptRequest": "Anfrage annehmen",
+      "addFriend": "Freund hinzufügen"
+    },
+    "sharedGroups": "Gemeinsame Gruppen"
   }
 }

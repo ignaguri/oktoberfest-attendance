@@ -115,6 +115,7 @@
     "menu": {
       "attendance": "Mis asistencias",
       "groups": "Grupos",
+      "friends": "Amigos",
       "leaderboard": "Ranking global",
       "achievements": "Logros",
       "profile": "Configuración del perfil",
@@ -2625,5 +2626,56 @@
     "title": "Novedades",
     "currentVersion": "Versión actual: {{version}}",
     "versionLabel": "Versión {{version}}"
+  },
+  "friends": {
+    "title": "Amigos",
+    "myFriends": "Mis amigos",
+    "requests": "Solicitudes",
+    "requestsCount": "Solicitudes ({{count}})",
+    "suggestions": {
+      "title": "Personas que quizás conozcas",
+      "sharedGroups": "{{count}} grupo en común",
+      "sharedGroupsPlural": "{{count}} grupos en común"
+    },
+    "search": {
+      "title": "Buscar amigos",
+      "placeholder": "Buscar por nombre de usuario o nombre",
+      "noResults": "No se encontraron usuarios"
+    },
+    "request": {
+      "send": "Agregar",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "cancel": "Cancelar solicitud",
+      "sent": "Solicitud enviada",
+      "pending": "Pendiente",
+      "accepted": "Solicitud aceptada"
+    },
+    "unfriend": "Eliminar amigo",
+    "unfriendConfirm": "¿Estás seguro de que quieres eliminar a {{name}} como amigo?",
+    "empty": "Aún no tienes amigos. ¡Busca usuarios o revisa las sugerencias!",
+    "emptyDescription": "Usa la búsqueda para encontrar personas que conozcas",
+    "requestsEmpty": "No hay solicitudes de amistad pendientes",
+    "friendsSince": "Amigos desde {{date}}",
+    "notification": {
+      "requestReceived": "{{name}} te envió una solicitud de amistad"
+    },
+    "status": {
+      "friends": "Amigos",
+      "pendingSent": "Pendiente",
+      "pendingReceived": "Responder",
+      "none": "Agregar amigo"
+    },
+    "qr": {
+      "title": "Agregar amigo",
+      "description": "Escanea este código QR para agregarme como amigo"
+    },
+    "profileBadge": {
+      "friends": "Amigos",
+      "requestSent": "Solicitud enviada",
+      "acceptRequest": "Aceptar solicitud",
+      "addFriend": "Añadir amigo"
+    },
+    "sharedGroups": "Grupos en común"
   }
 }

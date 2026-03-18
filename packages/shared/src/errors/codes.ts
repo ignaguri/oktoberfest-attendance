@@ -80,6 +80,13 @@ export const ErrorCodes = {
   // Wrapped errors
   WRAPPED_NOT_FOUND: "WRAPPED_NOT_FOUND",
   WRAPPED_NOT_READY: "WRAPPED_NOT_READY",
+
+  // Friendship errors
+  FRIENDSHIP_NOT_FOUND: "FRIENDSHIP_NOT_FOUND",
+  ALREADY_FRIENDS: "ALREADY_FRIENDS",
+  ALREADY_PENDING: "ALREADY_PENDING",
+  SELF_FRIEND_REQUEST: "SELF_FRIEND_REQUEST",
+  INVALID_FRIEND_REQUEST: "INVALID_FRIEND_REQUEST",
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

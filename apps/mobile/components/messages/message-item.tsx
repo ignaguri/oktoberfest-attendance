@@ -147,6 +147,7 @@ export function MessageItem({
         onClose={handleCloseProfileModal}
         profile={publicProfile}
         loading={profileLoading}
+        userId={selectedUserId ?? undefined}
       />
     </>
   );

@@ -1,9 +1,25 @@
 "use client";
 
-import { usePublicProfile } from "@prostcounter/shared/hooks";
-import { Beer, Calendar, Loader2, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import {
+  useAcceptFriendRequest,
+  useFriendshipStatus,
+  usePublicProfile,
+  useSendFriendRequest,
+} from "@prostcounter/shared/hooks";
+import {
+  Beer,
+  Calendar,
+  Check,
+  Clock,
+  Loader2,
+  TrendingUp,
+  UserPlus,
+  Users,
+} from "lucide-react";
+import { useCallback, useState } from "react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn, getAvatarUrl } from "@/lib/utils";
 
@@ -108,6 +124,15 @@ export function ProfilePreview({
                   )}
                 </div>
 
+                {/* Friendship badge / action button */}
+                {profile?.friendshipStatus &&
+                  profile.friendshipStatus !== "self" && (
+                    <FriendshipBadge
+                      status={profile.friendshipStatus}
+                      userId={userId}
+                    />
+                  )}
+
                 {/* Stats - only shown if we have stats from the API */}
                 {profile?.stats && (
                   <div className="mt-2 flex gap-6">
@@ -146,6 +171,18 @@ export function ProfilePreview({
                     </div>
                   </div>
                 )}
+
+                {/* Shared groups - only shown when > 0 and not self */}
+                {profile?.sharedGroups != null &&
+                  profile.sharedGroups > 0 &&
+                  profile.friendshipStatus !== "self" && (
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                      <Users className="h-3.5 w-3.5" />
+                      <span>
+                        {profile.sharedGroups} {t("friends.sharedGroups")}
+                      </span>
+                    </div>
+                  )}
               </div>
             )}
           </CardHeader>
@@ -153,4 +190,94 @@ export function ProfilePreview({
       </DialogContent>
     </Dialog>
   );
+}
+
+function FriendshipBadge({
+  status,
+  userId,
+}: {
+  status: "friends" | "pending_sent" | "pending_received" | "none";
+  userId?: string;
+}) {
+  const { t } = useTranslation();
+  const sendRequest = useSendFriendRequest();
+  const { data: statusData } = useFriendshipStatus(
+    status === "pending_received" ? userId : undefined,
+  );
+  const acceptRequest = useAcceptFriendRequest();
+
+  const friendshipId = statusData?.friendshipId;
+
+  const handleSendRequest = useCallback(async () => {
+    if (!userId) return;
+    try {
+      await sendRequest.mutateAsync(userId);
+    } catch {
+      // Error handled by mutation
+    }
+  }, [sendRequest, userId]);
+
+  const handleAcceptRequest = useCallback(async () => {
+    if (!friendshipId) return;
+    try {
+      await acceptRequest.mutateAsync(friendshipId);
+    } catch {
+      // Error handled by mutation
+    }
+  }, [acceptRequest, friendshipId]);
+
+  switch (status) {
+    case "friends":
+      return (
+        <Badge
+          variant="outline"
+          className="border-green-300 bg-green-50 text-green-700"
+        >
+          <Check className="mr-1 h-3 w-3" />
+          {t("friends.profileBadge.friends")}
+        </Badge>
+      );
+
+    case "pending_sent":
+      return (
+        <Badge variant="outline" className="text-muted-foreground">
+          <Clock className="mr-1 h-3 w-3" />
+          {t("friends.profileBadge.requestSent")}
+        </Badge>
+      );
+
+    case "pending_received":
+      return (
+        <Button
+          variant="yellow"
+          size="sm"
+          onClick={handleAcceptRequest}
+          disabled={acceptRequest.loading || !friendshipId}
+        >
+          {acceptRequest.loading ? (
+            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+          ) : (
+            <Check className="mr-1 h-3 w-3" />
+          )}
+          {t("friends.profileBadge.acceptRequest")}
+        </Button>
+      );
+
+    case "none":
+      return (
+        <Button
+          variant="yellow"
+          size="sm"
+          onClick={handleSendRequest}
+          disabled={sendRequest.loading}
+        >
+          {sendRequest.loading ? (
+            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+          ) : (
+            <UserPlus className="mr-1 h-3 w-3" />
+          )}
+          {t("friends.profileBadge.addFriend")}
+        </Button>
+      );
+  }
 }

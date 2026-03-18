@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useDeleteProfile,
+  useFriendRequestCount,
   useResetTutorial,
   useUpdateProfile,
 } from "@prostcounter/shared/hooks";
@@ -11,7 +12,7 @@ import {
 } from "@prostcounter/shared/schemas";
 import * as Application from "expo-application";
 import { useRouter } from "expo-router";
-import { Lock, LogOut, Puzzle } from "lucide-react-native";
+import { Lock, LogOut, Puzzle, Users } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
@@ -31,10 +32,13 @@ import {
   AlertDialogHeader,
   useAlertDialog,
 } from "@/components/ui/alert-dialog";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -70,6 +74,7 @@ export default function ProfileScreen() {
     error: profileError,
   } = useAdaptedProfile(user?.id);
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
+  const { data: friendRequestCount } = useFriendRequestCount();
   const updateProfileMutation = useUpdateProfile();
   const deleteProfileMutation = useDeleteProfile();
   const resetTutorialMutation = useResetTutorial();
@@ -259,6 +264,35 @@ export default function ProfileScreen() {
           errors={errors}
           control={control}
         />
+
+        {/* Friends Section */}
+        <Pressable
+          onPress={() => router.push("/friends")}
+          accessibilityLabel={t("friends.title")}
+        >
+          <Card size="md" variant="elevated">
+            <HStack className="items-center justify-between">
+              <HStack space="md" className="items-center">
+                <Users size={22} color={IconColors.primary} />
+                <Text className="text-lg font-semibold">
+                  {t("friends.title")}
+                </Text>
+              </HStack>
+              <HStack space="sm" className="items-center">
+                {friendRequestCount != null && friendRequestCount > 0 && (
+                  <Badge
+                    action="error"
+                    variant="solid"
+                    className="rounded-full"
+                  >
+                    <BadgeText>{friendRequestCount}</BadgeText>
+                  </Badge>
+                )}
+                <Text className="text-typography-400">›</Text>
+              </HStack>
+            </HStack>
+          </Card>
+        </Pressable>
 
         {/* Settings Section */}
         <SettingsSection

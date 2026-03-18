@@ -455,6 +455,62 @@ export type Database = {
         }
         Relationships: []
       }
+      friendships: {
+        Row: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: Database["public"]["Enums"]["friendship_status"]
+          updated_at: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: Database["public"]["Enums"]["friendship_status"]
+          updated_at?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: Database["public"]["Enums"]["friendship_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendships_addressee_id_fkey"
+            columns: ["addressee_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "friendships_addressee_id_fkey"
+            columns: ["addressee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "friendships_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string | null
@@ -509,47 +565,43 @@ export type Database = {
         Row: {
           content: string
           created_at: string
-          group_id: string
+          festival_id: string
           id: string
           message_type: Database["public"]["Enums"]["group_message_type"]
           pinned: boolean
           updated_at: string
           user_id: string
+          visibility: Database["public"]["Enums"]["message_visibility"]
         }
         Insert: {
           content: string
           created_at?: string
-          group_id: string
+          festival_id: string
           id?: string
           message_type?: Database["public"]["Enums"]["group_message_type"]
           pinned?: boolean
           updated_at?: string
           user_id: string
+          visibility?: Database["public"]["Enums"]["message_visibility"]
         }
         Update: {
           content?: string
           created_at?: string
-          group_id?: string
+          festival_id?: string
           id?: string
           message_type?: Database["public"]["Enums"]["group_message_type"]
           pinned?: boolean
           updated_at?: string
           user_id?: string
+          visibility?: Database["public"]["Enums"]["message_visibility"]
         }
         Relationships: [
           {
-            foreignKeyName: "group_messages_group_id_fkey"
-            columns: ["group_id"]
+            foreignKeyName: "group_messages_festival_id_fkey"
+            columns: ["festival_id"]
             isOneToOne: false
-            referencedRelation: "groups"
+            referencedRelation: "festivals"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "group_messages_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["group_id"]
           },
           {
             foreignKeyName: "group_messages_user_id_profiles_fkey"
@@ -1632,6 +1684,14 @@ export type Database = {
       }
     }
     Functions: {
+      _get_effective_drink_count: {
+        Args: { p_attendance_id: string }
+        Returns: number
+      }
+      accept_friend_request: {
+        Args: { p_friendship_id: string; p_user_id: string }
+        Returns: Json
+      }
       add_beer_picture: {
         Args: {
           p_attendance_id: string
@@ -1703,6 +1763,10 @@ export type Database = {
           invite_token: string
           winning_criteria_id: number
         }[]
+      }
+      decline_friend_request: {
+        Args: { p_friendship_id: string; p_user_id: string }
+        Returns: Json
       }
       delete_attendance: {
         Args: { p_attendance_id: string }
@@ -1914,6 +1978,7 @@ export type Database = {
         Args: { p_festival_id?: string; p_user_id: string }
         Returns: number
       }
+      is_friend: { Args: { user1: string; user2: string }; Returns: boolean }
       is_group_member: {
         Args: { group_id: string; user_id: string }
         Returns: boolean
@@ -1969,6 +2034,10 @@ export type Database = {
           tent_id: string
           user_id: string
         }[]
+      }
+      send_friend_request: {
+        Args: { p_addressee_id: string; p_requester_id: string }
+        Returns: Json
       }
       unlock_achievement: {
         Args: {
@@ -2047,8 +2116,10 @@ export type Database = {
         | "starkbierfest"
         | "fruehlingsfest"
         | "other"
+      friendship_status: "pending" | "accepted" | "declined"
       group_message_type: "message" | "alert"
       location_sharing_status_enum: "active" | "paused" | "expired"
+      message_visibility: "groups" | "public"
       photo_visibility_enum: "public" | "private"
     }
     CompositeTypes: {
@@ -2212,8 +2283,10 @@ export const Constants = {
         "fruehlingsfest",
         "other",
       ],
+      friendship_status: ["pending", "accepted", "declined"],
       group_message_type: ["message", "alert"],
       location_sharing_status_enum: ["active", "paused", "expired"],
+      message_visibility: ["groups", "public"],
       photo_visibility_enum: ["public", "private"],
     },
   },
