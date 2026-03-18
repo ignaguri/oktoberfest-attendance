@@ -44,6 +44,13 @@ import type {
   UpdateGroupMessageResponse,
   DeleteGroupMessageResponse,
   GroupMessageType,
+  ListFriendsResponse,
+  ListFriendRequestsResponse,
+  FriendRequestCountResponse,
+  FriendActionResponse,
+  ListFriendSuggestionsResponse,
+  SearchUsersResponse,
+  FriendshipStatusCheck,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -2378,6 +2385,184 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to delete message");
         }
         return parseJsonResponse<DeleteGroupMessageResponse>(response);
+      },
+    },
+
+    /**
+     * Friends API
+     */
+    friends: {
+      async list(): Promise<ListFriendsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch friends");
+        }
+        return parseJsonResponse<ListFriendsResponse>(response);
+      },
+
+      async getIncomingRequests(): Promise<ListFriendRequestsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends/requests/incoming`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch incoming requests");
+        }
+        return parseJsonResponse<ListFriendRequestsResponse>(response);
+      },
+
+      async getOutgoingRequests(): Promise<ListFriendRequestsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends/requests/outgoing`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch outgoing requests");
+        }
+        return parseJsonResponse<ListFriendRequestsResponse>(response);
+      },
+
+      async getRequestCount(): Promise<FriendRequestCountResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends/requests/count`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch request count");
+        }
+        return parseJsonResponse<FriendRequestCountResponse>(response);
+      },
+
+      async sendRequest(addresseeId: string): Promise<FriendActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/friends/request`,
+          {
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify({ addresseeId }),
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to send friend request");
+        }
+        return parseJsonResponse<FriendActionResponse>(response);
+      },
+
+      async acceptRequest(requestId: string): Promise<FriendActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/friends/request/${requestId}/accept`,
+          {
+            method: "POST",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to accept friend request");
+        }
+        return parseJsonResponse<FriendActionResponse>(response);
+      },
+
+      async declineRequest(requestId: string): Promise<FriendActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/friends/request/${requestId}/decline`,
+          {
+            method: "POST",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to decline friend request");
+        }
+        return parseJsonResponse<FriendActionResponse>(response);
+      },
+
+      async cancelRequest(requestId: string): Promise<FriendActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/friends/request/${requestId}`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to cancel friend request");
+        }
+        return parseJsonResponse<FriendActionResponse>(response);
+      },
+
+      async unfriend(userId: string): Promise<FriendActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/friends/${userId}`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to unfriend");
+        }
+        return parseJsonResponse<FriendActionResponse>(response);
+      },
+
+      async getSuggestions(): Promise<ListFriendSuggestionsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends/suggestions`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch suggestions");
+        }
+        return parseJsonResponse<ListFriendSuggestionsResponse>(response);
+      },
+
+      async search(query: string): Promise<SearchUsersResponse> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({ q: query });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends/search?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to search users");
+        }
+        return parseJsonResponse<SearchUsersResponse>(response);
+      },
+
+      async getStatus(userId: string): Promise<FriendshipStatusCheck> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/friends/status/${userId}`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to get friendship status");
+        }
+        return parseJsonResponse<FriendshipStatusCheck>(response);
       },
     },
   };

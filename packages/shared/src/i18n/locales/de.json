@@ -2310,5 +2310,47 @@
     "title": "Was ist neu",
     "currentVersion": "Aktuelle Version: {{version}}",
     "versionLabel": "Version {{version}}"
+  },
+  "friends": {
+    "title": "Freunde",
+    "myFriends": "Meine Freunde",
+    "requests": "Anfragen",
+    "requestsCount": "Anfragen ({{count}})",
+    "suggestions": {
+      "title": "Personen, die du kennen könntest",
+      "sharedGroups": "{{count}} gemeinsame Gruppe",
+      "sharedGroupsPlural": "{{count}} gemeinsame Gruppen"
+    },
+    "search": {
+      "placeholder": "Nach Benutzername oder Name suchen",
+      "noResults": "Keine Benutzer gefunden"
+    },
+    "request": {
+      "send": "Freund hinzufügen",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "cancel": "Anfrage zurückziehen",
+      "sent": "Anfrage gesendet",
+      "pending": "Ausstehend",
+      "accepted": "Anfrage angenommen"
+    },
+    "unfriend": "Entfreunden",
+    "unfriendConfirm": "Bist du sicher, dass du {{name}} entfreunden möchtest?",
+    "empty": "Noch keine Freunde. Suche nach Benutzern oder schau dir Vorschläge an!",
+    "requestsEmpty": "Keine ausstehenden Freundschaftsanfragen",
+    "friendsSince": "Freunde seit {{date}}",
+    "notification": {
+      "requestReceived": "{{name}} hat dir eine Freundschaftsanfrage gesendet"
+    },
+    "status": {
+      "friends": "Freunde",
+      "pendingSent": "Ausstehend",
+      "pendingReceived": "Antworten",
+      "none": "Freund hinzufügen"
+    },
+    "qr": {
+      "title": "Freund hinzufügen",
+      "description": "Scanne diesen QR-Code, um mich als Freund hinzuzufügen"
+    }
   }
 }

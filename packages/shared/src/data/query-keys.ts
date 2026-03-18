@@ -117,6 +117,20 @@ export class QueryKeys {
   static photoComments = (photoId: string, groupId: string) =>
     ["photo-comments", photoId, groupId] as const;
 
+  // Friend queries
+  static friends = () => ["friends"] as const;
+  static friendRequestsIncoming = () =>
+    ["friends", "requests", "incoming"] as const;
+  static friendRequestsOutgoing = () =>
+    ["friends", "requests", "outgoing"] as const;
+  static friendRequestCount = () =>
+    ["friends", "requests", "count"] as const;
+  static friendSuggestions = () => ["friends", "suggestions"] as const;
+  static friendSearch = (query: string) =>
+    ["friends", "search", query] as const;
+  static friendshipStatus = (userId: string) =>
+    ["friends", "status", userId] as const;
+
   // Crowd report queries
   static crowdStatus = (festivalId: string) =>
     ["crowd-status", festivalId] as const;

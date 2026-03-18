@@ -317,6 +317,13 @@ export default function RootLayout() {
                                         }}
                                       />
                                       <Stack.Screen
+                                        name="friends"
+                                        options={{
+                                          headerShown: false,
+                                          presentation: "card",
+                                        }}
+                                      />
+                                      <Stack.Screen
                                         name="achievements"
                                         options={{
                                           headerShown: false,

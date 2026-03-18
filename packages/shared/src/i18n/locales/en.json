@@ -2625,5 +2625,47 @@
     "title": "What's New",
     "currentVersion": "Current version: {{version}}",
     "versionLabel": "Version {{version}}"
+  },
+  "friends": {
+    "title": "Friends",
+    "myFriends": "My Friends",
+    "requests": "Requests",
+    "requestsCount": "Requests ({{count}})",
+    "suggestions": {
+      "title": "People You May Know",
+      "sharedGroups": "{{count}} shared group",
+      "sharedGroupsPlural": "{{count}} shared groups"
+    },
+    "search": {
+      "placeholder": "Search by username or name",
+      "noResults": "No users found"
+    },
+    "request": {
+      "send": "Add Friend",
+      "accept": "Accept",
+      "decline": "Decline",
+      "cancel": "Cancel Request",
+      "sent": "Request Sent",
+      "pending": "Pending",
+      "accepted": "Request accepted"
+    },
+    "unfriend": "Unfriend",
+    "unfriendConfirm": "Are you sure you want to unfriend {{name}}?",
+    "empty": "No friends yet. Search for users or check out suggestions!",
+    "requestsEmpty": "No pending friend requests",
+    "friendsSince": "Friends since {{date}}",
+    "notification": {
+      "requestReceived": "{{name}} sent you a friend request"
+    },
+    "status": {
+      "friends": "Friends",
+      "pendingSent": "Pending",
+      "pendingReceived": "Respond",
+      "none": "Add Friend"
+    },
+    "qr": {
+      "title": "Add Friend",
+      "description": "Scan this QR code to add me as a friend"
+    }
   }
 }
