@@ -50,6 +50,7 @@ export class SupabaseProfileRepository {
   async getPublicProfile(
     userId: string,
     festivalId?: string,
+    currentUserId?: string,
   ): Promise<PublicProfile> {
     const { data, error } = await this.supabase
       .from("profiles")
@@ -60,12 +61,6 @@ export class SupabaseProfileRepository {
     if (error || !data) {
       throw new Error(`Profile not found: ${error?.message}`);
     }
-
-    // Get the current authenticated user
-    const {
-      data: { user: currentUser },
-    } = await this.supabase.auth.getUser();
-    const currentUserId = currentUser?.id;
 
     let stats: PublicProfile["stats"] = null;
     let friendshipStatus: PublicProfile["friendshipStatus"] = null;

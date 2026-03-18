@@ -38,14 +38,21 @@ CREATE INDEX IF NOT EXISTS idx_friendships_accepted
 ALTER TABLE public.friendships ENABLE ROW LEVEL SECURITY;
 
 -- 5. Helper function: check if two users are friends
+-- Restricted to authenticated role only; caller must be one of the two users
 CREATE OR REPLACE FUNCTION public.is_friend(user1 uuid, user2 uuid)
 RETURNS boolean
-LANGUAGE sql
+LANGUAGE plpgsql
 SECURITY DEFINER
 STABLE
 SET search_path = public
 AS $$
-  SELECT EXISTS (
+BEGIN
+  -- Prevent probing arbitrary pairs: caller must be one of the users
+  IF auth.uid() IS NULL OR (auth.uid() != user1 AND auth.uid() != user2) THEN
+    RETURN false;
+  END IF;
+
+  RETURN EXISTS (
     SELECT 1 FROM public.friendships
     WHERE status = 'accepted'
     AND (
@@ -53,7 +60,11 @@ AS $$
       OR (requester_id = user2 AND addressee_id = user1)
     )
   );
+END;
 $$;
+
+REVOKE EXECUTE ON FUNCTION public.is_friend(uuid, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_friend(uuid, uuid) TO authenticated;
 
 -- 6. RLS Policies for friendships table
 
@@ -118,6 +129,15 @@ BEGIN
       'success', false,
       'error_code', 'INVALID_INPUT',
       'message', 'User IDs cannot be null'
+    );
+  END IF;
+
+  -- Prevent impersonation: caller must be the requester
+  IF p_requester_id != auth.uid() THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'error_code', 'FORBIDDEN',
+      'message', 'Cannot send requests on behalf of other users'
     );
   END IF;
 
@@ -216,6 +236,15 @@ AS $$
 DECLARE
   v_friendship record;
 BEGIN
+  -- Prevent impersonation: caller must be the user
+  IF p_user_id != auth.uid() THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'error_code', 'FORBIDDEN',
+      'message', 'Cannot accept requests on behalf of other users'
+    );
+  END IF;
+
   SELECT id, requester_id, addressee_id, status
   INTO v_friendship
   FROM public.friendships
@@ -271,6 +300,15 @@ AS $$
 DECLARE
   v_friendship record;
 BEGIN
+  -- Prevent impersonation: caller must be the user
+  IF p_user_id != auth.uid() THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'error_code', 'FORBIDDEN',
+      'message', 'Cannot decline requests on behalf of other users'
+    );
+  END IF;
+
   SELECT id, requester_id, addressee_id, status
   INTO v_friendship
   FROM public.friendships

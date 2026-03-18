@@ -79,7 +79,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
         ),
       );
 
-      // 2. auth.getUser (already mocked in createMockSupabase with currentUserId)
+      // currentUserId is passed from route via c.var.user.id
 
       const res = await makeRequest(currentUserId);
 

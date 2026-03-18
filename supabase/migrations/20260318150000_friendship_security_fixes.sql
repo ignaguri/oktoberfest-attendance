@@ -253,9 +253,57 @@ END;
 $$;
 
 -- =====================================================
+-- 1b. Restrict is_friend() to prevent probing arbitrary pairs
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.is_friend(user1 uuid, user2 uuid)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+BEGIN
+  -- Prevent probing arbitrary pairs: caller must be one of the users
+  IF auth.uid() IS NULL OR (auth.uid() != user1 AND auth.uid() != user2) THEN
+    RETURN false;
+  END IF;
+
+  RETURN EXISTS (
+    SELECT 1 FROM public.friendships
+    WHERE status = 'accepted'
+    AND (
+      (requester_id = user1 AND addressee_id = user2)
+      OR (requester_id = user2 AND addressee_id = user1)
+    )
+  );
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.is_friend(uuid, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_friend(uuid, uuid) TO authenticated;
+
+-- =====================================================
 -- 2. Unordered pair uniqueness constraint
 -- =====================================================
--- Prevents both (A→B) and (B→A) rows from existing simultaneously
+-- Prevents both (A→B) and (B→A) rows from existing simultaneously.
+-- First, deduplicate any reverse-duplicate pairs that may have been created
+-- before this constraint existed. Keep the accepted row (or the newer one if tied).
+DELETE FROM public.friendships f1
+USING public.friendships f2
+WHERE f1.requester_id = f2.addressee_id
+  AND f1.addressee_id = f2.requester_id
+  AND f1.id != f2.id
+  AND (
+    -- Keep accepted over non-accepted
+    (f2.status = 'accepted' AND f1.status != 'accepted')
+    OR
+    -- If same status, keep the newer one (higher id)
+    (f2.status = f1.status AND f1.created_at < f2.created_at)
+    OR
+    -- Tiebreaker: keep the row with the lower id
+    (f2.status = f1.status AND f1.created_at = f2.created_at AND f1.id > f2.id)
+  );
+
 CREATE UNIQUE INDEX IF NOT EXISTS idx_friendships_unique_pair
   ON public.friendships (LEAST(requester_id, addressee_id), GREATEST(requester_id, addressee_id));
 
