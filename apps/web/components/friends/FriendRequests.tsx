@@ -121,8 +121,8 @@ function IncomingRequestCard({ request }: RequestCardProps) {
   const profile = request.profile;
 
   return (
-    <Card>
-      <CardContent className="flex items-center gap-3 p-3">
+    <Card className="py-0">
+      <CardContent className="flex items-center gap-3 px-3 py-2.5">
         <AvatarPreview
           url={profile.avatarUrl}
           previewUrl={null}
@@ -191,8 +191,8 @@ function OutgoingRequestCard({ request }: RequestCardProps) {
   const profile = request.profile;
 
   return (
-    <Card>
-      <CardContent className="flex items-center gap-3 p-3">
+    <Card className="py-0">
+      <CardContent className="flex items-center gap-3 px-3 py-2.5">
         <AvatarPreview
           url={profile.avatarUrl}
           previewUrl={null}

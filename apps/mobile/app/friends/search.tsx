@@ -1,11 +1,11 @@
 import {
-  useFriendshipStatus,
   useSearchUsers,
   useSendFriendRequest,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { SearchUserResult } from "@prostcounter/shared/schemas";
 import { Search } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
 
 import { AddFriendButton } from "@/components/friends/add-friend-button";
@@ -21,13 +21,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
-interface SearchUser {
-  id: string;
-  username: string | null;
-  fullName: string | null;
-  avatarUrl: string | null;
-}
-
 export default function FriendSearchScreen() {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
@@ -40,12 +33,25 @@ export default function FriendSearchScreen() {
 
   const { data: results, loading } = useSearchUsers(debouncedQuery);
 
+  const sortedResults = useMemo(() => {
+    if (!results) return [];
+    return [...results].sort((a: SearchUserResult, b: SearchUserResult) => {
+      if (a.friendshipStatus === "friends" && b.friendshipStatus !== "friends")
+        return 1;
+      if (a.friendshipStatus !== "friends" && b.friendshipStatus === "friends")
+        return -1;
+      const nameA = (a.fullName || a.username || "").toLowerCase();
+      const nameB = (b.fullName || b.username || "").toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [results]);
+
   const renderItem = useCallback(
-    ({ item }: { item: SearchUser }) => <SearchResultItem user={item} />,
+    ({ item }: { item: SearchUserResult }) => <SearchResultItem user={item} />,
     [],
   );
 
-  const keyExtractor = useCallback((item: SearchUser) => item.id, []);
+  const keyExtractor = useCallback((item: SearchUserResult) => item.id, []);
 
   const showNoResults =
     !loading && debouncedQuery.length >= 1 && results?.length === 0;
@@ -85,7 +91,7 @@ export default function FriendSearchScreen() {
       )}
 
       <FlatList
-        data={results ?? []}
+        data={sortedResults}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         contentContainerClassName="px-4 pb-4"
@@ -96,8 +102,7 @@ export default function FriendSearchScreen() {
   );
 }
 
-function SearchResultItem({ user }: { user: SearchUser }) {
-  const { data: status, loading: statusLoading } = useFriendshipStatus(user.id);
+function SearchResultItem({ user }: { user: SearchUserResult }) {
   const sendRequest = useSendFriendRequest();
 
   const handleSendRequest = useCallback(() => {
@@ -105,7 +110,7 @@ function SearchResultItem({ user }: { user: SearchUser }) {
   }, [sendRequest, user.id]);
 
   const displayName = user.fullName || user.username || "";
-  const friendshipStatus = status?.status ?? "none";
+  const friendshipStatus = user.friendshipStatus;
 
   return (
     <HStack
@@ -135,7 +140,7 @@ function SearchResultItem({ user }: { user: SearchUser }) {
       <AddFriendButton
         status={friendshipStatus}
         onPress={handleSendRequest}
-        loading={sendRequest.loading || statusLoading}
+        loading={sendRequest.loading}
         size="sm"
       />
     </HStack>

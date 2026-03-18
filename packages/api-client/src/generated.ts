@@ -1808,6 +1808,8 @@ export interface paths {
                                 username: string | null;
                                 fullName: string | null;
                                 avatarUrl: string | null;
+                                /** @enum {string} */
+                                friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none";
                             }[];
                         };
                     };

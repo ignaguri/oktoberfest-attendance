@@ -104,6 +104,7 @@
     "menu": {
       "attendance": "Meine Besuche",
       "groups": "Gruppen",
+      "friends": "Freunde",
       "leaderboard": "Globale Rangliste",
       "achievements": "Erfolge",
       "profile": "Profileinstellungen",
@@ -2327,7 +2328,7 @@
       "noResults": "Keine Benutzer gefunden"
     },
     "request": {
-      "send": "Freund hinzufügen",
+      "send": "Hinzufügen",
       "accept": "Annehmen",
       "decline": "Ablehnen",
       "cancel": "Anfrage zurückziehen",

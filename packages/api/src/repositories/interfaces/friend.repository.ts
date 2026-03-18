@@ -40,6 +40,11 @@ export interface IFriendRepository {
       username: string | null;
       fullName: string | null;
       avatarUrl: string | null;
+      friendshipStatus:
+        | "friends"
+        | "pending_sent"
+        | "pending_received"
+        | "none";
     }[]
   >;
   getFriendshipStatus(

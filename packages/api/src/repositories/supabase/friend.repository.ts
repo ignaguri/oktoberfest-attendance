@@ -326,6 +326,11 @@ export class SupabaseFriendRepository implements IFriendRepository {
       username: string | null;
       fullName: string | null;
       avatarUrl: string | null;
+      friendshipStatus:
+        | "friends"
+        | "pending_sent"
+        | "pending_received"
+        | "none";
     }[]
   > {
     const { data, error } = await this.supabase
@@ -337,11 +342,47 @@ export class SupabaseFriendRepository implements IFriendRepository {
 
     if (error) throw new DatabaseError(error.message);
 
-    return (data || []).map((p) => ({
+    if (!data || data.length === 0) return [];
+
+    // Batch-fetch friendship statuses for all results
+    const userIds = data.map((p) => p.id);
+    const { data: friendships, error: fError } = await this.supabase
+      .from("friendships")
+      .select("id, requester_id, addressee_id, status")
+      .or(
+        userIds
+          .map(
+            (uid) =>
+              `and(requester_id.eq.${userId},addressee_id.eq.${uid}),and(requester_id.eq.${uid},addressee_id.eq.${userId})`,
+          )
+          .join(","),
+      );
+
+    if (fError) throw new DatabaseError(fError.message);
+
+    const friendshipMap = new Map<
+      string,
+      "friends" | "pending_sent" | "pending_received" | "none"
+    >();
+    for (const f of friendships || []) {
+      const otherUserId =
+        f.requester_id === userId ? f.addressee_id : f.requester_id;
+      if (f.status === "accepted") {
+        friendshipMap.set(otherUserId, "friends");
+      } else if (f.status === "pending") {
+        friendshipMap.set(
+          otherUserId,
+          f.requester_id === userId ? "pending_sent" : "pending_received",
+        );
+      }
+    }
+
+    return data.map((p) => ({
       id: p.id,
       username: p.username,
       fullName: p.full_name,
       avatarUrl: p.avatar_url,
+      friendshipStatus: friendshipMap.get(p.id) ?? "none",
     }));
   }
 

@@ -106,14 +106,16 @@ export type ListFriendSuggestionsResponse = z.infer<
   typeof ListFriendSuggestionsResponseSchema
 >;
 
+export const SearchUserResultSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string().nullable(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
+  friendshipStatus: z.enum(["friends", "pending_sent", "pending_received", "none"]),
+});
+export type SearchUserResult = z.infer<typeof SearchUserResultSchema>;
+
 export const SearchUsersResponseSchema = z.object({
-  data: z.array(
-    z.object({
-      id: z.string().uuid(),
-      username: z.string().nullable(),
-      fullName: z.string().nullable(),
-      avatarUrl: z.string().nullable(),
-    }),
-  ),
+  data: z.array(SearchUserResultSchema),
 });
 export type SearchUsersResponse = z.infer<typeof SearchUsersResponseSchema>;

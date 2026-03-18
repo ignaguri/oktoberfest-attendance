@@ -6,17 +6,16 @@ import { parseISO } from "date-fns";
 import { UserX } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
+import {
+  TappableAvatar,
+  UserProfileModal,
+} from "@/components/shared/user-profile-modal";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-
-import {
-  TappableAvatar,
-  UserProfileModal,
-} from "@/components/shared/user-profile-modal";
 
 interface FriendCardProps {
   friend: Friend;

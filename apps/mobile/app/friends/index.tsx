@@ -169,7 +169,7 @@ export default function FriendsScreen() {
   }, [t, pendingCount]);
 
   return (
-    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-background-50" edges={[]}>
       {/* Header */}
       <HStack className="items-center justify-between px-4 pb-2 pt-3">
         <Text className="text-2xl font-bold text-typography-900">
@@ -337,7 +337,11 @@ function MyFriendsTab({
 
   const renderFriendItem = ({ item }: { item: Friend }) => (
     <View className="px-4 py-1">
-      <FriendCard friend={item} festivalId={festivalId} onUnfriend={onUnfriend} />
+      <FriendCard
+        friend={item}
+        festivalId={festivalId}
+        onUnfriend={onUnfriend}
+      />
     </View>
   );
 

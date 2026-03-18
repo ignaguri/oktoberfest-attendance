@@ -10,6 +10,7 @@ import {
   Sparkles,
   Trophy,
   User,
+  UserPlus,
   Users,
 } from "lucide-react";
 
@@ -53,6 +54,13 @@ const menuItemsConfig: MenuItem[] = [
     labelKey: "common.menu.groups",
     href: "/groups",
     icon: <Users className="h-4 w-4" />,
+    section: "navigation",
+  },
+  {
+    id: "friends",
+    labelKey: "common.menu.friends",
+    href: "/friends",
+    icon: <UserPlus className="h-4 w-4" />,
     section: "navigation",
   },
   {
@@ -123,7 +131,7 @@ const menuSectionsConfig: MenuSection[] = [
   {
     id: "navigation",
     labelKey: "common.menu.navigation",
-    items: ["attendance", "groups", "leaderboard", "achievements"],
+    items: ["attendance", "groups", "friends", "leaderboard", "achievements"],
   },
   {
     id: "settings",

@@ -139,6 +139,11 @@ export class FriendService {
       username: string | null;
       fullName: string | null;
       avatarUrl: string | null;
+      friendshipStatus:
+        | "friends"
+        | "pending_sent"
+        | "pending_received"
+        | "none";
     }[]
   > {
     return await this.friendRepo.searchUsers(userId, query);

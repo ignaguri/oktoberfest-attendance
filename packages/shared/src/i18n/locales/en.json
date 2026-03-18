@@ -115,6 +115,7 @@
     "menu": {
       "attendance": "My Attendances",
       "groups": "Groups",
+      "friends": "Friends",
       "leaderboard": "Global Leaderboard",
       "achievements": "Achievements",
       "profile": "Profile Settings",
@@ -2642,7 +2643,7 @@
       "noResults": "No users found"
     },
     "request": {
-      "send": "Add Friend",
+      "send": "Add",
       "accept": "Accept",
       "decline": "Decline",
       "cancel": "Cancel Request",

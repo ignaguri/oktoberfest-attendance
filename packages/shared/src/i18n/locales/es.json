@@ -115,6 +115,7 @@
     "menu": {
       "attendance": "Mis asistencias",
       "groups": "Grupos",
+      "friends": "Amigos",
       "leaderboard": "Ranking global",
       "achievements": "Logros",
       "profile": "Configuración del perfil",
@@ -2642,7 +2643,7 @@
       "noResults": "No se encontraron usuarios"
     },
     "request": {
-      "send": "Agregar amigo",
+      "send": "Agregar",
       "accept": "Aceptar",
       "decline": "Rechazar",
       "cancel": "Cancelar solicitud",

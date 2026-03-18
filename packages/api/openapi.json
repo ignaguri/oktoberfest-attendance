@@ -3138,13 +3138,23 @@
                           "avatarUrl": {
                             "type": "string",
                             "nullable": true
+                          },
+                          "friendshipStatus": {
+                            "type": "string",
+                            "enum": [
+                              "friends",
+                              "pending_sent",
+                              "pending_received",
+                              "none"
+                            ]
                           }
                         },
                         "required": [
                           "id",
                           "username",
                           "fullName",
-                          "avatarUrl"
+                          "avatarUrl",
+                          "friendshipStatus"
                         ]
                       }
                     }
