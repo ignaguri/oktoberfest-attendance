@@ -2654,6 +2654,7 @@
     "unfriend": "Eliminar amigo",
     "unfriendConfirm": "¿Estás seguro de que quieres eliminar a {{name}} como amigo?",
     "empty": "Aún no tienes amigos. ¡Busca usuarios o revisa las sugerencias!",
+    "emptyDescription": "Usa la búsqueda para encontrar personas que conozcas",
     "requestsEmpty": "No hay solicitudes de amistad pendientes",
     "friendsSince": "Amigos desde {{date}}",
     "notification": {
@@ -2668,6 +2669,13 @@
     "qr": {
       "title": "Agregar amigo",
       "description": "Escanea este código QR para agregarme como amigo"
-    }
+    },
+    "profileBadge": {
+      "friends": "Amigos",
+      "requestSent": "Solicitud enviada",
+      "acceptRequest": "Aceptar solicitud",
+      "addFriend": "Añadir amigo"
+    },
+    "sharedGroups": "Grupos en común"
   }
 }

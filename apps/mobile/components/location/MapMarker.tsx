@@ -4,6 +4,7 @@ import { Image, View } from "react-native";
 
 import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/image-urls";
 
 interface FriendMarkerProps {
   avatarUrl: string | null;
@@ -37,7 +38,7 @@ export function FriendMarker({
       >
         {avatarUrl ? (
           <Image
-            source={{ uri: avatarUrl }}
+            source={{ uri: getAvatarUrl(avatarUrl) }}
             className="h-8 w-8 rounded-full"
             accessibilityLabel={`${username}'s avatar`}
           />
@@ -172,7 +173,7 @@ export function UserLocationMarker({
       >
         {avatarUrl ? (
           <Image
-            source={{ uri: avatarUrl }}
+            source={{ uri: getAvatarUrl(avatarUrl) }}
             className="h-10 w-10 rounded-full"
             accessibilityLabel="Your location"
           />

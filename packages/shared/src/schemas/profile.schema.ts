@@ -174,6 +174,13 @@ export const PublicProfileSchema = z.object({
     })
     .nullable()
     .optional(),
+  // Friendship status between the viewer and this user
+  friendshipStatus: z
+    .enum(["friends", "pending_sent", "pending_received", "none", "self"])
+    .nullable()
+    .optional(),
+  // Number of groups shared between the viewer and this user
+  sharedGroups: z.number().nullable().optional(),
 });
 
 export type PublicProfile = z.infer<typeof PublicProfileSchema>;

@@ -95,6 +95,7 @@ export function useSendFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestsOutgoing());
         invalidateQueries(QueryKeys.friendSuggestions());
         invalidateQueries(QueryKeys.friendshipStatus(addresseeId));
+        invalidateQueries(["public-profile", addresseeId] as const);
       },
     },
   );
@@ -117,6 +118,7 @@ export function useAcceptFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestsIncoming());
         invalidateQueries(QueryKeys.friendRequestCount());
         invalidateQueries(QueryKeys.friendSuggestions());
+        invalidateQueries(["public-profile"] as const);
       },
     },
   );

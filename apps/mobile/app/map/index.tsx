@@ -30,6 +30,7 @@ import { ScrollView } from "@/components/ui/scroll-view";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/image-urls";
 import { useLocationContext } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
@@ -267,7 +268,7 @@ function NearbyFriendsList({ members }: { members: LocationSessionMember[] }) {
           <HStack space="sm" className="items-center">
             <Avatar size="sm">
               {member.avatarUrl && (
-                <AvatarImage source={{ uri: member.avatarUrl }} />
+                <AvatarImage source={{ uri: getAvatarUrl(member.avatarUrl) }} />
               )}
               <AvatarFallbackText>
                 {member.username || member.fullName || "?"}

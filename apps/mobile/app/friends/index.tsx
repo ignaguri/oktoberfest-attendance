@@ -326,6 +326,7 @@ function MyFriendsTab({
   festivalId,
 }: MyFriendsTabProps) {
   const { t } = useTranslation();
+  const router = useRouter();
 
   if (isLoading && !isRefreshing) {
     return (
@@ -390,7 +391,7 @@ function MyFriendsTab({
         <Button
           variant="solid"
           action="primary"
-          onPress={() => {}}
+          onPress={() => router.push("/friends/search")}
           accessibilityLabel={t("friends.search.placeholder")}
         >
           <Search size={16} color={IconColors.white} />

@@ -107,6 +107,42 @@ Friend operations (send, accept, decline) use `SECURITY DEFINER` functions to ha
 | `GET` | `/friends/search?q=` | Search users by name/username |
 | `GET` | `/friends/status/:userId` | Friendship status with a user |
 
+## Profile Modal Integration
+
+Tapping any user's avatar (activity feed, leaderboard, friends list) opens a profile modal that includes friendship-aware elements:
+
+### Friendship Badge
+
+Displayed between the user's name and their stats:
+
+| Status | Display |
+|--------|---------|
+| `self` | Hidden (own profile) |
+| `friends` | Green "Friends" badge with check icon |
+| `pending_sent` | Muted "Request Sent" badge with clock icon |
+| `pending_received` | "Accept Request" button (primary action) |
+| `none` | "Add Friend" button (primary action) |
+
+Buttons trigger mutations (`useSendFriendRequest`, `useAcceptFriendRequest`) and the modal updates immediately via cache invalidation of the `public-profile` query key.
+
+### Shared Groups
+
+Below the stats, a "X shared groups" line appears when the current user and the viewed user are both members of one or more groups. Hidden when 0 or when viewing own profile.
+
+### Data Source
+
+Both fields (`friendshipStatus`, `sharedGroups`) come from the existing `GET /profiles/{userId}` endpoint, so the modal requires no additional API calls. The endpoint:
+
+1. Gets the current user from `supabase.auth.getUser()`
+2. Queries `friendships` table for the relationship between the two users
+3. Counts shared groups via `group_members` table intersection
+4. Returns everything in a single response
+
+### Components
+
+- **Web**: `FriendshipBadge` in `apps/web/components/ui/profile-preview.tsx`
+- **Mobile**: `MobileFriendshipBadge` in `apps/mobile/components/shared/user-profile-modal.tsx`
+
 ## Shared Code
 
 - **Schemas**: `packages/shared/src/schemas/friend.schema.ts`

@@ -290,6 +290,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         onClose={handleCloseProfileModal}
         profile={publicProfile}
         loading={profileLoading}
+        userId={selectedUserId ?? undefined}
       />
     </>
   );

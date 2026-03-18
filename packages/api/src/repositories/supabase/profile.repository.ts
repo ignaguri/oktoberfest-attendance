@@ -61,7 +61,15 @@ export class SupabaseProfileRepository {
       throw new Error(`Profile not found: ${error?.message}`);
     }
 
+    // Get the current authenticated user
+    const {
+      data: { user: currentUser },
+    } = await this.supabase.auth.getUser();
+    const currentUserId = currentUser?.id;
+
     let stats: PublicProfile["stats"] = null;
+    let friendshipStatus: PublicProfile["friendshipStatus"] = null;
+    let sharedGroups: PublicProfile["sharedGroups"] = null;
 
     // Fetch festival stats from user_festival_stats view if festivalId is provided
     if (festivalId) {
@@ -81,12 +89,60 @@ export class SupabaseProfileRepository {
       }
     }
 
+    // Friendship status and shared groups (skip if viewing own profile)
+    if (currentUserId && currentUserId !== userId) {
+      // Friendship status
+      const { data: friendship } = await this.supabase
+        .from("friendships")
+        .select("id, requester_id, status")
+        .or(
+          `and(requester_id.eq.${currentUserId},addressee_id.eq.${userId}),and(requester_id.eq.${userId},addressee_id.eq.${currentUserId})`,
+        )
+        .limit(1)
+        .maybeSingle();
+
+      if (!friendship) {
+        friendshipStatus = "none";
+      } else if (friendship.status === "accepted") {
+        friendshipStatus = "friends";
+      } else if (friendship.status === "pending") {
+        friendshipStatus =
+          friendship.requester_id === currentUserId
+            ? "pending_sent"
+            : "pending_received";
+      } else {
+        friendshipStatus = "none";
+      }
+
+      // Shared groups count: get current user's groups, then count how many the target user is also in
+      const { data: myGroups } = await this.supabase
+        .from("group_members")
+        .select("group_id")
+        .eq("user_id", currentUserId);
+
+      if (myGroups && myGroups.length > 0) {
+        const myGroupIds = myGroups.map((g) => g.group_id);
+        const { count } = await this.supabase
+          .from("group_members")
+          .select("group_id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .in("group_id", myGroupIds);
+        sharedGroups = count ?? 0;
+      } else {
+        sharedGroups = 0;
+      }
+    } else if (currentUserId && currentUserId === userId) {
+      friendshipStatus = "self";
+    }
+
     return {
       id: data.id,
       username: data.username,
       fullName: data.full_name,
       avatarUrl: data.avatar_url,
       stats,
+      friendshipStatus,
+      sharedGroups,
     };
   }
 

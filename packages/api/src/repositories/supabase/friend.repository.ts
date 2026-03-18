@@ -350,12 +350,7 @@ export class SupabaseFriendRepository implements IFriendRepository {
       .from("friendships")
       .select("id, requester_id, addressee_id, status")
       .or(
-        userIds
-          .map(
-            (uid) =>
-              `and(requester_id.eq.${userId},addressee_id.eq.${uid}),and(requester_id.eq.${uid},addressee_id.eq.${userId})`,
-          )
-          .join(","),
+        `and(requester_id.eq.${userId},addressee_id.in.(${userIds.join(",")})),and(addressee_id.eq.${userId},requester_id.in.(${userIds.join(",")}))`,
       );
 
     if (fError) throw new DatabaseError(fError.message);

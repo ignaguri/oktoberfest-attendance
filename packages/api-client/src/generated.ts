@@ -7212,6 +7212,9 @@ export interface paths {
                                     totalBeers: number;
                                     avgBeers: number;
                                 } | null;
+                                /** @enum {string|null} */
+                                friendshipStatus?: "friends" | "pending_sent" | "pending_received" | "none" | "self" | null;
+                                sharedGroups?: number | null;
                             };
                         };
                     };

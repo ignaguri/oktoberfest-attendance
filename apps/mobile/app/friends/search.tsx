@@ -20,6 +20,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/utils";
 
 export default function FriendSearchScreen() {
   const { t } = useTranslation();
@@ -119,7 +120,7 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
     >
       <Avatar size="md">
         {user.avatarUrl ? (
-          <AvatarImage source={{ uri: user.avatarUrl }} />
+          <AvatarImage source={{ uri: getAvatarUrl(user.avatarUrl) }} />
         ) : null}
         <AvatarFallbackText>{displayName}</AvatarFallbackText>
       </Avatar>

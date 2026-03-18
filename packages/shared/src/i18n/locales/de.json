@@ -2339,6 +2339,7 @@
     "unfriend": "Entfreunden",
     "unfriendConfirm": "Bist du sicher, dass du {{name}} entfreunden möchtest?",
     "empty": "Noch keine Freunde. Suche nach Benutzern oder schau dir Vorschläge an!",
+    "emptyDescription": "Nutze die Suche, um Leute zu finden, die du kennst",
     "requestsEmpty": "Keine ausstehenden Freundschaftsanfragen",
     "friendsSince": "Freunde seit {{date}}",
     "notification": {
@@ -2353,6 +2354,13 @@
     "qr": {
       "title": "Freund hinzufügen",
       "description": "Scanne diesen QR-Code, um mich als Freund hinzuzufügen"
-    }
+    },
+    "profileBadge": {
+      "friends": "Freunde",
+      "requestSent": "Anfrage gesendet",
+      "acceptRequest": "Anfrage annehmen",
+      "addFriend": "Freund hinzufügen"
+    },
+    "sharedGroups": "Gemeinsame Gruppen"
   }
 }

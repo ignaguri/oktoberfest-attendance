@@ -13081,6 +13081,22 @@
                             "totalBeers",
                             "avgBeers"
                           ]
+                        },
+                        "friendshipStatus": {
+                          "type": "string",
+                          "nullable": true,
+                          "enum": [
+                            "friends",
+                            "pending_sent",
+                            "pending_received",
+                            "none",
+                            "self",
+                            null
+                          ]
+                        },
+                        "sharedGroups": {
+                          "type": "number",
+                          "nullable": true
                         }
                       },
                       "required": [

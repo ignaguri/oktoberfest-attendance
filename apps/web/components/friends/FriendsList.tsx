@@ -60,7 +60,7 @@ export function FriendsList() {
       <EmptyState
         icon={Users}
         title={t("friends.empty")}
-        description={t("friends.search.noResults")}
+        description={t("friends.emptyDescription")}
       />
     );
   }

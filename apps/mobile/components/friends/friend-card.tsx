@@ -96,7 +96,9 @@ export function FriendCard({
                 onPress={handleUnfriend}
                 accessibilityRole="button"
                 accessibilityLabel={t("friends.unfriend")}
-                accessibilityHint={t("friends.unfriendConfirm")}
+                accessibilityHint={t("friends.unfriendConfirm", {
+                  name: displayName,
+                })}
                 className="p-2"
               >
                 <UserX size={18} color={IconColors.muted} />
@@ -111,6 +113,7 @@ export function FriendCard({
         onClose={handleCloseProfileModal}
         profile={publicProfile}
         loading={profileLoading}
+        userId={selectedUserId ?? undefined}
       />
     </>
   );

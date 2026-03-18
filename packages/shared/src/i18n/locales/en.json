@@ -2654,6 +2654,7 @@
     "unfriend": "Unfriend",
     "unfriendConfirm": "Are you sure you want to unfriend {{name}}?",
     "empty": "No friends yet. Search for users or check out suggestions!",
+    "emptyDescription": "Use the search to find people you know",
     "requestsEmpty": "No pending friend requests",
     "friendsSince": "Friends since {{date}}",
     "notification": {
@@ -2668,6 +2669,13 @@
     "qr": {
       "title": "Add Friend",
       "description": "Scan this QR code to add me as a friend"
-    }
+    },
+    "profileBadge": {
+      "friends": "Friends",
+      "requestSent": "Request Sent",
+      "acceptRequest": "Accept Request",
+      "addFriend": "Add Friend"
+    },
+    "sharedGroups": "Shared Groups"
   }
 }
