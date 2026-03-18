@@ -2322,6 +2322,7 @@
       "sharedGroupsPlural": "{{count}} gemeinsame Gruppen"
     },
     "search": {
+      "title": "Freunde finden",
       "placeholder": "Nach Benutzername oder Name suchen",
       "noResults": "Keine Benutzer gefunden"
     },

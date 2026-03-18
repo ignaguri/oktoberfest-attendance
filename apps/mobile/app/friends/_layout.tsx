@@ -9,9 +9,15 @@ export default function FriendsLayout() {
   return (
     <Stack screenOptions={defaultScreenOptions}>
       <Stack.Screen
+        name="index"
+        options={{
+          title: t("friends.title"),
+        }}
+      />
+      <Stack.Screen
         name="search"
         options={{
-          title: t("friends.search.placeholder"),
+          title: t("friends.search.title"),
         }}
       />
     </Stack>

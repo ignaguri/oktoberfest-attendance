@@ -1,3 +1,4 @@
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useAcceptFriendRequest,
   useCancelFriendRequest,
@@ -54,6 +55,7 @@ type TabType = "friends" | "requests";
 export default function FriendsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { currentFestival } = useFestival();
 
   // Tab state
   const [activeTab, setActiveTab] = useState<TabType>("friends");
@@ -246,6 +248,7 @@ export default function FriendsScreen() {
           onSendRequest={handleSendRequest}
           sendRequestLoading={sendRequest.loading}
           onUnfriend={handleUnfriendPress}
+          festivalId={currentFestival?.id}
         />
       ) : (
         <RequestsTab
@@ -308,6 +311,7 @@ interface MyFriendsTabProps {
   onSendRequest: (userId: string) => void;
   sendRequestLoading: boolean;
   onUnfriend: (friend: Friend) => void;
+  festivalId?: string;
 }
 
 function MyFriendsTab({
@@ -319,6 +323,7 @@ function MyFriendsTab({
   onSendRequest,
   sendRequestLoading,
   onUnfriend,
+  festivalId,
 }: MyFriendsTabProps) {
   const { t } = useTranslation();
 
@@ -332,7 +337,7 @@ function MyFriendsTab({
 
   const renderFriendItem = ({ item }: { item: Friend }) => (
     <View className="px-4 py-1">
-      <FriendCard friend={item} onUnfriend={onUnfriend} />
+      <FriendCard friend={item} festivalId={festivalId} onUnfriend={onUnfriend} />
     </View>
   );
 

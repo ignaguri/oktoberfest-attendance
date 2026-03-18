@@ -1,38 +1,43 @@
+import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Friend } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
-import { getInitials } from "@prostcounter/ui";
 import { parseISO } from "date-fns";
-import { ChevronRight, UserX } from "lucide-react-native";
-import { useCallback, useMemo } from "react";
+import { UserX } from "lucide-react-native";
+import { useCallback, useMemo, useState } from "react";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
-import { getAvatarUrl } from "@/lib/utils";
+
+import {
+  TappableAvatar,
+  UserProfileModal,
+} from "@/components/shared/user-profile-modal";
 
 interface FriendCardProps {
   friend: Friend;
-  onPress?: (friend: Friend) => void;
+  festivalId?: string;
   onUnfriend?: (friend: Friend) => void;
 }
 
-export function FriendCard({ friend, onPress, onUnfriend }: FriendCardProps) {
+export function FriendCard({
+  friend,
+  festivalId,
+  onUnfriend,
+}: FriendCardProps) {
   const { t } = useTranslation();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const { data: publicProfile, loading: profileLoading } = usePublicProfile(
+    selectedUserId ?? undefined,
+    festivalId,
+  );
 
   const displayName = friend.fullName || friend.username || "User";
-  const initials = getInitials({
-    fullName: friend.fullName,
-    username: friend.username,
-  });
 
   const formattedFriendsSince = useMemo(() => {
     try {
@@ -42,31 +47,30 @@ export function FriendCard({ friend, onPress, onUnfriend }: FriendCardProps) {
     }
   }, [friend.friendsSince]);
 
-  const handlePress = useCallback(() => {
-    onPress?.(friend);
-  }, [onPress, friend]);
+  const handleAvatarPress = useCallback(() => {
+    setSelectedUserId(friend.id);
+  }, [friend.id]);
+
+  const handleCloseProfileModal = useCallback(() => {
+    setSelectedUserId(null);
+  }, []);
 
   const handleUnfriend = useCallback(() => {
     onUnfriend?.(friend);
   }, [onUnfriend, friend]);
 
   return (
-    <Pressable
-      onPress={handlePress}
-      disabled={!onPress}
-      accessibilityRole="button"
-      accessibilityLabel={t("friends.status.friends") + ": " + displayName}
-    >
+    <>
       <Card variant="outline" size="md" className="bg-white">
         <HStack className="items-center justify-between">
           <HStack space="md" className="flex-1 items-center">
-            <Avatar size="md">
-              {friend.avatarUrl ? (
-                <AvatarImage source={{ uri: getAvatarUrl(friend.avatarUrl) }} />
-              ) : (
-                <AvatarFallbackText>{initials}</AvatarFallbackText>
-              )}
-            </Avatar>
+            <TappableAvatar
+              avatarUrl={friend.avatarUrl}
+              username={friend.username}
+              fullName={friend.fullName}
+              size="md"
+              onPress={handleAvatarPress}
+            />
 
             <VStack space="xs" className="flex-1">
               <Text className="text-base font-semibold text-typography-900">
@@ -99,11 +103,17 @@ export function FriendCard({ friend, onPress, onUnfriend }: FriendCardProps) {
                 <UserX size={18} color={IconColors.muted} />
               </Pressable>
             )}
-            {onPress && <ChevronRight size={20} color={IconColors.muted} />}
           </HStack>
         </HStack>
       </Card>
-    </Pressable>
+
+      <UserProfileModal
+        isOpen={!!selectedUserId}
+        onClose={handleCloseProfileModal}
+        profile={publicProfile}
+        loading={profileLoading}
+      />
+    </>
   );
 }
 

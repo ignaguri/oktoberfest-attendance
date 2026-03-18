@@ -2637,6 +2637,7 @@
       "sharedGroupsPlural": "{{count}} grupos en común"
     },
     "search": {
+      "title": "Buscar amigos",
       "placeholder": "Buscar por nombre de usuario o nombre",
       "noResults": "No se encontraron usuarios"
     },

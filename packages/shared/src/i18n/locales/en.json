@@ -2637,6 +2637,7 @@
       "sharedGroupsPlural": "{{count}} shared groups"
     },
     "search": {
+      "title": "Find Friends",
       "placeholder": "Search by username or name",
       "noResults": "No users found"
     },

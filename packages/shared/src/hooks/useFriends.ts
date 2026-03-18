@@ -91,9 +91,10 @@ export function useSendFriendRequest() {
       return await apiClient.friends.sendRequest(addresseeId);
     },
     {
-      onSuccess: () => {
+      onSuccess: (_data, addresseeId) => {
         invalidateQueries(QueryKeys.friendRequestsOutgoing());
         invalidateQueries(QueryKeys.friendSuggestions());
+        invalidateQueries(QueryKeys.friendshipStatus(addresseeId));
       },
     },
   );
@@ -173,9 +174,10 @@ export function useUnfriend() {
       return await apiClient.friends.unfriend(userId);
     },
     {
-      onSuccess: () => {
+      onSuccess: (_data, userId) => {
         invalidateQueries(QueryKeys.friends());
         invalidateQueries(QueryKeys.friendSuggestions());
+        invalidateQueries(QueryKeys.friendshipStatus(userId));
       },
     },
   );
