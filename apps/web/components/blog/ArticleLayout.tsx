@@ -13,7 +13,7 @@ const categoryColors: Record<string, string> = {
 const localeNames: Record<BlogLocale, string> = {
   en: "English",
   de: "Deutsch",
-  es: "Espanol",
+  es: "Español",
 };
 
 export function ArticleLayout({

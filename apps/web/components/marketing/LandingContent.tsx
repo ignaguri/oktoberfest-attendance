@@ -137,7 +137,7 @@ export function LandingContent() {
             </Button>
             <Button variant="outline" size="lg" asChild className="text-base">
               <Link href="/download">
-                <Download size={18} />
+                <Download size={18} className="mr-1" />
                 Download App
               </Link>
             </Button>

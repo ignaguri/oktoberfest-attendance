@@ -67,6 +67,7 @@
     "recharts": "^3.8.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "sanitize-html": "^2.17.1",
     "serwist": "^9.5.7",
     "sonner": "^2.0.7",

@@ -3,19 +3,61 @@ import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 
 import { ArticleLayout } from "@/components/blog/ArticleLayout";
 import { mdxComponents } from "@/components/blog/MDXComponents";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getAvailableLocales, getPostBySlug, getPostSlugs } from "@/lib/blog";
+import type { BlogLocale } from "@/lib/blog";
+import {
+  getAllPosts,
+  getAvailableLocales,
+  getPostBySlug,
+  getPostSlugs,
+} from "@/lib/blog";
 
 export const revalidate = 3600;
 
-type Params = { slug: string };
+const VALID_LOCALES: BlogLocale[] = ["de", "es"];
+
+type Params = { slug: string[] };
+
+function parseParams(slugParts: string[]): {
+  locale: BlogLocale;
+  slug: string;
+} | null {
+  if (slugParts.length === 1) {
+    // /blog/[slug] — English article
+    return { locale: "en", slug: slugParts[0] };
+  }
+  if (
+    slugParts.length === 2 &&
+    VALID_LOCALES.includes(slugParts[0] as BlogLocale)
+  ) {
+    // /blog/de/[slug] or /blog/es/[slug]
+    return { locale: slugParts[0] as BlogLocale, slug: slugParts[1] };
+  }
+  return null;
+}
 
 export async function generateStaticParams(): Promise<Params[]> {
-  const slugs = await getPostSlugs();
-  return slugs.map((slug) => ({ slug }));
+  const params: Params[] = [];
+
+  // English articles: /blog/[slug]
+  const enSlugs = await getPostSlugs();
+  for (const slug of enSlugs) {
+    params.push({ slug: [slug] });
+  }
+
+  // Localized articles: /blog/de/[slug], /blog/es/[slug]
+  for (const locale of VALID_LOCALES) {
+    const posts = await getAllPosts(locale);
+    for (const post of posts) {
+      params.push({ slug: [locale, post.slug] });
+    }
+  }
+
+  return params;
 }
 
 export async function generateMetadata({
@@ -23,20 +65,27 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getPostBySlug(slug, "en");
+  const { slug: slugParts } = await params;
+  const parsed = parseParams(slugParts);
+  if (!parsed) return {};
+
+  const { locale, slug } = parsed;
+  const post = await getPostBySlug(slug, locale);
   if (!post) return {};
 
   const availableLocales = await getAvailableLocales(slug);
 
   const alternates: Record<string, string> = {};
-  for (const locale of availableLocales) {
-    if (locale === "en") {
-      alternates[locale] = `https://prostcounter.fun/blog/${slug}`;
+  for (const loc of availableLocales) {
+    if (loc === "en") {
+      alternates[loc] = `https://prostcounter.fun/blog/${slug}`;
     } else {
-      alternates[locale] = `https://prostcounter.fun/blog/${locale}/${slug}`;
+      alternates[loc] = `https://prostcounter.fun/blog/${loc}/${slug}`;
     }
   }
+
+  const canonicalPath =
+    locale === "en" ? `/blog/${slug}` : `/blog/${locale}/${slug}`;
 
   return {
     title: `${post.title} - ProstCounter Blog`,
@@ -48,6 +97,9 @@ export async function generateMetadata({
       publishedTime: post.date,
       modifiedTime: post.lastModified,
       authors: [post.author],
+      ...(locale !== "en" && {
+        locale: locale === "de" ? "de_DE" : "es_ES",
+      }),
       images: [
         {
           url: `/api/og?title=${encodeURIComponent(post.title)}&category=${post.category}`,
@@ -58,7 +110,7 @@ export async function generateMetadata({
       ],
     },
     alternates: {
-      canonical: `https://prostcounter.fun/blog/${slug}`,
+      canonical: `https://prostcounter.fun${canonicalPath}`,
       languages: alternates,
     },
   };
@@ -69,8 +121,15 @@ export default async function BlogArticlePage({
 }: {
   params: Promise<Params>;
 }) {
-  const { slug } = await params;
-  const post = await getPostBySlug(slug, "en");
+  const { slug: slugParts } = await params;
+  const parsed = parseParams(slugParts);
+
+  if (!parsed) {
+    notFound();
+  }
+
+  const { locale, slug } = parsed;
+  const post = await getPostBySlug(slug, locale);
 
   if (!post) {
     notFound();
@@ -83,10 +142,14 @@ export default async function BlogArticlePage({
     components: mdxComponents,
     options: {
       mdxOptions: {
+        remarkPlugins: [remarkGfm],
         rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
       },
     },
   });
+
+  const canonicalPath =
+    locale === "en" ? `/blog/${slug}` : `/blog/${locale}/${slug}`;
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -110,8 +173,9 @@ export default async function BlogArticlePage({
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://prostcounter.fun/blog/${slug}`,
+      "@id": `https://prostcounter.fun${canonicalPath}`,
     },
+    ...(locale !== "en" && { inLanguage: locale }),
   };
 
   return (

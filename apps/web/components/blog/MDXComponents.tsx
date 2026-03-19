@@ -25,7 +25,7 @@ export function CTA({ children }: { children?: React.ReactNode }) {
             </Button>
             <Button variant="outline" size="sm" asChild>
               <Link href="/download">
-                <Download size={16} />
+                <Download size={16} className="mr-1" />
                 Download App
               </Link>
             </Button>
