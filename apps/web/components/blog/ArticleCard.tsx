@@ -2,7 +2,19 @@ import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
-import type { BlogPostMeta } from "@/lib/blog";
+import type { BlogLocale, BlogPostMeta } from "@/lib/blog";
+
+const dateLocaleMap: Record<BlogLocale, string> = {
+  en: "en-US",
+  de: "de-DE",
+  es: "es-ES",
+};
+
+const minReadMap: Record<BlogLocale, string> = {
+  en: "min read",
+  de: "Min.",
+  es: "min",
+};
 
 const categoryColors: Record<string, string> = {
   festivals: "bg-yellow-100 text-yellow-800",
@@ -46,15 +58,18 @@ export function ArticleCard({ post }: { post: BlogPostMeta }) {
           <div className="flex items-center gap-4 text-xs text-gray-400">
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {new Date(post.date).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
+              {new Date(post.date).toLocaleDateString(
+                dateLocaleMap[post.locale] || "en-US",
+                {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                },
+              )}
             </span>
             <span className="flex items-center gap-1">
               <Clock size={12} />
-              {post.readingTime} min read
+              {post.readingTime} {minReadMap[post.locale] || "min read"}
             </span>
           </div>
         </div>

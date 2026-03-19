@@ -190,15 +190,22 @@ export function getMdxComponents(locale: BlogLocale = "en") {
         {children}
       </li>
     ),
-    a: ({ children, href, ...props }: React.ComponentProps<"a">) => (
-      <a
-        href={href}
-        className="font-medium text-yellow-600 underline decoration-yellow-300 underline-offset-2 hover:text-yellow-700"
-        {...props}
-      >
-        {children}
-      </a>
-    ),
+    a: ({ children, href, ...props }: React.ComponentProps<"a">) => {
+      const linkClass =
+        "font-medium text-yellow-600 underline decoration-yellow-300 underline-offset-2 hover:text-yellow-700";
+      if (href && href.startsWith("/")) {
+        return (
+          <Link href={href} className={linkClass}>
+            {children}
+          </Link>
+        );
+      }
+      return (
+        <a href={href} className={linkClass} {...props}>
+          {children}
+        </a>
+      );
+    },
     blockquote: ({
       children,
       ...props

@@ -6,6 +6,22 @@ import readingTime from "reading-time";
 const CONTENT_DIR = path.join(process.cwd(), "content/blog");
 
 export type BlogCategory = "festivals" | "tips" | "culture" | "news";
+const VALID_CATEGORIES: BlogCategory[] = [
+  "festivals",
+  "tips",
+  "culture",
+  "news",
+];
+
+function parseCategory(value: unknown): BlogCategory {
+  if (
+    typeof value === "string" &&
+    VALID_CATEGORIES.includes(value as BlogCategory)
+  ) {
+    return value as BlogCategory;
+  }
+  return "tips";
+}
 export type BlogLocale = "en" | "de" | "es";
 
 export interface BlogPost {
@@ -54,7 +70,7 @@ export async function getAllPosts(
       date: data.date || new Date().toISOString(),
       lastModified: data.lastModified || data.date || new Date().toISOString(),
       author: data.author || "ProstCounter Team",
-      category: (data.category || "tips") as BlogCategory,
+      category: parseCategory(data.category),
       tags: data.tags || [],
       featuredImage: data.featuredImage || "/images/prost-counter-og-1.jpg",
       locale,
@@ -89,7 +105,7 @@ export async function getPostBySlug(
     date: data.date || new Date().toISOString(),
     lastModified: data.lastModified || data.date || new Date().toISOString(),
     author: data.author || "ProstCounter Team",
-    category: (data.category || "tips") as BlogCategory,
+    category: parseCategory(data.category),
     tags: data.tags || [],
     featuredImage: data.featuredImage || "/images/prost-counter-og-1.jpg",
     locale,

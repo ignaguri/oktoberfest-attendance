@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Link } from "next-view-transitions";
 
 import { ArticleCard } from "@/components/blog/ArticleCard";
 import { getAllPosts, getCategories } from "@/lib/blog";
@@ -28,13 +29,13 @@ export default async function BlogIndex() {
         {/* Category filters */}
         <div className="mt-6 flex flex-wrap gap-2">
           {categories.map((cat) => (
-            <a
+            <Link
               key={cat}
               href={`/blog/category/${cat}`}
               className="rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:border-yellow-300 hover:bg-yellow-50 hover:text-yellow-700"
             >
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </a>
+            </Link>
           ))}
         </div>
       </header>

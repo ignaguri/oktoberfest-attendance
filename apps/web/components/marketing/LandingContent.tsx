@@ -68,7 +68,7 @@ const festivals = [
     href: "/blog/starkbierfest-guide",
   },
   {
-    name: "Fruhlingsfest",
+    name: "Frühlingsfest",
     dates: "April — May",
     description: "Munich's spring festival on the Theresienwiese.",
     href: "/blog/fruehlingsfest-guide",
