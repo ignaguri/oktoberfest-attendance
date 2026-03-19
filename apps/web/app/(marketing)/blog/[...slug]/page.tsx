@@ -6,7 +6,7 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
 import { ArticleLayout } from "@/components/blog/ArticleLayout";
-import { mdxComponents } from "@/components/blog/MDXComponents";
+import { getMdxComponents } from "@/components/blog/MDXComponents";
 import { JsonLd } from "@/components/seo/JsonLd";
 import type { BlogLocale } from "@/lib/blog";
 import {
@@ -139,7 +139,7 @@ export default async function BlogArticlePage({
 
   const { content } = await compileMDX({
     source: post.content,
-    components: mdxComponents,
+    components: getMdxComponents(locale),
     options: {
       mdxOptions: {
         remarkPlugins: [remarkGfm],

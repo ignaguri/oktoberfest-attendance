@@ -16,6 +16,21 @@ const localeNames: Record<BlogLocale, string> = {
   es: "Español",
 };
 
+const uiTranslations: Record<
+  BlogLocale,
+  { backToBlog: string; minRead: string }
+> = {
+  en: { backToBlog: "Back to Blog", minRead: "min read" },
+  de: { backToBlog: "Zurück zum Blog", minRead: "Min. Lesezeit" },
+  es: { backToBlog: "Volver al Blog", minRead: "min de lectura" },
+};
+
+const dateLocaleMap: Record<BlogLocale, string> = {
+  en: "en-US",
+  de: "de-DE",
+  es: "es-ES",
+};
+
 export function ArticleLayout({
   post,
   availableLocales,
@@ -25,6 +40,9 @@ export function ArticleLayout({
   availableLocales: BlogLocale[];
   children: React.ReactNode;
 }) {
+  const t = uiTranslations[post.locale || "en"];
+  const dateFmtLocale = dateLocaleMap[post.locale || "en"];
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       {/* Back link */}
@@ -33,7 +51,7 @@ export function ArticleLayout({
         className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
       >
         <ArrowLeft size={14} />
-        Back to Blog
+        {t.backToBlog}
       </Link>
 
       {/* Header */}
@@ -67,7 +85,7 @@ export function ArticleLayout({
           </span>
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
-            {new Date(post.date).toLocaleDateString("en-US", {
+            {new Date(post.date).toLocaleDateString(dateFmtLocale, {
               month: "long",
               day: "numeric",
               year: "numeric",
@@ -75,7 +93,7 @@ export function ArticleLayout({
           </span>
           <span className="flex items-center gap-1.5">
             <Clock size={14} />
-            {post.readingTime} min read
+            {post.readingTime} {t.minRead}
           </span>
         </div>
 
