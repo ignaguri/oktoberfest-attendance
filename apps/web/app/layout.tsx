@@ -6,23 +6,13 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
 
-import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import { OfflineBanner } from "@/components/OfflineBanner";
 import { Toaster } from "@/components/ui/sonner";
-import { NotificationProvider } from "@/contexts/NotificationContext";
-import { WebFestivalProvider } from "@/contexts/WebFestivalProvider";
 import { GA_ID } from "@/lib/constants";
 import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
-import { getUser } from "@/lib/sharedActions";
 import { APP_VERSION } from "@/lib/version";
 
 import { SerwistProvider } from "./serwist-provider";
-
-// do not cache this layout
-export const revalidate = 0;
 
 const ogImages = [
   "/images/prost-counter-og-1.jpg",
@@ -82,61 +72,18 @@ export const viewport = {
   themeColor: "#ffffff",
 };
 
-async function checkUser() {
-  try {
-    await getUser();
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-function AppContent({
-  children,
-  isLoggedIn,
-}: {
-  children: React.ReactNode;
-  isLoggedIn: boolean;
-}) {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center pb-2">
-      <Navbar />
-      <OfflineBanner />
-      <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:justify-start sm:px-20">
-        <Breadcrumbs />
-        {children}
-      </main>
-      <Footer isLoggedIn={isLoggedIn} />
-    </div>
-  );
-}
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isLoggedIn = await checkUser();
-
   return (
     <ViewTransitions>
       <html lang="en" data-version={APP_VERSION}>
         <body className="bg-slate-50">
           <SerwistProvider swUrl="/serwist/sw.js">
             <DataProvider>
-              <I18nProvider>
-                {isLoggedIn ? (
-                  <WebFestivalProvider>
-                    <NotificationProvider>
-                      <AppContent isLoggedIn={isLoggedIn}>
-                        {children}
-                      </AppContent>
-                    </NotificationProvider>
-                  </WebFestivalProvider>
-                ) : (
-                  <AppContent isLoggedIn={isLoggedIn}>{children}</AppContent>
-                )}
-              </I18nProvider>
+              <I18nProvider>{children}</I18nProvider>
             </DataProvider>
             <Toaster richColors closeButton />
             <SpeedInsights />
