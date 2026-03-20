@@ -8,6 +8,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { identifyDevice } from "vexo-analytics";
 
 import { clearAllData } from "@/lib/database/debug";
 import { getDatabase } from "@/lib/database/init";
@@ -63,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: session.user.id,
           email: session.user.email,
         });
+        identifyDevice(session.user.id);
       }
 
       // Store session tokens if available
@@ -86,8 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: session.user.id,
           email: session.user.email,
         });
+        identifyDevice(session.user.id);
       } else {
         Sentry.setUser(null);
+        identifyDevice(null);
       }
 
       // Update stored tokens on auth changes
