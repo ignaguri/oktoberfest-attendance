@@ -1,4 +1,8 @@
 export const changelog: Record<string, string[]> = {
+  "1.0.0": [
+    "🤝 Friendship system — send and accept friend requests",
+    "📱 ProstCounter is now available on iOS App Store!",
+  ],
   "0.8.0": [
     "🍺 New drink types — track Radler, alcohol-free beer, wine and soft drinks",
     "💬 Post messages to your groups from the home feed",
