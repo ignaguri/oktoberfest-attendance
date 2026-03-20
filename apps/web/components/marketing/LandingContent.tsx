@@ -290,7 +290,7 @@ export function LandingContent() {
           >
             Ready for the next festival?
           </motion.h2>
-          <motion.p variants={fadeUp} className="mb-10 text-lg text-gray-400">
+          <motion.p variants={fadeUp} className="mb-10 text-lg text-gray-300">
             Download ProstCounter and start tracking your beer festival
             adventure today.
           </motion.p>
@@ -312,7 +312,7 @@ export function LandingContent() {
               variant="yellowOutline"
               size="lg"
               asChild
-              className="border-yellow-500 text-yellow-400 hover:bg-yellow-500/10 hover:text-yellow-300"
+              className="border-yellow-400 text-yellow-300 hover:bg-yellow-400/10 hover:text-yellow-200"
             >
               <Link href="/sign-up">Try the Web App</Link>
             </Button>

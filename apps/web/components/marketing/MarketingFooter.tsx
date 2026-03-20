@@ -35,7 +35,7 @@ export function MarketingFooter() {
                 ProstCounter
               </span>
             </Link>
-            <p className="mt-3 text-sm text-gray-500">
+            <p className="mt-3 text-sm text-gray-600">
               Track your beer festival attendance and compete with friends.
             </p>
           </div>
@@ -48,7 +48,7 @@ export function MarketingFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-500 hover:text-gray-700"
+                    className="text-sm text-gray-600 hover:text-gray-900"
                   >
                     {link.label}
                   </Link>
@@ -68,7 +68,7 @@ export function MarketingFooter() {
                   href={APP_STORE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-gray-600 hover:text-gray-900"
                 >
                   iOS App Store
                 </a>
@@ -76,7 +76,7 @@ export function MarketingFooter() {
               <li>
                 <Link
                   href="/download"
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-gray-600 hover:text-gray-900"
                 >
                   All Platforms
                 </Link>
@@ -84,7 +84,7 @@ export function MarketingFooter() {
               <li>
                 <Link
                   href="/sign-up"
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-gray-600 hover:text-gray-900"
                 >
                   Try the Web App
                 </Link>
@@ -102,7 +102,7 @@ export function MarketingFooter() {
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    className="text-sm text-gray-500 hover:text-gray-700"
+                    className="text-sm text-gray-600 hover:text-gray-900"
                   >
                     {link.label}
                   </Link>
@@ -113,7 +113,7 @@ export function MarketingFooter() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 sm:flex-row">
-          <p className="flex items-center gap-1 text-sm text-gray-400">
+          <p className="flex items-center gap-1 text-sm text-gray-500">
             <Beer size={14} />
             <span>&copy; {new Date().getFullYear()} ProstCounter. Prost!</span>
           </p>
@@ -122,7 +122,7 @@ export function MarketingFooter() {
               href="https://github.com/ignaguri"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-gray-400 hover:text-gray-600"
+              className="text-sm text-gray-500 hover:text-gray-700"
             >
               @ignaguri
             </a>
