@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import { unstable_cache } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -35,38 +34,6 @@ const getMimeType = (filename: string): string => {
       return "application/octet-stream";
   }
 };
-
-// Cache metadata retrieval for 24 hours
-const _getCachedImageMetadata = unstable_cache(
-  async (bucket: string, filePath: string) => {
-    // Use service role client - image metadata is public
-    const supabase = await createClient(true);
-
-    // Split path into directory and filename
-    const pathParts = filePath.split("/");
-    const fileName = pathParts.pop() || filePath;
-    const directory = pathParts.join("/");
-
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .list(directory, { search: fileName });
-
-    if (error || !data || data.length === 0) {
-      return null;
-    }
-
-    const file = data.find((f: any) => f.name === fileName);
-    return file
-      ? {
-          size: file.metadata?.size || 0,
-          lastModified: file.updated_at || file.created_at,
-          name: file.name,
-        }
-      : null;
-  },
-  ["image-metadata"],
-  { revalidate: 86400 }, // 24 hours
-);
 
 /**
  * Extract file path from a full Supabase storage URL or return the path as-is
