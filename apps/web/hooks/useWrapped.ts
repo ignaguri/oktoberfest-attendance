@@ -32,6 +32,7 @@ export function useWrappedData(festivalId?: string) {
       });
 
       if (error) {
+        // eslint-disable-next-line no-console
         console.error("Failed to fetch wrapped data:", error);
         return null;
       }

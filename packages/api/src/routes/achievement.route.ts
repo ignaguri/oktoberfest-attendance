@@ -116,10 +116,13 @@ app.openapi(evaluateAchievementsRoute, async (c) => {
   const { festivalId } = c.req.valid("json");
 
   // Call stored procedure to evaluate achievements
-  const { data, error } = await supabase.rpc("evaluate_user_achievements", {
-    p_user_id: user.id,
-    p_festival_id: festivalId,
-  });
+  const { data: _data, error } = await supabase.rpc(
+    "evaluate_user_achievements",
+    {
+      p_user_id: user.id,
+      p_festival_id: festivalId,
+    },
+  );
 
   if (error) {
     throw new Error(`Failed to evaluate achievements: ${error.message}`);

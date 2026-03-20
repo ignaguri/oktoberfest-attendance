@@ -138,6 +138,7 @@ export function QuickAddDrinkButtons({
         // Clear success after animation
         setTimeout(() => setSuccessType(null), 1500);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Failed to log consumption:", error);
       } finally {
         setLoadingType(null);

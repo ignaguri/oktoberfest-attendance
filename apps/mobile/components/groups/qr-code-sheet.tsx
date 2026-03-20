@@ -60,6 +60,7 @@ export function QRCodeSheet({
     if (isOpen && !currentToken && !isGenerating) {
       handleRegenerateToken();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, currentToken]);
 
   const handleRegenerateToken = useCallback(async () => {

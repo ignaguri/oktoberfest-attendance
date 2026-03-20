@@ -65,6 +65,7 @@ export const LocationPrivacySettings = () => {
       );
     } catch (error) {
       // Error handling is already done in the mutation
+      // eslint-disable-next-line no-console
       console.error("Failed to toggle location sharing:", error);
     }
   };

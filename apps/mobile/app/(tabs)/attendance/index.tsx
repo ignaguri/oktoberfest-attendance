@@ -66,7 +66,10 @@ export default function AttendanceScreen() {
     refetch: refetchReservations,
   } = useReservations(currentFestival?.id);
 
-  const reservations = reservationsData?.reservations ?? [];
+  const reservations = useMemo(
+    () => reservationsData?.reservations ?? [],
+    [reservationsData?.reservations],
+  );
 
   // Check-in mutation
   const checkInReservation = useCheckInReservation();

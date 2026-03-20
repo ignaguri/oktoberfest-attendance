@@ -93,7 +93,7 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
       // @ts-ignore - Root route "/" works at runtime but isn't in typed routes with NativeTabs
       router.replace("/");
     }
-  }, [isAuthenticated, isLoading, segments]);
+  }, [isAuthenticated, isLoading, segments, router]);
 
   return <>{children}</>;
 }

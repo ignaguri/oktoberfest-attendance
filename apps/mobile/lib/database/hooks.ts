@@ -414,7 +414,7 @@ export function useLocalDeleteAttendance() {
 
   return useMutation<void, Error, { attendanceId: string; festivalId: string }>(
     {
-      mutationFn: async ({ attendanceId, festivalId }) => {
+      mutationFn: async ({ attendanceId, festivalId: _festivalId }) => {
         if (!isReady) {
           throw new Error("Database not ready");
         }
@@ -654,7 +654,7 @@ export function useLocalDeleteConsumption() {
     Error,
     { consumptionId: string; attendanceId: string }
   >({
-    mutationFn: async ({ consumptionId, attendanceId }) => {
+    mutationFn: async ({ consumptionId, attendanceId: _attendanceId }) => {
       if (!isReady) {
         throw new Error("Database not ready");
       }

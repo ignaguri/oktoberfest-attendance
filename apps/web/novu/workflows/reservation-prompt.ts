@@ -23,7 +23,7 @@ export const reservationPromptWorkflow = workflow(
     step: any;
     payload: ReservationPromptPayload;
   }) => {
-    await step.inApp("in-app-notification", async (controls: any) => {
+    await step.inApp("in-app-notification", async (_controls: any) => {
       return {
         subject: `Did you make it to ${payload.tentName}?`,
         body: `We noticed you had a reservation at ${payload.tentName} at ${payload.reservationTime}. Check in to track your visit!`,

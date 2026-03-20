@@ -211,7 +211,7 @@ function createMockDb() {
       }),
     getAllAsync: vi
       .fn()
-      .mockImplementation(async (query: string, params?: unknown[]) => {
+      .mockImplementation(async (query: string, _params?: unknown[]) => {
         const match = query.match(/FROM\s+(\w+)/i);
         const table = match?.[1];
         if (!table || !records[table]) return [];

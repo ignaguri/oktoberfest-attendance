@@ -11,7 +11,7 @@ import { ALLOWED_EMOJIS } from "@prostcounter/shared/schemas";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { cn, getInitials } from "@prostcounter/ui";
 import { Send, Trash2, X } from "lucide-react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -69,8 +69,14 @@ export function PhotoDetailModal({
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
 
-  const userReactions = reactionsData?.userReactions || [];
-  const reactions = reactionsData?.reactions || [];
+  const userReactions = useMemo(
+    () => reactionsData?.userReactions || [],
+    [reactionsData?.userReactions],
+  );
+  const reactions = useMemo(
+    () => reactionsData?.reactions || [],
+    [reactionsData?.reactions],
+  );
 
   const handleToggleReaction = useCallback(
     async (emoji: string) => {
@@ -234,6 +240,8 @@ export function PhotoDetailModal({
               resizeMode="contain"
               onLoadStart={() => setImageLoading(true)}
               onLoadEnd={() => setImageLoading(false)}
+              accessibilityLabel={t("groups.gallery.photoDetail.photo")}
+              alt=""
             />
           </View>
 

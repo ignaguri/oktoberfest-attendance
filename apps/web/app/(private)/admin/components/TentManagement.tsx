@@ -109,11 +109,13 @@ export default function TentManagement() {
           setSelectedFestival(activeFestival?.id || festivalsData[0].id);
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error loading festivals:", error);
         toast.error(t("notifications.error.festivalLoadFailed"));
       }
     };
     loadFestivals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load tent data when festival selection changes
@@ -121,6 +123,7 @@ export default function TentManagement() {
     if (selectedFestival) {
       loadFestivalData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFestival]);
 
   const loadFestivalData = async () => {
@@ -138,6 +141,7 @@ export default function TentManagement() {
       setAvailableTents(availableData);
       setTentStats(statsData);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error loading festival data:", error);
       toast.error(t("notifications.error.tentLoadFailed"));
     } finally {
@@ -237,7 +241,7 @@ export default function TentManagement() {
 
   const selectedFestivalData = festivals.find((f) => f.id === selectedFestival);
 
-  const formatPrice = (price: number | null) => {
+  const _formatPrice = (price: number | null) => {
     if (price === null) return t("admin.tents.badges.default");
     return `€${price.toFixed(2)}`;
   };

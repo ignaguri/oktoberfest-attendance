@@ -29,6 +29,7 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
         source={require("@/assets/images/logo.png")}
         className={isLarge ? "h-24 w-24" : "h-16 w-16"}
         resizeMode="contain"
+        alt=""
         accessibilityLabel={t("app.logo")}
       />
 

@@ -7,6 +7,7 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../../lib/logger";
 import {
   ConflictError,
   DatabaseError,
@@ -36,21 +37,54 @@ export class SupabaseLocationRepository implements ILocationRepository {
       Date.now() + (input.durationMinutes || 120) * 60 * 1000,
     );
 
-    const { data: session, error: sessionError } = await this.supabase
+    const insertPayload = {
+      user_id: userId,
+      festival_id: input.festivalId,
+      is_active: true,
+      started_at: new Date().toISOString(),
+      expires_at: expiresAt.toISOString(),
+    };
+
+    let { data: session, error: sessionError } = await this.supabase
       .from("location_sessions")
-      .insert({
-        user_id: userId,
-        festival_id: input.festivalId,
-        is_active: true,
-        started_at: new Date().toISOString(),
-        expires_at: expiresAt.toISOString(),
-      })
+      .insert(insertPayload)
       .select()
       .single();
 
-    if (sessionError || !session) {
+    if (sessionError) {
+      // Handle unique constraint violation (expired-but-active session or race condition)
+      if (sessionError.code === "23505") {
+        // Deactivate stale sessions and retry once
+        await this.supabase
+          .from("location_sessions")
+          .update({ is_active: false, updated_at: new Date().toISOString() })
+          .eq("user_id", userId)
+          .eq("festival_id", input.festivalId)
+          .eq("is_active", true);
+
+        const { data: retrySession, error: retryError } = await this.supabase
+          .from("location_sessions")
+          .insert(insertPayload)
+          .select()
+          .single();
+
+        if (retryError || !retrySession) {
+          throw new DatabaseError(
+            `Failed to create location session after retry: ${retryError?.message || "No data returned"}`,
+          );
+        }
+
+        session = retrySession;
+      } else {
+        throw new DatabaseError(
+          `Failed to create location session: ${sessionError.message}`,
+        );
+      }
+    }
+
+    if (!session) {
       throw new DatabaseError(
-        `Failed to create location session: ${sessionError?.message || "No data returned"}`,
+        "Failed to create location session: No data returned",
       );
     }
 
@@ -72,7 +106,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
       if (membersError) {
         // Log error but don't fail the session creation
-        console.error(
+        logger.error(
           `Failed to insert location session members: ${membersError.message}`,
         );
       } else {

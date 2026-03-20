@@ -68,7 +68,7 @@ export default function ChangePasswordScreen() {
           },
         ],
       );
-    } catch (error) {
+    } catch {
       Alert.alert(t("common.status.error"), t("profile.changePassword.error"));
     } finally {
       setIsLoading(false);

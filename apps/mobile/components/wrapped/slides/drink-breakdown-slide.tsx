@@ -46,7 +46,7 @@ export function DrinkBreakdownSlide({
 
             <View className="mt-2">
               <VStack space="sm">
-                {breakdown.map((item, index) => (
+                {breakdown.map((item, _index) => (
                   <View
                     key={item.drinkType}
                     className="rounded-lg bg-white p-3 shadow-sm"

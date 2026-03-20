@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useApiClient } from "@prostcounter/shared/data";
 import {
   useConsumptions,
   useDeleteAttendance,
@@ -108,6 +109,7 @@ export function AttendanceTabContent({
   const { tents } = useAdaptedTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
   const deleteAttendance = useDeleteAttendance();
+  const apiClient = useApiClient();
 
   // Format date string for API calls
   const dateString =
@@ -117,7 +119,10 @@ export function AttendanceTabContent({
 
   // Fetch consumptions for this date
   const { data: consumptionsData } = useConsumptions(festivalId, dateString);
-  const consumptions = consumptionsData || [];
+  const consumptions = useMemo(
+    () => consumptionsData || [],
+    [consumptionsData],
+  );
 
   // Calculate counts per drink type from API consumptions
   const drinkCounts = useMemo(() => {
@@ -383,14 +388,44 @@ export function AttendanceTabContent({
     if (!existingAttendance?.id) return;
 
     try {
-      await deleteAttendance.mutateAsync(existingAttendance.id);
+      try {
+        await deleteAttendance.mutateAsync(existingAttendance.id);
+      } catch (error: unknown) {
+        // If 404, the local ID doesn't match the server ID (offline UUID mismatch)
+        // Look up the attendance by date and retry with the server ID
+        const is404 =
+          error instanceof Error &&
+          "statusCode" in error &&
+          (error as { statusCode: number }).statusCode === 404;
+        if (is404) {
+          const serverAttendance = await apiClient.attendance.getByDate({
+            festivalId,
+            date: dateString,
+          });
+          if (serverAttendance?.attendance?.id) {
+            await deleteAttendance.mutateAsync(serverAttendance.attendance.id);
+          }
+          // If no server attendance either, it's already gone - proceed with cleanup
+        } else {
+          throw error;
+        }
+      }
       setShowDeleteConfirm(false);
       onSuccess?.({ date: selectedDate, tentIds: [] });
       onClose();
     } catch (error) {
       logger.error("Failed to delete attendance:", error);
     }
-  }, [existingAttendance?.id, deleteAttendance, onSuccess, onClose]);
+  }, [
+    existingAttendance?.id,
+    deleteAttendance,
+    apiClient,
+    festivalId,
+    dateString,
+    onSuccess,
+    selectedDate,
+    onClose,
+  ]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(false);

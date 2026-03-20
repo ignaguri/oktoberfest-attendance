@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ preferences });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error in GET /api/location-sharing/preferences:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -174,14 +175,19 @@ export async function POST(request: NextRequest) {
           groupId,
           "started",
         );
-      } catch (error) {
-        console.warn("Failed to send location sharing notification:", error);
+      } catch (_notifError) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "Failed to send location sharing notification:",
+          _notifError,
+        );
         // Don't fail the request if notification fails
       }
     }
 
     return NextResponse.json({ preferences });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error in POST /api/location-sharing/preferences:", error);
     return NextResponse.json(
       { error: "Internal server error" },

@@ -410,7 +410,7 @@ export class SupabaseProfileRepository {
 
   async getAvatarUploadUrl(
     userId: string,
-    query: GetAvatarUploadUrlQuery,
+    _query: GetAvatarUploadUrlQuery,
   ): Promise<GetAvatarUploadUrlResponse> {
     // Generate unique file name (always use webp since mobile will compress to webp)
     const uniqueFileName = `${userId}_${Date.now()}.webp`;

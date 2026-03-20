@@ -45,7 +45,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   const reservationId = searchParams.get("reservationId");
 
   // Use React Query for fetching reservation data
-  const { data: reservation, loading: reservationLoading } =
+  const { data: reservation, loading: _reservationLoading } =
     useReservation(reservationId);
 
   // Mutations for create/update

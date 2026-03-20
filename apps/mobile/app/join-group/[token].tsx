@@ -34,7 +34,6 @@ export default function JoinGroupByTokenScreen() {
   const [result, setResult] = useState<JoinResult>({});
 
   // Join group when component mounts
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!token) {
       setStatus("error");
@@ -69,8 +68,8 @@ export default function JoinGroupByTokenScreen() {
     };
 
     joinGroup();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]); // Only run once on mount with the token
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleViewGroup = () => {
     if (result.groupId) {

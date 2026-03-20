@@ -255,6 +255,7 @@ function PhotoProgressItem({ photo, onRetry }: PhotoProgressItemProps) {
     <HStack className="items-center justify-between">
       <HStack space="sm" className="flex-1 items-center">
         <View className="h-8 w-8 items-center justify-center rounded bg-background-100">
+          {/* eslint-disable-next-line jsx-a11y/alt-text -- This is a lucide icon, not an HTML img */}
           <Image size={14} color={Colors.gray[500]} />
         </View>
         <VStack className="flex-1">
@@ -415,6 +416,7 @@ export function UploadSummaryCard({
           ) : failed > 0 ? (
             <AlertCircle size={LARGE_ICON_SIZE} color={Colors.error[500]} />
           ) : (
+            /* eslint-disable-next-line jsx-a11y/alt-text -- This is a lucide icon, not an HTML img */
             <Image size={LARGE_ICON_SIZE} color={Colors.gray[500]} />
           )}
           <VStack>

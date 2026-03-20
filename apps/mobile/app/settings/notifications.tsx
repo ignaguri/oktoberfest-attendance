@@ -36,7 +36,7 @@ export default function NotificationSettingsScreen() {
     requestPermission,
     registerForPushNotifications,
     markAsRegisteredWithNovu,
-    expoPushToken,
+    expoPushToken: _expoPushToken,
   } = useNotificationContextSafe();
 
   // Shared hooks for preferences
@@ -98,7 +98,7 @@ export default function NotificationSettingsScreen() {
 
     try {
       await updatePreferences.mutateAsync({ [apiKey]: value });
-    } catch (error) {
+    } catch {
       Alert.alert(
         t("common.status.error"),
         t("profile.notifications.updateError"),
@@ -142,7 +142,7 @@ export default function NotificationSettingsScreen() {
       // User wants to disable push notifications
       try {
         await updatePreferences.mutateAsync({ pushEnabled: false });
-      } catch (error) {
+      } catch {
         Alert.alert(
           t("common.status.error"),
           t("profile.notifications.updateError"),

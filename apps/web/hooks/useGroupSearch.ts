@@ -35,7 +35,7 @@ export function useGroupSearch(filters: GroupSearchFilters = {}) {
     limit = 50,
     sortBy = "created_at",
     sortOrder = "desc",
-    ...otherFilters
+    ..._otherFilters
   } = filters;
 
   return useQuery({

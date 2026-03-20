@@ -201,6 +201,7 @@ export function useLocationSharing(festivalId?: string) {
       speed?: number;
       altitude?: number;
     }) => {
+      // eslint-disable-next-line no-console
       console.log("Updating location for festival:", location.festivalId);
 
       const response = await fetch("/api/location-sharing/location", {
@@ -213,6 +214,7 @@ export function useLocationSharing(festivalId?: string) {
 
       if (!response.ok) {
         const error = await response.json();
+        // eslint-disable-next-line no-console
         console.error("Location update failed:", error);
         throw new Error(error.error || "Failed to update location");
       }
@@ -242,6 +244,7 @@ export function useLocationSharing(festivalId?: string) {
       throw new Error("Location services not available");
     }
 
+    // eslint-disable-next-line no-console
     console.log("Starting location sharing for festival:", festivalId);
 
     return new Promise<void>((resolve, reject) => {
@@ -249,6 +252,7 @@ export function useLocationSharing(festivalId?: string) {
         (position) => {
           const { coords } = position;
 
+          // eslint-disable-next-line no-console
           console.log("Sending location update:", {
             festivalId,
             latitude: coords.latitude,

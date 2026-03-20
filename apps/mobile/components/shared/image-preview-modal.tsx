@@ -91,6 +91,8 @@ export function ImagePreviewModal({
                 height: SCREEN_HEIGHT * 0.8,
               }}
               resizeMode="contain"
+              alt=""
+              accessibilityLabel=""
               onLoadStart={handleLoadStart}
               onLoadEnd={handleLoadEnd}
             />

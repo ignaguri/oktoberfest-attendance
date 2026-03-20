@@ -19,6 +19,7 @@ export function AppHeader() {
         source={logoImage}
         style={{ width: 64, height: 64 }}
         resizeMode="contain"
+        alt=""
         accessibilityLabel={t("app.logo")}
       />
       <HStack>

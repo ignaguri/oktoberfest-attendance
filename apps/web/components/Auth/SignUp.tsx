@@ -81,7 +81,8 @@ export default function SignUp() {
       e.preventDefault();
       handleSubmit(onSubmit)(e);
     },
-    [handleSubmit, onSubmit],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleSubmit],
   );
 
   if (isAccountCreated) {

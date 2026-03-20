@@ -112,7 +112,7 @@ export async function getDatabaseStats(
         deletedRows: deletedResult?.count || 0,
         pendingSync: pendingResult?.count || 0,
       });
-    } catch (error) {
+    } catch {
       // Table might not exist yet
       tables.push({
         name: tableName,

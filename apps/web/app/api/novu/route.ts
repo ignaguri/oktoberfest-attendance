@@ -31,6 +31,7 @@ try {
   });
 } catch (error) {
   // During build, Novu might not be configured - this is expected
+  // eslint-disable-next-line no-console
   console.warn(
     "Novu initialization skipped (likely during build):",
     error instanceof Error ? error.message : error,
@@ -38,7 +39,7 @@ try {
 }
 
 // Fallback handlers when Novu is not configured
-const fallbackHandler = (req: NextRequest) => {
+const fallbackHandler = (_req: NextRequest) => {
   return NextResponse.json(
     {
       error:
@@ -48,7 +49,7 @@ const fallbackHandler = (req: NextRequest) => {
   );
 };
 
-const fallbackOptions = (req: NextRequest) => {
+const fallbackOptions = (_req: NextRequest) => {
   return new NextResponse(null, { status: 204 });
 };
 

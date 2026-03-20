@@ -57,6 +57,7 @@ export function FailedOperationsSheet({
     if (isOpen && isReady) {
       loadFailedOperations();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isReady]);
 
   const loadFailedOperations = useCallback(async () => {

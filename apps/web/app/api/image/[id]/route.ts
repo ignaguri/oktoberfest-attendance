@@ -37,7 +37,7 @@ const getMimeType = (filename: string): string => {
 };
 
 // Cache metadata retrieval for 24 hours
-const getCachedImageMetadata = unstable_cache(
+const _getCachedImageMetadata = unstable_cache(
   async (bucket: string, filePath: string) => {
     // Use service role client - image metadata is public
     const supabase = await createClient(true);

@@ -78,6 +78,7 @@ export function DrinkStepper({
       await deleteConsumption.mutateAsync(mostRecentConsumption.id);
       onSuccess?.();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to delete consumption:", error);
     }
   }, [canDecrement, mostRecentConsumption, deleteConsumption, onSuccess]);
@@ -96,6 +97,7 @@ export function DrinkStepper({
       });
       onSuccess?.();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to log consumption:", error);
     }
   }, [

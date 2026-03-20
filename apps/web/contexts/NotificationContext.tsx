@@ -220,7 +220,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             setUserSynced(user.id); // Mark user as synced
           }
         }
-      } catch (error) {
+      } catch {
         // Silent error handling
       }
 
@@ -232,7 +232,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         } else {
           setPreferences(null);
         }
-      } catch (error) {
+      } catch {
         // Silent error handling
       } finally {
         setLoading(false);
@@ -250,7 +250,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     try {
       const result = await apiClient.notifications.registerToken(fcmToken);
       return result.success;
-    } catch (error) {
+    } catch {
       return false;
     }
   }, [fcmToken]);

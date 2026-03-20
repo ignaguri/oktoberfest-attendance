@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+/* eslint-disable no-console */
 import { writeFileSync } from "fs";
 import { resolve } from "path";
 

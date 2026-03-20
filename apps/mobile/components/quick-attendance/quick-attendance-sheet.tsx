@@ -389,6 +389,7 @@ export function QuickAttendanceSheet({
     today,
     pendingPhotos,
     attendance?.id,
+    attendance?.tentIds,
     currentFestival?.beerCost,
     logConsumption,
     updateAttendance,
@@ -553,6 +554,7 @@ export function QuickAttendanceSheet({
                         isUploadingPhotos && "opacity-60",
                       )}
                       resizeMode="cover"
+                      alt=""
                       accessibilityLabel={t("home.quickAttendance.photos")}
                     />
                     {isUploadingPhotos ? (
