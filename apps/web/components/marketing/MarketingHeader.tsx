@@ -3,10 +3,11 @@
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import AppLogo from "@/public/android-chrome-512x512.png";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 const navLinks = [
   { href: "/blog", label: "Blog" },
@@ -15,6 +16,14 @@ const navLinks = [
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
@@ -44,7 +53,9 @@ export function MarketingHeader() {
             </Link>
           ))}
           <Button variant="yellow" size="sm" asChild>
-            <Link href="/sign-in">Sign In</Link>
+            <Link href={isLoggedIn ? "/home" : "/sign-in"}>
+              {isLoggedIn ? "Go to App" : "Sign In"}
+            </Link>
           </Button>
         </div>
 
@@ -74,8 +85,11 @@ export function MarketingHeader() {
               </Link>
             ))}
             <Button variant="yellow" size="sm" asChild className="mt-1">
-              <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>
-                Sign In
+              <Link
+                href={isLoggedIn ? "/home" : "/sign-in"}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {isLoggedIn ? "Go to App" : "Sign In"}
               </Link>
             </Button>
           </div>
