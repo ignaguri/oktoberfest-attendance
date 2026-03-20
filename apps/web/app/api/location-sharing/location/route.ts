@@ -73,14 +73,7 @@ export async function POST(request: NextRequest) {
       .eq("festival_id", festivalId)
       .eq("sharing_enabled", true);
 
-    // eslint-disable-next-line no-console
-    console.log("Location sharing check:", {
-      userId: user.id,
-      festivalId,
-      count,
-      preferencesCount: preferences?.length || 0,
-      error: groupsError,
-    });
+    void preferences; // used only for count query
 
     if (groupsError) {
       reportSupabaseException("checkLocationSharingGroups", groupsError, {
@@ -114,9 +107,6 @@ export async function POST(request: NextRequest) {
       expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours
     };
 
-    // eslint-disable-next-line no-console
-    console.log("Upserting location:", locationData);
-
     const { data: location, error: locationError } = await (supabase as any)
       .from("user_locations")
       .upsert(locationData, { onConflict: "user_id,festival_id" })
@@ -134,9 +124,6 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-
-    // eslint-disable-next-line no-console
-    console.log("Location upserted successfully:", location.id);
 
     return NextResponse.json({
       location,

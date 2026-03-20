@@ -54,13 +54,14 @@ export class SupabaseLocationRepository implements ILocationRepository {
     if (sessionError) {
       // Handle unique constraint violation (expired-but-active session or race condition)
       if (sessionError.code === "23505") {
-        // Deactivate stale sessions and retry once
+        // Deactivate only expired-but-active sessions and retry once
         await this.supabase
           .from("location_sessions")
           .update({ is_active: false, updated_at: new Date().toISOString() })
           .eq("user_id", userId)
           .eq("festival_id", input.festivalId)
-          .eq("is_active", true);
+          .eq("is_active", true)
+          .lt("expires_at", new Date().toISOString());
 
         const { data: retrySession, error: retryError } = await this.supabase
           .from("location_sessions")
@@ -69,6 +70,12 @@ export class SupabaseLocationRepository implements ILocationRepository {
           .single();
 
         if (retryError || !retrySession) {
+          // If retry also hits constraint, user has a legitimately active session
+          if (retryError?.code === "23505") {
+            throw new ConflictError(
+              "User already has an active location session for this festival",
+            );
+          }
           throw new DatabaseError(
             `Failed to create location session after retry: ${retryError?.message || "No data returned"}`,
           );
@@ -107,7 +114,8 @@ export class SupabaseLocationRepository implements ILocationRepository {
       if (membersError) {
         // Log error but don't fail the session creation
         logger.error(
-          `Failed to insert location session members: ${membersError.message}`,
+          { err: membersError },
+          "Failed to insert location session members",
         );
       } else {
         sharedGroupIds = input.groupIds;

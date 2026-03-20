@@ -403,7 +403,20 @@ export function AttendanceTabContent({
             date: dateString,
           });
           if (serverAttendance?.attendance?.id) {
-            await deleteAttendance.mutateAsync(serverAttendance.attendance.id);
+            try {
+              await deleteAttendance.mutateAsync(
+                serverAttendance.attendance.id,
+              );
+            } catch (retryError: unknown) {
+              // If the fallback delete also returns 404, it's already gone
+              const isRetry404 =
+                retryError instanceof Error &&
+                "statusCode" in retryError &&
+                (retryError as { statusCode: number }).statusCode === 404;
+              if (!isRetry404) {
+                throw retryError;
+              }
+            }
           }
           // If no server attendance either, it's already gone - proceed with cleanup
         } else {
