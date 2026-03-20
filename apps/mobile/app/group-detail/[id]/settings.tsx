@@ -138,7 +138,7 @@ export default function GroupSettingsScreen() {
   const {
     control,
     handleSubmit,
-    reset,
+    reset: _reset,
     formState: { errors, isDirty },
   } = useForm<UpdateGroupFormData>({
     resolver: zodResolver(UpdateGroupFormSchema),

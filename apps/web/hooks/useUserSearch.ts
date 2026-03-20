@@ -41,7 +41,7 @@ export function useUserSearch(filters: UserSearchFilters = {}) {
     limit = 50,
     sortBy: _sortBy = "created_at",
     sortOrder: _sortOrder = "desc",
-    ...otherFilters
+    ..._otherFilters
   } = filters;
 
   return useQuery({
@@ -67,7 +67,7 @@ export function useUserSearch(filters: UserSearchFilters = {}) {
 export function useInfiniteUserSearch(
   filters: Omit<UserSearchFilters, "page"> = {},
 ) {
-  const { limit = 50, ...otherFilters } = filters;
+  const { limit = 50, ..._otherFilters } = filters;
 
   return useInfiniteQuery({
     queryKey: searchKeys.users({ ...filters, page: undefined }),

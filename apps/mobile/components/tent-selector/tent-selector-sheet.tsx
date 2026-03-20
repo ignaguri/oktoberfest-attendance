@@ -177,7 +177,7 @@ export function TentSelectorSheet({
 
   // Key extractor
   const keyExtractor = useCallback(
-    (item: TentOption, index: number) => item.value,
+    (item: TentOption, _index: number) => item.value,
     [],
   );
 

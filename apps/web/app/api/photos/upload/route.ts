@@ -144,6 +144,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
+      // eslint-disable-next-line no-console
       console.error("Upload error:", uploadError);
       return errorResponse(
         ErrorCodes.PHOTO_UPLOAD_FAILED,
@@ -164,6 +165,7 @@ export async function POST(request: NextRequest) {
       // Try to clean up uploaded file on DB error
       await supabase.storage.from("beer_pictures").remove([fileName]);
 
+      // eslint-disable-next-line no-console
       console.error("Database error:", dbError);
       return errorResponse(
         ErrorCodes.DATABASE_ERROR,
@@ -181,6 +183,7 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Unexpected error in photo upload:", error);
     return errorResponse(
       ErrorCodes.INTERNAL_ERROR,

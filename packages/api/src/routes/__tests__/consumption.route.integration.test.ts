@@ -609,7 +609,7 @@ describe("Consumption Routes Integration (Local DB)", () => {
     // Try to delete with user 2 - RLS should prevent deletion
     const user2Supabase = createTestSupabaseWithAuth(testUser2.token);
 
-    const { error: deleteError } = await user2Supabase
+    const { error: _deleteError } = await user2Supabase
       .from("consumptions")
       .delete()
       .eq("id", consumption!.id);

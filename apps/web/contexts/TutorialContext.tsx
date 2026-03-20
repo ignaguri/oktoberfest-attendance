@@ -70,6 +70,7 @@ export function TutorialProvider({
 
           if (joinButton) {
             // User has no groups, target the button instead
+            // eslint-disable-next-line no-console
             console.debug(
               `Tutorial: Dynamic targeting for groups step - targeting button instead of container`,
             );
@@ -88,6 +89,7 @@ export function TutorialProvider({
 
         const element = document.querySelector(step.target);
         if (!element) {
+          // eslint-disable-next-line no-console
           console.debug(
             `Tutorial: Skipping step "${step.id}" - element not found: ${step.target}`,
           );
@@ -103,6 +105,7 @@ export function TutorialProvider({
           getComputedStyle(element).visibility !== "hidden";
 
         if (!isVisible) {
+          // eslint-disable-next-line no-console
           console.debug(
             `Tutorial: Skipping step "${step.id}" - element not visible: ${step.target}`,
           );
@@ -147,6 +150,7 @@ export function TutorialProvider({
     try {
       await completeTutorial(undefined);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to save tutorial completion:", error);
     }
   };
@@ -185,6 +189,7 @@ export function TutorialProvider({
       }, TUTORIAL_CONSTANTS.AUTO_START_DELAY);
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingStatus, isCompleted, isActive]);
 
   const value: TutorialContextType = {

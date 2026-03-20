@@ -98,7 +98,7 @@ export { i18n };
 export function translateError(
   t: TFunction,
   code: string,
-  fallback?: string,
+  _fallback?: string,
 ): string {
   return t(`apiErrors.${code}`);
 }

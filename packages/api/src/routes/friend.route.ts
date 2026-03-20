@@ -13,6 +13,7 @@ import {
   SendFriendRequestSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseFriendRepository } from "../repositories/supabase";
 import { FriendService } from "../services/friend.service";
@@ -190,7 +191,7 @@ app.openapi(sendRequestRoute, async (c) => {
     notificationService
       .notifyFriendRequest(user.id, addresseeId)
       .catch((err) => {
-        console.error("[friend-request] notification failed:", err);
+        logger.error({ err }, "[friend-request] notification failed");
       });
   }
 

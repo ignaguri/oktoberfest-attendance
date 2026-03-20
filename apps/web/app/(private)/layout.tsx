@@ -19,7 +19,7 @@ export const revalidate = 0;
 async function AuthCheck() {
   try {
     await getUser();
-  } catch (error) {
+  } catch {
     redirect("/sign-in");
   }
 

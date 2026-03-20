@@ -101,7 +101,10 @@ export default function DetailedAttendanceForm({
     currentFestival?.id || "",
     dateString,
   );
-  const consumptions = consumptionsData || [];
+  const consumptions = useMemo(
+    () => consumptionsData || [],
+    [consumptionsData],
+  );
 
   // Calculate drink counts from consumptions
   const drinkCounts = useMemo(() => {

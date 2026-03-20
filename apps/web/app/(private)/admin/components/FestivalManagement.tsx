@@ -71,6 +71,7 @@ export default function FestivalManagement() {
 
   useEffect(() => {
     loadFestivals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadFestivals = async () => {

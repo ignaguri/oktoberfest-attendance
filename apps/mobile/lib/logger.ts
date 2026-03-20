@@ -91,15 +91,18 @@ class Logger {
 
   debug(message: string, context?: LogContext) {
     if (this.isDev) {
+      // eslint-disable-next-line no-console
       console.log(this.formatMessage("debug", message, context));
     }
   }
 
   info(message: string, context?: LogContext) {
+    // eslint-disable-next-line no-console
     console.info(this.formatMessage("info", message, context));
   }
 
   warn(message: string, context?: LogContext) {
+    // eslint-disable-next-line no-console
     console.warn(this.formatMessage("warn", message, context));
   }
 
@@ -116,6 +119,7 @@ class Logger {
           : error,
     };
 
+    // eslint-disable-next-line no-console
     console.error(this.formatMessage("error", message, errorContext));
 
     // Send to Sentry in production

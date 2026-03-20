@@ -35,6 +35,7 @@ export function useSearchHistory(options: UseSearchHistoryOptions = {}) {
         setHistory(Array.isArray(parsed) ? parsed : []);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.warn("Failed to load search history:", error);
     } finally {
       setIsLoaded(true);
@@ -48,6 +49,7 @@ export function useSearchHistory(options: UseSearchHistoryOptions = {}) {
     try {
       localStorage.setItem(storageKey, JSON.stringify(history));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.warn("Failed to save search history:", error);
     }
   }, [history, storageKey, isLoaded]);

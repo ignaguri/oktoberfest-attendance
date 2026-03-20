@@ -578,6 +578,7 @@ export class NotificationService {
         });
 
       if (rateLimitError) {
+        // eslint-disable-next-line no-console
         console.warn("Rate limit check failed", {
           error: rateLimitError,
           userId,
@@ -646,6 +647,7 @@ export class NotificationService {
             },
           });
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.warn("Failed to send notification to group member", {
             memberId: member.user_id,
             groupId,
@@ -663,6 +665,7 @@ export class NotificationService {
           p_notification_type: "location_sharing",
         });
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.warn("Failed to record rate limit entry", {
           userId,
           groupId,

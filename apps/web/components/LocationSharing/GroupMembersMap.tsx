@@ -55,7 +55,10 @@ export const GroupMembersMap = ({
     radiusMeters,
   );
 
-  const nearbyMembers = data?.nearbyMembers ?? [];
+  const nearbyMembers = useMemo(
+    () => data?.nearbyMembers ?? [],
+    [data?.nearbyMembers],
+  );
   const activeSharing = data?.activeSharing ?? false;
 
   const sortedMembers = useMemo(() => {

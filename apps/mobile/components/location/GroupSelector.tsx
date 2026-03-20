@@ -9,7 +9,7 @@ import { useUserGroups } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { Check, Users } from "lucide-react-native";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { ScrollView } from "react-native";
 
 import {
@@ -50,7 +50,7 @@ export function GroupSelector({
 }: GroupSelectorProps) {
   const { t } = useTranslation();
   const { data, loading } = useUserGroups(festivalId);
-  const groups = (data as Group[] | null) || [];
+  const groups = useMemo(() => (data as Group[] | null) || [], [data]);
 
   // When shareWithAll is toggled on, select all groups
   useEffect(() => {

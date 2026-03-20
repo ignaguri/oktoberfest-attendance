@@ -271,6 +271,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
                 source={{ uri: fullPictureUrl }}
                 className="h-16 w-16 rounded-lg"
                 resizeMode="cover"
+                alt=""
                 accessibilityLabel={t("activityFeed.uploadedPhoto")}
               />
             </Pressable>

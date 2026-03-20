@@ -18,6 +18,7 @@ export function initSentry() {
   // Only initialize if DSN is configured
   if (!SENTRY_DSN) {
     if (__DEV__) {
+      // eslint-disable-next-line no-console
       console.warn(
         "[Sentry] No DSN configured. Error monitoring disabled. Set EXPO_PUBLIC_SENTRY_DSN to enable.",
       );
@@ -94,6 +95,7 @@ export function initSentry() {
   });
 
   if (__DEV__) {
+    // eslint-disable-next-line no-console
     console.log("[Sentry] Initialized successfully");
   }
 }

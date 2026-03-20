@@ -40,6 +40,7 @@ export function FriendMarker({
           <Image
             source={{ uri: getAvatarUrl(avatarUrl) }}
             className="h-8 w-8 rounded-full"
+            alt=""
             accessibilityLabel={`${username}'s avatar`}
           />
         ) : (
@@ -79,7 +80,7 @@ interface TentMarkerProps {
  * Custom map marker for tents
  */
 export function TentMarker({
-  tentName,
+  tentName: _tentName,
   category,
   distanceMeters,
   isSelected = false,
@@ -175,6 +176,7 @@ export function UserLocationMarker({
           <Image
             source={{ uri: getAvatarUrl(avatarUrl) }}
             className="h-10 w-10 rounded-full"
+            alt=""
             accessibilityLabel="Your location"
           />
         ) : (

@@ -34,11 +34,14 @@ export const LocationSharingToggle = ({
     isStoppingSharing,
   } = useLocationSharing(currentFestival?.id);
 
+  // eslint-disable-next-line no-console
   console.log("LocationSharingToggle - Current festival:", currentFestival?.id);
+  // eslint-disable-next-line no-console
   console.log(
     "LocationSharingToggle - Has group sharing enabled:",
     hasGroupSharingEnabled,
   );
+  // eslint-disable-next-line no-console
   console.log("LocationSharingToggle - Is sharing:", isSharing);
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -65,7 +68,7 @@ export const LocationSharingToggle = ({
         permission.addEventListener("change", () => {
           setHasPermission(permission.state === "granted");
         });
-      } catch (error) {
+      } catch {
         // Permissions API not supported, we'll check permission on first use
         setHasPermission(null);
       }

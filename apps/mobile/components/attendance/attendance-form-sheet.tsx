@@ -134,7 +134,10 @@ export function AttendanceFormSheet({
     isOpen ? festivalId : "",
     isOpen ? dateString : "",
   );
-  const consumptions = consumptionsData || [];
+  const consumptions = useMemo(
+    () => consumptionsData || [],
+    [consumptionsData],
+  );
 
   // Calculate counts per drink type from API consumptions (initial values)
   const drinkCounts = useMemo(() => {
@@ -179,8 +182,11 @@ export function AttendanceFormSheet({
   );
 
   // Use fresh tent visits from API when available, fall back to prop data
-  const freshTentVisits: TentVisit[] =
-    attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [];
+  const freshTentVisits: TentVisit[] = useMemo(
+    () =>
+      attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [],
+    [attendanceWithPhotos?.tentVisits, existingAttendance?.tentVisits],
+  );
 
   // Default values based on existing attendance or selected date
   // Use unique tent IDs for the form (for tent selector)
@@ -205,7 +211,7 @@ export function AttendanceFormSheet({
   }, [existingAttendance, selectedDate, consumptions.length, freshTentVisits]);
 
   const {
-    control,
+    control: _control,
     handleSubmit,
     setValue,
     watch,
@@ -293,7 +299,7 @@ export function AttendanceFormSheet({
 
   // Get tent visits for display as badges (showing ALL visits with times)
   // These are historical visits - displayed chronologically
-  const tentVisitsForDisplay = useMemo((): TentVisitDisplay[] => {
+  const _tentVisitsForDisplay = useMemo((): TentVisitDisplay[] => {
     if (!freshTentVisits.length) return [];
     const allOptions = tents.flatMap((group) => group.options);
     return freshTentVisits
@@ -317,7 +323,7 @@ export function AttendanceFormSheet({
 
   // Get selected tents from form - these are what user currently has selected
   // Shows tents that will be added on save (may include ones already visited)
-  const selectedTentInfo = useMemo(() => {
+  const _selectedTentInfo = useMemo(() => {
     if (!selectedTents.length) return [];
     const allOptions = tents.flatMap((group) => group.options);
     return selectedTents

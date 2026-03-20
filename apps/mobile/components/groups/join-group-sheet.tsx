@@ -62,7 +62,6 @@ export function JoinGroupSheet({
   );
 
   // Reset state when sheet opens/closes
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen) {
       setMode("search");
@@ -72,16 +71,14 @@ export function JoinGroupSheet({
       setError(null);
     }
   }, [isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Clear error when user types
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (error) {
       setError(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteToken]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Handle joining a group
   const handleJoin = useCallback(async () => {

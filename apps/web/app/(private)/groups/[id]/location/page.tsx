@@ -4,7 +4,7 @@ import { GroupMembersMap } from "@/components/LocationSharing";
 import { getTranslations } from "@/lib/i18n/server";
 
 export default async function GroupLocationPage({
-  params,
+  params: _params,
 }: {
   params: Promise<{ id: string }>;
 }) {

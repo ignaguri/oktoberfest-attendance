@@ -81,7 +81,7 @@ export default function PhotoPrivacyScreen() {
       await apiClient.photos.updateGlobalSettings({
         hidePhotosFromAllGroups: value,
       });
-    } catch (error) {
+    } catch {
       // Revert on error
       setSettings((prev) => ({
         ...prev,
@@ -115,7 +115,7 @@ export default function PhotoPrivacyScreen() {
       await apiClient.photos.updateGroupSettings(groupId, {
         hidePhotosFromGroup: value,
       });
-    } catch (error) {
+    } catch {
       // Revert on error
       setSettings((prev) => ({
         ...prev,

@@ -362,6 +362,7 @@ export function OfflineDataProvider({
     }, ONLINE_SYNC_DELAY);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     effectiveIsOnline,
     isReady,

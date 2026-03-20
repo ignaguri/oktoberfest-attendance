@@ -72,12 +72,13 @@ const LocationSessionManagement = () => {
       const data = await response.json();
       setSessions(data.sessions || []);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error fetching sessions:", error);
       toast.error(t("admin.location.loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchSessions();
@@ -113,6 +114,7 @@ const LocationSessionManagement = () => {
       toast.success(t("admin.location.stopSuccess"));
       fetchSessions();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error stopping session:", error);
       toast.error(t("admin.location.stopError"));
     } finally {
@@ -150,6 +152,7 @@ const LocationSessionManagement = () => {
       );
       fetchSessions();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error cleaning up sessions:", error);
       toast.error(t("admin.location.cleanupError"));
     } finally {

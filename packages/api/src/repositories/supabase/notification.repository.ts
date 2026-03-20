@@ -98,7 +98,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
     };
   }
 
-  async getFCMTokens(userId: string): Promise<string[]> {
+  async getFCMTokens(_userId: string): Promise<string[]> {
     // TODO: Implement once fcm_tokens table is added
     // For now, return empty array
     return [];

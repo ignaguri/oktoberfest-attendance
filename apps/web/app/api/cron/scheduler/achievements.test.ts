@@ -73,7 +73,7 @@ function createMockSupabase({ userEvents = [], groupEvents = [] }: Events) {
 
     if (table === "group_members") {
       return {
-        select: vi.fn((cols?: string) => ({
+        select: vi.fn((_cols?: string) => ({
           eq: vi.fn((_col: string, _val: string) => ({
             data: [{ group_id: "g1" }, { group_id: "g2" }],
           })),

@@ -39,6 +39,7 @@ import {
   type SyncQueueEntry,
 } from "@/lib/database/debug";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
+import { logger } from "@/lib/logger";
 
 // =============================================================================
 // Main Screen
@@ -78,7 +79,7 @@ export default function DatabaseDebugScreen() {
       setPendingOps(opsData);
       setDirtyRecords(dirtyData);
     } catch (error) {
-      console.error("[Debug] Failed to load data:", error);
+      logger.error("[Debug] Failed to load data:", error);
     }
   }, [isReady, getDb]);
 
@@ -149,7 +150,7 @@ export default function DatabaseDebugScreen() {
         },
       ],
     );
-  }, [isReady, getDb, loadData]);
+  }, [isReady, getDb, loadData, t]);
 
   const handleClearCompleted = useCallback(async () => {
     if (!isReady) return;
@@ -221,7 +222,7 @@ export default function DatabaseDebugScreen() {
         },
       ],
     );
-  }, []);
+  }, [t]);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);

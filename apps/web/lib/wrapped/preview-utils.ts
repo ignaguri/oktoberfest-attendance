@@ -55,6 +55,7 @@ export async function generateShareImageFromElement(
 
     return blob;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Failed to capture image:", error);
     return null;
   }
@@ -69,6 +70,7 @@ async function getFontEmbedCSS(element: HTMLElement): Promise<string> {
     const { getFontEmbedCSS } = await import("html-to-image");
     return await getFontEmbedCSS(element);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn("Failed to get font embed CSS:", error);
     return "";
   }

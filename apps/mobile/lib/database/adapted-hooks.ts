@@ -370,7 +370,7 @@ export function useAdaptedProfile(
 // =============================================================================
 
 /** Raw row shape from the groups + member count query */
-interface GroupRow {
+interface _GroupRow {
   id: string;
   name: string;
   description: string | null;

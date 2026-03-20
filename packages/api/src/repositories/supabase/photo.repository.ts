@@ -258,9 +258,9 @@ export class SupabasePhotoRepository implements IPhotoRepository {
   }
 
   async updateCaption(
-    pictureId: string,
-    userId: string,
-    caption: string,
+    _pictureId: string,
+    _userId: string,
+    _caption: string,
   ): Promise<BeerPicture> {
     // Note: Current schema doesn't have caption field
     // This is a stub for future enhancement

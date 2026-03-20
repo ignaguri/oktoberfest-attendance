@@ -127,6 +127,8 @@ export function BeerPicturesSection({
                     isMarkedForRemoval && "opacity-40",
                   )}
                   resizeMode="cover"
+                  alt=""
+                  accessibilityLabel={t("attendance.beerPicture")}
                 />
                 {isMarkedForRemoval && (
                   <View className="absolute inset-0 items-center justify-center">
@@ -157,6 +159,8 @@ export function BeerPicturesSection({
                   isUploading && "opacity-60",
                 )}
                 resizeMode="cover"
+                alt=""
+                accessibilityLabel={t("attendance.beerPicture")}
               />
             </Pressable>
             {isUploading ? (

@@ -103,15 +103,19 @@ class SWLogger {
     switch (level) {
       case "TRACE":
       case "DEBUG":
+        // eslint-disable-next-line no-console
         console.debug(formattedMessage);
         break;
       case "INFO":
+        // eslint-disable-next-line no-console
         console.info(formattedMessage);
         break;
       case "WARN":
+        // eslint-disable-next-line no-console
         console.warn(formattedMessage);
         break;
       case "ERROR":
+        // eslint-disable-next-line no-console
         console.error(formattedMessage);
         break;
     }

@@ -271,6 +271,11 @@ export default function GroupGalleryScreen() {
                                 height: "100%",
                               }}
                               resizeMode="cover"
+                              alt=""
+                              accessibilityLabel={t(
+                                "groups.gallery.accessibility.photoBy",
+                                { username: userGroup.username },
+                              )}
                             />
                           ) : (
                             <View className="h-full w-full items-center justify-center bg-gray-200">

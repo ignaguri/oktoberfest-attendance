@@ -349,7 +349,12 @@ export default function GroupDetailScreen() {
                   size="sm"
                   onPress={handleGallery}
                 >
-                  <Image size={16} color={IconColors.default} />
+                  {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                  <Image
+                    size={16}
+                    color={IconColors.default}
+                    accessibilityLabel={t("groups.actions.gallery")}
+                  />
                   <ButtonText className="ml-1">
                     {t("groups.actions.gallery")}
                   </ButtonText>

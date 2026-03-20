@@ -149,6 +149,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
         <footer className="text-center">
           <div className="mb-3 text-3xl text-gray-600">Made with</div>
           <div className="flex flex-row items-center justify-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={LogoImage.src}
               alt="Prost Counter Logo"

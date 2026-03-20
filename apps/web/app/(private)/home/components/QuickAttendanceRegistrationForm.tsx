@@ -61,7 +61,10 @@ export const QuickAttendanceRegistrationForm = ({
     currentFestival?.id || "",
     todayString,
   );
-  const consumptions = consumptionsData || [];
+  const consumptions = useMemo(
+    () => consumptionsData || [],
+    [consumptionsData],
+  );
 
   // Calculate drink count summary
   const drinkSummary = useMemo(() => {

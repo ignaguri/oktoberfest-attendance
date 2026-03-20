@@ -70,6 +70,8 @@ function PictureItem({
             borderRadius: 12,
           }}
           resizeMode="cover"
+          alt=""
+          accessibilityLabel=""
           onError={() => setFailed(true)}
         />
       )}

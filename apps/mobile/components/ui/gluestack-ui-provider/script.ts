@@ -14,6 +14,7 @@ export const script = (mode: string) => {
     documentElement.classList.add(theme);
     documentElement.style.colorScheme = theme;
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
   }
 };

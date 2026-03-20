@@ -34,25 +34,28 @@ export default function SignUp() {
     resolver: standardSchemaResolver(signUpSchema),
   });
 
-  const onSubmit = async (data: SignUpFormData) => {
-    try {
-      await signUp({ email: data.email, password: data.password });
-      setIsAccountCreated(true);
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(t("notifications.error.signUpFailed"), {
-          description: error.message,
-        });
-      } else {
-        toast.error(t("notifications.error.signUpFailed"), {
-          description: t("notifications.error.generic"),
-        });
+  const onSubmit = useCallback(
+    async (data: SignUpFormData) => {
+      try {
+        await signUp({ email: data.email, password: data.password });
+        setIsAccountCreated(true);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(t("notifications.error.signUpFailed"), {
+            description: error.message,
+          });
+        } else {
+          toast.error(t("notifications.error.signUpFailed"), {
+            description: t("notifications.error.generic"),
+          });
+        }
+        if (emailRef.current) {
+          emailRef.current.focus();
+        }
       }
-      if (emailRef.current) {
-        emailRef.current.focus();
-      }
-    }
-  };
+    },
+    [t],
+  );
 
   const handleOAuthSignIn = async (provider: "google" | "apple") => {
     try {

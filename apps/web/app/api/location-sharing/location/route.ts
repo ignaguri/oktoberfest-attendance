@@ -73,13 +73,7 @@ export async function POST(request: NextRequest) {
       .eq("festival_id", festivalId)
       .eq("sharing_enabled", true);
 
-    console.log("Location sharing check:", {
-      userId: user.id,
-      festivalId,
-      count,
-      preferencesCount: preferences?.length || 0,
-      error: groupsError,
-    });
+    void preferences; // used only for count query
 
     if (groupsError) {
       reportSupabaseException("checkLocationSharingGroups", groupsError, {
@@ -113,8 +107,6 @@ export async function POST(request: NextRequest) {
       expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours
     };
 
-    console.log("Upserting location:", locationData);
-
     const { data: location, error: locationError } = await (supabase as any)
       .from("user_locations")
       .upsert(locationData, { onConflict: "user_id,festival_id" })
@@ -122,6 +114,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (locationError) {
+      // eslint-disable-next-line no-console
       console.error("Failed to insert location:", locationError);
       reportSupabaseException("updateUserLocation", locationError, {
         id: user.id,
@@ -132,13 +125,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Location upserted successfully:", location.id);
-
     return NextResponse.json({
       location,
       sharingEnabled: true,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error in POST /api/location-sharing/location:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -233,6 +225,7 @@ export async function GET(request: NextRequest) {
       nearbyMembers,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error in GET /api/location-sharing/location:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -282,6 +275,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error in DELETE /api/location-sharing/location:", error);
     return NextResponse.json(
       { error: "Internal server error" },

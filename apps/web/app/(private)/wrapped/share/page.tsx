@@ -26,8 +26,9 @@ export default function ShareImagePage() {
       try {
         const data = JSON.parse(storedData) as WrappedData;
         setWrappedData(data);
-      } catch (error) {
-        console.error("Failed to parse wrapped data:", error);
+      } catch (_error) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to parse wrapped data:", _error);
         toast.error(t("notifications.error.wrappedLoadFailed"));
         router.push("/wrapped");
       }
@@ -84,8 +85,9 @@ export default function ShareImagePage() {
 
       toast.dismiss();
       toast.success(t("notifications.success.imageDownloaded"));
-    } catch (error) {
-      console.error("Failed to generate image:", error);
+    } catch (_error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to generate image:", _error);
       toast.dismiss();
       toast.error(t("notifications.error.imageGenerateFailed"));
     } finally {
@@ -104,6 +106,7 @@ export default function ShareImagePage() {
 
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wrappedData, hasAutoDownloaded]);
 
   if (!wrappedData) {

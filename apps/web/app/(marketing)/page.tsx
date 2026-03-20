@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getUser } from "@/lib/sharedActions";
 
 export const revalidate = 86400;
 
@@ -29,17 +28,6 @@ export default async function LandingPage({
     if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
 
     redirect(callbackUrl.toString());
-  }
-
-  let user;
-  try {
-    user = await getUser();
-  } catch {
-    // not logged in
-  }
-
-  if (user) {
-    redirect("/home");
   }
 
   const jsonLd = {
