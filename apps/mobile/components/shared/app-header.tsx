@@ -5,6 +5,7 @@ import { Image, View } from "react-native";
 
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useCounts } from "@/lib/notifications/NovuProvider";
 
@@ -50,13 +51,33 @@ export function AppHeader() {
 
 function NotificationBell({ onPress }: { onPress: () => void }) {
   const { t } = useTranslation();
+  const { session } = useAuth();
+
+  // Only render the badge-aware bell when authenticated (NovuProvider available)
+  if (!session?.user?.id) {
+    return (
+      <Pressable
+        onPress={onPress}
+        accessibilityLabel={t("profile.notifications.title")}
+        className="p-2"
+      >
+        <Bell size={24} color={IconColors.default} />
+      </Pressable>
+    );
+  }
+
+  return <NotificationBellWithBadge onPress={onPress} />;
+}
+
+function NotificationBellWithBadge({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation();
   const { counts } = useCounts({ filters: [{ read: false }] });
   const unreadCount = counts?.[0]?.count ?? 0;
 
   return (
     <Pressable
       onPress={onPress}
-      accessibilityLabel={t("notifications.title")}
+      accessibilityLabel={t("profile.notifications.title")}
       className="relative p-2"
     >
       <Bell size={24} color={IconColors.default} />

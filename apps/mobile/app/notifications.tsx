@@ -21,7 +21,7 @@ export default function NotificationsScreen() {
           <ArrowLeft size={24} color={IconColors.default} />
         </Pressable>
         <Text className="text-lg font-semibold text-typography-900">
-          {t("notifications.title")}
+          {t("profile.notifications.title")}
         </Text>
       </View>
 
