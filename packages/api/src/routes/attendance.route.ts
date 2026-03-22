@@ -13,6 +13,7 @@ import {
   UpdatePersonalAttendanceResponseSchema,
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
+import { NO_ROWS_ERROR } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { logger } from "../lib/logger";
@@ -187,9 +188,8 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   const supabase = c.var.supabase;
   const { id } = c.req.valid("param");
 
-  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
-
-  // Query the attendances table directly (not the view) for delete verification
+  // Query the attendances table directly (not the view) to avoid
+  // security_invoker RLS complexity on attendance_with_totals
   const { data: attendance, error: findError } = await supabase
     .from("attendances")
     .select("id, user_id, festival_id")
@@ -197,22 +197,12 @@ app.openapi(deleteAttendanceRoute, async (c) => {
     .eq("user_id", user.id)
     .single();
 
-  if (findError) {
-    if (findError.code === "PGRST116") {
-      // Not found - attendance already deleted, treat as idempotent success
-      return c.json(
-        {
-          success: true,
-          message: "Attendance deleted successfully",
-        },
-        200,
-      );
-    }
-    // Unexpected DB error
+  if (findError && findError.code !== NO_ROWS_ERROR) {
     throw new DatabaseError(`Failed to fetch attendance: ${findError.message}`);
   }
 
   if (!attendance) {
+    // Already deleted or doesn't belong to user - treat as idempotent success
     return c.json(
       {
         success: true,
@@ -227,6 +217,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   await photoRepo.deleteByAttendanceId(id, user.id);
 
   // Delete the attendance
+  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
   await attendanceRepo.delete(id, user.id);
 
   // Invalidate wrapped data cache (attendance changes affect wrapped stats)

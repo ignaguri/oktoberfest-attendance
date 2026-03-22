@@ -173,9 +173,7 @@ export function GroupSelector({
                     value={group.id}
                     isChecked={isSelected}
                     isDisabled={shareWithAll}
-                    onChange={() => handleToggleGroup(group.id)}
                     size="sm"
-                    isInvalid={false}
                     className="pointer-events-none flex-1"
                   >
                     <CheckboxIndicator>
