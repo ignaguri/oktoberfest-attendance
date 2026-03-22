@@ -13,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
+import { NovuAutoSubscriber } from "@/components/notifications/NovuAutoSubscriber";
 import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
@@ -289,6 +290,7 @@ export default function RootLayout() {
                                   <NavigationGuard>
                                     <BackgroundSyncHandler />
                                     <SentryUserContextHandler />
+                                    <NovuAutoSubscriber />
                                     <NotificationPromptHandler />
                                     <UpdatePromptHandler />
                                     <TutorialOverlay />

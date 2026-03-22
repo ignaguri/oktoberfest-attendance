@@ -14,11 +14,11 @@ type NotificationPreferences =
  * These should match the workflow IDs configured in Novu
  */
 export const NOTIFICATION_WORKFLOWS = {
-  GROUP_JOIN: "group-join",
+  GROUP_JOIN: "group-join-notification",
   LOCATION_SHARING: "location-sharing-notification",
-  TENT_CHECKIN: "tent-check-in",
-  RESERVATION_REMINDER: "reservation-reminder",
-  RESERVATION_CHECKIN_PROMPT: "reservation-prompt",
+  TENT_CHECKIN: "tent-check-in-notification",
+  RESERVATION_REMINDER: "reservation-reminder-notification",
+  RESERVATION_CHECKIN_PROMPT: "reservation-check-in-prompt",
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
