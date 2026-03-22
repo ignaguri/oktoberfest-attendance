@@ -183,12 +183,25 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   const supabase = c.var.supabase;
   const { id } = c.req.valid("param");
 
-  // Verify attendance exists first
   const attendanceRepo = new SupabaseAttendanceRepository(supabase);
-  const attendance = await attendanceRepo.findById(id);
+
+  // Query the attendances table directly (not the view) for delete verification
+  const { data: attendance } = await supabase
+    .from("attendances")
+    .select("id, user_id, festival_id")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
 
   if (!attendance) {
-    throw new NotFoundError(ErrorCodes.ATTENDANCE_NOT_FOUND);
+    // Attendance already deleted or doesn't belong to user - treat as success
+    return c.json(
+      {
+        success: true,
+        message: "Attendance deleted successfully",
+      },
+      200,
+    );
   }
 
   // Delete associated photos first (to avoid FK constraint)
@@ -201,7 +214,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   // Invalidate wrapped data cache (attendance changes affect wrapped stats)
   try {
     const wrappedRepo = new SupabaseWrappedRepository(supabase);
-    await wrappedRepo.invalidateCache(user.id, attendance.festivalId);
+    await wrappedRepo.invalidateCache(user.id, attendance.festival_id);
   } catch (cacheError) {
     logger.error(
       { error: cacheError },

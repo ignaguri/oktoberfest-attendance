@@ -5,6 +5,7 @@ function createQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
       queries: {
+        networkMode: "always", // Don't pause queries when offline - fail fast so UI shows error/cached state
         staleTime: 2 * 60 * 1000, // 2 minutes (reduced for better freshness)
         gcTime: 10 * 60 * 1000, // 10 minutes
         retry: 2,

@@ -76,12 +76,7 @@ export function GroupSelector({
         // Toggle individual group
         if (selectedGroupIds.includes(groupId)) {
           const newSelection = selectedGroupIds.filter((id) => id !== groupId);
-          // If no groups selected, turn on shareWithAll
-          if (newSelection.length === 0) {
-            onShareWithAllChange(true);
-          } else {
-            onSelectionChange(newSelection);
-          }
+          onSelectionChange(newSelection);
         } else {
           onSelectionChange([...selectedGroupIds, groupId]);
         }
@@ -162,40 +157,46 @@ export function GroupSelector({
           {groups.map((group: Group) => {
             const isSelected = selectedGroupIds.includes(group.id);
             return (
-              <HStack
+              <Pressable
                 key={group.id}
-                space="sm"
-                className={cn(
-                  "items-center rounded-lg bg-background-0 p-2",
-                  shareWithAll && "opacity-50",
-                )}
+                onPress={() => handleToggleGroup(group.id)}
+                className="active:opacity-80"
               >
-                <Checkbox
-                  value={group.id}
-                  isChecked={isSelected}
-                  isDisabled={shareWithAll}
-                  onChange={() => handleToggleGroup(group.id)}
-                  size="sm"
-                  className="flex-1"
+                <HStack
+                  space="sm"
+                  className={cn(
+                    "items-center rounded-lg bg-background-0 p-2",
+                    shareWithAll && "opacity-50",
+                  )}
                 >
-                  <CheckboxIndicator>
-                    <CheckboxIcon as={Check} />
-                  </CheckboxIndicator>
-                  <CheckboxLabel
-                    className={cn(
-                      "flex-1 text-sm",
-                      isSelected && !shareWithAll
-                        ? "font-medium text-primary-700"
-                        : "text-typography-700",
-                    )}
+                  <Checkbox
+                    value={group.id}
+                    isChecked={isSelected}
+                    isDisabled={shareWithAll}
+                    onChange={() => handleToggleGroup(group.id)}
+                    size="sm"
+                    isInvalid={false}
+                    className="pointer-events-none flex-1"
                   >
-                    {group.name}
-                  </CheckboxLabel>
-                </Checkbox>
-                <Text className="text-xs text-typography-400">
-                  {group.memberCount || 0}
-                </Text>
-              </HStack>
+                    <CheckboxIndicator>
+                      <CheckboxIcon as={Check} />
+                    </CheckboxIndicator>
+                    <CheckboxLabel
+                      className={cn(
+                        "flex-1 text-sm",
+                        isSelected && !shareWithAll
+                          ? "font-medium text-primary-700"
+                          : "text-typography-700",
+                      )}
+                    >
+                      {group.name}
+                    </CheckboxLabel>
+                  </Checkbox>
+                  <Text className="text-xs text-typography-400">
+                    {group.memberCount || 0}
+                  </Text>
+                </HStack>
+              </Pressable>
             );
           })}
         </VStack>
