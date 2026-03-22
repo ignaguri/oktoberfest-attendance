@@ -23,6 +23,7 @@ RETURNS TABLE(
   group_count bigint
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     RETURN QUERY
