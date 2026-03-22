@@ -92,7 +92,7 @@ export function getNotificationRoute(
         return "/achievements";
 
       case NOTIFICATION_PUSH_TYPES.FRIEND_REQUEST:
-        return "/friends";
+        return "/friends?tab=requests";
 
       case NOTIFICATION_PUSH_TYPES.RESERVATION_REMINDER:
       case NOTIFICATION_PUSH_TYPES.RESERVATION_CHECKIN_PROMPT:
@@ -104,7 +104,7 @@ export function getNotificationRoute(
 
   // Fallback: infer route from payload shape (for in-app notifications)
   if (payload.achievementName) return "/achievements";
-  if (payload.senderName && !payload.groupId) return "/friends";
+  if (payload.senderName && !payload.groupId) return "/friends?tab=requests";
   if (payload.groupId) return `/group-detail/${payload.groupId}`;
 
   // Try URL if present
