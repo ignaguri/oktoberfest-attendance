@@ -1,6 +1,9 @@
+import type { Notification } from "@novu/js";
+import { getNotificationRoute } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -12,6 +15,18 @@ import { IconColors } from "@/lib/constants/colors";
 export default function NotificationsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+
+  const handleNotificationPress = useCallback(
+    (notification: Notification) => {
+      const payload = notification.data ?? {};
+      const route = getNotificationRoute(payload);
+
+      if (route) {
+        router.push(route as never);
+      }
+    },
+    [router],
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
@@ -26,7 +41,7 @@ export default function NotificationsScreen() {
       </View>
 
       {/* Inbox */}
-      <NotificationInbox />
+      <NotificationInbox onNotificationPress={handleNotificationPress} />
     </SafeAreaView>
   );
 }

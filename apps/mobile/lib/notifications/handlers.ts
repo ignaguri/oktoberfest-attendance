@@ -1,21 +1,8 @@
+import { getNotificationRoute } from "@prostcounter/shared/constants";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 
 import { logger } from "@/lib/logger";
-
-/**
- * Notification data payload structure from Novu
- */
-interface NotificationData {
-  type?: string;
-  groupId?: string;
-  achievementId?: string;
-  tentId?: string;
-  userId?: string;
-  reservationId?: string;
-  url?: string;
-  [key: string]: unknown;
-}
 
 /**
  * Configure notification handler for foreground notifications
@@ -37,73 +24,24 @@ export function configureNotificationHandler() {
 /**
  * Handle notification response (user tapped on notification)
  *
- * Routes user to appropriate screen based on notification type.
+ * Routes user to appropriate screen using the shared notification registry.
  */
 export function handleNotificationResponse(
   response: Notifications.NotificationResponse,
 ) {
-  const data = response.notification.request.content.data as NotificationData;
+  const data = response.notification.request.content.data as Record<
+    string,
+    unknown
+  >;
 
   if (!data) {
-    // No data, just open the app
     return;
   }
 
-  // Handle deep linking based on notification type
-  switch (data.type) {
-    case "group-join":
-    case "group-member-joined":
-      if (data.groupId) {
-        router.push(`/group-detail/${data.groupId}`);
-      } else {
-        router.push("/groups");
-      }
-      break;
+  const route = getNotificationRoute(data);
 
-    case "achievement-unlocked":
-      router.push("/achievements");
-      break;
-
-    case "tent-check-in":
-    case "group-check-in":
-      if (data.groupId) {
-        router.push(`/group-detail/${data.groupId}`);
-      } else {
-        router.push("/home");
-      }
-      break;
-
-    case "reminder":
-      router.push("/home");
-      break;
-
-    case "reservation-reminder":
-    case "reservation-check-in-prompt":
-      // Navigate to attendance tab with check-in reservation ID
-      if (data.reservationId) {
-        router.push(`/attendance?checkInReservationId=${data.reservationId}`);
-      } else {
-        router.push("/attendance");
-      }
-      break;
-
-    case "leaderboard-update":
-      router.push("/leaderboard");
-      break;
-
-    default:
-      // If there's a URL, try to navigate to it
-      if (data.url && typeof data.url === "string") {
-        try {
-          // Parse the URL path and navigate
-          const urlPath = new URL(data.url).pathname;
-          router.push(urlPath as never);
-        } catch {
-          // Invalid URL, go to home
-          router.push("/home");
-        }
-      }
-      break;
+  if (route) {
+    router.push(route as never);
   }
 }
 
@@ -116,8 +54,6 @@ export function setupNotificationListeners(): () => void {
   // Listen for notifications received while app is foregrounded
   const notificationReceivedSubscription =
     Notifications.addNotificationReceivedListener((notification) => {
-      // Notification received in foreground
-      // The handler configured above will show it as an alert
       logger.debug("Notification received in foreground:", {
         identifier: notification.request.identifier,
         content: notification.request.content,
@@ -130,7 +66,6 @@ export function setupNotificationListeners(): () => void {
       handleNotificationResponse(response);
     });
 
-  // Return cleanup function
   return () => {
     notificationReceivedSubscription.remove();
     notificationResponseSubscription.remove();
