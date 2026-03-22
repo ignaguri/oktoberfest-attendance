@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   RefreshControl,
   View,
 } from "react-native";
@@ -15,6 +16,7 @@ import {
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/utils";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -40,13 +42,22 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
       accessibilityHint={t("profile.notifications.tapToView")}
     >
       {/* Unread indicator */}
-      <View className="mr-3 justify-center">
+      <View className="mr-2 justify-center">
         {!isRead ? (
           <View className="h-2 w-2 rounded-full bg-primary-500" />
         ) : (
           <View className="h-2 w-2" />
         )}
       </View>
+
+      {/* Avatar */}
+      {notification.avatar && (
+        <Image
+          source={{ uri: getAvatarUrl(notification.avatar) }}
+          className="mr-3 h-10 w-10 rounded-full"
+          accessibilityLabel=""
+        />
+      )}
 
       {/* Content */}
       <View className="flex-1">
