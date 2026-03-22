@@ -508,7 +508,7 @@ export class NotificationService {
       }
 
       const sharerName = user.username || user.full_name || "Someone";
-      const sharerAvatar = user.avatar_url || "";
+      const sharerAvatar = user.avatar_url || undefined;
 
       // Send notifications to all eligible members
       const notificationPromises = membersToNotify.map((member) => {
@@ -588,7 +588,7 @@ export class NotificationService {
 
       // Prepare notification payload
       const joinerName = newMember.username ?? newMember.full_name ?? "Someone";
-      const joinerAvatar = newMember.avatar_url || "";
+      const joinerAvatar = newMember.avatar_url || undefined;
 
       const payload = {
         joinerName,
@@ -641,7 +641,7 @@ export class NotificationService {
 
       const requesterName =
         requester.username || requester.full_name || "Someone";
-      const requesterAvatar = requester.avatar_url || "";
+      const requesterAvatar = requester.avatar_url || undefined;
 
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.FRIEND_REQUEST,
@@ -732,7 +732,7 @@ export class NotificationService {
       }
 
       const userName = user.username || user.full_name || "Someone";
-      const userAvatar = user.avatar_url || "";
+      const userAvatar = user.avatar_url || undefined;
 
       // Send notifications to all eligible members with their specific group context
       const notificationPromises = membersToNotify.map((member) => {
