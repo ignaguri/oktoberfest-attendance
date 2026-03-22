@@ -9,11 +9,12 @@ import { useAuth } from "@/lib/auth/AuthContext";
 const NOVU_APP_ID = process.env.EXPO_PUBLIC_NOVU_APP_ID || "";
 
 /**
- * Novu API configuration for EU region
+ * Novu API configuration for US region
+ * The Novu account is on the US instance (api.novu.co)
  */
 const NOVU_CONFIG = {
-  apiUrl: "https://eu.api.novu.co",
-  socketUrl: "wss://eu.ws.novu.co",
+  apiUrl: "https://api.novu.co",
+  socketUrl: "wss://ws.novu.co",
 };
 
 interface NovuProviderWrapperProps {

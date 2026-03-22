@@ -218,7 +218,7 @@ export function NotificationInbox({
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         contentContainerStyle={
-          notifications?.length === 0 ? { flex: 1 } : undefined
+          notifications?.length === 0 ? { flexGrow: 1 } : undefined
         }
       />
     </View>
