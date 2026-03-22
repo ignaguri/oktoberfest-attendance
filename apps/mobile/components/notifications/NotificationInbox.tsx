@@ -35,7 +35,7 @@ function NotificationItem({ notification, onPress }: NotificationItemProps) {
     <Pressable
       onPress={() => onPress(notification)}
       className={cn(
-        "flex-row border-b border-outline-100 p-4",
+        "mx-3 mb-2 flex-row rounded-xl p-4 shadow-sm",
         isRead ? "bg-white" : "bg-primary-50",
       )}
       accessibilityLabel={notification.subject || notification.body}
@@ -190,10 +190,10 @@ export function NotificationInbox({
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
       {/* Header with mark all as read */}
       {unreadCount > 0 && (
-        <View className="flex-row items-center justify-between border-b border-outline-100 px-4 py-3">
+        <View className="flex-row items-center justify-between px-4 py-3">
           <Text className="text-sm text-typography-600">
             {t("profile.notifications.unreadCount", {
               count: unreadCount,
@@ -229,7 +229,9 @@ export function NotificationInbox({
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         contentContainerStyle={
-          notifications?.length === 0 ? { flexGrow: 1 } : undefined
+          notifications?.length === 0
+            ? { flexGrow: 1 }
+            : { paddingTop: 4, paddingBottom: 16 }
         }
       />
     </View>
