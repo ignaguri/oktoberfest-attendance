@@ -17,7 +17,11 @@ import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { NotFoundError, ValidationError } from "../middleware/error";
+import {
+  DatabaseError,
+  NotFoundError,
+  ValidationError,
+} from "../middleware/error";
 import {
   SupabaseAttendanceRepository,
   SupabasePhotoRepository,
@@ -186,15 +190,29 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   const attendanceRepo = new SupabaseAttendanceRepository(supabase);
 
   // Query the attendances table directly (not the view) for delete verification
-  const { data: attendance } = await supabase
+  const { data: attendance, error: findError } = await supabase
     .from("attendances")
     .select("id, user_id, festival_id")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
 
+  if (findError) {
+    if (findError.code === "PGRST116") {
+      // Not found - attendance already deleted, treat as idempotent success
+      return c.json(
+        {
+          success: true,
+          message: "Attendance deleted successfully",
+        },
+        200,
+      );
+    }
+    // Unexpected DB error
+    throw new DatabaseError(`Failed to fetch attendance: ${findError.message}`);
+  }
+
   if (!attendance) {
-    // Attendance already deleted or doesn't belong to user - treat as success
     return c.json(
       {
         success: true,

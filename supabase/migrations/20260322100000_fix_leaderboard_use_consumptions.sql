@@ -6,7 +6,7 @@
 -- attendances.beer_count, resulting in 0 beers for everyone.
 
 -- =============================================================================
--- get_global_leaderboard: count beers from consumptions
+-- get_global_leaderboard: count beers from consumptions via JOIN
 -- =============================================================================
 CREATE OR REPLACE FUNCTION public.get_global_leaderboard(
   p_winning_criteria_id integer,
@@ -30,16 +30,11 @@ BEGIN
         SELECT
             a.user_id AS a_user_id,
             COUNT(DISTINCT a.date)::BIGINT AS days_attended,
-            COALESCE(
-                (SELECT COUNT(*)
-                 FROM consumptions c
-                 JOIN attendances a2 ON c.attendance_id = a2.id
-                 WHERE a2.user_id = a.user_id
-                   AND (p_festival_id IS NULL OR a2.festival_id = p_festival_id)
-                   AND c.drink_type IN ('beer', 'radler')
-                ), 0
-            )::BIGINT AS total_beers
+            COUNT(c.id)::BIGINT AS total_beers
         FROM attendances a
+        LEFT JOIN consumptions c
+            ON c.attendance_id = a.id
+            AND c.drink_type IN ('beer', 'radler')
         WHERE (p_festival_id IS NULL OR a.festival_id = p_festival_id)
         GROUP BY a.user_id
     ),
@@ -69,7 +64,6 @@ BEGIN
     LEFT JOIN attendance_stats ast ON p.id = ast.a_user_id
     LEFT JOIN group_stats gs ON p.id = gs.g_user_id
     WHERE
-        -- Only include users who have attendance data for the specified festival
         (p_festival_id IS NULL OR ast.a_user_id IS NOT NULL)
         AND (ast.days_attended > 0 OR ast.total_beers > 0)
     ORDER BY
@@ -88,7 +82,7 @@ END;
 $$;
 
 -- =============================================================================
--- get_group_leaderboard: count beers from consumptions
+-- get_group_leaderboard: count beers from consumptions via JOIN
 -- =============================================================================
 CREATE OR REPLACE FUNCTION public.get_group_leaderboard(
   p_group_id uuid,
@@ -121,27 +115,10 @@ BEGIN
         g.festival_id,
         f.name AS festival_name,
         COUNT(DISTINCT a.date)::BIGINT AS days_attended,
-        COALESCE(
-            (SELECT COUNT(*)
-             FROM consumptions c
-             JOIN attendances a2 ON c.attendance_id = a2.id
-             WHERE a2.user_id = p.id
-               AND a2.festival_id = g.festival_id
-               AND c.drink_type IN ('beer', 'radler')
-            ), 0
-        )::BIGINT AS total_beers,
+        COUNT(c.id)::BIGINT AS total_beers,
         CASE
             WHEN COUNT(DISTINCT a.date) > 0 THEN
-                ROUND(
-                    COALESCE(
-                        (SELECT COUNT(*)
-                         FROM consumptions c
-                         JOIN attendances a2 ON c.attendance_id = a2.id
-                         WHERE a2.user_id = p.id
-                           AND a2.festival_id = g.festival_id
-                           AND c.drink_type IN ('beer', 'radler')
-                        ), 0
-                    )::NUMERIC / COUNT(DISTINCT a.date)::NUMERIC, 2)
+                ROUND(COUNT(c.id)::NUMERIC / COUNT(DISTINCT a.date)::NUMERIC, 2)
             ELSE 0
         END AS avg_beers
     FROM profiles p
@@ -149,45 +126,22 @@ BEGIN
     INNER JOIN groups g ON gm.group_id = g.id
     INNER JOIN festivals f ON g.festival_id = f.id
     LEFT JOIN attendances a ON p.id = a.user_id AND a.festival_id = g.festival_id
+    LEFT JOIN consumptions c
+        ON c.attendance_id = a.id
+        AND c.drink_type IN ('beer', 'radler')
     WHERE gm.group_id = p_group_id
     GROUP BY p.id, p.username, p.full_name, p.avatar_url, g.id, g.name, g.festival_id, f.name
     ORDER BY
         CASE
             WHEN p_winning_criteria_id = 1 THEN COUNT(DISTINCT a.date)
-            WHEN p_winning_criteria_id = 2 THEN
-                COALESCE(
-                    (SELECT COUNT(*)
-                     FROM consumptions c
-                     JOIN attendances a2 ON c.attendance_id = a2.id
-                     WHERE a2.user_id = p.id
-                       AND a2.festival_id = g.festival_id
-                       AND c.drink_type IN ('beer', 'radler')
-                    ), 0
-                )
+            WHEN p_winning_criteria_id = 2 THEN COUNT(c.id)
             WHEN p_winning_criteria_id = 3 THEN
                 CASE
                     WHEN COUNT(DISTINCT a.date) > 0 THEN
-                        COALESCE(
-                            (SELECT COUNT(*)
-                             FROM consumptions c
-                             JOIN attendances a2 ON c.attendance_id = a2.id
-                             WHERE a2.user_id = p.id
-                               AND a2.festival_id = g.festival_id
-                               AND c.drink_type IN ('beer', 'radler')
-                            ), 0
-                        )::NUMERIC / COUNT(DISTINCT a.date)::NUMERIC
+                        COUNT(c.id)::NUMERIC / COUNT(DISTINCT a.date)::NUMERIC
                     ELSE 0
                 END
-            ELSE
-                COALESCE(
-                    (SELECT COUNT(*)
-                     FROM consumptions c
-                     JOIN attendances a2 ON c.attendance_id = a2.id
-                     WHERE a2.user_id = p.id
-                       AND a2.festival_id = g.festival_id
-                       AND c.drink_type IN ('beer', 'radler')
-                    ), 0
-                )
+            ELSE COUNT(c.id)
         END DESC;
 END;
 $$;
