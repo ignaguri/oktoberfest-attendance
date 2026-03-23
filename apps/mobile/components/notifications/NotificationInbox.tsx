@@ -63,9 +63,13 @@ function NotificationItem({
   const isRead = notification.isRead;
   const swipeableRef = useRef<Swipeable>(null);
 
-  const handleSwipeOpen = useCallback(() => {
+  const handleSwipeOpen = useCallback(async () => {
     swipeableRef.current?.close();
-    onArchive(notification);
+    try {
+      await onArchive(notification);
+    } catch {
+      // Archive failed silently — notification stays in list
+    }
   }, [notification, onArchive]);
 
   return (

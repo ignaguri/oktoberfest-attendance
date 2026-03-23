@@ -39,7 +39,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   RESERVATION_REMINDER: "reservation-reminder",
   RESERVATION_CHECKIN_PROMPT: "reservation-check-in-prompt",
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
-  GROUP_ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
+  GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
 } as const;
 
@@ -109,8 +109,13 @@ export function getNotificationRoute(
 
   // Try URL if present
   if (payload.url && typeof payload.url === "string") {
+    // App-relative URLs can be used as-is
+    if (payload.url.startsWith("/")) {
+      return payload.url;
+    }
     try {
-      return new URL(payload.url).pathname;
+      const parsed = new URL(payload.url);
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
     } catch {
       // Invalid URL
     }

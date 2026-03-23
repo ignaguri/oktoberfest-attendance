@@ -20,7 +20,7 @@ import type {
 import { getInitials } from "@prostcounter/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Search, UserPlus, Users, UserX } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -62,6 +62,13 @@ export default function FriendsScreen() {
   const [activeTab, setActiveTab] = useState<TabType>(
     tab === "requests" ? "requests" : "friends",
   );
+
+  // Sync tab state when URL param changes (e.g. navigating back with different tab)
+  useEffect(() => {
+    if (tab === "requests" && activeTab !== "requests") {
+      setActiveTab("requests");
+    }
+  }, [tab, activeTab]);
 
   // Alert dialog for unfriend confirmation
   const { dialog, showDialog, closeDialog } = useAlertDialog();
