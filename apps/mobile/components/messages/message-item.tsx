@@ -92,7 +92,7 @@ export function MessageItem({
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
               <Text
-                className="text-sm font-medium text-typography-900"
+                className="text-typography-900 text-sm font-medium"
                 numberOfLines={1}
               >
                 {displayName}
@@ -108,11 +108,11 @@ export function MessageItem({
               )}
               {isPinned && <Pin size={12} color={IconColors.muted} />}
             </HStack>
-            <Text className="text-xs text-typography-400">{timeAgo}</Text>
+            <Text className="text-typography-400 text-xs">{timeAgo}</Text>
           </HStack>
 
           {/* Message content */}
-          <Text className="text-sm text-typography-500">{message.content}</Text>
+          <Text className="text-typography-500 text-sm">{message.content}</Text>
 
           {/* Alert badge */}
           {isAlert && (
@@ -120,7 +120,7 @@ export function MessageItem({
               action="warning"
               variant="solid"
               size="sm"
-              className="mr-auto mt-1 bg-primary-500"
+              className="bg-primary-500 mt-1 mr-auto"
             >
               <BadgeText className="text-xs text-white">
                 {t("groups.messages.item.alert")}

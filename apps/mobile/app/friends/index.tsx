@@ -179,10 +179,10 @@ export default function FriendsScreen() {
   }, [t, pendingCount]);
 
   return (
-    <SafeAreaView className="flex-1 bg-background-50" edges={[]}>
+    <SafeAreaView className="bg-background-50 flex-1" edges={[]}>
       {/* Header */}
-      <HStack className="items-center justify-between px-4 pb-2 pt-3">
-        <Text className="text-2xl font-bold text-typography-900">
+      <HStack className="items-center justify-between px-4 pt-3 pb-2">
+        <Text className="text-typography-900 text-2xl font-bold">
           {t("friends.title")}
         </Text>
         <Pressable
@@ -196,7 +196,7 @@ export default function FriendsScreen() {
       </HStack>
 
       {/* Segmented tabs */}
-      <HStack space="sm" className="mx-4 mb-3 rounded-xl bg-background-100 p-1">
+      <HStack space="sm" className="bg-background-100 mx-4 mb-3 rounded-xl p-1">
         <Pressable
           onPress={() => setActiveTab("friends")}
           className={
@@ -211,8 +211,8 @@ export default function FriendsScreen() {
           <Text
             className={
               activeTab === "friends"
-                ? "text-center text-sm font-semibold text-typography-900"
-                : "text-center text-sm font-medium text-typography-500"
+                ? "text-typography-900 text-center text-sm font-semibold"
+                : "text-typography-500 text-center text-sm font-medium"
             }
           >
             {t("friends.myFriends")}
@@ -234,14 +234,14 @@ export default function FriendsScreen() {
             <Text
               className={
                 activeTab === "requests"
-                  ? "text-center text-sm font-semibold text-typography-900"
-                  : "text-center text-sm font-medium text-typography-500"
+                  ? "text-typography-900 text-center text-sm font-semibold"
+                  : "text-typography-500 text-center text-sm font-medium"
               }
             >
               {requestsTabLabel}
             </Text>
             {pendingCount > 0 && activeTab !== "requests" && (
-              <View className="h-2 w-2 rounded-full bg-primary-500" />
+              <View className="bg-primary-500 h-2 w-2 rounded-full" />
             )}
           </HStack>
         </Pressable>
@@ -283,7 +283,7 @@ export default function FriendsScreen() {
           <AlertDialogHeader>
             <Heading size="lg">{dialog.title}</Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mb-4 mt-3">
+          <AlertDialogBody className="mt-3 mb-4">
             <Text className="text-typography-700">{dialog.message}</Text>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -361,7 +361,7 @@ function MyFriendsTab({
       {/* Suggestions section */}
       {suggestions.length > 0 && (
         <VStack space="sm" className="mb-3">
-          <Text className="px-4 text-base font-semibold text-typography-700">
+          <Text className="text-typography-700 px-4 text-base font-semibold">
             {t("friends.suggestions.title")}
           </Text>
           <ScrollView
@@ -383,7 +383,7 @@ function MyFriendsTab({
 
       {/* Friends list header */}
       {friends.length > 0 && (
-        <Text className="mb-1 px-4 text-base font-semibold text-typography-700">
+        <Text className="text-typography-700 mb-1 px-4 text-base font-semibold">
           {t("friends.myFriends")}
         </Text>
       )}
@@ -395,7 +395,7 @@ function MyFriendsTab({
     return (
       <VStack space="md" className="items-center px-8 pt-16">
         <Users size={56} color={Colors.gray[300]} />
-        <Text className="text-center text-base text-typography-500">
+        <Text className="text-typography-500 text-center text-base">
           {t("friends.empty")}
         </Text>
         <Button
@@ -479,14 +479,14 @@ function SuggestionCard({ suggestion, onAdd, loading }: SuggestionCardProps) {
 
       <VStack space="xs" className="items-center">
         <Text
-          className="text-center text-sm font-semibold text-typography-900"
+          className="text-typography-900 text-center text-sm font-semibold"
           numberOfLines={1}
         >
           {displayName}
         </Text>
         {sharedGroupsText && (
           <Text
-            className="text-center text-xs text-typography-500"
+            className="text-typography-500 text-center text-xs"
             numberOfLines={1}
           >
             {sharedGroupsText}
@@ -573,7 +573,7 @@ function RequestsTab({
       {isEmpty ? (
         <VStack space="md" className="items-center px-8 pt-16">
           <UserX size={56} color={Colors.gray[300]} />
-          <Text className="text-center text-base text-typography-500">
+          <Text className="text-typography-500 text-center text-base">
             {t("friends.requestsEmpty")}
           </Text>
         </VStack>
@@ -582,7 +582,7 @@ function RequestsTab({
           {/* Incoming requests */}
           {incomingRequests.length > 0 && (
             <VStack space="sm">
-              <Text className="text-base font-semibold text-typography-700">
+              <Text className="text-typography-700 text-base font-semibold">
                 {t("friends.requests")}
               </Text>
               {incomingRequests.map((request) => (
@@ -601,7 +601,7 @@ function RequestsTab({
           {/* Outgoing requests */}
           {outgoingRequests.length > 0 && (
             <VStack space="sm">
-              <Text className="text-base font-semibold text-typography-700">
+              <Text className="text-typography-700 text-base font-semibold">
                 {t("friends.request.sent")}
               </Text>
               {outgoingRequests.map((request) => (

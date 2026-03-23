@@ -16,11 +16,11 @@ cssInterop(UILink, { className: "style" });
 cssInterop(UILink.Text, { className: "style" });
 
 const linkStyle = tva({
-  base: "group/link data-[disabled=true]:opacity-4 web:outline-0 data-[disabled=true]:web:cursor-not-allowed data-[focus-visible=true]:web:outline-0 data-[focus-visible=true]:web:ring-2 data-[focus-visible=true]:web:ring-indicator-primary",
+  base: "group/link web:outline-0 data-[disabled=true]:web:cursor-not-allowed data-[focus-visible=true]:web:outline-0 data-[focus-visible=true]:web:ring-2 data-[focus-visible=true]:web:ring-indicator-primary data-[disabled=true]:opacity-4",
 });
 
 const linkTextStyle = tva({
-  base: "font-body web:tracking-sm web:display-inline web:margin-0 web:padding-0 web:position-relative web:word-wrap-break-word font-normal text-info-700 underline data-[active=true]:text-info-700 data-[hover=true]:text-info-600 data-[hover=true]:no-underline web:my-0 web:box-border web:list-none web:whitespace-pre-wrap web:border-0 web:bg-transparent web:text-start web:font-sans",
+  base: "font-body web:tracking-sm web:display-inline web:margin-0 web:padding-0 web:position-relative web:word-wrap-break-word text-info-700 data-[active=true]:text-info-700 data-[hover=true]:text-info-600 web:my-0 web:box-border web:list-none web:whitespace-pre-wrap web:border-0 web:bg-transparent web:text-start web:font-sans font-normal underline data-[hover=true]:no-underline",
 
   variants: {
     isTruncated: {

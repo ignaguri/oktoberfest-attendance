@@ -20,7 +20,7 @@ export function LeaderboardSkeleton() {
       <Card
         variant="filled"
         size="md"
-        className="border border-primary-200 bg-primary-100 px-4 py-4"
+        className="border-primary-200 bg-primary-100 border px-4 py-4"
       >
         <HStack className="items-center justify-between">
           <HStack space="md" className="flex-1 items-center">
@@ -35,7 +35,7 @@ export function LeaderboardSkeleton() {
       </Card>
 
       {/* Divider */}
-      <View className="my-1 h-px bg-outline-200" />
+      <View className="bg-outline-200 my-1 h-px" />
 
       {/* Section Header */}
       <HStack space="sm" className="items-center">
@@ -47,7 +47,7 @@ export function LeaderboardSkeleton() {
       <Card variant="outline" size="md" className="bg-white">
         <VStack>
           {/* Table Header */}
-          <HStack className="items-center border-b border-outline-100 p-3">
+          <HStack className="border-outline-100 items-center border-b p-3">
             <Skeleton variant="rounded" className="mr-3 h-4 w-8" />
             <Skeleton variant="rounded" className="h-4 w-20" />
             <View className="flex-1" />
@@ -62,7 +62,7 @@ export function LeaderboardSkeleton() {
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <HStack
               key={i}
-              className="items-center border-b border-outline-50 p-3"
+              className="border-outline-50 items-center border-b p-3"
             >
               <Skeleton variant="rounded" className="mr-3 h-5 w-6" />
               <Skeleton variant="circular" className="mr-2 h-8 w-8" />

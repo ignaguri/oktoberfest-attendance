@@ -25,7 +25,7 @@ export default function NotificationsScreen() {
   );
 
   return (
-    <View className="flex-1 bg-background-50">
+    <View className="bg-background-50 flex-1">
       <Stack.Screen
         options={{
           ...defaultScreenOptions,

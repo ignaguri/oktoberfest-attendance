@@ -191,7 +191,7 @@ export function TentSelectorSheet({
 
         {/* Header */}
         <HStack className="mb-3 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 text-lg font-semibold">
             {mode === "single"
               ? t("tentSelector.titleSingle")
               : t("tentSelector.titleMulti")}
@@ -214,7 +214,7 @@ export function TentSelectorSheet({
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
             <ActivityIndicator size="large" color={IconColors.default} />
-            <Text className="mt-2 text-typography-500">
+            <Text className="text-typography-500 mt-2">
               {t("tentSelector.loading")}
             </Text>
           </VStack>

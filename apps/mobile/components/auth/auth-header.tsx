@@ -37,7 +37,7 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
       <View className="mt-3 flex-row">
         <Text
           className={cn(
-            "font-bold text-primary-600",
+            "text-primary-600 font-bold",
             isLarge ? "text-3xl" : "text-2xl",
           )}
         >
@@ -45,7 +45,7 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
         </Text>
         <Text
           className={cn(
-            "font-bold text-primary-500",
+            "text-primary-500 font-bold",
             isLarge ? "text-3xl" : "text-2xl",
           )}
         >
@@ -55,7 +55,7 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
 
       {/* Optional Tagline */}
       {tagline && (
-        <Text className="mt-2 text-center text-typography-500" size="sm">
+        <Text className="text-typography-500 mt-2 text-center" size="sm">
           {tagline}
         </Text>
       )}

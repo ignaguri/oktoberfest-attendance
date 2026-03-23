@@ -86,7 +86,7 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
                         RARITY_COLORS.common,
                     }}
                   />
-                  <Text className="text-xs capitalize text-gray-500">
+                  <Text className="text-xs text-gray-500 capitalize">
                     {t(`achievements.rarity.${achievement.rarity}`)}
                   </Text>
                   <Text className="text-xs text-gray-400">

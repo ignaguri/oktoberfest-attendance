@@ -246,7 +246,7 @@ export function AttendanceCalendar({
           <VStack className="items-center">
             {/* Today indicator */}
             {isToday && (
-              <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />
+              <View className="bg-primary-800 absolute -top-0.5 h-1 w-3 rounded-full" />
             )}
 
             {/* Day number */}
@@ -261,7 +261,7 @@ export function AttendanceCalendar({
                   {hasAttendance && drinkCount! > 0 && (
                     <HStack className="items-center gap-0.5">
                       <Beer size={10} color={Colors.primary[600]} />
-                      <Text className="text-[10px] font-semibold text-primary-600">
+                      <Text className="text-primary-600 text-[10px] font-semibold">
                         {drinkCount}
                       </Text>
                     </HStack>
@@ -306,7 +306,7 @@ export function AttendanceCalendar({
   );
 
   return (
-    <VStack className="rounded-xl bg-background-0 p-4">
+    <VStack className="bg-background-0 rounded-xl p-4">
       {/* Header with month navigation */}
       <HStack className="mb-4 items-center justify-between">
         <Pressable
@@ -320,7 +320,7 @@ export function AttendanceCalendar({
           />
         </Pressable>
 
-        <Text className="text-lg font-semibold text-typography-900">
+        <Text className="text-typography-900 text-lg font-semibold">
           {formatLocalized(currentMonth, "MMMM yyyy")}
         </Text>
 
@@ -340,7 +340,7 @@ export function AttendanceCalendar({
       <HStack className="mb-2 justify-around">
         {weekdayHeaders.map((day) => (
           <View key={day} className="w-12 items-center">
-            <Text className="text-xs font-medium text-typography-500">
+            <Text className="text-typography-500 text-xs font-medium">
               {day}
             </Text>
           </View>
@@ -361,23 +361,23 @@ export function AttendanceCalendar({
       {/* Legend */}
       <HStack
         space="lg"
-        className="mt-4 flex-wrap justify-center border-t border-background-200 pt-4"
+        className="border-background-200 mt-4 flex-wrap justify-center border-t pt-4"
       >
         <HStack space="sm" className="items-center">
-          <View className="h-3 w-3 rounded border border-primary-300 bg-primary-100" />
-          <Text className="text-xs text-typography-500">
+          <View className="border-primary-300 bg-primary-100 h-3 w-3 rounded border" />
+          <Text className="text-typography-500 text-xs">
             {t("attendance.calendar.hasAttendance")}
           </Text>
         </HStack>
         <HStack space="sm" className="items-center">
           <View className="h-3 w-3 rounded border border-teal-300 bg-teal-100" />
-          <Text className="text-xs text-typography-500">
+          <Text className="text-typography-500 text-xs">
             {t("attendance.calendar.hasReservation")}
           </Text>
         </HStack>
         <HStack space="sm" className="items-center">
-          <View className="h-3 w-3 rounded bg-primary-500" />
-          <Text className="text-xs text-typography-500">
+          <View className="bg-primary-500 h-3 w-3 rounded" />
+          <Text className="text-typography-500 text-xs">
             {t("attendance.calendar.selected")}
           </Text>
         </HStack>

@@ -97,7 +97,7 @@ export function QRCodeSheet({
                 {t("groups.qrCode.title")}
               </Heading>
             </HStack>
-            <Text className="text-center text-sm text-typography-500">
+            <Text className="text-typography-500 text-center text-sm">
               {t("groups.qrCode.description", {
                 name: groupName,
               })}
@@ -109,7 +109,7 @@ export function QRCodeSheet({
             {isGenerating || !joinUrl ? (
               <VStack className="h-52 w-52 items-center justify-center">
                 <Spinner size="large" />
-                <Text className="mt-2 text-sm text-typography-500">
+                <Text className="text-typography-500 mt-2 text-sm">
                   {t("groups.qrCode.generating")}
                 </Text>
               </VStack>
@@ -124,7 +124,7 @@ export function QRCodeSheet({
           </VStack>
 
           {/* Helper text */}
-          <Text className="text-center text-sm text-typography-500">
+          <Text className="text-typography-500 text-center text-sm">
             {t("groups.qrCode.helper")}
           </Text>
 

@@ -214,7 +214,7 @@ export function DrinkTypePicker({
                     {count > 0 && (
                       <VStack
                         className={cn(
-                          "absolute -right-1 -top-1 items-center justify-center rounded-full px-1",
+                          "absolute -top-1 -right-1 items-center justify-center rounded-full px-1",
                           badgeSize,
                         )}
                         style={{ backgroundColor: color }}
@@ -234,7 +234,7 @@ export function DrinkTypePicker({
                       className={cn(
                         "text-xs",
                         isSelected
-                          ? "font-medium text-typography-900"
+                          ? "text-typography-900 font-medium"
                           : "text-typography-500",
                       )}
                     >

@@ -97,7 +97,7 @@ export function CrowdReportPrompt({
             <HStack className="w-full items-center justify-between">
               <HStack space="sm" className="items-center">
                 <Users size={20} color={IconColors.primary} />
-                <Text className="text-lg font-semibold text-typography-900">
+                <Text className="text-typography-900 text-lg font-semibold">
                   {t("crowdReport.selectLevel")}
                 </Text>
               </HStack>
@@ -106,7 +106,7 @@ export function CrowdReportPrompt({
               </Pressable>
             </HStack>
 
-            <Text className="text-sm text-typography-500">
+            <Text className="text-typography-500 text-sm">
               {t("crowdReport.promptDescription")}
             </Text>
 
@@ -116,12 +116,12 @@ export function CrowdReportPrompt({
                 <Pressable
                   key={tent.id}
                   onPress={() => handleTentPress(tent)}
-                  className="rounded-lg border border-outline-200 px-4 py-3 active:bg-background-100"
+                  className="border-outline-200 active:bg-background-100 rounded-lg border px-4 py-3"
                   accessibilityLabel={tent.name}
                   accessibilityHint={t("crowdReport.reportCrowd")}
                 >
                   <HStack className="items-center justify-between">
-                    <Text className="text-base text-typography-700">
+                    <Text className="text-typography-700 text-base">
                       {tent.name}
                     </Text>
                     <Users size={16} color={IconColors.muted} />

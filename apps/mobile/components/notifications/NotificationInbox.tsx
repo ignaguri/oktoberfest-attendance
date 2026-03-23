@@ -93,7 +93,7 @@ function NotificationItem({
         {/* Unread indicator */}
         <View className="mr-2 justify-center">
           {!isRead ? (
-            <View className="h-2 w-2 rounded-full bg-primary-500" />
+            <View className="bg-primary-500 h-2 w-2 rounded-full" />
           ) : (
             <View className="h-2 w-2" />
           )}
@@ -111,18 +111,18 @@ function NotificationItem({
         {/* Content */}
         <View className="flex-1">
           {notification.subject && (
-            <Text className="mb-1 font-semibold text-typography-900">
+            <Text className="text-typography-900 mb-1 font-semibold">
               {notification.subject}
             </Text>
           )}
           <Text
-            className="text-sm text-typography-700"
+            className="text-typography-700 text-sm"
             numberOfLines={2}
             ellipsizeMode="tail"
           >
             {notification.body}
           </Text>
-          <Text className="mt-1 text-xs text-typography-400">{timeAgo}</Text>
+          <Text className="text-typography-400 mt-1 text-xs">{timeAgo}</Text>
         </View>
       </Pressable>
     </Swipeable>
@@ -135,10 +135,10 @@ function EmptyState() {
   return (
     <View className="flex-1 items-center justify-center p-8">
       <Bell size={48} color={Colors.primary[500]} style={{ opacity: 0.4 }} />
-      <Text className="mt-4 text-center text-typography-500">
+      <Text className="text-typography-500 mt-4 text-center">
         {t("profile.notifications.empty")}
       </Text>
-      <Text className="mt-2 text-center text-sm text-typography-400">
+      <Text className="text-typography-400 mt-2 text-center text-sm">
         {t("profile.notifications.emptyHint")}
       </Text>
     </View>
@@ -233,7 +233,7 @@ export function NotificationInbox({
       {/* Header with mark all as read */}
       {unreadCount > 0 && (
         <View className="flex-row items-center justify-between px-4 py-3">
-          <Text className="text-sm text-typography-600">
+          <Text className="text-typography-600 text-sm">
             {t("profile.notifications.unreadCount", {
               count: unreadCount,
             })}
@@ -244,7 +244,7 @@ export function NotificationInbox({
             accessibilityLabel={t("profile.notifications.markAllRead")}
           >
             <CheckCheck size={16} color={Colors.primary[500]} />
-            <Text className="text-sm text-primary-500">
+            <Text className="text-primary-500 text-sm">
               {t("profile.notifications.markAllRead")}
             </Text>
           </Pressable>

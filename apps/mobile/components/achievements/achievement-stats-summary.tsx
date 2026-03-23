@@ -32,36 +32,36 @@ export function AchievementStatsSummary({
       <HStack className="items-center justify-around p-4">
         {/* Progress */}
         <VStack className="items-center">
-          <Text className="text-2xl font-bold text-primary-700">
+          <Text className="text-primary-700 text-2xl font-bold">
             {unlocked_achievements}/{total_achievements}
           </Text>
-          <Text className="text-xs text-primary-600">
+          <Text className="text-primary-600 text-xs">
             {t("achievements.unlocked")}
           </Text>
         </VStack>
 
         {/* Divider */}
-        <VStack className="h-10 w-px bg-primary-200" />
+        <VStack className="bg-primary-200 h-10 w-px" />
 
         {/* Percentage */}
         <VStack className="items-center">
-          <Text className="text-2xl font-bold text-primary-700">
+          <Text className="text-primary-700 text-2xl font-bold">
             {percentage}%
           </Text>
-          <Text className="text-xs text-primary-600">
+          <Text className="text-primary-600 text-xs">
             {t("achievements.complete")}
           </Text>
         </VStack>
 
         {/* Divider */}
-        <VStack className="h-10 w-px bg-primary-200" />
+        <VStack className="bg-primary-200 h-10 w-px" />
 
         {/* Points */}
         <VStack className="items-center">
-          <Text className="text-2xl font-bold text-primary-700">
+          <Text className="text-primary-700 text-2xl font-bold">
             {total_points}
           </Text>
-          <Text className="text-xs text-primary-600">
+          <Text className="text-primary-600 text-xs">
             {t("achievements.totalPoints")}
           </Text>
         </VStack>

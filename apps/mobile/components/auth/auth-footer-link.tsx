@@ -31,7 +31,7 @@ export function AuthFooterLink({
     <View className="mt-4 flex-row items-center justify-center">
       <Text className="text-typography-600">{prefix} </Text>
       <Pressable onPress={() => router.push(href)}>
-        <Text className="font-semibold text-primary-600">{linkText}</Text>
+        <Text className="text-primary-600 font-semibold">{linkText}</Text>
       </Pressable>
     </View>
   );

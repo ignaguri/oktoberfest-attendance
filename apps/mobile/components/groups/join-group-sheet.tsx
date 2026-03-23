@@ -141,7 +141,7 @@ export function JoinGroupSheet({
       return (
         <VStack className="items-center py-8">
           <ActivityIndicator color={Colors.primary[500]} />
-          <Text className="mt-2 text-sm text-typography-500">
+          <Text className="text-typography-500 mt-2 text-sm">
             {t("groups.join.searching")}
           </Text>
         </VStack>
@@ -152,7 +152,7 @@ export function JoinGroupSheet({
       return (
         <VStack className="items-center py-8">
           <Users size={48} color={IconColors.disabled} />
-          <Text className="mt-2 text-sm text-typography-500">
+          <Text className="text-typography-500 mt-2 text-sm">
             {t("groups.join.noResults")}
           </Text>
         </VStack>
@@ -167,12 +167,12 @@ export function JoinGroupSheet({
               <Card variant="outline" size="sm" className="bg-background-0">
                 <HStack className="items-center justify-between">
                   <VStack space="xs">
-                    <Text className="font-medium text-typography-900">
+                    <Text className="text-typography-900 font-medium">
                       {group.name}
                     </Text>
                     <HStack space="xs" className="items-center">
                       <Users size={12} color={IconColors.muted} />
-                      <Text className="text-xs text-typography-500">
+                      <Text className="text-typography-500 text-xs">
                         {t("groups.memberCount", {
                           count: group.memberCount,
                         })}
@@ -191,7 +191,7 @@ export function JoinGroupSheet({
     return (
       <VStack className="items-center py-8">
         <Search size={48} color={IconColors.disabled} />
-        <Text className="mt-2 text-center text-sm text-typography-500">
+        <Text className="text-typography-500 mt-2 text-center text-sm">
           {t("groups.join.searchPrompt")}
         </Text>
       </VStack>
@@ -209,12 +209,12 @@ export function JoinGroupSheet({
         {selectedGroup && (
           <Card variant="elevated" size="md" className="bg-background-0">
             <VStack space="sm">
-              <Text className="font-semibold text-typography-900">
+              <Text className="text-typography-900 font-semibold">
                 {selectedGroup.name}
               </Text>
               <HStack space="xs" className="items-center">
                 <Users size={14} color={IconColors.muted} />
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("groups.memberCount", {
                     count: selectedGroup.memberCount,
                   })}
@@ -225,7 +225,7 @@ export function JoinGroupSheet({
         )}
 
         <VStack space="sm">
-          <Text className="text-sm font-medium text-typography-700">
+          <Text className="text-typography-700 text-sm font-medium">
             {isPasswordMode
               ? t("groups.join.passwordLabel")
               : t("groups.join.tokenLabel")}
@@ -249,12 +249,12 @@ export function JoinGroupSheet({
               autoCorrect={false}
             />
           </Input>
-          <Text className="text-xs text-typography-400">
+          <Text className="text-typography-400 text-xs">
             {isPasswordMode
               ? t("groups.join.passwordHelp")
               : t("groups.join.tokenHelp")}
           </Text>
-          {error && <Text className="text-sm text-error-600">{error}</Text>}
+          {error && <Text className="text-error-600 text-sm">{error}</Text>}
         </VStack>
 
         {/* Action Buttons */}
@@ -299,7 +299,7 @@ export function JoinGroupSheet({
 
         {/* Header */}
         <HStack className="mb-4 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 text-lg font-semibold">
             {t("groups.join.title")}
           </Text>
           <Pressable onPress={handleClose} hitSlop={8}>

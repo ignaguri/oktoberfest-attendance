@@ -64,7 +64,7 @@ export function AttendanceSkeleton() {
           </HStack>
 
           {/* Divider */}
-          <View className="h-px bg-background-200" />
+          <View className="bg-background-200 h-px" />
 
           {/* Row 2: Spending */}
           <HStack className="justify-around">

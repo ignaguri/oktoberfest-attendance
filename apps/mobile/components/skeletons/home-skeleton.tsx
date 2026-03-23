@@ -20,7 +20,7 @@ export function HomeSkeleton() {
       <Card
         size="md"
         variant="filled"
-        className="border border-outline-200 bg-background-100"
+        className="border-outline-200 bg-background-100 border"
       >
         <HStack space="sm" className="items-center justify-center">
           <Skeleton variant="circular" className="h-7 w-7" />

@@ -24,7 +24,7 @@ export function AchievementProgressBar({
         <ProgressFilledTrack />
       </Progress>
       {showLabel && (
-        <Text className="text-xs text-typography-500">
+        <Text className="text-typography-500 text-xs">
           {current_value} / {target_value} ({Math.round(percentage)}%)
         </Text>
       )}

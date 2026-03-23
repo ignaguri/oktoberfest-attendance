@@ -90,12 +90,12 @@ export function ComposeMessage({
         </ActionsheetDragIndicatorWrapper>
 
         <ActionsheetScrollView className="w-full">
-          <VStack space="md" className="px-2 pb-4 pt-2">
+          <VStack space="md" className="px-2 pt-2 pb-4">
             <VStack space="xs">
               <Heading size="md" className="text-typography-900">
                 {t("groups.messages.compose.title")}
               </Heading>
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 {messageType === "alert"
                   ? t("groups.messages.compose.subtitleAlert")
                   : t("groups.messages.compose.subtitleMessage")}
@@ -174,7 +174,7 @@ export function ComposeMessage({
                 multiline
                 numberOfLines={4}
                 maxLength={MAX_CHARS + 50} // Allow slightly over for UX
-                className="min-h-[100px] rounded-lg border border-outline-200 bg-white p-3 text-sm text-typography-900"
+                className="border-outline-200 text-typography-900 min-h-[100px] rounded-lg border bg-white p-3 text-sm"
                 textAlignVertical="top"
                 autoFocus
               />

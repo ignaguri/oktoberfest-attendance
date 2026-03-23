@@ -209,7 +209,7 @@ export function Leaderboard({
     return (
       <Card variant="outline" size="md" className="items-center bg-white p-6">
         <Trophy size={48} color={IconColors.disabled} />
-        <Text className="mt-2 text-center text-typography-500">
+        <Text className="text-typography-500 mt-2 text-center">
           {emptyMessage || t("leaderboard.empty")}
         </Text>
       </Card>
@@ -220,8 +220,8 @@ export function Leaderboard({
     <>
       <Card variant="outline" size="sm" className="bg-white p-0">
         {/* Header Row */}
-        <HStack className="border-b border-outline-100 px-3 py-2.5">
-          <Text className="flex-1 text-sm font-medium text-typography-500">
+        <HStack className="border-outline-100 border-b px-3 py-2.5">
+          <Text className="text-typography-500 flex-1 text-sm font-medium">
             {t("leaderboard.header.player")}
           </Text>
           <SortableHeader
@@ -274,7 +274,7 @@ export function Leaderboard({
                   className={cn(
                     "items-center px-3 py-2.5",
                     isCurrentUser && "bg-primary-50",
-                    !isLast && "border-b border-outline-50",
+                    !isLast && "border-outline-50 border-b",
                   )}
                 >
                   {/* Position + Avatar + Name */}
@@ -295,7 +295,7 @@ export function Leaderboard({
                       </VStack>
                     ) : (
                       <VStack className="h-7 w-7 items-center justify-center">
-                        <Text className="text-sm font-semibold text-typography-400">
+                        <Text className="text-typography-400 text-sm font-semibold">
                           {displayPosition}
                         </Text>
                       </VStack>
@@ -323,14 +323,14 @@ export function Leaderboard({
                       className={cn(
                         "flex-1 text-sm",
                         isCurrentUser
-                          ? "font-semibold text-primary-700"
+                          ? "text-primary-700 font-semibold"
                           : "text-typography-900",
                       )}
                       numberOfLines={1}
                     >
                       {displayName}
                       {isCurrentUser && (
-                        <Text className="text-xs text-typography-500">
+                        <Text className="text-typography-500 text-xs">
                           {" "}
                           (You)
                         </Text>

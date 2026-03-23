@@ -34,10 +34,10 @@ export function AppHeader() {
           accessibilityLabel={t("app.logo")}
         />
         <View className="flex-row">
-          <Text className="text-3xl font-extrabold text-primary-600">
+          <Text className="text-primary-600 text-3xl font-extrabold">
             {t("app.namePart1")}
           </Text>
-          <Text className="text-3xl font-extrabold text-primary-500">
+          <Text className="text-primary-500 text-3xl font-extrabold">
             {t("app.namePart2")}
           </Text>
         </View>
@@ -83,7 +83,7 @@ function NotificationBellWithBadge({ onPress }: { onPress: () => void }) {
       <Bell size={24} color={IconColors.default} />
       {unreadCount > 0 && (
         <View
-          className="absolute -right-0.5 -top-0.5 items-center justify-center rounded-full"
+          className="absolute -top-0.5 -right-0.5 items-center justify-center rounded-full"
           style={{
             backgroundColor: Colors.primary[500],
             minWidth: 18,

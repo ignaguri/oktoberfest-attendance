@@ -94,7 +94,7 @@ export default function GroupsScreen() {
   // Loading state - festival or initial data load
   if (festivalLoading || (isLoading && !groups)) {
     return (
-      <View className="flex-1 bg-background-50">
+      <View className="bg-background-50 flex-1">
         <GroupsSkeleton />
       </View>
     );
@@ -103,8 +103,8 @@ export default function GroupsScreen() {
   // No festival (rare - API returned no festivals)
   if (!currentFestival) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50 p-6">
-        <Text className="text-center text-typography-500">
+      <View className="bg-background-50 flex-1 items-center justify-center p-6">
+        <Text className="text-typography-500 text-center">
           {t("groups.noFestival")}
         </Text>
       </View>
@@ -114,7 +114,7 @@ export default function GroupsScreen() {
   // Error state
   if (groupsError) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-50">
+      <View className="bg-background-50 flex-1 items-center justify-center">
         <ErrorState error={groupsError} onRetry={refetch} />
       </View>
     );
@@ -126,7 +126,7 @@ export default function GroupsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="flex-1 bg-background-50"
+        className="bg-background-50 flex-1"
         refreshControl={
           <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
         }
@@ -135,7 +135,7 @@ export default function GroupsScreen() {
           <VStack space="md" className="p-4 pb-20">
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
-              <Text className="text-sm text-typography-500">
+              <Text className="text-typography-500 text-sm">
                 {t("groups.yourGroups")}
               </Text>
               <HStack space="sm">
@@ -215,7 +215,7 @@ export default function GroupsScreen() {
               {dialog.title}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mb-4 mt-3">
+          <AlertDialogBody className="mt-3 mb-4">
             <Text size="sm" className="text-typography-500">
               {dialog.message}
             </Text>

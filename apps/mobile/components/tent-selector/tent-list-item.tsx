@@ -71,7 +71,7 @@ export function TentListItem({
           <Text
             className={cn(
               isSelected
-                ? "font-semibold text-primary-700"
+                ? "text-primary-700 font-semibold"
                 : "text-typography-700",
             )}
           >

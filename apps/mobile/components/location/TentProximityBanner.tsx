@@ -163,7 +163,7 @@ export function TentProximityBanner({
       {/* Dismiss button */}
       <Pressable
         onPress={handleDismiss}
-        className="absolute -right-2 -top-2 rounded-full bg-background-50 p-1"
+        className="bg-background-50 absolute -top-2 -right-2 rounded-full p-1"
         style={{
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },

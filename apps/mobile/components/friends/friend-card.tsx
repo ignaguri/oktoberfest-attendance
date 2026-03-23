@@ -72,16 +72,16 @@ export function FriendCard({
             />
 
             <VStack space="xs" className="flex-1">
-              <Text className="text-base font-semibold text-typography-900">
+              <Text className="text-typography-900 text-base font-semibold">
                 {displayName}
               </Text>
               {friend.username && friend.fullName && (
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   @{friend.username}
                 </Text>
               )}
               {formattedFriendsSince && (
-                <Text className="text-xs text-typography-400">
+                <Text className="text-typography-400 text-xs">
                   {t("friends.friendsSince", {
                     date: formattedFriendsSince,
                   })}

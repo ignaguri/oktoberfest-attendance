@@ -135,10 +135,10 @@ export function GroupSelectorSheet({
           ) : groups.length === 0 ? (
             <VStack space="sm" className="items-center py-8">
               <Users size={40} color={IconColors.muted} />
-              <Text className="text-center text-typography-500">
+              <Text className="text-typography-500 text-center">
                 {t("location.groups.noGroups")}
               </Text>
-              <Text className="text-center text-sm text-typography-400">
+              <Text className="text-typography-400 text-center text-sm">
                 {t("location.groups.noGroupsHint")}
               </Text>
             </VStack>
@@ -149,12 +149,12 @@ export function GroupSelectorSheet({
                 onPress={() => handleShareWithAllToggle(!shareWithAll)}
                 className="active:opacity-80"
               >
-                <HStack className="items-center justify-between rounded-lg bg-background-50 p-4">
+                <HStack className="bg-background-50 items-center justify-between rounded-lg p-4">
                   <VStack className="flex-1">
-                    <Text className="font-medium text-typography-900">
+                    <Text className="text-typography-900 font-medium">
                       {t("location.groups.shareWithAll")}
                     </Text>
-                    <Text className="text-sm text-typography-500">
+                    <Text className="text-typography-500 text-sm">
                       {t("location.groups.shareWithAllDescription")}
                     </Text>
                   </VStack>
@@ -171,7 +171,7 @@ export function GroupSelectorSheet({
 
               {/* Group list */}
               <VStack space="xs">
-                <Text className="text-xs font-medium uppercase tracking-wide text-typography-500">
+                <Text className="text-typography-500 text-xs font-medium tracking-wide uppercase">
                   {t("location.groups.selectGroups")}
                 </Text>
                 <ScrollView
@@ -215,7 +215,7 @@ export function GroupSelectorSheet({
                               {group.name}
                             </CheckboxLabel>
                           </Checkbox>
-                          <Text className="text-xs text-typography-500">
+                          <Text className="text-typography-500 text-xs">
                             {group.memberCount || 0} {t("common.members")}
                           </Text>
                         </HStack>
@@ -226,8 +226,8 @@ export function GroupSelectorSheet({
               </VStack>
 
               {/* Selection summary */}
-              <View className="border-t border-outline-200 pt-4">
-                <Text className="text-center text-sm text-typography-600">
+              <View className="border-outline-200 border-t pt-4">
+                <Text className="text-typography-600 text-center text-sm">
                   {shareWithAll
                     ? t("location.groups.sharingWithAll")
                     : t("location.groups.sharingWithSome", {

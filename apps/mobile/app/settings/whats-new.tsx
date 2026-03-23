@@ -16,22 +16,22 @@ export default function WhatsNewScreen() {
   const currentVersion = Application.nativeApplicationVersion ?? "1.0.0";
 
   return (
-    <ScrollView className="flex-1 bg-background-50">
+    <ScrollView className="bg-background-50 flex-1">
       <VStack space="md" className="p-4">
-        <Text className="text-center text-sm text-typography-400">
+        <Text className="text-typography-400 text-center text-sm">
           {t("whatsNew.currentVersion", { version: currentVersion })}
         </Text>
 
         {sortedVersions.map((version) => (
           <View key={version} className="rounded-2xl bg-white p-4 shadow-sm">
-            <Text className="mb-3 text-lg font-semibold text-typography-900">
+            <Text className="text-typography-900 mb-3 text-lg font-semibold">
               {t("whatsNew.versionLabel", { version })}
             </Text>
             <VStack space="sm">
               {changelog[version].map((feature, index) => (
                 <View key={index} className="flex-row gap-2">
                   <Text className="text-typography-500">•</Text>
-                  <Text className="flex-1 text-typography-700">{feature}</Text>
+                  <Text className="text-typography-700 flex-1">{feature}</Text>
                 </View>
               ))}
             </VStack>

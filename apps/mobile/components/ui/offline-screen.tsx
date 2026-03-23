@@ -19,13 +19,13 @@ export function OfflineScreen({ messageKey }: OfflineScreenProps) {
   const { t } = useTranslation();
 
   return (
-    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
+    <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
       <VStack className="flex-1 items-center justify-center p-6">
         <WifiOff size={48} color={IconColors.disabled} />
-        <Text className="mt-4 text-center text-lg font-semibold text-typography-700">
+        <Text className="text-typography-700 mt-4 text-center text-lg font-semibold">
           {t("common.offline.title")}
         </Text>
-        <Text className="mt-2 text-center text-typography-500">
+        <Text className="text-typography-500 mt-2 text-center">
           {t(messageKey)}
         </Text>
       </VStack>

@@ -135,7 +135,7 @@ export function GlobalAlertProvider({ children }: GlobalAlertProviderProps) {
             </Heading>
           </AlertDialogHeader>
           <AlertDialogBody>
-            <Text className="text-center text-typography-600">
+            <Text className="text-typography-600 text-center">
               {alert?.message}
             </Text>
           </AlertDialogBody>

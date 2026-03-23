@@ -166,10 +166,10 @@ export function PhotoDetailModal({
           <VStack className="flex-1">
             <HStack className="items-center justify-between">
               <HStack space="xs" className="items-center">
-                <Text className="text-sm font-semibold text-typography-900">
+                <Text className="text-typography-900 text-sm font-semibold">
                   {item.username}
                 </Text>
-                <Text className="text-xs text-typography-400">
+                <Text className="text-typography-400 text-xs">
                   {formatRelativeTime(new Date(item.createdAt))}
                 </Text>
               </HStack>
@@ -185,7 +185,7 @@ export function PhotoDetailModal({
                 </Pressable>
               )}
             </HStack>
-            <Text className="text-sm text-typography-700">{item.content}</Text>
+            <Text className="text-typography-700 text-sm">{item.content}</Text>
           </VStack>
         </HStack>
       );
@@ -209,10 +209,10 @@ export function PhotoDetailModal({
         <View className="flex-1 bg-white">
           {/* Header with close button */}
           <View
-            className="flex-row items-center justify-between border-b border-outline-200 px-4 pb-2"
+            className="border-outline-200 flex-row items-center justify-between border-b px-4 pb-2"
             style={{ paddingTop: Math.max(insets.top, 12) }}
           >
-            <Text className="text-lg font-semibold text-typography-900">
+            <Text className="text-typography-900 text-lg font-semibold">
               {t("groups.gallery.photoDetail.reactions")}
             </Text>
             <Pressable
@@ -246,7 +246,7 @@ export function PhotoDetailModal({
           </View>
 
           {/* Emoji Reactions Row */}
-          <View className="border-b border-outline-200 px-4 py-3">
+          <View className="border-outline-200 border-b px-4 py-3">
             <HStack space="sm" className="justify-center">
               {ALLOWED_EMOJIS.map((emoji) => {
                 const hasReacted = userReactions.includes(emoji);
@@ -268,8 +268,8 @@ export function PhotoDetailModal({
                     className={cn(
                       "flex-row items-center rounded-full px-3 py-1.5",
                       hasReacted
-                        ? "border-2 border-primary-500 bg-primary-50"
-                        : "border border-outline-200 bg-background-50",
+                        ? "border-primary-500 bg-primary-50 border-2"
+                        : "border-outline-200 bg-background-50 border",
                     )}
                   >
                     <Text className="text-lg">{emoji}</Text>
@@ -293,8 +293,8 @@ export function PhotoDetailModal({
 
           {/* Comments Section */}
           <View className="flex-1">
-            <View className="border-b border-outline-200 px-4 py-2">
-              <Text className="text-sm font-semibold text-typography-700">
+            <View className="border-outline-200 border-b px-4 py-2">
+              <Text className="text-typography-700 text-sm font-semibold">
                 {t("groups.gallery.photoDetail.comments")}
               </Text>
             </View>
@@ -309,7 +309,7 @@ export function PhotoDetailModal({
               />
             ) : (
               <View className="flex-1 items-center justify-center p-8">
-                <Text className="text-center text-sm text-typography-400">
+                <Text className="text-typography-400 text-center text-sm">
                   {t("groups.gallery.photoDetail.noComments")}
                 </Text>
               </View>
@@ -318,7 +318,7 @@ export function PhotoDetailModal({
 
           {/* Comment Input */}
           <View
-            className="border-t border-outline-200 px-4 py-3"
+            className="border-outline-200 border-t px-4 py-3"
             style={{ paddingBottom: Math.max(insets.bottom, 8) }}
           >
             <HStack space="sm" className="items-center">
@@ -329,7 +329,7 @@ export function PhotoDetailModal({
                 placeholderTextColor={Colors.gray[400]}
                 maxLength={500}
                 multiline
-                className="flex-1 rounded-full border border-outline-300 bg-background-50 px-4 py-2 text-sm text-typography-900"
+                className="border-outline-300 bg-background-50 text-typography-900 flex-1 rounded-full border px-4 py-2 text-sm"
               />
               <Pressable
                 onPress={handleAddComment}

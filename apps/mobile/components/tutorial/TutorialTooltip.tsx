@@ -135,7 +135,7 @@ export function TutorialTooltip({
                 className={cn(
                   "mx-1 h-2 rounded-full",
                   index === currentIndex
-                    ? "w-6 bg-primary-500"
+                    ? "bg-primary-500 w-6"
                     : "w-2 bg-gray-300",
                 )}
               />

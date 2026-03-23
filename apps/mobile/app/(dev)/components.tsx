@@ -135,7 +135,7 @@ const ButtonsShowcase = () => (
   <Section title="Buttons">
     <VStack space="md">
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Solid Actions
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -160,7 +160,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Outline
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -182,7 +182,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Ghost (New)
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -199,7 +199,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Link
         </Text>
         <HStack space="sm" className="flex-wrap">
@@ -210,7 +210,7 @@ const ButtonsShowcase = () => (
       </VStack>
 
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Sizes
         </Text>
         <HStack space="sm" className="flex-wrap items-center">
@@ -247,7 +247,7 @@ const ButtonsShowcase = () => (
 const BadgesShowcase = () => (
   <Section title="Badges">
     <VStack space="sm">
-      <Text bold className="text-xs uppercase text-gray-600">
+      <Text bold className="text-xs text-gray-600 uppercase">
         Solid
       </Text>
       <HStack space="sm" className="flex-wrap">
@@ -269,7 +269,7 @@ const BadgesShowcase = () => (
           <BadgeText>Muted</BadgeText>
         </Badge>
       </HStack>
-      <Text bold className="mt-2 text-xs uppercase text-gray-600">
+      <Text bold className="mt-2 text-xs text-gray-600 uppercase">
         Outline
       </Text>
       <HStack space="sm" className="flex-wrap">
@@ -287,7 +287,7 @@ const BadgesShowcase = () => (
 const AvatarsShowcase = () => (
   <Section title="Avatars">
     <VStack space="sm">
-      <Text bold className="text-xs uppercase text-gray-600">
+      <Text bold className="text-xs text-gray-600 uppercase">
         Sizes
       </Text>
       <HStack space="md" className="items-end">
@@ -307,7 +307,7 @@ const AvatarsShowcase = () => (
           <AvatarFallbackText>XL</AvatarFallbackText>
         </Avatar>
       </HStack>
-      <Text bold className="mt-2 text-xs uppercase text-gray-600">
+      <Text bold className="mt-2 text-xs text-gray-600 uppercase">
         With Badge
       </Text>
       <HStack space="md">
@@ -332,7 +332,7 @@ const FormControlsShowcase = () => {
     <Section title="Form Controls">
       <VStack space="lg">
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Input
           </Text>
           <Input variant="outline" size="md">
@@ -459,7 +459,7 @@ const TextareaShowcase = () => (
   <Section title="Textarea">
     <VStack space="md">
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Default
         </Text>
         <Textarea size="md">
@@ -467,7 +467,7 @@ const TextareaShowcase = () => (
         </Textarea>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Small Size
         </Text>
         <Textarea size="sm">
@@ -482,7 +482,7 @@ const ProgressShowcase = () => (
   <Section title="Progress">
     <VStack space="md">
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           25% Progress
         </Text>
         <Progress value={25} size="md">
@@ -490,7 +490,7 @@ const ProgressShowcase = () => (
         </Progress>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           50% Progress
         </Text>
         <Progress value={50} size="md">
@@ -498,7 +498,7 @@ const ProgressShowcase = () => (
         </Progress>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           75% Progress (Large)
         </Text>
         <Progress value={75} size="lg">
@@ -506,7 +506,7 @@ const ProgressShowcase = () => (
         </Progress>
       </VStack>
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Complete (XL)
         </Text>
         <Progress value={100} size="xl">
@@ -524,7 +524,7 @@ const SelectShowcase = () => {
     <Section title="Select">
       <VStack space="md">
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Choose a tent
           </Text>
           <Select
@@ -567,13 +567,13 @@ const SelectShowcase = () => {
 const DividerShowcase = () => (
   <Section title="Divider">
     <VStack space="md">
-      <Text bold className="text-xs uppercase text-gray-600">
+      <Text bold className="text-xs text-gray-600 uppercase">
         Horizontal
       </Text>
       <Text>Content above divider</Text>
       <Divider orientation="horizontal" />
       <Text>Content below divider</Text>
-      <Text bold className="mt-2 text-xs uppercase text-gray-600">
+      <Text bold className="mt-2 text-xs text-gray-600 uppercase">
         Vertical
       </Text>
       <HStack space="md" className="h-8 items-center">
@@ -647,7 +647,7 @@ const FabShowcase = () => (
         </Fab>
       </Box>
       <VStack space="xs">
-        <Text bold className="text-xs uppercase text-gray-600">
+        <Text bold className="text-xs text-gray-600 uppercase">
           Sizes
         </Text>
         <HStack space="md" className="items-center">
@@ -690,7 +690,7 @@ const SkeletonShowcase = () => {
         </Button>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Card Skeleton
           </Text>
           <Skeleton
@@ -705,7 +705,7 @@ const SkeletonShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Text Lines
           </Text>
           <SkeletonText
@@ -723,7 +723,7 @@ const SkeletonShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Avatar Skeleton
           </Text>
           <Skeleton
@@ -738,7 +738,7 @@ const SkeletonShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Combined Layout
           </Text>
           <HStack space="md" className="items-center">
@@ -818,7 +818,7 @@ const ToastShowcase = () => {
         </Text>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Solid Variants
           </Text>
           <HStack space="sm" className="flex-wrap">
@@ -866,7 +866,7 @@ const ToastShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Outline Variants
           </Text>
           <HStack space="sm" className="flex-wrap">
@@ -981,7 +981,7 @@ const DevToolsShowcase = () => {
         </Text>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Database
           </Text>
           <Button
@@ -998,7 +998,7 @@ const DevToolsShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Text bold className="text-xs uppercase text-gray-600">
+          <Text bold className="text-xs text-gray-600 uppercase">
             Auth & Storage
           </Text>
           <Button

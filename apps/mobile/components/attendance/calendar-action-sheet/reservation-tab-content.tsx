@@ -305,14 +305,14 @@ export function ReservationTabContent({
 
         {/* Tent Selector */}
         <VStack space="sm">
-          <Text className="text-sm font-medium text-typography-700">
+          <Text className="text-typography-700 text-sm font-medium">
             {t("reservation.form.tent")}
           </Text>
           <Pressable
             onPress={() => !isEditMode && setShowTentSelector(true)}
             disabled={isEditMode}
             className={cn(
-              "w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3",
+              "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
               isEditMode && "opacity-50",
               errors.tentId && "border-error-500",
             )}
@@ -339,12 +339,12 @@ export function ReservationTabContent({
             </HStack>
           </Pressable>
           {errors.tentId && (
-            <Text className="text-sm text-error-600">
+            <Text className="text-error-600 text-sm">
               {t("validation.tentRequired")}
             </Text>
           )}
           {isEditMode && (
-            <Text className="text-xs text-typography-400">
+            <Text className="text-typography-400 text-xs">
               {t("reservation.form.tentCannotBeChanged")}
             </Text>
           )}
@@ -382,7 +382,7 @@ export function ReservationTabContent({
 
         {/* Notes Field */}
         <VStack space="sm">
-          <Text className="text-sm font-medium text-typography-700">
+          <Text className="text-typography-700 text-sm font-medium">
             {t("reservation.form.note")}
           </Text>
           <Controller
@@ -413,10 +413,10 @@ export function ReservationTabContent({
           render={({ field: { value, onChange } }) => (
             <HStack className="items-center justify-between">
               <VStack>
-                <Text className="text-base font-medium text-typography-900">
+                <Text className="text-typography-900 text-base font-medium">
                   {t("reservation.form.visibleToGroups")}
                 </Text>
-                <Text className="text-sm text-typography-500">
+                <Text className="text-typography-500 text-sm">
                   {t("reservation.form.visibleToGroupsDescription")}
                 </Text>
               </VStack>
@@ -485,7 +485,7 @@ export function ReservationTabContent({
               {t("reservation.form.cancelConfirmTitle")}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mb-4 mt-3">
+          <AlertDialogBody className="mt-3 mb-4">
             <Text size="sm" className="text-typography-500">
               {t("reservation.form.cancelConfirmMessage")}
             </Text>

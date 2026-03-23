@@ -83,11 +83,11 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
   );
 
   return (
-    <View className="relative w-full rounded-lg bg-background-100 p-1">
+    <View className="bg-background-100 relative w-full rounded-lg p-1">
       {/* Animated sliding indicator */}
       <Animated.View
         style={animatedIndicatorStyle}
-        className="absolute left-1 top-1 h-[calc(100%-8px)] rounded-md bg-background-0 shadow-sm"
+        className="bg-background-0 absolute top-1 left-1 h-[calc(100%-8px)] rounded-md shadow-sm"
       />
 
       {/* Tab buttons */}

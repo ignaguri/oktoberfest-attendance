@@ -83,14 +83,14 @@ export function ReminderOffsetSelect({
   return (
     <VStack space="sm">
       {label && (
-        <Text className="text-sm font-medium text-typography-700">{label}</Text>
+        <Text className="text-typography-700 text-sm font-medium">{label}</Text>
       )}
 
       <Pressable
         onPress={() => !disabled && setIsOpen(true)}
         disabled={disabled}
         className={cn(
-          "w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3",
+          "border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3",
           disabled && "opacity-50",
         )}
         accessibilityRole="button"
@@ -100,7 +100,7 @@ export function ReminderOffsetSelect({
         <HStack className="items-center justify-between">
           <HStack space="sm" className="items-center">
             <Bell size={18} color={IconColors.muted} />
-            <Text className="text-base text-typography-900">
+            <Text className="text-typography-900 text-base">
               {selectedLabel}
             </Text>
           </HStack>
@@ -116,7 +116,7 @@ export function ReminderOffsetSelect({
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
 
-          <Text className="mb-4 text-center text-lg font-semibold text-typography-900">
+          <Text className="text-typography-900 mb-4 text-center text-lg font-semibold">
             {t("reservation.form.reminder")}
           </Text>
 
@@ -129,7 +129,7 @@ export function ReminderOffsetSelect({
               >
                 <ActionsheetItemText
                   className={
-                    option.value === value ? "font-medium text-primary-600" : ""
+                    option.value === value ? "text-primary-600 font-medium" : ""
                   }
                 >
                   {option.label}
