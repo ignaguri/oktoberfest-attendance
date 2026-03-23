@@ -45,6 +45,21 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
   } = await supabase.auth.getSession();
 
   if (session?.access_token) {
+    // Check if the token is expired or about to expire (within 60s)
+    const expiresAt = session.expires_at; // Unix timestamp in seconds
+    const now = Math.floor(Date.now() / 1000);
+
+    if (expiresAt && expiresAt - now < 60) {
+      // Token expired or about to expire, force refresh
+      const { data: refreshed } = await supabase.auth.refreshSession();
+      if (refreshed.session?.access_token) {
+        return {
+          Authorization: `Bearer ${refreshed.session.access_token}`,
+          "Content-Type": "application/json",
+        };
+      }
+    }
+
     return {
       Authorization: `Bearer ${session.access_token}`,
       "Content-Type": "application/json",

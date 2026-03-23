@@ -135,10 +135,21 @@ class Logger {
           return;
         }
 
+        // Flatten nested objects to avoid Sentry's shallow serialization showing "[Object]"
+        const flattenContext = (ctx?: LogContext): LogContext | undefined => {
+          if (!ctx) return undefined;
+          return Object.fromEntries(
+            Object.entries(ctx).map(([k, v]) => [
+              k,
+              typeof v === "object" && v !== null ? safeStringify(v) : v,
+            ]),
+          );
+        };
+
         if (error instanceof Error) {
           Sentry.captureException(error, {
             contexts: {
-              custom: context,
+              custom: flattenContext(context),
             },
             tags: {
               source: "logger",
@@ -148,7 +159,7 @@ class Logger {
           Sentry.captureMessage(message, {
             level: "error",
             contexts: {
-              custom: errorContext,
+              custom: flattenContext(errorContext),
             },
           });
         }
