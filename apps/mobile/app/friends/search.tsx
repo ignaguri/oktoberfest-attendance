@@ -58,8 +58,8 @@ export default function FriendSearchScreen() {
     !loading && debouncedQuery.length >= 1 && results?.length === 0;
 
   return (
-    <VStack className="bg-background-50 flex-1">
-      <VStack className="px-4 pt-4 pb-2">
+    <VStack className="flex-1 bg-background-50">
+      <VStack className="px-4 pb-2 pt-4">
         <Input size="lg" variant="rounded">
           <InputSlot className="pl-3">
             <InputIcon as={Search} color={IconColors.muted} />
@@ -115,7 +115,7 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
 
   return (
     <HStack
-      className="border-outline-100 items-center border-b py-3"
+      className="items-center border-b border-outline-100 py-3"
       space="md"
     >
       <Avatar size="md">
@@ -127,12 +127,12 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
 
       <VStack className="min-w-0 flex-1">
         {user.fullName ? (
-          <Text className="text-typography-900 font-semibold" numberOfLines={1}>
+          <Text className="font-semibold text-typography-900" numberOfLines={1}>
             {user.fullName}
           </Text>
         ) : null}
         {user.username ? (
-          <Text className="text-typography-500 text-sm" numberOfLines={1}>
+          <Text className="text-sm text-typography-500" numberOfLines={1}>
             @{user.username}
           </Text>
         ) : null}

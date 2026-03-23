@@ -249,17 +249,17 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
               <Text
-                className="text-typography-900 text-sm font-medium"
+                className="text-sm font-medium text-typography-900"
                 numberOfLines={1}
               >
                 {displayName}
               </Text>
               {getActivityIcon(activity_type, activity_data)}
             </HStack>
-            <Text className="text-typography-400 text-xs">{timeAgo}</Text>
+            <Text className="text-xs text-typography-400">{timeAgo}</Text>
           </HStack>
 
-          <Text className="text-typography-500 text-sm">{description}</Text>
+          <Text className="text-sm text-typography-500">{description}</Text>
 
           {/* Photo thumbnail for photo uploads */}
           {activity_type === "photo_upload" && fullPictureUrl && (

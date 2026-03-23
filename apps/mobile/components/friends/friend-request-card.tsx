@@ -67,11 +67,11 @@ export function FriendRequestCard({
           </Avatar>
 
           <VStack space="xs" className="flex-1">
-            <Text className="text-typography-900 text-base font-semibold">
+            <Text className="text-base font-semibold text-typography-900">
               {displayName}
             </Text>
             {profile.username && profile.fullName && (
-              <Text className="text-typography-500 text-sm">
+              <Text className="text-sm text-typography-500">
                 @{profile.username}
               </Text>
             )}

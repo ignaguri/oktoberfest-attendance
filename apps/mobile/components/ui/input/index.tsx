@@ -35,7 +35,7 @@ cssInterop(PrimitiveIcon, {
 });
 
 const inputStyle = tva({
-  base: "border-background-300 data-[focus=true]:border-primary-700 data-[hover=true]:border-outline-400 data-[disabled=true]:hover:border-background-300 data-[focus=true]:hover:border-primary-700 flex-row content-center items-center overflow-hidden data-[disabled=true]:opacity-40",
+  base: "flex-row content-center items-center overflow-hidden border-background-300 data-[focus=true]:border-primary-700 data-[hover=true]:border-outline-400 data-[disabled=true]:opacity-40 data-[disabled=true]:hover:border-background-300 data-[focus=true]:hover:border-primary-700",
 
   variants: {
     size: {
@@ -47,19 +47,19 @@ const inputStyle = tva({
 
     variant: {
       underlined:
-        "data-[invalid=true]:border-error-700 data-[invalid=true]:data-[focus=true]:border-error-700 data-[invalid=true]:data-[disabled=true]:hover:border-error-700 data-[invalid=true]:data-[focus=true]:hover:border-error-700 data-[invalid=true]:hover:border-error-700 rounded-none border-b data-[invalid=true]:border-b-2",
+        "rounded-none border-b data-[invalid=true]:border-b-2 data-[invalid=true]:border-error-700 data-[invalid=true]:data-[focus=true]:border-error-700 data-[invalid=true]:data-[disabled=true]:hover:border-error-700 data-[invalid=true]:data-[focus=true]:hover:border-error-700 data-[invalid=true]:hover:border-error-700",
 
       outline:
-        "data-[invalid=true]:border-error-700 data-[invalid=true]:data-[focus=true]:border-error-700 data-[invalid=true]:data-[disabled=true]:hover:border-error-700 data-[invalid=true]:data-[focus=true]:hover:border-error-700 data-[invalid=true]:hover:border-error-700 data-[focus=true]:web:ring-1 data-[invalid=true]:web:ring-1 data-[focus=true]:web:ring-inset data-[invalid=true]:web:ring-inset data-[focus=true]:web:ring-indicator-primary data-[invalid=true]:web:ring-indicator-error data-[invalid=true]:data-[disabled=true]:hover:web:ring-1 data-[invalid=true]:data-[focus=true]:hover:web:ring-1 data-[invalid=true]:data-[disabled=true]:hover:web:ring-inset data-[invalid=true]:data-[focus=true]:hover:web:ring-inset data-[invalid=true]:data-[disabled=true]:hover:web:ring-indicator-error data-[invalid=true]:data-[focus=true]:hover:web:ring-indicator-error rounded border",
+        "rounded border data-[invalid=true]:border-error-700 data-[invalid=true]:data-[focus=true]:border-error-700 data-[invalid=true]:data-[disabled=true]:hover:border-error-700 data-[invalid=true]:data-[focus=true]:hover:border-error-700 data-[invalid=true]:hover:border-error-700 data-[focus=true]:web:ring-1 data-[invalid=true]:web:ring-1 data-[focus=true]:web:ring-inset data-[invalid=true]:web:ring-inset data-[focus=true]:web:ring-indicator-primary data-[invalid=true]:web:ring-indicator-error data-[invalid=true]:data-[disabled=true]:hover:web:ring-1 data-[invalid=true]:data-[focus=true]:hover:web:ring-1 data-[invalid=true]:data-[disabled=true]:hover:web:ring-inset data-[invalid=true]:data-[focus=true]:hover:web:ring-inset data-[invalid=true]:data-[disabled=true]:hover:web:ring-indicator-error data-[invalid=true]:data-[focus=true]:hover:web:ring-indicator-error",
 
       rounded:
-        "data-[invalid=true]:border-error-700 data-[invalid=true]:data-[focus=true]:border-error-700 data-[invalid=true]:data-[disabled=true]:hover:border-error-700 data-[invalid=true]:data-[focus=true]:hover:border-error-700 data-[invalid=true]:hover:border-error-700 data-[focus=true]:web:ring-1 data-[invalid=true]:web:ring-1 data-[focus=true]:web:ring-inset data-[invalid=true]:web:ring-inset data-[focus=true]:web:ring-indicator-primary data-[invalid=true]:web:ring-indicator-error data-[invalid=true]:data-[disabled=true]:hover:web:ring-1 data-[invalid=true]:data-[focus=true]:hover:web:ring-1 data-[invalid=true]:data-[disabled=true]:hover:web:ring-inset data-[invalid=true]:data-[focus=true]:hover:web:ring-inset data-[invalid=true]:data-[disabled=true]:hover:web:ring-indicator-error data-[invalid=true]:data-[focus=true]:hover:web:ring-indicator-error rounded-full border",
+        "rounded-full border data-[invalid=true]:border-error-700 data-[invalid=true]:data-[focus=true]:border-error-700 data-[invalid=true]:data-[disabled=true]:hover:border-error-700 data-[invalid=true]:data-[focus=true]:hover:border-error-700 data-[invalid=true]:hover:border-error-700 data-[focus=true]:web:ring-1 data-[invalid=true]:web:ring-1 data-[focus=true]:web:ring-inset data-[invalid=true]:web:ring-inset data-[focus=true]:web:ring-indicator-primary data-[invalid=true]:web:ring-indicator-error data-[invalid=true]:data-[disabled=true]:hover:web:ring-1 data-[invalid=true]:data-[focus=true]:hover:web:ring-1 data-[invalid=true]:data-[disabled=true]:hover:web:ring-inset data-[invalid=true]:data-[focus=true]:hover:web:ring-inset data-[invalid=true]:data-[disabled=true]:hover:web:ring-indicator-error data-[invalid=true]:data-[focus=true]:hover:web:ring-indicator-error",
     },
   },
 });
 
 const inputIconStyle = tva({
-  base: "text-typography-400 items-center justify-center fill-none",
+  base: "items-center justify-center fill-none text-typography-400",
   parentVariants: {
     size: {
       "2xs": "h-3 w-3",
@@ -73,17 +73,17 @@ const inputIconStyle = tva({
 });
 
 const inputSlotStyle = tva({
-  base: "web:disabled:cursor-not-allowed items-center justify-center",
+  base: "items-center justify-center web:disabled:cursor-not-allowed",
 });
 
 const inputFieldStyle = tva({
-  base: "ios:leading-[0px] text-typography-900 placeholder:text-typography-500 web:cursor-text web:data-[disabled=true]:cursor-not-allowed h-full flex-1 px-3 py-0",
+  base: "ios:leading-[0px] h-full flex-1 px-3 py-0 text-typography-900 placeholder:text-typography-500 web:cursor-text web:data-[disabled=true]:cursor-not-allowed",
 
   parentVariants: {
     variant: {
-      underlined: "web:outline-none web:outline-0 px-0",
+      underlined: "px-0 web:outline-none web:outline-0",
       outline: "web:outline-none web:outline-0",
-      rounded: "web:outline-none web:outline-0 px-4",
+      rounded: "px-4 web:outline-none web:outline-0",
     },
 
     size: {

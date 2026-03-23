@@ -44,7 +44,7 @@ cssInterop(PrimitiveIcon, {
 });
 
 const buttonStyle = tva({
-  base: "group/button bg-primary-500 data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 flex-row items-center justify-center gap-2 rounded data-[disabled=true]:opacity-40",
+  base: "group/button flex-row items-center justify-center gap-2 rounded bg-primary-500 data-[disabled=true]:opacity-40 data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2",
   variants: {
     action: {
       primary:
@@ -58,15 +58,15 @@ const buttonStyle = tva({
       negative:
         "border-error-300 bg-error-500 data-[active=true]:border-error-500 data-[hover=true]:border-error-400 data-[active=true]:bg-error-700 data-[hover=true]:bg-error-600 data-[focus-visible=true]:web:ring-indicator-info",
       default:
-        "data-[hover=true]:bg-background-50 bg-transparent data-[active=true]:bg-transparent",
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     variant: {
       solid: "",
       outline:
-        "data-[hover=true]:bg-background-50 border bg-transparent data-[active=true]:bg-transparent",
+        "border bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
       link: "bg-transparent px-0 data-[active=true]:bg-transparent data-[hover=true]:bg-transparent",
       ghost:
-        "data-[active=true]:bg-background-200 data-[hover=true]:bg-background-100 bg-transparent",
+        "bg-transparent data-[active=true]:bg-background-200 data-[hover=true]:bg-background-100",
     },
 
     size: {
@@ -107,25 +107,25 @@ const buttonStyle = tva({
       action: "primary",
       variant: "outline",
       class:
-        "data-[hover=true]:bg-background-50 bg-transparent data-[active=true]:bg-transparent",
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "secondary",
       variant: "outline",
       class:
-        "data-[hover=true]:bg-background-50 bg-transparent data-[active=true]:bg-transparent",
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "positive",
       variant: "outline",
       class:
-        "data-[hover=true]:bg-background-50 bg-transparent data-[active=true]:bg-transparent",
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "negative",
       variant: "outline",
       class:
-        "data-[hover=true]:bg-background-50 bg-transparent data-[active=true]:bg-transparent",
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     // primaryDark compound variants
     {
@@ -138,44 +138,44 @@ const buttonStyle = tva({
       action: "primaryDark",
       variant: "outline",
       class:
-        "data-[hover=true]:bg-background-50 bg-transparent data-[active=true]:bg-transparent",
+        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "primaryDark",
       variant: "ghost",
       class:
-        "data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100 bg-transparent",
+        "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
     },
     // ghost variant compound variants for all actions
     {
       action: "primary",
       variant: "ghost",
       class:
-        "data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100 bg-transparent",
+        "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
     },
     {
       action: "secondary",
       variant: "ghost",
       class:
-        "data-[active=true]:bg-secondary-200 data-[hover=true]:bg-secondary-100 bg-transparent",
+        "bg-transparent data-[active=true]:bg-secondary-200 data-[hover=true]:bg-secondary-100",
     },
     {
       action: "positive",
       variant: "ghost",
       class:
-        "data-[active=true]:bg-success-200 data-[hover=true]:bg-success-100 bg-transparent",
+        "bg-transparent data-[active=true]:bg-success-200 data-[hover=true]:bg-success-100",
     },
     {
       action: "negative",
       variant: "ghost",
       class:
-        "data-[active=true]:bg-error-200 data-[hover=true]:bg-error-100 bg-transparent",
+        "bg-transparent data-[active=true]:bg-error-200 data-[hover=true]:bg-error-100",
     },
   ],
 });
 
 const buttonTextStyle = tva({
-  base: "text-typography-0 web:select-none font-semibold",
+  base: "font-semibold text-typography-0 web:select-none",
   parentVariants: {
     action: {
       primary:

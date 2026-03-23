@@ -99,7 +99,7 @@ export function GroupSelector({
     return (
       <HStack className="items-center justify-center py-4">
         <Spinner size="small" color={Colors.primary[500]} />
-        <Text className="text-typography-500 ml-2 text-sm">
+        <Text className="ml-2 text-sm text-typography-500">
           {t("common.loading")}
         </Text>
       </HStack>
@@ -110,7 +110,7 @@ export function GroupSelector({
     return (
       <HStack space="sm" className="items-center py-3">
         <Users size={16} color={IconColors.muted} />
-        <Text className="text-typography-500 text-sm">
+        <Text className="text-sm text-typography-500">
           {t("location.groups.noGroups")}
         </Text>
       </HStack>
@@ -124,8 +124,8 @@ export function GroupSelector({
         onPress={() => handleShareWithAllToggle(!shareWithAll)}
         className="active:opacity-80"
       >
-        <HStack className="bg-background-0 items-center justify-between rounded-lg p-2">
-          <Text className="text-typography-700 text-sm">
+        <HStack className="items-center justify-between rounded-lg bg-background-0 p-2">
+          <Text className="text-sm text-typography-700">
             {t("location.groups.shareWithAll")}
           </Text>
           <Switch
@@ -142,7 +142,7 @@ export function GroupSelector({
 
       {/* Divider with text */}
       <HStack className="items-center py-1">
-        <Text className="text-typography-400 flex-1 text-center text-xs">
+        <Text className="flex-1 text-center text-xs text-typography-400">
           {t("location.groups.orSelectSpecific")}
         </Text>
       </HStack>
@@ -165,7 +165,7 @@ export function GroupSelector({
                 <HStack
                   space="sm"
                   className={cn(
-                    "bg-background-0 items-center rounded-lg p-2",
+                    "items-center rounded-lg bg-background-0 p-2",
                     shareWithAll && "opacity-50",
                   )}
                 >
@@ -183,14 +183,14 @@ export function GroupSelector({
                       className={cn(
                         "flex-1 text-sm",
                         isSelected && !shareWithAll
-                          ? "text-primary-700 font-medium"
+                          ? "font-medium text-primary-700"
                           : "text-typography-700",
                       )}
                     >
                       {group.name}
                     </CheckboxLabel>
                   </Checkbox>
-                  <Text className="text-typography-400 text-xs">
+                  <Text className="text-xs text-typography-400">
                     {group.memberCount || 0}
                   </Text>
                 </HStack>

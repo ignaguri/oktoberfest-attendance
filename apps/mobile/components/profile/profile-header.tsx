@@ -78,7 +78,7 @@ export function ProfileHeader({
                 })}
               </AvatarFallbackText>
             )}
-            <AvatarBadge className="bg-primary-500 items-center justify-center border-white">
+            <AvatarBadge className="items-center justify-center border-white bg-primary-500">
               {isAvatarUploading ? (
                 <Spinner size="small" color={IconColors.white} />
               ) : (
@@ -90,11 +90,11 @@ export function ProfileHeader({
 
         {!isEditing ? (
           <VStack space="sm" className="items-center">
-            <Text className="text-typography-900 text-xl font-bold">
+            <Text className="text-xl font-bold text-typography-900">
               {profile?.full_name || profile?.username || "User"}
             </Text>
             {profile?.username && profile?.full_name && (
-              <Text className="text-typography-600 text-sm">
+              <Text className="text-sm text-typography-600">
                 @{profile.username}
               </Text>
             )}
@@ -113,7 +113,7 @@ export function ProfileHeader({
           <VStack space="lg" className="w-full">
             {/* Email (read-only) - First position */}
             <VStack space="xs">
-              <Text className="text-typography-700 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-700">
                 {t("profile.email")}
               </Text>
               <Input variant="outline" size="md" isDisabled>
@@ -123,7 +123,7 @@ export function ProfileHeader({
 
             {/* Username Field */}
             <VStack space="xs">
-              <Text className="text-typography-700 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-700">
                 {t("profile.username")}
               </Text>
               <Controller
@@ -147,7 +147,7 @@ export function ProfileHeader({
                 )}
               />
               {errors.username && (
-                <Text className="text-error-600 mt-1 text-sm">
+                <Text className="mt-1 text-sm text-error-600">
                   {errors.username.message}
                 </Text>
               )}
@@ -155,7 +155,7 @@ export function ProfileHeader({
 
             {/* Full Name Field */}
             <VStack space="xs">
-              <Text className="text-typography-700 text-sm font-medium">
+              <Text className="text-sm font-medium text-typography-700">
                 {t("profile.fullName")}
               </Text>
               <Controller

@@ -138,7 +138,7 @@ export default function GroupGalleryScreen() {
   // Loading state
   if (isLoading && !galleryData) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Stack.Screen
           options={{
             title: t("groups.gallery.title"),
@@ -152,7 +152,7 @@ export default function GroupGalleryScreen() {
   // Error state
   if (error) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Stack.Screen
           options={{
             title: t("groups.gallery.title"),
@@ -176,7 +176,7 @@ export default function GroupGalleryScreen() {
       />
 
       <ScrollView
-        className="bg-background-50 flex-1"
+        className="flex-1 bg-background-50"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -193,10 +193,10 @@ export default function GroupGalleryScreen() {
               className="items-center bg-white p-8"
             >
               <Camera size={48} color={IconColors.disabled} />
-              <Text className="text-typography-700 mt-4 text-center text-lg font-medium">
+              <Text className="mt-4 text-center text-lg font-medium text-typography-700">
                 {t("groups.gallery.empty.title")}
               </Text>
-              <Text className="text-typography-500 mt-2 text-center text-sm">
+              <Text className="mt-2 text-center text-sm text-typography-500">
                 {t("groups.gallery.empty.description")}
               </Text>
             </Card>
@@ -206,7 +206,7 @@ export default function GroupGalleryScreen() {
           {groupedGallery.map((dayGroup) => (
             <VStack key={dayGroup.date} space="md">
               {/* Date Header */}
-              <Text className="text-typography-900 text-lg font-semibold">
+              <Text className="text-lg font-semibold text-typography-900">
                 {dayGroup.formattedDate}
               </Text>
 
@@ -230,7 +230,7 @@ export default function GroupGalleryScreen() {
                         </AvatarFallbackText>
                       )}
                     </Avatar>
-                    <Text className="text-typography-700 text-sm font-medium">
+                    <Text className="text-sm font-medium text-typography-700">
                       {userGroup.username ||
                         userGroup.fullName ||
                         t("common.unknown")}

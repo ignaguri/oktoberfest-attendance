@@ -96,7 +96,7 @@ export function FestivalStatus() {
     <Card
       size="md"
       variant="filled"
-      className={cn(config.bgColor, "border-outline-200 border")}
+      className={cn(config.bgColor, "border border-outline-200")}
     >
       <HStack space="sm" className="items-center justify-center">
         {config.icon}
@@ -104,7 +104,7 @@ export function FestivalStatus() {
           {message}
         </Text>
         <Text className="text-typography-400">•</Text>
-        <Text className="text-typography-700 text-base font-bold">
+        <Text className="text-base font-bold text-typography-700">
           {currentFestival.name}
         </Text>
       </HStack>

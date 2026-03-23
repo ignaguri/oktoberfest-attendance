@@ -239,7 +239,7 @@ export default function AttendanceScreen() {
   // Loading state - festival or initial data load
   if (festivalLoading || ((isLoading || reservationsLoading) && !attendances)) {
     return (
-      <View className="bg-background-50 flex-1">
+      <View className="flex-1 bg-background-50">
         <AttendanceSkeleton />
       </View>
     );
@@ -248,8 +248,8 @@ export default function AttendanceScreen() {
   // No festival (rare - API returned no festivals)
   if (!currentFestival) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center p-6">
-        <Text className="text-typography-500 text-center">
+      <View className="flex-1 items-center justify-center bg-background-50 p-6">
+        <Text className="text-center text-typography-500">
           {t("attendance.noFestival")}
         </Text>
       </View>
@@ -259,7 +259,7 @@ export default function AttendanceScreen() {
   // Error state
   if (attendancesError) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ErrorState error={attendancesError} onRetry={refetch} />
       </View>
     );
@@ -268,7 +268,7 @@ export default function AttendanceScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="bg-background-50 flex-1"
+        className="flex-1 bg-background-50"
         refreshControl={
           <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
         }
@@ -287,33 +287,33 @@ export default function AttendanceScreen() {
           {/* Stats Summary */}
           {attendances &&
             (attendances as AttendanceWithTotals[]).length > 0 && (
-              <View className="bg-background-0 mt-4 rounded-xl p-4">
-                <Text className="text-typography-700 mb-3 text-sm font-medium">
+              <View className="mt-4 rounded-xl bg-background-0 p-4">
+                <Text className="mb-3 text-sm font-medium text-typography-700">
                   {t("attendance.summary.title")}
                 </Text>
                 {/* Row 1: Days, Drinks, Avg */}
                 <View className="flex-row justify-around">
                   <View className="items-center">
-                    <Text className="text-primary-500 text-2xl font-bold">
+                    <Text className="text-2xl font-bold text-primary-500">
                       {(attendances as AttendanceWithTotals[]).length}
                     </Text>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("attendance.summary.days")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-primary-500 text-2xl font-bold">
+                    <Text className="text-2xl font-bold text-primary-500">
                       {(attendances as AttendanceWithTotals[]).reduce(
                         (sum, a) => sum + a.drinkCount,
                         0,
                       )}
                     </Text>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("attendance.summary.drinks")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-primary-500 text-2xl font-bold">
+                    <Text className="text-2xl font-bold text-primary-500">
                       {(
                         (attendances as AttendanceWithTotals[]).reduce(
                           (sum, a) => sum + a.drinkCount,
@@ -321,34 +321,34 @@ export default function AttendanceScreen() {
                         ) / (attendances as AttendanceWithTotals[]).length
                       ).toFixed(1)}
                     </Text>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("attendance.summary.avgPerDay")}
                     </Text>
                   </View>
                 </View>
                 {/* Row 2: Spending Breakdown */}
-                <View className="border-background-200 mt-4 flex-row justify-around border-t pt-4">
+                <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
                   <View className="items-center">
-                    <Text className="text-primary-500 text-2xl font-bold">
+                    <Text className="text-2xl font-bold text-primary-500">
                       €{(spendingTotals.spent / 100).toFixed(0)}
                     </Text>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("attendance.summary.spent")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-typography-700 text-2xl font-bold">
+                    <Text className="text-2xl font-bold text-typography-700">
                       €{(spendingTotals.base / 100).toFixed(0)}
                     </Text>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("attendance.summary.baseCost")}
                     </Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-success-500 text-2xl font-bold">
+                    <Text className="text-2xl font-bold text-success-500">
                       €{(spendingTotals.tips / 100).toFixed(0)}
                     </Text>
-                    <Text className="text-typography-500 text-xs">
+                    <Text className="text-xs text-typography-500">
                       {t("attendance.summary.tips")}
                     </Text>
                   </View>
@@ -401,7 +401,7 @@ export default function AttendanceScreen() {
               {dialog.title}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mt-3 mb-4">
+          <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
               {dialog.message}
             </Text>

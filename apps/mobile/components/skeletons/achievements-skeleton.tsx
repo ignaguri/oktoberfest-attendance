@@ -62,7 +62,7 @@ export function AchievementsSkeleton() {
 
                   {/* Progress */}
                   <VStack className="w-24" space="xs">
-                    <View className="bg-background-200 h-2 w-full rounded-full" />
+                    <View className="h-2 w-full rounded-full bg-background-200" />
                     <Skeleton
                       variant="rounded"
                       className="h-3 w-8 self-center"

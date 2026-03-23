@@ -27,10 +27,10 @@ export function EmptyGroupsState({
           <Users size={64} color={IconColors.disabled} />
 
           <VStack space="sm" className="items-center">
-            <Heading size="lg" className="text-typography-900 text-center">
+            <Heading size="lg" className="text-center text-typography-900">
               {t("groups.empty.title")}
             </Heading>
-            <Text className="text-typography-500 text-center">
+            <Text className="text-center text-typography-500">
               {t("groups.empty.description")}
             </Text>
           </VStack>

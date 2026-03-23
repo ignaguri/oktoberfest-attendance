@@ -76,12 +76,12 @@ export function AboutSection() {
 
   return (
     <Card size="md" variant="elevated">
-      <Text className="text-typography-900 mb-2 text-lg font-semibold">
+      <Text className="mb-2 text-lg font-semibold text-typography-900">
         {t("profile.about.title")}
       </Text>
 
       <VStack>
-        <View className="border-outline-100 border-b">
+        <View className="border-b border-outline-100">
           <Pressable
             className="flex-row items-center justify-between py-3"
             onPress={() => router.push("/settings/whats-new")}
@@ -103,7 +103,7 @@ export function AboutSection() {
             key={link.key}
             className={
               index < LINKS.length - 1
-                ? "border-outline-100 border-b"
+                ? "border-b border-outline-100"
                 : undefined
             }
           >

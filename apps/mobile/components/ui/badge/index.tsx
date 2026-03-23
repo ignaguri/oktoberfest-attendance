@@ -39,7 +39,7 @@ const badgeStyle = tva({
 });
 
 const badgeTextStyle = tva({
-  base: "font-body text-typography-700 font-normal tracking-normal uppercase",
+  base: "font-body font-normal uppercase tracking-normal text-typography-700",
 
   parentVariants: {
     action: {

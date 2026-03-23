@@ -240,7 +240,7 @@ export default function GroupSettingsScreen() {
   // Loading state
   if (isLoading && !group) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Spinner size="large" />
       </View>
     );
@@ -249,7 +249,7 @@ export default function GroupSettingsScreen() {
   // Error state
   if (groupError) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ErrorState error={groupError} onRetry={refetchGroup} />
       </View>
     );
@@ -258,9 +258,9 @@ export default function GroupSettingsScreen() {
   // No group found
   if (!group) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center p-6">
+      <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <SettingsIcon size={48} color={IconColors.disabled} />
-        <Text className="text-typography-500 mt-4 text-center">
+        <Text className="mt-4 text-center text-typography-500">
           {t("groups.settings.notFound")}
         </Text>
         <Button
@@ -282,7 +282,7 @@ export default function GroupSettingsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
-        className="bg-background-50 flex-1"
+        className="flex-1 bg-background-50"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching ?? false}
@@ -297,14 +297,14 @@ export default function GroupSettingsScreen() {
               <VStack space="lg">
                 <HStack space="sm" className="items-center">
                   <SettingsIcon size={18} color={IconColors.primary} />
-                  <Text className="text-typography-900 font-medium">
+                  <Text className="font-medium text-typography-900">
                     {t("groups.settings.details")}
                   </Text>
                 </HStack>
 
                 {/* Group Name */}
                 <VStack space="sm">
-                  <Text className="text-typography-700 text-sm font-medium">
+                  <Text className="text-sm font-medium text-typography-700">
                     {t("groups.create.nameLabel")}
                   </Text>
                   <Controller
@@ -322,7 +322,7 @@ export default function GroupSettingsScreen() {
                     )}
                   />
                   {errors.name && (
-                    <Text className="text-error-600 text-sm">
+                    <Text className="text-sm text-error-600">
                       {errors.name.message}
                     </Text>
                   )}
@@ -330,7 +330,7 @@ export default function GroupSettingsScreen() {
 
                 {/* Description */}
                 <VStack space="sm">
-                  <Text className="text-typography-700 text-sm font-medium">
+                  <Text className="text-sm font-medium text-typography-700">
                     {t("groups.settings.description")}
                   </Text>
                   <Controller
@@ -351,7 +351,7 @@ export default function GroupSettingsScreen() {
                     )}
                   />
                   {errors.description && (
-                    <Text className="text-error-600 text-sm">
+                    <Text className="text-sm text-error-600">
                       {errors.description.message}
                     </Text>
                   )}
@@ -359,7 +359,7 @@ export default function GroupSettingsScreen() {
 
                 {/* Winning Criteria */}
                 <VStack space="sm">
-                  <Text className="text-typography-700 text-sm font-medium">
+                  <Text className="text-sm font-medium text-typography-700">
                     {t("groups.create.criteriaLabel")}
                   </Text>
                   <Controller
@@ -440,10 +440,10 @@ export default function GroupSettingsScreen() {
           <VStack space="sm">
             <HStack space="sm" className="items-center">
               <Users size={18} color={IconColors.default} />
-              <Text className="text-typography-900 font-medium">
+              <Text className="font-medium text-typography-900">
                 {t("groups.settings.members")}
               </Text>
-              <Text className="text-typography-500 text-sm">
+              <Text className="text-sm text-typography-500">
                 ({(members as GroupMember[])?.length || 0})
               </Text>
               {isLoadingMembers && <Spinner size="small" />}
@@ -462,10 +462,10 @@ export default function GroupSettingsScreen() {
           {/* Leave Group Section */}
           <Card variant="outline" size="md" className="border-error-200">
             <VStack space="sm">
-              <Text className="text-error-600 font-medium">
+              <Text className="font-medium text-error-600">
                 {t("groups.settings.dangerZone")}
               </Text>
-              <Text className="text-typography-500 text-sm">
+              <Text className="text-sm text-typography-500">
                 {isCreator
                   ? t("groups.settings.leaveCreatorWarning")
                   : t("groups.settings.leaveWarning")}
@@ -507,7 +507,7 @@ export default function GroupSettingsScreen() {
               {dialog.title}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mt-3 mb-4">
+          <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
               {dialog.message}
             </Text>

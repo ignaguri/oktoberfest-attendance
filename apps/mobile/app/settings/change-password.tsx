@@ -77,7 +77,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="bg-background-50 flex-1"
+      className="flex-1 bg-background-50"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -99,7 +99,7 @@ export default function ChangePasswordScreen() {
           <View className="rounded-2xl bg-white p-4 shadow-sm">
             {/* New Password */}
             <View className="mb-4">
-              <Text className="text-typography-700 mb-1 text-sm font-medium">
+              <Text className="mb-1 text-sm font-medium text-typography-700">
                 {t("profile.changePassword.newPassword")}
               </Text>
               <Controller
@@ -139,7 +139,7 @@ export default function ChangePasswordScreen() {
                 )}
               />
               {errors.password && (
-                <Text className="text-error-600 mt-1 text-sm">
+                <Text className="mt-1 text-sm text-error-600">
                   {errors.password.message}
                 </Text>
               )}
@@ -147,7 +147,7 @@ export default function ChangePasswordScreen() {
 
             {/* Confirm Password */}
             <View className="mb-6">
-              <Text className="text-typography-700 mb-1 text-sm font-medium">
+              <Text className="mb-1 text-sm font-medium text-typography-700">
                 {t("profile.changePassword.confirmPassword")}
               </Text>
               <Controller
@@ -189,7 +189,7 @@ export default function ChangePasswordScreen() {
                 )}
               />
               {errors.confirmPassword && (
-                <Text className="text-error-600 mt-1 text-sm">
+                <Text className="mt-1 text-sm text-error-600">
                   {errors.confirmPassword.message}
                 </Text>
               )}

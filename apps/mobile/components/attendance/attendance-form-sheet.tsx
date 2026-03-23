@@ -477,7 +477,7 @@ export function AttendanceFormSheet({
 
           {/* Header */}
           <HStack className="mb-4 w-full items-center justify-between px-2">
-            <Text className="text-typography-900 text-lg font-semibold">
+            <Text className="text-lg font-semibold text-typography-900">
               {isEditMode
                 ? t("attendance.form.editTitle")
                 : t("attendance.form.addTitle")}
@@ -491,16 +491,16 @@ export function AttendanceFormSheet({
             <VStack space="xl" className="px-2 pb-4">
               {/* Date Display */}
               <VStack space="sm">
-                <Text className="text-typography-700 text-sm font-medium">
+                <Text className="text-sm font-medium text-typography-700">
                   {t("common.labels.date")}
                 </Text>
                 <HStack space="lg" className="items-center justify-between">
                   <HStack
                     space="sm"
-                    className="bg-background-100 flex-1 items-center rounded-lg px-4 py-3"
+                    className="flex-1 items-center rounded-lg bg-background-100 px-4 py-3"
                   >
                     <Calendar size={18} color={IconColors.muted} />
-                    <Text className="text-typography-700 text-base">
+                    <Text className="text-base text-typography-700">
                       {formattedDate}
                     </Text>
                   </HStack>
@@ -521,7 +521,7 @@ export function AttendanceFormSheet({
 
               {/* Drink Type Picker & Stepper */}
               <VStack space="md">
-                <Text className="text-typography-700 text-center text-sm font-medium">
+                <Text className="text-center text-sm font-medium text-typography-700">
                   {t("attendance.howManyDrinks")}
                 </Text>
 
@@ -543,12 +543,12 @@ export function AttendanceFormSheet({
                 />
 
                 {/* Total drinks - simple number */}
-                <Text className="text-typography-500 text-center text-sm">
+                <Text className="text-center text-sm text-typography-500">
                   {t("attendance.totalDrinks")}: {totalLocalDrinks}
                 </Text>
                 {/* Validation error for drinks */}
                 {errors.amount && (
-                  <Text className="text-error-600 text-center text-sm">
+                  <Text className="text-center text-sm text-error-600">
                     {t(errors.amount.message || "validation.tent.required")}
                   </Text>
                 )}
@@ -556,12 +556,12 @@ export function AttendanceFormSheet({
 
               {/* Tent Selector */}
               <VStack space="sm">
-                <Text className="text-typography-700 text-sm font-medium">
+                <Text className="text-sm font-medium text-typography-700">
                   {t("attendance.table.visitedTents")}
                 </Text>
                 <Pressable
                   onPress={() => setShowTentSelector(true)}
-                  className="border-background-300 bg-background-0 w-full rounded-lg border px-4 py-3"
+                  className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
                 >
                   {combinedTentDisplay.length > 0 ? (
                     <HStack className="flex-wrap gap-2">
@@ -581,13 +581,13 @@ export function AttendanceFormSheet({
                       ))}
                     </HStack>
                   ) : (
-                    <Text className="text-typography-400 text-base">
+                    <Text className="text-base text-typography-400">
                       {t("attendance.form.selectTents")}
                     </Text>
                   )}
                 </Pressable>
                 {errors.tents && (
-                  <Text className="text-error-600 text-sm">
+                  <Text className="text-sm text-error-600">
                     {t(errors.tents.message || "validation.required")}
                   </Text>
                 )}
@@ -656,7 +656,7 @@ export function AttendanceFormSheet({
               {t("attendance.form.deleteConfirmTitle")}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mt-3 mb-4">
+          <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
               {t("attendance.form.deleteConfirmMessage")}
             </Text>

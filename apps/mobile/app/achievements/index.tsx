@@ -73,7 +73,7 @@ export default function AchievementsScreen() {
   // Loading state (initial or festival loading)
   if (festivalLoading || (loading && achievements.length === 0)) {
     return (
-      <ScrollView className="bg-background-50 flex-1">
+      <ScrollView className="flex-1 bg-background-50">
         <AchievementsSkeleton />
       </ScrollView>
     );
@@ -82,7 +82,7 @@ export default function AchievementsScreen() {
   // No festival selected
   if (!currentFestival) {
     return (
-      <ScrollView className="bg-background-50 flex-1">
+      <ScrollView className="flex-1 bg-background-50">
         <VStack space="md" className="p-4">
           <Card
             variant="outline"
@@ -90,7 +90,7 @@ export default function AchievementsScreen() {
             className="items-center bg-white p-6"
           >
             <Award size={48} color={IconColors.disabled} />
-            <Text className="text-typography-500 mt-2 text-center">
+            <Text className="mt-2 text-center text-typography-500">
               {t("achievements.noFestival")}
             </Text>
           </Card>
@@ -103,7 +103,7 @@ export default function AchievementsScreen() {
   if (error && achievements.length === 0) {
     return (
       <ScrollView
-        className="bg-background-50 flex-1"
+        className="flex-1 bg-background-50"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
@@ -120,10 +120,10 @@ export default function AchievementsScreen() {
             className="items-center bg-white p-6"
           >
             <Award size={48} color={IconColors.error} />
-            <Text className="text-error-600 mt-2 text-center">
+            <Text className="mt-2 text-center text-error-600">
               {t("achievements.error")}
             </Text>
-            <Text className="text-typography-400 mt-1 text-center text-sm">
+            <Text className="mt-1 text-center text-sm text-typography-400">
               {t("common.actions.pullToRefresh")}
             </Text>
           </Card>
@@ -134,7 +134,7 @@ export default function AchievementsScreen() {
 
   return (
     <ScrollView
-      className="bg-background-50 flex-1"
+      className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl
           refreshing={isRefetching}
@@ -191,7 +191,7 @@ export default function AchievementsScreen() {
             className="items-center bg-white p-6"
           >
             <Award size={48} color={IconColors.muted} />
-            <Text className="text-typography-500 mt-2 text-center">
+            <Text className="mt-2 text-center text-typography-500">
               {t("achievements.empty")}
             </Text>
           </Card>

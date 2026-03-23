@@ -227,7 +227,7 @@ export default function ProfileScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <ScrollView className="bg-background-50 flex-1">
+      <ScrollView className="flex-1 bg-background-50">
         <ProfileSkeleton />
       </ScrollView>
     );
@@ -236,7 +236,7 @@ export default function ProfileScreen() {
   // Error state
   if (profileError) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <ErrorState error={profileError} onRetry={syncAndRefresh} />
       </View>
     );
@@ -244,7 +244,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      className="bg-background-50 flex-1"
+      className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
       }
@@ -401,7 +401,7 @@ export default function ProfileScreen() {
         />
 
         {/* App Version */}
-        <Text className="text-typography-400 text-center text-xs">
+        <Text className="text-center text-xs text-typography-400">
           v{Application.nativeApplicationVersion} (
           {Application.nativeBuildVersion})
         </Text>
@@ -431,7 +431,7 @@ export default function ProfileScreen() {
               {dialog.title}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mt-3 mb-4">
+          <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
               {dialog.message}
             </Text>

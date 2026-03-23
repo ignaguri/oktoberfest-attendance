@@ -40,7 +40,7 @@ export function GroupMembersList({
     return (
       <Card variant="outline" size="md" className="items-center p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="text-typography-500 mt-2 text-center">
+        <Text className="mt-2 text-center text-typography-500">
           {t("groups.members.empty")}
         </Text>
       </Card>
@@ -100,18 +100,18 @@ export function GroupMembersList({
                       <Crown size={14} color={IconColors.primary} />
                     )}
                     {isCurrentUser && (
-                      <Text className="text-typography-400 text-xs">
+                      <Text className="text-xs text-typography-400">
                         {t("groups.members.you")}
                       </Text>
                     )}
                   </HStack>
                   {member.username && member.fullName && (
-                    <Text className="text-typography-400 text-xs">
+                    <Text className="text-xs text-typography-400">
                       @{member.username}
                     </Text>
                   )}
                   {joinedDate && (
-                    <Text className="text-typography-400 text-xs">
+                    <Text className="text-xs text-typography-400">
                       {t("groups.members.joined", {
                         date: joinedDate,
                       })}

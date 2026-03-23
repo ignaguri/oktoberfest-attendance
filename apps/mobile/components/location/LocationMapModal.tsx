@@ -258,7 +258,7 @@ function NearbyFriendsList({ members }: { members: LocationSessionMember[] }) {
     return (
       <Box className="items-center p-8">
         <MapPin size={40} color={Colors.neutral[400]} />
-        <Text className="text-typography-500 mt-4 text-center">
+        <Text className="mt-4 text-center text-typography-500">
           {t("location.noFriendsNearby")}
         </Text>
       </Box>
@@ -279,15 +279,15 @@ function NearbyFriendsList({ members }: { members: LocationSessionMember[] }) {
               </AvatarFallbackText>
             </Avatar>
             <VStack className="flex-1">
-              <Text className="text-typography-900 font-medium">
+              <Text className="font-medium text-typography-900">
                 {member.fullName || member.username}
               </Text>
-              <Text className="text-typography-500 text-sm">
+              <Text className="text-sm text-typography-500">
                 {member.groupName}
               </Text>
             </VStack>
             {member.distance !== null && (
-              <Text className="text-typography-500 text-sm">
+              <Text className="text-sm text-typography-500">
                 {Math.round(member.distance)}m
               </Text>
             )}
@@ -354,10 +354,10 @@ const NearbyTentsList = forwardRef<FlatList<NearbyTent>, NearbyTentsListProps>(
                   />
                 </Box>
                 <VStack className="flex-1">
-                  <Text className="text-typography-900 font-medium">
+                  <Text className="font-medium text-typography-900">
                     {tent.tentName}
                   </Text>
-                  <Text className="text-typography-500 text-sm capitalize">
+                  <Text className="text-sm capitalize text-typography-500">
                     {tent.category || "tent"}
                   </Text>
                 </VStack>
@@ -367,7 +367,7 @@ const NearbyTentsList = forwardRef<FlatList<NearbyTent>, NearbyTentsListProps>(
                       e.stopPropagation();
                       onCheckIn();
                     }}
-                    className="bg-primary-500 active:bg-primary-600 rounded-lg px-3 py-1.5"
+                    className="rounded-lg bg-primary-500 px-3 py-1.5 active:bg-primary-600"
                     accessibilityLabel={t("location.checkInAt", {
                       tent: tent.tentName,
                     })}
@@ -378,11 +378,11 @@ const NearbyTentsList = forwardRef<FlatList<NearbyTent>, NearbyTentsListProps>(
                   </Pressable>
                 ) : (
                   <VStack className="items-end">
-                    <Text className="text-typography-700 text-sm font-medium">
+                    <Text className="text-sm font-medium text-typography-700">
                       {Math.round(tent.distanceMeters)}m
                     </Text>
                     {tent.beerPrice && (
-                      <Text className="text-typography-500 text-xs">
+                      <Text className="text-xs text-typography-500">
                         {"\u20AC"}
                         {tent.beerPrice.toFixed(2)}
                       </Text>
@@ -401,7 +401,7 @@ const NearbyTentsList = forwardRef<FlatList<NearbyTent>, NearbyTentsListProps>(
       return (
         <Box className="items-center p-8">
           <Beer size={40} color={Colors.neutral[400]} />
-          <Text className="text-typography-500 mt-4 text-center">
+          <Text className="mt-4 text-center text-typography-500">
             {t("location.noTentsNearby")}
           </Text>
         </Box>

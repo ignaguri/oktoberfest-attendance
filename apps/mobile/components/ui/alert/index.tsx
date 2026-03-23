@@ -14,7 +14,7 @@ import { Text, View } from "react-native";
 const SCOPE = "ALERT";
 
 const alertStyle = tva({
-  base: "border-outline-100 flex-row items-center gap-2 rounded-md px-4 py-3",
+  base: "flex-row items-center gap-2 rounded-md border-outline-100 px-4 py-3",
 
   variants: {
     action: {
@@ -27,7 +27,7 @@ const alertStyle = tva({
 
     variant: {
       solid: "",
-      outline: "bg-background-0 border",
+      outline: "border bg-background-0",
     },
   },
 });

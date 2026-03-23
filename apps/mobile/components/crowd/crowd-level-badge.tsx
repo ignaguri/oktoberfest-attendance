@@ -41,7 +41,7 @@ export function CrowdLevelBadge({
   if (!crowdLevel) {
     if (compact) return null;
     return (
-      <Text className="text-typography-400 text-xs">
+      <Text className="text-xs text-typography-400">
         {t("crowdReport.noReports")}
       </Text>
     );
@@ -65,7 +65,7 @@ export function CrowdLevelBadge({
         </HStack>
       </View>
       {avgWaitMinutes != null && avgWaitMinutes > 0 && !compact && (
-        <Text className="text-typography-500 text-xs">
+        <Text className="text-xs text-typography-500">
           {t("crowdReport.waitTime", {
             minutes: avgWaitMinutes,
           })}

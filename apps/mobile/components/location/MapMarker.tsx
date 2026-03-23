@@ -44,8 +44,8 @@ export function FriendMarker({
             accessibilityLabel={`${username}'s avatar`}
           />
         ) : (
-          <View className="bg-primary-100 h-8 w-8 items-center justify-center rounded-full">
-            <Text className="text-primary-700 text-sm font-bold">
+          <View className="h-8 w-8 items-center justify-center rounded-full bg-primary-100">
+            <Text className="text-sm font-bold text-primary-700">
               {getInitials({ username })}
             </Text>
           </View>
@@ -98,7 +98,7 @@ export function TentMarker({
       <View
         className={cn(
           "rounded-lg px-2 py-1",
-          isSelected && "border-primary-700 border-2",
+          isSelected && "border-2 border-primary-700",
         )}
         style={{
           backgroundColor: markerColor,
@@ -160,7 +160,7 @@ export function UserLocationMarker({
     <View className="items-center">
       {/* Avatar or fallback */}
       <View
-        className="rounded-full border-3 p-0.5"
+        className="border-3 rounded-full p-0.5"
         style={{
           borderWidth: 3,
           borderColor,

@@ -104,7 +104,7 @@ export default function GroupMessagesScreen() {
   // Loading state
   if (isLoading && messages.length === 0) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Stack.Screen
           options={{
             title: t("groups.messages.title"),
@@ -118,7 +118,7 @@ export default function GroupMessagesScreen() {
   // Error state
   if (error && messages.length === 0) {
     return (
-      <View className="bg-background-50 flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-background-50">
         <Stack.Screen
           options={{
             title: t("groups.messages.title"),
@@ -144,7 +144,7 @@ export default function GroupMessagesScreen() {
       />
 
       <ScrollView
-        className="bg-background-50 flex-1"
+        className="flex-1 bg-background-50"
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -163,10 +163,10 @@ export default function GroupMessagesScreen() {
               className="items-center bg-white p-8"
             >
               <MessageSquare size={48} color={IconColors.disabled} />
-              <Text className="text-typography-700 mt-4 text-center text-lg font-medium">
+              <Text className="mt-4 text-center text-lg font-medium text-typography-700">
                 {t("groups.messages.empty.title")}
               </Text>
-              <Text className="text-typography-500 mt-2 text-center text-sm">
+              <Text className="mt-2 text-center text-sm text-typography-500">
                 {t("groups.messages.empty.description")}
               </Text>
               <Button
@@ -188,7 +188,7 @@ export default function GroupMessagesScreen() {
                     key={message.id}
                     className={cn(
                       index < pinnedMessages.length - 1 &&
-                        "border-outline-100 border-b",
+                        "border-b border-outline-100",
                     )}
                   >
                     <MessageItem
@@ -212,7 +212,7 @@ export default function GroupMessagesScreen() {
                     key={message.id}
                     className={cn(
                       index < regularMessages.length - 1 &&
-                        "border-outline-100 border-b",
+                        "border-b border-outline-100",
                     )}
                   >
                     <MessageItem
@@ -282,7 +282,7 @@ export default function GroupMessagesScreen() {
               {dialog.title}
             </Heading>
           </AlertDialogHeader>
-          <AlertDialogBody className="mt-3 mb-4">
+          <AlertDialogBody className="mb-4 mt-3">
             <Text size="sm" className="text-typography-500">
               {dialog.message}
             </Text>

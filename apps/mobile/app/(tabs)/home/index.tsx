@@ -183,7 +183,7 @@ export default function HomeScreen() {
   // Loading state - show skeleton while festival is loading
   if (festivalLoading) {
     return (
-      <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
+      <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
         <ScrollView className="flex-1">
           <VStack space="md" className="p-4 pb-20">
             <AppHeader />
@@ -195,7 +195,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView className="bg-background-50 flex-1" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
       {/* Tent Proximity Banner - shows at top when near a tent (active festival only) */}
       {isFestivalActive && Platform.OS !== "web" && (
         <TentProximityBanner threshold={50} />
@@ -235,7 +235,7 @@ export default function HomeScreen() {
                   />
                   <Pressable
                     onPress={() => router.push("/map")}
-                    className="bg-primary-500 flex-row items-center gap-2 rounded-lg px-3 py-2"
+                    className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
                     accessibilityLabel={t("location.map.openAccessibility")}
                   >
                     <Map size={18} color={Colors.white} />
@@ -244,7 +244,7 @@ export default function HomeScreen() {
                     </Text>
                     {isSharing && nearbyMembers.length > 0 && (
                       <View className="ml-1 rounded-full bg-white px-2 py-0.5">
-                        <Text className="text-primary-600 text-xs font-bold">
+                        <Text className="text-xs font-bold text-primary-600">
                           {nearbyMembers.length}
                         </Text>
                       </View>

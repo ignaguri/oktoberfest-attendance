@@ -54,7 +54,7 @@ export function UpdateAvailablePrompt({
 
         <AlertDialogBody>
           <VStack space="md">
-            <Text className="text-typography-600 text-center">
+            <Text className="text-center text-typography-600">
               {t("update.available.description")}
             </Text>
           </VStack>

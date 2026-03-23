@@ -232,14 +232,14 @@ export default function DatabaseDebugScreen() {
     return (
       <VStack className="flex-1 items-center justify-center p-4">
         <ButtonSpinner color={Colors.primary[500]} />
-        <Text className="text-typography-500 mt-2">Loading database...</Text>
+        <Text className="mt-2 text-typography-500">Loading database...</Text>
       </VStack>
     );
   }
 
   return (
     <ScrollView
-      className="bg-background-50 flex-1"
+      className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
@@ -324,7 +324,7 @@ export default function DatabaseDebugScreen() {
                 disabled={isLoading || stats?.syncQueue.failed === 0}
               >
                 <XCircle size={14} color={Colors.error[500]} />
-                <ButtonText className="text-error-500 ml-1">
+                <ButtonText className="ml-1 text-error-500">
                   Delete Failed
                 </ButtonText>
               </Button>
@@ -406,20 +406,20 @@ export default function DatabaseDebugScreen() {
                 .map((table) => (
                   <HStack
                     key={table.name}
-                    className="bg-background-100 items-center justify-between rounded p-2"
+                    className="items-center justify-between rounded bg-background-100 p-2"
                   >
                     <Text className="font-mono text-sm">{table.name}</Text>
                     <HStack space="sm">
-                      <Text className="text-typography-500 text-xs">
+                      <Text className="text-xs text-typography-500">
                         {table.totalRows} rows
                       </Text>
                       {table.dirtyRows > 0 && (
-                        <Text className="text-primary-500 text-xs">
+                        <Text className="text-xs text-primary-500">
                           {table.dirtyRows} dirty
                         </Text>
                       )}
                       {table.deletedRows > 0 && (
-                        <Text className="text-error-500 text-xs">
+                        <Text className="text-xs text-error-500">
                           {table.deletedRows} deleted
                         </Text>
                       )}
@@ -439,14 +439,14 @@ export default function DatabaseDebugScreen() {
         >
           <VStack space="xs" className="mt-2">
             {pendingOps.length === 0 ? (
-              <Text className="text-typography-500 text-center text-sm">
+              <Text className="text-center text-sm text-typography-500">
                 No pending operations
               </Text>
             ) : (
               pendingOps.slice(0, 20).map((op) => (
                 <HStack
                   key={op.id}
-                  className="bg-background-100 items-center justify-between rounded p-2"
+                  className="items-center justify-between rounded bg-background-100 p-2"
                 >
                   <VStack className="flex-1">
                     <HStack space="xs" className="items-center">
@@ -457,21 +457,21 @@ export default function DatabaseDebugScreen() {
                     </HStack>
                     {op.last_error && (
                       <Text
-                        className="text-error-500 text-xs"
+                        className="text-xs text-error-500"
                         numberOfLines={1}
                       >
                         {op.last_error}
                       </Text>
                     )}
                   </VStack>
-                  <Text className="text-typography-400 text-xs">
+                  <Text className="text-xs text-typography-400">
                     {op.retry_count > 0 && `(${op.retry_count}x)`}
                   </Text>
                 </HStack>
               ))
             )}
             {pendingOps.length > 20 && (
-              <Text className="text-typography-400 text-center text-xs">
+              <Text className="text-center text-xs text-typography-400">
                 +{pendingOps.length - 20} more
               </Text>
             )}
@@ -487,14 +487,14 @@ export default function DatabaseDebugScreen() {
         >
           <VStack space="xs" className="mt-2">
             {dirtyRecords.length === 0 ? (
-              <Text className="text-typography-500 text-center text-sm">
+              <Text className="text-center text-sm text-typography-500">
                 All records synced
               </Text>
             ) : (
               dirtyRecords.slice(0, 20).map((record) => (
                 <HStack
                   key={`${record.table}-${record.id}`}
-                  className="bg-background-100 items-center justify-between rounded p-2"
+                  className="items-center justify-between rounded bg-background-100 p-2"
                 >
                   <VStack className="flex-1">
                     <Text className="font-mono text-xs">
@@ -517,7 +517,7 @@ export default function DatabaseDebugScreen() {
               ))
             )}
             {dirtyRecords.length > 20 && (
-              <Text className="text-typography-400 text-center text-xs">
+              <Text className="text-center text-xs text-typography-400">
                 +{dirtyRecords.length - 20} more
               </Text>
             )}
@@ -580,7 +580,7 @@ function StatBadge({
     <VStack className={cn("items-center rounded-lg p-2", bgColor)}>
       {icon}
       <Text className="text-lg font-semibold">{value}</Text>
-      <Text className="text-typography-500 text-xs">{label}</Text>
+      <Text className="text-xs text-typography-500">{label}</Text>
     </VStack>
   );
 }
@@ -617,7 +617,7 @@ function CollapsibleSection({
         <HStack className="items-center justify-between">
           <VStack>
             <Heading size="sm">{title}</Heading>
-            <Text className="text-typography-500 text-xs">{subtitle}</Text>
+            <Text className="text-xs text-typography-500">{subtitle}</Text>
           </VStack>
           <ChevronRight
             size={20}

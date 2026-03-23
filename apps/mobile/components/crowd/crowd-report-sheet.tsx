@@ -143,10 +143,10 @@ export function CrowdReportSheet({
           {/* Header */}
           <HStack className="w-full items-center justify-between">
             <VStack>
-              <Text className="text-typography-900 text-lg font-semibold">
+              <Text className="text-lg font-semibold text-typography-900">
                 {t("crowdReport.reportCrowd")}
               </Text>
-              <Text className="text-typography-500 text-sm">{tentName}</Text>
+              <Text className="text-sm text-typography-500">{tentName}</Text>
             </VStack>
             <Pressable onPress={handleClose} hitSlop={8}>
               <X size={24} color={IconColors.default} />
@@ -181,7 +181,7 @@ export function CrowdReportSheet({
             <>
               {/* Crowd Level Selection */}
               <VStack space="sm">
-                <Text className="text-typography-700 text-sm font-medium">
+                <Text className="text-sm font-medium text-typography-700">
                   {t("crowdReport.selectLevel")}
                 </Text>
                 <HStack space="sm" className="w-full">
@@ -225,10 +225,10 @@ export function CrowdReportSheet({
               {/* Wait Time Selection */}
               <VStack space="sm">
                 <HStack className="items-center justify-between">
-                  <Text className="text-typography-700 text-sm font-medium">
+                  <Text className="text-sm font-medium text-typography-700">
                     {t("crowdReport.waitTimeLabel")}
                   </Text>
-                  <Text className="text-typography-400 text-xs">
+                  <Text className="text-xs text-typography-400">
                     {t("crowdReport.waitTimeOptional")}
                   </Text>
                 </HStack>
@@ -257,7 +257,7 @@ export function CrowdReportSheet({
                           className={cn(
                             "text-sm",
                             isSelected
-                              ? "text-primary-700 font-medium"
+                              ? "font-medium text-primary-700"
                               : "text-typography-600",
                           )}
                         >
@@ -271,7 +271,7 @@ export function CrowdReportSheet({
 
               {/* Error message */}
               {error && (
-                <Text className="text-error-600 text-sm">
+                <Text className="text-sm text-error-600">
                   {error.includes("5 minutes")
                     ? t("crowdReport.rateLimited")
                     : t("crowdReport.error")}
