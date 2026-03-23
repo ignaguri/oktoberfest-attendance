@@ -36,6 +36,20 @@ logger.info("API Client initialized", {
   ),
 });
 
+// Mutex to prevent concurrent token refresh calls
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  const { data: refreshed, error } = await supabase.auth.refreshSession();
+  if (error || !refreshed.session?.access_token) {
+    logger.warn("Supabase session refresh failed", {
+      hasError: !!error,
+    });
+    return null;
+  }
+  return refreshed.session.access_token;
+}
+
 /**
  * Get auth headers for API requests using Supabase mobile client
  */
@@ -50,11 +64,24 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
     const now = Math.floor(Date.now() / 1000);
 
     if (expiresAt && expiresAt - now < 60) {
-      // Token expired or about to expire, force refresh
-      const { data: refreshed } = await supabase.auth.refreshSession();
-      if (refreshed.session?.access_token) {
+      // Deduplicate concurrent refresh calls with a shared promise
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      const newToken = await refreshPromise;
+
+      if (newToken) {
         return {
-          Authorization: `Bearer ${refreshed.session.access_token}`,
+          Authorization: `Bearer ${newToken}`,
+          "Content-Type": "application/json",
+        };
+      }
+
+      // Refresh failed — if token is already expired, don't send it
+      if (expiresAt <= now) {
+        return {
           "Content-Type": "application/json",
         };
       }
