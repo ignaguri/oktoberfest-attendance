@@ -15,6 +15,9 @@ web-build/
 google-services.json
 GoogleService-Info.plist
 
+# Google Play Service Account
+play-store-service-account.json
+
 # iOS
 ios/
 

@@ -63,6 +63,10 @@
         "ascApiKeyId": "PY24WLRGP9",
         "ascApiKeyIssuerId": "fb388bd7-b3f2-4e8a-bb92-a701ca335b82",
         "ascApiKeyPath": "./keys/AuthKey_PY24WLRGP9.p8"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./keys/play-store-service-account.json",
+        "track": "production"
       }
     }
   }
