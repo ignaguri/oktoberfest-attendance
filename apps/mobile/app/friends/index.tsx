@@ -18,9 +18,9 @@ import type {
   FriendSuggestion,
 } from "@prostcounter/shared/schemas";
 import { getInitials } from "@prostcounter/ui";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Search, UserPlus, Users, UserX } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -57,8 +57,18 @@ export default function FriendsScreen() {
   const router = useRouter();
   const { currentFestival } = useFestival();
 
-  // Tab state
-  const [activeTab, setActiveTab] = useState<TabType>("friends");
+  // Tab state - supports deep linking via ?tab=requests
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const [activeTab, setActiveTab] = useState<TabType>(
+    tab === "requests" ? "requests" : "friends",
+  );
+
+  // Sync tab state when URL param changes (e.g. navigating back with different tab)
+  useEffect(() => {
+    if (tab === "requests" && activeTab !== "requests") {
+      setActiveTab("requests");
+    }
+  }, [tab, activeTab]);
 
   // Alert dialog for unfriend confirmation
   const { dialog, showDialog, closeDialog } = useAlertDialog();

@@ -1,3 +1,4 @@
+import { useFriendshipStatus } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WinningCriteria } from "@prostcounter/shared/schemas";
 import type { LeaderboardEntry } from "@prostcounter/shared/schemas";
@@ -10,7 +11,6 @@ import {
   Medal,
   TrendingUp,
   Trophy,
-  X,
 } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
@@ -20,21 +20,15 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import {
-  Modal,
-  ModalBackdrop,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-} from "@/components/ui/modal";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
+
+import type { UserProfileData } from "./user-profile-modal";
+import { UserProfileModal } from "./user-profile-modal";
 
 export type SortOrder = "asc" | "desc";
 
@@ -148,6 +142,13 @@ export function Leaderboard({
     null,
   );
 
+  // Fetch friendship status for the selected user
+  const selectedUserId =
+    selectedUser && selectedUser.userId !== currentUserId
+      ? selectedUser.userId
+      : undefined;
+  const { data: friendshipData } = useFriendshipStatus(selectedUserId);
+
   const handleUserPress = useCallback((entry: LeaderboardEntry) => {
     setSelectedUser(entry);
   }, []);
@@ -155,6 +156,25 @@ export function Leaderboard({
   const handleCloseModal = useCallback(() => {
     setSelectedUser(null);
   }, []);
+
+  // Map LeaderboardEntry to UserProfileData for UserProfileModal
+  const selectedProfileData: UserProfileData | null = useMemo(() => {
+    if (!selectedUser) return null;
+    return {
+      username: selectedUser.username,
+      fullName: selectedUser.fullName,
+      avatarUrl: selectedUser.avatarUrl,
+      stats: {
+        daysAttended: selectedUser.daysAttended ?? 0,
+        totalBeers: selectedUser.totalBeers ?? 0,
+        avgBeers: selectedUser.avgBeers ?? 0,
+      },
+      friendshipStatus:
+        selectedUser.userId === currentUserId
+          ? "self"
+          : (friendshipData?.status ?? null),
+    };
+  }, [selectedUser, currentUserId, friendshipData]);
 
   // Use activeSortColumn if provided, otherwise fall back to winningCriteria
   const currentSortColumn = activeSortColumn || winningCriteria;
@@ -359,121 +379,13 @@ export function Leaderboard({
       </Card>
 
       {/* User Detail Modal */}
-      <Modal isOpen={!!selectedUser} onClose={handleCloseModal} size="sm">
-        <ModalBackdrop />
-        <ModalContent>
-          <ModalHeader>
-            <Heading size="md" className="text-typography-900">
-              {t("leaderboard.userDetail.title")}
-            </Heading>
-            <ModalCloseButton>
-              <X size={20} color={IconColors.default} />
-            </ModalCloseButton>
-          </ModalHeader>
-          <ModalBody className="pb-6">
-            {selectedUser && (
-              <VStack space="md" className="items-center">
-                {/* Large Avatar */}
-                <Avatar size="xl">
-                  {selectedUser.avatarUrl ? (
-                    <AvatarImage
-                      source={{ uri: getAvatarUrl(selectedUser.avatarUrl) }}
-                      alt={
-                        selectedUser.fullName || selectedUser.username || "User"
-                      }
-                    />
-                  ) : (
-                    <AvatarFallbackText>
-                      {getInitials({
-                        fullName: selectedUser.fullName,
-                        username: selectedUser.username,
-                      })}
-                    </AvatarFallbackText>
-                  )}
-                </Avatar>
-
-                {/* User Info */}
-                <VStack space="xs" className="items-center">
-                  {selectedUser.fullName && (
-                    <Text className="text-lg font-semibold text-typography-900">
-                      {selectedUser.fullName}
-                    </Text>
-                  )}
-                  {selectedUser.username && (
-                    <Text className="text-sm text-typography-500">
-                      @{selectedUser.username}
-                    </Text>
-                  )}
-                </VStack>
-
-                {/* Stats */}
-                <HStack space="lg" className="mt-2">
-                  <VStack className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <Calendar size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
-                        {selectedUser.daysAttended ?? 0}
-                      </Text>
-                    </HStack>
-                    <Text className="text-xs text-typography-500">
-                      {t("leaderboard.stats.days")}
-                    </Text>
-                  </VStack>
-                  <VStack className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <Beer size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
-                        {selectedUser.totalBeers ?? 0}
-                      </Text>
-                    </HStack>
-                    <Text className="text-xs text-typography-500">
-                      {t("leaderboard.stats.drinks")}
-                    </Text>
-                  </VStack>
-                  <VStack className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <TrendingUp size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
-                        {typeof selectedUser.avgBeers === "number"
-                          ? selectedUser.avgBeers.toFixed(1)
-                          : "0.0"}
-                      </Text>
-                    </HStack>
-                    <Text className="text-xs text-typography-500">
-                      {t("leaderboard.stats.avg")}
-                    </Text>
-                  </VStack>
-                </HStack>
-
-                {/* Position Badge */}
-                {selectedUser.position <= 3 && (
-                  <HStack
-                    space="xs"
-                    className={cn(
-                      "mt-2 items-center rounded-full px-3 py-1",
-                      POSITION_COLORS[selectedUser.position as 1 | 2 | 3]?.bg,
-                    )}
-                  >
-                    {selectedUser.position === 1 ? (
-                      <Trophy size={16} color={POSITION_COLORS[1].icon} />
-                    ) : (
-                      <Medal
-                        size={16}
-                        color={
-                          POSITION_COLORS[selectedUser.position as 2 | 3]?.icon
-                        }
-                      />
-                    )}
-                    <Text className="text-sm font-medium text-typography-800">
-                      #{selectedUser.position}
-                    </Text>
-                  </HStack>
-                )}
-              </VStack>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <UserProfileModal
+        isOpen={!!selectedUser}
+        onClose={handleCloseModal}
+        profile={selectedProfileData}
+        userId={selectedUser?.userId}
+        title={t("leaderboard.userDetail.title")}
+      />
     </>
   );
 }

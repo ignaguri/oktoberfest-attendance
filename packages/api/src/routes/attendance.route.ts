@@ -13,11 +13,16 @@ import {
   UpdatePersonalAttendanceResponseSchema,
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
+import { NO_ROWS_ERROR } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { NotFoundError, ValidationError } from "../middleware/error";
+import {
+  DatabaseError,
+  NotFoundError,
+  ValidationError,
+} from "../middleware/error";
 import {
   SupabaseAttendanceRepository,
   SupabasePhotoRepository,
@@ -183,12 +188,28 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   const supabase = c.var.supabase;
   const { id } = c.req.valid("param");
 
-  // Verify attendance exists first
-  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
-  const attendance = await attendanceRepo.findById(id);
+  // Query the attendances table directly (not the view) to avoid
+  // security_invoker RLS complexity on attendance_with_totals
+  const { data: attendance, error: findError } = await supabase
+    .from("attendances")
+    .select("id, user_id, festival_id")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (findError && findError.code !== NO_ROWS_ERROR) {
+    throw new DatabaseError(`Failed to fetch attendance: ${findError.message}`);
+  }
 
   if (!attendance) {
-    throw new NotFoundError(ErrorCodes.ATTENDANCE_NOT_FOUND);
+    // Already deleted or doesn't belong to user - treat as idempotent success
+    return c.json(
+      {
+        success: true,
+        message: "Attendance deleted successfully",
+      },
+      200,
+    );
   }
 
   // Delete associated photos first (to avoid FK constraint)
@@ -196,12 +217,13 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   await photoRepo.deleteByAttendanceId(id, user.id);
 
   // Delete the attendance
+  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
   await attendanceRepo.delete(id, user.id);
 
   // Invalidate wrapped data cache (attendance changes affect wrapped stats)
   try {
     const wrappedRepo = new SupabaseWrappedRepository(supabase);
-    await wrappedRepo.invalidateCache(user.id, attendance.festivalId);
+    await wrappedRepo.invalidateCache(user.id, attendance.festival_id);
   } catch (cacheError) {
     logger.error(
       { error: cacheError },

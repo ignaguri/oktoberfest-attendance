@@ -3,74 +3,132 @@ import { useCounts, useNotifications } from "@novu/react-native";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { Bell, CheckCheck } from "lucide-react-native";
-import { useCallback } from "react";
+import { Archive, Bell, CheckCheck } from "lucide-react-native";
+import { useCallback, useRef } from "react";
 import {
   ActivityIndicator,
+  Animated,
   FlatList,
+  Image,
   RefreshControl,
   View,
 } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { Colors } from "@/lib/constants/colors";
+import { Colors, IconColors } from "@/lib/constants/colors";
+import { getAvatarUrl } from "@/lib/utils";
+
+const EMPTY_CONTAINER_STYLE = { flexGrow: 1 } as const;
+const LIST_CONTAINER_STYLE = { paddingTop: 4, paddingBottom: 16 } as const;
 
 interface NotificationItemProps {
   notification: Notification;
   onPress: (notification: Notification) => void;
+  onArchive: (notification: Notification) => void;
 }
 
-/**
- * Single notification item component
- */
-function NotificationItem({ notification, onPress }: NotificationItemProps) {
-  const { t } = useTranslation();
-  const timeAgo = formatRelativeTime(new Date(notification.createdAt));
-  const isRead = notification.isRead;
+function renderRightActions(
+  _progress: Animated.AnimatedInterpolation<number>,
+  dragX: Animated.AnimatedInterpolation<number>,
+  label: string,
+) {
+  const scale = dragX.interpolate({
+    inputRange: [-80, 0],
+    outputRange: [1, 0.5],
+    extrapolate: "clamp",
+  });
 
   return (
-    <Pressable
-      onPress={() => onPress(notification)}
-      className={cn(
-        "flex-row border-b border-outline-100 p-4",
-        isRead ? "bg-white" : "bg-primary-50",
-      )}
-      accessibilityLabel={notification.subject || notification.body}
-      accessibilityHint={t("profile.notifications.tapToView")}
-    >
-      {/* Unread indicator */}
-      <View className="mr-3 justify-center">
-        {!isRead ? (
-          <View className="h-2 w-2 rounded-full bg-primary-500" />
-        ) : (
-          <View className="h-2 w-2" />
-        )}
-      </View>
-
-      {/* Content */}
-      <View className="flex-1">
-        {notification.subject && (
-          <Text className="mb-1 font-semibold text-typography-900">
-            {notification.subject}
-          </Text>
-        )}
-        <Text
-          className="text-sm text-typography-700"
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {notification.body}
-        </Text>
-        <Text className="mt-1 text-xs text-typography-400">{timeAgo}</Text>
-      </View>
-    </Pressable>
+    <View className="mx-3 mb-2 items-center justify-center rounded-xl bg-red-500 px-6">
+      <Animated.View
+        style={{ transform: [{ scale }] }}
+        className="items-center"
+      >
+        <Archive size={20} color={IconColors.white} />
+        <Text className="mt-1 text-xs text-white">{label}</Text>
+      </Animated.View>
+    </View>
   );
 }
 
-/**
- * Empty state when no notifications
- */
+function NotificationItem({
+  notification,
+  onPress,
+  onArchive,
+}: NotificationItemProps) {
+  const { t } = useTranslation();
+  const timeAgo = formatRelativeTime(new Date(notification.createdAt));
+  const isRead = notification.isRead;
+  const swipeableRef = useRef<Swipeable>(null);
+
+  const handleSwipeOpen = useCallback(async () => {
+    swipeableRef.current?.close();
+    try {
+      await onArchive(notification);
+    } catch {
+      // Archive failed silently — notification stays in list
+    }
+  }, [notification, onArchive]);
+
+  return (
+    <Swipeable
+      ref={swipeableRef}
+      renderRightActions={(progress, dragX) =>
+        renderRightActions(progress, dragX, t("profile.notifications.archive"))
+      }
+      onSwipeableOpen={handleSwipeOpen}
+      overshootRight={false}
+    >
+      <Pressable
+        onPress={() => onPress(notification)}
+        className={cn(
+          "mx-3 mb-2 flex-row rounded-xl p-4 shadow-sm",
+          isRead ? "bg-white" : "bg-primary-50",
+        )}
+        accessibilityLabel={notification.subject || notification.body}
+        accessibilityHint={t("profile.notifications.tapToView")}
+      >
+        {/* Unread indicator */}
+        <View className="mr-2 justify-center">
+          {!isRead ? (
+            <View className="h-2 w-2 rounded-full bg-primary-500" />
+          ) : (
+            <View className="h-2 w-2" />
+          )}
+        </View>
+
+        {/* Avatar */}
+        {notification.avatar && (
+          <Image
+            source={{ uri: getAvatarUrl(notification.avatar) }}
+            className="mr-3 h-10 w-10 rounded-full"
+            alt=""
+          />
+        )}
+
+        {/* Content */}
+        <View className="flex-1">
+          {notification.subject && (
+            <Text className="mb-1 font-semibold text-typography-900">
+              {notification.subject}
+            </Text>
+          )}
+          <Text
+            className="text-sm text-typography-700"
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {notification.body}
+          </Text>
+          <Text className="mt-1 text-xs text-typography-400">{timeAgo}</Text>
+        </View>
+      </Pressable>
+    </Swipeable>
+  );
+}
+
 function EmptyState() {
   const { t } = useTranslation();
 
@@ -91,21 +149,7 @@ interface NotificationInboxProps {
   onNotificationPress?: (notification: Notification) => void;
 }
 
-/**
- * Notification Inbox Component
- *
- * Displays a list of notifications from Novu.
- * Uses the @novu/react-native hooks for data fetching.
- *
- * Must be used within a NovuProviderWrapper.
- *
- * Usage:
- * ```tsx
- * <NovuProviderWrapper>
- *   <NotificationInbox onNotificationPress={(n) => logger.debug(n.id)} />
- * </NovuProviderWrapper>
- * ```
- */
+/** Must be used within a NovuProviderWrapper. */
 export function NotificationInbox({
   onNotificationPress,
 }: NotificationInboxProps) {
@@ -143,22 +187,28 @@ export function NotificationInbox({
 
   const handleNotificationPress = useCallback(
     async (notification: Notification) => {
-      // Mark as read when tapped (Notification object has read method)
+      // Mark as read when tapped
       if (!notification.isRead) {
         await notification.read();
       }
-
-      // Call the external handler if provided
       onNotificationPress?.(notification);
     },
     [onNotificationPress],
   );
 
+  const handleArchive = useCallback(async (notification: Notification) => {
+    await notification.archive();
+  }, []);
+
   const renderItem = useCallback(
     ({ item }: { item: Notification }) => (
-      <NotificationItem notification={item} onPress={handleNotificationPress} />
+      <NotificationItem
+        notification={item}
+        onPress={handleNotificationPress}
+        onArchive={handleArchive}
+      />
     ),
-    [handleNotificationPress],
+    [handleNotificationPress, handleArchive],
   );
 
   const renderFooter = useCallback(() => {
@@ -179,10 +229,10 @@ export function NotificationInbox({
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
       {/* Header with mark all as read */}
       {unreadCount > 0 && (
-        <View className="flex-row items-center justify-between border-b border-outline-100 px-4 py-3">
+        <View className="flex-row items-center justify-between px-4 py-3">
           <Text className="text-sm text-typography-600">
             {t("profile.notifications.unreadCount", {
               count: unreadCount,
@@ -218,7 +268,9 @@ export function NotificationInbox({
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         contentContainerStyle={
-          notifications?.length === 0 ? { flex: 1 } : undefined
+          notifications?.length === 0
+            ? EMPTY_CONTAINER_STYLE
+            : LIST_CONTAINER_STYLE
         }
       />
     </View>

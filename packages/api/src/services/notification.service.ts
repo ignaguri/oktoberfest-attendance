@@ -2,30 +2,16 @@ import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import type { Database } from "@prostcounter/db";
 import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
+import {
+  DEFAULT_AVATAR_URL,
+  NOTIFICATION_WORKFLOWS,
+} from "@prostcounter/shared/constants";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
 
 type NotificationPreferences =
   Database["public"]["Tables"]["user_notification_preferences"]["Row"];
-
-/**
- * Notification workflow identifiers
- * These should match the workflow IDs configured in Novu
- */
-export const NOTIFICATION_WORKFLOWS = {
-  GROUP_JOIN: "group-join",
-  LOCATION_SHARING: "location-sharing-notification",
-  TENT_CHECKIN: "tent-check-in",
-  RESERVATION_REMINDER: "reservation-reminder",
-  RESERVATION_CHECKIN_PROMPT: "reservation-prompt",
-  ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
-  GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
-  FRIEND_REQUEST: "friend-request",
-} as const;
-
-export type NotificationWorkflowId =
-  (typeof NOTIFICATION_WORKFLOWS)[keyof typeof NOTIFICATION_WORKFLOWS];
 
 /**
  * Notification Service
@@ -508,7 +494,7 @@ export class NotificationService {
       }
 
       const sharerName = user.username || user.full_name || "Someone";
-      const sharerAvatar = user.avatar_url || "";
+      const sharerAvatar = user.avatar_url || DEFAULT_AVATAR_URL;
 
       // Send notifications to all eligible members
       const notificationPromises = membersToNotify.map((member) => {
@@ -588,7 +574,7 @@ export class NotificationService {
 
       // Prepare notification payload
       const joinerName = newMember.username ?? newMember.full_name ?? "Someone";
-      const joinerAvatar = newMember.avatar_url || "";
+      const joinerAvatar = newMember.avatar_url || DEFAULT_AVATAR_URL;
 
       const payload = {
         joinerName,
@@ -641,7 +627,7 @@ export class NotificationService {
 
       const requesterName =
         requester.username || requester.full_name || "Someone";
-      const requesterAvatar = requester.avatar_url || "";
+      const requesterAvatar = requester.avatar_url || DEFAULT_AVATAR_URL;
 
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.FRIEND_REQUEST,
@@ -732,7 +718,7 @@ export class NotificationService {
       }
 
       const userName = user.username || user.full_name || "Someone";
-      const userAvatar = user.avatar_url || "";
+      const userAvatar = user.avatar_url || DEFAULT_AVATAR_URL;
 
       // Send notifications to all eligible members with their specific group context
       const notificationPromises = membersToNotify.map((member) => {

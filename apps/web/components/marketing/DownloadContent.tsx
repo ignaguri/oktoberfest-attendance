@@ -95,7 +95,7 @@ export function DownloadContent() {
                 {platform.description}
               </p>
               {platform.available ? (
-                <Button variant="yellow" size="sm" asChild className="w-full">
+                <Button variant="yellow" size="sm" asChild className="w-fit">
                   {platform.href.startsWith("http") ? (
                     <a
                       href={platform.href}

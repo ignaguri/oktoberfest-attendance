@@ -346,10 +346,10 @@ describe("Attendance Routes - Unit Tests", () => {
       });
     });
 
-    it("should return 404 when attendance does not exist", async () => {
+    it("should return 200 when attendance does not exist (idempotent delete)", async () => {
       const attendanceId = "223e4567-e89b-12d3-a456-426614174999";
 
-      // Mock findById - attendance not found
+      // Mock direct table query - attendance not found
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseError("Not found", "PGRST116")),
       );
@@ -363,14 +363,12 @@ describe("Attendance Routes - Unit Tests", () => {
         headers: req.headers,
       });
 
-      expect(res.status).toBe(404);
+      // Treat already-deleted attendance as success (idempotent)
+      expect(res.status).toBe(200);
       const body = await res.json();
       expect(body).toMatchObject({
-        error: expect.objectContaining({
-          message: "ATTENDANCE_NOT_FOUND",
-          code: "ATTENDANCE_NOT_FOUND",
-          statusCode: 404,
-        }),
+        success: true,
+        message: "Attendance deleted successfully",
       });
     });
 
