@@ -82,7 +82,11 @@ function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
   return Object.fromEntries(
     Object.entries(ctx).map(([k, v]) => [
       k,
-      typeof v === "object" && v !== null ? safeStringify(v) : v,
+      typeof v === "object" && v !== null
+        ? v instanceof Error
+          ? safeStringify({ name: v.name, message: v.message, stack: v.stack })
+          : safeStringify(v)
+        : v,
     ]),
   );
 }

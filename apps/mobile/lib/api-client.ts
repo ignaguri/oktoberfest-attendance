@@ -46,14 +46,19 @@ function withAuth(token: string): ApiHeaders {
 let refreshPromise: Promise<string | null> | null = null;
 
 async function refreshAccessToken(): Promise<string | null> {
-  const { data: refreshed, error } = await supabase.auth.refreshSession();
-  if (error || !refreshed.session?.access_token) {
-    logger.warn("Supabase session refresh failed", {
-      hasError: !!error,
-    });
+  try {
+    const { data: refreshed, error } = await supabase.auth.refreshSession();
+    if (error || !refreshed.session?.access_token) {
+      logger.warn("Supabase session refresh failed", {
+        hasError: !!error,
+      });
+      return null;
+    }
+    return refreshed.session.access_token;
+  } catch {
+    logger.warn("Supabase session refresh threw an exception");
     return null;
   }
-  return refreshed.session.access_token;
 }
 
 /**
