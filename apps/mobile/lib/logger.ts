@@ -73,6 +73,20 @@ function truncateData(data: unknown): unknown {
   return data;
 }
 
+/**
+ * Stringify nested object values so Sentry's shallow serializer
+ * doesn't reduce them to "[Object]"
+ */
+function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
+  if (!ctx) return undefined;
+  return Object.fromEntries(
+    Object.entries(ctx).map(([k, v]) => [
+      k,
+      typeof v === "object" && v !== null ? safeStringify(v) : v,
+    ]),
+  );
+}
+
 class Logger {
   private isDev =
     typeof __DEV__ !== "undefined"
@@ -134,19 +148,6 @@ class Logger {
           // Sentry not initialized yet, skip sending
           return;
         }
-
-        // Stringify nested objects to avoid Sentry's shallow serialization showing "[Object]"
-        const stringifyContextValues = (
-          ctx?: LogContext,
-        ): LogContext | undefined => {
-          if (!ctx) return undefined;
-          return Object.fromEntries(
-            Object.entries(ctx).map(([k, v]) => [
-              k,
-              typeof v === "object" && v !== null ? safeStringify(v) : v,
-            ]),
-          );
-        };
 
         if (error instanceof Error) {
           Sentry.captureException(error, {

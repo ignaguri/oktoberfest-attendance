@@ -36,7 +36,13 @@ logger.info("API Client initialized", {
   ),
 });
 
-// Mutex to prevent concurrent token refresh calls
+const BASE_HEADERS: ApiHeaders = { "Content-Type": "application/json" };
+
+function withAuth(token: string): ApiHeaders {
+  return { ...BASE_HEADERS, Authorization: `Bearer ${token}` };
+}
+
+// Deduplicates concurrent token refresh calls
 let refreshPromise: Promise<string | null> | null = null;
 
 async function refreshAccessToken(): Promise<string | null> {
@@ -59,12 +65,11 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
   } = await supabase.auth.getSession();
 
   if (session?.access_token) {
-    // Check if the token is expired or about to expire (within 60s)
-    const expiresAt = session.expires_at; // Unix timestamp in seconds
+    const expiresAt = session.expires_at;
     const now = Math.floor(Date.now() / 1000);
 
+    // Proactively refresh tokens near expiry to avoid 401s on app resume
     if (expiresAt && expiresAt - now < 60) {
-      // Deduplicate concurrent refresh calls with a shared promise
       if (!refreshPromise) {
         refreshPromise = refreshAccessToken().finally(() => {
           refreshPromise = null;
@@ -73,29 +78,20 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
       const newToken = await refreshPromise;
 
       if (newToken) {
-        return {
-          Authorization: `Bearer ${newToken}`,
-          "Content-Type": "application/json",
-        };
+        return withAuth(newToken);
       }
 
-      // Refresh failed — if token is already expired, don't send it
+      // Refresh failed — don't send an already-expired token
       if (expiresAt <= now) {
-        return {
-          "Content-Type": "application/json",
-        };
+        return BASE_HEADERS;
       }
+      // Token not yet expired, send it and accept it may expire mid-flight
     }
 
-    return {
-      Authorization: `Bearer ${session.access_token}`,
-      "Content-Type": "application/json",
-    };
+    return withAuth(session.access_token);
   }
 
-  return {
-    "Content-Type": "application/json",
-  };
+  return BASE_HEADERS;
 }
 
 /**
