@@ -1063,7 +1063,9 @@
       "emptyHint": "Your notifications will appear here",
       "unreadCount": "{{count}} unread",
       "markAllRead": "Mark all read",
-      "tapToView": "Tap to view notification details"
+      "tapToView": "Tap to view notification details",
+      "archive": "Archive",
+      "swipeToArchive": "Swipe left to archive"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -2497,7 +2499,9 @@
       "profile": "Profile",
       "attendance": "Attendance",
       "achievements": "Achievements",
-      "settings": "Settings"
+      "settings": "Settings",
+      "calendar": "Calendar",
+      "leaderboard": "Leaderboard"
     }
   },
   "landing": {

@@ -29,7 +29,7 @@ export function MarketingHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
-          href="/"
+          href={isLoggedIn ? "/home" : "/"}
           className="flex items-center gap-2 text-lg font-bold text-gray-900"
         >
           <Image
@@ -84,7 +84,7 @@ export function MarketingHeader() {
                 {link.label}
               </Link>
             ))}
-            <Button variant="yellow" size="sm" asChild className="mt-1">
+            <Button variant="yellow" size="sm" asChild className="mt-1 w-fit">
               <Link
                 href={isLoggedIn ? "/home" : "/sign-in"}
                 onClick={() => setMobileMenuOpen(false)}

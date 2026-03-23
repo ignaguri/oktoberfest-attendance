@@ -1063,7 +1063,9 @@
       "emptyHint": "Tus notificaciones aparecerán acá",
       "unreadCount": "{{count}} sin leer",
       "markAllRead": "Marcar todas como leídas",
-      "tapToView": "Tocá para ver los detalles"
+      "tapToView": "Tocá para ver los detalles",
+      "archive": "Archivar",
+      "swipeToArchive": "Deslizá a la izquierda para archivar"
     },
     "privacy": {
       "title": "Configuración de privacidad",
@@ -2497,7 +2499,9 @@
       "profile": "Perfil",
       "attendance": "Asistencia",
       "achievements": "Logros",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "calendar": "Calendario",
+      "leaderboard": "Ranking"
     }
   },
   "landing": {

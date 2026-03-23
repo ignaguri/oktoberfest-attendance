@@ -1028,7 +1028,9 @@
       "emptyHint": "Deine Benachrichtigungen werden hier erscheinen",
       "unreadCount": "{{count}} ungelesen",
       "markAllRead": "Alle als gelesen markieren",
-      "tapToView": "Tippe, um Details anzuzeigen"
+      "tapToView": "Tippe, um Details anzuzeigen",
+      "archive": "Archivieren",
+      "swipeToArchive": "Nach links wischen zum Archivieren"
     },
     "privacy": {
       "title": "Privatsphäre-Einstellungen",
@@ -2258,7 +2260,14 @@
   },
   "navigation": {
     "breadcrumbs": {
-      "settings": "Einstellungen"
+      "home": "Startseite",
+      "groups": "Gruppen",
+      "profile": "Profil",
+      "attendance": "Anwesenheit",
+      "achievements": "Erfolge",
+      "settings": "Einstellungen",
+      "calendar": "Kalender",
+      "leaderboard": "Bestenliste"
     }
   },
   "crowdReport": {
