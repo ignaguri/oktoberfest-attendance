@@ -1,4 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
+import * as Sentry from "@sentry/react-native";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { View } from "react-native";
 
@@ -36,9 +37,13 @@ class ErrorBoundaryClass extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log error to console (Sentry integration can be added later)
     logger.error("ErrorBoundary caught an error:", error, {
       componentStack: errorInfo.componentStack,
+    });
+    Sentry.captureException(error, {
+      contexts: {
+        react: { componentStack: errorInfo.componentStack },
+      },
     });
   }
 
