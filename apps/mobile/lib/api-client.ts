@@ -36,6 +36,31 @@ logger.info("API Client initialized", {
   ),
 });
 
+const BASE_HEADERS: ApiHeaders = { "Content-Type": "application/json" };
+
+function withAuth(token: string): ApiHeaders {
+  return { ...BASE_HEADERS, Authorization: `Bearer ${token}` };
+}
+
+// Deduplicates concurrent token refresh calls
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    const { data: refreshed, error } = await supabase.auth.refreshSession();
+    if (error || !refreshed.session?.access_token) {
+      logger.warn("Supabase session refresh failed", {
+        hasError: !!error,
+      });
+      return null;
+    }
+    return refreshed.session.access_token;
+  } catch {
+    logger.warn("Supabase session refresh threw an exception");
+    return null;
+  }
+}
+
 /**
  * Get auth headers for API requests using Supabase mobile client
  */
@@ -45,15 +70,33 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
   } = await supabase.auth.getSession();
 
   if (session?.access_token) {
-    return {
-      Authorization: `Bearer ${session.access_token}`,
-      "Content-Type": "application/json",
-    };
+    const expiresAt = session.expires_at;
+    const now = Math.floor(Date.now() / 1000);
+
+    // Proactively refresh tokens near expiry to avoid 401s on app resume
+    if (expiresAt && expiresAt - now < 60) {
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      const newToken = await refreshPromise;
+
+      if (newToken) {
+        return withAuth(newToken);
+      }
+
+      // Refresh failed — don't send an already-expired token
+      if (expiresAt <= now) {
+        return BASE_HEADERS;
+      }
+      // Token not yet expired, send it and accept it may expire mid-flight
+    }
+
+    return withAuth(session.access_token);
   }
 
-  return {
-    "Content-Type": "application/json",
-  };
+  return BASE_HEADERS;
 }
 
 /**

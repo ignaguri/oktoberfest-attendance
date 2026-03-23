@@ -73,6 +73,24 @@ function truncateData(data: unknown): unknown {
   return data;
 }
 
+/**
+ * Stringify nested object values so Sentry's shallow serializer
+ * doesn't reduce them to "[Object]"
+ */
+function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
+  if (!ctx) return undefined;
+  return Object.fromEntries(
+    Object.entries(ctx).map(([k, v]) => [
+      k,
+      typeof v === "object" && v !== null
+        ? v instanceof Error
+          ? safeStringify({ name: v.name, message: v.message, stack: v.stack })
+          : safeStringify(v)
+        : v,
+    ]),
+  );
+}
+
 class Logger {
   private isDev =
     typeof __DEV__ !== "undefined"
@@ -138,7 +156,7 @@ class Logger {
         if (error instanceof Error) {
           Sentry.captureException(error, {
             contexts: {
-              custom: context,
+              custom: stringifyContextValues(context),
             },
             tags: {
               source: "logger",
@@ -148,7 +166,7 @@ class Logger {
           Sentry.captureMessage(message, {
             level: "error",
             contexts: {
-              custom: errorContext,
+              custom: stringifyContextValues(errorContext),
             },
           });
         }
