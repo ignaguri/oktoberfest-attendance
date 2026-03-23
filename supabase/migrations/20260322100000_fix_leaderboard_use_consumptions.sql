@@ -183,6 +183,7 @@ visible_users AS (
   SELECT DISTINCT uf.user_id, a.festival_id
   FROM user_friends uf
   JOIN attendances a ON a.user_id = uf.user_id
+  WHERE GREATEST(a.created_at, a.updated_at) > (now() - '48:00:00'::interval)
 ),
 -- Aggregate consumptions by attendance and drink_type
 recent_consumptions AS (

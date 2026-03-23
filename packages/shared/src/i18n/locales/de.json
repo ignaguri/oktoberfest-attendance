@@ -1029,8 +1029,7 @@
       "unreadCount": "{{count}} ungelesen",
       "markAllRead": "Alle als gelesen markieren",
       "tapToView": "Tippe, um Details anzuzeigen",
-      "archive": "Archivieren",
-      "swipeToArchive": "Nach links wischen zum Archivieren"
+      "archive": "Archivieren"
     },
     "privacy": {
       "title": "Privatsphäre-Einstellungen",

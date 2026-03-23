@@ -17,8 +17,11 @@ import { Swipeable } from "react-native-gesture-handler";
 
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { Colors } from "@/lib/constants/colors";
+import { Colors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
+
+const EMPTY_CONTAINER_STYLE = { flexGrow: 1 } as const;
+const LIST_CONTAINER_STYLE = { paddingTop: 4, paddingBottom: 16 } as const;
 
 interface NotificationItemProps {
   notification: Notification;
@@ -26,9 +29,6 @@ interface NotificationItemProps {
   onArchive: (notification: Notification) => void;
 }
 
-/**
- * Render the archive action behind the swipeable item
- */
 function renderRightActions(
   _progress: Animated.AnimatedInterpolation<number>,
   dragX: Animated.AnimatedInterpolation<number>,
@@ -46,16 +46,13 @@ function renderRightActions(
         style={{ transform: [{ scale }] }}
         className="items-center"
       >
-        <Archive size={20} color="white" />
+        <Archive size={20} color={IconColors.white} />
         <Text className="mt-1 text-xs text-white">{label}</Text>
       </Animated.View>
     </View>
   );
 }
 
-/**
- * Single notification item component with swipe-to-archive
- */
 function NotificationItem({
   notification,
   onPress,
@@ -128,9 +125,6 @@ function NotificationItem({
   );
 }
 
-/**
- * Empty state when no notifications
- */
 function EmptyState() {
   const { t } = useTranslation();
 
@@ -151,15 +145,7 @@ interface NotificationInboxProps {
   onNotificationPress?: (notification: Notification) => void;
 }
 
-/**
- * Notification Inbox Component
- *
- * Displays a list of notifications from Novu.
- * Uses the @novu/react-native hooks for data fetching.
- * Supports swipe-to-archive on individual notifications.
- *
- * Must be used within a NovuProviderWrapper.
- */
+/** Must be used within a NovuProviderWrapper. */
 export function NotificationInbox({
   onNotificationPress,
 }: NotificationInboxProps) {
@@ -279,8 +265,8 @@ export function NotificationInbox({
         onEndReachedThreshold={0.5}
         contentContainerStyle={
           notifications?.length === 0
-            ? { flexGrow: 1 }
-            : { paddingTop: 4, paddingBottom: 16 }
+            ? EMPTY_CONTAINER_STYLE
+            : LIST_CONTAINER_STYLE
         }
       />
     </View>

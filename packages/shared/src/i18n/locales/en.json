@@ -1064,8 +1064,7 @@
       "unreadCount": "{{count}} unread",
       "markAllRead": "Mark all read",
       "tapToView": "Tap to view notification details",
-      "archive": "Archive",
-      "swipeToArchive": "Swipe left to archive"
+      "archive": "Archive"
     },
     "privacy": {
       "title": "Privacy Settings",

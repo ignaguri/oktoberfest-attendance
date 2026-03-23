@@ -8,14 +8,26 @@ import { useCallback } from "react";
 
 import { useNotifications } from "@/contexts/NotificationContext";
 
+const INBOX_APPEARANCE = {
+  elements: {
+    bellContainer: { color: "white" },
+    bellIcon: { color: "white" },
+    popoverContent: {
+      width: "80dvw",
+      height: "75dvh",
+      transform: "translateX(-8px)",
+    },
+  },
+} as const;
+
 export function NotificationBell() {
   const { user, loading } = useNotifications();
   const router = useRouter();
 
   const handleNotificationClick = useCallback(
     (notification: Notification) => {
-      const payload = notification.data ?? {};
-      const route = getNotificationRoute(payload);
+      if (!notification.data) return;
+      const route = getNotificationRoute(notification.data);
       if (route) {
         router.push(route);
       }
@@ -23,7 +35,6 @@ export function NotificationBell() {
     [router],
   );
 
-  // Don't render until loaded or if no user
   if (loading || !user) {
     return null;
   }
@@ -33,21 +44,7 @@ export function NotificationBell() {
       applicationIdentifier={process.env.NEXT_PUBLIC_NOVU_APP_ID!}
       subscriberId={user.id}
       onNotificationClick={handleNotificationClick}
-      appearance={{
-        elements: {
-          bellContainer: {
-            color: "white",
-          },
-          bellIcon: {
-            color: "white",
-          },
-          popoverContent: {
-            width: "80dvw",
-            height: "75dvh",
-            transform: "translateX(-8px)",
-          },
-        },
-      }}
+      appearance={INBOX_APPEARANCE}
     />
   );
 }
