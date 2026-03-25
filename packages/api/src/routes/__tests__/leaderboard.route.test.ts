@@ -166,6 +166,43 @@ describe("Leaderboard Routes - Unit Tests", () => {
       );
     });
 
+    it("should handle decimal totalBeers from radler weighting", async () => {
+      const festivalId = "123e4567-e89b-12d3-a456-426614174000";
+
+      // Supabase returns NUMERIC as strings
+      const mockLeaderboard = [
+        {
+          user_id: "user1",
+          username: "radlerfan",
+          full_name: "Radler Fan",
+          avatar_url: null,
+          days_attended: 2,
+          total_beers: "3.5", // 3 beers + 1 radler (0.5)
+          avg_beers: "1.75",
+        },
+      ];
+
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: mockLeaderboard,
+        error: null,
+      } as any);
+
+      const req = createAuthRequest(
+        `/leaderboard?festivalId=${festivalId}&limit=50&offset=0`,
+        { method: "GET" },
+      );
+
+      const res = await app.request(req.url, {
+        method: req.method,
+        headers: req.headers,
+      });
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.data[0].totalBeers).toBe(3.5);
+      expect(body.data[0].avgBeers).toBe(1.75);
+    });
+
     it("should validate required festivalId query parameter", async () => {
       const req = createAuthRequest(`/leaderboard?limit=50&offset=0`, {
         method: "GET",
