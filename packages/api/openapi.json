@@ -5936,7 +5936,7 @@
                             "type": "integer"
                           },
                           "totalBeers": {
-                            "type": "integer"
+                            "type": "number"
                           },
                           "avgBeers": {
                             "type": "number"
@@ -6074,7 +6074,7 @@
                             "type": "integer"
                           },
                           "totalBeers": {
-                            "type": "integer"
+                            "type": "number"
                           },
                           "avgBeers": {
                             "type": "number"

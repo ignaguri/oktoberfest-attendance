@@ -111,6 +111,9 @@ export default function GlobalLeaderboardClient() {
           placeholder="Select winning criteria"
         />
       </div>
+      <p className="text-muted-foreground mb-2 text-center text-xs">
+        {t("leaderboard.scoringNote")}
+      </p>
       {selectedCriteria && leaderboardData && leaderboardData.length > 0 && (
         <Leaderboard
           entries={leaderboardData}

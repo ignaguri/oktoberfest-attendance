@@ -919,6 +919,7 @@
     "loading": "Lade Rangliste...",
     "noFestival": "Bitte wähle ein Festival aus, um die Rangliste anzuzeigen",
     "error": "Laden der Rangliste fehlgeschlagen",
+    "scoringNote": "Bier = 1 Punkt, Radler = 0,5 Punkte",
     "header": {
       "player": "Spieler"
     },
