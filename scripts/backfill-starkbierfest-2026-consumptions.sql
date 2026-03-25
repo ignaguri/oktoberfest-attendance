@@ -16,6 +16,7 @@ WITH starkbier_festival AS (
   FROM festivals
   WHERE festival_type = 'starkbierfest'
     AND name ILIKE '%2026%'
+  ORDER BY start_date DESC, created_at DESC
   LIMIT 1
 ),
 missing_attendances AS (
@@ -54,6 +55,7 @@ ORDER BY p.username, ma.date;
 --   FROM festivals
 --   WHERE festival_type = 'starkbierfest'
 --     AND name ILIKE '%2026%'
+--   ORDER BY start_date DESC, created_at DESC
 --   LIMIT 1
 -- ),
 -- missing_attendances AS (

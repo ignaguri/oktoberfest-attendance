@@ -1,10 +1,15 @@
 -- Count radler as 0.5 beers in leaderboard rankings.
 -- Only affects leaderboard RPCs; attendance_with_totals and other views unchanged.
+--
+-- NOTE: Must DROP + CREATE (not CREATE OR REPLACE) because the return type
+-- of total_beers changes from BIGINT to NUMERIC.
 
 -- =============================================================================
 -- get_global_leaderboard: radler = 0.5 beer
 -- =============================================================================
-CREATE OR REPLACE FUNCTION public.get_global_leaderboard(
+DROP FUNCTION IF EXISTS public.get_global_leaderboard(integer, uuid);
+
+CREATE FUNCTION public.get_global_leaderboard(
   p_winning_criteria_id integer,
   p_festival_id uuid DEFAULT NULL::uuid
 )
@@ -20,6 +25,7 @@ RETURNS TABLE(
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
     RETURN QUERY
@@ -87,7 +93,9 @@ $$;
 -- =============================================================================
 -- get_group_leaderboard: radler = 0.5 beer
 -- =============================================================================
-CREATE OR REPLACE FUNCTION public.get_group_leaderboard(
+DROP FUNCTION IF EXISTS public.get_group_leaderboard(uuid, integer);
+
+CREATE FUNCTION public.get_group_leaderboard(
   p_group_id uuid,
   p_winning_criteria_id integer
 )
