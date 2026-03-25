@@ -134,6 +134,9 @@ export default function GroupPage() {
         {t(`groups.winningCriteria.${group.winningCriteria}`)}
       </p>
 
+      <p className="text-muted-foreground mb-2 text-xs">
+        {t("leaderboard.scoringNote")}
+      </p>
       <div className="flex flex-col gap-4">
         <Leaderboard
           entries={leaderboardEntries}

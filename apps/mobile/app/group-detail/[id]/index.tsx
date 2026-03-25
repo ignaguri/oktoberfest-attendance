@@ -395,6 +395,9 @@ export default function GroupDetailScreen() {
               </Text>
               {isLoadingLeaderboard && <Spinner size="small" />}
             </HStack>
+            <Text className="text-xs text-typography-400">
+              {t("leaderboard.scoringNote")}
+            </Text>
 
             <Leaderboard
               entries={(leaderboardData as LeaderboardEntry[]) || []}
