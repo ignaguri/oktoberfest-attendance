@@ -9,7 +9,7 @@ export const LeaderboardEntrySchema = z.object({
   fullName: z.string().nullable(),
   avatarUrl: z.url().nullable(),
   daysAttended: z.number().int(),
-  totalBeers: z.number().int(),
+  totalBeers: z.number(),
   avgBeers: z.number(),
   position: z.number().int(),
   groupCount: z.number().int().optional(),

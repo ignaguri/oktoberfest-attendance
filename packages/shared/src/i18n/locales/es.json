@@ -954,6 +954,7 @@
     "loading": "Cargando ranking...",
     "noFestival": "Por favor, seleccioná un festival para ver el ranking",
     "error": "Error al cargar el ranking",
+    "scoringNote": "Cerveza = 1 punto, Radler = 0,5 puntos",
     "header": {
       "player": "Jugador"
     },

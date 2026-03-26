@@ -116,7 +116,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
       fullName: data.full_name,
       avatarUrl: data.avatar_url,
       daysAttended: data.days_attended || 0,
-      totalBeers: data.total_beers || 0,
+      totalBeers: parseFloat(data.total_beers || "0"),
       avgBeers: parseFloat(data.avg_beers || "0"),
       position: data.position || 0,
       groupCount: data.group_count || 0,

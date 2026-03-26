@@ -191,6 +191,9 @@ export default function LeaderboardScreen() {
             })}
           </Heading>
         </HStack>
+        <Text className="text-xs text-typography-400">
+          {t("leaderboard.scoringNote")}
+        </Text>
 
         {/* Leaderboard with sortable columns */}
         <Leaderboard

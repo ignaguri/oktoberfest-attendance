@@ -954,6 +954,7 @@
     "loading": "Loading leaderboard...",
     "noFestival": "Please select a festival to view the leaderboard",
     "error": "Failed to load leaderboard",
+    "scoringNote": "Beer = 1 point, Radler = 0.5 points",
     "header": {
       "player": "Player"
     },
