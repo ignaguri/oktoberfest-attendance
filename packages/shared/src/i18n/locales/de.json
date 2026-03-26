@@ -2270,6 +2270,20 @@
       "leaderboard": "Bestenliste"
     }
   },
+  "update": {
+    "available": {
+      "title": "Update verfügbar",
+      "description": "Eine neue Version von ProstCounter ist bereit. Starte neu, um die neuesten Funktionen und Verbesserungen zu erhalten.",
+      "restartNow": "Jetzt neu starten",
+      "later": "Vielleicht später"
+    },
+    "storeAvailable": {
+      "title": "Neue Version verfügbar",
+      "description": "Eine neue Version von ProstCounter ist im App Store verfügbar. Aktualisiere, um die neuesten Funktionen und Verbesserungen zu erhalten.",
+      "updateNow": "Jetzt aktualisieren",
+      "later": "Vielleicht später"
+    }
+  },
   "crowdReport": {
     "title": "Auslastungsbericht",
     "status": "Auslastungsstatus",

@@ -6,6 +6,7 @@ import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { ArrowUpCircle, Download } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -17,9 +18,10 @@ import { NovuAutoSubscriber } from "@/components/notifications/NovuAutoSubscribe
 import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
-import { UpdateAvailablePrompt } from "@/components/update/UpdateAvailablePrompt";
+import { UpdatePrompt } from "@/components/update/UpdatePrompt";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
 import { useSentryUserContext } from "@/hooks/useSentryUserContext";
+import { useStoreUpdate } from "@/hooks/useStoreUpdate";
 import { GlobalAlertProvider } from "@/lib/alerts";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
@@ -211,11 +213,37 @@ function UpdatePromptHandler() {
   };
 
   return (
-    <UpdateAvailablePrompt
+    <UpdatePrompt
       isOpen={showPrompt}
       onClose={() => setDismissed(true)}
       onUpdate={handleUpdate}
+      icon={Download}
+      titleKey="update.available.title"
+      descriptionKey="update.available.description"
+      primaryButtonKey="update.available.restartNow"
+      dismissButtonKey="update.available.later"
       isLoading={isRestarting}
+    />
+  );
+}
+
+// Show prompt when a newer version is available on the App Store
+function StoreUpdatePromptHandler() {
+  const { isStoreUpdateAvailable, openStore } = useStoreUpdate();
+  const [dismissed, setDismissed] = useState(false);
+
+  const showPrompt = isStoreUpdateAvailable && !dismissed;
+
+  return (
+    <UpdatePrompt
+      isOpen={showPrompt}
+      onClose={() => setDismissed(true)}
+      onUpdate={openStore}
+      icon={ArrowUpCircle}
+      titleKey="update.storeAvailable.title"
+      descriptionKey="update.storeAvailable.description"
+      primaryButtonKey="update.storeAvailable.updateNow"
+      dismissButtonKey="update.storeAvailable.later"
     />
   );
 }
@@ -293,6 +321,7 @@ export default function RootLayout() {
                                     <NovuAutoSubscriber />
                                     <NotificationPromptHandler />
                                     <UpdatePromptHandler />
+                                    <StoreUpdatePromptHandler />
                                     <TutorialOverlay />
                                     <SyncStatusBar />
                                     <Stack

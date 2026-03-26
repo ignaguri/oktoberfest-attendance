@@ -2578,6 +2578,12 @@
       "description": "Una nueva versión de ProstCounter está lista. Reiniciá para obtener las últimas funciones y mejoras.",
       "restartNow": "Reiniciar ahora",
       "later": "Tal vez más tarde"
+    },
+    "storeAvailable": {
+      "title": "Nueva versión disponible",
+      "description": "Una nueva versión de ProstCounter está disponible en la App Store. Actualizá para obtener las últimas funciones y mejoras.",
+      "updateNow": "Actualizar ahora",
+      "later": "Tal vez más tarde"
     }
   },
   "crowdReport": {
