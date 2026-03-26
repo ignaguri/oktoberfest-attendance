@@ -68,6 +68,7 @@ export function useStoreUpdate() {
     if (now - lastCheckRef.current < CHECK_INTERVAL_MS) return;
 
     isCheckingRef.current = true;
+    lastCheckRef.current = now;
 
     try {
       const currentVersion = Application.nativeApplicationVersion;
@@ -80,7 +81,6 @@ export function useStoreUpdate() {
         );
         setIsStoreUpdateAvailable(true);
       }
-      lastCheckRef.current = Date.now();
     } catch (error) {
       logger.error("Error checking store version:", error);
     } finally {
@@ -106,7 +106,11 @@ export function useStoreUpdate() {
   }, [checkForStoreUpdate]);
 
   const openStore = useCallback(async () => {
-    await Linking.openURL(APP_STORE_URL);
+    try {
+      await Linking.openURL(APP_STORE_URL);
+    } catch (error) {
+      logger.error("Failed to open App Store URL:", error);
+    }
   }, []);
 
   return {
