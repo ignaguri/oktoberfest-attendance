@@ -13,7 +13,9 @@ import type { TentGroup } from "@prostcounter/shared/hooks";
 import type {
   AttendanceByDate,
   AttendanceWithTotals,
+  Consumption as SharedConsumption,
   GroupWithMembers,
+  TentVisit,
   WinningCriteria,
 } from "@prostcounter/shared/schemas";
 import {
@@ -31,6 +33,7 @@ import { OfflineContext } from "./offline-provider";
 import {
   queryAttendanceByDateWithTotals,
   queryAttendancesWithTotals,
+  queryConsumptionsByDate,
   queryGroupsWithMemberCount,
 } from "./queries";
 import { ALL_LOCAL_PREFIXES, localKeys } from "./query-keys";
@@ -294,16 +297,29 @@ export function useAdaptedAttendanceByDate(
 
       if (!row) return null;
 
-      // Get tent IDs from tent_visits for this date
-      const tentVisitRows = await db.getAllAsync<{ tent_id: string }>(
-        `SELECT DISTINCT tent_id FROM tent_visits
-         WHERE festival_id = ? AND visit_date = ? AND _deleted = 0`,
+      // Get tent visits with tent names for this date
+      const tentVisitRows = await db.getAllAsync<{
+        tent_id: string;
+        visit_date: string | null;
+        tent_name: string | null;
+      }>(
+        `SELECT tv.tent_id, tv.visit_date, t.name as tent_name
+         FROM tent_visits tv
+         LEFT JOIN tents t ON tv.tent_id = t.id
+         WHERE tv.festival_id = ? AND tv.visit_date = ? AND tv._deleted = 0`,
         [festivalId, date],
       );
+
+      const tentVisits: TentVisit[] = tentVisitRows.map((tv) => ({
+        tentId: tv.tent_id,
+        visitDate: tv.visit_date ?? date,
+        tentName: tv.tent_name ?? null,
+      }));
 
       const base = rowToAttendanceWithTotals(row);
       return {
         ...base,
+        tentVisits,
         tentIds: tentVisitRows.map((tv) => tv.tent_id),
         pictureUrls: [],
         pictures: [],
@@ -415,6 +431,52 @@ export function useAdaptedGroups(
       }));
     },
     enabled: isReady && !!festivalId,
+    staleTime: Infinity,
+  });
+
+  return toDataQueryResult(query);
+}
+
+// =============================================================================
+// Consumptions
+// =============================================================================
+
+/**
+ * Offline-first replacement for useConsumptions().
+ * Reads from local SQLite and maps to shared Consumption type (camelCase).
+ */
+export function useAdaptedConsumptionsByDate(
+  festivalId: string | undefined,
+  date: string | undefined,
+): DataQueryResult<SharedConsumption[]> {
+  const { isReady, getDb } = useOfflineContext();
+
+  const query = useQuery<SharedConsumption[], Error>({
+    queryKey:
+      festivalId && date
+        ? localKeys.consumptions.byDate(festivalId, date)
+        : ["local-consumptions"],
+    queryFn: async () => {
+      if (!isReady || !getDb || !festivalId || !date) return [];
+      const drizzleDb = createDrizzleDb(getDb());
+      const rows = await queryConsumptionsByDate(drizzleDb, festivalId, date);
+
+      return rows.map((row) => ({
+        id: row.id,
+        attendanceId: row.attendance_id,
+        tentId: row.tent_id ?? null,
+        drinkType: row.drink_type ?? "beer",
+        drinkName: row.drink_name ?? null,
+        basePriceCents: row.base_price_cents,
+        pricePaidCents: row.price_paid_cents,
+        tipCents: row.tip_cents ?? null,
+        volumeMl: row.volume_ml ?? null,
+        recordedAt: row.recorded_at,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      })) as SharedConsumption[];
+    },
+    enabled: isReady && !!festivalId && !!date,
     staleTime: Infinity,
   });
 

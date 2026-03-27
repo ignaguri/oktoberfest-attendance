@@ -12,9 +12,10 @@
 import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
+import { OfflineContext } from "@/lib/database/offline-provider";
 import { logger } from "@/lib/logger";
 
 import {
@@ -51,6 +52,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const offlineContext = useContext(OfflineContext);
   const updateAttendance = useOfflineUpdateAttendance();
   const logConsumption = useOfflineLogConsumption();
   const deleteConsumption = useOfflineDeleteConsumption();
@@ -178,9 +180,18 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         // Step 5: Invalidate caches
         invalidateQueries(QueryKeys.attendanceByDate(festivalId, dateStr));
         invalidateQueries(QueryKeys.consumptions(festivalId, dateStr));
-        // Invalidate galleries if photos were deleted
         if (photosToDelete.length > 0) {
-          invalidateQueries(["gallery"]); // Prefix match: all galleries
+          invalidateQueries(["gallery"]);
+        }
+
+        // Step 6: Trigger a single background push for all queued operations
+        // Retry once after 3s if first attempt fails (e.g., transient network error)
+        if (offlineContext?.isOnline) {
+          offlineContext.sync({ direction: "push" }).catch(() => {
+            setTimeout(() => {
+              offlineContext.sync({ direction: "push" }).catch(() => {});
+            }, 3000);
+          });
         }
       } catch (err) {
         const saveError =
@@ -192,6 +203,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
       }
     },
     [
+      offlineContext,
       updateAttendance,
       logConsumption,
       deleteConsumption,

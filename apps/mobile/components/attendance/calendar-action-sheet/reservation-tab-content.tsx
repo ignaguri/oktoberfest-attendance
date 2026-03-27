@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useCancelReservation,
   useCreateReservation,
-  useTents,
   useUpdateReservation,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -31,6 +30,7 @@ import { Text } from "@/components/ui/text";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors, SwitchColors } from "@/lib/constants/colors";
+import { useAdaptedTents } from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
@@ -81,7 +81,7 @@ export function ReservationTabContent({
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const isEditMode = !!existingReservation;
-  const { tents } = useTents(festivalId);
+  const { tents } = useAdaptedTents(festivalId);
 
   // Track last initialized state to prevent infinite loops
   const lastInitializedRef = useRef<{

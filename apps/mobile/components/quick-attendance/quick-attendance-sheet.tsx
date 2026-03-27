@@ -1,11 +1,8 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useConsumptions,
-  useUpdatePersonalAttendance,
-} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import * as Haptics from "expo-haptics";
 import {
@@ -19,7 +16,7 @@ import {
   Wine,
   X,
 } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -46,6 +43,7 @@ import {
   type PendingPhoto,
   useBeerPictureUpload,
 } from "@/hooks/useBeerPictureUpload";
+import { useOfflineUpdateAttendance } from "@/hooks/useOfflineAttendance";
 import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
 import {
   BackgroundColors,
@@ -55,8 +53,11 @@ import {
 } from "@/lib/constants/colors";
 import {
   useAdaptedAttendanceByDate,
+  useAdaptedConsumptionsByDate,
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
+import { OfflineContext } from "@/lib/database/offline-provider";
+import { ALL_LOCAL_PREFIXES } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
 
@@ -171,15 +172,20 @@ export function QuickAttendanceSheet({
   const { data: attendance, refetch: refetchAttendance } =
     useAdaptedAttendanceByDate(festivalId, today);
 
-  // Fetch today's consumptions (for drink counts)
-  const { data: consumptionsData } = useConsumptions(festivalId || "", today);
+  // Fetch today's consumptions (local-first from SQLite)
+  const { data: consumptionsData } = useAdaptedConsumptionsByDate(
+    festivalId,
+    today,
+  );
 
   // Fetch tents for name lookup (offline-first)
   const { tents: tentGroups } = useAdaptedTents(festivalId);
 
-  // Mutations
+  // Mutations (local-first)
+  const offlineContext = useContext(OfflineContext);
+  const queryClient = useQueryClient();
   const logConsumption = useOfflineLogConsumption();
-  const updateAttendance = useUpdatePersonalAttendance();
+  const updateAttendance = useOfflineUpdateAttendance();
 
   // Photo upload hook
   const {
@@ -341,7 +347,22 @@ export function QuickAttendanceSheet({
         }
       }
 
-      // Refetch attendance data
+      // Invalidate local caches so adapted hooks re-read from SQLite
+      await Promise.all(
+        ALL_LOCAL_PREFIXES.map((prefix) =>
+          queryClient.invalidateQueries({ queryKey: [prefix] }),
+        ),
+      );
+
+      // Trigger background push
+      if (offlineContext?.isOnline) {
+        offlineContext.sync({ direction: "push" }).catch(() => {
+          setTimeout(() => {
+            offlineContext.sync({ direction: "push" }).catch(() => {});
+          }, 3000);
+        });
+      }
+
       await refetchAttendance();
 
       // Show success toast with appropriate message
@@ -394,6 +415,8 @@ export function QuickAttendanceSheet({
     logConsumption,
     updateAttendance,
     uploadPendingPhotos,
+    offlineContext,
+    queryClient,
     refetchAttendance,
     toast,
     onClose,

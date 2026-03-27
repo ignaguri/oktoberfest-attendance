@@ -331,7 +331,7 @@ export function OfflineDataProvider({
 
     // On native, use NetInfo
     const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
-      const online = state.isConnected === null ? true : state.isConnected;
+      const online = state.isInternetReachable ?? state.isConnected ?? true;
       setIsOnline(online);
 
       // Update sync status when going offline

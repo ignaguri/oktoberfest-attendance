@@ -1,10 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useAttendanceByDate,
-  useConsumptions,
-  useDeleteAttendance,
-  useTents,
-} from "@prostcounter/shared/hooks";
+import { useDeleteAttendance } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AttendanceWithTotals,
@@ -47,6 +42,11 @@ import { VStack } from "@/components/ui/vstack";
 import { type PendingPhoto } from "@/hooks/useBeerPictureUpload";
 import { useSaveAttendance } from "@/hooks/useSaveAttendance";
 import { IconColors } from "@/lib/constants/colors";
+import {
+  useAdaptedAttendanceByDate,
+  useAdaptedConsumptionsByDate,
+  useAdaptedTents,
+} from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
@@ -119,20 +119,19 @@ export function AttendanceFormSheet({
   });
 
   const isEditMode = !!existingAttendance;
-  const { tents } = useTents(festivalId);
+  const { tents } = useAdaptedTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
   const deleteAttendance = useDeleteAttendance();
 
-  // Format date string for API calls
   const dateString =
     selectedDate && !isNaN(selectedDate.getTime())
       ? format(selectedDate, "yyyy-MM-dd")
       : "";
 
-  // Fetch consumptions for this date
-  const { data: consumptionsData } = useConsumptions(
-    isOpen ? festivalId : "",
-    isOpen ? dateString : "",
+  // Fetch consumptions for this date (local-first from SQLite)
+  const { data: consumptionsData } = useAdaptedConsumptionsByDate(
+    isOpen ? festivalId : undefined,
+    isOpen ? dateString : undefined,
   );
   const consumptions = useMemo(
     () => consumptionsData || [],
@@ -168,10 +167,10 @@ export function AttendanceFormSheet({
   // Track previous isOpen state to detect when sheet opens
   const prevIsOpenRef = useRef(isOpen);
 
-  // Fetch complete attendance data with beer pictures when editing
-  const { data: attendanceWithPhotos } = useAttendanceByDate(
-    isOpen && isEditMode ? festivalId : "",
-    isOpen && isEditMode ? dateString : "",
+  // Fetch complete attendance data with beer pictures when editing (local-first)
+  const { data: attendanceWithPhotos } = useAdaptedAttendanceByDate(
+    isOpen && isEditMode ? festivalId : undefined,
+    isOpen && isEditMode ? dateString : undefined,
   );
 
   // Create dynamic schema based on festival dates

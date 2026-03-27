@@ -1,16 +1,10 @@
 /**
- * Offline-Aware Attendance Hook
+ * Local-First Attendance Hook
  *
- * Mobile-specific wrapper for the attendance update hook that respects offline mode:
- * - When online: delegates to the original API-based useUpdatePersonalAttendance
- * - When offline: writes to local SQLite and queues for sync
- *
- * This is needed because the shared useUpdatePersonalAttendance hook calls the API
- * directly, which hangs/fails when offline, blocking the entire save flow in
- * useSaveAttendance.
+ * All mutations write to local SQLite first. Sync is NOT triggered here --
+ * the orchestrator (useSaveAttendance) triggers a single push after all writes.
  */
 
-import { useUpdatePersonalAttendance } from "@prostcounter/shared/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
@@ -23,7 +17,7 @@ import { logger } from "@/lib/logger";
 interface UpdateAttendanceInput {
   festivalId: string;
   date: string;
-  amount: number;
+  amount?: number;
   tents?: string[];
 }
 
@@ -34,21 +28,17 @@ interface UpdateAttendanceResult {
 }
 
 /**
- * Offline-aware hook to update personal attendance.
- * - Online: Makes API call directly via useUpdatePersonalAttendance
- * - Offline: Stores in local SQLite and queues for sync
- * - Falls back to online-only mode when OfflineDataProvider is not available
+ * Local-first hook to update personal attendance.
+ * Always writes to SQLite first. Does not trigger sync -- caller is responsible.
  */
 export function useOfflineUpdateAttendance() {
   const context = useContext(OfflineContext);
-  const isOnline = context?.isOnline ?? true;
   const isReady = context?.isReady ?? false;
   const getDb = context?.getDb;
   const refreshPendingCount = context?.refreshPendingCount;
-  const apiMutation = useUpdatePersonalAttendance();
   const { user } = useAuth();
 
-  const updateAttendanceOffline = useCallback(
+  const updateAttendanceLocal = useCallback(
     async (input: UpdateAttendanceInput): Promise<UpdateAttendanceResult> => {
       if (!isReady || !getDb || !refreshPendingCount) {
         throw new Error("Offline mode not available");
@@ -62,7 +52,6 @@ export function useOfflineUpdateAttendance() {
       const db = getDb();
       const now = new Date().toISOString();
 
-      // Check if attendance already exists for this festival + date
       const existing = await db.getFirstAsync<LocalAttendance>(
         "SELECT * FROM attendances WHERE festival_id = ? AND date = ? AND _deleted = 0",
         [input.festivalId, input.date],
@@ -71,7 +60,6 @@ export function useOfflineUpdateAttendance() {
       let attendanceId: string;
 
       if (existing) {
-        // Update existing attendance
         attendanceId = existing.id;
         await db.runAsync(
           `UPDATE attendances SET
@@ -80,7 +68,6 @@ export function useOfflineUpdateAttendance() {
           [now, existing.id],
         );
 
-        // Enqueue update operation for sync
         await enqueueOperation(db, "UPDATE", "attendances", existing.id, {
           festival_id: input.festivalId,
           date: input.date,
@@ -92,7 +79,6 @@ export function useOfflineUpdateAttendance() {
           attendanceId,
         });
       } else {
-        // Insert new attendance
         attendanceId = generateUUID();
         await db.runAsync(
           `INSERT INTO attendances (
@@ -102,7 +88,6 @@ export function useOfflineUpdateAttendance() {
           [attendanceId, userId, input.festivalId, input.date, now, now],
         );
 
-        // Enqueue insert operation for sync
         await enqueueOperation(db, "INSERT", "attendances", attendanceId, {
           festival_id: input.festivalId,
           date: input.date,
@@ -115,10 +100,38 @@ export function useOfflineUpdateAttendance() {
         });
       }
 
+      // Write tent_visits locally so adapted hooks see them immediately
+      if (input.tents && input.tents.length > 0) {
+        for (const tentId of input.tents) {
+          const visitId = generateUUID();
+          await db.runAsync(
+            `INSERT OR REPLACE INTO tent_visits (
+              id, user_id, tent_id, festival_id, visit_date,
+              _synced_at, _deleted, _dirty
+            ) VALUES (
+              COALESCE(
+                (SELECT id FROM tent_visits WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?),
+                ?
+              ),
+              ?, ?, ?, ?, NULL, 0, 1
+            )`,
+            [
+              userId,
+              tentId,
+              input.festivalId,
+              input.date,
+              visitId,
+              userId,
+              tentId,
+              input.festivalId,
+              input.date,
+            ],
+          );
+        }
+      }
+
       await refreshPendingCount();
 
-      // Return a result matching the API shape so callers (useSaveAttendance)
-      // can use result.attendanceId for photo uploads
       return {
         attendanceId,
         tentsAdded: input.tents ?? [],
@@ -129,18 +142,6 @@ export function useOfflineUpdateAttendance() {
   );
 
   return useMutation({
-    mutationFn: async (
-      input: UpdateAttendanceInput,
-    ): Promise<UpdateAttendanceResult> => {
-      // If online or offline mode not available, use API
-      if (isOnline || !context) {
-        logger.debug("[OfflineAttendance] Online - calling API");
-        return apiMutation.mutateAsync(input);
-      } else {
-        // Offline: write locally and queue for sync
-        logger.debug("[OfflineAttendance] Offline - saving locally");
-        return updateAttendanceOffline(input);
-      }
-    },
+    mutationFn: updateAttendanceLocal,
   });
 }

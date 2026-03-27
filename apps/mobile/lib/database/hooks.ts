@@ -46,6 +46,7 @@ import {
   generateConsumptionIdempotencyKey,
   generateUUID,
   getRecentConsumption,
+  insertConsumptionLocally,
 } from "./sync-queue";
 
 // =============================================================================
@@ -568,7 +569,25 @@ export function useLocalLogConsumption() {
         Date.now(),
       );
 
-      const consumption: LocalConsumption = {
+      await insertConsumptionLocally(db, {
+        id,
+        attendanceId: input.attendanceId,
+        festivalId: input.festivalId,
+        date: input.date,
+        drinkType: input.drinkType,
+        drinkName: input.drinkName,
+        volumeMl: input.volumeMl,
+        pricePaidCents: input.pricePaidCents,
+        basePriceCents: input.basePriceCents,
+        tipCents: input.tipCents,
+        tentId: input.tentId,
+        idempotencyKey,
+        now,
+      });
+
+      await refreshPendingCount();
+
+      return {
         id,
         attendance_id: input.attendanceId,
         drink_type: input.drinkType,
@@ -585,54 +604,7 @@ export function useLocalLogConsumption() {
         _synced_at: null,
         _dirty: 1,
         _deleted: 0,
-      };
-
-      await db.runAsync(
-        `INSERT INTO consumptions (
-          id, attendance_id, drink_type, drink_name, volume_ml,
-          price_paid_cents, base_price_cents, tip_cents, tent_id,
-          recorded_at, idempotency_key, created_at, updated_at,
-          _synced_at, _dirty, _deleted
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 1, 0)`,
-        [
-          id,
-          input.attendanceId,
-          input.drinkType,
-          input.drinkName ?? null,
-          input.volumeMl,
-          input.pricePaidCents,
-          input.basePriceCents ?? input.pricePaidCents,
-          input.tipCents ?? null,
-          input.tentId ?? null,
-          now,
-          idempotencyKey,
-          now,
-          now,
-        ],
-      );
-
-      // Enqueue for server sync
-      await enqueueOperation(
-        db,
-        "INSERT",
-        "consumptions",
-        id,
-        {
-          festival_id: input.festivalId,
-          date: input.date,
-          drink_type: input.drinkType,
-          drink_name: input.drinkName,
-          volume_ml: input.volumeMl,
-          price_paid_cents: input.pricePaidCents,
-          base_price_cents: input.basePriceCents,
-          tip_cents: input.tipCents,
-          tent_id: input.tentId,
-        },
-        { idempotencyKey },
-      );
-
-      await refreshPendingCount();
-      return consumption;
+      } as LocalConsumption;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({

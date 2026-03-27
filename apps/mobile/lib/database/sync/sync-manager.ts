@@ -9,15 +9,9 @@ import type * as SQLite from "expo-sqlite";
 
 import { logger } from "@/lib/logger";
 
-import { MUTABLE_TABLES, type SyncQueueItem } from "../schema";
-import {
-  getPendingOperations,
-  getQueueStats,
-  getSyncMetadata,
-  markOperationCompleted,
-  markOperationFailed,
-  markOperationProcessing,
-} from "../sync-queue";
+import { type ProcessorResult, QueueProcessor } from "../queue-processor";
+import { MUTABLE_TABLES } from "../schema";
+import { getQueueStats, getSyncMetadata } from "../sync-queue";
 import {
   pullGroupMembers,
   pullGroups,
@@ -29,14 +23,12 @@ import {
   pullConsumptions,
   pullProfile,
 } from "./pull-user-data";
-import { pushDirtyRecords } from "./push-dirty";
 import { pushDelete, pushInsert, pushUpdate } from "./push-handlers";
-import type { PullResult, PushResult, SyncOptions, SyncResult } from "./types";
+import type { PullResult, SyncOptions, SyncResult } from "./types";
 
 // Re-export types for consumers
 export type {
   PullResult,
-  PushResult,
   SyncDirection,
   SyncOptions,
   SyncResult,
@@ -106,12 +98,10 @@ export class SyncManager {
 
       // Then push local changes
       if (direction === "push" || direction === "both") {
-        const pushResults = await this.pushAll();
-        result.pushed = pushResults.filter((r) => r.success).length;
-        result.failed = pushResults.filter((r) => !r.success).length;
-        result.errors.push(
-          ...pushResults.filter((r) => r.error).map((r) => r.error!),
-        );
+        const pushResult = await this.pushAll();
+        result.pushed = pushResult.succeeded;
+        result.failed = pushResult.failed;
+        result.errors.push(...pushResult.errors.map((e) => e.error));
       }
 
       result.success = result.failed === 0;
@@ -179,65 +169,27 @@ export class SyncManager {
   // Push Operations
   // ===========================================================================
 
-  async pushAll(): Promise<PushResult[]> {
-    const results: PushResult[] = [];
+  async pushAll(): Promise<ProcessorResult> {
+    const processor = new QueueProcessor(this.db, {
+      signal: this.abortController?.signal ?? undefined,
+    });
 
-    // Process queued operations
-    const pendingOps = await getPendingOperations(this.db);
-    logger.debug(
-      `[SyncManager] Processing ${pendingOps.length} pending operations`,
-    );
-
-    for (const op of pendingOps) {
-      if (this.abortController?.signal.aborted) {
-        break;
-      }
-      const result = await this.processOperation(op);
-      results.push(result);
-    }
-
-    // Also push dirty records that aren't queued
-    const dirtyResults = await pushDirtyRecords(this.db);
-    results.push(...dirtyResults);
-
-    return results;
-  }
-
-  private async processOperation(op: SyncQueueItem): Promise<PushResult> {
-    const result: PushResult = {
-      operationId: op.id,
-      success: false,
-    };
-
-    try {
-      await markOperationProcessing(this.db, op.id);
+    processor.registerHandler("INSERT", async (op) => {
       const payload = JSON.parse(op.payload);
+      await pushInsert(op.table_name, op.record_id, payload);
+    });
+    processor.registerHandler("UPDATE", async (op) => {
+      const payload = JSON.parse(op.payload);
+      await pushUpdate(op.table_name, op.record_id, payload);
+    });
+    processor.registerHandler("DELETE", async (op) => {
+      await pushDelete(op.table_name, op.record_id);
+    });
+    processor.registerHandler("UPLOAD_FILE", async () => {
+      // File uploads handled by photo-queue
+    });
 
-      switch (op.operation) {
-        case "INSERT":
-          await pushInsert(op.table_name, op.record_id, payload);
-          break;
-        case "UPDATE":
-          await pushUpdate(op.table_name, op.record_id, payload);
-          break;
-        case "DELETE":
-          await pushDelete(op.table_name, op.record_id);
-          break;
-        case "UPLOAD_FILE":
-          // File uploads are handled separately by photo-queue
-          break;
-      }
-
-      await markOperationCompleted(this.db, op.id);
-      result.success = true;
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      await markOperationFailed(this.db, op.id, errorMsg);
-      result.error = errorMsg;
-      logger.error(`[SyncManager] Operation ${op.id} failed:`, error);
-    }
-
-    return result;
+    return processor.processQueue();
   }
 
   // ===========================================================================
