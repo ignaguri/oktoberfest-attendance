@@ -257,7 +257,7 @@ export function useLocalTents(festivalId: string | undefined) {
     queryFn: async () => {
       if (!isReady) return [];
       const drizzleDb = createDrizzleDb(getDb());
-      return await queryTents(drizzleDb);
+      return await queryTents(drizzleDb, festivalId);
     },
     enabled: isReady && !!festivalId,
     staleTime: Infinity,

@@ -15,7 +15,7 @@ import { consumptions } from "./schema/consumptions";
 import { festivals } from "./schema/festivals";
 import { groupMembers, groups } from "./schema/groups";
 import { profiles } from "./schema/profiles";
-import { tents } from "./schema/tents";
+import { festivalTents, tents } from "./schema/tents";
 
 // =============================================================================
 // Attendance Queries with Consumption Aggregations
@@ -230,9 +230,37 @@ export async function queryFestivalById(db: DrizzleDb, festivalId: string) {
 // =============================================================================
 
 /**
- * Query all tents ordered by name.
+ * Query tents for a festival via the festival_tents junction table.
+ * Falls back to all tents if no festival_tents mappings exist (backward compat).
  */
-export async function queryTents(db: DrizzleDb) {
+export async function queryTents(db: DrizzleDb, festivalId?: string) {
+  if (festivalId) {
+    const festivalSpecific = await db
+      .select({
+        id: tents.id,
+        name: tents.name,
+        category: tents.category,
+        _synced_at: tents._synced_at,
+        _deleted: tents._deleted,
+        _dirty: tents._dirty,
+      })
+      .from(festivalTents)
+      .innerJoin(tents, eq(festivalTents.tent_id, tents.id))
+      .where(
+        and(
+          eq(festivalTents.festival_id, festivalId),
+          eq(tents._deleted, 0),
+          eq(festivalTents._deleted, 0),
+        ),
+      )
+      .orderBy(tents.name);
+
+    if (festivalSpecific.length > 0) {
+      return festivalSpecific;
+    }
+  }
+
+  // Fallback: return all tents if no junction data
   return await db
     .select()
     .from(tents)
