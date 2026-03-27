@@ -14,7 +14,7 @@ import { useCallback, useContext } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
-import { ALL_LOCAL_PREFIXES, localKeys } from "@/lib/database/query-keys";
+import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
 import {
   enqueueOperation,
   generateConsumptionIdempotencyKey,
@@ -200,12 +200,10 @@ export function useOfflineDeleteConsumption() {
 
       await refreshPendingCount();
 
-      // Invalidate all local consumption caches
-      await Promise.all(
-        ALL_LOCAL_PREFIXES.map((prefix) =>
-          queryClient.invalidateQueries({ queryKey: [prefix] }),
-        ),
-      );
+      await invalidateLocalQueries(queryClient, [
+        "local-consumptions",
+        "local-attendances",
+      ]);
 
       logger.debug("[OfflineConsumption] Soft-deleted consumption locally:", {
         consumptionId,

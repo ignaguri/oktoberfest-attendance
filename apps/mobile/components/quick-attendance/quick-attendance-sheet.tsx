@@ -56,8 +56,11 @@ import {
   useAdaptedConsumptionsByDate,
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
-import { OfflineContext } from "@/lib/database/offline-provider";
-import { ALL_LOCAL_PREFIXES } from "@/lib/database/query-keys";
+import {
+  OfflineContext,
+  triggerBackgroundPush,
+} from "@/lib/database/offline-provider";
+import { invalidateAllLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
 
@@ -347,26 +350,8 @@ export function QuickAttendanceSheet({
         }
       }
 
-      // Invalidate local caches so adapted hooks re-read from SQLite
-      await Promise.all(
-        ALL_LOCAL_PREFIXES.map((prefix) =>
-          queryClient.invalidateQueries({ queryKey: [prefix] }),
-        ),
-      );
-
-      // Trigger background push with retry on failure
-      if (offlineContext?.isOnline) {
-        offlineContext
-          .sync({ direction: "push" })
-          .then((result) => {
-            if (!result.success) {
-              setTimeout(() => {
-                offlineContext.sync({ direction: "push" }).catch(() => {});
-              }, 3000);
-            }
-          })
-          .catch(() => {});
-      }
+      await invalidateAllLocalQueries(queryClient);
+      triggerBackgroundPush(offlineContext);
 
       await refetchAttendance();
 

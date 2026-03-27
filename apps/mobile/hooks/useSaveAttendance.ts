@@ -15,7 +15,10 @@ import { format } from "date-fns";
 import { useCallback, useContext, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
-import { OfflineContext } from "@/lib/database/offline-provider";
+import {
+  OfflineContext,
+  triggerBackgroundPush,
+} from "@/lib/database/offline-provider";
 import { logger } from "@/lib/logger";
 
 import {
@@ -184,20 +187,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           invalidateQueries(["gallery"]);
         }
 
-        // Step 6: Trigger a single background push for all queued operations
-        // Retry once after 3s if first attempt fails
-        if (offlineContext?.isOnline) {
-          offlineContext
-            .sync({ direction: "push" })
-            .then((result) => {
-              if (!result.success) {
-                setTimeout(() => {
-                  offlineContext.sync({ direction: "push" }).catch(() => {});
-                }, 3000);
-              }
-            })
-            .catch(() => {});
-        }
+        // Step 6: Push all queued operations to server
+        triggerBackgroundPush(offlineContext);
       } catch (err) {
         const saveError =
           err instanceof Error ? err : new Error("Failed to save attendance");

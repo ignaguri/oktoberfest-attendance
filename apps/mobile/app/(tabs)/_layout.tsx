@@ -143,12 +143,8 @@ function FabGroup({ isFestivalActive }: { isFestivalActive: boolean }) {
   return (
     <VStack
       space="sm"
-      style={{
-        position: "absolute",
-        bottom: bottomOffset,
-        right: 16,
-        alignItems: "flex-end",
-      }}
+      className="absolute right-4 items-end"
+      style={{ bottom: bottomOffset }}
     >
       {showCrowdFab && onCrowdFabPress && (
         <CrowdReportFab onPress={onCrowdFabPress} />

@@ -10,7 +10,7 @@ import { useCallback, useContext } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
-import { ALL_LOCAL_PREFIXES } from "@/lib/database/query-keys";
+import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import type { LocalAttendance } from "@/lib/database/schema";
 import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
 import { logger } from "@/lib/logger";
@@ -134,12 +134,11 @@ export function useOfflineUpdateAttendance() {
 
       await refreshPendingCount();
 
-      // Invalidate all local caches so adapted hooks re-read
-      await Promise.all(
-        ALL_LOCAL_PREFIXES.map((prefix) =>
-          queryClient.invalidateQueries({ queryKey: [prefix] }),
-        ),
-      );
+      await invalidateLocalQueries(queryClient, [
+        "local-attendances",
+        "local-tents",
+        "local-consumptions",
+      ]);
 
       return {
         attendanceId,

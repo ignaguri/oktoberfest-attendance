@@ -164,19 +164,18 @@ export default function HomeScreen() {
   }, [todayVisitedTents]);
 
   // Sync crowd FAB visibility to the shared context (rendered by _layout.tsx)
+  const shouldShowCrowdFab =
+    isOnline && isFestivalActive && todayVisitedTents.length > 0;
+
   useEffect(() => {
-    const shouldShow =
-      isOnline && isFestivalActive && todayVisitedTents.length > 0;
-    setShowCrowdFab(shouldShow);
-    setOnCrowdFabPress(shouldShow ? () => handleCrowdFabPress : null);
+    setShowCrowdFab(shouldShowCrowdFab);
+    setOnCrowdFabPress(shouldShowCrowdFab ? handleCrowdFabPress : null);
     return () => {
       setShowCrowdFab(false);
       setOnCrowdFabPress(null);
     };
   }, [
-    isOnline,
-    isFestivalActive,
-    todayVisitedTents.length,
+    shouldShowCrowdFab,
     handleCrowdFabPress,
     setShowCrowdFab,
     setOnCrowdFabPress,

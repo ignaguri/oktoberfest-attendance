@@ -535,3 +535,23 @@ export function useOfflineSafe(): OfflineContextType {
   // Return stable default if context unavailable, otherwise return context directly
   return context ?? DEFAULT_OFFLINE_CONTEXT;
 }
+
+/**
+ * Fire-and-forget push sync with a single retry after 3s on failure.
+ * No-op if offline or context unavailable.
+ */
+export function triggerBackgroundPush(
+  offlineContext: OfflineContextType | undefined | null,
+): void {
+  if (!offlineContext?.isOnline) return;
+  offlineContext
+    .sync({ direction: "push" })
+    .then((result) => {
+      if (!result.success) {
+        setTimeout(() => {
+          offlineContext.sync({ direction: "push" }).catch(() => {});
+        }, 3000);
+      }
+    })
+    .catch(() => {});
+}
