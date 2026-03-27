@@ -15,11 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {
-  CrowdReportFab,
-  CrowdReportPrompt,
-  CrowdStatusSummary,
-} from "@/components/crowd";
+import { CrowdReportPrompt, CrowdStatusSummary } from "@/components/crowd";
 import {
   LocationSharingToggle,
   TentProximityBanner,
@@ -40,6 +36,7 @@ import {
   useAdaptedTents,
   useSyncRefresh,
 } from "@/lib/database/adapted-hooks";
+import { useIsOnline } from "@/lib/database/offline-provider";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
@@ -61,6 +58,7 @@ export default function HomeScreen() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
+  const isOnline = useIsOnline();
 
   // Determine if festival is currently active (not ended)
   const isFestivalActive = useMemo(() => {
@@ -74,7 +72,12 @@ export default function HomeScreen() {
   const { isSharing, nearbyMembers } = useLocationContextSafe();
 
   // Quick attendance context (for crowd report prompt after save)
-  const { pendingCrowdReport, setPendingCrowdReport } = useQuickAttendance();
+  const {
+    pendingCrowdReport,
+    setPendingCrowdReport,
+    setShowCrowdFab,
+    setOnCrowdFabPress,
+  } = useQuickAttendance();
 
   // Crowd report prompt state
   const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);
@@ -159,6 +162,25 @@ export default function HomeScreen() {
     setCrowdPromptTents(todayVisitedTents);
     setShowCrowdPrompt(true);
   }, [todayVisitedTents]);
+
+  // Sync crowd FAB visibility to the shared context (rendered by _layout.tsx)
+  useEffect(() => {
+    const shouldShow =
+      isOnline && isFestivalActive && todayVisitedTents.length > 0;
+    setShowCrowdFab(shouldShow);
+    setOnCrowdFabPress(shouldShow ? () => handleCrowdFabPress : null);
+    return () => {
+      setShowCrowdFab(false);
+      setOnCrowdFabPress(null);
+    };
+  }, [
+    isOnline,
+    isFestivalActive,
+    todayVisitedTents.length,
+    handleCrowdFabPress,
+    setShowCrowdFab,
+    setOnCrowdFabPress,
+  ]);
 
   // Handle crowd prompt close
   const handleCrowdPromptClose = useCallback(() => {
@@ -266,11 +288,6 @@ export default function HomeScreen() {
           </TutorialTarget>
         </VStack>
       </ScrollView>
-
-      {/* Crowd Report FAB - only visible when tents visited today and festival active */}
-      {isFestivalActive && todayVisitedTents.length > 0 && (
-        <CrowdReportFab onPress={handleCrowdFabPress} />
-      )}
 
       {/* Crowd Report Prompt - after attendance save or from FAB */}
       {isFestivalActive &&

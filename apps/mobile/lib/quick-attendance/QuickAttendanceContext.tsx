@@ -33,6 +33,14 @@ interface QuickAttendanceContextType {
   pendingCrowdReport: PendingCrowdReport | null;
   /** Set pending crowd report data */
   setPendingCrowdReport: (data: PendingCrowdReport | null) => void;
+  /** Whether to show the crowd report FAB (set by home screen) */
+  showCrowdFab: boolean;
+  /** Update crowd FAB visibility */
+  setShowCrowdFab: (show: boolean) => void;
+  /** Handler for crowd FAB press (set by home screen) */
+  onCrowdFabPress: (() => void) | null;
+  /** Set crowd FAB press handler */
+  setOnCrowdFabPress: (handler: (() => void) | null) => void;
 }
 
 const QuickAttendanceContext = createContext<QuickAttendanceContextType | null>(
@@ -59,6 +67,10 @@ export function QuickAttendanceProvider({
   >();
   const [pendingCrowdReport, setPendingCrowdReport] =
     useState<PendingCrowdReport | null>(null);
+  const [showCrowdFab, setShowCrowdFab] = useState(false);
+  const [onCrowdFabPress, setOnCrowdFabPress] = useState<(() => void) | null>(
+    null,
+  );
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup timeout on unmount
@@ -104,6 +116,10 @@ export function QuickAttendanceProvider({
       closeSheet,
       pendingCrowdReport,
       setPendingCrowdReport,
+      showCrowdFab,
+      setShowCrowdFab,
+      onCrowdFabPress,
+      setOnCrowdFabPress,
     }),
     [
       isOpen,
@@ -112,6 +128,8 @@ export function QuickAttendanceProvider({
       openSheet,
       closeSheet,
       pendingCrowdReport,
+      showCrowdFab,
+      onCrowdFabPress,
     ],
   );
 
