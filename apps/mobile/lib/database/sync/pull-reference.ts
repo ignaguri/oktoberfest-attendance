@@ -155,21 +155,18 @@ export async function pullTents(
         result.inserted++;
       }
 
-      // Populate festival_tents junction table
+      // Upsert festival_tents junction table (updates beer_price if changed)
+      const ftId = generateUUID();
       await db.runAsync(
-        `INSERT OR IGNORE INTO festival_tents (
+        `INSERT INTO festival_tents (
           id, festival_id, tent_id, beer_price,
           created_at, updated_at, _synced_at, _deleted, _dirty
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)`,
-        [
-          generateUUID(),
-          festivalId,
-          tent.id,
-          ft.beerPrice ?? null,
-          now,
-          now,
-          now,
-        ],
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+        ON CONFLICT(festival_id, tent_id) DO UPDATE SET
+          beer_price = excluded.beer_price,
+          updated_at = excluded.updated_at,
+          _synced_at = excluded._synced_at`,
+        [ftId, festivalId, tent.id, ft.beerPrice ?? null, now, now, now],
       );
     }
 

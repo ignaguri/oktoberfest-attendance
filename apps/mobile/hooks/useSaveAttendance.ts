@@ -185,13 +185,18 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         }
 
         // Step 6: Trigger a single background push for all queued operations
-        // Retry once after 3s if first attempt fails (e.g., transient network error)
+        // Retry once after 3s if first attempt fails
         if (offlineContext?.isOnline) {
-          offlineContext.sync({ direction: "push" }).catch(() => {
-            setTimeout(() => {
-              offlineContext.sync({ direction: "push" }).catch(() => {});
-            }, 3000);
-          });
+          offlineContext
+            .sync({ direction: "push" })
+            .then((result) => {
+              if (!result.success) {
+                setTimeout(() => {
+                  offlineContext.sync({ direction: "push" }).catch(() => {});
+                }, 3000);
+              }
+            })
+            .catch(() => {});
         }
       } catch (err) {
         const saveError =

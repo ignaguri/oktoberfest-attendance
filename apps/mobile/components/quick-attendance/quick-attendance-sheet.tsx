@@ -354,13 +354,18 @@ export function QuickAttendanceSheet({
         ),
       );
 
-      // Trigger background push
+      // Trigger background push with retry on failure
       if (offlineContext?.isOnline) {
-        offlineContext.sync({ direction: "push" }).catch(() => {
-          setTimeout(() => {
-            offlineContext.sync({ direction: "push" }).catch(() => {});
-          }, 3000);
-        });
+        offlineContext
+          .sync({ direction: "push" })
+          .then((result) => {
+            if (!result.success) {
+              setTimeout(() => {
+                offlineContext.sync({ direction: "push" }).catch(() => {});
+              }, 3000);
+            }
+          })
+          .catch(() => {});
       }
 
       await refetchAttendance();

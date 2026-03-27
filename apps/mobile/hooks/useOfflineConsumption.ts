@@ -14,7 +14,7 @@ import { useCallback, useContext } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
-import { localKeys } from "@/lib/database/query-keys";
+import { ALL_LOCAL_PREFIXES, localKeys } from "@/lib/database/query-keys";
 import {
   enqueueOperation,
   generateConsumptionIdempotencyKey,
@@ -146,8 +146,12 @@ export function useOfflineLogConsumption() {
 
       await refreshPendingCount();
 
+      // Invalidate both key patterns used by consumers
       queryClient.invalidateQueries({
         queryKey: localKeys.consumptions.byAttendance(attendanceId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: localKeys.consumptions.byDate(input.festivalId, input.date),
       });
 
       logger.debug("[OfflineConsumption] Saved consumption locally:", {
@@ -174,6 +178,7 @@ export function useOfflineDeleteConsumption() {
   const isReady = context?.isReady ?? false;
   const getDb = context?.getDb;
   const refreshPendingCount = context?.refreshPendingCount;
+  const queryClient = useQueryClient();
 
   const deleteConsumptionLocal = useCallback(
     async (consumptionId: string): Promise<void> => {
@@ -195,11 +200,18 @@ export function useOfflineDeleteConsumption() {
 
       await refreshPendingCount();
 
+      // Invalidate all local consumption caches
+      await Promise.all(
+        ALL_LOCAL_PREFIXES.map((prefix) =>
+          queryClient.invalidateQueries({ queryKey: [prefix] }),
+        ),
+      );
+
       logger.debug("[OfflineConsumption] Soft-deleted consumption locally:", {
         consumptionId,
       });
     },
-    [isReady, getDb, refreshPendingCount],
+    [isReady, getDb, refreshPendingCount, queryClient],
   );
 
   return useMutation({

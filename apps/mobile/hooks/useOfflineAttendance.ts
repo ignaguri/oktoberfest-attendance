@@ -5,11 +5,12 @@
  * the orchestrator (useSaveAttendance) triggers a single push after all writes.
  */
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
+import { ALL_LOCAL_PREFIXES } from "@/lib/database/query-keys";
 import type { LocalAttendance } from "@/lib/database/schema";
 import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
 import { logger } from "@/lib/logger";
@@ -36,6 +37,7 @@ export function useOfflineUpdateAttendance() {
   const isReady = context?.isReady ?? false;
   const getDb = context?.getDb;
   const refreshPendingCount = context?.refreshPendingCount;
+  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const updateAttendanceLocal = useCallback(
@@ -132,13 +134,20 @@ export function useOfflineUpdateAttendance() {
 
       await refreshPendingCount();
 
+      // Invalidate all local caches so adapted hooks re-read
+      await Promise.all(
+        ALL_LOCAL_PREFIXES.map((prefix) =>
+          queryClient.invalidateQueries({ queryKey: [prefix] }),
+        ),
+      );
+
       return {
         attendanceId,
         tentsAdded: input.tents ?? [],
         tentsRemoved: [],
       };
     },
-    [isReady, getDb, refreshPendingCount, user?.id],
+    [isReady, getDb, refreshPendingCount, queryClient, user?.id],
   );
 
   return useMutation({

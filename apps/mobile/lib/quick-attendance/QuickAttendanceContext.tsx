@@ -68,9 +68,13 @@ export function QuickAttendanceProvider({
   const [pendingCrowdReport, setPendingCrowdReport] =
     useState<PendingCrowdReport | null>(null);
   const [showCrowdFab, setShowCrowdFab] = useState(false);
-  const [onCrowdFabPress, setOnCrowdFabPress] = useState<(() => void) | null>(
-    null,
-  );
+  // Wrap function in object to prevent React from invoking it as a state updater
+  const [crowdFabHandler, setCrowdFabHandler] = useState<{
+    fn: (() => void) | null;
+  }>({ fn: null });
+  const setOnCrowdFabPress = useCallback((handler: (() => void) | null) => {
+    setCrowdFabHandler({ fn: handler });
+  }, []);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup timeout on unmount
@@ -118,7 +122,7 @@ export function QuickAttendanceProvider({
       setPendingCrowdReport,
       showCrowdFab,
       setShowCrowdFab,
-      onCrowdFabPress,
+      onCrowdFabPress: crowdFabHandler.fn,
       setOnCrowdFabPress,
     }),
     [
@@ -129,7 +133,8 @@ export function QuickAttendanceProvider({
       closeSheet,
       pendingCrowdReport,
       showCrowdFab,
-      onCrowdFabPress,
+      crowdFabHandler,
+      setOnCrowdFabPress,
     ],
   );
 
