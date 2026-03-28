@@ -5,7 +5,6 @@
  * Designed to fit inside an accordion panel.
  */
 
-import { useUserGroups } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { Check, Users } from "lucide-react-native";
@@ -25,6 +24,7 @@ import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { useAdaptedGroups } from "@/lib/database/adapted-hooks";
 
 interface Group {
   id: string;
@@ -49,7 +49,7 @@ export function GroupSelector({
   onShareWithAllChange,
 }: GroupSelectorProps) {
   const { t } = useTranslation();
-  const { data, loading } = useUserGroups(festivalId);
+  const { data, loading } = useAdaptedGroups(festivalId);
   const groups = useMemo(() => (data as Group[] | null) || [], [data]);
 
   // When shareWithAll is toggled on, select all groups

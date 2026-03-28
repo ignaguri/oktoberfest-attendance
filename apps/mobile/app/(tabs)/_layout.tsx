@@ -4,12 +4,15 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useMemo } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CrowdReportFab } from "@/components/crowd/crowd-report-fab";
 import {
   QuickAttendanceFab,
   QuickAttendanceSheet,
 } from "@/components/quick-attendance";
+import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
 import {
   QuickAttendanceProvider,
@@ -22,13 +25,8 @@ import {
 function TabsLayoutContent() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const {
-    isOpen,
-    openSheet,
-    closeSheet,
-    preselectedTentId,
-    preselectedTentName,
-  } = useQuickAttendance();
+  const { isOpen, closeSheet, preselectedTentId, preselectedTentName } =
+    useQuickAttendance();
 
   // Check if we're within festival dates
   const isFestivalActive = useMemo(() => {
@@ -116,14 +114,8 @@ function TabsLayoutContent() {
         {/* Components tab removed - Native tabs have 5-tab limit and overflow creates "More" menu */}
       </NativeTabs>
 
-      {/* Quick Attendance FAB - self-registers with tutorial context */}
-      {showFab && (
-        <QuickAttendanceFab
-          onPress={() => openSheet()}
-          disabled={!isFestivalActive}
-          tutorialStepId="quick-attendance-fab"
-        />
-      )}
+      {/* FAB group - positioned as a unit above the tab bar */}
+      {showFab && <FabGroup isFestivalActive={isFestivalActive} />}
 
       {/* Quick Attendance Sheet */}
       <QuickAttendanceSheet
@@ -133,6 +125,36 @@ function TabsLayoutContent() {
         preselectedTentName={preselectedTentName}
       />
     </View>
+  );
+}
+
+/**
+ * Vertically stacked FAB group positioned above the tab bar.
+ * Crowd report FAB sits above the attendance FAB with a small gap.
+ */
+function FabGroup({ isFestivalActive }: { isFestivalActive: boolean }) {
+  const insets = useSafeAreaInsets();
+  const { openSheet, showCrowdFab, onCrowdFabPress } = useQuickAttendance();
+
+  const nativeTabBarHeight = Platform.OS === "android" ? 100 : 50;
+  const margin = insets.bottom === 0 ? 40 : 24;
+  const bottomOffset = nativeTabBarHeight + margin + insets.bottom;
+
+  return (
+    <VStack
+      space="sm"
+      className="absolute right-4 items-end"
+      style={{ bottom: bottomOffset }}
+    >
+      {showCrowdFab && onCrowdFabPress && (
+        <CrowdReportFab onPress={onCrowdFabPress} />
+      )}
+      <QuickAttendanceFab
+        onPress={() => openSheet()}
+        disabled={!isFestivalActive}
+        tutorialStepId="quick-attendance-fab"
+      />
+    </VStack>
   );
 }
 

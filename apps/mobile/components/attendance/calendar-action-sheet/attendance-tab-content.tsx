@@ -1,9 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useApiClient } from "@prostcounter/shared/data";
-import {
-  useConsumptions,
-  useDeleteAttendance,
-} from "@prostcounter/shared/hooks";
+import { useDeleteAttendance } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AttendanceWithTotals,
@@ -39,6 +36,7 @@ import { useSaveAttendance } from "@/hooks/useSaveAttendance";
 import { IconColors } from "@/lib/constants/colors";
 import {
   useAdaptedAttendanceByDate,
+  useAdaptedConsumptionsByDate,
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
@@ -117,8 +115,11 @@ export function AttendanceTabContent({
       ? format(selectedDate, "yyyy-MM-dd")
       : "";
 
-  // Fetch consumptions for this date
-  const { data: consumptionsData } = useConsumptions(festivalId, dateString);
+  // Fetch consumptions for this date (local-first from SQLite)
+  const { data: consumptionsData } = useAdaptedConsumptionsByDate(
+    festivalId,
+    dateString,
+  );
   const consumptions = useMemo(
     () => consumptionsData || [],
     [consumptionsData],

@@ -12,9 +12,13 @@
 import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { format } from "date-fns";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
+import {
+  OfflineContext,
+  triggerBackgroundPush,
+} from "@/lib/database/offline-provider";
 import { logger } from "@/lib/logger";
 
 import {
@@ -51,6 +55,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const offlineContext = useContext(OfflineContext);
   const updateAttendance = useOfflineUpdateAttendance();
   const logConsumption = useOfflineLogConsumption();
   const deleteConsumption = useOfflineDeleteConsumption();
@@ -178,10 +183,12 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         // Step 5: Invalidate caches
         invalidateQueries(QueryKeys.attendanceByDate(festivalId, dateStr));
         invalidateQueries(QueryKeys.consumptions(festivalId, dateStr));
-        // Invalidate galleries if photos were deleted
         if (photosToDelete.length > 0) {
-          invalidateQueries(["gallery"]); // Prefix match: all galleries
+          invalidateQueries(["gallery"]);
         }
+
+        // Step 6: Push all queued operations to server
+        triggerBackgroundPush(offlineContext);
       } catch (err) {
         const saveError =
           err instanceof Error ? err : new Error("Failed to save attendance");
@@ -192,6 +199,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
       }
     },
     [
+      offlineContext,
       updateAttendance,
       logConsumption,
       deleteConsumption,

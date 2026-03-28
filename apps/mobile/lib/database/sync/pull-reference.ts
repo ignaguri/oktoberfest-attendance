@@ -11,7 +11,7 @@ import { logger } from "@/lib/logger";
 
 import { apiClient } from "../../api-client";
 import type { LocalAchievement, LocalFestival, LocalTent } from "../schema";
-import { updateLastSyncAt } from "../sync-queue";
+import { generateUUID, updateLastSyncAt } from "../sync-queue";
 import { shouldUpdate } from "./conflict";
 import type { PullResult } from "./types";
 
@@ -154,6 +154,20 @@ export async function pullTents(
         );
         result.inserted++;
       }
+
+      // Upsert festival_tents junction table (updates beer_price if changed)
+      const ftId = generateUUID();
+      await db.runAsync(
+        `INSERT INTO festival_tents (
+          id, festival_id, tent_id, beer_price,
+          created_at, updated_at, _synced_at, _deleted, _dirty
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+        ON CONFLICT(festival_id, tent_id) DO UPDATE SET
+          beer_price = excluded.beer_price,
+          updated_at = excluded.updated_at,
+          _synced_at = excluded._synced_at`,
+        [ftId, festivalId, tent.id, ft.beerPrice ?? null, now, now, now],
+      );
     }
 
     await updateLastSyncAt(db, "tents", now);

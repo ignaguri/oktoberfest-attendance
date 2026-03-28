@@ -70,3 +70,33 @@ export const ALL_LOCAL_PREFIXES = [
   "local-user-achievements",
   "local-beer-pictures",
 ] as const;
+
+/**
+ * Invalidate all local SQLite query caches.
+ * Use after bulk operations or sync. For single mutations, prefer targeted invalidation.
+ */
+export async function invalidateAllLocalQueries(queryClient: {
+  invalidateQueries: (opts: { queryKey: string[] }) => Promise<void>;
+}): Promise<void> {
+  await Promise.all(
+    ALL_LOCAL_PREFIXES.map((prefix) =>
+      queryClient.invalidateQueries({ queryKey: [prefix] }),
+    ),
+  );
+}
+
+/**
+ * Invalidate specific local query key prefixes.
+ */
+export async function invalidateLocalQueries(
+  queryClient: {
+    invalidateQueries: (opts: { queryKey: string[] }) => Promise<void>;
+  },
+  prefixes: readonly string[],
+): Promise<void> {
+  await Promise.all(
+    prefixes.map((prefix) =>
+      queryClient.invalidateQueries({ queryKey: [prefix] }),
+    ),
+  );
+}

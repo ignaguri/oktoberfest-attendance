@@ -331,7 +331,7 @@ export function OfflineDataProvider({
 
     // On native, use NetInfo
     const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
-      const online = state.isConnected === null ? true : state.isConnected;
+      const online = state.isInternetReachable ?? state.isConnected ?? true;
       setIsOnline(online);
 
       // Update sync status when going offline
@@ -534,4 +534,24 @@ export function useOfflineSafe(): OfflineContextType {
   const context = useContext(OfflineContext);
   // Return stable default if context unavailable, otherwise return context directly
   return context ?? DEFAULT_OFFLINE_CONTEXT;
+}
+
+/**
+ * Fire-and-forget push sync with a single retry after 3s on failure.
+ * No-op if offline or context unavailable.
+ */
+export function triggerBackgroundPush(
+  offlineContext: OfflineContextType | undefined | null,
+): void {
+  if (!offlineContext?.isOnline) return;
+  offlineContext
+    .sync({ direction: "push" })
+    .then((result) => {
+      if (!result.success) {
+        setTimeout(() => {
+          offlineContext.sync({ direction: "push" }).catch(() => {});
+        }, 3000);
+      }
+    })
+    .catch(() => {});
 }

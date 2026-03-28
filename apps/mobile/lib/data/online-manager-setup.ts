@@ -27,11 +27,10 @@ export function useOnlineManager() {
 
     // Subscribe to network state changes
     const unsubscribe = NetInfo.addEventListener((state) => {
-      // Update React Query's online status based on connectivity
-      // If we can't determine connectivity, assume online
-      onlineManager.setOnline(
-        state.isConnected === null ? true : state.isConnected,
-      );
+      // Use isInternetReachable for accurate detection (catches captive portals)
+      // Fall back to isConnected, then assume online if unknown
+      const online = state.isInternetReachable ?? state.isConnected ?? true;
+      onlineManager.setOnline(online);
     });
 
     return () => unsubscribe();

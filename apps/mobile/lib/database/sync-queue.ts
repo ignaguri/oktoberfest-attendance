@@ -498,3 +498,91 @@ export async function getRecentConsumption<T>(
   );
   return result ?? null;
 }
+
+// =============================================================================
+// Consumption Write Helpers
+// =============================================================================
+
+export interface InsertConsumptionParams {
+  id: string;
+  attendanceId: string;
+  festivalId: string;
+  date: string;
+  drinkType: string;
+  drinkName?: string | null;
+  volumeMl: number;
+  pricePaidCents: number;
+  basePriceCents?: number | null;
+  tipCents?: number | null;
+  tentId?: string | null;
+  idempotencyKey: string;
+  now: string;
+}
+
+/**
+ * Inserts a consumption into local SQLite and enqueues it for server sync.
+ * Shared by useOfflineConsumption and useLocalLogConsumption to avoid duplicate SQL.
+ */
+export async function insertConsumptionLocally(
+  db: SQLite.SQLiteDatabase,
+  params: InsertConsumptionParams,
+): Promise<void> {
+  const {
+    id,
+    attendanceId,
+    festivalId,
+    date,
+    drinkType,
+    drinkName,
+    volumeMl,
+    pricePaidCents,
+    basePriceCents,
+    tipCents,
+    tentId,
+    idempotencyKey,
+    now,
+  } = params;
+
+  await db.runAsync(
+    `INSERT INTO consumptions (
+      id, attendance_id, drink_type, drink_name, volume_ml,
+      price_paid_cents, base_price_cents, tip_cents, tent_id,
+      recorded_at, idempotency_key, created_at, updated_at,
+      _synced_at, _dirty, _deleted
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 1, 0)`,
+    [
+      id,
+      attendanceId,
+      drinkType,
+      drinkName ?? null,
+      volumeMl,
+      pricePaidCents,
+      basePriceCents ?? pricePaidCents,
+      tipCents ?? null,
+      tentId ?? null,
+      now,
+      idempotencyKey,
+      now,
+      now,
+    ],
+  );
+
+  await enqueueOperation(
+    db,
+    "INSERT",
+    "consumptions",
+    id,
+    {
+      festival_id: festivalId,
+      date,
+      drink_type: drinkType,
+      drink_name: drinkName,
+      volume_ml: volumeMl,
+      price_paid_cents: pricePaidCents,
+      base_price_cents: basePriceCents,
+      tip_cents: tipCents,
+      tent_id: tentId,
+    },
+    { idempotencyKey },
+  );
+}
