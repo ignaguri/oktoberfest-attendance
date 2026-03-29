@@ -18,6 +18,7 @@ export async function proxy(request: NextRequest) {
     "/manifest.webmanifest",
     "/offline",
     "/privacy",
+    "/child-safety",
     "/r",
     "/reset-password",
     "/robots.txt",

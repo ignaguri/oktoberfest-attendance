@@ -18,6 +18,7 @@ const blogLinks = [
 
 const legalLinks = [
   { href: "/privacy", label: "Privacy Policy" },
+  { href: "/child-safety", label: "Child Safety" },
   { href: "/r/bugs", label: "Report a Bug", external: true },
   { href: "/r/feedback", label: "Request a Feature", external: true },
 ];
