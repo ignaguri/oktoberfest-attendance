@@ -11,6 +11,7 @@
 
 import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useCallback, useContext, useState } from "react";
 
@@ -19,6 +20,7 @@ import {
   OfflineContext,
   triggerBackgroundPush,
 } from "@/lib/database/offline-provider";
+import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
 
 import {
@@ -56,6 +58,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const [error, setError] = useState<Error | null>(null);
 
   const offlineContext = useContext(OfflineContext);
+  const queryClient = useQueryClient();
   const updateAttendance = useOfflineUpdateAttendance();
   const logConsumption = useOfflineLogConsumption();
   const deleteConsumption = useOfflineDeleteConsumption();
@@ -128,6 +131,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
                   tentId,
                   pricePaidCents: priceCents,
                   volumeMl: 1000,
+                  skipDedup: true,
+                  skipSideEffects: true,
                 });
               }
             } else if (delta < 0) {
@@ -143,11 +148,21 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
               for (let i = 0; i < Math.abs(delta); i++) {
                 const toDelete = consumptionsOfType[i];
                 if (toDelete) {
-                  await deleteConsumption.mutateAsync(toDelete.id);
+                  await deleteConsumption.mutateAsync({
+                    consumptionId: toDelete.id,
+                    skipSideEffects: true,
+                  });
                 }
               }
             }
           }
+
+          // Refresh pending count and invalidate local caches once after all writes
+          await offlineContext?.refreshPendingCount?.();
+          await invalidateLocalQueries(queryClient, [
+            "local-consumptions",
+            "local-attendances",
+          ]);
         }
 
         // Step 3: Delete photos marked for removal
@@ -200,6 +215,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
     },
     [
       offlineContext,
+      queryClient,
       updateAttendance,
       logConsumption,
       deleteConsumption,
