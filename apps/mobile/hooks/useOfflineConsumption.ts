@@ -12,11 +12,11 @@ import type {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
+import { useAuth } from "@/lib/auth/AuthContext";
+
 type OfflineLogConsumptionInput = LogConsumptionInput & {
   skipDedup?: boolean;
 };
-
-import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
 import {
@@ -104,7 +104,6 @@ export function useOfflineLogConsumption() {
       }
 
       // Deduplication: skip if same drink type was logged within 30 seconds
-      // (bypassed for batch operations like saving multiple beers at once)
       if (!input.skipDedup) {
         const recentConsumption = await getRecentConsumption<{ id: string }>(
           db,
