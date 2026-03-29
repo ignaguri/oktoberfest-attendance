@@ -13,11 +13,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
-
-type OfflineLogConsumptionInput = LogConsumptionInput & {
-  skipDedup?: boolean;
-  skipSideEffects?: boolean;
-};
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
 import {
@@ -28,6 +23,11 @@ import {
   insertConsumptionLocally,
 } from "@/lib/database/sync-queue";
 import { logger } from "@/lib/logger";
+
+type OfflineLogConsumptionInput = LogConsumptionInput & {
+  skipDedup?: boolean;
+  skipSideEffects?: boolean;
+};
 
 function buildConsumptionResult(
   id: string,
