@@ -49,6 +49,8 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 - For fixes/adjustments within the same version: increment the letter suffix (e.g., `1.0.1-c` → `1.0.1-d`)
 - For new feature releases: update to a new version number (e.g., `1.0.1-d` → `1.0.2-a`)
 
+**Important - Version Sync**: When bumping the app version, update it in **both** `apps/mobile/app.config.ts` (`version` field) **and** `apps/mobile/ios/ProstCounter/Info.plist` (`CFBundleShortVersionString`). The Info.plist value takes precedence in bare workflow iOS builds, so a mismatch will cause App Store submission to use the wrong version.
+
 ### Test Users (Local Development)
 
 Seed data creates users `user1@example.com` through `user10@example.com` with password `password`.
