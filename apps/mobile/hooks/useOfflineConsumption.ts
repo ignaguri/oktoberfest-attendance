@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 
 type OfflineLogConsumptionInput = LogConsumptionInput & {
   skipDedup?: boolean;
+  skipSideEffects?: boolean;
 };
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
@@ -150,15 +151,16 @@ export function useOfflineLogConsumption() {
         now,
       });
 
-      await refreshPendingCount();
+      if (!input.skipSideEffects) {
+        await refreshPendingCount();
 
-      // Invalidate both key patterns used by consumers
-      queryClient.invalidateQueries({
-        queryKey: localKeys.consumptions.byAttendance(attendanceId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: localKeys.consumptions.byDate(input.festivalId, input.date),
-      });
+        queryClient.invalidateQueries({
+          queryKey: localKeys.consumptions.byAttendance(attendanceId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: localKeys.consumptions.byDate(input.festivalId, input.date),
+        });
+      }
 
       logger.debug("[OfflineConsumption] Saved consumption locally:", {
         consumptionId,
@@ -179,6 +181,11 @@ export function useOfflineLogConsumption() {
  * Local-first hook to delete a consumption.
  * Always soft-deletes locally. Does not trigger sync -- caller is responsible.
  */
+type DeleteConsumptionInput = {
+  consumptionId: string;
+  skipSideEffects?: boolean;
+};
+
 export function useOfflineDeleteConsumption() {
   const context = useContext(OfflineContext);
   const isReady = context?.isReady ?? false;
@@ -187,7 +194,12 @@ export function useOfflineDeleteConsumption() {
   const queryClient = useQueryClient();
 
   const deleteConsumptionLocal = useCallback(
-    async (consumptionId: string): Promise<void> => {
+    async (input: string | DeleteConsumptionInput): Promise<void> => {
+      const consumptionId =
+        typeof input === "string" ? input : input.consumptionId;
+      const skipSideEffects =
+        typeof input === "string" ? false : input.skipSideEffects;
+
       if (!isReady || !getDb || !refreshPendingCount) {
         throw new Error("Offline mode not available");
       }
@@ -204,12 +216,14 @@ export function useOfflineDeleteConsumption() {
         id: consumptionId,
       });
 
-      await refreshPendingCount();
+      if (!skipSideEffects) {
+        await refreshPendingCount();
 
-      await invalidateLocalQueries(queryClient, [
-        "local-consumptions",
-        "local-attendances",
-      ]);
+        await invalidateLocalQueries(queryClient, [
+          "local-consumptions",
+          "local-attendances",
+        ]);
+      }
 
       logger.debug("[OfflineConsumption] Soft-deleted consumption locally:", {
         consumptionId,

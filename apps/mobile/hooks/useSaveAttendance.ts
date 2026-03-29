@@ -129,6 +129,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
                   pricePaidCents: priceCents,
                   volumeMl: 1000,
                   skipDedup: true,
+                  skipSideEffects: true,
                 });
               }
             } else if (delta < 0) {
@@ -144,11 +145,17 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
               for (let i = 0; i < Math.abs(delta); i++) {
                 const toDelete = consumptionsOfType[i];
                 if (toDelete) {
-                  await deleteConsumption.mutateAsync(toDelete.id);
+                  await deleteConsumption.mutateAsync({
+                    consumptionId: toDelete.id,
+                    skipSideEffects: true,
+                  });
                 }
               }
             }
           }
+
+          // Refresh pending count once after all consumption writes
+          await offlineContext?.refreshPendingCount?.();
         }
 
         // Step 3: Delete photos marked for removal
