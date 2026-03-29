@@ -12,6 +12,10 @@ import type {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
+type OfflineLogConsumptionInput = LogConsumptionInput & {
+  skipDedup?: boolean;
+};
+
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
@@ -59,7 +63,7 @@ export function useOfflineLogConsumption() {
   const { user } = useAuth();
 
   const logConsumptionLocal = useCallback(
-    async (input: LogConsumptionInput): Promise<Consumption | null> => {
+    async (input: OfflineLogConsumptionInput): Promise<Consumption | null> => {
       if (!isReady || !getDb || !refreshPendingCount) {
         throw new Error("Offline mode not available");
       }
@@ -100,24 +104,27 @@ export function useOfflineLogConsumption() {
       }
 
       // Deduplication: skip if same drink type was logged within 30 seconds
-      const recentConsumption = await getRecentConsumption<{ id: string }>(
-        db,
-        attendanceId,
-        input.drinkType,
-        30,
-      );
-
-      if (recentConsumption) {
-        logger.debug(
-          "[OfflineConsumption] Deduplication: returning existing consumption",
-          { id: recentConsumption.id },
-        );
-        return buildConsumptionResult(
-          recentConsumption.id,
+      // (bypassed for batch operations like saving multiple beers at once)
+      if (!input.skipDedup) {
+        const recentConsumption = await getRecentConsumption<{ id: string }>(
+          db,
           attendanceId,
-          input,
-          now,
+          input.drinkType,
+          30,
         );
+
+        if (recentConsumption) {
+          logger.debug(
+            "[OfflineConsumption] Deduplication: returning existing consumption",
+            { id: recentConsumption.id },
+          );
+          return buildConsumptionResult(
+            recentConsumption.id,
+            attendanceId,
+            input,
+            now,
+          );
+        }
       }
 
       // Idempotency key prevents duplicate server-side creation during sync

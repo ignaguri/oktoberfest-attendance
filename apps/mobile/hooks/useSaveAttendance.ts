@@ -128,6 +128,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
                   tentId,
                   pricePaidCents: priceCents,
                   volumeMl: 1000,
+                  skipDedup: true,
                 });
               }
             } else if (delta < 0) {

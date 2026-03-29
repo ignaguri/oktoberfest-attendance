@@ -523,6 +523,7 @@ export interface LogConsumptionInput {
   basePriceCents?: number;
   tipCents?: number;
   tentId?: string;
+  skipDedup?: boolean;
 }
 
 /**
@@ -543,19 +544,22 @@ export function useLocalLogConsumption() {
       const db = getDb();
 
       // Check for recent duplicate consumption (within 30 seconds)
-      const recentConsumption = await getRecentConsumption<LocalConsumption>(
-        db,
-        input.attendanceId,
-        input.drinkType,
-        30, // seconds
-      );
-
-      if (recentConsumption) {
-        // Return existing consumption instead of creating a duplicate
-        logger.debug(
-          `[useLocalLogConsumption] Deduplication: returning existing consumption ${recentConsumption.id}`,
+      // (bypassed for batch operations like saving multiple beers at once)
+      if (!input.skipDedup) {
+        const recentConsumption = await getRecentConsumption<LocalConsumption>(
+          db,
+          input.attendanceId,
+          input.drinkType,
+          30, // seconds
         );
-        return recentConsumption;
+
+        if (recentConsumption) {
+          // Return existing consumption instead of creating a duplicate
+          logger.debug(
+            `[useLocalLogConsumption] Deduplication: returning existing consumption ${recentConsumption.id}`,
+          );
+          return recentConsumption;
+        }
       }
 
       const now = new Date().toISOString();
