@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/client";
 
 const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
@@ -22,34 +23,33 @@ const stagger = {
   },
 };
 
-const platforms = [
+const platformKeys = [
   {
+    key: "ios",
     icon: Smartphone,
     name: "iOS",
-    description: "iPhone & iPad",
-    action: "Download on the App Store",
     href: APP_STORE_URL,
     available: true,
   },
   {
+    key: "android",
     icon: Smartphone,
     name: "Android",
-    description: "Coming soon",
-    action: "Get notified",
     href: "/sign-up",
     available: false,
   },
   {
+    key: "webApp",
     icon: Globe,
     name: "Web App",
-    description: "Any browser, any device",
-    action: "Open Web App",
     href: "/sign-up",
     available: true,
   },
-];
+] as const;
 
 export function DownloadContent() {
+  const { t } = useTranslation();
+
   return (
     <div className="px-4 py-16 sm:px-6">
       <motion.div
@@ -66,11 +66,11 @@ export function DownloadContent() {
           variants={fadeUp}
           className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
         >
-          Download ProstCounter
+          {t("marketing.download.title")}
         </motion.h1>
 
         <motion.p variants={fadeUp} className="mb-12 text-lg text-gray-500">
-          Track your beer festival experience on any device. Free forever.
+          {t("marketing.download.subtitle")}
         </motion.p>
 
         {/* Platform cards */}
@@ -78,9 +78,9 @@ export function DownloadContent() {
           className="mb-12 grid gap-4 sm:grid-cols-3"
           variants={stagger}
         >
-          {platforms.map((platform) => (
+          {platformKeys.map((platform) => (
             <motion.div
-              key={platform.name}
+              key={platform.key}
               variants={fadeUp}
               className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
             >
@@ -92,7 +92,7 @@ export function DownloadContent() {
                 {platform.name}
               </h2>
               <p className="mb-4 text-sm text-gray-500">
-                {platform.description}
+                {t(`marketing.download.${platform.key}.description`)}
               </p>
               {platform.available ? (
                 <Button variant="yellow" size="sm" asChild className="w-fit">
@@ -103,15 +103,19 @@ export function DownloadContent() {
                       rel="noopener noreferrer"
                     >
                       <Download size={16} />
-                      {platform.action}
+                      {t(`marketing.download.${platform.key}.action`)}
                     </a>
                   ) : (
-                    <Link href={platform.href}>{platform.action}</Link>
+                    <Link href={platform.href}>
+                      {t(`marketing.download.${platform.key}.action`)}
+                    </Link>
                   )}
                 </Button>
               ) : (
                 <Button variant="outline" size="sm" asChild className="w-full">
-                  <Link href={platform.href}>{platform.action}</Link>
+                  <Link href={platform.href}>
+                    {t(`marketing.download.${platform.key}.action`)}
+                  </Link>
                 </Button>
               )}
             </motion.div>
@@ -124,7 +128,7 @@ export function DownloadContent() {
           className="mx-auto max-w-xs rounded-2xl border border-gray-200 bg-white p-8"
         >
           <p className="mb-4 text-sm font-medium text-gray-600">
-            Scan with your phone
+            {t("marketing.download.scanWithPhone")}
           </p>
           <Image
             src="/images/qrcode-download.svg"
@@ -134,7 +138,7 @@ export function DownloadContent() {
             className="mx-auto"
           />
           <p className="mt-4 text-xs text-gray-400">
-            Opens the App Store on iOS devices
+            {t("marketing.download.opensAppStore")}
           </p>
         </motion.div>
       </motion.div>

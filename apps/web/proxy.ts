@@ -82,6 +82,7 @@ export async function proxy(request: NextRequest) {
     publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/blog") || // Blog pages (marketing)
     request.nextUrl.pathname.startsWith("/download") || // Download page (marketing)
+    /^\/(de|es)(\/|$)/.test(request.nextUrl.pathname) || // Localized marketing pages
     request.nextUrl.pathname.startsWith("/r/") ||
     request.nextUrl.pathname.startsWith("/api/") || // API routes handle their own auth
     request.nextUrl.pathname.startsWith("/serwist/") || // Service worker assets

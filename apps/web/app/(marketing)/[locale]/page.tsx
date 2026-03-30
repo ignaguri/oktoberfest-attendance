@@ -1,35 +1,60 @@
 import "server-only";
 
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://prostcounter.fun",
-    languages: {
-      en: "https://prostcounter.fun",
-      de: "https://prostcounter.fun/de",
-      es: "https://prostcounter.fun/es",
-    },
-  },
-};
+const VALID_LOCALES = ["de", "es"] as const;
+type ValidLocale = (typeof VALID_LOCALES)[number];
 
-export default async function LandingPage({
+type Params = { locale: string };
+
+export async function generateStaticParams(): Promise<Params[]> {
+  return VALID_LOCALES.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!VALID_LOCALES.includes(locale as ValidLocale)) return {};
+
+  return {
+    alternates: {
+      canonical: `https://prostcounter.fun/${locale}`,
+      languages: {
+        en: "https://prostcounter.fun",
+        de: "https://prostcounter.fun/de",
+        es: "https://prostcounter.fun/es",
+      },
+    },
+  };
+}
+
+export default async function LocalizedLandingPage({
+  params,
   searchParams,
 }: {
+  params: Promise<Params>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // Handle OAuth callback codes
-  const params = await searchParams;
-  if (params.code) {
-    const code = params.code as string;
-    const redirectParam = params.redirect as string;
+  const { locale } = await params;
 
+  if (!VALID_LOCALES.includes(locale as ValidLocale)) {
+    notFound();
+  }
+
+  // Handle OAuth callback codes (same as English landing)
+  const sp = await searchParams;
+  if (sp.code) {
+    const code = sp.code as string;
+    const redirectParam = sp.redirect as string;
     const callbackUrl = new URL(
       "/auth/callback",
       process.env.NEXT_PUBLIC_VERCEL_URL
@@ -38,7 +63,6 @@ export default async function LandingPage({
     );
     callbackUrl.searchParams.set("code", code);
     if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
-
     redirect(callbackUrl.toString());
   }
 
@@ -51,6 +75,7 @@ export default async function LandingPage({
       "Track your beer festival attendance, compete with friends, and keep memories of every Oktoberfest visit.",
     applicationCategory: "LifestyleApplication",
     operatingSystem: "iOS, Android, Web",
+    inLanguage: locale,
     offers: {
       "@type": "Offer",
       price: "0",

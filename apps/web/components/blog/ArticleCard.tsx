@@ -4,6 +4,8 @@ import { Link } from "next-view-transitions";
 
 import type { BlogLocale, BlogPostMeta } from "@/lib/blog";
 
+import { localizeCategory } from "./blog-i18n";
+
 const dateLocaleMap: Record<BlogLocale, string> = {
   en: "en-US",
   de: "de-DE",
@@ -46,7 +48,7 @@ export function ArticleCard({ post }: { post: BlogPostMeta }) {
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${categoryColors[post.category] || "bg-gray-100 text-gray-800"}`}
             >
-              {post.category}
+              {localizeCategory(post.category, post.locale)}
             </span>
           </div>
           <h2 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-yellow-600">

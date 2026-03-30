@@ -31,7 +31,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadLanguage = async () => {
       if (!profile) {
-        // No profile yet, use default English
+        // No profile (anonymous user) — auto-detect from browser
+        const detected = detectBrowserLanguage([
+          ...SUPPORTED_LANGUAGES,
+        ] as string[]);
+        if (i18n.language !== detected) {
+          await changeLanguage(detected);
+        }
         setIsLanguageLoaded(true);
         return;
       }

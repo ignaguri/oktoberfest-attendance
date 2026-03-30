@@ -2688,5 +2688,155 @@
       "addFriend": "Add Friend"
     },
     "sharedGroups": "Shared Groups"
+  },
+  "marketing": {
+    "header": {
+      "blog": "Blog",
+      "download": "Download",
+      "signIn": "Sign In",
+      "goToApp": "Go to App"
+    },
+    "hero": {
+      "title1": "Your beer festival",
+      "title2": "Companion App",
+      "subtitle": "Track every Masskrug, compete with friends on leaderboards, and relive your Oktoberfest memories — all in one app.",
+      "getStarted": "Get Started Free",
+      "downloadApp": "Download App",
+      "freeForever": "Free forever. Available on iOS, Android & Web."
+    },
+    "features": {
+      "sectionTitle": "Everything you need at the Wiesn",
+      "sectionSubtitle": "Built by festival-goers, for festival-goers.",
+      "trackBeers": {
+        "title": "Track Your Beers",
+        "description": "Log daily consumption, record tent visits, snap photos of your Masskrugs, and build a timeline of every festival day."
+      },
+      "competeWithFriends": {
+        "title": "Compete with Friends",
+        "description": "Create groups, challenge your crew on leaderboards, and see who racks up the most festival days (or beers)."
+      },
+      "liveLocation": {
+        "title": "Live Location Sharing",
+        "description": "Lost your friends at the Wiesn? Share your real-time location across festival tents so nobody drinks alone."
+      },
+      "achievements": {
+        "title": "Earn Achievements",
+        "description": "Unlock 40+ badges across categories — from first-timer milestones to legendary streaks and hidden surprises."
+      }
+    },
+    "festivals": {
+      "sectionTitle": "Munich Beer Festivals",
+      "sectionSubtitle": "ProstCounter supports all major Munich beer festivals.",
+      "oktoberfest": {
+        "name": "Oktoberfest 2026",
+        "dates": "Sep 19 — Oct 4",
+        "description": "The world's largest beer festival returns to Munich."
+      },
+      "starkbierfest": {
+        "name": "Starkbierfest",
+        "dates": "March — April",
+        "description": "Munich's strong beer season — the locals' hidden gem."
+      },
+      "fruehlingsfest": {
+        "name": "Frühlingsfest",
+        "dates": "April — May",
+        "description": "Munich's spring festival on the Theresienwiese."
+      },
+      "viewCalendar": "View the full Munich festival calendar"
+    },
+    "cta": {
+      "title": "Ready for the next festival?",
+      "subtitle": "Download ProstCounter and start tracking your beer festival adventure today.",
+      "downloadIos": "Download on iOS",
+      "tryWebApp": "Try the Web App",
+      "scanToDownload": "Scan to download on your phone"
+    },
+    "download": {
+      "title": "Download ProstCounter",
+      "subtitle": "Track your beer festival experience on any device. Free forever.",
+      "ios": {
+        "description": "iPhone & iPad",
+        "action": "Download on the App Store"
+      },
+      "android": {
+        "description": "Coming soon",
+        "action": "Get notified"
+      },
+      "webApp": {
+        "description": "Any browser, any device",
+        "action": "Open Web App"
+      },
+      "scanWithPhone": "Scan with your phone",
+      "opensAppStore": "Opens the App Store on iOS devices"
+    },
+    "footer": {
+      "tagline": "Track your beer festival attendance and compete with friends.",
+      "blog": "Blog",
+      "download": "Download",
+      "legal": "Legal",
+      "blogLinks": {
+        "oktoberfestGuide": "Oktoberfest 2026 Guide",
+        "firstTimeTips": "First Time Tips",
+        "tentGuide": "Tent Guide",
+        "festivalCalendar": "Festival Calendar"
+      },
+      "downloadLinks": {
+        "iosAppStore": "iOS App Store",
+        "allPlatforms": "All Platforms",
+        "tryWebApp": "Try the Web App"
+      },
+      "legalLinks": {
+        "privacyPolicy": "Privacy Policy",
+        "childSafety": "Child Safety",
+        "reportBug": "Report a Bug",
+        "requestFeature": "Request a Feature"
+      },
+      "copyright": "© {{year}} ProstCounter. Prost!"
+    },
+    "childSafety": {
+      "title": "Child Safety Standards",
+      "lastUpdated": "Last updated:",
+      "intro": {
+        "title": "1. Introduction",
+        "text": "ProstCounter is a beer festival and Volksfest attendance tracking application designed exclusively for adults aged 18 and older. We are committed to the safety of all users, particularly children. We maintain a zero-tolerance policy toward child sexual abuse and exploitation (CSAE) in any form."
+      },
+      "csaeStandards": {
+        "title": "2. CSAE Standards",
+        "text": "ProstCounter strictly prohibits any content or behavior that sexually exploits, abuses, or endangers children. This includes, but is not limited to:",
+        "items": {
+          "csam": "Child sexual abuse material (CSAM) of any kind, including AI-generated content",
+          "grooming": "Grooming or solicitation of minors",
+          "sextortion": "Sextortion involving minors",
+          "trafficking": "Trafficking of minors",
+          "other": "Any other form of child sexual exploitation or endangerment"
+        },
+        "consequence": "Any such content identified on our platform will be immediately removed and reported to the relevant authorities."
+      },
+      "reporting": {
+        "title": "3. In-App Reporting",
+        "text1": "Users can report child safety concerns directly within the ProstCounter app. Reports can be submitted through the in-app feedback and support mechanism available in the app settings.",
+        "text2": "All reports related to child safety are treated with the highest priority. We review and act upon every report promptly.",
+        "emailText": "You may also report concerns by emailing us directly at"
+      },
+      "csamResponse": {
+        "title": "4. CSAM Response",
+        "text": "Upon obtaining actual knowledge of child sexual abuse material (CSAM) on our platform, ProstCounter will take the following actions:",
+        "items": {
+          "removal": "Immediate removal of the offending content from the platform",
+          "preservation": "Evidence preservation as required by applicable law",
+          "reporting": "Reporting to authorities, including the National Center for Missing & Exploited Children (NCMEC) via the CyberTipline, and local law enforcement as appropriate",
+          "suspension": "Account suspension of the offending user, pending investigation"
+        }
+      },
+      "legalCompliance": {
+        "title": "5. Legal Compliance",
+        "text": "ProstCounter complies with all applicable child safety laws and regulations, including reporting obligations to relevant regional and national authorities. We cooperate fully with law enforcement agencies in the investigation of child exploitation offenses."
+      },
+      "contact": {
+        "title": "6. Contact",
+        "text": "If you have any child safety concerns or need to report an issue, please contact our designated child safety point of contact:",
+        "boxTitle": "ProstCounter — Child Safety Contact"
+      }
+    }
   }
 }

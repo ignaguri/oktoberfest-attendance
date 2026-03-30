@@ -2385,5 +2385,155 @@
       "addFriend": "Freund hinzufügen"
     },
     "sharedGroups": "Gemeinsame Gruppen"
+  },
+  "marketing": {
+    "header": {
+      "blog": "Blog",
+      "download": "Download",
+      "signIn": "Anmelden",
+      "goToApp": "Zur App"
+    },
+    "hero": {
+      "title1": "Dein Bierfest",
+      "title2": "Begleiter-App",
+      "subtitle": "Zähle jeden Masskrug, messe dich mit Freunden in Bestenlisten und erlebe deine Oktoberfest-Erinnerungen neu — alles in einer App.",
+      "getStarted": "Kostenlos starten",
+      "downloadApp": "App herunterladen",
+      "freeForever": "Für immer kostenlos. Verfügbar für iOS, Android & Web."
+    },
+    "features": {
+      "sectionTitle": "Alles, was du auf der Wiesn brauchst",
+      "sectionSubtitle": "Von Festgängern für Festgänger entwickelt.",
+      "trackBeers": {
+        "title": "Bier zählen",
+        "description": "Erfasse deinen täglichen Konsum, protokolliere Zeltbesuche, knipse Fotos deiner Masskrüge und erstelle eine Chronik jedes Festtages."
+      },
+      "competeWithFriends": {
+        "title": "Tritt gegen Freunde an",
+        "description": "Erstelle Gruppen, fordere deine Crew in Bestenlisten heraus und finde heraus, wer die meisten Festtage (oder Biere) sammelt."
+      },
+      "liveLocation": {
+        "title": "Live-Standort teilen",
+        "description": "Freunde auf der Wiesn verloren? Teile deinen Echtzeit-Standort zwischen den Festzelten, damit niemand alleine trinkt."
+      },
+      "achievements": {
+        "title": "Erfolge freischalten",
+        "description": "Schalte über 40 Abzeichen in verschiedenen Kategorien frei — von Erstbesucher-Meilensteinen bis zu legendären Serien und versteckten Überraschungen."
+      }
+    },
+    "festivals": {
+      "sectionTitle": "Münchner Bierfeste",
+      "sectionSubtitle": "ProstCounter unterstützt alle großen Münchner Bierfeste.",
+      "oktoberfest": {
+        "name": "Oktoberfest 2026",
+        "dates": "19. Sep. — 4. Okt.",
+        "description": "Das größte Bierfest der Welt kehrt nach München zurück."
+      },
+      "starkbierfest": {
+        "name": "Starkbierfest",
+        "dates": "März — April",
+        "description": "Münchens Starkbierzeit — der Geheimtipp der Einheimischen."
+      },
+      "fruehlingsfest": {
+        "name": "Frühlingsfest",
+        "dates": "April — Mai",
+        "description": "Münchens Frühlingsfest auf der Theresienwiese."
+      },
+      "viewCalendar": "Den vollständigen Münchner Festkalender ansehen"
+    },
+    "cta": {
+      "title": "Bereit fürs nächste Fest?",
+      "subtitle": "Lade ProstCounter herunter und starte noch heute dein Bierfest-Abenteuer.",
+      "downloadIos": "Für iOS herunterladen",
+      "tryWebApp": "Web-App ausprobieren",
+      "scanToDownload": "Scannen, um die App herunterzuladen"
+    },
+    "download": {
+      "title": "ProstCounter herunterladen",
+      "subtitle": "Erlebe dein Bierfest auf jedem Gerät. Für immer kostenlos.",
+      "ios": {
+        "description": "iPhone & iPad",
+        "action": "Im App Store laden"
+      },
+      "android": {
+        "description": "Demnächst verfügbar",
+        "action": "Benachrichtigt werden"
+      },
+      "webApp": {
+        "description": "Jeder Browser, jedes Gerät",
+        "action": "Web-App öffnen"
+      },
+      "scanWithPhone": "Mit dem Handy scannen",
+      "opensAppStore": "Öffnet den App Store auf iOS-Geräten"
+    },
+    "footer": {
+      "tagline": "Verfolge deine Bierfest-Besuche und tritt gegen Freunde an.",
+      "blog": "Blog",
+      "download": "Download",
+      "legal": "Rechtliches",
+      "blogLinks": {
+        "oktoberfestGuide": "Oktoberfest 2026 Guide",
+        "firstTimeTips": "Tipps für Erstbesucher",
+        "tentGuide": "Zelt-Guide",
+        "festivalCalendar": "Festkalender"
+      },
+      "downloadLinks": {
+        "iosAppStore": "iOS App Store",
+        "allPlatforms": "Alle Plattformen",
+        "tryWebApp": "Web-App ausprobieren"
+      },
+      "legalLinks": {
+        "privacyPolicy": "Datenschutzerklärung",
+        "childSafety": "Kinderschutz",
+        "reportBug": "Fehler melden",
+        "requestFeature": "Feature vorschlagen"
+      },
+      "copyright": "© {{year}} ProstCounter. Prost!"
+    },
+    "childSafety": {
+      "title": "Kinderschutzstandards",
+      "lastUpdated": "Zuletzt aktualisiert:",
+      "intro": {
+        "title": "1. Einleitung",
+        "text": "ProstCounter ist eine App zur Erfassung von Bierfest- und Volksfest-Besuchen, die ausschließlich für Erwachsene ab 18 Jahren konzipiert ist. Wir setzen uns für die Sicherheit aller Nutzer ein, insbesondere von Kindern. Wir verfolgen eine Null-Toleranz-Politik gegenüber sexuellem Missbrauch und sexueller Ausbeutung von Kindern (CSAE) in jeder Form."
+      },
+      "csaeStandards": {
+        "title": "2. CSAE-Standards",
+        "text": "ProstCounter verbietet strikt jegliche Inhalte oder Verhaltensweisen, die Kinder sexuell ausbeuten, missbrauchen oder gefährden. Dies umfasst unter anderem:",
+        "items": {
+          "csam": "Material über sexuellen Kindesmissbrauch (CSAM) jeglicher Art, einschließlich KI-generierter Inhalte",
+          "grooming": "Grooming oder Anwerbung von Minderjährigen",
+          "sextortion": "Sextortion unter Beteiligung von Minderjährigen",
+          "trafficking": "Menschenhandel mit Minderjährigen",
+          "other": "Jede andere Form der sexuellen Ausbeutung oder Gefährdung von Kindern"
+        },
+        "consequence": "Jegliche derartige Inhalte, die auf unserer Plattform identifiziert werden, werden sofort entfernt und den zuständigen Behörden gemeldet."
+      },
+      "reporting": {
+        "title": "3. Meldung in der App",
+        "text1": "Nutzer können Bedenken zum Kinderschutz direkt in der ProstCounter-App melden. Meldungen können über die Feedback- und Support-Funktion in den App-Einstellungen eingereicht werden.",
+        "text2": "Alle Meldungen im Zusammenhang mit Kinderschutz werden mit höchster Priorität behandelt. Wir prüfen und bearbeiten jede Meldung umgehend.",
+        "emailText": "Sie können Bedenken auch direkt per E-Mail melden an"
+      },
+      "csamResponse": {
+        "title": "4. Reaktion auf CSAM",
+        "text": "Bei Kenntnis von Material über sexuellen Kindesmissbrauch (CSAM) auf unserer Plattform wird ProstCounter folgende Maßnahmen ergreifen:",
+        "items": {
+          "removal": "Sofortige Entfernung der betreffenden Inhalte von der Plattform",
+          "preservation": "Beweissicherung gemäß geltendem Recht",
+          "reporting": "Meldung an die Behörden, einschließlich des National Center for Missing & Exploited Children (NCMEC) über die CyberTipline sowie an die örtlichen Strafverfolgungsbehörden",
+          "suspension": "Kontosperrung des betreffenden Nutzers bis zum Abschluss der Ermittlungen"
+        }
+      },
+      "legalCompliance": {
+        "title": "5. Rechtliche Konformität",
+        "text": "ProstCounter hält alle geltenden Kinderschutzgesetze und -vorschriften ein, einschließlich der Meldepflichten gegenüber den zuständigen regionalen und nationalen Behörden. Wir arbeiten uneingeschränkt mit den Strafverfolgungsbehörden bei der Aufklärung von Straftaten der Kindesausbeutung zusammen."
+      },
+      "contact": {
+        "title": "6. Kontakt",
+        "text": "Wenn Sie Bedenken zum Kinderschutz haben oder ein Problem melden möchten, kontaktieren Sie bitte unsere zuständige Kinderschutz-Kontaktstelle:",
+        "boxTitle": "ProstCounter — Kinderschutz-Kontakt"
+      }
+    }
   }
 }
