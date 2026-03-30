@@ -1,20 +1,20 @@
 import "server-only";
 
+import { getAppUrl } from "@prostcounter/shared/utils";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { JsonLd } from "@/components/seo/JsonLd";
+import type { BlogLocale } from "@/lib/blog";
+import { NON_DEFAULT_LOCALES } from "@/lib/blog";
 
 export const revalidate = 86400;
-
-const VALID_LOCALES = ["de", "es"] as const;
-type ValidLocale = (typeof VALID_LOCALES)[number];
 
 type Params = { locale: string };
 
 export async function generateStaticParams(): Promise<Params[]> {
-  return VALID_LOCALES.map((locale) => ({ locale }));
+  return NON_DEFAULT_LOCALES.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({
@@ -23,7 +23,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (!VALID_LOCALES.includes(locale as ValidLocale)) return {};
+  if (!NON_DEFAULT_LOCALES.includes(locale as BlogLocale)) return {};
 
   return {
     alternates: {
@@ -46,7 +46,7 @@ export default async function LocalizedLandingPage({
 }) {
   const { locale } = await params;
 
-  if (!VALID_LOCALES.includes(locale as ValidLocale)) {
+  if (!NON_DEFAULT_LOCALES.includes(locale as BlogLocale)) {
     notFound();
   }
 
@@ -55,12 +55,7 @@ export default async function LocalizedLandingPage({
   if (sp.code) {
     const code = sp.code as string;
     const redirectParam = sp.redirect as string;
-    const callbackUrl = new URL(
-      "/auth/callback",
-      process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : "http://localhost:3000",
-    );
+    const callbackUrl = new URL("/auth/callback", getAppUrl());
     callbackUrl.searchParams.set("code", code);
     if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
     redirect(callbackUrl.toString());

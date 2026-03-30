@@ -1,5 +1,18 @@
 import type { BlogCategory, BlogLocale } from "@/lib/blog";
 
+export const categoryColors: Record<string, string> = {
+  festivals: "bg-yellow-100 text-yellow-800",
+  tips: "bg-blue-100 text-blue-800",
+  culture: "bg-purple-100 text-purple-800",
+  news: "bg-green-100 text-green-800",
+};
+
+export const dateLocaleMap: Record<BlogLocale, string> = {
+  en: "en-US",
+  de: "de-DE",
+  es: "es-ES",
+};
+
 export const categoryNames: Record<BlogCategory, Record<BlogLocale, string>> = {
   festivals: { en: "Festivals", de: "Feste", es: "Festivales" },
   tips: { en: "Tips", de: "Tipps", es: "Consejos" },

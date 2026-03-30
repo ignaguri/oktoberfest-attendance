@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DownloadContent } from "@/components/marketing/DownloadContent";
+import type { BlogLocale } from "@/lib/blog";
+import { NON_DEFAULT_LOCALES } from "@/lib/blog";
 
 export const revalidate = 86400;
-
-const VALID_LOCALES = ["de", "es"] as const;
-type ValidLocale = (typeof VALID_LOCALES)[number];
 
 type Params = { locale: string };
 
 export async function generateStaticParams(): Promise<Params[]> {
-  return VALID_LOCALES.map((locale) => ({ locale }));
+  return NON_DEFAULT_LOCALES.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({
@@ -20,7 +19,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (!VALID_LOCALES.includes(locale as ValidLocale)) return {};
+  if (!NON_DEFAULT_LOCALES.includes(locale as BlogLocale)) return {};
 
   return {
     title: "Download ProstCounter - iOS, Android & Web",
@@ -44,7 +43,7 @@ export default async function LocalizedDownloadPage({
 }) {
   const { locale } = await params;
 
-  if (!VALID_LOCALES.includes(locale as ValidLocale)) {
+  if (!NON_DEFAULT_LOCALES.includes(locale as BlogLocale)) {
     notFound();
   }
 

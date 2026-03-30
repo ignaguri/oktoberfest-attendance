@@ -5,8 +5,6 @@ import type { BlogCategory, BlogLocale, BlogPostMeta } from "@/lib/blog";
 import { ArticleCard } from "./ArticleCard";
 import { localizeCategory } from "./blog-i18n";
 
-const SUPPORTED_LOCALES: BlogLocale[] = ["en", "de", "es"];
-
 const uiText: Record<BlogLocale, { subtitle: string; empty: string }> = {
   en: {
     subtitle:
@@ -40,14 +38,6 @@ export function BlogIndexView({
   locale: BlogLocale;
 }) {
   const t = uiText[locale];
-
-  const alternates: Record<string, string> = {};
-  for (const loc of SUPPORTED_LOCALES) {
-    alternates[loc] =
-      loc === "en"
-        ? "https://prostcounter.fun/blog"
-        : `https://prostcounter.fun/blog/${loc}`;
-  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">

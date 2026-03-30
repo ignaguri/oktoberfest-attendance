@@ -2,28 +2,15 @@ import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
-import type { BlogLocale, BlogPostMeta } from "@/lib/blog";
+import type { BlogPostMeta } from "@/lib/blog";
 
-import { localizeCategory } from "./blog-i18n";
+import { categoryColors, dateLocaleMap, localizeCategory } from "./blog-i18n";
 
-const dateLocaleMap: Record<BlogLocale, string> = {
-  en: "en-US",
-  de: "de-DE",
-  es: "es-ES",
-};
-
-const minReadMap: Record<BlogLocale, string> = {
+const minReadMap = {
   en: "min read",
   de: "Min.",
   es: "min",
-};
-
-const categoryColors: Record<string, string> = {
-  festivals: "bg-yellow-100 text-yellow-800",
-  tips: "bg-blue-100 text-blue-800",
-  culture: "bg-purple-100 text-purple-800",
-  news: "bg-green-100 text-green-800",
-};
+} as const;
 
 export function ArticleCard({ post }: { post: BlogPostMeta }) {
   const href =

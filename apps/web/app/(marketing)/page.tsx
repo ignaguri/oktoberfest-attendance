@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getAppUrl } from "@prostcounter/shared/utils";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -30,12 +31,7 @@ export default async function LandingPage({
     const code = params.code as string;
     const redirectParam = params.redirect as string;
 
-    const callbackUrl = new URL(
-      "/auth/callback",
-      process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : "http://localhost:3000",
-    );
+    const callbackUrl = new URL("/auth/callback", getAppUrl());
     callbackUrl.searchParams.set("code", code);
     if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
 

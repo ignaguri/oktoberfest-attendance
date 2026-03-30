@@ -18,17 +18,11 @@ import {
   getPostBySlug,
   getPostsByCategory,
   getPostSlugs,
+  NON_DEFAULT_LOCALES,
+  VALID_CATEGORIES,
 } from "@/lib/blog";
 
 export const revalidate = 3600;
-
-const VALID_LOCALES: BlogLocale[] = ["de", "es"];
-const VALID_CATEGORIES: BlogCategory[] = [
-  "festivals",
-  "tips",
-  "culture",
-  "news",
-];
 
 type ParsedRoute =
   | { type: "article"; locale: BlogLocale; slug: string }
@@ -41,7 +35,7 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/[slug] — English article
   if (
     slugParts.length === 1 &&
-    !VALID_LOCALES.includes(slugParts[0] as BlogLocale)
+    !NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale)
   ) {
     return { type: "article", locale: "en", slug: slugParts[0] };
   }
@@ -49,7 +43,7 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/de or /blog/es — Localized blog index
   if (
     slugParts.length === 1 &&
-    VALID_LOCALES.includes(slugParts[0] as BlogLocale)
+    NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale)
   ) {
     return { type: "index", locale: slugParts[0] as BlogLocale };
   }
@@ -57,7 +51,7 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/de/[slug] or /blog/es/[slug] — Localized article
   if (
     slugParts.length === 2 &&
-    VALID_LOCALES.includes(slugParts[0] as BlogLocale)
+    NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale)
   ) {
     // Check if it's a category route: /blog/de/category
     if (slugParts[1] === "category") {
@@ -73,7 +67,7 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/de/category/[cat] or /blog/es/category/[cat] — Localized category
   if (
     slugParts.length === 3 &&
-    VALID_LOCALES.includes(slugParts[0] as BlogLocale) &&
+    NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale) &&
     slugParts[1] === "category" &&
     VALID_CATEGORIES.includes(slugParts[2] as BlogCategory)
   ) {
@@ -96,7 +90,7 @@ export async function generateStaticParams(): Promise<Params[]> {
     params.push({ slug: [slug] });
   }
 
-  for (const locale of VALID_LOCALES) {
+  for (const locale of NON_DEFAULT_LOCALES) {
     // Localized blog index: /blog/de, /blog/es
     params.push({ slug: [locale] });
 

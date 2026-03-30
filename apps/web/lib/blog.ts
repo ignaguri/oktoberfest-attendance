@@ -6,7 +6,7 @@ import readingTime from "reading-time";
 const CONTENT_DIR = path.join(process.cwd(), "content/blog");
 
 export type BlogCategory = "festivals" | "tips" | "culture" | "news";
-const VALID_CATEGORIES: BlogCategory[] = [
+export const VALID_CATEGORIES: BlogCategory[] = [
   "festivals",
   "tips",
   "culture",
@@ -23,6 +23,9 @@ function parseCategory(value: unknown): BlogCategory {
   return "tips";
 }
 export type BlogLocale = "en" | "de" | "es";
+
+/** Non-English locales that have their own URL prefix (e.g. /de, /es) */
+export const NON_DEFAULT_LOCALES: BlogLocale[] = ["de", "es"];
 
 export interface BlogPost {
   slug: string;

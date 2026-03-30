@@ -3,16 +3,13 @@ import { notFound } from "next/navigation";
 
 import { CategoryView } from "@/components/blog/CategoryView";
 import type { BlogCategory } from "@/lib/blog";
-import { getCategories, getPostsByCategory } from "@/lib/blog";
+import {
+  getCategories,
+  getPostsByCategory,
+  VALID_CATEGORIES,
+} from "@/lib/blog";
 
 export const revalidate = 3600;
-
-const VALID_CATEGORIES: BlogCategory[] = [
-  "festivals",
-  "tips",
-  "culture",
-  "news",
-];
 
 type Params = { category: string };
 

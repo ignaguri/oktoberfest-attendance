@@ -3,14 +3,12 @@ import { Link } from "next-view-transitions";
 
 import type { BlogLocale, BlogPost } from "@/lib/blog";
 
-import { localizeCategory, localizeTag } from "./blog-i18n";
-
-const categoryColors: Record<string, string> = {
-  festivals: "bg-yellow-100 text-yellow-800",
-  tips: "bg-blue-100 text-blue-800",
-  culture: "bg-purple-100 text-purple-800",
-  news: "bg-green-100 text-green-800",
-};
+import {
+  categoryColors,
+  dateLocaleMap,
+  localizeCategory,
+  localizeTag,
+} from "./blog-i18n";
 
 const uiTranslations: Record<
   BlogLocale,
@@ -19,12 +17,6 @@ const uiTranslations: Record<
   en: { backToBlog: "Back to Blog", minRead: "min read" },
   de: { backToBlog: "Zurück zum Blog", minRead: "Min. Lesezeit" },
   es: { backToBlog: "Volver al Blog", minRead: "min de lectura" },
-};
-
-const dateLocaleMap: Record<BlogLocale, string> = {
-  en: "en-US",
-  de: "de-DE",
-  es: "es-ES",
 };
 
 export function ArticleLayout({
