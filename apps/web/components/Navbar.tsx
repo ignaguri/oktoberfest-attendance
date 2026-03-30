@@ -13,7 +13,11 @@ import { NotificationBell } from "./NotificationBell";
 import { PWAReloadButton } from "./PWAReloadButton";
 import { UserMenu } from "./UserMenu/UserMenu";
 
-export default function Navbar() {
+interface NavbarProps {
+  showUserMenu?: boolean;
+}
+
+export default function Navbar({ showUserMenu = true }: NavbarProps) {
   const { t } = useTranslation();
   const { data: profileData, loading } = useCurrentProfile();
 
@@ -33,13 +37,13 @@ export default function Navbar() {
           <span translate="no">ProstCounter</span>
         </Link>
 
-        {loading && (
+        {showUserMenu && loading && (
           <div className="flex h-10 items-center">
             <div className="h-8 w-8 animate-pulse rounded-full bg-gray-600" />
           </div>
         )}
 
-        {!loading && profileData && (
+        {showUserMenu && !loading && profileData && (
           <div className="flex items-center gap-2">
             <PWAReloadButton />
             <Button
@@ -64,6 +68,14 @@ export default function Navbar() {
                 }}
               />
             </div>
+          </div>
+        )}
+
+        {!showUserMenu && !loading && profileData && (
+          <div className="flex h-10 items-center">
+            <Link href="/home" className="text-white">
+              {t("common.buttons.goHome")}
+            </Link>
           </div>
         )}
 

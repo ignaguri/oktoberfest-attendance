@@ -13,7 +13,7 @@ export default function PublicLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center pb-2">
-      <Navbar />
+      <Navbar showUserMenu={false} />
       <OfflineBanner />
       <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:justify-start sm:px-20">
         <Breadcrumbs />
