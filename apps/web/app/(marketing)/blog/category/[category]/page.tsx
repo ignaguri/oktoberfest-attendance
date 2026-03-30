@@ -1,3 +1,4 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -30,11 +31,11 @@ export async function generateMetadata({
     title: `${label} - ProstCounter Blog`,
     description: `${label} articles from ProstCounter`,
     alternates: {
-      canonical: `https://prostcounter.fun/blog/category/${category}`,
+      canonical: `${PROD_URL}/blog/category/${category}`,
       languages: {
-        en: `https://prostcounter.fun/blog/category/${category}`,
-        de: `https://prostcounter.fun/blog/de/category/${category}`,
-        es: `https://prostcounter.fun/blog/es/category/${category}`,
+        en: `${PROD_URL}/blog/category/${category}`,
+        de: `${PROD_URL}/blog/de/category/${category}`,
+        es: `${PROD_URL}/blog/es/category/${category}`,
       },
     },
   };

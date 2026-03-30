@@ -1,5 +1,6 @@
 import "server-only";
 
+import { PROD_URL } from "@prostcounter/shared/constants";
 import { getAppUrl } from "@prostcounter/shared/utils";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -11,11 +12,11 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: "https://prostcounter.fun",
+    canonical: PROD_URL,
     languages: {
-      en: "https://prostcounter.fun",
-      de: "https://prostcounter.fun/de",
-      es: "https://prostcounter.fun/es",
+      en: PROD_URL,
+      de: `${PROD_URL}/de`,
+      es: `${PROD_URL}/es`,
     },
   },
 };
@@ -42,7 +43,7 @@ export default async function LandingPage({
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "ProstCounter",
-    url: "https://prostcounter.fun",
+    url: PROD_URL,
     description:
       "Track your beer festival attendance, compete with friends, and keep memories of every Oktoberfest visit.",
     applicationCategory: "LifestyleApplication",
@@ -57,7 +58,7 @@ export default async function LandingPage({
       name: "ProstCounter",
       logo: {
         "@type": "ImageObject",
-        url: "https://prostcounter.fun/android-chrome-512x512.png",
+        url: `${PROD_URL}/android-chrome-512x512.png`,
       },
     },
   };

@@ -1,3 +1,4 @@
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
@@ -22,10 +23,8 @@ function parseCategory(value: unknown): BlogCategory {
   }
   return "tips";
 }
-export type BlogLocale = "en" | "de" | "es";
-
 /** Non-English locales that have their own URL prefix (e.g. /de, /es) */
-export const NON_DEFAULT_LOCALES: BlogLocale[] = ["de", "es"];
+export const NON_DEFAULT_LOCALES: SupportedLanguage[] = ["de", "es"];
 
 export interface BlogPost {
   slug: string;
@@ -37,19 +36,19 @@ export interface BlogPost {
   category: BlogCategory;
   tags: string[];
   featuredImage: string;
-  locale: BlogLocale;
+  locale: SupportedLanguage;
   readingTime: number;
   content: string;
 }
 
 export interface BlogPostMeta extends Omit<BlogPost, "content"> {}
 
-function getLocaleDir(locale: BlogLocale): string {
+function getLocaleDir(locale: SupportedLanguage): string {
   return path.join(CONTENT_DIR, locale);
 }
 
 export async function getAllPosts(
-  locale: BlogLocale = "en",
+  locale: SupportedLanguage = "en",
 ): Promise<BlogPostMeta[]> {
   const dir = getLocaleDir(locale);
 
@@ -88,7 +87,7 @@ export async function getAllPosts(
 
 export async function getPostBySlug(
   slug: string,
-  locale: BlogLocale = "en",
+  locale: SupportedLanguage = "en",
 ): Promise<BlogPost | null> {
   const dir = getLocaleDir(locale);
   const filePath = path.join(dir, `${slug}.mdx`);
@@ -136,15 +135,17 @@ export async function getCategories(): Promise<BlogCategory[]> {
 
 export async function getPostsByCategory(
   category: BlogCategory,
-  locale: BlogLocale = "en",
+  locale: SupportedLanguage = "en",
 ): Promise<BlogPostMeta[]> {
   const posts = await getAllPosts(locale);
   return posts.filter((post) => post.category === category);
 }
 
-export async function getAvailableLocales(slug: string): Promise<BlogLocale[]> {
-  const locales: BlogLocale[] = ["en", "de", "es"];
-  const available: BlogLocale[] = [];
+export async function getAvailableLocales(
+  slug: string,
+): Promise<SupportedLanguage[]> {
+  const locales: SupportedLanguage[] = ["en", "de", "es"];
+  const available: SupportedLanguage[] = [];
 
   for (const locale of locales) {
     const filePath = path.join(getLocaleDir(locale), `${slug}.mdx`);

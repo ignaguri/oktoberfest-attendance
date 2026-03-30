@@ -1,7 +1,8 @@
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
 import { Link } from "next-view-transitions";
 
-import type { BlogLocale, BlogPost } from "@/lib/blog";
+import type { BlogPost } from "@/lib/blog";
 
 import {
   categoryColors,
@@ -11,7 +12,7 @@ import {
 } from "./blog-i18n";
 
 const uiTranslations: Record<
-  BlogLocale,
+  SupportedLanguage,
   { backToBlog: string; minRead: string }
 > = {
   en: { backToBlog: "Back to Blog", minRead: "min read" },

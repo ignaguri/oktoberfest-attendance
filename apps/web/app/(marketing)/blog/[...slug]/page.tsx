@@ -1,3 +1,5 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
@@ -10,7 +12,7 @@ import { BlogIndexView } from "@/components/blog/BlogIndexView";
 import { CategoryView } from "@/components/blog/CategoryView";
 import { getMdxComponents } from "@/components/blog/MDXComponents";
 import { JsonLd } from "@/components/seo/JsonLd";
-import type { BlogCategory, BlogLocale } from "@/lib/blog";
+import type { BlogCategory } from "@/lib/blog";
 import {
   getAllPosts,
   getAvailableLocales,
@@ -25,9 +27,9 @@ import {
 export const revalidate = 3600;
 
 type ParsedRoute =
-  | { type: "article"; locale: BlogLocale; slug: string }
-  | { type: "index"; locale: BlogLocale }
-  | { type: "category"; locale: BlogLocale; category: BlogCategory };
+  | { type: "article"; locale: SupportedLanguage; slug: string }
+  | { type: "index"; locale: SupportedLanguage }
+  | { type: "category"; locale: SupportedLanguage; category: BlogCategory };
 
 type Params = { slug: string[] };
 
@@ -35,7 +37,7 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/[slug] — English article
   if (
     slugParts.length === 1 &&
-    !NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale)
+    !NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)
   ) {
     return { type: "article", locale: "en", slug: slugParts[0] };
   }
@@ -43,15 +45,15 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/de or /blog/es — Localized blog index
   if (
     slugParts.length === 1 &&
-    NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale)
+    NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)
   ) {
-    return { type: "index", locale: slugParts[0] as BlogLocale };
+    return { type: "index", locale: slugParts[0] as SupportedLanguage };
   }
 
   // /blog/de/[slug] or /blog/es/[slug] — Localized article
   if (
     slugParts.length === 2 &&
-    NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale)
+    NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)
   ) {
     // Check if it's a category route: /blog/de/category
     if (slugParts[1] === "category") {
@@ -59,7 +61,7 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
     }
     return {
       type: "article",
-      locale: slugParts[0] as BlogLocale,
+      locale: slugParts[0] as SupportedLanguage,
       slug: slugParts[1],
     };
   }
@@ -67,13 +69,13 @@ function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/de/category/[cat] or /blog/es/category/[cat] — Localized category
   if (
     slugParts.length === 3 &&
-    NON_DEFAULT_LOCALES.includes(slugParts[0] as BlogLocale) &&
+    NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage) &&
     slugParts[1] === "category" &&
     VALID_CATEGORIES.includes(slugParts[2] as BlogCategory)
   ) {
     return {
       type: "category",
-      locale: slugParts[0] as BlogLocale,
+      locale: slugParts[0] as SupportedLanguage,
       category: slugParts[2] as BlogCategory,
     };
   }
@@ -124,11 +126,11 @@ export async function generateMetadata({
       description:
         "Guides, tips, and news about Oktoberfest, Munich beer festivals, and the ProstCounter app.",
       alternates: {
-        canonical: `https://prostcounter.fun/blog/${parsed.locale}`,
+        canonical: `${PROD_URL}/blog/${parsed.locale}`,
         languages: {
-          en: "https://prostcounter.fun/blog",
-          de: "https://prostcounter.fun/blog/de",
-          es: "https://prostcounter.fun/blog/es",
+          en: `${PROD_URL}/blog`,
+          de: `${PROD_URL}/blog/de`,
+          es: `${PROD_URL}/blog/es`,
         },
       },
     };
@@ -141,11 +143,11 @@ export async function generateMetadata({
       title: `${label} - ProstCounter Blog`,
       description: `${label} articles from ProstCounter`,
       alternates: {
-        canonical: `https://prostcounter.fun/blog/${parsed.locale}/category/${parsed.category}`,
+        canonical: `${PROD_URL}/blog/${parsed.locale}/category/${parsed.category}`,
         languages: {
-          en: `https://prostcounter.fun/blog/category/${parsed.category}`,
-          de: `https://prostcounter.fun/blog/de/category/${parsed.category}`,
-          es: `https://prostcounter.fun/blog/es/category/${parsed.category}`,
+          en: `${PROD_URL}/blog/category/${parsed.category}`,
+          de: `${PROD_URL}/blog/de/category/${parsed.category}`,
+          es: `${PROD_URL}/blog/es/category/${parsed.category}`,
         },
       },
     };
@@ -161,8 +163,8 @@ export async function generateMetadata({
   for (const loc of availableLocales) {
     alternates[loc] =
       loc === "en"
-        ? `https://prostcounter.fun/blog/${slug}`
-        : `https://prostcounter.fun/blog/${loc}/${slug}`;
+        ? `${PROD_URL}/blog/${slug}`
+        : `${PROD_URL}/blog/${loc}/${slug}`;
   }
 
   const canonicalPath =
@@ -192,7 +194,7 @@ export async function generateMetadata({
     },
     robots: { index: true, follow: true },
     alternates: {
-      canonical: `https://prostcounter.fun${canonicalPath}`,
+      canonical: `${PROD_URL}${canonicalPath}`,
       languages: alternates,
     },
   };
@@ -243,8 +245,6 @@ export default async function BlogCatchAllPage({
     notFound();
   }
 
-  const availableLocales = await getAvailableLocales(slug);
-
   const { content } = await compileMDX({
     source: post.content,
     components: getMdxComponents(locale),
@@ -264,7 +264,7 @@ export default async function BlogCatchAllPage({
     "@type": "Article",
     headline: post.title,
     description: post.description,
-    image: `https://prostcounter.fun/api/og?title=${encodeURIComponent(post.title)}&category=${post.category}`,
+    image: `${PROD_URL}/api/og?title=${encodeURIComponent(post.title)}&category=${post.category}`,
     datePublished: post.date,
     dateModified: post.lastModified,
     author: { "@type": "Person", name: post.author },
@@ -273,12 +273,12 @@ export default async function BlogCatchAllPage({
       name: "ProstCounter",
       logo: {
         "@type": "ImageObject",
-        url: "https://prostcounter.fun/android-chrome-512x512.png",
+        url: `${PROD_URL}/android-chrome-512x512.png`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://prostcounter.fun${canonicalPath}`,
+      "@id": `${PROD_URL}${canonicalPath}`,
     },
     ...(locale !== "en" && { inLanguage: locale }),
   };
