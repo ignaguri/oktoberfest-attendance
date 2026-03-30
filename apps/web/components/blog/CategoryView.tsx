@@ -1,9 +1,14 @@
-import type { BlogCategory, BlogLocale, BlogPostMeta } from "@/lib/blog";
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
+
+import type { BlogCategory, BlogPostMeta } from "@/lib/blog";
 
 import { ArticleCard } from "./ArticleCard";
 import { localizeCategory } from "./blog-i18n";
 
-const categoryDescriptions: Record<BlogCategory, Record<BlogLocale, string>> = {
+const categoryDescriptions: Record<
+  BlogCategory,
+  Record<SupportedLanguage, string>
+> = {
   festivals: {
     en: "Guides and information about Munich beer festivals",
     de: "Guides und Informationen zu Münchner Bierfesten",
@@ -26,7 +31,7 @@ const categoryDescriptions: Record<BlogCategory, Record<BlogLocale, string>> = {
   },
 };
 
-const emptyText: Record<BlogLocale, string> = {
+const emptyText: Record<SupportedLanguage, string> = {
   en: "No articles in this category yet. Check back soon!",
   de: "Noch keine Artikel in dieser Kategorie. Schau bald wieder vorbei!",
   es: "Aún no hay artículos en esta categoría. ¡Vuelve pronto!",
@@ -39,7 +44,7 @@ export function CategoryView({
 }: {
   category: BlogCategory;
   posts: BlogPostMeta[];
-  locale: BlogLocale;
+  locale: SupportedLanguage;
 }) {
   const label = localizeCategory(category, locale);
   const description = categoryDescriptions[category]?.[locale] ?? "";

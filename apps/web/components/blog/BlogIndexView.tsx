@@ -1,11 +1,12 @@
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import { Link } from "next-view-transitions";
 
-import type { BlogCategory, BlogLocale, BlogPostMeta } from "@/lib/blog";
+import type { BlogCategory, BlogPostMeta } from "@/lib/blog";
 
 import { ArticleCard } from "./ArticleCard";
 import { localizeCategory } from "./blog-i18n";
 
-const uiText: Record<BlogLocale, { subtitle: string; empty: string }> = {
+const uiText: Record<SupportedLanguage, { subtitle: string; empty: string }> = {
   en: {
     subtitle:
       "Your guide to Munich beer festivals, Oktoberfest tips, and more.",
@@ -22,7 +23,7 @@ const uiText: Record<BlogLocale, { subtitle: string; empty: string }> = {
   },
 };
 
-function categoryHref(cat: string, locale: BlogLocale): string {
+function categoryHref(cat: string, locale: SupportedLanguage): string {
   return locale === "en"
     ? `/blog/category/${cat}`
     : `/blog/${locale}/category/${cat}`;
@@ -35,7 +36,7 @@ export function BlogIndexView({
 }: {
   posts: BlogPostMeta[];
   categories: BlogCategory[];
-  locale: BlogLocale;
+  locale: SupportedLanguage;
 }) {
   const t = uiText[locale];
 

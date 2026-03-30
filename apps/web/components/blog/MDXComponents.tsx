@@ -1,14 +1,14 @@
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import { Beer, Calendar, Download, MapPin } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
-import type { BlogLocale } from "@/lib/blog";
 
 const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
 const ctaTranslations: Record<
-  BlogLocale,
+  SupportedLanguage,
   { text: string; tryFree: string; download: string }
 > = {
   en: {
@@ -33,7 +33,7 @@ function CTAInner({
   locale = "en",
 }: {
   children?: React.ReactNode;
-  locale?: BlogLocale;
+  locale?: SupportedLanguage;
 }) {
   const t = ctaTranslations[locale];
   return (
@@ -117,13 +117,17 @@ export function FestivalInfo({
   );
 }
 
-const downloadTranslations: Record<BlogLocale, { tryWeb: string }> = {
+const downloadTranslations: Record<SupportedLanguage, { tryWeb: string }> = {
   en: { tryWeb: "Try Web App" },
   de: { tryWeb: "Web-App testen" },
   es: { tryWeb: "Probar App Web" },
 };
 
-function DownloadButtonsInner({ locale = "en" }: { locale?: BlogLocale }) {
+function DownloadButtonsInner({
+  locale = "en",
+}: {
+  locale?: SupportedLanguage;
+}) {
   const t = downloadTranslations[locale];
   return (
     <div className="my-6 flex flex-wrap items-center gap-4">
@@ -143,7 +147,7 @@ function DownloadButtonsInner({ locale = "en" }: { locale?: BlogLocale }) {
   );
 }
 
-export function getMdxComponents(locale: BlogLocale = "en") {
+export function getMdxComponents(locale: SupportedLanguage = "en") {
   return {
     CTA: (props: { children?: React.ReactNode }) => (
       <CTAInner {...props} locale={locale} />

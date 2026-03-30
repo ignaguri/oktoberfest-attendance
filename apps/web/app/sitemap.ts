@@ -1,8 +1,7 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import type { MetadataRoute } from "next";
 
 import { getAllPosts } from "@/lib/blog";
-
-const BASE_URL = "https://prostcounter.fun";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts("en");
@@ -11,37 +10,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: BASE_URL,
+      url: PROD_URL,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
     },
     {
-      url: `${BASE_URL}/blog`,
+      url: `${PROD_URL}/blog`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/download`,
+      url: `${PROD_URL}/download`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/sign-in`,
+      url: `${PROD_URL}/sign-in`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/sign-up`,
+      url: `${PROD_URL}/sign-up`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/privacy`,
+      url: `${PROD_URL}/privacy`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,
@@ -49,21 +48,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${BASE_URL}/blog/${post.slug}`,
+    url: `${PROD_URL}/blog/${post.slug}`,
     lastModified: new Date(post.lastModified || post.date),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
 
   const deBlogRoutes: MetadataRoute.Sitemap = dePosts.map((post) => ({
-    url: `${BASE_URL}/blog/de/${post.slug}`,
+    url: `${PROD_URL}/blog/de/${post.slug}`,
     lastModified: new Date(post.lastModified || post.date),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
   const esBlogRoutes: MetadataRoute.Sitemap = esPosts.map((post) => ({
-    url: `${BASE_URL}/blog/es/${post.slug}`,
+    url: `${PROD_URL}/blog/es/${post.slug}`,
     lastModified: new Date(post.lastModified || post.date),
     changeFrequency: "monthly" as const,
     priority: 0.7,
@@ -72,7 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Category pages
   const categories = ["festivals", "tips", "culture", "news"];
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((cat) => ({
-    url: `${BASE_URL}/blog/category/${cat}`,
+    url: `${PROD_URL}/blog/category/${cat}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.6,

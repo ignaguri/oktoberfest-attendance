@@ -1,3 +1,4 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import type { Metadata } from "next";
 
 import { BlogIndexView } from "@/components/blog/BlogIndexView";
@@ -10,11 +11,11 @@ export const metadata: Metadata = {
   description:
     "Guides, tips, and news about Oktoberfest, Munich beer festivals, and the ProstCounter app.",
   alternates: {
-    canonical: "https://prostcounter.fun/blog",
+    canonical: `${PROD_URL}/blog`,
     languages: {
-      en: "https://prostcounter.fun/blog",
-      de: "https://prostcounter.fun/blog/de",
-      es: "https://prostcounter.fun/blog/es",
+      en: `${PROD_URL}/blog`,
+      de: `${PROD_URL}/blog/de`,
+      es: `${PROD_URL}/blog/es`,
     },
   },
 };

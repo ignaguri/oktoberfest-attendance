@@ -1,3 +1,4 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -22,7 +23,7 @@ import { logger } from "@/lib/logger";
 const LINKS = [
   {
     key: "privacy" as const,
-    url: "https://prostcounter.fun/privacy",
+    url: `${PROD_URL}/privacy`,
     Icon: Shield,
   },
   {

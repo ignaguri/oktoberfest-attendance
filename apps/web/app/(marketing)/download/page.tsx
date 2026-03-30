@@ -1,3 +1,4 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import type { Metadata } from "next";
 
 import { DownloadContent } from "@/components/marketing/DownloadContent";
@@ -9,11 +10,11 @@ export const metadata: Metadata = {
   description:
     "Download ProstCounter for free on iOS, Android, or use the web app. Track your beer festival experience on any device.",
   alternates: {
-    canonical: "https://prostcounter.fun/download",
+    canonical: `${PROD_URL}/download`,
     languages: {
-      en: "https://prostcounter.fun/download",
-      de: "https://prostcounter.fun/de/download",
-      es: "https://prostcounter.fun/es/download",
+      en: `${PROD_URL}/download`,
+      de: `${PROD_URL}/de/download`,
+      es: `${PROD_URL}/es/download`,
     },
   },
 };

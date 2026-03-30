@@ -1,5 +1,7 @@
 import "server-only";
 
+import { PROD_URL } from "@prostcounter/shared/constants";
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import { getAppUrl } from "@prostcounter/shared/utils";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
@@ -7,7 +9,6 @@ import { notFound, redirect } from "next/navigation";
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
-import type { BlogLocale } from "@/lib/blog";
 import { NON_DEFAULT_LOCALES } from "@/lib/blog";
 
 export const revalidate = 86400;
@@ -24,15 +25,15 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (!NON_DEFAULT_LOCALES.includes(locale as BlogLocale)) return {};
+  if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) return {};
 
   return {
     alternates: {
-      canonical: `https://prostcounter.fun/${locale}`,
+      canonical: `${PROD_URL}/${locale}`,
       languages: {
-        en: "https://prostcounter.fun",
-        de: "https://prostcounter.fun/de",
-        es: "https://prostcounter.fun/es",
+        en: PROD_URL,
+        de: `${PROD_URL}/de`,
+        es: `${PROD_URL}/es`,
       },
     },
   };
@@ -47,7 +48,7 @@ export default async function LocalizedLandingPage({
 }) {
   const { locale } = await params;
 
-  if (!NON_DEFAULT_LOCALES.includes(locale as BlogLocale)) {
+  if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) {
     notFound();
   }
 
@@ -66,7 +67,7 @@ export default async function LocalizedLandingPage({
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "ProstCounter",
-    url: "https://prostcounter.fun",
+    url: PROD_URL,
     description:
       "Track your beer festival attendance, compete with friends, and keep memories of every Oktoberfest visit.",
     applicationCategory: "LifestyleApplication",
@@ -82,7 +83,7 @@ export default async function LocalizedLandingPage({
       name: "ProstCounter",
       logo: {
         "@type": "ImageObject",
-        url: "https://prostcounter.fun/android-chrome-512x512.png",
+        url: `${PROD_URL}/android-chrome-512x512.png`,
       },
     },
   };

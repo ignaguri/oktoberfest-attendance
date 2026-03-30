@@ -1,4 +1,6 @@
-import type { BlogCategory, BlogLocale } from "@/lib/blog";
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
+
+import type { BlogCategory } from "@/lib/blog";
 
 export const categoryColors: Record<string, string> = {
   festivals: "bg-yellow-100 text-yellow-800",
@@ -7,20 +9,23 @@ export const categoryColors: Record<string, string> = {
   news: "bg-green-100 text-green-800",
 };
 
-export const dateLocaleMap: Record<BlogLocale, string> = {
+export const dateLocaleMap: Record<SupportedLanguage, string> = {
   en: "en-US",
   de: "de-DE",
   es: "es-ES",
 };
 
-export const categoryNames: Record<BlogCategory, Record<BlogLocale, string>> = {
+export const categoryNames: Record<
+  BlogCategory,
+  Record<SupportedLanguage, string>
+> = {
   festivals: { en: "Festivals", de: "Feste", es: "Festivales" },
   tips: { en: "Tips", de: "Tipps", es: "Consejos" },
   culture: { en: "Culture", de: "Kultur", es: "Cultura" },
   news: { en: "News", de: "Neuigkeiten", es: "Noticias" },
 };
 
-const tagNames: Record<string, Record<BlogLocale, string>> = {
+const tagNames: Record<string, Record<SupportedLanguage, string>> = {
   oktoberfest: { en: "Oktoberfest", de: "Oktoberfest", es: "Oktoberfest" },
   "first time": { en: "First time", de: "Erstbesucher", es: "Primera vez" },
   "beginners guide": {
@@ -97,13 +102,16 @@ const tagNames: Record<string, Record<BlogLocale, string>> = {
   },
 };
 
-export function localizeCategory(category: string, locale: BlogLocale): string {
+export function localizeCategory(
+  category: string,
+  locale: SupportedLanguage,
+): string {
   return (
     categoryNames[category as BlogCategory]?.[locale] ??
     category.charAt(0).toUpperCase() + category.slice(1)
   );
 }
 
-export function localizeTag(tag: string, locale: BlogLocale): string {
+export function localizeTag(tag: string, locale: SupportedLanguage): string {
   return tagNames[tag]?.[locale] ?? tag;
 }
