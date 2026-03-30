@@ -6,15 +6,15 @@ import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { i18n, useTranslation } from "@/lib/i18n/client";
+import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
-const navLinks = [
-  { href: "/blog", label: "Blog" },
-  { href: "/download", label: "Download" },
-];
+import { MarketingLanguageSelector } from "./MarketingLanguageSelector";
 
 export function MarketingHeader() {
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -25,11 +25,20 @@ export function MarketingHeader() {
     });
   }, []);
 
+  const lang = i18n.language;
+  const navLinks = [
+    { href: marketingUrl("/blog", lang), label: t("marketing.header.blog") },
+    {
+      href: marketingUrl("/download", lang),
+      label: t("marketing.header.download"),
+    },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
-          href={isLoggedIn ? "/home" : "/"}
+          href={isLoggedIn ? "/home" : marketingUrl("/", lang)}
           className="flex items-center gap-2 text-lg font-bold text-gray-900"
         >
           <Image
@@ -52,9 +61,12 @@ export function MarketingHeader() {
               {link.label}
             </Link>
           ))}
+          <MarketingLanguageSelector />
           <Button variant="yellow" size="sm" asChild>
             <Link href={isLoggedIn ? "/home" : "/sign-in"}>
-              {isLoggedIn ? "Go to App" : "Sign In"}
+              {isLoggedIn
+                ? t("marketing.header.goToApp")
+                : t("marketing.header.signIn")}
             </Link>
           </Button>
         </div>
@@ -84,12 +96,17 @@ export function MarketingHeader() {
                 {link.label}
               </Link>
             ))}
+            <div className="px-3 py-2">
+              <MarketingLanguageSelector />
+            </div>
             <Button variant="yellow" size="sm" asChild className="mt-1 w-fit">
               <Link
                 href={isLoggedIn ? "/home" : "/sign-in"}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {isLoggedIn ? "Go to App" : "Sign In"}
+                {isLoggedIn
+                  ? t("marketing.header.goToApp")
+                  : t("marketing.header.signIn")}
               </Link>
             </Button>
           </div>

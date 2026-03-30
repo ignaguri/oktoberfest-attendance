@@ -1,56 +1,73 @@
+"use client";
+
 import { Beer } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
+import { i18n, useTranslation } from "@/lib/i18n/client";
+import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 
 const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
-const blogLinks = [
-  { href: "/blog/oktoberfest-2026-guide", label: "Oktoberfest 2026 Guide" },
-  { href: "/blog/first-time-oktoberfest", label: "First Time Tips" },
-  { href: "/blog/oktoberfest-tents-guide", label: "Tent Guide" },
-  {
-    href: "/blog/munich-beer-festivals-calendar",
-    label: "Festival Calendar",
-  },
-];
-
-const legalLinks = [
-  { href: "/privacy", label: "Privacy Policy" },
-  { href: "/r/bugs", label: "Report a Bug", external: true },
-  { href: "/r/feedback", label: "Request a Feature", external: true },
-];
-
 export function MarketingFooter() {
+  const { t } = useTranslation();
+  const lang = i18n.language;
+
+  const blogLinks = [
+    { href: "/blog/oktoberfest-2026-guide", labelKey: "oktoberfestGuide" },
+    { href: "/blog/first-time-oktoberfest", labelKey: "firstTimeTips" },
+    { href: "/blog/oktoberfest-tents-guide", labelKey: "tentGuide" },
+    {
+      href: "/blog/munich-beer-festivals-calendar",
+      labelKey: "festivalCalendar",
+    },
+  ] as const;
+
+  const legalLinks = [
+    { href: "/privacy", labelKey: "privacyPolicy" as const },
+    { href: "/child-safety", labelKey: "childSafety" as const },
+    { href: "/r/bugs", labelKey: "reportBug" as const, external: true },
+    {
+      href: "/r/feedback",
+      labelKey: "requestFeature" as const,
+      external: true,
+    },
+  ];
+
   return (
     <footer className="border-t border-gray-200 bg-gray-50">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
+            <Link
+              href={marketingUrl("/", lang)}
+              className="flex items-center gap-2"
+            >
               <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" />
               <span className="text-lg font-bold" translate="no">
                 ProstCounter
               </span>
             </Link>
             <p className="mt-3 text-sm text-gray-600">
-              Track your beer festival attendance and compete with friends.
+              {t("marketing.footer.tagline")}
             </p>
           </div>
 
           {/* Blog */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-gray-900">Blog</h3>
+            <h3 className="mb-3 text-sm font-semibold text-gray-900">
+              {t("marketing.footer.blog")}
+            </h3>
             <ul className="space-y-2">
               {blogLinks.map((link) => (
                 <li key={link.href}>
                   <Link
-                    href={link.href}
+                    href={marketingUrl(link.href, lang)}
                     className="text-sm text-gray-600 hover:text-gray-900"
                   >
-                    {link.label}
+                    {t(`marketing.footer.blogLinks.${link.labelKey}`)}
                   </Link>
                 </li>
               ))}
@@ -60,7 +77,7 @@ export function MarketingFooter() {
           {/* Download */}
           <div>
             <h3 className="mb-3 text-sm font-semibold text-gray-900">
-              Download
+              {t("marketing.footer.download")}
             </h3>
             <ul className="space-y-2">
               <li>
@@ -70,15 +87,15 @@ export function MarketingFooter() {
                   rel="noopener noreferrer"
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
-                  iOS App Store
+                  {t("marketing.footer.downloadLinks.iosAppStore")}
                 </a>
               </li>
               <li>
                 <Link
-                  href="/download"
+                  href={marketingUrl("/download", lang)}
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
-                  All Platforms
+                  {t("marketing.footer.downloadLinks.allPlatforms")}
                 </Link>
               </li>
               <li>
@@ -86,7 +103,7 @@ export function MarketingFooter() {
                   href="/sign-up"
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
-                  Try the Web App
+                  {t("marketing.footer.downloadLinks.tryWebApp")}
                 </Link>
               </li>
             </ul>
@@ -94,7 +111,9 @@ export function MarketingFooter() {
 
           {/* Legal */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-gray-900">Legal</h3>
+            <h3 className="mb-3 text-sm font-semibold text-gray-900">
+              {t("marketing.footer.legal")}
+            </h3>
             <ul className="space-y-2">
               {legalLinks.map((link) => (
                 <li key={link.href}>
@@ -104,7 +123,7 @@ export function MarketingFooter() {
                     rel={link.external ? "noopener noreferrer" : undefined}
                     className="text-sm text-gray-600 hover:text-gray-900"
                   >
-                    {link.label}
+                    {t(`marketing.footer.legalLinks.${link.labelKey}`)}
                   </Link>
                 </li>
               ))}
@@ -115,7 +134,11 @@ export function MarketingFooter() {
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 sm:flex-row">
           <p className="flex items-center gap-1 text-sm text-gray-500">
             <Beer size={14} />
-            <span>&copy; {new Date().getFullYear()} ProstCounter. Prost!</span>
+            <span>
+              {t("marketing.footer.copyright", {
+                year: new Date().getFullYear(),
+              })}
+            </span>
           </p>
           <div className="flex items-center gap-4">
             <a

@@ -11,62 +11,73 @@ import {
 } from "@prostcounter/shared/i18n";
 import type { TFunction } from "i18next";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useCurrentProfile } from "@/lib/data";
 import { detectBrowserLanguage } from "@/lib/utils/detectLanguage";
-
-// Initialize i18n on client with default language
-initI18n();
+import { getLangCookie, setLangCookie } from "@/lib/utils/langCookie";
 
 /**
- * I18n Provider for the web app
- * Wrap your app with this in the root layout
- * Loads user's saved language preference and auto-detects if not set
+ * Detect the initial language synchronously from cookie or browser.
+ * Called once at module load to initialize i18n with the correct language
+ * before any React rendering, eliminating the blank flash for anonymous users.
+ */
+function detectInitialLanguage(): string {
+  const supported = [...SUPPORTED_LANGUAGES] as string[];
+
+  // 1. Check cookie (returning visitor)
+  const cookieLang = getLangCookie();
+  if (cookieLang && supported.includes(cookieLang)) {
+    return cookieLang;
+  }
+
+  // 2. Detect from browser (first visit)
+  const browserLang = detectBrowserLanguage(supported);
+
+  // Persist for next visit
+  setLangCookie(browserLang);
+
+  return browserLang;
+}
+
+// Initialize i18n synchronously with the detected language
+initI18n(detectInitialLanguage());
+
+/**
+ * I18n Provider for the web app.
+ * For anonymous users, language is already set synchronously via cookie/browser detection.
+ * For authenticated users, applies the saved preferred_language from their profile.
  */
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [isLanguageLoaded, setIsLanguageLoaded] = useState(false);
   const { data: profile } = useCurrentProfile();
+  const hasAppliedProfile = useRef(false);
+  const [, forceUpdate] = useState(0);
 
   useEffect(() => {
-    const loadLanguage = async () => {
-      if (!profile) {
-        // No profile yet, use default English
-        setIsLanguageLoaded(true);
-        return;
-      }
+    if (!profile || hasAppliedProfile.current) return;
 
+    const applyProfileLanguage = async () => {
       let languageToUse: string;
 
       if (profile.preferred_language) {
-        // User has explicitly set a language
         languageToUse = profile.preferred_language;
       } else {
-        // Auto-detect from browser
         languageToUse = detectBrowserLanguage([
           ...SUPPORTED_LANGUAGES,
         ] as string[]);
-
-        // Note: We could save the detected language to the profile here,
-        // but we'll let it happen naturally when the user first interacts
-        // with the language selector or on first app use
       }
 
-      // Change language if different from current
       if (i18n.language !== languageToUse) {
         await changeLanguage(languageToUse);
+        setLangCookie(languageToUse);
+        forceUpdate((n) => n + 1);
       }
 
-      setIsLanguageLoaded(true);
+      hasAppliedProfile.current = true;
     };
 
-    loadLanguage();
+    applyProfileLanguage();
   }, [profile]);
-
-  // Don't render children until language is loaded to prevent flash of wrong language
-  if (!isLanguageLoaded) {
-    return null;
-  }
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

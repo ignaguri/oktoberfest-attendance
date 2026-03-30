@@ -1,20 +1,14 @@
-import { ArrowLeft, Calendar, Clock, Globe, User } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
 import { Link } from "next-view-transitions";
 
 import type { BlogLocale, BlogPost } from "@/lib/blog";
 
-const categoryColors: Record<string, string> = {
-  festivals: "bg-yellow-100 text-yellow-800",
-  tips: "bg-blue-100 text-blue-800",
-  culture: "bg-purple-100 text-purple-800",
-  news: "bg-green-100 text-green-800",
-};
-
-const localeNames: Record<BlogLocale, string> = {
-  en: "English",
-  de: "Deutsch",
-  es: "Español",
-};
+import {
+  categoryColors,
+  dateLocaleMap,
+  localizeCategory,
+  localizeTag,
+} from "./blog-i18n";
 
 const uiTranslations: Record<
   BlogLocale,
@@ -25,29 +19,22 @@ const uiTranslations: Record<
   es: { backToBlog: "Volver al Blog", minRead: "min de lectura" },
 };
 
-const dateLocaleMap: Record<BlogLocale, string> = {
-  en: "en-US",
-  de: "de-DE",
-  es: "es-ES",
-};
-
 export function ArticleLayout({
   post,
-  availableLocales,
   children,
 }: {
   post: BlogPost;
-  availableLocales: BlogLocale[];
   children: React.ReactNode;
 }) {
-  const t = uiTranslations[post.locale || "en"];
-  const dateFmtLocale = dateLocaleMap[post.locale || "en"];
+  const locale = post.locale || "en";
+  const t = uiTranslations[locale];
+  const dateFmtLocale = dateLocaleMap[locale];
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       {/* Back link */}
       <Link
-        href="/blog"
+        href={post.locale === "en" ? "/blog" : `/blog/${post.locale}`}
         className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
       >
         <ArrowLeft size={14} />
@@ -60,14 +47,14 @@ export function ArticleLayout({
           <span
             className={`rounded-full px-3 py-1 text-xs font-medium ${categoryColors[post.category] || "bg-gray-100 text-gray-800"}`}
           >
-            {post.category}
+            {localizeCategory(post.category, locale)}
           </span>
           {post.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
               className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600"
             >
-              {tag}
+              {localizeTag(tag, locale)}
             </span>
           ))}
         </div>
@@ -96,33 +83,6 @@ export function ArticleLayout({
             {post.readingTime} {t.minRead}
           </span>
         </div>
-
-        {/* Language switcher */}
-        {availableLocales.length > 1 && (
-          <div className="mt-4 flex items-center gap-2 text-sm">
-            <Globe size={14} className="text-gray-400" />
-            {availableLocales.map((locale) => {
-              const href =
-                locale === "en"
-                  ? `/blog/${post.slug}`
-                  : `/blog/${locale}/${post.slug}`;
-              const isActive = locale === post.locale;
-              return (
-                <Link
-                  key={locale}
-                  href={href}
-                  className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "bg-yellow-100 text-yellow-800"
-                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                  }`}
-                >
-                  {localeNames[locale]}
-                </Link>
-              );
-            })}
-          </div>
-        )}
       </header>
 
       {/* Content */}

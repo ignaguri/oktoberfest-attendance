@@ -2568,7 +2568,8 @@
     "links": {
       "privacy": "Privacidad",
       "terms": "Términos",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "childSafety": "Seguridad infantil"
     },
     "copyright": "© 2024 ProstCounter. Todos los derechos reservados."
   },
@@ -2687,5 +2688,155 @@
       "addFriend": "Añadir amigo"
     },
     "sharedGroups": "Grupos en común"
+  },
+  "marketing": {
+    "header": {
+      "blog": "Blog",
+      "download": "Descargar",
+      "signIn": "Iniciar sesión",
+      "goToApp": "Ir a la app"
+    },
+    "hero": {
+      "title1": "La app para tu",
+      "title2": "festival cervecero",
+      "subtitle": "Cuenta cada Masskrug, compite con amigos en clasificaciones y revive tus recuerdos del Oktoberfest — todo en una app.",
+      "getStarted": "Empieza gratis",
+      "downloadApp": "Descargar app",
+      "freeForever": "Gratis para siempre. Disponible en iOS, Android y Web."
+    },
+    "features": {
+      "sectionTitle": "Todo lo que necesitas en la Wiesn",
+      "sectionSubtitle": "De festivaleros, para festivaleros.",
+      "trackBeers": {
+        "title": "Cuenta tus cervezas",
+        "description": "Registra tu consumo diario, apunta tus visitas a carpas, saca fotos de tus Masskrugs y construye la cronología de cada día de festival."
+      },
+      "competeWithFriends": {
+        "title": "Compite con amigos",
+        "description": "Crea grupos, desafía a tu equipo en clasificaciones y descubre quién acumula más días de festival (o cervezas)."
+      },
+      "liveLocation": {
+        "title": "Ubicación en tiempo real",
+        "description": "¿No encuentras a tus amigos en la Wiesn? Comparte tu ubicación en tiempo real entre las carpas para que nadie beba solo."
+      },
+      "achievements": {
+        "title": "Consigue logros",
+        "description": "Desbloquea más de 40 insignias en distintas categorías — desde hitos de primerizo hasta rachas legendarias y sorpresas ocultas."
+      }
+    },
+    "festivals": {
+      "sectionTitle": "Festivales cerveceros de Múnich",
+      "sectionSubtitle": "ProstCounter cubre todos los grandes festivales cerveceros de Múnich.",
+      "oktoberfest": {
+        "name": "Oktoberfest 2026",
+        "dates": "19 sep. — 4 oct.",
+        "description": "El festival cervecero más grande del mundo regresa a Múnich."
+      },
+      "starkbierfest": {
+        "name": "Starkbierfest",
+        "dates": "Marzo — Abril",
+        "description": "La temporada de cerveza fuerte de Múnich — el secreto mejor guardado de los muniqueses."
+      },
+      "fruehlingsfest": {
+        "name": "Frühlingsfest",
+        "dates": "Abril — Mayo",
+        "description": "El festival de primavera de Múnich en la Theresienwiese."
+      },
+      "viewCalendar": "Ver el calendario completo de festivales de Múnich"
+    },
+    "cta": {
+      "title": "¿Listo para el próximo festival?",
+      "subtitle": "Descarga ProstCounter y empieza a registrar tu aventura cervecera hoy.",
+      "downloadIos": "Descargar en iOS",
+      "tryWebApp": "Probar la app web",
+      "scanToDownload": "Escanea para descargar en tu móvil"
+    },
+    "download": {
+      "title": "Descargar ProstCounter",
+      "subtitle": "Registra tu experiencia cervecera en cualquier dispositivo. Gratis para siempre.",
+      "ios": {
+        "description": "iPhone e iPad",
+        "action": "Descargar en el App Store"
+      },
+      "android": {
+        "description": "Próximamente",
+        "action": "Recibir notificación"
+      },
+      "webApp": {
+        "description": "Cualquier navegador, cualquier dispositivo",
+        "action": "Abrir app web"
+      },
+      "scanWithPhone": "Escanea con tu móvil",
+      "opensAppStore": "Abre el App Store en dispositivos iOS"
+    },
+    "footer": {
+      "tagline": "Registra tu asistencia a festivales cerveceros y compite con amigos.",
+      "blog": "Blog",
+      "download": "Descargar",
+      "legal": "Legal",
+      "blogLinks": {
+        "oktoberfestGuide": "Guía del Oktoberfest 2026",
+        "firstTimeTips": "Consejos para primerizos",
+        "tentGuide": "Guía de carpas",
+        "festivalCalendar": "Calendario de festivales"
+      },
+      "downloadLinks": {
+        "iosAppStore": "iOS App Store",
+        "allPlatforms": "Todas las plataformas",
+        "tryWebApp": "Probar la app web"
+      },
+      "legalLinks": {
+        "privacyPolicy": "Política de privacidad",
+        "childSafety": "Protección infantil",
+        "reportBug": "Reportar un error",
+        "requestFeature": "Solicitar una función"
+      },
+      "copyright": "© {{year}} ProstCounter. ¡Prost!"
+    },
+    "childSafety": {
+      "title": "Estándares de protección infantil",
+      "lastUpdated": "Última actualización:",
+      "intro": {
+        "title": "1. Introducción",
+        "text": "ProstCounter es una aplicación de seguimiento de asistencia a festivales cerveceros y Volksfeste diseñada exclusivamente para adultos mayores de 18 años. Estamos comprometidos con la seguridad de todos los usuarios, especialmente de los menores. Mantenemos una política de tolerancia cero hacia el abuso y la explotación sexual infantil (CSAE) en cualquier forma."
+      },
+      "csaeStandards": {
+        "title": "2. Estándares CSAE",
+        "text": "ProstCounter prohíbe estrictamente cualquier contenido o comportamiento que explote, abuse o ponga en peligro sexualmente a menores. Esto incluye, entre otros:",
+        "items": {
+          "csam": "Material de abuso sexual infantil (CSAM) de cualquier tipo, incluido el contenido generado por IA",
+          "grooming": "Grooming o captación de menores",
+          "sextortion": "Sextorsión que involucre a menores",
+          "trafficking": "Trata de menores",
+          "other": "Cualquier otra forma de explotación sexual o peligro para menores"
+        },
+        "consequence": "Cualquier contenido de este tipo identificado en nuestra plataforma será eliminado de inmediato y reportado a las autoridades correspondientes."
+      },
+      "reporting": {
+        "title": "3. Reportes dentro de la app",
+        "text1": "Los usuarios pueden reportar preocupaciones sobre la seguridad infantil directamente dentro de la app ProstCounter. Los reportes pueden enviarse a través del sistema de comentarios y soporte disponible en los ajustes de la app.",
+        "text2": "Todos los reportes relacionados con la seguridad infantil se tratan con la máxima prioridad. Revisamos y actuamos sobre cada reporte de forma inmediata.",
+        "emailText": "También puede reportar sus preocupaciones enviándonos un correo electrónico directamente a"
+      },
+      "csamResponse": {
+        "title": "4. Respuesta ante CSAM",
+        "text": "Al obtener conocimiento efectivo de material de abuso sexual infantil (CSAM) en nuestra plataforma, ProstCounter tomará las siguientes medidas:",
+        "items": {
+          "removal": "Eliminación inmediata del contenido infractor de la plataforma",
+          "preservation": "Preservación de evidencia según lo exija la ley aplicable",
+          "reporting": "Reporte a las autoridades, incluido el National Center for Missing & Exploited Children (NCMEC) a través de la CyberTipline, y a las fuerzas del orden locales según corresponda",
+          "suspension": "Suspensión de la cuenta del usuario infractor, en espera de investigación"
+        }
+      },
+      "legalCompliance": {
+        "title": "5. Cumplimiento legal",
+        "text": "ProstCounter cumple con todas las leyes y regulaciones aplicables en materia de protección infantil, incluidas las obligaciones de reporte ante las autoridades regionales y nacionales correspondientes. Cooperamos plenamente con las fuerzas del orden en la investigación de delitos de explotación infantil."
+      },
+      "contact": {
+        "title": "6. Contacto",
+        "text": "Si tiene alguna preocupación sobre la seguridad infantil o necesita reportar un problema, comuníquese con nuestro punto de contacto designado para protección infantil:",
+        "boxTitle": "ProstCounter — Contacto de protección infantil"
+      }
+    }
   }
 }
