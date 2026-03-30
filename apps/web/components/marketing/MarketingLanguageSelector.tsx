@@ -3,12 +3,13 @@
 import {
   changeLanguage,
   getCurrentLanguage,
+  i18n,
   LANGUAGE_NAMES,
   SUPPORTED_LANGUAGES,
 } from "@prostcounter/shared/i18n";
 import { Globe } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { setLangCookie } from "@/lib/utils/langCookie";
 
@@ -52,6 +53,15 @@ export function MarketingLanguageSelector() {
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Sync state if language changes externally (e.g. I18nProvider profile load)
+  useEffect(() => {
+    const handler = (lang: string) => setCurrentLang(lang);
+    i18n.on("languageChanged", handler);
+    return () => {
+      i18n.off("languageChanged", handler);
+    };
+  }, []);
 
   const handleChange = useCallback(
     async (e: React.ChangeEvent<HTMLSelectElement>) => {

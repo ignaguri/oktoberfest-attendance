@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { LandingContent } from "@/components/marketing/LandingContent";
+import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
 import type { BlogLocale } from "@/lib/blog";
 import { NON_DEFAULT_LOCALES } from "@/lib/blog";
@@ -88,6 +89,7 @@ export default async function LocalizedLandingPage({
 
   return (
     <>
+      <SyncLocale locale={locale} />
       <JsonLd data={jsonLd} />
       <LandingContent />
     </>

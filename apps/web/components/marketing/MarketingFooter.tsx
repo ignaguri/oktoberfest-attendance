@@ -4,13 +4,15 @@ import { Beer } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
-import { useTranslation } from "@/lib/i18n/client";
+import { i18n, useTranslation } from "@/lib/i18n/client";
+import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 
 const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
 export function MarketingFooter() {
   const { t } = useTranslation();
+  const lang = i18n.language;
 
   const blogLinks = [
     { href: "/blog/oktoberfest-2026-guide", labelKey: "oktoberfestGuide" },
@@ -39,7 +41,10 @@ export function MarketingFooter() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
+            <Link
+              href={marketingUrl("/", lang)}
+              className="flex items-center gap-2"
+            >
               <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" />
               <span className="text-lg font-bold" translate="no">
                 ProstCounter
@@ -59,7 +64,7 @@ export function MarketingFooter() {
               {blogLinks.map((link) => (
                 <li key={link.href}>
                   <Link
-                    href={link.href}
+                    href={marketingUrl(link.href, lang)}
                     className="text-sm text-gray-600 hover:text-gray-900"
                   >
                     {t(`marketing.footer.blogLinks.${link.labelKey}`)}
@@ -87,7 +92,7 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link
-                  href="/download"
+                  href={marketingUrl("/download", lang)}
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
                   {t("marketing.footer.downloadLinks.allPlatforms")}

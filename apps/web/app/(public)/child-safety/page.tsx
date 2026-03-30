@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "@/lib/i18n/client";
+import { i18n, useTranslation } from "@/lib/i18n/client";
 
 export default function ChildSafetyStandards() {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ export default function ChildSafetyStandards() {
       <div className="prose prose-lg max-w-none space-y-6">
         <p className="mb-8 text-sm text-gray-600">
           <strong>{t("marketing.childSafety.lastUpdated")}</strong>{" "}
-          {new Date("2026-03-30").toLocaleDateString("en-US", {
+          {new Date("2026-03-30").toLocaleDateString(i18n.language, {
             year: "numeric",
             month: "long",
             day: "numeric",

@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/lib/i18n/client";
+import { i18n, useTranslation } from "@/lib/i18n/client";
+import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 
 const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
@@ -43,6 +44,7 @@ const festivalKeys = [
 
 export function LandingContent() {
   const { t } = useTranslation();
+  const lang = i18n.language;
 
   return (
     <div className="overflow-hidden">
@@ -103,7 +105,7 @@ export function LandingContent() {
               <Link href="/sign-up">{t("marketing.hero.getStarted")}</Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="text-base">
-              <Link href="/download">
+              <Link href={marketingUrl("/download", lang)}>
                 <Download size={18} className="mr-1" />
                 {t("marketing.hero.downloadApp")}
               </Link>
@@ -199,7 +201,7 @@ export function LandingContent() {
             {festivalKeys.map((festival) => (
               <motion.div key={festival.key} variants={fadeUp}>
                 <Link
-                  href={festival.href}
+                  href={marketingUrl(festival.href, lang)}
                   className="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-yellow-300 hover:shadow-md"
                 >
                   <div className="mb-3 flex items-center gap-2 text-sm font-medium text-yellow-600">
@@ -225,7 +227,7 @@ export function LandingContent() {
             variants={fadeUp}
           >
             <Link
-              href="/blog/munich-beer-festivals-calendar"
+              href={marketingUrl("/blog/munich-beer-festivals-calendar", lang)}
               className="text-sm font-medium text-yellow-600 underline decoration-yellow-300 underline-offset-4 hover:text-yellow-700"
             >
               {t("marketing.festivals.viewCalendar")}

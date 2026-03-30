@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DownloadContent } from "@/components/marketing/DownloadContent";
+import { SyncLocale } from "@/components/marketing/SyncLocale";
 import type { BlogLocale } from "@/lib/blog";
 import { NON_DEFAULT_LOCALES } from "@/lib/blog";
 
@@ -47,5 +48,10 @@ export default async function LocalizedDownloadPage({
     notFound();
   }
 
-  return <DownloadContent />;
+  return (
+    <>
+      <SyncLocale locale={locale} />
+      <DownloadContent />
+    </>
+  );
 }

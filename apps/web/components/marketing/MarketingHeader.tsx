@@ -6,7 +6,8 @@ import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/lib/i18n/client";
+import { i18n, useTranslation } from "@/lib/i18n/client";
+import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
@@ -24,16 +25,20 @@ export function MarketingHeader() {
     });
   }, []);
 
+  const lang = i18n.language;
   const navLinks = [
-    { href: "/blog", label: t("marketing.header.blog") },
-    { href: "/download", label: t("marketing.header.download") },
+    { href: marketingUrl("/blog", lang), label: t("marketing.header.blog") },
+    {
+      href: marketingUrl("/download", lang),
+      label: t("marketing.header.download"),
+    },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
-          href={isLoggedIn ? "/home" : "/"}
+          href={isLoggedIn ? "/home" : marketingUrl("/", lang)}
           className="flex items-center gap-2 text-lg font-bold text-gray-900"
         >
           <Image
