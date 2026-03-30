@@ -10,6 +10,8 @@ import { Globe } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
+import { setLangCookie } from "@/lib/utils/langCookie";
+
 const LOCALE_PATTERN = /^\/(de|es)(\/|$)/;
 
 /**
@@ -55,6 +57,7 @@ export function MarketingLanguageSelector() {
     async (e: React.ChangeEvent<HTMLSelectElement>) => {
       const lang = e.target.value;
       await changeLanguage(lang);
+      setLangCookie(lang);
       setCurrentLang(lang);
 
       const newUrl = getLocalizedUrl(pathname, lang);
