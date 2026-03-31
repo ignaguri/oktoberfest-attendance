@@ -12,7 +12,8 @@
         "simulator": false
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "prebuildCommand": "npx expo prebuild --clean --platform android"
       }
     },
     "preview": {
@@ -22,7 +23,8 @@
         "simulator": false
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "prebuildCommand": "npx expo prebuild --clean --platform android"
       },
       "env": {
         "SENTRY_ORG": "prostcounter",
@@ -32,6 +34,9 @@
     "production": {
       "channel": "production",
       "autoIncrement": true,
+      "android": {
+        "prebuildCommand": "npx expo prebuild --clean --platform android"
+      },
       "env": {
         "EXPO_PUBLIC_SENTRY_DSN": "https://976065906ffaab22c65cb37405653cea@o4507997605527552.ingest.de.sentry.io/4507997611098192",
         "SENTRY_ORG": "prostcounter",
@@ -43,7 +48,8 @@
       "distribution": "internal",
       "autoIncrement": true,
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "prebuildCommand": "npx expo prebuild --clean --platform android"
       },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://jdmhjakxhtghsbnstyou.supabase.co",
