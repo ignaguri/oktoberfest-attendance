@@ -1,7 +1,7 @@
 import { PROD_URL } from "@prostcounter/shared/constants";
 import type { MetadataRoute } from "next";
 
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, VALID_CATEGORIES } from "@/lib/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts("en");
@@ -52,6 +52,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
+      url: `${PROD_URL}/blog/de`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${PROD_URL}/blog/es`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: `${PROD_URL}/privacy`,
       lastModified: new Date(),
       changeFrequency: "yearly",
@@ -87,7 +99,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Category pages
-  const categories = ["festivals", "tips", "culture", "news"];
+  const categories = VALID_CATEGORIES;
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((cat) => ({
     url: `${PROD_URL}/blog/category/${cat}`,
     lastModified: new Date(),
