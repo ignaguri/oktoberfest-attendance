@@ -1,7 +1,7 @@
 import { PROD_URL } from "@prostcounter/shared/constants";
 import type { MetadataRoute } from "next";
 
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, VALID_CATEGORIES } from "@/lib/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts("en");
@@ -28,19 +28,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${PROD_URL}/sign-in`,
+      url: `${PROD_URL}/de`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${PROD_URL}/es`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${PROD_URL}/de/download`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${PROD_URL}/sign-up`,
+      url: `${PROD_URL}/es/download`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
+    },
+    {
+      url: `${PROD_URL}/blog/de`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${PROD_URL}/blog/es`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${PROD_URL}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${PROD_URL}/child-safety`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,
@@ -69,12 +99,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Category pages
-  const categories = ["festivals", "tips", "culture", "news"];
+  const categories = VALID_CATEGORIES;
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((cat) => ({
     url: `${PROD_URL}/blog/category/${cat}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.6,
+  }));
+  const deCategoryRoutes: MetadataRoute.Sitemap = categories.map((cat) => ({
+    url: `${PROD_URL}/blog/de/category/${cat}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.5,
+  }));
+  const esCategoryRoutes: MetadataRoute.Sitemap = categories.map((cat) => ({
+    url: `${PROD_URL}/blog/es/category/${cat}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.5,
   }));
 
   return [
@@ -83,5 +125,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...deBlogRoutes,
     ...esBlogRoutes,
     ...categoryRoutes,
+    ...deCategoryRoutes,
+    ...esCategoryRoutes,
   ];
 }

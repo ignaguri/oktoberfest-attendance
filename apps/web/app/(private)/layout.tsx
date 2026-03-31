@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -12,6 +13,10 @@ import { WhatsNew } from "@/components/WhatsNew";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { WebFestivalProvider } from "@/contexts/WebFestivalProvider";
 import { getUser } from "@/lib/sharedActions";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 // Keep private routes fully dynamic (auth-dependent)
 export const revalidate = 0;
