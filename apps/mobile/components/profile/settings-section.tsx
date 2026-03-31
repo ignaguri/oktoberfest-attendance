@@ -11,7 +11,11 @@ import {
   useTranslation,
 } from "@prostcounter/shared/i18n";
 import type { Festival, TipMode } from "@prostcounter/shared/schemas";
-import { TIP_MODES } from "@prostcounter/shared/utils";
+import {
+  getTipModeDescriptions,
+  getTipModeLabels,
+  TIP_MODES,
+} from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { format, parseISO } from "date-fns";
 import { useRouter } from "expo-router";
@@ -97,6 +101,7 @@ export function SettingsSection({
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showTipModeSheet, setShowTipModeSheet] = useState(false);
   const [showFixedAmountInput, setShowFixedAmountInput] = useState(false);
+  const [pendingFixedInput, setPendingFixedInput] = useState(false);
   const [fixedAmountText, setFixedAmountText] = useState(
     tipFixedAmount?.toString() ?? "",
   );
@@ -126,29 +131,15 @@ export function SettingsSection({
     [setLanguage],
   );
 
-  const tipModeLabels: Record<TipMode, string> = {
-    none: t("profile.tipMode.none"),
-    ceiling_plus_1: t("profile.tipMode.ceilingPlus1"),
-    ceiling_plus_2: t("profile.tipMode.ceilingPlus2"),
-    percentage_10: t("profile.tipMode.percentage10"),
-    fixed: t("profile.tipMode.fixed"),
-  };
-
-  const tipModeDescriptions: Record<TipMode, string> = {
-    none: t("profile.tipMode.noneDescription"),
-    ceiling_plus_1: t("profile.tipMode.ceilingPlus1Description"),
-    ceiling_plus_2: t("profile.tipMode.ceilingPlus2Description"),
-    percentage_10: t("profile.tipMode.percentage10Description"),
-    fixed: t("profile.tipMode.fixedDescription"),
-  };
+  const tipModeLabels = getTipModeLabels(t);
+  const tipModeDescriptions = getTipModeDescriptions(t);
 
   const handleTipModeSelect = useCallback(
     (mode: TipMode) => {
       setShowTipModeSheet(false);
       if (mode === "fixed") {
         updateProfile({ tip_mode: mode });
-        // Delay opening the fixed amount sheet to allow the tip mode sheet to finish closing
-        setTimeout(() => setShowFixedAmountInput(true), 400);
+        setPendingFixedInput(true);
       } else {
         updateProfile({ tip_mode: mode, tip_fixed_amount: null });
       }
@@ -156,9 +147,19 @@ export function SettingsSection({
     [updateProfile],
   );
 
+  const handleTipModeSheetClose = useCallback(() => {
+    setShowTipModeSheet(false);
+    if (pendingFixedInput) {
+      setPendingFixedInput(false);
+      // Sync text with current profile value when opening
+      setFixedAmountText(tipFixedAmount?.toString() ?? "");
+      setShowFixedAmountInput(true);
+    }
+  }, [pendingFixedInput, tipFixedAmount]);
+
   const handleFixedAmountSave = useCallback(() => {
     const amount = parseFloat(fixedAmountText.replace(",", "."));
-    if (!isNaN(amount) && amount >= 0) {
+    if (!isNaN(amount) && amount >= 0 && amount <= 99) {
       updateProfile({ tip_fixed_amount: amount });
     }
     setShowFixedAmountInput(false);
@@ -416,10 +417,7 @@ export function SettingsSection({
       </Pressable>
 
       {/* Tip Mode Selection Sheet */}
-      <Actionsheet
-        isOpen={showTipModeSheet}
-        onClose={() => setShowTipModeSheet(false)}
-      >
+      <Actionsheet isOpen={showTipModeSheet} onClose={handleTipModeSheetClose}>
         <ActionsheetBackdrop />
         <ActionsheetContent className="pb-8">
           <ActionsheetDragIndicatorWrapper>
@@ -438,7 +436,7 @@ export function SettingsSection({
             return (
               <ActionsheetItem
                 key={mode}
-                onPress={() => handleTipModeSelect(mode as TipMode)}
+                onPress={() => handleTipModeSelect(mode)}
                 className={cn(isSelected && "bg-primary-50")}
               >
                 <HStack className="w-full items-center justify-between">
@@ -449,10 +447,10 @@ export function SettingsSection({
                         isSelected && "font-semibold text-primary-600",
                       )}
                     >
-                      {tipModeLabels[mode as TipMode]}
+                      {tipModeLabels[mode]}
                     </Text>
                     <Text className="text-xs text-typography-400">
-                      {tipModeDescriptions[mode as TipMode]}
+                      {tipModeDescriptions[mode]}
                     </Text>
                   </VStack>
                   {isSelected && (

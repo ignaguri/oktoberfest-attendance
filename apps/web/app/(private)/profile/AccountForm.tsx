@@ -8,9 +8,9 @@ import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { changeLanguage } from "@prostcounter/shared/i18n";
 import type { ProfileForm, TipMode } from "@prostcounter/shared/schemas";
 import { ProfileFormSchema } from "@prostcounter/shared/schemas";
-import { TIP_MODES } from "@prostcounter/shared/utils";
+import { getTipModeLabels, TIP_MODES } from "@prostcounter/shared/utils";
 import { Link } from "next-view-transitions";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -50,6 +50,10 @@ export default function AccountForm() {
     tipFixedAmount?.toString() ?? "",
   );
 
+  useEffect(() => {
+    setFixedAmountText(tipFixedAmount?.toString() ?? "");
+  }, [tipFixedAmount]);
+
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile?.avatar_url || null,
   );
@@ -76,6 +80,37 @@ export default function AccountForm() {
       });
     }
   }, [profile, reset]);
+
+  const handleTipModeChange = useCallback(
+    async (mode: TipMode) => {
+      try {
+        if (mode === "fixed") {
+          await updateProfileMutation({ tip_mode: mode });
+        } else {
+          await updateProfileMutation({
+            tip_mode: mode,
+            tip_fixed_amount: null,
+          });
+        }
+        toast.success(t("profile.updateSuccess"));
+      } catch {
+        toast.error(t("profile.updateError"));
+      }
+    },
+    [updateProfileMutation, t],
+  );
+
+  const handleFixedAmountSave = useCallback(async () => {
+    const amount = parseFloat(fixedAmountText.replace(",", "."));
+    if (!isNaN(amount) && amount >= 0 && amount <= 99) {
+      try {
+        await updateProfileMutation({ tip_fixed_amount: amount });
+        toast.success(t("profile.updateSuccess"));
+      } catch {
+        toast.error(t("profile.updateError"));
+      }
+    }
+  }, [fixedAmountText, updateProfileMutation, t]);
 
   // Show loading state
   if (userLoading || profileLoading) {
@@ -141,41 +176,7 @@ export default function AccountForm() {
     }
   };
 
-  const tipModeLabels: Record<TipMode, string> = {
-    none: t("profile.tipMode.none"),
-    ceiling_plus_1: t("profile.tipMode.ceilingPlus1"),
-    ceiling_plus_2: t("profile.tipMode.ceilingPlus2"),
-    percentage_10: t("profile.tipMode.percentage10"),
-    fixed: t("profile.tipMode.fixed"),
-  };
-
-  const handleTipModeChange = async (mode: TipMode) => {
-    try {
-      if (mode === "fixed") {
-        await updateProfileMutation({ tip_mode: mode });
-      } else {
-        await updateProfileMutation({
-          tip_mode: mode,
-          tip_fixed_amount: null,
-        });
-      }
-      toast.success(t("profile.updateSuccess"));
-    } catch {
-      toast.error(t("profile.updateError"));
-    }
-  };
-
-  const handleFixedAmountSave = async () => {
-    const amount = parseFloat(fixedAmountText.replace(",", "."));
-    if (!isNaN(amount) && amount >= 0) {
-      try {
-        await updateProfileMutation({ tip_fixed_amount: amount });
-        toast.success(t("profile.updateSuccess"));
-      } catch {
-        toast.error(t("profile.updateError"));
-      }
-    }
-  };
+  const tipModeLabels = getTipModeLabels(t);
 
   const handleLanguageChange = async (language: string | null) => {
     try {
@@ -343,7 +344,7 @@ export default function AccountForm() {
           >
             {TIP_MODES.map((mode) => (
               <option key={mode} value={mode}>
-                {tipModeLabels[mode as TipMode]}
+                {tipModeLabels[mode]}
               </option>
             ))}
           </select>

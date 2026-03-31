@@ -265,13 +265,14 @@ export default function DetailedAttendanceForm({
 
         if (delta > 0) {
           // Create new consumptions
+          const basePriceCents = getDrinkPriceCents(type);
           for (let i = 0; i < delta; i++) {
             await apiClient.consumption.log({
               festivalId: currentFestival!.id,
               date: submitDateString,
               drinkType: type,
-              pricePaidCents: calculatePricePaid(getDrinkPriceCents(type)),
-              basePriceCents: getDrinkPriceCents(type),
+              pricePaidCents: calculatePricePaid(basePriceCents),
+              basePriceCents,
               volumeMl: 1000,
             });
           }

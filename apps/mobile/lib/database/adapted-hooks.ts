@@ -16,6 +16,7 @@ import type {
   Consumption as SharedConsumption,
   GroupWithMembers,
   TentVisit,
+  TipMode,
   WinningCriteria,
 } from "@prostcounter/shared/schemas";
 import {
@@ -345,12 +346,7 @@ interface ProfileCacheData {
   tutorial_completed: boolean | null;
   tutorial_completed_at: string | null;
   updated_at: string | null;
-  tip_mode:
-    | "none"
-    | "ceiling_plus_1"
-    | "ceiling_plus_2"
-    | "percentage_10"
-    | "fixed";
+  tip_mode: TipMode;
   tip_fixed_amount: number | null;
 }
 
@@ -366,8 +362,8 @@ function adaptLocalProfile(local: LocalProfile): ProfileCacheData {
     tutorial_completed: sqliteBoolToJs(local.tutorial_completed),
     tutorial_completed_at: local.tutorial_completed_at,
     updated_at: local.updated_at,
-    tip_mode: (local as any).tip_mode ?? "ceiling_plus_1",
-    tip_fixed_amount: (local as any).tip_fixed_amount ?? null,
+    tip_mode: (local.tip_mode as TipMode) ?? "ceiling_plus_1",
+    tip_fixed_amount: local.tip_fixed_amount ?? null,
   };
 }
 
