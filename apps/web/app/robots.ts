@@ -22,6 +22,8 @@ export default function robots(): MetadataRoute.Robots {
           "/admin",
           "/join-group",
           "/auth/",
+          "/sign-in",
+          "/sign-up",
         ],
       },
     ],
