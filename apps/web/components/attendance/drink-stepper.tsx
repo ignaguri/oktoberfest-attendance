@@ -3,6 +3,7 @@
 import {
   useDeleteConsumption,
   useLogConsumption,
+  useTipCalculation,
 } from "@prostcounter/shared/hooks";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { Loader2, Minus, Plus } from "lucide-react";
@@ -49,6 +50,7 @@ export function DrinkStepper({
 }: DrinkStepperProps) {
   const logConsumption = useLogConsumption();
   const deleteConsumption = useDeleteConsumption();
+  const { calculatePricePaid } = useTipCalculation();
 
   // Filter consumptions by drink type and calculate count
   const typeConsumptions = useMemo(() => {
@@ -92,7 +94,8 @@ export function DrinkStepper({
         date,
         drinkType,
         tentId,
-        pricePaidCents: defaultPriceCents,
+        pricePaidCents: calculatePricePaid(defaultPriceCents),
+        basePriceCents: defaultPriceCents,
         volumeMl: 1000,
       });
       onSuccess?.();
@@ -107,6 +110,7 @@ export function DrinkStepper({
     drinkType,
     tentId,
     defaultPriceCents,
+    calculatePricePaid,
     logConsumption,
     onSuccess,
   ]);

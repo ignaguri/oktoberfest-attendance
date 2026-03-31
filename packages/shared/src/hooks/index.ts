@@ -137,6 +137,7 @@ export {
 
 // Pricing hooks
 export { useDrinkPrice, type UseDrinkPriceReturn } from "./useDrinkPrice";
+export { useTipCalculation } from "./useTipCalculation";
 
 // Notification hooks
 export {

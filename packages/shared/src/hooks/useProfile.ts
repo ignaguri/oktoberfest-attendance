@@ -46,6 +46,8 @@ type ProfileCacheData = {
   tutorial_completed: boolean | null;
   tutorial_completed_at: string | null;
   updated_at: string | null;
+  tip_mode?: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+  tip_fixed_amount?: number | null;
 };
 
 /**
@@ -64,6 +66,8 @@ export function useUpdateProfile() {
       username?: string;
       full_name?: string;
       preferred_language?: string | null;
+      tip_mode?: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+      tip_fixed_amount?: number | null;
     },
     { previousProfile: ProfileCacheData | undefined }
   >(
@@ -90,6 +94,12 @@ export function useUpdateProfile() {
             }),
             ...(newData.full_name !== undefined && {
               full_name: newData.full_name,
+            }),
+            ...(newData.tip_mode !== undefined && {
+              tip_mode: newData.tip_mode,
+            }),
+            ...(newData.tip_fixed_amount !== undefined && {
+              tip_fixed_amount: newData.tip_fixed_amount,
             }),
           });
         }

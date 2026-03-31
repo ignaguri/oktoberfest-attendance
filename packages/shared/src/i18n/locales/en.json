@@ -979,6 +979,22 @@
     "language": "Language",
     "languageDescription": "Choose your preferred language",
     "selectLanguage": "Select language",
+    "tipMode": {
+      "title": "Tip Calculation",
+      "description": "How tips are calculated when logging drinks",
+      "none": "No tip",
+      "noneDescription": "Pay exact base price",
+      "ceilingPlus1": "Round up + €1",
+      "ceilingPlus1Description": "Round to next euro, then add €1",
+      "ceilingPlus2": "Round up + €2",
+      "ceilingPlus2Description": "Round to next euro, then add €2",
+      "percentage10": "10% tip",
+      "percentage10Description": "Add 10%, rounded to nearest euro",
+      "fixed": "Fixed amount",
+      "fixedDescription": "Add a fixed tip amount",
+      "fixedAmount": "Tip amount (€)",
+      "fixedAmountPlaceholder": "1.50"
+    },
     "updateSuccess": "Profile updated successfully",
     "updateError": "Failed to update profile",
     "sections": {

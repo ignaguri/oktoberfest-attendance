@@ -1,3 +1,4 @@
+import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
@@ -56,6 +57,7 @@ export function DrinkStepper({
   onMutationEnd,
 }: DrinkStepperProps) {
   const { t } = useTranslation();
+  const { calculatePricePaid } = useTipCalculation();
   const logConsumption = useOfflineLogConsumption();
   const deleteConsumption = useOfflineDeleteConsumption();
 
@@ -115,7 +117,8 @@ export function DrinkStepper({
         date,
         drinkType,
         tentId,
-        pricePaidCents: defaultPriceCents,
+        pricePaidCents: calculatePricePaid(defaultPriceCents),
+        basePriceCents: defaultPriceCents,
         volumeMl: 1000, // Default 1L
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -132,6 +135,7 @@ export function DrinkStepper({
     drinkType,
     tentId,
     defaultPriceCents,
+    calculatePricePaid,
     logConsumption,
     onMutationStart,
     onMutationEnd,

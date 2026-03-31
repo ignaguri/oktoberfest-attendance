@@ -5,7 +5,11 @@
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useConsumptions } from "@prostcounter/shared/hooks";
+import {
+  useConsumptions,
+  useDrinkPrice,
+  useTipCalculation,
+} from "@prostcounter/shared/hooks";
 import type {
   AttendanceByDate,
   DetailedAttendanceForm,
@@ -49,6 +53,10 @@ export default function DetailedAttendanceForm({
 }: DetailedAttendanceFormProps) {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
+  const { getDrinkPriceCents } = useDrinkPrice({
+    festivalBeerCost: currentFestival?.beerCost,
+  });
+  const { calculatePricePaid } = useTipCalculation();
   const [existingAttendance, setExistingAttendance] =
     useState<AttendanceByDate | null>(null);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
@@ -262,7 +270,8 @@ export default function DetailedAttendanceForm({
               festivalId: currentFestival!.id,
               date: submitDateString,
               drinkType: type,
-              pricePaidCents: 1620, // Default price
+              pricePaidCents: calculatePricePaid(getDrinkPriceCents(type)),
+              basePriceCents: getDrinkPriceCents(type),
               volumeMl: 1000,
             });
           }

@@ -1,4 +1,5 @@
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
@@ -157,6 +158,7 @@ export function QuickAttendanceSheet({
   preselectedTentName,
 }: QuickAttendanceSheetProps) {
   const { t } = useTranslation();
+  const { calculatePricePaid } = useTipCalculation();
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
@@ -324,7 +326,8 @@ export function QuickAttendanceSheet({
           date: today,
           drinkType: selectedDrinkType,
           tentId: selectedTentId,
-          pricePaidCents: priceCents,
+          pricePaidCents: calculatePricePaid(priceCents),
+          basePriceCents: priceCents,
           volumeMl: 1000,
         });
       }
@@ -402,6 +405,7 @@ export function QuickAttendanceSheet({
     attendance?.id,
     attendance?.tentIds,
     currentFestival?.beerCost,
+    calculatePricePaid,
     logConsumption,
     updateAttendance,
     uploadPendingPhotos,

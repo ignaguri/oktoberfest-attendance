@@ -7052,6 +7052,13 @@ export interface paths {
                                 avatar_url: string | null;
                                 preferred_language: string | null;
                                 email?: string | null;
+                                /**
+                                 * @default ceiling_plus_1
+                                 * @enum {string}
+                                 */
+                                tip_mode: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+                                /** @default null */
+                                tip_fixed_amount: number | null;
                             };
                         };
                     };
@@ -7087,6 +7094,9 @@ export interface paths {
                         username?: string;
                         full_name?: string;
                         preferred_language?: string | null;
+                        /** @enum {string} */
+                        tip_mode?: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+                        tip_fixed_amount?: number | null;
                     };
                 };
             };
@@ -7107,6 +7117,13 @@ export interface paths {
                                 tutorial_completed: boolean | null;
                                 tutorial_completed_at: string | null;
                                 updated_at: string | null;
+                                /**
+                                 * @default ceiling_plus_1
+                                 * @enum {string}
+                                 */
+                                tip_mode: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+                                /** @default null */
+                                tip_fixed_amount: number | null;
                             };
                         };
                     };

@@ -979,6 +979,22 @@
     "language": "Idioma",
     "languageDescription": "Elegí tu idioma preferido",
     "selectLanguage": "Seleccioná un idioma",
+    "tipMode": {
+      "title": "Cálculo de propina",
+      "description": "Cómo se calcula la propina al registrar bebidas",
+      "none": "Sin propina",
+      "noneDescription": "Pagar el precio base exacto",
+      "ceilingPlus1": "Redondear + 1 €",
+      "ceilingPlus1Description": "Redondear al próximo euro y sumar 1 €",
+      "ceilingPlus2": "Redondear + 2 €",
+      "ceilingPlus2Description": "Redondear al próximo euro y sumar 2 €",
+      "percentage10": "10 % de propina",
+      "percentage10Description": "Agregar 10 %, redondeado al euro más cercano",
+      "fixed": "Monto fijo",
+      "fixedDescription": "Agregar un monto fijo de propina",
+      "fixedAmount": "Monto de propina (€)",
+      "fixedAmountPlaceholder": "1,50"
+    },
     "updateSuccess": "Perfil actualizado exitosamente",
     "updateError": "Error al actualizar el perfil",
     "sections": {

@@ -4,9 +4,11 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { changeLanguage } from "@prostcounter/shared/i18n";
-import type { ProfileForm } from "@prostcounter/shared/schemas";
+import type { ProfileForm, TipMode } from "@prostcounter/shared/schemas";
 import { ProfileFormSchema } from "@prostcounter/shared/schemas";
+import { TIP_MODES } from "@prostcounter/shared/utils";
 import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -42,6 +44,11 @@ export default function AccountForm() {
     useResetTutorial();
   const { mutateAsync: deleteProfile, loading: isDeleting } =
     useDeleteProfile();
+
+  const { tipMode, tipFixedAmount } = useTipCalculation();
+  const [fixedAmountText, setFixedAmountText] = useState(
+    tipFixedAmount?.toString() ?? "",
+  );
 
   const [avatar_url, setAvatarUrl] = useState<string | null>(
     profile?.avatar_url || null,
@@ -131,6 +138,42 @@ export default function AccountForm() {
       toast.success(t("profile.tutorial.resetSuccess"));
     } catch {
       toast.error(t("notifications.error.tutorialResetFailed"));
+    }
+  };
+
+  const tipModeLabels: Record<TipMode, string> = {
+    none: t("profile.tipMode.none"),
+    ceiling_plus_1: t("profile.tipMode.ceilingPlus1"),
+    ceiling_plus_2: t("profile.tipMode.ceilingPlus2"),
+    percentage_10: t("profile.tipMode.percentage10"),
+    fixed: t("profile.tipMode.fixed"),
+  };
+
+  const handleTipModeChange = async (mode: TipMode) => {
+    try {
+      if (mode === "fixed") {
+        await updateProfileMutation({ tip_mode: mode });
+      } else {
+        await updateProfileMutation({
+          tip_mode: mode,
+          tip_fixed_amount: null,
+        });
+      }
+      toast.success(t("profile.updateSuccess"));
+    } catch {
+      toast.error(t("profile.updateError"));
+    }
+  };
+
+  const handleFixedAmountSave = async () => {
+    const amount = parseFloat(fixedAmountText.replace(",", "."));
+    if (!isNaN(amount) && amount >= 0) {
+      try {
+        await updateProfileMutation({ tip_fixed_amount: amount });
+        toast.success(t("profile.updateSuccess"));
+      } catch {
+        toast.error(t("profile.updateError"));
+      }
     }
   };
 
@@ -283,6 +326,42 @@ export default function AccountForm() {
           onLanguageChange={handleLanguageChange}
           disabled={isUpdating}
         />
+      </div>
+
+      {/* Tip Calculation Mode */}
+      <div className="card">
+        <div className="flex items-center gap-4">
+          <Label htmlFor="tipMode" className="font-semibold">
+            {t("profile.tipMode.title")}:
+          </Label>
+          <select
+            id="tipMode"
+            value={tipMode}
+            onChange={(e) => handleTipModeChange(e.target.value as TipMode)}
+            disabled={isUpdating}
+            className="max-w-fit rounded-md border border-gray-300 px-3 py-2 pr-8 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none"
+          >
+            {TIP_MODES.map((mode) => (
+              <option key={mode} value={mode}>
+                {tipModeLabels[mode as TipMode]}
+              </option>
+            ))}
+          </select>
+          {tipMode === "fixed" && (
+            <Input
+              id="fixedTipAmount"
+              type="number"
+              step="0.1"
+              min="0"
+              max="99"
+              className="w-20"
+              value={fixedAmountText}
+              onChange={(e) => setFixedAmountText(e.target.value)}
+              onBlur={handleFixedAmountSave}
+              placeholder={t("profile.tipMode.fixedAmountPlaceholder")}
+            />
+          )}
+        </div>
       </div>
 
       {/* Location sharing disabled - requires migration from deprecated location_sharing_preferences

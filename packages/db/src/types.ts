@@ -998,6 +998,8 @@ export type Database = {
           id: string
           is_super_admin: boolean | null
           preferred_language: string | null
+          tip_fixed_amount: number | null
+          tip_mode: string
           tutorial_completed: boolean | null
           tutorial_completed_at: string | null
           updated_at: string | null
@@ -1010,6 +1012,8 @@ export type Database = {
           id: string
           is_super_admin?: boolean | null
           preferred_language?: string | null
+          tip_fixed_amount?: number | null
+          tip_mode?: string
           tutorial_completed?: boolean | null
           tutorial_completed_at?: string | null
           updated_at?: string | null
@@ -1022,6 +1026,8 @@ export type Database = {
           id?: string
           is_super_admin?: boolean | null
           preferred_language?: string | null
+          tip_fixed_amount?: number | null
+          tip_mode?: string
           tutorial_completed?: boolean | null
           tutorial_completed_at?: string | null
           updated_at?: string | null
