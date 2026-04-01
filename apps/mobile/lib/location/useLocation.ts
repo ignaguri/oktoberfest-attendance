@@ -1,3 +1,4 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import * as Location from "expo-location";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -12,6 +13,8 @@ import { logger } from "@/lib/logger";
  * Location hook for managing device location and permissions
  */
 export function useLocation() {
+  const { t } = useTranslation();
+
   // Permission state
   const [permissionStatus, setPermissionStatusState] =
     useState<LocationPermissionStatus>("undetermined");
@@ -165,8 +168,7 @@ export function useLocation() {
         // Check if location services are enabled before attempting
         const servicesEnabled = await checkLocationServicesEnabled();
         if (!servicesEnabled) {
-          const message = "Location services are disabled";
-          setLocationError(message);
+          setLocationError(t("location.errors.servicesDisabled"));
           logger.warn("Location services disabled on device");
           return null;
         }
@@ -178,18 +180,17 @@ export function useLocation() {
         setCurrentLocation(location);
         return location;
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Failed to get location";
-        setLocationError(message);
+        const errorDetail = error instanceof Error ? error.message : "unknown";
+        setLocationError(t("location.errors.locationUnavailable"));
         // Location unavailability is expected (GPS off, no signal) — warn, not error
         logger.warn("Could not get current location", {
-          error: message,
+          error: errorDetail,
         });
         return null;
       } finally {
         setIsLocationLoading(false);
       }
-    }, [permissionStatus]); // checkLocationServicesEnabled is stable (no deps) so omitted
+    }, [permissionStatus, t]); // checkLocationServicesEnabled is stable (no deps) so omitted
 
   /**
    * Start watching location updates

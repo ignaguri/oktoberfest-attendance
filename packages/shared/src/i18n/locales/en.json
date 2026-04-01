@@ -1916,7 +1916,9 @@
     },
     "errors": {
       "startFailed": "Failed to start sharing. Please try again.",
-      "stopFailed": "Failed to stop sharing. Please try again."
+      "stopFailed": "Failed to stop sharing. Please try again.",
+      "servicesDisabled": "Location services are disabled",
+      "locationUnavailable": "Failed to get location"
     }
   },
   "photos": {
