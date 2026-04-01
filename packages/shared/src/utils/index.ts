@@ -10,6 +10,15 @@ export {
   formatLocalized,
 } from "./date-utils";
 
+// Pricing utilities
+export {
+  calculatePricePaidCents,
+  getTipModeDescriptions,
+  getTipModeLabels,
+  TIP_MODES,
+} from "./pricing";
+export type { TipMode } from "./pricing";
+
 // Image URL utilities
 export {
   createGetAvatarUrl,

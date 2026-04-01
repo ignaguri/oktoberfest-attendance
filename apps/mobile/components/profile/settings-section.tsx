@@ -1,12 +1,21 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useLanguage } from "@prostcounter/shared/hooks";
+import {
+  useLanguage,
+  useTipCalculation,
+  useUpdateProfile,
+} from "@prostcounter/shared/hooks";
 import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import {
   LANGUAGE_NAMES,
   SUPPORTED_LANGUAGES,
   useTranslation,
 } from "@prostcounter/shared/i18n";
-import type { Festival } from "@prostcounter/shared/schemas";
+import type { Festival, TipMode } from "@prostcounter/shared/schemas";
+import {
+  getTipModeDescriptions,
+  getTipModeLabels,
+  TIP_MODES,
+} from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { format, parseISO } from "date-fns";
 import { useRouter } from "expo-router";
@@ -15,6 +24,7 @@ import {
   CalendarDays,
   Check,
   ChevronRight,
+  Coins,
   Fingerprint,
   Image as ImageIcon,
   Languages,
@@ -36,6 +46,7 @@ import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
@@ -84,8 +95,16 @@ export function SettingsSection({
   const router = useRouter();
   const { currentFestival, festivals, setCurrentFestival } = useFestival();
   const { currentLanguage, currentLanguageName, setLanguage } = useLanguage();
+  const { tipMode, tipFixedAmount } = useTipCalculation();
+  const { mutate: updateProfile } = useUpdateProfile();
   const [showFestivalSheet, setShowFestivalSheet] = useState(false);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
+  const [showTipModeSheet, setShowTipModeSheet] = useState(false);
+  const [showFixedAmountInput, setShowFixedAmountInput] = useState(false);
+  const [pendingFixedInput, setPendingFixedInput] = useState(false);
+  const [fixedAmountText, setFixedAmountText] = useState(
+    tipFixedAmount?.toString() ?? "",
+  );
 
   const getBiometricLabel = () => {
     if (biometricType === "facial") return t("biometric.labels.faceId");
@@ -111,6 +130,40 @@ export function SettingsSection({
     },
     [setLanguage],
   );
+
+  const tipModeLabels = getTipModeLabels(t);
+  const tipModeDescriptions = getTipModeDescriptions(t);
+
+  const handleTipModeSelect = useCallback(
+    (mode: TipMode) => {
+      setShowTipModeSheet(false);
+      if (mode === "fixed") {
+        updateProfile({ tip_mode: mode });
+        setPendingFixedInput(true);
+      } else {
+        updateProfile({ tip_mode: mode, tip_fixed_amount: null });
+      }
+    },
+    [updateProfile],
+  );
+
+  const handleTipModeSheetClose = useCallback(() => {
+    setShowTipModeSheet(false);
+    if (pendingFixedInput) {
+      setPendingFixedInput(false);
+      // Sync text with current profile value when opening
+      setFixedAmountText(tipFixedAmount?.toString() ?? "");
+      setShowFixedAmountInput(true);
+    }
+  }, [pendingFixedInput, tipFixedAmount]);
+
+  const handleFixedAmountSave = useCallback(() => {
+    const amount = parseFloat(fixedAmountText.replace(",", "."));
+    if (!isNaN(amount) && amount >= 0 && amount <= 99) {
+      updateProfile({ tip_fixed_amount: amount });
+    }
+    setShowFixedAmountInput(false);
+  }, [fixedAmountText, updateProfile]);
 
   return (
     <Card size="md" variant="elevated">
@@ -277,7 +330,7 @@ export function SettingsSection({
 
       {/* Language Selector */}
       <Pressable
-        className="flex-row items-center justify-between py-3"
+        className="flex-row items-center justify-between border-b border-outline-100 py-3"
         onPress={() => setShowLanguageSheet(true)}
         accessibilityRole="button"
         accessibilityLabel={t("profile.language")}
@@ -336,6 +389,104 @@ export function SettingsSection({
               </ActionsheetItem>
             );
           })}
+        </ActionsheetContent>
+      </Actionsheet>
+
+      {/* Tip Mode Selector */}
+      <Pressable
+        className="flex-row items-center justify-between py-3"
+        onPress={() => setShowTipModeSheet(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t("profile.tipMode.title")}
+      >
+        <Box className="flex-row items-center gap-3">
+          <Coins size={24} color={IconColors.default} />
+          <Box>
+            <Text className="text-typography-900">
+              {t("profile.tipMode.title")}
+            </Text>
+            <Text className="text-sm text-typography-500">
+              {tipModeLabels[tipMode]}
+              {tipMode === "fixed" && tipFixedAmount
+                ? ` (€${tipFixedAmount})`
+                : ""}
+            </Text>
+          </Box>
+        </Box>
+        <ChevronRight size={24} color={IconColors.muted} />
+      </Pressable>
+
+      {/* Tip Mode Selection Sheet */}
+      <Actionsheet isOpen={showTipModeSheet} onClose={handleTipModeSheetClose}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent className="pb-8">
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <VStack space="md" className="w-full px-4 pt-4">
+            <Heading size="md" className="text-center">
+              {t("profile.tipMode.title")}
+            </Heading>
+            <Text className="text-center text-sm text-typography-500">
+              {t("profile.tipMode.description")}
+            </Text>
+          </VStack>
+          {TIP_MODES.map((mode) => {
+            const isSelected = mode === tipMode;
+            return (
+              <ActionsheetItem
+                key={mode}
+                onPress={() => handleTipModeSelect(mode)}
+                className={cn(isSelected && "bg-primary-50")}
+              >
+                <HStack className="w-full items-center justify-between">
+                  <VStack space="xs" className="flex-1">
+                    <Text
+                      className={cn(
+                        "text-typography-900",
+                        isSelected && "font-semibold text-primary-600",
+                      )}
+                    >
+                      {tipModeLabels[mode]}
+                    </Text>
+                    <Text className="text-xs text-typography-400">
+                      {tipModeDescriptions[mode]}
+                    </Text>
+                  </VStack>
+                  {isSelected && (
+                    <Check size={20} color={Colors.primary[500]} />
+                  )}
+                </HStack>
+              </ActionsheetItem>
+            );
+          })}
+        </ActionsheetContent>
+      </Actionsheet>
+
+      {/* Fixed Amount Input Sheet */}
+      <Actionsheet
+        isOpen={showFixedAmountInput}
+        onClose={handleFixedAmountSave}
+      >
+        <ActionsheetBackdrop />
+        <ActionsheetContent className="pb-8">
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <VStack space="md" className="w-full px-4 pt-4">
+            <Heading size="md" className="text-center">
+              {t("profile.tipMode.fixedAmount")}
+            </Heading>
+            <Input size="lg">
+              <InputField
+                placeholder={t("profile.tipMode.fixedAmountPlaceholder")}
+                keyboardType="decimal-pad"
+                value={fixedAmountText}
+                onChangeText={setFixedAmountText}
+                onSubmitEditing={handleFixedAmountSave}
+              />
+            </Input>
+          </VStack>
         </ActionsheetContent>
       </Actionsheet>
     </Card>

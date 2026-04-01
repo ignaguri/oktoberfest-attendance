@@ -1,3 +1,4 @@
+import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
@@ -86,6 +87,7 @@ export function QuickAddDrinkButtons({
   onSuccess,
 }: QuickAddDrinkButtonsProps) {
   const { t } = useTranslation();
+  const { calculatePricePaid } = useTipCalculation();
   const logConsumption = useOfflineLogConsumption();
   const [successType, setSuccessType] = useState<DrinkType | null>(null);
   const [loadingType, setLoadingType] = useState<DrinkType | null>(null);
@@ -118,7 +120,8 @@ export function QuickAddDrinkButtons({
           date,
           drinkType: type,
           tentId,
-          pricePaidCents: defaultPriceCents,
+          pricePaidCents: calculatePricePaid(defaultPriceCents),
+          basePriceCents: defaultPriceCents,
           volumeMl: 1000, // Default 1L
         });
 
@@ -143,6 +146,7 @@ export function QuickAddDrinkButtons({
       date,
       tentId,
       defaultPriceCents,
+      calculatePricePaid,
       logConsumption,
       onSuccess,
     ],

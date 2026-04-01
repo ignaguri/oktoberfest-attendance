@@ -944,6 +944,22 @@
     "language": "Sprache",
     "languageDescription": "Wähle deine bevorzugte Sprache",
     "selectLanguage": "Sprache wählen",
+    "tipMode": {
+      "title": "Trinkgeldberechnung",
+      "description": "Wie Trinkgeld beim Eintragen von Getränken berechnet wird",
+      "none": "Kein Trinkgeld",
+      "noneDescription": "Exakten Grundpreis zahlen",
+      "ceilingPlus1": "Aufrunden + 1 €",
+      "ceilingPlus1Description": "Auf nächsten Euro aufrunden, dann 1 € dazu",
+      "ceilingPlus2": "Aufrunden + 2 €",
+      "ceilingPlus2Description": "Auf nächsten Euro aufrunden, dann 2 € dazu",
+      "percentage10": "10 % Trinkgeld",
+      "percentage10Description": "10 % aufschlagen, auf nächsten Euro gerundet",
+      "fixed": "Fester Betrag",
+      "fixedDescription": "Einen festen Trinkgeldbetrag hinzufügen",
+      "fixedAmount": "Trinkgeldbetrag (€)",
+      "fixedAmountPlaceholder": "1,50"
+    },
     "updateSuccess": "Profil erfolgreich aktualisiert",
     "updateError": "Profilaktualisierung fehlgeschlagen",
     "sections": {

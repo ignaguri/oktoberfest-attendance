@@ -12785,6 +12785,22 @@
                         "email": {
                           "type": "string",
                           "nullable": true
+                        },
+                        "tip_mode": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "ceiling_plus_1",
+                            "ceiling_plus_2",
+                            "percentage_10",
+                            "fixed"
+                          ],
+                          "default": "ceiling_plus_1"
+                        },
+                        "tip_fixed_amount": {
+                          "type": "number",
+                          "nullable": true,
+                          "default": null
                         }
                       },
                       "required": [
@@ -12856,6 +12872,22 @@
                   "preferred_language": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "tip_mode": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "ceiling_plus_1",
+                      "ceiling_plus_2",
+                      "percentage_10",
+                      "fixed"
+                    ]
+                  },
+                  "tip_fixed_amount": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 99
                   }
                 }
               }
@@ -12900,6 +12932,22 @@
                         "updated_at": {
                           "type": "string",
                           "nullable": true
+                        },
+                        "tip_mode": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "ceiling_plus_1",
+                            "ceiling_plus_2",
+                            "percentage_10",
+                            "fixed"
+                          ],
+                          "default": "ceiling_plus_1"
+                        },
+                        "tip_fixed_amount": {
+                          "type": "number",
+                          "nullable": true,
+                          "default": null
                         }
                       },
                       "required": [

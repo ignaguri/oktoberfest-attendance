@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { offlineColumns } from "./common";
 
@@ -12,6 +12,8 @@ export const profiles = sqliteTable("profiles", {
   tutorial_completed: integer(),
   tutorial_completed_at: text(),
   is_super_admin: integer(),
+  tip_mode: text().default("ceiling_plus_1"),
+  tip_fixed_amount: real(),
   updated_at: text(),
   ...offlineColumns,
 });

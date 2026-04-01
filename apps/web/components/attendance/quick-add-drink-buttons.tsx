@@ -1,6 +1,9 @@
 "use client";
 
-import { useLogConsumption } from "@prostcounter/shared/hooks";
+import {
+  useLogConsumption,
+  useTipCalculation,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import type { TFunction } from "i18next";
@@ -112,6 +115,7 @@ export function QuickAddDrinkButtons({
 }: QuickAddDrinkButtonsProps) {
   const { t } = useTranslation();
   const logConsumption = useLogConsumption();
+  const { calculatePricePaid } = useTipCalculation();
   const [successType, setSuccessType] = useState<DrinkType | null>(null);
   const [loadingType, setLoadingType] = useState<DrinkType | null>(null);
 
@@ -127,7 +131,8 @@ export function QuickAddDrinkButtons({
           date,
           drinkType: type,
           tentId,
-          pricePaidCents: defaultPriceCents,
+          pricePaidCents: calculatePricePaid(defaultPriceCents),
+          basePriceCents: defaultPriceCents,
           volumeMl: 1000,
         });
 
@@ -151,6 +156,7 @@ export function QuickAddDrinkButtons({
       date,
       tentId,
       defaultPriceCents,
+      calculatePricePaid,
       logConsumption,
       onSuccess,
     ],

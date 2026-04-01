@@ -10,6 +10,7 @@
  */
 
 import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
+import { useTipCalculation } from "@prostcounter/shared/hooks";
 import type { Consumption, DrinkType } from "@prostcounter/shared/schemas";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -64,6 +65,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const deleteConsumption = useOfflineDeleteConsumption();
   const { uploadPendingPhotos } = useBeerPictureUpload();
   const { getDrinkPriceCents } = useDrinkPrice();
+  const { calculatePricePaid } = useTipCalculation();
   const invalidateQueries = useInvalidateQueries();
 
   const saveAttendance = useCallback(
@@ -129,7 +131,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
                   date: dateStr,
                   drinkType,
                   tentId,
-                  pricePaidCents: priceCents,
+                  pricePaidCents: calculatePricePaid(priceCents),
+                  basePriceCents: priceCents,
                   volumeMl: 1000,
                   skipDedup: true,
                   skipSideEffects: true,
@@ -221,6 +224,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
       deleteConsumption,
       uploadPendingPhotos,
       getDrinkPriceCents,
+      calculatePricePaid,
       invalidateQueries,
     ],
   );

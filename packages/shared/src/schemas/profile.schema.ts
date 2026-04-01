@@ -1,6 +1,16 @@
 import { z } from "zod";
 
 import { SUPPORTED_LANGUAGES } from "../i18n/core";
+import { TIP_MODES } from "../utils/pricing";
+import type { TipMode } from "../utils/pricing";
+
+// Re-export TipMode for consumers
+export type { TipMode };
+
+// Tip mode schema
+export const TipModeSchema = z.enum(
+  TIP_MODES as [TipMode, ...TipMode[]],
+);
 
 // Profile schemas
 export const ProfileSchema = z.object({
@@ -11,6 +21,8 @@ export const ProfileSchema = z.object({
   tutorial_completed: z.boolean().nullable(),
   tutorial_completed_at: z.string().nullable(),
   updated_at: z.string().nullable(),
+  tip_mode: TipModeSchema.default("ceiling_plus_1"),
+  tip_fixed_amount: z.number().nullable().default(null),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -21,6 +33,8 @@ export const ProfileShortSchema = z.object({
   avatar_url: z.string().nullable(),
   preferred_language: z.string().nullable(),
   email: z.string().nullable().optional(),
+  tip_mode: TipModeSchema.default("ceiling_plus_1"),
+  tip_fixed_amount: z.number().nullable().default(null),
 });
 
 export type ProfileShort = z.infer<typeof ProfileShortSchema>;
@@ -41,6 +55,8 @@ export const UpdateProfileSchema = z.object({
       "Invalid language code",
     )
     .optional(),
+  tip_mode: TipModeSchema.optional(),
+  tip_fixed_amount: z.number().min(0).max(99).nullable().optional(),
 });
 
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;

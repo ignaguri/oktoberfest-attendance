@@ -33,7 +33,9 @@ export class SupabaseProfileRepository {
   async getProfileShort(userId: string, email?: string): Promise<ProfileShort> {
     const { data, error } = await this.supabase
       .from("profiles")
-      .select("full_name, username, avatar_url, preferred_language")
+      .select(
+        "full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount",
+      )
       .eq("id", userId)
       .single();
 
@@ -43,6 +45,7 @@ export class SupabaseProfileRepository {
 
     return {
       ...data,
+      tip_mode: data.tip_mode as ProfileShort["tip_mode"],
       email: email ?? null,
     };
   }
@@ -151,6 +154,8 @@ export class SupabaseProfileRepository {
         username: input.username,
         full_name: input.full_name,
         preferred_language: input.preferred_language,
+        tip_mode: input.tip_mode,
+        tip_fixed_amount: input.tip_fixed_amount,
         updated_at: new Date().toISOString(),
       })
       .eq("id", userId)
