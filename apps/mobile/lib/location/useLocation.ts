@@ -162,6 +162,15 @@ export function useLocation() {
       setLocationError(null);
 
       try {
+        // Check if location services are enabled before attempting
+        const servicesEnabled = await Location.hasServicesEnabledAsync();
+        if (!servicesEnabled) {
+          const message = "Location services are disabled";
+          setLocationError(message);
+          logger.warn("Location services disabled on device");
+          return null;
+        }
+
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
@@ -172,7 +181,10 @@ export function useLocation() {
         const message =
           error instanceof Error ? error.message : "Failed to get location";
         setLocationError(message);
-        logger.error("Error getting current location", error);
+        // Location unavailability is expected (GPS off, no signal) — warn, not error
+        logger.warn("Could not get current location", {
+          error: message,
+        });
         return null;
       } finally {
         setIsLocationLoading(false);
@@ -221,7 +233,10 @@ export function useLocation() {
 
         return true;
       } catch (error) {
-        logger.error("Error starting location watch", error);
+        // Location watch failures are expected (GPS off, no signal) — warn, not error
+        logger.warn("Could not start location watch", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         return false;
       }
     },

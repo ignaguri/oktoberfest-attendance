@@ -52,6 +52,11 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .single();
 
     if (sessionError) {
+      // Handle foreign key violation (festival doesn't exist)
+      if (sessionError.code === "23503") {
+        throw new NotFoundError("Festival not found");
+      }
+
       // Handle unique constraint violation (expired-but-active session or race condition)
       if (sessionError.code === "23505") {
         // Deactivate only expired-but-active sessions and retry once
