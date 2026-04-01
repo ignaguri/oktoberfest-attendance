@@ -993,7 +993,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
       async update(data: {
         username?: string;
         full_name?: string;
-        tip_mode?: string;
+        tip_mode?: Profile["tip_mode"];
         tip_fixed_amount?: number | null;
       }): Promise<{ profile: Profile }> {
         const headers = await getAuthHeaders();

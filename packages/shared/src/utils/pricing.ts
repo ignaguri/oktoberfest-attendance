@@ -62,9 +62,12 @@ export function calculatePricePaidCents(
       return (Math.ceil(basePriceCents / 100) + 1) * 100;
     case "ceiling_plus_2":
       return (Math.ceil(basePriceCents / 100) + 2) * 100;
-    case "percentage_10":
-      return Math.round((basePriceCents * 1.1) / 100) * 100;
+    case "percentage_10": {
+      const totalEurosRounded = Math.round((basePriceCents * 1.1) / 100);
+      const totalCents = totalEurosRounded * 100;
+      return Math.max(totalCents, basePriceCents);
+    }
     case "fixed":
-      return basePriceCents + Math.round((fixedAmountEuros ?? 0) * 100);
+      return basePriceCents + Math.round(Math.max(fixedAmountEuros ?? 0, 0) * 100);
   }
 }

@@ -17,6 +17,7 @@ import {
   useCancelQueries,
   QueryKeys,
 } from "../data";
+import type { TipMode } from "../utils/pricing";
 
 /**
  * Hook to fetch current user's profile
@@ -46,7 +47,7 @@ type ProfileCacheData = {
   tutorial_completed: boolean | null;
   tutorial_completed_at: string | null;
   updated_at: string | null;
-  tip_mode?: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+  tip_mode?: TipMode;
   tip_fixed_amount?: number | null;
 };
 
@@ -66,7 +67,7 @@ export function useUpdateProfile() {
       username?: string;
       full_name?: string;
       preferred_language?: string | null;
-      tip_mode?: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
+      tip_mode?: TipMode;
       tip_fixed_amount?: number | null;
     },
     { previousProfile: ProfileCacheData | undefined }
