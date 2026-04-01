@@ -8,6 +8,7 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
+import { PgErrorCode } from "../../lib/postgres-errors";
 import {
   ConflictError,
   DatabaseError,
@@ -52,13 +53,22 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .single();
 
     if (sessionError) {
-      // Handle foreign key violation (festival doesn't exist)
-      if (sessionError.code === "23503") {
-        throw new NotFoundError("Festival not found");
+      // Handle foreign key violation
+      if (sessionError.code === PgErrorCode.FOREIGN_KEY_VIOLATION) {
+        const detail = sessionError.message || "";
+        if (
+          detail.includes("festival_id") ||
+          detail.includes("location_sessions_festival_id_fkey")
+        ) {
+          throw new NotFoundError("Festival not found");
+        }
+        throw new DatabaseError(
+          `Failed to create location session due to foreign key violation: ${sessionError.message}`,
+        );
       }
 
       // Handle unique constraint violation (expired-but-active session or race condition)
-      if (sessionError.code === "23505") {
+      if (sessionError.code === PgErrorCode.UNIQUE_VIOLATION) {
         // Deactivate only expired-but-active sessions and retry once
         await this.supabase
           .from("location_sessions")
@@ -76,7 +86,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
         if (retryError || !retrySession) {
           // If retry also hits constraint, user has a legitimately active session
-          if (retryError?.code === "23505") {
+          if (retryError?.code === PgErrorCode.UNIQUE_VIOLATION) {
             throw new ConflictError(
               "User already has an active location session for this festival",
             );

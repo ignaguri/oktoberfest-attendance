@@ -17,6 +17,7 @@ import { NO_ROWS_ERROR } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { logger } from "../lib/logger";
+import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
 import {
   DatabaseError,
@@ -595,7 +596,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     .single();
 
   // Ignore unique constraint violation (tent visit already exists)
-  if (tentVisitError && tentVisitError.code !== "23505") {
+  if (tentVisitError && tentVisitError.code !== PgErrorCode.UNIQUE_VIOLATION) {
     throw new Error("Error creating tent visit");
   }
 

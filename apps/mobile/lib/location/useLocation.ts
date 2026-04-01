@@ -163,7 +163,7 @@ export function useLocation() {
 
       try {
         // Check if location services are enabled before attempting
-        const servicesEnabled = await Location.hasServicesEnabledAsync();
+        const servicesEnabled = await checkLocationServicesEnabled();
         if (!servicesEnabled) {
           const message = "Location services are disabled";
           setLocationError(message);
@@ -189,7 +189,7 @@ export function useLocation() {
       } finally {
         setIsLocationLoading(false);
       }
-    }, [permissionStatus]);
+    }, [permissionStatus]); // checkLocationServicesEnabled is stable (no deps) so omitted
 
   /**
    * Start watching location updates
