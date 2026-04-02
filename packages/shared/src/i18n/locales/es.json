@@ -1901,7 +1901,9 @@
     },
     "errors": {
       "startFailed": "No se pudo iniciar el compartir. Por favor, intentá de nuevo.",
-      "stopFailed": "No se pudo detener el compartir. Por favor, intentá de nuevo."
+      "stopFailed": "No se pudo detener el compartir. Por favor, intentá de nuevo.",
+      "servicesDisabled": "Los servicios de ubicación están desactivados",
+      "locationUnavailable": "No se pudo obtener la ubicación"
     },
     "warnings": {
       "permissionNotGranted": "Permiso de ubicación no otorgado",

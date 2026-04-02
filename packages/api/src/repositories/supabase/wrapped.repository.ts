@@ -6,6 +6,7 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import {
   DatabaseError,
   ForbiddenError,
@@ -100,7 +101,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       ) // Within last 24 hours
       .single();
 
-    if (error && error.code !== "PGRST116") {
+    if (error && error.code !== PgErrorCode.NO_ROWS) {
       // Ignore "no rows" error
       throw new DatabaseError(
         `Failed to check wrapped cache: ${error.message}`,

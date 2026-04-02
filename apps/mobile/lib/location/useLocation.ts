@@ -1,3 +1,4 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
 import * as Location from "expo-location";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -12,6 +13,8 @@ import { logger } from "@/lib/logger";
  * Location hook for managing device location and permissions
  */
 export function useLocation() {
+  const { t } = useTranslation();
+
   // Permission state
   const [permissionStatus, setPermissionStatusState] =
     useState<LocationPermissionStatus>("undetermined");
@@ -162,6 +165,14 @@ export function useLocation() {
       setLocationError(null);
 
       try {
+        // Check if location services are enabled before attempting
+        const servicesEnabled = await checkLocationServicesEnabled();
+        if (!servicesEnabled) {
+          setLocationError(t("location.errors.servicesDisabled"));
+          logger.warn("Location services disabled on device");
+          return null;
+        }
+
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
@@ -169,15 +180,17 @@ export function useLocation() {
         setCurrentLocation(location);
         return location;
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Failed to get location";
-        setLocationError(message);
-        logger.error("Error getting current location", error);
+        const errorDetail = error instanceof Error ? error.message : "unknown";
+        setLocationError(t("location.errors.locationUnavailable"));
+        // Location unavailability is expected (GPS off, no signal) — warn, not error
+        logger.warn("Could not get current location", {
+          error: errorDetail,
+        });
         return null;
       } finally {
         setIsLocationLoading(false);
       }
-    }, [permissionStatus]);
+    }, [permissionStatus, t]); // checkLocationServicesEnabled is stable (no deps) so omitted
 
   /**
    * Start watching location updates
@@ -221,7 +234,10 @@ export function useLocation() {
 
         return true;
       } catch (error) {
-        logger.error("Error starting location watch", error);
+        // Location watch failures are expected (GPS off, no signal) — warn, not error
+        logger.warn("Could not start location watch", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         return false;
       }
     },

@@ -13,10 +13,10 @@ import {
   UpdatePersonalAttendanceResponseSchema,
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
-import { NO_ROWS_ERROR } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { logger } from "../lib/logger";
+import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
 import {
   DatabaseError,
@@ -197,7 +197,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
     .eq("user_id", user.id)
     .single();
 
-  if (findError && findError.code !== NO_ROWS_ERROR) {
+  if (findError && findError.code !== PgErrorCode.NO_ROWS) {
     throw new DatabaseError(`Failed to fetch attendance: ${findError.message}`);
   }
 
@@ -558,7 +558,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
 
   let attendanceId = existingAttendance?.id;
 
-  if (attendanceError && attendanceError.code !== "PGRST116") {
+  if (attendanceError && attendanceError.code !== PgErrorCode.NO_ROWS) {
     throw new Error("Error checking existing attendance");
   }
 
@@ -595,7 +595,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     .single();
 
   // Ignore unique constraint violation (tent visit already exists)
-  if (tentVisitError && tentVisitError.code !== "23505") {
+  if (tentVisitError && tentVisitError.code !== PgErrorCode.UNIQUE_VIOLATION) {
     throw new Error("Error creating tent visit");
   }
 

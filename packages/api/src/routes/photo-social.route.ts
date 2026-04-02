@@ -11,6 +11,7 @@ import {
   RemovePhotoReactionSchema,
 } from "@prostcounter/shared";
 
+import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
 
 // Create router
@@ -215,7 +216,7 @@ app.openapi(addReactionRoute, async (c) => {
   });
 
   if (error) {
-    if (error.code === "23505") {
+    if (error.code === PgErrorCode.UNIQUE_VIOLATION) {
       // Unique constraint violation
       return c.json(
         { error: "CONFLICT", message: "You already reacted with this emoji" },

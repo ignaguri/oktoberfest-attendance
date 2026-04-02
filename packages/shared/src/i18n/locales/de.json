@@ -1656,7 +1656,9 @@
     },
     "errors": {
       "startFailed": "Freigabe konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
-      "stopFailed": "Freigabe konnte nicht gestoppt werden. Bitte versuchen Sie es erneut."
+      "stopFailed": "Freigabe konnte nicht gestoppt werden. Bitte versuchen Sie es erneut.",
+      "servicesDisabled": "Standortdienste sind deaktiviert",
+      "locationUnavailable": "Standort konnte nicht ermittelt werden"
     },
     "warnings": {
       "permissionNotGranted": "Standortberechtigung nicht erteilt",

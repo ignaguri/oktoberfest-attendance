@@ -136,6 +136,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withModularHeaders.js",
     "./plugins/withFirebaseNotificationColor.js",
     "./plugins/withGoogleMapsApiKey.js",
+    "./plugins/withAsyncStorageMavenRepo.js",
     "expo-maps",
     "expo-updates",
     [
