@@ -12,6 +12,7 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import {
   ConflictError,
   DatabaseError,
@@ -140,7 +141,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .eq("id", id)
       .single();
 
-    if (error && error.code === "PGRST116") {
+    if (error && error.code === PgErrorCode.NO_ROWS) {
       return null;
     }
 
@@ -174,7 +175,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .eq("invite_token", inviteToken)
       .single();
 
-    if (error && error.code === "PGRST116") {
+    if (error && error.code === PgErrorCode.NO_ROWS) {
       return null;
     }
 

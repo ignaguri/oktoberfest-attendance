@@ -161,7 +161,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .single();
 
     if (error || !data) {
-      if (error?.code === "PGRST116") {
+      if (error?.code === PgErrorCode.NO_ROWS) {
         throw new NotFoundError("Location session not found");
       }
       throw new DatabaseError(
@@ -185,7 +185,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .gt("expires_at", new Date().toISOString())
       .single();
 
-    if (error && error.code !== "PGRST116") {
+    if (error && error.code !== PgErrorCode.NO_ROWS) {
       throw new DatabaseError(
         `Failed to fetch active session: ${error.message}`,
       );
@@ -390,7 +390,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .single();
 
     if (error || !data) {
-      if (error?.code === "PGRST116") {
+      if (error?.code === PgErrorCode.NO_ROWS) {
         throw new NotFoundError("Location session not found");
       }
       throw new DatabaseError(

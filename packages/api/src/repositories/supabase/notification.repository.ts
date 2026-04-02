@@ -6,6 +6,7 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
+import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { INotificationRepository } from "../interfaces/notification.repository";
 
@@ -34,7 +35,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       .eq("user_id", userId)
       .single();
 
-    if (error && error.code !== "PGRST116") {
+    if (error && error.code !== PgErrorCode.NO_ROWS) {
       // PGRST116 = no rows returned
       throw new DatabaseError(
         `Failed to fetch notification preferences: ${error.message}`,
@@ -131,7 +132,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       .gte("created_at", oneHourAgo)
       .limit(5); // Check if more than 5 in last hour
 
-    if (error && error.code !== "PGRST116") {
+    if (error && error.code !== PgErrorCode.NO_ROWS) {
       throw new DatabaseError(
         `Failed to check notification rate limit: ${error.message}`,
       );

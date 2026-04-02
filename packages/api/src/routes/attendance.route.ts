@@ -13,7 +13,6 @@ import {
   UpdatePersonalAttendanceResponseSchema,
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
-import { NO_ROWS_ERROR } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { logger } from "../lib/logger";
@@ -198,7 +197,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
     .eq("user_id", user.id)
     .single();
 
-  if (findError && findError.code !== NO_ROWS_ERROR) {
+  if (findError && findError.code !== PgErrorCode.NO_ROWS) {
     throw new DatabaseError(`Failed to fetch attendance: ${findError.message}`);
   }
 
@@ -559,7 +558,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
 
   let attendanceId = existingAttendance?.id;
 
-  if (attendanceError && attendanceError.code !== "PGRST116") {
+  if (attendanceError && attendanceError.code !== PgErrorCode.NO_ROWS) {
     throw new Error("Error checking existing attendance");
   }
 

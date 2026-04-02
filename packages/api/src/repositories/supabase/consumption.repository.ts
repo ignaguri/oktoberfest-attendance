@@ -2,6 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type { Consumption, LogConsumptionInput } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { IConsumptionRepository } from "../interfaces";
 
@@ -115,7 +116,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
 
     if (attError) {
       // No attendance found means no consumptions
-      if (attError.code === "PGRST116") {
+      if (attError.code === PgErrorCode.NO_ROWS) {
         return [];
       }
       throw new DatabaseError(

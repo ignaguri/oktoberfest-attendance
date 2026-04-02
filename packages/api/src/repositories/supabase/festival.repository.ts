@@ -2,6 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type { Festival, ListFestivalsQuery } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { IFestivalRepository } from "../interfaces";
 
@@ -38,7 +39,7 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") {
+      if (error.code === PgErrorCode.NO_ROWS) {
         return null; // Not found
       }
       throw new DatabaseError(`Failed to fetch festival: ${error.message}`);
@@ -55,7 +56,7 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") {
+      if (error.code === PgErrorCode.NO_ROWS) {
         return null; // No active festival
       }
       throw new DatabaseError(

@@ -10,6 +10,7 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError, NotFoundError } from "../../middleware/error";
 import type { IAttendanceRepository } from "../interfaces";
 
@@ -75,7 +76,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") {
+      if (error.code === PgErrorCode.NO_ROWS) {
         return null; // Not found
       }
       throw new DatabaseError(`Failed to fetch attendance: ${error.message}`);
@@ -176,7 +177,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .single();
 
     if (fetchError) {
-      if (fetchError.code === "PGRST116") {
+      if (fetchError.code === PgErrorCode.NO_ROWS) {
         throw new NotFoundError("Attendance not found");
       }
       throw new DatabaseError(
@@ -302,7 +303,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") {
+      if (error.code === PgErrorCode.NO_ROWS) {
         return null;
       }
       throw new DatabaseError(`Failed to check festival: ${error.message}`);
@@ -330,7 +331,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .single();
 
     if (attendanceError) {
-      if (attendanceError.code === "PGRST116") {
+      if (attendanceError.code === PgErrorCode.NO_ROWS) {
         return null; // Not found
       }
       throw new DatabaseError(

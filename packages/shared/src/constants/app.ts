@@ -15,6 +15,3 @@ export const DEFAULT_TIMEZONE = "Europe/Berlin";
 
 // Alias for backward compatibility
 export const TIMEZONE = DEFAULT_TIMEZONE;
-
-// Supabase/PostgREST error codes
-export const NO_ROWS_ERROR = "PGRST116";

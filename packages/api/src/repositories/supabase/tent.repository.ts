@@ -2,6 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type { FestivalTent, NearbyTent } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { ITentRepository } from "../interfaces";
 
@@ -61,7 +62,7 @@ export class SupabaseTentRepository implements ITentRepository {
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") {
+      if (error.code === PgErrorCode.NO_ROWS) {
         return null; // Not found
       }
       throw new DatabaseError(

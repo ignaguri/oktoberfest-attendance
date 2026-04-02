@@ -7,6 +7,7 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { PgErrorCode } from "../../lib/postgres-errors";
 import {
   DatabaseError,
   ForbiddenError,
@@ -55,7 +56,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .eq("user_id", userId)
       .single();
 
-    if (error && error.code !== "PGRST116") {
+    if (error && error.code !== PgErrorCode.NO_ROWS) {
       throw new DatabaseError(`Failed to fetch reservation: ${error.message}`);
     }
 
@@ -211,7 +212,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .single();
 
     if (error || !data) {
-      if (error?.code === "PGRST116") {
+      if (error?.code === PgErrorCode.NO_ROWS) {
         throw new NotFoundError("Reservation not found");
       }
       throw new DatabaseError(
