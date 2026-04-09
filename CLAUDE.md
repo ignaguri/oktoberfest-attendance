@@ -57,69 +57,103 @@ Seed data creates users `user1@example.com` through `user10@example.com` with pa
 
 ## Architecture
 
+For the full system architecture, monorepo structure, API routes, testing infrastructure, and database schema, see **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)**.
+
 ### Tech Stack
 
 - **Web**: Next.js 15, React 19, TypeScript
 - **Mobile**: Expo/React Native with Gluestack UI + NativeWind
 - **Backend**: Supabase (auth, database, storage)
-- **API**: Hono + OpenAPI (type-safe REST API in packages/api)
+- **API**: Hono + OpenAPI (type-safe REST API in `packages/api/`)
 - **State Management**: TanStack React Query v5
 - **i18n**: i18next + react-i18next (shared across web and mobile)
 - **Testing**: Vitest (unit & integration tests)
-- **Build System**: Turborepo (monorepo orchestration)
-- **Package Manager**: pnpm
+- **Build System**: Turborepo with pnpm workspaces
 
-### Application Structure
+### Key Packages
+
+| Package | Path | Purpose |
+|---------|------|---------|
+| `@prostcounter/api` | `packages/api/` | Hono API routes & business logic |
+| `@prostcounter/api-client` | `packages/api-client/` | Auto-generated type-safe API client |
+| `@prostcounter/shared` | `packages/shared/` | Shared utilities, types, schemas, i18n, hooks |
+| `@prostcounter/db` | `packages/db/` | Database types (generated from Supabase) |
+| `@prostcounter/ui` | `packages/ui/` | Shared UI utilities (`cn()`, etc.) |
+
+### Regenerating the API Client
+
+After changing Hono API routes:
+1. `pnpm --filter=@prostcounter/api generate-spec` - Generate OpenAPI spec
+2. `pnpm --filter=@prostcounter/api-client generate` - Generate TypeScript client
+
+## Web App
+
+### Route Groups
+
+The web app (`apps/web/`) uses Next.js App Router with three route groups:
+
+- **`(private)/`** - Auth-protected routes (home, attendance, groups, leaderboard, profile, admin)
+- **`(public)/`** - Auth pages (sign-in, sign-up, forgot-password)
+- **`(marketing)/`** - Public marketing pages and blog (no auth required)
+
+### Styling
+
+- **shadcn/ui + Tailwind CSS** for all web components
+- Primary: `yellow-500` (#F59E0B), `yellow-600` (#D97706)
+
+## Blog / Marketing Content
+
+The web app has a file-based blog at `apps/web/content/blog/` using **MDX** (Markdown + JSX).
+
+### Content Structure
 
 ```
-prostcounter/
-├── apps/
-│   ├── web/                  # Next.js PWA
-│   │   ├── app/              # App router pages
-│   │   ├── components/       # React components
-│   │   └── lib/              # Utilities, hooks, contexts
-│   │
-│   └── mobile/               # Expo React Native app
-│       ├── app/              # Expo Router pages
-│       │   ├── (auth)/       # Auth screens (sign-in, sign-up, forgot-password)
-│       │   ├── (tabs)/       # Main tabs (home, attendance, groups, leaderboard, profile)
-│       │   ├── settings/     # Settings screens (change-password, notifications, photo-privacy)
-│       │   ├── groups/       # Group detail screens ([id]/index, [id]/settings, [id]/gallery)
-│       │   ├── achievements/ # Achievements screen
-│       │   └── join-group/   # Join group by invite token
-│       ├── components/       # React Native components
-│       │   ├── ui/           # Gluestack UI components
-│       │   └── [feature]/    # Feature-specific (profile, attendance, groups, etc.)
-│       ├── hooks/            # Mobile-specific hooks (biometrics, image upload)
-│       └── lib/              # Utilities, constants, contexts
-│           ├── auth/         # AuthContext, biometrics
-│           ├── constants/    # colors.ts
-│           ├── festival/     # FestivalContext
-│           └── data/         # query-client setup
-│
-├── packages/
-│   ├── api/                  # Hono API routes & business logic
-│   ├── shared/               # Shared utilities, types, schemas, i18n, hooks
-│   ├── db/                   # Database types (generated from Supabase)
-│   └── api-client/           # Type-safe API client (auto-generated)
-│
-└── supabase/                 # Database migrations & seed data
+apps/web/content/blog/
+├── en/                    # English articles
+├── de/                    # German translations
+└── es/                    # Spanish translations
 ```
 
-### Core Data Models
+Each article is an `.mdx` file with YAML frontmatter. **All articles must exist in all 3 locales.**
 
-- **attendances**: Daily beer count per user/date
-- **tent_visits**: Location tracking with timestamps
-- **beer_pictures**: Photo uploads linked to attendances
-- **groups**: Competition groups with invite tokens
-- **profiles**: User metadata (username, full_name, avatar)
-- **festivals**: Multi-festival support (dates, cost, location)
+### Writing a Blog Article
 
-### Key Business Logic
+Frontmatter format:
+```yaml
+---
+title: "Article Title"
+description: "Short description for previews and SEO"
+date: "2026-04-09"
+lastModified: "2026-04-09"
+author: "ProstCounter Team"
+category: "festivals"           # festivals | tips | culture | news
+tags: ["oktoberfest", "2026", "guide"]
+featuredImage: "/images/prost-counter-og-1.jpg"
+locale: "en"                    # en | de | es
+---
+```
 
-- **Festival Dates**: Dynamic from database via FestivalContext
-- **Beer Cost**: Configurable per festival (default €16.2)
-- **Competition Types**: days_attended | total_beers | avg_beers
+### Available MDX Components
+
+These custom components can be used inside blog articles:
+
+- **`<CTA />`** - Call-to-action box for the ProstCounter app (app store links + sign-up button). Include at the end of every article.
+- **`<DownloadButtons />`** - Download button group for app distribution
+- **`<AppScreenshot src="" alt="" caption="" />`** - Responsive image with caption
+- **`<FestivalInfo name="" dates="" location="" description="" />`** - Festival info card with icons
+
+### Blog Utilities
+
+- `apps/web/lib/blog.ts` - `getAllPosts()`, `getPostBySlug()`, `getPostsByCategory()`, etc.
+- `apps/web/components/blog/` - `ArticleLayout`, `BlogIndexView`, `ArticleCard`, `CategoryView`, `MDXComponents`
+
+### Blog Routes
+
+- `/blog` - English index
+- `/blog/[slug]` - English article
+- `/blog/de/[slug]` - German article
+- `/blog/es/[slug]` - Spanish article
+- `/blog/category/[category]` - Category page (supports locale prefixes too)
 
 ## Important Patterns
 
@@ -134,17 +168,9 @@ prostcounter/
 The mobile app uses a nested provider structure in `apps/mobile/app/_layout.tsx`:
 
 ```
-GestureHandlerRootView
-└── SafeAreaProvider
-    └── I18nextProvider
-        └── ErrorBoundary
-            └── DataProvider (TanStack React Query)
-                └── ApiClientProvider
-                    └── GluestackUIProvider
-                        └── AuthProvider
-                            └── FestivalProvider
-                                └── NavigationGuard
-                                    └── Stack (Expo Router)
+GestureHandlerRootView → SafeAreaProvider → I18nextProvider → ErrorBoundary
+  → DataProvider → ApiClientProvider → GluestackUIProvider → AuthProvider
+    → FestivalProvider → NavigationGuard → Stack
 ```
 
 **Important**: GluestackUIProvider must be inside ApiClientProvider because OverlayProvider renders modals/sheets via portal.
@@ -159,181 +185,25 @@ GestureHandlerRootView
 - i18next shared between web and mobile in `packages/shared/src/i18n/`
 - Use `useTranslation()` hook from `@prostcounter/shared/i18n`
 
-### State Management
+## Styling (Mobile)
 
-- **TanStack React Query v5** for server state
-- Business logic hooks in `packages/shared/src/hooks/` (shared) and `apps/*/hooks/` (app-specific)
-
-## Styling System
-
-### Brand Colors (Yellow Theme)
-
-- Primary: `yellow-500` (#F59E0B), `yellow-600` (#D97706)
-- Web: shadcn/ui + Tailwind CSS
-- Mobile: Gluestack UI + NativeWind
-
-**IMPORTANT (Mobile)**: Always use Gluestack UI components and NativeWind (Tailwind classes via `className`) for styling. Do NOT use React Native `StyleSheet` or inline style objects.
-
-## API Layer
-
-- **Hono REST API** in `packages/api/` with OpenAPI spec generation
-- **Type-safe client** auto-generated in `packages/api-client/` using `openapi-typescript` and `openapi-fetch`
-- Regenerate API client:
-  1. `pnpm --filter=@prostcounter/api generate-spec` - Generate OpenAPI spec from Hono routes
-  2. `pnpm --filter=@prostcounter/api-client generate` - Generate TypeScript types and client from spec
-- Both web and mobile use the same API client for all server communication
-
-## Mobile-Specific Features
-
-The mobile app includes several features not present in the web version:
-
-1. **Biometric Authentication** (Face ID/Touch ID)
-   - Hook: `useBiometrics()` in `apps/mobile/hooks/useBiometrics.ts`
-   - Can be enabled/disabled in profile settings
-
-2. **Tutorial/Onboarding System**
-   - Tutorial shown on first app launch
-   - Can be reset from profile settings using `useResetTutorial()`
-
-3. **Native Image Capture**
-   - Camera and photo library integration
-   - Hooks: `useImageUpload()`, `useAvatarUpload()`, `useBeerPictureUpload()`
-   - Component: `ImageSourcePicker` for camera/library selection
-
-4. **Settings Screens**
-   - `/settings/change-password` - Change password
-   - `/settings/notifications` - Notification preferences (UI ready, API TODO)
-   - `/settings/photo-privacy` - Photo visibility settings
-
-5. **Navigation Guards**
-   - Auto-redirect to sign-in for unauthenticated users
-   - Protected route handling via NavigationGuard component
-
-6. **Error Boundaries**
-   - App-wide error handling with ErrorBoundary component
-   - Prevents crashes from propagating
-
-### Mobile-Specific Hooks
-
-- `useBiometrics()` - Biometric authentication management
-- `useBeerPictureUpload()` - Upload beer photos
-- `useImageUpload()` - Generic image upload
-- `useAvatarUpload()` - Profile avatar upload
-- `useSaveAttendance()` - Save attendance with optimistic updates
-- `useDrinkPrice()` - Calculate drink costs (mobile & web)
+- **Gluestack UI + NativeWind** (Tailwind classes via `className`)
+- **IMPORTANT**: Do NOT use React Native `StyleSheet` or inline style objects
+- Use `Colors` and `IconColors` from `@/lib/constants/colors` for icon props
+- Use `lucide-react-native` for icons
 
 ## Mobile Development Patterns
 
 **Reference implementation**: `apps/mobile/app/(tabs)/profile.tsx`
 
-When developing mobile screens, follow the patterns established in the profile page:
-
-### File Structure
-
-```typescript
-// 1. External imports (grouped by package)
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useCurrentProfile,
-  useUpdateProfile,
-} from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  UpdateProfileSchema,
-  type UpdateProfileInput,
-} from "@prostcounter/shared/schemas";
-import { useRouter } from "expo-router";
-import { Lock, LogOut } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
-
-// 2. Internal component imports
-import { ProfileHeader } from "@/components/profile/profile-header";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { VStack } from "@/components/ui/vstack";
-
-// 3. Constants and utilities
-import { Colors, IconColors } from "@/lib/constants/colors";
-```
-
-### Component Structure
-
-```typescript
-export default function ScreenName() {
-  const { t } = useTranslation();
-  const router = useRouter();
-
-  // 1. Dialog/sheet state (use reusable hooks)
-  const { dialog, showDialog, closeDialog } = useAlertDialog();
-
-  // 2. Data hooks from @prostcounter/shared/hooks
-  const { data, loading, error, refetch } = useSomeData();
-  const mutation = useSomeMutation();
-
-  // 3. Local UI state
-  const [isEditing, setIsEditing] = useState(false);
-
-  // 4. Form setup with `values` option (React 19 pattern - no useEffect needed)
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<InputType>({
-    resolver: zodResolver(Schema),
-    values: data ? { field: data.field || "" } : undefined,
-  });
-
-  // 5. Memoized handlers with useCallback
-  const onSave = useCallback(async (data: InputType) => {
-    try {
-      await mutation.mutateAsync(data);
-      showDialog(t("common.status.success"), t("screen.successMessage"));
-    } catch {
-      showDialog(t("common.status.error"), t("screen.errorMessage"));
-    }
-  }, [mutation, showDialog, t]);
-
-  // 6. Loading/error states
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} onRetry={refetch} />;
-
-  // 7. Main render with VStack layout
-  return (
-    <ScrollView>
-      <VStack space="lg" className="p-4">
-        <Card size="lg" variant="elevated">
-          {/* Content */}
-        </Card>
-      </VStack>
-    </ScrollView>
-  );
-}
-```
-
 ### Key Patterns
 
 1. **Componentization**: Extract reusable sections to `components/[feature]/`
-2. **Color constants**: Use `Colors` and `IconColors` from `@/lib/constants/colors` for icon props
-3. **Icons**: Use `lucide-react-native` with `IconColors.default`, `IconColors.white`, etc.
-4. **Translations**: Never use `defaultValue` in `t()` calls. Always add keys to **all 3 locale files** (`en.json`, `de.json`, `es.json`) with proper translations (correct umlauts for German, accents/punctuation for Spanish)
-5. **Layout**: Use `VStack`/`HStack` with `space` prop instead of margin
-6. **Cards**: Use `Card` component with `size` and `variant` props
-7. **Forms**: Use `useForm` with `values` option (not `defaultValues` + useEffect)
-8. **Dialogs**: Use `useAlertDialog` hook from alert-dialog component
-9. **Accessibility**: Add `accessibilityLabel` and `accessibilityHint` to interactive elements
-
-### Color Constants (`lib/constants/colors.ts`)
-
-```typescript
-import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
-
-// For icon color props
-<LogOut size={20} color={IconColors.white} />
-<Lock size={20} color={IconColors.default} />
-
-// For spinner/loader colors
-<ButtonSpinner color={Colors.primary[600]} />
-
-// For Switch components
-<Switch trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }} />
-```
+2. **Translations**: Never use `defaultValue` in `t()` calls. Always add keys to **all 3 locale files** (`en.json`, `de.json`, `es.json`) with proper translations (correct umlauts for German, accents/punctuation for Spanish)
+3. **Layout**: Use `VStack`/`HStack` with `space` prop instead of margin
+4. **Forms**: Use `useForm` with `values` option (not `defaultValues` + useEffect)
+5. **Dialogs**: Use `useAlertDialog` hook from alert-dialog component
+6. **Accessibility**: Add `accessibilityLabel` and `accessibilityHint` to interactive elements
 
 ## Important Development Notes
 
@@ -350,5 +220,7 @@ import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 
 ## Additional Documentation
 
-- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture and testing guide
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Full system architecture, API routes, testing infrastructure, database schema
+- **[VERSION_MANAGEMENT.md](./docs/VERSION_MANAGEMENT.md)** - Version bumping, changelog, and release workflow
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Mobile app plans
+- **[FRIENDSHIP_SYSTEM.md](./docs/FRIENDSHIP_SYSTEM.md)** - Friendship feature documentation
