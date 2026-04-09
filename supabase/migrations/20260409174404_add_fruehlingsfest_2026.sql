@@ -63,12 +63,20 @@ BEGIN
     (v_festival_id, 'other', v_base_price);
 END $$;
 
--- Step 5: Create tent-level beer price override for Hippodrom (EUR 14.50 vs default EUR 13.50)
+-- Step 5: Create tent-level beer/radler price overrides for Hippodrom (EUR 14.50 vs default EUR 13.50)
 INSERT INTO drink_type_prices (festival_tent_id, drink_type, price_cents)
-VALUES (
-  (SELECT ft.id FROM festival_tents ft
-   WHERE ft.tent_id = 'b0000000-0000-4000-b000-000000000002'
-     AND ft.festival_id = (SELECT id FROM festivals WHERE short_name = 'fruehlingsfest-2026')),
-  'beer',
-  1450
-);
+VALUES
+  (
+    (SELECT ft.id FROM festival_tents ft
+     WHERE ft.tent_id = 'b0000000-0000-4000-b000-000000000002'
+       AND ft.festival_id = (SELECT id FROM festivals WHERE short_name = 'fruehlingsfest-2026')),
+    'beer',
+    1450
+  ),
+  (
+    (SELECT ft.id FROM festival_tents ft
+     WHERE ft.tent_id = 'b0000000-0000-4000-b000-000000000002'
+       AND ft.festival_id = (SELECT id FROM festivals WHERE short_name = 'fruehlingsfest-2026')),
+    'radler',
+    1450
+  );
