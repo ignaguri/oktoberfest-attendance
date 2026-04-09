@@ -685,24 +685,14 @@ export class NotificationService {
   }
 
   /**
-   * Send daily reminder push notification to a user
-   * (respects daily_reminder_enabled)
+   * Send daily reminder push notification to a user.
+   * Called from cron which pre-filters by daily_reminder_enabled — no per-user preference check needed.
    */
   async notifyDailyReminder(
     userId: string,
     payload: { dayOfYear: number },
   ): Promise<void> {
     try {
-      const { data: prefs } = await this.supabase
-        .from("user_notification_preferences")
-        .select("daily_reminder_enabled")
-        .eq("user_id", userId)
-        .single();
-
-      if (prefs && prefs.daily_reminder_enabled === false) {
-        return;
-      }
-
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.DAILY_REMINDER,
         to: userId,

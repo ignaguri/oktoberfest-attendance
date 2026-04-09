@@ -47,8 +47,7 @@ export const dailyReminderWorkflow = workflow(
     await step.push(
       "push-notification",
       async (controls: any) => {
-        const messageIndex =
-          (payload.dayOfYear ?? 0) % MOTIVATIONAL_MESSAGES.length;
+        const messageIndex = payload.dayOfYear % MOTIVATIONAL_MESSAGES.length;
         const message = MOTIVATIONAL_MESSAGES[messageIndex];
 
         return {

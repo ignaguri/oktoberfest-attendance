@@ -29,8 +29,10 @@ export async function processDailyReminderNotifications(
   const dayOfYear = getDayOfYear();
 
   await Promise.allSettled(
-    eligibleUsers.map((user) =>
-      notifications.notifyDailyReminder(user.user_id!, { dayOfYear }),
-    ),
+    eligibleUsers
+      .filter((user) => user.user_id != null)
+      .map((user) =>
+        notifications.notifyDailyReminder(user.user_id!, { dayOfYear }),
+      ),
   );
 }
