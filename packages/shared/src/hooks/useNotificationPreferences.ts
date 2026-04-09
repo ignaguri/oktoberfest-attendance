@@ -6,14 +6,14 @@
  */
 
 import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  useSetQueryData,
-  useGetQueryData,
-  useCancelQueries,
   QueryKeys,
+  useApiClient,
+  useCancelQueries,
+  useGetQueryData,
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
+  useSetQueryData,
 } from "../data";
 
 /**
@@ -27,6 +27,7 @@ export type NotificationPreferencesResponse = {
   remindersEnabled: boolean | null;
   achievementNotificationsEnabled: boolean | null;
   groupNotificationsEnabled: boolean | null;
+  dailyReminderEnabled: boolean | null;
   createdAt: string;
   updatedAt: string | null;
 } | null;
@@ -41,6 +42,7 @@ export type UpdateNotificationPreferencesInput = {
   remindersEnabled?: boolean;
   achievementNotificationsEnabled?: boolean;
   groupNotificationsEnabled?: boolean;
+  dailyReminderEnabled?: boolean;
 };
 
 /**
@@ -114,6 +116,9 @@ export function useUpdateNotificationPreferences(userId?: string) {
             }),
             ...(newData.groupNotificationsEnabled !== undefined && {
               groupNotificationsEnabled: newData.groupNotificationsEnabled,
+            }),
+            ...(newData.dailyReminderEnabled !== undefined && {
+              dailyReminderEnabled: newData.dailyReminderEnabled,
             }),
             updatedAt: new Date().toISOString(),
           });

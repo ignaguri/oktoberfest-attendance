@@ -1522,6 +1522,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         remindersEnabled: boolean | null;
         achievementNotificationsEnabled: boolean | null;
         groupNotificationsEnabled: boolean | null;
+        dailyReminderEnabled: boolean | null;
         createdAt: string;
         updatedAt: string | null;
       } | null> {
@@ -1546,6 +1547,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         remindersEnabled?: boolean;
         achievementNotificationsEnabled?: boolean;
         groupNotificationsEnabled?: boolean;
+        dailyReminderEnabled?: boolean;
       }): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(

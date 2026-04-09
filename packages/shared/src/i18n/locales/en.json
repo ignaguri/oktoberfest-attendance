@@ -1055,6 +1055,8 @@
       "groupActivity": "Group Activity",
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
+      "dailyReminder": "Daily Reminder",
+      "dailyReminderDescription": "Get a daily push reminder to open the app",
       "info": "You can change your notification preferences at any time",
       "updateError": "Failed to update notification settings",
       "noToken": "Failed to get push notification token. Please try again.",

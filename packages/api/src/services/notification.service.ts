@@ -244,6 +244,7 @@ export class NotificationService {
           achievement_notifications_enabled:
             preferences.achievementNotificationsEnabled,
           group_notifications_enabled: preferences.groupNotificationsEnabled,
+          daily_reminder_enabled: preferences.dailyReminderEnabled,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "user_id" },

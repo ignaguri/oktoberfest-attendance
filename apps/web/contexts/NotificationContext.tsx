@@ -27,6 +27,7 @@ type ApiPreferences = {
   remindersEnabled: boolean | null;
   achievementNotificationsEnabled: boolean | null;
   groupNotificationsEnabled: boolean | null;
+  dailyReminderEnabled: boolean | null;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -43,6 +44,7 @@ const mapApiToDbPreferences = (
   reminders_enabled: api.remindersEnabled,
   achievement_notifications_enabled: api.achievementNotificationsEnabled,
   group_notifications_enabled: api.groupNotificationsEnabled,
+  daily_reminder_enabled: api.dailyReminderEnabled ?? true,
   created_at: api.createdAt,
   updated_at: api.updatedAt,
 });

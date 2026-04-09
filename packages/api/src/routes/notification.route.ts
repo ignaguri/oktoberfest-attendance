@@ -209,6 +209,7 @@ app.openapi(getPreferencesRoute, async (c) => {
       achievementNotificationsEnabled:
         preferences.achievement_notifications_enabled,
       groupNotificationsEnabled: preferences.group_notifications_enabled,
+      dailyReminderEnabled: preferences.daily_reminder_enabled,
       createdAt: preferences.created_at,
       updatedAt: preferences.updated_at,
     },

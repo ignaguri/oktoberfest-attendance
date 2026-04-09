@@ -60,6 +60,7 @@ export const NotificationPreferencesSchema = z.object({
   remindersEnabled: z.boolean().nullable(),
   achievementNotificationsEnabled: z.boolean().nullable(),
   groupNotificationsEnabled: z.boolean().nullable(),
+  dailyReminderEnabled: z.boolean().nullable(),
   createdAt: z.iso.datetime().nullable(),
   updatedAt: z.iso.datetime().nullable(),
 });
@@ -79,6 +80,7 @@ export const UpdateNotificationPreferencesSchema = z.object({
   remindersEnabled: z.boolean().optional(),
   achievementNotificationsEnabled: z.boolean().optional(),
   groupNotificationsEnabled: z.boolean().optional(),
+  dailyReminderEnabled: z.boolean().optional(),
 });
 
 export type UpdateNotificationPreferencesInput = z.infer<

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import {
   achievementUnlockedWorkflow,
+  dailyReminderWorkflow,
   friendRequestWorkflow,
   groupAchievementUnlockedWorkflow,
   groupJoinWorkflow,
@@ -29,6 +30,7 @@ try {
       achievementUnlockedWorkflow,
       groupAchievementUnlockedWorkflow,
       friendRequestWorkflow,
+      dailyReminderWorkflow,
     ],
   });
 } catch (error) {
