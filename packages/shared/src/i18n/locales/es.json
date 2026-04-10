@@ -1055,6 +1055,8 @@
       "groupActivity": "Actividad del grupo",
       "reminders": "Recordatorios",
       "remindersDescription": "Recordatorios de reservas y avisos de check-in",
+      "dailyReminder": "Recordatorio diario",
+      "dailyReminderDescription": "Recibí un recordatorio diario para abrir la app",
       "info": "Podés cambiar tus preferencias de notificaciones en cualquier momento",
       "updateError": "Error al actualizar la configuración de notificaciones",
       "noToken": "Error al obtener el token de notificaciones push. Por favor, intentá de nuevo.",

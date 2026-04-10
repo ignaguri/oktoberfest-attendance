@@ -6,6 +6,7 @@ import {
   DEFAULT_AVATAR_URL,
   NOTIFICATION_WORKFLOWS,
 } from "@prostcounter/shared/constants";
+import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
@@ -13,12 +14,37 @@ import { logger } from "../lib/logger";
 type NotificationPreferences =
   Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
+type SubscriberProfile = {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+};
+
+function isConflictError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const e = error as {
+    statusCode?: number;
+    status?: number;
+    code?: number;
+    message?: string;
+  };
+  const status = e.statusCode ?? e.status ?? e.code;
+  if (status === 409) return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("409") || message.toLowerCase().includes("already exists")
+  );
+}
+
 /**
  * Notification Service
  * Handles notification triggering, FCM token management, and user preferences
  */
 export class NotificationService {
   private novu: Novu;
+  private expoIntegrationId: string | undefined;
+  private fcmIntegrationId: string | undefined;
 
   constructor(
     private supabase: SupabaseClient<Database>,
@@ -30,6 +56,26 @@ export class NotificationService {
     this.novu = new Novu({
       secretKey: novuApiKey,
     });
+    this.expoIntegrationId = process.env.NOVU_EXPO_INTEGRATION_ID;
+    this.fcmIntegrationId = process.env.NOVU_FCM_INTEGRATION_ID;
+  }
+
+  private requireExpoIntegrationId(): string {
+    if (!this.expoIntegrationId) {
+      throw new Error(
+        "NOVU_EXPO_INTEGRATION_ID is not set; refusing to register Expo push token",
+      );
+    }
+    return this.expoIntegrationId;
+  }
+
+  private requireFcmIntegrationId(): string {
+    if (!this.fcmIntegrationId) {
+      throw new Error(
+        "NOVU_FCM_INTEGRATION_ID is not set; refusing to register FCM token",
+      );
+    }
+    return this.fcmIntegrationId;
   }
 
   /**
@@ -38,20 +84,30 @@ export class NotificationService {
    */
   async registerFCMToken(userId: string, token: string): Promise<boolean> {
     try {
-      await this.novu.subscribers.credentials.update(
-        {
-          providerId: ChatOrPushProviderEnum.Fcm,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
-          credentials: {
-            deviceTokens: [token],
-          },
-        },
-        userId,
+      const integrationIdentifier = this.requireFcmIntegrationId();
+      await runNovuWriteTolerantly(
+        () =>
+          this.novu.subscribers.credentials.update(
+            {
+              providerId: ChatOrPushProviderEnum.Fcm,
+              integrationIdentifier,
+              credentials: { deviceTokens: [token] },
+            },
+            userId,
+          ),
+        () =>
+          logger.warn(
+            { userId },
+            "Novu SDK ResponseValidationError on FCM register — treating as success",
+          ),
+      );
+      logger.info(
+        { userId, tokenPrefix: token.substring(0, 20) },
+        "FCM token attached to Novu subscriber",
       );
       return true;
     } catch (error) {
-      logger.error({ error }, "Error registering FCM token");
+      logger.error({ error, userId }, "Error registering FCM token");
       return false;
     }
   }
@@ -63,146 +119,171 @@ export class NotificationService {
   async registerExpoPushToken(
     userId: string,
     token: string,
-  ): Promise<{ success: boolean; novuRegistered: boolean; error?: string }> {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      await this.novu.subscribers.credentials.update(
-        {
-          providerId: ChatOrPushProviderEnum.Expo,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
-          credentials: {
-            deviceTokens: [token],
-          },
-        },
-        userId,
+      const integrationIdentifier = this.requireExpoIntegrationId();
+      await runNovuWriteTolerantly(
+        () =>
+          this.novu.subscribers.credentials.update(
+            {
+              providerId: ChatOrPushProviderEnum.Expo,
+              integrationIdentifier,
+              credentials: { deviceTokens: [token] },
+            },
+            userId,
+          ),
+        () =>
+          logger.warn(
+            { userId, tokenPrefix: token.substring(0, 30) },
+            "Novu SDK ResponseValidationError on Expo register — treating as success",
+          ),
       );
-      return { success: true, novuRegistered: true };
+      logger.info(
+        { userId, tokenPrefix: token.substring(0, 30) },
+        "Expo push token attached to Novu subscriber",
+      );
+      return { success: true };
     } catch (error) {
-      logger.error({ error }, "Error registering Expo push token");
+      logger.error({ error, userId }, "Error registering Expo push token");
       const errorMessage =
         error instanceof Error
           ? error.message
           : "Failed to register push token";
-      return { success: false, novuRegistered: false, error: errorMessage };
+      return { success: false, error: errorMessage };
     }
   }
 
   /**
    * Register push token - auto-detects token type (Expo or FCM)
-   * Returns detailed result including whether Novu registration succeeded
    */
   async registerPushToken(
     userId: string,
     token: string,
-  ): Promise<{ success: boolean; novuRegistered: boolean; error?: string }> {
+  ): Promise<{ success: boolean; error?: string }> {
     // Expo push tokens start with "ExponentPushToken["
     if (token.startsWith("ExponentPushToken[")) {
       return this.registerExpoPushToken(userId, token);
     }
-    // Fallback to FCM for other token formats
     const fcmResult = await this.registerFCMToken(userId, token);
     return {
       success: fcmResult,
-      novuRegistered: fcmResult,
       error: fcmResult ? undefined : "Failed to register FCM token",
     };
   }
 
   /**
-   * Subscribe user to Novu notifications with full profile data
-   * Handles existing subscribers (409 Conflict) by updating instead
+   * Subscribe user to Novu. Handles existing subscribers (409 Conflict) by
+   * actively patching them — we don't rely on "create updates on conflict"
+   * because some SDK versions throw 409 without applying the update.
    */
   async subscribeUser(
     userId: string,
-    userEmail?: string,
-    firstName?: string,
-    lastName?: string,
-    avatar?: string,
+    profile?: SubscriberProfile,
   ): Promise<{ success: boolean; error?: string }> {
-    logger.debug(
-      {
-        userId,
-        userEmail,
-        firstName,
-        lastName,
-        avatar: avatar ? "present" : "null",
-      },
-      "subscribeUser called",
-    );
+    const payload: Record<string, unknown> = { subscriberId: userId };
+    if (profile?.email !== undefined) payload.email = profile.email;
+    if (profile?.firstName !== undefined) payload.firstName = profile.firstName;
+    if (profile?.lastName !== undefined) payload.lastName = profile.lastName;
+    if (profile?.avatar !== undefined) payload.avatar = profile.avatar;
 
     try {
-      // Build payload with only defined values
-      // Novu SDK rejects undefined values, so we must omit them
-      const payload: Record<string, unknown> = {
-        subscriberId: userId,
-      };
-      if (userEmail !== undefined) payload.email = userEmail;
-      if (firstName !== undefined) payload.firstName = firstName;
-      if (lastName !== undefined) payload.lastName = lastName;
-      if (avatar !== undefined) payload.avatar = avatar;
-
-      logger.info(payload, "About to call Novu subscribers.create");
-      const result = await this.novu.subscribers.create(
-        payload as {
-          subscriberId: string;
-          email?: string;
-          firstName?: string;
-          lastName?: string;
-          avatar?: string;
-        },
+      await runNovuWriteTolerantly(
+        () =>
+          this.novu.subscribers.create(
+            payload as {
+              subscriberId: string;
+              email?: string;
+              firstName?: string;
+              lastName?: string;
+              avatar?: string;
+            },
+          ),
+        () =>
+          logger.warn(
+            { userId },
+            "Novu SDK ResponseValidationError on subscriber create — treating as success",
+          ),
       );
-      logger.info({ result }, "Novu subscriber create SUCCESS");
+      logger.info({ userId }, "Novu subscriber create SUCCESS");
       return { success: true };
     } catch (error) {
-      logger.error(
-        {
-          error,
-          errorString: String(error),
-          errorJSON: JSON.stringify(error, null, 2),
-        },
-        "Novu subscriber create FAILED",
-      );
-
-      // Check if it's a 409 Conflict (subscriber already exists)
-      // First check for status code property (Novu SDK may include this)
-      const errorObj = error as {
-        statusCode?: number;
-        status?: number;
-        code?: number;
-        message?: string;
+      if (isConflictError(error)) {
+        return this.patchExistingSubscriber(userId, profile);
+      }
+      logger.error({ error, userId }, "Novu subscriber create FAILED");
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
       };
-      const statusCode =
-        errorObj.statusCode ?? errorObj.status ?? errorObj.code;
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
-      // Check for 409 status code first, then fall back to message matching
-      const is409 =
-        statusCode === 409 ||
-        errorMessage.includes("409") ||
-        errorMessage.toLowerCase().includes("already exists");
-
-      if (is409) {
-        // According to Novu SDK, calling create on an existing subscriber updates it
-        // But some versions may throw 409. In that case, we consider it a success
-        // since the subscriber already exists and can receive notifications
-        logger.debug("Subscriber already exists - treating as success");
-        return { success: true };
-      }
-
-      // Log full error details for non-409 errors
-      if (error instanceof Error) {
-        logger.error(
-          {
-            errorName: error.name,
-            errorMessage: error.message,
-            errorStack: error.stack,
-          },
-          "Error details",
-        );
-      }
-      return { success: false, error: errorMessage };
     }
+  }
+
+  private async patchExistingSubscriber(
+    userId: string,
+    profile?: SubscriberProfile,
+  ): Promise<{ success: boolean }> {
+    const updatePayload: Record<string, unknown> = {};
+    if (profile?.email !== undefined) updatePayload.email = profile.email;
+    if (profile?.firstName !== undefined)
+      updatePayload.firstName = profile.firstName;
+    if (profile?.lastName !== undefined)
+      updatePayload.lastName = profile.lastName;
+    if (profile?.avatar !== undefined) updatePayload.avatar = profile.avatar;
+
+    if (Object.keys(updatePayload).length === 0) {
+      return { success: true };
+    }
+
+    try {
+      await runNovuWriteTolerantly(
+        () =>
+          this.novu.subscribers.patch(
+            updatePayload as {
+              email?: string;
+              firstName?: string;
+              lastName?: string;
+              avatar?: string;
+            },
+            userId,
+          ),
+        () =>
+          logger.warn(
+            { userId },
+            "Novu SDK ResponseValidationError on subscriber patch — treating as success",
+          ),
+      );
+      logger.info(
+        { userId },
+        "Novu subscriber already existed — updated profile",
+      );
+    } catch (updateError) {
+      // Subscriber exists and can receive notifications even if the profile
+      // patch failed. Credential update (the push path) is the real signal.
+      logger.error(
+        { updateError, userId },
+        "Failed to update existing Novu subscriber after 409",
+      );
+    }
+    return { success: true };
+  }
+
+  /**
+   * Atomic push enable: ensure subscriber exists AND attach push token in
+   * one server-side operation.
+   */
+  async subscribeAndRegisterToken(
+    userId: string,
+    token: string,
+    profile?: SubscriberProfile,
+  ): Promise<{ success: boolean; error?: string }> {
+    const subscribeResult = await this.subscribeUser(userId, profile);
+    if (!subscribeResult.success) {
+      return {
+        success: false,
+        error: subscribeResult.error ?? "Failed to subscribe user",
+      };
+    }
+    return this.registerPushToken(userId, token);
   }
 
   /**
@@ -244,6 +325,7 @@ export class NotificationService {
           achievement_notifications_enabled:
             preferences.achievementNotificationsEnabled,
           group_notifications_enabled: preferences.groupNotificationsEnabled,
+          daily_reminder_enabled: preferences.dailyReminderEnabled,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "user_id" },

@@ -1377,6 +1377,7 @@ export type Database = {
           achievement_notifications_enabled: boolean | null
           checkin_enabled: boolean | null
           created_at: string | null
+          daily_reminder_enabled: boolean
           group_join_enabled: boolean | null
           group_notifications_enabled: boolean | null
           id: string
@@ -1389,6 +1390,7 @@ export type Database = {
           achievement_notifications_enabled?: boolean | null
           checkin_enabled?: boolean | null
           created_at?: string | null
+          daily_reminder_enabled?: boolean
           group_join_enabled?: boolean | null
           group_notifications_enabled?: boolean | null
           id?: string
@@ -1401,6 +1403,7 @@ export type Database = {
           achievement_notifications_enabled?: boolean | null
           checkin_enabled?: boolean | null
           created_at?: string | null
+          daily_reminder_enabled?: boolean
           group_join_enabled?: boolean | null
           group_notifications_enabled?: boolean | null
           id?: string

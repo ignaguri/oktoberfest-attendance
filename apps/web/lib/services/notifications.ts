@@ -7,10 +7,12 @@ import {
   IS_PROD,
   PROD_URL,
 } from "@prostcounter/shared/constants";
+import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
 import { ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/achievement-unlocked";
+import { DAILY_REMINDER_WORKFLOW_ID } from "@/novu/workflows/daily-reminder";
 import { GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/group-achievement-unlocked";
 import { GROUP_JOIN_WORKFLOW_ID } from "@/novu/workflows/group-join";
 import { LOCATION_SHARING_WORKFLOW_ID } from "@/novu/workflows/location-sharing";
@@ -36,6 +38,7 @@ export const NOTIFICATION_WORKFLOWS = {
   RESERVATION_CHECKIN_PROMPT: RESERVATION_PROMPT_WORKFLOW_ID,
   ACHIEVEMENT_UNLOCKED: ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
   GROUP_ACHIEVEMENT_UNLOCKED: GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
+  DAILY_REMINDER: DAILY_REMINDER_WORKFLOW_ID,
 } as const;
 
 /**
@@ -47,6 +50,8 @@ export type NotificationWorkflowId =
 export class NotificationService {
   private supabase;
   public novu: Novu; // Make novu public so it can be accessed
+  private expoIntegrationId: string | undefined;
+  private fcmIntegrationId: string | undefined;
 
   constructor() {
     // Use direct service role client to access all user data for notifications
@@ -71,6 +76,8 @@ export class NotificationService {
     this.novu = new Novu({
       secretKey: novuApiKey,
     });
+    this.expoIntegrationId = process.env.NOVU_EXPO_INTEGRATION_ID;
+    this.fcmIntegrationId = process.env.NOVU_FCM_INTEGRATION_ID;
   }
 
   /**
@@ -506,17 +513,25 @@ export class NotificationService {
    * Register FCM device token with Novu subscriber
    */
   async registerFCMToken(userId: string, token: string): Promise<boolean> {
+    if (!this.fcmIntegrationId) {
+      reportNotificationException(
+        "registerFCMToken",
+        new Error("NOVU_FCM_INTEGRATION_ID is not set"),
+        { id: userId },
+      );
+      return false;
+    }
+    const integrationIdentifier = this.fcmIntegrationId;
     try {
-      await this.novu.subscribers.credentials.update(
-        {
-          providerId: ChatOrPushProviderEnum.Fcm,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
-          credentials: {
-            deviceTokens: [token],
+      await runNovuWriteTolerantly(() =>
+        this.novu.subscribers.credentials.update(
+          {
+            providerId: ChatOrPushProviderEnum.Fcm,
+            integrationIdentifier,
+            credentials: { deviceTokens: [token] },
           },
-        },
-        userId,
+          userId,
+        ),
       );
       return true;
     } catch (error) {
@@ -532,17 +547,25 @@ export class NotificationService {
    * This replaces all existing tokens with the new ones
    */
   async updateFCMTokens(userId: string, tokens: string[]): Promise<boolean> {
+    if (!this.fcmIntegrationId) {
+      reportNotificationException(
+        "updateFCMTokens",
+        new Error("NOVU_FCM_INTEGRATION_ID is not set"),
+        { id: userId },
+      );
+      return false;
+    }
+    const integrationIdentifier = this.fcmIntegrationId;
     try {
-      await this.novu.subscribers.credentials.update(
-        {
-          providerId: ChatOrPushProviderEnum.Fcm,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
-          credentials: {
-            deviceTokens: tokens,
+      await runNovuWriteTolerantly(() =>
+        this.novu.subscribers.credentials.update(
+          {
+            providerId: ChatOrPushProviderEnum.Fcm,
+            integrationIdentifier,
+            credentials: { deviceTokens: tokens },
           },
-        },
-        userId,
+          userId,
+        ),
       );
       return true;
     } catch (error) {
@@ -679,6 +702,27 @@ export class NotificationService {
         id: userId,
       });
       return { success: false, error: "Failed to send notification" };
+    }
+  }
+
+  /**
+   * Send daily reminder push notification to a user.
+   * Called from cron which pre-filters by daily_reminder_enabled — no per-user preference check needed.
+   */
+  async notifyDailyReminder(
+    userId: string,
+    payload: { dayOfYear: number },
+  ): Promise<void> {
+    try {
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.DAILY_REMINDER,
+        to: userId,
+        payload,
+      });
+    } catch (error) {
+      reportNotificationException("notifyDailyReminder", error as Error, {
+        id: userId,
+      });
     }
   }
 }

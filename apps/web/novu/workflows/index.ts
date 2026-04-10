@@ -1,5 +1,6 @@
 // Export all workflows for the bridge endpoint
 export * from "./achievement-unlocked";
+export * from "./daily-reminder";
 export * from "./friend-request";
 export * from "./group-achievement-unlocked";
 export * from "./group-join";

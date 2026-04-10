@@ -6,14 +6,14 @@
  */
 
 import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  useSetQueryData,
-  useGetQueryData,
-  useCancelQueries,
   QueryKeys,
+  useApiClient,
+  useCancelQueries,
+  useGetQueryData,
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
+  useSetQueryData,
 } from "../data";
 
 /**
@@ -27,6 +27,7 @@ export type NotificationPreferencesResponse = {
   remindersEnabled: boolean | null;
   achievementNotificationsEnabled: boolean | null;
   groupNotificationsEnabled: boolean | null;
+  dailyReminderEnabled: boolean | null;
   createdAt: string;
   updatedAt: string | null;
 } | null;
@@ -41,6 +42,7 @@ export type UpdateNotificationPreferencesInput = {
   remindersEnabled?: boolean;
   achievementNotificationsEnabled?: boolean;
   groupNotificationsEnabled?: boolean;
+  dailyReminderEnabled?: boolean;
 };
 
 /**
@@ -115,6 +117,9 @@ export function useUpdateNotificationPreferences(userId?: string) {
             ...(newData.groupNotificationsEnabled !== undefined && {
               groupNotificationsEnabled: newData.groupNotificationsEnabled,
             }),
+            ...(newData.dailyReminderEnabled !== undefined && {
+              dailyReminderEnabled: newData.dailyReminderEnabled,
+            }),
             updatedAt: new Date().toISOString(),
           });
         }
@@ -147,6 +152,27 @@ export function useRegisterFCMToken() {
   return useMutation(async (token: string) => {
     return await apiClient.notifications.registerToken(token);
   });
+}
+
+/**
+ * Hook to atomically enable push notifications — subscribes the user to
+ * Novu AND attaches the push token in a single backend call. Prefer this
+ * over calling useSubscribeToNotifications + useRegisterFCMToken.
+ */
+export function useEnablePushNotifications() {
+  const apiClient = useApiClient();
+
+  return useMutation(
+    async (data: {
+      token: string;
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    }) => {
+      return await apiClient.notifications.enablePush(data);
+    },
+  );
 }
 
 /**

@@ -50,6 +50,31 @@ export const SubscribeUserResponseSchema = z.object({
 export type SubscribeUserResponse = z.infer<typeof SubscribeUserResponseSchema>;
 
 /**
+ * Enable push notifications request (atomic subscribe + register token)
+ * POST /api/v1/notifications/enable
+ */
+export const EnablePushNotificationsSchema = z.object({
+  token: z.string().min(1, "Push token is required"),
+  email: z.union([z.email(), z.literal("")]).optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  avatar: z.union([z.url(), z.literal("")]).optional(),
+});
+
+export type EnablePushNotificationsInput = z.infer<
+  typeof EnablePushNotificationsSchema
+>;
+
+export const EnablePushNotificationsResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.string().optional(),
+});
+
+export type EnablePushNotificationsResponse = z.infer<
+  typeof EnablePushNotificationsResponseSchema
+>;
+
+/**
  * User notification preferences
  */
 export const NotificationPreferencesSchema = z.object({
@@ -60,6 +85,7 @@ export const NotificationPreferencesSchema = z.object({
   remindersEnabled: z.boolean().nullable(),
   achievementNotificationsEnabled: z.boolean().nullable(),
   groupNotificationsEnabled: z.boolean().nullable(),
+  dailyReminderEnabled: z.boolean().nullable(),
   createdAt: z.iso.datetime().nullable(),
   updatedAt: z.iso.datetime().nullable(),
 });
@@ -79,6 +105,7 @@ export const UpdateNotificationPreferencesSchema = z.object({
   remindersEnabled: z.boolean().optional(),
   achievementNotificationsEnabled: z.boolean().optional(),
   groupNotificationsEnabled: z.boolean().optional(),
+  dailyReminderEnabled: z.boolean().optional(),
 });
 
 export type UpdateNotificationPreferencesInput = z.infer<

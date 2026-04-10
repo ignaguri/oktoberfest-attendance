@@ -7,50 +7,50 @@
 
 // Import shared schema types
 import type {
-  FestivalTent,
-  ListAttendancesResponse,
-  DeleteAttendanceResponse,
   AttendanceByDate,
   AttendanceWithTotals,
   Consumption,
-  LogConsumptionInput,
-  ListGroupsResponse,
-  Group,
-  GroupWithMembers,
-  GroupActionResponse,
-  LeaderboardResponse,
-  WinningCriteriaListResponse,
-  ListAchievementsResponse,
-  EvaluateAchievementsResponse,
-  GetAchievementsWithProgressResponse,
-  GetAchievementLeaderboardResponse,
-  ListAvailableAchievementsResponse,
-  ListFestivalsResponse,
-  GetFestivalResponse,
-  GetCalendarEventsResponse,
-  ProfileShort,
-  Profile,
-  PublicProfile,
-  TutorialStatus,
-  MissingProfileFields,
-  Highlights,
-  GetCrowdStatusResponse,
-  GetTentCrowdReportsResponse,
-  SubmitCrowdReportResponse,
+  CreateMessageResponse,
   CrowdLevel,
+  DeleteAttendanceResponse,
+  DeleteGroupMessageResponse,
+  EvaluateAchievementsResponse,
+  FestivalTent,
+  FriendActionResponse,
+  FriendRequestCountResponse,
+  FriendshipStatusCheck,
+  GetAchievementLeaderboardResponse,
+  GetAchievementsWithProgressResponse,
+  GetCalendarEventsResponse,
+  GetCrowdStatusResponse,
+  GetFestivalResponse,
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
-  CreateMessageResponse,
-  UpdateGroupMessageResponse,
-  DeleteGroupMessageResponse,
+  GetTentCrowdReportsResponse,
+  Group,
+  GroupActionResponse,
   GroupMessageType,
-  ListFriendsResponse,
+  GroupWithMembers,
+  Highlights,
+  LeaderboardResponse,
+  ListAchievementsResponse,
+  ListAttendancesResponse,
+  ListAvailableAchievementsResponse,
+  ListFestivalsResponse,
   ListFriendRequestsResponse,
-  FriendRequestCountResponse,
-  FriendActionResponse,
+  ListFriendsResponse,
   ListFriendSuggestionsResponse,
+  ListGroupsResponse,
+  LogConsumptionInput,
+  MissingProfileFields,
+  Profile,
+  ProfileShort,
+  PublicProfile,
   SearchUsersResponse,
-  FriendshipStatusCheck,
+  SubmitCrowdReportResponse,
+  TutorialStatus,
+  UpdateGroupMessageResponse,
+  WinningCriteriaListResponse,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -743,7 +743,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/achievements/with-progress?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch achievements with progress");
+          await extractApiError(
+            response,
+            "Failed to fetch achievements with progress",
+          );
         }
         return parseJsonResponse<GetAchievementsWithProgressResponse>(response);
       },
@@ -756,7 +759,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
         const url = `${baseUrl}/v1/achievements/leaderboard?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch achievement leaderboard");
+          await extractApiError(
+            response,
+            "Failed to fetch achievement leaderboard",
+          );
         }
         return parseJsonResponse<GetAchievementLeaderboardResponse>(response);
       },
@@ -771,7 +777,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch available achievements");
+          await extractApiError(
+            response,
+            "Failed to fetch available achievements",
+          );
         }
         return parseJsonResponse<ListAvailableAchievementsResponse>(response);
       },
@@ -1514,6 +1523,35 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse(response);
       },
 
+      async enablePush(data: {
+        token: string;
+        email?: string;
+        firstName?: string;
+        lastName?: string;
+        avatar?: string;
+      }): Promise<{
+        success: boolean;
+        error?: string;
+      }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/notifications/enable`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(
+            response,
+            "Failed to enable push notifications",
+          );
+        }
+        return parseJsonResponse(response);
+      },
+
       async getPreferences(): Promise<{
         userId: string;
         pushEnabled: boolean | null;
@@ -1522,6 +1560,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         remindersEnabled: boolean | null;
         achievementNotificationsEnabled: boolean | null;
         groupNotificationsEnabled: boolean | null;
+        dailyReminderEnabled: boolean | null;
         createdAt: string;
         updatedAt: string | null;
       } | null> {
@@ -1534,7 +1573,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch notification preferences");
+          await extractApiError(
+            response,
+            "Failed to fetch notification preferences",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1546,6 +1588,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         remindersEnabled?: boolean;
         achievementNotificationsEnabled?: boolean;
         groupNotificationsEnabled?: boolean;
+        dailyReminderEnabled?: boolean;
       }): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(
@@ -1686,7 +1729,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch available wrapped festivals");
+          await extractApiError(
+            response,
+            "Failed to fetch available wrapped festivals",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1733,7 +1779,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch global photo settings");
+          await extractApiError(
+            response,
+            "Failed to fetch global photo settings",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1752,7 +1801,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to update global photo settings");
+          await extractApiError(
+            response,
+            "Failed to update global photo settings",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1774,7 +1826,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch group photo settings");
+          await extractApiError(
+            response,
+            "Failed to fetch group photo settings",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1792,7 +1847,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           { headers },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to fetch group photo settings");
+          await extractApiError(
+            response,
+            "Failed to fetch group photo settings",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1816,7 +1874,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(response, "Failed to update group photo settings");
+          await extractApiError(
+            response,
+            "Failed to update group photo settings",
+          );
         }
         return parseJsonResponse(response);
       },
@@ -1856,10 +1917,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           },
         );
         if (!response.ok) {
-          await extractApiError(
-            response,
-            "Failed to update photos visibility",
-          );
+          await extractApiError(response, "Failed to update photos visibility");
         }
         return parseJsonResponse(response);
       },

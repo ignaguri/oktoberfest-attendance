@@ -1,5 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  EnablePushNotificationsResponseSchema,
+  EnablePushNotificationsSchema,
   NotificationPreferencesSchema,
   RegisterFCMTokenResponseSchema,
   RegisterFCMTokenSchema,
@@ -80,6 +82,74 @@ app.openapi(registerTokenRoute, async (c) => {
   return c.json(result, 200);
 });
 
+// POST /notifications/enable - Atomic subscribe + register push token
+const enablePushRoute = createRoute({
+  method: "post",
+  path: "/notifications/enable",
+  tags: ["notifications"],
+  summary: "Enable push notifications (atomic)",
+  description:
+    "Subscribes the user to Novu and attaches the device's push token in a single server-side operation. Prefer this over calling /subscribe and /token separately.",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: EnablePushNotificationsSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Push notifications enabled successfully",
+      content: {
+        "application/json": {
+          schema: EnablePushNotificationsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(enablePushRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { token, email, firstName, lastName, avatar } = c.req.valid("json");
+
+  logger.debug(
+    {
+      userId: user.id,
+      tokenPrefix: token?.substring(0, 30),
+      hasEmail: !!email,
+    },
+    "Enable push request",
+  );
+
+  const novuApiKey = process.env.NOVU_API_KEY!;
+  const notificationService = new NotificationService(supabase, novuApiKey);
+
+  const result = await notificationService.subscribeAndRegisterToken(
+    user.id,
+    token,
+    { email, firstName, lastName, avatar },
+  );
+
+  logger.debug(result, "Enable push result");
+  return c.json(result, 200);
+});
+
 // POST /notifications/subscribe - Subscribe user to Novu
 const subscribeUserRoute = createRoute({
   method: "post",
@@ -140,13 +210,12 @@ app.openapi(subscribeUserRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const result = await notificationService.subscribeUser(
-    user.id,
+  const result = await notificationService.subscribeUser(user.id, {
     email,
     firstName,
     lastName,
     avatar,
-  );
+  });
 
   logger.debug(result, "Subscribe result");
   return c.json(result, 200);
@@ -209,6 +278,7 @@ app.openapi(getPreferencesRoute, async (c) => {
       achievementNotificationsEnabled:
         preferences.achievement_notifications_enabled,
       groupNotificationsEnabled: preferences.group_notifications_enabled,
+      dailyReminderEnabled: preferences.daily_reminder_enabled,
       createdAt: preferences.created_at,
       updatedAt: preferences.updated_at,
     },
