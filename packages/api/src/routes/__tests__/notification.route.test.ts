@@ -191,10 +191,12 @@ describe("Notification Routes - Unit Tests", () => {
       expect(body).toEqual({ success: true });
       expect(mockNotificationService.subscribeUser).toHaveBeenCalledWith(
         mockUser.id,
-        subscribeData.email,
-        subscribeData.firstName,
-        subscribeData.lastName,
-        subscribeData.avatar,
+        {
+          email: subscribeData.email,
+          firstName: subscribeData.firstName,
+          lastName: subscribeData.lastName,
+          avatar: subscribeData.avatar,
+        },
       );
     });
 
@@ -218,10 +220,12 @@ describe("Notification Routes - Unit Tests", () => {
       expect(body).toEqual({ success: true });
       expect(mockNotificationService.subscribeUser).toHaveBeenCalledWith(
         mockUser.id,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+        {
+          email: undefined,
+          firstName: undefined,
+          lastName: undefined,
+          avatar: undefined,
+        },
       );
     });
 

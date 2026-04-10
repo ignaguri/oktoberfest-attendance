@@ -7394,16 +7394,12 @@
                     "success": {
                       "type": "boolean"
                     },
-                    "novuRegistered": {
-                      "type": "boolean"
-                    },
                     "error": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "success",
-                    "novuRegistered"
+                    "success"
                   ]
                 }
               }

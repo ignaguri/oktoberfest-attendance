@@ -12,6 +12,7 @@ import {
   useCurrentProfile,
   useSubscribeToNotifications,
 } from "@prostcounter/shared/hooks";
+import { splitFullName } from "@prostcounter/shared/utils";
 import { useEffect, useRef } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -34,15 +35,12 @@ export function NovuAutoSubscriber() {
     const subscribe = async () => {
       try {
         const fullAvatarUrl = getAvatarUrl(profile.avatar_url);
+        const { firstName, lastName } = splitFullName(profile.full_name);
 
         const result = await subscribeToNotifications.mutateAsync({
           ...(profile.email && { email: profile.email }),
-          ...(profile.full_name?.split(" ")[0] && {
-            firstName: profile.full_name.split(" ")[0],
-          }),
-          ...(profile.full_name?.split(" ").slice(1).join(" ") && {
-            lastName: profile.full_name.split(" ").slice(1).join(" "),
-          }),
+          ...(firstName && { firstName }),
+          ...(lastName && { lastName }),
           ...(fullAvatarUrl && { avatar: fullAvatarUrl }),
         });
 

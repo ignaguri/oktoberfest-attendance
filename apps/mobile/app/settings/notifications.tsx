@@ -5,6 +5,7 @@ import {
   useUpdateNotificationPreferences,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { splitFullName } from "@prostcounter/shared/utils";
 import {
   Bell,
   CalendarClock,
@@ -164,22 +165,17 @@ export default function NotificationSettingsScreen() {
     setIsEnabling(true);
 
     try {
-      // Step 1: Request iOS permission
-      logger.info("[Push] Step 1: Requesting iOS permission...");
       const granted = await requestPermission();
       if (!granted) {
-        logger.info("[Push] Step 1 failed: Permission not granted");
         setIsEnabling(false);
         return;
       }
-      logger.info("[Push] Step 1 complete: Permission granted");
 
-      // Step 2: Register for push notifications to get the Expo push token
-      // registerForPushNotifications now returns the token directly
-      logger.info("[Push] Step 2: Getting Expo push token...");
       const token = await registerForPushNotifications();
       if (!token) {
-        logger.error("[Push] Step 2 failed: No token returned");
+        logger.error(
+          "[Push] No token returned from registerForPushNotifications",
+        );
         Alert.alert(
           t("common.status.error"),
           t("profile.notifications.noToken"),
@@ -187,32 +183,21 @@ export default function NotificationSettingsScreen() {
         setIsEnabling(false);
         return;
       }
-      logger.info(
-        "[Push] Step 2 complete: Token obtained: " +
-          token.substring(0, 30) +
-          "...",
-      );
-
-      // Step 3: Subscribe + register token atomically on the backend
-      logger.info("[Push] Step 3: Enabling push on backend (atomic)...");
 
       const fullAvatarUrl = getAvatarUrl(profile?.avatar_url);
-      const firstName = profile?.full_name?.split(" ")[0];
-      const lastName = profile?.full_name?.split(" ").slice(1).join(" ");
+      const { firstName, lastName } = splitFullName(profile?.full_name);
 
-      const enablePayload = {
+      const enableResult = await enablePush.mutateAsync({
         token,
         ...(profile?.email && { email: profile.email }),
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
         ...(fullAvatarUrl && { avatar: fullAvatarUrl }),
-      };
+      });
 
-      const enableResult = await enablePush.mutateAsync(enablePayload);
-
-      if (!enableResult.success || !enableResult.novuRegistered) {
+      if (!enableResult.success) {
         const errorMsg = enableResult.error || "Unknown error";
-        logger.error("[Push] Step 3 failed: " + errorMsg);
+        logger.error("[Push] enablePush failed: " + errorMsg);
         Alert.alert(
           t("common.status.error"),
           `Failed to enable push notifications: ${errorMsg}`,
@@ -220,16 +205,10 @@ export default function NotificationSettingsScreen() {
         setIsEnabling(false);
         return;
       }
-      logger.info("[Push] Step 3 complete: Subscribed and token registered");
 
-      // Mark as registered with Novu in context
       markAsRegisteredWithNovu();
-
-      // Step 4: Update preferences to enable push
-      logger.info("[Push] Step 4: Updating preferences...");
       await updatePreferences.mutateAsync({ pushEnabled: true });
-
-      logger.info("[Push] All steps complete: Push notifications enabled!");
+      logger.info("[Push] Push notifications enabled");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);

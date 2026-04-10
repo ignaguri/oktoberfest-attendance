@@ -67,7 +67,6 @@ export type EnablePushNotificationsInput = z.infer<
 
 export const EnablePushNotificationsResponseSchema = z.object({
   success: z.boolean(),
-  novuRegistered: z.boolean(),
   error: z.string().optional(),
 });
 

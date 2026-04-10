@@ -7,6 +7,7 @@ import {
   IS_PROD,
   PROD_URL,
 } from "@prostcounter/shared/constants";
+import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
@@ -24,19 +25,6 @@ import {
 } from "@/utils/sentry";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
-
-/**
- * @novu/api client-side response validation drifts from the live API shape.
- * When the SDK throws ResponseValidationError, the write has already succeeded
- * server-side — we only need to tolerate the post-hoc client-side check.
- */
-function isNovuResponseValidationError(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const name = (error as { name?: string }).name;
-  if (name === "ResponseValidationError") return true;
-  const message = error instanceof Error ? error.message : String(error);
-  return message.toLowerCase().includes("response validation failed");
-}
 
 /**
  * Notification workflow identifiers
@@ -533,20 +521,20 @@ export class NotificationService {
       );
       return false;
     }
+    const integrationIdentifier = this.fcmIntegrationId;
     try {
-      await this.novu.subscribers.credentials.update(
-        {
-          providerId: ChatOrPushProviderEnum.Fcm,
-          integrationIdentifier: this.fcmIntegrationId,
-          credentials: {
-            deviceTokens: [token],
+      await runNovuWriteTolerantly(() =>
+        this.novu.subscribers.credentials.update(
+          {
+            providerId: ChatOrPushProviderEnum.Fcm,
+            integrationIdentifier,
+            credentials: { deviceTokens: [token] },
           },
-        },
-        userId,
+          userId,
+        ),
       );
       return true;
     } catch (error) {
-      if (isNovuResponseValidationError(error)) return true;
       reportNotificationException("registerFCMToken", error as Error, {
         id: userId,
       });
@@ -567,20 +555,20 @@ export class NotificationService {
       );
       return false;
     }
+    const integrationIdentifier = this.fcmIntegrationId;
     try {
-      await this.novu.subscribers.credentials.update(
-        {
-          providerId: ChatOrPushProviderEnum.Fcm,
-          integrationIdentifier: this.fcmIntegrationId,
-          credentials: {
-            deviceTokens: tokens,
+      await runNovuWriteTolerantly(() =>
+        this.novu.subscribers.credentials.update(
+          {
+            providerId: ChatOrPushProviderEnum.Fcm,
+            integrationIdentifier,
+            credentials: { deviceTokens: tokens },
           },
-        },
-        userId,
+          userId,
+        ),
       );
       return true;
     } catch (error) {
-      if (isNovuResponseValidationError(error)) return true;
       reportNotificationException("updateFCMTokens", error as Error, {
         id: userId,
       });

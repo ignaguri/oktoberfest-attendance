@@ -4099,7 +4099,6 @@ export interface paths {
                     content: {
                         "application/json": {
                             success: boolean;
-                            novuRegistered: boolean;
                             error?: string;
                         };
                     };

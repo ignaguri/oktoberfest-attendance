@@ -210,13 +210,12 @@ app.openapi(subscribeUserRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const result = await notificationService.subscribeUser(
-    user.id,
+  const result = await notificationService.subscribeUser(user.id, {
     email,
     firstName,
     lastName,
     avatar,
-  );
+  });
 
   logger.debug(result, "Subscribe result");
   return c.json(result, 200);

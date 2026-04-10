@@ -1531,7 +1531,6 @@ export function createTypedApiClient(config: ApiClientConfig) {
         avatar?: string;
       }): Promise<{
         success: boolean;
-        novuRegistered: boolean;
         error?: string;
       }> {
         const headers = await getAuthHeaders();
