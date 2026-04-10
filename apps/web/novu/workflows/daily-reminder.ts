@@ -1,10 +1,10 @@
 import { workflow } from "@novu/framework";
+import { NOTIFICATION_PUSH_TYPES } from "@prostcounter/shared/constants";
 import { z } from "zod";
 
 export const DAILY_REMINDER_WORKFLOW_ID = "daily-reminder" as const;
 
 export const dailyReminderPayloadSchema = z.object({
-  userName: z.string().optional().describe("Name of the user"),
   dayOfYear: z.number().describe("Day of year for rotating messages"),
 });
 
@@ -47,14 +47,17 @@ export const dailyReminderWorkflow = workflow(
     await step.push(
       "push-notification",
       async (controls: any) => {
-        const messageIndex = payload.dayOfYear % MOTIVATIONAL_MESSAGES.length;
+        // dayOfYear is 1-based (Jan 1 => 1), so subtract 1 before modulo
+        // to start the rotation at index 0 on day 1.
+        const messageIndex =
+          (payload.dayOfYear - 1) % MOTIVATIONAL_MESSAGES.length;
         const message = MOTIVATIONAL_MESSAGES[messageIndex];
 
         return {
           subject: controls.pushSubject || message.subject,
           body: controls.pushBody || message.body,
           data: {
-            type: "daily-reminder",
+            type: NOTIFICATION_PUSH_TYPES.DAILY_REMINDER,
           },
         };
       },

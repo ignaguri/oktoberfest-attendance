@@ -202,8 +202,8 @@ export class NotificationService {
       if (lastName !== undefined) payload.lastName = lastName;
       if (avatar !== undefined) payload.avatar = avatar;
 
-      logger.info(payload, "About to call Novu subscribers.create");
-      const result = await this.novu.subscribers.create(
+      logger.debug({ userId }, "About to call Novu subscribers.create");
+      await this.novu.subscribers.create(
         payload as {
           subscriberId: string;
           email?: string;
@@ -212,7 +212,7 @@ export class NotificationService {
           avatar?: string;
         },
       );
-      logger.info({ result }, "Novu subscriber create SUCCESS");
+      logger.info({ userId }, "Novu subscriber create SUCCESS");
       return { success: true };
     } catch (error) {
       if (isNovuResponseValidationError(error)) {
