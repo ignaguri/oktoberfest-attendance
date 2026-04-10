@@ -14,6 +14,19 @@ type NotificationPreferences =
   Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
 /**
+ * @novu/api client-side response validation drifts from the live API shape.
+ * When the SDK throws ResponseValidationError, the write has already succeeded
+ * server-side — we only need to tolerate the post-hoc client-side check.
+ */
+function isNovuResponseValidationError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const name = (error as { name?: string }).name;
+  if (name === "ResponseValidationError") return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return message.toLowerCase().includes("response validation failed");
+}
+
+/**
  * Notification Service
  * Handles notification triggering, FCM token management, and user preferences
  */
@@ -68,6 +81,13 @@ export class NotificationService {
       );
       return true;
     } catch (error) {
+      if (isNovuResponseValidationError(error)) {
+        logger.warn(
+          { userId },
+          "Novu SDK ResponseValidationError on FCM register — treating as success (write already applied server-side)",
+        );
+        return true;
+      }
       logger.error({ error }, "Error registering FCM token");
       return false;
     }
@@ -108,6 +128,17 @@ export class NotificationService {
       );
       return { success: true, novuRegistered: true };
     } catch (error) {
+      if (isNovuResponseValidationError(error)) {
+        logger.warn(
+          {
+            userId,
+            tokenPrefix: token.substring(0, 30),
+            integrationIdentifier: this.expoIntegrationId,
+          },
+          "Novu SDK ResponseValidationError on Expo register — treating as success (write already applied server-side)",
+        );
+        return { success: true, novuRegistered: true };
+      }
       logger.error({ error }, "Error registering Expo push token");
       const errorMessage =
         error instanceof Error
@@ -184,6 +215,13 @@ export class NotificationService {
       logger.info({ result }, "Novu subscriber create SUCCESS");
       return { success: true };
     } catch (error) {
+      if (isNovuResponseValidationError(error)) {
+        logger.warn(
+          { userId },
+          "Novu SDK ResponseValidationError on subscriber create — treating as success (write already applied server-side)",
+        );
+        return { success: true };
+      }
       logger.error(
         {
           error,
@@ -245,6 +283,13 @@ export class NotificationService {
           }
           return { success: true };
         } catch (updateError) {
+          if (isNovuResponseValidationError(updateError)) {
+            logger.warn(
+              { userId },
+              "Novu SDK ResponseValidationError on subscriber patch — treating as success",
+            );
+            return { success: true };
+          }
           logger.error(
             { updateError, userId },
             "Failed to update existing Novu subscriber after 409",
