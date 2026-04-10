@@ -19,6 +19,8 @@ type NotificationPreferences =
  */
 export class NotificationService {
   private novu: Novu;
+  private expoIntegrationId: string | undefined;
+  private fcmIntegrationId: string | undefined;
 
   constructor(
     private supabase: SupabaseClient<Database>,
@@ -30,6 +32,8 @@ export class NotificationService {
     this.novu = new Novu({
       secretKey: novuApiKey,
     });
+    this.expoIntegrationId = process.env.NOVU_EXPO_INTEGRATION_ID;
+    this.fcmIntegrationId = process.env.NOVU_FCM_INTEGRATION_ID;
   }
 
   /**
@@ -37,17 +41,30 @@ export class NotificationService {
    * @deprecated Use registerExpoPushToken for Expo apps
    */
   async registerFCMToken(userId: string, token: string): Promise<boolean> {
+    if (!this.fcmIntegrationId) {
+      logger.error(
+        "NOVU_FCM_INTEGRATION_ID is not set; refusing to register FCM token",
+      );
+      return false;
+    }
     try {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Fcm,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
+          integrationIdentifier: this.fcmIntegrationId,
           credentials: {
             deviceTokens: [token],
           },
         },
         userId,
+      );
+      logger.info(
+        {
+          userId,
+          tokenPrefix: token.substring(0, 20),
+          integrationIdentifier: this.fcmIntegrationId,
+        },
+        "FCM token attached to Novu subscriber",
       );
       return true;
     } catch (error) {
@@ -64,17 +81,30 @@ export class NotificationService {
     userId: string,
     token: string,
   ): Promise<{ success: boolean; novuRegistered: boolean; error?: string }> {
+    if (!this.expoIntegrationId) {
+      const msg =
+        "NOVU_EXPO_INTEGRATION_ID is not set; refusing to register Expo push token";
+      logger.error(msg);
+      return { success: false, novuRegistered: false, error: msg };
+    }
     try {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Expo,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
+          integrationIdentifier: this.expoIntegrationId,
           credentials: {
             deviceTokens: [token],
           },
         },
         userId,
+      );
+      logger.info(
+        {
+          userId,
+          tokenPrefix: token.substring(0, 30),
+          integrationIdentifier: this.expoIntegrationId,
+        },
+        "Expo push token attached to Novu subscriber",
       );
       return { success: true, novuRegistered: true };
     } catch (error) {
@@ -183,11 +213,47 @@ export class NotificationService {
         errorMessage.toLowerCase().includes("already exists");
 
       if (is409) {
-        // According to Novu SDK, calling create on an existing subscriber updates it
-        // But some versions may throw 409. In that case, we consider it a success
-        // since the subscriber already exists and can receive notifications
-        logger.debug("Subscriber already exists - treating as success");
-        return { success: true };
+        // Subscriber exists — actively update so profile fields stay fresh.
+        // We don't want to rely on "create updates on conflict" — some SDK
+        // versions throw 409 without applying the update.
+        try {
+          const updatePayload: Record<string, unknown> = {};
+          if (userEmail !== undefined) updatePayload.email = userEmail;
+          if (firstName !== undefined) updatePayload.firstName = firstName;
+          if (lastName !== undefined) updatePayload.lastName = lastName;
+          if (avatar !== undefined) updatePayload.avatar = avatar;
+
+          if (Object.keys(updatePayload).length > 0) {
+            await this.novu.subscribers.patch(
+              updatePayload as {
+                email?: string;
+                firstName?: string;
+                lastName?: string;
+                avatar?: string;
+              },
+              userId,
+            );
+            logger.info(
+              { userId },
+              "Novu subscriber already existed — updated profile",
+            );
+          } else {
+            logger.debug(
+              { userId },
+              "Novu subscriber already existed — nothing to update",
+            );
+          }
+          return { success: true };
+        } catch (updateError) {
+          logger.error(
+            { updateError, userId },
+            "Failed to update existing Novu subscriber after 409",
+          );
+          // Still return success — the subscriber exists and can receive
+          // notifications. Credential update (the actual push path) will be
+          // attempted next and is the real signal.
+          return { success: true };
+        }
       }
 
       // Log full error details for non-409 errors
@@ -203,6 +269,45 @@ export class NotificationService {
       }
       return { success: false, error: errorMessage };
     }
+  }
+
+  /**
+   * Atomic push enable: ensure subscriber exists AND attach push token in
+   * one server-side operation. The client used to call subscribe then
+   * registerToken separately, which left room for partial state (subscriber
+   * created but no token attached). Callers should prefer this method.
+   */
+  async subscribeAndRegisterToken(
+    userId: string,
+    token: string,
+    profile?: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    },
+  ): Promise<{
+    success: boolean;
+    novuRegistered: boolean;
+    error?: string;
+  }> {
+    const subscribeResult = await this.subscribeUser(
+      userId,
+      profile?.email,
+      profile?.firstName,
+      profile?.lastName,
+      profile?.avatar,
+    );
+
+    if (!subscribeResult.success) {
+      return {
+        success: false,
+        novuRegistered: false,
+        error: subscribeResult.error ?? "Failed to subscribe user",
+      };
+    }
+
+    return this.registerPushToken(userId, token);
   }
 
   /**

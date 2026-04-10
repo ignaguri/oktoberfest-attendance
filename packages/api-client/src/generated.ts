@@ -4059,6 +4059,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/notifications/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Enable push notifications (atomic)
+         * @description Subscribes the user to Novu and attaches the device's push token in a single server-side operation. Prefer this over calling /subscribe and /token separately.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        token: string;
+                        email?: string | "";
+                        firstName?: string;
+                        lastName?: string;
+                        avatar?: string | "";
+                    };
+                };
+            };
+            responses: {
+                /** @description Push notifications enabled successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                            novuRegistered: boolean;
+                            error?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/notifications/subscribe": {
         parameters: {
             query?: never;

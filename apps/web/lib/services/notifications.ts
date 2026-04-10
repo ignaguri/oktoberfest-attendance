@@ -49,6 +49,8 @@ export type NotificationWorkflowId =
 export class NotificationService {
   private supabase;
   public novu: Novu; // Make novu public so it can be accessed
+  private expoIntegrationId: string | undefined;
+  private fcmIntegrationId: string | undefined;
 
   constructor() {
     // Use direct service role client to access all user data for notifications
@@ -73,6 +75,8 @@ export class NotificationService {
     this.novu = new Novu({
       secretKey: novuApiKey,
     });
+    this.expoIntegrationId = process.env.NOVU_EXPO_INTEGRATION_ID;
+    this.fcmIntegrationId = process.env.NOVU_FCM_INTEGRATION_ID;
   }
 
   /**
@@ -508,12 +512,19 @@ export class NotificationService {
    * Register FCM device token with Novu subscriber
    */
   async registerFCMToken(userId: string, token: string): Promise<boolean> {
+    if (!this.fcmIntegrationId) {
+      reportNotificationException(
+        "registerFCMToken",
+        new Error("NOVU_FCM_INTEGRATION_ID is not set"),
+        { id: userId },
+      );
+      return false;
+    }
     try {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Fcm,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
+          integrationIdentifier: this.fcmIntegrationId,
           credentials: {
             deviceTokens: [token],
           },
@@ -534,12 +545,19 @@ export class NotificationService {
    * This replaces all existing tokens with the new ones
    */
   async updateFCMTokens(userId: string, tokens: string[]): Promise<boolean> {
+    if (!this.fcmIntegrationId) {
+      reportNotificationException(
+        "updateFCMTokens",
+        new Error("NOVU_FCM_INTEGRATION_ID is not set"),
+        { id: userId },
+      );
+      return false;
+    }
     try {
       await this.novu.subscribers.credentials.update(
         {
           providerId: ChatOrPushProviderEnum.Fcm,
-          // Empty string = use Novu's default integration for this provider
-          integrationIdentifier: "",
+          integrationIdentifier: this.fcmIntegrationId,
           credentials: {
             deviceTokens: tokens,
           },

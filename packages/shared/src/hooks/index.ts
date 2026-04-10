@@ -100,11 +100,11 @@ export {
 
 // Group message hooks
 export {
+  useDeleteMessage,
   useGroupMessages,
   useMessageFeed,
   usePostMessage,
   useUpdateMessage,
-  useDeleteMessage,
 } from "./useGroupMessages";
 
 // Activity feed hooks
@@ -143,6 +143,7 @@ export { useTipCalculation } from "./useTipCalculation";
 export {
   type NotificationPreferencesResponse,
   type UpdateNotificationPreferencesInput,
+  useEnablePushNotifications,
   useNotificationPreferences,
   useRegisterFCMToken,
   useSubscribeToNotifications,

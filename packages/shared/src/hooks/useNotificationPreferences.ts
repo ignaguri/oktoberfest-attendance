@@ -155,6 +155,27 @@ export function useRegisterFCMToken() {
 }
 
 /**
+ * Hook to atomically enable push notifications — subscribes the user to
+ * Novu AND attaches the push token in a single backend call. Prefer this
+ * over calling useSubscribeToNotifications + useRegisterFCMToken.
+ */
+export function useEnablePushNotifications() {
+  const apiClient = useApiClient();
+
+  return useMutation(
+    async (data: {
+      token: string;
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    }) => {
+      return await apiClient.notifications.enablePush(data);
+    },
+  );
+}
+
+/**
  * Hook to subscribe user to Novu notifications
  */
 export function useSubscribeToNotifications() {

@@ -1,8 +1,7 @@
 import {
   useCurrentProfile,
+  useEnablePushNotifications,
   useNotificationPreferences,
-  useRegisterFCMToken,
-  useSubscribeToNotifications,
   useUpdateNotificationPreferences,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -56,9 +55,8 @@ export default function NotificationSettingsScreen() {
 
   const updatePreferences = useUpdateNotificationPreferences();
 
-  // Hooks for Novu registration
-  const registerToken = useRegisterFCMToken();
-  const subscribeToNotifications = useSubscribeToNotifications();
+  // Atomic subscribe + token registration
+  const enablePush = useEnablePushNotifications();
 
   // Get current user profile
   const { data: profile } = useCurrentProfile();
@@ -195,58 +193,40 @@ export default function NotificationSettingsScreen() {
           "...",
       );
 
-      // Step 3: Subscribe user to Novu (creates subscriber)
-      logger.info("[Push] Step 3: Subscribing to Novu...");
+      // Step 3: Subscribe + register token atomically on the backend
+      logger.info("[Push] Step 3: Enabling push on backend (atomic)...");
 
-      // Get full avatar URL using the utility (constructs Supabase storage URL)
       const fullAvatarUrl = getAvatarUrl(profile?.avatar_url);
+      const firstName = profile?.full_name?.split(" ")[0];
+      const lastName = profile?.full_name?.split(" ").slice(1).join(" ");
 
-      const subscribePayload = {
+      const enablePayload = {
+        token,
         ...(profile?.email && { email: profile.email }),
-        ...(profile?.full_name?.split(" ")[0] && {
-          firstName: profile.full_name.split(" ")[0],
-        }),
-        ...(profile?.full_name?.split(" ").slice(1).join(" ") && {
-          lastName: profile.full_name.split(" ").slice(1).join(" "),
-        }),
+        ...(firstName && { firstName }),
+        ...(lastName && { lastName }),
         ...(fullAvatarUrl && { avatar: fullAvatarUrl }),
       };
-      logger.info(
-        "[Push] Subscribe payload: " + JSON.stringify(subscribePayload),
-      );
-      const subscribeResult =
-        await subscribeToNotifications.mutateAsync(subscribePayload);
 
-      if (!subscribeResult.success) {
-        const errorMsg = subscribeResult.error || "Unknown error";
+      const enableResult = await enablePush.mutateAsync(enablePayload);
+
+      if (!enableResult.success || !enableResult.novuRegistered) {
+        const errorMsg = enableResult.error || "Unknown error";
         logger.error("[Push] Step 3 failed: " + errorMsg);
-        Alert.alert(t("common.status.error"), `Subscribe failed: ${errorMsg}`);
-        setIsEnabling(false);
-        return;
-      }
-      logger.info("[Push] Step 3 complete: Subscribed to Novu");
-
-      // Step 4: Register token with Novu
-      logger.info("[Push] Step 4: Registering token with Novu...");
-      const tokenResult = await registerToken.mutateAsync(token);
-
-      if (!tokenResult.success || !tokenResult.novuRegistered) {
-        const errorMsg = tokenResult.error || "Unknown error";
-        logger.error("[Push] Step 4 failed: " + errorMsg);
         Alert.alert(
           t("common.status.error"),
-          `Token registration failed: ${errorMsg}`,
+          `Failed to enable push notifications: ${errorMsg}`,
         );
         setIsEnabling(false);
         return;
       }
-      logger.info("[Push] Step 4 complete: Token registered with Novu");
+      logger.info("[Push] Step 3 complete: Subscribed and token registered");
 
       // Mark as registered with Novu in context
       markAsRegisteredWithNovu();
 
-      // Step 5: Update preferences to enable push
-      logger.info("[Push] Step 5: Updating preferences...");
+      // Step 4: Update preferences to enable push
+      logger.info("[Push] Step 4: Updating preferences...");
       await updatePreferences.mutateAsync({ pushEnabled: true });
 
       logger.info("[Push] All steps complete: Push notifications enabled!");
