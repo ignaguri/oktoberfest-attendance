@@ -32,3 +32,6 @@ export { isNovuResponseValidationError, runNovuWriteTolerantly } from "./novu";
 
 // Name helpers
 export { splitFullName } from "./split-full-name";
+
+// Festival status
+export { getFestivalStatus } from "./festival-status";
