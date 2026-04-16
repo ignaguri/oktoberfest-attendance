@@ -5,10 +5,12 @@
  * Uses the shared hooks (useTutorialStatus, useCompleteTutorial) for persistence.
  */
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useCompleteTutorial,
   useTutorialStatus,
 } from "@prostcounter/shared/hooks";
+import { getFestivalStatus } from "@prostcounter/shared/utils";
 import { type Href, useRouter } from "expo-router";
 import {
   createContext,
@@ -88,6 +90,7 @@ interface TutorialProviderProps {
 function TutorialProviderInner({ children }: TutorialProviderProps) {
   const { isAuthenticated } = useAuth();
   const { data: tutorialStatus, loading: isLoading } = useTutorialStatus();
+  const { currentFestival } = useFestival();
   const completeTutorial = useCompleteTutorial();
   const router = useRouter();
 
@@ -100,6 +103,9 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
   const targetRefs = useRef<Map<string, View>>(new Map());
 
   const isCompleted = tutorialStatus?.tutorial_completed ?? false;
+  const isFestivalActive = currentFestival
+    ? getFestivalStatus(currentFestival) === "active"
+    : false;
 
   // Auto-start tutorial for new users (only once per session)
   useEffect(() => {
@@ -112,7 +118,8 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
       tutorialStatus !== null &&
       !isCompleted &&
       !hasAutoStarted &&
-      !isActive
+      !isActive &&
+      isFestivalActive
     ) {
       const timer = setTimeout(() => {
         setIsActive(true);
@@ -129,6 +136,7 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     isCompleted,
     hasAutoStarted,
     isActive,
+    isFestivalActive,
   ]);
 
   const currentStep = useMemo(

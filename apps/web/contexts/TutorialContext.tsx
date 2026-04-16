@@ -1,5 +1,6 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import type { ReactNode } from "react";
 import {
   createContext,
@@ -11,6 +12,7 @@ import {
 
 import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
 import { useCompleteTutorial } from "@/hooks/useProfile";
+import { getFestivalStatus } from "@/lib/festivalConstants";
 import { type TutorialStep, tutorialSteps } from "@/lib/tutorialSteps";
 
 interface TutorialContextType {
@@ -49,6 +51,10 @@ export function TutorialProvider({
   const [isCompleted, setIsCompleted] = useState(initialTutorialCompleted);
   const [visibleSteps, setVisibleSteps] = useState<TutorialStep[]>([]);
   const { mutateAsync: completeTutorial } = useCompleteTutorial();
+  const { currentFestival } = useFestival();
+  const isFestivalActive = currentFestival
+    ? getFestivalStatus(currentFestival) === "active"
+    : false;
 
   // Sync internal state with prop changes (when cache is invalidated)
   useEffect(() => {
@@ -182,7 +188,7 @@ export function TutorialProvider({
 
   // Auto-start tutorial for new users (only after status is loaded)
   useEffect(() => {
-    if (!isLoadingStatus && !isCompleted && !isActive) {
+    if (!isLoadingStatus && !isCompleted && !isActive && isFestivalActive) {
       // Small delay to ensure page is loaded
       const timer = setTimeout(() => {
         startTutorial();
@@ -190,7 +196,7 @@ export function TutorialProvider({
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingStatus, isCompleted, isActive]);
+  }, [isLoadingStatus, isCompleted, isActive, isFestivalActive]);
 
   const value: TutorialContextType = {
     isActive,

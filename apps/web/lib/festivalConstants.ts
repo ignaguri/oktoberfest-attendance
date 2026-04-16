@@ -1,7 +1,9 @@
 import type { Festival } from "@prostcounter/shared/schemas";
-import { endOfDay, isBefore, isWithinInterval, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 
 import type { FestivalTent } from "./types";
+
+export { getFestivalStatus } from "@prostcounter/shared/utils";
 
 // Default fallback values for when festival data is not available
 const DEFAULT_BEER_COST = 16.2;
@@ -24,29 +26,6 @@ export function getFestivalConstants(festival: Festival): FestivalConstants {
     festivalName: festival.name,
     festivalLocation: festival.location,
   };
-}
-
-function isFestivalActive(festival: Festival): boolean {
-  const now = new Date();
-  const startDate = parseISO(festival.startDate);
-  const endDate = endOfDay(parseISO(festival.endDate));
-
-  return isWithinInterval(now, { start: startDate, end: endDate });
-}
-
-function isFestivalUpcoming(festival: Festival): boolean {
-  const now = new Date();
-  const startDate = parseISO(festival.startDate);
-
-  return isBefore(now, startDate);
-}
-
-export function getFestivalStatus(
-  festival: Festival,
-): "upcoming" | "active" | "ended" {
-  if (isFestivalUpcoming(festival)) return "upcoming";
-  if (isFestivalActive(festival)) return "active";
-  return "ended";
 }
 
 // Helper function to get beer cost for a specific tent at a specific festival
