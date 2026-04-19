@@ -169,7 +169,10 @@ final class AppViewModel: ObservableObject {
             )
 
             status = .idle
-        } catch APIError.noSession {
+        } catch APIError.noSession, APIError.unauthorized {
+            // .unauthorized means the refresh attempt in APIClient.authorize
+            // did not recover the session; retrying won't help. Fall through
+            // to the "sign in on iPhone first" UX.
             status = .noSession
         } catch {
             status = .needsRetry
@@ -212,6 +215,11 @@ final class AppViewModel: ObservableObject {
                 if shouldPromptAfter, let tentId = tentAtLogTime {
                     promptingCrowdForTentId = tentId
                 }
+                return
+            } catch APIError.noSession, APIError.unauthorized {
+                // Refresh in APIClient.authorize already failed — retrying
+                // won't help. Surface the sign-in prompt immediately.
+                status = .noSession
                 return
             } catch {
                 lastError = error
