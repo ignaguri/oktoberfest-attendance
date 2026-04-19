@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import SwiftUI
 
@@ -56,14 +57,18 @@ final class AppViewModel: ObservableObject {
     // festival beer price so all drink types pass the check even without a
     // per-drink-type price resolver on the watch (MVP limitation).
     @Published private(set) var beerCostCents: Int = 0
+    /// GPS-nearby tents fetched during bootstrap; used by TentPickerView.
+    @Published private(set) var nearbyTents: [NearbyTent] = []
 
     private let api: APIClient
     private let tokenStore: TokenStore
+    private let locationService: LocationService
     private let dateFormatter: DateFormatter
 
-    init(api: APIClient = APIClient(), tokenStore: TokenStore = TokenStore()) {
+    init(api: APIClient = APIClient(), tokenStore: TokenStore = TokenStore(), locationService: LocationService = LocationService()) {
         self.api = api
         self.tokenStore = tokenStore
+        self.locationService = locationService
         let f = DateFormatter()
         f.calendar = .init(identifier: .iso8601)
         f.locale = .init(identifier: "en_US_POSIX")
@@ -100,11 +105,30 @@ final class AppViewModel: ObservableObject {
 
             if let a = attendance {
                 drinkCount = a.drinkCount
-                currentTentId = a.tentIds.first
             } else {
                 drinkCount = 0
             }
             beerCostCents = Int(((festival.beerCost ?? 0) * 100).rounded())
+
+            // Fetch nearby tents using GPS; non-fatal if location is denied or fails.
+            var fetchedNearby: [NearbyTent] = []
+            if let location = try? await locationService.currentLocation() {
+                fetchedNearby = (try? await api.fetchNearbyTents(
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude,
+                    festivalId: festId
+                )) ?? []
+            }
+            nearbyTents = fetchedNearby
+
+            // Priority: today's attendance tent (user checked in on phone) → GPS-nearest → none.
+            let resolved = TentResolver.resolve(
+                attendance: attendance,
+                nearbyTents: fetchedNearby
+            )
+            currentTentId = resolved.tentId
+            currentTentName = resolved.tentName
+
             status = .idle
         } catch APIError.noSession {
             status = .noSession
@@ -150,6 +174,12 @@ final class AppViewModel: ObservableObject {
         }
         print("logDrink failed after 3 attempts: \(String(describing: lastError))")
         status = .needsRetry
+    }
+
+    /// Manually override the active tent (called from TentPickerView).
+    func changeTent(to tent: NearbyTent) {
+        currentTentId = tent.tentId
+        currentTentName = tent.tentName
     }
 
     func acknowledgeSuccess() {

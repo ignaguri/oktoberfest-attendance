@@ -28,7 +28,22 @@ extension APIClient {
     func logConsumption(_ body: LogConsumptionRequest) async throws -> AttendanceWithTotals {
         try await post("consumption", body: body)
     }
+
+    // GET /tents/nearby?latitude=...&longitude=...&festivalId=...&radiusMeters=250
+    // Server expects string-coerced query params (Zod coerce). Returns pre-sorted by distance.
+    func fetchNearbyTents(latitude: Double, longitude: Double, festivalId: String) async throws -> [NearbyTent] {
+        let envelope: NearbyTentsResponse = try await get(
+            "tents/nearby",
+            query: [
+                "latitude": String(latitude),
+                "longitude": String(longitude),
+                "festivalId": festivalId,
+                "radiusMeters": "250"
+            ]
+        )
+        return envelope.tents
+    }
+
 }
 
-// Slice 4 will add: fetchNearbyTents, fetchTodayReservations.
 // Slice 5 will add: postCrowdReport.

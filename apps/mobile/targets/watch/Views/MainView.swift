@@ -4,13 +4,25 @@ import WatchKit
 struct MainView: View {
     @StateObject private var viewModel = AppViewModel()
     @State private var showingDrinkPicker = false
+    @State private var showingTentPicker = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
-                Text(viewModel.currentTentName)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                Button {
+                    showingTentPicker = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(viewModel.currentTentName)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
 
                 Button {
                     Task {
@@ -55,6 +67,12 @@ struct MainView: View {
                         WKInterfaceDevice.current().play(.success)
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $showingTentPicker) {
+            TentPickerView(tents: viewModel.nearbyTents) { tent in
+                viewModel.changeTent(to: tent)
+                showingTentPicker = false
             }
         }
         .task { await viewModel.bootstrap() }
