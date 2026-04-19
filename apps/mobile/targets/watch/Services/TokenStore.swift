@@ -70,6 +70,5 @@ final class TokenStore {
         }
         let epoch = session.expiresAt.timeIntervalSince1970
         defaults.set(String(Int(epoch)), forKey: "expiresAt")
-        defaults.synchronize()
     }
 }

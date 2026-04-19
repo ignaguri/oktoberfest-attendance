@@ -57,7 +57,6 @@ final class WatchSessionReceiver: NSObject {
                 log.error("Skipping key \(key, privacy: .public) with unsupported type \(String(describing: type(of: value)), privacy: .public)")
             }
         }
-        defaults.synchronize()
         log.info("Session data received and stored.")
     }
 }
