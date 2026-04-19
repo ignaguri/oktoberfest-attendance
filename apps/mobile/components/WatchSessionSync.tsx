@@ -2,41 +2,38 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { clearSessionOnWatch, syncSessionToWatch } from "@/lib/watch-sync";
 
 export function WatchSessionSync() {
+  const { session } = useAuth();
   const { currentFestival } = useFestival();
 
   useEffect(() => {
     if (Platform.OS !== "ios") return;
 
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
-        clearSessionOnWatch();
-        return;
-      }
-      if (
-        (event === "SIGNED_IN" ||
-          event === "TOKEN_REFRESHED" ||
-          event === "USER_UPDATED" ||
-          event === "INITIAL_SESSION") &&
-        session?.access_token &&
-        session.refresh_token &&
-        session.user?.id
-      ) {
-        syncSessionToWatch({
-          accessToken: session.access_token,
-          refreshToken: session.refresh_token,
-          userId: session.user.id,
-          currentFestivalId: currentFestival?.id ?? null,
-          expiresAt: session.expires_at ?? 0,
-        });
-      }
-    });
+    if (!session) {
+      clearSessionOnWatch();
+      return;
+    }
 
-    return () => data.subscription.unsubscribe();
-  }, [currentFestival?.id]);
+    const { access_token, refresh_token, expires_at, user } = session;
+    if (!access_token || !refresh_token || !user?.id) return;
+
+    syncSessionToWatch({
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      userId: user.id,
+      currentFestivalId: currentFestival?.id ?? null,
+      expiresAt: expires_at ?? 0,
+    });
+  }, [
+    session?.access_token,
+    session?.refresh_token,
+    session?.expires_at,
+    session?.user?.id,
+    currentFestival?.id,
+  ]);
 
   return null;
 }

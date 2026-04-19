@@ -5,7 +5,7 @@ import WatchConnectivity
 
 @MainActor
 final class AppViewModel: ObservableObject {
-    enum DrinkType: String, CaseIterable, Identifiable {
+    enum DrinkType: String, CaseIterable, Identifiable, Encodable {
         case beer = "beer"
         case radler = "radler"
         case alcoholFree = "alcohol_free"
@@ -50,7 +50,7 @@ final class AppViewModel: ObservableObject {
 
     /// Watch-side crowd levels. Server enum is empty|moderate|crowded|full;
     /// we skip "full" to keep the small-screen picker to 3 actions + Skip.
-    enum CrowdLevel: String, CaseIterable, Identifiable {
+    enum CrowdLevel: String, CaseIterable, Identifiable, Encodable {
         case empty = "empty"
         case busy = "moderate"
         case packed = "crowded"
@@ -122,26 +122,21 @@ final class AppViewModel: ObservableObject {
                 isoDate: todayString
             )
             async let festivalTask = api.fetchFestival(id: festId)
-
-            let attendance = try await attendanceTask
-            let festival = try await festivalTask
-
-            if let a = attendance {
-                drinkCount = a.drinkCount
-            } else {
-                drinkCount = 0
-            }
-            beerCostCents = Int(((festival.beerCost ?? 0) * 100).rounded())
-
-            // Fetch nearby tents using GPS; non-fatal if location is denied or fails.
-            var fetchedNearby: [NearbyTent] = []
-            if let location = try? await locationService.currentLocation() {
-                fetchedNearby = (try? await api.fetchNearbyTents(
+            async let nearbyTask: [NearbyTent] = {
+                guard let location = try? await locationService.currentLocation() else { return [] }
+                return (try? await api.fetchNearbyTents(
                     latitude: location.coordinate.latitude,
                     longitude: location.coordinate.longitude,
                     festivalId: festId
                 )) ?? []
-            }
+            }()
+
+            let attendance = try await attendanceTask
+            let festival = try await festivalTask
+            let fetchedNearby = await nearbyTask
+
+            drinkCount = attendance?.drinkCount ?? 0
+            beerCostCents = Int(((festival.beerCost ?? 0) * 100).rounded())
             nearbyTents = fetchedNearby
 
             // Priority: today's attendance tent (user checked in on phone) → GPS-nearest → none.
@@ -182,13 +177,12 @@ final class AppViewModel: ObservableObject {
             festivalId: festId,
             date: todayString,
             tentId: tentAtLogTime,
-            drinkType: type.rawValue,
+            drinkType: type,
             pricePaidCents: beerCostCents
         )
 
-        var attempts = 0
         var lastError: Error?
-        while attempts < 3 {
+        for attempt in 1...3 {
             do {
                 let result = try await api.logConsumption(body)
                 drinkCount = result.drinkCount
@@ -200,9 +194,8 @@ final class AppViewModel: ObservableObject {
                 return
             } catch {
                 lastError = error
-                attempts += 1
-                if attempts < 3 {
-                    let delayMs: UInt64 = attempts == 1 ? 500 : 2_000
+                if attempt < 3 {
+                    let delayMs: UInt64 = attempt == 1 ? 500 : 2_000
                     try? await Task.sleep(nanoseconds: delayMs * 1_000_000)
                 }
             }
@@ -239,7 +232,7 @@ final class AppViewModel: ObservableObject {
         do {
             try await api.postCrowdReport(
                 tentId: tentId,
-                body: CrowdReportRequest(festivalId: festId, crowdLevel: level.rawValue)
+                body: CrowdReportRequest(festivalId: festId, crowdLevel: level)
             )
         } catch {
             print("submitCrowdReport failed: \(error)")

@@ -4,8 +4,13 @@ struct LogConsumptionRequest: Encodable {
     let festivalId: String
     let date: String            // yyyy-MM-dd
     let tentId: String?
-    let drinkType: String       // "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other"
+    let drinkType: AppViewModel.DrinkType
     let pricePaidCents: Int     // required by server; send festival.beerCost so paid >= server-derived base
+}
+
+struct CrowdReportRequest: Encodable {
+    let festivalId: String
+    let crowdLevel: AppViewModel.CrowdLevel
 }
 
 extension APIClient {
@@ -29,8 +34,7 @@ extension APIClient {
         try await post("consumption", body: body)
     }
 
-    // GET /tents/nearby?latitude=...&longitude=...&festivalId=...&radiusMeters=250
-    // Server expects string-coerced query params (Zod coerce). Returns pre-sorted by distance.
+    // GET /tents/nearby — server pre-sorts by distance.
     func fetchNearbyTents(latitude: Double, longitude: Double, festivalId: String) async throws -> [NearbyTent] {
         let envelope: NearbyTentsResponse = try await get(
             "tents/nearby",
@@ -44,16 +48,10 @@ extension APIClient {
         return envelope.tents
     }
 
-
-    // POST /tents/{tentId}/crowd-report — body { festivalId, crowdLevel, waitTimeMinutes? }
-    // Server returns { report: {...} }; we ignore the response body (fire-and-forget on watch).
+    // POST /tents/{tentId}/crowd-report — body { festivalId, crowdLevel, waitTimeMinutes? }.
+    // We ignore the response body (fire-and-forget on watch).
     func postCrowdReport(tentId: String, body: CrowdReportRequest) async throws {
         struct Envelope: Decodable {}
         let _: Envelope = try await post("tents/\(tentId)/crowd-report", body: body)
     }
-}
-
-struct CrowdReportRequest: Encodable {
-    let festivalId: String
-    let crowdLevel: String  // "empty" | "moderate" | "crowded" | "full"
 }

@@ -43,15 +43,13 @@ enum TentResolver {
     }
 }
 
-// MARK: - Debug assertions (exercised in DEBUG builds via Preview)
-
 #if DEBUG
 import SwiftUI
 
 extension TentResolver {
-    /// Runs the canonical test scenarios at preview-render time in Debug builds.
+    /// Runs the canonical test scenarios at preview-render time.
     /// No XCTest target exists in the @bacons/apple-targets watch scaffold,
-    /// so assertions ride along with SwiftUI previews for now.
+    /// so assertions ride along with SwiftUI previews.
     static func runAssertions() {
         let tentA = NearbyTent(tentId: "tent-a", tentName: "Hofbräu", category: nil,
                                latitude: 48.1, longitude: 11.5, distanceMeters: 10, beerPrice: 14.0)

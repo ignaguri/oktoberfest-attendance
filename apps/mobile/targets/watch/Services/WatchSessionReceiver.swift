@@ -69,17 +69,14 @@ extension WatchSessionReceiver: WCSessionDelegate {
         }
     }
 
-    // updateApplicationContext: simulator-compatible persistent delivery.
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         storeReceived(applicationContext)
     }
 
-    // sendMessage: real-time delivery when watch app is in foreground.
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         storeReceived(message)
     }
 
-    // transferUserInfo: legacy queued delivery (backward compatibility).
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         storeReceived(userInfo)
     }
