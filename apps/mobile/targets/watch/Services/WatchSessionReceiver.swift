@@ -1,5 +1,8 @@
 import Foundation
+import os
 import WatchConnectivity
+
+private let log = Logger(subsystem: "com.prostcounter.watch", category: "receiver")
 
 /// Receives session data forwarded from the iPhone via WCSession and writes it
 /// into the shared App Group UserDefaults so TokenStore can read it.
@@ -51,11 +54,11 @@ final class WatchSessionReceiver: NSObject {
             } else if let number = value as? NSNumber {
                 defaults.set(String(describing: number), forKey: key)
             } else {
-                print("[WatchSessionReceiver] Skipping key \(key) with unsupported type \(type(of: value))")
+                log.error("Skipping key \(key, privacy: .public) with unsupported type \(String(describing: type(of: value)), privacy: .public)")
             }
         }
         defaults.synchronize()
-        print("[WatchSessionReceiver] Session data received and stored.")
+        log.info("Session data received and stored.")
     }
 }
 
@@ -69,7 +72,7 @@ extension WatchSessionReceiver: WCSessionDelegate {
         error: Error?
     ) {
         if let error = error {
-            print("[WatchSessionReceiver] Activation error: \(error)")
+            log.error("Activation error: \(error.localizedDescription, privacy: .public)")
             return
         }
         // Apply any context delivered while the session was not yet active.

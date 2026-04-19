@@ -15,7 +15,10 @@ const path = require("path");
 const BRIDGE_CLASS_SNIPPET = `
 // MARK: - WatchSessionBridge (injected by withWatchSessionBridge.js)
 
+import os
 import WatchConnectivity
+
+private let watchBridgeLog = Logger(subsystem: "com.prostcounter.watch", category: "bridge")
 
 /// Bridges App Group UserDefaults changes on the iPhone to the paired Apple Watch
 /// via WCSession.updateApplicationContext (simulator-compatible) with a sendMessage
@@ -38,9 +41,9 @@ final class WatchSessionBridge: NSObject {
 
   private override init() {
     super.init()
-    NSLog("[WatchSessionBridge] init")
+    watchBridgeLog.info("init")
     guard WCSession.isSupported() else {
-      NSLog("[WatchSessionBridge] WCSession not supported")
+      watchBridgeLog.error("WCSession not supported")
       return
     }
     defaults = UserDefaults(suiteName: appGroup)
@@ -94,12 +97,12 @@ final class WatchSessionBridge: NSObject {
 
     let payload: [String: Any] = stringPayload
 
-    NSLog("[WatchSessionBridge] forwarding payload with keys: \\(payload.keys.sorted())")
+    watchBridgeLog.info("forwarding payload with keys: \\(payload.keys.sorted(), privacy: .public)")
 
     // Fast path: send a message directly when the watch app is in the foreground.
     if WCSession.default.isReachable {
       WCSession.default.sendMessage(payload, replyHandler: nil, errorHandler: { error in
-        NSLog("[WatchSessionBridge] sendMessage error: \\(error)")
+        watchBridgeLog.error("sendMessage error: \\(error.localizedDescription, privacy: .public)")
       })
     }
 
@@ -107,9 +110,9 @@ final class WatchSessionBridge: NSObject {
     // the latest context to the watch app on next foreground (replaces previous value).
     do {
       try WCSession.default.updateApplicationContext(payload)
-      NSLog("[WatchSessionBridge] updateApplicationContext succeeded")
+      watchBridgeLog.info("updateApplicationContext succeeded")
     } catch {
-      NSLog("[WatchSessionBridge] updateApplicationContext error: \\(error)")
+      watchBridgeLog.error("updateApplicationContext error: \\(error.localizedDescription, privacy: .public)")
     }
   }
 
@@ -128,10 +131,10 @@ extension WatchSessionBridge: WCSessionDelegate {
     error: Error?
   ) {
     if let error = error {
-      NSLog("[WatchSessionBridge] Activation error: \\(error)")
+      watchBridgeLog.error("Activation error: \\(error.localizedDescription, privacy: .public)")
       return
     }
-    NSLog("[WatchSessionBridge] activation complete: state=\\(activationState.rawValue) paired=\\(WCSession.default.isPaired) installed=\\(WCSession.default.isWatchAppInstalled) reachable=\\(WCSession.default.isReachable)")
+    watchBridgeLog.info("activation complete: state=\\(activationState.rawValue, privacy: .public) paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) reachable=\\(WCSession.default.isReachable, privacy: .public)")
     if activationState == .activated {
       forwardToWatch()
     }
@@ -150,7 +153,7 @@ extension WatchSessionBridge: WCSessionDelegate {
   /// We forward it to JavaScript as a device event so React Query can
   /// invalidate cached attendance data and trigger a pull sync.
   func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-    NSLog("[WatchSessionBridge] didReceiveMessage: \\(message)")
+    watchBridgeLog.info("didReceiveMessage: \\(message, privacy: .public)")
     guard let type = message["type"] as? String else { return }
     DispatchQueue.main.async {
       if let bridge = RCTBridge.current() {
@@ -158,9 +161,9 @@ extension WatchSessionBridge: WCSessionDelegate {
           withName: "watchRemoteEvent",
           body: ["type": type]
         )
-        NSLog("[WatchSessionBridge] dispatched watchRemoteEvent type=\\(type) to RN")
+        watchBridgeLog.info("dispatched watchRemoteEvent type=\\(type, privacy: .public) to RN")
       } else {
-        NSLog("[WatchSessionBridge] no RCTBridge.current() — event dropped")
+        watchBridgeLog.error("no RCTBridge.current() — event dropped")
       }
     }
   }
