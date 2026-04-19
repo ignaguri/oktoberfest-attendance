@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct watchEntry: App {
+struct WatchEntry: App {
     init() {
         // Activate WCSession receiver so the watch can persist session tokens
         // forwarded from the iPhone bridge (updateApplicationContext +
