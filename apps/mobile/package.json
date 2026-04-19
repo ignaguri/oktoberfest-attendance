@@ -39,6 +39,7 @@
     "@legendapp/motion": "^2.5.3",
     "@novu/js": "^3.14.1",
     "@novu/react-native": "^3.14.1",
+    "@bacons/apple-targets": "^4.0.6",
     "@prostcounter/api-client": "workspace:*",
     "@prostcounter/db": "workspace:*",
     "@prostcounter/shared": "workspace:*",
@@ -117,7 +118,6 @@
     }
   },
   "devDependencies": {
-    "@bacons/apple-targets": "^4.0.6",
     "@react-native-community/cli": "^20.1.2",
     "@react-native/metro-config": "^0.83.3",
     "@types/node": "^25.5.0",
