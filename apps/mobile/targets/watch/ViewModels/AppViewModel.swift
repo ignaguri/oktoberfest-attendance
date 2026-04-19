@@ -95,7 +95,12 @@ final class AppViewModel: ObservableObject {
         f.calendar = .init(identifier: .iso8601)
         f.locale = .init(identifier: "en_US_POSIX")
         f.dateFormat = "yyyy-MM-dd"
-        f.timeZone = .current
+        // Must match packages/shared/src/utils/date-utils.ts formatDateForDatabase —
+        // the server validates `date` as a regex only (YYYY-MM-DD) and trusts the
+        // client to format in festival-local time. Using .current would send the
+        // device's local calendar date, which drifts from the festival day across
+        // time zones (e.g. a watch in UTC-5 at 11 PM Munich would post yesterday).
+        f.timeZone = TimeZone(identifier: "Europe/Berlin")!
         self.dateFormatter = f
     }
 
