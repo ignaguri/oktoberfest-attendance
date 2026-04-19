@@ -9,7 +9,13 @@ enum APIError: Error {
 }
 
 final class APIClient {
-    static let baseURL = URL(string: "https://prostcounter.fun/api/v1")!
+    static let baseURL: URL = {
+        #if DEBUG
+        return URL(string: "http://localhost:3008/api/v1")!
+        #else
+        return URL(string: "https://prostcounter.fun/api/v1")!
+        #endif
+    }()
 
     private let session: URLSession
     private let tokenStore: TokenStore
