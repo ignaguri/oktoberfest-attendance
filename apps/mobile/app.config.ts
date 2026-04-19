@@ -57,6 +57,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       usesNonExemptEncryption: false,
     },
     appleTeamId: "4Q9U9B3BKC",
+    entitlements: {
+      "com.apple.security.application-groups": ["group.com.prostcounter.shared"],
+    },
   },
   android: {
     adaptiveIcon: {
@@ -138,6 +141,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withFirebaseNotificationColor.js",
     "./plugins/withGoogleMapsApiKey.js",
     "./plugins/withAsyncStorageMavenRepo.js",
+    "@bacons/apple-targets",
     "expo-maps",
     "expo-updates",
     [
