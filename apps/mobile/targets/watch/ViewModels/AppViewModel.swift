@@ -75,7 +75,13 @@ final class AppViewModel: ObservableObject {
     // the server's price_paid_cents >= base_price_cents constraint. Defaults to
     // festival beer price so all drink types pass the check even without a
     // per-drink-type price resolver on the watch (MVP limitation).
-    @Published private(set) var beerCostCents: Int = 0
+    /// System default beer price in cents. Mirrors DEFAULT_DRINK_PRICES.beer in
+    /// packages/shared/src/schemas/pricing.schema.ts. Used as the pricePaidCents
+    /// fallback when the festival has no explicit beerCost, so the server's
+    /// price_paid_cents >= base_price_cents constraint is still satisfied.
+    static let defaultBeerCostCents: Int = 1620
+
+    @Published private(set) var beerCostCents: Int = AppViewModel.defaultBeerCostCents
     /// GPS-nearby tents fetched during bootstrap; used by TentPickerView.
     @Published private(set) var nearbyTents: [NearbyTent] = []
     /// When non-nil, MainView surfaces the CrowdPromptView for this tent.
@@ -159,7 +165,14 @@ final class AppViewModel: ObservableObject {
             let fetchedNearby = await nearbyTask
 
             drinkCount = attendance?.drinkCount ?? 0
-            beerCostCents = Int(((festival.beerCost ?? 0) * 100).rounded())
+            if let beerCost = festival.beerCost, beerCost > 0 {
+                beerCostCents = Int((beerCost * 100).rounded())
+            } else {
+                // Festival hasn't set a beer price yet — fall back to the
+                // shared system default so logs still satisfy the server's
+                // price_paid_cents >= base_price_cents constraint.
+                beerCostCents = Self.defaultBeerCostCents
+            }
             nearbyTents = fetchedNearby
 
             // Priority: today's attendance tent (user checked in on phone) → GPS-nearest → none.
