@@ -4,6 +4,7 @@ import Foundation
 enum LocationError: Error {
     case denied
     case failed(Error)
+    case alreadyInFlight
 }
 
 /// Wraps CLLocationManager in an async-friendly API.
@@ -26,6 +27,12 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
             throw LocationError.denied
         }
         return try await withCheckedThrowingContinuation { cont in
+            // Reject overlapping callers instead of overwriting the in-flight
+            // continuation, which would leak the previous awaiter forever.
+            if self.continuation != nil {
+                cont.resume(throwing: LocationError.alreadyInFlight)
+                return
+            }
             self.continuation = cont
             if status == .notDetermined {
                 manager.requestWhenInUseAuthorization()
