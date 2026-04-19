@@ -5,7 +5,7 @@ struct LogConsumptionRequest: Encodable {
     let date: String            // yyyy-MM-dd
     let tentId: String?
     let drinkType: String       // "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other"
-    let pricePaidCents: Int     // required by server schema (send 0 when unknown)
+    let pricePaidCents: Int     // required by server; send festival.beerCost so paid >= server-derived base
 }
 
 extension APIClient {
@@ -17,6 +17,11 @@ extension APIClient {
             query: ["festivalId": festivalId, "date": isoDate]
         )
         return envelope.attendance
+    }
+
+    // GET /festivals/{id}
+    func fetchFestival(id: String) async throws -> Festival {
+        try await get("festivals/\(id)")
     }
 
     // POST /consumption — returns full AttendanceWithTotals

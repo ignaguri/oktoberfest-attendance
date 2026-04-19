@@ -51,6 +51,11 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var currentTentId: String? = nil
     @Published private(set) var currentTentName: String = "—"
     @Published private(set) var festivalId: String? = nil
+    // Derived from festivals.beerCost; used as pricePaidCents on log POST to satisfy
+    // the server's price_paid_cents >= base_price_cents constraint. Defaults to
+    // festival beer price so all drink types pass the check even without a
+    // per-drink-type price resolver on the watch (MVP limitation).
+    @Published private(set) var beerCostCents: Int = 0
 
     private let api: APIClient
     private let tokenStore: TokenStore
@@ -84,16 +89,22 @@ final class AppViewModel: ObservableObject {
         festivalId = festId
 
         do {
-            let attendance = try await api.fetchTodayAttendance(
+            async let attendanceTask = api.fetchTodayAttendance(
                 festivalId: festId,
                 isoDate: todayString
             )
+            async let festivalTask = api.fetchFestival(id: festId)
+
+            let attendance = try await attendanceTask
+            let festival = try await festivalTask
+
             if let a = attendance {
                 drinkCount = a.drinkCount
                 currentTentId = a.tentIds.first
             } else {
                 drinkCount = 0
             }
+            beerCostCents = Int(((festival.beerCost ?? 0) * 100).rounded())
             status = .idle
         } catch APIError.noSession {
             status = .noSession
@@ -117,7 +128,7 @@ final class AppViewModel: ObservableObject {
             date: todayString,
             tentId: currentTentId,
             drinkType: type.rawValue,
-            pricePaidCents: 0
+            pricePaidCents: beerCostCents
         )
 
         var attempts = 0

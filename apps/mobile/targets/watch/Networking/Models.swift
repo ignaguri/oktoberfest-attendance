@@ -5,6 +5,7 @@ struct Festival: Decodable, Identifiable {
     let name: String
     let startDate: String
     let endDate: String
+    let beerCost: Double?   // EUR, e.g. 13.5 — used to derive pricePaidCents for drink logs
 }
 
 // Maps to AttendanceByDateSchema (extends AttendanceWithTotalsSchema).

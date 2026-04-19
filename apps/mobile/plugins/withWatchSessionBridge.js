@@ -33,9 +33,16 @@ final class WatchSessionBridge: NSObject {
   private let watchedKeys = ["accessToken", "refreshToken", "userId", "currentFestivalId", "expiresAt"]
   private var defaults: UserDefaults?
 
+  private var pollTimer: Timer?
+  private var lastPayload: [String: String] = [:]
+
   private override init() {
     super.init()
-    guard WCSession.isSupported() else { return }
+    NSLog("[WatchSessionBridge] init")
+    guard WCSession.isSupported() else {
+      NSLog("[WatchSessionBridge] WCSession not supported")
+      return
+    }
     defaults = UserDefaults(suiteName: appGroup)
     WCSession.default.delegate = self
     WCSession.default.activate()
@@ -43,13 +50,22 @@ final class WatchSessionBridge: NSObject {
   }
 
   private func startObserving() {
-    guard let defaults = defaults else { return }
+    // Observe all UserDefaults changes — the JS ExtensionStorage writes via its
+    // own UserDefaults instance, so filtering by object would miss them.
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(defaultsDidChange(_:)),
       name: UserDefaults.didChangeNotification,
-      object: defaults
+      object: nil
     )
+
+    // Safety net: poll every 2s in case KVO misses a write (e.g., from a
+    // separate UserDefaults instance that doesn't post didChange).
+    DispatchQueue.main.async { [weak self] in
+      self?.pollTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+        self?.forwardToWatch()
+      }
+    }
   }
 
   @objc private func defaultsDidChange(_ notification: Notification) {
@@ -64,27 +80,36 @@ final class WatchSessionBridge: NSObject {
       let defaults = defaults
     else { return }
 
-    var payload: [String: Any] = [:]
+    var stringPayload: [String: String] = [:]
     for key in watchedKeys {
-      if let value = defaults.object(forKey: key) {
-        payload[key] = value
+      if let value = defaults.string(forKey: key) {
+        stringPayload[key] = value
       }
     }
-    guard !payload.isEmpty else { return }
+    guard !stringPayload.isEmpty else { return }
+
+    // Dedupe: only forward if the data actually changed since last send.
+    if stringPayload == lastPayload { return }
+    lastPayload = stringPayload
+
+    let payload: [String: Any] = stringPayload
+
+    NSLog("[WatchSessionBridge] forwarding payload with keys: \\(payload.keys.sorted())")
 
     // Fast path: send a message directly when the watch app is in the foreground.
     if WCSession.default.isReachable {
-      WCSession.default.sendMessage(payload as [String: Any], replyHandler: nil, errorHandler: { error in
-        print("[WatchSessionBridge] sendMessage error: \\(error)")
+      WCSession.default.sendMessage(payload, replyHandler: nil, errorHandler: { error in
+        NSLog("[WatchSessionBridge] sendMessage error: \\(error)")
       })
     }
 
     // Persistent path: updateApplicationContext works in simulator and delivers
     // the latest context to the watch app on next foreground (replaces previous value).
     do {
-      try WCSession.default.updateApplicationContext(payload as [String: Any])
+      try WCSession.default.updateApplicationContext(payload)
+      NSLog("[WatchSessionBridge] updateApplicationContext succeeded")
     } catch {
-      print("[WatchSessionBridge] updateApplicationContext error: \\(error)")
+      NSLog("[WatchSessionBridge] updateApplicationContext error: \\(error)")
     }
   }
 
@@ -103,9 +128,10 @@ extension WatchSessionBridge: WCSessionDelegate {
     error: Error?
   ) {
     if let error = error {
-      print("[WatchSessionBridge] Activation error: \\(error)")
+      NSLog("[WatchSessionBridge] Activation error: \\(error)")
       return
     }
+    NSLog("[WatchSessionBridge] activation complete: state=\\(activationState.rawValue) paired=\\(WCSession.default.isPaired) installed=\\(WCSession.default.isWatchAppInstalled) reachable=\\(WCSession.default.isReachable)")
     if activationState == .activated {
       forwardToWatch()
     }
