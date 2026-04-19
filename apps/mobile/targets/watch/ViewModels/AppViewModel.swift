@@ -48,6 +48,25 @@ final class AppViewModel: ObservableObject {
         case noFestival
     }
 
+    /// Watch-side crowd levels. Server enum is empty|moderate|crowded|full;
+    /// we skip "full" to keep the small-screen picker to 3 actions + Skip.
+    enum CrowdLevel: String, CaseIterable, Identifiable {
+        case empty = "empty"
+        case busy = "moderate"
+        case packed = "crowded"
+
+        var id: String { rawValue }
+
+        /// User-facing label shown on the picker button.
+        var label: String {
+            switch self {
+            case .empty: return "Empty"
+            case .busy: return "Busy"
+            case .packed: return "Packed"
+            }
+        }
+    }
+
     @Published private(set) var status: Status = .idle
     @Published private(set) var drinkCount: Int = 0
     @Published private(set) var currentTentId: String? = nil
@@ -60,6 +79,9 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var beerCostCents: Int = 0
     /// GPS-nearby tents fetched during bootstrap; used by TentPickerView.
     @Published private(set) var nearbyTents: [NearbyTent] = []
+    /// When non-nil, MainView surfaces the CrowdPromptView for this tent.
+    /// Set when the tapped Prost was the first drink of the day against a known tent.
+    @Published var promptingCrowdForTentId: String? = nil
 
     private let api: APIClient
     private let tokenStore: TokenStore
@@ -146,12 +168,20 @@ final class AppViewModel: ObservableObject {
             // bootstrap failed or no festival available — leave status as-is (noSession / noFestival / needsRetry).
             return
         }
+        // Capture the pre-log state so we can decide whether to surface the
+        // crowd prompt once the POST succeeds.
+        let tentAtLogTime = currentTentId
+        let shouldPromptAfter = Self.shouldPromptForCrowd(
+            priorDrinkCount: drinkCount,
+            tentId: tentAtLogTime
+        )
+
         status = .logging
 
         let body = LogConsumptionRequest(
             festivalId: festId,
             date: todayString,
-            tentId: currentTentId,
+            tentId: tentAtLogTime,
             drinkType: type.rawValue,
             pricePaidCents: beerCostCents
         )
@@ -164,6 +194,9 @@ final class AppViewModel: ObservableObject {
                 drinkCount = result.drinkCount
                 notifyIPhoneOfDrinkLog()
                 status = .success
+                if shouldPromptAfter, let tentId = tentAtLogTime {
+                    promptingCrowdForTentId = tentId
+                }
                 return
             } catch {
                 lastError = error
@@ -187,6 +220,58 @@ final class AppViewModel: ObservableObject {
     func acknowledgeSuccess() {
         if status == .success { status = .idle }
     }
+
+    /// Pure helper so the detection rule can be exercised without touching the API.
+    /// Prompt only when this drink is the first of the day AND we actually know
+    /// which tent to attribute the crowd level to.
+    static func shouldPromptForCrowd(priorDrinkCount: Int, tentId: String?) -> Bool {
+        priorDrinkCount == 0 && tentId != nil
+    }
+
+    /// Submit the selected crowd level for the prompt's tent. Failures are
+    /// swallowed — the crowd report is a bonus, and we don't want a network
+    /// error to disrupt the Prost! success flow.
+    func submitCrowdReport(level: CrowdLevel) async {
+        guard let tentId = promptingCrowdForTentId, let festId = festivalId else {
+            promptingCrowdForTentId = nil
+            return
+        }
+        do {
+            try await api.postCrowdReport(
+                tentId: tentId,
+                body: CrowdReportRequest(festivalId: festId, crowdLevel: level.rawValue)
+            )
+        } catch {
+            print("submitCrowdReport failed: \(error)")
+        }
+        promptingCrowdForTentId = nil
+    }
+
+    /// Dismiss the crowd prompt without posting (user tapped Skip or the sheet).
+    func dismissCrowdPrompt() {
+        promptingCrowdForTentId = nil
+    }
+
+    #if DEBUG
+    /// Debug-only sanity checks for the first-drink detection rule.
+    /// Invoked from CrowdPromptView_Previews so the assertions run whenever
+    /// previews render, without requiring an XCTest target.
+    static func runCrowdDetectionAssertions() {
+        assert(
+            Self.shouldPromptForCrowd(priorDrinkCount: 0, tentId: "t1"),
+            "First drink with a tent should prompt"
+        )
+        assert(
+            !Self.shouldPromptForCrowd(priorDrinkCount: 0, tentId: nil),
+            "First drink without a tent should not prompt"
+        )
+        assert(
+            !Self.shouldPromptForCrowd(priorDrinkCount: 3, tentId: "t1"),
+            "Subsequent drink should not prompt"
+        )
+        print("[AppViewModel] crowd detection assertions passed ✓")
+    }
+    #endif
 
     /// Fire-and-forget WCSession ping so the iPhone bridge can prompt React Query
     /// to invalidate attendance data. Safe to call even if the iPhone isn't

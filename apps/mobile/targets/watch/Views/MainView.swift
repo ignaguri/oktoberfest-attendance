@@ -75,6 +75,25 @@ struct MainView: View {
                 showingTentPicker = false
             }
         }
+        .sheet(
+            isPresented: Binding(
+                get: { viewModel.promptingCrowdForTentId != nil },
+                set: { presented in
+                    if !presented { viewModel.dismissCrowdPrompt() }
+                }
+            )
+        ) {
+            CrowdPromptView(
+                tentName: viewModel.currentTentName,
+                onSubmit: { level in
+                    Task {
+                        await viewModel.submitCrowdReport(level: level)
+                        WKInterfaceDevice.current().play(.success)
+                    }
+                },
+                onSkip: { viewModel.dismissCrowdPrompt() }
+            )
+        }
         .task { await viewModel.bootstrap() }
     }
 
