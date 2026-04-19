@@ -18,10 +18,13 @@ const BRIDGE_CLASS_SNIPPET = `
 import WatchConnectivity
 
 /// Bridges App Group UserDefaults changes on the iPhone to the paired Apple Watch
-/// via WCSession.transferUserInfo.
+/// via WCSession.updateApplicationContext (simulator-compatible) with a sendMessage
+/// fast path when the watch app is reachable.
 ///
 /// Flow:
-///   JS (ExtensionStorage) → UserDefaults(suiteName:) → KVO here → WCSession.transferUserInfo
+///   JS (ExtensionStorage) → UserDefaults(suiteName:) → KVO here
+///     → WCSession.sendMessage (if watch reachable, for real-time delivery)
+///     → WCSession.updateApplicationContext (persistent, simulator-compatible)
 final class WatchSessionBridge: NSObject {
 
   static let shared = WatchSessionBridge()
@@ -69,7 +72,20 @@ final class WatchSessionBridge: NSObject {
     }
     guard !payload.isEmpty else { return }
 
-    WCSession.default.transferUserInfo(payload)
+    // Fast path: send a message directly when the watch app is in the foreground.
+    if WCSession.default.isReachable {
+      WCSession.default.sendMessage(payload as [String: Any], replyHandler: nil, errorHandler: { error in
+        print("[WatchSessionBridge] sendMessage error: \\(error)")
+      })
+    }
+
+    // Persistent path: updateApplicationContext works in simulator and delivers
+    // the latest context to the watch app on next foreground (replaces previous value).
+    do {
+      try WCSession.default.updateApplicationContext(payload as [String: Any])
+    } catch {
+      print("[WatchSessionBridge] updateApplicationContext error: \\(error)")
+    }
   }
 
   deinit {
