@@ -13,6 +13,17 @@ struct Session {
     let expiresAt: Date
 }
 
+/// Reads the Supabase session the iPhone has forwarded to us.
+///
+/// Tokens live in App Group `UserDefaults` (not Keychain) on purpose:
+/// sharing a Keychain between iPhone and watch requires a shared keychain
+/// group entitlement, but the JS side writes via @bacons/apple-targets
+/// `ExtensionStorage`, which goes through `UserDefaults(suiteName:)` only.
+/// Staying on App Group UserDefaults keeps the JS ↔ iPhone ↔ watch path
+/// uniform — we don't need a second persistence layer just for the watch.
+///
+/// Blast radius is bounded to binaries signed with the same Apple team,
+/// since App Group membership requires matching signing provenance.
 final class TokenStore {
     static let appGroup = "group.com.prostcounter.shared"
     private let defaults: UserDefaults
