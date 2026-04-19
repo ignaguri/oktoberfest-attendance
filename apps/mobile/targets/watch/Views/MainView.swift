@@ -13,7 +13,7 @@ struct MainView: View {
                     showingTentPicker = true
                 } label: {
                     HStack(spacing: 4) {
-                        Text(viewModel.currentTentName)
+                        Text(viewModel.currentTent.tentName)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -84,7 +84,7 @@ struct MainView: View {
             )
         ) {
             CrowdPromptView(
-                tentName: viewModel.currentTentName,
+                tentName: viewModel.currentTent.tentName,
                 onSubmit: { level in
                     Task {
                         await viewModel.submitCrowdReport(level: level)

@@ -69,8 +69,7 @@ final class AppViewModel: ObservableObject {
 
     @Published private(set) var status: Status = .idle
     @Published private(set) var drinkCount: Int = 0
-    @Published private(set) var currentTentId: String? = nil
-    @Published private(set) var currentTentName: String = "—"
+    @Published private(set) var currentTent: ResolvedTent = ResolvedTent(tentId: nil, tentName: "—", source: .none)
     @Published private(set) var festivalId: String? = nil
     // Derived from festivals.beerCost; used as pricePaidCents on log POST to satisfy
     // the server's price_paid_cents >= base_price_cents constraint. Defaults to
@@ -140,12 +139,10 @@ final class AppViewModel: ObservableObject {
             nearbyTents = fetchedNearby
 
             // Priority: today's attendance tent (user checked in on phone) → GPS-nearest → none.
-            let resolved = TentResolver.resolve(
+            currentTent = TentResolver.resolve(
                 attendance: attendance,
                 nearbyTents: fetchedNearby
             )
-            currentTentId = resolved.tentId
-            currentTentName = resolved.tentName
 
             status = .idle
         } catch APIError.noSession {
@@ -165,7 +162,7 @@ final class AppViewModel: ObservableObject {
         }
         // Capture the pre-log state so we can decide whether to surface the
         // crowd prompt once the POST succeeds.
-        let tentAtLogTime = currentTentId
+        let tentAtLogTime = currentTent.tentId
         let shouldPromptAfter = Self.shouldPromptForCrowd(
             priorDrinkCount: drinkCount,
             tentId: tentAtLogTime
@@ -206,8 +203,11 @@ final class AppViewModel: ObservableObject {
 
     /// Manually override the active tent (called from TentPickerView).
     func changeTent(to tent: NearbyTent) {
-        currentTentId = tent.tentId
-        currentTentName = tent.tentName
+        currentTent = ResolvedTent(
+            tentId: tent.tentId,
+            tentName: tent.tentName,
+            source: .manualOverride
+        )
     }
 
     func acknowledgeSuccess() {

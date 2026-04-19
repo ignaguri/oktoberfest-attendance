@@ -4,6 +4,7 @@ import Foundation
 enum TentSource {
     case attendance
     case gps
+    case manualOverride
     case none
 }
 
