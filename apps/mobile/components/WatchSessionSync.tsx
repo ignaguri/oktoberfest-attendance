@@ -11,31 +11,20 @@ export function WatchSessionSync() {
   useEffect(() => {
     if (Platform.OS !== "ios") return;
 
-    let unsub: (() => void) | undefined;
-
-    const writeIfSignedIn = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.access_token && session.refresh_token && session.user?.id) {
-        syncSessionToWatch({
-          accessToken: session.access_token,
-          refreshToken: session.refresh_token,
-          userId: session.user.id,
-          currentFestivalId: currentFestival?.id ?? null,
-          expiresAt: session.expires_at ?? 0,
-        });
-      }
-    };
-
-    void writeIfSignedIn();
-
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
         clearSessionOnWatch();
         return;
       }
-      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
+      if (
+        (event === "SIGNED_IN" ||
+          event === "TOKEN_REFRESHED" ||
+          event === "USER_UPDATED" ||
+          event === "INITIAL_SESSION") &&
+        session?.access_token &&
+        session.refresh_token &&
+        session.user?.id
+      ) {
         syncSessionToWatch({
           accessToken: session.access_token,
           refreshToken: session.refresh_token,
@@ -46,8 +35,7 @@ export function WatchSessionSync() {
       }
     });
 
-    unsub = () => data.subscription.unsubscribe();
-    return unsub;
+    return () => data.subscription.unsubscribe();
   }, [currentFestival?.id]);
 
   return null;
