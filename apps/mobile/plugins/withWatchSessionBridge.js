@@ -169,16 +169,25 @@ extension WatchSessionBridge: WCSessionDelegate {
 
 // Inserted right after the #endif that closes the #if os(iOS) || os(tvOS) block
 // in application(_:didFinishLaunchingWithOptions:).
-// Anchor: the literal "#endif" line that follows factory.startReactNative(...)
 const INIT_CALL =
   "\n    // Activate the WatchConnectivity bridge so session tokens written to the\n    // shared App Group are forwarded to the paired Apple Watch.\n    _ = WatchSessionBridge.shared\n";
 
 /**
- * Anchor used for the init-call insertion.
- * In the Expo-generated AppDelegate.swift the #if os(iOS) || os(tvOS) block ends with
- * exactly this string. We append the activation call immediately after it.
+ * Anchor used for the init-call insertion. Includes the full
+ * factory.startReactNative(...) call followed by its closing #endif so the
+ * match is structurally unique inside AppDelegate.swift. A bare "#endif"
+ * would also match the #if DEBUG block later in the file, and whether it
+ * hit the correct one would depend on source order — fragile across Expo
+ * template changes.
+ *
+ * Whitespace must match the Expo-generated template exactly (4-space indent
+ * on the call, 6-space indent on the named arguments, "#endif" at column 0).
  */
-const INIT_ANCHOR = "#endif";
+const INIT_ANCHOR = `    factory.startReactNative(
+      withModuleName: "main",
+      in: window,
+      launchOptions: launchOptions)
+#endif`;
 
 module.exports = function withWatchSessionBridge(config) {
   return withDangerousMod(config, [
@@ -201,15 +210,21 @@ module.exports = function withWatchSessionBridge(config) {
 
       // 1. Inject the activation call after the closing #endif of the
       //    #if os(iOS) || os(tvOS) block inside didFinishLaunchingWithOptions.
-      //    The generated file has exactly one "#endif" inside that function.
-      //    We replace the first occurrence to be safe and precise.
-      if (!src.includes(INIT_ANCHOR)) {
-        console.warn(
-          "withWatchSessionBridge: Could not find '#endif' anchor in AppDelegate.swift — init call NOT injected.",
+      //    Must be unambiguous — fail loudly if the Expo template drifted,
+      //    rather than silently injecting at the wrong spot (or not at all).
+      const anchorMatches = src.split(INIT_ANCHOR).length - 1;
+      if (anchorMatches === 0) {
+        throw new Error(
+          "withWatchSessionBridge: INIT_ANCHOR not found in AppDelegate.swift. " +
+            "The Expo template has likely changed — update the anchor in this plugin.",
         );
-      } else {
-        src = src.replace(INIT_ANCHOR, INIT_ANCHOR + INIT_CALL);
       }
+      if (anchorMatches > 1) {
+        throw new Error(
+          `withWatchSessionBridge: INIT_ANCHOR matched ${anchorMatches} times in AppDelegate.swift — expected exactly 1.`,
+        );
+      }
+      src = src.replace(INIT_ANCHOR, INIT_ANCHOR + INIT_CALL);
 
       // 2. Append the WatchSessionBridge class as top-level code at end of file.
       src = src + "\n" + BRIDGE_CLASS_SNIPPET;
