@@ -70,6 +70,8 @@ final class AppViewModel: ObservableObject {
     var todayString: String { dateFormatter.string(from: Date()) }
 
     func bootstrap() async {
+        // Skip if already loaded unless we need a retry.
+        if festivalId != nil && status == .idle { return }
         status = .loading
         guard let session = tokenStore.read() else {
             status = .noSession
@@ -101,8 +103,11 @@ final class AppViewModel: ObservableObject {
     }
 
     func logDrink(_ type: DrinkType) async {
+        if festivalId == nil {
+            await bootstrap()
+        }
         guard let festId = festivalId else {
-            status = .needsRetry
+            // bootstrap failed or no festival available — leave status as-is (noSession / noFestival / needsRetry).
             return
         }
         status = .logging
@@ -119,8 +124,8 @@ final class AppViewModel: ObservableObject {
         var lastError: Error?
         while attempts < 3 {
             do {
-                _ = try await api.logConsumption(body)
-                drinkCount += 1
+                let result = try await api.logConsumption(body)
+                drinkCount = result.drinkCount
                 status = .success
                 return
             } catch {
