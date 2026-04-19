@@ -180,7 +180,14 @@ final class AppViewModel: ObservableObject {
     }
 
     func logDrink(_ type: DrinkType) async {
-        if festivalId == nil {
+        // If the iPhone has changed currentFestivalId since we cached it
+        // (e.g. the user switched festivals on the phone while the watch app
+        // stayed alive), re-bootstrap so we don't keep logging against the
+        // old festival. Otherwise bootstrap only when cached id is missing.
+        let latestFestivalId = tokenStore.read()?.currentFestivalId
+        if festivalId == nil || (latestFestivalId != nil && latestFestivalId != festivalId) {
+            // Force bootstrap to re-fetch even if status == .idle.
+            festivalId = nil
             await bootstrap()
         }
         guard let festId = festivalId else {
