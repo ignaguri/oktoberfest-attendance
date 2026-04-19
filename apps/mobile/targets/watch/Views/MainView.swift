@@ -15,7 +15,9 @@ struct MainView: View {
                 Button {
                     Task {
                         await viewModel.logDrink(.beer)
-                        WKInterfaceDevice.current().play(.success)
+                        if viewModel.status == .success {
+                            WKInterfaceDevice.current().play(.success)
+                        }
                     }
                 } label: {
                     Label("Prost!", systemImage: "mug.fill")
@@ -49,7 +51,9 @@ struct MainView: View {
                 showingDrinkPicker = false
                 Task {
                     await viewModel.logDrink(type)
-                    WKInterfaceDevice.current().play(.success)
+                    if viewModel.status == .success {
+                        WKInterfaceDevice.current().play(.success)
+                    }
                 }
             }
         }
