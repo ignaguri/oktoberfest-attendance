@@ -8,24 +8,29 @@ struct DrinkTypePickerView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 6) {
-                ForEach(nonDefaultTypes) { type in
-                    Button {
-                        onPick(type)
-                    } label: {
-                        HStack {
-                            Text(type.emoji)
-                            Text(type.label).font(.footnote)
-                            Spacer()
+        // Wrapped in NavigationStack so `.navigationTitle` renders when the
+        // view is presented via `.sheet` in MainView (sheets are a new
+        // navigation context and need their own stack).
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 6) {
+                    ForEach(nonDefaultTypes) { type in
+                        Button {
+                            onPick(type)
+                        } label: {
+                            HStack {
+                                Text(type.emoji)
+                                Text(type.label).font(.footnote)
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 40)
                         }
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .buttonStyle(.bordered)
                     }
-                    .buttonStyle(.bordered)
                 }
+                .padding(.horizontal, 6)
             }
-            .padding(.horizontal, 6)
+            .navigationTitle("Drink")
         }
-        .navigationTitle("Drink")
     }
 }
