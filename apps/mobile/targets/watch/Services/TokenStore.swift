@@ -56,4 +56,20 @@ final class TokenStore {
         guard let session = read() else { return true }
         return session.expiresAt.timeIntervalSinceNow < 60
     }
+
+    /// Persists a refreshed session back into App Group UserDefaults. Mirrors
+    /// the key schema the iPhone bridge uses (see WatchSessionBridge.watchedKeys),
+    /// so a subsequent push from the iPhone overwrites cleanly without
+    /// schema drift.
+    func write(_ session: Session) {
+        defaults.set(session.accessToken, forKey: "accessToken")
+        defaults.set(session.refreshToken, forKey: "refreshToken")
+        defaults.set(session.userId, forKey: "userId")
+        if let festival = session.currentFestivalId {
+            defaults.set(festival, forKey: "currentFestivalId")
+        }
+        let epoch = session.expiresAt.timeIntervalSince1970
+        defaults.set(String(Int(epoch)), forKey: "expiresAt")
+        defaults.synchronize()
+    }
 }

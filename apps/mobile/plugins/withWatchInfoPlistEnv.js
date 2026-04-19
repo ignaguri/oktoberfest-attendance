@@ -8,7 +8,9 @@ const path = require("path");
  * expoConfig (which is fingerprinted).
  *
  * Keys injected (opt-in — only written if the env var is set):
- *   - WATCH_API_BASE_URL     from EXPO_PUBLIC_WATCH_API_BASE_URL
+ *   - WATCH_API_BASE_URL       from EXPO_PUBLIC_WATCH_API_BASE_URL
+ *   - WATCH_SUPABASE_URL       from EXPO_PUBLIC_SUPABASE_URL
+ *   - WATCH_SUPABASE_ANON_KEY  from EXPO_PUBLIC_SUPABASE_ANON_KEY
  *
  * Why a plugin rather than a hardcoded Info.plist entry:
  *   The watch has no access to Expo env at runtime (no React Native,
@@ -25,6 +27,8 @@ const WATCH_INFO_PLIST_PATH = path.join("targets", "watch", "Info.plist");
 /** @type {Array<{ key: string, envVar: string }>} */
 const INJECTIONS = [
   { key: "WATCH_API_BASE_URL", envVar: "EXPO_PUBLIC_WATCH_API_BASE_URL" },
+  { key: "WATCH_SUPABASE_URL", envVar: "EXPO_PUBLIC_SUPABASE_URL" },
+  { key: "WATCH_SUPABASE_ANON_KEY", envVar: "EXPO_PUBLIC_SUPABASE_ANON_KEY" },
 ];
 
 function writePlistKey(src, key, value) {

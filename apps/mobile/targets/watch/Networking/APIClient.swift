@@ -28,11 +28,17 @@ final class APIClient {
 
     private let session: URLSession
     private let tokenStore: TokenStore
+    private let supabaseAuth: SupabaseAuth
     private let decoder: JSONDecoder
 
-    init(tokenStore: TokenStore = TokenStore(), session: URLSession = .shared) {
+    init(
+        tokenStore: TokenStore = TokenStore(),
+        supabaseAuth: SupabaseAuth = .shared,
+        session: URLSession = .shared
+    ) {
         self.session = session
         self.tokenStore = tokenStore
+        self.supabaseAuth = supabaseAuth
         let d = JSONDecoder()
         d.keyDecodingStrategy = .convertFromSnakeCase
         self.decoder = d
@@ -45,7 +51,7 @@ final class APIClient {
         }
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
-        try authorize(&request)
+        try await authorize(&request)
         return try await send(request)
     }
 
@@ -54,7 +60,7 @@ final class APIClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(body)
-        try authorize(&request)
+        try await authorize(&request)
         return try await send(request)
     }
 
@@ -65,13 +71,30 @@ final class APIClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(body)
-        try authorize(&request)
+        try await authorize(&request)
         try await sendVoid(request)
     }
 
-    private func authorize(_ request: inout URLRequest) throws {
-        guard let session = tokenStore.read() else { throw APIError.noSession }
-        request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
+    private func authorize(_ request: inout URLRequest) async throws {
+        guard var current = tokenStore.read() else { throw APIError.noSession }
+        if tokenStore.isExpired {
+            do {
+                let refreshed = try await supabaseAuth.refresh(using: current.refreshToken)
+                // Preserve the festival id — /token doesn't echo it back.
+                let merged = Session(
+                    accessToken: refreshed.accessToken,
+                    refreshToken: refreshed.refreshToken,
+                    userId: refreshed.userId,
+                    currentFestivalId: current.currentFestivalId,
+                    expiresAt: refreshed.expiresAt
+                )
+                tokenStore.write(merged)
+                current = merged
+            } catch {
+                throw APIError.noSession
+            }
+        }
+        request.setValue("Bearer \(current.accessToken)", forHTTPHeaderField: "Authorization")
     }
 
     private func send<T: Decodable>(_ request: URLRequest) async throws -> T {
