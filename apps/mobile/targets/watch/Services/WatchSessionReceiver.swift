@@ -41,8 +41,17 @@ final class WatchSessionReceiver: NSObject {
         guard let defaults = defaults else { return }
         let keys = ["accessToken", "refreshToken", "userId", "currentFestivalId", "expiresAt"]
         for key in keys {
-            if let value = dict[key] {
-                defaults.set(value, forKey: key)
+            guard let value = dict[key] else { continue }
+            // TokenStore reads every key via `defaults.string(forKey:)`. If the
+            // iPhone side ever drifts and sends a non-String (e.g. expiresAt as
+            // a Double), a direct `defaults.set(value)` writes a non-string and
+            // the reads silently return nil, stranding the user as unauth'd.
+            if let string = value as? String {
+                defaults.set(string, forKey: key)
+            } else if let number = value as? NSNumber {
+                defaults.set(String(describing: number), forKey: key)
+            } else {
+                print("[WatchSessionReceiver] Skipping key \(key) with unsupported type \(type(of: value))")
             }
         }
         defaults.synchronize()
