@@ -86,6 +86,10 @@ final class AppViewModel: ObservableObject {
     private let tokenStore: TokenStore
     private let locationService: LocationService
     private let dateFormatter: DateFormatter
+    /// Single-flight guard so concurrent callers funnel through the same
+    /// in-flight bootstrap instead of kicking off parallel fetches that
+    /// race on the @Published properties.
+    private var bootstrapTask: Task<Void, Never>?
 
     init(api: APIClient = APIClient(), tokenStore: TokenStore = TokenStore(), locationService: LocationService = LocationService()) {
         self.api = api
@@ -107,8 +111,23 @@ final class AppViewModel: ObservableObject {
     var todayString: String { dateFormatter.string(from: Date()) }
 
     func bootstrap() async {
-        // Skip if already loaded unless we need a retry.
+        // Skip if already loaded and healthy.
         if festivalId != nil && status == .idle { return }
+        // If a bootstrap is already running, await that task instead of
+        // starting a second one that would race on the @Published state.
+        if let existing = bootstrapTask {
+            await existing.value
+            return
+        }
+        let task = Task { @MainActor in
+            await self.performBootstrap()
+        }
+        bootstrapTask = task
+        await task.value
+        bootstrapTask = nil
+    }
+
+    private func performBootstrap() async {
         status = .loading
         guard let session = tokenStore.read() else {
             status = .noSession
