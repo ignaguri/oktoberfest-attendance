@@ -19,6 +19,7 @@ import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdatePrompt } from "@/components/update/UpdatePrompt";
+import { WatchRemoteInvalidationListener } from "@/components/WatchRemoteInvalidationListener";
 import { WatchSessionSync } from "@/components/WatchSessionSync";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
 import { useSentryUserContext } from "@/hooks/useSentryUserContext";
@@ -320,6 +321,7 @@ export default function RootLayout() {
                                     <BackgroundSyncHandler />
                                     <SentryUserContextHandler />
                                     <WatchSessionSync />
+                                    <WatchRemoteInvalidationListener />
                                     <NovuAutoSubscriber />
                                     <NotificationPromptHandler />
                                     <UpdatePromptHandler />

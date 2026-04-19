@@ -1,6 +1,7 @@
 import CoreLocation
 import Foundation
 import SwiftUI
+import WatchConnectivity
 
 @MainActor
 final class AppViewModel: ObservableObject {
@@ -161,6 +162,7 @@ final class AppViewModel: ObservableObject {
             do {
                 let result = try await api.logConsumption(body)
                 drinkCount = result.drinkCount
+                notifyIPhoneOfDrinkLog()
                 status = .success
                 return
             } catch {
@@ -184,5 +186,19 @@ final class AppViewModel: ObservableObject {
 
     func acknowledgeSuccess() {
         if status == .success { status = .idle }
+    }
+
+    /// Fire-and-forget WCSession ping so the iPhone bridge can prompt React Query
+    /// to invalidate attendance data. Safe to call even if the iPhone isn't
+    /// reachable — sendMessage fails silently, and the phone will still catch up
+    /// via refetchOnWindowFocus when the user next brings it to the foreground.
+    private func notifyIPhoneOfDrinkLog() {
+        guard WCSession.isSupported() else { return }
+        let session = WCSession.default
+        guard session.activationState == .activated else { return }
+        let payload: [String: Any] = ["type": "drinkLogged"]
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+        }
     }
 }

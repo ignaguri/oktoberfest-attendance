@@ -145,6 +145,25 @@ extension WatchSessionBridge: WCSessionDelegate {
     // Required on iOS — reactivate to support Apple Watch switching
     WCSession.default.activate()
   }
+
+  /// Called when the watch sends a message — currently only "drinkLogged".
+  /// We forward it to JavaScript as a device event so React Query can
+  /// invalidate cached attendance data and trigger a pull sync.
+  func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+    NSLog("[WatchSessionBridge] didReceiveMessage: \\(message)")
+    guard let type = message["type"] as? String else { return }
+    DispatchQueue.main.async {
+      if let bridge = RCTBridge.current() {
+        bridge.eventDispatcher().sendDeviceEvent(
+          withName: "watchRemoteEvent",
+          body: ["type": type]
+        )
+        NSLog("[WatchSessionBridge] dispatched watchRemoteEvent type=\\(type) to RN")
+      } else {
+        NSLog("[WatchSessionBridge] no RCTBridge.current() — event dropped")
+      }
+    }
+  }
 }
 `;
 
