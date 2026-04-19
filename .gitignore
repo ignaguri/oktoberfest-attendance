@@ -87,3 +87,17 @@ apps/mobile/credentials/
 /ios
 /android
 .worktrees/
+
+# Expo cache
+.expo/
+
+# Claude agent local data
+.superpowers/
+.claude/settings.json
+
+# Mobile build artifacts
+apps/mobile/build-*.ipa
+apps/mobile/build-*.aab
+
+# Demo videos
+*.mp4
