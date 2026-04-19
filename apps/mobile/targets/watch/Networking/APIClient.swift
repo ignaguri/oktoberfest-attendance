@@ -10,6 +10,15 @@ enum APIError: Error {
 
 final class APIClient {
     static let baseURL: URL = {
+        // Allow per-build overrides (e.g. a physical watch pointing at a
+        // developer's LAN-accessible dev server) via the `WATCH_API_BASE_URL`
+        // key injected into this target's Info.plist by withWatchInfoPlistEnv.
+        // The value must already include the API version path (e.g. "/api/v1").
+        if let override = Bundle.main.object(forInfoDictionaryKey: "WATCH_API_BASE_URL") as? String,
+           !override.isEmpty,
+           let url = URL(string: override) {
+            return url
+        }
         #if DEBUG
         return URL(string: "http://localhost:3008/api/v1")!
         #else
