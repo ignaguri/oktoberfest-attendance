@@ -51,7 +51,6 @@ extension APIClient {
     // POST /tents/{tentId}/crowd-report — body { festivalId, crowdLevel, waitTimeMinutes? }.
     // We ignore the response body (fire-and-forget on watch).
     func postCrowdReport(tentId: String, body: CrowdReportRequest) async throws {
-        struct Envelope: Decodable {}
-        let _: Envelope = try await post("tents/\(tentId)/crowd-report", body: body)
+        try await postVoid("tents/\(tentId)/crowd-report", body: body)
     }
 }

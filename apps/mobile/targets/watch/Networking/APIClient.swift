@@ -49,6 +49,17 @@ final class APIClient {
         return try await send(request)
     }
 
+    /// POST that discards the response body. Use for fire-and-forget endpoints
+    /// where the server returns JSON we don't need (crowd reports, etc.).
+    func postVoid<B: Encodable>(_ path: String, body: B) async throws {
+        var request = URLRequest(url: Self.baseURL.appendingPathComponent(path))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(body)
+        try authorize(&request)
+        try await sendVoid(request)
+    }
+
     private func authorize(_ request: inout URLRequest) throws {
         guard let session = tokenStore.read() else { throw APIError.noSession }
         request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
@@ -63,6 +74,21 @@ final class APIClient {
         case 200..<300:
             do { return try decoder.decode(T.self, from: data) }
             catch { throw APIError.decoding(error) }
+        case 401:
+            throw APIError.unauthorized
+        default:
+            throw APIError.httpStatus(http.statusCode, data)
+        }
+    }
+
+    private func sendVoid(_ request: URLRequest) async throws {
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw APIError.network(URLError(.badServerResponse))
+        }
+        switch http.statusCode {
+        case 200..<300:
+            return
         case 401:
             throw APIError.unauthorized
         default:
