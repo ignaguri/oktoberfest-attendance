@@ -1,4 +1,10 @@
 export const changelog: Record<string, string[]> = {
+  "1.4.0": [
+    "Apple Watch companion app — log drinks straight from your wrist with Prost!",
+    "Watch tent picker to switch tents without pulling out your phone",
+    "Attendance sheet now shows the actual time of each tent visit",
+    "Tent visits from the watch, web, or another device now sync to your phone automatically",
+  ],
   "1.3.0": [
     "Offline-first — drinks, tents and attendance save instantly even without internet",
     "Tent selector now shows only tents for the current festival",
