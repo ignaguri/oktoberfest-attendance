@@ -4,6 +4,7 @@ import type {
   CreateAttendanceInput,
   CreateAttendanceResponse,
   ListAttendancesQuery,
+  TentVisitRow,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
@@ -36,13 +37,19 @@ export interface IAttendanceRepository {
   /**
    * List attendances for a user and festival
    * @param userId - User ID
-   * @param query - Query parameters (festivalId, limit, offset)
-   * @returns Array of attendance records and total count
+   * @param query - Query parameters (festivalId, limit, offset, include)
+   * @returns Array of attendance records and total count. When
+   *   `query.include === "tent_visits"`, a flat `tentVisits` array with
+   *   sync-grade fields (id, userId, updatedAt) is also returned.
    */
   list(
     userId: string,
     query: ListAttendancesQuery,
-  ): Promise<{ data: AttendanceWithTotals[]; total: number }>;
+  ): Promise<{
+    data: AttendanceWithTotals[];
+    total: number;
+    tentVisits?: TentVisitRow[];
+  }>;
 
   /**
    * Delete an attendance record

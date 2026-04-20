@@ -5,6 +5,7 @@ import type {
   CreateAttendanceInput,
   CreateAttendanceResponse,
   ListAttendancesQuery,
+  TentVisitRow,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
@@ -92,8 +93,12 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
   async list(
     userId: string,
     query: ListAttendancesQuery,
-  ): Promise<{ data: AttendanceWithTotals[]; total: number }> {
-    const { festivalId, limit, offset } = query;
+  ): Promise<{
+    data: AttendanceWithTotals[];
+    total: number;
+    tentVisits?: TentVisitRow[];
+  }> {
+    const { festivalId, limit, offset, include } = query;
 
     // Get total count
     const { count, error: countError } = await this.supabase
@@ -121,10 +126,11 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError(`Failed to list attendances: ${error.message}`);
     }
 
-    // Fetch all tent visits for this festival
+    // Fetch all tent visits for this festival (also used for sync-grade
+    // projection when include === "tent_visits").
     const { data: tentVisits, error: tentVisitsError } = await this.supabase
       .from("tent_visits")
-      .select("tent_id, visit_date, tents(name)")
+      .select("id, user_id, tent_id, festival_id, visit_date, tents(name)")
       .eq("user_id", userId)
       .eq("festival_id", festivalId);
 
@@ -162,10 +168,29 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       };
     });
 
-    return {
+    const result: {
+      data: AttendanceWithTotals[];
+      total: number;
+      tentVisits?: TentVisitRow[];
+    } = {
       data: enrichedData,
       total: count || 0,
     };
+
+    if (include === "tent_visits") {
+      result.tentVisits = (tentVisits || [])
+        .filter((v) => v.visit_date !== null)
+        .map((v) => ({
+          id: v.id,
+          userId: v.user_id,
+          tentId: v.tent_id,
+          festivalId: v.festival_id,
+          visitDate: v.visit_date!,
+          tentName: (v.tents as any)?.name ?? null,
+        }));
+    }
+
+    return result;
   }
 
   async delete(id: string, userId: string): Promise<void> {
