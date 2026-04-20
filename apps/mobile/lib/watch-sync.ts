@@ -57,3 +57,15 @@ export function clearSessionOnWatch(): void {
   setIfChanged(storage, "currentFestivalId", "");
   setIfChanged(storage, "expiresAt", "0");
 }
+
+/**
+ * Mirrors the user's selected language to the watch via App Group UserDefaults.
+ * The watch reads this on launch and overrides `AppleLanguages` so String Catalog
+ * lookups resolve against the chosen locale. Changes made while the watch app is
+ * running take effect on its next cold start (AppleLanguages is bundle-level).
+ */
+export function syncLanguageToWatch(lang: string): void {
+  const storage = getStorage();
+  if (!storage) return;
+  setIfChanged(storage, "preferredLanguage", lang);
+}

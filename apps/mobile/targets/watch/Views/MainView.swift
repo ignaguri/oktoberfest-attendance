@@ -33,8 +33,8 @@ struct MainView: View {
                     }
                 } label: {
                     HStack(spacing: 4) {
-                        Text("🍺")
-                        Text("Prost!")
+                        Text(verbatim: "🍺")
+                        Text(verbatim: "Prost!")
                     }
                     .font(.title3.bold())
                     .frame(maxWidth: .infinity, minHeight: 44)
@@ -46,7 +46,7 @@ struct MainView: View {
                     viewModel.status == .noFestival
                 )
 
-                Button("Other drink…") {
+                Button(String(localized: "watch.drink.other")) {
                     showingDrinkPicker = true
                 }
                 .font(.footnote)
@@ -106,9 +106,22 @@ struct MainView: View {
     private var todaySummary: String {
         let others = max(0, viewModel.drinkCount - viewModel.beerCount)
         if others == 0 {
-            return "Today: \(viewModel.drinkCount) 🍺"
+            return String(
+                format: NSLocalizedString(
+                    "watch.today.count",
+                    comment: "Today summary when only beers were logged. %lld is drink count."
+                ),
+                Int64(viewModel.drinkCount)
+            )
         }
-        return "Today: \(viewModel.beerCount) 🍺 · \(others) other"
+        return String(
+            format: NSLocalizedString(
+                "watch.today.countMixed",
+                comment: "Today summary with beers and other drinks. %1$lld is beers, %2$lld is others."
+            ),
+            Int64(viewModel.beerCount),
+            Int64(others)
+        )
     }
 
     @ViewBuilder
@@ -117,7 +130,7 @@ struct MainView: View {
         case .idle, .loading, .logging:
             EmptyView()
         case .success:
-            Text("✓ Prost!")
+            Text(verbatim: "✓ Prost!")
                 .font(.caption2)
                 .foregroundStyle(.green)
                 .task {
@@ -125,15 +138,15 @@ struct MainView: View {
                     viewModel.acknowledgeSuccess()
                 }
         case .needsRetry:
-            Text("Not sent — tap Prost to retry")
+            Text("watch.error.notSent")
                 .font(.caption2)
                 .foregroundStyle(.red)
         case .noSession:
-            Text("Sign in on iPhone first")
+            Text("watch.status.noSession")
                 .font(.caption2)
                 .foregroundStyle(.orange)
         case .noFestival:
-            Text("Pick a festival on iPhone")
+            Text("watch.status.noFestival")
                 .font(.caption2)
                 .foregroundStyle(.orange)
         }

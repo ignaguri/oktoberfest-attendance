@@ -16,11 +16,11 @@ final class AppViewModel: ObservableObject {
 
         var label: String {
             switch self {
-            case .beer: return "Beer"
-            case .radler: return "Radler"
-            case .alcoholFree: return "Alcohol-free"
-            case .wine: return "Wine"
-            case .softDrink: return "Soft drink"
+            case .beer: return String(localized: "watch.drink.beer")
+            case .radler: return String(localized: "watch.drink.radler")
+            case .alcoholFree: return String(localized: "watch.drink.alcohol_free")
+            case .wine: return String(localized: "watch.drink.wine")
+            case .softDrink: return String(localized: "watch.drink.soft_drink")
             }
         }
 
@@ -47,19 +47,21 @@ final class AppViewModel: ObservableObject {
 
     /// Watch-side crowd levels. Server enum is empty|moderate|crowded|full;
     /// we skip "full" to keep the small-screen picker to 3 actions + Skip.
+    /// Case names mirror the mobile/web translation keys under `crowdReport.levels.*`
+    /// so the shared i18n strings can be reused verbatim.
     enum CrowdLevel: String, CaseIterable, Identifiable, Encodable {
         case empty = "empty"
-        case busy = "moderate"
-        case packed = "crowded"
+        case moderate = "moderate"
+        case crowded = "crowded"
 
         var id: String { rawValue }
 
         /// User-facing label shown on the picker button.
         var label: String {
             switch self {
-            case .empty: return "Empty"
-            case .busy: return "Busy"
-            case .packed: return "Packed"
+            case .empty: return String(localized: "watch.crowd.empty")
+            case .moderate: return String(localized: "watch.crowd.moderate")
+            case .crowded: return String(localized: "watch.crowd.crowded")
             }
         }
     }

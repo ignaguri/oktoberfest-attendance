@@ -11,24 +11,32 @@ struct CrowdPromptView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
-                Text("✓ Prost!")
+                Text(verbatim: "✓ Prost!")
                     .font(.caption)
                     .foregroundStyle(.green)
-                Text("How crowded is \(tentName)?")
-                    .font(.footnote)
-                    .multilineTextAlignment(.center)
+                Text(
+                    String(
+                        format: NSLocalizedString(
+                            "watch.crowd.prompt",
+                            comment: "Crowd report question header. %@ is the tent name."
+                        ),
+                        tentName
+                    )
+                )
+                .font(.footnote)
+                .multilineTextAlignment(.center)
 
                 ForEach(AppViewModel.CrowdLevel.allCases) { level in
                     Button {
                         onSubmit(level)
                     } label: {
-                        Text(level.label)
+                        Text(verbatim: level.label)
                             .frame(maxWidth: .infinity, minHeight: 36)
                     }
                     .buttonStyle(.bordered)
                 }
 
-                Button("Skip") { onSkip() }
+                Button("common.skip") { onSkip() }
                     .buttonStyle(.plain)
                     .font(.caption)
                     .foregroundStyle(.secondary)
