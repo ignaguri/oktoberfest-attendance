@@ -111,7 +111,7 @@ struct MainView: View {
                     "watch.today.count",
                     comment: "Today summary when only beers were logged. %lld is drink count."
                 ),
-                viewModel.drinkCount
+                Int64(viewModel.drinkCount)
             )
         }
         return String(
@@ -119,8 +119,8 @@ struct MainView: View {
                 "watch.today.countMixed",
                 comment: "Today summary with beers and other drinks. %1$lld is beers, %2$lld is others."
             ),
-            viewModel.beerCount,
-            others
+            Int64(viewModel.beerCount),
+            Int64(others)
         )
     }
 

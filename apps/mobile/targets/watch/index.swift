@@ -3,9 +3,9 @@ import SwiftUI
 @main
 struct WatchEntry: App {
     init() {
-        // Apply the user's language preference (mirrored from the iPhone via
-        // the App Group) BEFORE any SwiftUI view loads, so String Catalog
-        // lookups resolve against the chosen locale on this launch.
+        // Persist the user's language preference (mirrored from the iPhone via
+        // the App Group) into `AppleLanguages`. Takes effect on the NEXT cold
+        // launch — see `applyPreferredLanguage()` for the timing detail.
         Self.applyPreferredLanguage()
 
         // Activate WCSession receiver so the watch can persist session tokens

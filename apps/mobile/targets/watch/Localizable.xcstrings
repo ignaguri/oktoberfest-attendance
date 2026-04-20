@@ -157,9 +157,51 @@
     "watch.today.countMixed" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Today: %1$lld 🍺 · %2$lld other" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute: %1$lld 🍺 · %2$lld andere" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hoy: %1$lld 🍺 · %2$lld otras" } }
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Today: %1$lld 🍺 · %#@others@" },
+          "substitutions" : {
+            "others" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : { "stringUnit" : { "state" : "translated", "value" : "%arg other" } },
+                  "other" : { "stringUnit" : { "state" : "translated", "value" : "%arg others" } }
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "stringUnit" : { "state" : "translated", "value" : "Heute: %1$lld 🍺 · %#@others@" },
+          "substitutions" : {
+            "others" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : { "stringUnit" : { "state" : "translated", "value" : "%arg weiteres" } },
+                  "other" : { "stringUnit" : { "state" : "translated", "value" : "%arg weitere" } }
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "stringUnit" : { "state" : "translated", "value" : "Hoy: %1$lld 🍺 · %#@others@" },
+          "substitutions" : {
+            "others" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : { "stringUnit" : { "state" : "translated", "value" : "%arg otra" } },
+                  "other" : { "stringUnit" : { "state" : "translated", "value" : "%arg otras" } }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
