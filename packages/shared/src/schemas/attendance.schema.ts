@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { AttendanceWithTotalsSchema } from "./consumption.schema";
+import {
+  AttendanceWithTotalsSchema,
+  TentVisitRowSchema,
+} from "./consumption.schema";
 
 /**
  * Query parameters for listing attendances
@@ -9,6 +12,7 @@ export const ListAttendancesQuerySchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
+  include: z.literal("tent_visits").optional(),
 });
 
 export type ListAttendancesQuery = z.infer<typeof ListAttendancesQuerySchema>;
@@ -18,6 +22,7 @@ export type ListAttendancesQuery = z.infer<typeof ListAttendancesQuerySchema>;
  */
 export const ListAttendancesResponseSchema = z.object({
   data: z.array(AttendanceWithTotalsSchema),
+  tentVisits: z.array(TentVisitRowSchema).optional(),
   total: z.number().int(),
   limit: z.number().int(),
   offset: z.number().int(),

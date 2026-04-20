@@ -71,6 +71,23 @@ export const TentVisitSchema = z.object({
 export type TentVisit = z.infer<typeof TentVisitSchema>;
 
 /**
+ * Schema for a full tent_visits row (sync-grade — includes id, userId, updatedAt).
+ * Used by the phone's offline sync puller. UI callers should keep using TentVisitSchema.
+ */
+export const TentVisitRowSchema = z.object({
+  id: z.uuid(),
+  userId: z.uuid(),
+  tentId: z.uuid(),
+  festivalId: z.uuid(),
+  visitDate: z.iso.datetime(),
+  tentName: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
+export type TentVisitRow = z.infer<typeof TentVisitRowSchema>;
+
+/**
  * Schema for attendance with computed totals
  */
 export const AttendanceWithTotalsSchema = z.object({
