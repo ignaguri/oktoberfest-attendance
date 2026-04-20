@@ -4,12 +4,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "ProstCounter",
   slug: "prostcounter",
-  version: "1.3.3",
+  version: "1.4.0",
   orientation: "portrait",
   scheme: "prostcounter",
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
-  runtimeVersion: "1.3.3-a",
+  runtimeVersion: "1.4.0-a",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -57,6 +57,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       usesNonExemptEncryption: false,
     },
     appleTeamId: "4Q9U9B3BKC",
+    entitlements: {
+      "com.apple.security.application-groups": ["group.com.prostcounter.shared"],
+    },
   },
   android: {
     adaptiveIcon: {
@@ -135,9 +138,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     "./plugins/withModularHeaders.js",
     "./plugins/withApsEnvironment.js",
+    "./plugins/withWatchSessionBridge.js",
+    "./plugins/withWatchInfoPlistEnv.js",
     "./plugins/withFirebaseNotificationColor.js",
     "./plugins/withGoogleMapsApiKey.js",
     "./plugins/withAsyncStorageMavenRepo.js",
+    "@bacons/apple-targets",
     "expo-maps",
     "expo-updates",
     [

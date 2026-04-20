@@ -79,6 +79,9 @@ app.openapi(listAttendancesRoute, async (c) => {
   return c.json(
     {
       data: result.data,
+      ...(result.tentVisits !== undefined && {
+        tentVisits: result.tentVisits,
+      }),
       total: result.total,
       limit: query.limit,
       offset: query.offset,

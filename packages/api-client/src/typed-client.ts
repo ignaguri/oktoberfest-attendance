@@ -190,12 +190,14 @@ export function createTypedApiClient(config: ApiClientConfig) {
         festivalId?: string;
         limit?: number;
         offset?: number;
+        include?: "tent_visits";
       }): Promise<ListAttendancesResponse> {
         const headers = await getAuthHeaders();
         const params = new URLSearchParams();
         if (query?.festivalId) params.set("festivalId", query.festivalId);
         if (query?.limit) params.set("limit", query.limit.toString());
         if (query?.offset) params.set("offset", query.offset.toString());
+        if (query?.include) params.set("include", query.include);
 
         const url = `${baseUrl}/v1/attendance?${params}`;
         const response = await fetchWithLogging("GET", url, { headers });

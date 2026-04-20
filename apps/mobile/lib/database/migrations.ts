@@ -69,13 +69,10 @@ const MIGRATIONS: MigrationFn[] = [
     logger.debug("[Migrations] Initial schema created from Drizzle migration");
   },
 
-  // Future migrations go here:
-  // v1 -> v2: Example migration
-  // async (db) => {
-  //   await db.execAsync(`
-  //     ALTER TABLE attendances ADD COLUMN notes TEXT;
-  //   `);
-  // },
+  // v1 -> v2: Add created_at to tent_visits (full timestamp for UI rendering).
+  async (db) => {
+    await addColumnIfNotExists(db, "tent_visits", "created_at", "TEXT");
+  },
 ];
 
 /**

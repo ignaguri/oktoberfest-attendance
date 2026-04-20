@@ -125,7 +125,7 @@ export type MutableTable =
 // Constants
 // =============================================================================
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const DATABASE_NAME = "prostcounter.db";
 
 // =============================================================================
@@ -451,6 +451,7 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
       tent_id TEXT NOT NULL REFERENCES tents(id),
       festival_id TEXT NOT NULL REFERENCES festivals(id),
       visit_date TEXT,
+      created_at TEXT,
       _synced_at TEXT,
       _deleted INTEGER DEFAULT 0,
       _dirty INTEGER DEFAULT 0,

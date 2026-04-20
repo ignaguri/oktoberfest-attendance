@@ -19,6 +19,7 @@ import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdatePrompt } from "@/components/update/UpdatePrompt";
+import { WatchBridge } from "@/components/WatchBridge";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
 import { useSentryUserContext } from "@/hooks/useSentryUserContext";
 import { useStoreUpdate } from "@/hooks/useStoreUpdate";
@@ -318,6 +319,7 @@ export default function RootLayout() {
                                   <NavigationGuard>
                                     <BackgroundSyncHandler />
                                     <SentryUserContextHandler />
+                                    <WatchBridge />
                                     <NovuAutoSubscriber />
                                     <NotificationPromptHandler />
                                     <UpdatePromptHandler />
