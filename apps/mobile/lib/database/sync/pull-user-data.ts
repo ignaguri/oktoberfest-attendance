@@ -277,9 +277,14 @@ async function processAttendances(
  * Upsert tent_visits into local SQLite from the server's attendance response.
  *
  * tent_visits are immutable post-insert on the server (no update path), so
- * we only need insert-if-missing — no LWW timestamp comparison. Ghost-row
- * reconciliation (local _dirty=1 rows with client UUIDs) is added in a
- * follow-up commit.
+ * we only need insert-if-missing — no LWW timestamp comparison.
+ *
+ * Ghost-row reconciliation: useOfflineUpdateAttendance writes tent_visits
+ * locally with a client-generated UUID and _dirty=1. The parent attendance
+ * push creates server tent_visits with different UUIDs — the local client-UUID
+ * rows are never cleared because there's no direct push handler for
+ * tent_visits. Here we detect them via the natural-key match and rewrite the
+ * local id to the server id so the row converges.
  */
 async function processTentVisits(
   db: SQLite.SQLiteDatabase,
@@ -302,20 +307,41 @@ async function processTentVisits(
           [now, tv.id],
         );
       }
-    } else {
-      // INSERT OR IGNORE guards against the rare natural-key collision from a
-      // local _dirty=1 ghost row with a client UUID. Ghost cleanup lands next.
-      const res = await db.runAsync(
-        `INSERT OR IGNORE INTO tent_visits (
+      continue;
+    }
+
+    // No local row with this server id — check for a ghost row (local _dirty=1
+    // write from useOfflineUpdateAttendance that used a client UUID).
+    const byNaturalKey = await db.getFirstAsync<LocalTentVisit>(
+      `SELECT * FROM tent_visits
+       WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?
+         AND _deleted = 0`,
+      [tv.userId, tv.tentId, tv.festivalId, tv.visitDate],
+    );
+
+    if (byNaturalKey && byNaturalKey.id !== tv.id) {
+      const oldId = byNaturalKey.id;
+      await db.runAsync(
+        `UPDATE tent_visits SET
+          id = ?, _synced_at = ?, _dirty = 0, _deleted = 0
+        WHERE id = ?`,
+        [tv.id, now, oldId],
+      );
+      logger.info(
+        `[SyncManager] Reconciled tent_visit ID: ${oldId} → ${tv.id}`,
+      );
+      result.updated++;
+    } else if (!byNaturalKey) {
+      await db.runAsync(
+        `INSERT INTO tent_visits (
           id, user_id, tent_id, festival_id, visit_date,
           _synced_at, _dirty, _deleted
         ) VALUES (?, ?, ?, ?, ?, ?, 0, 0)`,
         [tv.id, tv.userId, tv.tentId, tv.festivalId, tv.visitDate, now],
       );
-      if (res.changes > 0) {
-        result.inserted++;
-      }
+      result.inserted++;
     }
+    // If byNaturalKey exists with matching ID, it was handled in the existing branch above.
   }
 }
 
