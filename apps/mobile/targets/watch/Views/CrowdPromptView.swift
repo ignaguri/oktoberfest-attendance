@@ -16,7 +16,10 @@ struct CrowdPromptView: View {
                     .foregroundStyle(.green)
                 Text(
                     String(
-                        format: NSLocalizedString("watch.crowd.prompt", comment: ""),
+                        format: NSLocalizedString(
+                            "watch.crowd.prompt",
+                            comment: "Crowd report question header. %@ is the tent name."
+                        ),
                         tentName
                     )
                 )

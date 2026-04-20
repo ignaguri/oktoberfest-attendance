@@ -27,7 +27,7 @@ struct WatchEntry: App {
     /// this write only takes effect on the NEXT cold launch.
     private static func applyPreferredLanguage() {
         guard
-            let defaults = UserDefaults(suiteName: "group.com.prostcounter.shared"),
+            let defaults = UserDefaults(suiteName: TokenStore.appGroup),
             let lang = defaults.string(forKey: "preferredLanguage"),
             ["en", "de", "es"].contains(lang)
         else {

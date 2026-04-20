@@ -107,12 +107,18 @@ struct MainView: View {
         let others = max(0, viewModel.drinkCount - viewModel.beerCount)
         if others == 0 {
             return String(
-                format: NSLocalizedString("watch.today.count", comment: ""),
+                format: NSLocalizedString(
+                    "watch.today.count",
+                    comment: "Today summary when only beers were logged. %lld is drink count."
+                ),
                 viewModel.drinkCount
             )
         }
         return String(
-            format: NSLocalizedString("watch.today.countMixed", comment: ""),
+            format: NSLocalizedString(
+                "watch.today.countMixed",
+                comment: "Today summary with beers and other drinks. %1$lld is beers, %2$lld is others."
+            ),
             viewModel.beerCount,
             others
         )
