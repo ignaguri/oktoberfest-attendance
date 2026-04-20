@@ -246,7 +246,12 @@ function WatchInstallPromptHandler() {
 
   useEffect(() => {
     if (Platform.OS !== "ios") return;
-    hasWatchInstallPromptBeenShown().then(setHasBeenShown);
+    hasWatchInstallPromptBeenShown()
+      .then(setHasBeenShown)
+      .catch((error) => {
+        logger.warn("Failed to read watch install prompt state", { error });
+        setHasBeenShown(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -262,32 +267,23 @@ function WatchInstallPromptHandler() {
     }
   }, [isAuthenticated, hasBeenShown, isPaired, isInstalled]);
 
-  const markShown = () => {
-    setWatchInstallPromptShown(true).catch(() => {});
+  const dismiss = () => {
+    setShowPrompt(false);
     setHasBeenShown(true);
+    setWatchInstallPromptShown(true).catch(() => {});
   };
 
-  const handleInstall = async () => {
-    await Linking.openURL(IOS_APP_STORE_URL).catch(() => {});
-    markShown();
-  };
-
-  const handleSkip = () => {
-    setShowPrompt(false);
-    markShown();
-  };
-
-  const handleClose = () => {
-    setShowPrompt(false);
-    markShown();
+  const handleInstall = () => {
+    Linking.openURL(IOS_APP_STORE_URL).catch(() => {});
+    dismiss();
   };
 
   return (
     <WatchInstallPrompt
       isOpen={showPrompt}
-      onClose={handleClose}
+      onClose={dismiss}
       onInstall={handleInstall}
-      onSkip={handleSkip}
+      onSkip={dismiss}
     />
   );
 }

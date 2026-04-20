@@ -20,7 +20,7 @@ import { Colors } from "@/lib/constants/colors";
 interface WatchInstallPromptProps {
   isOpen: boolean;
   onClose: () => void;
-  onInstall: () => void | Promise<void>;
+  onInstall: () => void;
   onSkip: () => void;
 }
 
@@ -87,9 +87,8 @@ export function WatchInstallPrompt({
         <AlertDialogFooter className="flex-col gap-2 pt-4">
           <Button
             className="w-full"
-            onPress={async () => {
-              await onInstall();
-              onClose();
+            onPress={() => {
+              onInstall();
             }}
             accessibilityLabel={t("watch.install.install")}
           >
@@ -98,10 +97,7 @@ export function WatchInstallPrompt({
           <Button
             variant="link"
             className="w-full"
-            onPress={() => {
-              onSkip();
-              onClose();
-            }}
+            onPress={onSkip}
             accessibilityLabel={t("watch.install.skip")}
           >
             <ButtonText className="text-typography-500">
