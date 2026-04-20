@@ -279,12 +279,21 @@ async function processAttendances(
  * tent_visits are immutable post-insert on the server (no update path), so
  * we only need insert-if-missing — no LWW timestamp comparison.
  *
+ * visit_date is normalized to YYYY-MM-DD to match the local write path in
+ * useOfflineUpdateAttendance and the UI query in useAdaptedAttendanceByDate
+ * (which compares on exact date-string match). The server stores visit_date
+ * as an ISO timestamp, but the local schema's
+ * UNIQUE(user_id, tent_id, festival_id, visit_date) index and adapted-hook
+ * query both assume "one row per tent per day".
+ *
  * Ghost-row reconciliation: useOfflineUpdateAttendance writes tent_visits
  * locally with a client-generated UUID and _dirty=1. The parent attendance
  * push creates server tent_visits with different UUIDs — the local client-UUID
  * rows are never cleared because there's no direct push handler for
- * tent_visits. Here we detect them via the natural-key match and rewrite the
- * local id to the server id so the row converges.
+ * tent_visits. Also, earlier mixed-format pulls may have left rows with
+ * timestamp visit_dates that are invisible to the UI. Both are cleaned up
+ * here by deleting any row sharing the natural key (date-only match, or a
+ * timestamp prefix-matching the date) whose id differs from the server's.
  */
 async function processTentVisits(
   db: SQLite.SQLiteDatabase,
@@ -293,55 +302,44 @@ async function processTentVisits(
   now: string,
 ): Promise<void> {
   for (const tv of tentVisits) {
+    const visitDate = tv.visitDate.slice(0, 10);
+
+    // Clean up any other local row with the same natural key — both ghost
+    // rows (date-only visit_date, _dirty=1) and stale pulled rows from an
+    // earlier mixed-format pull (timestamp visit_date starting with this date).
+    await db.runAsync(
+      `DELETE FROM tent_visits
+       WHERE user_id = ? AND tent_id = ? AND festival_id = ?
+         AND (visit_date = ? OR visit_date LIKE ?)
+         AND id != ?`,
+      [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
+    );
+
     const existing = await db.getFirstAsync<LocalTentVisit>(
       "SELECT * FROM tent_visits WHERE id = ?",
       [tv.id],
     );
 
     if (existing) {
-      // Row already tracked by server id — no fields to update (immutable).
-      // Refresh _synced_at and clear _dirty in case a prior push left it dirty.
-      if (existing._synced_at !== now || existing._dirty === 1) {
-        await db.runAsync(
-          `UPDATE tent_visits SET _synced_at = ?, _dirty = 0 WHERE id = ?`,
-          [now, tv.id],
-        );
-      }
-      continue;
-    }
-
-    // No local row with this server id — check for a ghost row (local _dirty=1
-    // write from useOfflineUpdateAttendance that used a client UUID).
-    const byNaturalKey = await db.getFirstAsync<LocalTentVisit>(
-      `SELECT * FROM tent_visits
-       WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?
-         AND _deleted = 0`,
-      [tv.userId, tv.tentId, tv.festivalId, tv.visitDate],
-    );
-
-    if (byNaturalKey && byNaturalKey.id !== tv.id) {
-      const oldId = byNaturalKey.id;
       await db.runAsync(
         `UPDATE tent_visits SET
-          id = ?, _synced_at = ?, _dirty = 0, _deleted = 0
+          visit_date = ?, _synced_at = ?, _dirty = 0, _deleted = 0
         WHERE id = ?`,
-        [tv.id, now, oldId],
+        [visitDate, now, tv.id],
       );
-      logger.info(
-        `[SyncManager] Reconciled tent_visit ID: ${oldId} → ${tv.id}`,
-      );
-      result.updated++;
-    } else if (!byNaturalKey) {
+      if (existing.visit_date !== visitDate || existing._dirty === 1) {
+        result.updated++;
+      }
+    } else {
       await db.runAsync(
         `INSERT INTO tent_visits (
           id, user_id, tent_id, festival_id, visit_date,
           _synced_at, _dirty, _deleted
         ) VALUES (?, ?, ?, ?, ?, ?, 0, 0)`,
-        [tv.id, tv.userId, tv.tentId, tv.festivalId, tv.visitDate, now],
+        [tv.id, tv.userId, tv.tentId, tv.festivalId, visitDate, now],
       );
       result.inserted++;
     }
-    // If byNaturalKey exists with matching ID, it was handled in the existing branch above.
   }
 }
 
