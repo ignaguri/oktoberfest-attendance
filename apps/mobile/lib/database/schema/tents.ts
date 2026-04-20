@@ -72,6 +72,7 @@ export const tentVisits = sqliteTable(
       .notNull()
       .references(() => festivals.id),
     visit_date: text(),
+    created_at: text(),
     ...offlineColumns,
   },
   (t) => [

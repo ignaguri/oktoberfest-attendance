@@ -104,18 +104,19 @@ export function useOfflineUpdateAttendance() {
 
       // Write tent_visits locally so adapted hooks see them immediately
       if (input.tents && input.tents.length > 0) {
+        const nowIso = new Date().toISOString();
         for (const tentId of input.tents) {
           const visitId = generateUUID();
           await db.runAsync(
             `INSERT OR REPLACE INTO tent_visits (
-              id, user_id, tent_id, festival_id, visit_date,
+              id, user_id, tent_id, festival_id, visit_date, created_at,
               _synced_at, _deleted, _dirty
             ) VALUES (
               COALESCE(
                 (SELECT id FROM tent_visits WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?),
                 ?
               ),
-              ?, ?, ?, ?, NULL, 0, 1
+              ?, ?, ?, ?, ?, NULL, 0, 1
             )`,
             [
               userId,
@@ -127,6 +128,7 @@ export function useOfflineUpdateAttendance() {
               tentId,
               input.festivalId,
               input.date,
+              nowIso,
             ],
           );
         }

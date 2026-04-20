@@ -298,13 +298,18 @@ export function useAdaptedAttendanceByDate(
 
       if (!row) return null;
 
-      // Get tent visits with tent names for this date
+      // Get tent visits with tent names for this date.
+      // Project the UI-facing `visitDate` from `created_at` when available
+      // (holds the actual timestamp), falling back to the date-only
+      // `visit_date` so locally-written rows without a created_at still
+      // render.
       const tentVisitRows = await db.getAllAsync<{
         tent_id: string;
         visit_date: string | null;
+        created_at: string | null;
         tent_name: string | null;
       }>(
-        `SELECT tv.tent_id, tv.visit_date, t.name as tent_name
+        `SELECT tv.tent_id, tv.visit_date, tv.created_at, t.name as tent_name
          FROM tent_visits tv
          LEFT JOIN tents t ON tv.tent_id = t.id
          WHERE tv.festival_id = ? AND tv.visit_date = ? AND tv._deleted = 0`,
@@ -313,7 +318,7 @@ export function useAdaptedAttendanceByDate(
 
       const tentVisits: TentVisit[] = tentVisitRows.map((tv) => ({
         tentId: tv.tent_id,
-        visitDate: tv.visit_date ?? date,
+        visitDate: tv.created_at ?? tv.visit_date ?? date,
         tentName: tv.tent_name ?? null,
       }));
 

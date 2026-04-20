@@ -303,6 +303,7 @@ async function processTentVisits(
 ): Promise<void> {
   for (const tv of tentVisits) {
     const visitDate = tv.visitDate.slice(0, 10);
+    const createdAt = tv.visitDate;
 
     // Clean up any other local row with the same natural key — both ghost
     // rows (date-only visit_date, _dirty=1) and stale pulled rows from an
@@ -323,20 +324,24 @@ async function processTentVisits(
     if (existing) {
       await db.runAsync(
         `UPDATE tent_visits SET
-          visit_date = ?, _synced_at = ?, _dirty = 0, _deleted = 0
+          visit_date = ?, created_at = ?, _synced_at = ?, _dirty = 0, _deleted = 0
         WHERE id = ?`,
-        [visitDate, now, tv.id],
+        [visitDate, createdAt, now, tv.id],
       );
-      if (existing.visit_date !== visitDate || existing._dirty === 1) {
+      if (
+        existing.visit_date !== visitDate ||
+        existing.created_at !== createdAt ||
+        existing._dirty === 1
+      ) {
         result.updated++;
       }
     } else {
       await db.runAsync(
         `INSERT INTO tent_visits (
-          id, user_id, tent_id, festival_id, visit_date,
+          id, user_id, tent_id, festival_id, visit_date, created_at,
           _synced_at, _dirty, _deleted
-        ) VALUES (?, ?, ?, ?, ?, ?, 0, 0)`,
-        [tv.id, tv.userId, tv.tentId, tv.festivalId, visitDate, now],
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)`,
+        [tv.id, tv.userId, tv.tentId, tv.festivalId, visitDate, createdAt, now],
       );
       result.inserted++;
     }
