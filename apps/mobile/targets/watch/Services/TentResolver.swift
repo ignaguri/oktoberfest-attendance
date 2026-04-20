@@ -60,7 +60,7 @@ extension TentResolver {
 
         // 1. Attendance tent wins over GPS (name comes from tentVisits)
         let attendance = AttendanceByDate(id: "a1", date: "2026-04-19", festivalId: "f1",
-                                          drinkCount: 2, tentIds: ["tent-b"],
+                                          drinkCount: 2, beerCount: 2, tentIds: ["tent-b"],
                                           tentVisits: [TentVisit(tentId: "tent-b", tentName: "Paulaner")])
         let r1 = resolve(attendance: attendance, nearbyTents: nearby)
         assert(r1.tentId == "tent-b", "Test 1 failed: expected tent-b (attendance), got \(r1.tentId ?? "nil")")
@@ -79,7 +79,7 @@ extension TentResolver {
 
         // 4. Attendance tent with no matching visit and no nearby → name="—" but keeps ID
         let orphanAttendance = AttendanceByDate(id: "a2", date: "2026-04-19", festivalId: "f1",
-                                                drinkCount: 1, tentIds: ["tent-z"], tentVisits: [])
+                                                drinkCount: 1, beerCount: 1, tentIds: ["tent-z"], tentVisits: [])
         let r4 = resolve(attendance: orphanAttendance, nearbyTents: nearby)
         assert(r4.tentId == "tent-z", "Test 4 failed: expected tent-z, got \(r4.tentId ?? "nil")")
         assert(r4.tentName == "—", "Test 4 name failed: expected —, got \(r4.tentName)")

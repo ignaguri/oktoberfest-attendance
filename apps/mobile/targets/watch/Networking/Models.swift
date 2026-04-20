@@ -16,6 +16,7 @@ struct AttendanceByDate: Decodable {
     let date: String
     let festivalId: String
     let drinkCount: Int
+    let beerCount: Int
     let tentIds: [String]            // flat array of tent UUIDs
     let tentVisits: [TentVisit]      // tent UUID + name — useful when GPS list doesn't include this tent
 }
@@ -35,6 +36,7 @@ struct AttendanceByDateResponse: Decodable {
 struct AttendanceWithTotals: Decodable {
     let id: String
     let drinkCount: Int
+    let beerCount: Int
 }
 
 // Maps to GET /tents/nearby response.
@@ -56,4 +58,28 @@ struct NearbyTent: Decodable, Identifiable {
 // Envelope for GET /tents/nearby.
 struct NearbyTentsResponse: Decodable {
     let tents: [NearbyTent]
+}
+
+// Maps to FestivalTentSchema from GET /tents — the full tent roster for a
+// festival (no distance filter). Used in the tent picker so the user can
+// pick any tent regardless of where they physically are.
+struct FestivalTent: Decodable, Identifiable {
+    struct TentDetails: Decodable {
+        let id: String
+        let name: String
+        let category: String?
+    }
+    let festivalId: String
+    let tentId: String
+    let beerPrice: Double?
+    let tent: TentDetails
+
+    var id: String { tentId }
+    var name: String { tent.name }
+    var category: String? { tent.category }
+}
+
+// Envelope for GET /tents.
+struct FestivalTentsResponse: Decodable {
+    let data: [FestivalTent]
 }

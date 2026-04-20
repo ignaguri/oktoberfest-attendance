@@ -11,7 +11,6 @@ final class AppViewModel: ObservableObject {
         case alcoholFree = "alcohol_free"
         case wine = "wine"
         case softDrink = "soft_drink"
-        case other = "other"
 
         var id: String { rawValue }
 
@@ -22,7 +21,6 @@ final class AppViewModel: ObservableObject {
             case .alcoholFree: return "Alcohol-free"
             case .wine: return "Wine"
             case .softDrink: return "Soft drink"
-            case .other: return "Other"
             }
         }
 
@@ -33,7 +31,6 @@ final class AppViewModel: ObservableObject {
             case .alcoholFree: return "🚫"
             case .wine: return "🍷"
             case .softDrink: return "🥤"
-            case .other: return "✨"
             }
         }
     }
@@ -69,6 +66,7 @@ final class AppViewModel: ObservableObject {
 
     @Published private(set) var status: Status = .idle
     @Published private(set) var drinkCount: Int = 0
+    @Published private(set) var beerCount: Int = 0
     @Published private(set) var currentTent: ResolvedTent = ResolvedTent(tentId: nil, tentName: "—", source: .none)
     @Published private(set) var festivalId: String? = nil
     // Derived from festivals.beerCost; used as pricePaidCents on log POST to satisfy
@@ -82,8 +80,11 @@ final class AppViewModel: ObservableObject {
     static let defaultBeerCostCents: Int = 1620
 
     @Published private(set) var beerCostCents: Int = AppViewModel.defaultBeerCostCents
-    /// GPS-nearby tents fetched during bootstrap; used by TentPickerView.
+    /// GPS-nearby tents fetched during bootstrap; used to auto-pick a tent.
     @Published private(set) var nearbyTents: [NearbyTent] = []
+    /// Full tent roster for the active festival (GET /tents). Drives the
+    /// picker so the user can pick any tent regardless of GPS.
+    @Published private(set) var festivalTents: [FestivalTent] = []
     /// When non-nil, MainView surfaces the CrowdPromptView for this tent.
     /// Set when the tapped Prost was the first drink of the day against a known tent.
     @Published var promptingCrowdForTentId: String? = nil
@@ -159,12 +160,17 @@ final class AppViewModel: ObservableObject {
                     festivalId: festId
                 )) ?? []
             }()
+            async let festivalTentsTask: [FestivalTent] = {
+                (try? await api.fetchFestivalTents(festivalId: festId)) ?? []
+            }()
 
             let attendance = try await attendanceTask
             let festival = try await festivalTask
             let fetchedNearby = await nearbyTask
+            let fetchedFestivalTents = await festivalTentsTask
 
             drinkCount = attendance?.drinkCount ?? 0
+            beerCount = attendance?.beerCount ?? 0
             if let beerCost = festival.beerCost, beerCost > 0 {
                 beerCostCents = Int((beerCost * 100).rounded())
             } else {
@@ -174,6 +180,7 @@ final class AppViewModel: ObservableObject {
                 beerCostCents = Self.defaultBeerCostCents
             }
             nearbyTents = fetchedNearby
+            festivalTents = fetchedFestivalTents
 
             // Priority: today's attendance tent (user checked in on phone) → GPS-nearest → none.
             currentTent = TentResolver.resolve(
@@ -222,6 +229,7 @@ final class AppViewModel: ObservableObject {
             date: todayString,
             tentId: tentAtLogTime,
             drinkType: type,
+            basePriceCents: beerCostCents,
             pricePaidCents: beerCostCents
         )
 
@@ -230,6 +238,23 @@ final class AppViewModel: ObservableObject {
             do {
                 let result = try await api.logConsumption(body)
                 drinkCount = result.drinkCount
+                beerCount = result.beerCount
+                // Mirror QuickAttendanceSheet's Save flow — when a tent is
+                // selected, also replace the day's tent list so the iPhone
+                // UI reflects the watch's pick on its next refetch. Failure
+                // here is best-effort: the drink is already logged, so we
+                // don't want to roll back or downgrade status to needsRetry.
+                if let tentId = tentAtLogTime {
+                    do {
+                        try await api.updateAttendanceTents(
+                            festivalId: festId,
+                            date: todayString,
+                            tentIds: [tentId]
+                        )
+                    } catch {
+                        print("updateAttendanceTents failed (non-fatal): \(error)")
+                    }
+                }
                 notifyIPhoneOfDrinkLog()
                 status = .success
                 if shouldPromptAfter, let tentId = tentAtLogTime {
@@ -254,10 +279,10 @@ final class AppViewModel: ObservableObject {
     }
 
     /// Manually override the active tent (called from TentPickerView).
-    func changeTent(to tent: NearbyTent) {
+    func changeTent(to tent: FestivalTent) {
         currentTent = ResolvedTent(
             tentId: tent.tentId,
-            tentName: tent.tentName,
+            tentName: tent.name,
             source: .manualOverride
         )
     }

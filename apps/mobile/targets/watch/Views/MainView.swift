@@ -32,9 +32,12 @@ struct MainView: View {
                         }
                     }
                 } label: {
-                    Label("Prost!", systemImage: "mug.fill")
-                        .font(.title3.bold())
-                        .frame(maxWidth: .infinity, minHeight: 44)
+                    HStack(spacing: 4) {
+                        Text("🍺")
+                        Text("Prost!")
+                    }
+                    .font(.title3.bold())
+                    .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(
@@ -50,7 +53,7 @@ struct MainView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(.blue)
 
-                Text("Today: \(viewModel.drinkCount) 🍺")
+                Text(todaySummary)
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
@@ -70,7 +73,10 @@ struct MainView: View {
             }
         }
         .sheet(isPresented: $showingTentPicker) {
-            TentPickerView(tents: viewModel.nearbyTents) { tent in
+            TentPickerView(
+                tents: viewModel.festivalTents,
+                selectedTentId: viewModel.currentTent.tentId
+            ) { tent in
                 viewModel.changeTent(to: tent)
                 showingTentPicker = false
             }
@@ -95,6 +101,14 @@ struct MainView: View {
             )
         }
         .task { await viewModel.bootstrap() }
+    }
+
+    private var todaySummary: String {
+        let others = max(0, viewModel.drinkCount - viewModel.beerCount)
+        if others == 0 {
+            return "Today: \(viewModel.drinkCount) 🍺"
+        }
+        return "Today: \(viewModel.beerCount) 🍺 · \(others) other"
     }
 
     @ViewBuilder
