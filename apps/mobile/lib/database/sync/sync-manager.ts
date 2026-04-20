@@ -148,7 +148,7 @@ export class SyncManager {
       // Pull user data
       if (userId) {
         results.push(await pullProfile(this.db, userId));
-        results.push(await pullAttendances(this.db, festivalId));
+        results.push(...(await pullAttendances(this.db, festivalId)));
         results.push(await pullConsumptions(this.db, festivalId));
         results.push(await pullGroups(this.db, festivalId));
         results.push(await pullGroupMembers(this.db, festivalId));

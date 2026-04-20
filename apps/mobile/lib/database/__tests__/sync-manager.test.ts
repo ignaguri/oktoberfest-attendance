@@ -384,11 +384,14 @@ describe("Pull functions", () => {
   });
 
   describe("pullAttendances", () => {
-    it("should pull attendances from API", async () => {
+    it("should return both attendances and tent_visits PullResults", async () => {
       const db = mockDb as unknown as Parameters<typeof pullAttendances>[0];
-      const result = await pullAttendances(db, "festival-1");
+      const results = await pullAttendances(db, "festival-1");
 
-      expect(result.table).toBe("attendances");
+      expect(results.map((r) => r.table)).toEqual([
+        "attendances",
+        "tent_visits",
+      ]);
     });
   });
 
