@@ -5,6 +5,7 @@
  * profiles, attendances, consumptions.
  */
 
+import { formatDateForDatabase } from "@prostcounter/shared";
 import type * as SQLite from "expo-sqlite";
 
 import { logger } from "@/lib/logger";
@@ -302,19 +303,37 @@ async function processTentVisits(
   now: string,
 ): Promise<void> {
   for (const tv of tentVisits) {
-    const visitDate = tv.visitDate.slice(0, 10);
+    const visitDate = formatDateForDatabase(new Date(tv.visitDate));
     const createdAt = tv.visitDate;
 
     // Clean up any other local row with the same natural key — both ghost
     // rows (date-only visit_date, _dirty=1) and stale pulled rows from an
     // earlier mixed-format pull (timestamp visit_date starting with this date).
-    await db.runAsync(
-      `DELETE FROM tent_visits
+    // Only fires when such a row actually exists to avoid per-sync write churn.
+    const ghost = await db.getFirstAsync<{ id: string }>(
+      `SELECT id FROM tent_visits
        WHERE user_id = ? AND tent_id = ? AND festival_id = ?
          AND (visit_date = ? OR visit_date LIKE ?)
-         AND id != ?`,
+         AND id != ?
+       LIMIT 1`,
       [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
     );
+    if (ghost) {
+      await db.runAsync(
+        `DELETE FROM tent_visits
+         WHERE user_id = ? AND tent_id = ? AND festival_id = ?
+           AND (visit_date = ? OR visit_date LIKE ?)
+           AND id != ?`,
+        [
+          tv.userId,
+          tv.tentId,
+          tv.festivalId,
+          visitDate,
+          `${visitDate}%`,
+          tv.id,
+        ],
+      );
+    }
 
     const existing = await db.getFirstAsync<LocalTentVisit>(
       "SELECT * FROM tent_visits WHERE id = ?",
@@ -322,17 +341,19 @@ async function processTentVisits(
     );
 
     if (existing) {
-      await db.runAsync(
-        `UPDATE tent_visits SET
-          visit_date = ?, created_at = ?, _synced_at = ?, _dirty = 0, _deleted = 0
-        WHERE id = ?`,
-        [visitDate, createdAt, now, tv.id],
-      );
-      if (
+      const needsUpdate =
         existing.visit_date !== visitDate ||
         existing.created_at !== createdAt ||
-        existing._dirty === 1
-      ) {
+        existing._dirty === 1 ||
+        existing._deleted === 1 ||
+        existing._synced_at === null;
+      if (needsUpdate) {
+        await db.runAsync(
+          `UPDATE tent_visits SET
+            visit_date = ?, created_at = ?, _synced_at = ?, _dirty = 0, _deleted = 0
+          WHERE id = ?`,
+          [visitDate, createdAt, now, tv.id],
+        );
         result.updated++;
       }
     } else {

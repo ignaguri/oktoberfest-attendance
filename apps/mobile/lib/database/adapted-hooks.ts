@@ -298,11 +298,9 @@ export function useAdaptedAttendanceByDate(
 
       if (!row) return null;
 
-      // Get tent visits with tent names for this date.
-      // Project the UI-facing `visitDate` from `created_at` when available
-      // (holds the actual timestamp), falling back to the date-only
-      // `visit_date` so locally-written rows without a created_at still
-      // render.
+      // Use created_at (server timestamp) for display; fall back to
+      // date-only visit_date because locally-written rows may not have
+      // created_at populated yet.
       const tentVisitRows = await db.getAllAsync<{
         tent_id: string;
         visit_date: string | null;
