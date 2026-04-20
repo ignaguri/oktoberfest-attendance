@@ -33,10 +33,13 @@ export function useWatchStatus(): WatchStatus {
     const subscription = DeviceEventEmitter.addListener(
       "watchState",
       (payload: WatchStateEvent) => {
-        setStatus({
-          isPaired: payload?.isPaired ?? false,
-          isInstalled: payload?.isWatchAppInstalled ?? false,
-        });
+        const nextPaired = payload?.isPaired ?? false;
+        const nextInstalled = payload?.isWatchAppInstalled ?? false;
+        setStatus((prev) =>
+          prev.isPaired === nextPaired && prev.isInstalled === nextInstalled
+            ? prev
+            : { isPaired: nextPaired, isInstalled: nextInstalled },
+        );
       },
     );
 

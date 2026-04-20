@@ -31,6 +31,7 @@ import {
   hasWatchInstallPromptBeenShown,
   setWatchInstallPromptShown,
 } from "@/lib/auth/secure-storage";
+import { IOS_APP_STORE_URL } from "@/lib/constants/app-store";
 import { useFocusManager } from "@/lib/data/focus-manager-setup";
 import { useOnlineManager } from "@/lib/data/online-manager-setup";
 import { DataProvider } from "@/lib/data/query-client";
@@ -58,8 +59,6 @@ import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
 import { initSentry } from "@/lib/sentry";
 import { TutorialProvider } from "@/lib/tutorial";
 import { useWatchStatus } from "@/lib/watch/useWatchStatus";
-
-const WATCH_APP_STORE_URL = "https://apps.apple.com/app/id6758376527";
 
 // Initialize Sentry for error monitoring (native only)
 if (Platform.OS !== "web") {
@@ -246,6 +245,7 @@ function WatchInstallPromptHandler() {
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
+    if (Platform.OS !== "ios") return;
     hasWatchInstallPromptBeenShown().then(setHasBeenShown);
   }, []);
 
@@ -268,7 +268,7 @@ function WatchInstallPromptHandler() {
   };
 
   const handleInstall = async () => {
-    await Linking.openURL(WATCH_APP_STORE_URL).catch(() => {});
+    await Linking.openURL(IOS_APP_STORE_URL).catch(() => {});
     markShown();
   };
 
