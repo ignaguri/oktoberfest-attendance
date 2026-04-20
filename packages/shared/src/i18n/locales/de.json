@@ -2304,6 +2304,19 @@
       "later": "Vielleicht später"
     }
   },
+  "watch": {
+    "install": {
+      "promptTitle": "Hol dir ProstCounter auf deine Apple Watch",
+      "promptDescription": "Du hast eine Apple Watch gekoppelt. Installiere unsere Companion-App, um Maßkrüge direkt vom Handgelenk zu zählen.",
+      "benefits": {
+        "fastLog": "Eine Maß mit zwei Taps eintragen",
+        "autoTent": "Zelt automatisch erkennen",
+        "groupActivity": "Gruppen-Aktivität in Echtzeit sehen"
+      },
+      "install": "Watch-App installieren",
+      "skip": "Nicht jetzt"
+    }
+  },
   "crowdReport": {
     "title": "Auslastungsbericht",
     "status": "Auslastungsstatus",
@@ -2441,6 +2454,14 @@
         "description": "Schalte über 40 Abzeichen in verschiedenen Kategorien frei — von Erstbesucher-Meilensteinen bis zu legendären Serien und versteckten Überraschungen."
       }
     },
+    "appleWatchHighlight": {
+      "title": "Jetzt auf der Apple Watch",
+      "subtitle": "Zähl jede Maß, ohne dein Handy rauszuholen. Unsere Apple-Watch-Companion-App ist gebaut für Festzelt, Biergarten und alles dazwischen.",
+      "bulletFastLog": "Eine Maß mit zwei Taps eintragen",
+      "bulletAutoTent": "Zelt automatisch per GPS erkennen",
+      "bulletGroupActivity": "Die neuesten Biere deiner Gruppe in Echtzeit sehen",
+      "cta": "Für iOS herunterladen"
+    },
     "festivals": {
       "sectionTitle": "Münchner Bierfeste",
       "sectionSubtitle": "ProstCounter unterstützt alle großen Münchner Bierfeste.",
@@ -2482,6 +2503,11 @@
       "webApp": {
         "description": "Jeder Browser, jedes Gerät",
         "action": "Web-App öffnen"
+      },
+      "appleWatch": {
+        "title": "Apple-Watch-Companion inklusive",
+        "description": "Installier die iOS-App und die Companion-App ist automatisch auf deiner gekoppelten Apple Watch verfügbar.",
+        "requirements": "Benötigt watchOS 10 oder neuer"
       },
       "scanWithPhone": "Mit dem Handy scannen",
       "opensAppStore": "Öffnet den App Store auf iOS-Geräten"

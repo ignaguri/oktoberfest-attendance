@@ -2607,6 +2607,19 @@
       "later": "Tal vez más tarde"
     }
   },
+  "watch": {
+    "install": {
+      "promptTitle": "Instalá ProstCounter en tu Apple Watch",
+      "promptDescription": "Tenés un Apple Watch emparejado. Instalá nuestra app complementaria para registrar Maßkrüge directamente desde la muñeca.",
+      "benefits": {
+        "fastLog": "Registrá una jarra en dos toques",
+        "autoTent": "Detectá automáticamente la carpa en la que estás",
+        "groupActivity": "Mirá la actividad de tu grupo en tiempo real"
+      },
+      "install": "Instalar app del Watch",
+      "skip": "Ahora no"
+    }
+  },
   "crowdReport": {
     "title": "Reporte de multitud",
     "status": "Estado de multitud",
@@ -2744,6 +2757,14 @@
         "description": "Desbloquea más de 40 insignias en distintas categorías — desde hitos de primerizo hasta rachas legendarias y sorpresas ocultas."
       }
     },
+    "appleWatchHighlight": {
+      "title": "Ya disponible en Apple Watch",
+      "subtitle": "Registrá cada jarra sin sacar el móvil. Nuestra app complementaria para Apple Watch está pensada para la carpa, el biergarten y todo lo que hay en medio.",
+      "bulletFastLog": "Registrá una jarra en dos toques",
+      "bulletAutoTent": "Detectá la carpa automáticamente por GPS",
+      "bulletGroupActivity": "Mirá las últimas jarras de tu grupo en tiempo real",
+      "cta": "Descargar en iOS"
+    },
     "festivals": {
       "sectionTitle": "Festivales cerveceros de Múnich",
       "sectionSubtitle": "ProstCounter cubre todos los grandes festivales cerveceros de Múnich.",
@@ -2785,6 +2806,11 @@
       "webApp": {
         "description": "Cualquier navegador, cualquier dispositivo",
         "action": "Abrir app web"
+      },
+      "appleWatch": {
+        "title": "App de Apple Watch incluida",
+        "description": "Instalá la app de iOS y la app complementaria estará disponible automáticamente en tu Apple Watch emparejado.",
+        "requirements": "Requiere watchOS 10 o posterior"
       },
       "scanWithPhone": "Escanea con tu móvil",
       "opensAppStore": "Abre el App Store en dispositivos iOS"

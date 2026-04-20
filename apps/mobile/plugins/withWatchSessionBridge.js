@@ -75,6 +75,26 @@ final class WatchSessionBridge: NSObject {
     forwardToWatch()
   }
 
+  /// Dispatches the current pairing / installed state of the paired Apple Watch
+  /// to JavaScript so the app can render a one-time "install the companion"
+  /// prompt when a watch is paired but the companion hasn't been installed.
+  private func emitWatchState() {
+    guard WCSession.default.activationState == .activated else { return }
+    let payload: [String: Any] = [
+      "isPaired": WCSession.default.isPaired,
+      "isWatchAppInstalled": WCSession.default.isWatchAppInstalled,
+    ]
+    DispatchQueue.main.async {
+      if let bridge = RCTBridge.current() {
+        bridge.eventDispatcher().sendDeviceEvent(
+          withName: "watchState",
+          body: payload
+        )
+        watchBridgeLog.info("dispatched watchState paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) to RN")
+      }
+    }
+  }
+
   private func forwardToWatch() {
     guard
       WCSession.default.activationState == .activated,
@@ -137,6 +157,7 @@ extension WatchSessionBridge: WCSessionDelegate {
     watchBridgeLog.info("activation complete: state=\\(activationState.rawValue, privacy: .public) paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) reachable=\\(WCSession.default.isReachable, privacy: .public)")
     if activationState == .activated {
       forwardToWatch()
+      emitWatchState()
     }
   }
 
@@ -147,6 +168,14 @@ extension WatchSessionBridge: WCSessionDelegate {
   func sessionDidDeactivate(_ session: WCSession) {
     // Required on iOS — reactivate to support Apple Watch switching
     WCSession.default.activate()
+  }
+
+  /// Fires when the user pairs/unpairs a watch or installs/uninstalls the
+  /// companion app while the phone app is running. Re-emitting the state lets
+  /// the install prompt react live without requiring a cold restart.
+  func sessionWatchStateDidChange(_ session: WCSession) {
+    watchBridgeLog.info("sessionWatchStateDidChange: paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public)")
+    emitWatchState()
   }
 
   /// Called when the watch sends a message — currently only "drinkLogged".

@@ -1,7 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Beer, Calendar, Download, MapPin, Trophy, Users } from "lucide-react";
+import {
+  Beer,
+  Calendar,
+  Check,
+  Download,
+  MapPin,
+  Trophy,
+  Users,
+  Watch,
+} from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
@@ -166,6 +175,77 @@ export function LandingContent() {
                 </p>
               </motion.div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Apple Watch Highlight */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            className="grid items-center gap-12 md:grid-cols-2"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+          >
+            <motion.div
+              variants={fadeUp}
+              className="flex items-center justify-center"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 opacity-30 blur-3xl" />
+                <div className="relative inline-flex items-center justify-center rounded-[3rem] bg-gradient-to-br from-gray-900 to-gray-700 p-10 shadow-2xl">
+                  <Watch
+                    size={140}
+                    className="text-yellow-400"
+                    strokeWidth={1.5}
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeUp}>
+              <span className="mb-3 inline-flex items-center rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-yellow-700 uppercase">
+                <Watch size={14} className="mr-1.5" />
+                Apple Watch
+              </span>
+              <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                {t("marketing.appleWatchHighlight.title")}
+              </h2>
+              <p className="mb-6 text-lg text-gray-600">
+                {t("marketing.appleWatchHighlight.subtitle")}
+              </p>
+
+              <ul className="mb-8 space-y-3">
+                {(
+                  [
+                    "bulletFastLog",
+                    "bulletAutoTent",
+                    "bulletGroupActivity",
+                  ] as const
+                ).map((bullet) => (
+                  <li key={bullet} className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-yellow-500 text-white">
+                      <Check size={14} strokeWidth={3} />
+                    </span>
+                    <span className="text-gray-700">
+                      {t(`marketing.appleWatchHighlight.${bullet}`)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href={APP_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+              >
+                <Download size={18} className="mr-2" />
+                {t("marketing.appleWatchHighlight.cta")}
+              </a>
+            </motion.div>
           </motion.div>
         </div>
       </section>

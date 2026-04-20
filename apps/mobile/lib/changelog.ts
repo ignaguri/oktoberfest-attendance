@@ -1,4 +1,7 @@
 export const changelog: Record<string, string[]> = {
+  "1.4.1": [
+    "One-tap prompt to install the Apple Watch companion when your watch is paired",
+  ],
   "1.4.0": [
     "Apple Watch companion app — log drinks straight from your wrist with Prost!",
     "Watch tent picker to switch tents without pulling out your phone",

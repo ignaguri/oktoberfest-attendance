@@ -16,6 +16,8 @@ const KEYS = {
   LOCATION_PROMPT_SHOWN: "prostcounter_location_prompt_shown",
   LOCATION_PERMISSION_STATUS: "prostcounter_location_permission_status",
   LOCATION_SESSION_ID: "prostcounter_location_session_id",
+  // Apple Watch keys
+  WATCH_INSTALL_PROMPT_SHOWN: "prostcounter_watch_install_prompt_shown",
 } as const;
 
 /**
@@ -279,4 +281,28 @@ export async function clearAllLocationData(): Promise<void> {
     SecureStore.deleteItemAsync(KEYS.LOCATION_PERMISSION_STATUS),
     SecureStore.deleteItemAsync(KEYS.LOCATION_SESSION_ID),
   ]);
+}
+
+// =============================================================================
+// Apple Watch Storage
+// =============================================================================
+
+/**
+ * Store whether the Apple Watch install prompt has been shown
+ */
+export async function setWatchInstallPromptShown(
+  shown: boolean,
+): Promise<void> {
+  await SecureStore.setItemAsync(
+    KEYS.WATCH_INSTALL_PROMPT_SHOWN,
+    shown ? "true" : "false",
+  );
+}
+
+/**
+ * Check if the Apple Watch install prompt has been shown
+ */
+export async function hasWatchInstallPromptBeenShown(): Promise<boolean> {
+  const value = await SecureStore.getItemAsync(KEYS.WATCH_INSTALL_PROMPT_SHOWN);
+  return value === "true";
 }

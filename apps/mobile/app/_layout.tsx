@@ -8,7 +8,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowUpCircle, Download } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -19,6 +19,7 @@ import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
 import { UpdatePrompt } from "@/components/update/UpdatePrompt";
+import { WatchInstallPrompt } from "@/components/watch/WatchInstallPrompt";
 import { WatchBridge } from "@/components/WatchBridge";
 import { useAppUpdate } from "@/hooks/useAppUpdate";
 import { useSentryUserContext } from "@/hooks/useSentryUserContext";
@@ -26,6 +27,10 @@ import { useStoreUpdate } from "@/hooks/useStoreUpdate";
 import { GlobalAlertProvider } from "@/lib/alerts";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
+import {
+  hasWatchInstallPromptBeenShown,
+  setWatchInstallPromptShown,
+} from "@/lib/auth/secure-storage";
 import { useFocusManager } from "@/lib/data/focus-manager-setup";
 import { useOnlineManager } from "@/lib/data/online-manager-setup";
 import { DataProvider } from "@/lib/data/query-client";
@@ -52,6 +57,9 @@ import {
 import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
 import { initSentry } from "@/lib/sentry";
 import { TutorialProvider } from "@/lib/tutorial";
+import { useWatchStatus } from "@/lib/watch/useWatchStatus";
+
+const WATCH_APP_STORE_URL = "https://apps.apple.com/app/id6758376527";
 
 // Initialize Sentry for error monitoring (native only)
 if (Platform.OS !== "web") {
@@ -228,6 +236,62 @@ function UpdatePromptHandler() {
   );
 }
 
+// Prompt iPhone users with a paired Apple Watch (but no companion app installed)
+// to install the ProstCounter watch companion. One-shot — once dismissed or
+// opened, we never prompt again (persisted via SecureStore).
+function WatchInstallPromptHandler() {
+  const { isAuthenticated } = useAuth();
+  const { isPaired, isInstalled } = useWatchStatus();
+  const [hasBeenShown, setHasBeenShown] = useState<boolean | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  useEffect(() => {
+    hasWatchInstallPromptBeenShown().then(setHasBeenShown);
+  }, []);
+
+  useEffect(() => {
+    if (
+      Platform.OS === "ios" &&
+      isAuthenticated &&
+      hasBeenShown === false &&
+      isPaired === true &&
+      isInstalled === false
+    ) {
+      const timer = setTimeout(() => setShowPrompt(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, hasBeenShown, isPaired, isInstalled]);
+
+  const markShown = () => {
+    setWatchInstallPromptShown(true).catch(() => {});
+    setHasBeenShown(true);
+  };
+
+  const handleInstall = async () => {
+    await Linking.openURL(WATCH_APP_STORE_URL).catch(() => {});
+    markShown();
+  };
+
+  const handleSkip = () => {
+    setShowPrompt(false);
+    markShown();
+  };
+
+  const handleClose = () => {
+    setShowPrompt(false);
+    markShown();
+  };
+
+  return (
+    <WatchInstallPrompt
+      isOpen={showPrompt}
+      onClose={handleClose}
+      onInstall={handleInstall}
+      onSkip={handleSkip}
+    />
+  );
+}
+
 // Show prompt when a newer version is available on the App Store
 function StoreUpdatePromptHandler() {
   const { isStoreUpdateAvailable, openStore } = useStoreUpdate();
@@ -324,6 +388,7 @@ export default function RootLayout() {
                                     <NotificationPromptHandler />
                                     <UpdatePromptHandler />
                                     <StoreUpdatePromptHandler />
+                                    <WatchInstallPromptHandler />
                                     <TutorialOverlay />
                                     <SyncStatusBar />
                                     <Stack

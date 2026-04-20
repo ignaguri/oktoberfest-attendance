@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Beer, Download, Globe, Smartphone } from "lucide-react";
+import { Beer, Download, Globe, Smartphone, Watch } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
@@ -140,6 +140,29 @@ export function DownloadContent() {
           <p className="mt-4 text-xs text-gray-400">
             {t("marketing.download.opensAppStore")}
           </p>
+        </motion.div>
+
+        {/* Apple Watch Companion */}
+        <motion.div
+          variants={fadeUp}
+          className="mx-auto mt-10 max-w-2xl rounded-2xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50 p-6 text-left sm:p-8"
+        >
+          <div className="flex items-start gap-4 sm:gap-6">
+            <div className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gray-900 sm:size-16">
+              <Watch size={32} className="text-yellow-400" strokeWidth={1.75} />
+            </div>
+            <div className="flex-1">
+              <h3 className="mb-2 text-lg font-bold text-gray-900 sm:text-xl">
+                {t("marketing.download.appleWatch.title")}
+              </h3>
+              <p className="mb-2 text-sm text-gray-600 sm:text-base">
+                {t("marketing.download.appleWatch.description")}
+              </p>
+              <p className="text-xs text-gray-500">
+                {t("marketing.download.appleWatch.requirements")}
+              </p>
+            </div>
+          </div>
         </motion.div>
       </motion.div>
     </div>
