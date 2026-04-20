@@ -1,0 +1,166 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "common.skip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Skip" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Überspringen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Omitir" } }
+      }
+    },
+    "watch.crowd.crowded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Crowded" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Voll" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Lleno" } }
+      }
+    },
+    "watch.crowd.empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Empty" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Leer" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Vacío" } }
+      }
+    },
+    "watch.crowd.moderate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moderate" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Moderat" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Moderado" } }
+      }
+    },
+    "watch.crowd.prompt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How crowded is %@?" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wie voll ist %@?" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "¿Qué tan llena está %@?" } }
+      }
+    },
+    "watch.drink.alcohol_free" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Alcohol-Free" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alkoholfrei" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sin alcohol" } }
+      }
+    },
+    "watch.drink.beer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Beer" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bier" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cerveza" } }
+      }
+    },
+    "watch.drink.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Other drink…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anderes Getränk…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Otra bebida…" } }
+      }
+    },
+    "watch.drink.radler" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Radler" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Radler" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Radler" } }
+      }
+    },
+    "watch.drink.soft_drink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Soft Drink" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Softdrink" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Refresco" } }
+      }
+    },
+    "watch.drink.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Drink" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Getränk" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Bebida" } }
+      }
+    },
+    "watch.drink.wine" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wine" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wein" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Vino" } }
+      }
+    },
+    "watch.error.notSent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not sent — tap Prost to retry" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nicht gesendet – tippe auf Prost, um es erneut zu versuchen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No enviado — tocá Prost para reintentar" } }
+      }
+    },
+    "watch.status.noFestival" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pick a festival on iPhone" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wähle ein Festival auf dem iPhone" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Elegí un festival en el iPhone" } }
+      }
+    },
+    "watch.status.noSession" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign in on iPhone first" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Melde dich zuerst auf dem iPhone an" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Iniciá sesión primero en el iPhone" } }
+      }
+    },
+    "watch.tent.empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No tents for this festival" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Zelte für dieses Festival" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No hay carpas para este festival" } }
+      }
+    },
+    "watch.tent.select" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select tent" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zelt auswählen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Seleccionar carpa" } }
+      }
+    },
+    "watch.tent.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tent" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zelt" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Carpa" } }
+      }
+    },
+    "watch.today.count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Today: %lld 🍺" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute: %lld 🍺" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hoy: %lld 🍺" } }
+      }
+    },
+    "watch.today.countMixed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Today: %1$lld 🍺 · %2$lld other" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute: %1$lld 🍺 · %2$lld andere" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hoy: %1$lld 🍺 · %2$lld otras" } }
+      }
+    }
+  }
+}

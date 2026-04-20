@@ -7,7 +7,12 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <!-- Localized for de/es in InfoPlist.xcstrings — update both together. -->
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>ProstCounter uses your location to detect the nearest tent at the festival.</string>
+    <key>WATCH_SUPABASE_URL</key>
+    <string>https://jdmhjakxhtghsbnstyou.supabase.co</string>
+    <key>WATCH_SUPABASE_ANON_KEY</key>
+    <string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkbWhqYWt4aHRnaHNibnN0eW91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyOTA2NjEsImV4cCI6MjA1Njg2NjY2MX0.ep_qWmBgtZgeE64XoHnTL0ihyEuYzEubOxREKFtjYnw</string>
   </dict>
 </plist>

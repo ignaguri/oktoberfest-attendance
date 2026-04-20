@@ -1,0 +1,14 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "NSLocationWhenInUseUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "ProstCounter uses your location to detect the nearest tent at the festival." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "ProstCounter verwendet deinen Standort, um das nächstgelegene Festzelt zu erkennen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "ProstCounter usa tu ubicación para detectar la carpa más cercana del festival." } }
+      }
+    }
+  }
+}

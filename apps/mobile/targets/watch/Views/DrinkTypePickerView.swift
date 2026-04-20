@@ -19,8 +19,8 @@ struct DrinkTypePickerView: View {
                             onPick(type)
                         } label: {
                             HStack {
-                                Text(type.emoji)
-                                Text(type.label).font(.footnote)
+                                Text(verbatim: type.emoji)
+                                Text(verbatim: type.label).font(.footnote)
                                 Spacer()
                             }
                             .frame(maxWidth: .infinity, minHeight: 40)
@@ -30,7 +30,7 @@ struct DrinkTypePickerView: View {
                 }
                 .padding(.horizontal, 6)
             }
-            .navigationTitle("Drink")
+            .navigationTitle(Text("watch.drink.title"))
         }
     }
 }

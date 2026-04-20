@@ -6,6 +6,7 @@ import {
 } from "@prostcounter/shared/i18n";
 
 import { logger } from "../logger";
+import { syncLanguageToWatch } from "../watch-sync";
 
 const LANGUAGE_KEY = "@prostcounter/language";
 
@@ -34,6 +35,10 @@ export async function initMobileI18n() {
 
     // Initialize with detected/saved language
     initI18n(locale);
+
+    // Mirror the initial locale to the watch so the Swift side can honor it
+    // on first launch before the user ever touches the language picker.
+    syncLanguageToWatch(locale);
   } catch (error) {
     // Fallback to English if anything fails
     logger.warn("Failed to initialize i18n with locale detection", { error });
@@ -54,6 +59,7 @@ export async function setLanguage(language: string) {
   }
 
   await sharedChangeLanguage(language);
+  syncLanguageToWatch(language);
 }
 
 // Re-export from shared

@@ -23,7 +23,8 @@ enum TentResolver {
 
     /// Placeholder shown when no tent has been resolved yet. Acts as a CTA
     /// label on the tent-picker button so users know why it's tappable.
-    static let noTentPlaceholder = "Select tent"
+    /// Computed so it resolves against the current locale each time.
+    static var noTentPlaceholder: String { String(localized: "watch.tent.select") }
 
     static func resolve(
         attendance: AttendanceByDate?,

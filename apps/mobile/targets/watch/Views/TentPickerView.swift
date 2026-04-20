@@ -9,7 +9,7 @@ struct TentPickerView: View {
         ScrollView {
             VStack(spacing: 6) {
                 if tents.isEmpty {
-                    Text("No tents for this festival")
+                    Text("watch.tent.empty")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .padding(.top, 16)
@@ -21,7 +21,7 @@ struct TentPickerView: View {
             }
             .padding(.horizontal, 6)
         }
-        .navigationTitle("Tent")
+        .navigationTitle(Text("watch.tent.title"))
     }
 }
 
