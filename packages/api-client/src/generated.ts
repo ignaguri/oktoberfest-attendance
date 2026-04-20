@@ -284,6 +284,7 @@ export interface paths {
                     festivalId: string;
                     limit?: number;
                     offset?: number | null;
+                    include?: "tent_visits";
                 };
                 header?: never;
                 path?: never;
@@ -323,6 +324,19 @@ export interface paths {
                                     visitDate: string;
                                     tentName: string | null;
                                 }[];
+                            }[];
+                            tentVisits?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                userId: string;
+                                /** Format: uuid */
+                                tentId: string;
+                                /** Format: uuid */
+                                festivalId: string;
+                                /** Format: date-time */
+                                visitDate: string;
+                                tentName: string | null;
                             }[];
                             total: number;
                             limit: number;

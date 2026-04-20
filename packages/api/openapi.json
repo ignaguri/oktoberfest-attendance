@@ -566,6 +566,17 @@
             "required": false,
             "name": "offset",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "tent_visits"
+              ]
+            },
+            "required": false,
+            "name": "include",
+            "in": "query"
           }
         ],
         "responses": {
@@ -663,6 +674,46 @@
                           "totalTipCents",
                           "avgPriceCents",
                           "tentVisits"
+                        ]
+                      }
+                    },
+                    "tentVisits": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "userId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "tentId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "festivalId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "visitDate": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "tentName": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "userId",
+                          "tentId",
+                          "festivalId",
+                          "visitDate",
+                          "tentName"
                         ]
                       }
                     },
