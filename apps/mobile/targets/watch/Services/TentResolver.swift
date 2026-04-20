@@ -18,8 +18,12 @@ struct ResolvedTent {
 /// Resolves which tent to use, following the priority chain:
 ///   1. First tentId from today's attendance (user already checked in on phone)
 ///   2. Nearest tent from GPS (server pre-sorts by distance)
-///   3. None (tentId = nil, name = "—")
+///   3. None — surfaces a CTA label prompting the user to pick a tent.
 enum TentResolver {
+
+    /// Placeholder shown when no tent has been resolved yet. Acts as a CTA
+    /// label on the tent-picker button so users know why it's tappable.
+    static let noTentPlaceholder = "Select tent"
 
     static func resolve(
         attendance: AttendanceByDate?,
@@ -39,8 +43,8 @@ enum TentResolver {
             return ResolvedTent(tentId: nearest.tentId, tentName: nearest.tentName, source: .gps)
         }
 
-        // 3. Nothing available
-        return ResolvedTent(tentId: nil, tentName: "—", source: .none)
+        // 3. Nothing available — user must tap to pick one.
+        return ResolvedTent(tentId: nil, tentName: noTentPlaceholder, source: .none)
     }
 }
 

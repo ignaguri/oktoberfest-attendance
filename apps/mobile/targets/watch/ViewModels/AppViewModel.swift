@@ -67,7 +67,11 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var status: Status = .idle
     @Published private(set) var drinkCount: Int = 0
     @Published private(set) var beerCount: Int = 0
-    @Published private(set) var currentTent: ResolvedTent = ResolvedTent(tentId: nil, tentName: "—", source: .none)
+    @Published private(set) var currentTent: ResolvedTent = ResolvedTent(
+        tentId: nil,
+        tentName: TentResolver.noTentPlaceholder,
+        source: .none
+    )
     @Published private(set) var festivalId: String? = nil
     // Derived from festivals.beerCost; used as pricePaidCents on log POST to satisfy
     // the server's price_paid_cents >= base_price_cents constraint. Defaults to
