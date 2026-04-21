@@ -2607,6 +2607,19 @@
       "later": "Maybe Later"
     }
   },
+  "watch": {
+    "install": {
+      "promptTitle": "Get ProstCounter on your Apple Watch",
+      "promptDescription": "You have a paired Apple Watch. Install our companion app to log Masskrugs straight from your wrist.",
+      "benefits": {
+        "fastLog": "Log a Mass in two taps",
+        "autoTent": "Auto-detect which tent you're in",
+        "groupActivity": "See your group's activity in real time"
+      },
+      "install": "Install Watch App",
+      "skip": "Not now"
+    }
+  },
   "crowdReport": {
     "title": "Crowd Report",
     "status": "Crowd Status",
@@ -2744,6 +2757,14 @@
         "description": "Unlock 40+ badges across categories — from first-timer milestones to legendary streaks and hidden surprises."
       }
     },
+    "appleWatchHighlight": {
+      "title": "Now on Apple Watch",
+      "subtitle": "Log every Mass without pulling out your phone. Our Apple Watch companion is built for the tent, the biergarten, and everywhere in between.",
+      "bulletFastLog": "Log a drink in two taps",
+      "bulletAutoTent": "Auto-detect which tent you're in via GPS",
+      "bulletGroupActivity": "See your group's latest beers in real time",
+      "cta": "Download on iOS"
+    },
     "festivals": {
       "sectionTitle": "Munich Beer Festivals",
       "sectionSubtitle": "ProstCounter supports all major Munich beer festivals.",
@@ -2785,6 +2806,11 @@
       "webApp": {
         "description": "Any browser, any device",
         "action": "Open Web App"
+      },
+      "appleWatch": {
+        "title": "Apple Watch Companion included",
+        "description": "Install the iOS app and the companion is automatically available on your paired Apple Watch.",
+        "requirements": "Requires watchOS 10 or later"
       },
       "scanWithPhone": "Scan with your phone",
       "opensAppStore": "Opens the App Store on iOS devices"

@@ -4,9 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppStateStatus } from "react-native";
 import { AppState, Platform } from "react-native";
 
+import { IOS_APP_STORE_URL } from "@/lib/constants/app-store";
 import { logger } from "@/lib/logger";
-
-const APP_STORE_URL = "https://apps.apple.com/app/id6758376527";
 
 /** Minimum interval between store version checks (1 hour). */
 const CHECK_INTERVAL_MS = 60 * 60 * 1000;
@@ -107,7 +106,7 @@ export function useStoreUpdate() {
 
   const openStore = useCallback(async () => {
     try {
-      await Linking.openURL(APP_STORE_URL);
+      await Linking.openURL(IOS_APP_STORE_URL);
     } catch (error) {
       logger.error("Failed to open App Store URL:", error);
     }
