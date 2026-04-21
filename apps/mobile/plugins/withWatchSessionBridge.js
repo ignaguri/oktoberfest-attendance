@@ -86,9 +86,11 @@ final class WatchSessionBridge: NSObject {
     ]
     DispatchQueue.main.async {
       if let bridge = RCTBridge.current() {
-        bridge.eventDispatcher().sendDeviceEvent(
-          withName: "watchState",
-          body: payload
+        bridge.enqueueJSCall(
+          "RCTDeviceEventEmitter",
+          method: "emit",
+          args: ["watchState", payload],
+          completion: nil
         )
         watchBridgeLog.info("dispatched watchState paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) to RN")
       }
@@ -186,9 +188,11 @@ extension WatchSessionBridge: WCSessionDelegate {
     guard let type = message["type"] as? String else { return }
     DispatchQueue.main.async {
       if let bridge = RCTBridge.current() {
-        bridge.eventDispatcher().sendDeviceEvent(
-          withName: "watchRemoteEvent",
-          body: ["type": type]
+        bridge.enqueueJSCall(
+          "RCTDeviceEventEmitter",
+          method: "emit",
+          args: ["watchRemoteEvent", ["type": type]],
+          completion: nil
         )
         watchBridgeLog.info("dispatched watchRemoteEvent type=\\(type, privacy: .public) to RN")
       } else {
