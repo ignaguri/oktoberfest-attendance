@@ -55,3 +55,13 @@ export function replaceLocalhostInUrl(
     return url;
   }
 }
+
+/**
+ * Build a shareable group-invite URL. The path "/join-group" is the one the
+ * mobile app intercepts via Universal Links / Android App Links (see
+ * apps/mobile/app.config.ts intent filters), so every invite URL we share
+ * MUST use this path (not "/api/join-group") for deeplinking to work.
+ */
+export function buildGroupInviteUrl(token: string): string {
+  return `${getAppUrl()}/join-group?token=${token}`;
+}

@@ -1,4 +1,4 @@
-import { getAppUrl } from "@prostcounter/shared";
+import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useGroupLeaderboard,
@@ -134,7 +134,7 @@ export default function GroupDetailScreen() {
   const shareViaWhatsApp = useCallback(async () => {
     if (!group?.inviteToken) return;
 
-    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
+    const inviteUrl = buildGroupInviteUrl(group.inviteToken);
     const message = t("groups.share.message", { name: group.name });
     const shareText = `${message}\n\n${inviteUrl}`;
 
@@ -161,7 +161,7 @@ export default function GroupDetailScreen() {
   const copyToClipboard = useCallback(async () => {
     if (!group?.inviteToken) return;
 
-    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
+    const inviteUrl = buildGroupInviteUrl(group.inviteToken);
     const message = t("groups.share.message", { name: group.name });
     const shareText = `${message}\n\n${inviteUrl}`;
 
@@ -179,7 +179,7 @@ export default function GroupDetailScreen() {
   const openNativeShare = useCallback(async () => {
     if (!group?.inviteToken) return;
 
-    const inviteUrl = `${getAppUrl()}/join-group?token=${group.inviteToken}`;
+    const inviteUrl = buildGroupInviteUrl(group.inviteToken);
     const message = t("groups.share.message", { name: group.name });
     const shareText = `${message}\n\n${inviteUrl}`;
 
