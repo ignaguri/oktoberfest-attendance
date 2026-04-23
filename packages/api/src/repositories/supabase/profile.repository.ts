@@ -212,13 +212,20 @@ export class SupabaseProfileRepository {
       .eq("user_id", userId);
 
     // 10. Delete profile (this should cascade or be handled by RLS)
-    const { error } = await this.supabase
+    const { data: deleted, error } = await this.supabase
       .from("profiles")
       .delete()
-      .eq("id", userId);
+      .eq("id", userId)
+      .select("id");
 
     if (error) {
       throw new Error(`Failed to delete profile: ${error.message}`);
+    }
+
+    if (!deleted || deleted.length === 0) {
+      throw new Error(
+        `Profile delete affected 0 rows for id=${userId}; likely RLS policy blocked`,
+      );
     }
   }
 
