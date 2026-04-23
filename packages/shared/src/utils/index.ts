@@ -1,5 +1,5 @@
 // URL utilities
-export { getAppUrl, replaceLocalhostInUrl } from "./url";
+export { getAppUrl, replaceLocalhostInUrl, safeHost } from "./url";
 
 // Date utilities
 export {

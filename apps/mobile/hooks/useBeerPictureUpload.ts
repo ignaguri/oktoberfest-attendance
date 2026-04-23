@@ -11,10 +11,11 @@
  * 3. API: Get signed upload URL → Upload to storage → Confirm upload
  */
 
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+import { replaceLocalhostInUrl, safeHost } from "@prostcounter/shared/utils";
 import { useCallback, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
+import { Sentry } from "@/lib/sentry";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
@@ -155,20 +156,58 @@ export function useBeerPictureUpload({
 
           // Step 3: Upload compressed image directly to storage
           // Fix URL for local dev: replace localhost with the mobile client's Supabase host
+          const envSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
           const fixedUploadUrl = replaceLocalhostInUrl(
             uploadUrl,
-            process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+            envSupabaseUrl,
           );
-          const uploadResponse = await fetch(fixedUploadUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": compressedImage.mimeType,
-            },
-            body: compressedImage.arrayBuffer,
-          });
+
+          let uploadResponse: Response;
+          try {
+            uploadResponse = await fetch(fixedUploadUrl, {
+              method: "PUT",
+              headers: {
+                "Content-Type": compressedImage.mimeType,
+              },
+              body: compressedImage.arrayBuffer,
+            });
+          } catch (networkErr) {
+            // No response at all (DNS, TLS, timeout). The host is the single
+            // most useful field here — captures "wrong URL in the build" cases.
+            Sentry.captureException(networkErr, {
+              tags: { flow: "beer-picture-upload" },
+              extra: {
+                stage: "network",
+                uploadHost: safeHost(fixedUploadUrl),
+                envSupabaseHost: safeHost(envSupabaseUrl),
+                mimeType: compressedImage.mimeType,
+                fileSize: compressedImage.arrayBuffer.byteLength,
+              },
+            });
+            throw networkErr;
+          }
 
           if (!uploadResponse.ok) {
-            throw new Error("Failed to upload image to storage");
+            const bodySnippet = await uploadResponse
+              .text()
+              .catch(() => "<no body>");
+            Sentry.captureMessage("Storage PUT failed", {
+              level: "error",
+              tags: { flow: "beer-picture-upload" },
+              extra: {
+                stage: "http",
+                status: uploadResponse.status,
+                statusText: uploadResponse.statusText,
+                body: bodySnippet.slice(0, 500),
+                uploadHost: safeHost(fixedUploadUrl),
+                envSupabaseHost: safeHost(envSupabaseUrl),
+                mimeType: compressedImage.mimeType,
+                fileSize: compressedImage.arrayBuffer.byteLength,
+              },
+            });
+            throw new Error(
+              `Storage upload failed (${uploadResponse.status} on ${safeHost(fixedUploadUrl)})`,
+            );
           }
 
           // Step 4: Confirm upload with API

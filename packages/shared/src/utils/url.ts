@@ -55,3 +55,16 @@ export function replaceLocalhostInUrl(
     return url;
   }
 }
+
+/**
+ * Parse just the host out of a URL without throwing. Useful for logging /
+ * diagnostics where an unparseable input should surface as a sentinel string
+ * rather than crash the caller.
+ */
+export function safeHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return "<invalid-url>";
+  }
+}

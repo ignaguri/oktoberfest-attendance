@@ -7,9 +7,10 @@
 
 import { useInvalidateQueries } from "@prostcounter/shared/data";
 import { QueryKeys } from "@prostcounter/shared/data";
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+import { replaceLocalhostInUrl, safeHost } from "@prostcounter/shared/utils";
 
 import { apiClient } from "@/lib/api-client";
+import { Sentry } from "@/lib/sentry";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
@@ -62,20 +63,53 @@ export function useAvatarUpload({
 
       // Step 2: Upload compressed image directly to storage
       // Fix URL for local dev: replace localhost with the mobile client's Supabase host
-      const fixedUploadUrl = replaceLocalhostInUrl(
-        uploadUrl,
-        process.env.EXPO_PUBLIC_SUPABASE_URL || "",
-      );
-      const uploadResponse = await fetch(fixedUploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": image.mimeType,
-        },
-        body: image.arrayBuffer,
-      });
+      const envSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
+      const fixedUploadUrl = replaceLocalhostInUrl(uploadUrl, envSupabaseUrl);
+
+      let uploadResponse: Response;
+      try {
+        uploadResponse = await fetch(fixedUploadUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": image.mimeType,
+          },
+          body: image.arrayBuffer,
+        });
+      } catch (networkErr) {
+        Sentry.captureException(networkErr, {
+          tags: { flow: "avatar-upload" },
+          extra: {
+            stage: "network",
+            uploadHost: safeHost(fixedUploadUrl),
+            envSupabaseHost: safeHost(envSupabaseUrl),
+            mimeType: image.mimeType,
+            fileSize: image.arrayBuffer.byteLength,
+          },
+        });
+        throw networkErr;
+      }
 
       if (!uploadResponse.ok) {
-        throw new Error("Failed to upload image to storage");
+        const bodySnippet = await uploadResponse
+          .text()
+          .catch(() => "<no body>");
+        Sentry.captureMessage("Storage PUT failed", {
+          level: "error",
+          tags: { flow: "avatar-upload" },
+          extra: {
+            stage: "http",
+            status: uploadResponse.status,
+            statusText: uploadResponse.statusText,
+            body: bodySnippet.slice(0, 500),
+            uploadHost: safeHost(fixedUploadUrl),
+            envSupabaseHost: safeHost(envSupabaseUrl),
+            mimeType: image.mimeType,
+            fileSize: image.arrayBuffer.byteLength,
+          },
+        });
+        throw new Error(
+          `Storage upload failed (${uploadResponse.status} on ${safeHost(fixedUploadUrl)})`,
+        );
       }
 
       // Step 3: Confirm upload with just the filename
