@@ -35,8 +35,11 @@ DECLARE
   user_lat double precision;
   user_lng double precision;
 BEGIN
-  -- Enforce that the caller is querying their own data
-  IF input_user_id != auth.uid() THEN
+  -- Enforce that the caller is querying their own data. auth.uid() is NULL for
+  -- unauthenticated/anon callers and `NULL != anything` yields NULL (not TRUE),
+  -- which would bypass the IF. The explicit NULL check closes that hole — and
+  -- matters here because this function is granted to the `anon` role.
+  IF auth.uid() IS NULL OR input_user_id <> auth.uid() THEN
     RAISE EXCEPTION 'Access denied: input_user_id must match authenticated user';
   END IF;
 

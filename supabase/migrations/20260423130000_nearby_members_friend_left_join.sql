@@ -33,7 +33,9 @@ DECLARE
   user_lat double precision;
   user_lng double precision;
 BEGIN
-  IF input_user_id != auth.uid() THEN
+  -- Reject unauthenticated callers explicitly; see the matching comment in
+  -- 20260423120000_add_friend_location_sharing.sql for the rationale.
+  IF auth.uid() IS NULL OR input_user_id <> auth.uid() THEN
     RAISE EXCEPTION 'Access denied: input_user_id must match authenticated user';
   END IF;
 
