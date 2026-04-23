@@ -9,8 +9,7 @@ ALTER TABLE public.location_sessions
 COMMENT ON COLUMN public.location_sessions.share_with_friends IS
   'When true, the user''s accepted friends can see this session regardless of group overlap.';
 
-DROP FUNCTION IF EXISTS public.get_nearby_group_members(uuid, uuid, integer);
-
+-- Signature unchanged, so CREATE OR REPLACE preserves existing GRANTs.
 CREATE OR REPLACE FUNCTION public.get_nearby_group_members(
   input_user_id uuid,
   input_festival_id uuid,

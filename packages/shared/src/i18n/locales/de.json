@@ -1646,11 +1646,9 @@
       "multipleGroups": "{{count}} Gruppen",
       "collapseHint": "Tippe zum Zuklappen",
       "expandHint": "Tippe zum Aufklappen",
-      "orSelectSpecific": "Oder bestimmte Gruppen auswählen"
-    },
-    "friends": {
+      "orSelectSpecific": "Oder bestimmte Gruppen auswählen",
       "alsoShareWithFriends": "Auch mit meinen Freunden teilen",
-      "alsoShareDescription": "Freunde sehen deinen Standort auch, wenn ihr in keiner gemeinsamen Gruppe seid"
+      "alsoShareWithFriendsDescription": "Freunde sehen deinen Standort auch, wenn ihr in keiner gemeinsamen Gruppe seid"
     },
     "proximity": {
       "veryClose": "Sehr nah",

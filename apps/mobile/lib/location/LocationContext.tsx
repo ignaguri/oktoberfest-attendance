@@ -48,6 +48,21 @@ export interface StartSharingResult {
 }
 
 /**
+ * Options for startSharing — bundled so the call site stays readable as new
+ * visibility knobs are added (shareWithFriends, groupIds, durationMinutes...).
+ */
+export interface StartSharingOptions {
+  /** How long to share, in minutes. Default 120 (2 hours). */
+  durationMinutes?: number;
+  /** Specific groups to share with. When omitted, shares with all the user's
+   *  groups for this festival. */
+  groupIds?: string[];
+  /** Additive: when true, accepted friends can see this session regardless of
+   *  group overlap. */
+  shareWithFriends?: boolean;
+}
+
+/**
  * Location Context Type
  */
 interface LocationContextType {
@@ -80,9 +95,7 @@ interface LocationContextType {
   markPromptAsShown: () => Promise<void>;
   startSharing: (
     festivalId: string,
-    durationMinutes?: number,
-    groupIds?: string[],
-    shareWithFriends?: boolean,
+    options?: StartSharingOptions,
   ) => Promise<StartSharingResult>;
   stopSharing: () => Promise<boolean>;
   startLocalTracking: (festivalId?: string) => Promise<boolean>;
@@ -194,21 +207,20 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   );
 
   /**
-   * Start location sharing
+   * Start location sharing.
    * @param festivalId - Festival to share location for
-   * @param durationMinutes - How long to share (default 2 hours)
-   * @param groupIds - Specific groups to share with (undefined = all groups)
-   * @param shareWithFriends - When true, accepted friends can see this session
-   *   regardless of group overlap (additive to the group visibility)
-   * @returns Result object with success status, session, and background status
+   * @param options - Visibility + duration knobs; see StartSharingOptions
    */
   const startSharing = useCallback(
     async (
       festivalId: string,
-      durationMinutes = 120,
-      groupIds?: string[],
-      shareWithFriends = false,
+      options: StartSharingOptions = {},
     ): Promise<StartSharingResult> => {
+      const {
+        durationMinutes = 120,
+        groupIds,
+        shareWithFriends = false,
+      } = options;
       if (!location.hasPermission) {
         logger.warn("No permission to start sharing");
         return {
@@ -734,12 +746,7 @@ const defaultContext: LocationContextType = {
   requestPermission: async () => false,
   requestBackgroundPermission: async () => false,
   markPromptAsShown: async () => {},
-  startSharing: async (
-    _festivalId,
-    _durationMinutes?,
-    _groupIds?,
-    _shareWithFriends?,
-  ) => ({
+  startSharing: async () => ({
     success: false,
     backgroundEnabled: false,
   }),

@@ -110,12 +110,11 @@ export function LocationSharingToggle({
       }
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      const result = await startSharing(
-        festivalId,
-        selectedDuration,
+      const result = await startSharing(festivalId, {
+        durationMinutes: selectedDuration,
         groupIds,
         shareWithFriends,
-      );
+      });
 
       if (!result.success) {
         showAlert(
@@ -157,12 +156,11 @@ export function LocationSharingToggle({
     if (granted) {
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      const result = await startSharing(
-        festivalId,
-        selectedDuration,
+      const result = await startSharing(festivalId, {
+        durationMinutes: selectedDuration,
         groupIds,
         shareWithFriends,
-      );
+      });
 
       if (!result.success) {
         showAlert(
@@ -413,7 +411,7 @@ export function LocationSharingToggle({
                       onPress={() => setShareWithFriends(!shareWithFriends)}
                       className="mt-3 active:opacity-80"
                       accessibilityLabel={t(
-                        "location.friends.alsoShareWithFriends",
+                        "location.groups.alsoShareWithFriends",
                       )}
                     >
                       <HStack className="items-center justify-between rounded-lg bg-background-0 p-2">
@@ -421,10 +419,12 @@ export function LocationSharingToggle({
                           <Heart size={16} color={IconColors.default} />
                           <VStack className="flex-1">
                             <Text className="text-sm text-typography-700">
-                              {t("location.friends.alsoShareWithFriends")}
+                              {t("location.groups.alsoShareWithFriends")}
                             </Text>
                             <Text className="text-xs text-typography-500">
-                              {t("location.friends.alsoShareDescription")}
+                              {t(
+                                "location.groups.alsoShareWithFriendsDescription",
+                              )}
                             </Text>
                           </VStack>
                         </HStack>
