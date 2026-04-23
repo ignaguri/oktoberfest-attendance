@@ -61,9 +61,15 @@ export function replaceLocalhostInUrl(
  * mobile app intercepts via Universal Links / Android App Links (see
  * apps/mobile/app.config.ts intent filters), so every invite URL we share
  * MUST use this path (not "/api/join-group") for deeplinking to work.
+ *
+ * @param token - Invite token (URL-encoded internally so non-UUID formats are safe).
+ * @param baseUrl - Optional origin override. Web callers pass `window.location.origin`
+ *                  so the link matches the current browser origin; mobile callers
+ *                  omit it to pick up getAppUrl() (EXPO_PUBLIC_APP_URL).
  */
-export function buildGroupInviteUrl(token: string): string {
-  return `${getAppUrl()}/join-group?token=${token}`;
+export function buildGroupInviteUrl(token: string, baseUrl?: string): string {
+  const origin = baseUrl ?? getAppUrl();
+  return `${origin}/join-group?token=${encodeURIComponent(token)}`;
 }
 
 /**

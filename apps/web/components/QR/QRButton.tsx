@@ -1,5 +1,6 @@
 "use client";
 
+import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { QrCode } from "lucide-react";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -27,17 +28,17 @@ export default function QRButton({
   const [groupLink, setGroupLink] = useState("");
   const [tokenGenerated, setTokenGenerated] = useState(false);
 
-  const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
-
   const { mutateAsync: renewToken } = useRenewInviteToken();
 
   const generateShareLink = useCallback(async () => {
     try {
       const { inviteToken } = await renewToken({ groupId });
-      // Use /join-group (not /api/join-group) so the URL matches the mobile
-      // app's Universal Link / Android App Link intent filter. The web app
-      // still forwards /join-group -> /api/join-group internally.
-      const newGroupLink = `${APP_URL}/join-group?token=${inviteToken}`;
+      // Pin the origin to the browser window so the link matches whatever host
+      // the user is currently on (prod, preview, local). The shared helper
+      // enforces the "/join-group" path that the mobile intent filter expects.
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : undefined;
+      const newGroupLink = buildGroupInviteUrl(inviteToken, origin);
       startTransition(() => {
         setGroupLink(newGroupLink);
       });
@@ -46,7 +47,7 @@ export default function QRButton({
         description: "Failed to generate QR code. Please try again.",
       });
     }
-  }, [groupId, APP_URL, renewToken]);
+  }, [groupId, renewToken]);
 
   const handleQRClick = async () => {
     if (!tokenGenerated) {
