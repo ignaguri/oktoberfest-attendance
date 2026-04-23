@@ -225,14 +225,21 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     }
 
     // Delete database record
-    const { error: dbError } = await this.supabase
+    const { data: deleted, error: dbError } = await this.supabase
       .from("beer_pictures")
       .delete()
       .eq("id", pictureId)
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .select("id");
 
     if (dbError) {
       throw new DatabaseError(`Failed to delete picture: ${dbError.message}`);
+    }
+
+    if (!deleted || deleted.length === 0) {
+      throw new DatabaseError(
+        `Picture delete affected 0 rows for id=${pictureId}; not owned by user or RLS policy blocked`,
+      );
     }
   }
 
