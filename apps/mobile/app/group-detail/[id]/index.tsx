@@ -121,22 +121,24 @@ export default function GroupDetailScreen() {
   );
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
-  // Handle share - opens custom action sheet
+  const shareMessage = group
+    ? t("groups.share.message", { name: group.name })
+    : "";
+  const shareUrl = group?.inviteToken
+    ? buildGroupInviteUrl(group.inviteToken)
+    : "";
+  const shareText = group?.inviteToken ? `${shareMessage}\n\n${shareUrl}` : "";
+
   const handleShare = useCallback(() => {
     if (!group?.inviteToken) {
       showDialog(t("common.status.error"), t("groups.share.noToken"));
       return;
     }
     setIsShareSheetOpen(true);
-  }, [group, showDialog, t]);
+  }, [group?.inviteToken, showDialog, t]);
 
-  // Share via WhatsApp directly
   const shareViaWhatsApp = useCallback(async () => {
     if (!group?.inviteToken) return;
-
-    const inviteUrl = buildGroupInviteUrl(group.inviteToken);
-    const message = t("groups.share.message", { name: group.name });
-    const shareText = `${message}\n\n${inviteUrl}`;
 
     const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
 
@@ -155,15 +157,10 @@ export default function GroupDetailScreen() {
       logger.error("Failed to open WhatsApp:", error);
       showDialog(t("common.status.error"), t("groups.share.whatsappFailed"));
     }
-  }, [group, showDialog, t]);
+  }, [group?.inviteToken, shareText, showDialog, t]);
 
-  // Copy to clipboard
   const copyToClipboard = useCallback(async () => {
     if (!group?.inviteToken) return;
-
-    const inviteUrl = buildGroupInviteUrl(group.inviteToken);
-    const message = t("groups.share.message", { name: group.name });
-    const shareText = `${message}\n\n${inviteUrl}`;
 
     try {
       await Clipboard.setStringAsync(shareText);
@@ -173,26 +170,21 @@ export default function GroupDetailScreen() {
       logger.error("Failed to copy to clipboard:", error);
       showDialog(t("common.status.error"), t("groups.share.copyFailed"));
     }
-  }, [group, showDialog, t]);
+  }, [group?.inviteToken, shareText, showDialog, t]);
 
-  // Open native share sheet
   const openNativeShare = useCallback(async () => {
     if (!group?.inviteToken) return;
-
-    const inviteUrl = buildGroupInviteUrl(group.inviteToken);
-    const message = t("groups.share.message", { name: group.name });
-    const shareText = `${message}\n\n${inviteUrl}`;
 
     try {
       await Share.share({
         message: shareText,
-        title: message,
+        title: shareMessage,
       });
       setIsShareSheetOpen(false);
     } catch (error) {
       logger.error("Failed to share:", error);
     }
-  }, [group, t]);
+  }, [group?.inviteToken, shareText, shareMessage]);
 
   // Handle settings navigation
   const handleSettings = useCallback(() => {
