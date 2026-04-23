@@ -44,6 +44,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       is_active: true,
       started_at: new Date().toISOString(),
       expires_at: expiresAt.toISOString(),
+      share_with_friends: input.shareWithFriends ?? false,
     };
 
     let { data: session, error: sessionError } = await this.supabase

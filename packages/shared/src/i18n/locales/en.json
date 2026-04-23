@@ -1904,7 +1904,9 @@
       "multipleGroups": "{{count}} groups",
       "collapseHint": "Tap to collapse",
       "expandHint": "Tap to expand",
-      "orSelectSpecific": "Or select specific groups"
+      "orSelectSpecific": "Or select specific groups",
+      "alsoShareWithFriends": "Also share with my friends",
+      "alsoShareWithFriendsDescription": "Friends can see your location even if you don't share a group"
     },
     "proximity": {
       "veryClose": "Very close",

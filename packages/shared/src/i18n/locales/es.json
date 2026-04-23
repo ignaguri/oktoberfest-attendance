@@ -1894,7 +1894,9 @@
       "multipleGroups": "{{count}} grupos",
       "collapseHint": "Tocá para contraer",
       "expandHint": "Tocá para expandir",
-      "orSelectSpecific": "O seleccioná grupos específicos"
+      "orSelectSpecific": "O seleccioná grupos específicos",
+      "alsoShareWithFriends": "Compartir también con mis amigos",
+      "alsoShareWithFriendsDescription": "Tus amigos ven tu ubicación aunque no compartan un grupo con vos"
     },
     "proximity": {
       "veryClose": "Muy cerca",

@@ -18,12 +18,12 @@ import {
   CheckboxLabel,
 } from "@/components/ui/checkbox";
 import { HStack } from "@/components/ui/hstack";
+import { LabeledSwitchRow } from "@/components/ui/labeled-switch-row";
 import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
-import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { Colors, IconColors } from "@/lib/constants/colors";
 import { useAdaptedGroups } from "@/lib/database/adapted-hooks";
 
 interface Group {
@@ -119,26 +119,11 @@ export function GroupSelector({
 
   return (
     <VStack space="sm" className="pt-3">
-      {/* Share with all toggle */}
-      <Pressable
-        onPress={() => handleShareWithAllToggle(!shareWithAll)}
-        className="active:opacity-80"
-      >
-        <HStack className="items-center justify-between rounded-lg bg-background-0 p-2">
-          <Text className="text-sm text-typography-700">
-            {t("location.groups.shareWithAll")}
-          </Text>
-          <Switch
-            size="sm"
-            value={shareWithAll}
-            onValueChange={handleShareWithAllToggle}
-            trackColor={{
-              false: SwitchColors.trackOff,
-              true: SwitchColors.trackOn,
-            }}
-          />
-        </HStack>
-      </Pressable>
+      <LabeledSwitchRow
+        title={t("location.groups.shareWithAll")}
+        value={shareWithAll}
+        onValueChange={handleShareWithAllToggle}
+      />
 
       {/* Divider with text */}
       <HStack className="items-center py-1">

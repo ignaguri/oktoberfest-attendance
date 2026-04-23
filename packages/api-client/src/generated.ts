@@ -5373,6 +5373,8 @@ export interface paths {
                          */
                         visibility?: "groups" | "specific";
                         groupIds?: string[];
+                        /** @default false */
+                        shareWithFriends?: boolean;
                     };
                 };
             };

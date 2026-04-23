@@ -77,6 +77,13 @@ export const StartLocationSessionSchema = z
      * Required when visibility is "specific", ignored when "groups"
      */
     groupIds: z.array(z.uuid({ error: "Invalid group ID" })).optional(),
+    /**
+     * Additive visibility: when true, the user's accepted friends can see this
+     * session regardless of group overlap. Combines with the group visibility
+     * (a user sees this session if they share a selected group OR they are a
+     * friend and this flag is true).
+     */
+    shareWithFriends: z.boolean().optional().default(false),
   })
   .refine(
     (data) =>

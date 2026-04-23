@@ -2053,6 +2053,8 @@ export function createTypedApiClient(config: ApiClientConfig) {
         visibility?: "groups" | "specific";
         /** Group IDs to share with when visibility is "specific" */
         groupIds?: string[];
+        /** Additive: when true, accepted friends can see this session */
+        shareWithFriends?: boolean;
       }): Promise<{
         session: {
           id: string;
