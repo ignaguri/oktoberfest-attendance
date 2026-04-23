@@ -15,6 +15,7 @@ import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import { useCallback, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
+import { putToStorageWithDiagnostics } from "@/lib/storage-upload";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
@@ -155,21 +156,19 @@ export function useBeerPictureUpload({
 
           // Step 3: Upload compressed image directly to storage
           // Fix URL for local dev: replace localhost with the mobile client's Supabase host
+          const envSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
           const fixedUploadUrl = replaceLocalhostInUrl(
             uploadUrl,
-            process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+            envSupabaseUrl,
           );
-          const uploadResponse = await fetch(fixedUploadUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": compressedImage.mimeType,
-            },
-            body: compressedImage.arrayBuffer,
-          });
 
-          if (!uploadResponse.ok) {
-            throw new Error("Failed to upload image to storage");
-          }
+          await putToStorageWithDiagnostics({
+            url: fixedUploadUrl,
+            body: compressedImage.arrayBuffer,
+            mimeType: compressedImage.mimeType,
+            envSupabaseUrl,
+            flow: "beer-picture-upload",
+          });
 
           // Step 4: Confirm upload with API
           const confirmedPhoto =

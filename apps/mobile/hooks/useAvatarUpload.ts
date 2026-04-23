@@ -10,6 +10,7 @@ import { QueryKeys } from "@prostcounter/shared/data";
 import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 
 import { apiClient } from "@/lib/api-client";
+import { putToStorageWithDiagnostics } from "@/lib/storage-upload";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
@@ -62,21 +63,16 @@ export function useAvatarUpload({
 
       // Step 2: Upload compressed image directly to storage
       // Fix URL for local dev: replace localhost with the mobile client's Supabase host
-      const fixedUploadUrl = replaceLocalhostInUrl(
-        uploadUrl,
-        process.env.EXPO_PUBLIC_SUPABASE_URL || "",
-      );
-      const uploadResponse = await fetch(fixedUploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": image.mimeType,
-        },
-        body: image.arrayBuffer,
-      });
+      const envSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
+      const fixedUploadUrl = replaceLocalhostInUrl(uploadUrl, envSupabaseUrl);
 
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload image to storage");
-      }
+      await putToStorageWithDiagnostics({
+        url: fixedUploadUrl,
+        body: image.arrayBuffer,
+        mimeType: image.mimeType,
+        envSupabaseUrl,
+        flow: "avatar-upload",
+      });
 
       // Step 3: Confirm upload with just the filename
       await apiClient.profile.confirmAvatarUpload(fileName);

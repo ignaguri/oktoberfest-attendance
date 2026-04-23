@@ -3,6 +3,7 @@ export {
   buildGroupInviteUrl,
   getAppUrl,
   replaceLocalhostInUrl,
+  safeHost,
 } from "./url";
 
 // Date utilities
