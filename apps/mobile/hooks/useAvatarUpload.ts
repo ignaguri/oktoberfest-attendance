@@ -7,10 +7,10 @@
 
 import { useInvalidateQueries } from "@prostcounter/shared/data";
 import { QueryKeys } from "@prostcounter/shared/data";
-import { replaceLocalhostInUrl, safeHost } from "@prostcounter/shared/utils";
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 
 import { apiClient } from "@/lib/api-client";
-import { Sentry } from "@/lib/sentry";
+import { putToStorageWithDiagnostics } from "@/lib/storage-upload";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
@@ -66,51 +66,13 @@ export function useAvatarUpload({
       const envSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
       const fixedUploadUrl = replaceLocalhostInUrl(uploadUrl, envSupabaseUrl);
 
-      let uploadResponse: Response;
-      try {
-        uploadResponse = await fetch(fixedUploadUrl, {
-          method: "PUT",
-          headers: {
-            "Content-Type": image.mimeType,
-          },
-          body: image.arrayBuffer,
-        });
-      } catch (networkErr) {
-        Sentry.captureException(networkErr, {
-          tags: { flow: "avatar-upload" },
-          extra: {
-            stage: "network",
-            uploadHost: safeHost(fixedUploadUrl),
-            envSupabaseHost: safeHost(envSupabaseUrl),
-            mimeType: image.mimeType,
-            fileSize: image.arrayBuffer.byteLength,
-          },
-        });
-        throw networkErr;
-      }
-
-      if (!uploadResponse.ok) {
-        const bodySnippet = await uploadResponse
-          .text()
-          .catch(() => "<no body>");
-        Sentry.captureMessage("Storage PUT failed", {
-          level: "error",
-          tags: { flow: "avatar-upload" },
-          extra: {
-            stage: "http",
-            status: uploadResponse.status,
-            statusText: uploadResponse.statusText,
-            body: bodySnippet.slice(0, 500),
-            uploadHost: safeHost(fixedUploadUrl),
-            envSupabaseHost: safeHost(envSupabaseUrl),
-            mimeType: image.mimeType,
-            fileSize: image.arrayBuffer.byteLength,
-          },
-        });
-        throw new Error(
-          `Storage upload failed (${uploadResponse.status} on ${safeHost(fixedUploadUrl)})`,
-        );
-      }
+      await putToStorageWithDiagnostics({
+        url: fixedUploadUrl,
+        body: image.arrayBuffer,
+        mimeType: image.mimeType,
+        envSupabaseUrl,
+        flow: "avatar-upload",
+      });
 
       // Step 3: Confirm upload with just the filename
       await apiClient.profile.confirmAvatarUpload(fileName);

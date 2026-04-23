@@ -11,11 +11,11 @@
  * 3. API: Get signed upload URL → Upload to storage → Confirm upload
  */
 
-import { replaceLocalhostInUrl, safeHost } from "@prostcounter/shared/utils";
+import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import { useCallback, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
-import { Sentry } from "@/lib/sentry";
+import { putToStorageWithDiagnostics } from "@/lib/storage-upload";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
@@ -162,53 +162,13 @@ export function useBeerPictureUpload({
             envSupabaseUrl,
           );
 
-          let uploadResponse: Response;
-          try {
-            uploadResponse = await fetch(fixedUploadUrl, {
-              method: "PUT",
-              headers: {
-                "Content-Type": compressedImage.mimeType,
-              },
-              body: compressedImage.arrayBuffer,
-            });
-          } catch (networkErr) {
-            // No response at all (DNS, TLS, timeout). The host is the single
-            // most useful field here — captures "wrong URL in the build" cases.
-            Sentry.captureException(networkErr, {
-              tags: { flow: "beer-picture-upload" },
-              extra: {
-                stage: "network",
-                uploadHost: safeHost(fixedUploadUrl),
-                envSupabaseHost: safeHost(envSupabaseUrl),
-                mimeType: compressedImage.mimeType,
-                fileSize: compressedImage.arrayBuffer.byteLength,
-              },
-            });
-            throw networkErr;
-          }
-
-          if (!uploadResponse.ok) {
-            const bodySnippet = await uploadResponse
-              .text()
-              .catch(() => "<no body>");
-            Sentry.captureMessage("Storage PUT failed", {
-              level: "error",
-              tags: { flow: "beer-picture-upload" },
-              extra: {
-                stage: "http",
-                status: uploadResponse.status,
-                statusText: uploadResponse.statusText,
-                body: bodySnippet.slice(0, 500),
-                uploadHost: safeHost(fixedUploadUrl),
-                envSupabaseHost: safeHost(envSupabaseUrl),
-                mimeType: compressedImage.mimeType,
-                fileSize: compressedImage.arrayBuffer.byteLength,
-              },
-            });
-            throw new Error(
-              `Storage upload failed (${uploadResponse.status} on ${safeHost(fixedUploadUrl)})`,
-            );
-          }
+          await putToStorageWithDiagnostics({
+            url: fixedUploadUrl,
+            body: compressedImage.arrayBuffer,
+            mimeType: compressedImage.mimeType,
+            envSupabaseUrl,
+            flow: "beer-picture-upload",
+          });
 
           // Step 4: Confirm upload with API
           const confirmedPhoto =
