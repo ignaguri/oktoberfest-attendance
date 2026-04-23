@@ -282,9 +282,11 @@ function NearbyFriendsList({ members }: { members: LocationSessionMember[] }) {
               <Text className="font-medium text-typography-900">
                 {member.fullName || member.username}
               </Text>
-              <Text className="text-sm text-typography-500">
-                {member.groupName}
-              </Text>
+              {member.groupNames.length > 0 && (
+                <Text className="text-sm text-typography-500">
+                  {member.groupNames.join(", ")}
+                </Text>
+              )}
             </VStack>
             {member.distance !== null && (
               <Text className="text-sm text-typography-500">

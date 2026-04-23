@@ -2153,7 +2153,6 @@ export function createTypedApiClient(config: ApiClientConfig) {
         latitude: number;
         longitude: number;
         radiusMeters?: number;
-        groupId?: string;
       }): Promise<{
         members: Array<{
           sessionId: string;
@@ -2161,8 +2160,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           username: string;
           fullName: string | null;
           avatarUrl: string | null;
-          groupId: string;
-          groupName: string;
+          groupNames: string[];
           lastLocation: {
             latitude: number;
             longitude: number;
@@ -2186,7 +2184,6 @@ export function createTypedApiClient(config: ApiClientConfig) {
         });
         if (query.radiusMeters)
           params.set("radiusMeters", query.radiusMeters.toString());
-        if (query.groupId) params.set("groupId", query.groupId);
 
         const response = await fetchWithLogging(
           "GET",

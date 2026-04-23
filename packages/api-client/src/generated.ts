@@ -5631,7 +5631,6 @@ export interface paths {
                     latitude?: number | null;
                     longitude?: number | null;
                     radiusMeters?: number;
-                    groupId?: string;
                 };
                 header?: never;
                 path?: never;
@@ -5655,9 +5654,7 @@ export interface paths {
                                 fullName: string | null;
                                 /** Format: uri */
                                 avatarUrl: string | null;
-                                /** Format: uuid */
-                                groupId: string;
-                                groupName: string;
+                                groupNames: string[];
                                 lastLocation: {
                                     latitude: number;
                                     longitude: number;
