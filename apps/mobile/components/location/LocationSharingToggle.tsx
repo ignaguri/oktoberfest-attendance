@@ -16,12 +16,12 @@ import { View } from "react-native";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
+import { LabeledSwitchRow } from "@/components/ui/labeled-switch-row";
 import { Pressable } from "@/components/ui/pressable";
-import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useGlobalAlert } from "@/lib/alerts";
-import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { Colors, IconColors } from "@/lib/constants/colors";
 import { useLocationContext } from "@/lib/location";
 
 import { GroupSelector } from "./GroupSelector";
@@ -407,38 +407,16 @@ export function LocationSharingToggle({
                     />
 
                     {/* Also share with friends (additive to group visibility) */}
-                    <Pressable
-                      onPress={() => setShareWithFriends(!shareWithFriends)}
-                      className="mt-3 active:opacity-80"
-                      accessibilityLabel={t(
-                        "location.groups.alsoShareWithFriends",
+                    <LabeledSwitchRow
+                      className="mt-3"
+                      icon={Heart}
+                      title={t("location.groups.alsoShareWithFriends")}
+                      description={t(
+                        "location.groups.alsoShareWithFriendsDescription",
                       )}
-                    >
-                      <HStack className="items-center justify-between rounded-lg bg-background-0 p-2">
-                        <HStack space="sm" className="flex-1 items-center pr-2">
-                          <Heart size={16} color={IconColors.default} />
-                          <VStack className="flex-1">
-                            <Text className="text-sm text-typography-700">
-                              {t("location.groups.alsoShareWithFriends")}
-                            </Text>
-                            <Text className="text-xs text-typography-500">
-                              {t(
-                                "location.groups.alsoShareWithFriendsDescription",
-                              )}
-                            </Text>
-                          </VStack>
-                        </HStack>
-                        <Switch
-                          size="sm"
-                          value={shareWithFriends}
-                          onValueChange={setShareWithFriends}
-                          trackColor={{
-                            false: SwitchColors.trackOff,
-                            true: SwitchColors.trackOn,
-                          }}
-                        />
-                      </HStack>
-                    </Pressable>
+                      value={shareWithFriends}
+                      onValueChange={setShareWithFriends}
+                    />
                   </View>
                 )}
               </VStack>
