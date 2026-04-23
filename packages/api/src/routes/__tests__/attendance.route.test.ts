@@ -324,9 +324,10 @@ describe("Attendance Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
       );
 
-      // Mock attendance delete operation
+      // Mock attendance delete operation — must return at least one row so
+      // the repository's "0 rows affected" guard doesn't fire.
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
+        createMockChain(mockSupabaseSuccess([{ id: attendanceId }])),
       );
 
       const req = createAuthRequest(`/attendance/${attendanceId}`, {
