@@ -761,6 +761,7 @@ export type Database = {
           festival_id: string
           id: string
           is_active: boolean
+          share_with_friends: boolean
           started_at: string
           updated_at: string
           user_id: string
@@ -771,6 +772,7 @@ export type Database = {
           festival_id: string
           id?: string
           is_active?: boolean
+          share_with_friends?: boolean
           started_at?: string
           updated_at?: string
           user_id: string
@@ -781,6 +783,7 @@ export type Database = {
           festival_id?: string
           id?: string
           is_active?: boolean
+          share_with_friends?: boolean
           started_at?: string
           updated_at?: string
           user_id?: string

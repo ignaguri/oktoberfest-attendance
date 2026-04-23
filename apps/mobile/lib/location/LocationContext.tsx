@@ -82,6 +82,7 @@ interface LocationContextType {
     festivalId: string,
     durationMinutes?: number,
     groupIds?: string[],
+    shareWithFriends?: boolean,
   ) => Promise<StartSharingResult>;
   stopSharing: () => Promise<boolean>;
   startLocalTracking: (festivalId?: string) => Promise<boolean>;
@@ -197,6 +198,8 @@ export function LocationProvider({ children }: { children: ReactNode }) {
    * @param festivalId - Festival to share location for
    * @param durationMinutes - How long to share (default 2 hours)
    * @param groupIds - Specific groups to share with (undefined = all groups)
+   * @param shareWithFriends - When true, accepted friends can see this session
+   *   regardless of group overlap (additive to the group visibility)
    * @returns Result object with success status, session, and background status
    */
   const startSharing = useCallback(
@@ -204,6 +207,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       festivalId: string,
       durationMinutes = 120,
       groupIds?: string[],
+      shareWithFriends = false,
     ): Promise<StartSharingResult> => {
       if (!location.hasPermission) {
         logger.warn("No permission to start sharing");
@@ -235,6 +239,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           // Pass visibility and groupIds if specific groups selected
           visibility: groupIds && groupIds.length > 0 ? "specific" : "groups",
           groupIds: groupIds && groupIds.length > 0 ? groupIds : undefined,
+          shareWithFriends,
         });
 
         if (!result?.session) {
@@ -729,7 +734,12 @@ const defaultContext: LocationContextType = {
   requestPermission: async () => false,
   requestBackgroundPermission: async () => false,
   markPromptAsShown: async () => {},
-  startSharing: async (_festivalId, _durationMinutes?, _groupIds?) => ({
+  startSharing: async (
+    _festivalId,
+    _durationMinutes?,
+    _groupIds?,
+    _shareWithFriends?,
+  ) => ({
     success: false,
     backgroundEnabled: false,
   }),

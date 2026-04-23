@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
+  Heart,
   MapPin,
   Radio,
   Users,
@@ -16,10 +17,11 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
+import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useGlobalAlert } from "@/lib/alerts";
-import { Colors, IconColors } from "@/lib/constants/colors";
+import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
 import { useLocationContext } from "@/lib/location";
 
 import { GroupSelector } from "./GroupSelector";
@@ -69,6 +71,7 @@ export function LocationSharingToggle({
   const [isGroupSelectorOpen, setIsGroupSelectorOpen] = useState(false);
   const [shareWithAll, setShareWithAll] = useState(true);
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const [shareWithFriends, setShareWithFriends] = useState(false);
   // Inline warning message (shown when background location has issues)
   const [inlineWarning, setInlineWarning] = useState<string | null>(null);
 
@@ -107,7 +110,12 @@ export function LocationSharingToggle({
       }
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      const result = await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(
+        festivalId,
+        selectedDuration,
+        groupIds,
+        shareWithFriends,
+      );
 
       if (!result.success) {
         showAlert(
@@ -137,6 +145,7 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    shareWithFriends,
     showAlert,
     useInlineWarnings,
     t,
@@ -148,7 +157,12 @@ export function LocationSharingToggle({
     if (granted) {
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      const result = await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(
+        festivalId,
+        selectedDuration,
+        groupIds,
+        shareWithFriends,
+      );
 
       if (!result.success) {
         showAlert(
@@ -173,6 +187,7 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    shareWithFriends,
     showAlert,
     useInlineWarnings,
     t,
@@ -392,6 +407,38 @@ export function LocationSharingToggle({
                       shareWithAll={shareWithAll}
                       onShareWithAllChange={setShareWithAll}
                     />
+
+                    {/* Also share with friends (additive to group visibility) */}
+                    <Pressable
+                      onPress={() => setShareWithFriends(!shareWithFriends)}
+                      className="mt-3 active:opacity-80"
+                      accessibilityLabel={t(
+                        "location.friends.alsoShareWithFriends",
+                      )}
+                    >
+                      <HStack className="items-center justify-between rounded-lg bg-background-0 p-2">
+                        <HStack space="sm" className="flex-1 items-center pr-2">
+                          <Heart size={16} color={IconColors.default} />
+                          <VStack className="flex-1">
+                            <Text className="text-sm text-typography-700">
+                              {t("location.friends.alsoShareWithFriends")}
+                            </Text>
+                            <Text className="text-xs text-typography-500">
+                              {t("location.friends.alsoShareDescription")}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                        <Switch
+                          size="sm"
+                          value={shareWithFriends}
+                          onValueChange={setShareWithFriends}
+                          trackColor={{
+                            false: SwitchColors.trackOff,
+                            true: SwitchColors.trackOn,
+                          }}
+                        />
+                      </HStack>
+                    </Pressable>
                   </View>
                 )}
               </VStack>

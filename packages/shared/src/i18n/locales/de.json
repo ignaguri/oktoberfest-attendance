@@ -1648,6 +1648,10 @@
       "expandHint": "Tippe zum Aufklappen",
       "orSelectSpecific": "Oder bestimmte Gruppen auswählen"
     },
+    "friends": {
+      "alsoShareWithFriends": "Auch mit meinen Freunden teilen",
+      "alsoShareDescription": "Freunde sehen deinen Standort auch, wenn ihr in keiner gemeinsamen Gruppe seid"
+    },
     "proximity": {
       "veryClose": "Sehr nah",
       "hint": "Tippen, um auf Karte anzuzeigen und einzuchecken",

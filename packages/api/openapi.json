@@ -9922,6 +9922,10 @@
                       "type": "string",
                       "format": "uuid"
                     }
+                  },
+                  "shareWithFriends": {
+                    "type": "boolean",
+                    "default": false
                   }
                 },
                 "required": [

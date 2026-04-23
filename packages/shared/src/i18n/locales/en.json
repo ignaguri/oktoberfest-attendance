@@ -1906,6 +1906,10 @@
       "expandHint": "Tap to expand",
       "orSelectSpecific": "Or select specific groups"
     },
+    "friends": {
+      "alsoShareWithFriends": "Also share with my friends",
+      "alsoShareDescription": "Friends can see your location even if you don't share a group"
+    },
     "proximity": {
       "veryClose": "Very close",
       "hint": "Tap to view on map and check in",

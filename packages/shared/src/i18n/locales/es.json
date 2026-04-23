@@ -1896,6 +1896,10 @@
       "expandHint": "Tocá para expandir",
       "orSelectSpecific": "O seleccioná grupos específicos"
     },
+    "friends": {
+      "alsoShareWithFriends": "Compartir también con mis amigos",
+      "alsoShareDescription": "Tus amigos ven tu ubicación aunque no compartan un grupo con vos"
+    },
     "proximity": {
       "veryClose": "Muy cerca",
       "hint": "Tocá para ver en el mapa y registrarte",
