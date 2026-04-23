@@ -46,7 +46,10 @@ export default function ShareButton({
   const generateShareLink = useCallback(async () => {
     try {
       const { inviteToken } = await renewToken({ groupId });
-      const newGroupLink = `${APP_URL}/api/join-group?token=${inviteToken}`;
+      // Use /join-group (not /api/join-group) so the URL matches the mobile
+      // app's Universal Link / Android App Link intent filter. The web app
+      // still forwards /join-group -> /api/join-group internally.
+      const newGroupLink = `${APP_URL}/join-group?token=${inviteToken}`;
       startTransition(() => {
         setGroupLink(newGroupLink);
       });
