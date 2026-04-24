@@ -9922,6 +9922,10 @@
                       "type": "string",
                       "format": "uuid"
                     }
+                  },
+                  "shareWithFriends": {
+                    "type": "boolean",
+                    "default": false
                   }
                 },
                 "required": [
@@ -10424,15 +10428,6 @@
             "required": false,
             "name": "radiusMeters",
             "in": "query"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "required": false,
-            "name": "groupId",
-            "in": "query"
           }
         ],
         "responses": {
@@ -10468,12 +10463,11 @@
                             "nullable": true,
                             "format": "uri"
                           },
-                          "groupId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "groupName": {
-                            "type": "string"
+                          "groupNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "lastLocation": {
                             "type": "object",
@@ -10515,8 +10509,7 @@
                           "username",
                           "fullName",
                           "avatarUrl",
-                          "groupId",
-                          "groupName",
+                          "groupNames",
                           "lastLocation",
                           "distance"
                         ]

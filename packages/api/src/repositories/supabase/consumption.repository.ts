@@ -146,13 +146,20 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       throw new DatabaseError("Unauthorized to delete this consumption");
     }
 
-    const { error } = await this.supabase
+    const { data: deleted, error } = await this.supabase
       .from("consumptions")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .select("id");
 
     if (error) {
       throw new DatabaseError(`Failed to delete consumption: ${error.message}`);
+    }
+
+    if (!deleted || deleted.length === 0) {
+      throw new DatabaseError(
+        `Consumption delete affected 0 rows for id=${id}; likely RLS policy or FK constraint`,
+      );
     }
   }
 

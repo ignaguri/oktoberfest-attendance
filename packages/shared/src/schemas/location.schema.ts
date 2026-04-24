@@ -34,7 +34,11 @@ export const LocationSessionSchema = z.object({
 export type LocationSession = z.infer<typeof LocationSessionSchema>;
 
 /**
- * Location session with member info
+ * Location session with member info.
+ *
+ * `groupNames` mirrors the `group_names text[]` that the get_nearby_group_members
+ * RPC actually returns — one entry per group the member and caller both belong
+ * to (empty when visibility is purely friend-based).
  */
 export const LocationSessionMemberSchema = z.object({
   sessionId: z.uuid(),
@@ -42,8 +46,7 @@ export const LocationSessionMemberSchema = z.object({
   username: z.string(),
   fullName: z.string().nullable(),
   avatarUrl: z.url().nullable(),
-  groupId: z.uuid(),
-  groupName: z.string(),
+  groupNames: z.array(z.string()),
   lastLocation: LocationPointSchema.nullable(),
   distance: z.number().nullable(), // Distance in meters (if calculated)
 });
@@ -77,6 +80,13 @@ export const StartLocationSessionSchema = z
      * Required when visibility is "specific", ignored when "groups"
      */
     groupIds: z.array(z.uuid({ error: "Invalid group ID" })).optional(),
+    /**
+     * Additive visibility: when true, the user's accepted friends can see this
+     * session regardless of group overlap. Combines with the group visibility
+     * (a user sees this session if they share a selected group OR they are a
+     * friend and this flag is true).
+     */
+    shareWithFriends: z.boolean().optional().default(false),
   })
   .refine(
     (data) =>
@@ -164,7 +174,6 @@ export const GetNearbyMembersQuerySchema = z.object({
     .max(5000)
     .optional()
     .default(1000), // 1km default
-  groupId: z.uuid({ error: "Invalid group ID" }).optional(), // Filter to specific group
 });
 
 export type GetNearbyMembersQuery = z.infer<typeof GetNearbyMembersQuerySchema>;

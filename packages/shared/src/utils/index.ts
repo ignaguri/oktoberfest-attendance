@@ -1,5 +1,10 @@
 // URL utilities
-export { getAppUrl, replaceLocalhostInUrl } from "./url";
+export {
+  buildGroupInviteUrl,
+  getAppUrl,
+  replaceLocalhostInUrl,
+  safeHost,
+} from "./url";
 
 // Date utilities
 export {

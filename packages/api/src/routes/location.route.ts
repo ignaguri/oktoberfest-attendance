@@ -304,7 +304,6 @@ app.openapi(getNearbyMembersRoute, async (c) => {
     query.latitude,
     query.longitude,
     query.radiusMeters,
-    query.groupId,
   );
 
   return c.json(

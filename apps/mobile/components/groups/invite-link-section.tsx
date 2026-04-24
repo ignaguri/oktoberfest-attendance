@@ -1,4 +1,4 @@
-import { getAppUrl } from "@prostcounter/shared";
+import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Check, Copy, Link, RefreshCw, Share2 } from "lucide-react-native";
@@ -31,9 +31,7 @@ export function InviteLinkSection({
   const renewToken = useRenewInviteToken();
   const [copied, setCopied] = useState(false);
 
-  const inviteUrl = inviteToken
-    ? `${getAppUrl()}/join-group?token=${inviteToken}`
-    : "";
+  const inviteUrl = inviteToken ? buildGroupInviteUrl(inviteToken) : "";
 
   // Handle copy to clipboard (uses Share as fallback)
   const handleCopy = useCallback(async () => {

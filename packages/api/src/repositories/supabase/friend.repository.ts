@@ -223,26 +223,40 @@ export class SupabaseFriendRepository implements IFriendRepository {
   }
 
   async cancelRequest(friendshipId: string, userId: string): Promise<void> {
-    const { error } = await this.supabase
+    const { data: deleted, error } = await this.supabase
       .from("friendships")
       .delete()
       .eq("id", friendshipId)
       .eq("requester_id", userId)
-      .eq("status", "pending");
+      .eq("status", "pending")
+      .select("id");
 
     if (error) throw new DatabaseError(error.message);
+
+    if (!deleted || deleted.length === 0) {
+      throw new DatabaseError(
+        `Friend request cancel affected 0 rows for id=${friendshipId}; not pending, not the requester, or RLS policy blocked`,
+      );
+    }
   }
 
   async unfriend(userId: string, friendUserId: string): Promise<void> {
-    const { error } = await this.supabase
+    const { data: deleted, error } = await this.supabase
       .from("friendships")
       .delete()
       .eq("status", "accepted")
       .or(
         `and(requester_id.eq.${userId},addressee_id.eq.${friendUserId}),and(requester_id.eq.${friendUserId},addressee_id.eq.${userId})`,
-      );
+      )
+      .select("id");
 
     if (error) throw new DatabaseError(error.message);
+
+    if (!deleted || deleted.length === 0) {
+      throw new DatabaseError(
+        `Unfriend affected 0 rows for pair (${userId}, ${friendUserId}); no accepted friendship or RLS policy blocked`,
+      );
+    }
   }
 
   async getSuggestions(userId: string): Promise<FriendSuggestion[]> {

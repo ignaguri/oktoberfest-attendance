@@ -174,7 +174,10 @@ export function FriendMap({
               longitude: member.lastLocation.longitude,
             },
             title: member.fullName || member.username || "Friend",
-            snippet: member.groupName || undefined,
+            snippet:
+              member.groupNames.length > 0
+                ? member.groupNames.join(", ")
+                : undefined,
           });
         }
       });

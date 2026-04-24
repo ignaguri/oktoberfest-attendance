@@ -212,14 +212,21 @@ export class SupabaseGroupRepository implements IGroupRepository {
   }
 
   async removeMember(groupId: string, userId: string): Promise<void> {
-    const { error } = await this.supabase
+    const { data: deleted, error } = await this.supabase
       .from("group_members")
       .delete()
       .eq("group_id", groupId)
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .select("user_id");
 
     if (error) {
       throw new DatabaseError(`Failed to remove member: ${error.message}`);
+    }
+
+    if (!deleted || deleted.length === 0) {
+      throw new DatabaseError(
+        `Group member removal affected 0 rows for group=${groupId}, user=${userId}; not a member or RLS policy blocked`,
+      );
     }
   }
 

@@ -446,8 +446,7 @@ describe("Location Routes - Unit Tests", () => {
           username: "beerfan",
           fullName: "Beer Fan",
           avatarUrl: "https://example.com/avatar1.jpg",
-          groupId: "group-e89b-12d3-a456-426614174001",
-          groupName: "Beer Buddies",
+          groupNames: ["Beer Buddies"],
           lastLocation: {
             latitude: 48.1352,
             longitude: 11.5821,
@@ -462,8 +461,7 @@ describe("Location Routes - Unit Tests", () => {
           username: "prosthund",
           fullName: "Prost Hund",
           avatarUrl: null,
-          groupId: "group-e89b-12d3-a456-426614174001",
-          groupName: "Beer Buddies",
+          groupNames: ["Beer Buddies"],
           lastLocation: {
             latitude: 48.1355,
             longitude: 11.5825,
@@ -502,38 +500,6 @@ describe("Location Routes - Unit Tests", () => {
         latitude,
         longitude,
         1000,
-        undefined,
-      );
-    });
-
-    it("should filter by group ID", async () => {
-      const festivalId = "123e4567-e89b-12d3-a456-426614174000";
-      const groupId = "923e4567-e89b-12d3-a456-426614174001"; // Valid UUID
-      const latitude = 48.1351;
-      const longitude = 11.582;
-
-      mockLocationService.getNearbyMembers.mockResolvedValueOnce([]);
-
-      const req = createAuthRequest(
-        `/location/nearby?festivalId=${festivalId}&latitude=${latitude}&longitude=${longitude}&groupId=${groupId}`,
-        {
-          method: "GET",
-        },
-      );
-
-      const res = await app.request(req.url, {
-        method: req.method,
-        headers: req.headers,
-      });
-
-      expect(res.status).toBe(200);
-      expect(mockLocationService.getNearbyMembers).toHaveBeenCalledWith(
-        mockUser.id,
-        festivalId,
-        latitude,
-        longitude,
-        1000, // Default radius
-        groupId,
       );
     });
 
@@ -636,24 +602,6 @@ describe("Location Routes - Unit Tests", () => {
 
       const req = createAuthRequest(
         `/location/nearby?festivalId=${festivalId}&latitude=100&longitude=11.582`, // Invalid latitude
-        {
-          method: "GET",
-        },
-      );
-
-      const res = await app.request(req.url, {
-        method: req.method,
-        headers: req.headers,
-      });
-
-      expect(res.status).toBe(400);
-    });
-
-    it("should validate groupId is valid UUID when provided", async () => {
-      const festivalId = "123e4567-e89b-12d3-a456-426614174000";
-
-      const req = createAuthRequest(
-        `/location/nearby?festivalId=${festivalId}&latitude=48.1351&longitude=11.582&groupId=invalid-uuid`,
         {
           method: "GET",
         },

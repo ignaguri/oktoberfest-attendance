@@ -66,7 +66,6 @@ export interface ILocationRepository {
    * @param latitude - Current latitude
    * @param longitude - Current longitude
    * @param radiusMeters - Search radius in meters
-   * @param groupId - Optional group filter
    * @returns Array of nearby members with their locations
    */
   getNearbyMembers(
@@ -75,7 +74,6 @@ export interface ILocationRepository {
     latitude: number,
     longitude: number,
     radiusMeters: number,
-    groupId?: string,
   ): Promise<LocationSessionMember[]>;
 
   /**

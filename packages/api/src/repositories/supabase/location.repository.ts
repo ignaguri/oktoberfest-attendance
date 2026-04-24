@@ -44,6 +44,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       is_active: true,
       started_at: new Date().toISOString(),
       expires_at: expiresAt.toISOString(),
+      share_with_friends: input.shareWithFriends ?? false,
     };
 
     let { data: session, error: sessionError } = await this.supabase
@@ -258,12 +259,14 @@ export class SupabaseLocationRepository implements ILocationRepository {
   async getNearbyMembers(
     userId: string,
     festivalId: string,
-    latitude: number,
-    longitude: number,
+    _latitude: number,
+    _longitude: number,
     radiusMeters: number,
-    groupId?: string,
   ): Promise<LocationSessionMember[]> {
-    // Use the database RPC function for proximity search
+    // Use the database RPC function for proximity search. Note the RPC derives
+    // the caller's current position from their own active session, so the
+    // latitude/longitude args are not passed through — kept in the interface
+    // for the route handler's response shape.
     const { data, error } = await this.supabase.rpc(
       "get_nearby_group_members",
       {
@@ -279,20 +282,13 @@ export class SupabaseLocationRepository implements ILocationRepository {
       );
     }
 
-    // Filter by groupId if provided
-    let filtered = data || [];
-    if (groupId) {
-      filtered = filtered.filter((m: any) => m.group_id === groupId);
-    }
-
-    return filtered.map((m: any) => ({
+    return (data || []).map((m: any) => ({
       sessionId: m.session_id,
       userId: m.user_id,
       username: m.username,
       fullName: m.full_name,
       avatarUrl: m.avatar_url,
-      groupId: m.group_id,
-      groupName: m.group_name,
+      groupNames: (m.group_names ?? []) as string[],
       lastLocation:
         m.latitude && m.longitude
           ? {

@@ -1,5 +1,6 @@
 "use client";
 
+import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { Share2 } from "lucide-react";
 import {
   startTransition,
@@ -39,14 +40,14 @@ export default function ShareButton({
     url: groupLink,
   });
 
-  const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
-
   const { mutateAsync: renewToken } = useRenewInviteToken();
 
   const generateShareLink = useCallback(async () => {
     try {
       const { inviteToken } = await renewToken({ groupId });
-      const newGroupLink = `${APP_URL}/api/join-group?token=${inviteToken}`;
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : undefined;
+      const newGroupLink = buildGroupInviteUrl(inviteToken, origin);
       startTransition(() => {
         setGroupLink(newGroupLink);
       });
@@ -55,7 +56,7 @@ export default function ShareButton({
         description: "Failed to generate share link. Please try again.",
       });
     }
-  }, [groupId, APP_URL, renewToken]);
+  }, [groupId, renewToken]);
 
   const handleShareClick = async () => {
     if (!tokenGenerated) {

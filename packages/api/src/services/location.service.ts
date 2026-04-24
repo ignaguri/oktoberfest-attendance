@@ -155,7 +155,6 @@ export class LocationService {
    * @param latitude - Current latitude
    * @param longitude - Current longitude
    * @param radiusMeters - Search radius in meters
-   * @param groupId - Optional group filter
    * @returns Array of nearby members with their locations
    */
   async getNearbyMembers(
@@ -164,7 +163,6 @@ export class LocationService {
     latitude: number,
     longitude: number,
     radiusMeters: number,
-    groupId?: string,
   ): Promise<LocationSessionMember[]> {
     // Validate radius
     if (radiusMeters < 100 || radiusMeters > 5000) {
@@ -188,7 +186,6 @@ export class LocationService {
       latitude,
       longitude,
       radiusMeters,
-      groupId,
     );
 
     // Filter out user's own location (shouldn't be in results, but defensive)

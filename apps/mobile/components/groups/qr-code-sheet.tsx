@@ -1,4 +1,4 @@
-import { getAppUrl } from "@prostcounter/shared";
+import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { QrCode, RefreshCw } from "lucide-react-native";
@@ -75,10 +75,7 @@ export function QRCodeSheet({
     }
   }, [groupId, renewToken]);
 
-  const appUrl = getAppUrl();
-  const joinUrl = currentToken
-    ? `${appUrl}/api/join-group?token=${currentToken}`
-    : null;
+  const joinUrl = currentToken ? buildGroupInviteUrl(currentToken) : null;
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>

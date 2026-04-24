@@ -218,14 +218,24 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError("Unauthorized to delete this attendance");
     }
 
-    // Delete the attendance (consumptions will cascade delete)
-    const { error } = await this.supabase
+    // Delete the attendance (consumptions will cascade delete).
+    // Use .select() so the driver returns the affected rows; otherwise a
+    // silent 0-row delete (RLS denial or blocking FK) is indistinguishable
+    // from a real delete and the route handler would happily report success.
+    const { data: deleted, error } = await this.supabase
       .from("attendances")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .select("id");
 
     if (error) {
       throw new DatabaseError(`Failed to delete attendance: ${error.message}`);
+    }
+
+    if (!deleted || deleted.length === 0) {
+      throw new DatabaseError(
+        `Attendance delete affected 0 rows for id=${id}; likely RLS policy or FK constraint`,
+      );
     }
   }
 

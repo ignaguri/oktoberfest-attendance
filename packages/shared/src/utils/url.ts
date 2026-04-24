@@ -55,3 +55,32 @@ export function replaceLocalhostInUrl(
     return url;
   }
 }
+
+/**
+ * Build a shareable group-invite URL. The path "/join-group" is the one the
+ * mobile app intercepts via Universal Links / Android App Links (see
+ * apps/mobile/app.config.ts intent filters), so every invite URL we share
+ * MUST use this path (not "/api/join-group") for deeplinking to work.
+ *
+ * @param token - Invite token (URL-encoded internally so non-UUID formats are safe).
+ * @param baseUrl - Optional origin override. Web callers pass `window.location.origin`
+ *                  so the link matches the current browser origin; mobile callers
+ *                  omit it to pick up getAppUrl() (EXPO_PUBLIC_APP_URL).
+ */
+export function buildGroupInviteUrl(token: string, baseUrl?: string): string {
+  const origin = baseUrl ?? getAppUrl();
+  return `${origin}/join-group?token=${encodeURIComponent(token)}`;
+}
+
+/**
+ * Parse just the host out of a URL without throwing. Useful for logging /
+ * diagnostics where an unparseable input should surface as a sentinel string
+ * rather than crash the caller.
+ */
+export function safeHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return "<invalid-url>";
+  }
+}

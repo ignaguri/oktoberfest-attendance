@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
+  Heart,
   MapPin,
   Radio,
   Users,
@@ -15,6 +16,7 @@ import { View } from "react-native";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
+import { LabeledSwitchRow } from "@/components/ui/labeled-switch-row";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -69,6 +71,7 @@ export function LocationSharingToggle({
   const [isGroupSelectorOpen, setIsGroupSelectorOpen] = useState(false);
   const [shareWithAll, setShareWithAll] = useState(true);
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const [shareWithFriends, setShareWithFriends] = useState(false);
   // Inline warning message (shown when background location has issues)
   const [inlineWarning, setInlineWarning] = useState<string | null>(null);
 
@@ -107,7 +110,11 @@ export function LocationSharingToggle({
       }
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      const result = await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(festivalId, {
+        durationMinutes: selectedDuration,
+        groupIds,
+        shareWithFriends,
+      });
 
       if (!result.success) {
         showAlert(
@@ -137,6 +144,7 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    shareWithFriends,
     showAlert,
     useInlineWarnings,
     t,
@@ -148,7 +156,11 @@ export function LocationSharingToggle({
     if (granted) {
       // Pass groupIds only if not sharing with all groups
       const groupIds = shareWithAll ? undefined : selectedGroupIds;
-      const result = await startSharing(festivalId, selectedDuration, groupIds);
+      const result = await startSharing(festivalId, {
+        durationMinutes: selectedDuration,
+        groupIds,
+        shareWithFriends,
+      });
 
       if (!result.success) {
         showAlert(
@@ -173,6 +185,7 @@ export function LocationSharingToggle({
     selectedDuration,
     shareWithAll,
     selectedGroupIds,
+    shareWithFriends,
     showAlert,
     useInlineWarnings,
     t,
@@ -391,6 +404,18 @@ export function LocationSharingToggle({
                       onSelectionChange={setSelectedGroupIds}
                       shareWithAll={shareWithAll}
                       onShareWithAllChange={setShareWithAll}
+                    />
+
+                    {/* Also share with friends (additive to group visibility) */}
+                    <LabeledSwitchRow
+                      className="mt-3"
+                      icon={Heart}
+                      title={t("location.groups.alsoShareWithFriends")}
+                      description={t(
+                        "location.groups.alsoShareWithFriendsDescription",
+                      )}
+                      value={shareWithFriends}
+                      onValueChange={setShareWithFriends}
                     />
                   </View>
                 )}
