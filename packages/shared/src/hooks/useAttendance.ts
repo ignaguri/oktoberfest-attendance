@@ -20,6 +20,7 @@ import {
  */
 export const ATTENDANCE_SIDE_EFFECT_KEYS = [
   ["attendances"],
+  ["attendanceByDate"],
   ["user"],
   ["leaderboard"],
   ["highlights"],
@@ -113,7 +114,6 @@ export function useUpdatePersonalAttendance() {
         for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
           invalidateQueries([...key]);
         }
-        invalidateQueries(["attendanceByDate"]);
       },
     },
   );

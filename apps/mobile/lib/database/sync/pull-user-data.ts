@@ -132,12 +132,18 @@ export async function pullAttendances(
     const attendances = response.data;
     const now = new Date().toISOString();
 
+    // Only reconcile deletes when the response is the full festival snapshot.
+    // The list endpoint is paginated (limit: 100); if we only got a partial
+    // page, rows missing from the response might still live on the server.
+    const isFullSnapshot = attendances.length >= response.total;
+
     await processAttendances(
       db,
       festivalId,
       attendances,
       attendancesResult,
       now,
+      isFullSnapshot,
     );
     await updateLastSyncAt(db, "attendances", now);
 
@@ -169,6 +175,7 @@ async function processAttendances(
   }>,
   result: PullResult,
   now: string,
+  isFullSnapshot: boolean,
 ): Promise<void> {
   for (const att of attendances) {
     const existing = await db.getFirstAsync<LocalAttendance>(
@@ -284,6 +291,10 @@ async function processAttendances(
   // no longer returns was deleted elsewhere (other device, web, admin). Mark
   // it soft-deleted so the UI drops it and the periodic cleanup can purge it.
   // Skips _dirty rows so in-flight local mutations aren't clobbered.
+  // Skipped when the response was paginated/partial — we'd otherwise delete
+  // rows that still exist on the server but live on another page.
+  if (!isFullSnapshot) return;
+
   const serverIds = new Set(attendances.map((a) => a.id));
   const localRows = await db.getAllAsync<{ id: string }>(
     `SELECT id FROM attendances
@@ -301,6 +312,12 @@ async function processAttendances(
           `UPDATE attendances
            SET _deleted = 1, _synced_at = ?
            WHERE id = ?`,
+          [now, row.id],
+        );
+        await db.runAsync(
+          `UPDATE consumptions
+           SET _deleted = 1, _synced_at = ?
+           WHERE attendance_id = ? AND _deleted = 0`,
           [now, row.id],
         );
         result.deleted++;
