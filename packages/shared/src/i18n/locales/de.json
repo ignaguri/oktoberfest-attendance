@@ -252,7 +252,10 @@
       "shareQR": "QR-Code teilen",
       "generating": "QR-Code wird generiert...",
       "helper": "Freunde können diesen Code scannen, um deiner Gruppe sofort beizutreten",
-      "regenerate": "QR-Code neu erstellen"
+      "regenerate": "QR-Code neu erstellen",
+      "generate": "QR-Code erstellen",
+      "noTokenCreator": "Noch kein Einladungslink. Tippe auf Erstellen, um einen zu generieren.",
+      "noTokenMember": "Noch kein Einladungslink. Bitte den Gruppenersteller, einen zu erstellen."
     },
     "create": {
       "title": "Gruppe erstellen",
@@ -1672,7 +1675,7 @@
     "benefits": {
       "findFriends": "Finde deine Freunde auf der Festivalkarte",
       "nearbyTents": "Bekomme Vorschläge, wenn du in der Nähe eines Zelts bist",
-      "privacy": "Nur für Gruppenmitglieder sichtbar"
+      "privacy": "Nur für deine Gruppenmitglieder und Freunde sichtbar"
     },
     "promptTitle": "Standort teilen",
     "promptDescription": "Aktiviere Standortfreigabe, um Freunde zu finden und Zelte in der Nähe zu entdecken",

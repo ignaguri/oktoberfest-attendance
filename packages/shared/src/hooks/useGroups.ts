@@ -5,14 +5,14 @@
  */
 
 import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  useSetQueryData,
-  useGetQueryData,
-  useCancelQueries,
   QueryKeys,
+  useApiClient,
+  useCancelQueries,
+  useGetQueryData,
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
+  useSetQueryData,
 } from "../data";
 
 /**
@@ -384,7 +384,6 @@ export function useRenewInviteToken() {
     },
     {
       onSuccess: (_data, { groupId }) => {
-        // Invalidate group details to refresh the invite token
         invalidateQueries(QueryKeys.group(groupId));
       },
     },

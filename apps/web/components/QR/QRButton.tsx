@@ -1,8 +1,8 @@
 "use client";
 
 import { buildGroupInviteUrl } from "@prostcounter/shared";
-import { QrCode } from "lucide-react";
-import { startTransition, useCallback, useEffect, useState } from "react";
+import { QrCode, RefreshCw } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ResponsiveDialog from "@/components/ResponsiveDialog";
@@ -14,6 +14,8 @@ import QRCode from "./QRCode";
 interface QRButtonProps {
   groupName: string;
   groupId: string;
+  inviteToken: string | null;
+  isCreator: boolean;
   withText?: boolean;
 }
 
@@ -22,49 +24,30 @@ const ICON_SIZE = 20;
 export default function QRButton({
   groupName,
   groupId,
+  inviteToken,
+  isCreator,
   withText = false,
 }: QRButtonProps) {
   const [open, setOpen] = useState(false);
-  const [groupLink, setGroupLink] = useState("");
-  const [tokenGenerated, setTokenGenerated] = useState(false);
+  const { mutateAsync: renewToken, loading: isRegenerating } =
+    useRenewInviteToken();
 
-  const { mutateAsync: renewToken } = useRenewInviteToken();
+  const groupLink = useMemo(() => {
+    if (!inviteToken) return "";
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : undefined;
+    return buildGroupInviteUrl(inviteToken, origin);
+  }, [inviteToken]);
 
-  const generateShareLink = useCallback(async () => {
+  const handleRegenerate = async () => {
     try {
-      const { inviteToken } = await renewToken({ groupId });
-      // Pin the origin to the browser window so the link matches whatever host
-      // the user is currently on (prod, preview, local). The shared helper
-      // enforces the "/join-group" path that the mobile intent filter expects.
-      const origin =
-        typeof window !== "undefined" ? window.location.origin : undefined;
-      const newGroupLink = buildGroupInviteUrl(inviteToken, origin);
-      startTransition(() => {
-        setGroupLink(newGroupLink);
-      });
+      await renewToken({ groupId });
     } catch {
       toast.error("Error", {
-        description: "Failed to generate QR code. Please try again.",
+        description: "Failed to regenerate invite token. Please try again.",
       });
     }
-  }, [groupId, renewToken]);
-
-  const handleQRClick = async () => {
-    if (!tokenGenerated) {
-      await generateShareLink();
-      setTokenGenerated(true);
-    }
-    setOpen(true);
   };
-
-  useEffect(() => {
-    if (open && !tokenGenerated) {
-      generateShareLink();
-      startTransition(() => {
-        setTokenGenerated(true);
-      });
-    }
-  }, [generateShareLink, open, tokenGenerated]);
 
   const title = "QR Code to Join";
   const description = `Scan this QR code to join "${groupName}"`;
@@ -74,7 +57,7 @@ export default function QRButton({
       <Button
         variant="outline"
         className="flex items-center"
-        onClick={handleQRClick}
+        onClick={() => setOpen(true)}
       >
         <QrCode size={ICON_SIZE} />
         {withText && <span className="ml-2">QR Code</span>}
@@ -88,13 +71,32 @@ export default function QRButton({
         className="sm:max-w-[425px]"
       >
         <div className="flex flex-col items-center gap-4 p-6">
-          {groupLink && (
+          {groupLink ? (
             <>
               <QRCode value={groupLink} size={220} />
               <p className="text-muted-foreground text-center text-sm">
                 Others can scan this code to join your group instantly!
               </p>
             </>
+          ) : (
+            <p className="text-muted-foreground text-center text-sm">
+              No invite link yet.
+              {isCreator
+                ? " Generate one with the button below."
+                : " Ask the group creator to generate one."}
+            </p>
+          )}
+
+          {isCreator && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRegenerate}
+              disabled={isRegenerating}
+            >
+              <RefreshCw size={16} className="mr-2" />
+              {groupLink ? "Regenerate" : "Generate"}
+            </Button>
           )}
         </div>
       </ResponsiveDialog>

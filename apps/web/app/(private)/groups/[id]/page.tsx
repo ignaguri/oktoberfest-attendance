@@ -10,7 +10,11 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
-import { useGroupLeaderboard, useGroupSettings } from "@/lib/data";
+import {
+  useCurrentUser,
+  useGroupLeaderboard,
+  useGroupSettings,
+} from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import type { WinningCriteria } from "@/lib/types";
 
@@ -36,8 +40,13 @@ export default function GroupPage() {
     error: groupError,
   } = useGroupSettings(groupId);
 
+  const { data: currentUser } = useCurrentUser();
+
   // The group data is nested inside the response
   const group = groupResponse?.data;
+  const isCreator =
+    !!group && !!currentUser && group.createdBy === currentUser.id;
+  const inviteToken = group?.inviteToken ?? null;
 
   // Fetch leaderboard
   const criteriaId = group
@@ -122,7 +131,12 @@ export default function GroupPage() {
         <h2 className="grow pr-2 text-center text-3xl font-bold">
           {t("groups.pageTitle")} &quot;{group.name}&quot;
         </h2>
-        <ShareButton groupName={group.name} groupId={group.id} />
+        <ShareButton
+          groupName={group.name}
+          groupId={group.id}
+          inviteToken={inviteToken}
+          isCreator={isCreator}
+        />
       </div>
 
       {group.description && (
@@ -172,8 +186,20 @@ export default function GroupPage() {
             </Link>
           </Button>
           <div className="flex items-center gap-2">
-            <QRButton groupName={group.name} groupId={group.id} withText />
-            <ShareButton groupName={group.name} groupId={group.id} withText />
+            <QRButton
+              groupName={group.name}
+              groupId={group.id}
+              inviteToken={inviteToken}
+              isCreator={isCreator}
+              withText
+            />
+            <ShareButton
+              groupName={group.name}
+              groupId={group.id}
+              inviteToken={inviteToken}
+              isCreator={isCreator}
+              withText
+            />
           </div>
         </div>
       </div>

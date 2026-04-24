@@ -7,6 +7,7 @@ import {
   GroupMemberParamSchema,
   GroupSchema,
   GroupWithMembersSchema,
+  InviteTokenResponseSchema,
   JoinByTokenResponseSchema,
   JoinByTokenSchema,
   JoinGroupSchema,
@@ -632,6 +633,76 @@ app.openapi(removeMemberRoute, async (c) => {
     },
     200,
   );
+});
+
+// GET /groups/:id/token - Read current invite token (members only)
+const getInviteTokenRoute = createRoute({
+  method: "get",
+  path: "/groups/{id}/token",
+  tags: ["groups"],
+  summary: "Get current invite token",
+  description:
+    "Read the current invite token for the group. Any group member can call this; rotation requires the creator.",
+  request: {
+    params: GroupIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Current invite token",
+      content: {
+        "application/json": {
+          schema: InviteTokenResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not a group member",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getInviteTokenRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const inviteToken = await service.getInviteToken(id, user.id);
+
+  return c.json({ inviteToken }, 200);
 });
 
 // POST /groups/:id/token/renew - Regenerate invite token
