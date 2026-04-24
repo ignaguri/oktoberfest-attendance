@@ -1,6 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useApiClient } from "@prostcounter/shared/data";
-import { useDeleteAttendance } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AttendanceWithTotals,
@@ -39,6 +37,7 @@ import {
   useAdaptedConsumptionsByDate,
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
+import { useLocalDeleteAttendance } from "@/lib/database/hooks";
 import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
@@ -106,8 +105,7 @@ export function AttendanceTabContent({
   const isEditMode = !!existingAttendance;
   const { tents } = useAdaptedTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
-  const deleteAttendance = useDeleteAttendance();
-  const apiClient = useApiClient();
+  const deleteAttendance = useLocalDeleteAttendance();
 
   // Format date string for API calls
   const dateString =
@@ -389,41 +387,10 @@ export function AttendanceTabContent({
     if (!existingAttendance?.id) return;
 
     try {
-      try {
-        await deleteAttendance.mutateAsync(existingAttendance.id);
-      } catch (error: unknown) {
-        // If 404, the local ID doesn't match the server ID (offline UUID mismatch)
-        // Look up the attendance by date and retry with the server ID
-        const is404 =
-          error instanceof Error &&
-          "statusCode" in error &&
-          (error as { statusCode: number }).statusCode === 404;
-        if (is404) {
-          const serverAttendance = await apiClient.attendance.getByDate({
-            festivalId,
-            date: dateString,
-          });
-          if (serverAttendance?.attendance?.id) {
-            try {
-              await deleteAttendance.mutateAsync(
-                serverAttendance.attendance.id,
-              );
-            } catch (retryError: unknown) {
-              // If the fallback delete also returns 404, it's already gone
-              const isRetry404 =
-                retryError instanceof Error &&
-                "statusCode" in retryError &&
-                (retryError as { statusCode: number }).statusCode === 404;
-              if (!isRetry404) {
-                throw retryError;
-              }
-            }
-          }
-          // If no server attendance either, it's already gone - proceed with cleanup
-        } else {
-          throw error;
-        }
-      }
+      await deleteAttendance.mutateAsync({
+        attendanceId: existingAttendance.id,
+        festivalId,
+      });
       setShowDeleteConfirm(false);
       onSuccess?.({ date: selectedDate, tentIds: [] });
       onClose();
@@ -433,9 +400,7 @@ export function AttendanceTabContent({
   }, [
     existingAttendance?.id,
     deleteAttendance,
-    apiClient,
     festivalId,
-    dateString,
     onSuccess,
     selectedDate,
     onClose,
@@ -445,7 +410,7 @@ export function AttendanceTabContent({
     setShowDeleteConfirm(false);
   }, []);
 
-  const isDeleting = deleteAttendance.loading;
+  const isDeleting = deleteAttendance.isPending;
   const isProcessing = isSaving || isDeleting;
 
   return (

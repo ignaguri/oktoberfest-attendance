@@ -447,6 +447,12 @@ export function useLocalDeleteAttendance() {
         queryClient.invalidateQueries({
           queryKey: ["local-consumptions"],
         });
+        // Server-side derived views that depend on attendance state.
+        queryClient.invalidateQueries({ queryKey: ["attendances"] });
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+        queryClient.invalidateQueries({ queryKey: ["highlights"] });
+        queryClient.invalidateQueries({ queryKey: ["wrapped"] });
       },
     },
   );

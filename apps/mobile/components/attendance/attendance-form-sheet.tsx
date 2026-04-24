@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDeleteAttendance } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AttendanceWithTotals,
@@ -47,6 +46,7 @@ import {
   useAdaptedConsumptionsByDate,
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
+import { useLocalDeleteAttendance } from "@/lib/database/hooks";
 import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../tent-selector/tent-selector-sheet";
@@ -121,7 +121,7 @@ export function AttendanceFormSheet({
   const isEditMode = !!existingAttendance;
   const { tents } = useAdaptedTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
-  const deleteAttendance = useDeleteAttendance();
+  const deleteAttendance = useLocalDeleteAttendance();
 
   const dateString =
     selectedDate && !isNaN(selectedDate.getTime())
@@ -443,20 +443,29 @@ export function AttendanceFormSheet({
     if (!existingAttendance?.id) return;
 
     try {
-      await deleteAttendance.mutateAsync(existingAttendance.id);
+      await deleteAttendance.mutateAsync({
+        attendanceId: existingAttendance.id,
+        festivalId,
+      });
       setShowDeleteConfirm(false);
       onSuccess?.();
       onClose();
     } catch (error) {
       logger.error("Failed to delete attendance:", error);
     }
-  }, [existingAttendance?.id, deleteAttendance, onSuccess, onClose]);
+  }, [
+    existingAttendance?.id,
+    deleteAttendance,
+    festivalId,
+    onSuccess,
+    onClose,
+  ]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(false);
   }, []);
 
-  const isDeleting = deleteAttendance.loading;
+  const isDeleting = deleteAttendance.isPending;
   const isProcessing = isSaving || isDeleting;
 
   // Format date for display - guard against invalid dates

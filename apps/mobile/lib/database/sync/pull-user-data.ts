@@ -132,7 +132,13 @@ export async function pullAttendances(
     const attendances = response.data;
     const now = new Date().toISOString();
 
-    await processAttendances(db, attendances, attendancesResult, now);
+    await processAttendances(
+      db,
+      festivalId,
+      attendances,
+      attendancesResult,
+      now,
+    );
     await updateLastSyncAt(db, "attendances", now);
 
     await processTentVisits(
@@ -151,6 +157,7 @@ export async function pullAttendances(
 
 async function processAttendances(
   db: SQLite.SQLiteDatabase,
+  festivalId: string,
   attendances: Array<{
     id: string;
     userId: string;
@@ -270,6 +277,31 @@ async function processAttendances(
         result.inserted++;
       }
       // If byNaturalKey exists with matching ID, it was already handled above
+    }
+  }
+
+  // Reconcile server-side deletes: any row previously synced that the server
+  // no longer returns was deleted elsewhere (other device, web, admin). Mark
+  // it soft-deleted so the UI drops it and the periodic cleanup can purge it.
+  // Skips _dirty rows so in-flight local mutations aren't clobbered.
+  const serverIds = new Set(attendances.map((a) => a.id));
+  const localRows = await db.getAllAsync<{ id: string }>(
+    `SELECT id FROM attendances
+     WHERE festival_id = ?
+       AND _deleted = 0
+       AND _dirty = 0
+       AND _synced_at IS NOT NULL`,
+    [festivalId],
+  );
+  for (const row of localRows) {
+    if (!serverIds.has(row.id)) {
+      await db.runAsync(
+        `UPDATE attendances
+         SET _deleted = 1, _synced_at = ?
+         WHERE id = ?`,
+        [now, row.id],
+      );
+      result.deleted++;
     }
   }
 }
