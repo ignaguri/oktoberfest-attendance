@@ -377,13 +377,26 @@ export function useRemoveMember() {
 export function useRenewInviteToken() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
 
   return useMutation(
     async ({ groupId }: { groupId: string }) => {
       return await apiClient.groups.renewToken(groupId);
     },
     {
-      onSuccess: (_data, { groupId }) => {
+      onSuccess: ({ inviteToken }, { groupId }) => {
+        // Push the rotated token into the group cache so QR/share UIs reflect
+        // it without waiting for the refetch to land.
+        const cached = getQueryData<{ data: GroupCacheData }>(
+          QueryKeys.group(groupId),
+        );
+        if (cached?.data) {
+          setQueryData(QueryKeys.group(groupId), {
+            ...cached,
+            data: { ...cached.data, inviteToken },
+          });
+        }
         invalidateQueries(QueryKeys.group(groupId));
       },
     },
