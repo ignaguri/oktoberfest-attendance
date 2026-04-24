@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useRenewInviteToken } from "@/hooks/useGroups";
+import { useTranslation } from "@/lib/i18n/client";
 
 import QRCode from "./QRCode";
 
@@ -28,6 +29,7 @@ export default function QRButton({
   isCreator,
   withText = false,
 }: QRButtonProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { mutateAsync: renewToken, loading: isRegenerating } =
     useRenewInviteToken();
@@ -43,14 +45,11 @@ export default function QRButton({
     try {
       await renewToken({ groupId });
     } catch {
-      toast.error("Error", {
-        description: "Failed to regenerate invite token. Please try again.",
+      toast.error(t("common.status.error"), {
+        description: t("groups.qrCode.regenerateError"),
       });
     }
   };
-
-  const title = "QR Code to Join";
-  const description = `Scan this QR code to join "${groupName}"`;
 
   return (
     <>
@@ -60,14 +59,14 @@ export default function QRButton({
         onClick={() => setOpen(true)}
       >
         <QrCode size={ICON_SIZE} />
-        {withText && <span className="ml-2">QR Code</span>}
+        {withText && <span className="ml-2">{t("groups.qrCode.title")}</span>}
       </Button>
 
       <ResponsiveDialog
         open={open}
         onOpenChange={setOpen}
-        title={title}
-        description={description}
+        title={t("groups.qrCode.title")}
+        description={t("groups.qrCode.description", { name: groupName })}
         className="sm:max-w-[425px]"
       >
         <div className="flex flex-col items-center gap-4 p-6">
@@ -75,15 +74,14 @@ export default function QRButton({
             <>
               <QRCode value={groupLink} size={220} />
               <p className="text-muted-foreground text-center text-sm">
-                Others can scan this code to join your group instantly!
+                {t("groups.qrCode.helper")}
               </p>
             </>
           ) : (
             <p className="text-muted-foreground text-center text-sm">
-              No invite link yet.
               {isCreator
-                ? " Generate one with the button below."
-                : " Ask the group creator to generate one."}
+                ? t("groups.qrCode.noTokenCreator")
+                : t("groups.qrCode.noTokenMember")}
             </p>
           )}
 
@@ -95,7 +93,9 @@ export default function QRButton({
               disabled={isRegenerating}
             >
               <RefreshCw size={16} className="mr-2" />
-              {groupLink ? "Regenerate" : "Generate"}
+              {groupLink
+                ? t("groups.qrCode.regenerate")
+                : t("groups.qrCode.generate")}
             </Button>
           )}
         </div>

@@ -10,6 +10,7 @@ import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
 import { useRenewInviteToken } from "@/hooks/useGroups";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface ShareButtonProps {
   groupName: string;
@@ -28,6 +29,7 @@ export default function ShareButton({
   isCreator,
   withText = false,
 }: ShareButtonProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const groupLink = useMemo(() => {
@@ -63,8 +65,8 @@ export default function ShareButton({
     try {
       await renewToken({ groupId });
     } catch {
-      toast.error("Error", {
-        description: "Failed to regenerate invite token. Please try again.",
+      toast.error(t("common.status.error"), {
+        description: t("groups.qrCode.regenerateError"),
       });
     }
   };
@@ -110,10 +112,9 @@ export default function ShareButton({
             </>
           ) : (
             <p className="text-muted-foreground text-center text-sm">
-              No invite link yet.
               {isCreator
-                ? " Generate one with the button below."
-                : " Ask the group creator to generate one."}
+                ? t("groups.qrCode.noTokenCreator")
+                : t("groups.qrCode.noTokenMember")}
             </p>
           )}
 
@@ -125,7 +126,9 @@ export default function ShareButton({
               disabled={isRegenerating}
             >
               <RefreshCw size={16} className="mr-2" />
-              {groupLink ? "Regenerate" : "Generate"}
+              {groupLink
+                ? t("groups.qrCode.regenerate")
+                : t("groups.qrCode.generate")}
             </Button>
           )}
         </div>

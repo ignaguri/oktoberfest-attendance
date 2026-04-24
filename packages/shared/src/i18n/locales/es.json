@@ -276,8 +276,9 @@
       "helper": "Tus amigos pueden escanear este código para unirse a tu grupo al instante",
       "regenerate": "Regenerar código QR",
       "generate": "Generar código QR",
-      "noTokenCreator": "Aún no hay enlace de invitación. Tocá Generar para crear uno.",
-      "noTokenMember": "Aún no hay enlace de invitación. Pedile al creador del grupo que genere uno."
+      "noTokenCreator": "Aún no hay enlace de invitación. Creá uno con el botón de abajo.",
+      "noTokenMember": "Aún no hay enlace de invitación. Pedile al creador del grupo que genere uno.",
+      "regenerateError": "No se pudo regenerar el enlace de invitación. Intentá de nuevo."
     },
     "create": {
       "title": "Crear grupo",

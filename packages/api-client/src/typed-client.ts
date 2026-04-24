@@ -587,22 +587,6 @@ export function createTypedApiClient(config: ApiClientConfig) {
         );
       },
 
-      async getToken(groupId: string): Promise<{ inviteToken: string | null }> {
-        const headers = await getAuthHeaders();
-        const response = await fetchWithLogging(
-          "GET",
-          `${baseUrl}/v1/groups/${groupId}/token`,
-          {
-            method: "GET",
-            headers,
-          },
-        );
-        if (!response.ok) {
-          await extractApiError(response, "Failed to read invite token");
-        }
-        return parseJsonResponse<{ inviteToken: string | null }>(response);
-      },
-
       async renewToken(groupId: string): Promise<{ inviteToken: string }> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(

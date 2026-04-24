@@ -183,28 +183,6 @@ export class GroupService {
   }
 
   /**
-   * Read the current invite token for a group.
-   * Any member can read; returns null for legacy groups without a token.
-   */
-  async getInviteToken(
-    groupId: string,
-    userId: string,
-  ): Promise<string | null> {
-    const group = await this.groupRepo.findById(groupId);
-
-    if (!group) {
-      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
-    }
-
-    const isMember = await this.groupRepo.isMember(groupId, userId);
-    if (!isMember) {
-      throw new ForbiddenError(ErrorCodes.NOT_GROUP_MEMBER);
-    }
-
-    return group.inviteToken ?? null;
-  }
-
-  /**
    * Renew group invite token
    * Only the group creator can renew the token
    */

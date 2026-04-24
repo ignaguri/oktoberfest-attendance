@@ -276,8 +276,9 @@
       "helper": "Friends can scan this code to join your group instantly",
       "regenerate": "Regenerate QR Code",
       "generate": "Generate QR Code",
-      "noTokenCreator": "No invite link yet. Tap Generate to create one.",
-      "noTokenMember": "No invite link yet. Ask the group creator to generate one."
+      "noTokenCreator": "No invite link yet. Use the button below to create one.",
+      "noTokenMember": "No invite link yet. Ask the group creator to generate one.",
+      "regenerateError": "Failed to regenerate invite token. Please try again."
     },
     "create": {
       "title": "Create Group",

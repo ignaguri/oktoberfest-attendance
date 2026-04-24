@@ -191,17 +191,6 @@ export const RenewTokenResponseSchema = z.object({
 export type RenewTokenResponse = z.infer<typeof RenewTokenResponseSchema>;
 
 /**
- * Read invite token response
- * GET /api/v1/groups/:id/token
- * Members can read; null when the group has no token yet (legacy groups).
- */
-export const InviteTokenResponseSchema = z.object({
-  inviteToken: z.string().nullable(),
-});
-
-export type InviteTokenResponse = z.infer<typeof InviteTokenResponseSchema>;
-
-/**
  * Join by token request
  * POST /api/v1/groups/join-by-token
  */

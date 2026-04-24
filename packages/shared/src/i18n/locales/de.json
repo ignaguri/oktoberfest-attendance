@@ -254,8 +254,9 @@
       "helper": "Freunde können diesen Code scannen, um deiner Gruppe sofort beizutreten",
       "regenerate": "QR-Code neu erstellen",
       "generate": "QR-Code erstellen",
-      "noTokenCreator": "Noch kein Einladungslink. Tippe auf Erstellen, um einen zu generieren.",
-      "noTokenMember": "Noch kein Einladungslink. Bitte den Gruppenersteller, einen zu erstellen."
+      "noTokenCreator": "Noch kein Einladungslink. Erstelle einen über die Schaltfläche unten.",
+      "noTokenMember": "Noch kein Einladungslink. Bitte den Gruppenersteller, einen zu erstellen.",
+      "regenerateError": "Einladungslink konnte nicht neu erstellt werden. Bitte erneut versuchen."
     },
     "create": {
       "title": "Gruppe erstellen",
