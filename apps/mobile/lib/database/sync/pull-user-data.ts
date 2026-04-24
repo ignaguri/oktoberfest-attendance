@@ -293,16 +293,19 @@ async function processAttendances(
        AND _synced_at IS NOT NULL`,
     [festivalId],
   );
-  for (const row of localRows) {
-    if (!serverIds.has(row.id)) {
-      await db.runAsync(
-        `UPDATE attendances
-         SET _deleted = 1, _synced_at = ?
-         WHERE id = ?`,
-        [now, row.id],
-      );
-      result.deleted++;
-    }
+  const stale = localRows.filter((row) => !serverIds.has(row.id));
+  if (stale.length > 0) {
+    await db.withTransactionAsync(async () => {
+      for (const row of stale) {
+        await db.runAsync(
+          `UPDATE attendances
+           SET _deleted = 1, _synced_at = ?
+           WHERE id = ?`,
+          [now, row.id],
+        );
+        result.deleted++;
+      }
+    });
   }
 }
 
