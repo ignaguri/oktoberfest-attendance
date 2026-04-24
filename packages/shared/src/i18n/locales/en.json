@@ -274,7 +274,11 @@
       "shareQR": "Share QR Code",
       "generating": "Generating QR code...",
       "helper": "Friends can scan this code to join your group instantly",
-      "regenerate": "Regenerate QR Code"
+      "regenerate": "Regenerate QR Code",
+      "generate": "Generate QR Code",
+      "noTokenCreator": "No invite link yet. Use the button below to create one.",
+      "noTokenMember": "No invite link yet. Ask the group creator to generate one.",
+      "regenerateError": "Failed to regenerate invite token. Please try again."
     },
     "create": {
       "title": "Create Group",
@@ -1834,7 +1838,7 @@
     "benefits": {
       "findFriends": "Find your friends on the festival map",
       "nearbyTents": "Get suggestions when you're near a tent",
-      "privacy": "Only visible to your group members"
+      "privacy": "Only visible to your group members and friends"
     },
     "promptTitle": "Share Your Location",
     "promptDescription": "Enable location sharing to find friends and discover nearby tents",

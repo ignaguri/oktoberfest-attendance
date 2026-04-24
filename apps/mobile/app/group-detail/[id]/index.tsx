@@ -442,6 +442,7 @@ export default function GroupDetailScreen() {
           groupId={id!}
           groupName={group.name}
           inviteToken={group.inviteToken}
+          isCreator={isCreator}
         />
       )}
 

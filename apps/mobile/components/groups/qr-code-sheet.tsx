@@ -2,7 +2,7 @@ import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { QrCode, RefreshCw } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import QRCode from "react-native-qrcode-svg";
 
 import {
@@ -27,6 +27,7 @@ interface QRCodeSheetProps {
   groupId: string;
   groupName: string;
   inviteToken?: string | null;
+  isCreator: boolean;
 }
 
 /**
@@ -38,44 +39,22 @@ export function QRCodeSheet({
   onClose,
   groupId,
   groupName,
-  inviteToken: initialToken,
+  inviteToken,
+  isCreator,
 }: QRCodeSheetProps) {
   const { t } = useTranslation();
-  const [currentToken, setCurrentToken] = useState<string | null>(
-    initialToken || null,
-  );
-  const [isGenerating, setIsGenerating] = useState(false);
-
   const renewToken = useRenewInviteToken();
-
-  // Update token when prop changes
-  useEffect(() => {
-    if (initialToken) {
-      setCurrentToken(initialToken);
-    }
-  }, [initialToken]);
-
-  // Generate new token when sheet opens if no token exists
-  useEffect(() => {
-    if (isOpen && !currentToken && !isGenerating) {
-      handleRegenerateToken();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, currentToken]);
+  const isGenerating = renewToken.loading;
 
   const handleRegenerateToken = useCallback(async () => {
-    setIsGenerating(true);
     try {
-      const result = await renewToken.mutateAsync({ groupId });
-      setCurrentToken(result.inviteToken);
+      await renewToken.mutateAsync({ groupId });
     } catch (error) {
       logger.error("Failed to generate token:", error);
-    } finally {
-      setIsGenerating(false);
     }
   }, [groupId, renewToken]);
 
-  const joinUrl = currentToken ? buildGroupInviteUrl(currentToken) : null;
+  const joinUrl = inviteToken ? buildGroupInviteUrl(inviteToken) : null;
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -103,20 +82,26 @@ export function QRCodeSheet({
 
           {/* QR Code */}
           <VStack className="items-center rounded-2xl bg-white p-6">
-            {isGenerating || !joinUrl ? (
+            {isGenerating ? (
               <VStack className="h-52 w-52 items-center justify-center">
                 <Spinner size="large" />
                 <Text className="mt-2 text-sm text-typography-500">
                   {t("groups.qrCode.generating")}
                 </Text>
               </VStack>
-            ) : (
+            ) : joinUrl ? (
               <QRCode
                 value={joinUrl}
                 size={208}
                 color="#000000"
                 backgroundColor="#FFFFFF"
               />
+            ) : (
+              <Text className="h-52 w-52 px-2 text-center text-sm text-typography-500">
+                {isCreator
+                  ? t("groups.qrCode.noTokenCreator")
+                  : t("groups.qrCode.noTokenMember")}
+              </Text>
             )}
           </VStack>
 
@@ -125,24 +110,28 @@ export function QRCodeSheet({
             {t("groups.qrCode.helper")}
           </Text>
 
-          {/* Regenerate button */}
-          <Button
-            variant="outline"
-            action="secondary"
-            size="md"
-            onPress={handleRegenerateToken}
-            isDisabled={isGenerating}
-            className="mt-2"
-          >
-            {isGenerating ? (
-              <ButtonSpinner color={Colors.gray[500]} />
-            ) : (
-              <RefreshCw size={16} color={IconColors.default} />
-            )}
-            <ButtonText className="ml-2">
-              {t("groups.qrCode.regenerate")}
-            </ButtonText>
-          </Button>
+          {/* Regenerate button (creator only) */}
+          {isCreator && (
+            <Button
+              variant="outline"
+              action="secondary"
+              size="md"
+              onPress={handleRegenerateToken}
+              isDisabled={isGenerating}
+              className="mt-2"
+            >
+              {isGenerating ? (
+                <ButtonSpinner color={Colors.gray[500]} />
+              ) : (
+                <RefreshCw size={16} color={IconColors.default} />
+              )}
+              <ButtonText className="ml-2">
+                {joinUrl
+                  ? t("groups.qrCode.regenerate")
+                  : t("groups.qrCode.generate")}
+              </ButtonText>
+            </Button>
+          )}
         </VStack>
       </ActionsheetContent>
     </Actionsheet>

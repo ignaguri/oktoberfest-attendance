@@ -1,14 +1,8 @@
 "use client";
 
 import { buildGroupInviteUrl } from "@prostcounter/shared";
-import { Share2 } from "lucide-react";
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { RefreshCw, Share2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import QRCode from "@/components/QR/QRCode";
@@ -16,10 +10,13 @@ import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useShare } from "@/hooks/use-share";
 import { useRenewInviteToken } from "@/hooks/useGroups";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface ShareButtonProps {
   groupName: string;
   groupId: string;
+  inviteToken: string | null;
+  isCreator: boolean;
   withText?: boolean;
 }
 
@@ -28,11 +25,19 @@ const ICON_SIZE = 20;
 export default function ShareButton({
   groupName,
   groupId,
+  inviteToken,
+  isCreator,
   withText = false,
 }: ShareButtonProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [groupLink, setGroupLink] = useState("");
-  const [tokenGenerated, setTokenGenerated] = useState(false);
+
+  const groupLink = useMemo(() => {
+    if (!inviteToken) return "";
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : undefined;
+    return buildGroupInviteUrl(inviteToken, origin);
+  }, [inviteToken]);
 
   const { shareViaNative, isWebShareSupported, shareViaWhatsApp } = useShare({
     title: `Join ${groupName} on ProstCounter`,
@@ -40,74 +45,34 @@ export default function ShareButton({
     url: groupLink,
   });
 
-  const { mutateAsync: renewToken } = useRenewInviteToken();
-
-  const generateShareLink = useCallback(async () => {
-    try {
-      const { inviteToken } = await renewToken({ groupId });
-      const origin =
-        typeof window !== "undefined" ? window.location.origin : undefined;
-      const newGroupLink = buildGroupInviteUrl(inviteToken, origin);
-      startTransition(() => {
-        setGroupLink(newGroupLink);
-      });
-    } catch {
-      toast.error("Error", {
-        description: "Failed to generate share link. Please try again.",
-      });
-    }
-  }, [groupId, renewToken]);
+  const { mutateAsync: renewToken, loading: isRegenerating } =
+    useRenewInviteToken();
 
   const handleShareClick = async () => {
-    if (!tokenGenerated) {
-      await generateShareLink();
-      setTokenGenerated(true);
+    if (!groupLink) {
+      setOpen(true);
+      return;
     }
 
-    if (isWebShareSupported && groupLink) {
-      // Direct native sharing - no dialog needed
+    if (isWebShareSupported) {
       await shareViaNative();
     } else {
-      // Fallback to dialog for unsupported browsers
       setOpen(true);
     }
   };
 
-  useEffect(() => {
-    if (open && !tokenGenerated) {
-      generateShareLink();
-      startTransition(() => {
-        setTokenGenerated(true); // Set to true after generating the token
+  const handleRegenerate = async () => {
+    try {
+      await renewToken({ groupId });
+    } catch {
+      toast.error(t("common.status.error"), {
+        description: t("groups.qrCode.regenerateError"),
       });
     }
-  }, [generateShareLink, open, tokenGenerated]);
+  };
 
   const title = "Invite to join";
   const description = "Choose how you'd like to share the group information:";
-
-  const ButtonsGroup = useMemo(
-    () => (
-      <div className="flex flex-col items-center gap-4 p-6">
-        {groupLink && (
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-muted-foreground text-sm">
-              Scan QR code to join:
-            </p>
-            <QRCode value={groupLink} size={180} />
-          </div>
-        )}
-        <div className="flex flex-col gap-2">
-          <Button variant="yellow" onClick={shareViaNative}>
-            {isWebShareSupported ? "Share Invite" : "Copy Invite Link"}
-          </Button>
-          <Button variant="darkYellow" onClick={shareViaWhatsApp}>
-            Share via WhatsApp
-          </Button>
-        </div>
-      </div>
-    ),
-    [groupLink, shareViaNative, shareViaWhatsApp, isWebShareSupported],
-  );
 
   return (
     <>
@@ -127,7 +92,46 @@ export default function ShareButton({
         description={description}
         className="sm:max-w-[425px]"
       >
-        {ButtonsGroup}
+        <div className="flex flex-col items-center gap-4 p-6">
+          {groupLink ? (
+            <>
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-muted-foreground text-sm">
+                  Scan QR code to join:
+                </p>
+                <QRCode value={groupLink} size={180} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button variant="yellow" onClick={shareViaNative}>
+                  {isWebShareSupported ? "Share Invite" : "Copy Invite Link"}
+                </Button>
+                <Button variant="darkYellow" onClick={shareViaWhatsApp}>
+                  Share via WhatsApp
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="text-muted-foreground text-center text-sm">
+              {isCreator
+                ? t("groups.qrCode.noTokenCreator")
+                : t("groups.qrCode.noTokenMember")}
+            </p>
+          )}
+
+          {isCreator && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRegenerate}
+              disabled={isRegenerating}
+            >
+              <RefreshCw size={16} className="mr-2" />
+              {groupLink
+                ? t("groups.qrCode.regenerate")
+                : t("groups.qrCode.generate")}
+            </Button>
+          )}
+        </div>
       </ResponsiveDialog>
     </>
   );

@@ -5,14 +5,14 @@
  */
 
 import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  useSetQueryData,
-  useGetQueryData,
-  useCancelQueries,
   QueryKeys,
+  useApiClient,
+  useCancelQueries,
+  useGetQueryData,
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
+  useSetQueryData,
 } from "../data";
 
 /**
@@ -376,16 +376,27 @@ export function useRemoveMember() {
  */
 export function useRenewInviteToken() {
   const apiClient = useApiClient();
-  const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
 
   return useMutation(
     async ({ groupId }: { groupId: string }) => {
       return await apiClient.groups.renewToken(groupId);
     },
     {
-      onSuccess: (_data, { groupId }) => {
-        // Invalidate group details to refresh the invite token
-        invalidateQueries(QueryKeys.group(groupId));
+      onSuccess: ({ inviteToken }, { groupId }) => {
+        // Push the rotated token into the group cache so QR/share UIs reflect
+        // it without waiting for a refetch. The mutation response is the
+        // canonical value, so no invalidate is needed.
+        const cached = getQueryData<{ data: GroupCacheData }>(
+          QueryKeys.group(groupId),
+        );
+        if (cached?.data) {
+          setQueryData(QueryKeys.group(groupId), {
+            ...cached,
+            data: { ...cached.data, inviteToken },
+          });
+        }
       },
     },
   );
