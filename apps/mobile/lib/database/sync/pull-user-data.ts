@@ -132,7 +132,19 @@ export async function pullAttendances(
     const attendances = response.data;
     const now = new Date().toISOString();
 
-    await processAttendances(db, attendances, attendancesResult, now);
+    // Only reconcile deletes when the response is the full festival snapshot.
+    // The list endpoint is paginated (limit: 100); if we only got a partial
+    // page, rows missing from the response might still live on the server.
+    const isFullSnapshot = attendances.length >= response.total;
+
+    await processAttendances(
+      db,
+      festivalId,
+      attendances,
+      attendancesResult,
+      now,
+      isFullSnapshot,
+    );
     await updateLastSyncAt(db, "attendances", now);
 
     await processTentVisits(
@@ -151,6 +163,7 @@ export async function pullAttendances(
 
 async function processAttendances(
   db: SQLite.SQLiteDatabase,
+  festivalId: string,
   attendances: Array<{
     id: string;
     userId: string;
@@ -162,6 +175,7 @@ async function processAttendances(
   }>,
   result: PullResult,
   now: string,
+  isFullSnapshot: boolean,
 ): Promise<void> {
   for (const att of attendances) {
     const existing = await db.getFirstAsync<LocalAttendance>(
@@ -271,6 +285,44 @@ async function processAttendances(
       }
       // If byNaturalKey exists with matching ID, it was already handled above
     }
+  }
+
+  // Reconcile server-side deletes: any row previously synced that the server
+  // no longer returns was deleted elsewhere (other device, web, admin). Mark
+  // it soft-deleted so the UI drops it and the periodic cleanup can purge it.
+  // Skips _dirty rows so in-flight local mutations aren't clobbered.
+  // Skipped when the response was paginated/partial — we'd otherwise delete
+  // rows that still exist on the server but live on another page.
+  if (!isFullSnapshot) return;
+
+  const serverIds = new Set(attendances.map((a) => a.id));
+  const localRows = await db.getAllAsync<{ id: string }>(
+    `SELECT id FROM attendances
+     WHERE festival_id = ?
+       AND _deleted = 0
+       AND _dirty = 0
+       AND _synced_at IS NOT NULL`,
+    [festivalId],
+  );
+  const stale = localRows.filter((row) => !serverIds.has(row.id));
+  if (stale.length > 0) {
+    await db.withTransactionAsync(async () => {
+      for (const row of stale) {
+        await db.runAsync(
+          `UPDATE attendances
+           SET _deleted = 1, _synced_at = ?
+           WHERE id = ?`,
+          [now, row.id],
+        );
+        await db.runAsync(
+          `UPDATE consumptions
+           SET _deleted = 1, _synced_at = ?
+           WHERE attendance_id = ? AND _deleted = 0`,
+          [now, row.id],
+        );
+        result.deleted++;
+      }
+    });
   }
 }
 

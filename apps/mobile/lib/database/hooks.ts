@@ -9,6 +9,7 @@
  * All query keys are managed via localKeys (query-keys.ts).
  */
 
+import { ATTENDANCE_SIDE_EFFECT_KEYS } from "@prostcounter/shared/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";
 
@@ -447,6 +448,9 @@ export function useLocalDeleteAttendance() {
         queryClient.invalidateQueries({
           queryKey: ["local-consumptions"],
         });
+        for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
+          queryClient.invalidateQueries({ queryKey: [...key] });
+        }
       },
     },
   );

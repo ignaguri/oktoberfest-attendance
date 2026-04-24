@@ -65,6 +65,7 @@ export {
 
 // Attendance hooks
 export {
+  ATTENDANCE_SIDE_EFFECT_KEYS,
   useAttendanceByDate,
   useAttendances,
   useDeleteAttendance,

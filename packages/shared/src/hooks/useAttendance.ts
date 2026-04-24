@@ -5,12 +5,27 @@
  */
 
 import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
   QueryKeys,
+  useApiClient,
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
 } from "../data";
+
+/**
+ * Query-key prefixes to invalidate whenever an attendance is created,
+ * updated, or deleted. Listed as prefixes (e.g. ["leaderboard"] matches
+ * all ["leaderboard", ...] variants) so callers don't need to know the
+ * exact festival / criteria / user id.
+ */
+export const ATTENDANCE_SIDE_EFFECT_KEYS = [
+  ["attendances"],
+  ["attendanceByDate"],
+  ["user"],
+  ["leaderboard"],
+  ["highlights"],
+  ["wrapped"],
+] as const;
 
 /**
  * Hook to fetch user's attendance data for a festival
@@ -47,16 +62,9 @@ export function useDeleteAttendance() {
     },
     {
       onSuccess: () => {
-        // Invalidate all attendances (will match any festival)
-        invalidateQueries(["attendances"]);
-        // Invalidate user stats
-        invalidateQueries(["user"]);
-        // Also invalidate leaderboards since attendance affects rankings
-        invalidateQueries(["leaderboard"]);
-        // Invalidate highlights as they depend on attendance
-        invalidateQueries(["highlights"]);
-        // Invalidate wrapped data cache (attendance changes affect wrapped stats)
-        invalidateQueries(["wrapped"]);
+        for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
+          invalidateQueries([...key]);
+        }
       },
     },
   );
@@ -103,18 +111,9 @@ export function useUpdatePersonalAttendance() {
     },
     {
       onSuccess: () => {
-        // Invalidate all attendances
-        invalidateQueries(["attendances"]);
-        // Invalidate attendance by date queries
-        invalidateQueries(["attendanceByDate"]);
-        // Invalidate user stats
-        invalidateQueries(["user"]);
-        // Invalidate leaderboards
-        invalidateQueries(["leaderboard"]);
-        // Invalidate highlights
-        invalidateQueries(["highlights"]);
-        // Invalidate wrapped data cache (attendance changes affect wrapped stats)
-        invalidateQueries(["wrapped"]);
+        for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
+          invalidateQueries([...key]);
+        }
       },
     },
   );
