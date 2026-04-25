@@ -938,6 +938,33 @@
   },
   "profile": {
     "pageTitle": "dein Profil",
+    "appleWatch": {
+      "title": "Apple Watch",
+      "description": "Logge Biere direkt vom Handgelenk",
+      "notPaired": "Keine Apple Watch gekoppelt",
+      "notInstalled": "ProstCounter auf deiner Apple Watch installieren",
+      "notInstalledHint": "Öffne die Watch-App auf dem iPhone, um den Begleiter zu installieren",
+      "status": {
+        "paired": "Gekoppelt",
+        "installed": "Installiert",
+        "reachable": "Verbunden",
+        "notReachable": "Watch-App geschlossen"
+      },
+      "syncNow": "Jetzt synchronisieren",
+      "syncNowA11yLabel": "Jetzt synchronisieren",
+      "syncNowA11yHint": "Deine Anmeldung erneut an die Apple Watch senden",
+      "syncSuccess": "Sitzung an deine Watch gesendet",
+      "testConnection": "Verbindung testen",
+      "testConnectionA11yLabel": "Verbindung testen",
+      "testConnectionA11yHint": "Die Apple Watch anpingen und auf Antwort warten",
+      "testDisabledWhenUnreachable": "Öffne zuerst ProstCounter auf deiner Watch",
+      "testing": "Teste…",
+      "testResult": {
+        "pong": "Watch hat geantwortet",
+        "timeout": "Keine Antwort – öffne ProstCounter auf deiner Watch und versuche es erneut",
+        "noStorage": "Auf diesem Gerät nicht verfügbar"
+      }
+    },
     "editButton": "Profil bearbeiten",
     "username": "Benutzername",
     "usernamePlaceholder": "Benutzernamen wählen",

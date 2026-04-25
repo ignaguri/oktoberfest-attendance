@@ -22,6 +22,7 @@ import { AboutSection } from "@/components/profile/about-section";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
+import { WatchSection } from "@/components/profile/watch-section";
 import { ProfileSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
@@ -301,6 +302,9 @@ export default function ProfileScreen() {
           isBiometricEnabled={isBiometricEnabled}
           onBiometricToggle={handleBiometricToggle}
         />
+
+        {/* Apple Watch Section (iOS-only; hidden when no watch state yet) */}
+        <WatchSection />
 
         {/* Sign Out & Change Password */}
         <Card size="md" variant="ghost">
