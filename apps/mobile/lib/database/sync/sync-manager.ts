@@ -190,7 +190,9 @@ export class SyncManager {
     processor.registerHandler("UPLOAD_FILE", async (op) => {
       const { festivalId } = JSON.parse(op.payload) as { festivalId?: string };
       if (!festivalId) {
-        throw new Error("UPLOAD_FILE op missing festivalId in payload");
+        throw new Error(
+          `UPLOAD_FILE op missing festivalId in payload (op.id=${op.id}, table=${op.table_name}, record_id=${op.record_id})`,
+        );
       }
       await runUploadFileOp(
         this.db,

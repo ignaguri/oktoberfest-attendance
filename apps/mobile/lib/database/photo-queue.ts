@@ -246,6 +246,11 @@ export async function savePendingPhotos(
  * Wraps savePendingPhotos so the call sites in useSaveAttendance and
  * quick-attendance-sheet share the same shape. The depends_on chain is
  * what stops /photos/upload-url from 403'ing on a not-yet-synced attendance.
+ *
+ * Throws if any input photo failed to be queued — savePendingPhotos
+ * intentionally swallows per-photo errors and returns only the successful
+ * subset, which would otherwise let the save flow report success while
+ * silently dropping user-selected photos.
  */
 export async function enqueuePendingPhotosForAttendance(
   db: SQLite.SQLiteDatabase,
@@ -258,7 +263,7 @@ export async function enqueuePendingPhotosForAttendance(
   },
 ): Promise<SavedPendingPhoto[]> {
   if (args.pendingPhotos.length === 0) return [];
-  return savePendingPhotos(
+  const queued = await savePendingPhotos(
     db,
     args.pendingPhotos.map((p) => ({
       localUri: p.localUri,
@@ -268,6 +273,12 @@ export async function enqueuePendingPhotosForAttendance(
       dependsOn: args.dependsOn,
     })),
   );
+  if (queued.length !== args.pendingPhotos.length) {
+    throw new Error(
+      `Failed to queue ${args.pendingPhotos.length - queued.length} of ${args.pendingPhotos.length} photo(s) for upload`,
+    );
+  }
+  return queued;
 }
 
 // =============================================================================
@@ -454,16 +465,26 @@ export async function uploadPendingPhoto(
     const confirmedPhoto = await apiClient.photos.confirmUpload(pictureId);
     onProgress?.(photo.id, 0.9);
 
-    // 5. Update local record
+    // 5. Reconcile local id to the server-issued UUID and update the row.
+    // The local id is generated as `photo-${ts}-${rand}` to avoid collisions
+    // before sync; once confirmed, we adopt the server UUID so downstream
+    // operations (delete, visibility updates) target the correct row and
+    // pictures[].id satisfies the shared z.uuid() schema.
     await db.runAsync(
       `UPDATE beer_pictures
-       SET picture_url = ?,
+       SET id = ?,
+           picture_url = ?,
            _pending_upload = 0,
            _local_uri = NULL,
            _dirty = 0,
            _synced_at = ?
        WHERE id = ?`,
-      [confirmedPhoto.pictureUrl, new Date().toISOString(), photo.id],
+      [
+        confirmedPhoto.id,
+        confirmedPhoto.pictureUrl,
+        new Date().toISOString(),
+        photo.id,
+      ],
     );
 
     // 6. Clean up local file

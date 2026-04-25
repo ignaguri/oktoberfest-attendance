@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   compressPhoto,
+  enqueuePendingPhotosForAttendance,
   getPendingUploadsDir,
   type PhotoQueueStats,
   type PhotoUploadResult,
@@ -276,16 +277,18 @@ describe("Photo Queue", () => {
       expect(photos[0].attendance_id).toBe("att-1");
     });
 
-    it("should update photo after successful upload", async () => {
+    it("should update photo after successful upload (id reconciled to server UUID)", async () => {
       await mockDb.runAsync(
         `UPDATE beer_pictures
-         SET picture_url = ?,
+         SET id = ?,
+             picture_url = ?,
              _pending_upload = 0,
              _local_uri = NULL,
              _dirty = 0,
              _synced_at = ?
          WHERE id = ?`,
         [
+          "00000000-0000-4000-8000-000000000001",
           "https://storage.example.com/photo.webp",
           new Date().toISOString(),
           "photo-123",
@@ -411,6 +414,51 @@ describe("savePendingPhoto dependsOn", () => {
   });
 });
 
+describe("enqueuePendingPhotosForAttendance", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("throws if any photo fails to enqueue (no silent partial success)", async () => {
+    // Make copyAsync fail on the second photo so savePendingPhoto throws
+    // for that one. enqueuePendingPhotosForAttendance must surface this
+    // as an error rather than reporting success on the partial subset.
+    const fileSystem = await import("expo-file-system/legacy");
+    let call = 0;
+    (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockImplementation(
+      async () => {
+        call += 1;
+        if (call === 2) throw new Error("copy failed");
+        return undefined;
+      },
+    );
+
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(null),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+
+    await expect(
+      enqueuePendingPhotosForAttendance(db as never, {
+        pendingPhotos: [
+          { localUri: "file:///mock/a.jpg" },
+          { localUri: "file:///mock/b.jpg" },
+        ],
+        attendanceId: "att-1",
+        userId: "user-1",
+        festivalId: "festival-1",
+        dependsOn: "op-1",
+      }),
+    ).rejects.toThrow(/Failed to queue 1 of 2 photo/);
+
+    // Reset for other tests
+    (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockResolvedValue(
+      undefined,
+    );
+  });
+});
+
 describe("runUploadFileOp", () => {
   const baseApiClient = {
     photos: {
@@ -457,5 +505,53 @@ describe("runUploadFileOp", () => {
     ).resolves.toBeUndefined();
 
     expect(baseApiClient.photos.getUploadUrl).not.toHaveBeenCalled();
+  });
+
+  it("reconciles local id to server UUID after confirmUpload", async () => {
+    const SERVER_ID = "11111111-1111-4111-8111-111111111111";
+    const localPhoto = createMockPhoto({
+      id: "photo-local-abc",
+      _local_uri: "file:///mock/pending-uploads/photo-local-abc.jpg",
+    });
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(localPhoto),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+    const apiClient = {
+      photos: {
+        getUploadUrl: vi.fn().mockResolvedValue({
+          uploadUrl: "https://storage.example.com/signed",
+          pictureId: SERVER_ID,
+        }),
+        confirmUpload: vi.fn().mockResolvedValue({
+          id: SERVER_ID,
+          pictureUrl: "user-1/festival-1/123_photo.webp",
+        }),
+      },
+    };
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(64)),
+      })
+      .mockResolvedValueOnce({ ok: true, status: 200 });
+
+    await runUploadFileOp(
+      db as never,
+      { recordId: localPhoto.id, festivalId: "festival-1" },
+      { apiClient },
+    );
+
+    const updateCall = db.runAsync.mock.calls.find((c) =>
+      String(c[0]).includes("UPDATE beer_pictures"),
+    );
+    expect(updateCall).toBeDefined();
+    expect(updateCall![1]).toEqual([
+      SERVER_ID,
+      "user-1/festival-1/123_photo.webp",
+      expect.any(String),
+      "photo-local-abc",
+    ]);
   });
 });
