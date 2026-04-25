@@ -13,8 +13,11 @@ import {
   type PhotoQueueStats,
   type PhotoUploadResult,
   type ProcessPendingPhotosResult,
+  runUploadFileOp,
+  savePendingPhoto,
 } from "../photo-queue";
 import type { LocalBeerPicture } from "../schema";
+import { enqueueOperation } from "../sync-queue";
 
 // Mock expo-file-system/legacy
 vi.mock("expo-file-system/legacy", () => ({
@@ -347,5 +350,112 @@ describe("Photo Upload Integration", () => {
     expect(uploadFlow).toHaveLength(10);
     expect(uploadFlow[0]).toContain("FileSystem");
     expect(uploadFlow[9]).toContain("Delete local file");
+  });
+});
+
+describe("savePendingPhoto dependsOn", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("forwards dependsOn to enqueueOperation when set", async () => {
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(null),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+
+    await savePendingPhoto(db as never, {
+      localUri: "file:///mock/picked.jpg",
+      attendanceId: "attendance-1",
+      userId: "user-1",
+      festivalId: "festival-1",
+      dependsOn: "attendance-op-id",
+    });
+
+    expect(enqueueOperation).toHaveBeenCalledWith(
+      expect.anything(),
+      "UPLOAD_FILE",
+      "beer_pictures",
+      expect.any(String),
+      expect.objectContaining({
+        festivalId: "festival-1",
+        attendanceId: "attendance-1",
+      }),
+      { dependsOn: "attendance-op-id" },
+    );
+  });
+
+  it("omits dependsOn options when not set", async () => {
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(null),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+
+    await savePendingPhoto(db as never, {
+      localUri: "file:///mock/picked.jpg",
+      attendanceId: "attendance-1",
+      userId: "user-1",
+      festivalId: "festival-1",
+    });
+
+    expect(enqueueOperation).toHaveBeenCalledWith(
+      expect.anything(),
+      "UPLOAD_FILE",
+      "beer_pictures",
+      expect.any(String),
+      expect.any(Object),
+      undefined,
+    );
+  });
+});
+
+describe("runUploadFileOp", () => {
+  const baseApiClient = {
+    photos: {
+      getUploadUrl: vi.fn(),
+      confirmUpload: vi.fn(),
+    },
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("throws when the photo row is missing", async () => {
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(null),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 0 }),
+    };
+
+    await expect(
+      runUploadFileOp(
+        db as never,
+        { recordId: "missing", festivalId: "festival-1" },
+        { apiClient: baseApiClient },
+      ),
+    ).rejects.toThrow(/Photo not found/);
+  });
+
+  it("is a no-op when the photo is already uploaded", async () => {
+    const db = {
+      getFirstAsync: vi
+        .fn()
+        .mockResolvedValue(createMockPhoto({ _pending_upload: 0 })),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 0 }),
+    };
+
+    await expect(
+      runUploadFileOp(
+        db as never,
+        { recordId: "photo-123", festivalId: "festival-1" },
+        { apiClient: baseApiClient },
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(baseApiClient.photos.getUploadUrl).not.toHaveBeenCalled();
   });
 });

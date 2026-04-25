@@ -26,6 +26,7 @@ interface UpdateAttendanceResult {
   attendanceId: string;
   tentsAdded: string[];
   tentsRemoved: string[];
+  attendanceQueueOpId: string;
 }
 
 /**
@@ -60,6 +61,7 @@ export function useOfflineUpdateAttendance() {
       );
 
       let attendanceId: string;
+      let attendanceQueueOpId: string;
 
       if (existing) {
         attendanceId = existing.id;
@@ -70,12 +72,18 @@ export function useOfflineUpdateAttendance() {
           [now, existing.id],
         );
 
-        await enqueueOperation(db, "UPDATE", "attendances", existing.id, {
-          festival_id: input.festivalId,
-          date: input.date,
-          beer_count: 0,
-          tents: input.tents,
-        });
+        attendanceQueueOpId = await enqueueOperation(
+          db,
+          "UPDATE",
+          "attendances",
+          existing.id,
+          {
+            festival_id: input.festivalId,
+            date: input.date,
+            beer_count: 0,
+            tents: input.tents,
+          },
+        );
 
         logger.debug("[OfflineAttendance] Updated existing attendance:", {
           attendanceId,
@@ -90,12 +98,18 @@ export function useOfflineUpdateAttendance() {
           [attendanceId, userId, input.festivalId, input.date, now, now],
         );
 
-        await enqueueOperation(db, "INSERT", "attendances", attendanceId, {
-          festival_id: input.festivalId,
-          date: input.date,
-          beer_count: 0,
-          tents: input.tents,
-        });
+        attendanceQueueOpId = await enqueueOperation(
+          db,
+          "INSERT",
+          "attendances",
+          attendanceId,
+          {
+            festival_id: input.festivalId,
+            date: input.date,
+            beer_count: 0,
+            tents: input.tents,
+          },
+        );
 
         logger.debug("[OfflineAttendance] Created new attendance:", {
           attendanceId,
@@ -146,6 +160,7 @@ export function useOfflineUpdateAttendance() {
         attendanceId,
         tentsAdded: input.tents ?? [],
         tentsRemoved: [],
+        attendanceQueueOpId,
       };
     },
     [isReady, getDb, refreshPendingCount, queryClient, user?.id],

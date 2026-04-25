@@ -163,6 +163,12 @@ vi.mock("../../api-client", () => ({
   },
 }));
 
+// Mock the photo-queue module so the test runner doesn't try to parse
+// expo-image-manipulator's transitive react-native imports under Vite/Rollup.
+vi.mock("../photo-queue", () => ({
+  runUploadFileOp: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Mock the sync-queue module
 vi.mock("../sync-queue", () => ({
   getSyncMetadata: vi.fn().mockResolvedValue(null),

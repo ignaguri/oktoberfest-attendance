@@ -9,6 +9,8 @@ import type * as SQLite from "expo-sqlite";
 
 import { logger } from "@/lib/logger";
 
+import { apiClient } from "../../api-client";
+import { runUploadFileOp } from "../photo-queue";
 import { type ProcessorResult, QueueProcessor } from "../queue-processor";
 import { MUTABLE_TABLES } from "../schema";
 import { getQueueStats, getSyncMetadata } from "../sync-queue";
@@ -185,8 +187,16 @@ export class SyncManager {
     processor.registerHandler("DELETE", async (op) => {
       await pushDelete(op.table_name, op.record_id);
     });
-    processor.registerHandler("UPLOAD_FILE", async () => {
-      // File uploads handled by photo-queue
+    processor.registerHandler("UPLOAD_FILE", async (op) => {
+      const { festivalId } = JSON.parse(op.payload) as { festivalId?: string };
+      if (!festivalId) {
+        throw new Error("UPLOAD_FILE op missing festivalId in payload");
+      }
+      await runUploadFileOp(
+        this.db,
+        { recordId: op.record_id, festivalId },
+        { apiClient },
+      );
     });
 
     return processor.processQueue();

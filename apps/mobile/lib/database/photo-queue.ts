@@ -39,6 +39,13 @@ export interface PendingPhotoInput {
   festivalId: string;
   /** Photo visibility */
   visibility?: PhotoVisibility;
+  /**
+   * Sync-queue op id this UPLOAD_FILE depends on. When the attendance row
+   * was created or updated locally in the same flow, set this to the queue
+   * id of that INSERT/UPDATE op so the upload waits until the attendance
+   * has been pushed to the server.
+   */
+  dependsOn?: string;
 }
 
 export interface SavedPendingPhoto {
@@ -189,12 +196,19 @@ export async function savePendingPhoto(
   );
 
   // Queue upload operation
-  await enqueueOperation(db, "UPLOAD_FILE", "beer_pictures", photoId, {
-    localUri: permanentPath,
-    festivalId: input.festivalId,
-    attendanceId: input.attendanceId,
-    visibility: input.visibility || "public",
-  });
+  await enqueueOperation(
+    db,
+    "UPLOAD_FILE",
+    "beer_pictures",
+    photoId,
+    {
+      localUri: permanentPath,
+      festivalId: input.festivalId,
+      attendanceId: input.attendanceId,
+      visibility: input.visibility || "public",
+    },
+    input.dependsOn ? { dependsOn: input.dependsOn } : undefined,
+  );
 
   return {
     id: photoId,
@@ -224,6 +238,36 @@ export async function savePendingPhotos(
   }
 
   return results;
+}
+
+/**
+ * Enqueue picked photos as UPLOAD_FILE ops chained to an attendance push.
+ *
+ * Wraps savePendingPhotos so the call sites in useSaveAttendance and
+ * quick-attendance-sheet share the same shape. The depends_on chain is
+ * what stops /photos/upload-url from 403'ing on a not-yet-synced attendance.
+ */
+export async function enqueuePendingPhotosForAttendance(
+  db: SQLite.SQLiteDatabase,
+  args: {
+    pendingPhotos: { localUri: string }[];
+    attendanceId: string;
+    userId: string;
+    festivalId: string;
+    dependsOn?: string;
+  },
+): Promise<SavedPendingPhoto[]> {
+  if (args.pendingPhotos.length === 0) return [];
+  return savePendingPhotos(
+    db,
+    args.pendingPhotos.map((p) => ({
+      localUri: p.localUri,
+      attendanceId: args.attendanceId,
+      userId: args.userId,
+      festivalId: args.festivalId,
+      dependsOn: args.dependsOn,
+    })),
+  );
 }
 
 // =============================================================================
@@ -497,6 +541,44 @@ export async function processPendingPhotoUploads(
     failed,
     results,
   };
+}
+
+/**
+ * Queue-handler entry point for an UPLOAD_FILE op.
+ *
+ * Loads the beer_pictures row by record id, calls uploadPendingPhoto, and
+ * throws on failure so the QueueProcessor can record the error and apply
+ * its existing retry-with-backoff behavior. Idempotent: if the row is
+ * already uploaded (`_pending_upload = 0`), returns without doing work.
+ */
+export async function runUploadFileOp(
+  db: SQLite.SQLiteDatabase,
+  payload: {
+    recordId: string;
+    festivalId: string;
+  },
+  options: UploadPhotoOptions,
+): Promise<void> {
+  const photo = await getPhotoById(db, payload.recordId);
+
+  if (!photo) {
+    throw new Error(`Photo not found for UPLOAD_FILE op: ${payload.recordId}`);
+  }
+
+  if (photo._pending_upload === 0) {
+    return;
+  }
+
+  const result = await uploadPendingPhoto(
+    db,
+    photo,
+    payload.festivalId,
+    options,
+  );
+
+  if (!result.success) {
+    throw new Error(result.error || "Photo upload failed");
+  }
 }
 
 // =============================================================================

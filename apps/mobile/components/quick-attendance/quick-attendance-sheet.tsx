@@ -46,6 +46,7 @@ import {
 } from "@/hooks/useBeerPictureUpload";
 import { useOfflineUpdateAttendance } from "@/hooks/useOfflineAttendance";
 import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
+import { useAuth } from "@/lib/auth/AuthContext";
 import {
   BackgroundColors,
   Colors,
@@ -61,6 +62,7 @@ import {
   OfflineContext,
   triggerBackgroundPush,
 } from "@/lib/database/offline-provider";
+import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
 import { invalidateAllLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
@@ -192,13 +194,10 @@ export function QuickAttendanceSheet({
   const logConsumption = useOfflineLogConsumption();
   const updateAttendance = useOfflineUpdateAttendance();
 
-  // Photo upload hook
-  const {
-    pickImages,
-    uploadPendingPhotos,
-    isPicking,
-    isUploading: isUploadingPhotos,
-  } = useBeerPictureUpload();
+  const { user } = useAuth();
+
+  // Photo upload hook (picking only; uploads run via the sync queue)
+  const { pickImages, isPicking } = useBeerPictureUpload();
 
   // Local state
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType | null>(
@@ -332,7 +331,7 @@ export function QuickAttendanceSheet({
         });
       }
 
-      // Update attendance with tent or upload photos
+      // Update attendance with tent or enqueue photos
       if (selectedTentId || pendingPhotos.length > 0) {
         const result = await updateAttendance.mutateAsync({
           festivalId,
@@ -340,15 +339,20 @@ export function QuickAttendanceSheet({
           tents: selectedTentId ? [selectedTentId] : [],
         });
 
-        // If we have pending photos, upload them
         if (pendingPhotos.length > 0) {
-          const attendanceId = result?.attendanceId || attendance?.id;
-          if (attendanceId) {
-            await uploadPendingPhotos({
-              festivalId,
-              attendanceId,
+          const attendanceId = result.attendanceId || attendance?.id;
+          const userId = user?.id;
+          const db = offlineContext?.getDb?.();
+
+          if (attendanceId && userId && db) {
+            await enqueuePendingPhotosForAttendance(db, {
               pendingPhotos,
+              attendanceId,
+              userId,
+              festivalId,
+              dependsOn: result.attendanceQueueOpId,
             });
+            await offlineContext?.refreshPendingCount?.();
           }
         }
       }
@@ -408,7 +412,7 @@ export function QuickAttendanceSheet({
     calculatePricePaid,
     logConsumption,
     updateAttendance,
-    uploadPendingPhotos,
+    user?.id,
     offlineContext,
     queryClient,
     refetchAttendance,
@@ -418,7 +422,7 @@ export function QuickAttendanceSheet({
     t,
   ]);
 
-  const isLoading = isSaving || isUploadingPhotos;
+  const isLoading = isSaving;
 
   return (
     <>
@@ -568,13 +572,13 @@ export function QuickAttendanceSheet({
                       source={{ uri: photo.localUri }}
                       className={cn(
                         "h-16 w-16 rounded-lg",
-                        isUploadingPhotos && "opacity-60",
+                        isSaving && "opacity-60",
                       )}
                       resizeMode="cover"
                       alt=""
                       accessibilityLabel={t("home.quickAttendance.photos")}
                     />
-                    {isUploadingPhotos ? (
+                    {isSaving ? (
                       <View className="absolute inset-0 items-center justify-center">
                         <ActivityIndicator
                           size="small"

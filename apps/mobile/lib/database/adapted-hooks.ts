@@ -320,13 +320,37 @@ export function useAdaptedAttendanceByDate(
         tentName: tv.tent_name ?? null,
       }));
 
+      // Pending uploads expose _local_uri so the UI can render off disk
+      // until the sync queue swaps in the remote pictureUrl.
+      const pictureRows = await db.getAllAsync<{
+        id: string;
+        picture_url: string | null;
+        _local_uri: string | null;
+        _pending_upload: number;
+      }>(
+        `SELECT id, picture_url, _local_uri, _pending_upload
+         FROM beer_pictures
+         WHERE attendance_id = ? AND _deleted = 0
+         ORDER BY created_at ASC`,
+        [row.id],
+      );
+
+      const pictures: { id: string; pictureUrl: string }[] = [];
+      for (const p of pictureRows) {
+        const pictureUrl =
+          p._pending_upload === 1 && p._local_uri
+            ? p._local_uri
+            : p.picture_url;
+        if (pictureUrl) pictures.push({ id: p.id, pictureUrl });
+      }
+
       const base = rowToAttendanceWithTotals(row);
       return {
         ...base,
         tentVisits,
         tentIds: tentVisitRows.map((tv) => tv.tent_id),
-        pictureUrls: [],
-        pictures: [],
+        pictureUrls: pictures.map((p) => p.pictureUrl),
+        pictures,
       };
     },
     enabled: isReady && !!festivalId && !!date,

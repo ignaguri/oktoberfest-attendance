@@ -1973,7 +1973,10 @@
       "uploadFailed": "Hochladen des Bildes fehlgeschlagen",
       "avatarUploadFailed": "Aktualisierung des Profilbilds fehlgeschlagen",
       "photoUploadFailed": "Hochladen des Fotos fehlgeschlagen"
-    }
+    },
+    "queued": "In Warteschlange",
+    "willRetry": "Upload wird automatisch wiederholt",
+    "failedPermanent": "Foto-Upload fehlgeschlagen. Zum Wiederholen tippen."
   },
   "validation": {
     "required": "Dieses Feld ist erforderlich",

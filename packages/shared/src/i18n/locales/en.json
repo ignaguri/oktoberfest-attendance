@@ -2227,7 +2227,10 @@
       "uploadFailed": "Failed to upload image",
       "avatarUploadFailed": "Failed to update profile picture",
       "photoUploadFailed": "Failed to upload photo"
-    }
+    },
+    "queued": "Queued",
+    "willRetry": "Upload will retry automatically",
+    "failedPermanent": "Photo upload failed. Tap to retry."
   },
   "validation": {
     "required": "This field is required",
