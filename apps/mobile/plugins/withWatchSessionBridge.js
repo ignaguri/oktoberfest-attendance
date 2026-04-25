@@ -98,15 +98,19 @@ final class WatchSessionBridge: NSObject {
     }
 
     if let nonce = defaults.string(forKey: sentinelPing), nonce != lastPingNonce, !nonce.isEmpty {
-      lastPingNonce = nonce
+      // Don't burn the nonce on transient failures. If the session isn't
+      // activated or the watch isn't reachable yet, leave lastPingNonce alone
+      // so the 2s poll retries — otherwise pingWatch() always times out when
+      // the user taps Test connection a beat too early.
       guard WCSession.default.activationState == .activated else {
-        watchBridgeLog.info("ping skipped — session not activated")
+        watchBridgeLog.info("ping deferred — session not activated, nonce=\\(nonce, privacy: .public)")
         return
       }
       guard WCSession.default.isReachable else {
-        watchBridgeLog.info("ping skipped — watch not reachable")
+        watchBridgeLog.info("ping deferred — watch not reachable, nonce=\\(nonce, privacy: .public)")
         return
       }
+      lastPingNonce = nonce
       watchBridgeLog.info("ping send nonce=\\(nonce, privacy: .public)")
       WCSession.default.sendMessage(
         ["type": "ping", "nonce": nonce],

@@ -72,19 +72,20 @@ export function syncLanguageToWatch(lang: string): void {
 
 /**
  * Re-push the session to the watch, bypassing the native bridge's dedupe cache.
- * Writes the token keys and bumps `forceSyncNonce` — WatchSessionBridge observes
- * the nonce bump, clears its `lastPayload`, and re-delivers via WCSession
- * sendMessage + updateApplicationContext. Use when the watch appears stuck on
+ * Token keys still go through `setIfChanged` (avoid five redundant
+ * UserDefaults.didChangeNotification wake-ups when nothing actually moved); the
+ * bypass comes from bumping `forceSyncNonce`, which the bridge observes to
+ * clear its `lastPayload` and re-deliver. Use when the watch appears stuck on
  * the empty-session screen despite the phone being signed in.
  */
 export function forceSyncSessionToWatch(params: WatchSession): void {
   const storage = getStorage();
   if (!storage) return;
-  storage.set("accessToken", params.accessToken);
-  storage.set("refreshToken", params.refreshToken);
-  storage.set("userId", params.userId);
-  storage.set("currentFestivalId", params.currentFestivalId ?? "");
-  storage.set("expiresAt", String(params.expiresAt));
+  setIfChanged(storage, "accessToken", params.accessToken);
+  setIfChanged(storage, "refreshToken", params.refreshToken);
+  setIfChanged(storage, "userId", params.userId);
+  setIfChanged(storage, "currentFestivalId", params.currentFestivalId ?? "");
+  setIfChanged(storage, "expiresAt", String(params.expiresAt));
   storage.set("forceSyncNonce", String(Date.now()));
 }
 

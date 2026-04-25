@@ -89,16 +89,17 @@ extension WatchSessionReceiver: WCSessionDelegate {
         // Token payloads don't carry a `type` field, so this branch is safe.
         if let type = message["type"] as? String, type == "ping" {
             let nonce = message["nonce"] as? String ?? ""
-            log.info("ping received nonce=\(nonce, privacy: .public)")
-            if WCSession.default.isReachable {
-                WCSession.default.sendMessage(
-                    ["type": "pong", "nonce": nonce],
-                    replyHandler: nil,
-                    errorHandler: { error in
-                        log.error("pong send error: \(error.localizedDescription, privacy: .public)")
-                    }
-                )
-            }
+            log.info("ping received nonce=\(nonce, privacy: .public) reachable=\(session.isReachable, privacy: .public)")
+            // The phone only reaches us via sendMessage when the channel is
+            // live — don't gate the pong on session.isReachable, which can
+            // flicker between deliveries and would silently drop the reply.
+            session.sendMessage(
+                ["type": "pong", "nonce": nonce],
+                replyHandler: nil,
+                errorHandler: { error in
+                    log.error("pong send error: \(error.localizedDescription, privacy: .public)")
+                }
+            )
             return
         }
         storeReceived(message)
