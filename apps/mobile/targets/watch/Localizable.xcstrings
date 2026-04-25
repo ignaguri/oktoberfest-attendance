@@ -117,9 +117,9 @@
     "watch.status.noSession" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign in on iPhone first" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Melde dich zuerst auf dem iPhone an" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Iniciá sesión primero en el iPhone" } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open ProstCounter on iPhone" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffne ProstCounter auf dem iPhone" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrí ProstCounter en el iPhone" } }
       }
     },
     "watch.tent.empty" : {

@@ -34,10 +34,16 @@ final class WatchSessionBridge: NSObject {
 
   private let appGroup = "group.com.prostcounter.shared"
   private let watchedKeys = ["accessToken", "refreshToken", "userId", "currentFestivalId", "expiresAt"]
+  // Sentinel keys: JS writes a fresh nonce here to trigger one-off actions via
+  // the same UserDefaults KVO path that carries tokens.
+  private let sentinelForceSync = "forceSyncNonce"
+  private let sentinelPing = "pingNonce"
   private var defaults: UserDefaults?
 
   private var pollTimer: Timer?
   private var lastPayload: [String: String] = [:]
+  private var lastForceSyncNonce: String = ""
+  private var lastPingNonce: String = ""
 
   private override init() {
     super.init()
@@ -66,13 +72,50 @@ final class WatchSessionBridge: NSObject {
     // separate UserDefaults instance that doesn't post didChange).
     DispatchQueue.main.async { [weak self] in
       self?.pollTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+        self?.handleSentinels()
         self?.forwardToWatch()
       }
     }
   }
 
   @objc private func defaultsDidChange(_ notification: Notification) {
+    handleSentinels()
     forwardToWatch()
+  }
+
+  /// Checks the JS-driven action sentinels (forceSyncNonce, pingNonce) and
+  /// triggers the corresponding WCSession action when the value bumps.
+  /// Using sentinel keys keeps all JS↔native bridging on a single channel
+  /// (App Group UserDefaults) — no native-module RCT bridging needed.
+  private func handleSentinels() {
+    guard let defaults = defaults else { return }
+
+    if let nonce = defaults.string(forKey: sentinelForceSync), nonce != lastForceSyncNonce, !nonce.isEmpty {
+      lastForceSyncNonce = nonce
+      watchBridgeLog.info("forceSync nonce=\\(nonce, privacy: .public) — clearing dedupe cache")
+      // Clear dedupe cache so forwardToWatch sends even if tokens didn't change.
+      lastPayload = [:]
+    }
+
+    if let nonce = defaults.string(forKey: sentinelPing), nonce != lastPingNonce, !nonce.isEmpty {
+      lastPingNonce = nonce
+      guard WCSession.default.activationState == .activated else {
+        watchBridgeLog.info("ping skipped — session not activated")
+        return
+      }
+      guard WCSession.default.isReachable else {
+        watchBridgeLog.info("ping skipped — watch not reachable")
+        return
+      }
+      watchBridgeLog.info("ping send nonce=\\(nonce, privacy: .public)")
+      WCSession.default.sendMessage(
+        ["type": "ping", "nonce": nonce],
+        replyHandler: nil,
+        errorHandler: { error in
+          watchBridgeLog.error("ping sendMessage error: \\(error.localizedDescription, privacy: .public)")
+        }
+      )
+    }
   }
 
   /// Dispatches the current pairing / installed state of the paired Apple Watch
@@ -83,6 +126,7 @@ final class WatchSessionBridge: NSObject {
     let payload: [String: Any] = [
       "isPaired": WCSession.default.isPaired,
       "isWatchAppInstalled": WCSession.default.isWatchAppInstalled,
+      "isReachable": WCSession.default.isReachable,
     ]
     DispatchQueue.main.async {
       if let bridge = RCTBridge.current() {
@@ -92,7 +136,7 @@ final class WatchSessionBridge: NSObject {
           args: ["watchState", payload],
           completion: nil
         )
-        watchBridgeLog.info("dispatched watchState paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) to RN")
+        watchBridgeLog.info("dispatched watchState paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) reachable=\\(WCSession.default.isReachable, privacy: .public) to RN")
       }
     }
   }
@@ -180,18 +224,29 @@ extension WatchSessionBridge: WCSessionDelegate {
     emitWatchState()
   }
 
-  /// Called when the watch sends a message — currently only "drinkLogged".
-  /// We forward it to JavaScript as a device event so React Query can
-  /// invalidate cached attendance data and trigger a pull sync.
+  /// Fires when the watch app foregrounds/backgrounds. Re-emit so the Profile
+  /// screen's Test-connection button enables/disables live.
+  func sessionReachabilityDidChange(_ session: WCSession) {
+    watchBridgeLog.info("sessionReachabilityDidChange: reachable=\\(WCSession.default.isReachable, privacy: .public)")
+    emitWatchState()
+  }
+
+  /// Called when the watch sends a message — currently "drinkLogged" (sync
+  /// nudge) and "pong" (connection-test reply). Forward to JavaScript as a
+  /// device event so React Query / the ping promise resolver can react.
   func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
     watchBridgeLog.info("didReceiveMessage: \\(message, privacy: .public)")
     guard let type = message["type"] as? String else { return }
+    var payload: [String: Any] = ["type": type]
+    if let nonce = message["nonce"] as? String {
+      payload["nonce"] = nonce
+    }
     DispatchQueue.main.async {
       if let bridge = RCTBridge.current() {
         bridge.enqueueJSCall(
           "RCTDeviceEventEmitter",
           method: "emit",
-          args: ["watchRemoteEvent", ["type": type]],
+          args: ["watchRemoteEvent", payload],
           completion: nil
         )
         watchBridgeLog.info("dispatched watchRemoteEvent type=\\(type, privacy: .public) to RN")

@@ -973,6 +973,33 @@
   },
   "profile": {
     "pageTitle": "Your Profile",
+    "appleWatch": {
+      "title": "Apple Watch",
+      "description": "Log beers from your wrist",
+      "notPaired": "No Apple Watch paired",
+      "notInstalled": "Install ProstCounter on your Apple Watch",
+      "notInstalledHint": "Open the Watch app on your iPhone to install the companion",
+      "status": {
+        "paired": "Paired",
+        "installed": "Installed",
+        "reachable": "Reachable",
+        "notReachable": "Watch app closed"
+      },
+      "syncNow": "Sync now",
+      "syncNowA11yLabel": "Sync now",
+      "syncNowA11yHint": "Resend your sign-in to the Apple Watch",
+      "syncSuccess": "Session sent to your watch",
+      "testConnection": "Test connection",
+      "testConnectionA11yLabel": "Test connection",
+      "testConnectionA11yHint": "Ping the Apple Watch app and wait for a reply",
+      "testDisabledWhenUnreachable": "Open ProstCounter on your watch first",
+      "testing": "Testing…",
+      "testResult": {
+        "pong": "Watch responded",
+        "timeout": "No response — open ProstCounter on your watch and try again",
+        "noStorage": "Unavailable on this device"
+      }
+    },
     "editButton": "Edit Profile",
     "username": "Username",
     "usernamePlaceholder": "Choose a username",

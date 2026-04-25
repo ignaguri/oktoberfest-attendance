@@ -973,6 +973,33 @@
   },
   "profile": {
     "pageTitle": "Tu perfil",
+    "appleWatch": {
+      "title": "Apple Watch",
+      "description": "Registrá birras desde tu muñeca",
+      "notPaired": "No hay Apple Watch vinculado",
+      "notInstalled": "Instalá ProstCounter en tu Apple Watch",
+      "notInstalledHint": "Abrí la app Watch en tu iPhone para instalar el complemento",
+      "status": {
+        "paired": "Vinculado",
+        "installed": "Instalado",
+        "reachable": "Conectado",
+        "notReachable": "App del reloj cerrada"
+      },
+      "syncNow": "Sincronizar ahora",
+      "syncNowA11yLabel": "Sincronizar ahora",
+      "syncNowA11yHint": "Volver a enviar tu sesión al Apple Watch",
+      "syncSuccess": "Sesión enviada a tu reloj",
+      "testConnection": "Probar conexión",
+      "testConnectionA11yLabel": "Probar conexión",
+      "testConnectionA11yHint": "Hacer ping al Apple Watch y esperar respuesta",
+      "testDisabledWhenUnreachable": "Abrí primero ProstCounter en tu reloj",
+      "testing": "Probando…",
+      "testResult": {
+        "pong": "El reloj respondió",
+        "timeout": "Sin respuesta — abrí ProstCounter en tu reloj y probá de nuevo",
+        "noStorage": "No disponible en este dispositivo"
+      }
+    },
     "editButton": "Editar perfil",
     "username": "Nombre de usuario",
     "usernamePlaceholder": "Elegí un nombre de usuario",

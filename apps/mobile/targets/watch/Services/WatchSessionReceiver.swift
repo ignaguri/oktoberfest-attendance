@@ -85,6 +85,22 @@ extension WatchSessionReceiver: WCSessionDelegate {
     }
 
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        // Connection-test ping from the phone: reply with pong and stop.
+        // Token payloads don't carry a `type` field, so this branch is safe.
+        if let type = message["type"] as? String, type == "ping" {
+            let nonce = message["nonce"] as? String ?? ""
+            log.info("ping received nonce=\(nonce, privacy: .public)")
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(
+                    ["type": "pong", "nonce": nonce],
+                    replyHandler: nil,
+                    errorHandler: { error in
+                        log.error("pong send error: \(error.localizedDescription, privacy: .public)")
+                    }
+                )
+            }
+            return
+        }
         storeReceived(message)
     }
 
