@@ -17,7 +17,6 @@ import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
 import {
   enqueueOperation,
-  generateConsumptionIdempotencyKey,
   generateUUID,
   getRecentConsumption,
   insertConsumptionLocally,
@@ -127,14 +126,10 @@ export function useOfflineLogConsumption() {
         }
       }
 
-      // Idempotency key prevents duplicate server-side creation during sync
-      const idempotencyKey = generateConsumptionIdempotencyKey(
-        attendanceId,
-        input.festivalId,
-        input.date,
-        input.drinkType,
-        Date.now(),
-      );
+      // Idempotency key prevents duplicate server-side creation during sync.
+      // Stable per local row (consumptionId is the local UUID we just generated)
+      // so retries of the same logical insert reuse the same key.
+      const idempotencyKey = `${attendanceId}-${input.drinkType}-${consumptionId}`;
 
       await insertConsumptionLocally(db, {
         id: consumptionId,

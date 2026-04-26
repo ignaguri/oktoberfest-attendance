@@ -13,7 +13,11 @@ import { apiClient } from "../../api-client";
 import { runUploadFileOp } from "../photo-queue";
 import { type ProcessorResult, QueueProcessor } from "../queue-processor";
 import { MUTABLE_TABLES } from "../schema";
-import { getQueueStats, getSyncMetadata } from "../sync-queue";
+import {
+  cleanupOrphanConsumptions,
+  getQueueStats,
+  getSyncMetadata,
+} from "../sync-queue";
 import {
   pullGroupMembers,
   pullGroups,
@@ -155,6 +159,11 @@ export class SyncManager {
         results.push(await pullGroups(this.db, festivalId));
         results.push(await pullGroupMembers(this.db, festivalId));
         results.push(await pullUserAchievements(this.db, festivalId));
+
+        // Heal: drop local consumption rows that will never sync (orphan ghosts
+        // from the pre-idempotency-key duplicate-row bug). Only after a
+        // successful pull so we know the server view is loaded locally.
+        await cleanupOrphanConsumptions(this.db);
       }
     } catch (error) {
       logger.error("[SyncManager] Pull failed:", error);
@@ -178,11 +187,21 @@ export class SyncManager {
 
     processor.registerHandler("INSERT", async (op) => {
       const payload = JSON.parse(op.payload);
-      await pushInsert(op.table_name, op.record_id, payload);
+      await pushInsert(
+        op.table_name,
+        op.record_id,
+        payload,
+        op.idempotency_key,
+      );
     });
     processor.registerHandler("UPDATE", async (op) => {
       const payload = JSON.parse(op.payload);
-      await pushUpdate(op.table_name, op.record_id, payload);
+      await pushUpdate(
+        op.table_name,
+        op.record_id,
+        payload,
+        op.idempotency_key,
+      );
     });
     processor.registerHandler("DELETE", async (op) => {
       await pushDelete(op.table_name, op.record_id);
@@ -201,7 +220,10 @@ export class SyncManager {
       );
     });
 
-    return processor.processQueue();
+    // retryFailed() resets failed ops with retries left back to pending and
+    // then processes the queue. This is what users expect from the reload
+    // button — without it, a transiently-failed op stays "1 pending" forever.
+    return processor.retryFailed();
   }
 
   // ===========================================================================

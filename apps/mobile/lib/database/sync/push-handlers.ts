@@ -16,6 +16,7 @@ export async function pushInsert(
   tableName: string,
   _recordId: string,
   payload: Record<string, unknown>,
+  idempotencyKey?: string | null,
 ): Promise<void> {
   switch (tableName) {
     case "attendances":
@@ -40,6 +41,7 @@ export async function pushInsert(
         tentId: payload.tent_id as string | undefined,
         pricePaidCents: (payload.price_paid_cents as number) ?? 0,
         volumeMl: (payload.volume_ml as number) ?? 1000,
+        ...(idempotencyKey ? { idempotencyKey } : {}),
       });
       break;
     default:
@@ -54,6 +56,7 @@ export async function pushUpdate(
   tableName: string,
   recordId: string,
   payload: Record<string, unknown>,
+  idempotencyKey?: string | null,
 ): Promise<void> {
   switch (tableName) {
     case "attendances":
@@ -102,6 +105,7 @@ export async function pushUpdate(
         pricePaidCents,
         volumeMl,
         tentId: (payload.tentId || payload.tent_id) as string | undefined,
+        ...(idempotencyKey ? { idempotencyKey } : {}),
       });
       break;
     }

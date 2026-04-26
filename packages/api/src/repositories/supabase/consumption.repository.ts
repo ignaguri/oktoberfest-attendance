@@ -129,17 +129,23 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
   }
 
   async delete(id: string, userId: string): Promise<void> {
-    // First verify the consumption belongs to the user
+    // Verify ownership only if the row exists. A missing row is treated as
+    // idempotent success so retries from the offline queue (where the local
+    // record may have never been pushed) don't loop on 500s.
     const { data: consumption, error: fetchError } = await this.supabase
       .from("consumptions")
       .select("attendance_id, attendances(user_id)")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
-    if (fetchError || !consumption) {
+    if (fetchError) {
       throw new DatabaseError(
-        `Failed to fetch consumption: ${fetchError?.message || "No data returned"}`,
+        `Failed to fetch consumption: ${fetchError.message}`,
       );
+    }
+
+    if (!consumption) {
+      return;
     }
 
     if ((consumption.attendances as any)?.user_id !== userId) {
