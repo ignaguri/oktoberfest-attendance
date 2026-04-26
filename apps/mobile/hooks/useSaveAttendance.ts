@@ -2,11 +2,12 @@
  * Hook for saving attendance with photos and consumption sync
  *
  * Orchestrates the complete save flow:
- * 1. Update attendance record
+ * 1. Update attendance record (local-first; enqueues server push)
  * 2. Sync consumptions (create/delete based on delta)
  * 3. Delete photos marked for removal
- * 4. Upload pending photos
+ * 4. Enqueue pending photo uploads (depend on attendance push)
  * 5. Invalidate relevant caches
+ * 6. Trigger background push of the sync queue
  */
 
 import { QueryKeys, useInvalidateQueries } from "@prostcounter/shared/data";
@@ -17,17 +18,16 @@ import { format } from "date-fns";
 import { useCallback, useContext, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
+import { useAuth } from "@/lib/auth/AuthContext";
 import {
   OfflineContext,
   triggerBackgroundPush,
 } from "@/lib/database/offline-provider";
+import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
 import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
 
-import {
-  type PendingPhoto,
-  useBeerPictureUpload,
-} from "./useBeerPictureUpload";
+import { type PendingPhoto } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
 import { useOfflineUpdateAttendance } from "./useOfflineAttendance";
 import {
@@ -63,7 +63,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const updateAttendance = useOfflineUpdateAttendance();
   const logConsumption = useOfflineLogConsumption();
   const deleteConsumption = useOfflineDeleteConsumption();
-  const { uploadPendingPhotos } = useBeerPictureUpload();
+  const { user } = useAuth();
   const { getDrinkPriceCents } = useDrinkPrice();
   const { calculatePricePaid } = useTipCalculation();
   const invalidateQueries = useInvalidateQueries();
@@ -185,16 +185,21 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           );
         }
 
-        // Step 4: Upload pending photos
+        // Step 4: Enqueue photo uploads chained to the attendance push.
         if (pendingPhotos.length > 0) {
-          const attendanceId = existingAttendanceId || result?.attendanceId;
+          const attendanceId = existingAttendanceId || result.attendanceId;
+          const userId = user?.id;
+          const db = offlineContext?.getDb?.();
 
-          if (attendanceId) {
-            await uploadPendingPhotos({
-              festivalId,
-              attendanceId,
+          if (attendanceId && userId && db) {
+            await enqueuePendingPhotosForAttendance(db, {
               pendingPhotos,
+              attendanceId,
+              userId,
+              festivalId,
+              dependsOn: result.attendanceQueueOpId,
             });
+            await offlineContext?.refreshPendingCount?.();
           }
         }
 
@@ -222,7 +227,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
       updateAttendance,
       logConsumption,
       deleteConsumption,
-      uploadPendingPhotos,
+      user?.id,
       getDrinkPriceCents,
       calculatePricePaid,
       invalidateQueries,

@@ -12,7 +12,7 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { DatabaseError, NotFoundError } from "../../middleware/error";
+import { DatabaseError } from "../../middleware/error";
 import type { IAttendanceRepository } from "../interfaces";
 
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
@@ -194,24 +194,23 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
   }
 
   async delete(id: string, userId: string): Promise<void> {
-    // First verify the attendance belongs to the user
+    // Verify ownership only if the row exists. A missing row is treated as
+    // idempotent success so retries from the offline queue (where the local
+    // record may have never been pushed) don't loop on 500s/404s.
     const { data: attendance, error: fetchError } = await this.supabase
       .from("attendances")
       .select("user_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (fetchError) {
-      if (fetchError.code === PgErrorCode.NO_ROWS) {
-        throw new NotFoundError("Attendance not found");
-      }
       throw new DatabaseError(
         `Failed to fetch attendance: ${fetchError.message}`,
       );
     }
 
     if (!attendance) {
-      throw new NotFoundError("Attendance not found");
+      return;
     }
 
     if (attendance.user_id !== userId) {

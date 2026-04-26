@@ -71,8 +71,13 @@ export function createGetBeerPictureUrl(config: ImageUrlConfig) {
   return (pictureUrl: string | null | undefined): string | undefined => {
     if (!pictureUrl) return undefined;
 
-    // If it's already a full URL, return as-is
-    if (pictureUrl.startsWith("http")) {
+    // Pass through full URLs and local file/content URIs (offline-queued
+    // photos render straight from disk until the sync queue uploads them).
+    if (
+      pictureUrl.startsWith("http") ||
+      pictureUrl.startsWith("file:") ||
+      pictureUrl.startsWith("content:")
+    ) {
       return pictureUrl;
     }
 

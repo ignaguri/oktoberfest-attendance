@@ -1,32 +1,21 @@
 /**
- * Hook for handling beer picture uploads in the mobile app
+ * Hook for picking beer pictures.
  *
- * Provides separate methods for:
- * 1. Picking images (for instant preview - no compression)
- * 2. Uploading images (compression happens here, when form is saved)
- *
- * Flow:
- * 1. User picks images → stored locally with original URIs for instant preview
- * 2. User clicks Save → images are compressed and uploaded
- * 3. API: Get signed upload URL → Upload to storage → Confirm upload
+ * Returns picked URIs as PendingPhoto entries for immediate preview. Actual
+ * persistence + compression + upload runs through the offline sync queue
+ * (see savePendingPhotos in lib/database/photo-queue and the UPLOAD_FILE
+ * handler in lib/database/sync/sync-manager). The queue ensures photo
+ * uploads only fire after their parent attendance has been pushed, which
+ * is what prevents 403 "Attendance not found" on /photos/upload-url.
  */
 
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import { useCallback, useState } from "react";
-
-import { apiClient } from "@/lib/api-client";
-import { putToStorageWithDiagnostics } from "@/lib/storage-upload";
 
 import { type ImageSource, useImageUpload } from "./useImageUpload";
 
-interface UploadedPhoto {
-  id: string;
-  pictureUrl: string;
-}
-
 /**
  * Pending photo ready for preview
- * Stores original URI - compression happens at upload time
+ * Stores original URI - compression happens at upload time inside the queue
  */
 interface PendingPhoto {
   id: string;
@@ -34,52 +23,34 @@ interface PendingPhoto {
 }
 
 interface UseBeerPictureUploadOptions {
-  /** Called when any upload fails */
+  /** Called when picking fails */
   onError?: (error: Error) => void;
 }
 
 interface UseBeerPictureUploadReturn {
   /** Pick images from camera or library - returns pending photos for preview */
   pickImages: (source: ImageSource) => Promise<PendingPhoto[] | null>;
-  /** Upload pending photos to storage - call this when form is saved */
-  uploadPendingPhotos: (params: {
-    festivalId: string;
-    attendanceId: string;
-    pendingPhotos: PendingPhoto[];
-  }) => Promise<UploadedPhoto[]>;
   /** Whether images are being picked/processed from gallery */
   isPicking: boolean;
-  /** Whether an upload is in progress */
-  isUploading: boolean;
   /** Last error that occurred */
   error: Error | null;
 }
 
-export type { ImageSource, PendingPhoto, UploadedPhoto };
+export type { ImageSource, PendingPhoto };
 
 export function useBeerPictureUpload({
   onError,
 }: UseBeerPictureUploadOptions = {}): UseBeerPictureUploadReturn {
   const [isPicking, setIsPicking] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const { pickImagesRaw, compressImage, showError } = useImageUpload({
+  const { pickImagesRaw } = useImageUpload({
     onError,
     allowMultiple: true,
     allowEditing: false, // Keep original aspect ratio for beer pictures
-    compress: {
-      maxSize: 1200, // Larger than avatars for better photo quality
-      quality: 0.85,
-    },
     errorMessageKey: "imageUpload.errors.photoUploadFailed",
   });
 
-  /**
-   * Pick images from camera or library
-   * Returns pending photos with original URIs for instant preview
-   * Does NOT compress or upload - compression happens in uploadPendingPhotos
-   */
   const pickImages = useCallback(
     async (source: ImageSource): Promise<PendingPhoto[] | null> => {
       try {
@@ -91,7 +62,6 @@ export function useBeerPictureUpload({
           return null;
         }
 
-        // Create pending photos with original URIs for instant preview
         const pendingPhotos: PendingPhoto[] = images.map((img, index) => ({
           id: `pending-${Date.now()}-${index}`,
           localUri: img.uri,
@@ -111,94 +81,9 @@ export function useBeerPictureUpload({
     [pickImagesRaw, onError],
   );
 
-  /**
-   * Upload pending photos to storage
-   * Compresses images at upload time (not when picking)
-   * Call this when the form is saved
-   */
-  const uploadPendingPhotos = useCallback(
-    async ({
-      festivalId,
-      attendanceId,
-      pendingPhotos,
-    }: {
-      festivalId: string;
-      attendanceId: string;
-      pendingPhotos: PendingPhoto[];
-    }): Promise<UploadedPhoto[]> => {
-      if (!festivalId || !attendanceId) {
-        throw new Error("Missing festival or attendance ID");
-      }
-
-      if (!pendingPhotos.length) {
-        return [];
-      }
-
-      setIsUploading(true);
-      setError(null);
-
-      try {
-        const uploadedPhotos: UploadedPhoto[] = [];
-
-        // Compress and upload each image sequentially
-        for (const pending of pendingPhotos) {
-          // Step 1: Compress image (deferred from pick time)
-          const compressedImage = await compressImage(pending.localUri);
-
-          // Step 2: Get signed upload URL from API
-          const { uploadUrl, pictureId } = await apiClient.photos.getUploadUrl({
-            festivalId,
-            attendanceId,
-            fileName: compressedImage.originalFileName,
-            fileType: compressedImage.mimeType,
-            fileSize: compressedImage.arrayBuffer.byteLength,
-          });
-
-          // Step 3: Upload compressed image directly to storage
-          // Fix URL for local dev: replace localhost with the mobile client's Supabase host
-          const envSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
-          const fixedUploadUrl = replaceLocalhostInUrl(
-            uploadUrl,
-            envSupabaseUrl,
-          );
-
-          await putToStorageWithDiagnostics({
-            url: fixedUploadUrl,
-            body: compressedImage.arrayBuffer,
-            mimeType: compressedImage.mimeType,
-            envSupabaseUrl,
-            flow: "beer-picture-upload",
-          });
-
-          // Step 4: Confirm upload with API
-          const confirmedPhoto =
-            await apiClient.photos.confirmUpload(pictureId);
-
-          uploadedPhotos.push({
-            id: confirmedPhoto.id,
-            pictureUrl: confirmedPhoto.pictureUrl,
-          });
-        }
-
-        return uploadedPhotos;
-      } catch (err) {
-        const uploadError =
-          err instanceof Error ? err : new Error("Upload failed");
-        setError(uploadError);
-        showError(uploadError);
-        throw uploadError;
-      } finally {
-        setIsUploading(false);
-      }
-    },
-    [compressImage, showError],
-  );
-
   return {
     pickImages,
-    uploadPendingPhotos,
     isPicking,
-    isUploading,
     error,
   };
 }

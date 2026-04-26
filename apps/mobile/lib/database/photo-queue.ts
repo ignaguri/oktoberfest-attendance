@@ -39,6 +39,13 @@ export interface PendingPhotoInput {
   festivalId: string;
   /** Photo visibility */
   visibility?: PhotoVisibility;
+  /**
+   * Sync-queue op id this UPLOAD_FILE depends on. When the attendance row
+   * was created or updated locally in the same flow, set this to the queue
+   * id of that INSERT/UPDATE op so the upload waits until the attendance
+   * has been pushed to the server.
+   */
+  dependsOn?: string;
 }
 
 export interface SavedPendingPhoto {
@@ -189,12 +196,19 @@ export async function savePendingPhoto(
   );
 
   // Queue upload operation
-  await enqueueOperation(db, "UPLOAD_FILE", "beer_pictures", photoId, {
-    localUri: permanentPath,
-    festivalId: input.festivalId,
-    attendanceId: input.attendanceId,
-    visibility: input.visibility || "public",
-  });
+  await enqueueOperation(
+    db,
+    "UPLOAD_FILE",
+    "beer_pictures",
+    photoId,
+    {
+      localUri: permanentPath,
+      festivalId: input.festivalId,
+      attendanceId: input.attendanceId,
+      visibility: input.visibility || "public",
+    },
+    input.dependsOn ? { dependsOn: input.dependsOn } : undefined,
+  );
 
   return {
     id: photoId,
@@ -224,6 +238,47 @@ export async function savePendingPhotos(
   }
 
   return results;
+}
+
+/**
+ * Enqueue picked photos as UPLOAD_FILE ops chained to an attendance push.
+ *
+ * Wraps savePendingPhotos so the call sites in useSaveAttendance and
+ * quick-attendance-sheet share the same shape. The depends_on chain is
+ * what stops /photos/upload-url from 403'ing on a not-yet-synced attendance.
+ *
+ * Throws if any input photo failed to be queued — savePendingPhotos
+ * intentionally swallows per-photo errors and returns only the successful
+ * subset, which would otherwise let the save flow report success while
+ * silently dropping user-selected photos.
+ */
+export async function enqueuePendingPhotosForAttendance(
+  db: SQLite.SQLiteDatabase,
+  args: {
+    pendingPhotos: { localUri: string }[];
+    attendanceId: string;
+    userId: string;
+    festivalId: string;
+    dependsOn?: string;
+  },
+): Promise<SavedPendingPhoto[]> {
+  if (args.pendingPhotos.length === 0) return [];
+  const queued = await savePendingPhotos(
+    db,
+    args.pendingPhotos.map((p) => ({
+      localUri: p.localUri,
+      attendanceId: args.attendanceId,
+      userId: args.userId,
+      festivalId: args.festivalId,
+      dependsOn: args.dependsOn,
+    })),
+  );
+  if (queued.length !== args.pendingPhotos.length) {
+    throw new Error(
+      `Failed to queue ${args.pendingPhotos.length - queued.length} of ${args.pendingPhotos.length} photo(s) for upload`,
+    );
+  }
+  return queued;
 }
 
 // =============================================================================
@@ -410,16 +465,26 @@ export async function uploadPendingPhoto(
     const confirmedPhoto = await apiClient.photos.confirmUpload(pictureId);
     onProgress?.(photo.id, 0.9);
 
-    // 5. Update local record
+    // 5. Reconcile local id to the server-issued UUID and update the row.
+    // The local id is generated as `photo-${ts}-${rand}` to avoid collisions
+    // before sync; once confirmed, we adopt the server UUID so downstream
+    // operations (delete, visibility updates) target the correct row and
+    // pictures[].id satisfies the shared z.uuid() schema.
     await db.runAsync(
       `UPDATE beer_pictures
-       SET picture_url = ?,
+       SET id = ?,
+           picture_url = ?,
            _pending_upload = 0,
            _local_uri = NULL,
            _dirty = 0,
            _synced_at = ?
        WHERE id = ?`,
-      [confirmedPhoto.pictureUrl, new Date().toISOString(), photo.id],
+      [
+        confirmedPhoto.id,
+        confirmedPhoto.pictureUrl,
+        new Date().toISOString(),
+        photo.id,
+      ],
     );
 
     // 6. Clean up local file
@@ -497,6 +562,44 @@ export async function processPendingPhotoUploads(
     failed,
     results,
   };
+}
+
+/**
+ * Queue-handler entry point for an UPLOAD_FILE op.
+ *
+ * Loads the beer_pictures row by record id, calls uploadPendingPhoto, and
+ * throws on failure so the QueueProcessor can record the error and apply
+ * its existing retry-with-backoff behavior. Idempotent: if the row is
+ * already uploaded (`_pending_upload = 0`), returns without doing work.
+ */
+export async function runUploadFileOp(
+  db: SQLite.SQLiteDatabase,
+  payload: {
+    recordId: string;
+    festivalId: string;
+  },
+  options: UploadPhotoOptions,
+): Promise<void> {
+  const photo = await getPhotoById(db, payload.recordId);
+
+  if (!photo) {
+    throw new Error(`Photo not found for UPLOAD_FILE op: ${payload.recordId}`);
+  }
+
+  if (photo._pending_upload === 0) {
+    return;
+  }
+
+  const result = await uploadPendingPhoto(
+    db,
+    photo,
+    payload.festivalId,
+    options,
+  );
+
+  if (!result.success) {
+    throw new Error(result.error || "Photo upload failed");
+  }
 }
 
 // =============================================================================

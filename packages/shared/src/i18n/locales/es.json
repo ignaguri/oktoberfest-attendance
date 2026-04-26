@@ -2227,7 +2227,10 @@
       "uploadFailed": "Error al subir la imagen",
       "avatarUploadFailed": "Error al actualizar la foto de perfil",
       "photoUploadFailed": "Error al subir la foto"
-    }
+    },
+    "queued": "En cola",
+    "willRetry": "La subida se reintentará automáticamente",
+    "failedPermanent": "La subida de la foto falló. Toca para reintentar."
   },
   "validation": {
     "required": "Este campo es requerido",

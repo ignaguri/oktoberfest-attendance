@@ -394,6 +394,69 @@ export async function getDirtyRecordCount(
 }
 
 // =============================================================================
+// Orphan Cleanup
+// =============================================================================
+
+/**
+ * Hard-deletes local consumption rows that will never sync to the server.
+ *
+ * A row is "orphaned" when:
+ *  - It is dirty (`_dirty=1`) and never synced (`_synced_at IS NULL`)
+ *  - Its INSERT queue op is either missing OR permanently failed (retry_count >= maxRetries)
+ *  - It was created at least `minAgeHours` ago (default 1h) — protects fresh in-flight logs
+ *
+ * Healing for users who hit the pre-fix duplicate-row bug where retries created
+ * extra ghost rows that were never deduped server-side.
+ *
+ * Returns the number of rows deleted.
+ */
+export async function cleanupOrphanConsumptions(
+  db: SQLite.SQLiteDatabase,
+  maxRetries: number = 3,
+  minAgeHours: number = 1,
+): Promise<number> {
+  const orphans = await db.getAllAsync<{ id: string; queue_id: string | null }>(
+    `SELECT c.id as id, q.id as queue_id
+       FROM consumptions c
+       LEFT JOIN _sync_queue q
+         ON q.table_name = 'consumptions'
+        AND q.record_id = c.id
+        AND q.operation = 'INSERT'
+      WHERE c._dirty = 1
+        AND c._synced_at IS NULL
+        AND (q.id IS NULL OR (q.status = 'failed' AND q.retry_count >= ?))
+        AND c.created_at < datetime('now', ?)`,
+    [maxRetries, `-${minAgeHours} hours`],
+  );
+
+  if (orphans.length === 0) return 0;
+
+  const placeholders = orphans.map(() => "?").join(",");
+  const consumptionIds = orphans.map((o) => o.id);
+  const queueIds = orphans
+    .map((o) => o.queue_id)
+    .filter((q): q is string => !!q);
+
+  await db.runAsync(
+    `DELETE FROM consumptions WHERE id IN (${placeholders})`,
+    consumptionIds,
+  );
+
+  if (queueIds.length > 0) {
+    const qPlaceholders = queueIds.map(() => "?").join(",");
+    await db.runAsync(
+      `DELETE FROM _sync_queue WHERE id IN (${qPlaceholders})`,
+      queueIds,
+    );
+  }
+
+  logger.debug(
+    `[SyncQueue] Cleaned up ${orphans.length} orphan consumption rows`,
+  );
+  return orphans.length;
+}
+
+// =============================================================================
 // Soft Delete Operations
 // =============================================================================
 
