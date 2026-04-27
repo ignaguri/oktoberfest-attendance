@@ -1122,7 +1122,8 @@
       "syncing": "Synchronisiere…",
       "confirmTitle": "Daten mit Server synchronisieren?",
       "confirmMessage": "Lokale Änderungen, die noch nicht synchronisiert wurden, gehen verloren und alle Daten werden erneut vom Server geladen. Fortfahren?",
-      "success": "Deine Daten sind jetzt mit dem Server synchronisiert."
+      "success": "Deine Daten sind jetzt mit dem Server synchronisiert.",
+      "errorNoFestival": "Bitte wähle ein Festival aus, bevor du synchronisierst."
     },
     "languageSettings": {
       "title": "Sprache",

@@ -25,10 +25,8 @@ import { SettingsSection } from "@/components/profile/settings-section";
 import { SyncDataSection } from "@/components/profile/sync-data-section";
 import { WatchSection } from "@/components/profile/watch-section";
 import { ProfileSkeleton } from "@/components/skeletons";
-import {
-  ConfirmAlertDialog,
-  useAlertDialog,
-} from "@/components/ui/alert-dialog";
+import { useAlertDialog } from "@/components/ui/alert-dialog";
+import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

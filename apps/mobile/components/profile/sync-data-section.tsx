@@ -1,10 +1,9 @@
+import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useCallback } from "react";
 
-import {
-  ConfirmAlertDialog,
-  useAlertDialog,
-} from "@/components/ui/alert-dialog";
+import { useAlertDialog } from "@/components/ui/alert-dialog";
+import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
@@ -17,8 +16,11 @@ import { logger } from "@/lib/logger";
 export function SyncDataSection() {
   const { t } = useTranslation();
   const isOnline = useIsOnline();
+  const { currentFestival } = useFestival();
   const { resync, isResyncing } = useResyncFromServer();
   const { dialog, showDialog, closeDialog } = useAlertDialog();
+
+  const hasFestival = Boolean(currentFestival?.id);
 
   const runResync = useCallback(async () => {
     try {
@@ -36,13 +38,20 @@ export function SyncDataSection() {
       showDialog(t("common.status.error"), t("common.errors.offline.message"));
       return;
     }
+    if (!hasFestival) {
+      showDialog(
+        t("common.status.error"),
+        t("profile.syncData.errorNoFestival"),
+      );
+      return;
+    }
     showDialog(
       t("profile.syncData.confirmTitle"),
       t("profile.syncData.confirmMessage"),
       "destructive",
       runResync,
     );
-  }, [isOnline, isResyncing, runResync, showDialog, t]);
+  }, [hasFestival, isOnline, isResyncing, runResync, showDialog, t]);
 
   return (
     <>
@@ -60,7 +69,7 @@ export function SyncDataSection() {
             variant="outline"
             action="secondary"
             onPress={handlePress}
-            disabled={isResyncing}
+            disabled={isResyncing || !hasFestival}
             className="border-yellow-400"
             accessibilityLabel={t("profile.syncData.button")}
             accessibilityHint={t("profile.syncData.helper")}

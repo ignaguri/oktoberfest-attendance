@@ -26,10 +26,11 @@ export function useResyncFromServer() {
         throw new Error(result.errors[0] ?? "Sync failed");
       }
 
-      await invalidateAllLocalQueries(queryClient);
-
       logger.debug("[Resync] Complete", { pulled: result.pulled });
     } finally {
+      // Always invalidate caches: after clearAllData the local DB no longer
+      // matches any cached query results, even if the subsequent pull failed.
+      await invalidateAllLocalQueries(queryClient);
       setIsResyncing(false);
     }
   }, [offline, queryClient]);

@@ -1165,7 +1165,8 @@
       "syncing": "Syncing…",
       "confirmTitle": "Sync data with server?",
       "confirmMessage": "This will discard any local changes that haven't synced yet and re-download everything from the server. Continue?",
-      "success": "Your data is now in sync with the server."
+      "success": "Your data is now in sync with the server.",
+      "errorNoFestival": "Please select a festival before syncing."
     },
     "languageSettings": {
       "title": "Language",

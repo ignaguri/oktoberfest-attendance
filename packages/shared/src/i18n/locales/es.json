@@ -1165,7 +1165,8 @@
       "syncing": "Sincronizando…",
       "confirmTitle": "¿Sincronizar datos con el servidor?",
       "confirmMessage": "Se descartarán los cambios locales que aún no se hayan sincronizado y se volverán a descargar todos los datos del servidor. ¿Continuar?",
-      "success": "Tus datos están ahora sincronizados con el servidor."
+      "success": "Tus datos están ahora sincronizados con el servidor.",
+      "errorNoFestival": "Seleccioná un festival antes de sincronizar."
     },
     "languageSettings": {
       "title": "Idioma",
