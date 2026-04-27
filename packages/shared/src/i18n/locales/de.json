@@ -1116,6 +1116,15 @@
       "resetSuccess": "Das Tutorial wurde zurückgesetzt. du siehst es erneut, wenn du die Startseite besuchen.",
       "resetError": "Zurücksetzen des Tutorials fehlgeschlagen. Bitte versuche es erneut."
     },
+    "syncData": {
+      "button": "Jetzt synchronisieren",
+      "helper": "Lade vom Server neu, falls deine Daten falsch aussehen.",
+      "syncing": "Synchronisiere…",
+      "confirmTitle": "Daten mit Server synchronisieren?",
+      "confirmMessage": "Lokale Änderungen, die noch nicht synchronisiert wurden, gehen verloren und alle Daten werden erneut vom Server geladen. Fortfahren?",
+      "success": "Deine Daten sind jetzt mit dem Server synchronisiert.",
+      "errorNoFestival": "Bitte wähle ein Festival aus, bevor du synchronisierst."
+    },
     "languageSettings": {
       "title": "Sprache",
       "description": "Wähle deine bevorzugte App-Sprache",

@@ -22,22 +22,15 @@ import { AboutSection } from "@/components/profile/about-section";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
+import { SyncDataSection } from "@/components/profile/sync-data-section";
 import { WatchSection } from "@/components/profile/watch-section";
 import { ProfileSkeleton } from "@/components/skeletons";
-import {
-  AlertDialog,
-  AlertDialogBackdrop,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  useAlertDialog,
-} from "@/components/ui/alert-dialog";
+import { useAlertDialog } from "@/components/ui/alert-dialog";
+import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
-import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { ScrollView } from "@/components/ui/scroll-view";
@@ -396,6 +389,8 @@ export default function ProfileScreen() {
         {/* About & Support */}
         <AboutSection />
 
+        <SyncDataSection />
+
         {/* Danger Zone - Delete Account */}
         <DangerZone
           showDeleteConfirm={showDeleteConfirm}
@@ -419,63 +414,7 @@ export default function ProfileScreen() {
         disabled={isAvatarUploading}
       />
 
-      {/* Gluestack AlertDialog */}
-      <AlertDialog isOpen={dialog.isOpen} onClose={closeDialog} size="md">
-        <AlertDialogBackdrop />
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <Heading
-              size="lg"
-              className={
-                dialog.type === "destructive"
-                  ? "text-error-600"
-                  : "text-typography-950"
-              }
-            >
-              {dialog.title}
-            </Heading>
-          </AlertDialogHeader>
-          <AlertDialogBody className="mb-4 mt-3">
-            <Text size="sm" className="text-typography-500">
-              {dialog.message}
-            </Text>
-          </AlertDialogBody>
-          <AlertDialogFooter className="gap-3">
-            {dialog.onConfirm ? (
-              <>
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  onPress={closeDialog}
-                  className="flex-1"
-                >
-                  <ButtonText>{t("common.buttons.cancel")}</ButtonText>
-                </Button>
-                <Button
-                  action={
-                    dialog.type === "destructive" ? "negative" : "primary"
-                  }
-                  onPress={() => {
-                    dialog.onConfirm?.();
-                    closeDialog();
-                  }}
-                  className="flex-1"
-                >
-                  <ButtonText>
-                    {dialog.type === "destructive"
-                      ? t("common.buttons.confirm")
-                      : t("common.buttons.ok")}
-                  </ButtonText>
-                </Button>
-              </>
-            ) : (
-              <Button action="primary" onPress={closeDialog} className="flex-1">
-                <ButtonText>{t("common.buttons.ok")}</ButtonText>
-              </Button>
-            )}
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmAlertDialog dialog={dialog} onClose={closeDialog} />
     </ScrollView>
   );
 }

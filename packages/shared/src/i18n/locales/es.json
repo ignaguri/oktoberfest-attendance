@@ -1159,6 +1159,15 @@
       "resetSuccess": "El tutorial se reinició. Lo verás de nuevo cuando visites la página de inicio.",
       "resetError": "Error al reiniciar el tutorial. Por favor, intentá de nuevo."
     },
+    "syncData": {
+      "button": "Sincronizar ahora",
+      "helper": "Volvé a descargar del servidor si tus datos parecen incorrectos.",
+      "syncing": "Sincronizando…",
+      "confirmTitle": "¿Sincronizar datos con el servidor?",
+      "confirmMessage": "Se descartarán los cambios locales que aún no se hayan sincronizado y se volverán a descargar todos los datos del servidor. ¿Continuar?",
+      "success": "Tus datos están ahora sincronizados con el servidor.",
+      "errorNoFestival": "Seleccioná un festival antes de sincronizar."
+    },
     "languageSettings": {
       "title": "Idioma",
       "description": "Elegí tu idioma preferido para la app",

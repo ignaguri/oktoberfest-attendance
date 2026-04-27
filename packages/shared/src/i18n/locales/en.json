@@ -1159,6 +1159,15 @@
       "resetSuccess": "The tutorial has been reset. You'll see it again when you visit the home page.",
       "resetError": "Failed to reset tutorial. Please try again."
     },
+    "syncData": {
+      "button": "Sync now",
+      "helper": "Re-download from server if your data looks wrong.",
+      "syncing": "Syncing…",
+      "confirmTitle": "Sync data with server?",
+      "confirmMessage": "This will discard any local changes that haven't synced yet and re-download everything from the server. Continue?",
+      "success": "Your data is now in sync with the server.",
+      "errorNoFestival": "Please select a festival before syncing."
+    },
     "languageSettings": {
       "title": "Language",
       "description": "Choose your preferred language for the app",
