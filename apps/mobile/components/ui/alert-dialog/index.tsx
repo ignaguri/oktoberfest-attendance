@@ -348,3 +348,4 @@ export {
   AlertDialogFooter,
   AlertDialogHeader,
 };
+export { ConfirmAlertDialog } from "./confirm";
