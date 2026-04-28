@@ -7,8 +7,10 @@ import {
   Bug,
   ChevronRight,
   Lightbulb,
+  Share2,
   Shield,
   Sparkles,
+  Star,
 } from "lucide-react-native";
 import { useCallback } from "react";
 
@@ -19,6 +21,8 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
+import { useRatePrompt } from "@/lib/rate-app/useRatePrompt";
+import { useShareApp } from "@/lib/share/useShareApp";
 
 const LINKS = [
   {
@@ -38,6 +42,33 @@ const LINKS = [
   },
 ] satisfies { key: string; url: string; Icon: LucideIcon }[];
 
+function ActionRow({
+  label,
+  Icon,
+  onPress,
+  accessibilityRole,
+}: {
+  label: string;
+  Icon: LucideIcon;
+  onPress: () => void | Promise<void>;
+  accessibilityRole: "button" | "link";
+}) {
+  return (
+    <Pressable
+      className="flex-row items-center justify-between py-3"
+      onPress={onPress}
+      accessibilityRole={accessibilityRole}
+      accessibilityLabel={label}
+    >
+      <View className="flex-row items-center gap-3">
+        <Icon size={20} color={IconColors.default} />
+        <Text className="text-typography-900">{label}</Text>
+      </View>
+      <ChevronRight size={20} color={IconColors.muted} />
+    </Pressable>
+  );
+}
+
 function LinkRow({
   label,
   url,
@@ -56,24 +87,20 @@ function LinkRow({
   }, [url]);
 
   return (
-    <Pressable
-      className="flex-row items-center justify-between py-3"
+    <ActionRow
+      label={label}
+      Icon={Icon}
       onPress={handlePress}
       accessibilityRole="link"
-      accessibilityLabel={label}
-    >
-      <View className="flex-row items-center gap-3">
-        <Icon size={20} color={IconColors.default} />
-        <Text className="text-typography-900">{label}</Text>
-      </View>
-      <ChevronRight size={20} color={IconColors.muted} />
-    </Pressable>
+    />
   );
 }
 
 export function AboutSection() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { requestReviewManually } = useRatePrompt();
+  const shareApp = useShareApp();
 
   return (
     <Card size="md" variant="elevated">
@@ -83,20 +110,30 @@ export function AboutSection() {
 
       <VStack>
         <View className="border-b border-outline-100">
-          <Pressable
-            className="flex-row items-center justify-between py-3"
+          <ActionRow
+            label={t("profile.about.whatsNew")}
+            Icon={Sparkles}
             onPress={() => router.push("/settings/whats-new")}
             accessibilityRole="button"
-            accessibilityLabel={t("profile.about.whatsNew")}
-          >
-            <View className="flex-row items-center gap-3">
-              <Sparkles size={20} color={IconColors.default} />
-              <Text className="text-typography-900">
-                {t("profile.about.whatsNew")}
-              </Text>
-            </View>
-            <ChevronRight size={20} color={IconColors.muted} />
-          </Pressable>
+          />
+        </View>
+
+        <View className="border-b border-outline-100">
+          <ActionRow
+            label={t("profile.about.rateApp")}
+            Icon={Star}
+            onPress={requestReviewManually}
+            accessibilityRole="button"
+          />
+        </View>
+
+        <View className="border-b border-outline-100">
+          <ActionRow
+            label={t("profile.about.shareApp")}
+            Icon={Share2}
+            onPress={shareApp}
+            accessibilityRole="button"
+          />
         </View>
 
         {LINKS.map((link, index) => (

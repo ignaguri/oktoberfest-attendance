@@ -26,6 +26,7 @@ import {
 import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
 import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
+import { useRatePrompt } from "@/lib/rate-app/useRatePrompt";
 
 import { type PendingPhoto } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
@@ -67,6 +68,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const { getDrinkPriceCents } = useDrinkPrice();
   const { calculatePricePaid } = useTipCalculation();
   const invalidateQueries = useInvalidateQueries();
+  const { recordAttendanceSave } = useRatePrompt();
 
   const saveAttendance = useCallback(
     async (input: SaveAttendanceInput) => {
@@ -212,6 +214,10 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
 
         // Step 6: Push all queued operations to server
         triggerBackgroundPush(offlineContext);
+
+        // Step 7: Maybe surface a rate-the-app prompt. Fire-and-forget; never
+        // block the save flow on this.
+        void recordAttendanceSave();
       } catch (err) {
         const saveError =
           err instanceof Error ? err : new Error("Failed to save attendance");
@@ -231,6 +237,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
       getDrinkPriceCents,
       calculatePricePaid,
       invalidateQueries,
+      recordAttendanceSave,
     ],
   );
 
