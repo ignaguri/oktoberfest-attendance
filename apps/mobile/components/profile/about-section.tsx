@@ -1,5 +1,6 @@
 import { PROD_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
@@ -7,8 +8,10 @@ import {
   Bug,
   ChevronRight,
   Lightbulb,
+  Share2,
   Shield,
   Sparkles,
+  Star,
 } from "lucide-react-native";
 import { useCallback } from "react";
 
@@ -17,6 +20,8 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
+import { useRatePrompt } from "@/hooks/useRatePrompt";
+import { useShareApp } from "@/hooks/useShareApp";
 import { IconColors } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
 
@@ -38,28 +43,27 @@ const LINKS = [
   },
 ] satisfies { key: string; url: string; Icon: LucideIcon }[];
 
-function LinkRow({
+function ActionRow({
   label,
-  url,
   Icon,
+  onPress,
+  accessibilityRole = "button",
+  bordered = false,
 }: {
   label: string;
-  url: string;
   Icon: LucideIcon;
+  onPress: () => void | Promise<void>;
+  accessibilityRole?: "button" | "link";
+  bordered?: boolean;
 }) {
-  const handlePress = useCallback(async () => {
-    try {
-      await WebBrowser.openBrowserAsync(url);
-    } catch (error) {
-      logger.error("Failed to open URL:", error);
-    }
-  }, [url]);
-
   return (
     <Pressable
-      className="flex-row items-center justify-between py-3"
-      onPress={handlePress}
-      accessibilityRole="link"
+      className={cn(
+        "flex-row items-center justify-between py-3",
+        bordered && "border-b border-outline-100",
+      )}
+      onPress={onPress}
+      accessibilityRole={accessibilityRole}
       accessibilityLabel={label}
     >
       <View className="flex-row items-center gap-3">
@@ -71,9 +75,41 @@ function LinkRow({
   );
 }
 
+function LinkRow({
+  label,
+  url,
+  Icon,
+  bordered,
+}: {
+  label: string;
+  url: string;
+  Icon: LucideIcon;
+  bordered?: boolean;
+}) {
+  const handlePress = useCallback(async () => {
+    try {
+      await WebBrowser.openBrowserAsync(url);
+    } catch (error) {
+      logger.error("Failed to open URL:", error);
+    }
+  }, [url]);
+
+  return (
+    <ActionRow
+      label={label}
+      Icon={Icon}
+      onPress={handlePress}
+      accessibilityRole="link"
+      bordered={bordered}
+    />
+  );
+}
+
 export function AboutSection() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { requestReviewManually } = useRatePrompt();
+  const shareApp = useShareApp();
 
   return (
     <Card size="md" variant="elevated">
@@ -82,38 +118,33 @@ export function AboutSection() {
       </Text>
 
       <VStack>
-        <View className="border-b border-outline-100">
-          <Pressable
-            className="flex-row items-center justify-between py-3"
-            onPress={() => router.push("/settings/whats-new")}
-            accessibilityRole="button"
-            accessibilityLabel={t("profile.about.whatsNew")}
-          >
-            <View className="flex-row items-center gap-3">
-              <Sparkles size={20} color={IconColors.default} />
-              <Text className="text-typography-900">
-                {t("profile.about.whatsNew")}
-              </Text>
-            </View>
-            <ChevronRight size={20} color={IconColors.muted} />
-          </Pressable>
-        </View>
+        <ActionRow
+          label={t("profile.about.whatsNew")}
+          Icon={Sparkles}
+          onPress={() => router.push("/settings/whats-new")}
+          bordered
+        />
+        <ActionRow
+          label={t("profile.about.rateApp")}
+          Icon={Star}
+          onPress={requestReviewManually}
+          bordered
+        />
+        <ActionRow
+          label={t("profile.about.shareApp")}
+          Icon={Share2}
+          onPress={shareApp}
+          bordered
+        />
 
         {LINKS.map((link, index) => (
-          <View
+          <LinkRow
             key={link.key}
-            className={
-              index < LINKS.length - 1
-                ? "border-b border-outline-100"
-                : undefined
-            }
-          >
-            <LinkRow
-              label={t(`profile.about.${link.key}`)}
-              url={link.url}
-              Icon={link.Icon}
-            />
-          </View>
+            label={t(`profile.about.${link.key}`)}
+            url={link.url}
+            Icon={link.Icon}
+            bordered={index < LINKS.length - 1}
+          />
         ))}
       </VStack>
     </Card>

@@ -1187,8 +1187,10 @@
       "privacy": "Privacidad",
       "reportBug": "Reportar un error",
       "requestFeature": "Solicitar una función",
-      "buyMeABeer": "Comprame una cerveza",
-      "whatsNew": "Novedades"
+      "buyMeABeer": "Cómprame una cerveza",
+      "whatsNew": "Novedades",
+      "rateApp": "Calificar la app",
+      "shareApp": "Compartir la app"
     },
     "deleteAccount": {
       "title": "Eliminar cuenta",

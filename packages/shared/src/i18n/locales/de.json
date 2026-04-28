@@ -1145,7 +1145,9 @@
       "reportBug": "Fehler melden",
       "requestFeature": "Funktion vorschlagen",
       "buyMeABeer": "Kauf mir ein Bier",
-      "whatsNew": "Was ist neu"
+      "whatsNew": "Was ist neu",
+      "rateApp": "App bewerten",
+      "shareApp": "App teilen"
     },
     "deleteAccount": {
       "title": "Konto löschen",

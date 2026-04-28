@@ -1188,7 +1188,9 @@
       "reportBug": "Report a Bug",
       "requestFeature": "Request a Feature",
       "buyMeABeer": "Buy Me a Beer",
-      "whatsNew": "What's New"
+      "whatsNew": "What's New",
+      "rateApp": "Rate the app",
+      "shareApp": "Share the app"
     },
     "deleteAccount": {
       "title": "Delete Account",
