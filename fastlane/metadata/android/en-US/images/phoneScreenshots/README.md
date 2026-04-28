@@ -6,7 +6,7 @@ Drop final PNGs in this directory. Files are picked up in lexical order, so the 
 
 - Format: PNG (preferred) or JPEG
 - Aspect ratio: 9:16 portrait (or 16:9 landscape)
-- Size: 1080×1920 px (16:9 portrait) is the safe target — Play Console accepts up to 7680 px on the long edge
+- Size: 1080×1920 px (9:16 portrait) is the safe target — Play Console accepts up to 7680 px on the long edge
 - Min: 2 screenshots, Max: 8
 
 ## Naming convention

@@ -62,7 +62,7 @@ If we want push-from-CI instead of copy-paste:
 
 1. `bundle add fastlane --group=:development` at the repo root (or use `gem install fastlane` standalone).
 2. Add `fastlane/Fastfile` with a `lane :metadata do supply(skip_upload_apk: true, skip_upload_aab: true) end`.
-3. Reuse the existing `apps/mobile/keys/play-store-service-account.json` referenced in `eas.json`.
+3. Provide a Play Console service-account JSON at `apps/mobile/keys/play-store-service-account.json` (the path referenced by `eas.json`). This file is **not** committed — `keys/` is gitignored. Generate it from Play Console → Setup → API access → Service accounts, download the JSON, and place it at that path locally. Never commit it.
 4. Run `bundle exec fastlane metadata`.
 
 The directory layout in this repo is ready as-is — no migration required.

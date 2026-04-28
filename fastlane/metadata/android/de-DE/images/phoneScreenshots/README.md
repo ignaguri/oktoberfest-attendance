@@ -30,4 +30,4 @@ Wie en-US, aber Geräte­sprache vor dem Aufnehmen auf Deutsch stellen (Einstell
 
 ## Text-Overlays
 
-Tester-Feedback empfiehlt kurze Overlays (z. B. „Zähle deine Maß!"). Halte Typografie und Tonalität über alle Shots hinweg konsistent.
+Tester-Feedback empfiehlt kurze Overlays (z. B. „Zähle deine Maß!“). Halte Typografie und Tonalität über alle Shots hinweg konsistent.
