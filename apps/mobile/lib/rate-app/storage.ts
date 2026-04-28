@@ -14,36 +14,44 @@ const ATTENDANCE_COUNT_KEY = "@prostcounter/rate-prompt/attendanceCount";
 const LAST_PROMPTED_AT_KEY = "@prostcounter/rate-prompt/lastPromptedAt";
 const LAST_PROMPTED_COUNT_KEY = "@prostcounter/rate-prompt/lastPromptedCount";
 
-export interface RatePromptState {
-  attendanceCount: number;
+export interface PromptHistory {
   lastPromptedAt: number | null;
   lastPromptedCount: number;
 }
 
-export async function readRatePromptState(): Promise<RatePromptState> {
+/**
+ * Hot path: a single getItem + setItem on every successful attendance save.
+ * Prompt history is intentionally NOT read here — most calls early-return on
+ * the milestone check, and the extra two reads only matter ~3 times per
+ * user lifetime (see readPromptHistory).
+ */
+export async function incrementAttendanceCount(): Promise<number> {
   try {
-    const [count, promptedAt, promptedCount] = await Promise.all([
-      AsyncStorage.getItem(ATTENDANCE_COUNT_KEY),
+    const raw = await AsyncStorage.getItem(ATTENDANCE_COUNT_KEY);
+    const next = parseIntOrZero(raw) + 1;
+    await AsyncStorage.setItem(ATTENDANCE_COUNT_KEY, String(next));
+    return next;
+  } catch (error) {
+    logger.warn("Failed to increment attendance count:", { error });
+    return 0;
+  }
+}
+
+export async function readPromptHistory(): Promise<PromptHistory> {
+  try {
+    const [promptedAt, promptedCount] = await Promise.all([
       AsyncStorage.getItem(LAST_PROMPTED_AT_KEY),
       AsyncStorage.getItem(LAST_PROMPTED_COUNT_KEY),
     ]);
 
     return {
-      attendanceCount: parseIntOrZero(count),
       lastPromptedAt: promptedAt ? parseIntOrNull(promptedAt) : null,
       lastPromptedCount: parseIntOrZero(promptedCount),
     };
   } catch (error) {
-    logger.warn("Failed to read rate prompt state:", { error });
-    return { attendanceCount: 0, lastPromptedAt: null, lastPromptedCount: 0 };
+    logger.warn("Failed to read prompt history:", { error });
+    return { lastPromptedAt: null, lastPromptedCount: 0 };
   }
-}
-
-export async function incrementAttendanceCount(): Promise<number> {
-  const state = await readRatePromptState();
-  const next = state.attendanceCount + 1;
-  await AsyncStorage.setItem(ATTENDANCE_COUNT_KEY, String(next));
-  return next;
 }
 
 export async function recordPromptShown(

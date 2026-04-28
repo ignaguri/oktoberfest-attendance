@@ -1,5 +1,6 @@
 import { PROD_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
@@ -19,10 +20,10 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
+import { useRatePrompt } from "@/hooks/useRatePrompt";
+import { useShareApp } from "@/hooks/useShareApp";
 import { IconColors } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
-import { useRatePrompt } from "@/lib/rate-app/useRatePrompt";
-import { useShareApp } from "@/lib/share/useShareApp";
 
 const LINKS = [
   {
@@ -46,16 +47,21 @@ function ActionRow({
   label,
   Icon,
   onPress,
-  accessibilityRole,
+  accessibilityRole = "button",
+  bordered = false,
 }: {
   label: string;
   Icon: LucideIcon;
   onPress: () => void | Promise<void>;
-  accessibilityRole: "button" | "link";
+  accessibilityRole?: "button" | "link";
+  bordered?: boolean;
 }) {
   return (
     <Pressable
-      className="flex-row items-center justify-between py-3"
+      className={cn(
+        "flex-row items-center justify-between py-3",
+        bordered && "border-b border-outline-100",
+      )}
       onPress={onPress}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={label}
@@ -73,10 +79,12 @@ function LinkRow({
   label,
   url,
   Icon,
+  bordered,
 }: {
   label: string;
   url: string;
   Icon: LucideIcon;
+  bordered?: boolean;
 }) {
   const handlePress = useCallback(async () => {
     try {
@@ -92,6 +100,7 @@ function LinkRow({
       Icon={Icon}
       onPress={handlePress}
       accessibilityRole="link"
+      bordered={bordered}
     />
   );
 }
@@ -109,48 +118,33 @@ export function AboutSection() {
       </Text>
 
       <VStack>
-        <View className="border-b border-outline-100">
-          <ActionRow
-            label={t("profile.about.whatsNew")}
-            Icon={Sparkles}
-            onPress={() => router.push("/settings/whats-new")}
-            accessibilityRole="button"
-          />
-        </View>
-
-        <View className="border-b border-outline-100">
-          <ActionRow
-            label={t("profile.about.rateApp")}
-            Icon={Star}
-            onPress={requestReviewManually}
-            accessibilityRole="button"
-          />
-        </View>
-
-        <View className="border-b border-outline-100">
-          <ActionRow
-            label={t("profile.about.shareApp")}
-            Icon={Share2}
-            onPress={shareApp}
-            accessibilityRole="button"
-          />
-        </View>
+        <ActionRow
+          label={t("profile.about.whatsNew")}
+          Icon={Sparkles}
+          onPress={() => router.push("/settings/whats-new")}
+          bordered
+        />
+        <ActionRow
+          label={t("profile.about.rateApp")}
+          Icon={Star}
+          onPress={requestReviewManually}
+          bordered
+        />
+        <ActionRow
+          label={t("profile.about.shareApp")}
+          Icon={Share2}
+          onPress={shareApp}
+          bordered
+        />
 
         {LINKS.map((link, index) => (
-          <View
+          <LinkRow
             key={link.key}
-            className={
-              index < LINKS.length - 1
-                ? "border-b border-outline-100"
-                : undefined
-            }
-          >
-            <LinkRow
-              label={t(`profile.about.${link.key}`)}
-              url={link.url}
-              Icon={link.Icon}
-            />
-          </View>
+            label={t(`profile.about.${link.key}`)}
+            url={link.url}
+            Icon={link.Icon}
+            bordered={index < LINKS.length - 1}
+          />
         ))}
       </VStack>
     </Card>

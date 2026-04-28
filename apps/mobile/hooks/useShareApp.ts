@@ -11,10 +11,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { useCallback } from "react";
 import { Platform, Share } from "react-native";
 
-import {
-  ANDROID_PLAY_STORE_URL,
-  IOS_APP_STORE_URL,
-} from "@/lib/constants/app-store";
+import { APP_STORE_URL } from "@/lib/constants/app-store";
 import { logger } from "@/lib/logger";
 
 export function useShareApp() {
@@ -23,19 +20,15 @@ export function useShareApp() {
   return useCallback(async () => {
     const message = t("home.shareAppDialog.shareText");
     const title = t("home.shareAppDialog.title");
-    const storeUrl = Platform.select({
-      ios: IOS_APP_STORE_URL,
-      android: ANDROID_PLAY_STORE_URL,
-      default: IOS_APP_STORE_URL,
-    });
+
+    // RN's Share.share() ignores `url` on Android — append it to the message there.
+    const content =
+      Platform.OS === "ios"
+        ? { message, url: APP_STORE_URL, title }
+        : { message: `${message} ${APP_STORE_URL}`, title };
 
     try {
-      await Share.share(
-        Platform.OS === "ios"
-          ? { message, url: storeUrl, title }
-          : { message: `${message} ${storeUrl}`, title },
-        { dialogTitle: title },
-      );
+      await Share.share(content, { dialogTitle: title });
     } catch (error) {
       logger.error("Failed to open share sheet:", error);
     }

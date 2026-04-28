@@ -26,7 +26,6 @@ import {
 import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
 import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
-import { useRatePrompt } from "@/lib/rate-app/useRatePrompt";
 
 import { type PendingPhoto } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
@@ -35,6 +34,7 @@ import {
   useOfflineDeleteConsumption,
   useOfflineLogConsumption,
 } from "./useOfflineConsumption";
+import { useRatePrompt } from "./useRatePrompt";
 
 interface SaveAttendanceInput {
   festivalId: string;
