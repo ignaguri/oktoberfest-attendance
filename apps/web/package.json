@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -82,7 +82,6 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "16.1.6",
     "@novu/framework": "^2.10.0",
     "@tailwindcss/forms": "0.5.11",
     "@tailwindcss/postcss": "^4.2.4",
@@ -96,7 +95,6 @@
     "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.5",
     "esbuild-wasm": "^0.27.4",
-    "eslint-config-next": "16.1.7",
     "happy-dom": "^20.9.0",
     "postcss": "8.5.13",
     "tailwindcss": "4.2.4",
