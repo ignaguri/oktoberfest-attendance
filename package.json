@@ -48,7 +48,7 @@
   "dependencies": {
     "expo": "~55.0.19",
     "react": "19.2.5",
-    "react-native": "0.83.6"
+    "react-native": "0.83.2"
   },
   "devDependencies": {
     "@novu/api": "^3.14.2",
