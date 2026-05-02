@@ -4,7 +4,7 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
-import { formatDateForDatabase } from "../lib/date-utils";
+import { formatDateForDatabase } from "../packages/shared/src/utils/date-utils";
 
 // Configuration
 const PACKAGE_JSON_PATH = path.join(__dirname, "..", "package.json");
