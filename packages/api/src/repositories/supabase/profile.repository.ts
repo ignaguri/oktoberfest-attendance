@@ -186,7 +186,6 @@ export class SupabaseProfileRepository {
       .delete()
       .eq("user_id", userId);
 
-    // 10. Delete profile (this should cascade or be handled by RLS)
     const { data: deleted, error } = await this.supabase
       .from("profiles")
       .delete()
