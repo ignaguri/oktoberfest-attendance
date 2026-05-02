@@ -170,38 +170,29 @@ export class SupabaseProfileRepository {
   }
 
   async deleteProfile(userId: string): Promise<void> {
-    // Delete user's data in order (respecting foreign keys)
-    // 1. Delete consumptions
-    await this.supabase.from("consumptions").delete().eq("user_id", userId);
+    // Delete user's data in order (respecting foreign keys).
+    // consumptions cascade-delete via attendances (FK ON DELETE CASCADE).
 
-    // 2. Delete beer pictures
     await this.supabase.from("beer_pictures").delete().eq("user_id", userId);
 
-    // 3. Delete tent visits
     await this.supabase.from("tent_visits").delete().eq("user_id", userId);
 
-    // 4. Delete attendances
     await this.supabase.from("attendances").delete().eq("user_id", userId);
 
-    // 5. Delete group memberships
     await this.supabase.from("group_members").delete().eq("user_id", userId);
 
-    // 6. Delete reservations
     await this.supabase.from("reservations").delete().eq("user_id", userId);
 
-    // 7. Delete user achievements
     await this.supabase
       .from("user_achievements")
       .delete()
       .eq("user_id", userId);
 
-    // 8. Delete notification preferences
     await this.supabase
       .from("user_notification_preferences")
       .delete()
       .eq("user_id", userId);
 
-    // 9. Delete location data (use type assertion as these tables may not be in generated types)
     await (this.supabase as any)
       .from("user_locations")
       .delete()
