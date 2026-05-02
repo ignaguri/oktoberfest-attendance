@@ -54,10 +54,7 @@ export const CreateGroupForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-2 space-y-2"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 space-y-2">
       <h3 className="text-xl font-semibold">{t("groups.create.title")}</h3>
       <Input
         type="text"
@@ -85,12 +82,7 @@ export const CreateGroupForm = () => {
         {...register("password")}
       />
 
-      <Button
-        type="submit"
-        variant="yellow"
-        className="w-fit self-center"
-        disabled={isCreating}
-      >
+      <Button type="submit" variant="yellow" className="w-fit self-center" disabled={isCreating}>
         {isCreating ? t("common.status.loading") : t("groups.create.submit")}
       </Button>
     </form>

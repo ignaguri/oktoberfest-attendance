@@ -6,11 +6,7 @@ import { QueryKeys } from "@prostcounter/shared/data";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  useInvalidateQueries,
-  useMutation,
-  useQuery,
-} from "@/lib/data/react-query-provider";
+import { useInvalidateQueries, useMutation, useQuery } from "@/lib/data/react-query-provider";
 
 export interface LocationSharingPreference {
   id: string;
@@ -62,9 +58,7 @@ export function useLocationSharingPreferences(festivalId?: string) {
   return useQuery(
     QueryKeys.locationSharingPreferences(festivalId || ""),
     async () => {
-      const response = await fetch(
-        `/api/location-sharing/preferences?festivalId=${festivalId}`,
-      );
+      const response = await fetch(`/api/location-sharing/preferences?festivalId=${festivalId}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch location sharing preferences");
@@ -113,13 +107,9 @@ export function useUpdateLocationSharingPreferences() {
     {
       onSuccess: (_, variables) => {
         // Invalidate preferences cache for the specific festival
-        invalidateQueries(
-          QueryKeys.locationSharingPreferences(variables.festivalId),
-        );
+        invalidateQueries(QueryKeys.locationSharingPreferences(variables.festivalId));
         toast.success(
-          variables.sharingEnabled
-            ? "Location sharing enabled"
-            : "Location sharing disabled",
+          variables.sharingEnabled ? "Location sharing enabled" : "Location sharing disabled",
         );
       },
       onError: (error) => {
@@ -132,10 +122,7 @@ export function useUpdateLocationSharingPreferences() {
 /**
  * Hook to get nearby group members
  */
-export function useNearbyGroupMembers(
-  festivalId?: string,
-  radiusMeters: number = 500,
-) {
+export function useNearbyGroupMembers(festivalId?: string, radiusMeters: number = 500) {
   return useQuery(
     QueryKeys.nearbyGroupMembers(festivalId || "", radiusMeters),
     async () => {
@@ -224,12 +211,9 @@ export function useLocationSharing(festivalId?: string) {
   );
 
   const stopSharingMutation = useMutation(async (festivalId: string) => {
-    const response = await fetch(
-      `/api/location-sharing/location?festivalId=${festivalId}`,
-      {
-        method: "DELETE",
-      },
-    );
+    const response = await fetch(`/api/location-sharing/location?festivalId=${festivalId}`, {
+      method: "DELETE",
+    });
 
     if (!response.ok) {
       const error = await response.json();

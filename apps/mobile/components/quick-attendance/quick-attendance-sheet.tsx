@@ -22,10 +22,7 @@ import { ActivityIndicator, Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RadlerIcon } from "@/components/icons/radler-icon";
-import {
-  type ImageSource,
-  ImageSourcePicker,
-} from "@/components/image-source-picker";
+import { type ImageSource, ImageSourcePicker } from "@/components/image-source-picker";
 import { TentSelectorSheet } from "@/components/tent-selector/tent-selector-sheet";
 import {
   Actionsheet,
@@ -40,28 +37,17 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
-import {
-  type PendingPhoto,
-  useBeerPictureUpload,
-} from "@/hooks/useBeerPictureUpload";
+import { type PendingPhoto, useBeerPictureUpload } from "@/hooks/useBeerPictureUpload";
 import { useOfflineUpdateAttendance } from "@/hooks/useOfflineAttendance";
 import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
 import { useAuth } from "@/lib/auth/AuthContext";
-import {
-  BackgroundColors,
-  Colors,
-  DrinkTypeColors,
-  IconColors,
-} from "@/lib/constants/colors";
+import { BackgroundColors, Colors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
 import {
   useAdaptedAttendanceByDate,
   useAdaptedConsumptionsByDate,
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
-import {
-  OfflineContext,
-  triggerBackgroundPush,
-} from "@/lib/database/offline-provider";
+import { OfflineContext, triggerBackgroundPush } from "@/lib/database/offline-provider";
 import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
 import { invalidateAllLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
@@ -79,13 +65,7 @@ interface QuickAttendanceSheetProps {
 /**
  * Visible drink types for the quick attendance picker
  */
-const DRINK_TYPES: DrinkType[] = [
-  "beer",
-  "radler",
-  "alcohol_free",
-  "wine",
-  "soft_drink",
-];
+const DRINK_TYPES: DrinkType[] = ["beer", "radler", "alcohol_free", "wine", "soft_drink"];
 
 /**
  * Get the icon component for a drink type
@@ -105,13 +85,7 @@ function DrinkIcon({
     case "beer":
       return <Beer size={size} color={color} />;
     case "radler":
-      return (
-        <RadlerIcon
-          size={size}
-          color={color}
-          backgroundColor={backgroundColor}
-        />
-      );
+      return <RadlerIcon size={size} color={color} backgroundColor={backgroundColor} />;
     case "wine":
       return <Wine size={size} color={color} />;
     case "soft_drink":
@@ -176,14 +150,13 @@ export function QuickAttendanceSheet({
   }, [isOpen]);
 
   // Fetch today's attendance (offline-first, for tent preselection)
-  const { data: attendance, refetch: refetchAttendance } =
-    useAdaptedAttendanceByDate(festivalId, today);
-
-  // Fetch today's consumptions (local-first from SQLite)
-  const { data: consumptionsData } = useAdaptedConsumptionsByDate(
+  const { data: attendance, refetch: refetchAttendance } = useAdaptedAttendanceByDate(
     festivalId,
     today,
   );
+
+  // Fetch today's consumptions (local-first from SQLite)
+  const { data: consumptionsData } = useAdaptedConsumptionsByDate(festivalId, today);
 
   // Fetch tents for name lookup (offline-first)
   const { tents: tentGroups } = useAdaptedTents(festivalId);
@@ -200,9 +173,7 @@ export function QuickAttendanceSheet({
   const { pickImages, isPicking } = useBeerPictureUpload();
 
   // Local state
-  const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType | null>(
-    null,
-  );
+  const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType | null>(null);
   const [selectedTentId, setSelectedTentId] = useState<string | undefined>();
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [isTentSheetOpen, setIsTentSheetOpen] = useState(false);
@@ -305,10 +276,8 @@ export function QuickAttendanceSheet({
     if (!festivalId) return;
 
     // Must have at least a drink, photos, or tent change (using same logic as hasChanges)
-    const hasTentChange =
-      selectedTentId && selectedTentId !== attendance?.tentIds?.[0];
-    if (!selectedDrinkType && pendingPhotos.length === 0 && !hasTentChange)
-      return;
+    const hasTentChange = selectedTentId && selectedTentId !== attendance?.tentIds?.[0];
+    if (!selectedDrinkType && pendingPhotos.length === 0 && !hasTentChange) return;
 
     setIsSaving(true);
 
@@ -391,9 +360,7 @@ export function QuickAttendanceSheet({
         render: () => (
           <HStack className="items-center gap-2 rounded-lg bg-error-500 px-4 py-3">
             <X size={18} color={Colors.white} />
-            <Text className="font-medium text-white">
-              {t("common.errors.generic")}
-            </Text>
+            <Text className="font-medium text-white">{t("common.errors.generic")}</Text>
           </HStack>
         ),
       });
@@ -460,14 +427,9 @@ export function QuickAttendanceSheet({
                   const isSelected = selectedDrinkType === type;
                   const originalCount = drinkCounts[type] || 0;
                   // Show +1 count if selected (but not while saving, to avoid double-counting after refetch)
-                  const displayCount =
-                    isSelected && !isLoading
-                      ? originalCount + 1
-                      : originalCount;
+                  const displayCount = isSelected && !isLoading ? originalCount + 1 : originalCount;
                   const color = getDrinkColor(type);
-                  const iconBgColor = isSelected
-                    ? BackgroundColors[50]
-                    : BackgroundColors[100];
+                  const iconBgColor = isSelected ? BackgroundColors[50] : BackgroundColors[100];
 
                   return (
                     <Pressable
@@ -500,9 +462,7 @@ export function QuickAttendanceSheet({
                             className="absolute -right-1 -top-1 min-w-[20px] items-center justify-center rounded-full px-1"
                             style={{ backgroundColor: color }}
                           >
-                            <Text className="text-xs font-bold text-white">
-                              {displayCount}
-                            </Text>
+                            <Text className="text-xs font-bold text-white">{displayCount}</Text>
                           </VStack>
                         )}
                       </VStack>
@@ -516,9 +476,7 @@ export function QuickAttendanceSheet({
                 <Text
                   className="text-center text-base font-medium text-typography-700"
                   style={{
-                    color: selectedDrinkType
-                      ? getDrinkColor(selectedDrinkType)
-                      : undefined,
+                    color: selectedDrinkType ? getDrinkColor(selectedDrinkType) : undefined,
                   }}
                 >
                   {selectedDrinkLabel}
@@ -543,11 +501,7 @@ export function QuickAttendanceSheet({
                   )}
                 >
                   <Text
-                    className={cn(
-                      selectedTentName
-                        ? "text-typography-900"
-                        : "text-typography-400",
-                    )}
+                    className={cn(selectedTentName ? "text-typography-900" : "text-typography-400")}
                   >
                     {selectedTentName || t("home.quickAttendance.selectTent")}
                   </Text>
@@ -570,20 +524,14 @@ export function QuickAttendanceSheet({
                   <View key={photo.id} className="relative">
                     <Image
                       source={{ uri: photo.localUri }}
-                      className={cn(
-                        "h-16 w-16 rounded-lg",
-                        isSaving && "opacity-60",
-                      )}
+                      className={cn("h-16 w-16 rounded-lg", isSaving && "opacity-60")}
                       resizeMode="cover"
                       alt=""
                       accessibilityLabel={t("home.quickAttendance.photos")}
                     />
                     {isSaving ? (
                       <View className="absolute inset-0 items-center justify-center">
-                        <ActivityIndicator
-                          size="small"
-                          color={IconColors.white}
-                        />
+                        <ActivityIndicator size="small" color={IconColors.white} />
                       </View>
                     ) : (
                       <Pressable
@@ -626,9 +574,7 @@ export function QuickAttendanceSheet({
             >
               {isLoading && <ButtonSpinner color={Colors.white} />}
               <ButtonText>
-                {isLoading
-                  ? t("common.status.saving")
-                  : t("quickAttendance.save")}
+                {isLoading ? t("common.status.saving") : t("quickAttendance.save")}
               </ButtonText>
             </Button>
           </VStack>

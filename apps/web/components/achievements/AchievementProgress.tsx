@@ -26,9 +26,7 @@ export function AchievementProgress({
     <div className={cn("space-y-2", className)}>
       {showLabel && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">
-            {t("achievements.card.progress")}
-          </span>
+          <span className="text-gray-600">{t("achievements.card.progress")}</span>
           <span className="font-medium text-gray-900">
             {current_value} / {target_value}
           </span>

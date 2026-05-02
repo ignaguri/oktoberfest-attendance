@@ -4,10 +4,7 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  type SignUpFormData,
-  signUpSchema,
-} from "@prostcounter/shared/schemas";
+import { type SignUpFormData, signUpSchema } from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
 import React, { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -90,9 +87,7 @@ export default function SignUp() {
   if (isAccountCreated) {
     return (
       <div className="card">
-        <h2 className="w-full text-center">
-          {t("auth.signUp.accountCreated")}
-        </h2>
+        <h2 className="w-full text-center">{t("auth.signUp.accountCreated")}</h2>
         <div className="flex flex-col items-center gap-6">
           <p>{t("auth.signUp.success.checkEmail")}</p>
           <Button asChild variant="yellow">
@@ -105,9 +100,7 @@ export default function SignUp() {
 
   return (
     <div className="card">
-      <h2 className="w-full p-0 text-center text-2xl font-semibold">
-        {t("auth.signUp.title")}
-      </h2>
+      <h2 className="w-full p-0 text-center text-2xl font-semibold">{t("auth.signUp.title")}</h2>
 
       <form onSubmit={onSubmitHandler} className="column w-full">
         <Label htmlFor="email">{t("auth.signUp.emailLabel")}</Label>
@@ -131,9 +124,7 @@ export default function SignUp() {
           {...register("password")}
         />
 
-        <Label htmlFor="confirmPassword">
-          {t("auth.signUp.confirmPasswordLabel")}
-        </Label>
+        <Label htmlFor="confirmPassword">{t("auth.signUp.confirmPasswordLabel")}</Label>
         <Input
           errorMsg={confirmPasswordError}
           id="confirmPassword"
@@ -142,21 +133,14 @@ export default function SignUp() {
           {...register("confirmPassword")}
         />
 
-        <Button
-          className="self-center"
-          type="submit"
-          variant="yellow"
-          disabled={isSubmitting}
-        >
+        <Button className="self-center" type="submit" variant="yellow" disabled={isSubmitting}>
           {t("auth.signUp.submit")}
         </Button>
       </form>
 
       <div className="flex w-full items-center gap-4">
         <div className="h-px flex-1 bg-gray-300"></div>
-        <span className="text-sm text-gray-500">
-          {t("auth.signIn.orContinueWith")}
-        </span>
+        <span className="text-sm text-gray-500">{t("auth.signIn.orContinueWith")}</span>
         <div className="h-px flex-1 bg-gray-300"></div>
       </div>
 

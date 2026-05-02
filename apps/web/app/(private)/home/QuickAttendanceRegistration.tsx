@@ -13,9 +13,7 @@ import { WrappedCTA } from "./WrappedCTA";
 
 const QuickAttendanceRegistration = () => {
   const [attendanceId, setAttendanceId] = useState<string | null>(null);
-  const [crowdReportTentId, setCrowdReportTentId] = useState<string | null>(
-    null,
-  );
+  const [crowdReportTentId, setCrowdReportTentId] = useState<string | null>(null);
   const { currentFestival } = useFestival();
 
   const handleAttendanceIdReceived = (id: string) => {
@@ -32,9 +30,7 @@ const QuickAttendanceRegistration = () => {
     ? getFestivalConstants(currentFestival)
     : { festivalEndDate: null };
   const isLastDayOfFestival =
-    currentFestival && festivalEndDate
-      ? isSameDay(today, festivalEndDate)
-      : false;
+    currentFestival && festivalEndDate ? isSameDay(today, festivalEndDate) : false;
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -44,9 +40,7 @@ const QuickAttendanceRegistration = () => {
         attendanceId={attendanceId}
         renderPhotoUpload={(id) => <BeerPictureUpload attendanceId={id} />}
       />
-      {isLastDayOfFestival && (
-        <WrappedCTA isLastDayOfFestival={isLastDayOfFestival} />
-      )}
+      {isLastDayOfFestival && <WrappedCTA isLastDayOfFestival={isLastDayOfFestival} />}
       <CrowdReportDialog
         open={!!crowdReportTentId}
         onOpenChange={(open) => {

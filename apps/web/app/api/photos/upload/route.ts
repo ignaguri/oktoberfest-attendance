@@ -12,11 +12,7 @@ export const runtime = "nodejs";
 /**
  * Helper to create error responses with consistent format
  */
-function errorResponse(
-  code: string,
-  message: string,
-  status: number,
-): NextResponse {
+function errorResponse(code: string, message: string, status: number): NextResponse {
   return NextResponse.json(
     {
       error: { code, message, statusCode: status },
@@ -36,11 +32,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return errorResponse(
-        ErrorCodes.UNAUTHORIZED,
-        "You must be logged in to upload photos",
-        401,
-      );
+      return errorResponse(ErrorCodes.UNAUTHORIZED, "You must be logged in to upload photos", 401);
     }
 
     // Parse FormData (type assertion needed due to Node.js/Web API FormData conflict)
@@ -53,19 +45,11 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!picture) {
-      return errorResponse(
-        ErrorCodes.VALIDATION_ERROR,
-        "No picture provided",
-        400,
-      );
+      return errorResponse(ErrorCodes.VALIDATION_ERROR, "No picture provided", 400);
     }
 
     if (!attendanceId) {
-      return errorResponse(
-        ErrorCodes.VALIDATION_ERROR,
-        "No attendanceId provided",
-        400,
-      );
+      return errorResponse(ErrorCodes.VALIDATION_ERROR, "No attendanceId provided", 400);
     }
 
     // Validate visibility
@@ -80,11 +64,7 @@ export async function POST(request: NextRequest) {
     // Check file size (10MB limit)
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     if (picture.size > MAX_FILE_SIZE) {
-      return errorResponse(
-        ErrorCodes.FILE_TOO_LARGE,
-        "File size exceeds 10MB limit",
-        400,
-      );
+      return errorResponse(ErrorCodes.FILE_TOO_LARGE, "File size exceeds 10MB limit", 400);
     }
 
     // Validate file type
@@ -124,11 +104,7 @@ export async function POST(request: NextRequest) {
         .webp({ quality: 80 })
         .toBuffer();
     } catch {
-      return errorResponse(
-        ErrorCodes.PHOTO_UPLOAD_FAILED,
-        "Failed to process image",
-        422,
-      );
+      return errorResponse(ErrorCodes.PHOTO_UPLOAD_FAILED, "Failed to process image", 422);
     }
 
     // Generate unique filename
@@ -167,11 +143,7 @@ export async function POST(request: NextRequest) {
 
       // eslint-disable-next-line no-console
       console.error("Database error:", dbError);
-      return errorResponse(
-        ErrorCodes.DATABASE_ERROR,
-        "Failed to save photo record",
-        500,
-      );
+      return errorResponse(ErrorCodes.DATABASE_ERROR, "Failed to save photo record", 500);
     }
 
     return NextResponse.json(
@@ -185,10 +157,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Unexpected error in photo upload:", error);
-    return errorResponse(
-      ErrorCodes.INTERNAL_ERROR,
-      "An unexpected error occurred",
-      500,
-    );
+    return errorResponse(ErrorCodes.INTERNAL_ERROR, "An unexpected error occurred", 500);
   }
 }

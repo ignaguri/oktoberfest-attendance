@@ -44,9 +44,7 @@ function eurosToCents(euros: number): number {
  * Shared hook for getting drink prices
  * @param options - Optional configuration including festival beer cost
  */
-export function useDrinkPrice(
-  options: UseDrinkPriceOptions = {},
-): UseDrinkPriceReturn {
+export function useDrinkPrice(options: UseDrinkPriceOptions = {}): UseDrinkPriceReturn {
   const { festivalBeerCost } = options;
 
   /**

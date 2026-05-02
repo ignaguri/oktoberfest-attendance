@@ -250,9 +250,7 @@ export function useLeaveGroup() {
         // Get the festivalId from the group cache if not provided
         let targetFestivalId = festivalId || null;
         if (!targetFestivalId) {
-          const groupData = getQueryData<{ data: GroupCacheData }>(
-            QueryKeys.group(groupId),
-          );
+          const groupData = getQueryData<{ data: GroupCacheData }>(QueryKeys.group(groupId));
           targetFestivalId = groupData?.data?.festivalId || null;
         }
 
@@ -388,9 +386,7 @@ export function useRenewInviteToken() {
         // Push the rotated token into the group cache so QR/share UIs reflect
         // it without waiting for a refetch. The mutation response is the
         // canonical value, so no invalidate is needed.
-        const cached = getQueryData<{ data: GroupCacheData }>(
-          QueryKeys.group(groupId),
-        );
+        const cached = getQueryData<{ data: GroupCacheData }>(QueryKeys.group(groupId));
         if (cached?.data) {
           setQueryData(QueryKeys.group(groupId), {
             ...cached,

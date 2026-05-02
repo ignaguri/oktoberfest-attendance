@@ -34,9 +34,7 @@ function withGoogleMapsApiKey(config) {
     }
 
     const metaDataName = "com.google.android.geo.API_KEY";
-    const existing = application["meta-data"].find(
-      (m) => m.$?.["android:name"] === metaDataName,
-    );
+    const existing = application["meta-data"].find((m) => m.$?.["android:name"] === metaDataName);
 
     if (existing) {
       existing.$["android:value"] = apiKey;
@@ -49,9 +47,7 @@ function withGoogleMapsApiKey(config) {
       });
     }
 
-    console.log(
-      "withGoogleMapsApiKey: Injected Google Maps API key into AndroidManifest.xml",
-    );
+    console.log("withGoogleMapsApiKey: Injected Google Maps API key into AndroidManifest.xml");
     return config;
   });
 }

@@ -42,19 +42,14 @@ async function handleJoinGroupRequest(request: NextRequest) {
 
     if (response.ok) {
       const result = await response.json();
-      const redirectUrl = new URL(
-        "/join-group/success",
-        request.nextUrl.origin,
-      );
+      const redirectUrl = new URL("/join-group/success", request.nextUrl.origin);
       redirectUrl.searchParams.set("group", result.group?.name || "Group");
       redirectUrl.searchParams.set("group_id", result.group?.id || "");
       return NextResponse.redirect(redirectUrl);
     }
 
     // Handle error responses
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Unknown error" }));
+    const error = await response.json().catch(() => ({ message: "Unknown error" }));
     const errorMessage = error.message || "Failed to join group";
 
     // Handle specific error types based on status and message
@@ -78,23 +73,13 @@ async function handleJoinGroupRequest(request: NextRequest) {
     }
 
     // Generic error
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: response.status },
-    );
+    return NextResponse.json({ error: errorMessage }, { status: response.status });
   } catch (error) {
     const err = error as Error;
     reportApiException("join-group", err);
-    logger.error(
-      "Failed to join group with token",
-      logger.apiRoute("join-group", { token }),
-      err,
-    );
+    logger.error("Failed to join group with token", logger.apiRoute("join-group", { token }), err);
 
-    return NextResponse.json(
-      { error: "Failed to join the group." },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to join the group." }, { status: 500 });
   }
 }
 

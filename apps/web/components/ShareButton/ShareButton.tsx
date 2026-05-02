@@ -34,8 +34,7 @@ export default function ShareButton({
 
   const groupLink = useMemo(() => {
     if (!inviteToken) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : undefined;
+    const origin = typeof window !== "undefined" ? window.location.origin : undefined;
     return buildGroupInviteUrl(inviteToken, origin);
   }, [inviteToken]);
 
@@ -45,8 +44,7 @@ export default function ShareButton({
     url: groupLink,
   });
 
-  const { mutateAsync: renewToken, loading: isRegenerating } =
-    useRenewInviteToken();
+  const { mutateAsync: renewToken, loading: isRegenerating } = useRenewInviteToken();
 
   const handleShareClick = async () => {
     if (!groupLink) {
@@ -76,11 +74,7 @@ export default function ShareButton({
 
   return (
     <>
-      <Button
-        variant="yellow"
-        className="flex items-center"
-        onClick={handleShareClick}
-      >
+      <Button variant="yellow" className="flex items-center" onClick={handleShareClick}>
         <Share2 size={ICON_SIZE} />
         {withText && <span className="ml-2">{title}</span>}
       </Button>
@@ -96,9 +90,7 @@ export default function ShareButton({
           {groupLink ? (
             <>
               <div className="flex flex-col items-center gap-2">
-                <p className="text-muted-foreground text-sm">
-                  Scan QR code to join:
-                </p>
+                <p className="text-muted-foreground text-sm">Scan QR code to join:</p>
                 <QRCode value={groupLink} size={180} />
               </div>
               <div className="flex flex-col gap-2">
@@ -112,9 +104,7 @@ export default function ShareButton({
             </>
           ) : (
             <p className="text-muted-foreground text-center text-sm">
-              {isCreator
-                ? t("groups.qrCode.noTokenCreator")
-                : t("groups.qrCode.noTokenMember")}
+              {isCreator ? t("groups.qrCode.noTokenCreator") : t("groups.qrCode.noTokenMember")}
             </p>
           )}
 
@@ -126,9 +116,7 @@ export default function ShareButton({
               disabled={isRegenerating}
             >
               <RefreshCw size={16} className="mr-2" />
-              {groupLink
-                ? t("groups.qrCode.regenerate")
-                : t("groups.qrCode.generate")}
+              {groupLink ? t("groups.qrCode.regenerate") : t("groups.qrCode.generate")}
             </Button>
           )}
         </div>

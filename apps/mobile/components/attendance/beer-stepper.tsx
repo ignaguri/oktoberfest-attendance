@@ -62,10 +62,7 @@ export function BeerStepper({
             : "border-background-300 bg-background-100",
         )}
       >
-        <Minus
-          size={24}
-          color={canDecrement ? IconColors.primary : IconColors.disabled}
-        />
+        <Minus size={24} color={canDecrement ? IconColors.primary : IconColors.disabled} />
       </Pressable>
 
       {/* Count display */}
@@ -89,10 +86,7 @@ export function BeerStepper({
             : "border-background-300 bg-background-100",
         )}
       >
-        <Plus
-          size={24}
-          color={canIncrement ? IconColors.primary : IconColors.disabled}
-        />
+        <Plus size={24} color={canIncrement ? IconColors.primary : IconColors.disabled} />
       </Pressable>
     </HStack>
   );

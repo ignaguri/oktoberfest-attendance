@@ -29,10 +29,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -81,12 +78,9 @@ describe("Leaderboard Routes - Unit Tests", () => {
         error: null,
       } as any);
 
-      const req = createAuthRequest(
-        `/leaderboard?festivalId=${festivalId}&limit=50&offset=0`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/leaderboard?festivalId=${festivalId}&limit=50&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -187,10 +181,9 @@ describe("Leaderboard Routes - Unit Tests", () => {
         error: null,
       } as any);
 
-      const req = createAuthRequest(
-        `/leaderboard?festivalId=${festivalId}&limit=50&offset=0`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/leaderboard?festivalId=${festivalId}&limit=50&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -217,12 +210,9 @@ describe("Leaderboard Routes - Unit Tests", () => {
     });
 
     it("should validate UUID format for festivalId", async () => {
-      const req = createAuthRequest(
-        `/leaderboard?festivalId=invalid-uuid&limit=50&offset=0`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/leaderboard?festivalId=invalid-uuid&limit=50&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -247,12 +237,9 @@ describe("Leaderboard Routes - Unit Tests", () => {
         },
       } as any);
 
-      const req = createAuthRequest(
-        `/leaderboard?festivalId=${festivalId}&limit=50&offset=0`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/leaderboard?festivalId=${festivalId}&limit=50&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -323,9 +310,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
       vi.mocked(mockSupabase.from)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroup)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockMember)))
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupData)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupData)));
 
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: mockLeaderboard,
@@ -411,21 +396,16 @@ describe("Leaderboard Routes - Unit Tests", () => {
       vi.mocked(mockSupabase.from)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroup)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockMember)))
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupData)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupData)));
 
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: mockLeaderboard,
         error: null,
       } as any);
 
-      const req = createAuthRequest(
-        `/groups/${groupId}/leaderboard?sortBy=avg_beers`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/groups/${groupId}/leaderboard?sortBy=avg_beers`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -486,9 +466,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
       );
 
       // Mock isMember check - user is NOT a member (empty result)
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const req = createAuthRequest(`/groups/${groupId}/leaderboard`, {
         method: "GET",
@@ -545,9 +523,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
 
       // Mock isMember check - success
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess([{ user_id: mockUser.id, group_id: groupId }]),
-        ),
+        createMockChain(mockSupabaseSuccess([{ user_id: mockUser.id, group_id: groupId }])),
       );
 
       // Mock group query from LeaderboardRepository.getForGroup - error
@@ -588,12 +564,9 @@ describe("Leaderboard Routes - Unit Tests", () => {
 
     it("should require authentication for GET /groups/:id/leaderboard", async () => {
       const groupId = "923e4567-e89b-12d3-a456-426614174000";
-      const req = new Request(
-        `http://localhost/groups/${groupId}/leaderboard`,
-        {
-          method: "GET",
-        },
-      );
+      const req = new Request(`http://localhost/groups/${groupId}/leaderboard`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,

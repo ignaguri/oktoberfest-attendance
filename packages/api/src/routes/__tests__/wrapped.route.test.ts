@@ -51,10 +51,7 @@ describe("Wrapped Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -135,10 +132,7 @@ describe("Wrapped Routes - Unit Tests", () => {
       expect(body.wrapped.totalDays).toBe(5);
       expect(body.wrapped.totalBeers).toBe(25);
       expect(body.cached).toBe(true);
-      expect(mockWrappedService.getWrapped).toHaveBeenCalledWith(
-        mockUser.id,
-        festivalId,
-      );
+      expect(mockWrappedService.getWrapped).toHaveBeenCalledWith(mockUser.id, festivalId);
     });
 
     it("should return null when no wrapped data cached", async () => {
@@ -180,9 +174,7 @@ describe("Wrapped Routes - Unit Tests", () => {
     it("should return 404 when festival not found", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174999";
 
-      mockWrappedService.getWrapped.mockRejectedValueOnce(
-        new NotFoundError("Festival not found"),
-      );
+      mockWrappedService.getWrapped.mockRejectedValueOnce(new NotFoundError("Festival not found"));
 
       const req = createAuthRequest(`/wrapped/${festivalId}`, {
         method: "GET",
@@ -485,16 +477,13 @@ describe("Wrapped Routes - Unit Tests", () => {
 
     it("should require authentication for POST /wrapped/:festivalId/generate", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
-      const req = new Request(
-        `http://localhost/wrapped/${festivalId}/generate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ force: false }),
+      const req = new Request(`http://localhost/wrapped/${festivalId}/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ force: false }),
+      });
 
       const res = await app.request(req as Request);
 

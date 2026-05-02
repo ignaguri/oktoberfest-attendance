@@ -23,8 +23,7 @@ const registerTokenRoute = createRoute({
   path: "/notifications/token",
   tags: ["notifications"],
   summary: "Register FCM device token",
-  description:
-    "Registers a Firebase Cloud Messaging device token with Novu for push notifications",
+  description: "Registers a Firebase Cloud Messaging device token with Novu for push notifications",
   request: {
     body: {
       content: {
@@ -140,11 +139,12 @@ app.openapi(enablePushRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const result = await notificationService.subscribeAndRegisterToken(
-    user.id,
-    token,
-    { email, firstName, lastName, avatar },
-  );
+  const result = await notificationService.subscribeAndRegisterToken(user.id, token, {
+    email,
+    firstName,
+    lastName,
+    avatar,
+  });
 
   logger.debug(result, "Enable push result");
   return c.json(result, 200);
@@ -156,8 +156,7 @@ const subscribeUserRoute = createRoute({
   path: "/notifications/subscribe",
   tags: ["notifications"],
   summary: "Subscribe user to Novu",
-  description:
-    "Subscribes a user to Novu notification system with their profile data",
+  description: "Subscribes a user to Novu notification system with their profile data",
   request: {
     body: {
       content: {
@@ -259,9 +258,7 @@ app.openapi(getPreferencesRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const preferences = await notificationService.getUserNotificationPreferences(
-    user.id,
-  );
+  const preferences = await notificationService.getUserNotificationPreferences(user.id);
 
   if (!preferences) {
     return c.json(null, 200);
@@ -275,8 +272,7 @@ app.openapi(getPreferencesRoute, async (c) => {
       groupJoinEnabled: preferences.group_join_enabled,
       checkinEnabled: preferences.checkin_enabled,
       remindersEnabled: preferences.reminders_enabled,
-      achievementNotificationsEnabled:
-        preferences.achievement_notifications_enabled,
+      achievementNotificationsEnabled: preferences.achievement_notifications_enabled,
       groupNotificationsEnabled: preferences.group_notifications_enabled,
       dailyReminderEnabled: preferences.daily_reminder_enabled,
       createdAt: preferences.created_at,
@@ -336,10 +332,7 @@ app.openapi(updatePreferencesRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY!;
   const notificationService = new NotificationService(supabase, novuApiKey);
 
-  const success = await notificationService.updateUserNotificationPreferences(
-    user.id,
-    preferences,
-  );
+  const success = await notificationService.updateUserNotificationPreferences(user.id, preferences);
 
   return c.json({ success }, 200);
 });

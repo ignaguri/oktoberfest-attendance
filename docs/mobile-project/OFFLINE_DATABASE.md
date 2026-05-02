@@ -6,20 +6,20 @@ How the mobile app's offline-first SQLite layer works, and how to make schema ch
 
 The mobile app uses an offline-first architecture where all data is stored locally in SQLite and synced with the Supabase backend. The key components:
 
-| Component | File(s) | Purpose |
-|-----------|---------|---------|
-| **Drizzle Schema** | `lib/database/schema/*.ts` | Table definitions (source of truth) |
-| **Drizzle Migrations** | `drizzle/*.sql` | Generated DDL for creating/altering tables |
-| **Migration Runner** | `lib/database/migrations.ts` | Applies pending migrations on app startup |
-| **Query Helpers** | `lib/database/queries.ts` | Type-safe Drizzle query builders |
-| **Query Keys** | `lib/database/query-keys.ts` | Centralized TanStack Query cache keys |
-| **Hooks** | `lib/database/hooks.ts` | React hooks for reading/writing local data |
-| **Adapted Hooks** | `lib/database/adapted-hooks.ts` | Adapter layer matching shared API hook types |
-| **Sync Manager** | `lib/database/sync-manager.ts` | Pull from Supabase, push dirty records |
-| **Sync Queue** | `lib/database/sync-queue.ts` | Queue for pending write operations |
-| **Queue Processor** | `lib/database/queue-processor.ts` | Processes queued operations with retries |
-| **Offline Provider** | `lib/database/offline-provider.tsx` | React context providing DB + sync state |
-| **DB Init** | `lib/database/init.ts` | Opens SQLite, runs migrations, integrity checks |
+| Component              | File(s)                             | Purpose                                         |
+| ---------------------- | ----------------------------------- | ----------------------------------------------- |
+| **Drizzle Schema**     | `lib/database/schema/*.ts`          | Table definitions (source of truth)             |
+| **Drizzle Migrations** | `drizzle/*.sql`                     | Generated DDL for creating/altering tables      |
+| **Migration Runner**   | `lib/database/migrations.ts`        | Applies pending migrations on app startup       |
+| **Query Helpers**      | `lib/database/queries.ts`           | Type-safe Drizzle query builders                |
+| **Query Keys**         | `lib/database/query-keys.ts`        | Centralized TanStack Query cache keys           |
+| **Hooks**              | `lib/database/hooks.ts`             | React hooks for reading/writing local data      |
+| **Adapted Hooks**      | `lib/database/adapted-hooks.ts`     | Adapter layer matching shared API hook types    |
+| **Sync Manager**       | `lib/database/sync-manager.ts`      | Pull from Supabase, push dirty records          |
+| **Sync Queue**         | `lib/database/sync-queue.ts`        | Queue for pending write operations              |
+| **Queue Processor**    | `lib/database/queue-processor.ts`   | Processes queued operations with retries        |
+| **Offline Provider**   | `lib/database/offline-provider.tsx` | React context providing DB + sync state         |
+| **DB Init**            | `lib/database/init.ts`              | Opens SQLite, runs migrations, integrity checks |
 
 ## How It Works
 
@@ -131,22 +131,29 @@ Edit the appropriate file in `lib/database/schema/`. For example, to add a `note
 
 ```typescript
 // lib/database/schema/attendances.ts
-export const attendances = sqliteTable("attendances", {
-  id: text().primaryKey(),
-  user_id: text().notNull(),
-  festival_id: text().notNull().references(() => festivals.id),
-  date: text().notNull(),
-  beer_count: integer().notNull().default(0),
-  notes: text(),  // ← NEW COLUMN
-  created_at: text(),
-  updated_at: text(),
-  ...offlineColumns,
-}, (t) => [
-  // ... indexes
-]);
+export const attendances = sqliteTable(
+  "attendances",
+  {
+    id: text().primaryKey(),
+    user_id: text().notNull(),
+    festival_id: text()
+      .notNull()
+      .references(() => festivals.id),
+    date: text().notNull(),
+    beer_count: integer().notNull().default(0),
+    notes: text(), // ← NEW COLUMN
+    created_at: text(),
+    updated_at: text(),
+    ...offlineColumns,
+  },
+  (t) => [
+    // ... indexes
+  ],
+);
 ```
 
 **Important conventions:**
+
 - Always use **snake_case** for column names (matches existing consumers)
 - Use `.notNull()` for columns that should never be null
 - Use `.default(value)` for columns with defaults
@@ -166,17 +173,16 @@ This creates a new SQL file in `drizzle/` (e.g., `drizzle/0001_some_name.sql`).
 Add the new migration to `drizzle/migrations.js`:
 
 ```javascript
-const migration0000 = fs.readFileSync(
-  path.join(__dirname, "0000_busy_menace.sql"), "utf8"
-);
+const migration0000 = fs.readFileSync(path.join(__dirname, "0000_busy_menace.sql"), "utf8");
 const migration0001 = fs.readFileSync(
-  path.join(__dirname, "0001_some_name.sql"), "utf8"  // ← ADD
+  path.join(__dirname, "0001_some_name.sql"),
+  "utf8", // ← ADD
 );
 
 module.exports = {
   migrations: [
     { name: "0000_busy_menace", sql: migration0000 },
-    { name: "0001_some_name", sql: migration0001 },  // ← ADD
+    { name: "0001_some_name", sql: migration0001 }, // ← ADD
   ],
 };
 ```
@@ -186,7 +192,9 @@ Then add the migration function in `lib/database/migrations.ts`:
 ```typescript
 const MIGRATIONS: MigrationFn[] = [
   // v0 -> v1: Initial schema from Drizzle
-  async (db) => { /* existing */ },
+  async (db) => {
+    /* existing */
+  },
 
   // v1 -> v2: Add notes column to attendances  ← ADD
   async (db) => {
@@ -207,7 +215,7 @@ const MIGRATIONS: MigrationFn[] = [
 In `lib/database/schema.ts`:
 
 ```typescript
-export const SCHEMA_VERSION = 2;  // was 1
+export const SCHEMA_VERSION = 2; // was 1
 ```
 
 ### Step 5: Update Queries (if needed)
@@ -258,7 +266,7 @@ export const myTable = sqliteTable("my_table", {
   id: text().primaryKey(),
   name: text().notNull(),
   // ... your columns
-  ...offlineColumns,  // Include for synced tables
+  ...offlineColumns, // Include for synced tables
 });
 
 export type MyTableRow = typeof myTable.$inferSelect;
@@ -288,6 +296,7 @@ export type LocalMyTable = MyTableRow;
 ### Step 4: Add to Table Lists
 
 In `lib/database/schema.ts`, add the table name to:
+
 - `SyncableTable` union type (if synced)
 - `MutableTable` union type (if user-editable)
 - `SYNCABLE_TABLES` array (if synced)
@@ -305,32 +314,39 @@ Add query functions to `queries.ts` and hooks to `hooks.ts`.
 ## Key Conventions
 
 ### Column Naming
+
 - Always **snake_case** for Drizzle property names (e.g., `festival_id`, not `festivalId`)
 - This matches the SQLite column names and avoids type mismatches with consumers
 
 ### Offline Columns
+
 Every synced table must include `...offlineColumns` from `./common.ts`:
+
 - `_synced_at` — timestamp of last successful sync
 - `_deleted` — soft delete flag (0 or 1)
 - `_dirty` — needs sync flag (0 or 1)
 
 ### Photo Tables
+
 Tables with file uploads also include `...photoColumns`:
+
 - `_pending_upload` — has a pending file upload (0 or 1)
 - `_local_uri` — local file path before upload completes
 
 ### Query Keys
+
 All query keys are defined in `query-keys.ts`. Never use hardcoded strings:
 
 ```typescript
 // Good
-queryKey: localKeys.attendances.all(festivalId)
+queryKey: localKeys.attendances.all(festivalId);
 
 // Bad
-queryKey: ["local-attendances", festivalId]
+queryKey: ["local-attendances", festivalId];
 ```
 
 ### Table Name Safety
+
 Use `SyncableTable` and `MutableTable` types instead of `string` for table names:
 
 ```typescript
@@ -344,18 +360,19 @@ function myFunction(tableName: string) { ... }
 ## Drizzle ORM Quick Reference
 
 ### Select All
+
 ```typescript
 const rows = await db.select().from(festivals).where(eq(festivals._deleted, 0));
 ```
 
 ### Select Specific Columns
+
 ```typescript
-const rows = await db
-  .select({ id: festivals.id, name: festivals.name })
-  .from(festivals);
+const rows = await db.select({ id: festivals.id, name: festivals.name }).from(festivals);
 ```
 
 ### JOIN with Aggregation
+
 ```typescript
 const rows = await db
   .select({
@@ -368,6 +385,7 @@ const rows = await db
 ```
 
 ### Insert
+
 ```typescript
 await db.insert(attendances).values({
   id: generateUUID(),
@@ -378,15 +396,19 @@ await db.insert(attendances).values({
 ```
 
 ### Update
+
 ```typescript
-await db.update(attendances)
+await db
+  .update(attendances)
   .set({ beer_count: 5, _dirty: 1 })
   .where(eq(attendances.id, attendanceId));
 ```
 
 ### Delete (soft)
+
 ```typescript
-await db.update(attendances)
+await db
+  .update(attendances)
   .set({ _deleted: 1, _dirty: 1 })
   .where(eq(attendances.id, attendanceId));
 ```
@@ -394,16 +416,19 @@ await db.update(attendances)
 ## Troubleshooting
 
 ### "Migration failed"
+
 - Check that `SCHEMA_VERSION` matches the number of migrations in the `MIGRATIONS` array
 - Ensure the migration SQL is valid (test it manually in a SQLite client)
 - Check `drizzle/migrations.js` has the correct file paths
 
 ### Type mismatches after schema change
+
 - Run `npx tsc --noEmit` to see all type errors
 - Check that you used snake_case in the Drizzle schema
 - Ensure `.notNull()` is used where consumers expect non-null values
 
 ### Query returns wrong shape
+
 - Drizzle's `.select()` without arguments returns all columns
 - For JOINs, use explicit `.select({ ... })` to control the shape
 - Check that the query function in `queries.ts` includes all needed columns

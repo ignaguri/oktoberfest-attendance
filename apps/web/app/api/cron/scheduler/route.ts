@@ -23,12 +23,7 @@ export async function POST(req: Request) {
   const nowIso = new Date().toISOString();
   const baseUrl = IS_PROD ? PROD_URL : DEV_URL;
 
-  await processReservationNotifications(
-    supabase,
-    notifications,
-    baseUrl,
-    nowIso,
-  );
+  await processReservationNotifications(supabase, notifications, baseUrl, nowIso);
 
   await processAchievementNotifications(supabase, notifications);
 

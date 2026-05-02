@@ -15,11 +15,7 @@ export async function generateStaticParams(): Promise<Params[]> {
   return NON_DEFAULT_LOCALES.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale } = await params;
   if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) return {};
 
@@ -38,11 +34,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocalizedDownloadPage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
+export default async function LocalizedDownloadPage({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
 
   if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) {

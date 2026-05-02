@@ -20,15 +20,11 @@ const CacheManagement = () => {
     try {
       if ("serviceWorker" in navigator && "caches" in window) {
         const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName)),
-        );
+        await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
 
         // Update service worker
         const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(
-          registrations.map((registration) => registration.update()),
-        );
+        await Promise.all(registrations.map((registration) => registration.update()));
 
         toast.success(t("notifications.success.swCacheCleared"));
       } else {
@@ -61,9 +57,7 @@ const CacheManagement = () => {
         setUserId("");
         setFestivalId("");
       } else {
-        toast.error(
-          result.error || t("notifications.error.wrappedCacheRegenerateFailed"),
-        );
+        toast.error(result.error || t("notifications.error.wrappedCacheRegenerateFailed"));
       }
     } catch (error) {
       logger.error(
@@ -125,9 +119,7 @@ const CacheManagement = () => {
                 id="userId"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder={t(
-                  "admin.cache.wrappedData.form.userIdPlaceholder",
-                )}
+                placeholder={t("admin.cache.wrappedData.form.userIdPlaceholder")}
                 className="mt-1"
               />
             </div>
@@ -140,9 +132,7 @@ const CacheManagement = () => {
                 id="festivalId"
                 value={festivalId}
                 onChange={(e) => setFestivalId(e.target.value)}
-                placeholder={t(
-                  "admin.cache.wrappedData.form.festivalIdPlaceholder",
-                )}
+                placeholder={t("admin.cache.wrappedData.form.festivalIdPlaceholder")}
                 className="mt-1"
               />
             </div>
@@ -157,9 +147,7 @@ const CacheManagement = () => {
                 : t("admin.cache.wrappedData.buttons.regenerate")}
             </Button>
 
-            <p className="text-muted-foreground text-sm">
-              {t("admin.cache.wrappedData.help")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("admin.cache.wrappedData.help")}</p>
           </div>
         </div>
       </div>

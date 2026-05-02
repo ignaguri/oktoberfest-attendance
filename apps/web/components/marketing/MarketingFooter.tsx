@@ -41,18 +41,13 @@ export function MarketingFooter() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link
-              href={marketingUrl("/", lang)}
-              className="flex items-center gap-2"
-            >
+            <Link href={marketingUrl("/", lang)} className="flex items-center gap-2">
               <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" />
               <span className="text-lg font-bold" translate="no">
                 ProstCounter
               </span>
             </Link>
-            <p className="mt-3 text-sm text-gray-600">
-              {t("marketing.footer.tagline")}
-            </p>
+            <p className="mt-3 text-sm text-gray-600">{t("marketing.footer.tagline")}</p>
           </div>
 
           {/* Blog */}
@@ -99,10 +94,7 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/sign-up"
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
+                <Link href="/sign-up" className="text-sm text-gray-600 hover:text-gray-900">
                   {t("marketing.footer.downloadLinks.tryWebApp")}
                 </Link>
               </li>

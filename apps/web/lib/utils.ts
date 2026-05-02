@@ -20,10 +20,7 @@ export function isPWAInstalled(): boolean {
       return true;
     }
     // Check for iOS Safari standalone mode
-    if (
-      "standalone" in window.navigator &&
-      (window.navigator as any).standalone === true
-    ) {
+    if ("standalone" in window.navigator && (window.navigator as any).standalone === true) {
       return true;
     }
     // Check for Android app context
@@ -49,9 +46,7 @@ export function isIOS(): boolean {
  */
 export function supportsBeforeInstallPrompt(): boolean {
   if (typeof window === "undefined") return false;
-  return (
-    "BeforeInstallPromptEvent" in window || "onbeforeinstallprompt" in window
-  );
+  return "BeforeInstallPromptEvent" in window || "onbeforeinstallprompt" in window;
 }
 
 // Re-export image URL utilities for convenience

@@ -67,31 +67,19 @@ export function ImageSourcePicker({
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
 
-        <ActionsheetItem
-          onPress={() => handleSelect("camera")}
-          disabled={disabled}
-        >
+        <ActionsheetItem onPress={() => handleSelect("camera")} disabled={disabled}>
           <Camera size={20} color={IconColors.default} />
-          <ActionsheetItemText>
-            {t("profile.avatar.takePhoto")}
-          </ActionsheetItemText>
+          <ActionsheetItemText>{t("profile.avatar.takePhoto")}</ActionsheetItemText>
         </ActionsheetItem>
 
-        <ActionsheetItem
-          onPress={() => handleSelect("library")}
-          disabled={disabled}
-        >
+        <ActionsheetItem onPress={() => handleSelect("library")} disabled={disabled}>
           <ImagePlus size={20} color={IconColors.default} />
-          <ActionsheetItemText>
-            {t("profile.avatar.chooseFromLibrary")}
-          </ActionsheetItemText>
+          <ActionsheetItemText>{t("profile.avatar.chooseFromLibrary")}</ActionsheetItemText>
         </ActionsheetItem>
 
         <ActionsheetItem onPress={handleClose}>
           <X size={20} color={IconColors.muted} />
-          <ActionsheetItemText>
-            {t("common.buttons.cancel")}
-          </ActionsheetItemText>
+          <ActionsheetItemText>{t("common.buttons.cancel")}</ActionsheetItemText>
         </ActionsheetItem>
       </ActionsheetContent>
     </Actionsheet>

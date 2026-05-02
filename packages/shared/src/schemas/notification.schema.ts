@@ -19,9 +19,7 @@ export const RegisterFCMTokenResponseSchema = z.object({
   error: z.string().optional(),
 });
 
-export type RegisterFCMTokenResponse = z.infer<
-  typeof RegisterFCMTokenResponseSchema
->;
+export type RegisterFCMTokenResponse = z.infer<typeof RegisterFCMTokenResponseSchema>;
 
 /**
  * Subscribe user to Novu request
@@ -61,18 +59,14 @@ export const EnablePushNotificationsSchema = z.object({
   avatar: z.union([z.url(), z.literal("")]).optional(),
 });
 
-export type EnablePushNotificationsInput = z.infer<
-  typeof EnablePushNotificationsSchema
->;
+export type EnablePushNotificationsInput = z.infer<typeof EnablePushNotificationsSchema>;
 
 export const EnablePushNotificationsResponseSchema = z.object({
   success: z.boolean(),
   error: z.string().optional(),
 });
 
-export type EnablePushNotificationsResponse = z.infer<
-  typeof EnablePushNotificationsResponseSchema
->;
+export type EnablePushNotificationsResponse = z.infer<typeof EnablePushNotificationsResponseSchema>;
 
 /**
  * User notification preferences
@@ -90,9 +84,7 @@ export const NotificationPreferencesSchema = z.object({
   updatedAt: z.iso.datetime().nullable(),
 });
 
-export type NotificationPreferences = z.infer<
-  typeof NotificationPreferencesSchema
->;
+export type NotificationPreferences = z.infer<typeof NotificationPreferencesSchema>;
 
 /**
  * Update notification preferences request

@@ -105,10 +105,7 @@ export function PhotoPreview({
         )}
       </div>
 
-      <Dialog
-        open={!!selectedImage}
-        onOpenChange={() => setSelectedImage(null)}
-      >
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogOverlay />
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden p-0">
           {selectedImage && (

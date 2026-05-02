@@ -4,13 +4,7 @@
  * Uses ApiClientContext to get the platform-specific API client
  */
 
-import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  QueryKeys,
-} from "../data";
+import { useApiClient, useQuery, useMutation, useInvalidateQueries, QueryKeys } from "../data";
 import type { LogConsumptionInput, Consumption } from "../schemas";
 
 /**
@@ -31,11 +25,7 @@ export function useLogConsumption() {
         invalidateQueries(["attendances"]);
         invalidateQueries(["attendanceByDate"]);
         // Invalidate consumptions for this date
-        invalidateQueries([
-          "consumptions",
-          variables.festivalId,
-          variables.date,
-        ]);
+        invalidateQueries(["consumptions", variables.festivalId, variables.date]);
         // Invalidate user stats and leaderboards
         invalidateQueries(["user"]);
         invalidateQueries(["leaderboard"]);

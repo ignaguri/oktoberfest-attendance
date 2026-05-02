@@ -24,12 +24,7 @@ import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn, getAvatarUrl } from "@/lib/utils";
@@ -41,22 +36,14 @@ interface ImageModalProps {
   onClose: () => void;
 }
 
-export function ImageModal({
-  imageUrl,
-  photoId,
-  groupId,
-  onClose,
-}: ImageModalProps) {
+export function ImageModal({ imageUrl, photoId, groupId, onClose }: ImageModalProps) {
   const { t } = useTranslation();
   const hasSocial = !!photoId && !!groupId;
 
   const { data: profile } = useCurrentProfile();
   const currentUserId = profile?.id;
 
-  const { data: reactionsData } = usePhotoReactions(
-    photoId ?? "",
-    groupId ?? "",
-  );
+  const { data: reactionsData } = usePhotoReactions(photoId ?? "", groupId ?? "");
   const { data: comments } = usePhotoComments(photoId ?? "", groupId ?? "");
 
   const { mutateAsync: addReaction } = useAddReaction();
@@ -73,9 +60,9 @@ export function ImageModal({
 
   const getReactionCount = useCallback(
     (emoji: string) => {
-      const reaction = (
-        reactionsData?.reactions as AggregatedReaction[] | undefined
-      )?.find((r: AggregatedReaction) => r.emoji === emoji);
+      const reaction = (reactionsData?.reactions as AggregatedReaction[] | undefined)?.find(
+        (r: AggregatedReaction) => r.emoji === emoji,
+      );
       return reaction?.count ?? 0;
     },
     [reactionsData],
@@ -138,9 +125,7 @@ export function ImageModal({
 
         <DialogClose className="absolute top-4 right-4 z-50 rounded-full bg-white/90 p-2 transition-colors hover:bg-white">
           <X className="size-5 text-black" />
-          <span className="sr-only">
-            {t("groups.gallery.photoDetail.close")}
-          </span>
+          <span className="sr-only">{t("groups.gallery.photoDetail.close")}</span>
         </DialogClose>
 
         <div className={cn("flex", hasSocial ? "flex-col sm:flex-row" : "")}>
@@ -148,9 +133,7 @@ export function ImageModal({
           <div
             className={cn(
               "relative",
-              hasSocial
-                ? "min-h-[40vh] flex-1 sm:min-h-[70vh]"
-                : "h-[80vh] w-full",
+              hasSocial ? "min-h-[40vh] flex-1 sm:min-h-[70vh]" : "h-[80vh] w-full",
             )}
           >
             <Image
@@ -197,9 +180,7 @@ export function ImageModal({
                           <span
                             className={cn(
                               "text-xs",
-                              isReacted
-                                ? "font-medium text-yellow-700"
-                                : "text-gray-500",
+                              isReacted ? "font-medium text-yellow-700" : "text-gray-500",
                             )}
                           >
                             {count}
@@ -219,60 +200,45 @@ export function ImageModal({
 
                 <ScrollArea className="flex-1 px-4">
                   <div className="flex flex-col gap-3 pb-2">
-                    {(!comments ||
-                      (comments as PhotoComment[]).length === 0) && (
+                    {(!comments || (comments as PhotoComment[]).length === 0) && (
                       <p className="py-4 text-center text-sm text-gray-400">
                         {t("groups.gallery.photoDetail.noComments")}
                       </p>
                     )}
-                    {(comments as PhotoComment[] | undefined)?.map(
-                      (comment: PhotoComment) => (
-                        <div key={comment.id} className="flex gap-2">
-                          <Avatar className="size-7 flex-shrink-0">
-                            <AvatarImage
-                              src={getAvatarUrl(comment.avatarUrl)}
-                              alt={
-                                comment.username
-                                  ? `${comment.username}'s avatar`
-                                  : ""
-                              }
-                            />
-                            <AvatarFallback className="text-xs">
-                              {comment.username?.[0]?.toUpperCase() ?? "?"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-medium text-gray-900">
-                                {comment.username}
-                              </span>
-                              <span className="text-xs text-gray-400">
-                                {formatRelativeTime(
-                                  new Date(comment.createdAt),
-                                )}
-                              </span>
-                              {currentUserId === comment.userId && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleDeleteComment(comment.id)
-                                  }
-                                  className="ml-auto text-gray-400 hover:text-red-500"
-                                  aria-label={t(
-                                    "groups.gallery.photoDetail.deleteComment",
-                                  )}
-                                >
-                                  <Trash2 className="size-3" />
-                                </button>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-700">
-                              {comment.content}
-                            </p>
+                    {(comments as PhotoComment[] | undefined)?.map((comment: PhotoComment) => (
+                      <div key={comment.id} className="flex gap-2">
+                        <Avatar className="size-7 flex-shrink-0">
+                          <AvatarImage
+                            src={getAvatarUrl(comment.avatarUrl)}
+                            alt={comment.username ? `${comment.username}'s avatar` : ""}
+                          />
+                          <AvatarFallback className="text-xs">
+                            {comment.username?.[0]?.toUpperCase() ?? "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-gray-900">
+                              {comment.username}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {formatRelativeTime(new Date(comment.createdAt))}
+                            </span>
+                            {currentUserId === comment.userId && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="ml-auto text-gray-400 hover:text-red-500"
+                                aria-label={t("groups.gallery.photoDetail.deleteComment")}
+                              >
+                                <Trash2 className="size-3" />
+                              </button>
+                            )}
                           </div>
+                          <p className="text-sm text-gray-700">{comment.content}</p>
                         </div>
-                      ),
-                    )}
+                      </div>
+                    ))}
                   </div>
                 </ScrollArea>
 
@@ -285,11 +251,7 @@ export function ImageModal({
                     className="flex-1 text-sm"
                     maxLength={500}
                     onKeyDown={(e) => {
-                      if (
-                        e.key === "Enter" &&
-                        !e.shiftKey &&
-                        !isAddingComment
-                      ) {
+                      if (e.key === "Enter" && !e.shiftKey && !isAddingComment) {
                         e.preventDefault();
                         handleAddComment();
                       }

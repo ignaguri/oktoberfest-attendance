@@ -6,10 +6,7 @@
  */
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useCompleteTutorial,
-  useTutorialStatus,
-} from "@prostcounter/shared/hooks";
+import { useCompleteTutorial, useTutorialStatus } from "@prostcounter/shared/hooks";
 import { getFestivalStatus } from "@prostcounter/shared/utils";
 import { type Href, useRouter } from "expo-router";
 import {
@@ -28,11 +25,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { logger } from "@/lib/logger";
 
 import { TUTORIAL_TIMING } from "./constants";
-import {
-  TOTAL_STEPS,
-  TUTORIAL_STEPS,
-  type TutorialStep,
-} from "./tutorialSteps";
+import { TOTAL_STEPS, TUTORIAL_STEPS, type TutorialStep } from "./tutorialSteps";
 
 /** Measurement data for a target component */
 export interface TargetMeasurement {
@@ -139,10 +132,7 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     isFestivalActive,
   ]);
 
-  const currentStep = useMemo(
-    () => TUTORIAL_STEPS[currentStepIndex] ?? null,
-    [currentStepIndex],
-  );
+  const currentStep = useMemo(() => TUTORIAL_STEPS[currentStepIndex] ?? null, [currentStepIndex]);
 
   // Navigate to the appropriate tab when the step changes
   useEffect(() => {
@@ -174,47 +164,43 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     targetRefs.current.delete(stepId);
   }, []);
 
-  const getTargetMeasurement = useCallback(
-    (stepId: string): Promise<TargetMeasurement | null> => {
-      return new Promise((resolve) => {
-        try {
-          const ref = targetRefs.current.get(stepId);
-          if (!ref) {
+  const getTargetMeasurement = useCallback((stepId: string): Promise<TargetMeasurement | null> => {
+    return new Promise((resolve) => {
+      try {
+        const ref = targetRefs.current.get(stepId);
+        if (!ref) {
+          resolve(null);
+          return;
+        }
+
+        ref.measureInWindow((x, y, width, height) => {
+          if (width === 0 && height === 0) {
+            // Component not yet laid out
             resolve(null);
             return;
           }
-
-          ref.measureInWindow((x, y, width, height) => {
-            if (width === 0 && height === 0) {
-              // Component not yet laid out
-              resolve(null);
-              return;
-            }
-            // On Android, measureInWindow returns coordinates relative to the
-            // app window (below the status bar), but our Modal uses
-            // statusBarTranslucent which renders from the very top of the
-            // screen. We must add the status bar height to align the spotlight.
-            const statusBarOffset =
-              Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0;
-            const adjustedY = y + statusBarOffset;
-            resolve({
-              x,
-              y: adjustedY,
-              width,
-              height,
-              pageX: x,
-              pageY: adjustedY,
-            });
+          // On Android, measureInWindow returns coordinates relative to the
+          // app window (below the status bar), but our Modal uses
+          // statusBarTranslucent which renders from the very top of the
+          // screen. We must add the status bar height to align the spotlight.
+          const statusBarOffset = Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0;
+          const adjustedY = y + statusBarOffset;
+          resolve({
+            x,
+            y: adjustedY,
+            width,
+            height,
+            pageX: x,
+            pageY: adjustedY,
           });
-        } catch (error) {
-          // Fail gracefully if measurement fails
-          logger.warn("Failed to measure tutorial target", { error });
-          resolve(null);
-        }
-      });
-    },
-    [],
-  );
+        });
+      } catch (error) {
+        // Fail gracefully if measurement fails
+        logger.warn("Failed to measure tutorial target", { error });
+        resolve(null);
+      }
+    });
+  }, []);
 
   const nextStep = useCallback(() => {
     if (currentStepIndex < TOTAL_STEPS - 1) {
@@ -281,11 +267,7 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     ],
   );
 
-  return (
-    <TutorialContext.Provider value={value}>
-      {children}
-    </TutorialContext.Provider>
-  );
+  return <TutorialContext.Provider value={value}>{children}</TutorialContext.Provider>;
 }
 
 /**
@@ -315,11 +297,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       startTutorial: () => {},
     };
 
-    return (
-      <TutorialContext.Provider value={emptyValue}>
-        {children}
-      </TutorialContext.Provider>
-    );
+    return <TutorialContext.Provider value={emptyValue}>{children}</TutorialContext.Provider>;
   }
 
   // When authenticated, use the full implementation

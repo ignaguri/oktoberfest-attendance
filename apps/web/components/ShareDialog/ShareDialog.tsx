@@ -29,13 +29,8 @@ export function ShareDialog({
   className,
 }: ShareDialogProps) {
   const { t } = useTranslation();
-  const {
-    copyButtonText,
-    showQRCode,
-    copyToClipboard,
-    shareViaWhatsApp,
-    toggleQRCode,
-  } = useShare();
+  const { copyButtonText, showQRCode, copyToClipboard, shareViaWhatsApp, toggleQRCode } =
+    useShare();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,21 +51,13 @@ export function ShareDialog({
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-2 p-8">
-          <Button
-            variant="yellow"
-            onClick={shareViaWhatsApp}
-            className="w-full"
-          >
+          <Button variant="yellow" onClick={shareViaWhatsApp} className="w-full">
             {t("groups.share.shareLink", {
               defaultValue: "Share via WhatsApp",
             })}
           </Button>
 
-          <Button
-            variant="yellowOutline"
-            onClick={copyToClipboard}
-            className="w-full"
-          >
+          <Button variant="yellowOutline" onClick={copyToClipboard} className="w-full">
             {copyButtonText}
           </Button>
 

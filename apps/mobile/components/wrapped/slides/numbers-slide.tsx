@@ -1,12 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { formatCurrency, formatNumber } from "@prostcounter/shared/wrapped";
-import {
-  Beer,
-  CalendarDays,
-  DollarSign,
-  TrendingUp,
-} from "lucide-react-native";
+import { Beer, CalendarDays, DollarSign, TrendingUp } from "lucide-react-native";
 import { View } from "react-native";
 
 import { HStack } from "@/components/ui/hstack";
@@ -26,12 +21,8 @@ export function NumbersSlide({ data, isActive }: NumbersSlideProps) {
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-blue-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.numbers.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.numbers.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.numbers.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.numbers.subtitle")}</SlideSubtitle>
 
         <View className="mt-6">
           <VStack space="md">

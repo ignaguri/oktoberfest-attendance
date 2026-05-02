@@ -296,16 +296,11 @@ export class SupabaseFriendRepository implements IFriendRepository {
 
     const connectedUserIds = new Set<string>();
     for (const f of existingFriendships || []) {
-      connectedUserIds.add(
-        f.requester_id === userId ? f.addressee_id : f.requester_id,
-      );
+      connectedUserIds.add(f.requester_id === userId ? f.addressee_id : f.requester_id);
     }
 
     // Aggregate shared groups per user, excluding existing connections
-    const userMap = new Map<
-      string,
-      { profile: ProfileRow; sharedGroups: number }
-    >();
+    const userMap = new Map<string, { profile: ProfileRow; sharedGroups: number }>();
 
     for (const member of sharedMembers || []) {
       const memberId = member.user_id as string;
@@ -340,11 +335,7 @@ export class SupabaseFriendRepository implements IFriendRepository {
       username: string | null;
       fullName: string | null;
       avatarUrl: string | null;
-      friendshipStatus:
-        | "friends"
-        | "pending_sent"
-        | "pending_received"
-        | "none";
+      friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none";
     }[]
   > {
     const { data, error } = await this.supabase
@@ -374,8 +365,7 @@ export class SupabaseFriendRepository implements IFriendRepository {
       "friends" | "pending_sent" | "pending_received" | "none"
     >();
     for (const f of friendships || []) {
-      const otherUserId =
-        f.requester_id === userId ? f.addressee_id : f.requester_id;
+      const otherUserId = f.requester_id === userId ? f.addressee_id : f.requester_id;
       if (f.status === "accepted") {
         friendshipMap.set(otherUserId, "friends");
       } else if (f.status === "pending") {
@@ -395,10 +385,7 @@ export class SupabaseFriendRepository implements IFriendRepository {
     }));
   }
 
-  async getFriendshipStatus(
-    userId: string,
-    otherUserId: string,
-  ): Promise<FriendshipStatusCheck> {
+  async getFriendshipStatus(userId: string, otherUserId: string): Promise<FriendshipStatusCheck> {
     const { data, error } = await this.supabase
       .from("friendships")
       .select("id, requester_id, addressee_id, status")

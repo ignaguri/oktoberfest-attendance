@@ -5,17 +5,8 @@ import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export interface SearchSuggestion {
@@ -52,9 +43,7 @@ export function SearchSuggestions({
   const filteredSuggestions = useMemo(() => {
     const recent = suggestions.filter((s) => s.type === "recent").slice(0, 5);
     const popular = suggestions.filter((s) => s.type === "popular").slice(0, 3);
-    const other = suggestions
-      .filter((s) => !s.type || s.type === "suggestion")
-      .slice(0, 2);
+    const other = suggestions.filter((s) => !s.type || s.type === "suggestion").slice(0, 2);
 
     return [...recent, ...popular, ...other].slice(0, maxSuggestions);
   }, [suggestions, maxSuggestions]);
@@ -121,28 +110,23 @@ export function SearchSuggestions({
       <PopoverContent className="w-80 p-0" align="start">
         <Command>
           <CommandList>
-            {Object.entries(groupedSuggestions).map(
-              ([type, groupSuggestions]) => (
-                <CommandGroup key={type} heading={getGroupTitle(type)}>
-                  {groupSuggestions.map((suggestion) => (
-                    <CommandItem
-                      key={suggestion.id}
-                      onSelect={() => handleSuggestionClick(suggestion)}
-                      className="flex items-center gap-2"
-                    >
-                      {getSuggestionIcon(suggestion.type)}
-                      <span className="flex-1">{suggestion.text}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              ),
-            )}
+            {Object.entries(groupedSuggestions).map(([type, groupSuggestions]) => (
+              <CommandGroup key={type} heading={getGroupTitle(type)}>
+                {groupSuggestions.map((suggestion) => (
+                  <CommandItem
+                    key={suggestion.id}
+                    onSelect={() => handleSuggestionClick(suggestion)}
+                    className="flex items-center gap-2"
+                  >
+                    {getSuggestionIcon(suggestion.type)}
+                    <span className="flex-1">{suggestion.text}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
             {onClearHistory && (
               <CommandGroup>
-                <CommandItem
-                  onSelect={onClearHistory}
-                  className="text-muted-foreground"
-                >
+                <CommandItem onSelect={onClearHistory} className="text-muted-foreground">
                   Clear History
                 </CommandItem>
               </CommandGroup>

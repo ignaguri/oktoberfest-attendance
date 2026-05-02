@@ -7,10 +7,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  insertConsumptionLocally,
-  type InsertConsumptionParams,
-} from "../sync-queue";
+import { insertConsumptionLocally, type InsertConsumptionParams } from "../sync-queue";
 
 // Mock the logger
 vi.mock("@/lib/logger", () => ({
@@ -178,9 +175,7 @@ describe("insertConsumptionLocally", () => {
 
     const [, values] = mockDb.runAsync.mock.calls[0];
     // recorded_at, created_at, updated_at should all use 'now'
-    const nowOccurrences = values.filter(
-      (v: unknown) => v === "2024-10-05T18:30:00.000Z",
-    );
+    const nowOccurrences = values.filter((v: unknown) => v === "2024-10-05T18:30:00.000Z");
     expect(nowOccurrences.length).toBe(3);
   });
 });

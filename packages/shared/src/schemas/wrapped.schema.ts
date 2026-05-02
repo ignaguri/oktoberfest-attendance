@@ -19,15 +19,19 @@ export const WrappedDataSchema = z.object({
     })
     .nullable(),
   topDrinkType: z.string().nullable(),
-  drinkStats: z.object({
-    totalDrinks: z.number().int(),
-    topDrinkType: z.string().nullable(),
-    breakdown: z.array(z.object({
-      drinkType: z.string(),
-      count: z.number().int(),
-      percentage: z.number(),
-    })),
-  }).optional(),
+  drinkStats: z
+    .object({
+      totalDrinks: z.number().int(),
+      topDrinkType: z.string().nullable(),
+      breakdown: z.array(
+        z.object({
+          drinkType: z.string(),
+          count: z.number().int(),
+          percentage: z.number(),
+        }),
+      ),
+    })
+    .optional(),
   achievements: z.array(
     z.object({
       id: z.uuid(),
@@ -90,9 +94,7 @@ export const GenerateWrappedResponseSchema = z.object({
   regenerated: z.boolean(), // True if cache was invalidated and regenerated
 });
 
-export type GenerateWrappedResponse = z.infer<
-  typeof GenerateWrappedResponseSchema
->;
+export type GenerateWrappedResponse = z.infer<typeof GenerateWrappedResponseSchema>;
 
 /**
  * Wrapped access result schema
@@ -100,9 +102,7 @@ export type GenerateWrappedResponse = z.infer<
  */
 export const WrappedAccessResultSchema = z.object({
   allowed: z.boolean(),
-  reason: z
-    .enum(["not_ended", "no_data", "not_authenticated", "error"])
-    .optional(),
+  reason: z.enum(["not_ended", "no_data", "not_authenticated", "error"]).optional(),
   message: z.string().optional(),
 });
 
@@ -120,9 +120,7 @@ export const AvailableWrappedFestivalSchema = z.object({
   hasData: z.boolean(),
 });
 
-export type AvailableWrappedFestival = z.infer<
-  typeof AvailableWrappedFestivalSchema
->;
+export type AvailableWrappedFestival = z.infer<typeof AvailableWrappedFestivalSchema>;
 
 export const GetAvailableWrappedFestivalsResponseSchema = z.object({
   festivals: z.array(AvailableWrappedFestivalSchema),
@@ -141,9 +139,7 @@ export const RegenerateWrappedCacheBodySchema = z.object({
   userId: z.uuid().optional(),
 });
 
-export type RegenerateWrappedCacheInput = z.infer<
-  typeof RegenerateWrappedCacheBodySchema
->;
+export type RegenerateWrappedCacheInput = z.infer<typeof RegenerateWrappedCacheBodySchema>;
 
 export const RegenerateWrappedCacheResponseSchema = z.object({
   success: z.boolean(),
@@ -151,6 +147,4 @@ export const RegenerateWrappedCacheResponseSchema = z.object({
   error: z.string().optional(),
 });
 
-export type RegenerateWrappedCacheResponse = z.infer<
-  typeof RegenerateWrappedCacheResponseSchema
->;
+export type RegenerateWrappedCacheResponse = z.infer<typeof RegenerateWrappedCacheResponseSchema>;

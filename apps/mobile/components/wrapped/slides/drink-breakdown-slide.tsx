@@ -14,10 +14,7 @@ interface DrinkBreakdownSlideProps {
   isActive: boolean;
 }
 
-export function DrinkBreakdownSlide({
-  data,
-  isActive,
-}: DrinkBreakdownSlideProps) {
+export function DrinkBreakdownSlide({ data, isActive }: DrinkBreakdownSlideProps) {
   const { t } = useTranslation();
   const breakdown = data.drinkStats?.breakdown?.slice(0, 4) ?? [];
   const topDrink = data.drinkStats?.topDrinkType;
@@ -25,12 +22,8 @@ export function DrinkBreakdownSlide({
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-amber-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.drinkBreakdown.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.drinkBreakdown.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.drinkBreakdown.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.drinkBreakdown.subtitle")}</SlideSubtitle>
 
         <View className="mt-4">
           <VStack space="md">
@@ -47,15 +40,10 @@ export function DrinkBreakdownSlide({
             <View className="mt-2">
               <VStack space="sm">
                 {breakdown.map((item, _index) => (
-                  <View
-                    key={item.drinkType}
-                    className="rounded-lg bg-white p-3 shadow-sm"
-                  >
+                  <View key={item.drinkType} className="rounded-lg bg-white p-3 shadow-sm">
                     <View className="mb-1 flex-row items-center justify-between">
                       <Text className="text-sm font-medium text-gray-700">
-                        {t(
-                          `wrapped.drinkBreakdown.drinkTypes.${item.drinkType}`,
-                        )}
+                        {t(`wrapped.drinkBreakdown.drinkTypes.${item.drinkType}`)}
                       </Text>
                       <Text className="text-sm font-bold text-amber-600">
                         {item.count}{" "}

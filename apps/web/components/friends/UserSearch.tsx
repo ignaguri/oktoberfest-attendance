@@ -32,10 +32,7 @@ export function UserSearch() {
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsExpanded(false);
         setQuery("");
       }
@@ -55,12 +52,9 @@ export function UserSearch() {
     });
   }, []);
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setQuery(e.target.value);
-    },
-    [],
-  );
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  }, []);
 
   const showDropdown = isExpanded && debouncedQuery.length >= 1;
 
@@ -68,10 +62,8 @@ export function UserSearch() {
     if (!results) return [];
     return [...results].sort((a: SearchUserResult, b: SearchUserResult) => {
       // Friends go to the end
-      if (a.friendshipStatus === "friends" && b.friendshipStatus !== "friends")
-        return 1;
-      if (a.friendshipStatus !== "friends" && b.friendshipStatus === "friends")
-        return -1;
+      if (a.friendshipStatus === "friends" && b.friendshipStatus !== "friends") return 1;
+      if (a.friendshipStatus !== "friends" && b.friendshipStatus === "friends") return -1;
       // Alphabetical by name
       const nameA = (a.fullName || a.username || "").toLowerCase();
       const nameB = (b.fullName || b.username || "").toLowerCase();
@@ -80,10 +72,7 @@ export function UserSearch() {
   }, [results]);
 
   return (
-    <div
-      ref={containerRef}
-      className={isExpanded ? "relative flex-1" : "relative ml-auto"}
-    >
+    <div ref={containerRef} className={isExpanded ? "relative flex-1" : "relative ml-auto"}>
       {isExpanded ? (
         <div className="relative">
           <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
@@ -132,13 +121,9 @@ export function UserSearch() {
                     }}
                   />
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">
-                      {user.fullName || user.username}
-                    </p>
+                    <p className="truncate text-sm font-medium">{user.fullName || user.username}</p>
                     {user.username && (
-                      <p className="text-muted-foreground truncate text-xs">
-                        @{user.username}
-                      </p>
+                      <p className="text-muted-foreground truncate text-xs">@{user.username}</p>
                     )}
                   </div>
                   <AddFriendButton

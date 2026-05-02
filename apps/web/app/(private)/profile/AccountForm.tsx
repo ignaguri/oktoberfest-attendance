@@ -23,11 +23,7 @@ import { Label } from "@/components/ui/label";
 // import { LocationPrivacySettings } from "@/components/ui/location-privacy-settings";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import { useDeleteProfile, useResetTutorial } from "@/hooks/useProfile";
-import {
-  useCurrentProfile,
-  useCurrentUser,
-  useUpdateProfile,
-} from "@/lib/data";
+import { useCurrentProfile, useCurrentUser, useUpdateProfile } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function AccountForm() {
@@ -38,25 +34,18 @@ export default function AccountForm() {
   // Use React Query hooks
   const { data: user, loading: userLoading } = useCurrentUser();
   const { data: profile, loading: profileLoading } = useCurrentProfile();
-  const { mutate: updateProfileMutation, loading: isUpdating } =
-    useUpdateProfile();
-  const { mutate: resetTutorialMutation, loading: isResettingTutorial } =
-    useResetTutorial();
-  const { mutateAsync: deleteProfile, loading: isDeleting } =
-    useDeleteProfile();
+  const { mutate: updateProfileMutation, loading: isUpdating } = useUpdateProfile();
+  const { mutate: resetTutorialMutation, loading: isResettingTutorial } = useResetTutorial();
+  const { mutateAsync: deleteProfile, loading: isDeleting } = useDeleteProfile();
 
   const { tipMode, tipFixedAmount } = useTipCalculation();
-  const [fixedAmountText, setFixedAmountText] = useState(
-    tipFixedAmount?.toString() ?? "",
-  );
+  const [fixedAmountText, setFixedAmountText] = useState(tipFixedAmount?.toString() ?? "");
 
   useEffect(() => {
     setFixedAmountText(tipFixedAmount?.toString() ?? "");
   }, [tipFixedAmount]);
 
-  const [avatar_url, setAvatarUrl] = useState<string | null>(
-    profile?.avatar_url || null,
-  );
+  const [avatar_url, setAvatarUrl] = useState<string | null>(profile?.avatar_url || null);
 
   const {
     register,
@@ -117,9 +106,7 @@ export default function AccountForm() {
     return (
       <div className="flex flex-col gap-6">
         <div className="card">
-          <p className="text-center text-gray-600">
-            {t("common.status.loading")}
-          </p>
+          <p className="text-center text-gray-600">{t("common.status.loading")}</p>
         </div>
       </div>
     );
@@ -129,9 +116,7 @@ export default function AccountForm() {
     return (
       <div className="flex flex-col gap-6">
         <div className="card">
-          <p className="text-center text-red-600">
-            {t("notifications.error.profileUpdateFailed")}
-          </p>
+          <p className="text-center text-red-600">{t("notifications.error.profileUpdateFailed")}</p>
         </div>
       </div>
     );
@@ -188,13 +173,9 @@ export default function AccountForm() {
         await changeLanguage(language);
       } else {
         // Auto-detect and apply
-        const { detectBrowserLanguage } =
-          await import("@/lib/utils/detectLanguage");
-        const { SUPPORTED_LANGUAGES } =
-          await import("@prostcounter/shared/i18n");
-        const detected = detectBrowserLanguage([
-          ...SUPPORTED_LANGUAGES,
-        ] as string[]);
+        const { detectBrowserLanguage } = await import("@/lib/utils/detectLanguage");
+        const { SUPPORTED_LANGUAGES } = await import("@prostcounter/shared/i18n");
+        const detected = detectBrowserLanguage([...SUPPORTED_LANGUAGES] as string[]);
         await changeLanguage(detected);
       }
 
@@ -207,9 +188,7 @@ export default function AccountForm() {
   return (
     <div className="flex flex-col gap-6">
       <div className="card">
-        <h3 className="py-2 text-3xl font-black text-gray-800">
-          {t("profile.pageTitle")}
-        </h3>
+        <h3 className="py-2 text-3xl font-black text-gray-800">{t("profile.pageTitle")}</h3>
         <Avatar
           className="mb-4 flex flex-col items-center"
           isEditing={isEditing}
@@ -256,9 +235,7 @@ export default function AccountForm() {
               />
             ) : (
               <div className="p-2">
-                {profile.full_name || (
-                  <span className="text-gray-500">n/a</span>
-                )}
+                {profile.full_name || <span className="text-gray-500">n/a</span>}
               </div>
             )}
           </div>
@@ -285,9 +262,7 @@ export default function AccountForm() {
           {isEditing && (
             <div className="mt-4 flex flex-col items-center gap-2">
               <Button variant="yellow" type="submit" disabled={isUpdating}>
-                {isUpdating
-                  ? t("common.buttons.loading")
-                  : t("common.buttons.save")}
+                {isUpdating ? t("common.buttons.loading") : t("common.buttons.save")}
               </Button>
               <Button
                 variant="yellowOutline"
@@ -302,17 +277,11 @@ export default function AccountForm() {
         </form>
         {!isEditing && (
           <div className="flex flex-col items-center gap-4">
-            <Button
-              variant="yellow"
-              type="button"
-              onClick={() => setIsEditing(true)}
-            >
+            <Button variant="yellow" type="button" onClick={() => setIsEditing(true)}>
               {t("common.buttons.edit")}
             </Button>
             <Button variant="yellowOutline" type="button" asChild>
-              <Link href="/update-password">
-                {t("profile.account.changePassword")}
-              </Link>
+              <Link href="/update-password">{t("profile.account.changePassword")}</Link>
             </Button>
           </div>
         )}
@@ -374,21 +343,15 @@ export default function AccountForm() {
       {/* Tutorial Reset Section */}
       <div className="card bg-yellow-50">
         <div className="flex flex-col items-center gap-4">
-          <h4 className="text-lg font-semibold text-gray-800">
-            {t("profile.tutorial.title")}
-          </h4>
-          <p className="text-center text-sm text-gray-700">
-            {t("profile.tutorial.description")}
-          </p>
+          <h4 className="text-lg font-semibold text-gray-800">{t("profile.tutorial.title")}</h4>
+          <p className="text-center text-sm text-gray-700">{t("profile.tutorial.description")}</p>
           <Button
             variant="yellowOutline"
             size="sm"
             onClick={handleResetTutorial}
             disabled={isResettingTutorial}
           >
-            {isResettingTutorial
-              ? t("common.buttons.loading")
-              : t("profile.tutorial.resetButton")}
+            {isResettingTutorial ? t("common.buttons.loading") : t("profile.tutorial.resetButton")}
           </Button>
         </div>
       </div>
@@ -396,12 +359,8 @@ export default function AccountForm() {
       {/* Delete Account Section */}
       <div className="card bg-red-500/20">
         <div className="flex flex-col items-center gap-4">
-          <h4 className="text-lg font-semibold text-gray-800">
-            {t("profile.sections.danger")}
-          </h4>
-          <p className="text-center text-sm text-gray-700">
-            {t("profile.deleteAccount.warning")}
-          </p>
+          <h4 className="text-lg font-semibold text-gray-800">{t("profile.sections.danger")}</h4>
+          <p className="text-center text-sm text-gray-700">{t("profile.deleteAccount.warning")}</p>
           {showDeleteConfirm ? (
             <div className="flex flex-col items-center gap-2">
               <p className="text-center text-sm font-medium text-red-600">

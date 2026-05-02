@@ -64,9 +64,7 @@ function truncateData(data: unknown): unknown {
   }
 
   if (typeof data === "string") {
-    return data.length > 500
-      ? `${data.substring(0, 500)}... [truncated]`
-      : data;
+    return data.length > 500 ? `${data.substring(0, 500)}... [truncated]` : data;
   }
 
   // For objects/arrays, let safeStringify handle truncation
@@ -92,16 +90,9 @@ function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
 }
 
 class Logger {
-  private isDev =
-    typeof __DEV__ !== "undefined"
-      ? __DEV__
-      : process.env.NODE_ENV !== "production";
+  private isDev = typeof __DEV__ !== "undefined" ? __DEV__ : process.env.NODE_ENV !== "production";
 
-  private formatMessage(
-    level: LogLevel,
-    message: string,
-    context?: LogContext,
-  ): string {
+  private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
     const timestamp = new Date().toISOString();
     const contextStr = context ? `\n${safeStringify(context)}` : "";
     return `[${timestamp}] [${level.toUpperCase()}] ${message}${contextStr}`;
@@ -187,16 +178,12 @@ class Logger {
   logApiResponse(method: string, url: string, status: number, data?: unknown) {
     if (status >= 400) {
       // Log error responses at error level so they're always visible
-      this.error(
-        `API Error Response: ${method} ${url} - ${status}`,
-        undefined,
-        {
-          method,
-          url,
-          status,
-          data: truncateData(data),
-        },
-      );
+      this.error(`API Error Response: ${method} ${url} - ${status}`, undefined, {
+        method,
+        url,
+        status,
+        data: truncateData(data),
+      });
     } else {
       this.debug(`API Response: ${method} ${url} - ${status}`, {
         method,
@@ -214,9 +201,7 @@ class Logger {
     });
   }
 
-  private sanitizeHeaders(
-    headers?: Record<string, string>,
-  ): Record<string, string> {
+  private sanitizeHeaders(headers?: Record<string, string>): Record<string, string> {
     if (!headers) return {};
 
     const sanitized: Record<string, string> = {};
@@ -226,8 +211,7 @@ class Logger {
       const lowerKey = key.toLowerCase();
       if (SENSITIVE_HEADERS.includes(lowerKey)) {
         // Show first 10 chars to help with debugging, then mask
-        sanitized[key] =
-          value.length > 10 ? `${value.substring(0, 10)}...` : "[REDACTED]";
+        sanitized[key] = value.length > 10 ? `${value.substring(0, 10)}...` : "[REDACTED]";
       } else {
         sanitized[key] = value;
       }

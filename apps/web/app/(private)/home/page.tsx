@@ -33,11 +33,9 @@ import { QuickAttendanceWrapper } from "./QuickAttendanceWrapper";
 export default function Home() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const { data: tutorialStatus, loading: isTutorialStatusLoading } =
-    useTutorialStatus();
+  const { data: tutorialStatus, loading: isTutorialStatusLoading } = useTutorialStatus();
 
-  const isActive =
-    currentFestival && getFestivalStatus(currentFestival) === "active";
+  const isActive = currentFestival && getFestivalStatus(currentFestival) === "active";
 
   return (
     <TutorialProvider
@@ -46,11 +44,7 @@ export default function Home() {
     >
       <div className="flex max-w-lg flex-col items-center gap-4">
         <header className="flex flex-row items-center gap-4">
-          <Image
-            src={LogoImage}
-            alt={t("app.logo")}
-            className="inline-block size-20 sm:size-24"
-          />
+          <Image src={LogoImage} alt={t("app.logo")} className="inline-block size-20 sm:size-24" />
           <h1 className="text-4xl font-extrabold sm:text-5xl" translate="no">
             <span className="text-yellow-600">Prost</span>
             <span className="text-yellow-500">Counter</span>
@@ -93,10 +87,7 @@ export default function Home() {
 
           <Separator decorative />
 
-          <div
-            className="flex flex-col items-center gap-2"
-            data-tutorial="map-share"
-          >
+          <div className="flex flex-col items-center gap-2" data-tutorial="map-share">
             <MapButton />
             <ShareAppButton />
           </div>
@@ -106,13 +97,9 @@ export default function Home() {
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger className="px-2">
-              {t("landing.features.title")}
-            </AccordionTrigger>
+            <AccordionTrigger className="px-2">{t("landing.features.title")}</AccordionTrigger>
             <AccordionContent className="max-w-80">
-              <p className="text-center text-balance text-gray-600">
-                {t("landing.description")}
-              </p>
+              <p className="text-center text-balance text-gray-600">{t("landing.description")}</p>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

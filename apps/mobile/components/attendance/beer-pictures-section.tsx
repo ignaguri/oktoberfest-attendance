@@ -4,19 +4,13 @@ import { ImagePlus, Minus, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 
-import {
-  type ImageSource,
-  ImageSourcePicker,
-} from "@/components/image-source-picker";
+import { type ImageSource, ImageSourcePicker } from "@/components/image-source-picker";
 import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import {
-  type PendingPhoto,
-  useBeerPictureUpload,
-} from "@/hooks/useBeerPictureUpload";
+import { type PendingPhoto, useBeerPictureUpload } from "@/hooks/useBeerPictureUpload";
 import { IconColors } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
 import { getBeerPictureUrl } from "@/lib/utils";
@@ -105,9 +99,7 @@ export function BeerPicturesSection({
 
   return (
     <VStack className="gap-2">
-      <Text className="text-sm font-medium text-typography-700">
-        {t("attendance.form.photos")}
-      </Text>
+      <Text className="text-sm font-medium text-typography-700">{t("attendance.form.photos")}</Text>
 
       {/* Photo Grid */}
       <HStack className="flex-wrap gap-2">
@@ -117,15 +109,10 @@ export function BeerPicturesSection({
           const imageUrl = getBeerPictureUrl(photo.pictureUrl);
           return (
             <View key={photo.id || `photo-${index}`} className="relative">
-              <Pressable
-                onPress={() => handleImagePreview(imageUrl || photo.pictureUrl)}
-              >
+              <Pressable onPress={() => handleImagePreview(imageUrl || photo.pictureUrl)}>
                 <Image
                   source={{ uri: imageUrl }}
-                  className={cn(
-                    "h-20 w-20 rounded-lg",
-                    isMarkedForRemoval && "opacity-40",
-                  )}
+                  className={cn("h-20 w-20 rounded-lg", isMarkedForRemoval && "opacity-40")}
                   resizeMode="cover"
                   alt=""
                   accessibilityLabel={t("attendance.beerPicture")}
@@ -154,10 +141,7 @@ export function BeerPicturesSection({
             <Pressable onPress={() => handleImagePreview(photo.localUri)}>
               <Image
                 source={{ uri: photo.localUri }}
-                className={cn(
-                  "h-20 w-20 rounded-lg",
-                  isUploading && "opacity-60",
-                )}
+                className={cn("h-20 w-20 rounded-lg", isUploading && "opacity-60")}
                 resizeMode="cover"
                 alt=""
                 accessibilityLabel={t("attendance.beerPicture")}

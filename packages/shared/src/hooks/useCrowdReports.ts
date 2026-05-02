@@ -5,13 +5,7 @@
  */
 
 import type { CrowdLevel } from "../schemas/crowd-report.schema";
-import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  QueryKeys,
-} from "../data";
+import { useApiClient, useQuery, useMutation, useInvalidateQueries, QueryKeys } from "../data";
 
 /**
  * Hook to fetch aggregated crowd status for all tents in a festival.
@@ -96,23 +90,18 @@ export function useSubmitCrowdReport() {
       crowdLevel: CrowdLevel;
       waitTimeMinutes?: number;
     }) => {
-      const response = await apiClient.tents.submitCrowdReport(
-        variables.tentId,
-        {
-          festivalId: variables.festivalId,
-          crowdLevel: variables.crowdLevel,
-          waitTimeMinutes: variables.waitTimeMinutes,
-        },
-      );
+      const response = await apiClient.tents.submitCrowdReport(variables.tentId, {
+        festivalId: variables.festivalId,
+        crowdLevel: variables.crowdLevel,
+        waitTimeMinutes: variables.waitTimeMinutes,
+      });
       return response.report;
     },
     {
       onSuccess: (_data, variables) => {
         // Invalidate crowd status and tent reports
         invalidateQueries(QueryKeys.crowdStatus(variables.festivalId));
-        invalidateQueries(
-          QueryKeys.tentCrowdReports(variables.tentId, variables.festivalId),
-        );
+        invalidateQueries(QueryKeys.tentCrowdReports(variables.tentId, variables.festivalId));
       },
     },
   );

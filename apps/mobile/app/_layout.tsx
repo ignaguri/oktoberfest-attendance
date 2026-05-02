@@ -177,12 +177,7 @@ function NotificationPromptHandler() {
       const timer = setTimeout(() => setShowPrompt(true), 1000);
       return () => clearTimeout(timer);
     }
-  }, [
-    isAuthenticated,
-    hasPromptBeenShown,
-    isPermissionLoading,
-    permissionStatus,
-  ]);
+  }, [isAuthenticated, hasPromptBeenShown, isPermissionLoading, permissionStatus]);
 
   const handleEnable = async () => {
     setShowPrompt(false);

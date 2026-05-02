@@ -46,11 +46,7 @@ export async function getFCMToken(): Promise<string | null> {
       return null;
     }
   } catch (err) {
-    logger.error(
-      "Failed to retrieve FCM token",
-      logger.clientComponent("firebase"),
-      err as Error,
-    );
+    logger.error("Failed to retrieve FCM token", logger.clientComponent("firebase"), err as Error);
     return null;
   }
 }

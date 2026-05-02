@@ -33,9 +33,6 @@ export async function POST(request: NextRequest) {
       logger.apiRoute("novu/identify"),
       error as Error,
     );
-    return NextResponse.json(
-      { error: "Failed to identify user" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to identify user" }, { status: 500 });
   }
 }

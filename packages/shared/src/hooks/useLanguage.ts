@@ -42,18 +42,13 @@ export function useLanguage() {
   useEffect(() => {
     const loadSavedLanguage = async () => {
       if (!storage) {
-        console.warn(
-          "Language storage not configured. Call setLanguageStorage() first.",
-        );
+        console.warn("Language storage not configured. Call setLanguageStorage() first.");
         return;
       }
 
       try {
         const savedLang = await storage.getItem(LANGUAGE_STORAGE_KEY);
-        if (
-          savedLang &&
-          SUPPORTED_LANGUAGES.includes(savedLang as SupportedLanguage)
-        ) {
+        if (savedLang && SUPPORTED_LANGUAGES.includes(savedLang as SupportedLanguage)) {
           await changeLanguage(savedLang);
           setCurrentLanguage(savedLang as SupportedLanguage);
         }

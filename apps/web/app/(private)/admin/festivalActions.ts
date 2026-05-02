@@ -29,11 +29,7 @@ export async function createFestival(
 ): Promise<Festival> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("festivals")
-    .insert(festivalData)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("festivals").insert(festivalData).select().single();
 
   if (error) {
     reportSupabaseException("createFestival", error);
@@ -86,13 +82,8 @@ export async function deleteFestival(festivalId: string): Promise<void> {
     .limit(1);
 
   if (attendancesError) {
-    reportSupabaseException(
-      "deleteFestival - check attendances",
-      attendancesError,
-    );
-    throw new Error(
-      `Error checking festival attendances: ${attendancesError.message}`,
-    );
+    reportSupabaseException("deleteFestival - check attendances", attendancesError);
+    throw new Error(`Error checking festival attendances: ${attendancesError.message}`);
   }
 
   if (attendances && attendances.length > 0) {
@@ -119,10 +110,7 @@ export async function deleteFestival(festivalId: string): Promise<void> {
   }
 
   // If no associated data, safe to delete
-  const { error } = await supabase
-    .from("festivals")
-    .delete()
-    .eq("id", festivalId);
+  const { error } = await supabase.from("festivals").delete().eq("id", festivalId);
 
   if (error) {
     reportSupabaseException("deleteFestival", error);

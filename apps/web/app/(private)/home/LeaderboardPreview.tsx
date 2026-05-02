@@ -7,13 +7,7 @@ import { Link } from "next-view-transitions";
 
 import Avatar from "@/components/Avatar/Avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfilePreview } from "@/components/ui/profile-preview";
 import { SkeletonLeaderboard } from "@/components/ui/skeleton-cards";
 import {
@@ -148,15 +142,9 @@ const LeaderboardPreview = () => {
                         </div>
                       </ProfilePreview>
                     </TableCell>
-                    <TableCell className="font-medium">
-                      {user.daysAttended}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {user.totalBeers} 🍺
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {user.avgBeers?.toFixed(2)}
-                    </TableCell>
+                    <TableCell className="font-medium">{user.daysAttended}</TableCell>
+                    <TableCell className="font-medium">{user.totalBeers} 🍺</TableCell>
+                    <TableCell className="font-medium">{user.avgBeers?.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

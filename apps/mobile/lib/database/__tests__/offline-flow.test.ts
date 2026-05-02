@@ -12,11 +12,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type {
-  LocalAttendance,
-  LocalBeerPicture,
-  LocalConsumption,
-} from "../schema";
+import type { LocalAttendance, LocalBeerPicture, LocalConsumption } from "../schema";
 
 // =============================================================================
 // Mock Setup
@@ -87,9 +83,7 @@ const mockApiClient = {
 // Test Utilities
 // =============================================================================
 
-function createMockAttendance(
-  overrides: Partial<LocalAttendance> = {},
-): LocalAttendance {
+function createMockAttendance(overrides: Partial<LocalAttendance> = {}): LocalAttendance {
   return {
     id: `att-${Date.now()}`,
     user_id: "user-123",
@@ -105,9 +99,7 @@ function createMockAttendance(
   };
 }
 
-function createMockConsumption(
-  overrides: Partial<LocalConsumption> = {},
-): LocalConsumption {
+function createMockConsumption(overrides: Partial<LocalConsumption> = {}): LocalConsumption {
   return {
     id: `cons-${Date.now()}`,
     attendance_id: "att-123",
@@ -129,9 +121,7 @@ function createMockConsumption(
   };
 }
 
-function createMockBeerPicture(
-  overrides: Partial<LocalBeerPicture> = {},
-): LocalBeerPicture {
+function createMockBeerPicture(overrides: Partial<LocalBeerPicture> = {}): LocalBeerPicture {
   return {
     id: `photo-${Date.now()}`,
     attendance_id: "att-123",
@@ -207,12 +197,8 @@ describe("Offline Flow Integration", () => {
       ];
 
       // Verify dependency chain
-      const attendanceOp = queuedOperations.find(
-        (op) => op.table_name === "attendances",
-      );
-      const consumptionOp = queuedOperations.find(
-        (op) => op.table_name === "consumptions",
-      );
+      const attendanceOp = queuedOperations.find((op) => op.table_name === "attendances");
+      const consumptionOp = queuedOperations.find((op) => op.table_name === "consumptions");
 
       expect(attendanceOp?.depends_on).toBeNull();
       expect(consumptionOp?.depends_on).toBe("op-1");
@@ -263,9 +249,7 @@ describe("Offline Flow Integration", () => {
       mockNetInfo.isConnected = true;
 
       // Simulate API error
-      mockApiClient.attendances.create.mockRejectedValueOnce(
-        new Error("Server error"),
-      );
+      mockApiClient.attendances.create.mockRejectedValueOnce(new Error("Server error"));
 
       const syncResult = {
         success: false,
@@ -452,13 +436,11 @@ describe("Offline Flow Integration", () => {
       ];
 
       // op-2 can only run after op-1 is completed
-      const canProcessOp2 =
-        operations.find((op) => op.id === "op-1")?.status === "completed";
+      const canProcessOp2 = operations.find((op) => op.id === "op-1")?.status === "completed";
       expect(canProcessOp2).toBe(true);
 
       // op-3 cannot run until op-2 is completed
-      const canProcessOp3 =
-        operations.find((op) => op.id === "op-2")?.status === "completed";
+      const canProcessOp3 = operations.find((op) => op.id === "op-2")?.status === "completed";
       expect(canProcessOp3).toBe(false);
     });
   });
@@ -480,9 +462,7 @@ describe("Offline Flow Integration", () => {
       const relatedConsumptions = [
         createMockConsumption({ attendance_id: attendanceId, _deleted: 1 }),
       ];
-      const relatedPhotos = [
-        createMockBeerPicture({ attendance_id: attendanceId, _deleted: 1 }),
-      ];
+      const relatedPhotos = [createMockBeerPicture({ attendance_id: attendanceId, _deleted: 1 })];
 
       // All related records should be soft deleted
       expect(relatedConsumptions.every((c) => c._deleted === 1)).toBe(true);

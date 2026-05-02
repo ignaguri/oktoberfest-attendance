@@ -5,23 +5,13 @@ import { cn } from "@prostcounter/ui";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import {
-  Beer,
-  ExternalLink,
-  Map,
-  MapPin,
-  RefreshCw,
-} from "lucide-react-native";
+import { Beer, ExternalLink, Map, MapPin, RefreshCw } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { FriendMap } from "@/components/location/FriendMap";
 import { LocationSharingToggle } from "@/components/location/LocationSharingToggle";
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -56,9 +46,7 @@ export default function MapScreen() {
     stopLocalTracking,
   } = useLocationContext();
 
-  const [selectedTab, setSelectedTab] = useState<"friends" | "tents">(
-    "friends",
-  );
+  const [selectedTab, setSelectedTab] = useState<"friends" | "tents">("friends");
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
   const hasInitializedRef = useRef(false);
 
@@ -79,10 +67,7 @@ export default function MapScreen() {
           className="p-2"
           accessibilityLabel={t("common.actions.retry")}
         >
-          <RefreshCw
-            size={22}
-            color={isNearbyLoading ? Colors.neutral[400] : IconColors.white}
-          />
+          <RefreshCw size={22} color={isNearbyLoading ? Colors.neutral[400] : IconColors.white} />
         </Pressable>
       ),
     });
@@ -267,27 +252,19 @@ function NearbyFriendsList({ members }: { members: LocationSessionMember[] }) {
         <Card key={member.userId} size="sm" variant="outline" className="p-2">
           <HStack space="sm" className="items-center">
             <Avatar size="sm">
-              {member.avatarUrl && (
-                <AvatarImage source={{ uri: getAvatarUrl(member.avatarUrl) }} />
-              )}
-              <AvatarFallbackText>
-                {member.username || member.fullName || "?"}
-              </AvatarFallbackText>
+              {member.avatarUrl && <AvatarImage source={{ uri: getAvatarUrl(member.avatarUrl) }} />}
+              <AvatarFallbackText>{member.username || member.fullName || "?"}</AvatarFallbackText>
             </Avatar>
             <VStack className="flex-1">
               <Text className="font-medium text-typography-900">
                 {member.fullName || member.username}
               </Text>
               {member.groupNames.length > 0 && (
-                <Text className="text-sm text-typography-500">
-                  {member.groupNames.join(", ")}
-                </Text>
+                <Text className="text-sm text-typography-500">{member.groupNames.join(", ")}</Text>
               )}
             </VStack>
             {member.distance !== null && (
-              <Text className="text-sm text-typography-500">
-                {Math.round(member.distance)}m
-              </Text>
+              <Text className="text-sm text-typography-500">{Math.round(member.distance)}m</Text>
             )}
           </HStack>
         </Card>
@@ -303,21 +280,14 @@ interface NearbyTentsListProps {
   onCheckIn: () => void;
 }
 
-function NearbyTentsList({
-  tents,
-  selectedTentId,
-  onTentSelect,
-  onCheckIn,
-}: NearbyTentsListProps) {
+function NearbyTentsList({ tents, selectedTentId, onTentSelect, onCheckIn }: NearbyTentsListProps) {
   const { t } = useTranslation();
 
   if (tents.length === 0) {
     return (
       <Box className="items-center p-8">
         <Beer size={40} color={Colors.neutral[400]} />
-        <Text className="mt-4 text-center text-typography-500">
-          {t("location.noTentsNearby")}
-        </Text>
+        <Text className="mt-4 text-center text-typography-500">{t("location.noTentsNearby")}</Text>
       </Box>
     );
   }
@@ -336,11 +306,7 @@ function NearbyTentsList({
               size="sm"
               variant="outline"
               className="p-2"
-              style={
-                isSelected
-                  ? { borderColor: Colors.primary[500], borderWidth: 2 }
-                  : undefined
-              }
+              style={isSelected ? { borderColor: Colors.primary[500], borderWidth: 2 } : undefined}
             >
               <HStack space="sm" className="items-center">
                 <Box
@@ -366,9 +332,7 @@ function NearbyTentsList({
                   />
                 </Box>
                 <VStack className="flex-1">
-                  <Text className="font-medium text-typography-900">
-                    {tent.tentName}
-                  </Text>
+                  <Text className="font-medium text-typography-900">{tent.tentName}</Text>
                   <Text className="text-sm capitalize text-typography-500">
                     {tent.category || "tent"}
                   </Text>

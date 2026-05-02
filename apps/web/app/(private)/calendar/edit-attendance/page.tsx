@@ -18,12 +18,7 @@ export default function DirectAttendancePage() {
 
   return (
     <div className="container mx-auto max-w-lg p-4">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => router.push("/calendar")}
-        className="mb-4"
-      >
+      <Button variant="ghost" size="sm" onClick={() => router.push("/calendar")} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Calendar
       </Button>

@@ -18,11 +18,7 @@ import { ErrorCodes } from "@prostcounter/shared/errors";
 import { logger } from "../lib/logger";
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
-import {
-  DatabaseError,
-  NotFoundError,
-  ValidationError,
-} from "../middleware/error";
+import { DatabaseError, NotFoundError, ValidationError } from "../middleware/error";
 import {
   SupabaseAttendanceRepository,
   SupabasePhotoRepository,
@@ -39,8 +35,7 @@ const listAttendancesRoute = createRoute({
   path: "/attendance",
   tags: ["attendance"],
   summary: "List user's attendance records",
-  description:
-    "Returns paginated list of attendance records with computed totals",
+  description: "Returns paginated list of attendance records with computed totals",
   request: {
     query: ListAttendancesQuerySchema,
   },
@@ -96,8 +91,7 @@ const getAttendanceByDateRoute = createRoute({
   path: "/attendance/by-date",
   tags: ["attendance"],
   summary: "Get attendance for a specific date",
-  description:
-    "Returns attendance record for a specific date with tent IDs and picture URLs",
+  description: "Returns attendance record for a specific date with tent IDs and picture URLs",
   request: {
     query: GetAttendanceByDateQuerySchema,
   },
@@ -131,11 +125,7 @@ app.openapi(getAttendanceByDateRoute, async (c) => {
   const query = c.req.valid("query");
 
   const attendanceRepo = new SupabaseAttendanceRepository(supabase);
-  const result = await attendanceRepo.getByDate(
-    user.id,
-    query.festivalId,
-    query.date,
-  );
+  const result = await attendanceRepo.getByDate(user.id, query.festivalId, query.date);
 
   return c.json({ attendance: result }, 200);
 });
@@ -146,8 +136,7 @@ const deleteAttendanceRoute = createRoute({
   path: "/attendance/{id}",
   tags: ["attendance"],
   summary: "Delete an attendance record",
-  description:
-    "Deletes an attendance and all its associated consumptions (cascading delete)",
+  description: "Deletes an attendance and all its associated consumptions (cascading delete)",
   request: {
     params: AttendanceIdParamSchema,
   },
@@ -355,10 +344,7 @@ app.openapi(createAttendanceRoute, async (c) => {
             .map((membership) => membership.group_id)
             .filter((id): id is string => id !== null);
 
-          const notificationService = new NotificationService(
-            supabase,
-            novuApiKey,
-          );
+          const notificationService = new NotificationService(supabase, novuApiKey);
           await notificationService.notifyTentCheckin(
             user.id,
             tentNames,

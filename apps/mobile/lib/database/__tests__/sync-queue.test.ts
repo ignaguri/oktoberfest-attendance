@@ -14,8 +14,7 @@ describe("generateUUID", () => {
     const uuid = generateUUID();
 
     // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     expect(uuid).toMatch(uuidRegex);
   });
 
@@ -61,13 +60,7 @@ describe("generateConsumptionIdempotencyKey", () => {
     const drinkType = "beer";
     const timestamp = 1696147200000;
 
-    const key = generateConsumptionIdempotencyKey(
-      userId,
-      festivalId,
-      date,
-      drinkType,
-      timestamp,
-    );
+    const key = generateConsumptionIdempotencyKey(userId, festivalId, date, drinkType, timestamp);
 
     expect(key).toContain(userId);
     expect(key).toContain(festivalId);
@@ -83,20 +76,8 @@ describe("generateConsumptionIdempotencyKey", () => {
     const drinkType = "beer";
     const timestamp = 1696147200000;
 
-    const key1 = generateConsumptionIdempotencyKey(
-      userId,
-      festivalId,
-      date,
-      drinkType,
-      timestamp,
-    );
-    const key2 = generateConsumptionIdempotencyKey(
-      userId,
-      festivalId,
-      date,
-      drinkType,
-      timestamp,
-    );
+    const key1 = generateConsumptionIdempotencyKey(userId, festivalId, date, drinkType, timestamp);
+    const key2 = generateConsumptionIdempotencyKey(userId, festivalId, date, drinkType, timestamp);
 
     expect(key1).toBe(key2);
   });
@@ -131,20 +112,8 @@ describe("generateConsumptionIdempotencyKey", () => {
     const date = "2024-10-01";
     const timestamp = 1696147200000;
 
-    const beerKey = generateConsumptionIdempotencyKey(
-      userId,
-      festivalId,
-      date,
-      "beer",
-      timestamp,
-    );
-    const wineKey = generateConsumptionIdempotencyKey(
-      userId,
-      festivalId,
-      date,
-      "wine",
-      timestamp,
-    );
+    const beerKey = generateConsumptionIdempotencyKey(userId, festivalId, date, "beer", timestamp);
+    const wineKey = generateConsumptionIdempotencyKey(userId, festivalId, date, "wine", timestamp);
 
     expect(beerKey).not.toBe(wineKey);
   });

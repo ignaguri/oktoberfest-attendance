@@ -19,12 +19,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import {
-  Beer,
-  CalendarClock,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react-native";
+import { Beer, CalendarClock, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 
@@ -60,9 +55,7 @@ const getWeekdayHeaders = () => {
   const weekStart = startOfWeek(referenceMonday, {
     weekStartsOn: WEEK_STARTS_ON,
   });
-  return Array.from({ length: 7 }, (_, i) =>
-    formatLocalized(addDays(weekStart, i), "EEE"),
-  );
+  return Array.from({ length: 7 }, (_, i) => formatLocalized(addDays(weekStart, i), "EEE"));
 };
 
 /**
@@ -194,10 +187,7 @@ export function AttendanceCalendar({
         // Selected festival day (any month)
         isFestivalDay && isSelected && "bg-primary-500",
         // Festival day with attendance (not selected)
-        isFestivalDay &&
-          !isSelected &&
-          hasAttendance &&
-          "bg-primary-100 border border-primary-300",
+        isFestivalDay && !isSelected && hasAttendance && "bg-primary-100 border border-primary-300",
         // Festival day with reservation only (not selected, no attendance)
         isFestivalDay &&
           !isSelected &&
@@ -205,11 +195,7 @@ export function AttendanceCalendar({
           hasReservation &&
           "bg-teal-100 border border-teal-300",
         // Festival day without attendance or reservation (not selected)
-        isFestivalDay &&
-          !isSelected &&
-          !hasAttendance &&
-          !hasReservation &&
-          "bg-background-100",
+        isFestivalDay && !isSelected && !hasAttendance && !hasReservation && "bg-background-100",
       );
 
       const textClassName = cn(
@@ -223,17 +209,9 @@ export function AttendanceCalendar({
         // Festival day with attendance (not selected)
         isFestivalDay && !isSelected && hasAttendance && "text-primary-700",
         // Festival day with reservation only (not selected)
-        isFestivalDay &&
-          !isSelected &&
-          !hasAttendance &&
-          hasReservation &&
-          "text-teal-700",
+        isFestivalDay && !isSelected && !hasAttendance && hasReservation && "text-teal-700",
         // Festival day without attendance or reservation (not selected)
-        isFestivalDay &&
-          !isSelected &&
-          !hasAttendance &&
-          !hasReservation &&
-          "text-typography-900",
+        isFestivalDay && !isSelected && !hasAttendance && !hasReservation && "text-typography-900",
       );
 
       return (
@@ -245,33 +223,27 @@ export function AttendanceCalendar({
         >
           <VStack className="items-center">
             {/* Today indicator */}
-            {isToday && (
-              <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />
-            )}
+            {isToday && <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />}
 
             {/* Day number */}
             <Text className={textClassName}>{format(day, "d")}</Text>
 
             {/* Indicators row - show both if applicable */}
-            {isFestivalDay &&
-              !isSelected &&
-              (hasAttendance || hasReservation) && (
-                <HStack className="mt-0.5 items-center gap-1">
-                  {/* Beer count badge - only show if drinkCount > 0 */}
-                  {hasAttendance && drinkCount! > 0 && (
-                    <HStack className="items-center gap-0.5">
-                      <Beer size={10} color={Colors.primary[600]} />
-                      <Text className="text-[10px] font-semibold text-primary-600">
-                        {drinkCount}
-                      </Text>
-                    </HStack>
-                  )}
-                  {/* Reservation indicator */}
-                  {hasReservation && !hasAttendance && (
-                    <CalendarClock size={12} color={IconColors.reservation} />
-                  )}
-                </HStack>
-              )}
+            {isFestivalDay && !isSelected && (hasAttendance || hasReservation) && (
+              <HStack className="mt-0.5 items-center gap-1">
+                {/* Beer count badge - only show if drinkCount > 0 */}
+                {hasAttendance && drinkCount! > 0 && (
+                  <HStack className="items-center gap-0.5">
+                    <Beer size={10} color={Colors.primary[600]} />
+                    <Text className="text-[10px] font-semibold text-primary-600">{drinkCount}</Text>
+                  </HStack>
+                )}
+                {/* Reservation indicator */}
+                {hasReservation && !hasAttendance && (
+                  <CalendarClock size={12} color={IconColors.reservation} />
+                )}
+              </HStack>
+            )}
 
             {/* Indicators on selected */}
             {isSelected && (hasAttendance || hasReservation) && (
@@ -279,9 +251,7 @@ export function AttendanceCalendar({
                 {hasAttendance && drinkCount! > 0 && (
                   <HStack className="items-center gap-0.5">
                     <Beer size={10} color={Colors.white} />
-                    <Text className="text-[10px] font-semibold text-white">
-                      {drinkCount}
-                    </Text>
+                    <Text className="text-[10px] font-semibold text-white">{drinkCount}</Text>
                   </HStack>
                 )}
                 {hasReservation && !hasAttendance && (
@@ -309,30 +279,16 @@ export function AttendanceCalendar({
     <VStack className="rounded-xl bg-background-0 p-4">
       {/* Header with month navigation */}
       <HStack className="mb-4 items-center justify-between">
-        <Pressable
-          onPress={handlePrevMonth}
-          disabled={!canGoPrev}
-          className="p-2"
-        >
-          <ChevronLeft
-            size={24}
-            color={canGoPrev ? IconColors.default : IconColors.disabled}
-          />
+        <Pressable onPress={handlePrevMonth} disabled={!canGoPrev} className="p-2">
+          <ChevronLeft size={24} color={canGoPrev ? IconColors.default : IconColors.disabled} />
         </Pressable>
 
         <Text className="text-lg font-semibold text-typography-900">
           {formatLocalized(currentMonth, "MMMM yyyy")}
         </Text>
 
-        <Pressable
-          onPress={handleNextMonth}
-          disabled={!canGoNext}
-          className="p-2"
-        >
-          <ChevronRight
-            size={24}
-            color={canGoNext ? IconColors.default : IconColors.disabled}
-          />
+        <Pressable onPress={handleNextMonth} disabled={!canGoNext} className="p-2">
+          <ChevronRight size={24} color={canGoNext ? IconColors.default : IconColors.disabled} />
         </Pressable>
       </HStack>
 
@@ -340,9 +296,7 @@ export function AttendanceCalendar({
       <HStack className="mb-2 justify-around">
         {weekdayHeaders.map((day) => (
           <View key={day} className="w-12 items-center">
-            <Text className="text-xs font-medium text-typography-500">
-              {day}
-            </Text>
+            <Text className="text-xs font-medium text-typography-500">{day}</Text>
           </View>
         ))}
       </HStack>
@@ -351,9 +305,7 @@ export function AttendanceCalendar({
       <VStack space="xs">
         {calendarWeeks.map((week, weekIndex) => (
           <HStack key={weekIndex} className="justify-around">
-            {week.map((day, dayIndex) =>
-              renderDay(day, weekIndex * 7 + dayIndex),
-            )}
+            {week.map((day, dayIndex) => renderDay(day, weekIndex * 7 + dayIndex))}
           </HStack>
         ))}
       </VStack>
@@ -377,9 +329,7 @@ export function AttendanceCalendar({
         </HStack>
         <HStack space="sm" className="items-center">
           <View className="h-3 w-3 rounded bg-primary-500" />
-          <Text className="text-xs text-typography-500">
-            {t("attendance.calendar.selected")}
-          </Text>
+          <Text className="text-xs text-typography-500">{t("attendance.calendar.selected")}</Text>
         </HStack>
       </HStack>
     </VStack>

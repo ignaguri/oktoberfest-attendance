@@ -19,10 +19,7 @@ import { useCallback, useContext, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth/AuthContext";
-import {
-  OfflineContext,
-  triggerBackgroundPush,
-} from "@/lib/database/offline-provider";
+import { OfflineContext, triggerBackgroundPush } from "@/lib/database/offline-provider";
 import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
 import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
@@ -30,10 +27,7 @@ import { logger } from "@/lib/logger";
 import { type PendingPhoto } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
 import { useOfflineUpdateAttendance } from "./useOfflineAttendance";
-import {
-  useOfflineDeleteConsumption,
-  useOfflineLogConsumption,
-} from "./useOfflineConsumption";
+import { useOfflineDeleteConsumption, useOfflineLogConsumption } from "./useOfflineConsumption";
 import { useRatePrompt } from "./useRatePrompt";
 
 interface SaveAttendanceInput {
@@ -116,9 +110,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           }
 
           // Process each drink type
-          for (const drinkType of Object.keys(
-            localDrinkCounts,
-          ) as DrinkType[]) {
+          for (const drinkType of Object.keys(localDrinkCounts) as DrinkType[]) {
             const desiredCount = localDrinkCounts[drinkType];
             const currentCount = currentCounts[drinkType];
             const delta = desiredCount - currentCount;
@@ -145,9 +137,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
               const consumptionsOfType = existingConsumptions
                 .filter((c) => c.drinkType === drinkType)
                 .sort(
-                  (a, b) =>
-                    new Date(b.recordedAt).getTime() -
-                    new Date(a.recordedAt).getTime(),
+                  (a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime(),
                 );
 
               for (let i = 0; i < Math.abs(delta); i++) {
@@ -164,10 +154,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
 
           // Refresh pending count and invalidate local caches once after all writes
           await offlineContext?.refreshPendingCount?.();
-          await invalidateLocalQueries(queryClient, [
-            "local-consumptions",
-            "local-attendances",
-          ]);
+          await invalidateLocalQueries(queryClient, ["local-consumptions", "local-attendances"]);
         }
 
         // Step 3: Delete photos marked for removal
@@ -219,8 +206,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         // block the save flow on this.
         void recordAttendanceSave();
       } catch (err) {
-        const saveError =
-          err instanceof Error ? err : new Error("Failed to save attendance");
+        const saveError = err instanceof Error ? err : new Error("Failed to save attendance");
         setError(saveError);
         throw saveError;
       } finally {

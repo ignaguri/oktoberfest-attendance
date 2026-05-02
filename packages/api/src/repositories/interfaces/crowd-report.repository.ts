@@ -24,10 +24,7 @@ export interface ICrowdReportRepository {
    * @param festivalId - Festival ID
    * @returns Array of crowd reports with user info
    */
-  getTentReports(
-    tentId: string,
-    festivalId: string,
-  ): Promise<CrowdReportWithUser[]>;
+  getTentReports(tentId: string, festivalId: string): Promise<CrowdReportWithUser[]>;
 
   /**
    * Submit a new crowd report

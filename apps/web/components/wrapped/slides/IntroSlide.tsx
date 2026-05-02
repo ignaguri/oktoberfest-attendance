@@ -25,10 +25,7 @@ export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
   // Trigger confetti after delay when slide becomes active
   useEffect(() => {
     if (isActive) {
-      const timer = setTimeout(
-        triggerConfetti,
-        ANIMATION_DELAYS.confettiTrigger,
-      );
+      const timer = setTimeout(triggerConfetti, ANIMATION_DELAYS.confettiTrigger);
       return () => clearTimeout(timer);
     }
   }, [isActive, triggerConfetti]);
@@ -65,9 +62,7 @@ export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
           {data.festival_info.name}
         </SlideTitle>
 
-        <SlideSubtitle className="text-2xl font-semibold">
-          {t("wrapped.intro.title")}
-        </SlideSubtitle>
+        <SlideSubtitle className="text-2xl font-semibold">{t("wrapped.intro.title")}</SlideSubtitle>
 
         <div className="mt-4 rounded-lg bg-white px-6 py-3 shadow-md">
           <p className="text-xl font-medium text-gray-700">

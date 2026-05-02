@@ -41,15 +41,13 @@ export const searchKeys = {
   all: ["search"] as const,
 
   // User search queries
-  users: (filters: UserSearchFilters = {}) =>
-    [...searchKeys.all, "users", filters] as const,
+  users: (filters: UserSearchFilters = {}) => [...searchKeys.all, "users", filters] as const,
   user: (id: string) => [...searchKeys.all, "users", "detail", id] as const,
   userAttendances: (userId: string, filters: BaseSearchFilters = {}) =>
     [...searchKeys.all, "users", "attendances", userId, filters] as const,
 
   // Group search queries
-  groups: (filters: GroupSearchFilters = {}) =>
-    [...searchKeys.all, "groups", filters] as const,
+  groups: (filters: GroupSearchFilters = {}) => [...searchKeys.all, "groups", filters] as const,
   group: (id: string) => [...searchKeys.all, "groups", "detail", id] as const,
   groupMembers: (groupId: string, filters: BaseSearchFilters = {}) =>
     [...searchKeys.all, "groups", "members", groupId, filters] as const,
@@ -57,12 +55,10 @@ export const searchKeys = {
   // Festival search queries
   festivals: (filters: FestivalSearchFilters = {}) =>
     [...searchKeys.all, "festivals", filters] as const,
-  festival: (id: string) =>
-    [...searchKeys.all, "festivals", "detail", id] as const,
+  festival: (id: string) => [...searchKeys.all, "festivals", "detail", id] as const,
 
   // Tent search queries
-  tents: (filters: TentSearchFilters = {}) =>
-    [...searchKeys.all, "tents", filters] as const,
+  tents: (filters: TentSearchFilters = {}) => [...searchKeys.all, "tents", filters] as const,
   tent: (id: string) => [...searchKeys.all, "tents", "detail", id] as const,
 
   // Global search

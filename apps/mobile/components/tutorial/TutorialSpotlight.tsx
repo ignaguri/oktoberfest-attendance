@@ -29,10 +29,7 @@ interface TutorialSpotlightProps {
   visible: boolean;
 }
 
-export function TutorialSpotlight({
-  targetMeasurement,
-  visible,
-}: TutorialSpotlightProps) {
+export function TutorialSpotlight({ targetMeasurement, visible }: TutorialSpotlightProps) {
   const opacityAnim = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
@@ -86,13 +83,7 @@ export function TutorialSpotlight({
         {/* Mask: white = visible, black = transparent */}
         <Mask id="spotlight-mask">
           {/* Full white background (everything visible/dimmed) */}
-          <Rect
-            x={0}
-            y={0}
-            width={SCREEN_WIDTH}
-            height={SCREEN_HEIGHT}
-            fill="white"
-          />
+          <Rect x={0} y={0} width={SCREEN_WIDTH} height={SCREEN_HEIGHT} fill="white" />
           {/* Black rounded rect to create transparent cutout */}
           <Rect
             x={spotlightX}

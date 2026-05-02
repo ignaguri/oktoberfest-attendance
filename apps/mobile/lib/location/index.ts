@@ -5,9 +5,5 @@ export {
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
 } from "./background-location";
-export {
-  LocationProvider,
-  useLocationContext,
-  useLocationContextSafe,
-} from "./LocationContext";
+export { LocationProvider, useLocationContext, useLocationContextSafe } from "./LocationContext";
 export { useLocation } from "./useLocation";

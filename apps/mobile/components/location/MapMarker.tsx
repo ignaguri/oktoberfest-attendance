@@ -15,11 +15,7 @@ interface FriendMarkerProps {
 /**
  * Custom map marker for friends with avatar
  */
-export function FriendMarker({
-  avatarUrl,
-  username,
-  isSelected = false,
-}: FriendMarkerProps) {
+export function FriendMarker({ avatarUrl, username, isSelected = false }: FriendMarkerProps) {
   return (
     <View className="items-center">
       <View
@@ -45,9 +41,7 @@ export function FriendMarker({
           />
         ) : (
           <View className="h-8 w-8 items-center justify-center rounded-full bg-primary-100">
-            <Text className="text-sm font-bold text-primary-700">
-              {getInitials({ username })}
-            </Text>
+            <Text className="text-sm font-bold text-primary-700">{getInitials({ username })}</Text>
           </View>
         )}
       </View>
@@ -96,10 +90,7 @@ export function TentMarker({
   return (
     <View className="items-center">
       <View
-        className={cn(
-          "rounded-lg px-2 py-1",
-          isSelected && "border-2 border-primary-700",
-        )}
+        className={cn("rounded-lg px-2 py-1", isSelected && "border-2 border-primary-700")}
         style={{
           backgroundColor: markerColor,
           shadowColor: "#000",
@@ -112,9 +103,7 @@ export function TentMarker({
         <View className="flex-row items-center gap-1">
           <Beer size={14} color="white" />
           {distanceMeters < 100 && (
-            <Text className="text-xs font-medium text-white">
-              {Math.round(distanceMeters)}m
-            </Text>
+            <Text className="text-xs font-medium text-white">{Math.round(distanceMeters)}m</Text>
           )}
         </View>
       </View>

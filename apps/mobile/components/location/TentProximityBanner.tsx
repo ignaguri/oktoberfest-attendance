@@ -2,12 +2,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import { Beer, ChevronRight, X } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInUp,
-  SlideOutUp,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, SlideInUp, SlideOutUp } from "react-native-reanimated";
 
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
@@ -63,10 +58,7 @@ export function TentProximityBanner({
       clearTimeout(dismissTimeoutRef.current);
     }
     // Reset dismissed state after 5 minutes
-    dismissTimeoutRef.current = setTimeout(
-      () => setDismissed(false),
-      5 * 60 * 1000,
-    );
+    dismissTimeoutRef.current = setTimeout(() => setDismissed(false), 5 * 60 * 1000);
   }, []);
 
   const handlePress = useCallback(() => {
@@ -138,10 +130,7 @@ export function TentProximityBanner({
                 <Beer size={24} color="white" />
               </Box>
               <VStack className="flex-1">
-                <Text
-                  className="text-base font-semibold text-white"
-                  numberOfLines={1}
-                >
+                <Text className="text-base font-semibold text-white" numberOfLines={1}>
                   {closestTent.tentName}
                 </Text>
                 <Text className="text-sm text-white/80">{distanceText}</Text>

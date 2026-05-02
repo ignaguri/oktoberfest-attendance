@@ -61,10 +61,7 @@ app.openapi(listAchievementsRoute, async (c) => {
   const query = c.req.valid("query");
 
   const achievementRepo = new SupabaseAchievementRepository(supabase);
-  const achievements = await achievementRepo.listUserAchievements(
-    user.id,
-    query,
-  );
+  const achievements = await achievementRepo.listUserAchievements(user.id, query);
 
   return c.json({ data: achievements }, 200);
 });
@@ -116,13 +113,10 @@ app.openapi(evaluateAchievementsRoute, async (c) => {
   const { festivalId } = c.req.valid("json");
 
   // Call stored procedure to evaluate achievements
-  const { data: _data, error } = await supabase.rpc(
-    "evaluate_user_achievements",
-    {
-      p_user_id: user.id,
-      p_festival_id: festivalId,
-    },
-  );
+  const { data: _data, error } = await supabase.rpc("evaluate_user_achievements", {
+    p_user_id: user.id,
+    p_festival_id: festivalId,
+  });
 
   if (error) {
     throw new Error(`Failed to evaluate achievements: ${error.message}`);
@@ -160,8 +154,7 @@ const getAchievementsWithProgressRoute = createRoute({
   path: "/achievements/with-progress",
   tags: ["achievements"],
   summary: "Get all achievements with progress",
-  description:
-    "Returns all achievements (locked and unlocked) with user progress for a festival",
+  description: "Returns all achievements (locked and unlocked) with user progress for a festival",
   request: {
     query: ListAchievementsQuerySchema,
   },
@@ -205,46 +198,40 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
   }
 
   // Map database result to API response format
-  const achievements: AchievementWithProgress[] = (data || []).map(
-    (achievement: any) => ({
-      id: achievement.achievement_id,
-      name: achievement.name,
-      description: achievement.description,
-      category: achievement.category,
-      icon: achievement.icon,
-      points: achievement.points,
-      rarity: achievement.rarity,
-      conditions: {},
-      is_active: true,
-      created_at: "",
-      updated_at: "",
-      is_unlocked: achievement.is_unlocked,
-      unlocked_at: achievement.unlocked_at,
-      user_progress: achievement.current_progress
-        ? {
-            current_value:
-              (achievement.current_progress as any)?.current_value || 0,
-            target_value:
-              (achievement.current_progress as any)?.target_value || 1,
-            percentage: (achievement.current_progress as any)?.percentage || 0,
-            last_updated: new Date().toISOString(),
-          }
-        : {
-            current_value: 0,
-            target_value: 1,
-            percentage: 0,
-            last_updated: new Date().toISOString(),
-          },
-    }),
-  );
+  const achievements: AchievementWithProgress[] = (data || []).map((achievement: any) => ({
+    id: achievement.achievement_id,
+    name: achievement.name,
+    description: achievement.description,
+    category: achievement.category,
+    icon: achievement.icon,
+    points: achievement.points,
+    rarity: achievement.rarity,
+    conditions: {},
+    is_active: true,
+    created_at: "",
+    updated_at: "",
+    is_unlocked: achievement.is_unlocked,
+    unlocked_at: achievement.unlocked_at,
+    user_progress: achievement.current_progress
+      ? {
+          current_value: (achievement.current_progress as any)?.current_value || 0,
+          target_value: (achievement.current_progress as any)?.target_value || 1,
+          percentage: (achievement.current_progress as any)?.percentage || 0,
+          last_updated: new Date().toISOString(),
+        }
+      : {
+          current_value: 0,
+          target_value: 1,
+          percentage: 0,
+          last_updated: new Date().toISOString(),
+        },
+  }));
 
   // Calculate stats
   const stats: AchievementStats = {
     total_achievements: achievements.length,
     unlocked_achievements: achievements.filter((a) => a.is_unlocked).length,
-    total_points: achievements
-      .filter((a) => a.is_unlocked)
-      .reduce((sum, a) => sum + a.points, 0),
+    total_points: achievements.filter((a) => a.is_unlocked).reduce((sum, a) => sum + a.points, 0),
     breakdown_by_category: {
       consumption: { total: 0, unlocked: 0, points: 0 },
       attendance: { total: 0, unlocked: 0, points: 0 },
@@ -325,16 +312,14 @@ app.openapi(getAchievementLeaderboardRoute, async (c) => {
     throw new Error(`Failed to fetch leaderboard: ${error.message}`);
   }
 
-  const leaderboard: AchievementLeaderboardEntry[] = (data || []).map(
-    (entry: any) => ({
-      user_id: entry.user_id,
-      username: entry.username,
-      full_name: entry.full_name,
-      avatar_url: entry.avatar_url,
-      total_achievements: entry.total_achievements,
-      total_points: entry.total_points,
-    }),
-  );
+  const leaderboard: AchievementLeaderboardEntry[] = (data || []).map((entry: any) => ({
+    user_id: entry.user_id,
+    username: entry.username,
+    full_name: entry.full_name,
+    avatar_url: entry.avatar_url,
+    total_achievements: entry.total_achievements,
+    total_points: entry.total_points,
+  }));
 
   return c.json({ data: leaderboard }, 200);
 });
@@ -384,18 +369,16 @@ app.openapi(listAvailableAchievementsRoute, async (c) => {
     throw new Error(`Failed to fetch achievements: ${error.message}`);
   }
 
-  const achievements: AvailableAchievement[] = (data || []).map(
-    (achievement: any) => ({
-      id: achievement.id,
-      name: achievement.name,
-      description: achievement.description,
-      category: achievement.category,
-      icon: achievement.icon,
-      points: achievement.points,
-      rarity: achievement.rarity,
-      is_active: achievement.is_active,
-    }),
-  );
+  const achievements: AvailableAchievement[] = (data || []).map((achievement: any) => ({
+    id: achievement.id,
+    name: achievement.name,
+    description: achievement.description,
+    category: achievement.category,
+    icon: achievement.icon,
+    points: achievement.points,
+    rarity: achievement.rarity,
+    is_active: achievement.is_active,
+  }));
 
   return c.json({ data: achievements }, 200);
 });

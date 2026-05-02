@@ -189,13 +189,9 @@ async function checkHardwareAndEnrollment(): Promise<{
   const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
 
   let type: BiometricType = null;
-  if (
-    types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)
-  ) {
+  if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
     type = "facial";
-  } else if (
-    types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
-  ) {
+  } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
     type = "fingerprint";
   }
 

@@ -1,7 +1,4 @@
-import type {
-  ListAchievementsQuery,
-  UserAchievement,
-} from "@prostcounter/shared";
+import type { ListAchievementsQuery, UserAchievement } from "@prostcounter/shared";
 
 /**
  * Achievement repository interface
@@ -14,10 +11,7 @@ export interface IAchievementRepository {
    * @param query - Query parameters (festivalId, category)
    * @returns Array of user achievements with details
    */
-  listUserAchievements(
-    userId: string,
-    query: ListAchievementsQuery,
-  ): Promise<UserAchievement[]>;
+  listUserAchievements(userId: string, query: ListAchievementsQuery): Promise<UserAchievement[]>;
 
   /**
    * Get total achievement points for a user

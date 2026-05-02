@@ -46,11 +46,11 @@ fastlane/metadata/android/
 
 ## Field limits (Play Console)
 
-| Field | Limit |
-|---|---|
-| Title | 30 characters |
-| Short description | 80 characters |
-| Full description | 4000 characters |
+| Field             | Limit           |
+| ----------------- | --------------- |
+| Title             | 30 characters   |
+| Short description | 80 characters   |
+| Full description  | 4000 characters |
 
 ## Screenshot specs
 

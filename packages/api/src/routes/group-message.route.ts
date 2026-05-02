@@ -181,9 +181,7 @@ app.openapi(listGroupMessagesRoute, async (c) => {
 
   // Determine pagination
   const hasMore = regularMessages.length > limit;
-  const resultMessages = hasMore
-    ? regularMessages.slice(0, limit)
-    : regularMessages;
+  const resultMessages = hasMore ? regularMessages.slice(0, limit) : regularMessages;
 
   const nextCursor =
     hasMore && resultMessages.length > 0
@@ -191,9 +189,7 @@ app.openapi(listGroupMessagesRoute, async (c) => {
       : null;
 
   // Combine pinned + regular (only include pinned on first page)
-  const allMessages = cursor
-    ? resultMessages
-    : [...(pinnedMessages || []), ...resultMessages];
+  const allMessages = cursor ? resultMessages : [...(pinnedMessages || []), ...resultMessages];
 
   // Collect user IDs to fetch profiles
   const userIds = [...new Set(allMessages.map((m) => m.user_id))];
@@ -209,9 +205,7 @@ app.openapi(listGroupMessagesRoute, async (c) => {
 
   const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-  const messages = allMessages.map((m) =>
-    mapMessageResponse(m, profileMap.get(m.user_id)),
-  );
+  const messages = allMessages.map((m) => mapMessageResponse(m, profileMap.get(m.user_id)));
 
   return c.json({ messages, nextCursor, hasMore }, 200);
 });
@@ -336,9 +330,7 @@ app.openapi(getMessageFeedRoute, async (c) => {
 
   const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-  const feedMessages = resultMessages.map((m) =>
-    mapMessageResponse(m, profileMap.get(m.user_id)),
-  );
+  const feedMessages = resultMessages.map((m) => mapMessageResponse(m, profileMap.get(m.user_id)));
 
   return c.json({ messages: feedMessages, nextCursor, hasMore }, 200);
 });
@@ -457,8 +449,7 @@ const updateMessageRoute = createRoute({
   path: "/messages/{messageId}",
   tags: ["group-messages"],
   summary: "Update own message",
-  description:
-    "Update the content, type, or pinned state of a message you posted",
+  description: "Update the content, type, or pinned state of a message you posted",
   request: {
     params: MessageIdParamSchema,
     body: {
@@ -531,8 +522,7 @@ app.openapi(updateMessageRoute, async (c) => {
     updated_at: new Date().toISOString(),
   };
   if (updates.content !== undefined) updateData.content = updates.content;
-  if (updates.messageType !== undefined)
-    updateData.message_type = updates.messageType;
+  if (updates.messageType !== undefined) updateData.message_type = updates.messageType;
   if (updates.pinned !== undefined) updateData.pinned = updates.pinned;
 
   const { data: updated, error } = await supabase
@@ -637,10 +627,7 @@ app.openapi(deleteMessageRoute, async (c) => {
     throw new ForbiddenError("You can only delete your own messages");
   }
 
-  const { error } = await supabase
-    .from("group_messages")
-    .delete()
-    .eq("id", messageId);
+  const { error } = await supabase.from("group_messages").delete().eq("id", messageId);
 
   if (error) {
     throw new Error(`Failed to delete message: ${error.message}`);

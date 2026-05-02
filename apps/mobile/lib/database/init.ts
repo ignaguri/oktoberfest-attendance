@@ -88,9 +88,7 @@ export async function closeDatabase(): Promise<void> {
  * This function is kept for backwards compatibility but will be removed
  * in a future version. It uses legacy DDL constants instead of Drizzle migrations.
  */
-export async function initializeSchema(
-  db: SQLite.SQLiteDatabase,
-): Promise<void> {
+export async function initializeSchema(db: SQLite.SQLiteDatabase): Promise<void> {
   logger.debug("[Database] Initializing schema...");
 
   try {
@@ -123,9 +121,7 @@ export async function initializeSchema(
  * Initializes sync metadata for all syncable tables.
  * Inserts default records if they don't exist.
  */
-async function initializeSyncMetadata(
-  db: SQLite.SQLiteDatabase,
-): Promise<void> {
+async function initializeSyncMetadata(db: SQLite.SQLiteDatabase): Promise<void> {
   for (const tableName of SYNCABLE_TABLES) {
     await db.runAsync(
       `INSERT OR IGNORE INTO _sync_metadata (table_name, schema_version) VALUES (?, ?)`,
@@ -142,13 +138,9 @@ async function initializeSyncMetadata(
  * Runs a database integrity check.
  * Returns true if database is healthy, false if corrupted.
  */
-export async function checkDatabaseIntegrity(
-  db: SQLite.SQLiteDatabase,
-): Promise<boolean> {
+export async function checkDatabaseIntegrity(db: SQLite.SQLiteDatabase): Promise<boolean> {
   try {
-    const result = await db.getFirstAsync<{ integrity_check: string }>(
-      "PRAGMA integrity_check",
-    );
+    const result = await db.getFirstAsync<{ integrity_check: string }>("PRAGMA integrity_check");
     const isHealthy = result?.integrity_check === "ok";
     if (!isHealthy) {
       logger.warn("[Database] Integrity check failed:", { result });
@@ -163,9 +155,7 @@ export async function checkDatabaseIntegrity(
 /**
  * Gets database statistics for debugging.
  */
-export async function getDatabaseStats(
-  db: SQLite.SQLiteDatabase,
-): Promise<Record<string, number>> {
+export async function getDatabaseStats(db: SQLite.SQLiteDatabase): Promise<Record<string, number>> {
   const stats: Record<string, number> = {};
 
   for (const tableName of SYNCABLE_TABLES) {
@@ -265,9 +255,7 @@ export async function initializeDatabase(): Promise<SQLite.SQLiteDatabase> {
       if (version < SCHEMA_VERSION) {
         // Fresh database or needs migration
         await runMigrations(db);
-        logger.debug(
-          `[Database] Migrations complete: v${version} -> v${SCHEMA_VERSION}`,
-        );
+        logger.debug(`[Database] Migrations complete: v${version} -> v${SCHEMA_VERSION}`);
       } else {
         logger.debug(`[Database] Schema up to date (v${version})`);
       }

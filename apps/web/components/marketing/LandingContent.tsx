@@ -1,16 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Beer,
-  Calendar,
-  Check,
-  Download,
-  MapPin,
-  Trophy,
-  Users,
-  Watch,
-} from "lucide-react";
+import { Beer, Calendar, Check, Download, MapPin, Trophy, Users, Watch } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
@@ -105,12 +96,7 @@ export function LandingContent() {
             variants={fadeUp}
             className="flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
-            <Button
-              variant="darkYellow"
-              size="lg"
-              asChild
-              className="px-8 text-base"
-            >
+            <Button variant="darkYellow" size="lg" asChild className="px-8 text-base">
               <Link href="/sign-up">{t("marketing.hero.getStarted")}</Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="text-base">
@@ -162,9 +148,7 @@ export function LandingContent() {
                 variants={fadeUp}
                 className="group rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-shadow hover:shadow-md"
               >
-                <div
-                  className={`mb-4 inline-flex rounded-xl p-3 ${feature.color}`}
-                >
+                <div className={`mb-4 inline-flex rounded-xl p-3 ${feature.color}`}>
                   <feature.icon size={24} />
                 </div>
                 <h3 className="mb-2 text-xl font-bold text-gray-900">
@@ -189,18 +173,11 @@ export function LandingContent() {
             viewport={{ once: true, margin: "-100px" }}
             variants={stagger}
           >
-            <motion.div
-              variants={fadeUp}
-              className="flex items-center justify-center"
-            >
+            <motion.div variants={fadeUp} className="flex items-center justify-center">
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 opacity-30 blur-3xl" />
                 <div className="relative inline-flex items-center justify-center rounded-[3rem] bg-gradient-to-br from-gray-900 to-gray-700 p-10 shadow-2xl">
-                  <Watch
-                    size={140}
-                    className="text-yellow-400"
-                    strokeWidth={1.5}
-                  />
+                  <Watch size={140} className="text-yellow-400" strokeWidth={1.5} />
                 </div>
               </div>
             </motion.div>
@@ -218,22 +195,18 @@ export function LandingContent() {
               </p>
 
               <ul className="mb-8 space-y-3">
-                {(
-                  [
-                    "bulletFastLog",
-                    "bulletAutoTent",
-                    "bulletGroupActivity",
-                  ] as const
-                ).map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-yellow-500 text-white">
-                      <Check size={14} strokeWidth={3} />
-                    </span>
-                    <span className="text-gray-700">
-                      {t(`marketing.appleWatchHighlight.${bullet}`)}
-                    </span>
-                  </li>
-                ))}
+                {(["bulletFastLog", "bulletAutoTent", "bulletGroupActivity"] as const).map(
+                  (bullet) => (
+                    <li key={bullet} className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-yellow-500 text-white">
+                        <Check size={14} strokeWidth={3} />
+                      </span>
+                      <span className="text-gray-700">
+                        {t(`marketing.appleWatchHighlight.${bullet}`)}
+                      </span>
+                    </li>
+                  ),
+                )}
               </ul>
 
               <a
@@ -374,9 +347,7 @@ export function LandingContent() {
               height={120}
               className="mx-auto rounded-lg bg-white p-2"
             />
-            <p className="mt-2 text-xs text-gray-500">
-              {t("marketing.cta.scanToDownload")}
-            </p>
+            <p className="mt-2 text-xs text-gray-500">{t("marketing.cta.scanToDownload")}</p>
           </motion.div>
         </motion.div>
       </section>

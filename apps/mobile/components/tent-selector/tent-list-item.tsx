@@ -3,12 +3,7 @@ import { cn } from "@prostcounter/ui";
 import { Check } from "lucide-react-native";
 
 import { CrowdLevelBadge } from "@/components/crowd/crowd-level-badge";
-import {
-  Checkbox,
-  CheckboxIcon,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from "@/components/ui/checkbox";
+import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/components/ui/checkbox";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -69,19 +64,12 @@ export function TentListItem({
       <HStack className="items-center justify-between">
         <VStack className="flex-1">
           <Text
-            className={cn(
-              isSelected
-                ? "font-semibold text-primary-700"
-                : "text-typography-700",
-            )}
+            className={cn(isSelected ? "font-semibold text-primary-700" : "text-typography-700")}
           >
             {tentName}
           </Text>
           {crowdLevel && (
-            <CrowdLevelBadge
-              crowdLevel={crowdLevel}
-              avgWaitMinutes={avgWaitMinutes}
-            />
+            <CrowdLevelBadge crowdLevel={crowdLevel} avgWaitMinutes={avgWaitMinutes} />
           )}
         </VStack>
         {isSelected && <Check size={20} color={IconColors.default} />}

@@ -43,10 +43,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
     app.use("*", async (c, next) => {
       const authHeader = c.req.header("Authorization");
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
       c.set("user", mockUser);
       c.set("supabase", mockSupabase);
@@ -74,9 +71,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
     it("should return 'self' when viewing own profile", async () => {
       // 1. Profile query
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess({ ...mockProfileRow, id: currentUserId }),
-        ),
+        createMockChain(mockSupabaseSuccess({ ...mockProfileRow, id: currentUserId })),
       );
 
       // currentUserId is passed from route via c.var.user.id
@@ -107,9 +102,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 3. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 
@@ -137,9 +130,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 3. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 
@@ -166,9 +157,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 3. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 
@@ -184,14 +173,10 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 2. Friendship query - no result
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 3. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 
@@ -212,15 +197,11 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 2. Friendship query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 3. My groups query - current user is in 2 groups
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess([{ group_id: groupId1 }, { group_id: groupId2 }]),
-        ),
+        createMockChain(mockSupabaseSuccess([{ group_id: groupId1 }, { group_id: groupId2 }])),
       );
 
       // 4. Target user's shared groups count
@@ -242,14 +223,10 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 2. Friendship query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 3. My groups query - empty
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 
@@ -265,9 +242,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 2. Friendship query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 3. My groups query
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
@@ -306,14 +281,10 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 3. Friendship query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 4. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId, `?festivalId=${festivalId}`);
 
@@ -333,14 +304,10 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 2. Friendship query (no stats query since no festivalId)
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 3. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 
@@ -358,14 +325,10 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
       );
 
       // 2. Friendship query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // 3. My groups query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const res = await makeRequest(targetUserId);
 

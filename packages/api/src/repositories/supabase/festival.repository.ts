@@ -32,11 +32,7 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
   }
 
   async findById(id: string): Promise<Festival | null> {
-    const { data, error } = await this.supabase
-      .from("festivals")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data, error } = await this.supabase.from("festivals").select("*").eq("id", id).single();
 
     if (error) {
       if (error.code === PgErrorCode.NO_ROWS) {
@@ -59,9 +55,7 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       if (error.code === PgErrorCode.NO_ROWS) {
         return null; // No active festival
       }
-      throw new DatabaseError(
-        `Failed to fetch active festival: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch active festival: ${error.message}`);
     }
 
     return this.mapToFestival(data);

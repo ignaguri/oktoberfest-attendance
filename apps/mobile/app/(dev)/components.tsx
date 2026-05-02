@@ -115,13 +115,7 @@ const COMPONENT_OPTIONS: { label: string; value: ComponentType }[] = [
 ];
 
 // Section wrapper component (replaces CardHeader/CardTitle/CardContent)
-const Section = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <Card className="p-4">
     <VStack space="md">
       <Heading size="md">{title}</Heading>
@@ -345,19 +339,10 @@ const FormControlsShowcase = () => {
 
         <HStack className="items-center justify-between">
           <Text className="text-gray-700">Enable notifications</Text>
-          <Switch
-            value={switchValue}
-            onValueChange={setSwitchValue}
-            size="md"
-          />
+          <Switch value={switchValue} onValueChange={setSwitchValue} size="md" />
         </HStack>
 
-        <Checkbox
-          value="terms"
-          isChecked={checkboxValue}
-          onChange={setCheckboxValue}
-          size="md"
-        >
+        <Checkbox value="terms" isChecked={checkboxValue} onChange={setCheckboxValue} size="md">
           <CheckboxIndicator>
             <CheckboxIcon as={CheckIconWhite} />
           </CheckboxIndicator>
@@ -391,9 +376,7 @@ const ModalShowcase = () => {
   return (
     <Section title="Modal">
       <VStack space="md">
-        <Text className="text-sm text-gray-600">
-          Tap the button below to open a modal dialog.
-        </Text>
+        <Text className="text-sm text-gray-600">Tap the button below to open a modal dialog.</Text>
         <Button action="primary" onPress={() => setModalOpen(true)}>
           <ButtonText>Open Modal</ButtonText>
         </Button>
@@ -411,8 +394,8 @@ const ModalShowcase = () => {
             </ModalHeader>
             <ModalBody>
               <Text>
-                This is an example modal dialog. It can contain any content you
-                need to display to the user.
+                This is an example modal dialog. It can contain any content you need to display to
+                the user.
               </Text>
             </ModalBody>
             <ModalFooter>
@@ -424,11 +407,7 @@ const ModalShowcase = () => {
               >
                 <ButtonText>Cancel</ButtonText>
               </Button>
-              <Button
-                action="primary"
-                size="sm"
-                onPress={() => setModalOpen(false)}
-              >
+              <Button action="primary" size="sm" onPress={() => setModalOpen(false)}>
                 <ButtonText>Confirm</ButtonText>
               </Button>
             </ModalFooter>
@@ -527,17 +506,10 @@ const SelectShowcase = () => {
           <Text bold className="text-xs uppercase text-gray-600">
             Choose a tent
           </Text>
-          <Select
-            selectedValue={selectedValue}
-            onValueChange={setSelectedValue}
-          >
+          <Select selectedValue={selectedValue} onValueChange={setSelectedValue}>
             <SelectTrigger variant="outline" size="md">
               <SelectInput placeholder="Select tent..." />
-              <ChevronDown
-                size={20}
-                color={IconColors.default}
-                style={{ marginRight: 12 }}
-              />
+              <ChevronDown size={20} color={IconColors.default} style={{ marginRight: 12 }} />
             </SelectTrigger>
             <SelectPortal>
               <SelectBackdrop />
@@ -556,9 +528,7 @@ const SelectShowcase = () => {
             </SelectPortal>
           </Select>
         </VStack>
-        {selectedValue && (
-          <Text className="text-gray-600">Selected: {selectedValue}</Text>
-        )}
+        {selectedValue && <Text className="text-gray-600">Selected: {selectedValue}</Text>}
       </VStack>
     </Section>
   );
@@ -593,17 +563,12 @@ const ActionsheetShowcase = () => {
   return (
     <Section title="ActionSheet">
       <VStack space="md">
-        <Text className="text-sm text-gray-600">
-          Bottom sheet with multiple action options.
-        </Text>
+        <Text className="text-sm text-gray-600">Bottom sheet with multiple action options.</Text>
         <Button action="primary" onPress={() => setShowActionsheet(true)}>
           <ButtonText>Open ActionSheet</ButtonText>
         </Button>
 
-        <Actionsheet
-          isOpen={showActionsheet}
-          onClose={() => setShowActionsheet(false)}
-        >
+        <Actionsheet isOpen={showActionsheet} onClose={() => setShowActionsheet(false)}>
           <ActionsheetBackdrop />
           <ActionsheetContent>
             <ActionsheetDragIndicatorWrapper>
@@ -631,9 +596,7 @@ const ActionsheetShowcase = () => {
 const FabShowcase = () => (
   <Section title="Floating Action Button (FAB)">
     <VStack space="md">
-      <Text className="text-sm text-gray-600">
-        Floating action buttons for primary actions.
-      </Text>
+      <Text className="text-sm text-gray-600">Floating action buttons for primary actions.</Text>
       <Box className="relative h-48 rounded-lg bg-gray-100">
         <Fab size="md" placement="bottom right">
           <FabIcon as={AddIcon} />
@@ -678,14 +641,8 @@ const SkeletonShowcase = () => {
   return (
     <Section title="Skeleton">
       <VStack space="md">
-        <Text className="text-sm text-gray-600">
-          Loading placeholders for content.
-        </Text>
-        <Button
-          action="secondary"
-          variant="outline"
-          onPress={() => setIsLoaded(!isLoaded)}
-        >
+        <Text className="text-sm text-gray-600">Loading placeholders for content.</Text>
+        <Button action="secondary" variant="outline" onPress={() => setIsLoaded(!isLoaded)}>
           <ButtonText>{isLoaded ? "Show Skeleton" : "Load Content"}</ButtonText>
         </Button>
 
@@ -693,11 +650,7 @@ const SkeletonShowcase = () => {
           <Text bold className="text-xs uppercase text-gray-600">
             Card Skeleton
           </Text>
-          <Skeleton
-            variant="rounded"
-            isLoaded={isLoaded}
-            className="h-24 w-full"
-          >
+          <Skeleton variant="rounded" isLoaded={isLoaded} className="h-24 w-full">
             <Card className="p-4">
               <Text>Loaded card content!</Text>
             </Card>
@@ -708,12 +661,7 @@ const SkeletonShowcase = () => {
           <Text bold className="text-xs uppercase text-gray-600">
             Text Lines
           </Text>
-          <SkeletonText
-            _lines={3}
-            isLoaded={isLoaded}
-            gap={2}
-            className="h-3 w-full"
-          >
+          <SkeletonText _lines={3} isLoaded={isLoaded} gap={2} className="h-3 w-full">
             <VStack space="sm">
               <Text>First line of text</Text>
               <Text>Second line of text</Text>
@@ -726,11 +674,7 @@ const SkeletonShowcase = () => {
           <Text bold className="text-xs uppercase text-gray-600">
             Avatar Skeleton
           </Text>
-          <Skeleton
-            variant="circular"
-            isLoaded={isLoaded}
-            className="h-16 w-16"
-          >
+          <Skeleton variant="circular" isLoaded={isLoaded} className="h-16 w-16">
             <Avatar size="xl">
               <AvatarFallbackText>AB</AvatarFallbackText>
             </Avatar>
@@ -742,28 +686,16 @@ const SkeletonShowcase = () => {
             Combined Layout
           </Text>
           <HStack space="md" className="items-center">
-            <Skeleton
-              variant="circular"
-              isLoaded={isLoaded}
-              className="h-12 w-12"
-            >
+            <Skeleton variant="circular" isLoaded={isLoaded} className="h-12 w-12">
               <Avatar size="lg">
                 <AvatarFallbackText>JD</AvatarFallbackText>
               </Avatar>
             </Skeleton>
             <VStack className="flex-1">
-              <Skeleton
-                variant="rounded"
-                isLoaded={isLoaded}
-                className="mb-2 h-4 w-3/4"
-              >
+              <Skeleton variant="rounded" isLoaded={isLoaded} className="mb-2 h-4 w-3/4">
                 <Text bold>John Doe</Text>
               </Skeleton>
-              <Skeleton
-                variant="rounded"
-                isLoaded={isLoaded}
-                className="h-3 w-1/2"
-              >
+              <Skeleton variant="rounded" isLoaded={isLoaded} className="h-3 w-1/2">
                 <Text size="sm" className="text-gray-500">
                   @johndoe
                 </Text>
@@ -813,43 +745,25 @@ const ToastShowcase = () => {
   return (
     <Section title="Toast">
       <VStack space="md">
-        <Text className="text-sm text-gray-600">
-          Toast notifications for user feedback.
-        </Text>
+        <Text className="text-sm text-gray-600">Toast notifications for user feedback.</Text>
 
         <VStack space="xs">
           <Text bold className="text-xs uppercase text-gray-600">
             Solid Variants
           </Text>
           <HStack space="sm" className="flex-wrap">
-            <Button
-              action="positive"
-              size="sm"
-              onPress={() => showToast("success")}
-            >
+            <Button action="positive" size="sm" onPress={() => showToast("success")}>
               <ButtonText>Success</ButtonText>
             </Button>
-            <Button
-              action="negative"
-              size="sm"
-              onPress={() => showToast("error")}
-            >
+            <Button action="negative" size="sm" onPress={() => showToast("error")}>
               <ButtonText>Error</ButtonText>
             </Button>
           </HStack>
           <HStack space="sm" className="flex-wrap">
-            <Button
-              action="primary"
-              size="sm"
-              onPress={() => showToast("warning")}
-            >
+            <Button action="primary" size="sm" onPress={() => showToast("warning")}>
               <ButtonText>Warning</ButtonText>
             </Button>
-            <Button
-              action="secondary"
-              size="sm"
-              onPress={() => showToast("info")}
-            >
+            <Button action="secondary" size="sm" onPress={() => showToast("info")}>
               <ButtonText>Info</ButtonText>
             </Button>
           </HStack>
@@ -960,9 +874,7 @@ const DevToolsShowcase = () => {
         render: ({ id }) => (
           <Toast nativeID={`toast-${id}`} action="success" variant="solid">
             <ToastTitle>Storage Cleared</ToastTitle>
-            <ToastDescription>
-              All app storage cleared. Restart the app.
-            </ToastDescription>
+            <ToastDescription>All app storage cleared. Restart the app.</ToastDescription>
           </Toast>
         ),
       });
@@ -1016,11 +928,7 @@ const DevToolsShowcase = () => {
         </VStack>
 
         <VStack space="xs">
-          <Button
-            action="negative"
-            onPress={clearAllStorage}
-            disabled={isClearing}
-          >
+          <Button action="negative" onPress={clearAllStorage} disabled={isClearing}>
             <Trash2 size={18} color={IconColors.white} />
             <ButtonText className="ml-2">Clear All Storage</ButtonText>
           </Button>
@@ -1075,8 +983,7 @@ const renderComponent = (component: ComponentType) => {
 
 export default function ComponentsScreen() {
   const { t } = useTranslation();
-  const [selectedComponent, setSelectedComponent] =
-    useState<ComponentType>("dev-tools");
+  const [selectedComponent, setSelectedComponent] = useState<ComponentType>("dev-tools");
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
@@ -1098,18 +1005,13 @@ export default function ComponentsScreen() {
             if (Platform.OS === "ios") {
               ActionSheetIOS.showActionSheetWithOptions(
                 {
-                  options: [
-                    t("dev.buttons.cancel"),
-                    ...COMPONENT_OPTIONS.map((o) => o.label),
-                  ],
+                  options: [t("dev.buttons.cancel"), ...COMPONENT_OPTIONS.map((o) => o.label)],
                   cancelButtonIndex: 0,
                   title: "Select Component",
                 },
                 (buttonIndex) => {
                   if (buttonIndex > 0) {
-                    setSelectedComponent(
-                      COMPONENT_OPTIONS[buttonIndex - 1].value,
-                    );
+                    setSelectedComponent(COMPONENT_OPTIONS[buttonIndex - 1].value);
                   }
                 },
               );
@@ -1118,10 +1020,7 @@ export default function ComponentsScreen() {
           className="flex-row items-center justify-between rounded-xl border border-gray-300 bg-white px-4 py-3 active:bg-gray-50"
         >
           <Text className="text-base text-gray-900">
-            {
-              COMPONENT_OPTIONS.find((o) => o.value === selectedComponent)
-                ?.label
-            }
+            {COMPONENT_OPTIONS.find((o) => o.value === selectedComponent)?.label}
           </Text>
           <ChevronDown size={20} color={IconColors.default} />
         </Pressable>

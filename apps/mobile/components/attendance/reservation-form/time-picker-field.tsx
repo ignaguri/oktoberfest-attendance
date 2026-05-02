@@ -58,10 +58,7 @@ export function TimePickerField({
 
       if (date) {
         // Combine selected date with chosen time
-        const newDateTime = setMinutes(
-          setHours(selectedDate, date.getHours()),
-          date.getMinutes(),
-        );
+        const newDateTime = setMinutes(setHours(selectedDate, date.getHours()), date.getMinutes());
         onChange(newDateTime);
       }
     },
@@ -77,9 +74,7 @@ export function TimePickerField({
 
   return (
     <VStack space="sm">
-      {label && (
-        <Text className="text-sm font-medium text-typography-700">{label}</Text>
-      )}
+      {label && <Text className="text-sm font-medium text-typography-700">{label}</Text>}
 
       <Pressable
         onPress={handlePress}
@@ -95,12 +90,7 @@ export function TimePickerField({
       >
         <HStack space="sm" className="items-center">
           <Clock size={18} color={IconColors.muted} />
-          <Text
-            className={cn(
-              "text-base",
-              value ? "text-typography-900" : "text-typography-400",
-            )}
-          >
+          <Text className={cn("text-base", value ? "text-typography-900" : "text-typography-400")}>
             {formattedTime}
           </Text>
         </HStack>
@@ -127,9 +117,7 @@ export function TimePickerField({
           onPress={() => setShowPicker(false)}
           className="mt-2 items-center rounded-lg bg-primary-500 py-2"
         >
-          <Text className="font-medium text-white">
-            {t("common.buttons.done")}
-          </Text>
+          <Text className="font-medium text-white">{t("common.buttons.done")}</Text>
         </Pressable>
       )}
     </VStack>

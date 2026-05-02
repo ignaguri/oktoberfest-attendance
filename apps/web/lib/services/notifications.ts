@@ -1,12 +1,7 @@
 import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import type { Tables } from "@prostcounter/db";
-import {
-  DEFAULT_AVATAR_URL,
-  DEV_URL,
-  IS_PROD,
-  PROD_URL,
-} from "@prostcounter/shared/constants";
+import { DEFAULT_AVATAR_URL, DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
 import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
@@ -19,10 +14,7 @@ import { LOCATION_SHARING_WORKFLOW_ID } from "@/novu/workflows/location-sharing"
 import { RESERVATION_PROMPT_WORKFLOW_ID } from "@/novu/workflows/reservation-prompt";
 import { RESERVATION_REMINDER_WORKFLOW_ID } from "@/novu/workflows/reservation-reminder";
 import { TENT_CHECKIN_WORKFLOW_ID } from "@/novu/workflows/tent-check-in";
-import {
-  reportNotificationException,
-  reportSupabaseException,
-} from "@/utils/sentry";
+import { reportNotificationException, reportSupabaseException } from "@/utils/sentry";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
 
@@ -203,10 +195,7 @@ export class NotificationService {
         .in("user_id", recipientIds);
 
       if (error) {
-        reportSupabaseException(
-          "notifyGroupAchievement",
-          error as PostgrestError,
-        );
+        reportSupabaseException("notifyGroupAchievement", error as PostgrestError);
         return;
       }
 
@@ -336,10 +325,7 @@ export class NotificationService {
         .single();
 
       if (userError || !user) {
-        reportSupabaseException(
-          "notifyTentCheckin",
-          userError as PostgrestError,
-        );
+        reportSupabaseException("notifyTentCheckin", userError as PostgrestError);
         return;
       }
 
@@ -358,10 +344,7 @@ export class NotificationService {
         .neq("user_id", userId);
 
       if (membersError) {
-        reportSupabaseException(
-          "notifyTentCheckin",
-          membersError as PostgrestError,
-        );
+        reportSupabaseException("notifyTentCheckin", membersError as PostgrestError);
         return;
       }
 
@@ -380,10 +363,7 @@ export class NotificationService {
         .eq("checkin_enabled", true);
 
       if (prefsError) {
-        reportSupabaseException(
-          "notifyTentCheckin",
-          prefsError as PostgrestError,
-        );
+        reportSupabaseException("notifyTentCheckin", prefsError as PostgrestError);
         return;
       }
 
@@ -397,10 +377,7 @@ export class NotificationService {
       let userAvatar = DEFAULT_AVATAR_URL;
       if (user.avatar_url && user.avatar_url.trim()) {
         // Check if it's already a full URL
-        if (
-          user.avatar_url.startsWith("http://") ||
-          user.avatar_url.startsWith("https://")
-        ) {
+        if (user.avatar_url.startsWith("http://") || user.avatar_url.startsWith("https://")) {
           userAvatar = user.avatar_url;
         } else {
           // It's a filename, construct the full URL
@@ -416,8 +393,7 @@ export class NotificationService {
           .map((gm) => (gm.groups as any)?.name)
           .filter(Boolean);
 
-        const groupNamesText =
-          memberGroups.length > 0 ? memberGroups.join(", ") : "Group";
+        const groupNamesText = memberGroups.length > 0 ? memberGroups.join(", ") : "Group";
 
         return this.novu.trigger({
           workflowId: NOTIFICATION_WORKFLOWS.TENT_CHECKIN,
@@ -440,9 +416,7 @@ export class NotificationService {
   /**
    * Get user's notification preferences
    */
-  async getUserNotificationPreferences(
-    userId: string,
-  ): Promise<NotificationPreferences | null> {
+  async getUserNotificationPreferences(userId: string): Promise<NotificationPreferences | null> {
     const { data, error } = await this.supabase
       .from("user_notification_preferences")
       .select("*")
@@ -462,19 +436,14 @@ export class NotificationService {
   async updateUserNotificationPreferences(
     userId: string,
     preferences: Partial<
-      Pick<
-        NotificationPreferences,
-        "group_join_enabled" | "checkin_enabled" | "push_enabled"
-      >
+      Pick<NotificationPreferences, "group_join_enabled" | "checkin_enabled" | "push_enabled">
     >,
   ): Promise<boolean> {
-    const { error } = await this.supabase
-      .from("user_notification_preferences")
-      .upsert({
-        user_id: userId,
-        ...preferences,
-        updated_at: new Date().toISOString(),
-      });
+    const { error } = await this.supabase.from("user_notification_preferences").upsert({
+      user_id: userId,
+      ...preferences,
+      updated_at: new Date().toISOString(),
+    });
 
     if (error) {
       return false;
@@ -592,13 +561,15 @@ export class NotificationService {
 
     try {
       // Check rate limit using RPC
-      const { data: recentNotifications, error: rateLimitError } =
-        await this.supabase.rpc("check_notification_rate_limit", {
+      const { data: recentNotifications, error: rateLimitError } = await this.supabase.rpc(
+        "check_notification_rate_limit",
+        {
           p_user_id: userId,
           p_notification_type: "location_sharing",
           p_group_id: groupId,
           p_minutes_ago: 5,
-        });
+        },
+      );
 
       if (rateLimitError) {
         // eslint-disable-next-line no-console
@@ -709,10 +680,7 @@ export class NotificationService {
    * Send daily reminder push notification to a user.
    * Called from cron which pre-filters by daily_reminder_enabled — no per-user preference check needed.
    */
-  async notifyDailyReminder(
-    userId: string,
-    payload: { dayOfYear: number },
-  ): Promise<void> {
+  async notifyDailyReminder(userId: string, payload: { dayOfYear: number }): Promise<void> {
     try {
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.DAILY_REMINDER,

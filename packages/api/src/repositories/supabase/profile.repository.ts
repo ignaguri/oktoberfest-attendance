@@ -33,9 +33,7 @@ export class SupabaseProfileRepository {
   async getProfileShort(userId: string, email?: string): Promise<ProfileShort> {
     const { data, error } = await this.supabase
       .from("profiles")
-      .select(
-        "full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount",
-      )
+      .select("full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount")
       .eq("id", userId)
       .single();
 
@@ -105,9 +103,7 @@ export class SupabaseProfileRepository {
         friendshipStatus = "friends";
       } else if (friendship.status === "pending") {
         friendshipStatus =
-          friendship.requester_id === currentUserId
-            ? "pending_sent"
-            : "pending_received";
+          friendship.requester_id === currentUserId ? "pending_sent" : "pending_received";
       } else {
         friendshipStatus = "none";
       }
@@ -144,10 +140,7 @@ export class SupabaseProfileRepository {
     };
   }
 
-  async updateProfile(
-    userId: string,
-    input: UpdateProfileInput,
-  ): Promise<Profile> {
+  async updateProfile(userId: string, input: UpdateProfileInput): Promise<Profile> {
     const { data, error } = await this.supabase
       .from("profiles")
       .update({
@@ -170,48 +163,29 @@ export class SupabaseProfileRepository {
   }
 
   async deleteProfile(userId: string): Promise<void> {
-    // Delete user's data in order (respecting foreign keys)
-    // 1. Delete consumptions
-    await this.supabase.from("consumptions").delete().eq("user_id", userId);
+    // Delete user's data in order (respecting foreign keys).
+    // consumptions cascade-delete via attendances (FK ON DELETE CASCADE).
 
-    // 2. Delete beer pictures
     await this.supabase.from("beer_pictures").delete().eq("user_id", userId);
 
-    // 3. Delete tent visits
     await this.supabase.from("tent_visits").delete().eq("user_id", userId);
 
-    // 4. Delete attendances
     await this.supabase.from("attendances").delete().eq("user_id", userId);
 
-    // 5. Delete group memberships
     await this.supabase.from("group_members").delete().eq("user_id", userId);
 
-    // 6. Delete reservations
     await this.supabase.from("reservations").delete().eq("user_id", userId);
 
-    // 7. Delete user achievements
-    await this.supabase
-      .from("user_achievements")
-      .delete()
-      .eq("user_id", userId);
+    await this.supabase.from("user_achievements").delete().eq("user_id", userId);
 
-    // 8. Delete notification preferences
-    await this.supabase
-      .from("user_notification_preferences")
-      .delete()
-      .eq("user_id", userId);
+    await this.supabase.from("user_notification_preferences").delete().eq("user_id", userId);
 
-    // 9. Delete location data (use type assertion as these tables may not be in generated types)
-    await (this.supabase as any)
-      .from("user_locations")
-      .delete()
-      .eq("user_id", userId);
+    await (this.supabase as any).from("user_locations").delete().eq("user_id", userId);
     await (this.supabase as any)
       .from("location_sharing_preferences")
       .delete()
       .eq("user_id", userId);
 
-    // 10. Delete profile (this should cascade or be handled by RLS)
     const { data: deleted, error } = await this.supabase
       .from("profiles")
       .delete()
@@ -223,9 +197,7 @@ export class SupabaseProfileRepository {
     }
 
     if (!deleted || deleted.length === 0) {
-      throw new Error(
-        `Profile delete affected 0 rows for id=${userId}; likely RLS policy blocked`,
-      );
+      throw new Error(`Profile delete affected 0 rows for id=${userId}; likely RLS policy blocked`);
     }
   }
 
@@ -237,9 +209,7 @@ export class SupabaseProfileRepository {
       .single();
 
     if (error || !data) {
-      throw new Error(
-        `Failed to get tutorial status: ${error?.message || "No data returned"}`,
-      );
+      throw new Error(`Failed to get tutorial status: ${error?.message || "No data returned"}`);
     }
 
     return {
@@ -438,9 +408,7 @@ export class SupabaseProfileRepository {
 
     // Replace localhost with actual network IP for mobile access (upload URLs only)
     const supabaseUrl =
-      process.env.SUPABASE_PUBLIC_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      "";
+      process.env.SUPABASE_PUBLIC_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
     const uploadUrl = replaceLocalhostInUrl(data.signedUrl, supabaseUrl);
 
     return {

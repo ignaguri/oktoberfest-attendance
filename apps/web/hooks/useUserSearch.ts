@@ -2,18 +2,11 @@
 
 import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { getUserAttendances, getUsers } from "@/app/(private)/admin/actions";
-import {
-  searchKeys,
-  type UserSearchFilters,
-} from "@/lib/data/search-query-keys";
+import { searchKeys, type UserSearchFilters } from "@/lib/data/search-query-keys";
 
 // Import the server actions
 
@@ -64,19 +57,13 @@ export function useUserSearch(filters: UserSearchFilters = {}) {
 /**
  * Hook for infinite user search (for infinite scroll)
  */
-export function useInfiniteUserSearch(
-  filters: Omit<UserSearchFilters, "page"> = {},
-) {
+export function useInfiniteUserSearch(filters: Omit<UserSearchFilters, "page"> = {}) {
   const { limit = 50, ..._otherFilters } = filters;
 
   return useInfiniteQuery({
     queryKey: searchKeys.users({ ...filters, page: undefined }),
     queryFn: async ({ pageParam = 1 }): Promise<UserSearchResult> => {
-      const result = await getUsers(
-        filters.search || "",
-        pageParam as number,
-        limit,
-      );
+      const result = await getUsers(filters.search || "", pageParam as number, limit);
       return {
         users: result.users as CombinedUser[],
         totalCount: result.totalCount,
@@ -85,9 +72,7 @@ export function useInfiniteUserSearch(
       };
     },
     getNextPageParam: (lastPage: UserSearchResult) => {
-      return lastPage.currentPage < lastPage.totalPages
-        ? lastPage.currentPage + 1
-        : undefined;
+      return lastPage.currentPage < lastPage.totalPages ? lastPage.currentPage + 1 : undefined;
     },
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
@@ -164,29 +149,26 @@ export function useOptimisticUserUpdate() {
 
   const updateUserInCache = useCallback(
     (userId: string, updates: Partial<CombinedUser>) => {
-      queryClient.setQueriesData(
-        { queryKey: searchKeys.all },
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueriesData({ queryKey: searchKeys.all }, (oldData: any) => {
+        if (!oldData) return oldData;
 
-          if (Array.isArray(oldData)) {
-            return oldData.map((user: CombinedUser) =>
+        if (Array.isArray(oldData)) {
+          return oldData.map((user: CombinedUser) =>
+            user.id === userId ? { ...user, ...updates } : user,
+          );
+        }
+
+        if (oldData?.users) {
+          return {
+            ...oldData,
+            users: oldData.users.map((user: CombinedUser) =>
               user.id === userId ? { ...user, ...updates } : user,
-            );
-          }
+            ),
+          };
+        }
 
-          if (oldData?.users) {
-            return {
-              ...oldData,
-              users: oldData.users.map((user: CombinedUser) =>
-                user.id === userId ? { ...user, ...updates } : user,
-              ),
-            };
-          }
-
-          return oldData;
-        },
-      );
+        return oldData;
+      });
     },
     [queryClient],
   );

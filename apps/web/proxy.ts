@@ -37,10 +37,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Handle OAuth code parameter at root level as fallback
-  if (
-    request.nextUrl.pathname === "/" &&
-    request.nextUrl.searchParams.has("code")
-  ) {
+  if (request.nextUrl.pathname === "/" && request.nextUrl.searchParams.has("code")) {
     const code = request.nextUrl.searchParams.get("code");
     const redirectParam = request.nextUrl.searchParams.get("redirect");
 

@@ -1,14 +1,8 @@
-import type {
-  AttendanceWithTotals,
-  LogConsumptionInput,
-} from "@prostcounter/shared";
+import type { AttendanceWithTotals, LogConsumptionInput } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { ValidationError } from "../middleware/error";
-import type {
-  IAttendanceRepository,
-  IConsumptionRepository,
-} from "../repositories/interfaces";
+import type { IAttendanceRepository, IConsumptionRepository } from "../repositories/interfaces";
 
 /**
  * Consumption Service
@@ -31,10 +25,7 @@ export class ConsumptionService {
    * 5. TODO: Send tent check-in notification to groups
    * 6. Return attendance with updated totals
    */
-  async logConsumption(
-    userId: string,
-    data: LogConsumptionInput,
-  ): Promise<AttendanceWithTotals> {
+  async logConsumption(userId: string, data: LogConsumptionInput): Promise<AttendanceWithTotals> {
     const { festivalId, date, ...consumptionData } = data;
 
     // Validate date format
@@ -51,11 +42,7 @@ export class ConsumptionService {
     }
 
     // 1. Get or create attendance for this date
-    const attendance = await this.attendanceRepo.findOrCreate(
-      userId,
-      festivalId,
-      date,
-    );
+    const attendance = await this.attendanceRepo.findOrCreate(userId, festivalId, date);
 
     // 2. Create consumption record (pricing logic handled in repository)
     await this.consumptionRepo.create(userId, attendance.id, consumptionData);

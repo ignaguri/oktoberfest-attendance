@@ -26,13 +26,8 @@ export function configureNotificationHandler() {
  *
  * Routes user to appropriate screen using the shared notification registry.
  */
-export function handleNotificationResponse(
-  response: Notifications.NotificationResponse,
-) {
-  const data = response.notification.request.content.data as Record<
-    string,
-    unknown
-  >;
+export function handleNotificationResponse(response: Notifications.NotificationResponse) {
+  const data = response.notification.request.content.data as Record<string, unknown>;
 
   if (!data) {
     return;
@@ -52,19 +47,21 @@ export function handleNotificationResponse(
  */
 export function setupNotificationListeners(): () => void {
   // Listen for notifications received while app is foregrounded
-  const notificationReceivedSubscription =
-    Notifications.addNotificationReceivedListener((notification) => {
+  const notificationReceivedSubscription = Notifications.addNotificationReceivedListener(
+    (notification) => {
       logger.debug("Notification received in foreground:", {
         identifier: notification.request.identifier,
         content: notification.request.content,
       });
-    });
+    },
+  );
 
   // Listen for user interaction with notification
-  const notificationResponseSubscription =
-    Notifications.addNotificationResponseReceivedListener((response) => {
+  const notificationResponseSubscription = Notifications.addNotificationResponseReceivedListener(
+    (response) => {
       handleNotificationResponse(response);
-    });
+    },
+  );
 
   return () => {
     notificationReceivedSubscription.remove();

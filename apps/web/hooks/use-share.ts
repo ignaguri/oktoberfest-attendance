@@ -24,15 +24,13 @@ export function useShare(options: UseShareOptions = {}) {
 
   // Only append URL if the text doesn't already contain a URL
   const textContainsUrl =
-    options.text &&
-    (options.text.includes("http") || options.text.includes("www."));
+    options.text && (options.text.includes("http") || options.text.includes("www."));
   const shareText = textContainsUrl
     ? options.text || defaultText
     : `${options.text || defaultText} ${options.url || `${APP_URL}/download`}`;
 
   // Check if Web Share API is supported
-  const isWebShareSupported =
-    typeof navigator !== "undefined" && "share" in navigator;
+  const isWebShareSupported = typeof navigator !== "undefined" && "share" in navigator;
 
   const shareViaNative = async () => {
     if (!isWebShareSupported) {
@@ -56,8 +54,7 @@ export function useShare(options: UseShareOptions = {}) {
           }),
           {
             description: t("notifications.error.copyFailed", {
-              defaultValue:
-                "Native sharing failed. Copied to clipboard instead.",
+              defaultValue: "Native sharing failed. Copied to clipboard instead.",
             }),
           },
         );
@@ -69,13 +66,9 @@ export function useShare(options: UseShareOptions = {}) {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareText);
-      setCopyButtonText(
-        t("groups.share.linkCopied", { defaultValue: "Copied!" }),
-      );
+      setCopyButtonText(t("groups.share.linkCopied", { defaultValue: "Copied!" }));
       setTimeout(() => {
-        setCopyButtonText(
-          t("groups.share.copyLink", { defaultValue: "Copy share text" }),
-        );
+        setCopyButtonText(t("groups.share.copyLink", { defaultValue: "Copy share text" }));
       }, 3000);
     } catch {
       toast.error(t("common.errors.title", { defaultValue: "Error" }), {
@@ -87,10 +80,7 @@ export function useShare(options: UseShareOptions = {}) {
   };
 
   const shareViaWhatsApp = () => {
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(shareText)}`,
-      "_blank",
-    );
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
   };
 
   const toggleQRCode = () => {
@@ -98,9 +88,7 @@ export function useShare(options: UseShareOptions = {}) {
   };
 
   const resetCopyButton = () => {
-    setCopyButtonText(
-      t("groups.share.copyLink", { defaultValue: "Copy share text" }),
-    );
+    setCopyButtonText(t("groups.share.copyLink", { defaultValue: "Copy share text" }));
   };
 
   return {

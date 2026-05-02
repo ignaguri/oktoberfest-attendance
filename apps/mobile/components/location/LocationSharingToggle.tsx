@@ -82,11 +82,7 @@ export function LocationSharingToggle({
       try {
         const stopped = await stopSharing();
         if (!stopped) {
-          showAlert(
-            t("common.status.error"),
-            t("location.errors.stopFailed"),
-            "error",
-          );
+          showAlert(t("common.status.error"), t("location.errors.stopFailed"), "error");
         }
       } finally {
         setIsToggling(false);
@@ -217,15 +213,10 @@ export function LocationSharingToggle({
 
   // Inline warning banner component
   const WarningBanner = inlineWarning ? (
-    <View
-      className="mt-2 rounded-lg p-3"
-      style={{ backgroundColor: `${Colors.amber[500]}15` }}
-    >
+    <View className="mt-2 rounded-lg p-3" style={{ backgroundColor: `${Colors.amber[500]}15` }}>
       <HStack space="sm" className="items-start">
         <AlertTriangle size={18} color={Colors.amber[600]} />
-        <Text className="flex-1 text-sm text-typography-700">
-          {inlineWarning}
-        </Text>
+        <Text className="flex-1 text-sm text-typography-700">{inlineWarning}</Text>
         <Pressable
           onPress={dismissWarning}
           hitSlop={8}
@@ -245,17 +236,13 @@ export function LocationSharingToggle({
             onPress={handleToggle}
             disabled={isToggling || isSessionLoading}
             className="active:opacity-70"
-            accessibilityLabel={
-              isSharing ? t("location.stopSharing") : t("location.startSharing")
-            }
+            accessibilityLabel={isSharing ? t("location.stopSharing") : t("location.startSharing")}
           >
             <HStack space="sm" className="items-center">
               <View
                 className="rounded-full p-2"
                 style={{
-                  backgroundColor: isSharing
-                    ? Colors.success[500]
-                    : Colors.neutral[200],
+                  backgroundColor: isSharing ? Colors.success[500] : Colors.neutral[200],
                 }}
               >
                 {isSharing ? (
@@ -266,9 +253,7 @@ export function LocationSharingToggle({
               </View>
               <VStack>
                 <Text className="text-sm font-medium text-typography-900">
-                  {isSharing
-                    ? t("location.sharing.sharing")
-                    : t("location.sharing.notSharing")}
+                  {isSharing ? t("location.sharing.sharing") : t("location.sharing.notSharing")}
                 </Text>
                 {isSharing && nearbyMembers.length > 0 && (
                   <Text className="text-xs text-typography-500">
@@ -291,12 +276,8 @@ export function LocationSharingToggle({
     );
   }
 
-  const selectedDurationOption = DURATION_OPTIONS.find(
-    (o) => o.value === selectedDuration,
-  );
-  const selectedDurationLabel = selectedDurationOption
-    ? t(selectedDurationOption.labelKey)
-    : "";
+  const selectedDurationOption = DURATION_OPTIONS.find((o) => o.value === selectedDuration);
+  const selectedDurationLabel = selectedDurationOption ? t(selectedDurationOption.labelKey) : "";
 
   return (
     <>
@@ -323,9 +304,7 @@ export function LocationSharingToggle({
                   {t("location.sharing.title")}
                 </Text>
                 <Text className="text-xs text-typography-500">
-                  {isSharing
-                    ? t("location.sharingActive")
-                    : t("location.sharingInactive")}
+                  {isSharing ? t("location.sharingActive") : t("location.sharingInactive")}
                 </Text>
               </VStack>
             </HStack>
@@ -344,9 +323,7 @@ export function LocationSharingToggle({
                     onPress={() => setSelectedDuration(option.value)}
                     className={cn(
                       "rounded-full px-4 py-2",
-                      selectedDuration === option.value
-                        ? "bg-primary-500"
-                        : "bg-background-100",
+                      selectedDuration === option.value ? "bg-primary-500" : "bg-background-100",
                     )}
                   >
                     <Text
@@ -411,9 +388,7 @@ export function LocationSharingToggle({
                       className="mt-3"
                       icon={Heart}
                       title={t("location.groups.alsoShareWithFriends")}
-                      description={t(
-                        "location.groups.alsoShareWithFriendsDescription",
-                      )}
+                      description={t("location.groups.alsoShareWithFriendsDescription")}
                       value={shareWithFriends}
                       onValueChange={setShareWithFriends}
                     />
@@ -427,13 +402,9 @@ export function LocationSharingToggle({
             onPress={handleToggle}
             disabled={isToggling || isSessionLoading}
             action={isSharing ? "negative" : "primary"}
-            accessibilityLabel={
-              isSharing ? t("location.stopSharing") : t("location.startSharing")
-            }
+            accessibilityLabel={isSharing ? t("location.stopSharing") : t("location.startSharing")}
           >
-            {(isToggling || isSessionLoading) && (
-              <ButtonSpinner color={Colors.white} />
-            )}
+            {(isToggling || isSessionLoading) && <ButtonSpinner color={Colors.white} />}
             <ButtonText>
               {isSharing
                 ? t("location.stopSharing")

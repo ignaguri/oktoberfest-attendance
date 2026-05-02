@@ -5,11 +5,7 @@
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useConsumptions,
-  useDrinkPrice,
-  useTipCalculation,
-} from "@prostcounter/shared/hooks";
+import { useConsumptions, useDrinkPrice, useTipCalculation } from "@prostcounter/shared/hooks";
 import type {
   AttendanceByDate,
   DetailedAttendanceForm,
@@ -17,14 +13,7 @@ import type {
 } from "@prostcounter/shared/schemas";
 import { createDetailedAttendanceFormSchema } from "@prostcounter/shared/schemas";
 import { isWithinInterval } from "date-fns";
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -57,12 +46,9 @@ export default function DetailedAttendanceForm({
     festivalBeerCost: currentFestival?.beerCost,
   });
   const { calculatePricePaid } = useTipCalculation();
-  const [existingAttendance, setExistingAttendance] =
-    useState<AttendanceByDate | null>(null);
+  const [existingAttendance, setExistingAttendance] = useState<AttendanceByDate | null>(null);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
-  const [localDrinkCounts, setLocalDrinkCounts] = useState<
-    Record<DrinkType, number>
-  >({
+  const [localDrinkCounts, setLocalDrinkCounts] = useState<Record<DrinkType, number>>({
     beer: 0,
     radler: 0,
     wine: 0,
@@ -78,10 +64,7 @@ export default function DetailedAttendanceForm({
     const festivalDates = getFestivalDates(currentFestival);
     if (!festivalDates) return null;
 
-    return createDetailedAttendanceFormSchema(
-      festivalDates.startDate,
-      festivalDates.endDate,
-    );
+    return createDetailedAttendanceFormSchema(festivalDates.startDate, festivalDates.endDate);
   }, [currentFestival]);
 
   const initialDate = useMemo(() => {
@@ -101,18 +84,9 @@ export default function DetailedAttendanceForm({
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
 
   // Fetch consumptions for the current date
-  const dateString = useMemo(
-    () => formatDateForDatabase(currentDate),
-    [currentDate],
-  );
-  const { data: consumptionsData } = useConsumptions(
-    currentFestival?.id || "",
-    dateString,
-  );
-  const consumptions = useMemo(
-    () => consumptionsData || [],
-    [consumptionsData],
-  );
+  const dateString = useMemo(() => formatDateForDatabase(currentDate), [currentDate]);
+  const { data: consumptionsData } = useConsumptions(currentFestival?.id || "", dateString);
+  const consumptions = useMemo(() => consumptionsData || [], [consumptionsData]);
 
   // Calculate drink counts from consumptions
   const drinkCounts = useMemo(() => {
@@ -134,10 +108,7 @@ export default function DetailedAttendanceForm({
 
   // Calculate total drinks
   const totalLocalDrinks = useMemo(() => {
-    return Object.values(localDrinkCounts).reduce(
-      (sum, count) => sum + count,
-      0,
-    );
+    return Object.values(localDrinkCounts).reduce((sum, count) => sum + count, 0);
   }, [localDrinkCounts]);
 
   // Track which date we've initialized counts for (with data)
@@ -166,10 +137,7 @@ export default function DetailedAttendanceForm({
     }
 
     // Consumptions loaded for this date - need to initialize
-    if (
-      consumptions.length > 0 &&
-      initializedDateRef.current !== currentDateStr
-    ) {
+    if (consumptions.length > 0 && initializedDateRef.current !== currentDateStr) {
       startTransition(() => {
         setLocalDrinkCounts(drinkCounts);
       });
@@ -178,15 +146,12 @@ export default function DetailedAttendanceForm({
   }, [currentDate, consumptions.length, drinkCounts]);
 
   // Handle local drink count change
-  const handleLocalDrinkCountChange = useCallback(
-    (drinkType: DrinkType, newCount: number) => {
-      setLocalDrinkCounts((prev) => ({
-        ...prev,
-        [drinkType]: newCount,
-      }));
-    },
-    [],
-  );
+  const handleLocalDrinkCountChange = useCallback((drinkType: DrinkType, newCount: number) => {
+    setLocalDrinkCounts((prev) => ({
+      ...prev,
+      [drinkType]: newCount,
+    }));
+  }, []);
 
   const fetchAttendanceForDate = useCallback(
     async (date: Date) => {
@@ -280,11 +245,7 @@ export default function DetailedAttendanceForm({
           // Delete consumptions
           const typeConsumptions = consumptions
             .filter((c) => c.drinkType === type)
-            .sort(
-              (a, b) =>
-                new Date(b.recordedAt).getTime() -
-                new Date(a.recordedAt).getTime(),
-            );
+            .sort((a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime());
 
           for (let i = 0; i < Math.abs(delta); i++) {
             if (typeConsumptions[i]) {
@@ -330,9 +291,7 @@ export default function DetailedAttendanceForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-center">
-          {t("attendance.registerOrUpdate")}
-        </CardTitle>
+        <CardTitle className="text-center">{t("attendance.registerOrUpdate")}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
@@ -349,18 +308,12 @@ export default function DetailedAttendanceForm({
                   field.onChange(date!);
                   handleDateChange(date);
                 }}
-                festivalStartDate={
-                  getFestivalDates(currentFestival)?.startDate || new Date()
-                }
-                festivalEndDate={
-                  getFestivalDates(currentFestival)?.endDate || new Date()
-                }
+                festivalStartDate={getFestivalDates(currentFestival)?.startDate || new Date()}
+                festivalEndDate={getFestivalDates(currentFestival)?.endDate || new Date()}
               />
             )}
           />
-          {errors.date && (
-            <span className="error">{t(errors.date.message as string)}</span>
-          )}
+          {errors.date && <span className="error">{t(errors.date.message as string)}</span>}
 
           <Label htmlFor="amount">{t("attendance.howManyDrinks")}</Label>
 
@@ -387,9 +340,7 @@ export default function DetailedAttendanceForm({
           </div>
 
           {errors.amount && (
-            <span className="text-sm text-red-600">
-              {t(errors.amount.message as string)}
-            </span>
+            <span className="text-sm text-red-600">{t(errors.amount.message as string)}</span>
           )}
 
           <Label htmlFor="tents">{t("attendance.whichTents")}</Label>
@@ -412,9 +363,7 @@ export default function DetailedAttendanceForm({
             type="submit"
             disabled={isSubmitting}
           >
-            {existingAttendance
-              ? t("attendance.form.update")
-              : t("attendance.form.submit")}
+            {existingAttendance ? t("attendance.form.update") : t("attendance.form.submit")}
           </Button>
         </form>
 

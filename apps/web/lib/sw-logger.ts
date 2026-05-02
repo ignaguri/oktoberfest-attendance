@@ -82,22 +82,12 @@ class SWLogger {
     }
   }
 
-  private log(
-    level: LogLevel,
-    message: string,
-    context?: SWLogContext,
-    error?: Error,
-  ): void {
+  private log(level: LogLevel, message: string, context?: SWLogContext, error?: Error): void {
     if (!this.shouldLog(level)) {
       return;
     }
 
-    const formattedMessage = this.formatLogEntry(
-      level,
-      message,
-      context,
-      error,
-    );
+    const formattedMessage = this.formatLogEntry(level, message, context, error);
 
     // Output to appropriate console method
     switch (level) {
@@ -149,16 +139,11 @@ class SWLogger {
     return { ...context, component: "service-worker", action };
   }
 
-  caching(
-    action: string,
-    context?: Omit<SWLogContext, "action">,
-  ): SWLogContext {
+  caching(action: string, context?: Omit<SWLogContext, "action">): SWLogContext {
     return { ...context, component: "sw-cache", action };
   }
 
-  updateCheck(
-    context?: Omit<SWLogContext, "component" | "action">,
-  ): SWLogContext {
+  updateCheck(context?: Omit<SWLogContext, "component" | "action">): SWLogContext {
     return { ...context, component: "sw-update", action: "version-check" };
   }
 }

@@ -98,9 +98,7 @@ export function PhotoPrivacySettings() {
 
       setGroupSettings((prev) =>
         prev.map((group) =>
-          group.group_id === groupId
-            ? { ...group, hide_photos_from_group: newValue }
-            : group,
+          group.group_id === groupId ? { ...group, hide_photos_from_group: newValue } : group,
         ),
       );
 
@@ -128,9 +126,7 @@ export function PhotoPrivacySettings() {
   if (isLoading) {
     return (
       <div className="card">
-        <h3 className="py-2 text-2xl font-black text-gray-800">
-          {t("photo.privacy.title")}
-        </h3>
+        <h3 className="py-2 text-2xl font-black text-gray-800">{t("photo.privacy.title")}</h3>
         <div className="flex justify-center py-4">
           <div className="text-gray-500">{t("common.status.loading")}</div>
         </div>
@@ -140,12 +136,8 @@ export function PhotoPrivacySettings() {
 
   return (
     <div className="card">
-      <h3 className="py-2 text-xl font-black text-gray-800">
-        {t("photo.privacy.title")}
-      </h3>
-      <p className="mb-6 text-sm text-gray-600">
-        {t("photo.privacy.description")}
-      </p>
+      <h3 className="py-2 text-xl font-black text-gray-800">{t("photo.privacy.title")}</h3>
+      <p className="mb-6 text-sm text-gray-600">{t("photo.privacy.description")}</p>
 
       <div className="flex flex-col gap-6">
         {/* Global Setting */}
@@ -162,9 +154,7 @@ export function PhotoPrivacySettings() {
                 ) : (
                   <Eye className="h-4 w-4 text-green-600" />
                 )}
-                <span className="font-medium">
-                  {t("photo.privacy.hideFromAll")}
-                </span>
+                <span className="font-medium">{t("photo.privacy.hideFromAll")}</span>
               </div>
               <p className="text-left text-sm text-gray-600">
                 {t("photo.privacy.hideFromAllDescription")}
@@ -186,16 +176,11 @@ export function PhotoPrivacySettings() {
               <h4 className="text-lg font-semibold text-gray-700">
                 {t("photo.privacy.perGroupSettings")}
               </h4>
-              <p className="text-sm text-gray-600">
-                {t("photo.privacy.perGroupDescription")}
-              </p>
+              <p className="text-sm text-gray-600">{t("photo.privacy.perGroupDescription")}</p>
 
               <div className="space-y-4">
                 {groupSettings.map((group) => (
-                  <div
-                    key={group.group_id}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={group.group_id} className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         {group.hide_photos_from_group ? (
@@ -216,10 +201,7 @@ export function PhotoPrivacySettings() {
                     <Switch
                       checked={group.hide_photos_from_group}
                       onCheckedChange={() =>
-                        handleGroupToggle(
-                          group.group_id,
-                          group.hide_photos_from_group,
-                        )
+                        handleGroupToggle(group.group_id, group.hide_photos_from_group)
                       }
                       disabled={
                         savingGroups.has(group.group_id) ||
@@ -240,9 +222,7 @@ export function PhotoPrivacySettings() {
         )}
 
         {groupSettings.length === 0 && (
-          <div className="py-4 text-center text-gray-500">
-            {t("photo.privacy.noGroupsYet")}
-          </div>
+          <div className="py-4 text-center text-gray-500">{t("photo.privacy.noGroupsYet")}</div>
         )}
       </div>
     </div>

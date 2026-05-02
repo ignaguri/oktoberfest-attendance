@@ -7,17 +7,9 @@ import {
   useUpdateGroup,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  GroupMember,
-  WinningCriteria,
-} from "@prostcounter/shared/schemas";
+import type { GroupMember, WinningCriteria } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  LogOut,
-  Save,
-  Settings as SettingsIcon,
-  Users,
-} from "lucide-react-native";
+import { LogOut, Save, Settings as SettingsIcon, Users } from "lucide-react-native";
 import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { RefreshControl, ScrollView } from "react-native";
@@ -166,10 +158,7 @@ export default function GroupSettingsScreen() {
           },
         });
         refetchGroup();
-        showDialog(
-          t("common.status.success"),
-          t("groups.settings.updateSuccess"),
-        );
+        showDialog(t("common.status.success"), t("groups.settings.updateSuccess"));
       } catch (error) {
         logger.error("Failed to update group:", error);
         showDialog(t("common.status.error"), t("groups.settings.updateError"));
@@ -193,11 +182,7 @@ export default function GroupSettingsScreen() {
             refetchMembers();
           } catch (error) {
             logger.error("Failed to remove member:", error);
-            showDialog(
-              t("common.status.error"),
-              t("common.errors.generic"),
-              "destructive",
-            );
+            showDialog(t("common.status.error"), t("common.errors.generic"), "destructive");
           }
         },
       );
@@ -221,11 +206,7 @@ export default function GroupSettingsScreen() {
           router.replace("/(tabs)/groups");
         } catch (error) {
           logger.error("Failed to leave group:", error);
-          showDialog(
-            t("common.status.error"),
-            t("common.errors.generic"),
-            "destructive",
-          );
+          showDialog(t("common.status.error"), t("common.errors.generic"), "destructive");
         }
       },
     );
@@ -263,12 +244,7 @@ export default function GroupSettingsScreen() {
         <Text className="mt-4 text-center text-typography-500">
           {t("groups.settings.notFound")}
         </Text>
-        <Button
-          variant="outline"
-          action="secondary"
-          className="mt-4"
-          onPress={() => router.back()}
-        >
+        <Button variant="outline" action="secondary" className="mt-4" onPress={() => router.back()}>
           <ButtonText>{t("common.buttons.goBack")}</ButtonText>
         </Button>
       </View>
@@ -283,12 +259,7 @@ export default function GroupSettingsScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
         className="flex-1 bg-background-50"
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching ?? false}
-            onRefresh={onRefresh}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={onRefresh} />}
       >
         <VStack space="lg" className="p-4 pb-8">
           {/* Group Details Card */}
@@ -322,9 +293,7 @@ export default function GroupSettingsScreen() {
                     )}
                   />
                   {errors.name && (
-                    <Text className="text-sm text-error-600">
-                      {errors.name.message}
-                    </Text>
+                    <Text className="text-sm text-error-600">{errors.name.message}</Text>
                   )}
                 </VStack>
 
@@ -339,9 +308,7 @@ export default function GroupSettingsScreen() {
                     render={({ field: { onChange, onBlur, value } }) => (
                       <Textarea size="md">
                         <TextareaInput
-                          placeholder={t(
-                            "groups.settings.descriptionPlaceholder",
-                          )}
+                          placeholder={t("groups.settings.descriptionPlaceholder")}
                           value={value || ""}
                           onChangeText={onChange}
                           onBlur={onBlur}
@@ -351,9 +318,7 @@ export default function GroupSettingsScreen() {
                     )}
                   />
                   {errors.description && (
-                    <Text className="text-sm text-error-600">
-                      {errors.description.message}
-                    </Text>
+                    <Text className="text-sm text-error-600">{errors.description.message}</Text>
                   )}
                 </VStack>
 
@@ -370,13 +335,10 @@ export default function GroupSettingsScreen() {
                         <SelectTrigger variant="outline" size="md">
                           <SelectInput
                             value={
-                              WINNING_CRITERIA_OPTIONS.find(
-                                (opt) => opt.value === value,
-                              )
+                              WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)
                                 ? t(
-                                    WINNING_CRITERIA_OPTIONS.find(
-                                      (opt) => opt.value === value,
-                                    )!.label,
+                                    WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)!
+                                      .label,
                                   )
                                 : ""
                             }
@@ -417,9 +379,7 @@ export default function GroupSettingsScreen() {
                     <Save size={18} color={IconColors.white} />
                   )}
                   <ButtonText className="ml-2">
-                    {isSaving
-                      ? t("common.status.saving")
-                      : t("common.buttons.save")}
+                    {isSaving ? t("common.status.saving") : t("common.buttons.save")}
                   </ButtonText>
                 </Button>
               </VStack>
@@ -462,9 +422,7 @@ export default function GroupSettingsScreen() {
           {/* Leave Group Section */}
           <Card variant="outline" size="md" className="border-error-200">
             <VStack space="sm">
-              <Text className="font-medium text-error-600">
-                {t("groups.settings.dangerZone")}
-              </Text>
+              <Text className="font-medium text-error-600">{t("groups.settings.dangerZone")}</Text>
               <Text className="text-sm text-typography-500">
                 {isCreator
                   ? t("groups.settings.leaveCreatorWarning")
@@ -482,9 +440,7 @@ export default function GroupSettingsScreen() {
                 ) : (
                   <LogOut size={18} color={IconColors.error} />
                 )}
-                <ButtonText className="ml-2">
-                  {t("groups.settings.leave")}
-                </ButtonText>
+                <ButtonText className="ml-2">{t("groups.settings.leave")}</ButtonText>
               </Button>
             </VStack>
           </Card>
@@ -498,11 +454,7 @@ export default function GroupSettingsScreen() {
           <AlertDialogHeader>
             <Heading
               size="lg"
-              className={
-                dialog.type === "destructive"
-                  ? "text-error-600"
-                  : "text-typography-950"
-              }
+              className={dialog.type === "destructive" ? "text-error-600" : "text-typography-950"}
             >
               {dialog.title}
             </Heading>
@@ -524,9 +476,7 @@ export default function GroupSettingsScreen() {
                   <ButtonText>{t("common.buttons.cancel")}</ButtonText>
                 </Button>
                 <Button
-                  action={
-                    dialog.type === "destructive" ? "negative" : "primary"
-                  }
+                  action={dialog.type === "destructive" ? "negative" : "primary"}
                   onPress={() => {
                     dialog.onConfirm?.();
                     closeDialog();

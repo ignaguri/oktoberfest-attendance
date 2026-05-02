@@ -1,8 +1,7 @@
 import { workflow } from "@novu/framework";
 import { z } from "zod";
 
-export const RESERVATION_PROMPT_WORKFLOW_ID =
-  "reservation-check-in-prompt" as const;
+export const RESERVATION_PROMPT_WORKFLOW_ID = "reservation-check-in-prompt" as const;
 
 export const reservationPromptPayloadSchema = z.object({
   userName: z.string().describe("Name of the user to prompt"),
@@ -10,19 +9,11 @@ export const reservationPromptPayloadSchema = z.object({
   reservationTime: z.string().describe("Time of the reservation"),
 });
 
-export type ReservationPromptPayload = z.infer<
-  typeof reservationPromptPayloadSchema
->;
+export type ReservationPromptPayload = z.infer<typeof reservationPromptPayloadSchema>;
 
 export const reservationPromptWorkflow = workflow(
   RESERVATION_PROMPT_WORKFLOW_ID,
-  async ({
-    step,
-    payload,
-  }: {
-    step: any;
-    payload: ReservationPromptPayload;
-  }) => {
+  async ({ step, payload }: { step: any; payload: ReservationPromptPayload }) => {
     await step.inApp("in-app-notification", async (_controls: any) => {
       return {
         subject: `Did you make it to ${payload.tentName}?`,

@@ -106,9 +106,7 @@ export function useImageUpload({
   /**
    * Pick and compress images (original behavior)
    */
-  async function pickImages(
-    source: ImageSource,
-  ): Promise<PickedImage[] | null> {
+  async function pickImages(source: ImageSource): Promise<PickedImage[] | null> {
     try {
       setError(null);
 
@@ -135,8 +133,7 @@ export function useImageUpload({
 
       return processedImages;
     } catch (err) {
-      const uploadError =
-        err instanceof Error ? err : new Error("Image selection failed");
+      const uploadError = err instanceof Error ? err : new Error("Image selection failed");
       showError(uploadError);
       return null;
     }
@@ -146,9 +143,7 @@ export function useImageUpload({
    * Pick images without compression - for instant preview
    * Returns raw URIs that can be compressed later with compressImage()
    */
-  async function pickImagesRaw(
-    source: ImageSource,
-  ): Promise<RawPickedImage[] | null> {
+  async function pickImagesRaw(source: ImageSource): Promise<RawPickedImage[] | null> {
     try {
       setError(null);
 
@@ -174,8 +169,7 @@ export function useImageUpload({
         originalFileName: asset.uri.split("/").pop() || "image.jpg",
       }));
     } catch (err) {
-      const uploadError =
-        err instanceof Error ? err : new Error("Image selection failed");
+      const uploadError = err instanceof Error ? err : new Error("Image selection failed");
       showError(uploadError);
       return null;
     }
@@ -254,10 +248,7 @@ async function launchPicker(
 /**
  * Process a single image: compress and convert to ArrayBuffer
  */
-async function processImage(
-  uri: string,
-  options: Required<CompressOptions>,
-): Promise<PickedImage> {
+async function processImage(uri: string, options: Required<CompressOptions>): Promise<PickedImage> {
   // Compress image
   const compressedUri = await compressImage(uri, options);
 
@@ -282,10 +273,7 @@ async function processImage(
  * Compress and convert image to specified format
  * Only sets width to maintain aspect ratio
  */
-async function compressImage(
-  uri: string,
-  options: Required<CompressOptions>,
-): Promise<string> {
+async function compressImage(uri: string, options: Required<CompressOptions>): Promise<string> {
   const context = ImageManipulator.manipulate(uri);
   // Only set width to maintain aspect ratio - height will scale proportionally
   context.resize({ width: options.maxSize });

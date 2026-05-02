@@ -7,9 +7,7 @@ export default function ChildSafetyStandards() {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-8 text-center text-3xl font-bold">
-        {t("marketing.childSafety.title")}
-      </h1>
+      <h1 className="mb-8 text-center text-3xl font-bold">{t("marketing.childSafety.title")}</h1>
 
       <div className="prose prose-lg max-w-none space-y-6">
         <p className="mb-8 text-sm text-gray-600">
@@ -22,9 +20,7 @@ export default function ChildSafetyStandards() {
         </p>
 
         <section>
-          <h2 className="mb-4 text-2xl font-semibold">
-            {t("marketing.childSafety.intro.title")}
-          </h2>
+          <h2 className="mb-4 text-2xl font-semibold">{t("marketing.childSafety.intro.title")}</h2>
           <p>{t("marketing.childSafety.intro.text")}</p>
         </section>
 
@@ -37,14 +33,10 @@ export default function ChildSafetyStandards() {
             <li>{t("marketing.childSafety.csaeStandards.items.csam")}</li>
             <li>{t("marketing.childSafety.csaeStandards.items.grooming")}</li>
             <li>{t("marketing.childSafety.csaeStandards.items.sextortion")}</li>
-            <li>
-              {t("marketing.childSafety.csaeStandards.items.trafficking")}
-            </li>
+            <li>{t("marketing.childSafety.csaeStandards.items.trafficking")}</li>
             <li>{t("marketing.childSafety.csaeStandards.items.other")}</li>
           </ul>
-          <p className="mt-4">
-            {t("marketing.childSafety.csaeStandards.consequence")}
-          </p>
+          <p className="mt-4">{t("marketing.childSafety.csaeStandards.consequence")}</p>
         </section>
 
         <section>
@@ -72,24 +64,16 @@ export default function ChildSafetyStandards() {
           <p>{t("marketing.childSafety.csamResponse.text")}</p>
           <ul className="ml-4 list-inside list-disc space-y-2">
             <li>
-              <strong>
-                {t("marketing.childSafety.csamResponse.items.removal")}
-              </strong>
+              <strong>{t("marketing.childSafety.csamResponse.items.removal")}</strong>
             </li>
             <li>
-              <strong>
-                {t("marketing.childSafety.csamResponse.items.preservation")}
-              </strong>
+              <strong>{t("marketing.childSafety.csamResponse.items.preservation")}</strong>
             </li>
             <li>
-              <strong>
-                {t("marketing.childSafety.csamResponse.items.reporting")}
-              </strong>
+              <strong>{t("marketing.childSafety.csamResponse.items.reporting")}</strong>
             </li>
             <li>
-              <strong>
-                {t("marketing.childSafety.csamResponse.items.suspension")}
-              </strong>
+              <strong>{t("marketing.childSafety.csamResponse.items.suspension")}</strong>
             </li>
           </ul>
         </section>

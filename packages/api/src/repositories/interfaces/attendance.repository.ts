@@ -21,11 +21,7 @@ export interface IAttendanceRepository {
    * @param date - Date in YYYY-MM-DD format
    * @returns Attendance record with computed totals
    */
-  findOrCreate(
-    userId: string,
-    festivalId: string,
-    date: string,
-  ): Promise<AttendanceWithTotals>;
+  findOrCreate(userId: string, festivalId: string, date: string): Promise<AttendanceWithTotals>;
 
   /**
    * Get an attendance by ID
@@ -66,10 +62,7 @@ export interface IAttendanceRepository {
    * @param input - Attendance data including tents
    * @returns Attendance ID and whether tents changed
    */
-  createWithTents(
-    userId: string,
-    input: CreateAttendanceInput,
-  ): Promise<CreateAttendanceResponse>;
+  createWithTents(userId: string, input: CreateAttendanceInput): Promise<CreateAttendanceResponse>;
 
   /**
    * Update personal attendance without triggering notifications
@@ -88,9 +81,7 @@ export interface IAttendanceRepository {
    * @param festivalId - Festival ID
    * @returns Festival data or null
    */
-  festivalExists(
-    festivalId: string,
-  ): Promise<{ id: string; timezone: string | null } | null>;
+  festivalExists(festivalId: string): Promise<{ id: string; timezone: string | null } | null>;
 
   /**
    * Get attendance for a specific date with pictures
@@ -99,9 +90,5 @@ export interface IAttendanceRepository {
    * @param date - Date in YYYY-MM-DD format
    * @returns Attendance with tent IDs and picture URLs, or null if not found
    */
-  getByDate(
-    userId: string,
-    festivalId: string,
-    date: string,
-  ): Promise<AttendanceByDate | null>;
+  getByDate(userId: string, festivalId: string, date: string): Promise<AttendanceByDate | null>;
 }

@@ -72,18 +72,12 @@ export function useOfflineUpdateAttendance() {
           [now, existing.id],
         );
 
-        attendanceQueueOpId = await enqueueOperation(
-          db,
-          "UPDATE",
-          "attendances",
-          existing.id,
-          {
-            festival_id: input.festivalId,
-            date: input.date,
-            beer_count: 0,
-            tents: input.tents,
-          },
-        );
+        attendanceQueueOpId = await enqueueOperation(db, "UPDATE", "attendances", existing.id, {
+          festival_id: input.festivalId,
+          date: input.date,
+          beer_count: 0,
+          tents: input.tents,
+        });
 
         logger.debug("[OfflineAttendance] Updated existing attendance:", {
           attendanceId,
@@ -98,18 +92,12 @@ export function useOfflineUpdateAttendance() {
           [attendanceId, userId, input.festivalId, input.date, now, now],
         );
 
-        attendanceQueueOpId = await enqueueOperation(
-          db,
-          "INSERT",
-          "attendances",
-          attendanceId,
-          {
-            festival_id: input.festivalId,
-            date: input.date,
-            beer_count: 0,
-            tents: input.tents,
-          },
-        );
+        attendanceQueueOpId = await enqueueOperation(db, "INSERT", "attendances", attendanceId, {
+          festival_id: input.festivalId,
+          date: input.date,
+          beer_count: 0,
+          tents: input.tents,
+        });
 
         logger.debug("[OfflineAttendance] Created new attendance:", {
           attendanceId,

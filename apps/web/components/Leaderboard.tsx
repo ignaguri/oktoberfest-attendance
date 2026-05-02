@@ -120,9 +120,7 @@ export const Leaderboard = ({
           column={column}
           title={
             <div className="flex items-center gap-1">
-              {winningCriteria === "total_beers" && (
-                <Crown className="text-yellow-500" size={16} />
-              )}
+              {winningCriteria === "total_beers" && <Crown className="text-yellow-500" size={16} />}
               <span>{t("leaderboard.beers")}</span>
             </div>
           }
@@ -137,9 +135,7 @@ export const Leaderboard = ({
           column={column}
           title={
             <div className="flex items-center gap-1">
-              {winningCriteria === "avg_beers" && (
-                <Crown className="text-yellow-500" size={16} />
-              )}
+              {winningCriteria === "avg_beers" && <Crown className="text-yellow-500" size={16} />}
               <span>{t("leaderboard.average")}</span>
             </div>
           }
@@ -178,10 +174,7 @@ export const Leaderboard = ({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}

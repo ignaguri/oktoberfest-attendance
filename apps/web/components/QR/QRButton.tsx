@@ -31,13 +31,11 @@ export default function QRButton({
 }: QRButtonProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const { mutateAsync: renewToken, loading: isRegenerating } =
-    useRenewInviteToken();
+  const { mutateAsync: renewToken, loading: isRegenerating } = useRenewInviteToken();
 
   const groupLink = useMemo(() => {
     if (!inviteToken) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : undefined;
+    const origin = typeof window !== "undefined" ? window.location.origin : undefined;
     return buildGroupInviteUrl(inviteToken, origin);
   }, [inviteToken]);
 
@@ -53,11 +51,7 @@ export default function QRButton({
 
   return (
     <>
-      <Button
-        variant="outline"
-        className="flex items-center"
-        onClick={() => setOpen(true)}
-      >
+      <Button variant="outline" className="flex items-center" onClick={() => setOpen(true)}>
         <QrCode size={ICON_SIZE} />
         {withText && <span className="ml-2">{t("groups.qrCode.title")}</span>}
       </Button>
@@ -79,9 +73,7 @@ export default function QRButton({
             </>
           ) : (
             <p className="text-muted-foreground text-center text-sm">
-              {isCreator
-                ? t("groups.qrCode.noTokenCreator")
-                : t("groups.qrCode.noTokenMember")}
+              {isCreator ? t("groups.qrCode.noTokenCreator") : t("groups.qrCode.noTokenMember")}
             </p>
           )}
 
@@ -93,9 +85,7 @@ export default function QRButton({
               disabled={isRegenerating}
             >
               <RefreshCw size={16} className="mr-2" />
-              {groupLink
-                ? t("groups.qrCode.regenerate")
-                : t("groups.qrCode.generate")}
+              {groupLink ? t("groups.qrCode.regenerate") : t("groups.qrCode.generate")}
             </Button>
           )}
         </div>

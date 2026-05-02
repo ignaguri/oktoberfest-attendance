@@ -42,29 +42,17 @@ export const QuickAttendanceRegistrationForm = ({
 }: QuickAttendanceRegistrationFormProps) => {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
-  const {
-    tents,
-    isLoading: tentsLoading,
-    error: tentsError,
-  } = useTents(currentFestival?.id);
+  const { tents, isLoading: tentsLoading, error: tentsError } = useTents(currentFestival?.id);
   const { isExploding, triggerConfetti } = useConfetti();
-  const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(
-    null,
-  );
+  const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(null);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
 
   // Get today's date string
   const todayString = useMemo(() => formatDateForDatabase(new Date()), []);
 
   // Fetch consumptions for today
-  const { data: consumptionsData } = useConsumptions(
-    currentFestival?.id || "",
-    todayString,
-  );
-  const consumptions = useMemo(
-    () => consumptionsData || [],
-    [consumptionsData],
-  );
+  const { data: consumptionsData } = useConsumptions(currentFestival?.id || "", todayString);
+  const consumptions = useMemo(() => consumptionsData || [], [consumptionsData]);
 
   // Calculate drink count summary
   const drinkSummary = useMemo(() => {
@@ -117,10 +105,7 @@ export const QuickAttendanceRegistrationForm = ({
         if (attendance) {
           setAttendanceData(attendance);
           onAttendanceIdReceived(attendance.id);
-          setValue(
-            "tentId",
-            attendance.tentIds[attendance.tentIds.length - 1] || "",
-          );
+          setValue("tentId", attendance.tentIds[attendance.tentIds.length - 1] || "");
         }
       } catch {
         toast.error(t("notifications.error.attendanceLoadFailed"));
@@ -143,28 +128,25 @@ export const QuickAttendanceRegistrationForm = ({
         data.tentId && // Only if tent is selected (not empty)
         (!attendanceData?.tentIds ||
           attendanceData.tentIds.length === 0 ||
-          attendanceData.tentIds[attendanceData.tentIds.length - 1] !==
-            data.tentId)
+          attendanceData.tentIds[attendanceData.tentIds.length - 1] !== data.tentId)
           ? [data.tentId] // Only the new tent
           : []; // No new tent to add
 
       const dateString = formatDateForDatabase(new Date());
-      const { attendanceId: newAttendanceId } =
-        await apiClient.attendance.create({
-          festivalId: currentFestival.id,
-          date: dateString,
-          tents: tentsToSend,
-          amount: 0,
-        });
+      const { attendanceId: newAttendanceId } = await apiClient.attendance.create({
+        festivalId: currentFestival.id,
+        date: dateString,
+        tents: tentsToSend,
+        amount: 0,
+      });
 
       onAttendanceIdReceived(newAttendanceId);
 
       // Refetch attendance to get the full object from the server
-      const { attendance: freshAttendance } =
-        await apiClient.attendance.getByDate({
-          festivalId: currentFestival.id,
-          date: dateString,
-        });
+      const { attendance: freshAttendance } = await apiClient.attendance.getByDate({
+        festivalId: currentFestival.id,
+        date: dateString,
+      });
       if (freshAttendance) {
         setAttendanceData(freshAttendance);
       }
@@ -199,12 +181,7 @@ export const QuickAttendanceRegistrationForm = ({
     <>
       {isExploding && (
         <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
-          <ConfettiExplosion
-            force={0.4}
-            duration={2200}
-            particleCount={30}
-            width={400}
-          />
+          <ConfettiExplosion force={0.4} duration={2200} particleCount={30} width={400} />
         </div>
       )}
       {/* Card containing all attendance controls - matching mobile layout */}
@@ -212,9 +189,7 @@ export const QuickAttendanceRegistrationForm = ({
         <form className="flex w-full flex-col gap-4 rounded-lg border bg-white p-4">
           {/* Header with title and count summary */}
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">
-              {t("home.quickAttendance.title")}
-            </h3>
+            <h3 className="text-sm font-semibold">{t("home.quickAttendance.title")}</h3>
             {drinkSummary.total > 0 && (
               <span className="text-muted-foreground text-sm">
                 {t("home.quickAttendance.drinksToday", {

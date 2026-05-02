@@ -104,9 +104,7 @@ export default function GroupsScreen() {
   if (!currentFestival) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
-        <Text className="text-center text-typography-500">
-          {t("groups.noFestival")}
-        </Text>
+        <Text className="text-center text-typography-500">{t("groups.noFestival")}</Text>
       </View>
     );
   }
@@ -127,39 +125,21 @@ export default function GroupsScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
         className="flex-1 bg-background-50"
-        refreshControl={
-          <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
       >
         {hasGroups ? (
           <VStack space="md" className="p-4 pb-20">
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
-              <Text className="text-sm text-typography-500">
-                {t("groups.yourGroups")}
-              </Text>
+              <Text className="text-sm text-typography-500">{t("groups.yourGroups")}</Text>
               <HStack space="sm">
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  size="sm"
-                  onPress={handleJoinPress}
-                >
+                <Button variant="outline" action="secondary" size="sm" onPress={handleJoinPress}>
                   <UserPlus size={16} color={IconColors.default} />
-                  <ButtonText className="ml-1">
-                    {t("groups.actions.join")}
-                  </ButtonText>
+                  <ButtonText className="ml-1">{t("groups.actions.join")}</ButtonText>
                 </Button>
-                <Button
-                  variant="solid"
-                  action="primary"
-                  size="sm"
-                  onPress={handleCreatePress}
-                >
+                <Button variant="solid" action="primary" size="sm" onPress={handleCreatePress}>
                   <Plus size={16} color={IconColors.white} />
-                  <ButtonText className="ml-1">
-                    {t("groups.actions.create")}
-                  </ButtonText>
+                  <ButtonText className="ml-1">{t("groups.actions.create")}</ButtonText>
                 </Button>
               </HStack>
             </HStack>
@@ -167,19 +147,12 @@ export default function GroupsScreen() {
             {/* Groups list */}
             <VStack space="sm">
               {groupsList.map((group) => (
-                <GroupListItem
-                  key={group.id}
-                  group={group}
-                  onPress={handleGroupPress}
-                />
+                <GroupListItem key={group.id} group={group} onPress={handleGroupPress} />
               ))}
             </VStack>
           </VStack>
         ) : (
-          <EmptyGroupsState
-            onCreateGroup={handleCreatePress}
-            onJoinGroup={handleJoinPress}
-          />
+          <EmptyGroupsState onCreateGroup={handleCreatePress} onJoinGroup={handleJoinPress} />
         )}
       </ScrollView>
 
@@ -206,11 +179,7 @@ export default function GroupsScreen() {
           <AlertDialogHeader>
             <Heading
               size="lg"
-              className={
-                dialog.type === "destructive"
-                  ? "text-error-600"
-                  : "text-typography-950"
-              }
+              className={dialog.type === "destructive" ? "text-error-600" : "text-typography-950"}
             >
               {dialog.title}
             </Heading>

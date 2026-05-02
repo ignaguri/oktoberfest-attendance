@@ -47,14 +47,8 @@ import { logger } from "@/lib/logger";
 
 export default function DatabaseDebugScreen() {
   const { t } = useTranslation();
-  const {
-    isReady,
-    getDb,
-    sync,
-    syncStatus,
-    isSimulatingOffline,
-    setSimulateOffline,
-  } = useOfflineSafe();
+  const { isReady, getDb, sync, syncStatus, isSimulatingOffline, setSimulateOffline } =
+    useOfflineSafe();
 
   const [stats, setStats] = useState<DatabaseStats | null>(null);
   const [pendingOps, setPendingOps] = useState<SyncQueueEntry[]>([]);
@@ -197,31 +191,27 @@ export default function DatabaseDebugScreen() {
   }, [isReady, getDb]);
 
   const handleResetDatabase = useCallback(() => {
-    Alert.alert(
-      "Reset Database",
-      "This will delete all local data. Are you sure?",
-      [
-        { text: t("dev.buttons.cancel"), style: "cancel" },
-        {
-          text: "Reset",
-          style: "destructive",
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              await DatabaseDebugger.resetDb();
-              setStats(null);
-              setPendingOps([]);
-              setDirtyRecords([]);
-              Alert.alert("Success", "Database reset. Please restart the app.");
-            } catch (error) {
-              Alert.alert("Error", (error as Error).message);
-            } finally {
-              setIsLoading(false);
-            }
-          },
+    Alert.alert("Reset Database", "This will delete all local data. Are you sure?", [
+      { text: t("dev.buttons.cancel"), style: "cancel" },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: async () => {
+          setIsLoading(true);
+          try {
+            await DatabaseDebugger.resetDb();
+            setStats(null);
+            setPendingOps([]);
+            setDirtyRecords([]);
+            Alert.alert("Success", "Database reset. Please restart the app.");
+          } catch (error) {
+            Alert.alert("Error", (error as Error).message);
+          } finally {
+            setIsLoading(false);
+          }
         },
-      ],
-    );
+      },
+    ]);
   }, [t]);
 
   const toggleSection = (section: string) => {
@@ -240,9 +230,7 @@ export default function DatabaseDebugScreen() {
   return (
     <ScrollView
       className="flex-1 bg-background-50"
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
       <VStack space="md" className="p-4">
         {/* Header */}
@@ -324,9 +312,7 @@ export default function DatabaseDebugScreen() {
                 disabled={isLoading || stats?.syncQueue.failed === 0}
               >
                 <XCircle size={14} color={Colors.error[500]} />
-                <ButtonText className="ml-1 text-error-500">
-                  Delete Failed
-                </ButtonText>
+                <ButtonText className="ml-1 text-error-500">Delete Failed</ButtonText>
               </Button>
 
               <Button
@@ -349,12 +335,7 @@ export default function DatabaseDebugScreen() {
                 <ButtonText className="ml-1">Export</ButtonText>
               </Button>
 
-              <Button
-                size="sm"
-                variant="outline"
-                onPress={handleLogState}
-                disabled={isLoading}
-              >
+              <Button size="sm" variant="outline" onPress={handleLogState} disabled={isLoading}>
                 <Database size={14} color={Colors.primary[500]} />
                 <ButtonText className="ml-1">Log State</ButtonText>
               </Button>
@@ -369,10 +350,7 @@ export default function DatabaseDebugScreen() {
               variant={isSimulatingOffline ? "solid" : "outline"}
               onPress={() => setSimulateOffline(!isSimulatingOffline)}
             >
-              <WifiOff
-                size={14}
-                color={isSimulatingOffline ? Colors.white : IconColors.default}
-              />
+              <WifiOff size={14} color={isSimulatingOffline ? Colors.white : IconColors.default} />
               <ButtonText className="ml-1">
                 {isSimulatingOffline ? "Go Online" : "Go Offline"}
               </ButtonText>
@@ -380,12 +358,7 @@ export default function DatabaseDebugScreen() {
 
             <Divider className="my-2" />
 
-            <Button
-              size="sm"
-              action="negative"
-              onPress={handleResetDatabase}
-              disabled={isLoading}
-            >
+            <Button size="sm" action="negative" onPress={handleResetDatabase} disabled={isLoading}>
               <Trash2 size={14} color={Colors.white} />
               <ButtonText className="ml-1">Reset Database</ButtonText>
             </Button>
@@ -410,18 +383,12 @@ export default function DatabaseDebugScreen() {
                   >
                     <Text className="font-mono text-sm">{table.name}</Text>
                     <HStack space="sm">
-                      <Text className="text-xs text-typography-500">
-                        {table.totalRows} rows
-                      </Text>
+                      <Text className="text-xs text-typography-500">{table.totalRows} rows</Text>
                       {table.dirtyRows > 0 && (
-                        <Text className="text-xs text-primary-500">
-                          {table.dirtyRows} dirty
-                        </Text>
+                        <Text className="text-xs text-primary-500">{table.dirtyRows} dirty</Text>
                       )}
                       {table.deletedRows > 0 && (
-                        <Text className="text-xs text-error-500">
-                          {table.deletedRows} deleted
-                        </Text>
+                        <Text className="text-xs text-error-500">{table.deletedRows} deleted</Text>
                       )}
                     </HStack>
                   </HStack>
@@ -439,9 +406,7 @@ export default function DatabaseDebugScreen() {
         >
           <VStack space="xs" className="mt-2">
             {pendingOps.length === 0 ? (
-              <Text className="text-center text-sm text-typography-500">
-                No pending operations
-              </Text>
+              <Text className="text-center text-sm text-typography-500">No pending operations</Text>
             ) : (
               pendingOps.slice(0, 20).map((op) => (
                 <HStack
@@ -456,10 +421,7 @@ export default function DatabaseDebugScreen() {
                       </Text>
                     </HStack>
                     {op.last_error && (
-                      <Text
-                        className="text-xs text-error-500"
-                        numberOfLines={1}
-                      >
+                      <Text className="text-xs text-error-500" numberOfLines={1}>
                         {op.last_error}
                       </Text>
                     )}
@@ -487,9 +449,7 @@ export default function DatabaseDebugScreen() {
         >
           <VStack space="xs" className="mt-2">
             {dirtyRecords.length === 0 ? (
-              <Text className="text-center text-sm text-typography-500">
-                All records synced
-              </Text>
+              <Text className="text-center text-sm text-typography-500">All records synced</Text>
             ) : (
               dirtyRecords.slice(0, 20).map((record) => (
                 <HStack
@@ -550,11 +510,7 @@ function SyncStatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <Text
-      className={cn("rounded-full px-2 py-1 text-xs font-medium", getColor())}
-    >
-      {status}
-    </Text>
+    <Text className={cn("rounded-full px-2 py-1 text-xs font-medium", getColor())}>{status}</Text>
   );
 }
 
@@ -570,11 +526,7 @@ function StatBadge({
   color?: "primary" | "error";
 }) {
   const bgColor =
-    color === "primary"
-      ? "bg-primary-50"
-      : color === "error"
-        ? "bg-error-50"
-        : "bg-background-100";
+    color === "primary" ? "bg-primary-50" : color === "error" ? "bg-error-50" : "bg-background-100";
 
   return (
     <VStack className={cn("items-center rounded-lg p-2", bgColor)}>

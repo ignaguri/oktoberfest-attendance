@@ -83,10 +83,7 @@ export function EventCalendar({
       if (b.type === "beer_summary" && a.type !== "beer_summary") return 1;
 
       // For other events, sort by time
-      return (
-        new TZDate(a.from, TIMEZONE).getTime() -
-        new TZDate(b.from, TIMEZONE).getTime()
-      );
+      return new TZDate(a.from, TIMEZONE).getTime() - new TZDate(b.from, TIMEZONE).getTime();
     });
   }, [date, eventsByDay]);
 
@@ -114,9 +111,7 @@ export function EventCalendar({
               "after:bg-primary/70 relative after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full",
             ),
           }}
-          startMonth={
-            festivalStartDate ? subMonths(festivalStartDate, 1) : undefined
-          }
+          startMonth={festivalStartDate ? subMonths(festivalStartDate, 1) : undefined}
           endMonth={festivalEndDate ? addMonths(festivalEndDate, 1) : undefined}
           disabled={
             festivalStartDate && festivalEndDate
@@ -136,11 +131,7 @@ export function EventCalendar({
                 })
               : "Select a date"}
           </div>
-          <div
-            className="bg-muted-foreground/30 h-4 w-px"
-            role="separator"
-            aria-hidden="true"
-          />
+          <div className="bg-muted-foreground/30 h-4 w-px" role="separator" aria-hidden="true" />
           {renderAddButton ? (
             renderAddButton(date)
           ) : (
@@ -152,20 +143,13 @@ export function EventCalendar({
                 onClick={() => {
                   const params = new URLSearchParams(searchParams.toString());
                   if (date) {
-                    params.set(
-                      "date",
-                      formatDate(new TZDate(date, TIMEZONE), "yyyy-MM-dd"),
-                    );
+                    params.set("date", formatDate(new TZDate(date, TIMEZONE), "yyyy-MM-dd"));
                   }
                   params.set("newReservation", "1");
                   router.replace(`?${params.toString()}`);
                 }}
                 disabled={!date || hasReservations}
-                title={
-                  hasReservations
-                    ? "Click on reservation to edit"
-                    : "Add reservation"
-                }
+                title={hasReservations ? "Click on reservation to edit" : "Add reservation"}
               >
                 +Reservation
               </Button>
@@ -175,10 +159,7 @@ export function EventCalendar({
                 className="h-7 px-1"
                 onClick={() => {
                   if (date) {
-                    const dateStr = formatDate(
-                      new TZDate(date, TIMEZONE),
-                      "yyyy-MM-dd",
-                    );
+                    const dateStr = formatDate(new TZDate(date, TIMEZONE), "yyyy-MM-dd");
                     router.push(`/calendar/edit-attendance?date=${dateStr}`);
                   }
                 }}
@@ -191,9 +172,7 @@ export function EventCalendar({
           )}
         </div>
         <div className="flex w-full flex-col gap-2">
-          {dayEvents.length === 0 && (
-            <div className="text-muted-foreground text-sm">No events</div>
-          )}
+          {dayEvents.length === 0 && <div className="text-muted-foreground text-sm">No events</div>}
           {dayEvents.map((ev) => {
             // Different styling based on event type
             const getEventStyles = () => {
@@ -244,29 +223,20 @@ export function EventCalendar({
               } else {
                 // For attendance, tent_visit, and beer_summary events - go to attendance page
                 if (date) {
-                  const dateStr = formatDate(
-                    new TZDate(date, TIMEZONE),
-                    "yyyy-MM-dd",
-                  );
+                  const dateStr = formatDate(new TZDate(date, TIMEZONE), "yyyy-MM-dd");
                   router.push(`/attendance?date=${dateStr}`);
                 }
               }
             };
 
             return (
-              <div
-                key={ev.id}
-                className={styles.container}
-                onClick={handleEventClick}
-              >
+              <div key={ev.id} className={styles.container} onClick={handleEventClick}>
                 <div className={styles.title}>{ev.title}</div>
                 <div className={styles.time}>
                   {ev.type === "beer_summary"
                     ? "Daily Total"
                     : formatDate(new TZDate(ev.from, TIMEZONE), "HH:mm")}
-                  {ev.to
-                    ? ` - ${formatDate(new TZDate(ev.to, TIMEZONE), "HH:mm")}`
-                    : ""}
+                  {ev.to ? ` - ${formatDate(new TZDate(ev.to, TIMEZONE), "HH:mm")}` : ""}
                 </div>
               </div>
             );

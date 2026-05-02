@@ -2,10 +2,7 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import {
-  calculateTotalPoints,
-  sortAchievements,
-} from "@prostcounter/shared/wrapped";
+import { calculateTotalPoints, sortAchievements } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 
 import { AchievementBadge } from "@/components/achievements/AchievementBadge";
@@ -18,20 +15,14 @@ interface AchievementsSlideProps {
   isActive?: boolean;
 }
 
-export function AchievementsSlide({
-  data,
-  isActive = false,
-}: AchievementsSlideProps) {
+export function AchievementsSlide({ data, isActive = false }: AchievementsSlideProps) {
   const { t } = useTranslation();
   const achievements = sortAchievements(data.achievements);
   const totalPoints = calculateTotalPoints(data.achievements);
 
   if (achievements.length === 0) {
     return (
-      <BaseSlide
-        isActive={isActive}
-        className="bg-gradient-to-br from-violet-50 to-purple-50"
-      >
+      <BaseSlide isActive={isActive} className="bg-gradient-to-br from-violet-50 to-purple-50">
         <SlideTitle>{t("wrapped.achievements.title")}</SlideTitle>
         <p className="text-gray-600">No achievements unlocked yet</p>
       </BaseSlide>
@@ -39,19 +30,14 @@ export function AchievementsSlide({
   }
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-violet-50 to-purple-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-violet-50 to-purple-50">
       <SlideTitle>{t("wrapped.achievements.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.achievements.subtitle")}</SlideSubtitle>
 
       <div className="flex w-full max-w-2xl flex-col gap-4">
         <div className="rounded-lg bg-white p-4 text-center shadow">
           <p className="text-3xl font-bold text-yellow-600">{totalPoints}</p>
-          <p className="text-sm text-gray-600">
-            {t("wrapped.achievements.totalPoints")}
-          </p>
+          <p className="text-sm text-gray-600">{t("wrapped.achievements.totalPoints")}</p>
         </div>
 
         <div className="flex max-h-[50dvh] flex-col gap-2 overflow-y-auto">

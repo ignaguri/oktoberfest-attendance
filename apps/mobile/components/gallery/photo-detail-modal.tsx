@@ -25,11 +25,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -73,10 +69,7 @@ export function PhotoDetailModal({
     () => reactionsData?.userReactions || [],
     [reactionsData?.userReactions],
   );
-  const reactions = useMemo(
-    () => reactionsData?.reactions || [],
-    [reactionsData?.reactions],
-  );
+  const reactions = useMemo(() => reactionsData?.reactions || [], [reactionsData?.reactions]);
 
   const handleToggleReaction = useCallback(
     async (emoji: string) => {
@@ -126,9 +119,7 @@ export function PhotoDetailModal({
 
   const getReactionCount = useCallback(
     (emoji: string): number => {
-      const reaction = reactions.find(
-        (r: { emoji: string; count: number }) => r.emoji === emoji,
-      );
+      const reaction = reactions.find((r: { emoji: string; count: number }) => r.emoji === emoji);
       return reaction?.count || 0;
     },
     [reactions],
@@ -153,22 +144,15 @@ export function PhotoDetailModal({
         <HStack space="sm" className="px-4 py-2">
           <Avatar size="xs">
             {item.avatarUrl ? (
-              <AvatarImage
-                source={{ uri: getAvatarUrl(item.avatarUrl) }}
-                alt={item.username}
-              />
+              <AvatarImage source={{ uri: getAvatarUrl(item.avatarUrl) }} alt={item.username} />
             ) : (
-              <AvatarFallbackText>
-                {getInitials({ username: item.username })}
-              </AvatarFallbackText>
+              <AvatarFallbackText>{getInitials({ username: item.username })}</AvatarFallbackText>
             )}
           </Avatar>
           <VStack className="flex-1">
             <HStack className="items-center justify-between">
               <HStack space="xs" className="items-center">
-                <Text className="text-sm font-semibold text-typography-900">
-                  {item.username}
-                </Text>
+                <Text className="text-sm font-semibold text-typography-900">{item.username}</Text>
                 <Text className="text-xs text-typography-400">
                   {formatRelativeTime(new Date(item.createdAt))}
                 </Text>
@@ -176,9 +160,7 @@ export function PhotoDetailModal({
               {isOwnComment && (
                 <Pressable
                   onPress={() => handleDeleteComment(item.id)}
-                  accessibilityLabel={t(
-                    "groups.gallery.photoDetail.deleteComment",
-                  )}
+                  accessibilityLabel={t("groups.gallery.photoDetail.deleteComment")}
                   className="p-1"
                 >
                   <Trash2 size={14} color={IconColors.error} />
@@ -196,12 +178,7 @@ export function PhotoDetailModal({
   if (!visible || !photoId || !photoUrl) return null;
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -256,10 +233,7 @@ export function PhotoDetailModal({
                   <Pressable
                     key={emoji}
                     onPress={() => handleToggleReaction(emoji)}
-                    accessibilityLabel={t(
-                      "groups.gallery.photoDetail.reactWith",
-                      { emoji },
-                    )}
+                    accessibilityLabel={t("groups.gallery.photoDetail.reactWith", { emoji })}
                     accessibilityHint={
                       hasReacted
                         ? t("groups.gallery.photoDetail.tapToRemoveReaction")
@@ -277,9 +251,7 @@ export function PhotoDetailModal({
                       <Text
                         className={cn(
                           "ml-1 text-xs font-semibold",
-                          hasReacted
-                            ? "text-primary-600"
-                            : "text-typography-500",
+                          hasReacted ? "text-primary-600" : "text-typography-500",
                         )}
                       >
                         {count}
@@ -345,11 +317,7 @@ export function PhotoDetailModal({
                 ) : (
                   <Send
                     size={18}
-                    color={
-                      commentText.trim()
-                        ? IconColors.white
-                        : IconColors.disabled
-                    }
+                    color={commentText.trim() ? IconColors.white : IconColors.disabled}
                   />
                 )}
               </Pressable>

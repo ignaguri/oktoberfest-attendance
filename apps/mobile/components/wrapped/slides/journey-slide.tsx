@@ -1,10 +1,7 @@
 import { Motion } from "@legendapp/motion";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import {
-  CHART_CONFIG,
-  prepareTimelineData,
-} from "@prostcounter/shared/wrapped";
+import { CHART_CONFIG, prepareTimelineData } from "@prostcounter/shared/wrapped";
 import { useMemo } from "react";
 import { Dimensions } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
@@ -22,10 +19,7 @@ export function JourneySlide({ data, isActive }: JourneySlideProps) {
   const { t } = useTranslation();
   const screenWidth = Dimensions.get("window").width;
 
-  const timelineData = useMemo(
-    () => prepareTimelineData(data.timeline),
-    [data.timeline],
-  );
+  const timelineData = useMemo(() => prepareTimelineData(data.timeline), [data.timeline]);
 
   const chartWidth = screenWidth - 72; // 24px padding on each side + 24 extra
   const chartHeight = 200;
@@ -41,19 +35,13 @@ export function JourneySlide({ data, isActive }: JourneySlideProps) {
     y: padding.top + plotHeight - (d.beers / maxBeers) * plotHeight,
   }));
 
-  const pathD = points
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-    .join(" ");
+  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-indigo-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.journey.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.journey.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.journey.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.journey.subtitle")}</SlideSubtitle>
 
         <Motion.View
           initial={{ opacity: 0, scale: 0.9 }}

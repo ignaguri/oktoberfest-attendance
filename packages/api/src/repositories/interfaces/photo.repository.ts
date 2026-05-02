@@ -18,10 +18,7 @@ export interface IPhotoRepository {
    * @param query - Upload parameters
    * @returns Upload URL, public URL, and picture ID
    */
-  getUploadUrl(
-    userId: string,
-    query: GetPhotoUploadUrlQuery,
-  ): Promise<GetPhotoUploadUrlResponse>;
+  getUploadUrl(userId: string, query: GetPhotoUploadUrlQuery): Promise<GetPhotoUploadUrlResponse>;
 
   /**
    * Confirm photo upload was successful
@@ -37,10 +34,7 @@ export interface IPhotoRepository {
    * @param userId - User ID (for authorization)
    * @returns Array of beer pictures
    */
-  findByAttendance(
-    attendanceId: string,
-    userId: string,
-  ): Promise<BeerPicture[]>;
+  findByAttendance(attendanceId: string, userId: string): Promise<BeerPicture[]>;
 
   /**
    * List photos for a user
@@ -79,11 +73,7 @@ export interface IPhotoRepository {
    * @param caption - New caption text
    * @returns Updated picture
    */
-  updateCaption(
-    pictureId: string,
-    userId: string,
-    caption: string,
-  ): Promise<BeerPicture>;
+  updateCaption(pictureId: string, userId: string, caption: string): Promise<BeerPicture>;
 
   // ===== Photo Privacy Settings =====
 
@@ -111,10 +101,7 @@ export interface IPhotoRepository {
    * @param groupId - Group ID
    * @returns Group photo settings
    */
-  getGroupPhotoSettings(
-    userId: string,
-    groupId: string,
-  ): Promise<GroupPhotoSettings>;
+  getGroupPhotoSettings(userId: string, groupId: string): Promise<GroupPhotoSettings>;
 
   /**
    * Update user's photo settings for a specific group

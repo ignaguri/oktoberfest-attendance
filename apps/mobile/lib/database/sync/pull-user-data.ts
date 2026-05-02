@@ -11,12 +11,7 @@ import type * as SQLite from "expo-sqlite";
 import { logger } from "@/lib/logger";
 
 import { apiClient } from "../../api-client";
-import type {
-  LocalAttendance,
-  LocalConsumption,
-  LocalProfile,
-  LocalTentVisit,
-} from "../schema";
+import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
 import { updateLastSyncAt } from "../sync-queue";
 import { logConflict, shouldUpdate } from "./conflict";
 import type { PullResult } from "./types";
@@ -33,10 +28,7 @@ type ServerTentVisit = {
 /**
  * Pull user profile from server
  */
-export async function pullProfile(
-  db: SQLite.SQLiteDatabase,
-  userId: string,
-): Promise<PullResult> {
+export async function pullProfile(db: SQLite.SQLiteDatabase, userId: string): Promise<PullResult> {
   const result: PullResult = {
     table: "profiles",
     inserted: 0,
@@ -49,10 +41,9 @@ export async function pullProfile(
     const profile = response.profile;
     const now = new Date().toISOString();
 
-    const existing = await db.getFirstAsync<LocalProfile>(
-      "SELECT * FROM profiles WHERE id = ?",
-      [userId],
-    );
+    const existing = await db.getFirstAsync<LocalProfile>("SELECT * FROM profiles WHERE id = ?", [
+      userId,
+    ]);
 
     if (existing) {
       // Only update if not dirty (don't overwrite local changes)
@@ -137,22 +128,10 @@ export async function pullAttendances(
     // page, rows missing from the response might still live on the server.
     const isFullSnapshot = attendances.length >= response.total;
 
-    await processAttendances(
-      db,
-      festivalId,
-      attendances,
-      attendancesResult,
-      now,
-      isFullSnapshot,
-    );
+    await processAttendances(db, festivalId, attendances, attendancesResult, now, isFullSnapshot);
     await updateLastSyncAt(db, "attendances", now);
 
-    await processTentVisits(
-      db,
-      response.tentVisits ?? [],
-      tentVisitsResult,
-      now,
-    );
+    await processTentVisits(db, response.tentVisits ?? [], tentVisitsResult, now);
     await updateLastSyncAt(db, "tent_visits", now);
   } catch (error) {
     logger.error("[SyncManager] Pull attendances failed:", error);
@@ -197,23 +176,11 @@ async function processAttendances(
 
         // Log if there was a conflict (local had dirty changes)
         if (existing._dirty === 1) {
-          logConflict(
-            "attendances",
-            att.id,
-            existing.updated_at,
-            serverUpdatedAt,
-            "server",
-          );
+          logConflict("attendances", att.id, existing.updated_at, serverUpdatedAt, "server");
         }
       } else if (existing._dirty === 1) {
         // Local wins - log the conflict
-        logConflict(
-          "attendances",
-          att.id,
-          existing.updated_at,
-          serverUpdatedAt,
-          "local",
-        );
+        logConflict("attendances", att.id, existing.updated_at, serverUpdatedAt, "local");
       }
     } else {
       // No local record with this server ID — check if one exists with a
@@ -235,15 +202,15 @@ async function processAttendances(
 
         await db.withTransactionAsync(async () => {
           // Update all dependent tables referencing the old local ID
-          await db.runAsync(
-            `UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`,
-            [att.id, oldId],
-          );
+          await db.runAsync(`UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`, [
+            att.id,
+            oldId,
+          ]);
 
-          await db.runAsync(
-            `UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`,
-            [att.id, oldId],
-          );
+          await db.runAsync(`UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`, [
+            att.id,
+            oldId,
+          ]);
 
           // Update pending sync queue entries that reference the old ID
           await db.runAsync(
@@ -260,9 +227,7 @@ async function processAttendances(
           );
         });
 
-        logger.info(
-          `[SyncManager] Reconciled attendance ID: ${oldId} → ${att.id}`,
-        );
+        logger.info(`[SyncManager] Reconciled attendance ID: ${oldId} → ${att.id}`);
         result.updated++;
       } else if (!byNaturalKey) {
         await db.runAsync(
@@ -376,14 +341,7 @@ async function processTentVisits(
          WHERE user_id = ? AND tent_id = ? AND festival_id = ?
            AND (visit_date = ? OR visit_date LIKE ?)
            AND id != ?`,
-        [
-          tv.userId,
-          tv.tentId,
-          tv.festivalId,
-          visitDate,
-          `${visitDate}%`,
-          tv.id,
-        ],
+        [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
       );
     }
 
@@ -485,23 +443,11 @@ export async function pullConsumptions(
 
               // Log if there was a conflict
               if (existing._dirty === 1) {
-                logConflict(
-                  "consumptions",
-                  cons.id,
-                  existing.updated_at,
-                  cons.updatedAt,
-                  "server",
-                );
+                logConflict("consumptions", cons.id, existing.updated_at, cons.updatedAt, "server");
               }
             } else if (existing._dirty === 1) {
               // Local wins
-              logConflict(
-                "consumptions",
-                cons.id,
-                existing.updated_at,
-                cons.updatedAt,
-                "local",
-              );
+              logConflict("consumptions", cons.id, existing.updated_at, cons.updatedAt, "local");
             }
           } else {
             await db.runAsync(
@@ -532,10 +478,7 @@ export async function pullConsumptions(
           }
         }
       } catch (error) {
-        logger.error(
-          `[SyncManager] Pull consumptions for ${att.date} failed:`,
-          error,
-        );
+        logger.error(`[SyncManager] Pull consumptions for ${att.date} failed:`, error);
       }
     }
 

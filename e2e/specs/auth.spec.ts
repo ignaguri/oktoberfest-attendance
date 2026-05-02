@@ -24,10 +24,7 @@ test.describe("Authentication Flows", () => {
       await signInPage.expectFormVisible();
 
       // Sign in with default test user
-      await signInPage.signInAndWaitForHome(
-        DEFAULT_TEST_USER.email,
-        DEFAULT_TEST_USER.password,
-      );
+      await signInPage.signInAndWaitForHome(DEFAULT_TEST_USER.email, DEFAULT_TEST_USER.password);
 
       // Verify successful sign-in
       await homePage.expectOnHomePage();
@@ -40,10 +37,7 @@ test.describe("Authentication Flows", () => {
       await signInPage.goto();
 
       // Sign in with user1
-      await signInPage.signInAndWaitForHome(
-        TEST_USERS.user1.email,
-        TEST_USERS.user1.password,
-      );
+      await signInPage.signInAndWaitForHome(TEST_USERS.user1.email, TEST_USERS.user1.password);
 
       await homePage.expectOnHomePage();
     });
@@ -56,10 +50,7 @@ test.describe("Authentication Flows", () => {
 
       // First sign in
       await signInPage.goto();
-      await signInPage.signInAndWaitForHome(
-        DEFAULT_TEST_USER.email,
-        DEFAULT_TEST_USER.password,
-      );
+      await signInPage.signInAndWaitForHome(DEFAULT_TEST_USER.email, DEFAULT_TEST_USER.password);
       await homePage.expectOnHomePage();
 
       // Dismiss any overlays (What's New dialog and Tutorial)
@@ -72,18 +63,13 @@ test.describe("Authentication Flows", () => {
       await expect(page).toHaveURL(/\/sign-in|\/$/);
     });
 
-    test("should not access protected routes after sign out", async ({
-      page,
-    }) => {
+    test("should not access protected routes after sign out", async ({ page }) => {
       const signInPage = new SignInPage(page);
       const homePage = new HomePage(page);
 
       // Sign in first
       await signInPage.goto();
-      await signInPage.signInAndWaitForHome(
-        DEFAULT_TEST_USER.email,
-        DEFAULT_TEST_USER.password,
-      );
+      await signInPage.signInAndWaitForHome(DEFAULT_TEST_USER.email, DEFAULT_TEST_USER.password);
       await homePage.expectOnHomePage();
 
       // Dismiss any overlays (What's New dialog and Tutorial)
@@ -114,10 +100,7 @@ test.describe("Authentication Flows", () => {
       await signInPage.goto();
 
       // Try to sign in with invalid credentials
-      await signInPage.signIn(
-        INVALID_CREDENTIALS.email,
-        INVALID_CREDENTIALS.password,
-      );
+      await signInPage.signIn(INVALID_CREDENTIALS.email, INVALID_CREDENTIALS.password);
 
       // Wait a bit for any redirect or error
       await page.waitForTimeout(2000);
@@ -126,9 +109,7 @@ test.describe("Authentication Flows", () => {
       await expect(page).not.toHaveURL(/\/home/);
     });
 
-    test("should show error for wrong password with valid email", async ({
-      page,
-    }) => {
+    test("should show error for wrong password with valid email", async ({ page }) => {
       const signInPage = new SignInPage(page);
 
       await signInPage.goto();
@@ -157,9 +138,7 @@ test.describe("Authentication Flows", () => {
   });
 
   test.describe("FLOW_AUTH_004: Redirect Unauthenticated User", () => {
-    test("should redirect unauthenticated user to sign-in from /home", async ({
-      page,
-    }) => {
+    test("should redirect unauthenticated user to sign-in from /home", async ({ page }) => {
       // Try to access home directly without signing in
       await page.goto("/home");
 
@@ -167,30 +146,22 @@ test.describe("Authentication Flows", () => {
       await expect(page).toHaveURL(/\/sign-in|\/$/);
     });
 
-    test("should redirect unauthenticated user to sign-in from /groups", async ({
-      page,
-    }) => {
+    test("should redirect unauthenticated user to sign-in from /groups", async ({ page }) => {
       await page.goto("/groups");
       await expect(page).toHaveURL(/\/sign-in|\/$/);
     });
 
-    test("should redirect unauthenticated user to sign-in from /attendance", async ({
-      page,
-    }) => {
+    test("should redirect unauthenticated user to sign-in from /attendance", async ({ page }) => {
       await page.goto("/attendance");
       await expect(page).toHaveURL(/\/sign-in|\/$/);
     });
 
-    test("should redirect unauthenticated user to sign-in from /leaderboard", async ({
-      page,
-    }) => {
+    test("should redirect unauthenticated user to sign-in from /leaderboard", async ({ page }) => {
       await page.goto("/leaderboard");
       await expect(page).toHaveURL(/\/sign-in|\/$/);
     });
 
-    test("should redirect unauthenticated user to sign-in from /profile", async ({
-      page,
-    }) => {
+    test("should redirect unauthenticated user to sign-in from /profile", async ({ page }) => {
       await page.goto("/profile");
       await expect(page).toHaveURL(/\/sign-in|\/$/);
     });
@@ -204,9 +175,7 @@ test.describe("Authentication Flows", () => {
       await signUpPage.expectFormVisible();
     });
 
-    test("should submit sign up form with valid credentials", async ({
-      page,
-    }) => {
+    test("should submit sign up form with valid credentials", async ({ page }) => {
       const signUpPage = new SignUpPage(page);
 
       await signUpPage.goto();

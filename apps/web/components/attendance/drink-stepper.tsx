@@ -63,9 +63,7 @@ export function DrinkStepper({
   const mostRecentConsumption = useMemo(() => {
     if (typeConsumptions.length === 0) return null;
     return typeConsumptions.reduce((latest, current) => {
-      return new Date(current.recordedAt) > new Date(latest.recordedAt)
-        ? current
-        : latest;
+      return new Date(current.recordedAt) > new Date(latest.recordedAt) ? current : latest;
     });
   }, [typeConsumptions]);
 
@@ -126,8 +124,7 @@ export function DrinkStepper({
         disabled={!canDecrement}
         className={cn(
           "h-10 w-10 rounded-full",
-          canDecrement &&
-            "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
+          canDecrement && "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
         )}
       >
         {deleteConsumption.loading ? (
@@ -156,8 +153,7 @@ export function DrinkStepper({
         disabled={!canIncrement}
         className={cn(
           "h-10 w-10 rounded-full",
-          canIncrement &&
-            "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
+          canIncrement && "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
         )}
       >
         {logConsumption.loading ? (

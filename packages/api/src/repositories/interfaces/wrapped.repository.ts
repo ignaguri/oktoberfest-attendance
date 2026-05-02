@@ -24,11 +24,7 @@ export interface IWrappedRepository {
    * @param force - Force regeneration even if cached
    * @returns Generated wrapped data
    */
-  generate(
-    userId: string,
-    festivalId: string,
-    force?: boolean,
-  ): Promise<WrappedData>;
+  generate(userId: string, festivalId: string, force?: boolean): Promise<WrappedData>;
 
   /**
    * Invalidate wrapped cache for a user and festival
@@ -67,11 +63,7 @@ export interface IWrappedRepository {
    * @param userId - Optional user ID filter
    * @returns Number of entries regenerated
    */
-  regenerateCache(
-    adminUserId: string,
-    festivalId?: string,
-    userId?: string,
-  ): Promise<number>;
+  regenerateCache(adminUserId: string, festivalId?: string, userId?: string): Promise<number>;
 
   /**
    * Check if user is a super admin

@@ -5,11 +5,7 @@
  * with platform-specific auth configuration.
  */
 
-import {
-  ApiError,
-  type ApiHeaders,
-  createTypedApiClient,
-} from "@prostcounter/api-client";
+import { ApiError, type ApiHeaders, createTypedApiClient } from "@prostcounter/api-client";
 import Constants from "expo-constants";
 
 import { logger } from "./logger";
@@ -31,9 +27,7 @@ const API_BASE_URL =
 logger.info("API Client initialized", {
   baseUrl: API_BASE_URL,
   hasExpoConfig: !!Constants.expoConfig?.extra?.apiUrl,
-  hasEnvVar: !!(
-    typeof process !== "undefined" && process.env.EXPO_PUBLIC_API_URL
-  ),
+  hasEnvVar: !!(typeof process !== "undefined" && process.env.EXPO_PUBLIC_API_URL),
 });
 
 const BASE_HEADERS: ApiHeaders = { "Content-Type": "application/json" };

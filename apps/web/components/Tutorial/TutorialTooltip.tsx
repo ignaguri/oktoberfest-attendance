@@ -99,19 +99,11 @@ export function TutorialTooltip({
       // Keep tooltip within viewport
       x = Math.max(
         TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-        Math.min(
-          x,
-          window.innerWidth - tooltipWidth - TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-        ),
+        Math.min(x, window.innerWidth - tooltipWidth - TUTORIAL_CONSTANTS.TOOLTIP_PADDING),
       );
       y = Math.max(
         TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-        Math.min(
-          y,
-          window.innerHeight -
-            tooltipHeight -
-            TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-        ),
+        Math.min(y, window.innerHeight - tooltipHeight - TUTORIAL_CONSTANTS.TOOLTIP_PADDING),
       );
 
       setPosition({ x, y });
@@ -164,21 +156,11 @@ export function TutorialTooltip({
           // Keep tooltip within viewport
           x = Math.max(
             TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-            Math.min(
-              x,
-              window.innerWidth -
-                tooltipWidth -
-                TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-            ),
+            Math.min(x, window.innerWidth - tooltipWidth - TUTORIAL_CONSTANTS.TOOLTIP_PADDING),
           );
           y = Math.max(
             TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-            Math.min(
-              y,
-              window.innerHeight -
-                tooltipHeight -
-                TUTORIAL_CONSTANTS.TOOLTIP_PADDING,
-            ),
+            Math.min(y, window.innerHeight - tooltipHeight - TUTORIAL_CONSTANTS.TOOLTIP_PADDING),
           );
 
           setPosition({ x, y });
@@ -187,10 +169,7 @@ export function TutorialTooltip({
     };
 
     // Update position after a short delay to ensure tooltip is rendered
-    const renderTimer = setTimeout(
-      updateAfterRender,
-      TUTORIAL_CONSTANTS.RENDER_DELAY,
-    );
+    const renderTimer = setTimeout(updateAfterRender, TUTORIAL_CONSTANTS.RENDER_DELAY);
 
     // Update on scroll and resize
     const handleUpdate = () => {
@@ -274,10 +253,7 @@ export function TutorialTooltip({
           </Button>
         </div>
 
-        <Button
-          onClick={onNext}
-          className="h-8 bg-yellow-500 text-white hover:bg-yellow-600"
-        >
+        <Button onClick={onNext} className="h-8 bg-yellow-500 text-white hover:bg-yellow-600">
           {canGoNext ? (
             <>
               {t("tutorial.buttons.next")}

@@ -18,8 +18,7 @@ const listTentsRoute = createRoute({
   path: "/tents",
   tags: ["tents"],
   summary: "List tents for a festival",
-  description:
-    "Returns list of tents with festival-specific pricing and availability",
+  description: "Returns list of tents with festival-specific pricing and availability",
   request: {
     query: ListTentsQuerySchema,
   },

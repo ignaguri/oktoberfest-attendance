@@ -5,13 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function JoinGroupSuccessPage() {
@@ -43,9 +37,7 @@ export default function JoinGroupSuccessPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
             <Alert variant="success">
-              <AlertDescription>
-                {t("joinGroup.success.membershipNote")}
-              </AlertDescription>
+              <AlertDescription>{t("joinGroup.success.membershipNote")}</AlertDescription>
             </Alert>
 
             <div className="flex flex-col items-center gap-3">

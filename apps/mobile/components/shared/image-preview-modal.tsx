@@ -1,13 +1,6 @@
 import { X } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  Modal,
-  Pressable,
-  View,
-} from "react-native";
+import { ActivityIndicator, Dimensions, Image, Modal, Pressable, View } from "react-native";
 
 import { IconColors } from "@/lib/constants/colors";
 
@@ -28,10 +21,7 @@ interface ImagePreviewModalProps {
  * - Loading indicator while image loads
  * - Works with both remote URLs and local file URIs
  */
-export function ImagePreviewModal({
-  imageUri,
-  onClose,
-}: ImagePreviewModalProps) {
+export function ImagePreviewModal({ imageUri, onClose }: ImagePreviewModalProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleLoadStart = useCallback(() => {
@@ -43,12 +33,7 @@ export function ImagePreviewModal({
   }, []);
 
   return (
-    <Modal
-      visible={!!imageUri}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={!!imageUri} transparent animationType="fade" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: "black" }}>
         {/* Close Button */}
         <Pressable

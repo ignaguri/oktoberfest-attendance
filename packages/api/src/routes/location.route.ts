@@ -65,8 +65,7 @@ const startSessionRoute = createRoute({
       },
     },
     409: {
-      description:
-        "Conflict - User already has active session for this festival",
+      description: "Conflict - User already has active session for this festival",
       content: {
         "application/json": {
           schema: z.object({
@@ -170,8 +169,7 @@ const updateLocationRoute = createRoute({
   path: "/location/sessions/{id}",
   tags: ["location"],
   summary: "Update location for session",
-  description:
-    "Updates the current location for an active location sharing session",
+  description: "Updates the current location for an active location sharing session",
   request: {
     params: z.object({
       id: z.uuid({ error: "Invalid session ID" }),
@@ -251,8 +249,7 @@ const getNearbyMembersRoute = createRoute({
   path: "/location/nearby",
   tags: ["location"],
   summary: "Get nearby group members",
-  description:
-    "Retrieves group members currently sharing their location near the user's position",
+  description: "Retrieves group members currently sharing their location near the user's position",
   request: {
     query: GetNearbyMembersQuerySchema,
   },
@@ -419,8 +416,7 @@ const adminForceStopSessionRoute = createRoute({
   path: "/admin/location/sessions/{id}",
   tags: ["admin", "location"],
   summary: "Force stop a location session (admin)",
-  description:
-    "Forcefully stops a location session regardless of ownership. Admin only.",
+  description: "Forcefully stops a location session regardless of ownership. Admin only.",
   request: {
     params: z.object({
       id: z.uuid({ error: "Invalid session ID" }),

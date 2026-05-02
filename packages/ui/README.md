@@ -46,12 +46,7 @@ apps/mobile/components/ui/      # gluestack-ui v3 implementations (React Native)
 // apps/web/components/ui/button.tsx
 import type { ButtonProps } from "@prostcounter/ui";
 
-export const Button: React.FC<ButtonProps> = ({
-  variant,
-  size,
-  children,
-  ...props
-}) => {
+export const Button: React.FC<ButtonProps> = ({ variant, size, children, ...props }) => {
   return (
     <RadixButton className={buttonVariants({ variant, size })} {...props}>
       {children}
@@ -73,11 +68,7 @@ export const Button: React.FC<ButtonProps> = ({
 import type { ButtonProps } from "@prostcounter/ui";
 import { Button as GButton, ButtonText } from "@gluestack-ui/themed";
 
-export const Button: React.FC<ButtonProps> = ({
-  variant,
-  children,
-  ...props
-}) => {
+export const Button: React.FC<ButtonProps> = ({ variant, children, ...props }) => {
   return (
     <GButton sx={{ variant: variant }}>
       <ButtonText>{children}</ButtonText>

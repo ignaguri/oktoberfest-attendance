@@ -58,10 +58,7 @@ export default function InterceptedAttendanceModal() {
             <X className="size-4" />
           </Button>
 
-          <DetailedAttendanceForm
-            onAttendanceUpdate={handleClose}
-            selectedDate={selectedDate}
-          />
+          <DetailedAttendanceForm onAttendanceUpdate={handleClose} selectedDate={selectedDate} />
         </div>
       </div>
     </>

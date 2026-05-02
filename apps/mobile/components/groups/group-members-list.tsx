@@ -4,11 +4,7 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { Crown, UserMinus, Users } from "lucide-react-native";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -40,9 +36,7 @@ export function GroupMembersList({
     return (
       <Card variant="outline" size="md" className="items-center p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="mt-2 text-center text-typography-500">
-          {t("groups.members.empty")}
-        </Text>
+        <Text className="mt-2 text-center text-typography-500">{t("groups.members.empty")}</Text>
       </Card>
     );
   }
@@ -76,9 +70,7 @@ export function GroupMembersList({
               <HStack space="md" className="flex-1 items-center">
                 <Avatar size="sm">
                   {member.avatarUrl ? (
-                    <AvatarImage
-                      source={{ uri: getAvatarUrl(member.avatarUrl) }}
-                    />
+                    <AvatarImage source={{ uri: getAvatarUrl(member.avatarUrl) }} />
                   ) : (
                     <AvatarFallbackText>{initials}</AvatarFallbackText>
                   )}
@@ -96,19 +88,13 @@ export function GroupMembersList({
                     >
                       {displayName}
                     </Text>
-                    {isMemberCreator && (
-                      <Crown size={14} color={IconColors.primary} />
-                    )}
+                    {isMemberCreator && <Crown size={14} color={IconColors.primary} />}
                     {isCurrentUser && (
-                      <Text className="text-xs text-typography-400">
-                        {t("groups.members.you")}
-                      </Text>
+                      <Text className="text-xs text-typography-400">{t("groups.members.you")}</Text>
                     )}
                   </HStack>
                   {member.username && member.fullName && (
-                    <Text className="text-xs text-typography-400">
-                      @{member.username}
-                    </Text>
+                    <Text className="text-xs text-typography-400">@{member.username}</Text>
                   )}
                   {joinedDate && (
                     <Text className="text-xs text-typography-400">

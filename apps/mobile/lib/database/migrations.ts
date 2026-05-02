@@ -15,12 +15,7 @@
 import type * as SQLite from "expo-sqlite";
 
 import { logger } from "../logger";
-import {
-  getSchemaVersion,
-  SCHEMA_VERSION,
-  setSchemaVersion,
-  SYNCABLE_TABLES,
-} from "./schema";
+import { getSchemaVersion, SCHEMA_VERSION, setSchemaVersion, SYNCABLE_TABLES } from "./schema";
 
 // Import Drizzle-generated migrations
 const drizzleMigrations = require("../../drizzle/migrations.js");
@@ -96,9 +91,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
     const migration = MIGRATIONS[migrationIndex];
 
     if (!migration) {
-      throw new Error(
-        `Missing migration function for v${version} -> v${version + 1}`,
-      );
+      throw new Error(`Missing migration function for v${version} -> v${version + 1}`);
     }
 
     logger.info("Running migration", { from: version, to: version + 1 });
@@ -118,9 +111,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
         from: version,
         to: version + 1,
       });
-      throw new Error(
-        `Migration failed at v${version} -> v${version + 1}: ${error}`,
-      );
+      throw new Error(`Migration failed at v${version} -> v${version + 1}: ${error}`);
     }
   }
 
@@ -130,9 +121,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
 /**
  * Checks if migrations are needed.
  */
-export async function needsMigration(
-  db: SQLite.SQLiteDatabase,
-): Promise<boolean> {
+export async function needsMigration(db: SQLite.SQLiteDatabase): Promise<boolean> {
   const currentVersion = await getSchemaVersion(db);
   return currentVersion < SCHEMA_VERSION;
 }
@@ -169,9 +158,7 @@ export async function addColumnIfNotExists(
   columnDef: string,
 ): Promise<boolean> {
   // Check if column exists
-  const columns = await db.getAllAsync<{ name: string }>(
-    `PRAGMA table_info(${tableName})`,
-  );
+  const columns = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(${tableName})`);
 
   const columnExists = columns.some((col) => col.name === columnName);
 
@@ -180,9 +167,7 @@ export async function addColumnIfNotExists(
     return false;
   }
 
-  await db.execAsync(
-    `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`,
-  );
+  await db.execAsync(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`);
   logger.info("Added column", { tableName, columnName });
   return true;
 }
@@ -230,14 +215,9 @@ export async function renameTable(
  * Creates a backup of a table before migration.
  * Useful for complex migrations that might fail.
  */
-export async function backupTable(
-  db: SQLite.SQLiteDatabase,
-  tableName: string,
-): Promise<string> {
+export async function backupTable(db: SQLite.SQLiteDatabase, tableName: string): Promise<string> {
   const backupName = `${tableName}_backup_${Date.now()}`;
-  await db.execAsync(
-    `CREATE TABLE ${backupName} AS SELECT * FROM ${tableName}`,
-  );
+  await db.execAsync(`CREATE TABLE ${backupName} AS SELECT * FROM ${tableName}`);
   logger.info("Created backup", { backupName });
   return backupName;
 }
@@ -258,10 +238,7 @@ export async function restoreFromBackup(
 /**
  * Drops a backup table after successful migration.
  */
-export async function dropBackup(
-  db: SQLite.SQLiteDatabase,
-  backupName: string,
-): Promise<void> {
+export async function dropBackup(db: SQLite.SQLiteDatabase, backupName: string): Promise<void> {
   await db.execAsync(`DROP TABLE IF EXISTS ${backupName}`);
   logger.info("Dropped backup", { backupName });
 }

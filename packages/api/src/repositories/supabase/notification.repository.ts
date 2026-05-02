@@ -26,9 +26,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
     );
   }
 
-  async getPreferences(
-    userId: string,
-  ): Promise<NotificationPreferences | null> {
+  async getPreferences(userId: string): Promise<NotificationPreferences | null> {
     const { data, error } = await this.supabase
       .from("user_notification_preferences")
       .select("*")
@@ -37,9 +35,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
 
     if (error && error.code !== PgErrorCode.NO_ROWS) {
       // PGRST116 = no rows returned
-      throw new DatabaseError(
-        `Failed to fetch notification preferences: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch notification preferences: ${error.message}`);
     }
 
     if (!data) return null;
@@ -71,8 +67,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
           group_join_enabled: preferences.groupJoinEnabled,
           checkin_enabled: preferences.checkinEnabled,
           reminders_enabled: preferences.remindersEnabled,
-          achievement_notifications_enabled:
-            preferences.achievementNotificationsEnabled,
+          achievement_notifications_enabled: preferences.achievementNotificationsEnabled,
           group_notifications_enabled: preferences.groupNotificationsEnabled,
           daily_reminder_enabled: preferences.dailyReminderEnabled,
           updated_at: new Date().toISOString(),
@@ -119,10 +114,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
     );
   }
 
-  async canSendNotification(
-    userId: string,
-    notificationType: string,
-  ): Promise<boolean> {
+  async canSendNotification(userId: string, notificationType: string): Promise<boolean> {
     // Simple rate limiting using notification_rate_limit table
     // Check if user has been notified recently (within last hour)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -136,30 +128,21 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       .limit(5); // Check if more than 5 in last hour
 
     if (error && error.code !== PgErrorCode.NO_ROWS) {
-      throw new DatabaseError(
-        `Failed to check notification rate limit: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to check notification rate limit: ${error.message}`);
     }
 
     // Allow if less than 5 notifications in the last hour
     return !data || data.length < 5;
   }
 
-  async recordNotificationSent(
-    userId: string,
-    notificationType: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from("notification_rate_limit")
-      .insert({
-        user_id: userId,
-        notification_type: notificationType,
-      });
+  async recordNotificationSent(userId: string, notificationType: string): Promise<void> {
+    const { error } = await this.supabase.from("notification_rate_limit").insert({
+      user_id: userId,
+      notification_type: notificationType,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to record notification: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to record notification: ${error.message}`);
     }
   }
 }

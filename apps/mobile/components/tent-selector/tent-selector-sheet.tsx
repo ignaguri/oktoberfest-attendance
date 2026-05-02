@@ -1,8 +1,4 @@
-import {
-  type TentGroup,
-  type TentOption,
-  useTentCrowdStatus,
-} from "@prostcounter/shared/hooks";
+import { type TentGroup, type TentOption, useTentCrowdStatus } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { X } from "lucide-react-native";
@@ -81,10 +77,7 @@ export function TentSelectorSheet({
 
   // Create a map of tentId -> crowd status for quick lookup
   const crowdMap = useMemo(() => {
-    const map = new Map<
-      string,
-      { crowdLevel: string | null; avgWaitMinutes: number | null }
-    >();
+    const map = new Map<string, { crowdLevel: string | null; avgWaitMinutes: number | null }>();
     for (const status of crowdStatuses) {
       if (status.reportCount > 0) {
         map.set(status.tentId, {
@@ -106,9 +99,7 @@ export function TentSelectorSheet({
       .map((group: TentGroup) => ({
         title: group.category,
         data: query
-          ? group.options.filter((opt) =>
-              opt.label.toLowerCase().includes(query),
-            )
+          ? group.options.filter((opt) => opt.label.toLowerCase().includes(query))
           : group.options,
       }))
       .filter((section) => section.data.length > 0);
@@ -176,10 +167,7 @@ export function TentSelectorSheet({
   );
 
   // Key extractor
-  const keyExtractor = useCallback(
-    (item: TentOption, _index: number) => item.value,
-    [],
-  );
+  const keyExtractor = useCallback((item: TentOption, _index: number) => item.value, []);
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -192,9 +180,7 @@ export function TentSelectorSheet({
         {/* Header */}
         <HStack className="mb-3 w-full items-center justify-between px-2">
           <Text className="text-lg font-semibold text-typography-900">
-            {mode === "single"
-              ? t("tentSelector.titleSingle")
-              : t("tentSelector.titleMulti")}
+            {mode === "single" ? t("tentSelector.titleSingle") : t("tentSelector.titleMulti")}
           </Text>
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={IconColors.default} />
@@ -214,9 +200,7 @@ export function TentSelectorSheet({
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
             <ActivityIndicator size="large" color={IconColors.default} />
-            <Text className="mt-2 text-typography-500">
-              {t("tentSelector.loading")}
-            </Text>
+            <Text className="mt-2 text-typography-500">{t("tentSelector.loading")}</Text>
           </VStack>
         ) : error ? (
           <VStack className="items-center justify-center py-8">
@@ -225,9 +209,7 @@ export function TentSelectorSheet({
         ) : filteredSections.length === 0 ? (
           <VStack className="items-center justify-center py-8">
             <Text className="text-typography-500">
-              {searchQuery
-                ? t("tentSelector.noMatch")
-                : t("tentSelector.noTents")}
+              {searchQuery ? t("tentSelector.noMatch") : t("tentSelector.noTents")}
             </Text>
           </VStack>
         ) : (
@@ -259,12 +241,7 @@ export function TentSelectorSheet({
             >
               <ButtonText>{t("tentSelector.clear")}</ButtonText>
             </Button>
-            <Button
-              variant="solid"
-              action="primary"
-              className="flex-1"
-              onPress={onClose}
-            >
+            <Button variant="solid" action="primary" className="flex-1" onPress={onClose}>
               <ButtonText>
                 {selectedTents.length > 0
                   ? t("tentSelector.doneCount", { count: selectedTents.length })

@@ -27,10 +27,7 @@ import { festivalTents, tents } from "./schema/tents";
  *
  * Used by: useAdaptedAttendances, useAdaptedAttendanceByDate
  */
-export async function queryAttendancesWithTotals(
-  db: DrizzleDb,
-  festivalId: string,
-) {
+export async function queryAttendancesWithTotals(db: DrizzleDb, festivalId: string) {
   const result = await db
     .select({
       // Attendance fields
@@ -50,14 +47,9 @@ export async function queryAttendancesWithTotals(
     .from(attendances)
     .leftJoin(
       consumptions,
-      and(
-        eq(consumptions.attendance_id, attendances.id),
-        eq(consumptions._deleted, 0),
-      ),
+      and(eq(consumptions.attendance_id, attendances.id), eq(consumptions._deleted, 0)),
     )
-    .where(
-      and(eq(attendances.festival_id, festivalId), eq(attendances._deleted, 0)),
-    )
+    .where(and(eq(attendances.festival_id, festivalId), eq(attendances._deleted, 0)))
     .groupBy(attendances.id)
     .orderBy(sql`${attendances.date} DESC`);
 
@@ -91,10 +83,7 @@ export async function queryAttendanceByDateWithTotals(
     .from(attendances)
     .leftJoin(
       consumptions,
-      and(
-        eq(consumptions.attendance_id, attendances.id),
-        eq(consumptions._deleted, 0),
-      ),
+      and(eq(consumptions.attendance_id, attendances.id), eq(consumptions._deleted, 0)),
     )
     .where(
       and(
@@ -119,10 +108,7 @@ export async function queryAttendanceByDateWithTotals(
  *
  * Used by: useAdaptedGroups
  */
-export async function queryGroupsWithMemberCount(
-  db: DrizzleDb,
-  festivalId: string,
-) {
+export async function queryGroupsWithMemberCount(db: DrizzleDb, festivalId: string) {
   const result = await db
     .select({
       id: groups.id,
@@ -160,11 +146,7 @@ export async function queryGroupsWithMemberCount(
  *
  * Used by: useLocalConsumptionsByDate
  */
-export async function queryConsumptionsByDate(
-  db: DrizzleDb,
-  festivalId: string,
-  date: string,
-) {
+export async function queryConsumptionsByDate(db: DrizzleDb, festivalId: string, date: string) {
   const result = await db
     .select({
       id: consumptions.id,
@@ -261,11 +243,7 @@ export async function queryTents(db: DrizzleDb, festivalId?: string) {
   }
 
   // Fallback: return all tents if no junction data
-  return await db
-    .select()
-    .from(tents)
-    .where(eq(tents._deleted, 0))
-    .orderBy(tents.name);
+  return await db.select().from(tents).where(eq(tents._deleted, 0)).orderBy(tents.name);
 }
 
 // =============================================================================
@@ -275,27 +253,18 @@ export async function queryTents(db: DrizzleDb, festivalId?: string) {
 /**
  * Query all attendances for a festival ordered by date DESC.
  */
-export async function queryAttendancesByFestival(
-  db: DrizzleDb,
-  festivalId: string,
-) {
+export async function queryAttendancesByFestival(db: DrizzleDb, festivalId: string) {
   return await db
     .select()
     .from(attendances)
-    .where(
-      and(eq(attendances.festival_id, festivalId), eq(attendances._deleted, 0)),
-    )
+    .where(and(eq(attendances.festival_id, festivalId), eq(attendances._deleted, 0)))
     .orderBy(sql`${attendances.date} DESC`);
 }
 
 /**
  * Query a single attendance by festival and date.
  */
-export async function queryAttendanceByDate(
-  db: DrizzleDb,
-  festivalId: string,
-  date: string,
-) {
+export async function queryAttendanceByDate(db: DrizzleDb, festivalId: string, date: string) {
   const result = await db
     .select()
     .from(attendances)
@@ -318,38 +287,22 @@ export async function queryAttendanceByDate(
 /**
  * Query consumptions for a specific attendance.
  */
-export async function queryConsumptionsByAttendance(
-  db: DrizzleDb,
-  attendanceId: string,
-) {
+export async function queryConsumptionsByAttendance(db: DrizzleDb, attendanceId: string) {
   return await db
     .select()
     .from(consumptions)
-    .where(
-      and(
-        eq(consumptions.attendance_id, attendanceId),
-        eq(consumptions._deleted, 0),
-      ),
-    )
+    .where(and(eq(consumptions.attendance_id, attendanceId), eq(consumptions._deleted, 0)))
     .orderBy(sql`${consumptions.recorded_at} DESC`);
 }
 
 /**
  * Query all consumptions for a festival ordered by recorded_at DESC.
  */
-export async function queryConsumptionsByFestival(
-  db: DrizzleDb,
-  festivalId: string,
-) {
+export async function queryConsumptionsByFestival(db: DrizzleDb, festivalId: string) {
   return await db
     .select()
     .from(consumptions)
-    .where(
-      and(
-        eq(consumptions.attendance_id, festivalId),
-        eq(consumptions._deleted, 0),
-      ),
-    )
+    .where(and(eq(consumptions.attendance_id, festivalId), eq(consumptions._deleted, 0)))
     .orderBy(sql`${consumptions.recorded_at} DESC`);
 }
 
@@ -388,11 +341,7 @@ export async function queryAchievements(db: DrizzleDb) {
 /**
  * Query user achievements for a festival by user and festival.
  */
-export async function queryUserAchievements(
-  db: DrizzleDb,
-  userId: string,
-  festivalId: string,
-) {
+export async function queryUserAchievements(db: DrizzleDb, userId: string, festivalId: string) {
   return await db
     .select()
     .from(userAchievements)
@@ -411,19 +360,11 @@ export async function queryUserAchievements(
  * Since the local SQLite only stores the current user's data,
  * filtering by user_id is unnecessary for local queries.
  */
-export async function queryUserAchievementsByFestival(
-  db: DrizzleDb,
-  festivalId: string,
-) {
+export async function queryUserAchievementsByFestival(db: DrizzleDb, festivalId: string) {
   return await db
     .select()
     .from(userAchievements)
-    .where(
-      and(
-        eq(userAchievements.festival_id, festivalId),
-        eq(userAchievements._deleted, 0),
-      ),
-    )
+    .where(and(eq(userAchievements.festival_id, festivalId), eq(userAchievements._deleted, 0)))
     .orderBy(sql`${userAchievements.unlocked_at} DESC`);
 }
 

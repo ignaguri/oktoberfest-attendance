@@ -27,9 +27,7 @@ import type { Festival } from "../../schemas/festival.schema";
 import { selectFestival } from "./selection-logic";
 import type { FestivalContextType, FestivalStorage } from "./types";
 
-const FestivalContext = createContext<FestivalContextType | undefined>(
-  undefined,
-);
+const FestivalContext = createContext<FestivalContextType | undefined>(undefined);
 
 interface FestivalProviderProps {
   children: ReactNode;
@@ -38,13 +36,9 @@ interface FestivalProviderProps {
 }
 
 export function FestivalProvider({ children, storage }: FestivalProviderProps) {
-  const [currentFestival, setCurrentFestivalState] = useState<Festival | null>(
-    null,
-  );
+  const [currentFestival, setCurrentFestivalState] = useState<Festival | null>(null);
   const [storedFestivalId, setStoredFestivalId] = useState<string | null>(null);
-  const [cachedFestival, setCachedFestivalState] = useState<Festival | null>(
-    null,
-  );
+  const [cachedFestival, setCachedFestivalState] = useState<Festival | null>(null);
   const [storageLoaded, setStorageLoaded] = useState(false);
 
   // Track whether we have already applied the cache fallback to avoid
@@ -55,16 +49,15 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
   useEffect(() => {
     let mounted = true;
 
-    Promise.all([
-      storage.getSelectedFestivalId(),
-      storage.getCachedFestival(),
-    ]).then(([id, cached]) => {
-      if (mounted) {
-        setStoredFestivalId(id);
-        setCachedFestivalState(cached);
-        setStorageLoaded(true);
-      }
-    });
+    Promise.all([storage.getSelectedFestivalId(), storage.getCachedFestival()]).then(
+      ([id, cached]) => {
+        if (mounted) {
+          setStoredFestivalId(id);
+          setCachedFestivalState(cached);
+          setStorageLoaded(true);
+        }
+      },
+    );
 
     return () => {
       mounted = false;
@@ -72,16 +65,9 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
   }, [storage]);
 
   // Fetch festivals using the shared hook (React Query caching)
-  const {
-    data: festivalsData,
-    loading: isLoadingFestivals,
-    error: queryError,
-  } = useFestivals();
+  const { data: festivalsData, loading: isLoadingFestivals, error: queryError } = useFestivals();
 
-  const festivals: Festival[] = useMemo(
-    () => festivalsData || [],
-    [festivalsData],
-  );
+  const festivals: Festival[] = useMemo(() => festivalsData || [], [festivalsData]);
 
   // Select current festival based on priority when data changes
   useEffect(() => {
@@ -106,22 +92,11 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
 
     // Only apply fallback if API returned no data AND we have no current festival
     const apiHasNoData = !festivalsData || festivalsData.length === 0;
-    if (
-      apiHasNoData &&
-      !currentFestival &&
-      cachedFestival &&
-      !cacheAppliedRef.current
-    ) {
+    if (apiHasNoData && !currentFestival && cachedFestival && !cacheAppliedRef.current) {
       setCurrentFestivalState(cachedFestival);
       cacheAppliedRef.current = true;
     }
-  }, [
-    storageLoaded,
-    isLoadingFestivals,
-    festivalsData,
-    currentFestival,
-    cachedFestival,
-  ]);
+  }, [storageLoaded, isLoadingFestivals, festivalsData, currentFestival, cachedFestival]);
 
   // Handler to change the current festival
   const setCurrentFestival = useCallback(
@@ -148,11 +123,7 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
     [currentFestival, festivals, setCurrentFestival, isLoading, error],
   );
 
-  return (
-    <FestivalContext.Provider value={value}>
-      {children}
-    </FestivalContext.Provider>
-  );
+  return <FestivalContext.Provider value={value}>{children}</FestivalContext.Provider>;
 }
 
 /**

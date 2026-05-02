@@ -4,13 +4,7 @@
  * Uses ApiClientContext to get the platform-specific API client
  */
 
-import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  QueryKeys,
-} from "../data";
+import { useApiClient, useQuery, useMutation, useInvalidateQueries, QueryKeys } from "../data";
 
 /**
  * Hook to fetch a single reservation by ID
@@ -132,13 +126,7 @@ export function useCancelReservation() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async ({
-      reservationId,
-      festivalId,
-    }: {
-      reservationId: string;
-      festivalId: string;
-    }) => {
+    async ({ reservationId, festivalId }: { reservationId: string; festivalId: string }) => {
       const response = await apiClient.reservations.cancel(reservationId);
       return { ...response.reservation, festivalId };
     },
@@ -163,13 +151,7 @@ export function useCheckInReservation() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async ({
-      reservationId,
-      festivalId,
-    }: {
-      reservationId: string;
-      festivalId: string;
-    }) => {
+    async ({ reservationId, festivalId }: { reservationId: string; festivalId: string }) => {
       const response = await apiClient.reservations.checkIn(reservationId);
       return { ...response, festivalId };
     },

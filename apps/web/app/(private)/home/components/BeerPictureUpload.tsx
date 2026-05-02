@@ -42,12 +42,7 @@ const PicturePreview = ({ picture }: { picture: File | null }) => {
 
   return (
     <div className="relative h-32 w-32">
-      <Image
-        src={previewUrl}
-        alt="Beer picture preview"
-        fill
-        className="rounded object-cover"
-      />
+      <Image src={previewUrl} alt="Beer picture preview" fill className="rounded object-cover" />
     </div>
   );
 };
@@ -118,10 +113,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
         id="beer-picture-upload"
         errorMsg={errors.picture?.message}
       />
-      <Label
-        htmlFor="beer-picture-upload"
-        className={buttonVariants({ variant: "outline" })}
-      >
+      <Label htmlFor="beer-picture-upload" className={buttonVariants({ variant: "outline" })}>
         {watchedPicture ? (
           <span>{t("attendance.pictures.chooseDifferent")}</span>
         ) : (
@@ -152,9 +144,7 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
           </span>
           <Switch
             checked={watchedVisibility === "public"}
-            onCheckedChange={(checked) =>
-              setValue("visibility", checked ? "public" : "private")
-            }
+            onCheckedChange={(checked) => setValue("visibility", checked ? "public" : "private")}
           />
         </div>
       )}

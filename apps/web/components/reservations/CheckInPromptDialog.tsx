@@ -33,10 +33,7 @@ interface CheckInPromptDialogProps {
   onCheckIn: (reservationId: string) => Promise<void>;
 }
 
-export function CheckInPromptDialog({
-  reservation,
-  onCheckIn,
-}: CheckInPromptDialogProps) {
+export function CheckInPromptDialog({ reservation, onCheckIn }: CheckInPromptDialogProps) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -46,10 +43,7 @@ export function CheckInPromptDialog({
   const open = searchParams.get("prompt") === "checkin" && !!reservation;
 
   const handleClose = useCallback(() => {
-    const url = createUrlWithParams("/attendance", searchParams, [
-      "prompt",
-      "reservationId",
-    ]);
+    const url = createUrlWithParams("/attendance", searchParams, ["prompt", "reservationId"]);
     router.replace(url);
   }, [searchParams, router]);
 
@@ -86,12 +80,7 @@ export function CheckInPromptDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       {isExploding && (
         <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
-          <ConfettiExplosion
-            force={0.4}
-            duration={2200}
-            particleCount={30}
-            width={400}
-          />
+          <ConfettiExplosion force={0.4} duration={2200} particleCount={30} width={400} />
         </div>
       )}
       <DialogContent className="sm:max-w-md">
@@ -102,8 +91,7 @@ export function CheckInPromptDialog({
           </DialogTitle>
           <DialogDescription>
             {t("reservation.checkIn.timeForReservation", {
-              tentName:
-                reservation.tent?.name || t("reservation.checkIn.theTent"),
+              tentName: reservation.tent?.name || t("reservation.checkIn.theTent"),
             })}
           </DialogDescription>
         </DialogHeader>
@@ -115,8 +103,7 @@ export function CheckInPromptDialog({
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">
-                  {reservation.tent?.name ||
-                    t("reservation.checkIn.unknownTent")}
+                  {reservation.tent?.name || t("reservation.checkIn.unknownTent")}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -131,9 +118,7 @@ export function CheckInPromptDialog({
               )}
               {reservation.note && (
                 <div className="text-sm text-gray-600">
-                  <span className="font-medium">
-                    {t("reservation.checkIn.note")}:
-                  </span>{" "}
+                  <span className="font-medium">{t("reservation.checkIn.note")}:</span>{" "}
                   {reservation.note}
                 </div>
               )}

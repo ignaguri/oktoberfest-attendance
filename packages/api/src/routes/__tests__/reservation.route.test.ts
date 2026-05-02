@@ -57,10 +57,7 @@ describe("Reservation Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -103,9 +100,7 @@ describe("Reservation Routes - Unit Tests", () => {
         updatedAt: null,
       };
 
-      mockReservationService.createReservation.mockResolvedValueOnce(
-        mockReservation,
-      );
+      mockReservationService.createReservation.mockResolvedValueOnce(mockReservation);
 
       const req = createAuthRequest("/reservations", {
         method: "POST",
@@ -161,9 +156,7 @@ describe("Reservation Routes - Unit Tests", () => {
         updatedAt: null,
       };
 
-      mockReservationService.createReservation.mockResolvedValueOnce(
-        mockReservation,
-      );
+      mockReservationService.createReservation.mockResolvedValueOnce(mockReservation);
 
       const req = createAuthRequest("/reservations", {
         method: "POST",
@@ -404,10 +397,7 @@ describe("Reservation Routes - Unit Tests", () => {
       const body = (await res.json()) as any;
       expect(body.reservation.id).toBe(reservationId);
       expect(body.reservation.status).toBe("checked_in");
-      expect(mockReservationService.checkin).toHaveBeenCalledWith(
-        reservationId,
-        mockUser.id,
-      );
+      expect(mockReservationService.checkin).toHaveBeenCalledWith(reservationId, mockUser.id);
     });
 
     it("should check in and return attendance if auto_checkin enabled", async () => {
@@ -717,9 +707,7 @@ describe("Reservation Routes - Unit Tests", () => {
         updatedAt: new Date().toISOString(),
       };
 
-      mockReservationService.cancelReservation.mockResolvedValueOnce(
-        mockReservation,
-      );
+      mockReservationService.cancelReservation.mockResolvedValueOnce(mockReservation);
 
       const req = createAuthRequest(`/reservations/${reservationId}`, {
         method: "DELETE",
@@ -794,12 +782,9 @@ describe("Reservation Routes - Unit Tests", () => {
 
     it("should require authentication for POST /reservations/:id/checkin", async () => {
       const reservationId = "323e4567-e89b-12d3-a456-426614174002";
-      const req = new Request(
-        `http://localhost/reservations/${reservationId}/checkin`,
-        {
-          method: "POST",
-        },
-      );
+      const req = new Request(`http://localhost/reservations/${reservationId}/checkin`, {
+        method: "POST",
+      });
 
       const res = await app.request(req as Request);
 
@@ -821,12 +806,9 @@ describe("Reservation Routes - Unit Tests", () => {
 
     it("should require authentication for DELETE /reservations/:id", async () => {
       const reservationId = "323e4567-e89b-12d3-a456-426614174002";
-      const req = new Request(
-        `http://localhost/reservations/${reservationId}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = new Request(`http://localhost/reservations/${reservationId}`, {
+        method: "DELETE",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,

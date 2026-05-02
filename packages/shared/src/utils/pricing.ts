@@ -1,9 +1,4 @@
-export type TipMode =
-  | "none"
-  | "ceiling_plus_1"
-  | "ceiling_plus_2"
-  | "percentage_10"
-  | "fixed";
+export type TipMode = "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
 
 export const TIP_MODES: TipMode[] = [
   "none",
@@ -32,18 +27,14 @@ const TIP_MODE_DESCRIPTION_KEYS: Record<TipMode, string> = {
 };
 
 /** Get translated tip mode labels using a t() function */
-export function getTipModeLabels(
-  t: (key: string) => string,
-): Record<TipMode, string> {
+export function getTipModeLabels(t: (key: string) => string): Record<TipMode, string> {
   return Object.fromEntries(
     TIP_MODES.map((mode) => [mode, t(TIP_MODE_LABEL_KEYS[mode])]),
   ) as Record<TipMode, string>;
 }
 
 /** Get translated tip mode descriptions using a t() function */
-export function getTipModeDescriptions(
-  t: (key: string) => string,
-): Record<TipMode, string> {
+export function getTipModeDescriptions(t: (key: string) => string): Record<TipMode, string> {
   return Object.fromEntries(
     TIP_MODES.map((mode) => [mode, t(TIP_MODE_DESCRIPTION_KEYS[mode])]),
   ) as Record<TipMode, string>;

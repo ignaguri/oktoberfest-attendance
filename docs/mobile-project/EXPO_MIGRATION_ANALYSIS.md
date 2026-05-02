@@ -869,10 +869,7 @@ const supabase = createSupabaseBrowserClient();
 ```typescript
 interface DataProvider {
   useQuery<T>(key, fn, options): DataQueryResult<T>;
-  useMutation<TData, TVariables>(
-    fn,
-    options,
-  ): DataMutationResult<TData, TVariables>;
+  useMutation<TData, TVariables>(fn, options): DataMutationResult<TData, TVariables>;
   invalidateQueries(key?);
   setQueryData<T>(key, data);
   getQueryData<T>(key);
@@ -1039,10 +1036,7 @@ onMessage(messaging, (payload) => {
 ```javascript
 // Background message handler
 messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(
-    payload.notification.title,
-    payload.notification,
-  );
+  self.registration.showNotification(payload.notification.title, payload.notification);
 });
 ```
 
@@ -1207,8 +1201,8 @@ const onSubmit = form.handleSubmit(async (data) => {
 **Brand Colors** (Yellow theme):
 
 ```css
---yellow-400: #fbbf24 /* Light yellow */ --yellow-500: #f59e0b
-  /* Primary yellow */ --yellow-600: #d97706 /* Dark yellow */;
+--yellow-400: #fbbf24 /* Light yellow */ --yellow-500: #f59e0b /* Primary yellow */
+  --yellow-600: #d97706 /* Dark yellow */;
 ```
 
 **Usage**:

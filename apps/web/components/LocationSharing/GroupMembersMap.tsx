@@ -22,10 +22,7 @@ const formatDistance = (meters: number): string => {
   return `${(meters / 1000).toFixed(1)}km`;
 };
 
-const formatLastUpdated = (
-  timestamp: string,
-  t: (key: string) => string,
-): string => {
+const formatLastUpdated = (timestamp: string, t: (key: string) => string): string => {
   try {
     const date = new Date(timestamp);
     const now = new Date();
@@ -44,28 +41,17 @@ const formatLastUpdated = (
   }
 };
 
-export const GroupMembersMap = ({
-  className,
-  radiusMeters = 500,
-}: GroupMembersMapProps) => {
+export const GroupMembersMap = ({ className, radiusMeters = 500 }: GroupMembersMapProps) => {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const { data, loading, error } = useNearbyGroupMembers(
-    currentFestival?.id,
-    radiusMeters,
-  );
+  const { data, loading, error } = useNearbyGroupMembers(currentFestival?.id, radiusMeters);
 
-  const nearbyMembers = useMemo(
-    () => data?.nearbyMembers ?? [],
-    [data?.nearbyMembers],
-  );
+  const nearbyMembers = useMemo(() => data?.nearbyMembers ?? [], [data?.nearbyMembers]);
   const activeSharing = data?.activeSharing ?? false;
 
   const sortedMembers = useMemo(() => {
     if (!nearbyMembers) return [];
-    return [...nearbyMembers].sort(
-      (a, b) => a.distance_meters - b.distance_meters,
-    );
+    return [...nearbyMembers].sort((a, b) => a.distance_meters - b.distance_meters);
   }, [nearbyMembers]);
 
   if (!currentFestival) {
@@ -114,8 +100,7 @@ export const GroupMembersMap = ({
           <div className="py-8 text-center">
             <p className="text-muted-foreground text-sm">
               {t("common.errors.generic", {
-                defaultValue:
-                  "Failed to load nearby members. Please try again.",
+                defaultValue: "Failed to load nearby members. Please try again.",
               })}
             </p>
           </div>
@@ -142,12 +127,10 @@ export const GroupMembersMap = ({
             <p className="text-muted-foreground text-sm">
               {activeSharing
                 ? t("location.noFriendsNearby", {
-                    defaultValue:
-                      "No group members are sharing their location nearby.",
+                    defaultValue: "No group members are sharing their location nearby.",
                   })
                 : t("location.sharingInactive", {
-                    defaultValue:
-                      "Enable location sharing to see nearby group members.",
+                    defaultValue: "Enable location sharing to see nearby group members.",
                   })}
               <br />
               {t("groups.join.passwordHelp", {
@@ -199,9 +182,7 @@ export const GroupMembersMap = ({
                 {/* Member Info */}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="truncate text-sm font-medium">
-                      {displayName}
-                    </span>
+                    <span className="truncate text-sm font-medium">{displayName}</span>
                     <span className="text-xs font-medium text-green-600">
                       {formatDistance(member.distance_meters)}
                     </span>

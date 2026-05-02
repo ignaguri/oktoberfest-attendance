@@ -1,19 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ResetPasswordFormData,
-  resetPasswordSchema,
-} from "@prostcounter/shared/schemas";
+import { type ResetPasswordFormData, resetPasswordSchema } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AuthHeader, FormInput } from "@/components/auth";

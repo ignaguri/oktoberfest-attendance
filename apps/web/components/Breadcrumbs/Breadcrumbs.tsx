@@ -16,8 +16,7 @@ import {
 import { useGroupName } from "@/hooks/useGroups";
 
 function isUUID(str: string) {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(str);
 }
 
@@ -89,8 +88,7 @@ export default function Breadcrumbs() {
     // Apply the existing filtering logic
     if (newBreadcrumbs.length > 0) {
       if (
-        newBreadcrumbs[0].title.toLowerCase() ===
-        t("navigation.breadcrumbs.home").toLowerCase()
+        newBreadcrumbs[0].title.toLowerCase() === t("navigation.breadcrumbs.home").toLowerCase()
       ) {
         newBreadcrumbs.shift();
       } else if (newBreadcrumbs[0].title.toLowerCase() === "group settings") {

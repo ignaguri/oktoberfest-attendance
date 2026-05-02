@@ -57,10 +57,7 @@ describe("Location Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -158,9 +155,7 @@ describe("Location Routes - Unit Tests", () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
       mockLocationService.startSession.mockRejectedValueOnce(
-        new ConflictError(
-          "User already has an active location session for this festival",
-        ),
+        new ConflictError("User already has an active location session for this festival"),
       );
 
       const req = createAuthRequest("/location/sessions", {
@@ -249,18 +244,13 @@ describe("Location Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body).toEqual({ success: true, session: mockSession });
-      expect(mockLocationService.stopSession).toHaveBeenCalledWith(
-        sessionId,
-        mockUser.id,
-      );
+      expect(mockLocationService.stopSession).toHaveBeenCalledWith(sessionId, mockUser.id);
     });
 
     it("should return 404 when session not found", async () => {
       const sessionId = "123e4567-e89b-12d3-a456-426614174999";
 
-      mockLocationService.stopSession.mockRejectedValueOnce(
-        new NotFoundError("Session not found"),
-      );
+      mockLocationService.stopSession.mockRejectedValueOnce(new NotFoundError("Session not found"));
 
       const req = createAuthRequest(`/location/sessions/${sessionId}`, {
         method: "DELETE",
@@ -528,12 +518,9 @@ describe("Location Routes - Unit Tests", () => {
     });
 
     it("should validate festivalId is required", async () => {
-      const req = createAuthRequest(
-        "/location/nearby?latitude=48.1351&longitude=11.582",
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest("/location/nearby?latitude=48.1351&longitude=11.582", {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -546,12 +533,9 @@ describe("Location Routes - Unit Tests", () => {
     it("should validate latitude is required", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
-      const req = createAuthRequest(
-        `/location/nearby?festivalId=${festivalId}&longitude=11.582`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/location/nearby?festivalId=${festivalId}&longitude=11.582`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -564,12 +548,9 @@ describe("Location Routes - Unit Tests", () => {
     it("should validate longitude is required", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
-      const req = createAuthRequest(
-        `/location/nearby?festivalId=${festivalId}&latitude=48.1351`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/location/nearby?festivalId=${festivalId}&latitude=48.1351`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -635,12 +616,9 @@ describe("Location Routes - Unit Tests", () => {
 
     it("should require authentication for DELETE /location/sessions/:id", async () => {
       const sessionId = "123e4567-e89b-12d3-a456-426614174001";
-      const req = new Request(
-        `http://localhost/location/sessions/${sessionId}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = new Request(`http://localhost/location/sessions/${sessionId}`, {
+        method: "DELETE",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -652,22 +630,19 @@ describe("Location Routes - Unit Tests", () => {
 
     it("should require authentication for PUT /location/sessions/:id", async () => {
       const sessionId = "123e4567-e89b-12d3-a456-426614174001";
-      const req = new Request(
-        `http://localhost/location/sessions/${sessionId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            location: {
-              latitude: 48.1351,
-              longitude: 11.582,
-              timestamp: "2024-09-21T14:30:00Z",
-            },
-          }),
+      const req = new Request(`http://localhost/location/sessions/${sessionId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          location: {
+            latitude: 48.1351,
+            longitude: 11.582,
+            timestamp: "2024-09-21T14:30:00Z",
+          },
+        }),
+      });
 
       const res = await app.request(req as Request);
 

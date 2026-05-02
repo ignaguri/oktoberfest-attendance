@@ -7,24 +7,14 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
-import {
-  AlertCircle,
-  Check,
-  Cloud,
-  CloudOff,
-  RefreshCw,
-} from "lucide-react-native";
+import { AlertCircle, Check, Cloud, CloudOff, RefreshCw } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Pressable } from "react-native";
 
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
-import {
-  useIsOnline,
-  useOfflineSafe,
-  usePendingCount,
-} from "@/lib/database/offline-provider";
+import { useIsOnline, useOfflineSafe, usePendingCount } from "@/lib/database/offline-provider";
 import { logger } from "@/lib/logger";
 
 // =============================================================================
@@ -131,9 +121,7 @@ export function OfflineIndicator({
             <RefreshCw size={iconSize} color={Colors.primary[500]} />
           </Animated.View>
           {showText && (
-            <Text className={cn(textClass, "text-primary-500")}>
-              {t("offline.status.syncing")}
-            </Text>
+            <Text className={cn(textClass, "text-primary-500")}>{t("offline.status.syncing")}</Text>
           )}
         </>
       );
@@ -145,9 +133,7 @@ export function OfflineIndicator({
         <>
           <AlertCircle size={iconSize} color={Colors.error[500]} />
           {showText && (
-            <Text className={cn(textClass, "text-error-500")}>
-              {t("offline.status.error")}
-            </Text>
+            <Text className={cn(textClass, "text-error-500")}>{t("offline.status.error")}</Text>
           )}
         </>
       );
@@ -172,9 +158,7 @@ export function OfflineIndicator({
       <>
         <Check size={iconSize} color={Colors.success[500]} />
         {showText && (
-          <Text className={cn(textClass, "text-success-500")}>
-            {t("offline.status.synced")}
-          </Text>
+          <Text className={cn(textClass, "text-success-500")}>{t("offline.status.synced")}</Text>
         )}
       </>
     );
@@ -229,11 +213,7 @@ export function OfflineBadge({ className = "" }: OfflineBadgeProps) {
   return (
     <HStack
       space="xs"
-      className={cn(
-        "items-center rounded-full px-2 py-1",
-        getBgColor(),
-        className,
-      )}
+      className={cn("items-center rounded-full px-2 py-1", getBgColor(), className)}
     >
       {!isOnline ? (
         <CloudOff size={12} color={getIconColor()} />
@@ -244,9 +224,7 @@ export function OfflineBadge({ className = "" }: OfflineBadgeProps) {
       ) : (
         <Cloud size={12} color={getIconColor()} />
       )}
-      {pendingCount > 0 && (
-        <Text className="text-xs text-primary-600">{pendingCount}</Text>
-      )}
+      {pendingCount > 0 && <Text className="text-xs text-primary-600">{pendingCount}</Text>}
     </HStack>
   );
 }
@@ -302,11 +280,7 @@ export function OfflineBanner({ className = "" }: OfflineBannerProps) {
   return (
     <HStack
       space="sm"
-      className={cn(
-        "items-center justify-center px-4 py-2",
-        getBgColor(),
-        className,
-      )}
+      className={cn("items-center justify-center px-4 py-2", getBgColor(), className)}
     >
       {!isOnline ? (
         <CloudOff size={16} color={Colors.gray[500]} />

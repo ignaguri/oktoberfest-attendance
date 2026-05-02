@@ -20,9 +20,7 @@ export const tentCheckinWorkflow = workflow(
       "in-app-notification",
       async (controls: any) => {
         return {
-          subject:
-            controls.subject ||
-            `${payload.userName} checked in at ${payload.tentName}`,
+          subject: controls.subject || `${payload.userName} checked in at ${payload.tentName}`,
           body:
             controls.body ||
             `Just logged ${payload.beersCount} 🍺 at ${payload.tentName} at ${payload.checkInTime}`,
@@ -36,14 +34,9 @@ export const tentCheckinWorkflow = workflow(
             .describe("Check-in notification title"),
           body: z
             .string()
-            .default(
-              "Just logged {{beersCount}} 🍺 at {{tentName}} at {{checkInTime}}",
-            )
+            .default("Just logged {{beersCount}} 🍺 at {{tentName}} at {{checkInTime}}")
             .describe("Check-in notification message"),
-          showEmoji: z
-            .boolean()
-            .default(true)
-            .describe("Show beer emoji in message"),
+          showEmoji: z.boolean().default(true).describe("Show beer emoji in message"),
         }),
       },
     );
@@ -64,18 +57,12 @@ export const tentCheckinWorkflow = workflow(
       },
       {
         controlSchema: z.object({
-          pushSubject: z
-            .string()
-            .default("Tent check-in")
-            .describe("Push notification title"),
+          pushSubject: z.string().default("Tent check-in").describe("Push notification title"),
           pushBody: z
             .string()
             .default("{{userName}} is at {{tentName}} with {{beersCount}} 🍺")
             .describe("Push notification message"),
-          showEmoji: z
-            .boolean()
-            .default(true)
-            .describe("Show beer emoji in push message"),
+          showEmoji: z.boolean().default(true).describe("Show beer emoji in push message"),
         }),
       },
     );

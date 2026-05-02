@@ -71,9 +71,8 @@ export function SearchPagination({
     <div className={cn("flex items-center justify-between", className)}>
       {showInfo && totalItems && itemsPerPage && (
         <div className="text-muted-foreground text-sm">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}{" "}
-          results
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} to{" "}
+          {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
         </div>
       )}
 

@@ -36,11 +36,7 @@ export default function GlobalLeaderboardClient() {
 
   // Initialize winning criteria ID when data loads
   useEffect(() => {
-    if (
-      winningCriterias &&
-      winningCriterias.length > 0 &&
-      winningCriteriaId === 1
-    ) {
+    if (winningCriterias && winningCriterias.length > 0 && winningCriteriaId === 1) {
       startTransition(() => {
         setWinningCriteriaId(winningCriterias[0].id);
       });
@@ -87,10 +83,7 @@ export default function GlobalLeaderboardClient() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-center gap-2">
-        <Label
-          htmlFor="winning-criteria-select"
-          className="text-sm font-medium text-gray-700"
-        >
+        <Label htmlFor="winning-criteria-select" className="text-sm font-medium text-gray-700">
           {t("groups.create.winningCriteria")}:
         </Label>
         <SingleSelect

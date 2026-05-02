@@ -60,10 +60,7 @@ export function LeaderboardSkeleton() {
 
           {/* Table Rows */}
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <HStack
-              key={i}
-              className="items-center border-b border-outline-50 p-3"
-            >
+            <HStack key={i} className="items-center border-b border-outline-50 p-3">
               <Skeleton variant="rounded" className="mr-3 h-5 w-6" />
               <Skeleton variant="circular" className="mr-2 h-8 w-8" />
               <Skeleton variant="rounded" className="h-4 w-24" />

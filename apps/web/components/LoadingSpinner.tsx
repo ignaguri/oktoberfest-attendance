@@ -18,10 +18,7 @@ export default function LoadingSpinner({ size = 32 }: LoadingSpinnerProps) {
   return (
     <div className="grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible">
       <div
-        className={cn(
-          "animate-spin rounded-full border-4 border-t-transparent",
-          sizeClass,
-        )}
+        className={cn("animate-spin rounded-full border-4 border-t-transparent", sizeClass)}
       ></div>
     </div>
   );

@@ -15,8 +15,7 @@ export function useWrappedAccess(festivalId?: string) {
 
   return useQuery(
     QueryKeys.wrappedAccess(festivalId || ""),
-    async (): Promise<WrappedAccessResult> =>
-      apiClient.wrapped.checkAccess(festivalId!),
+    async (): Promise<WrappedAccessResult> => apiClient.wrapped.checkAccess(festivalId!),
     {
       enabled: !!festivalId,
       staleTime: 5 * 60 * 1000, // 5 minutes

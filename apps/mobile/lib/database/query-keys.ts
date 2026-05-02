@@ -16,25 +16,19 @@ export const localKeys = {
   },
   tents: {
     all: (festivalId?: string) => ["local-tents", festivalId] as const,
-    adapted: (festivalId?: string) =>
-      ["local-tents", festivalId, "adapted"] as const,
+    adapted: (festivalId?: string) => ["local-tents", festivalId, "adapted"] as const,
   },
   attendances: {
     all: (festivalId?: string) => ["local-attendances", festivalId] as const,
-    byDate: (festivalId: string, date: string) =>
-      ["local-attendances", festivalId, date] as const,
-    adapted: (festivalId?: string) =>
-      ["local-attendances", festivalId, "adapted"] as const,
+    byDate: (festivalId: string, date: string) => ["local-attendances", festivalId, date] as const,
+    adapted: (festivalId?: string) => ["local-attendances", festivalId, "adapted"] as const,
     adaptedByDate: (festivalId: string, date: string) =>
       ["local-attendances", festivalId, date, "adapted-bydate"] as const,
   },
   consumptions: {
-    byFestival: (festivalId?: string) =>
-      ["local-consumptions", festivalId] as const,
-    byDate: (festivalId: string, date: string) =>
-      ["local-consumptions", festivalId, date] as const,
-    byAttendance: (attendanceId?: string) =>
-      ["local-consumptions", attendanceId] as const,
+    byFestival: (festivalId?: string) => ["local-consumptions", festivalId] as const,
+    byDate: (festivalId: string, date: string) => ["local-consumptions", festivalId, date] as const,
+    byAttendance: (attendanceId?: string) => ["local-consumptions", attendanceId] as const,
   },
   profile: {
     current: ["local-profile"] as const,
@@ -42,19 +36,16 @@ export const localKeys = {
   },
   groups: {
     all: (festivalId?: string) => ["local-groups", festivalId] as const,
-    adapted: (festivalId?: string) =>
-      ["local-groups", festivalId, "adapted"] as const,
+    adapted: (festivalId?: string) => ["local-groups", festivalId, "adapted"] as const,
   },
   achievements: {
     all: ["local-achievements"] as const,
   },
   userAchievements: {
-    all: (festivalId?: string) =>
-      ["local-user-achievements", festivalId] as const,
+    all: (festivalId?: string) => ["local-user-achievements", festivalId] as const,
   },
   beerPictures: {
-    byAttendance: (attendanceId?: string) =>
-      ["local-beer-pictures", attendanceId] as const,
+    byAttendance: (attendanceId?: string) => ["local-beer-pictures", attendanceId] as const,
   },
 } as const;
 
@@ -79,9 +70,7 @@ export async function invalidateAllLocalQueries(queryClient: {
   invalidateQueries: (opts: { queryKey: string[] }) => Promise<void>;
 }): Promise<void> {
   await Promise.all(
-    ALL_LOCAL_PREFIXES.map((prefix) =>
-      queryClient.invalidateQueries({ queryKey: [prefix] }),
-    ),
+    ALL_LOCAL_PREFIXES.map((prefix) => queryClient.invalidateQueries({ queryKey: [prefix] })),
   );
 }
 
@@ -95,8 +84,6 @@ export async function invalidateLocalQueries(
   prefixes: readonly string[],
 ): Promise<void> {
   await Promise.all(
-    prefixes.map((prefix) =>
-      queryClient.invalidateQueries({ queryKey: [prefix] }),
-    ),
+    prefixes.map((prefix) => queryClient.invalidateQueries({ queryKey: [prefix] })),
   );
 }

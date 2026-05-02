@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useLogConsumption,
-  useTipCalculation,
-} from "@prostcounter/shared/hooks";
+import { useLogConsumption, useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import type { TFunction } from "i18next";
@@ -50,13 +47,7 @@ interface QuickAddDrinkButtonsProps {
 /**
  * Get the icon component for a drink type
  */
-function DrinkIcon({
-  type,
-  className,
-}: {
-  type: DrinkType;
-  className?: string;
-}) {
+function DrinkIcon({ type, className }: { type: DrinkType; className?: string }) {
   const iconClass = cn("h-5 w-5", className);
 
   switch (type) {

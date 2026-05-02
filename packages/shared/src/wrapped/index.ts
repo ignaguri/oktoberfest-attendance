@@ -46,16 +46,7 @@ export {
 
 // Personality
 export type { PersonalityAnalysis } from "./personality";
-export {
-  analyzePersonality,
-  getPersonalityDescription,
-  getPersonalityBadge,
-} from "./personality";
+export { analyzePersonality, getPersonalityDescription, getPersonalityBadge } from "./personality";
 
 // Config
-export {
-  WRAPPED_THEME,
-  PERSONALITY_DESCRIPTIONS,
-  RARITY_COLORS,
-  CHART_CONFIG,
-} from "./config";
+export { WRAPPED_THEME, PERSONALITY_DESCRIPTIONS, RARITY_COLORS, CHART_CONFIG } from "./config";

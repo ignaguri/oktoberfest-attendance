@@ -7,21 +7,11 @@ import { getInitials } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Camera } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-} from "react-native";
+import { Dimensions, Image, Pressable, RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
@@ -35,8 +25,7 @@ import { getAvatarUrl, getBeerPictureUrl } from "@/lib/utils";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NUM_COLUMNS = 3;
 const IMAGE_GAP = 4;
-const IMAGE_SIZE =
-  (SCREEN_WIDTH - 32 - IMAGE_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
+const IMAGE_SIZE = (SCREEN_WIDTH - 32 - IMAGE_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
 
 interface GalleryPhoto {
   id: string;
@@ -85,10 +74,7 @@ function groupGalleryData(photos: GalleryPhoto[]): GroupedGallery[] {
     .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
     .map(([date, users]) => ({
       date,
-      formattedDate: formatLocalized(
-        new TZDate(date, TIMEZONE),
-        "EEEE, MMMM d",
-      ),
+      formattedDate: formatLocalized(new TZDate(date, TIMEZONE), "EEEE, MMMM d"),
       users: Object.entries(users).map(([userId, userPhotos]) => ({
         userId,
         username: userPhotos[0].username,
@@ -177,21 +163,12 @@ export default function GroupGalleryScreen() {
 
       <ScrollView
         className="flex-1 bg-background-50"
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching ?? false}
-            onRefresh={refetch}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />}
       >
         <VStack space="lg" className="p-4 pb-8">
           {/* Empty State */}
           {!hasPhotos && (
-            <Card
-              variant="outline"
-              size="md"
-              className="items-center bg-white p-8"
-            >
+            <Card variant="outline" size="md" className="items-center bg-white p-8">
               <Camera size={48} color={IconColors.disabled} />
               <Text className="mt-4 text-center text-lg font-medium text-typography-700">
                 {t("groups.gallery.empty.title")}
@@ -231,9 +208,7 @@ export default function GroupGalleryScreen() {
                       )}
                     </Avatar>
                     <Text className="text-sm font-medium text-typography-700">
-                      {userGroup.username ||
-                        userGroup.fullName ||
-                        t("common.unknown")}
+                      {userGroup.username || userGroup.fullName || t("common.unknown")}
                     </Text>
                   </HStack>
 
@@ -245,16 +220,11 @@ export default function GroupGalleryScreen() {
                       return (
                         <Pressable
                           key={photo.id}
-                          onPress={() =>
-                            imageUrl && handleImagePress(photo.id, imageUrl)
-                          }
-                          accessibilityLabel={t(
-                            "groups.gallery.accessibility.photoBy",
-                            { username: userGroup.username },
-                          )}
-                          accessibilityHint={t(
-                            "groups.gallery.accessibility.tapToView",
-                          )}
+                          onPress={() => imageUrl && handleImagePress(photo.id, imageUrl)}
+                          accessibilityLabel={t("groups.gallery.accessibility.photoBy", {
+                            username: userGroup.username,
+                          })}
+                          accessibilityHint={t("groups.gallery.accessibility.tapToView")}
                           style={{
                             width: IMAGE_SIZE,
                             height: IMAGE_SIZE,
@@ -272,10 +242,9 @@ export default function GroupGalleryScreen() {
                               }}
                               resizeMode="cover"
                               alt=""
-                              accessibilityLabel={t(
-                                "groups.gallery.accessibility.photoBy",
-                                { username: userGroup.username },
-                              )}
+                              accessibilityLabel={t("groups.gallery.accessibility.photoBy", {
+                                username: userGroup.username,
+                              })}
                             />
                           ) : (
                             <View className="h-full w-full items-center justify-center bg-gray-200">

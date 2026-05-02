@@ -27,11 +27,7 @@ interface WhatsNewProps {
   isManualTrigger?: boolean;
 }
 
-export function WhatsNew({
-  open,
-  onOpenChange,
-  isManualTrigger = false,
-}: WhatsNewProps) {
+export function WhatsNew({ open, onOpenChange, isManualTrigger = false }: WhatsNewProps) {
   const { setWhatsNewVisible, canShowWhatsNew } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   // Start with current version expanded if there are changes, otherwise with the most recent version
@@ -40,18 +36,14 @@ export function WhatsNew({
       b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }),
     );
     const currentVersionChanges = changelog[APP_VERSION] || [];
-    return currentVersionChanges.length > 0
-      ? APP_VERSION
-      : sortedVersions[0] || "";
+    return currentVersionChanges.length > 0 ? APP_VERSION : sortedVersions[0] || "";
   });
   const currentVersionChanges = changelog[APP_VERSION] || [];
   const sortedVersions = Object.keys(changelog).sort((a, b) =>
     b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }),
   );
 
-  const previousVersions = sortedVersions
-    .filter((v) => v !== APP_VERSION)
-    .slice(0, 2); // Only take the two versions before the current one
+  const previousVersions = sortedVersions.filter((v) => v !== APP_VERSION).slice(0, 2); // Only take the two versions before the current one
   const shouldShowCurrentVersion = currentVersionChanges.length > 0;
 
   // Use controlled state if props are provided, otherwise use internal state
@@ -97,12 +89,7 @@ export function WhatsNew({
 
       return () => clearTimeout(timer);
     }
-  }, [
-    canShowWhatsNew,
-    setWhatsNewVisible,
-    isManualTrigger,
-    shouldShowCurrentVersion,
-  ]);
+  }, [canShowWhatsNew, setWhatsNewVisible, isManualTrigger, shouldShowCurrentVersion]);
 
   const handleClose = () => {
     if (isManualTrigger) {
@@ -179,11 +166,7 @@ export function WhatsNew({
           </div>
         </ScrollArea>
         <div className="flex justify-center">
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            className="mt-4 w-fit self-center"
-          >
+          <Button variant="outline" onClick={handleClose} className="mt-4 w-fit self-center">
             Got it
           </Button>
         </div>

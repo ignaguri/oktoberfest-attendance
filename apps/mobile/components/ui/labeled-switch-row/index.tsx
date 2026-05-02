@@ -54,9 +54,7 @@ export function LabeledSwitchRow({
           <VStack className="flex-1">
             <Text
               className={
-                isProminent
-                  ? "font-medium text-typography-900"
-                  : "text-sm text-typography-700"
+                isProminent ? "font-medium text-typography-900" : "text-sm text-typography-700"
               }
             >
               {title}
@@ -64,9 +62,7 @@ export function LabeledSwitchRow({
             {description ? (
               <Text
                 className={
-                  isProminent
-                    ? "text-sm text-typography-500"
-                    : "text-xs text-typography-500"
+                  isProminent ? "text-sm text-typography-500" : "text-xs text-typography-500"
                 }
               >
                 {description}

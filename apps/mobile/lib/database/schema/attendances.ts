@@ -1,11 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  index,
-  integer,
-  sqliteTable,
-  text,
-  unique,
-} from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 import { offlineColumns } from "./common";
 import { festivals } from "./festivals";
@@ -25,11 +19,7 @@ export const attendances = sqliteTable(
     ...offlineColumns,
   },
   (t) => [
-    unique("attendances_user_festival_date").on(
-      t.user_id,
-      t.festival_id,
-      t.date,
-    ),
+    unique("attendances_user_festival_date").on(t.user_id, t.festival_id, t.date),
     index("idx_attendances_user_festival").on(t.user_id, t.festival_id),
     index("idx_attendances_date").on(t.date),
     index("idx_attendances_dirty")

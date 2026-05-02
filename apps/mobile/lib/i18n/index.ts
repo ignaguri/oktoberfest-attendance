@@ -1,9 +1,5 @@
 import { setLanguageStorage } from "@prostcounter/shared/hooks";
-import {
-  changeLanguage as sharedChangeLanguage,
-  i18n,
-  initI18n,
-} from "@prostcounter/shared/i18n";
+import { changeLanguage as sharedChangeLanguage, i18n, initI18n } from "@prostcounter/shared/i18n";
 
 import { logger } from "../logger";
 import { syncLanguageToWatch } from "../watch-sync";
@@ -16,8 +12,7 @@ const LANGUAGE_KEY = "@prostcounter/language";
  */
 export async function initMobileI18n() {
   try {
-    const AsyncStorage =
-      require("@react-native-async-storage/async-storage").default;
+    const AsyncStorage = require("@react-native-async-storage/async-storage").default;
 
     // Configure language storage for mobile (must be called before initI18n)
     setLanguageStorage({
@@ -51,8 +46,7 @@ export async function initMobileI18n() {
  */
 export async function setLanguage(language: string) {
   try {
-    const AsyncStorage =
-      require("@react-native-async-storage/async-storage").default;
+    const AsyncStorage = require("@react-native-async-storage/async-storage").default;
     await AsyncStorage.setItem(LANGUAGE_KEY, language);
   } catch (error) {
     logger.warn("Failed to persist language", { error });
@@ -64,8 +58,4 @@ export async function setLanguage(language: string) {
 
 // Re-export from shared
 export { sharedChangeLanguage as changeLanguage, i18n };
-export {
-  I18nextProvider,
-  Trans,
-  useTranslation,
-} from "@prostcounter/shared/i18n";
+export { I18nextProvider, Trans, useTranslation } from "@prostcounter/shared/i18n";

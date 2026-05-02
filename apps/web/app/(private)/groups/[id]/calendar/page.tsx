@@ -26,9 +26,7 @@ export default function GroupCalendarPage({ params }: PageProps) {
   if (loading || !calendarData) {
     return (
       <div className="container flex flex-col items-center p-4">
-        <h1 className="mb-4 text-lg font-semibold">
-          {t("calendar.groupCalendar")}
-        </h1>
+        <h1 className="mb-4 text-lg font-semibold">{t("calendar.groupCalendar")}</h1>
         <div className="flex h-64 flex-col items-center justify-center gap-4">
           <LoadingSpinner />
           <span className="text-sm text-gray-500">{t("calendar.loading")}</span>
@@ -56,9 +54,7 @@ export default function GroupCalendarPage({ params }: PageProps) {
 
   return (
     <div className="container flex flex-col items-center p-4">
-      <h1 className="mb-4 text-lg font-semibold">
-        {t("calendar.groupCalendar")}
-      </h1>
+      <h1 className="mb-4 text-lg font-semibold">{t("calendar.groupCalendar")}</h1>
       <EventCalendar
         events={events}
         initialMonth={initialMonth}
@@ -66,9 +62,7 @@ export default function GroupCalendarPage({ params }: PageProps) {
         festivalEndDate={festivalEndDate}
       />
       {/* Mount a URL-driven reservation dialog */}
-      {calendarData.festivalId && (
-        <ReservationDialog festivalId={calendarData.festivalId} />
-      )}
+      {calendarData.festivalId && <ReservationDialog festivalId={calendarData.festivalId} />}
     </div>
   );
 }

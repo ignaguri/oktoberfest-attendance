@@ -62,9 +62,7 @@ export class AchievementsPage extends BasePage {
 
     // Loading/empty states
     this.loadingMessage = page.getByText(/loading achievements/i);
-    this.noAchievementsMessage = page.getByText(
-      /no achievements in this category/i,
-    );
+    this.noAchievementsMessage = page.getByText(/no achievements in this category/i);
   }
 
   /**
@@ -94,9 +92,7 @@ export class AchievementsPage extends BasePage {
     await this.expectOnAchievementsPage();
     await this.waitForLoad();
     // Either stats cards or no-festival message should be visible
-    const hasStats = await this.totalProgressCard
-      .isVisible()
-      .catch(() => false);
+    const hasStats = await this.totalProgressCard.isVisible().catch(() => false);
     const noFestival = await this.page
       .getByText(/please select a festival/i)
       .isVisible()

@@ -90,17 +90,10 @@ export function QRCodeSheet({
                 </Text>
               </VStack>
             ) : joinUrl ? (
-              <QRCode
-                value={joinUrl}
-                size={208}
-                color="#000000"
-                backgroundColor="#FFFFFF"
-              />
+              <QRCode value={joinUrl} size={208} color="#000000" backgroundColor="#FFFFFF" />
             ) : (
               <Text className="h-52 w-52 px-2 text-center text-sm text-typography-500">
-                {isCreator
-                  ? t("groups.qrCode.noTokenCreator")
-                  : t("groups.qrCode.noTokenMember")}
+                {isCreator ? t("groups.qrCode.noTokenCreator") : t("groups.qrCode.noTokenMember")}
               </Text>
             )}
           </VStack>
@@ -126,9 +119,7 @@ export function QRCodeSheet({
                 <RefreshCw size={16} color={IconColors.default} />
               )}
               <ButtonText className="ml-2">
-                {joinUrl
-                  ? t("groups.qrCode.regenerate")
-                  : t("groups.qrCode.generate")}
+                {joinUrl ? t("groups.qrCode.regenerate") : t("groups.qrCode.generate")}
               </ButtonText>
             </Button>
           )}

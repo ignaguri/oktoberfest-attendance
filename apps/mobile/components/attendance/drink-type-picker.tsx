@@ -10,11 +10,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import {
-  BackgroundColors,
-  DrinkTypeColors,
-  IconColors,
-} from "@/lib/constants/colors";
+import { BackgroundColors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
 
 /**
  * Visible drink types for the picker
@@ -55,13 +51,7 @@ function DrinkIcon({
     case "beer":
       return <Beer size={size} color={color} />;
     case "radler":
-      return (
-        <RadlerIcon
-          size={size}
-          color={color}
-          backgroundColor={backgroundColor}
-        />
-      );
+      return <RadlerIcon size={size} color={color} backgroundColor={backgroundColor} />;
     case "wine":
       return <Wine size={size} color={color} />;
     case "soft_drink":
@@ -167,9 +157,7 @@ export function DrinkTypePicker({
             const count = counts[type] || 0;
             const color = getDrinkColor(type);
             // Background color for RadlerIcon garnish
-            const iconBgColor = isSelected
-              ? BackgroundColors[50]
-              : BackgroundColors[100];
+            const iconBgColor = isSelected ? BackgroundColors[50] : BackgroundColors[100];
 
             return (
               <Pressable
@@ -188,25 +176,15 @@ export function DrinkTypePicker({
                       "relative items-center justify-center rounded-xl border-2",
                       iconContainerSize,
                       isSelected && "bg-background-50",
-                      !isSelected &&
-                        disabled &&
-                        "border-background-200 bg-background-100",
-                      !isSelected &&
-                        !disabled &&
-                        "border-background-200 bg-white",
+                      !isSelected && disabled && "border-background-200 bg-background-100",
+                      !isSelected && !disabled && "border-background-200 bg-white",
                     )}
                     style={getBorderStyle(type, isSelected)}
                   >
                     <DrinkIcon
                       type={type}
                       size={iconSize}
-                      color={
-                        isSelected
-                          ? color
-                          : disabled
-                            ? IconColors.disabled
-                            : IconColors.muted
-                      }
+                      color={isSelected ? color : disabled ? IconColors.disabled : IconColors.muted}
                       backgroundColor={iconBgColor}
                     />
 
@@ -219,11 +197,7 @@ export function DrinkTypePicker({
                         )}
                         style={{ backgroundColor: color }}
                       >
-                        <Text
-                          className={cn(badgeTextSize, "font-bold text-white")}
-                        >
-                          {count}
-                        </Text>
+                        <Text className={cn(badgeTextSize, "font-bold text-white")}>{count}</Text>
                       </VStack>
                     )}
                   </VStack>
@@ -233,9 +207,7 @@ export function DrinkTypePicker({
                     <Text
                       className={cn(
                         "text-xs",
-                        isSelected
-                          ? "font-medium text-typography-900"
-                          : "text-typography-500",
+                        isSelected ? "font-medium text-typography-900" : "text-typography-500",
                       )}
                     >
                       {getLabel(type)}

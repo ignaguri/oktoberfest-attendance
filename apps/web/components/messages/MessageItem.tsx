@@ -39,16 +39,12 @@ export function MessageItem({ message, onDelete }: MessageItemProps) {
     >
       <Avatar className="size-8 flex-shrink-0">
         <AvatarImage src={getAvatarUrl(message.avatarUrl ?? null)} />
-        <AvatarFallback className="text-xs">
-          {displayName[0]?.toUpperCase() ?? "?"}
-        </AvatarFallback>
+        <AvatarFallback className="text-xs">{displayName[0]?.toUpperCase() ?? "?"}</AvatarFallback>
       </Avatar>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-900">
-            {displayName}
-          </span>
+          <span className="text-sm font-medium text-gray-900">{displayName}</span>
           <span className="text-xs text-gray-400">{relativeTime}</span>
           {message.pinned && <Pin className="size-3 text-yellow-600" />}
           {message.messageType === "alert" && (
@@ -71,9 +67,7 @@ export function MessageItem({ message, onDelete }: MessageItemProps) {
             </button>
           )}
         </div>
-        <p className="mt-0.5 text-sm whitespace-pre-wrap text-gray-700">
-          {message.content}
-        </p>
+        <p className="mt-0.5 text-sm whitespace-pre-wrap text-gray-700">{message.content}</p>
       </div>
     </div>
   );

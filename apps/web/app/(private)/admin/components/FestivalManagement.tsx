@@ -212,33 +212,25 @@ export default function FestivalManagement() {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={t("admin.festivals.form.namePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="short_name">
-                    {t("admin.festivals.form.shortName")}
-                  </Label>
+                  <Label htmlFor="short_name">{t("admin.festivals.form.shortName")}</Label>
                   <Input
                     id="short_name"
                     value={formData.short_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, short_name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, short_name: e.target.value })}
                     placeholder={t("admin.festivals.form.shortNamePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="festival_type">
-                    {t("admin.festivals.form.type")}
-                  </Label>
+                  <Label htmlFor="festival_type">{t("admin.festivals.form.type")}</Label>
                   <Select
                     value={formData.festival_type}
                     onValueChange={(value: FestivalType) =>
@@ -258,32 +250,24 @@ export default function FestivalManagement() {
                       <SelectItem value="fruehlingsfest">
                         {t("admin.festivals.types.fruhlingsfest")}
                       </SelectItem>
-                      <SelectItem value="other">
-                        {t("admin.festivals.types.other")}
-                      </SelectItem>
+                      <SelectItem value="other">{t("admin.festivals.types.other")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="location">
-                    {t("admin.festivals.form.location")}
-                  </Label>
+                  <Label htmlFor="location">{t("admin.festivals.form.location")}</Label>
                   <Input
                     id="location"
                     value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder={t("admin.festivals.form.locationPlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="latitude">
-                    {t("admin.festivals.form.latitude")}
-                  </Label>
+                  <Label htmlFor="latitude">{t("admin.festivals.form.latitude")}</Label>
                   <Input
                     id="latitude"
                     type="number"
@@ -292,9 +276,7 @@ export default function FestivalManagement() {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        latitude: e.target.value
-                          ? parseFloat(e.target.value)
-                          : null,
+                        latitude: e.target.value ? parseFloat(e.target.value) : null,
                       })
                     }
                     placeholder={t("admin.festivals.form.latitudePlaceholder")}
@@ -302,9 +284,7 @@ export default function FestivalManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="longitude">
-                    {t("admin.festivals.form.longitude")}
-                  </Label>
+                  <Label htmlFor="longitude">{t("admin.festivals.form.longitude")}</Label>
                   <Input
                     id="longitude"
                     type="number"
@@ -313,9 +293,7 @@ export default function FestivalManagement() {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        longitude: e.target.value
-                          ? parseFloat(e.target.value)
-                          : null,
+                        longitude: e.target.value ? parseFloat(e.target.value) : null,
                       })
                     }
                     placeholder={t("admin.festivals.form.longitudePlaceholder")}
@@ -323,69 +301,51 @@ export default function FestivalManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="start_date">
-                    {t("admin.festivals.form.startDate")}
-                  </Label>
+                  <Label htmlFor="start_date">{t("admin.festivals.form.startDate")}</Label>
                   <Input
                     id="start_date"
                     type="date"
                     value={formData.start_date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, start_date: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="end_date">
-                    {t("admin.festivals.form.endDate")}
-                  </Label>
+                  <Label htmlFor="end_date">{t("admin.festivals.form.endDate")}</Label>
                   <Input
                     id="end_date"
                     type="date"
                     value={formData.end_date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, end_date: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="map_url">
-                    {t("admin.festivals.form.mapUrl")}
-                  </Label>
+                  <Label htmlFor="map_url">{t("admin.festivals.form.mapUrl")}</Label>
                   <Input
                     id="map_url"
                     type="url"
                     value={formData.map_url}
-                    onChange={(e) =>
-                      setFormData({ ...formData, map_url: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, map_url: e.target.value })}
                     placeholder={t("admin.festivals.form.mapUrlPlaceholder")}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="timezone">
-                    {t("admin.festivals.form.timezone")}
-                  </Label>
+                  <Label htmlFor="timezone">{t("admin.festivals.form.timezone")}</Label>
                   <Input
                     id="timezone"
                     value={formData.timezone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, timezone: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
                     placeholder={t("admin.festivals.form.timezonePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="status">
-                    {t("admin.festivals.form.status")}
-                  </Label>
+                  <Label htmlFor="status">{t("admin.festivals.form.status")}</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value: FestivalStatus) =>
@@ -399,12 +359,8 @@ export default function FestivalManagement() {
                       <SelectItem value="upcoming">
                         {t("admin.festivals.statuses.upcoming")}
                       </SelectItem>
-                      <SelectItem value="active">
-                        {t("admin.festivals.statuses.active")}
-                      </SelectItem>
-                      <SelectItem value="ended">
-                        {t("admin.festivals.statuses.ended")}
-                      </SelectItem>
+                      <SelectItem value="active">{t("admin.festivals.statuses.active")}</SelectItem>
+                      <SelectItem value="ended">{t("admin.festivals.statuses.ended")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -417,22 +373,16 @@ export default function FestivalManagement() {
                       setFormData({ ...formData, is_active: checked })
                     }
                   />
-                  <Label htmlFor="is_active">
-                    {t("admin.festivals.form.markActive")}
-                  </Label>
+                  <Label htmlFor="is_active">{t("admin.festivals.form.markActive")}</Label>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="description">
-                  {t("admin.festivals.form.description")}
-                </Label>
+                <Label htmlFor="description">{t("admin.festivals.form.description")}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder={t("admin.festivals.form.descriptionPlaceholder")}
                   rows={3}
                 />
@@ -485,13 +435,9 @@ export default function FestivalManagement() {
                       </span>
                     </div>
                     <div>{festival.location}</div>
-                    <div className="capitalize">
-                      {festival.festival_type.replace("_", " ")}
-                    </div>
+                    <div className="capitalize">{festival.festival_type.replace("_", " ")}</div>
                     {festival.description && (
-                      <div className="mt-2 text-gray-500">
-                        {festival.description}
-                      </div>
+                      <div className="mt-2 text-gray-500">{festival.description}</div>
                     )}
                   </div>
                 </div>

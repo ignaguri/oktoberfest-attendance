@@ -66,10 +66,7 @@ interface UseOfflineMutationOptions<TData, TVariables> {
   /** Whether to enqueue for server sync */
   syncToServer?: boolean;
   /** Function to build sync payload from variables */
-  buildPayload?: (
-    variables: TVariables,
-    result: TData,
-  ) => Record<string, unknown>;
+  buildPayload?: (variables: TVariables, result: TData) => Record<string, unknown>;
   /** Depends on another operation ID */
   dependsOn?: string;
   /** Callback when mutation succeeds */
@@ -192,8 +189,7 @@ function useOfflineWithContext() {
     abortSync: context?.abortSync ?? noopAbort,
     getDb: context?.getDb ?? noopGetDb,
     getSyncManager: context?.getSyncManager ?? noopGetSyncManager,
-    refreshPendingCount:
-      context?.refreshPendingCount ?? noopRefreshPendingCount,
+    refreshPendingCount: context?.refreshPendingCount ?? noopRefreshPendingCount,
     isSimulatingOffline: context?.isSimulatingOffline ?? false,
     setSimulateOffline: context?.setSimulateOffline ?? noopSetSimulateOffline,
     festivalId: undefined as string | undefined,
@@ -230,9 +226,7 @@ export function useLocalFestival(festivalId: string | undefined) {
   const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalFestival | null, Error>({
-    queryKey: festivalId
-      ? localKeys.festivals.byId(festivalId)
-      : localKeys.festivals.all,
+    queryKey: festivalId ? localKeys.festivals.byId(festivalId) : localKeys.festivals.all,
     queryFn: async () => {
       if (!isReady || !festivalId) return null;
       const drizzleDb = createDrizzleDb(getDb());
@@ -290,17 +284,12 @@ export function useLocalAttendances(festivalId: string | undefined) {
 /**
  * Hook to get attendance for a specific date.
  */
-export function useLocalAttendanceByDate(
-  festivalId: string | undefined,
-  date: string | undefined,
-) {
+export function useLocalAttendanceByDate(festivalId: string | undefined, date: string | undefined) {
   const { isReady, getDb } = useOfflineWithContext();
 
   return useQuery<LocalAttendance | null, Error>({
     queryKey:
-      festivalId && date
-        ? localKeys.attendances.byDate(festivalId, date)
-        : ["local-attendances"],
+      festivalId && date ? localKeys.attendances.byDate(festivalId, date) : ["local-attendances"],
     queryFn: async () => {
       if (!isReady || !festivalId || !date) return null;
       const drizzleDb = createDrizzleDb(getDb());
@@ -318,11 +307,7 @@ export function useLocalSaveAttendance() {
   const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
-  return useMutation<
-    LocalAttendance,
-    Error,
-    { festivalId: string; userId: string; date: string }
-  >({
+  return useMutation<LocalAttendance, Error, { festivalId: string; userId: string; date: string }>({
     mutationFn: async ({ festivalId, userId, date }) => {
       if (!isReady) {
         throw new Error("Database not ready");
@@ -414,46 +399,44 @@ export function useLocalDeleteAttendance() {
   const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, { attendanceId: string; festivalId: string }>(
-    {
-      mutationFn: async ({ attendanceId, festivalId: _festivalId }) => {
-        if (!isReady) {
-          throw new Error("Database not ready");
-        }
+  return useMutation<void, Error, { attendanceId: string; festivalId: string }>({
+    mutationFn: async ({ attendanceId, festivalId: _festivalId }) => {
+      if (!isReady) {
+        throw new Error("Database not ready");
+      }
 
-        const db = getDb();
-        const now = new Date().toISOString();
+      const db = getDb();
+      const now = new Date().toISOString();
 
-        // Soft delete
-        await db.runAsync(
-          "UPDATE attendances SET _deleted = 1, _dirty = 1, updated_at = ? WHERE id = ?",
-          [now, attendanceId],
-        );
+      // Soft delete
+      await db.runAsync(
+        "UPDATE attendances SET _deleted = 1, _dirty = 1, updated_at = ? WHERE id = ?",
+        [now, attendanceId],
+      );
 
-        // Also delete associated consumptions
-        await db.runAsync(
-          "UPDATE consumptions SET _deleted = 1, _dirty = 1, updated_at = ? WHERE attendance_id = ?",
-          [now, attendanceId],
-        );
+      // Also delete associated consumptions
+      await db.runAsync(
+        "UPDATE consumptions SET _deleted = 1, _dirty = 1, updated_at = ? WHERE attendance_id = ?",
+        [now, attendanceId],
+      );
 
-        // Enqueue delete operation
-        await enqueueOperation(db, "DELETE", "attendances", attendanceId, {});
+      // Enqueue delete operation
+      await enqueueOperation(db, "DELETE", "attendances", attendanceId, {});
 
-        await refreshPendingCount();
-      },
-      onSuccess: (_, { festivalId }) => {
-        queryClient.invalidateQueries({
-          queryKey: localKeys.attendances.all(festivalId),
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["local-consumptions"],
-        });
-        for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
-          queryClient.invalidateQueries({ queryKey: [...key] });
-        }
-      },
+      await refreshPendingCount();
     },
-  );
+    onSuccess: (_, { festivalId }) => {
+      queryClient.invalidateQueries({
+        queryKey: localKeys.attendances.all(festivalId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["local-consumptions"],
+      });
+      for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
+        queryClient.invalidateQueries({ queryKey: [...key] });
+      }
+    },
+  });
 }
 
 // =============================================================================
@@ -489,18 +472,12 @@ export function useLocalConsumptionsByDate(
 
   return useQuery<LocalConsumption[], Error>({
     queryKey:
-      festivalId && date
-        ? localKeys.consumptions.byDate(festivalId, date)
-        : ["local-consumptions"],
+      festivalId && date ? localKeys.consumptions.byDate(festivalId, date) : ["local-consumptions"],
     queryFn: async () => {
       if (!isReady || !festivalId || !date) return [];
 
       const drizzleDb = createDrizzleDb(getDb());
-      const consumptions = await queryConsumptionsByDate(
-        drizzleDb,
-        festivalId,
-        date,
-      );
+      const consumptions = await queryConsumptionsByDate(drizzleDb, festivalId, date);
       return consumptions;
     },
     enabled: isReady && !!festivalId && !!date,
@@ -508,13 +485,7 @@ export function useLocalConsumptionsByDate(
   });
 }
 
-export type DrinkType =
-  | "beer"
-  | "radler"
-  | "alcohol_free"
-  | "wine"
-  | "soft_drink"
-  | "other";
+export type DrinkType = "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
 
 export interface LogConsumptionInput {
   attendanceId: string;
@@ -625,11 +596,7 @@ export function useLocalDeleteConsumption() {
   const { isReady, getDb, refreshPendingCount } = useOfflineWithContext();
   const queryClient = useQueryClient();
 
-  return useMutation<
-    void,
-    Error,
-    { consumptionId: string; attendanceId: string }
-  >({
+  return useMutation<void, Error, { consumptionId: string; attendanceId: string }>({
     mutationFn: async ({ consumptionId, attendanceId: _attendanceId }) => {
       if (!isReady) {
         throw new Error("Database not ready");

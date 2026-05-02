@@ -25,9 +25,7 @@ export function OfflineScreen({ messageKey }: OfflineScreenProps) {
         <Text className="mt-4 text-center text-lg font-semibold text-typography-700">
           {t("common.offline.title")}
         </Text>
-        <Text className="mt-2 text-center text-typography-500">
-          {t(messageKey)}
-        </Text>
+        <Text className="mt-2 text-center text-typography-500">{t(messageKey)}</Text>
       </VStack>
     </SafeAreaView>
   );

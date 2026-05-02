@@ -9,20 +9,14 @@ import { logger } from "@/lib/logger";
 /**
  * Hook for capturing and sharing the wrapped share image
  */
-export function useWrappedShare(
-  data: WrappedData,
-  shareRef: React.RefObject<ViewShot | null>,
-) {
+export function useWrappedShare(data: WrappedData, shareRef: React.RefObject<ViewShot | null>) {
   const { t } = useTranslation();
   const [isSharing, setIsSharing] = useState(false);
 
   // Generate localized share text
   const shareText = useMemo(() => {
     const { total_beers, days_attended } = data.basic_stats;
-    const festivalHashtag = data.festival_info.name.replace(
-      /[^\p{L}\p{N}]/gu,
-      "",
-    );
+    const festivalHashtag = data.festival_info.name.replace(/[^\p{L}\p{N}]/gu, "");
 
     return (
       `${t("wrapped.shareText.title", { festivalName: data.festival_info.name })}\n\n` +

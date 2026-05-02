@@ -288,11 +288,7 @@ function AdminUsersPage() {
 
 ```tsx
 import { useSearchState, useUserSearch } from "@/hooks";
-import {
-  SearchInput,
-  SearchResults,
-  SearchPagination,
-} from "@/components/admin/search";
+import { SearchInput, SearchResults, SearchPagination } from "@/components/admin/search";
 
 function CustomUserSearch() {
   const searchState = useSearchState();

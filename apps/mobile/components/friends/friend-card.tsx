@@ -6,10 +6,7 @@ import { parseISO } from "date-fns";
 import { UserX } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  TappableAvatar,
-  UserProfileModal,
-} from "@/components/shared/user-profile-modal";
+import { TappableAvatar, UserProfileModal } from "@/components/shared/user-profile-modal";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -23,11 +20,7 @@ interface FriendCardProps {
   onUnfriend?: (friend: Friend) => void;
 }
 
-export function FriendCard({
-  friend,
-  festivalId,
-  onUnfriend,
-}: FriendCardProps) {
+export function FriendCard({ friend, festivalId, onUnfriend }: FriendCardProps) {
   const { t } = useTranslation();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
@@ -72,13 +65,9 @@ export function FriendCard({
             />
 
             <VStack space="xs" className="flex-1">
-              <Text className="text-base font-semibold text-typography-900">
-                {displayName}
-              </Text>
+              <Text className="text-base font-semibold text-typography-900">{displayName}</Text>
               {friend.username && friend.fullName && (
-                <Text className="text-sm text-typography-500">
-                  @{friend.username}
-                </Text>
+                <Text className="text-sm text-typography-500">@{friend.username}</Text>
               )}
               {formattedFriendsSince && (
                 <Text className="text-xs text-typography-400">

@@ -31,12 +31,8 @@ export function RankingsSlide({ data, isActive }: RankingsSlideProps) {
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-sky-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.rankings.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.rankings.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.rankings.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.rankings.subtitle")}</SlideSubtitle>
 
         {/* Group rankings */}
         {data.social_stats.top_3_rankings.length > 0 && (
@@ -68,19 +64,12 @@ export function RankingsSlide({ data, isActive }: RankingsSlideProps) {
                 className="flex-row items-center justify-between rounded-xl bg-white/70 px-4 py-3"
               >
                 <HStack space="sm" className="flex-1 items-center">
-                  <Text className="text-2xl">
-                    {getPositionEmoji(ranking.position)}
-                  </Text>
-                  <Text
-                    className="flex-1 text-base text-gray-700"
-                    numberOfLines={1}
-                  >
+                  <Text className="text-2xl">{getPositionEmoji(ranking.position)}</Text>
+                  <Text className="flex-1 text-base text-gray-700" numberOfLines={1}>
                     {ranking.group_name}
                   </Text>
                 </HStack>
-                <Text className="text-sm font-semibold text-sky-600">
-                  #{ranking.position}
-                </Text>
+                <Text className="text-sm font-semibold text-sky-600">#{ranking.position}</Text>
               </Motion.View>
             ))}
           </VStack>

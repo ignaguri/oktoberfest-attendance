@@ -1,11 +1,6 @@
 import { Eye, EyeOff } from "lucide-react-native";
 import React, { useState } from "react";
-import type {
-  Control,
-  ControllerRenderProps,
-  FieldValues,
-  Path,
-} from "react-hook-form";
+import type { Control, ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Pressable, View } from "react-native";
 
@@ -30,13 +25,7 @@ interface FormInputProps<T extends FieldValues> {
   /** Auto-capitalize behavior */
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   /** Auto-complete hint */
-  autoComplete?:
-    | "email"
-    | "password"
-    | "password-new"
-    | "name"
-    | "username"
-    | "off";
+  autoComplete?: "email" | "password" | "password-new" | "name" | "username" | "off";
   /** Whether to auto-focus this input */
   autoFocus?: boolean;
   /** Whether the input is disabled */
@@ -64,17 +53,8 @@ export function FormInput<T extends FieldValues>({
 }: FormInputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
 
-  const renderInput = ({
-    field,
-  }: {
-    field: ControllerRenderProps<T, Path<T>>;
-  }) => (
-    <Input
-      variant="outline"
-      size="lg"
-      isDisabled={disabled}
-      isInvalid={!!error}
-    >
+  const renderInput = ({ field }: { field: ControllerRenderProps<T, Path<T>> }) => (
+    <Input variant="outline" size="lg" isDisabled={disabled} isInvalid={!!error}>
       <InputField
         placeholder={placeholder}
         value={field.value}

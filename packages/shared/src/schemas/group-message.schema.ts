@@ -62,9 +62,7 @@ export const GetGroupMessagesResponseSchema = z.object({
   hasMore: z.boolean(),
 });
 
-export type GetGroupMessagesResponse = z.infer<
-  typeof GetGroupMessagesResponseSchema
->;
+export type GetGroupMessagesResponse = z.infer<typeof GetGroupMessagesResponseSchema>;
 
 /**
  * GET /messages/feed query params
@@ -86,9 +84,7 @@ export const GetMessageFeedResponseSchema = z.object({
   hasMore: z.boolean(),
 });
 
-export type GetMessageFeedResponse = z.infer<
-  typeof GetMessageFeedResponseSchema
->;
+export type GetMessageFeedResponse = z.infer<typeof GetMessageFeedResponseSchema>;
 
 /**
  * POST /messages body
@@ -134,9 +130,7 @@ export const UpdateGroupMessageSchema = z.object({
   pinned: z.boolean().optional(),
 });
 
-export type UpdateGroupMessageInput = z.infer<
-  typeof UpdateGroupMessageSchema
->;
+export type UpdateGroupMessageInput = z.infer<typeof UpdateGroupMessageSchema>;
 
 /**
  * PUT /messages/:messageId response
@@ -145,9 +139,7 @@ export const UpdateGroupMessageResponseSchema = z.object({
   message: GroupMessageItemSchema,
 });
 
-export type UpdateGroupMessageResponse = z.infer<
-  typeof UpdateGroupMessageResponseSchema
->;
+export type UpdateGroupMessageResponse = z.infer<typeof UpdateGroupMessageResponseSchema>;
 
 /**
  * DELETE /messages/:messageId response
@@ -156,9 +148,7 @@ export const DeleteGroupMessageResponseSchema = z.object({
   success: z.boolean(),
 });
 
-export type DeleteGroupMessageResponse = z.infer<
-  typeof DeleteGroupMessageResponseSchema
->;
+export type DeleteGroupMessageResponse = z.infer<typeof DeleteGroupMessageResponseSchema>;
 
 /**
  * Message ID param schema (for PUT/DELETE without groupId)
@@ -176,9 +166,7 @@ export const GroupMessageGroupIdParamSchema = z.object({
   groupId: z.string().uuid({ message: "Invalid group ID" }),
 });
 
-export type GroupMessageGroupIdParam = z.infer<
-  typeof GroupMessageGroupIdParamSchema
->;
+export type GroupMessageGroupIdParam = z.infer<typeof GroupMessageGroupIdParamSchema>;
 
 /**
  * @deprecated Use MessageIdParamSchema instead

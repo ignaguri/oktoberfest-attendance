@@ -61,9 +61,4 @@ export function NovuProviderWrapper({ children }: NovuProviderWrapperProps) {
 /**
  * Re-export Novu hooks for convenience
  */
-export {
-  useCounts,
-  useNotifications,
-  useNovu,
-  usePreferences,
-} from "@novu/react-native";
+export { useCounts, useNotifications, useNovu, usePreferences } from "@novu/react-native";

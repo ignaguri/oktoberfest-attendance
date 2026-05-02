@@ -35,14 +35,9 @@ export function useAchievementsWithProgress(festivalId?: string) {
   const apiClient = useApiClient();
 
   return useQuery(
-    [
-      ...QueryKeys.userAchievements("current", festivalId || ""),
-      "with-progress",
-    ],
+    [...QueryKeys.userAchievements("current", festivalId || ""), "with-progress"],
     async () => {
-      const response = await apiClient.achievements.getWithProgress(
-        festivalId!,
-      );
+      const response = await apiClient.achievements.getWithProgress(festivalId!);
       return response;
     },
     {

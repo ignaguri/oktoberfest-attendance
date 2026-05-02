@@ -18,12 +18,7 @@ interface MissingFieldProps {
   editLabel: string;
 }
 
-const MissingField: FC<MissingFieldProps> = ({
-  label,
-  icon,
-  link,
-  editLabel,
-}) => {
+const MissingField: FC<MissingFieldProps> = ({ label, icon, link, editLabel }) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center justify-center gap-2">

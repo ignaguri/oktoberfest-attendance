@@ -181,14 +181,8 @@ export function CreateGroupSheet({
                       <SelectInput
                         placeholder={t("groups.create.criteriaPlaceholder")}
                         value={
-                          WINNING_CRITERIA_OPTIONS.find(
-                            (opt) => opt.value === value,
-                          )
-                            ? t(
-                                WINNING_CRITERIA_OPTIONS.find(
-                                  (opt) => opt.value === value,
-                                )!.label,
-                              )
+                          WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)
+                            ? t(WINNING_CRITERIA_OPTIONS.find((opt) => opt.value === value)!.label)
                             : ""
                         }
                       />
@@ -220,9 +214,7 @@ export function CreateGroupSheet({
             </VStack>
 
             {/* Helper text */}
-            <Text className="text-sm text-typography-500">
-              {t("groups.create.criteriaHelp")}
-            </Text>
+            <Text className="text-sm text-typography-500">{t("groups.create.criteriaHelp")}</Text>
           </VStack>
         </ActionsheetScrollView>
 
@@ -246,9 +238,7 @@ export function CreateGroupSheet({
           >
             {isSubmitting && <ButtonSpinner color={Colors.white} />}
             <ButtonText>
-              {isSubmitting
-                ? t("common.status.creating")
-                : t("groups.actions.create")}
+              {isSubmitting ? t("common.status.creating") : t("groups.actions.create")}
             </ButtonText>
           </Button>
         </HStack>

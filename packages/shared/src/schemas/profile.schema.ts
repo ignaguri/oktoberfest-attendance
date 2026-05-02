@@ -8,9 +8,7 @@ import type { TipMode } from "../utils/pricing";
 export type { TipMode };
 
 // Tip mode schema
-export const TipModeSchema = z.enum(
-  TIP_MODES as [TipMode, ...TipMode[]],
-);
+export const TipModeSchema = z.enum(TIP_MODES as [TipMode, ...TipMode[]]);
 
 // Profile schemas
 export const ProfileSchema = z.object({
@@ -48,10 +46,7 @@ export const UpdateProfileSchema = z.object({
     .nullable()
     .refine(
       (val) =>
-        val === null ||
-        SUPPORTED_LANGUAGES.includes(
-          val as (typeof SUPPORTED_LANGUAGES)[number],
-        ),
+        val === null || SUPPORTED_LANGUAGES.includes(val as (typeof SUPPORTED_LANGUAGES)[number]),
       "Invalid language code",
     )
     .optional(),
@@ -138,9 +133,7 @@ export const GetHighlightsResponseSchema = z.object({
 // Avatar upload schemas
 export const GetAvatarUploadUrlQuerySchema = z.object({
   fileName: z.string().min(1),
-  fileType: z
-    .string()
-    .regex(/^image\/(jpeg|png|webp|gif)$/, "Invalid image type"),
+  fileType: z.string().regex(/^image\/(jpeg|png|webp|gif)$/, "Invalid image type"),
   fileSize: z.coerce
     .number()
     .int()
@@ -148,9 +141,7 @@ export const GetAvatarUploadUrlQuerySchema = z.object({
     .max(10 * 1024 * 1024), // Max 10MB
 });
 
-export type GetAvatarUploadUrlQuery = z.infer<
-  typeof GetAvatarUploadUrlQuerySchema
->;
+export type GetAvatarUploadUrlQuery = z.infer<typeof GetAvatarUploadUrlQuerySchema>;
 
 export const GetAvatarUploadUrlResponseSchema = z.object({
   uploadUrl: z.url(),
@@ -158,17 +149,13 @@ export const GetAvatarUploadUrlResponseSchema = z.object({
   expiresIn: z.number().int(),
 });
 
-export type GetAvatarUploadUrlResponse = z.infer<
-  typeof GetAvatarUploadUrlResponseSchema
->;
+export type GetAvatarUploadUrlResponse = z.infer<typeof GetAvatarUploadUrlResponseSchema>;
 
 export const ConfirmAvatarUploadSchema = z.object({
   fileName: z.string().min(1), // Just the filename, not the full URL
 });
 
-export type ConfirmAvatarUploadInput = z.infer<
-  typeof ConfirmAvatarUploadSchema
->;
+export type ConfirmAvatarUploadInput = z.infer<typeof ConfirmAvatarUploadSchema>;
 
 export const ConfirmAvatarUploadResponseSchema = z.object({
   success: z.boolean(),
@@ -211,6 +198,4 @@ export const GetPublicProfileResponseSchema = z.object({
   profile: PublicProfileSchema,
 });
 
-export type GetPublicProfileResponse = z.infer<
-  typeof GetPublicProfileResponseSchema
->;
+export type GetPublicProfileResponse = z.infer<typeof GetPublicProfileResponseSchema>;

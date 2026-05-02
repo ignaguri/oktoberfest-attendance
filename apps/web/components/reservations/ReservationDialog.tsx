@@ -4,10 +4,7 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  type ReservationForm,
-  ReservationFormSchema,
-} from "@prostcounter/shared/schemas";
+import { type ReservationForm, ReservationFormSchema } from "@prostcounter/shared/schemas";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -39,20 +36,15 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   const { tents, isLoading: tentsLoading } = useTents(festivalId);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const open =
-    searchParams.get("newReservation") === "1" ||
-    !!searchParams.get("reservationId");
+  const open = searchParams.get("newReservation") === "1" || !!searchParams.get("reservationId");
   const reservationId = searchParams.get("reservationId");
 
   // Use React Query for fetching reservation data
-  const { data: reservation, loading: _reservationLoading } =
-    useReservation(reservationId);
+  const { data: reservation, loading: _reservationLoading } = useReservation(reservationId);
 
   // Mutations for create/update
-  const { mutateAsync: createReservation, loading: isCreating } =
-    useCreateReservation();
-  const { mutateAsync: updateReservation, loading: isUpdating } =
-    useUpdateReservation();
+  const { mutateAsync: createReservation, loading: isCreating } = useCreateReservation();
+  const { mutateAsync: updateReservation, loading: isUpdating } = useUpdateReservation();
 
   const isMutating = isCreating || isUpdating;
 
@@ -100,8 +92,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
       // Creating new reservation - set defaults
       const defaultDate = new Date(initialDate);
       defaultDate.setHours(9, 0, 0, 0);
-      const defaultTentId =
-        tents.length > 0 ? tents[0]?.options[0]?.value || "" : "";
+      const defaultTentId = tents.length > 0 ? tents[0]?.options[0]?.value || "" : "";
       reset({
         tentId: defaultTentId,
         startAt: defaultDate,
@@ -112,10 +103,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
   }, [open, initialDate, reservationId, reservation, reset, tents]);
 
   const onClose = useCallback(() => {
-    const url = createUrlWithParams("/calendar", searchParams, [
-      "newReservation",
-      "reservationId",
-    ]);
+    const url = createUrlWithParams("/calendar", searchParams, ["newReservation", "reservationId"]);
     router.replace(url);
   }, [router, searchParams]);
 
@@ -147,14 +135,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
         toast.error(t("notifications.error.reservationSaveFailed"));
       }
     },
-    [
-      festivalId,
-      onClose,
-      reservationId,
-      createReservation,
-      updateReservation,
-      t,
-    ],
+    [festivalId, onClose, reservationId, createReservation, updateReservation, t],
   );
 
   return (
@@ -166,9 +147,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
         }
       }}
       title={
-        reservationId
-          ? t("reservation.dialog.editTitle")
-          : t("reservation.dialog.createTitle")
+        reservationId ? t("reservation.dialog.editTitle") : t("reservation.dialog.createTitle")
       }
       description={t("reservation.dialog.description")}
     >
@@ -186,9 +165,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
               onSelect={(option) => setValue("tentId", option.value)}
               disabled={tentsLoading || isMutating}
             />
-            {errors.tentId && (
-              <p className="text-sm text-red-600">{errors.tentId.message}</p>
-            )}
+            {errors.tentId && <p className="text-sm text-red-600">{errors.tentId.message}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="start">{t("reservation.dialog.dateTime")}</Label>
@@ -199,9 +176,7 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
               disabled={isMutating}
               calendarClassName="[--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
             />
-            {errors.startAt && (
-              <p className="text-sm text-red-600">{errors.startAt.message}</p>
-            )}
+            {errors.startAt && <p className="text-sm text-red-600">{errors.startAt.message}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="reminder">{t("reservation.dialog.reminder")}</Label>
@@ -211,40 +186,26 @@ export function ReservationDialog({ festivalId }: ReservationDialogProps) {
               disabled={isMutating}
             />
             {errors.reminderOffsetMinutes && (
-              <p className="text-sm text-red-600">
-                {errors.reminderOffsetMinutes.message}
-              </p>
+              <p className="text-sm text-red-600">{errors.reminderOffsetMinutes.message}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Label htmlFor="visibleToGroups">
-              {t("reservation.dialog.shareWithGroups")}
-            </Label>
+            <Label htmlFor="visibleToGroups">{t("reservation.dialog.shareWithGroups")}</Label>
             <Checkbox
               checked={visibleToGroups}
               onCheckedChange={(checked) =>
-                setValue(
-                  "visibleToGroups",
-                  checked === "indeterminate" ? false : checked,
-                )
+                setValue("visibleToGroups", checked === "indeterminate" ? false : checked)
               }
               disabled={isMutating}
             />
           </div>
         </div>
         <div className="flex justify-end gap-2 p-4 pt-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={isMutating}
-          >
+          <Button type="button" variant="outline" onClick={onClose} disabled={isMutating}>
             {t("reservation.dialog.cancel")}
           </Button>
           <Button type="submit" disabled={isMutating || tentsLoading}>
-            {reservationId
-              ? t("reservation.dialog.save")
-              : t("reservation.dialog.create")}
+            {reservationId ? t("reservation.dialog.save") : t("reservation.dialog.create")}
           </Button>
         </div>
       </form>

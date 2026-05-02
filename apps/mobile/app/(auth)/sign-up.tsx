@@ -1,8 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type SignUpFormData,
-  signUpSchema,
-} from "@prostcounter/shared/schemas";
+import { type SignUpFormData, signUpSchema } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,13 +7,7 @@ import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {
-  AuthFooterLink,
-  AuthHeader,
-  FormInput,
-  OAuthButtons,
-  OrDivider,
-} from "@/components/auth";
+import { AuthFooterLink, AuthHeader, FormInput, OAuthButtons, OrDivider } from "@/components/auth";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -25,8 +16,7 @@ import { IconColors } from "@/lib/constants/colors";
 export default function SignUpScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { signUp, signInWithGoogle, signInWithFacebook, signInWithApple } =
-    useAuth();
+  const { signUp, signInWithGoogle, signInWithFacebook, signInWithApple } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -82,9 +72,7 @@ export default function SignUpScreen() {
     setIsFacebookLoading(false);
 
     if (error && error.message !== "Authentication was cancelled") {
-      setError(
-        t("auth.signIn.errors.providerFailed", { provider: "Facebook" }),
-      );
+      setError(t("auth.signIn.errors.providerFailed", { provider: "Facebook" }));
     }
   };
 
@@ -99,8 +87,7 @@ export default function SignUpScreen() {
     }
   };
 
-  const isAnyLoading =
-    isLoading || isGoogleLoading || isFacebookLoading || isAppleLoading;
+  const isAnyLoading = isLoading || isGoogleLoading || isFacebookLoading || isAppleLoading;
 
   // Success state - show confirmation message
   if (success) {

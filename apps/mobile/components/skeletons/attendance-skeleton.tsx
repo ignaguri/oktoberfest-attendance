@@ -36,11 +36,7 @@ export function AttendanceSkeleton() {
           {[1, 2, 3, 4, 5].map((row) => (
             <HStack key={row} className="justify-around py-1">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                <Skeleton
-                  key={`${row}-${day}`}
-                  variant="circular"
-                  className="h-10 w-10"
-                />
+                <Skeleton key={`${row}-${day}`} variant="circular" className="h-10 w-10" />
               ))}
             </HStack>
           ))}

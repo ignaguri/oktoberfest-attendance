@@ -3,9 +3,7 @@ import type { Database } from "@prostcounter/db";
 type PublicSchema = Database[Extract<keyof Database, "public">];
 
 export type Views<
-  PublicViewNameOrOptions extends
-    | keyof PublicSchema["Views"]
-    | { schema: keyof Database },
+  PublicViewNameOrOptions extends keyof PublicSchema["Views"] | { schema: keyof Database },
   ViewName extends PublicViewNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicViewNameOrOptions["schema"]]["Views"]
     : never = never,

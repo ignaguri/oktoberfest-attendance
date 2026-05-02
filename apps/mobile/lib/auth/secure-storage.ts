@@ -23,10 +23,7 @@ const KEYS = {
 /**
  * Store session tokens securely
  */
-export async function storeSession(
-  accessToken: string,
-  refreshToken: string,
-): Promise<void> {
+export async function storeSession(accessToken: string, refreshToken: string): Promise<void> {
   await Promise.all([
     SecureStore.setItemAsync(KEYS.ACCESS_TOKEN, accessToken),
     SecureStore.setItemAsync(KEYS.REFRESH_TOKEN, refreshToken),
@@ -62,10 +59,7 @@ export async function clearSession(): Promise<void> {
  * Store biometric preference
  */
 export async function setBiometricEnabled(enabled: boolean): Promise<void> {
-  await SecureStore.setItemAsync(
-    KEYS.BIOMETRIC_ENABLED,
-    enabled ? "true" : "false",
-  );
+  await SecureStore.setItemAsync(KEYS.BIOMETRIC_ENABLED, enabled ? "true" : "false");
 }
 
 /**
@@ -108,11 +102,7 @@ export async function clearUserEmail(): Promise<void> {
  * Clear all auth-related stored data
  */
 export async function clearAllAuthData(): Promise<void> {
-  await Promise.all([
-    clearSession(),
-    clearBiometricEnabled(),
-    clearUserEmail(),
-  ]);
+  await Promise.all([clearSession(), clearBiometricEnabled(), clearUserEmail()]);
 }
 
 // =============================================================================
@@ -122,13 +112,8 @@ export async function clearAllAuthData(): Promise<void> {
 /**
  * Store whether notification permission prompt has been shown
  */
-export async function setNotificationPromptShown(
-  shown: boolean,
-): Promise<void> {
-  await SecureStore.setItemAsync(
-    KEYS.NOTIFICATION_PROMPT_SHOWN,
-    shown ? "true" : "false",
-  );
+export async function setNotificationPromptShown(shown: boolean): Promise<void> {
+  await SecureStore.setItemAsync(KEYS.NOTIFICATION_PROMPT_SHOWN, shown ? "true" : "false");
 }
 
 /**
@@ -142,10 +127,7 @@ export async function hasNotificationPromptBeenShown(): Promise<boolean> {
 /**
  * Store notification permission status
  */
-export type NotificationPermissionStatus =
-  | "undetermined"
-  | "granted"
-  | "denied";
+export type NotificationPermissionStatus = "undetermined" | "granted" | "denied";
 
 export async function setNotificationPermissionStatus(
   status: NotificationPermissionStatus,
@@ -157,9 +139,7 @@ export async function setNotificationPermissionStatus(
  * Get stored notification permission status
  */
 export async function getNotificationPermissionStatus(): Promise<NotificationPermissionStatus | null> {
-  const value = await SecureStore.getItemAsync(
-    KEYS.NOTIFICATION_PERMISSION_STATUS,
-  );
+  const value = await SecureStore.getItemAsync(KEYS.NOTIFICATION_PERMISSION_STATUS);
   if (value === "undetermined" || value === "granted" || value === "denied") {
     return value;
   }
@@ -206,10 +186,7 @@ export async function clearAllNotificationData(): Promise<void> {
  * Store whether location permission prompt has been shown
  */
 export async function setLocationPromptShown(shown: boolean): Promise<void> {
-  await SecureStore.setItemAsync(
-    KEYS.LOCATION_PROMPT_SHOWN,
-    shown ? "true" : "false",
-  );
+  await SecureStore.setItemAsync(KEYS.LOCATION_PROMPT_SHOWN, shown ? "true" : "false");
 }
 
 /**
@@ -223,15 +200,9 @@ export async function hasLocationPromptBeenShown(): Promise<boolean> {
 /**
  * Store location permission status
  */
-export type LocationPermissionStatus =
-  | "undetermined"
-  | "foreground"
-  | "background"
-  | "denied";
+export type LocationPermissionStatus = "undetermined" | "foreground" | "background" | "denied";
 
-export async function setLocationPermissionStatus(
-  status: LocationPermissionStatus,
-): Promise<void> {
+export async function setLocationPermissionStatus(status: LocationPermissionStatus): Promise<void> {
   await SecureStore.setItemAsync(KEYS.LOCATION_PERMISSION_STATUS, status);
 }
 
@@ -290,13 +261,8 @@ export async function clearAllLocationData(): Promise<void> {
 /**
  * Store whether the Apple Watch install prompt has been shown
  */
-export async function setWatchInstallPromptShown(
-  shown: boolean,
-): Promise<void> {
-  await SecureStore.setItemAsync(
-    KEYS.WATCH_INSTALL_PROMPT_SHOWN,
-    shown ? "true" : "false",
-  );
+export async function setWatchInstallPromptShown(shown: boolean): Promise<void> {
+  await SecureStore.setItemAsync(KEYS.WATCH_INSTALL_PROMPT_SHOWN, shown ? "true" : "false");
 }
 
 /**

@@ -33,24 +33,20 @@ export function analyzePersonality(data: WrappedData): PersonalityAnalysis {
   // Check if attended first day
   const attendedFirstDay =
     timeline.length > 0 &&
-    new Date(timeline[0].date).getTime() ===
-      new Date(data.festival_info.start_date).getTime();
+    new Date(timeline[0].date).getTime() === new Date(data.festival_info.start_date).getTime();
 
   // Determine primary personality type with scoring
   const typeScores = {
     Explorer: tentDiversityPct >= 70 ? 90 : tentDiversityPct,
     Champion: avgBeers >= 8 ? 95 : (avgBeers / 8) * 90,
-    Loyalist:
-      daysAttended / totalDays >= 0.8 ? 85 : (daysAttended / totalDays) * 80,
+    Loyalist: daysAttended / totalDays >= 0.8 ? 85 : (daysAttended / totalDays) * 80,
     "Social Butterfly": avgBeers <= 3 && daysAttended >= 5 ? 80 : 0,
     Consistent: variance < 2 && timeline.length >= 3 ? 75 : 0,
     "Casual Enjoyer": 50, // Default baseline
   };
 
   // Get highest scoring type
-  const primaryType = Object.entries(typeScores).reduce((a, b) =>
-    b[1] > a[1] ? b : a,
-  )[0];
+  const primaryType = Object.entries(typeScores).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
 
   // Build traits array
   const traits: string[] = [];
@@ -92,8 +88,7 @@ function calculateVariance(numbers: number[]): number {
 
   const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
   const squaredDiffs = numbers.map((num) => Math.pow(num - mean, 2));
-  const variance =
-    squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
+  const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
 
   return Math.sqrt(variance); // Return standard deviation
 }
@@ -101,10 +96,7 @@ function calculateVariance(numbers: number[]): number {
 /**
  * Get detailed personality description based on type and traits
  */
-export function getPersonalityDescription(
-  type: string,
-  traits: string[],
-): string {
+export function getPersonalityDescription(type: string, traits: string[]): string {
   const baseDescriptions: Record<string, string> = {
     Explorer:
       "You're an adventurer at heart! You explored a wide variety of tents and embraced diverse experiences throughout the festival.",
@@ -120,8 +112,7 @@ export function getPersonalityDescription(
       "You enjoyed the festival at your own pace! A balanced approach to beer and fun.",
   };
 
-  let description =
-    baseDescriptions[type] || baseDescriptions["Casual Enjoyer"];
+  let description = baseDescriptions[type] || baseDescriptions["Casual Enjoyer"];
 
   // Add trait-based additions
   if (traits.includes("Early Bird")) {

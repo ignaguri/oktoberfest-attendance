@@ -53,18 +53,12 @@ export interface INotificationRepository {
    * @param notificationType - Type of notification
    * @returns True if notification can be sent
    */
-  canSendNotification(
-    userId: string,
-    notificationType: string,
-  ): Promise<boolean>;
+  canSendNotification(userId: string, notificationType: string): Promise<boolean>;
 
   /**
    * Record that a notification was sent
    * @param userId - User ID
    * @param notificationType - Type of notification
    */
-  recordNotificationSent(
-    userId: string,
-    notificationType: string,
-  ): Promise<void>;
+  recordNotificationSent(userId: string, notificationType: string): Promise<void>;
 }

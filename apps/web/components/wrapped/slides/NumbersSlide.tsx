@@ -3,22 +3,10 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { formatCurrency, formatNumber } from "@prostcounter/shared/wrapped";
-import {
-  Beer,
-  CalendarDays,
-  DollarSign,
-  PartyPopper,
-  TrendingUp,
-} from "lucide-react";
+import { Beer, CalendarDays, DollarSign, PartyPopper, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
 
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-  StatItem,
-} from "./BaseSlide";
+import { BaseSlide, SlideContent, SlideSubtitle, SlideTitle, StatItem } from "./BaseSlide";
 
 interface NumbersSlideProps {
   data: WrappedData;
@@ -27,8 +15,7 @@ interface NumbersSlideProps {
 
 export function NumbersSlide({ data, isActive = false }: NumbersSlideProps) {
   const { t } = useTranslation();
-  const { total_beers, days_attended, total_spent, avg_beers } =
-    data.basic_stats;
+  const { total_beers, days_attended, total_spent, avg_beers } = data.basic_stats;
 
   const finalMessageKey = useMemo(() => {
     if (total_beers > 10 || avg_beers > 2.1) {
@@ -41,10 +28,7 @@ export function NumbersSlide({ data, isActive = false }: NumbersSlideProps) {
   }, [avg_beers, days_attended, total_beers]);
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-blue-50 to-cyan-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-blue-50 to-cyan-50">
       <SlideTitle>{t("wrapped.numbers.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.numbers.subtitle")}</SlideSubtitle>
 

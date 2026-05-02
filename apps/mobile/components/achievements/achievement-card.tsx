@@ -1,8 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  AchievementRarity,
-  AchievementWithProgress,
-} from "@prostcounter/shared/schemas";
+import type { AchievementRarity, AchievementWithProgress } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { parseISO } from "date-fns";
@@ -65,10 +62,7 @@ export const ICON_MAP: Record<string, string> = {
 };
 
 // Rarity styling configuration
-const RARITY_STYLES: Record<
-  AchievementRarity,
-  { bg: string; text: string; border: string }
-> = {
+const RARITY_STYLES: Record<AchievementRarity, { bg: string; text: string; border: string }> = {
   common: {
     bg: "bg-gray-100",
     text: "text-gray-700",
@@ -109,10 +103,7 @@ interface AchievementCardProps {
 /**
  * Achievement card displaying name, description, icon, rarity, points, and progress
  */
-export function AchievementCard({
-  achievement,
-  showProgress = true,
-}: AchievementCardProps) {
+export function AchievementCard({ achievement, showProgress = true }: AchievementCardProps) {
   const { t } = useTranslation();
   const {
     name,
@@ -152,11 +143,7 @@ export function AchievementCard({
     <Card
       variant="outline"
       size="sm"
-      className={cn(
-        is_unlocked
-          ? "border-green-200 bg-green-50"
-          : "border-gray-200 bg-white",
-      )}
+      className={cn(is_unlocked ? "border-green-200 bg-green-50" : "border-gray-200 bg-white")}
     >
       <VStack space="sm" className="p-3">
         {/* Header: Icon + Name/Description + Rarity */}
@@ -187,16 +174,8 @@ export function AchievementCard({
           </VStack>
 
           {/* Rarity Badge */}
-          <View
-            className={cn(
-              "rounded-md border px-2 py-1",
-              rarityStyle.bg,
-              rarityStyle.border,
-            )}
-          >
-            <Text
-              className={cn("text-xs font-medium capitalize", rarityStyle.text)}
-            >
+          <View className={cn("rounded-md border px-2 py-1", rarityStyle.bg, rarityStyle.border)}>
+            <Text className={cn("text-xs font-medium capitalize", rarityStyle.text)}>
               {displayRarity}
             </Text>
           </View>
@@ -221,19 +200,14 @@ export function AchievementCard({
             <HStack space="xs" className="items-center">
               <Text className="text-sm text-green-600">✓</Text>
               {formattedUnlockDate && (
-                <Text className="text-xs text-green-600">
-                  {formattedUnlockDate}
-                </Text>
+                <Text className="text-xs text-green-600">{formattedUnlockDate}</Text>
               )}
             </HStack>
           ) : (
             user_progress &&
             showProgress && (
               <View className="w-24">
-                <AchievementProgressBar
-                  progress={user_progress}
-                  showLabel={false}
-                />
+                <AchievementProgressBar progress={user_progress} showLabel={false} />
                 <Text className="mt-1 text-center text-xs text-typography-400">
                   {Math.round(user_progress.percentage)}%
                 </Text>

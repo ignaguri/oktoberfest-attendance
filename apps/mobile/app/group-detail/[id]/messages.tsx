@@ -1,9 +1,5 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useDeleteMessage,
-  useGroupMessages,
-  useGroupName,
-} from "@prostcounter/shared/hooks";
+import { useDeleteMessage, useGroupMessages, useGroupName } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -87,10 +83,7 @@ export default function GroupMessagesScreen() {
         messageId: deleteTargetId,
       });
     } catch {
-      showDialog(
-        t("common.status.error"),
-        t("groups.messages.item.deleteError"),
-      );
+      showDialog(t("common.status.error"), t("groups.messages.item.deleteError"));
     } finally {
       setDeleteTargetId(null);
     }
@@ -157,11 +150,7 @@ export default function GroupMessagesScreen() {
         <VStack space="md" className="p-4 pb-24">
           {/* Empty state */}
           {messages.length === 0 && (
-            <Card
-              variant="outline"
-              size="md"
-              className="items-center bg-white p-8"
-            >
+            <Card variant="outline" size="md" className="items-center bg-white p-8">
               <MessageSquare size={48} color={IconColors.disabled} />
               <Text className="mt-4 text-center text-lg font-medium text-typography-700">
                 {t("groups.messages.empty.title")}
@@ -169,11 +158,7 @@ export default function GroupMessagesScreen() {
               <Text className="mt-2 text-center text-sm text-typography-500">
                 {t("groups.messages.empty.description")}
               </Text>
-              <Button
-                action="primary"
-                className="mt-4"
-                onPress={() => setIsComposeOpen(true)}
-              >
+              <Button action="primary" className="mt-4" onPress={() => setIsComposeOpen(true)}>
                 <ButtonText>{t("groups.messages.compose.title")}</ButtonText>
               </Button>
             </Card>
@@ -187,8 +172,7 @@ export default function GroupMessagesScreen() {
                   <View
                     key={message.id}
                     className={cn(
-                      index < pinnedMessages.length - 1 &&
-                        "border-b border-outline-100",
+                      index < pinnedMessages.length - 1 && "border-b border-outline-100",
                     )}
                   >
                     <MessageItem
@@ -211,8 +195,7 @@ export default function GroupMessagesScreen() {
                   <View
                     key={message.id}
                     className={cn(
-                      index < regularMessages.length - 1 &&
-                        "border-b border-outline-100",
+                      index < regularMessages.length - 1 && "border-b border-outline-100",
                     )}
                   >
                     <MessageItem
@@ -238,9 +221,7 @@ export default function GroupMessagesScreen() {
             >
               {isFetchingNextPage && <ButtonSpinner color={Colors.gray[500]} />}
               <ButtonText>
-                {isFetchingNextPage
-                  ? t("common.status.loading")
-                  : t("home.activityFeed.loadMore")}
+                {isFetchingNextPage ? t("common.status.loading") : t("home.activityFeed.loadMore")}
               </ButtonText>
             </Button>
           )}

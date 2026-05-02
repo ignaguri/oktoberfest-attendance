@@ -6,16 +6,7 @@ import {
   usePublicProfile,
   useSendFriendRequest,
 } from "@prostcounter/shared/hooks";
-import {
-  Beer,
-  Calendar,
-  Check,
-  Clock,
-  Loader2,
-  TrendingUp,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { Beer, Calendar, Check, Clock, Loader2, TrendingUp, UserPlus, Users } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -52,10 +43,7 @@ export function ProfilePreview({
   const [isOpen, setIsOpen] = useState(false);
 
   // Only fetch profile data when dialog is open and we have a userId
-  const { data: profile, loading } = usePublicProfile(
-    isOpen ? userId : undefined,
-    festivalId,
-  );
+  const { data: profile, loading } = usePublicProfile(isOpen ? userId : undefined, festivalId);
 
   // Use fetched data if available, fallback to props
   const displayUsername = profile?.username ?? username;
@@ -69,12 +57,7 @@ export function ProfilePreview({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div
-          className={cn(
-            "cursor-pointer transition-colors hover:text-yellow-600",
-            className,
-          )}
-        >
+        <div className={cn("cursor-pointer transition-colors hover:text-yellow-600", className)}>
           {children}
         </div>
       </DialogTrigger>
@@ -84,54 +67,39 @@ export function ProfilePreview({
             {loading ? (
               <div className="flex flex-col items-center gap-3 py-4">
                 <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
-                <p className="text-sm text-gray-500">
-                  {t("common.status.loading")}
-                </p>
+                <p className="text-sm text-gray-500">{t("common.status.loading")}</p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-3">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage
-                    src={getAvatarUrl(displayAvatarUrl)}
-                    alt={displayName}
-                  />
+                  <AvatarImage src={getAvatarUrl(displayAvatarUrl)} alt={displayName} />
                   <AvatarFallback className="bg-yellow-100 text-2xl text-yellow-800">
                     {fallbackInitial}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   {displayUsername && (
-                    <CardTitle className="text-lg font-semibold">
-                      {displayUsername}
-                    </CardTitle>
+                    <CardTitle className="text-lg font-semibold">{displayUsername}</CardTitle>
                   )}
                   {displayFullName && (
                     <p
                       className={cn(
                         "text-gray-600",
-                        displayUsername
-                          ? "text-sm"
-                          : "text-lg font-semibold text-gray-900",
+                        displayUsername ? "text-sm" : "text-lg font-semibold text-gray-900",
                       )}
                     >
                       {displayFullName}
                     </p>
                   )}
                   {!displayUsername && !displayFullName && (
-                    <CardTitle className="text-lg font-semibold">
-                      Unknown User
-                    </CardTitle>
+                    <CardTitle className="text-lg font-semibold">Unknown User</CardTitle>
                   )}
                 </div>
 
                 {/* Friendship badge / action button */}
-                {profile?.friendshipStatus &&
-                  profile.friendshipStatus !== "self" && (
-                    <FriendshipBadge
-                      status={profile.friendshipStatus}
-                      userId={userId}
-                    />
-                  )}
+                {profile?.friendshipStatus && profile.friendshipStatus !== "self" && (
+                  <FriendshipBadge status={profile.friendshipStatus} userId={userId} />
+                )}
 
                 {/* Stats - only shown if we have stats from the API */}
                 {profile?.stats && (
@@ -143,9 +111,7 @@ export function ProfilePreview({
                           {profile.stats.daysAttended}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500">
-                        {t("leaderboard.stats.days")}
-                      </span>
+                      <span className="text-xs text-gray-500">{t("leaderboard.stats.days")}</span>
                     </div>
                     <div className="flex flex-col items-center">
                       <div className="flex items-center gap-1">
@@ -154,9 +120,7 @@ export function ProfilePreview({
                           {profile.stats.totalBeers}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500">
-                        {t("leaderboard.stats.drinks")}
-                      </span>
+                      <span className="text-xs text-gray-500">{t("leaderboard.stats.drinks")}</span>
                     </div>
                     <div className="flex flex-col items-center">
                       <div className="flex items-center gap-1">
@@ -165,9 +129,7 @@ export function ProfilePreview({
                           {profile.stats.avgBeers.toFixed(1)}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500">
-                        {t("leaderboard.stats.avg")}
-                      </span>
+                      <span className="text-xs text-gray-500">{t("leaderboard.stats.avg")}</span>
                     </div>
                   </div>
                 )}
@@ -229,10 +191,7 @@ function FriendshipBadge({
   switch (status) {
     case "friends":
       return (
-        <Badge
-          variant="outline"
-          className="border-green-300 bg-green-50 text-green-700"
-        >
+        <Badge variant="outline" className="border-green-300 bg-green-50 text-green-700">
           <Check className="mr-1 h-3 w-3" />
           {t("friends.profileBadge.friends")}
         </Badge>

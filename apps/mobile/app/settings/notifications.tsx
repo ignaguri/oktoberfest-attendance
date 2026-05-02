@@ -6,14 +6,7 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { splitFullName } from "@prostcounter/shared/utils";
-import {
-  Bell,
-  CalendarClock,
-  Clock,
-  ExternalLink,
-  Trophy,
-  Users,
-} from "lucide-react-native";
+import { Bell, CalendarClock, Clock, ExternalLink, Trophy, Users } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -77,8 +70,7 @@ export default function NotificationSettingsScreen() {
   // Map API response to local format
   const mappedPreferences = {
     reminders_enabled: preferences?.remindersEnabled ?? true,
-    achievement_notifications_enabled:
-      preferences?.achievementNotificationsEnabled ?? true,
+    achievement_notifications_enabled: preferences?.achievementNotificationsEnabled ?? true,
     group_notifications_enabled: preferences?.groupNotificationsEnabled ?? true,
     daily_reminder_enabled: preferences?.dailyReminderEnabled ?? true,
     push_enabled: preferences?.pushEnabled ?? false,
@@ -109,10 +101,7 @@ export default function NotificationSettingsScreen() {
     try {
       await updatePreferences.mutateAsync({ [apiKey]: value });
     } catch {
-      Alert.alert(
-        t("common.status.error"),
-        t("profile.notifications.updateError"),
-      );
+      Alert.alert(t("common.status.error"), t("profile.notifications.updateError"));
     }
   };
 
@@ -153,10 +142,7 @@ export default function NotificationSettingsScreen() {
       try {
         await updatePreferences.mutateAsync({ pushEnabled: false });
       } catch {
-        Alert.alert(
-          t("common.status.error"),
-          t("profile.notifications.updateError"),
-        );
+        Alert.alert(t("common.status.error"), t("profile.notifications.updateError"));
       }
     }
   };
@@ -173,13 +159,8 @@ export default function NotificationSettingsScreen() {
 
       const token = await registerForPushNotifications();
       if (!token) {
-        logger.error(
-          "[Push] No token returned from registerForPushNotifications",
-        );
-        Alert.alert(
-          t("common.status.error"),
-          t("profile.notifications.noToken"),
-        );
+        logger.error("[Push] No token returned from registerForPushNotifications");
+        Alert.alert(t("common.status.error"), t("profile.notifications.noToken"));
         setIsEnabling(false);
         return;
       }
@@ -198,10 +179,7 @@ export default function NotificationSettingsScreen() {
       if (!enableResult.success) {
         const errorMsg = enableResult.error || "Unknown error";
         logger.error("[Push] enablePush failed: " + errorMsg);
-        Alert.alert(
-          t("common.status.error"),
-          `Failed to enable push notifications: ${errorMsg}`,
-        );
+        Alert.alert(t("common.status.error"), `Failed to enable push notifications: ${errorMsg}`);
         setIsEnabling(false);
         return;
       }
@@ -210,13 +188,9 @@ export default function NotificationSettingsScreen() {
       await updatePreferences.mutateAsync({ pushEnabled: true });
       logger.info("[Push] Push notifications enabled");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("[Push] Exception: " + errorMessage);
-      Alert.alert(
-        t("common.status.error"),
-        `Failed to enable push notifications: ${errorMessage}`,
-      );
+      Alert.alert(t("common.status.error"), `Failed to enable push notifications: ${errorMessage}`);
     } finally {
       setIsEnabling(false);
     }
@@ -232,20 +206,14 @@ export default function NotificationSettingsScreen() {
 
   // Push is enabled if device permission is granted AND backend preference is true
   // Both conditions must be met for the switch to show ON
-  const isPushEnabled =
-    permissionStatus === "granted" && (preferences?.pushEnabled ?? false);
+  const isPushEnabled = permissionStatus === "granted" && (preferences?.pushEnabled ?? false);
   const isSaving = updatePreferences.loading || isEnabling;
 
   return (
     <>
       <ScrollView
         className="flex-1 bg-background-50"
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching ?? false}
-            onRefresh={onRefresh}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={onRefresh} />}
       >
         <View className="p-4">
           {/* Preferences Section */}
@@ -269,9 +237,7 @@ export default function NotificationSettingsScreen() {
               </View>
               <Switch
                 value={mappedPreferences.reminders_enabled}
-                onValueChange={(value) =>
-                  handleToggle("reminders_enabled", value)
-                }
+                onValueChange={(value) => handleToggle("reminders_enabled", value)}
                 disabled={isSaving}
                 trackColor={{
                   false: SwitchColors.trackOff,
@@ -296,9 +262,7 @@ export default function NotificationSettingsScreen() {
               </View>
               <Switch
                 value={mappedPreferences.achievement_notifications_enabled}
-                onValueChange={(value) =>
-                  handleToggle("achievement_notifications_enabled", value)
-                }
+                onValueChange={(value) => handleToggle("achievement_notifications_enabled", value)}
                 disabled={isSaving}
                 trackColor={{
                   false: SwitchColors.trackOff,
@@ -313,9 +277,7 @@ export default function NotificationSettingsScreen() {
               <View className="flex-1 flex-row items-center gap-3">
                 <Users size={24} color={IconColors.default} />
                 <View className="flex-1">
-                  <Text className="text-typography-900">
-                    {t("profile.notifications.groups")}
-                  </Text>
+                  <Text className="text-typography-900">{t("profile.notifications.groups")}</Text>
                   <Text className="text-sm text-typography-500">
                     {t("profile.notifications.groupsDescription")}
                   </Text>
@@ -323,9 +285,7 @@ export default function NotificationSettingsScreen() {
               </View>
               <Switch
                 value={mappedPreferences.group_notifications_enabled}
-                onValueChange={(value) =>
-                  handleToggle("group_notifications_enabled", value)
-                }
+                onValueChange={(value) => handleToggle("group_notifications_enabled", value)}
                 disabled={isSaving}
                 trackColor={{
                   false: SwitchColors.trackOff,
@@ -350,9 +310,7 @@ export default function NotificationSettingsScreen() {
               </View>
               <Switch
                 value={mappedPreferences.daily_reminder_enabled}
-                onValueChange={(value) =>
-                  handleToggle("daily_reminder_enabled", value)
-                }
+                onValueChange={(value) => handleToggle("daily_reminder_enabled", value)}
                 disabled={isSaving}
                 trackColor={{
                   false: SwitchColors.trackOff,
@@ -373,9 +331,7 @@ export default function NotificationSettingsScreen() {
               <View className="flex-1 flex-row items-center gap-3">
                 <Bell size={24} color={IconColors.default} />
                 <View className="flex-1">
-                  <Text className="text-typography-900">
-                    {t("profile.notifications.push")}
-                  </Text>
+                  <Text className="text-typography-900">{t("profile.notifications.push")}</Text>
                   <Text className="text-sm text-typography-500">
                     {t("profile.notifications.pushDescription")}
                   </Text>

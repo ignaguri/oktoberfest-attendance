@@ -6,10 +6,7 @@ export const FRIEND_REQUEST_WORKFLOW_ID = "friend-request" as const;
 
 export const friendRequestPayloadSchema = z.object({
   senderName: z.string().describe("Name of the user sending the request"),
-  senderAvatar: z
-    .string()
-    .optional()
-    .describe("URL of the sender's avatar image"),
+  senderAvatar: z.string().optional().describe("URL of the sender's avatar image"),
 });
 
 export type FriendRequestPayload = z.infer<typeof friendRequestPayloadSchema>;
@@ -21,9 +18,7 @@ export const friendRequestWorkflow = workflow(
       "in-app-friend-request",
       async (controls: any) => {
         return {
-          subject:
-            controls.subject ||
-            `${payload.senderName} sent you a friend request`,
+          subject: controls.subject || `${payload.senderName} sent you a friend request`,
           body:
             controls.body ||
             `${payload.senderName} wants to be your friend! Tap to accept or decline.`,
@@ -38,9 +33,7 @@ export const friendRequestWorkflow = workflow(
             .describe("Notification subject"),
           body: z
             .string()
-            .default(
-              "{{senderName}} wants to be your friend! Tap to accept or decline.",
-            )
+            .default("{{senderName}} wants to be your friend! Tap to accept or decline.")
             .describe("Notification message"),
         }),
       },
@@ -51,9 +44,7 @@ export const friendRequestWorkflow = workflow(
       async (controls: any) => {
         return {
           subject: controls.pushSubject || "New friend request",
-          body:
-            controls.pushBody ||
-            `${payload.senderName} wants to be your friend!`,
+          body: controls.pushBody || `${payload.senderName} wants to be your friend!`,
           data: {
             type: NOTIFICATION_PUSH_TYPES.FRIEND_REQUEST,
           },
@@ -61,10 +52,7 @@ export const friendRequestWorkflow = workflow(
       },
       {
         controlSchema: z.object({
-          pushSubject: z
-            .string()
-            .default("New friend request")
-            .describe("Push notification title"),
+          pushSubject: z.string().default("New friend request").describe("Push notification title"),
           pushBody: z
             .string()
             .default("{{senderName}} wants to be your friend!")

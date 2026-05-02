@@ -27,11 +27,7 @@ import { logger } from "@/lib/logger";
 import { closeDatabase, initializeDatabase, resetDatabase } from "./init";
 import { getMigrationStatus, runMigrations } from "./migrations";
 import { MUTABLE_TABLES } from "./schema";
-import {
-  cleanupCompletedOperations,
-  getDirtyRecordCount,
-  getQueueStats,
-} from "./sync-queue";
+import { cleanupCompletedOperations, getDirtyRecordCount, getQueueStats } from "./sync-queue";
 import type { DatabaseStatus, SyncState } from "./types";
 
 // =============================================================================
@@ -106,11 +102,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       } catch (error) {
         logger.error("[DatabaseProvider] Initialization failed:", error);
         if (mounted) {
-          setLastError(
-            error instanceof Error
-              ? error.message
-              : "Database initialization failed",
-          );
+          setLastError(error instanceof Error ? error.message : "Database initialization failed");
         }
       }
     }
@@ -163,19 +155,12 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
           setIsInitialized(true);
         } catch (error) {
           logger.error("[DatabaseProvider] Reinitialization failed:", error);
-          setLastError(
-            error instanceof Error
-              ? error.message
-              : "Database reinitialization failed",
-          );
+          setLastError(error instanceof Error ? error.message : "Database reinitialization failed");
         }
       }
     };
 
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange,
-    );
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
     return () => subscription.remove();
   }, [isInitialized]);
 
@@ -199,9 +184,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       setLastError(null);
     } catch (error) {
       logger.error("[DatabaseProvider] Status refresh failed:", error);
-      setLastError(
-        error instanceof Error ? error.message : "Status refresh failed",
-      );
+      setLastError(error instanceof Error ? error.message : "Status refresh failed");
     }
   }, [db]);
 
@@ -238,9 +221,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       logger.debug("[DatabaseProvider] Reset complete");
     } catch (error) {
       logger.error("[DatabaseProvider] Reset failed:", error);
-      setLastError(
-        error instanceof Error ? error.message : "Database reset failed",
-      );
+      setLastError(error instanceof Error ? error.message : "Database reset failed");
       throw error;
     }
   }, []);
@@ -259,15 +240,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       lastSyncAt,
       lastError,
     }),
-    [
-      isInitialized,
-      isOnline,
-      syncState,
-      pendingOperations,
-      dirtyRecords,
-      lastSyncAt,
-      lastError,
-    ],
+    [isInitialized, isOnline, syncState, pendingOperations, dirtyRecords, lastSyncAt, lastError],
   );
 
   const value: DatabaseContextValue = useMemo(
@@ -281,11 +254,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     [db, status, refreshStatus, reset, isInitialized],
   );
 
-  return (
-    <DatabaseContext.Provider value={value}>
-      {children}
-    </DatabaseContext.Provider>
-  );
+  return <DatabaseContext.Provider value={value}>{children}</DatabaseContext.Provider>;
 }
 
 // =============================================================================
@@ -345,8 +314,7 @@ export function useSyncIndicator(): {
     () => ({
       isOffline: !status.isOnline,
       isSyncing: status.syncState === "syncing",
-      hasPendingChanges:
-        status.pendingOperations > 0 || status.dirtyRecords > 0,
+      hasPendingChanges: status.pendingOperations > 0 || status.dirtyRecords > 0,
       hasError: status.syncState === "error" || status.lastError !== null,
       errorMessage: status.lastError,
     }),

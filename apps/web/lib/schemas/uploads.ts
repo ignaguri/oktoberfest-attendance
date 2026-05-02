@@ -22,13 +22,9 @@ export const beerPicturesSchema = z.object({
         .refine((file) => file.size <= MAX_FILE_SIZE, {
           message: `File is too large (max ${MAX_FILE_SIZE_MB}MB)`,
         })
-        .refine(
-          (file) =>
-            (VALID_IMAGE_TYPES as readonly string[]).includes(file.type),
-          {
-            message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-          },
-        ),
+        .refine((file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type), {
+          message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+        }),
     )
     .min(1, "At least one picture is required")
     .max(MAX_PICTURES, `Maximum ${MAX_PICTURES} pictures allowed`),
@@ -41,12 +37,9 @@ export const singlePictureSchema = z.object({
     .refine((file) => file.size <= MAX_FILE_SIZE, {
       message: `File is too large (max ${MAX_FILE_SIZE_MB}MB)`,
     })
-    .refine(
-      (file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type),
-      {
-        message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-      },
-    ),
+    .refine((file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type), {
+      message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+    }),
   visibility: z.enum(["public", "private"]),
 });
 
@@ -56,12 +49,9 @@ export const avatarSchema = z.object({
     .refine((file) => file.size <= MAX_FILE_SIZE, {
       message: `File is too large (max ${MAX_FILE_SIZE_MB}MB)`,
     })
-    .refine(
-      (file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type),
-      {
-        message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
-      },
-    ),
+    .refine((file) => (VALID_IMAGE_TYPES as readonly string[]).includes(file.type), {
+      message: "Unsupported file format (use JPEG, PNG, GIF, or WebP)",
+    }),
 });
 
 export type BeerPicturesFormData = z.infer<typeof beerPicturesSchema>;

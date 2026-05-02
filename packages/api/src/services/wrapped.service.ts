@@ -83,10 +83,7 @@ export class WrappedService {
    * @param festivalId - Festival ID
    * @returns Access result with allowed status and reason
    */
-  async checkAccess(
-    userId: string,
-    festivalId: string,
-  ): Promise<WrappedAccessResult> {
+  async checkAccess(userId: string, festivalId: string): Promise<WrappedAccessResult> {
     return this.wrappedRepo.checkAccess(userId, festivalId);
   }
 
@@ -96,9 +93,7 @@ export class WrappedService {
    * @param userId - User ID
    * @returns List of festivals with wrapped availability status
    */
-  async getAvailableFestivals(
-    userId: string,
-  ): Promise<AvailableWrappedFestival[]> {
+  async getAvailableFestivals(userId: string): Promise<AvailableWrappedFestival[]> {
     return this.wrappedRepo.getAvailableFestivals(userId);
   }
 

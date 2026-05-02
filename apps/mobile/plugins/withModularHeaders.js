@@ -10,10 +10,7 @@ function withModularHeaders(config) {
   return withDangerousMod(config, [
     "ios",
     async (config) => {
-      const podfilePath = path.join(
-        config.modRequest.platformProjectRoot,
-        "Podfile",
-      );
+      const podfilePath = path.join(config.modRequest.platformProjectRoot, "Podfile");
 
       try {
         let contents = fs.readFileSync(podfilePath, "utf8");

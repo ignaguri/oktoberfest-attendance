@@ -50,10 +50,7 @@ app.openapi(getPersonalCalendarRoute, async (c) => {
   const { festivalId } = c.req.valid("query");
 
   const calendarRepo = new SupabaseCalendarRepository(supabase);
-  const result = await calendarRepo.getPersonalCalendarEvents(
-    user.id,
-    festivalId,
-  );
+  const result = await calendarRepo.getPersonalCalendarEvents(user.id, festivalId);
 
   return c.json(
     {

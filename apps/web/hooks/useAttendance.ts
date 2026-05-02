@@ -5,7 +5,4 @@
  * The ApiClientProvider is set up in lib/data/query-client.tsx
  */
 
-export {
-  useAttendances,
-  useDeleteAttendance,
-} from "@prostcounter/shared/hooks";
+export { useAttendances, useDeleteAttendance } from "@prostcounter/shared/hooks";

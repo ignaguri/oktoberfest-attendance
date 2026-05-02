@@ -11,11 +11,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface ReminderOption {
@@ -49,9 +45,7 @@ export function ReminderSelect({
 }: ReminderSelectProps) {
   const [open, setOpen] = React.useState(false);
 
-  const selectedOption = reminderOptions.find(
-    (option) => option.minutes === value,
-  ) || {
+  const selectedOption = reminderOptions.find((option) => option.minutes === value) || {
     label: `${value} minutes before`,
     minutes: value,
   };

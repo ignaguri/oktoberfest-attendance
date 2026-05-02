@@ -13,10 +13,7 @@ const minReadMap = {
 } as const;
 
 export function ArticleCard({ post }: { post: BlogPostMeta }) {
-  const href =
-    post.locale === "en"
-      ? `/blog/${post.slug}`
-      : `/blog/${post.locale}/${post.slug}`;
+  const href = post.locale === "en" ? `/blog/${post.slug}` : `/blog/${post.locale}/${post.slug}`;
 
   return (
     <Link href={href} className="group block">
@@ -41,20 +38,15 @@ export function ArticleCard({ post }: { post: BlogPostMeta }) {
           <h2 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-yellow-600">
             {post.title}
           </h2>
-          <p className="mb-3 line-clamp-2 text-sm text-gray-500">
-            {post.description}
-          </p>
+          <p className="mb-3 line-clamp-2 text-sm text-gray-500">{post.description}</p>
           <div className="flex items-center gap-4 text-xs text-gray-400">
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {new Date(post.date).toLocaleDateString(
-                dateLocaleMap[post.locale] || "en-US",
-                {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                },
-              )}
+              {new Date(post.date).toLocaleDateString(dateLocaleMap[post.locale] || "en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
             </span>
             <span className="flex items-center gap-1">
               <Clock size={12} />

@@ -12,11 +12,7 @@ import {
   deleteFestival,
   updateFestival,
 } from "@/app/(private)/admin/festivalActions";
-import {
-  useInvalidateQueries,
-  useMutation,
-  useQuery,
-} from "@/lib/data/react-query-provider";
+import { useInvalidateQueries, useMutation, useQuery } from "@/lib/data/react-query-provider";
 
 /**
  * Hook to fetch all users (admin only)
@@ -45,8 +41,7 @@ export function useCreateFestival() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    (festivalData: Parameters<typeof createFestival>[0]) =>
-      createFestival(festivalData),
+    (festivalData: Parameters<typeof createFestival>[0]) => createFestival(festivalData),
     {
       onSuccess: () => {
         // Invalidate festivals queries
@@ -64,13 +59,8 @@ export function useUpdateFestival() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: Parameters<typeof updateFestival>[1];
-    }) => updateFestival(id, updates),
+    ({ id, updates }: { id: string; updates: Parameters<typeof updateFestival>[1] }) =>
+      updateFestival(id, updates),
     {
       onSuccess: () => {
         // Invalidate all festivals

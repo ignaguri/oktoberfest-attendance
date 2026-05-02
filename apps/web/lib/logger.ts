@@ -28,10 +28,7 @@ class Logger {
 
   private getLogLevel(): LogLevel {
     const envLevel = process.env.LOG_LEVEL?.toUpperCase() as LogLevel;
-    if (
-      envLevel &&
-      ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"].includes(envLevel)
-    ) {
+    if (envLevel && ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"].includes(envLevel)) {
       return envLevel;
     }
     return this.isDevelopment ? "DEBUG" : "WARN";
@@ -94,12 +91,7 @@ class Logger {
     }
   }
 
-  private log(
-    level: LogLevel,
-    message: string,
-    context?: LogContext,
-    error?: Error,
-  ): void {
+  private log(level: LogLevel, message: string, context?: LogContext, error?: Error): void {
     if (!this.shouldLog(level)) {
       return;
     }
@@ -166,17 +158,11 @@ class Logger {
   }
 
   // Utility methods for common logging scenarios
-  serverAction(
-    action: string,
-    context?: Omit<LogContext, "component">,
-  ): LogContext {
+  serverAction(action: string, context?: Omit<LogContext, "component">): LogContext {
     return { ...context, component: "server-action", action };
   }
 
-  clientComponent(
-    component: string,
-    context?: Omit<LogContext, "component">,
-  ): LogContext {
+  clientComponent(component: string, context?: Omit<LogContext, "component">): LogContext {
     return { ...context, component };
   }
 

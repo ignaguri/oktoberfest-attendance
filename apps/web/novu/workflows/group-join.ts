@@ -6,10 +6,7 @@ export const GROUP_JOIN_WORKFLOW_ID = "group-join-notification" as const;
 export const groupJoinPayloadSchema = z.object({
   joinerName: z.string().describe("Name of the user joining the group"),
   groupName: z.string().describe("Name of the group being joined"),
-  joinerAvatar: z
-    .string()
-    .optional()
-    .describe("URL of the joiner's avatar image"),
+  joinerAvatar: z.string().optional().describe("URL of the joiner's avatar image"),
   groupId: z.string().describe("Unique identifier of the group"),
 });
 
@@ -22,12 +19,8 @@ export const groupJoinWorkflow = workflow(
       "in-app-notification",
       async (controls: any) => {
         return {
-          subject:
-            controls.subject ||
-            `${payload.joinerName} joined ${payload.groupName}`,
-          body:
-            controls.body ||
-            `${payload.joinerName} just joined ${payload.groupName}. Say hi!`,
+          subject: controls.subject || `${payload.joinerName} joined ${payload.groupName}`,
+          body: controls.body || `${payload.joinerName} just joined ${payload.groupName}. Say hi!`,
           avatar: payload.joinerAvatar,
         };
       },
@@ -50,9 +43,7 @@ export const groupJoinWorkflow = workflow(
       async (controls: any) => {
         return {
           subject: controls.pushSubject || "New member in your group",
-          body:
-            controls.pushBody ||
-            `${payload.joinerName} joined ${payload.groupName}`,
+          body: controls.pushBody || `${payload.joinerName} joined ${payload.groupName}`,
           data: {
             type: "group-join",
             groupId: payload.groupId,

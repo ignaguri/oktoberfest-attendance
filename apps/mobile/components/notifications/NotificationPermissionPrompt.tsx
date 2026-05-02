@@ -84,9 +84,7 @@ export function NotificationPermissionPrompt({
                   >
                     <benefit.icon size={20} color={Colors.primary[500]} />
                   </View>
-                  <Text className="flex-1 text-sm text-typography-700">
-                    {benefit.text}
-                  </Text>
+                  <Text className="flex-1 text-sm text-typography-700">{benefit.text}</Text>
                 </HStack>
               ))}
             </VStack>

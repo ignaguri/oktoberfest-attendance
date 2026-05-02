@@ -36,9 +36,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch global leaderboard: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch global leaderboard: ${error.message}`);
     }
 
     // Apply pagination client-side since DB function doesn't support it
@@ -54,10 +52,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     };
   }
 
-  async getForGroup(
-    groupId: string,
-    query?: GroupLeaderboardQuery,
-  ): Promise<LeaderboardEntry[]> {
+  async getForGroup(groupId: string, query?: GroupLeaderboardQuery): Promise<LeaderboardEntry[]> {
     // Get group to determine winning criteria (default sort)
     const { data: group, error: groupError } = await this.supabase
       .from("groups")
@@ -72,8 +67,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     // Use query sortBy if provided, otherwise use group's winning criteria
     let winningCriteriaId = group.winning_criteria_id;
     if (query?.sortBy) {
-      winningCriteriaId =
-        WINNING_CRITERIA_MAP[query.sortBy] || group.winning_criteria_id;
+      winningCriteriaId = WINNING_CRITERIA_MAP[query.sortBy] || group.winning_criteria_id;
     }
 
     // Call database function for group leaderboard
@@ -83,9 +77,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch group leaderboard: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch group leaderboard: ${error.message}`);
     }
 
     return data.map((item: any, index: number) => ({
@@ -101,9 +93,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
       .order("id");
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch winning criteria: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch winning criteria: ${error.message}`);
     }
 
     return data || [];

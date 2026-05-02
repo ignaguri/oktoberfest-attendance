@@ -59,9 +59,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
     const { t } = useTranslation();
     const shareData = prepareShareImageData(data);
 
-    const getPositionText = (
-      position: { position: number; criteria: string } | null,
-    ) => {
+    const getPositionText = (position: { position: number; criteria: string } | null) => {
       if (!position) return "Not ranked";
 
       const criteriaLabels = {
@@ -76,9 +74,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
     const getCriteriaLabel = () => {
       if (!shareData.bestGlobalPosition) return null;
 
-      return t(
-        `groups.winningCriteria.${shareData.bestGlobalPosition?.criteria}`,
-      );
+      return t(`groups.winningCriteria.${shareData.bestGlobalPosition?.criteria}`);
     };
 
     return (
@@ -107,30 +103,16 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
           <p className="mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 bg-clip-text text-[140px] leading-tight font-bold text-transparent">
             My {shareData.festivalName}
           </p>
-          <p className="text-[100px] leading-tight font-bold text-yellow-800">
-            Wrapped
-          </p>
+          <p className="text-[100px] leading-tight font-bold text-yellow-800">Wrapped</p>
         </header>
 
         {/* Stats Grid */}
         <div className="grid w-full grid-cols-2 gap-8">
-          <StatCard
-            icon={CalendarDays}
-            value={shareData.daysAttended}
-            label="Days attended"
-          />
+          <StatCard icon={CalendarDays} value={shareData.daysAttended} label="Days attended" />
 
-          <StatCard
-            icon={Beer}
-            value={shareData.beersDrunk}
-            label="Beers drunk"
-          />
+          <StatCard icon={Beer} value={shareData.beersDrunk} label="Beers drunk" />
 
-          <StatCard
-            icon={Tent}
-            value={shareData.tentsVisited}
-            label="Tents visited"
-          />
+          <StatCard icon={Tent} value={shareData.tentsVisited} label="Tents visited" />
 
           <StatCard
             icon={Trophy}

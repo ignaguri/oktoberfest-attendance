@@ -2,12 +2,8 @@
 // This file is required by Firebase SDK for background message handling
 
 // Import Firebase scripts
-importScripts(
-  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js",
-);
-importScripts(
-  "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js",
-);
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
 // Initialize Firebase - config will be injected dynamically
 // Firebase Web API keys are designed to be public and are safe to expose
@@ -57,10 +53,7 @@ messaging.onBackgroundMessage((payload) => {
     ],
   };
 
-  return self.registration.showNotification(
-    notificationTitle,
-    notificationOptions,
-  );
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // Handle notification clicks (for FCM notifications only)
@@ -77,10 +70,7 @@ self.addEventListener("notificationclick", (event) => {
       clients.matchAll({ type: "window" }).then((clients) => {
         // Check if there is already a window/tab open
         for (const client of clients) {
-          if (
-            client.url.includes(self.registration.scope) &&
-            "focus" in client
-          ) {
+          if (client.url.includes(self.registration.scope) && "focus" in client) {
             return client.focus();
           }
         }

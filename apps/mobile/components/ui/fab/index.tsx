@@ -3,10 +3,7 @@ import { createFab } from "@gluestack-ui/core/fab/creator";
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import {
-  useStyleContext,
-  withStyleContext,
-} from "@gluestack-ui/utils/nativewind-utils";
+import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
 import React from "react";
 import { Pressable, Text } from "react-native";
@@ -115,59 +112,56 @@ const fabIconStyle = tva({
 type IFabProps = Omit<React.ComponentPropsWithoutRef<typeof UIFab>, "context"> &
   VariantProps<typeof fabStyle>;
 
-const Fab = React.forwardRef<React.ComponentRef<typeof UIFab>, IFabProps>(
-  function Fab(
-    { size = "md", placement = "bottom right", className, ...props },
-    ref,
-  ) {
-    return (
-      <UIFab
-        ref={ref}
-        {...props}
-        className={fabStyle({ size, placement, class: className })}
-        context={{ size }}
-      />
-    );
-  },
-);
+const Fab = React.forwardRef<React.ComponentRef<typeof UIFab>, IFabProps>(function Fab(
+  { size = "md", placement = "bottom right", className, ...props },
+  ref,
+) {
+  return (
+    <UIFab
+      ref={ref}
+      {...props}
+      className={fabStyle({ size, placement, class: className })}
+      context={{ size }}
+    />
+  );
+});
 
 type IFabLabelProps = React.ComponentPropsWithoutRef<typeof UIFab.Label> &
   VariantProps<typeof fabLabelStyle>;
 
-const FabLabel = React.forwardRef<
-  React.ComponentRef<typeof UIFab.Label>,
-  IFabLabelProps
->(function FabLabel(
-  {
-    size,
-    isTruncated = false,
-    bold = false,
-    underline = false,
-    strikeThrough = false,
-    className,
-    ...props
+const FabLabel = React.forwardRef<React.ComponentRef<typeof UIFab.Label>, IFabLabelProps>(
+  function FabLabel(
+    {
+      size,
+      isTruncated = false,
+      bold = false,
+      underline = false,
+      strikeThrough = false,
+      className,
+      ...props
+    },
+    ref,
+  ) {
+    const { size: parentSize } = useStyleContext(SCOPE);
+    return (
+      <UIFab.Label
+        ref={ref}
+        {...props}
+        className={fabLabelStyle({
+          parentVariants: {
+            size: parentSize,
+          },
+          size,
+          isTruncated,
+          bold,
+          underline,
+          strikeThrough,
+          class: className,
+        })}
+      />
+    );
   },
-  ref,
-) {
-  const { size: parentSize } = useStyleContext(SCOPE);
-  return (
-    <UIFab.Label
-      ref={ref}
-      {...props}
-      className={fabLabelStyle({
-        parentVariants: {
-          size: parentSize,
-        },
-        size,
-        isTruncated,
-        bold,
-        underline,
-        strikeThrough,
-        class: className,
-      })}
-    />
-  );
-});
+);
 
 type IFabIconProps = React.ComponentPropsWithoutRef<typeof UIFab.Icon> &
   VariantProps<typeof fabIconStyle> & {
@@ -175,47 +169,37 @@ type IFabIconProps = React.ComponentPropsWithoutRef<typeof UIFab.Icon> &
     width?: number;
   };
 
-const FabIcon = React.forwardRef<
-  React.ComponentRef<typeof UIFab.Icon>,
-  IFabIconProps
->(function FabIcon({ size, className, ...props }, ref) {
-  const { size: parentSize } = useStyleContext(SCOPE);
+const FabIcon = React.forwardRef<React.ComponentRef<typeof UIFab.Icon>, IFabIconProps>(
+  function FabIcon({ size, className, ...props }, ref) {
+    const { size: parentSize } = useStyleContext(SCOPE);
 
-  if (typeof size === "number") {
+    if (typeof size === "number") {
+      return (
+        <UIFab.Icon
+          ref={ref}
+          {...props}
+          className={fabIconStyle({ class: className })}
+          size={size}
+        />
+      );
+    } else if ((props.height !== undefined || props.width !== undefined) && size === undefined) {
+      return <UIFab.Icon ref={ref} {...props} className={fabIconStyle({ class: className })} />;
+    }
     return (
       <UIFab.Icon
         ref={ref}
         {...props}
-        className={fabIconStyle({ class: className })}
-        size={size}
+        className={fabIconStyle({
+          parentVariants: {
+            size: parentSize,
+          },
+          size,
+          class: className,
+        })}
       />
     );
-  } else if (
-    (props.height !== undefined || props.width !== undefined) &&
-    size === undefined
-  ) {
-    return (
-      <UIFab.Icon
-        ref={ref}
-        {...props}
-        className={fabIconStyle({ class: className })}
-      />
-    );
-  }
-  return (
-    <UIFab.Icon
-      ref={ref}
-      {...props}
-      className={fabIconStyle({
-        parentVariants: {
-          size: parentSize,
-        },
-        size,
-        class: className,
-      })}
-    />
-  );
-});
+  },
+);
 
 Fab.displayName = "Fab";
 FabLabel.displayName = "FabLabel";

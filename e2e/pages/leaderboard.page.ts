@@ -72,9 +72,7 @@ export class LeaderboardPage extends BasePage {
     await this.waitForLoad();
     // Either table or winning criteria should be visible
     const hasTable = await this.leaderboardTable.isVisible().catch(() => false);
-    const hasCriteria = await this.winningCriteriaLabel
-      .isVisible()
-      .catch(() => false);
+    const hasCriteria = await this.winningCriteriaLabel.isVisible().catch(() => false);
     expect(hasTable || hasCriteria).toBeTruthy();
   }
 

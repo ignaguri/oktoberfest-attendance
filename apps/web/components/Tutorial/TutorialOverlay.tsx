@@ -53,25 +53,17 @@ export function TutorialOverlay() {
 
       if (currentStep.position === "top") {
         // Position element in upper third of viewport with padding
-        targetScrollY =
-          window.scrollY +
-          elementRect.top -
-          TUTORIAL_CONSTANTS.SCROLL_TOP_PADDING;
+        targetScrollY = window.scrollY + elementRect.top - TUTORIAL_CONSTANTS.SCROLL_TOP_PADDING;
       } else if (currentStep.position === "bottom") {
         // Position element in lower third of viewport with space for tooltip
         targetScrollY =
           window.scrollY +
           elementRect.top -
           viewportHeight * TUTORIAL_CONSTANTS.SCROLL_BOTTOM_RATIO;
-      } else if (
-        currentStep.position === "left" ||
-        currentStep.position === "right"
-      ) {
+      } else if (currentStep.position === "left" || currentStep.position === "right") {
         // Center vertically for side positions
         targetScrollY =
-          window.scrollY +
-          elementRect.top -
-          viewportHeight * TUTORIAL_CONSTANTS.SCROLL_SIDE_RATIO;
+          window.scrollY + elementRect.top - viewportHeight * TUTORIAL_CONSTANTS.SCROLL_SIDE_RATIO;
       }
 
       // Smooth scroll to the calculated position
@@ -131,10 +123,7 @@ export function TutorialOverlay() {
 
   return (
     <>
-      <TutorialSpotlight
-        target={currentStep.target}
-        isActive={isActive && showStep}
-      />
+      <TutorialSpotlight target={currentStep.target} isActive={isActive && showStep} />
       <TutorialTooltip
         step={currentStep}
         isActive={isActive && showStep}

@@ -3,10 +3,7 @@
  * Uses API proxy strategy for server-side caching
  */
 
-import {
-  createGetAvatarUrl,
-  createGetBeerPictureUrl,
-} from "@prostcounter/shared";
+import { createGetAvatarUrl, createGetBeerPictureUrl } from "@prostcounter/shared";
 
 /**
  * Gets the correct avatar URL for web

@@ -58,9 +58,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       router.push(`/groups/${groupId}`);
       window.location.reload();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("groups.join.errors.failed"),
-      );
+      toast.error(error instanceof Error ? error.message : t("groups.join.errors.failed"));
     }
   };
 
@@ -94,9 +92,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       router.push(`/groups/${foundGroup.id}`);
       window.location.reload();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("groups.join.errors.failed"),
-      );
+      toast.error(error instanceof Error ? error.message : t("groups.join.errors.failed"));
     }
   };
 
@@ -104,9 +100,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
   if (groupId) {
     return (
       <div className="flex flex-col items-center gap-2 space-y-4">
-        <p className="text-gray-600">
-          {t("groups.join.clickToJoin", { groupName })}
-        </p>
+        <p className="text-gray-600">{t("groups.join.clickToJoin", { groupName })}</p>
         <Button
           type="button"
           variant="yellow"
@@ -122,10 +116,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
 
   // Otherwise, show the full form for searching and joining by name+password
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-2 space-y-2"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 space-y-2">
       <h3 className="text-xl font-semibold">{t("groups.join.title")}</h3>
       <Input
         type="text"
@@ -159,9 +150,7 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
         className="w-fit self-center"
         disabled={formSubmitting || isJoining}
       >
-        {formSubmitting || isJoining
-          ? t("groups.join.joining")
-          : t("groups.join.submit")}
+        {formSubmitting || isJoining ? t("groups.join.joining") : t("groups.join.submit")}
       </Button>
     </form>
   );

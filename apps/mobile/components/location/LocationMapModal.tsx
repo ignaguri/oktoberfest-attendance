@@ -6,11 +6,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Modal } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -54,9 +50,7 @@ export function LocationMapModal({
     stopLocalTracking,
   } = useLocationContext();
 
-  const [selectedTab, setSelectedTab] = useState<"friends" | "tents">(
-    "friends",
-  );
+  const [selectedTab, setSelectedTab] = useState<"friends" | "tents">("friends");
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
   const hasInitializedRef = useRef(false);
   const tentsListRef = useRef<FlatList<NearbyTent>>(null);
@@ -151,9 +145,7 @@ export function LocationMapModal({
             >
               <RefreshCw
                 size={22}
-                color={
-                  isNearbyLoading ? Colors.neutral[400] : IconColors.default
-                }
+                color={isNearbyLoading ? Colors.neutral[400] : IconColors.default}
               />
             </Pressable>
             <Pressable
@@ -178,10 +170,7 @@ export function LocationMapModal({
         </Box>
 
         {/* Bottom panel */}
-        <Box
-          className="flex-1 bg-white"
-          style={{ paddingBottom: insets.bottom + 8 }}
-        >
+        <Box className="flex-1 bg-white" style={{ paddingBottom: insets.bottom + 8 }}>
           {/* Sharing toggle */}
           <Box className="px-3 py-1">
             <LocationSharingToggle festivalId={festivalId} useInlineWarnings />
@@ -193,17 +182,13 @@ export function LocationMapModal({
               onPress={() => setSelectedTab("friends")}
               className={cn(
                 "flex-1 rounded-lg py-2",
-                selectedTab === "friends"
-                  ? "bg-primary-500"
-                  : "bg-background-100",
+                selectedTab === "friends" ? "bg-primary-500" : "bg-background-100",
               )}
             >
               <Text
                 className={cn(
                   "text-center font-medium",
-                  selectedTab === "friends"
-                    ? "text-white"
-                    : "text-typography-600",
+                  selectedTab === "friends" ? "text-white" : "text-typography-600",
                 )}
               >
                 {t("location.tabs.friends")} ({nearbyMembers.length})
@@ -213,17 +198,13 @@ export function LocationMapModal({
               onPress={() => setSelectedTab("tents")}
               className={cn(
                 "flex-1 rounded-lg py-2",
-                selectedTab === "tents"
-                  ? "bg-primary-500"
-                  : "bg-background-100",
+                selectedTab === "tents" ? "bg-primary-500" : "bg-background-100",
               )}
             >
               <Text
                 className={cn(
                   "text-center font-medium",
-                  selectedTab === "tents"
-                    ? "text-white"
-                    : "text-typography-600",
+                  selectedTab === "tents" ? "text-white" : "text-typography-600",
                 )}
               >
                 {t("location.tabs.tents")} ({nearbyTents.length})
@@ -271,27 +252,19 @@ function NearbyFriendsList({ members }: { members: LocationSessionMember[] }) {
         <Card key={member.userId} size="sm" variant="outline" className="p-2">
           <HStack space="sm" className="items-center">
             <Avatar size="sm">
-              {member.avatarUrl && (
-                <AvatarImage source={{ uri: getAvatarUrl(member.avatarUrl) }} />
-              )}
-              <AvatarFallbackText>
-                {member.username || member.fullName || "?"}
-              </AvatarFallbackText>
+              {member.avatarUrl && <AvatarImage source={{ uri: getAvatarUrl(member.avatarUrl) }} />}
+              <AvatarFallbackText>{member.username || member.fullName || "?"}</AvatarFallbackText>
             </Avatar>
             <VStack className="flex-1">
               <Text className="font-medium text-typography-900">
                 {member.fullName || member.username}
               </Text>
               {member.groupNames.length > 0 && (
-                <Text className="text-sm text-typography-500">
-                  {member.groupNames.join(", ")}
-                </Text>
+                <Text className="text-sm text-typography-500">{member.groupNames.join(", ")}</Text>
               )}
             </VStack>
             {member.distance !== null && (
-              <Text className="text-sm text-typography-500">
-                {Math.round(member.distance)}m
-              </Text>
+              <Text className="text-sm text-typography-500">{Math.round(member.distance)}m</Text>
             )}
           </HStack>
         </Card>
@@ -308,29 +281,19 @@ interface NearbyTentsListProps {
 }
 
 const NearbyTentsList = forwardRef<FlatList<NearbyTent>, NearbyTentsListProps>(
-  function NearbyTentsList(
-    { tents, selectedTentId, onTentSelect, onCheckIn },
-    ref,
-  ) {
+  function NearbyTentsList({ tents, selectedTentId, onTentSelect, onCheckIn }, ref) {
     const { t } = useTranslation();
 
     const renderTentItem = useCallback(
       ({ item: tent }: { item: NearbyTent }) => {
         const isSelected = tent.tentId === selectedTentId;
         return (
-          <Pressable
-            onPress={() => onTentSelect(tent)}
-            className="mx-3 mb-1 active:opacity-70"
-          >
+          <Pressable onPress={() => onTentSelect(tent)} className="mx-3 mb-1 active:opacity-70">
             <Card
               size="sm"
               variant="outline"
               className="p-2"
-              style={
-                isSelected
-                  ? { borderColor: Colors.primary[500], borderWidth: 2 }
-                  : undefined
-              }
+              style={isSelected ? { borderColor: Colors.primary[500], borderWidth: 2 } : undefined}
             >
               <HStack space="sm" className="items-center">
                 <Box
@@ -356,9 +319,7 @@ const NearbyTentsList = forwardRef<FlatList<NearbyTent>, NearbyTentsListProps>(
                   />
                 </Box>
                 <VStack className="flex-1">
-                  <Text className="font-medium text-typography-900">
-                    {tent.tentName}
-                  </Text>
+                  <Text className="font-medium text-typography-900">{tent.tentName}</Text>
                   <Text className="text-sm capitalize text-typography-500">
                     {tent.category || "tent"}
                   </Text>

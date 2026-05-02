@@ -19,11 +19,7 @@ import type {
   TipMode,
   WinningCriteria,
 } from "@prostcounter/shared/schemas";
-import {
-  useQuery,
-  useQueryClient,
-  type UseQueryResult,
-} from "@tanstack/react-query";
+import { useQuery, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { useCallback, useContext, useMemo } from "react";
 
 import { logger } from "@/lib/logger";
@@ -48,9 +44,7 @@ import type { LocalProfile, LocalTent } from "./schema";
  * Convert a TanStack Query result to the DataQueryResult interface
  * that all shared hooks and screens expect.
  */
-function toDataQueryResult<T>(
-  query: UseQueryResult<T, Error>,
-): DataQueryResult<T> {
+function toDataQueryResult<T>(query: UseQueryResult<T, Error>): DataQueryResult<T> {
   return {
     data: query.data ?? null,
     loading: query.isLoading,
@@ -239,8 +233,7 @@ function rowToAttendanceWithTotals(row: AttendanceRow): AttendanceWithTotals {
     totalSpentCents,
     totalBaseCents: row.totalBaseCents ?? 0,
     totalTipCents: row.totalTipCents ?? 0,
-    avgPriceCents:
-      drinkCount > 0 ? Math.round(totalSpentCents / drinkCount) : 0,
+    avgPriceCents: drinkCount > 0 ? Math.round(totalSpentCents / drinkCount) : 0,
     tentVisits: [],
   };
 }
@@ -290,11 +283,7 @@ export function useAdaptedAttendanceByDate(
       const drizzleDb = createDrizzleDb(db);
 
       // Get attendance with consumption totals (Drizzle query)
-      const row = await queryAttendanceByDateWithTotals(
-        drizzleDb,
-        festivalId,
-        date,
-      );
+      const row = await queryAttendanceByDateWithTotals(drizzleDb, festivalId, date);
 
       if (!row) return null;
 
@@ -337,10 +326,7 @@ export function useAdaptedAttendanceByDate(
 
       const pictures: { id: string; pictureUrl: string }[] = [];
       for (const p of pictureRows) {
-        const pictureUrl =
-          p._pending_upload === 1 && p._local_uri
-            ? p._local_uri
-            : p.picture_url;
+        const pictureUrl = p._pending_upload === 1 && p._local_uri ? p._local_uri : p.picture_url;
         if (pictureUrl) pictures.push({ id: p.id, pictureUrl });
       }
 
@@ -398,9 +384,7 @@ function adaptLocalProfile(local: LocalProfile): ProfileCacheData {
  * Offline-first replacement for useCurrentProfile().
  * Reads from local SQLite and converts types.
  */
-export function useAdaptedProfile(
-  userId: string | undefined,
-): DataQueryResult<ProfileCacheData> {
+export function useAdaptedProfile(userId: string | undefined): DataQueryResult<ProfileCacheData> {
   const query = useLocalProfile(userId);
 
   return {
@@ -485,9 +469,7 @@ export function useAdaptedConsumptionsByDate(
 
   const query = useQuery<SharedConsumption[], Error>({
     queryKey:
-      festivalId && date
-        ? localKeys.consumptions.byDate(festivalId, date)
-        : ["local-consumptions"],
+      festivalId && date ? localKeys.consumptions.byDate(festivalId, date) : ["local-consumptions"],
     queryFn: async () => {
       if (!isReady || !getDb || !festivalId || !date) return [];
       const drizzleDb = createDrizzleDb(getDb());

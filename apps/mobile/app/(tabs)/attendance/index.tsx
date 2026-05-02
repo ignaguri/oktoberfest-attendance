@@ -1,14 +1,8 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useCheckInReservation,
-  useReservations,
-} from "@prostcounter/shared/hooks";
+import { useCheckInReservation, useReservations } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  AttendanceWithTotals,
-  Reservation,
-} from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
 import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -33,10 +27,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import {
-  useAdaptedAttendances,
-  useSyncRefresh,
-} from "@/lib/database/adapted-hooks";
+import { useAdaptedAttendances, useSyncRefresh } from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 import { isActiveReservation } from "@/lib/utils/reservation";
 
@@ -78,8 +69,9 @@ export default function AttendanceScreen() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
-  const [pendingCheckInReservation, setPendingCheckInReservation] =
-    useState<Reservation | null>(null);
+  const [pendingCheckInReservation, setPendingCheckInReservation] = useState<Reservation | null>(
+    null,
+  );
   const [checkInMode, setCheckInMode] = useState(false);
   const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
 
@@ -87,13 +79,8 @@ export default function AttendanceScreen() {
   // This effect intentionally sets state when a deep link is detected
   useEffect(() => {
     if (checkInReservationId && reservations.length > 0) {
-      const reservation = reservations.find(
-        (r: Reservation) => r.id === checkInReservationId,
-      );
-      if (
-        reservation &&
-        (reservation.status === "pending" || reservation.status === "confirmed")
-      ) {
+      const reservation = reservations.find((r: Reservation) => r.id === checkInReservationId);
+      if (reservation && (reservation.status === "pending" || reservation.status === "confirmed")) {
         // Use queueMicrotask to defer state updates and avoid lint warning
         queueMicrotask(() => {
           setPendingCheckInReservation(reservation);
@@ -121,10 +108,7 @@ export default function AttendanceScreen() {
   const existingAttendance = useMemo(() => {
     if (!selectedDate || !attendances) return null;
     const dateStr = formatDateForDatabase(selectedDate);
-    return (
-      (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ??
-      null
-    );
+    return (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ?? null;
   }, [selectedDate, attendances]);
 
   // Find existing reservation for selected date
@@ -221,10 +205,7 @@ export default function AttendanceScreen() {
       refetchReservations();
     } catch (error) {
       logger.error("Failed to check in:", error);
-      showDialog(
-        t("common.status.error"),
-        t("reservation.checkIn.failedDescription"),
-      );
+      showDialog(t("common.status.error"), t("reservation.checkIn.failedDescription"));
     }
   }, [
     pendingCheckInReservation,
@@ -249,9 +230,7 @@ export default function AttendanceScreen() {
   if (!currentFestival) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
-        <Text className="text-center text-typography-500">
-          {t("attendance.noFestival")}
-        </Text>
+        <Text className="text-center text-typography-500">{t("attendance.noFestival")}</Text>
       </View>
     );
   }
@@ -269,9 +248,7 @@ export default function AttendanceScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
         className="flex-1 bg-background-50"
-        refreshControl={
-          <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
       >
         <View className="p-4 pb-20">
           {/* Calendar */}
@@ -285,76 +262,75 @@ export default function AttendanceScreen() {
           />
 
           {/* Stats Summary */}
-          {attendances &&
-            (attendances as AttendanceWithTotals[]).length > 0 && (
-              <View className="mt-4 rounded-xl bg-background-0 p-4">
-                <Text className="mb-3 text-sm font-medium text-typography-700">
-                  {t("attendance.summary.title")}
-                </Text>
-                {/* Row 1: Days, Drinks, Avg */}
-                <View className="flex-row justify-around">
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
-                      {(attendances as AttendanceWithTotals[]).length}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.days")}
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
-                      {(attendances as AttendanceWithTotals[]).reduce(
+          {attendances && (attendances as AttendanceWithTotals[]).length > 0 && (
+            <View className="mt-4 rounded-xl bg-background-0 p-4">
+              <Text className="mb-3 text-sm font-medium text-typography-700">
+                {t("attendance.summary.title")}
+              </Text>
+              {/* Row 1: Days, Drinks, Avg */}
+              <View className="flex-row justify-around">
+                <View className="items-center">
+                  <Text className="text-2xl font-bold text-primary-500">
+                    {(attendances as AttendanceWithTotals[]).length}
+                  </Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.days")}
+                  </Text>
+                </View>
+                <View className="items-center">
+                  <Text className="text-2xl font-bold text-primary-500">
+                    {(attendances as AttendanceWithTotals[]).reduce(
+                      (sum, a) => sum + a.drinkCount,
+                      0,
+                    )}
+                  </Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.drinks")}
+                  </Text>
+                </View>
+                <View className="items-center">
+                  <Text className="text-2xl font-bold text-primary-500">
+                    {(
+                      (attendances as AttendanceWithTotals[]).reduce(
                         (sum, a) => sum + a.drinkCount,
                         0,
-                      )}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.drinks")}
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
-                      {(
-                        (attendances as AttendanceWithTotals[]).reduce(
-                          (sum, a) => sum + a.drinkCount,
-                          0,
-                        ) / (attendances as AttendanceWithTotals[]).length
-                      ).toFixed(1)}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.avgPerDay")}
-                    </Text>
-                  </View>
-                </View>
-                {/* Row 2: Spending Breakdown */}
-                <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-primary-500">
-                      €{(spendingTotals.spent / 100).toFixed(0)}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.spent")}
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-typography-700">
-                      €{(spendingTotals.base / 100).toFixed(0)}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.baseCost")}
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-2xl font-bold text-success-500">
-                      €{(spendingTotals.tips / 100).toFixed(0)}
-                    </Text>
-                    <Text className="text-xs text-typography-500">
-                      {t("attendance.summary.tips")}
-                    </Text>
-                  </View>
+                      ) / (attendances as AttendanceWithTotals[]).length
+                    ).toFixed(1)}
+                  </Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.avgPerDay")}
+                  </Text>
                 </View>
               </View>
-            )}
+              {/* Row 2: Spending Breakdown */}
+              <View className="mt-4 flex-row justify-around border-t border-background-200 pt-4">
+                <View className="items-center">
+                  <Text className="text-2xl font-bold text-primary-500">
+                    €{(spendingTotals.spent / 100).toFixed(0)}
+                  </Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.spent")}
+                  </Text>
+                </View>
+                <View className="items-center">
+                  <Text className="text-2xl font-bold text-typography-700">
+                    €{(spendingTotals.base / 100).toFixed(0)}
+                  </Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.baseCost")}
+                  </Text>
+                </View>
+                <View className="items-center">
+                  <Text className="text-2xl font-bold text-success-500">
+                    €{(spendingTotals.tips / 100).toFixed(0)}
+                  </Text>
+                  <Text className="text-xs text-typography-500">
+                    {t("attendance.summary.tips")}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -392,11 +368,7 @@ export default function AttendanceScreen() {
           <AlertDialogHeader>
             <Heading
               size="lg"
-              className={
-                dialog.type === "destructive"
-                  ? "text-error-600"
-                  : "text-typography-950"
-              }
+              className={dialog.type === "destructive" ? "text-error-600" : "text-typography-950"}
             >
               {dialog.title}
             </Heading>
@@ -418,9 +390,7 @@ export default function AttendanceScreen() {
                   <ButtonText>{t("common.buttons.cancel")}</ButtonText>
                 </Button>
                 <Button
-                  action={
-                    dialog.type === "destructive" ? "negative" : "primary"
-                  }
+                  action={dialog.type === "destructive" ? "negative" : "primary"}
                   onPress={() => {
                     dialog.onConfirm?.();
                     closeDialog();

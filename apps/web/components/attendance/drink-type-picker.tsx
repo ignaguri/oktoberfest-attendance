@@ -67,13 +67,7 @@ interface DrinkTypePickerProps {
 /**
  * Get the icon component for a drink type
  */
-function DrinkIcon({
-  type,
-  className,
-}: {
-  type: DrinkType;
-  className?: string;
-}) {
+function DrinkIcon({ type, className }: { type: DrinkType; className?: string }) {
   const iconClass = cn("h-5 w-5", className);
 
   switch (type) {
@@ -152,20 +146,15 @@ export function DrinkTypePicker({
         disabled={disabled}
         className={cn(
           "relative",
-          isSelected &&
-            `ring-2 ring-offset-2 ${DRINK_TYPE_BORDER_COLORS[type]}`,
+          isSelected && `ring-2 ring-offset-2 ${DRINK_TYPE_BORDER_COLORS[type]}`,
           !showLabels && "h-12 w-12",
         )}
       >
         <DrinkIcon
           type={type}
-          className={cn(
-            isSelected ? DRINK_TYPE_COLORS[type] : DRINK_TYPE_COLORS[type],
-          )}
+          className={cn(isSelected ? DRINK_TYPE_COLORS[type] : DRINK_TYPE_COLORS[type])}
         />
-        {showLabels && (
-          <span className="ml-1">{getDrinkTypeLabel(type, t)}</span>
-        )}
+        {showLabels && <span className="ml-1">{getDrinkTypeLabel(type, t)}</span>}
 
         {/* Count badge */}
         {count > 0 && (
@@ -189,18 +178,12 @@ export function DrinkTypePicker({
       {responsive ? (
         // Responsive layout: two flex rows, second row centered
         <div className="flex flex-col items-center gap-2">
-          <div className="flex justify-center gap-2">
-            {firstRow.map(renderButton)}
-          </div>
-          <div className="flex justify-center gap-2">
-            {secondRow.map(renderButton)}
-          </div>
+          <div className="flex justify-center gap-2">{firstRow.map(renderButton)}</div>
+          <div className="flex justify-center gap-2">{secondRow.map(renderButton)}</div>
         </div>
       ) : (
         // Default layout: single row
-        <div className="flex justify-center gap-2">
-          {VISIBLE_DRINK_TYPES.map(renderButton)}
-        </div>
+        <div className="flex justify-center gap-2">{VISIBLE_DRINK_TYPES.map(renderButton)}</div>
       )}
       {/* Selected type label - hide in responsive mode or when hideSelectedLabel is true */}
       {!responsive && !hideSelectedLabel && (

@@ -6,20 +6,11 @@ import { isAfter, parseISO, startOfDay } from "date-fns";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Platform,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { Platform, Pressable, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CrowdReportPrompt, CrowdStatusSummary } from "@/components/crowd";
-import {
-  LocationSharingToggle,
-  TentProximityBanner,
-} from "@/components/location";
+import { LocationSharingToggle, TentProximityBanner } from "@/components/location";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { UnifiedFeed } from "@/components/shared/unified-feed";
@@ -72,18 +63,12 @@ export default function HomeScreen() {
   const { isSharing, nearbyMembers } = useLocationContextSafe();
 
   // Quick attendance context (for crowd report prompt after save)
-  const {
-    pendingCrowdReport,
-    setPendingCrowdReport,
-    setShowCrowdFab,
-    setOnCrowdFabPress,
-  } = useQuickAttendance();
+  const { pendingCrowdReport, setPendingCrowdReport, setShowCrowdFab, setOnCrowdFabPress } =
+    useQuickAttendance();
 
   // Crowd report prompt state
   const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);
-  const [crowdPromptTents, setCrowdPromptTents] = useState<
-    { id: string; name: string }[]
-  >([]);
+  const [crowdPromptTents, setCrowdPromptTents] = useState<{ id: string; name: string }[]>([]);
 
   // Today's date for querying attendance (recalculated on screen focus to handle midnight rollover)
   const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
@@ -95,10 +80,7 @@ export default function HomeScreen() {
   const festivalId = currentFestival?.id || "";
 
   // Fetch today's attendance to know which tents the user visited (offline-first)
-  const { data: todayAttendance } = useAdaptedAttendanceByDate(
-    festivalId,
-    today,
-  );
+  const { data: todayAttendance } = useAdaptedAttendanceByDate(festivalId, today);
 
   // Fetch tent data for name lookup (offline-first)
   const { tents: tentGroups } = useAdaptedTents(festivalId);
@@ -125,9 +107,7 @@ export default function HomeScreen() {
   }, [todayAttendance?.tentIds, resolveTentNames]);
 
   // Handle pending crowd report from QuickAttendanceSheet
-  const crowdPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const crowdPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear timer on unmount
   useEffect(() => {
@@ -164,8 +144,7 @@ export default function HomeScreen() {
   }, [todayVisitedTents]);
 
   // Sync crowd FAB visibility to the shared context (rendered by _layout.tsx)
-  const shouldShowCrowdFab =
-    isOnline && isFestivalActive && todayVisitedTents.length > 0;
+  const shouldShowCrowdFab = isOnline && isFestivalActive && todayVisitedTents.length > 0;
 
   useEffect(() => {
     setShowCrowdFab(shouldShowCrowdFab);
@@ -174,12 +153,7 @@ export default function HomeScreen() {
       setShowCrowdFab(false);
       setOnCrowdFabPress(null);
     };
-  }, [
-    shouldShowCrowdFab,
-    handleCrowdFabPress,
-    setShowCrowdFab,
-    setOnCrowdFabPress,
-  ]);
+  }, [shouldShowCrowdFab, handleCrowdFabPress, setShowCrowdFab, setOnCrowdFabPress]);
 
   // Handle crowd prompt close
   const handleCrowdPromptClose = useCallback(() => {
@@ -218,9 +192,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
       {/* Tent Proximity Banner - shows at top when near a tent (active festival only) */}
-      {isFestivalActive && Platform.OS !== "web" && (
-        <TentProximityBanner threshold={50} />
-      )}
+      {isFestivalActive && Platform.OS !== "web" && <TentProximityBanner threshold={50} />}
 
       <ScrollView
         className="flex-1"
@@ -250,10 +222,7 @@ export default function HomeScreen() {
             <TutorialTarget stepId="location-sharing">
               <Card size="md" variant="elevated" className="p-3">
                 <HStack className="items-center justify-between">
-                  <LocationSharingToggle
-                    festivalId={currentFestival.id}
-                    compact
-                  />
+                  <LocationSharingToggle festivalId={currentFestival.id} compact />
                   <Pressable
                     onPress={() => router.push("/map")}
                     className="flex-row items-center gap-2 rounded-lg bg-primary-500 px-3 py-2"
@@ -289,16 +258,14 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* Crowd Report Prompt - after attendance save or from FAB */}
-      {isFestivalActive &&
-        currentFestival?.id &&
-        crowdPromptTents.length > 0 && (
-          <CrowdReportPrompt
-            isOpen={showCrowdPrompt}
-            onClose={handleCrowdPromptClose}
-            tents={crowdPromptTents}
-            festivalId={currentFestival.id}
-          />
-        )}
+      {isFestivalActive && currentFestival?.id && crowdPromptTents.length > 0 && (
+        <CrowdReportPrompt
+          isOpen={showCrowdPrompt}
+          onClose={handleCrowdPromptClose}
+          tents={crowdPromptTents}
+          festivalId={currentFestival.id}
+        />
+      )}
     </SafeAreaView>
   );
 }

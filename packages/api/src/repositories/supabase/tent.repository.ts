@@ -39,10 +39,7 @@ export class SupabaseTentRepository implements ITentRepository {
     return data.map((item) => this.mapToFestivalTent(item));
   }
 
-  async findFestivalTent(
-    festivalId: string,
-    tentId: string,
-  ): Promise<FestivalTent | null> {
+  async findFestivalTent(festivalId: string, tentId: string): Promise<FestivalTent | null> {
     const { data, error } = await this.supabase
       .from("festival_tents")
       .select(
@@ -65,9 +62,7 @@ export class SupabaseTentRepository implements ITentRepository {
       if (error.code === PgErrorCode.NO_ROWS) {
         return null; // Not found
       }
-      throw new DatabaseError(
-        `Failed to fetch festival tent: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch festival tent: ${error.message}`);
     }
 
     return this.mapToFestivalTent(data);

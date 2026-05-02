@@ -3,38 +3,24 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { getPersonalityDescription } from "@prostcounter/shared/wrapped";
-import {
-  getPersonalityEmoji,
-  getTraitEmoji,
-} from "@prostcounter/shared/wrapped";
+import { getPersonalityEmoji, getTraitEmoji } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-} from "./BaseSlide";
+import { BaseSlide, SlideContent, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface PersonalitySlideProps {
   data: WrappedData;
   isActive?: boolean;
 }
 
-export function PersonalitySlide({
-  data,
-  isActive = false,
-}: PersonalitySlideProps) {
+export function PersonalitySlide({ data, isActive = false }: PersonalitySlideProps) {
   const { t } = useTranslation();
   const { type, traits } = data.personality;
   const description = getPersonalityDescription(type, traits);
   const emoji = getPersonalityEmoji(type);
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-pink-50 to-rose-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-pink-50 to-rose-50">
       <SlideTitle>{t("wrapped.personalitySlide.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.personalitySlide.subtitle")}</SlideSubtitle>
 
@@ -73,9 +59,7 @@ export function PersonalitySlide({
                   className="flex items-center gap-2 rounded-lg bg-white p-2 shadow"
                 >
                   <span className="text-2xl">{getTraitEmoji(trait)}</span>
-                  <span className="text-sm font-medium text-gray-700">
-                    {trait}
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">{trait}</span>
                 </motion.div>
               ))}
           </div>

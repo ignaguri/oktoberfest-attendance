@@ -24,8 +24,7 @@ const ogImages = [
   "/images/prost-counter-og-7.jpg",
 ];
 
-const getRandomImage = () =>
-  ogImages[Math.floor(Math.random() * ogImages.length)];
+const getRandomImage = () => ogImages[Math.floor(Math.random() * ogImages.length)];
 
 export const metadata: Metadata = {
   metadataBase: new URL(IS_PROD ? PROD_URL : DEV_URL),
@@ -71,11 +70,7 @@ export const viewport = {
   themeColor: "#ffffff",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ViewTransitions>
       <html lang="en" data-version={APP_VERSION}>

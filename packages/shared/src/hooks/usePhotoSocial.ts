@@ -4,13 +4,7 @@
  * Uses ApiClientContext to get the platform-specific API client
  */
 
-import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  QueryKeys,
-} from "../data";
+import { useApiClient, useQuery, useMutation, useInvalidateQueries, QueryKeys } from "../data";
 
 /**
  * Hook to fetch reactions for a photo in a group
@@ -41,15 +35,7 @@ export function useAddReaction() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async ({
-      photoId,
-      groupId,
-      emoji,
-    }: {
-      photoId: string;
-      groupId: string;
-      emoji: string;
-    }) => {
+    async ({ photoId, groupId, emoji }: { photoId: string; groupId: string; emoji: string }) => {
       return await apiClient.photoSocial.addReaction(photoId, groupId, emoji);
     },
     {
@@ -68,15 +54,7 @@ export function useRemoveReaction() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async ({
-      photoId,
-      groupId,
-      emoji,
-    }: {
-      photoId: string;
-      groupId: string;
-      emoji: string;
-    }) => {
+    async ({ photoId, groupId, emoji }: { photoId: string; groupId: string; emoji: string }) => {
       return await apiClient.photoSocial.removeReaction(photoId, groupId, emoji);
     },
     {

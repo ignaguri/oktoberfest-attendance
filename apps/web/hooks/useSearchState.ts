@@ -1,13 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 
 export interface SearchState {
   search: string;
@@ -54,24 +48,16 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     if (syncWithUrl) {
       return {
         search: searchParams.get(`${urlParamPrefix}search`) || defaultSearch,
-        page:
-          parseInt(searchParams.get(`${urlParamPrefix}page`) || "1", 10) ||
-          defaultPage,
-        limit:
-          parseInt(searchParams.get(`${urlParamPrefix}limit`) || "50", 10) ||
-          defaultLimit,
+        page: parseInt(searchParams.get(`${urlParamPrefix}page`) || "1", 10) || defaultPage,
+        limit: parseInt(searchParams.get(`${urlParamPrefix}limit`) || "50", 10) || defaultLimit,
         sortBy: searchParams.get(`${urlParamPrefix}sortBy`) || defaultSortBy,
         sortOrder:
-          (searchParams.get(`${urlParamPrefix}sortOrder`) as "asc" | "desc") ||
-          defaultSortOrder,
+          (searchParams.get(`${urlParamPrefix}sortOrder`) as "asc" | "desc") || defaultSortOrder,
         filters: Object.fromEntries(
           searchParams
             .entries()
             .filter(([key]) => key.startsWith(`${urlParamPrefix}filter_`))
-            .map(([key, value]) => [
-              key.replace(`${urlParamPrefix}filter_`, ""),
-              value,
-            ]),
+            .map(([key, value]) => [key.replace(`${urlParamPrefix}filter_`, ""), value]),
         ),
       };
     }
@@ -134,15 +120,7 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
         router.replace(newUrl, { scroll: false });
       }
     }
-  }, [
-    state,
-    syncWithUrl,
-    urlParamPrefix,
-    defaultLimit,
-    defaultSortBy,
-    defaultSortOrder,
-    router,
-  ]);
+  }, [state, syncWithUrl, urlParamPrefix, defaultLimit, defaultSortBy, defaultSortOrder, router]);
 
   // Debounce search term
   useEffect(() => {
@@ -174,12 +152,9 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     setState((prev) => ({ ...prev, limit, page: 1 }));
   }, []);
 
-  const updateSorting = useCallback(
-    (sortBy: string, sortOrder: "asc" | "desc") => {
-      setState((prev) => ({ ...prev, sortBy, sortOrder, page: 1 }));
-    },
-    [],
-  );
+  const updateSorting = useCallback((sortBy: string, sortOrder: "asc" | "desc") => {
+    setState((prev) => ({ ...prev, sortBy, sortOrder, page: 1 }));
+  }, []);
 
   const updateFilter = useCallback((key: string, value: any) => {
     setState((prev) => ({
@@ -222,14 +197,7 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
       sortOrder: defaultSortOrder,
       filters: defaultFilters,
     });
-  }, [
-    defaultSearch,
-    defaultPage,
-    defaultLimit,
-    defaultSortBy,
-    defaultSortOrder,
-    defaultFilters,
-  ]);
+  }, [defaultSearch, defaultPage, defaultLimit, defaultSortBy, defaultSortOrder, defaultFilters]);
 
   return {
     // State
@@ -254,10 +222,7 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
 
     // Computed
     hasActiveFilters: Object.values(state.filters).some(
-      (value) =>
-        value !== "" &&
-        value != null &&
-        (Array.isArray(value) ? value.length > 0 : true),
+      (value) => value !== "" && value != null && (Array.isArray(value) ? value.length > 0 : true),
     ),
     hasSearch: state.search.trim() !== "",
   };

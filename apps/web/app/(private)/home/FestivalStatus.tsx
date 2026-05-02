@@ -1,20 +1,12 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  differenceInDays,
-  endOfDay,
-  isBefore,
-  isWithinInterval,
-} from "date-fns";
+import { differenceInDays, endOfDay, isBefore, isWithinInterval } from "date-fns";
 import { CalendarCheck, Frown } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SkeletonFestivalStatus } from "@/components/ui/skeleton-cards";
-import {
-  getFestivalConstants,
-  getFestivalStatus,
-} from "@/lib/festivalConstants";
+import { getFestivalConstants, getFestivalStatus } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { WrappedCTA } from "./WrappedCTA";
@@ -27,8 +19,7 @@ export default function FestivalStatus() {
     return <SkeletonFestivalStatus />;
   }
 
-  const { festivalStartDate, festivalEndDate } =
-    getFestivalConstants(currentFestival);
+  const { festivalStartDate, festivalEndDate } = getFestivalConstants(currentFestival);
   const today = new Date();
   let status = "";
 

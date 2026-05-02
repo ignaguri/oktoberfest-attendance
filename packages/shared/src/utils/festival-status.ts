@@ -8,7 +8,6 @@ export function getFestivalStatus(festival: Festival): FestivalStatus {
   const endDate = endOfDay(parseISO(festival.endDate));
 
   if (isBefore(now, startDate)) return "upcoming";
-  if (isWithinInterval(now, { start: startDate, end: endDate }))
-    return "active";
+  if (isWithinInterval(now, { start: startDate, end: endDate })) return "active";
   return "ended";
 }

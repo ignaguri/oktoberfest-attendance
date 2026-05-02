@@ -33,13 +33,8 @@ export function FriendMap({
 }: FriendMapProps) {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const {
-    currentLocation,
-    nearbyMembers,
-    nearbyTents,
-    isSharing,
-    isNearbyLoading,
-  } = useLocationContext();
+  const { currentLocation, nearbyMembers, nearbyTents, isSharing, isNearbyLoading } =
+    useLocationContext();
 
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
 
@@ -101,9 +96,7 @@ export function FriendMap({
             title: member.fullName || member.username || "Friend",
             systemImage: "person.fill",
             tintColor:
-              selectedFriendId === member.userId
-                ? Colors.primary[700]
-                : Colors.primary[500],
+              selectedFriendId === member.userId ? Colors.primary[700] : Colors.primary[500],
           });
         }
       });
@@ -127,8 +120,7 @@ export function FriendMap({
           },
           title: tent.tentName,
           systemImage: "tent.fill",
-          tintColor:
-            selectedTentId === tent.tentId ? Colors.primary[700] : tintColor,
+          tintColor: selectedTentId === tent.tentId ? Colors.primary[700] : tintColor,
         });
       });
     }
@@ -174,10 +166,7 @@ export function FriendMap({
               longitude: member.lastLocation.longitude,
             },
             title: member.fullName || member.username || "Friend",
-            snippet:
-              member.groupNames.length > 0
-                ? member.groupNames.join(", ")
-                : undefined,
+            snippet: member.groupNames.length > 0 ? member.groupNames.join(", ") : undefined,
           });
         }
       });
@@ -201,29 +190,19 @@ export function FriendMap({
     }
 
     return result;
-  }, [
-    currentLocation,
-    showFriends,
-    showTents,
-    nearbyMembers,
-    nearbyTents,
-    isSharing,
-    t,
-  ]);
+  }, [currentLocation, showFriends, showTents, nearbyMembers, nearbyTents, isSharing, t]);
 
   // Quantize location to ~10m precision to avoid frequent circle re-renders
   const rawLatitude = currentLocation?.coords.latitude;
   const rawLongitude = currentLocation?.coords.longitude;
 
   const roundedLatitude = useMemo(
-    () =>
-      typeof rawLatitude === "number" ? Number(rawLatitude.toFixed(4)) : null,
+    () => (typeof rawLatitude === "number" ? Number(rawLatitude.toFixed(4)) : null),
     [rawLatitude],
   );
 
   const roundedLongitude = useMemo(
-    () =>
-      typeof rawLongitude === "number" ? Number(rawLongitude.toFixed(4)) : null,
+    () => (typeof rawLongitude === "number" ? Number(rawLongitude.toFixed(4)) : null),
     [rawLongitude],
   );
 
@@ -237,11 +216,7 @@ export function FriendMap({
 
   // Build circles array for search radius (works on both platforms)
   const appleCircles = useMemo(() => {
-    if (
-      roundedLatitude == null ||
-      roundedLongitude == null ||
-      roundedRadius == null
-    ) {
+    if (roundedLatitude == null || roundedLongitude == null || roundedRadius == null) {
       return [];
     }
 
@@ -261,11 +236,7 @@ export function FriendMap({
   }, [roundedLatitude, roundedLongitude, roundedRadius]);
 
   const googleCircles = useMemo(() => {
-    if (
-      roundedLatitude == null ||
-      roundedLongitude == null ||
-      roundedRadius == null
-    ) {
+    if (roundedLatitude == null || roundedLongitude == null || roundedRadius == null) {
       return [];
     }
 
@@ -356,29 +327,21 @@ export function FriendMap({
       {/* Loading indicator */}
       {isNearbyLoading && (
         <View className="absolute left-2.5 top-2.5 rounded-2xl bg-white/90 px-3 py-1.5">
-          <Text className="text-sm text-typography-500">
-            {t("location.map.loading")}
-          </Text>
+          <Text className="text-sm text-typography-500">{t("location.map.loading")}</Text>
         </View>
       )}
 
       {/* Stats overlay */}
       <View className="absolute bottom-2.5 left-2.5 flex-row gap-2">
         {showFriends && nearbyMembers.length > 0 && (
-          <View
-            className="rounded-xl px-2.5 py-1"
-            style={{ backgroundColor: Colors.primary[500] }}
-          >
+          <View className="rounded-xl px-2.5 py-1" style={{ backgroundColor: Colors.primary[500] }}>
             <Text className="text-xs font-medium text-white">
               {t("location.map.friendsNearby", { count: nearbyMembers.length })}
             </Text>
           </View>
         )}
         {showTents && nearbyTents.length > 0 && (
-          <View
-            className="rounded-xl px-2.5 py-1"
-            style={{ backgroundColor: Colors.amber[500] }}
-          >
+          <View className="rounded-xl px-2.5 py-1" style={{ backgroundColor: Colors.amber[500] }}>
             <Text className="text-xs font-medium text-white">
               {t("location.map.tentsNearby", { count: nearbyTents.length })}
             </Text>

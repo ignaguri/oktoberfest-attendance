@@ -29,8 +29,7 @@ const getReactionsRoute = createRoute({
   path: "/photos/{photoId}/reactions",
   tags: ["photo-social"],
   summary: "Get reactions for a photo in a group",
-  description:
-    "Returns aggregated emoji reactions for a photo within a specific group context",
+  description: "Returns aggregated emoji reactions for a photo within a specific group context",
   request: {
     params: z.object({
       photoId: z.string().uuid("Invalid photo ID"),
@@ -72,10 +71,7 @@ app.openapi(getReactionsRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json(
-      { error: "FORBIDDEN", message: "You are not a member of this group" },
-      403,
-    );
+    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
   }
 
   // Fetch reactions with user profiles
@@ -117,9 +113,7 @@ app.openapi(getReactionsRoute, async (c) => {
     emojiMap[emoji].count++;
 
     // Handle profiles - could be array or object depending on Supabase
-    const profile = Array.isArray(reaction.profiles)
-      ? reaction.profiles[0]
-      : reaction.profiles;
+    const profile = Array.isArray(reaction.profiles) ? reaction.profiles[0] : reaction.profiles;
 
     emojiMap[emoji].users.push({
       userId: reaction.user_id,
@@ -201,10 +195,7 @@ app.openapi(addReactionRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json(
-      { error: "FORBIDDEN", message: "You are not a member of this group" },
-      403,
-    );
+    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
   }
 
   // Insert reaction (unique constraint prevents duplicates)
@@ -218,10 +209,7 @@ app.openapi(addReactionRoute, async (c) => {
   if (error) {
     if (error.code === PgErrorCode.UNIQUE_VIOLATION) {
       // Unique constraint violation
-      return c.json(
-        { error: "CONFLICT", message: "You already reacted with this emoji" },
-        409,
-      );
+      return c.json({ error: "CONFLICT", message: "You already reacted with this emoji" }, 409);
     }
     throw new Error(`Failed to add reaction: ${error.message}`);
   }
@@ -330,10 +318,7 @@ app.openapi(getCommentsRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json(
-      { error: "FORBIDDEN", message: "You are not a member of this group" },
-      403,
-    );
+    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
   }
 
   // Fetch comments with user profiles
@@ -360,9 +345,7 @@ app.openapi(getCommentsRoute, async (c) => {
   }
 
   const formattedComments = (comments || []).map((comment) => {
-    const profile = Array.isArray(comment.profiles)
-      ? comment.profiles[0]
-      : comment.profiles;
+    const profile = Array.isArray(comment.profiles) ? comment.profiles[0] : comment.profiles;
 
     return {
       id: comment.id,
@@ -429,10 +412,7 @@ app.openapi(addCommentRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json(
-      { error: "FORBIDDEN", message: "You are not a member of this group" },
-      403,
-    );
+    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
   }
 
   // Insert comment

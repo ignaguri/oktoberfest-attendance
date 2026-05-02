@@ -88,9 +88,7 @@ const getCachedFestivalById = unstable_cache(
   { revalidate: 3600, tags: ["festivals"] }, // 1 hour cache
 );
 
-export async function fetchFestivalById(
-  festivalId: string,
-): Promise<Festival | null> {
+export async function fetchFestivalById(festivalId: string): Promise<Festival | null> {
   return getCachedFestivalById(festivalId);
 }
 
@@ -124,9 +122,7 @@ const getCachedFestivalTents = unstable_cache(
   { revalidate: 7200, tags: ["festivals", "tents", "festival-tents"] }, // 2 hours cache
 );
 
-export async function fetchFestivalTents(
-  festivalId: string,
-): Promise<FestivalTent[]> {
+export async function fetchFestivalTents(festivalId: string): Promise<FestivalTent[]> {
   return getCachedFestivalTents(festivalId);
 }
 

@@ -1,9 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import type { ActivityFeedItem } from "@prostcounter/shared";
-import {
-  GetActivityFeedQuerySchema,
-  GetActivityFeedResponseSchema,
-} from "@prostcounter/shared";
+import { GetActivityFeedQuerySchema, GetActivityFeedResponseSchema } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
 
@@ -16,8 +13,7 @@ const getActivityFeedRoute = createRoute({
   path: "/activity-feed",
   tags: ["activity-feed"],
   summary: "Get activity feed",
-  description:
-    "Returns activity feed items for a festival with cursor-based pagination",
+  description: "Returns activity feed items for a festival with cursor-based pagination",
   request: {
     query: GetActivityFeedQuerySchema,
   },

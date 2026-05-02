@@ -29,10 +29,7 @@ export function getFestivalConstants(festival: Festival): FestivalConstants {
 }
 
 // Helper function to get beer cost for a specific tent at a specific festival
-export function getTentBeerCost(
-  festivalTents: FestivalTent[],
-  tentId: string,
-): number {
+export function getTentBeerCost(festivalTents: FestivalTent[], tentId: string): number {
   const tentPrice = festivalTents.find((ft) => ft.tent_id === tentId);
 
   if (!tentPrice || !tentPrice.beer_price) {

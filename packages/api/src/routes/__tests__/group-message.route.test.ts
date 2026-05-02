@@ -61,10 +61,7 @@ describe("Group Message Routes", () => {
     app.use("*", async (c, next) => {
       const authHeader = c.req.header("Authorization");
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
       c.set("user", mockUser);
       c.set("supabase", mockSupabase);
@@ -98,17 +95,11 @@ describe("Group Message Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Group lookup (festival_id)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ festival_id: FESTIVAL_ID })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ festival_id: FESTIVAL_ID })))
         // 3. Group members
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess([{ user_id: mockUser.id }])),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([{ user_id: mockUser.id }])))
         // 4. Pinned messages
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([pinnedMsg])))
         // 5. Regular messages (limit+1 = 21, only 1 returned → hasMore=false)
@@ -138,9 +129,7 @@ describe("Group Message Routes", () => {
     });
 
     it("should return 403 when user is not a group member", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       const req = createAuthRequest(`/groups/${GROUP_ID}/messages?limit=20`);
       const res = await app.request(req as Request);
@@ -151,9 +140,7 @@ describe("Group Message Routes", () => {
     });
 
     it("should require authentication", async () => {
-      const req = new Request(
-        `http://localhost/groups/${GROUP_ID}/messages?limit=20`,
-      );
+      const req = new Request(`http://localhost/groups/${GROUP_ID}/messages?limit=20`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
@@ -211,22 +198,15 @@ describe("Group Message Routes", () => {
         // 2. Co-members
         .mockReturnValueOnce(
           createMockChain(
-            mockSupabaseSuccess([
-              { user_id: mockUser.id },
-              { user_id: OTHER_USER_ID },
-            ]),
+            mockSupabaseSuccess([{ user_id: mockUser.id }, { user_id: OTHER_USER_ID }]),
           ),
         )
         // 3. Messages
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess([message1, message2])),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([message1, message2])))
         // 4. Profiles
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(profiles)));
 
-      const req = createAuthRequest(
-        `/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`,
-      );
+      const req = createAuthRequest(`/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -239,13 +219,9 @@ describe("Group Message Routes", () => {
     });
 
     it("should return empty response when user has no groups", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`,
-      );
+      const req = createAuthRequest(`/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -255,9 +231,7 @@ describe("Group Message Routes", () => {
     });
 
     it("should require authentication", async () => {
-      const req = new Request(
-        `http://localhost/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`,
-      );
+      const req = new Request(`http://localhost/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
@@ -268,9 +242,7 @@ describe("Group Message Routes", () => {
         createMockChain(mockSupabaseError("Database connection error")),
       );
 
-      const req = createAuthRequest(
-        `/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`,
-      );
+      const req = createAuthRequest(`/messages/feed?festivalId=${FESTIVAL_ID}&limit=20`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -356,9 +328,7 @@ describe("Group Message Routes", () => {
     });
 
     it("should return 403 when user has no groups in the festival", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       const req = createAuthRequest("/messages", {
         method: "POST",
@@ -402,9 +372,7 @@ describe("Group Message Routes", () => {
             }),
           ),
         )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Insert failed")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Insert failed")));
 
       const req = createAuthRequest("/messages", {
         method: "POST",
@@ -469,12 +437,8 @@ describe("Group Message Routes", () => {
       const profile = makeMockProfile();
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(existingMessage)),
-        )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(updatedMessage)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(existingMessage)))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(updatedMessage)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(profile)));
 
       const req = createAuthRequest(`/messages/${MESSAGE_ID}`, {
@@ -497,12 +461,8 @@ describe("Group Message Routes", () => {
       const profile = makeMockProfile();
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(existingMessage)),
-        )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(updatedMessage)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(existingMessage)))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(updatedMessage)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(profile)));
 
       const req = createAuthRequest(`/messages/${MESSAGE_ID}`, {
@@ -518,9 +478,7 @@ describe("Group Message Routes", () => {
     });
 
     it("should return 404 when message does not exist", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       const req = createAuthRequest(`/messages/${MESSAGE_ID}`, {
         method: "PUT",
@@ -585,9 +543,7 @@ describe("Group Message Routes", () => {
       const existingMessage = { id: MESSAGE_ID, user_id: mockUser.id };
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(existingMessage)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(existingMessage)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       const req = createAuthRequest(`/messages/${MESSAGE_ID}`, {
@@ -602,9 +558,7 @@ describe("Group Message Routes", () => {
     });
 
     it("should return 404 when message does not exist", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       const req = createAuthRequest(`/messages/${MESSAGE_ID}`, {
         method: "DELETE",
@@ -659,12 +613,8 @@ describe("Group Message Routes", () => {
       const existingMessage = { id: MESSAGE_ID, user_id: mockUser.id };
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(existingMessage)),
-        )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Delete failed")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(existingMessage)))
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Delete failed")));
 
       const req = createAuthRequest(`/messages/${MESSAGE_ID}`, {
         method: "DELETE",

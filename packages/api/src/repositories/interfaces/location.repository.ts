@@ -16,10 +16,7 @@ export interface ILocationRepository {
    * @param data - Session configuration
    * @returns Created session
    */
-  startSession(
-    userId: string,
-    data: StartLocationSessionInput,
-  ): Promise<LocationSession>;
+  startSession(userId: string, data: StartLocationSessionInput): Promise<LocationSession>;
 
   /**
    * Stop an active location session
@@ -35,10 +32,7 @@ export interface ILocationRepository {
    * @param festivalId - Festival ID
    * @returns Active session if exists
    */
-  getActiveSession(
-    userId: string,
-    festivalId: string,
-  ): Promise<LocationSession | null>;
+  getActiveSession(userId: string, festivalId: string): Promise<LocationSession | null>;
 
   /**
    * Get all active sessions for a user
@@ -53,11 +47,7 @@ export interface ILocationRepository {
    * @param userId - User ID (for authorization)
    * @param location - New location data
    */
-  updateLocation(
-    sessionId: string,
-    userId: string,
-    location: LocationPoint,
-  ): Promise<void>;
+  updateLocation(sessionId: string, userId: string, location: LocationPoint): Promise<void>;
 
   /**
    * Get nearby group members sharing location

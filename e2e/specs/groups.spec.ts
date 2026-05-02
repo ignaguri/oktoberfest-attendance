@@ -1,10 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-import {
-  generateUniqueGroupName,
-  TEST_GROUPS,
-  TEST_USERS,
-} from "../helpers/test-data";
+import { generateUniqueGroupName, TEST_GROUPS, TEST_USERS } from "../helpers/test-data";
 import { GroupDetailPage } from "../pages/group-detail.page";
 import { GroupsPage } from "../pages/groups.page";
 import { GroupSettingsPage } from "../pages/group-settings.page";
@@ -24,10 +20,7 @@ test.describe("Groups Flows", () => {
     const homePage = new HomePage(page);
 
     await signInPage.goto();
-    await signInPage.signInAndWaitForHome(
-      GROUPS_TEST_USER.email,
-      GROUPS_TEST_USER.password,
-    );
+    await signInPage.signInAndWaitForHome(GROUPS_TEST_USER.email, GROUPS_TEST_USER.password);
     await homePage.expectOnHomePage();
 
     // Wait for page to fully load before dismissing overlays
@@ -73,18 +66,14 @@ test.describe("Groups Flows", () => {
       await groupsPage.expectGroupsPageLoaded();
 
       // Join Group B (since user might already be in Group A from seed)
-      await groupsPage.joinGroup(
-        TEST_GROUPS.groupB.name,
-        TEST_GROUPS.groupB.password,
-      );
+      await groupsPage.joinGroup(TEST_GROUPS.groupB.name, TEST_GROUPS.groupB.password);
 
       // Wait for navigation or success
       await page.waitForTimeout(2000);
 
       // Should either redirect to group page or show success toast
       const currentUrl = page.url();
-      const isOnGroupPage =
-        currentUrl.includes("/groups/") && !currentUrl.endsWith("/groups");
+      const isOnGroupPage = currentUrl.includes("/groups/") && !currentUrl.endsWith("/groups");
       if (!isOnGroupPage) {
         // If still on groups page, check for success toast or error
         await expect(page).toHaveURL(/\/groups/);
@@ -128,10 +117,7 @@ test.describe("Groups Flows", () => {
       await groupsPage.expectGroupsPageLoaded();
 
       // First join a group to ensure we're a member
-      await groupsPage.joinGroup(
-        TEST_GROUPS.groupC.name,
-        TEST_GROUPS.groupC.password,
-      );
+      await groupsPage.joinGroup(TEST_GROUPS.groupC.name, TEST_GROUPS.groupC.password);
 
       // Wait for potential navigation
       await page.waitForTimeout(2000);
@@ -157,19 +143,14 @@ test.describe("Groups Flows", () => {
   });
 
   test.describe("FLOW_GRP_005: Navigate to Group Settings", () => {
-    test("should navigate to group settings from detail page", async ({
-      page,
-    }) => {
+    test("should navigate to group settings from detail page", async ({ page }) => {
       const groupsPage = new GroupsPage(page);
 
       await groupsPage.goto();
       await groupsPage.expectGroupsPageLoaded();
 
       // Join a group first
-      await groupsPage.joinGroup(
-        TEST_GROUPS.groupA.name,
-        TEST_GROUPS.groupA.password,
-      );
+      await groupsPage.joinGroup(TEST_GROUPS.groupA.name, TEST_GROUPS.groupA.password);
 
       await page.waitForTimeout(2000);
 
@@ -219,9 +200,7 @@ test.describe("Groups Flows", () => {
 
       if (hasToast) {
         // Verify it's an error toast - could be password error or festival selection error
-        await expect(toast).toContainText(
-          /incorrect|error|unable|festival|password/i,
-        );
+        await expect(toast).toContainText(/incorrect|error|unable|festival|password/i);
       }
 
       // Should still be on groups page
@@ -237,10 +216,7 @@ test.describe("Groups Flows", () => {
       await groupsPage.expectGroupsPageLoaded();
 
       // First join a group to ensure we're a member
-      await groupsPage.joinGroup(
-        TEST_GROUPS.groupA.name,
-        TEST_GROUPS.groupA.password,
-      );
+      await groupsPage.joinGroup(TEST_GROUPS.groupA.name, TEST_GROUPS.groupA.password);
 
       await page.waitForTimeout(2000);
 

@@ -13,11 +13,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import useMediaQuery from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
@@ -30,22 +26,12 @@ interface DateTimePickerProps {
   calendarClassName?: string;
 }
 
-function generateTimePresets(
-  startHour: number,
-  endHour: number,
-  intervalMinutes: number,
-) {
+function generateTimePresets(startHour: number, endHour: number, intervalMinutes: number) {
   const presets = [];
-  for (
-    let minutes = startHour * 60;
-    minutes <= endHour * 60;
-    minutes += intervalMinutes
-  ) {
+  for (let minutes = startHour * 60; minutes <= endHour * 60; minutes += intervalMinutes) {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    const label = `${hours.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}`;
+    const label = `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
     presets.push({ label, hours, minutes: mins });
   }
   return presets;
@@ -61,9 +47,7 @@ export function DateTimePicker({
   calendarClassName,
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
-    value,
-  );
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(value);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   React.useEffect(() => {
@@ -132,9 +116,7 @@ export function DateTimePicker({
               }
               size="sm"
               className="h-8 text-xs"
-              onClick={() =>
-                handleTimePresetSelect(preset.hours, preset.minutes)
-              }
+              onClick={() => handleTimePresetSelect(preset.hours, preset.minutes)}
               disabled={!selectedDate}
             >
               {preset.label}
@@ -216,9 +198,7 @@ export function DateTimePicker({
                   }
                   size="sm"
                   className="h-8 text-xs"
-                  onClick={() =>
-                    handleTimePresetSelect(preset.hours, preset.minutes)
-                  }
+                  onClick={() => handleTimePresetSelect(preset.hours, preset.minutes)}
                   disabled={!selectedDate}
                 >
                   {preset.label}

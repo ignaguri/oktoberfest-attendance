@@ -93,12 +93,8 @@ export function PicturesSlide({ data, isActive }: PicturesSlideProps) {
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-stone-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.pictures.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.pictures.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.pictures.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.pictures.subtitle")}</SlideSubtitle>
 
         <Text className="mt-2 text-center text-sm text-gray-500">
           {t("wrapped.pictures.count", {

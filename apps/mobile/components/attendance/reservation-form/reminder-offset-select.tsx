@@ -82,9 +82,7 @@ export function ReminderOffsetSelect({
 
   return (
     <VStack space="sm">
-      {label && (
-        <Text className="text-sm font-medium text-typography-700">{label}</Text>
-      )}
+      {label && <Text className="text-sm font-medium text-typography-700">{label}</Text>}
 
       <Pressable
         onPress={() => !disabled && setIsOpen(true)}
@@ -100,9 +98,7 @@ export function ReminderOffsetSelect({
         <HStack className="items-center justify-between">
           <HStack space="sm" className="items-center">
             <Bell size={18} color={IconColors.muted} />
-            <Text className="text-base text-typography-900">
-              {selectedLabel}
-            </Text>
+            <Text className="text-base text-typography-900">{selectedLabel}</Text>
           </HStack>
           <ChevronDown size={18} color={IconColors.muted} />
         </HStack>
@@ -128,9 +124,7 @@ export function ReminderOffsetSelect({
                 className={option.value === value ? "bg-primary-50" : ""}
               >
                 <ActionsheetItemText
-                  className={
-                    option.value === value ? "font-medium text-primary-600" : ""
-                  }
+                  className={option.value === value ? "font-medium text-primary-600" : ""}
                 >
                   {option.label}
                 </ActionsheetItemText>

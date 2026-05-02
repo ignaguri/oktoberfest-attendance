@@ -98,10 +98,7 @@ export function ReservationTabContent({
   const parseExistingTime = useCallback((): Date => {
     if (existingReservation?.startAt) {
       const startDate = new Date(existingReservation.startAt);
-      return setMinutes(
-        setHours(selectedDate, startDate.getHours()),
-        startDate.getMinutes(),
-      );
+      return setMinutes(setHours(selectedDate, startDate.getHours()), startDate.getMinutes());
     }
     // Default to noon
     return setMinutes(setHours(selectedDate, 12), 0);
@@ -266,13 +263,7 @@ export function ReservationTabContent({
     } catch (error) {
       logger.error("Failed to cancel reservation:", error);
     }
-  }, [
-    existingReservation?.id,
-    festivalId,
-    cancelReservation,
-    onSuccess,
-    onClose,
-  ]);
+  }, [existingReservation?.id, festivalId, cancelReservation, onSuccess, onClose]);
 
   const handleDismissCancel = useCallback(() => {
     setShowCancelConfirm(false);
@@ -296,9 +287,7 @@ export function ReservationTabContent({
               isDisabled={isProcessing}
             >
               <Trash2 size={16} color={IconColors.error} />
-              <ButtonText className="ml-2">
-                {t("reservation.form.cancelReservation")}
-              </ButtonText>
+              <ButtonText className="ml-2">{t("reservation.form.cancelReservation")}</ButtonText>
             </Button>
           </HStack>
         )}
@@ -325,23 +314,17 @@ export function ReservationTabContent({
                 <Text
                   className={cn(
                     "text-base",
-                    selectedTentName
-                      ? "text-typography-900"
-                      : "text-typography-400",
+                    selectedTentName ? "text-typography-900" : "text-typography-400",
                   )}
                 >
                   {selectedTentName || t("reservation.form.selectTent")}
                 </Text>
               </HStack>
-              {!isEditMode && (
-                <ChevronDown size={18} color={IconColors.muted} />
-              )}
+              {!isEditMode && <ChevronDown size={18} color={IconColors.muted} />}
             </HStack>
           </Pressable>
           {errors.tentId && (
-            <Text className="text-sm text-error-600">
-              {t("validation.tentRequired")}
-            </Text>
+            <Text className="text-sm text-error-600">{t("validation.tentRequired")}</Text>
           )}
           {isEditMode && (
             <Text className="text-xs text-typography-400">
@@ -389,11 +372,7 @@ export function ReservationTabContent({
             control={control}
             name="note"
             render={({ field: { value, onChange, onBlur } }) => (
-              <Textarea
-                size="md"
-                isDisabled={isProcessing}
-                className="border-background-300"
-              >
+              <Textarea size="md" isDisabled={isProcessing} className="border-background-300">
                 <TextareaInput
                   placeholder={t("reservation.form.notePlaceholder")}
                   value={value || ""}
@@ -473,11 +452,7 @@ export function ReservationTabContent({
       />
 
       {/* Cancel Confirmation Dialog */}
-      <AlertDialog
-        isOpen={showCancelConfirm}
-        onClose={handleDismissCancel}
-        size="md"
-      >
+      <AlertDialog isOpen={showCancelConfirm} onClose={handleDismissCancel} size="md">
         <AlertDialogBackdrop />
         <AlertDialogContent>
           <AlertDialogHeader>

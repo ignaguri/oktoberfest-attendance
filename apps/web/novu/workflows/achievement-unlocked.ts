@@ -4,33 +4,18 @@ import { z } from "zod";
 export const ACHIEVEMENT_UNLOCKED_WORKFLOW_ID = "achievement-unlocked" as const;
 
 export const achievementUnlockedPayloadSchema = z.object({
-  userName: z
-    .string()
-    .describe("Name of the user who unlocked the achievement"),
+  userName: z.string().describe("Name of the user who unlocked the achievement"),
   achievementName: z.string().describe("Name of the achievement"),
-  achievementDescription: z
-    .string()
-    .describe("Description of what was achieved"),
-  achievementIcon: z
-    .string()
-    .optional()
-    .describe("Icon/emoji for the achievement"),
+  achievementDescription: z.string().describe("Description of what was achieved"),
+  achievementIcon: z.string().optional().describe("Icon/emoji for the achievement"),
   unlockedAt: z.string().describe("When the achievement was unlocked"),
 });
 
-export type AchievementUnlockedPayload = z.infer<
-  typeof achievementUnlockedPayloadSchema
->;
+export type AchievementUnlockedPayload = z.infer<typeof achievementUnlockedPayloadSchema>;
 
 export const achievementUnlockedWorkflow = workflow(
   ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
-  async ({
-    step,
-    payload,
-  }: {
-    step: any;
-    payload: AchievementUnlockedPayload;
-  }) => {
+  async ({ step, payload }: { step: any; payload: AchievementUnlockedPayload }) => {
     await step.inApp(
       "in-app-notification",
       async (controls: any) => {
@@ -55,18 +40,12 @@ export const achievementUnlockedWorkflow = workflow(
               '🎉 Congratulations! You\'ve unlocked "{{achievementName}}" - {{achievementDescription}}',
             )
             .describe("Achievement notification message"),
-          celebrationEmoji: z
-            .string()
-            .default("🎉")
-            .describe("Celebration emoji to use"),
+          celebrationEmoji: z.string().default("🎉").describe("Celebration emoji to use"),
           defaultIcon: z
             .string()
             .default("🏆")
             .describe("Default achievement icon if none provided"),
-          showCongrats: z
-            .boolean()
-            .default(true)
-            .describe("Show congratulations message"),
+          showCongrats: z.boolean().default(true).describe("Show congratulations message"),
         }),
       },
     );
@@ -77,8 +56,7 @@ export const achievementUnlockedWorkflow = workflow(
         const icon = payload.achievementIcon || controls.defaultIcon || "🏆";
         return {
           subject: controls.pushSubject || `${icon} Achievement Unlocked!`,
-          body:
-            controls.pushBody || `You've unlocked "${payload.achievementName}"`,
+          body: controls.pushBody || `You've unlocked "${payload.achievementName}"`,
           data: {
             type: "achievement-unlocked",
           },
@@ -94,10 +72,7 @@ export const achievementUnlockedWorkflow = workflow(
             .string()
             .default('You\'ve unlocked "{{achievementName}}"')
             .describe("Push notification message"),
-          defaultIcon: z
-            .string()
-            .default("🏆")
-            .describe("Default achievement icon for push"),
+          defaultIcon: z.string().default("🏆").describe("Default achievement icon for push"),
         }),
       },
     );

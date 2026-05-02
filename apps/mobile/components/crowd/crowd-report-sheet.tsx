@@ -1,7 +1,4 @@
-import {
-  useSubmitCrowdReport,
-  useTentCrowdReports,
-} from "@prostcounter/shared/hooks";
+import { useSubmitCrowdReport, useTentCrowdReports } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
@@ -65,9 +62,7 @@ export function CrowdReportSheet({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [selectedLevel, setSelectedLevel] = useState<CrowdLevel | null>(null);
-  const [waitTimeMinutes, setWaitTimeMinutes] = useState<number | undefined>(
-    undefined,
-  );
+  const [waitTimeMinutes, setWaitTimeMinutes] = useState<number | undefined>(undefined);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const { submitReport, isSubmitting, error, reset } = useSubmitCrowdReport();
@@ -110,14 +105,7 @@ export function CrowdReportSheet({
     } catch {
       // Error is handled by the hook
     }
-  }, [
-    selectedLevel,
-    waitTimeMinutes,
-    tentId,
-    festivalId,
-    submitReport,
-    onClose,
-  ]);
+  }, [selectedLevel, waitTimeMinutes, tentId, festivalId, submitReport, onClose]);
 
   const handleClose = useCallback(() => {
     setSelectedLevel(null);
@@ -155,10 +143,7 @@ export function CrowdReportSheet({
 
           {/* User's recent report notice */}
           {minutesSinceLastReport != null && (
-            <HStack
-              space="sm"
-              className="items-center rounded-lg bg-yellow-50 px-3 py-2"
-            >
+            <HStack space="sm" className="items-center rounded-lg bg-yellow-50 px-3 py-2">
               <CircleAlert size={16} color={Colors.primary[600]} />
               <Text className="text-sm text-yellow-700">
                 {t("crowdReport.recentReport", {
@@ -209,9 +194,7 @@ export function CrowdReportSheet({
                         <Text
                           className={cn(
                             "text-center text-xs font-medium",
-                            isSelected
-                              ? "text-primary-700"
-                              : "text-typography-600",
+                            isSelected ? "text-primary-700" : "text-typography-600",
                           )}
                         >
                           {t(`crowdReport.levels.${level}`)}
@@ -238,9 +221,7 @@ export function CrowdReportSheet({
                     return (
                       <Pressable
                         key={minutes}
-                        onPress={() =>
-                          setWaitTimeMinutes(isSelected ? undefined : minutes)
-                        }
+                        onPress={() => setWaitTimeMinutes(isSelected ? undefined : minutes)}
                         className={cn(
                           "rounded-lg border px-3 py-2",
                           isSelected
@@ -256,9 +237,7 @@ export function CrowdReportSheet({
                         <Text
                           className={cn(
                             "text-sm",
-                            isSelected
-                              ? "font-medium text-primary-700"
-                              : "text-typography-600",
+                            isSelected ? "font-medium text-primary-700" : "text-typography-600",
                           )}
                         >
                           {minutes}
@@ -291,9 +270,7 @@ export function CrowdReportSheet({
                 ) : (
                   <>
                     <Send size={18} color={IconColors.white} />
-                    <ButtonText className="ml-2">
-                      {t("crowdReport.submitReport")}
-                    </ButtonText>
+                    <ButtonText className="ml-2">{t("crowdReport.submitReport")}</ButtonText>
                   </>
                 )}
               </Button>

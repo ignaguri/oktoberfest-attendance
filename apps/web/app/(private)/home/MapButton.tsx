@@ -15,8 +15,7 @@ export default function MapButton() {
     return <Skeleton className="h-10 w-32 rounded" />;
   }
 
-  const { festivalMapUrl, festivalName } =
-    getFestivalConstants(currentFestival);
+  const { festivalMapUrl, festivalName } = getFestivalConstants(currentFestival);
 
   // If no map URL, don't render the button
   if (!festivalMapUrl) {

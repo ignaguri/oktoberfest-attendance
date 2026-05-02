@@ -38,12 +38,7 @@ interface CrowdReportPromptProps {
  * - If multiple tents: shows a list, tapping one opens CrowdReportSheet
  * - Dismissible: user can skip without reporting
  */
-export function CrowdReportPrompt({
-  isOpen,
-  onClose,
-  tents,
-  festivalId,
-}: CrowdReportPromptProps) {
+export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdReportPromptProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [selectedTent, setSelectedTent] = useState<TentInfo | null>(null);
@@ -121,9 +116,7 @@ export function CrowdReportPrompt({
                   accessibilityHint={t("crowdReport.reportCrowd")}
                 >
                   <HStack className="items-center justify-between">
-                    <Text className="text-base text-typography-700">
-                      {tent.name}
-                    </Text>
+                    <Text className="text-base text-typography-700">{tent.name}</Text>
                     <Users size={16} color={IconColors.muted} />
                   </HStack>
                 </Pressable>

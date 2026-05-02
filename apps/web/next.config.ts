@@ -13,9 +13,7 @@ if (existsSync(envDevicePath)) {
 }
 
 // Read package.json to get version
-const packageJson = JSON.parse(
-  readFileSync(join(__dirname, "package.json"), "utf8"),
-);
+const packageJson = JSON.parse(readFileSync(join(__dirname, "package.json"), "utf8"));
 
 const nextConfig: NextConfig = {
   env: {

@@ -35,26 +35,17 @@ type Params = { slug: string[] };
 
 function parseParams(slugParts: string[]): ParsedRoute | null {
   // /blog/[slug] — English article
-  if (
-    slugParts.length === 1 &&
-    !NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)
-  ) {
+  if (slugParts.length === 1 && !NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)) {
     return { type: "article", locale: "en", slug: slugParts[0] };
   }
 
   // /blog/de or /blog/es — Localized blog index
-  if (
-    slugParts.length === 1 &&
-    NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)
-  ) {
+  if (slugParts.length === 1 && NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)) {
     return { type: "index", locale: slugParts[0] as SupportedLanguage };
   }
 
   // /blog/de/[slug] or /blog/es/[slug] — Localized article
-  if (
-    slugParts.length === 2 &&
-    NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)
-  ) {
+  if (slugParts.length === 2 && NON_DEFAULT_LOCALES.includes(slugParts[0] as SupportedLanguage)) {
     // Check if it's a category route: /blog/de/category
     if (slugParts[1] === "category") {
       return null; // /blog/de/category without a category name
@@ -111,11 +102,7 @@ export async function generateStaticParams(): Promise<Params[]> {
   return params;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug: slugParts } = await params;
   const parsed = parseParams(slugParts);
   if (!parsed) return {};
@@ -137,8 +124,7 @@ export async function generateMetadata({
   }
 
   if (parsed.type === "category") {
-    const label =
-      parsed.category.charAt(0).toUpperCase() + parsed.category.slice(1);
+    const label = parsed.category.charAt(0).toUpperCase() + parsed.category.slice(1);
     return {
       title: `${label} - ProstCounter Blog`,
       description: `${label} articles from ProstCounter`,
@@ -161,14 +147,10 @@ export async function generateMetadata({
   const availableLocales = await getAvailableLocales(slug);
   const alternates: Record<string, string> = {};
   for (const loc of availableLocales) {
-    alternates[loc] =
-      loc === "en"
-        ? `${PROD_URL}/blog/${slug}`
-        : `${PROD_URL}/blog/${loc}/${slug}`;
+    alternates[loc] = loc === "en" ? `${PROD_URL}/blog/${slug}` : `${PROD_URL}/blog/${loc}/${slug}`;
   }
 
-  const canonicalPath =
-    locale === "en" ? `/blog/${slug}` : `/blog/${locale}/${slug}`;
+  const canonicalPath = locale === "en" ? `/blog/${slug}` : `/blog/${locale}/${slug}`;
 
   return {
     title: `${post.title} - ProstCounter Blog`,
@@ -200,11 +182,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogCatchAllPage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
+export default async function BlogCatchAllPage({ params }: { params: Promise<Params> }) {
   const { slug: slugParts } = await params;
   const parsed = parseParams(slugParts);
 
@@ -216,25 +194,13 @@ export default async function BlogCatchAllPage({
   if (parsed.type === "index") {
     const posts = await getAllPosts(parsed.locale);
     const categories = await getCategories();
-    return (
-      <BlogIndexView
-        posts={posts}
-        categories={categories}
-        locale={parsed.locale}
-      />
-    );
+    return <BlogIndexView posts={posts} categories={categories} locale={parsed.locale} />;
   }
 
   // Localized category page
   if (parsed.type === "category") {
     const posts = await getPostsByCategory(parsed.category, parsed.locale);
-    return (
-      <CategoryView
-        category={parsed.category}
-        posts={posts}
-        locale={parsed.locale}
-      />
-    );
+    return <CategoryView category={parsed.category} posts={posts} locale={parsed.locale} />;
   }
 
   // Article page
@@ -256,8 +222,7 @@ export default async function BlogCatchAllPage({
     },
   });
 
-  const canonicalPath =
-    locale === "en" ? `/blog/${slug}` : `/blog/${locale}/${slug}`;
+  const canonicalPath = locale === "en" ? `/blog/${slug}` : `/blog/${locale}/${slug}`;
 
   const articleJsonLd = {
     "@context": "https://schema.org",

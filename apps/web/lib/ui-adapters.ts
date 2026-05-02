@@ -111,12 +111,7 @@ export function mapButtonSize(size?: ContractButtonSize): ShadcnButtonSize {
 /**
  * shadcn/ui badge variants used in web implementation
  */
-export type ShadcnBadgeVariant =
-  | "default"
-  | "success"
-  | "secondary"
-  | "destructive"
-  | "outline";
+export type ShadcnBadgeVariant = "default" | "success" | "secondary" | "destructive" | "outline";
 
 /**
  * Maps contract badge action + variant to shadcn variant

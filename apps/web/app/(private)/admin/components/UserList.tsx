@@ -6,14 +6,8 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import type { Tables } from "@prostcounter/db";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  AdminAttendanceForm,
-  AdminUserUpdateForm,
-} from "@prostcounter/shared/schemas";
-import {
-  AdminAttendanceFormSchema,
-  AdminUserUpdateFormSchema,
-} from "@prostcounter/shared/schemas";
+import type { AdminAttendanceForm, AdminUserUpdateForm } from "@prostcounter/shared/schemas";
+import { AdminAttendanceFormSchema, AdminUserUpdateFormSchema } from "@prostcounter/shared/schemas";
 import type { User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDate } from "date-fns/format";
@@ -107,9 +101,7 @@ const UserEditForm = ({
             disabled
             readOnly
           />
-          <p className="text-muted-foreground mt-1 text-sm">
-            {t("admin.users.form.emailNote")}
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">{t("admin.users.form.emailNote")}</p>
         </div>
 
         <div>
@@ -123,9 +115,7 @@ const UserEditForm = ({
             errorMsg={errors.password?.message}
             {...register("password")}
           />
-          {errors.password && (
-            <span className="error">{errors.password.message}</span>
-          )}
+          {errors.password && <span className="error">{errors.password.message}</span>}
         </div>
         <div>
           <Label htmlFor="full_name" className="block">
@@ -138,9 +128,7 @@ const UserEditForm = ({
             errorMsg={errors.full_name?.message}
             {...register("full_name")}
           />
-          {errors.full_name && (
-            <span className="error">{errors.full_name.message}</span>
-          )}
+          {errors.full_name && <span className="error">{errors.full_name.message}</span>}
         </div>
         <div>
           <Label htmlFor="username" className="block">
@@ -153,9 +141,7 @@ const UserEditForm = ({
             errorMsg={errors.username?.message}
             {...register("username")}
           />
-          {errors.username && (
-            <span className="error">{errors.username.message}</span>
-          )}
+          {errors.username && <span className="error">{errors.username.message}</span>}
         </div>
         <div className="flex items-center gap-2">
           <Controller
@@ -184,10 +170,7 @@ const UserEditForm = ({
       <div className="mt-6">
         <Accordion type="single" collapsible>
           <AccordionItem value="attendances">
-            <AccordionTrigger
-              onClick={onFetchAttendances}
-              className="text-left"
-            >
+            <AccordionTrigger onClick={onFetchAttendances} className="text-left">
               {t("admin.users.attendances.title", {
                 count: attendances?.length || 0,
               })}
@@ -256,9 +239,7 @@ const AttendanceEditForm = ({
             setValueAs: (value: string) => new Date(value),
           })}
         />
-        {errors.date && (
-          <div className="text-red-500">{errors.date.message}</div>
-        )}
+        {errors.date && <div className="text-red-500">{errors.date.message}</div>}
       </div>
       <div>
         <Label htmlFor="beer_count" className="block">
@@ -271,9 +252,7 @@ const AttendanceEditForm = ({
           errorMsg={errors.beer_count?.message}
           {...register("beer_count", { valueAsNumber: true })}
         />
-        {errors.beer_count && (
-          <div className="text-red-500">{errors.beer_count.message}</div>
-        )}
+        {errors.beer_count && <div className="text-red-500">{errors.beer_count.message}</div>}
       </div>
       <div>
         <Label htmlFor="tents" className="block">
@@ -283,9 +262,7 @@ const AttendanceEditForm = ({
           selectedTents={watchedTentIds}
           onTentsChange={(tents) => setValue("tent_ids", tents)}
         />
-        {errors.tent_ids && (
-          <div className="text-red-500">{errors.tent_ids.message}</div>
-        )}
+        {errors.tent_ids && <div className="text-red-500">{errors.tent_ids.message}</div>}
       </div>
       <Button type="submit" disabled={isSubmitting}>
         {t("attendance.updateAttendance")}
@@ -303,9 +280,7 @@ const AttendanceTable = ({
 }) => {
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedAttendanceId, setSelectedAttendanceId] = useState<
-    string | null
-  >(null);
+  const [selectedAttendanceId, setSelectedAttendanceId] = useState<string | null>(null);
 
   const handleDelete = useCallback((attendanceId: string) => {
     setSelectedAttendanceId(attendanceId);
@@ -330,8 +305,7 @@ const AttendanceTable = ({
             title={t("admin.users.attendances.headers.date")}
           />
         ),
-        cell: ({ row }: any) =>
-          formatDate(new Date(row.original.date), "dd/MM/yyyy"),
+        cell: ({ row }: any) => formatDate(new Date(row.original.date), "dd/MM/yyyy"),
       },
       {
         accessorKey: "beer_count",
@@ -398,20 +372,14 @@ const AttendanceTable = ({
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("admin.users.attendances.deleteTitle")}
-            </DialogTitle>
+            <DialogTitle>{t("admin.users.attendances.deleteTitle")}</DialogTitle>
             <DialogDescription>
-              {t("admin.users.attendances.deleteConfirm")}{" "}
-              {t("common.actions.cannotUndo")}
+              {t("admin.users.attendances.deleteConfirm")} {t("common.actions.cannotUndo")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
                 {t("admin.users.attendances.buttons.cancel")}
               </Button>
             </DialogClose>
@@ -435,8 +403,7 @@ const UserList = () => {
   const queryClient = useQueryClient();
   const [attendances, setAttendances] = useState<AttendanceWithTents[]>([]);
   const [selectedUser, setSelectedUser] = useState<CombinedUser | null>(null);
-  const [selectedAttendance, setSelectedAttendance] =
-    useState<AttendanceWithTents | null>(null);
+  const [selectedAttendance, setSelectedAttendance] = useState<AttendanceWithTents | null>(null);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
   const [isFetchingAttendances, setIsFetchingAttendances] = useState(false);
@@ -601,9 +568,7 @@ const UserList = () => {
             onSubmit={handleUpdateUser}
             attendances={attendances}
             onDeleteAttendance={handleDeleteAttendance}
-            onFetchAttendances={() =>
-              selectedUser && fetchAttendances(selectedUser.id)
-            }
+            onFetchAttendances={() => selectedUser && fetchAttendances(selectedUser.id)}
             isFetchingAttendances={isFetchingAttendances}
           />
         )}
@@ -626,8 +591,7 @@ const UserList = () => {
             {attendances.map((attendance) => (
               <div key={attendance.id} className="mb-2">
                 <span>
-                  {attendance.date.toString()} - {attendance.beer_count}{" "}
-                  {t("common.beers")}
+                  {attendance.date.toString()} - {attendance.beer_count} {t("common.beers")}
                 </span>
                 <Button
                   onClick={() => {

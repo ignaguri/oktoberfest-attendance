@@ -10,13 +10,7 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
-import {
-  AlertCircle,
-  CheckCircle,
-  Cloud,
-  CloudOff,
-  RefreshCw,
-} from "lucide-react-native";
+import { AlertCircle, CheckCircle, Cloud, CloudOff, RefreshCw } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,21 +28,11 @@ interface SyncStatusBarProps {
   alwaysShow?: boolean;
 }
 
-export function SyncStatusBar({
-  onViewErrors,
-  alwaysShow = false,
-}: SyncStatusBarProps) {
+export function SyncStatusBar({ onViewErrors, alwaysShow = false }: SyncStatusBarProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const {
-    isReady,
-    isOnline,
-    syncStatus,
-    pendingCount,
-    lastSyncResult,
-    error,
-    sync,
-  } = useOfflineSafe();
+  const { isReady, isOnline, syncStatus, pendingCount, lastSyncResult, error, sync } =
+    useOfflineSafe();
 
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -115,17 +99,12 @@ export function SyncStatusBar({
   const isInteractive = hasError || hasPending;
 
   const content = (
-    <HStack
-      space="sm"
-      className={cn("items-center justify-center px-4 py-2", bgColor)}
-    >
+    <HStack space="sm" className={cn("items-center justify-center px-4 py-2", bgColor)}>
       {icon}
       <Text className={cn("text-xs", textColor)} numberOfLines={1}>
         {statusText}
       </Text>
-      {isInteractive && !isSyncing && (
-        <RefreshCw size={14} color={IconColors.muted} />
-      )}
+      {isInteractive && !isSyncing && <RefreshCw size={14} color={IconColors.muted} />}
     </HStack>
   );
 
@@ -141,9 +120,7 @@ export function SyncStatusBar({
       <Pressable
         onPress={hasError ? (onViewErrors ?? handleRetry) : handleRetry}
         accessibilityRole="button"
-        accessibilityLabel={
-          hasError ? t("sync.tapToRetry") : t("sync.tapToSync")
-        }
+        accessibilityLabel={hasError ? t("sync.tapToRetry") : t("sync.tapToSync")}
         style={{ paddingTop: insets.top }}
         className={cn(bgColor)}
       >

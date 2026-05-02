@@ -59,8 +59,7 @@ export function LocalDrinkStepper({
         disabled={!canDecrement}
         className={cn(
           "h-10 w-10 rounded-full",
-          canDecrement &&
-            "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
+          canDecrement && "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
         )}
       >
         <Minus className="h-4 w-4" />
@@ -85,8 +84,7 @@ export function LocalDrinkStepper({
         disabled={!canIncrement}
         className={cn(
           "h-10 w-10 rounded-full",
-          canIncrement &&
-            "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
+          canIncrement && "border-yellow-500 text-yellow-600 hover:bg-yellow-50",
         )}
       >
         <Plus className="h-4 w-4" />

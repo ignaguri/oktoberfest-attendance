@@ -4,32 +4,21 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-} from "./BaseSlide";
+import { BaseSlide, SlideContent, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface DrinkBreakdownSlideProps {
   data: WrappedData;
   isActive?: boolean;
 }
 
-export function DrinkBreakdownSlide({
-  data,
-  isActive = false,
-}: DrinkBreakdownSlideProps) {
+export function DrinkBreakdownSlide({ data, isActive = false }: DrinkBreakdownSlideProps) {
   const { t } = useTranslation();
   const breakdown = data.drinkStats?.breakdown?.slice(0, 4) ?? [];
   const topDrinkType = data.drinkStats?.topDrinkType;
   const totalDrinks = data.drinkStats?.totalDrinks ?? 0;
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-amber-50 to-orange-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-amber-50 to-orange-50">
       <SlideTitle>{t("wrapped.drinkBreakdown.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.drinkBreakdown.subtitle")}</SlideSubtitle>
 
@@ -37,18 +26,14 @@ export function DrinkBreakdownSlide({
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-white p-4 text-center shadow">
             <p className="text-3xl font-bold text-amber-600">{totalDrinks}</p>
-            <p className="text-sm text-gray-600">
-              {t("wrapped.drinkBreakdown.totalDrinks")}
-            </p>
+            <p className="text-sm text-gray-600">{t("wrapped.drinkBreakdown.totalDrinks")}</p>
           </div>
           {topDrinkType && (
             <div className="rounded-lg bg-white p-4 text-center shadow">
               <p className="text-2xl font-bold text-amber-600">
                 {t(`wrapped.drinkBreakdown.drinkTypes.${topDrinkType}`)}
               </p>
-              <p className="text-sm text-gray-600">
-                {t("wrapped.drinkBreakdown.topDrink")}
-              </p>
+              <p className="text-sm text-gray-600">{t("wrapped.drinkBreakdown.topDrink")}</p>
             </div>
           )}
         </div>
@@ -73,9 +58,7 @@ export function DrinkBreakdownSlide({
                   </span>
                   <span className="font-bold text-amber-600">
                     {item.count}{" "}
-                    <span className="font-normal text-gray-500">
-                      ({item.percentage}%)
-                    </span>
+                    <span className="font-normal text-gray-500">({item.percentage}%)</span>
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-amber-100">

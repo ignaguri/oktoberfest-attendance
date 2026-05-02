@@ -28,10 +28,7 @@ export interface BackgroundLocationData {
  * This must be set by the LocationContext before starting background updates
  */
 let onBackgroundLocationUpdate:
-  | ((
-      location: Location.LocationObject,
-      data: BackgroundLocationData,
-    ) => Promise<void>)
+  | ((location: Location.LocationObject, data: BackgroundLocationData) => Promise<void>)
   | null = null;
 
 /**
@@ -88,10 +85,7 @@ function ensureTaskDefined() {
     if (onBackgroundLocationUpdate && backgroundLocationData) {
       missingCallbackCount = 0;
       try {
-        await onBackgroundLocationUpdate(
-          latestLocation,
-          backgroundLocationData,
-        );
+        await onBackgroundLocationUpdate(latestLocation, backgroundLocationData);
       } catch (err) {
         logger.error("Error in callback", err);
       }
@@ -120,10 +114,7 @@ function ensureTaskDefined() {
  */
 export function setBackgroundLocationCallback(
   callback:
-    | ((
-        location: Location.LocationObject,
-        data: BackgroundLocationData,
-      ) => Promise<void>)
+    | ((location: Location.LocationObject, data: BackgroundLocationData) => Promise<void>)
     | null,
 ) {
   ensureTaskDefined();
@@ -136,9 +127,7 @@ export function setBackgroundLocationCallback(
 /**
  * Set the data for background location task (also persists to AsyncStorage)
  */
-export async function setBackgroundLocationData(
-  data: BackgroundLocationData | null,
-) {
+export async function setBackgroundLocationData(data: BackgroundLocationData | null) {
   backgroundLocationData = data;
   try {
     if (data) {
@@ -179,9 +168,7 @@ export async function startBackgroundLocationUpdates(
     ensureTaskDefined();
 
     // Check if background location task is already running
-    const isRunning = await Location.hasStartedLocationUpdatesAsync(
-      BACKGROUND_LOCATION_TASK,
-    );
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
 
     if (isRunning) {
       logger.debug("Task already running, stopping first");
@@ -220,9 +207,7 @@ export async function startBackgroundLocationUpdates(
  */
 export async function stopBackgroundLocationUpdates(): Promise<void> {
   try {
-    const isRunning = await Location.hasStartedLocationUpdatesAsync(
-      BACKGROUND_LOCATION_TASK,
-    );
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
 
     if (isRunning) {
       await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
@@ -241,9 +226,7 @@ export async function stopBackgroundLocationUpdates(): Promise<void> {
  */
 export async function isBackgroundLocationRunning(): Promise<boolean> {
   try {
-    return await Location.hasStartedLocationUpdatesAsync(
-      BACKGROUND_LOCATION_TASK,
-    );
+    return await Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
   } catch (error) {
     logger.error("Error checking status", error);
     return false;

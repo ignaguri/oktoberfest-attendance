@@ -92,9 +92,7 @@ export default function JoinGroupByTokenScreen() {
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <VStack space="lg" className="items-center">
           <ActivityIndicator size="large" color={Colors.primary[500]} />
-          <Text className="text-center text-typography-500">
-            {t("groups.deepLink.joining")}
-          </Text>
+          <Text className="text-center text-typography-500">{t("groups.deepLink.joining")}</Text>
         </VStack>
       </View>
     );
@@ -199,9 +197,7 @@ export default function JoinGroupByTokenScreen() {
           <Heading size="xl" className="text-center text-error-600">
             {t("groups.deepLink.errorTitle")}
           </Heading>
-          <Text className="text-center text-typography-500">
-            {result.errorMessage}
-          </Text>
+          <Text className="text-center text-typography-500">{result.errorMessage}</Text>
         </VStack>
 
         <VStack space="md" className="w-full">

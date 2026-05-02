@@ -29,10 +29,7 @@ describe("Festival Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -249,9 +246,7 @@ describe("Festival Routes - Unit Tests", () => {
 
     it("should return empty array when no festivals found", async () => {
       // Mock empty result
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const req = createAuthRequest("/festivals", {
         method: "GET",
@@ -270,9 +265,7 @@ describe("Festival Routes - Unit Tests", () => {
     it("should handle database errors gracefully", async () => {
       // Mock database error
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to list festivals", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to list festivals", "PGRST000")),
       );
 
       const req = createAuthRequest("/festivals", {

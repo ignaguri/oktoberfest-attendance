@@ -31,10 +31,7 @@ export function SearchHighlight({
       {parts.map((part, index) => {
         const isMatch = part.match(regex) !== null;
         return (
-          <span
-            key={index}
-            className={isMatch ? highlightClassName : undefined}
-          >
+          <span key={index} className={isMatch ? highlightClassName : undefined}>
             {part}
           </span>
         );

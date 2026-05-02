@@ -37,22 +37,14 @@ export function SearchResults({
 
   if (isEmpty) {
     return (
-      <div
-        className={cn(
-          "flex flex-col items-center justify-center py-8 text-center",
-          className,
-        )}
-      >
+      <div className={cn("flex flex-col items-center justify-center py-8 text-center", className)}>
         {emptyComponent || (
           <>
             <Search className="text-muted-foreground mb-4 h-12 w-12" />
-            <p className="text-muted-foreground text-lg font-medium">
-              {emptyMessage}
-            </p>
+            <p className="text-muted-foreground text-lg font-medium">{emptyMessage}</p>
             {searchTerm && (
               <p className="text-muted-foreground mt-2 text-sm">
-                No results found for{" "}
-                <span className="font-medium">&ldquo;{searchTerm}&rdquo;</span>
+                No results found for <span className="font-medium">&ldquo;{searchTerm}&rdquo;</span>
               </p>
             )}
           </>

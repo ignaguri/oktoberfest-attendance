@@ -71,15 +71,13 @@ export function useUnifiedFeed(festivalId?: string) {
   const feedItems = useMemo(
     () =>
       [...activityItems, ...messageItems].sort(
-        (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
       ),
     [activityItems, messageItems],
   );
 
   const hasNextPage = activities.hasNextPage || messages.hasNextPage;
-  const isFetchingNextPage =
-    activities.isFetchingNextPage || messages.isFetchingNextPage;
+  const isFetchingNextPage = activities.isFetchingNextPage || messages.isFetchingNextPage;
 
   // Load more from whichever source's tail is newer (it has more ground to cover)
   const fetchNextPage = useCallback(() => {
@@ -93,10 +91,7 @@ export function useUnifiedFeed(festivalId?: string) {
 
     if (activities.hasNextPage && messages.hasNextPage) {
       // Fetch from the source whose oldest item is newer (more to catch up)
-      if (
-        actTailTime === undefined ||
-        (msgTailTime !== undefined && msgTailTime > actTailTime)
-      ) {
+      if (actTailTime === undefined || (msgTailTime !== undefined && msgTailTime > actTailTime)) {
         messages.fetchNextPage();
       } else {
         activities.fetchNextPage();

@@ -4,13 +4,7 @@
  * Uses ApiClientContext to get the platform-specific API client
  */
 
-import {
-  QueryKeys,
-  useApiClient,
-  useInvalidateQueries,
-  useMutation,
-  useQuery,
-} from "../data";
+import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } from "../data";
 
 /**
  * Query-key prefixes to invalidate whenever an attendance is created,
@@ -101,12 +95,7 @@ export function useUpdatePersonalAttendance() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async (input: {
-      festivalId: string;
-      date: string;
-      tents?: string[];
-      amount?: number;
-    }) => {
+    async (input: { festivalId: string; date: string; tents?: string[]; amount?: number }) => {
       return await apiClient.attendance.updatePersonal(input);
     },
     {

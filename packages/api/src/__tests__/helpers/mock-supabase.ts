@@ -10,11 +10,7 @@ import { createMockUser } from "./test-server";
  *
  * @param finalResult - Optional result to return when the chain is executed (via await, single, maybeSingle, then)
  */
-function createMockQueryBuilder(finalResult?: {
-  data: any;
-  error: any;
-  count?: number;
-}) {
+function createMockQueryBuilder(finalResult?: { data: any; error: any; count?: number }) {
   const defaultResult = finalResult || { data: null, error: null };
 
   const builder: any = {
@@ -54,9 +50,7 @@ function createMockQueryBuilder(finalResult?: {
   };
 
   // Make builder thenable so it can be awaited directly
-  builder.then = vi.fn((resolve) =>
-    Promise.resolve(defaultResult).then(resolve),
-  );
+  builder.then = vi.fn((resolve) => Promise.resolve(defaultResult).then(resolve));
 
   return builder;
 }
@@ -70,11 +64,7 @@ function createMockQueryBuilder(finalResult?: {
  *   createMockChain({ data: mockGroup, error: null })
  * );
  */
-export function createMockChain(finalResult: {
-  data: any;
-  error: any;
-  count?: number;
-}) {
+export function createMockChain(finalResult: { data: any; error: any; count?: number }) {
   return createMockQueryBuilder(finalResult);
 }
 

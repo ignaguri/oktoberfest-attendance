@@ -28,12 +28,7 @@ export default function Navbar({ showUserMenu = true }: NavbarProps) {
           className="flex items-center gap-2 text-base font-bold text-white sm:text-xl"
           href={profileData ? "/home" : "/"}
         >
-          <Image
-            src={AppLogo}
-            alt="ProstCounter Logo"
-            className="size-6"
-            priority
-          />
+          <Image src={AppLogo} alt="ProstCounter Logo" className="size-6" priority />
           <span translate="no">ProstCounter</span>
         </Link>
 

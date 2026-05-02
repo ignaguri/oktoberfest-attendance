@@ -1,7 +1,4 @@
-import {
-  useSearchUsers,
-  useSendFriendRequest,
-} from "@prostcounter/shared/hooks";
+import { useSearchUsers, useSendFriendRequest } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchUserResult } from "@prostcounter/shared/schemas";
 import { Search } from "lucide-react-native";
@@ -9,11 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
 
 import { AddFriendButton } from "@/components/friends/add-friend-button";
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -37,10 +30,8 @@ export default function FriendSearchScreen() {
   const sortedResults = useMemo(() => {
     if (!results) return [];
     return [...results].sort((a: SearchUserResult, b: SearchUserResult) => {
-      if (a.friendshipStatus === "friends" && b.friendshipStatus !== "friends")
-        return 1;
-      if (a.friendshipStatus !== "friends" && b.friendshipStatus === "friends")
-        return -1;
+      if (a.friendshipStatus === "friends" && b.friendshipStatus !== "friends") return 1;
+      if (a.friendshipStatus !== "friends" && b.friendshipStatus === "friends") return -1;
       const nameA = (a.fullName || a.username || "").toLowerCase();
       const nameB = (b.fullName || b.username || "").toLowerCase();
       return nameA.localeCompare(nameB);
@@ -54,8 +45,7 @@ export default function FriendSearchScreen() {
 
   const keyExtractor = useCallback((item: SearchUserResult) => item.id, []);
 
-  const showNoResults =
-    !loading && debouncedQuery.length >= 1 && results?.length === 0;
+  const showNoResults = !loading && debouncedQuery.length >= 1 && results?.length === 0;
 
   return (
     <VStack className="flex-1 bg-background-50">
@@ -85,9 +75,7 @@ export default function FriendSearchScreen() {
 
       {showNoResults && (
         <VStack className="items-center py-8">
-          <Text className="text-typography-400">
-            {t("friends.search.noResults")}
-          </Text>
+          <Text className="text-typography-400">{t("friends.search.noResults")}</Text>
         </VStack>
       )}
 
@@ -114,14 +102,9 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
   const friendshipStatus = user.friendshipStatus;
 
   return (
-    <HStack
-      className="items-center border-b border-outline-100 py-3"
-      space="md"
-    >
+    <HStack className="items-center border-b border-outline-100 py-3" space="md">
       <Avatar size="md">
-        {user.avatarUrl ? (
-          <AvatarImage source={{ uri: getAvatarUrl(user.avatarUrl) }} />
-        ) : null}
+        {user.avatarUrl ? <AvatarImage source={{ uri: getAvatarUrl(user.avatarUrl) }} /> : null}
         <AvatarFallbackText>{displayName}</AvatarFallbackText>
       </Avatar>
 

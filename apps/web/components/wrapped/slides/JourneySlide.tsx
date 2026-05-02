@@ -27,10 +27,7 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
 
   if (timelineData.length === 0) {
     return (
-      <BaseSlide
-        isActive={isActive}
-        className="bg-gradient-to-br from-purple-50 to-pink-50"
-      >
+      <BaseSlide isActive={isActive} className="bg-gradient-to-br from-purple-50 to-pink-50">
         <SlideTitle>{t("wrapped.journey.title")}</SlideTitle>
         <p className="text-gray-600">No timeline data available</p>
       </BaseSlide>
@@ -38,31 +35,15 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
   }
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-purple-50 to-pink-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-purple-50 to-pink-50">
       <SlideTitle>{t("wrapped.journey.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.journey.subtitle")}</SlideSubtitle>
 
       <div className="w-full max-w-3xl">
-        <ResponsiveContainer
-          width="100%"
-          height={CHART_CONFIG.dimensions.height}
-        >
-          <LineChart
-            data={timelineData}
-            margin={CHART_CONFIG.dimensions.margin}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={CHART_CONFIG.colors.grid}
-            />
-            <XAxis
-              dataKey="date"
-              stroke={CHART_CONFIG.colors.text}
-              fontSize={12}
-            />
+        <ResponsiveContainer width="100%" height={CHART_CONFIG.dimensions.height}>
+          <LineChart data={timelineData} margin={CHART_CONFIG.dimensions.margin}>
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_CONFIG.colors.grid} />
+            <XAxis dataKey="date" stroke={CHART_CONFIG.colors.text} fontSize={12} />
             <YAxis stroke={CHART_CONFIG.colors.text} fontSize={12} />
             <Tooltip
               contentStyle={{
@@ -86,9 +67,7 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
 
         <div className="mt-6 grid grid-cols-2 gap-4 text-center">
           <div className="rounded-lg bg-white p-3 shadow">
-            <p className="text-sm text-gray-600">
-              {t("wrapped.peakMoment.bestDay")}
-            </p>
+            <p className="text-sm text-gray-600">{t("wrapped.peakMoment.bestDay")}</p>
             <p className="text-xl font-bold text-yellow-600">
               {t("wrapped.peakMoment.beers", {
                 count: Math.max(...timelineData.map((d) => d.beers)),
@@ -96,12 +75,8 @@ export function JourneySlide({ data, isActive = false }: JourneySlideProps) {
             </p>
           </div>
           <div className="rounded-lg bg-white p-3 shadow">
-            <p className="text-sm text-gray-600">
-              {t("wrapped.numbers.daysAttended")}
-            </p>
-            <p className="text-xl font-bold text-yellow-600">
-              {timelineData.length}
-            </p>
+            <p className="text-sm text-gray-600">{t("wrapped.numbers.daysAttended")}</p>
+            <p className="text-xl font-bold text-yellow-600">{timelineData.length}</p>
           </div>
         </div>
       </div>

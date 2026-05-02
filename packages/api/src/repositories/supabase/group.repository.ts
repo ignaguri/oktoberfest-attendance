@@ -1,4 +1,4 @@
-import type { Database } from "@prostcounter/db";
+import type { Database, TablesUpdate } from "@prostcounter/db";
 import type {
   CreateGroupInput,
   Group,
@@ -13,11 +13,7 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import {
-  ConflictError,
-  DatabaseError,
-  NotFoundError,
-} from "../../middleware/error";
+import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
 import type { IGroupRepository } from "../interfaces";
 
 // Mapping between winning criteria strings and database IDs
@@ -27,14 +23,12 @@ const WINNING_CRITERIA_MAP: Record<string, number> = {
   avg_beers: 3,
 };
 
-const WINNING_CRITERIA_REVERSE_MAP: Record<
-  number,
-  "days_attended" | "total_beers" | "avg_beers"
-> = {
-  1: "days_attended",
-  2: "total_beers",
-  3: "avg_beers",
-};
+const WINNING_CRITERIA_REVERSE_MAP: Record<number, "days_attended" | "total_beers" | "avg_beers"> =
+  {
+    1: "days_attended",
+    2: "total_beers",
+    3: "avg_beers",
+  };
 
 export class SupabaseGroupRepository implements IGroupRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -43,22 +37,17 @@ export class SupabaseGroupRepository implements IGroupRepository {
     // Map winning criteria string to ID
     const winningCriteriaId = WINNING_CRITERIA_MAP[data.winningCriteria];
     if (!winningCriteriaId) {
-      throw new DatabaseError(
-        `Invalid winning criteria: ${data.winningCriteria}`,
-      );
+      throw new DatabaseError(`Invalid winning criteria: ${data.winningCriteria}`);
     }
 
     // Use SECURITY DEFINER function to bypass RLS
     // This function creates the group AND adds the creator as a member atomically
-    const { data: result, error } = await this.supabase.rpc(
-      "create_group_with_member",
-      {
-        p_group_name: data.name,
-        p_user_id: userId,
-        p_festival_id: data.festivalId,
-        p_winning_criteria_id: winningCriteriaId,
-      },
-    );
+    const { data: result, error } = await this.supabase.rpc("create_group_with_member", {
+      p_group_name: data.name,
+      p_user_id: userId,
+      p_festival_id: data.festivalId,
+      p_winning_criteria_id: winningCriteriaId,
+    });
 
     if (error) {
       throw new DatabaseError(`Failed to create group: ${error.message}`);
@@ -74,9 +63,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       id: group.group_id,
       name: group.group_name,
       festivalId: group.festival_id,
-      winningCriteria:
-        WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] ||
-        "total_beers",
+      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
       inviteToken: group.invite_token,
       createdBy: group.created_by,
       createdAt: group.created_at,
@@ -84,10 +71,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     };
   }
 
-  async listUserGroups(
-    userId: string,
-    query?: ListGroupsQuery,
-  ): Promise<GroupWithMembers[]> {
+  async listUserGroups(userId: string, query?: ListGroupsQuery): Promise<GroupWithMembers[]> {
     let supabaseQuery = this.supabase
       .from("groups")
       .select(
@@ -146,9 +130,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     }
 
     if (error || !data) {
-      throw new DatabaseError(
-        `Failed to fetch group: ${error?.message || "No data returned"}`,
-      );
+      throw new DatabaseError(`Failed to fetch group: ${error?.message || "No data returned"}`);
     }
 
     // Get member count
@@ -180,9 +162,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     }
 
     if (error || !data) {
-      throw new DatabaseError(
-        `Failed to fetch group: ${error?.message || "No data returned"}`,
-      );
+      throw new DatabaseError(`Failed to fetch group: ${error?.message || "No data returned"}`);
     }
 
     return this.mapToGroup(data);
@@ -231,8 +211,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
   }
 
   async update(groupId: string, data: UpdateGroupInput): Promise<Group> {
-    // Build update object
-    const updateData: Record<string, unknown> = {};
+    const updateData: TablesUpdate<"groups"> = {};
 
     if (data.name !== undefined) {
       updateData.name = data.name;
@@ -259,9 +238,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .single();
 
     if (error || !group) {
-      throw new DatabaseError(
-        `Failed to update group: ${error?.message || "No data returned"}`,
-      );
+      throw new DatabaseError(`Failed to update group: ${error?.message || "No data returned"}`);
     }
 
     return this.mapToGroup(group);
@@ -275,9 +252,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .single();
 
     if (error || !data) {
-      throw new DatabaseError(
-        `Failed to check creator: ${error?.message || "No data returned"}`,
-      );
+      throw new DatabaseError(`Failed to check creator: ${error?.message || "No data returned"}`);
     }
 
     return data.created_by === userId;
@@ -380,9 +355,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     }
 
     if (!data.invite_token) {
-      throw new DatabaseError(
-        "Failed to renew invite token: no token returned",
-      );
+      throw new DatabaseError("Failed to renew invite token: no token returned");
     }
 
     return data.invite_token;
@@ -402,9 +375,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .eq("group_id", groupId);
 
     if (membersError) {
-      throw new DatabaseError(
-        `Failed to get group members: ${membersError.message}`,
-      );
+      throw new DatabaseError(`Failed to get group members: ${membersError.message}`);
     }
 
     const memberIds = (members || [])
@@ -441,9 +412,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       .order("created_at", { ascending: false });
 
     if (photosError) {
-      throw new DatabaseError(
-        `Failed to get group gallery: ${photosError.message}`,
-      );
+      throw new DatabaseError(`Failed to get group gallery: ${photosError.message}`);
     }
 
     return (photos || []).map((photo: any) => ({
@@ -462,13 +431,9 @@ export class SupabaseGroupRepository implements IGroupRepository {
     // Extract winning criteria name from joined table or use reverse map
     let winningCriteria: "days_attended" | "total_beers" | "avg_beers";
     if (data.winning_criteria && typeof data.winning_criteria === "object") {
-      winningCriteria = data.winning_criteria.name as
-        | "days_attended"
-        | "total_beers"
-        | "avg_beers";
+      winningCriteria = data.winning_criteria.name as "days_attended" | "total_beers" | "avg_beers";
     } else if (data.winning_criteria_id) {
-      winningCriteria =
-        WINNING_CRITERIA_REVERSE_MAP[data.winning_criteria_id] || "total_beers";
+      winningCriteria = WINNING_CRITERIA_REVERSE_MAP[data.winning_criteria_id] || "total_beers";
     } else {
       winningCriteria = "total_beers"; // Fallback
     }

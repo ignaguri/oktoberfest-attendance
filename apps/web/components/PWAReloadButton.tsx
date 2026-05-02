@@ -27,17 +27,13 @@ export function PWAReloadButton() {
       // Clear service worker caches
       if ("serviceWorker" in navigator && "caches" in window) {
         const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName)),
-        );
+        await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
       }
 
       // Update service worker
       if ("serviceWorker" in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(
-          registrations.map((registration) => registration.update()),
-        );
+        await Promise.all(registrations.map((registration) => registration.update()));
       }
 
       // Reload the page with cache bypass

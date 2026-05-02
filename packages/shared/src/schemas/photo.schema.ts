@@ -19,9 +19,7 @@ export const GetPhotoUploadUrlQuerySchema = z.object({
     .max(10 * 1024 * 1024, "File size must not exceed 10MB"), // 10MB max
 });
 
-export type GetPhotoUploadUrlQuery = z.infer<
-  typeof GetPhotoUploadUrlQuerySchema
->;
+export type GetPhotoUploadUrlQuery = z.infer<typeof GetPhotoUploadUrlQuerySchema>;
 
 /**
  * Photo upload URL response
@@ -33,9 +31,7 @@ export const GetPhotoUploadUrlResponseSchema = z.object({
   pictureId: z.uuid(), // Pre-created beer_pictures record ID
 });
 
-export type GetPhotoUploadUrlResponse = z.infer<
-  typeof GetPhotoUploadUrlResponseSchema
->;
+export type GetPhotoUploadUrlResponse = z.infer<typeof GetPhotoUploadUrlResponseSchema>;
 
 /**
  * Confirm photo upload request
@@ -60,9 +56,7 @@ export const ConfirmPhotoUploadResponseSchema = z.object({
   }),
 });
 
-export type ConfirmPhotoUploadResponse = z.infer<
-  typeof ConfirmPhotoUploadResponseSchema
->;
+export type ConfirmPhotoUploadResponse = z.infer<typeof ConfirmPhotoUploadResponseSchema>;
 
 /**
  * Photo visibility enum
@@ -130,9 +124,7 @@ export const UpdateGlobalPhotoSettingsSchema = z.object({
   hidePhotosFromAllGroups: z.boolean(),
 });
 
-export type UpdateGlobalPhotoSettingsInput = z.infer<
-  typeof UpdateGlobalPhotoSettingsSchema
->;
+export type UpdateGlobalPhotoSettingsInput = z.infer<typeof UpdateGlobalPhotoSettingsSchema>;
 
 /**
  * Group photo settings schema
@@ -154,9 +146,7 @@ export const UpdateGroupPhotoSettingsSchema = z.object({
   hidePhotosFromGroup: z.boolean(),
 });
 
-export type UpdateGroupPhotoSettingsInput = z.infer<
-  typeof UpdateGroupPhotoSettingsSchema
->;
+export type UpdateGroupPhotoSettingsInput = z.infer<typeof UpdateGroupPhotoSettingsSchema>;
 
 /**
  * Update photo visibility request
@@ -165,9 +155,7 @@ export const UpdatePhotoVisibilitySchema = z.object({
   visibility: PhotoVisibilitySchema,
 });
 
-export type UpdatePhotoVisibilityInput = z.infer<
-  typeof UpdatePhotoVisibilitySchema
->;
+export type UpdatePhotoVisibilityInput = z.infer<typeof UpdatePhotoVisibilitySchema>;
 
 /**
  * Bulk update photo visibility request
@@ -177,6 +165,4 @@ export const BulkUpdatePhotoVisibilitySchema = z.object({
   visibility: PhotoVisibilitySchema,
 });
 
-export type BulkUpdatePhotoVisibilityInput = z.infer<
-  typeof BulkUpdatePhotoVisibilitySchema
->;
+export type BulkUpdatePhotoVisibilityInput = z.infer<typeof BulkUpdatePhotoVisibilitySchema>;

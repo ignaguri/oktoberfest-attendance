@@ -71,9 +71,7 @@ interface NotificationPayload {
  *
  * @returns Route path string, or null if no specific route
  */
-export function getNotificationRoute(
-  payload: NotificationPayload,
-): string | null {
+export function getNotificationRoute(payload: NotificationPayload): string | null {
   const type = payload.type;
 
   // Route by explicit push type first

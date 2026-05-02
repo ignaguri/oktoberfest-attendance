@@ -4,10 +4,7 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  type UpdatePasswordFormData,
-  updatePasswordSchema,
-} from "@prostcounter/shared/schemas";
+import { type UpdatePasswordFormData, updatePasswordSchema } from "@prostcounter/shared/schemas";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -46,9 +43,7 @@ export default function UpdatePassword() {
     <div className="card">
       <h2 className="w-full text-center">{t("auth.updatePassword.title")}</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
-        <Label htmlFor="password">
-          {t("auth.updatePassword.passwordLabel")}
-        </Label>
+        <Label htmlFor="password">{t("auth.updatePassword.passwordLabel")}</Label>
         <Input
           errorMsg={errors.password?.message}
           id="password"
@@ -67,9 +62,7 @@ export default function UpdatePassword() {
           {...register("password")}
         />
 
-        <Label htmlFor="confirmPassword">
-          {t("auth.updatePassword.confirmPasswordLabel")}
-        </Label>
+        <Label htmlFor="confirmPassword">{t("auth.updatePassword.confirmPasswordLabel")}</Label>
         <Input
           errorMsg={errors.confirmPassword?.message}
           id="confirmPassword"
@@ -88,15 +81,8 @@ export default function UpdatePassword() {
           {...register("confirmPassword")}
         />
 
-        <Button
-          variant="yellow"
-          className="self-center"
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting
-            ? t("common.status.loading")
-            : t("auth.updatePassword.submit")}
+        <Button variant="yellow" className="self-center" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? t("common.status.loading") : t("auth.updatePassword.submit")}
         </Button>
       </form>
     </div>

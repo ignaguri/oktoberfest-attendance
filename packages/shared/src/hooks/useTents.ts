@@ -27,9 +27,7 @@ export function useTents(festivalId?: string) {
   const apiClient = useApiClient();
 
   // Use different query keys for festival-specific vs all tents
-  const queryKey = festivalId
-    ? QueryKeys.tents(festivalId)
-    : QueryKeys.allTents();
+  const queryKey = festivalId ? QueryKeys.tents(festivalId) : QueryKeys.allTents();
 
   const query = useQuery(
     queryKey,
@@ -55,9 +53,7 @@ export function useTents(festivalId?: string) {
         ? tent.category.charAt(0).toUpperCase() + tent.category.slice(1)
         : "Uncategorized";
 
-      const existingCategory = acc.find(
-        (g: TentGroup) => g.category === category,
-      );
+      const existingCategory = acc.find((g: TentGroup) => g.category === category);
 
       if (existingCategory) {
         existingCategory.options.push({

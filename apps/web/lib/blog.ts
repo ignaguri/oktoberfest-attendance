@@ -7,18 +7,10 @@ import readingTime from "reading-time";
 const CONTENT_DIR = path.join(process.cwd(), "content/blog");
 
 export type BlogCategory = "festivals" | "tips" | "culture" | "news";
-export const VALID_CATEGORIES: BlogCategory[] = [
-  "festivals",
-  "tips",
-  "culture",
-  "news",
-];
+export const VALID_CATEGORIES: BlogCategory[] = ["festivals", "tips", "culture", "news"];
 
 function parseCategory(value: unknown): BlogCategory {
-  if (
-    typeof value === "string" &&
-    VALID_CATEGORIES.includes(value as BlogCategory)
-  ) {
+  if (typeof value === "string" && VALID_CATEGORIES.includes(value as BlogCategory)) {
     return value as BlogCategory;
   }
   return "tips";
@@ -47,9 +39,7 @@ function getLocaleDir(locale: SupportedLanguage): string {
   return path.join(CONTENT_DIR, locale);
 }
 
-export async function getAllPosts(
-  locale: SupportedLanguage = "en",
-): Promise<BlogPostMeta[]> {
+export async function getAllPosts(locale: SupportedLanguage = "en"): Promise<BlogPostMeta[]> {
   const dir = getLocaleDir(locale);
 
   if (!fs.existsSync(dir)) {
@@ -80,9 +70,7 @@ export async function getAllPosts(
     } satisfies BlogPostMeta;
   });
 
-  return posts.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
+  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export async function getPostBySlug(
@@ -141,9 +129,7 @@ export async function getPostsByCategory(
   return posts.filter((post) => post.category === category);
 }
 
-export async function getAvailableLocales(
-  slug: string,
-): Promise<SupportedLanguage[]> {
+export async function getAvailableLocales(slug: string): Promise<SupportedLanguage[]> {
   const locales: SupportedLanguage[] = ["en", "de", "es"];
   const available: SupportedLanguage[] = [];
 

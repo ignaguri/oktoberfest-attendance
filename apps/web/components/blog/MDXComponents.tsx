@@ -71,18 +71,10 @@ export function AppScreenshot({
   return (
     <figure className="my-6">
       <div className="overflow-hidden rounded-lg border border-gray-200">
-        <Image
-          src={src}
-          alt={alt}
-          width={800}
-          height={450}
-          className="w-full"
-        />
+        <Image src={src} alt={alt} width={800} height={450} className="w-full" />
       </div>
       {caption && (
-        <figcaption className="mt-2 text-center text-sm text-gray-500">
-          {caption}
-        </figcaption>
+        <figcaption className="mt-2 text-center text-sm text-gray-500">{caption}</figcaption>
       )}
     </figure>
   );
@@ -123,11 +115,7 @@ const downloadTranslations: Record<SupportedLanguage, { tryWeb: string }> = {
   es: { tryWeb: "Probar App Web" },
 };
 
-function DownloadButtonsInner({
-  locale = "en",
-}: {
-  locale?: SupportedLanguage;
-}) {
+function DownloadButtonsInner({ locale = "en" }: { locale?: SupportedLanguage }) {
   const t = downloadTranslations[locale];
   return (
     <div className="my-6 flex flex-wrap items-center gap-4">
@@ -149,18 +137,13 @@ function DownloadButtonsInner({
 
 export function getMdxComponents(locale: SupportedLanguage = "en") {
   return {
-    CTA: (props: { children?: React.ReactNode }) => (
-      <CTAInner {...props} locale={locale} />
-    ),
+    CTA: (props: { children?: React.ReactNode }) => <CTAInner {...props} locale={locale} />,
     AppScreenshot,
     FestivalInfo,
     DownloadButtons: () => <DownloadButtonsInner locale={locale} />,
     // Override default HTML elements for better styling
     h1: ({ children, ...props }: React.ComponentProps<"h1">) => (
-      <h1
-        className="mt-8 mb-4 text-3xl font-bold tracking-tight text-gray-900"
-        {...props}
-      >
+      <h1 className="mt-8 mb-4 text-3xl font-bold tracking-tight text-gray-900" {...props}>
         {children}
       </h1>
     ),
@@ -210,10 +193,7 @@ export function getMdxComponents(locale: SupportedLanguage = "en") {
         </a>
       );
     },
-    blockquote: ({
-      children,
-      ...props
-    }: React.ComponentProps<"blockquote">) => (
+    blockquote: ({ children, ...props }: React.ComponentProps<"blockquote">) => (
       <blockquote
         className="my-4 border-l-4 border-yellow-400 bg-yellow-50 py-2 pl-4 text-gray-700 italic"
         {...props}

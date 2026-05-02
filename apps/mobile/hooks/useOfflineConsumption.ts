@@ -5,10 +5,7 @@
  * the orchestrator (useSaveAttendance) triggers a single push after all writes.
  */
 
-import type {
-  Consumption,
-  LogConsumptionInput,
-} from "@prostcounter/shared/schemas";
+import type { Consumption, LogConsumptionInput } from "@prostcounter/shared/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
@@ -113,16 +110,10 @@ export function useOfflineLogConsumption() {
         );
 
         if (recentConsumption) {
-          logger.debug(
-            "[OfflineConsumption] Deduplication: returning existing consumption",
-            { id: recentConsumption.id },
-          );
-          return buildConsumptionResult(
-            recentConsumption.id,
-            attendanceId,
-            input,
-            now,
-          );
+          logger.debug("[OfflineConsumption] Deduplication: returning existing consumption", {
+            id: recentConsumption.id,
+          });
+          return buildConsumptionResult(recentConsumption.id, attendanceId, input, now);
         }
       }
 
@@ -190,10 +181,8 @@ export function useOfflineDeleteConsumption() {
 
   const deleteConsumptionLocal = useCallback(
     async (input: string | DeleteConsumptionInput): Promise<void> => {
-      const consumptionId =
-        typeof input === "string" ? input : input.consumptionId;
-      const skipSideEffects =
-        typeof input === "string" ? false : input.skipSideEffects;
+      const consumptionId = typeof input === "string" ? input : input.consumptionId;
+      const skipSideEffects = typeof input === "string" ? false : input.skipSideEffects;
 
       if (!isReady || !getDb || !refreshPendingCount) {
         throw new Error("Offline mode not available");
@@ -214,10 +203,7 @@ export function useOfflineDeleteConsumption() {
       if (!skipSideEffects) {
         await refreshPendingCount();
 
-        await invalidateLocalQueries(queryClient, [
-          "local-consumptions",
-          "local-attendances",
-        ]);
+        await invalidateLocalQueries(queryClient, ["local-consumptions", "local-attendances"]);
       }
 
       logger.debug("[OfflineConsumption] Soft-deleted consumption locally:", {

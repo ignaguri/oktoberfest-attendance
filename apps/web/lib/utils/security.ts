@@ -55,10 +55,7 @@ export function sanitizeHTML(html: string, maxLength: number = 10000): string {
  * Sanitize search term for database queries
  * Removes SQL wildcards and escape characters
  */
-export function sanitizeSearchTerm(
-  search: string,
-  maxLength: number = 100,
-): string {
+export function sanitizeSearchTerm(search: string, maxLength: number = 100): string {
   if (!search || typeof search !== "string") {
     return "";
   }

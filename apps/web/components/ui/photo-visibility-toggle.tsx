@@ -26,8 +26,7 @@ export function PhotoVisibilityToggle({
   className = "",
 }: PhotoVisibilityToggleProps) {
   const { t } = useTranslation();
-  const [visibility, setVisibility] =
-    useState<PhotoVisibility>(currentVisibility);
+  const [visibility, setVisibility] = useState<PhotoVisibility>(currentVisibility);
   const [isLoading, setIsLoading] = useState(false);
 
   const isPublic = visibility === "public";
@@ -69,19 +68,11 @@ export function PhotoVisibilityToggle({
         <EyeOff size={iconSize} className="text-red-600" />
       )}
 
-      <Switch
-        checked={isPublic}
-        onCheckedChange={handleToggle}
-        disabled={isLoading}
-      />
+      <Switch checked={isPublic} onCheckedChange={handleToggle} disabled={isLoading} />
 
       {showLabel && (
-        <span
-          className={cn(size === "sm" ? "text-xs" : "text-sm", "font-medium")}
-        >
-          {isPublic
-            ? t("photo.visibility.public")
-            : t("photo.visibility.private")}
+        <span className={cn(size === "sm" ? "text-xs" : "text-sm", "font-medium")}>
+          {isPublic ? t("photo.visibility.public") : t("photo.visibility.private")}
         </span>
       )}
     </div>

@@ -82,9 +82,7 @@ export function useUpdateProfile() {
         await cancelQueries(QueryKeys.profile());
 
         // Snapshot the previous value
-        const previousProfile = getQueryData<ProfileCacheData>(
-          QueryKeys.profile(),
-        );
+        const previousProfile = getQueryData<ProfileCacheData>(QueryKeys.profile());
 
         // Optimistically update the cache with new values
         if (previousProfile) {
@@ -111,10 +109,7 @@ export function useUpdateProfile() {
       onError: (_error, _variables, context) => {
         // Rollback to previous value on error
         if (context?.previousProfile) {
-          setQueryData<ProfileCacheData>(
-            QueryKeys.profile(),
-            context.previousProfile,
-          );
+          setQueryData<ProfileCacheData>(QueryKeys.profile(), context.previousProfile);
         }
       },
       onSettled: () => {
@@ -191,9 +186,7 @@ export function useCompleteTutorial() {
         await cancelQueries(QueryKeys.tutorialStatus());
 
         // Snapshot the previous value
-        const previousStatus = getQueryData<TutorialStatusCacheData>(
-          QueryKeys.tutorialStatus(),
-        );
+        const previousStatus = getQueryData<TutorialStatusCacheData>(QueryKeys.tutorialStatus());
 
         // Optimistically update to completed
         setQueryData<TutorialStatusCacheData>(QueryKeys.tutorialStatus(), {
@@ -206,10 +199,7 @@ export function useCompleteTutorial() {
       onError: (_error, _variables, context) => {
         // Rollback on error
         if (context?.previousStatus) {
-          setQueryData<TutorialStatusCacheData>(
-            QueryKeys.tutorialStatus(),
-            context.previousStatus,
-          );
+          setQueryData<TutorialStatusCacheData>(QueryKeys.tutorialStatus(), context.previousStatus);
         }
       },
       onSettled: () => {
@@ -292,10 +282,7 @@ export function usePublicProfile(userId?: string, festivalId?: string) {
     QueryKeys.publicProfile(userId || "", festivalId),
     async () => {
       if (!userId) return null;
-      const response = await apiClient.profile.getPublicProfile(
-        userId,
-        festivalId,
-      );
+      const response = await apiClient.profile.getPublicProfile(userId, festivalId);
       return response.profile;
     },
     {

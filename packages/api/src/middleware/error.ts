@@ -1,8 +1,4 @@
-import {
-  type ErrorCode,
-  ErrorCodes,
-  isErrorCode,
-} from "@prostcounter/shared/errors";
+import { type ErrorCode, ErrorCodes, isErrorCode } from "@prostcounter/shared/errors";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 
@@ -143,9 +139,7 @@ export function errorHandler(err: Error, c: Context) {
       path: c.req.path,
       userId,
       userEmail,
-      ...(err instanceof ValidationError && err.errors
-        ? { validationErrors: err.errors }
-        : {}),
+      ...(err instanceof ValidationError && err.errors ? { validationErrors: err.errors } : {}),
     });
 
     return c.json(
@@ -154,9 +148,7 @@ export function errorHandler(err: Error, c: Context) {
           message: err.message,
           code: err.code,
           statusCode: err.statusCode,
-          ...(err instanceof ValidationError && err.errors
-            ? { errors: err.errors }
-            : {}),
+          ...(err instanceof ValidationError && err.errors ? { errors: err.errors } : {}),
         },
       },
       err.statusCode as any,

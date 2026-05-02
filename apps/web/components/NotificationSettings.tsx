@@ -35,10 +35,7 @@ export function NotificationSettings() {
     );
   }
 
-  const handleToggle = async (
-    key: keyof typeof preferences,
-    value: boolean,
-  ) => {
+  const handleToggle = async (key: keyof typeof preferences, value: boolean) => {
     if (isUpdating) return;
 
     setIsUpdating(true);
@@ -73,8 +70,7 @@ export function NotificationSettings() {
       }
     } catch (error: any) {
       toast.error(t("common.status.error"), {
-        description:
-          error.message || t("notificationSettings.errors.pushFailed"),
+        description: error.message || t("notificationSettings.errors.pushFailed"),
       });
     } finally {
       setIsUpdating(false);
@@ -83,9 +79,7 @@ export function NotificationSettings() {
 
   return (
     <div className="card">
-      <h3 className="py-2 text-xl font-black text-gray-800">
-        {t("notificationSettings.title")}
-      </h3>
+      <h3 className="py-2 text-xl font-black text-gray-800">{t("notificationSettings.title")}</h3>
 
       <div className="flex flex-col gap-6">
         {/* Consolidated Notification Preferences */}
@@ -99,9 +93,7 @@ export function NotificationSettings() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">
-                  {t("notificationSettings.reminders")}
-                </span>
+                <span className="font-medium">{t("notificationSettings.reminders")}</span>
               </div>
               <p className="text-left text-sm text-gray-600">
                 {t("notificationSettings.description.reminders")}
@@ -110,9 +102,7 @@ export function NotificationSettings() {
             <Switch
               aria-label={t("notificationSettings.reminders")}
               checked={preferences.reminders_enabled ?? true}
-              onCheckedChange={(checked) =>
-                handleToggle("reminders_enabled", checked)
-              }
+              onCheckedChange={(checked) => handleToggle("reminders_enabled", checked)}
               disabled={isUpdating}
             />
           </div>
@@ -145,9 +135,7 @@ export function NotificationSettings() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
-                <span className="font-medium">
-                  {t("notificationSettings.groupNotifications")}
-                </span>
+                <span className="font-medium">{t("notificationSettings.groupNotifications")}</span>
               </div>
               <p className="text-left text-sm text-gray-600">
                 {t("notificationSettings.description.groups")}
@@ -156,9 +144,7 @@ export function NotificationSettings() {
             <Switch
               aria-label={t("notificationSettings.groupNotifications")}
               checked={preferences.group_notifications_enabled ?? true}
-              onCheckedChange={(checked) =>
-                handleToggle("group_notifications_enabled", checked)
-              }
+              onCheckedChange={(checked) => handleToggle("group_notifications_enabled", checked)}
               disabled={isUpdating}
             />
           </div>
@@ -178,9 +164,7 @@ export function NotificationSettings() {
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <Smartphone className="h-4 w-4" />
-                  <span className="font-medium">
-                    {t("notificationSettings.pushNotifications")}
-                  </span>
+                  <span className="font-medium">{t("notificationSettings.pushNotifications")}</span>
                 </div>
                 <p className="text-left text-sm text-gray-600">
                   {t("notificationSettings.description.push")}
@@ -191,9 +175,7 @@ export function NotificationSettings() {
                   </p>
                 )}
                 {pushSupported && pushPermission === "denied" && (
-                  <p className="text-sm text-red-600">
-                    {t("notificationSettings.status.blocked")}
-                  </p>
+                  <p className="text-sm text-red-600">{t("notificationSettings.status.blocked")}</p>
                 )}
               </div>
 
@@ -213,9 +195,7 @@ export function NotificationSettings() {
                   <Switch
                     aria-label={t("notificationSettings.pushNotifications")}
                     checked={preferences.push_enabled ?? false}
-                    onCheckedChange={(checked) =>
-                      handleToggle("push_enabled", checked)
-                    }
+                    onCheckedChange={(checked) => handleToggle("push_enabled", checked)}
                     disabled={isUpdating}
                   />
                 )}

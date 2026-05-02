@@ -73,8 +73,7 @@ const getFestivalStatusBadgeProps = (
 
 export function UserMenu({ profileData, className }: UserMenuProps) {
   const { t } = useTranslation();
-  const { currentFestival, festivals, setCurrentFestival, isLoading } =
-    useFestival();
+  const { currentFestival, festivals, setCurrentFestival, isLoading } = useFestival();
   const { canInstall, installPWA } = useInstallPWA();
   const [isOpen, setIsOpen] = useState(false);
   const [isFestivalModalOpen, setIsFestivalModalOpen] = useState(false);
@@ -123,9 +122,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
     });
   };
 
-  const renderMenuItem = (
-    item: ReturnType<typeof getMenuItemsWithHandlers>[0],
-  ) => {
+  const renderMenuItem = (item: ReturnType<typeof getMenuItemsWithHandlers>[0]) => {
     if (item.href) {
       return (
         <DropdownMenuItem key={item.id} asChild className="cursor-pointer py-2">
@@ -144,8 +141,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
         disabled={item.disabled}
         className={cn(
           "flex cursor-pointer items-center gap-2 py-2",
-          item.variant === "destructive" &&
-            "text-destructive focus:text-destructive",
+          item.variant === "destructive" && "text-destructive focus:text-destructive",
         )}
       >
         {item.icon}
@@ -157,8 +153,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   const renderFestivalSection = () => {
     if (isLoading || !currentFestival) return null;
 
-    const { firstLetter, lastTwoDigits } =
-      getFestivalDisplayInfo(currentFestival);
+    const { firstLetter, lastTwoDigits } = getFestivalDisplayInfo(currentFestival);
     const { status, variant } = getFestivalStatusBadgeProps(currentFestival);
 
     return (
@@ -177,9 +172,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
               <sub className="text-xs">{lastTwoDigits}</sub>
             </div>
             <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm font-medium">
-                {currentFestival.name}
-              </span>
+              <span className="truncate text-sm font-medium">{currentFestival.name}</span>
               <div className="flex items-center gap-2">
                 <Badge variant={variant} className="w-fit text-xs capitalize">
                   {t(`festival.status.${status}`)}
@@ -206,14 +199,11 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{t("festival.selector.title")}</DialogTitle>
-            <DialogDescription>
-              {t("festival.selector.description")}
-            </DialogDescription>
+            <DialogDescription>{t("festival.selector.description")}</DialogDescription>
           </DialogHeader>
           <div className="grid max-h-96 gap-3 overflow-y-auto">
             {festivals.map((festival) => {
-              const { firstLetter, lastTwoDigits } =
-                getFestivalDisplayInfo(festival);
+              const { firstLetter, lastTwoDigits } = getFestivalDisplayInfo(festival);
               const { status, variant } = getFestivalStatusBadgeProps(festival);
               const isSelected = festival.id === currentFestival?.id;
 
@@ -223,8 +213,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                   variant={isSelected ? "default" : "outline"}
                   className={cn(
                     "h-auto w-full justify-start p-4",
-                    isSelected &&
-                      "border-yellow-500 bg-yellow-500 hover:bg-yellow-600",
+                    isSelected && "border-yellow-500 bg-yellow-500 hover:bg-yellow-600",
                   )}
                   onClick={() => {
                     setCurrentFestival(festival);
@@ -235,9 +224,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                     <div
                       className={cn(
                         "flex size-10 flex-shrink-0 items-center justify-center rounded-md font-semibold",
-                        isSelected
-                          ? "bg-white text-yellow-500"
-                          : "bg-yellow-500 text-white",
+                        isSelected ? "bg-white text-yellow-500" : "bg-yellow-500 text-white",
                       )}
                     >
                       <span className="text-base">
@@ -256,9 +243,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                         {format(parseISO(festival.startDate), "MMM d")} -{" "}
                         {format(parseISO(festival.endDate), "MMM d, yyyy")}
                       </div>
-                      <span className="text-muted-foreground text-xs">
-                        {festival.location}
-                      </span>
+                      <span className="text-muted-foreground text-xs">{festival.location}</span>
                     </div>
                   </div>
                 </Button>
@@ -271,21 +256,12 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   };
 
   const renderShareDialog = () => {
-    return (
-      <ShareDialog
-        open={isShareDialogOpen}
-        onOpenChange={setIsShareDialogOpen}
-      />
-    );
+    return <ShareDialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen} />;
   };
 
   const renderWhatsNewDialog = () => {
     return (
-      <WhatsNew
-        open={isWhatsNewOpen}
-        onOpenChange={setIsWhatsNewOpen}
-        isManualTrigger={true}
-      />
+      <WhatsNew open={isWhatsNewOpen} onOpenChange={setIsWhatsNewOpen} isManualTrigger={true} />
     );
   };
 
@@ -297,10 +273,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className={cn(
-              "flex h-auto items-center gap-2 p-2 hover:bg-gray-700",
-              className,
-            )}
+            className={cn("flex h-auto items-center gap-2 p-2 hover:bg-gray-700", className)}
           >
             <Avatar
               url={profileData.avatar_url}
@@ -334,10 +307,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
           {menuSections.map((section) => {
             const sectionItems = getMenuItemsBySection(t, section.id);
             const itemsWithHandlers = sectionItems.map(
-              (item) =>
-                menuItemsWithHandlers.find(
-                  (handlerItem) => handlerItem.id === item.id,
-                )!,
+              (item) => menuItemsWithHandlers.find((handlerItem) => handlerItem.id === item.id)!,
             );
 
             return (

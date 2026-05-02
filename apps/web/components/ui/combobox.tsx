@@ -12,11 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export interface ComboboxOption {
@@ -94,23 +90,16 @@ export function Combobox({
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               {options.map((group, groupIndex) => (
-                <CommandGroup
-                  key={group.title || `group-${groupIndex}`}
-                  heading={group.title}
-                >
+                <CommandGroup key={group.title || `group-${groupIndex}`} heading={group.title}>
                   {group.options.map((option) => (
                     <CommandItem
                       key={option.value}
                       value={option.label}
                       onSelect={(currentValue) => {
                         // Find the option that matches the selected label
-                        const selectedOption = allOptions.find(
-                          (opt) => opt.label === currentValue,
-                        );
+                        const selectedOption = allOptions.find((opt) => opt.label === currentValue);
                         onValueChange?.(
-                          selectedOption?.value === value
-                            ? ""
-                            : selectedOption?.value || "",
+                          selectedOption?.value === value ? "" : selectedOption?.value || "",
                         );
                         setOpen(false);
                       }}

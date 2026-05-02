@@ -9,11 +9,7 @@ import { Link } from "next-view-transitions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-export function WrappedCTA({
-  isLastDayOfFestival,
-}: {
-  isLastDayOfFestival?: boolean;
-}) {
+export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: boolean }) {
   const { currentFestival } = useFestival();
   const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
 
@@ -48,9 +44,7 @@ export function WrappedCTA({
               }}
             >
               <h3 className="text-xl font-bold text-gray-800">
-                {isLastDayOfFestival
-                  ? "Wrapping up your festival!"
-                  : "Your Wrapped is ready!"}
+                {isLastDayOfFestival ? "Wrapping up your festival!" : "Your Wrapped is ready!"}
               </h3>
             </motion.div>
 

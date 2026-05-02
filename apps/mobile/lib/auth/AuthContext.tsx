@@ -1,13 +1,6 @@
 import * as Sentry from "@sentry/react-native";
 import type { Session, User } from "@supabase/supabase-js";
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { identifyDevice } from "vexo-analytics";
 
 import { clearAllData } from "@/lib/database/debug";

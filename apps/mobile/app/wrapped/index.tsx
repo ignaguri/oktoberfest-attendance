@@ -17,11 +17,7 @@ export default function WrappedScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
-  const {
-    data: wrappedData,
-    loading,
-    error,
-  } = useWrappedData(currentFestival?.id);
+  const { data: wrappedData, loading, error } = useWrappedData(currentFestival?.id);
 
   const handleClose = () => {
     router.back();
@@ -33,9 +29,7 @@ export default function WrappedScreen() {
       <View className="flex-1 items-center justify-center bg-yellow-50">
         <VStack space="md" className="items-center">
           <ActivityIndicator size="large" color={Colors.primary[500]} />
-          <Text className="text-base text-gray-600">
-            {t("wrapped.loading")}
-          </Text>
+          <Text className="text-base text-gray-600">{t("wrapped.loading")}</Text>
         </VStack>
       </View>
     );
@@ -46,16 +40,9 @@ export default function WrappedScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-yellow-50 p-6">
         <VStack space="md" className="items-center">
-          <Text className="text-center text-base text-gray-600">
-            {t("wrapped.error")}
-          </Text>
-          <Pressable
-            onPress={handleClose}
-            className="rounded-lg bg-primary-500 px-6 py-3"
-          >
-            <Text className="font-semibold text-white">
-              {t("wrapped.close")}
-            </Text>
+          <Text className="text-center text-base text-gray-600">{t("wrapped.error")}</Text>
+          <Pressable onPress={handleClose} className="rounded-lg bg-primary-500 px-6 py-3">
+            <Text className="font-semibold text-white">{t("wrapped.close")}</Text>
           </Pressable>
         </VStack>
       </View>
@@ -67,16 +54,9 @@ export default function WrappedScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-yellow-50 p-6">
         <VStack space="md" className="items-center">
-          <Text className="text-center text-base text-gray-600">
-            {t("wrapped.accessDenied")}
-          </Text>
-          <Pressable
-            onPress={handleClose}
-            className="rounded-lg bg-primary-500 px-6 py-3"
-          >
-            <Text className="font-semibold text-white">
-              {t("wrapped.close")}
-            </Text>
+          <Text className="text-center text-base text-gray-600">{t("wrapped.accessDenied")}</Text>
+          <Pressable onPress={handleClose} className="rounded-lg bg-primary-500 px-6 py-3">
+            <Text className="font-semibold text-white">{t("wrapped.close")}</Text>
           </Pressable>
         </VStack>
       </View>

@@ -91,8 +91,7 @@ export function useUpdateNotificationPreferences(userId?: string) {
         await cancelQueries(queryKey);
 
         // Snapshot the previous value
-        const previousPreferences =
-          getQueryData<NotificationPreferencesResponse>(queryKey);
+        const previousPreferences = getQueryData<NotificationPreferencesResponse>(queryKey);
 
         // Optimistically update the cache
         if (previousPreferences) {
@@ -111,8 +110,7 @@ export function useUpdateNotificationPreferences(userId?: string) {
               remindersEnabled: newData.remindersEnabled,
             }),
             ...(newData.achievementNotificationsEnabled !== undefined && {
-              achievementNotificationsEnabled:
-                newData.achievementNotificationsEnabled,
+              achievementNotificationsEnabled: newData.achievementNotificationsEnabled,
             }),
             ...(newData.groupNotificationsEnabled !== undefined && {
               groupNotificationsEnabled: newData.groupNotificationsEnabled,
@@ -129,10 +127,7 @@ export function useUpdateNotificationPreferences(userId?: string) {
       onError: (_error, _variables, context) => {
         // Rollback on error
         if (context?.previousPreferences) {
-          setQueryData<NotificationPreferencesResponse>(
-            queryKey,
-            context.previousPreferences,
-          );
+          setQueryData<NotificationPreferencesResponse>(queryKey, context.previousPreferences);
         }
       },
       onSettled: () => {
@@ -182,12 +177,7 @@ export function useSubscribeToNotifications() {
   const apiClient = useApiClient();
 
   return useMutation(
-    async (data: {
-      email?: string;
-      firstName?: string;
-      lastName?: string;
-      avatar?: string;
-    }) => {
+    async (data: { email?: string; firstName?: string; lastName?: string; avatar?: string }) => {
       return await apiClient.notifications.subscribe(data);
     },
   );

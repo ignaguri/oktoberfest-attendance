@@ -53,9 +53,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     if (data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0) {
       slideList.push({
         key: "drink_breakdown",
-        render: (isActive) => (
-          <DrinkBreakdownSlide data={data} isActive={isActive} />
-        ),
+        render: (isActive) => <DrinkBreakdownSlide data={data} isActive={isActive} />,
       });
     }
 
@@ -71,9 +69,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     if (data.tent_stats && data.tent_stats.unique_tents > 0) {
       slideList.push({
         key: "tent_explorer",
-        render: (isActive) => (
-          <TentExplorerSlide data={data} isActive={isActive} />
-        ),
+        render: (isActive) => <TentExplorerSlide data={data} isActive={isActive} />,
       });
     }
 
@@ -81,9 +77,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     if (data.peak_moments && data.peak_moments.best_day) {
       slideList.push({
         key: "peak_moment",
-        render: (isActive) => (
-          <PeakMomentSlide data={data} isActive={isActive} />
-        ),
+        render: (isActive) => <PeakMomentSlide data={data} isActive={isActive} />,
       });
     }
 
@@ -105,9 +99,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     if (data.achievements && data.achievements.length > 0) {
       slideList.push({
         key: "achievements",
-        render: (isActive) => (
-          <AchievementsSlide data={data} isActive={isActive} />
-        ),
+        render: (isActive) => <AchievementsSlide data={data} isActive={isActive} />,
       });
     }
 
@@ -115,17 +107,12 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     if (data.personality) {
       slideList.push({
         key: "personality",
-        render: (isActive) => (
-          <PersonalitySlide data={data} isActive={isActive} />
-        ),
+        render: (isActive) => <PersonalitySlide data={data} isActive={isActive} />,
       });
     }
 
     // Rankings (if top 3 group rankings exist)
-    if (
-      data.social_stats?.top_3_rankings &&
-      data.social_stats.top_3_rankings.length > 0
-    ) {
+    if (data.social_stats?.top_3_rankings && data.social_stats.top_3_rankings.length > 0) {
       slideList.push({
         key: "rankings",
         render: (isActive) => <RankingsSlide data={data} isActive={isActive} />,
@@ -136,31 +123,24 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     if (data.comparisons && data.comparisons.vs_last_year) {
       slideList.push({
         key: "comparisons",
-        render: (isActive) => (
-          <ComparisonsSlide data={data} isActive={isActive} />
-        ),
+        render: (isActive) => <ComparisonsSlide data={data} isActive={isActive} />,
       });
     }
 
     // Always include outro
     slideList.push({
       key: "outro",
-      render: (isActive) => (
-        <OutroSlide data={data} isActive={isActive} onClose={onClose} />
-      ),
+      render: (isActive) => <OutroSlide data={data} isActive={isActive} onClose={onClose} />,
     });
 
     return slideList;
   }, [data, onClose]);
 
-  const handlePageSelected = useCallback(
-    (e: { nativeEvent: { position: number } }) => {
-      const position = e.nativeEvent.position;
-      setCurrentPage(position);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    },
-    [],
-  );
+  const handlePageSelected = useCallback((e: { nativeEvent: { position: number } }) => {
+    const position = e.nativeEvent.position;
+    setCurrentPage(position);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
 
   return (
     <View className="flex-1">

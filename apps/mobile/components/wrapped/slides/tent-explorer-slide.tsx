@@ -27,12 +27,8 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-green-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.tentExplorer.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.tentExplorer.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.tentExplorer.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.tentExplorer.subtitle")}</SlideSubtitle>
 
         <View className="mt-4">
           <HStack space="md">
@@ -62,9 +58,7 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
             transition={{ type: "timing", duration: 400, delay: 500 }}
             className="items-center rounded-2xl bg-white/70 p-4"
           >
-            <Text className="text-sm text-gray-500">
-              {t("wrapped.tentExplorer.favorite")}
-            </Text>
+            <Text className="text-sm text-gray-500">{t("wrapped.tentExplorer.favorite")}</Text>
             <Text className="mt-1 text-xl font-bold text-gray-800">
               {data.tent_stats.favorite_tent}
             </Text>
@@ -89,12 +83,8 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
               className="flex-row items-center justify-between rounded-xl bg-white/50 px-4 py-3"
             >
               <HStack space="sm" className="items-center">
-                <Text className="text-lg font-bold text-green-600">
-                  #{index + 1}
-                </Text>
-                <Text className="text-base text-gray-700">
-                  {tent.tent_name}
-                </Text>
+                <Text className="text-lg font-bold text-green-600">#{index + 1}</Text>
+                <Text className="text-base text-gray-700">{tent.tent_name}</Text>
               </HStack>
               <Text className="text-sm text-gray-500">
                 {t("wrapped.tentExplorer.visits", { count: tent.visit_count })}

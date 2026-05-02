@@ -78,9 +78,7 @@ export class SupabaseCalendarRepository {
       .forEach((a) => {
         const beerCount = Number(a.beer_count) || 0;
         const hasTentVisits = (tentVisits ?? []).some(
-          (tv) =>
-            tv.visit_date &&
-            tv.visit_date.substring(0, 10) === a.date.substring(0, 10),
+          (tv) => tv.visit_date && tv.visit_date.substring(0, 10) === a.date.substring(0, 10),
         );
 
         if (hasTentVisits && beerCount > 0) {
@@ -168,9 +166,7 @@ export class SupabaseCalendarRepository {
       .in("id", memberIds);
 
     const idToName = new Map<string, string>();
-    (profiles ?? []).forEach((p) =>
-      idToName.set(p.id, p.username ?? p.full_name ?? "Member"),
-    );
+    (profiles ?? []).forEach((p) => idToName.set(p.id, p.username ?? p.full_name ?? "Member"));
 
     // Get attendances using the view
     const { data: attendances, error: attError } = await this.supabase
@@ -197,9 +193,7 @@ export class SupabaseCalendarRepository {
     // Get group-visible reservations
     const { data: reservations, error: resError } = await this.supabase
       .from("reservations")
-      .select(
-        "id, user_id, start_at, end_at, status, visible_to_groups, tent:tents(id, name)",
-      )
+      .select("id, user_id, start_at, end_at, status, visible_to_groups, tent:tents(id, name)")
       .eq("festival_id", festivalId)
       .eq("visible_to_groups", true)
       .in("user_id", memberIds);

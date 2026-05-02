@@ -44,10 +44,7 @@ export function CrowdStatusCard() {
     };
     return (crowdStatuses as TentCrowdStatus[])
       .filter((s) => s.reportCount > 0 && s.crowdLevel)
-      .sort(
-        (a, b) =>
-          (crowdOrder[a.crowdLevel!] ?? 99) - (crowdOrder[b.crowdLevel!] ?? 99),
-      );
+      .sort((a, b) => (crowdOrder[a.crowdLevel!] ?? 99) - (crowdOrder[b.crowdLevel!] ?? 99));
   }, [crowdStatuses]);
 
   if (festivalLoading || isLoading) {
@@ -81,9 +78,7 @@ export function CrowdStatusCard() {
         <CardContent>
           <div className="flex flex-col gap-2">
             {tentsWithReports.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                {t("crowdReport.noReports")}
-              </p>
+              <p className="text-sm text-gray-500">{t("crowdReport.noReports")}</p>
             ) : (
               <>
                 {tentsWithReports.slice(0, 5).map((tent) => (
@@ -91,9 +86,7 @@ export function CrowdStatusCard() {
                     key={tent.tentId}
                     className="flex items-center justify-between rounded-lg px-2 py-1.5"
                   >
-                    <span className="text-sm text-gray-700">
-                      {tent.tentName}
-                    </span>
+                    <span className="text-sm text-gray-700">{tent.tentName}</span>
                     <div className="flex items-center gap-2">
                       <span
                         className={cn(
@@ -102,21 +95,17 @@ export function CrowdStatusCard() {
                         )}
                       >
                         <span
-                          className={cn(
-                            "size-2 rounded-full",
-                            CROWD_LEVEL_DOT[tent.crowdLevel!],
-                          )}
+                          className={cn("size-2 rounded-full", CROWD_LEVEL_DOT[tent.crowdLevel!])}
                         />
                         {t(`crowdReport.levels.${tent.crowdLevel}`)}
                       </span>
-                      {tent.avgWaitMinutes != null &&
-                        tent.avgWaitMinutes > 0 && (
-                          <span className="text-xs text-gray-500">
-                            {t("crowdReport.waitTime", {
-                              minutes: tent.avgWaitMinutes,
-                            })}
-                          </span>
-                        )}
+                      {tent.avgWaitMinutes != null && tent.avgWaitMinutes > 0 && (
+                        <span className="text-xs text-gray-500">
+                          {t("crowdReport.waitTime", {
+                            minutes: tent.avgWaitMinutes,
+                          })}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -142,10 +131,7 @@ export function CrowdStatusCard() {
         </CardContent>
       </Card>
 
-      <CrowdReportDialog
-        open={reportDialogOpen}
-        onOpenChange={setReportDialogOpen}
-      />
+      <CrowdReportDialog open={reportDialogOpen} onOpenChange={setReportDialogOpen} />
     </>
   );
 }

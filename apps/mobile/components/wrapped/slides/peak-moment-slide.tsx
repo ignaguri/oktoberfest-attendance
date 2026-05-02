@@ -1,10 +1,7 @@
 import { Motion } from "@legendapp/motion";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import {
-  formatCurrency,
-  formatWrappedDate,
-} from "@prostcounter/shared/wrapped";
+import { formatCurrency, formatWrappedDate } from "@prostcounter/shared/wrapped";
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
@@ -37,12 +34,8 @@ export function PeakMomentSlide({ data, isActive }: PeakMomentSlideProps) {
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-amber-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.peakMoment.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.peakMoment.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.peakMoment.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.peakMoment.subtitle")}</SlideSubtitle>
 
         {bestDay && (
           <Motion.View
@@ -60,9 +53,7 @@ export function PeakMomentSlide({ data, isActive }: PeakMomentSlideProps) {
             className="items-center rounded-2xl bg-white/70 p-6"
           >
             <Text className="text-5xl">{"\u{1F3C6}"}</Text>
-            <Text className="mt-2 text-sm text-gray-500">
-              {t("wrapped.peakMoment.bestDay")}
-            </Text>
+            <Text className="mt-2 text-sm text-gray-500">{t("wrapped.peakMoment.bestDay")}</Text>
             <Text className="mt-1 text-lg font-semibold text-gray-800">
               {formatWrappedDate(bestDay.date)}
             </Text>

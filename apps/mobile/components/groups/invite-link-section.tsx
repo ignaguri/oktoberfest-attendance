@@ -85,9 +85,7 @@ export function InviteLinkSection({
       <VStack space="md">
         <HStack space="sm" className="items-center">
           <Link size={18} color={IconColors.primary} />
-          <Text className="font-medium text-typography-900">
-            {t("groups.settings.inviteLink")}
-          </Text>
+          <Text className="font-medium text-typography-900">{t("groups.settings.inviteLink")}</Text>
         </HStack>
 
         {inviteToken ? (
@@ -116,9 +114,7 @@ export function InviteLinkSection({
                   <Copy size={16} color={IconColors.default} />
                 )}
                 <ButtonText className="ml-1">
-                  {copied
-                    ? t("groups.settings.copied")
-                    : t("groups.settings.copy")}
+                  {copied ? t("groups.settings.copied") : t("groups.settings.copy")}
                 </ButtonText>
               </Button>
 
@@ -130,9 +126,7 @@ export function InviteLinkSection({
                 onPress={handleShare}
               >
                 <Share2 size={16} color={IconColors.default} />
-                <ButtonText className="ml-1">
-                  {t("groups.actions.share")}
-                </ButtonText>
+                <ButtonText className="ml-1">{t("groups.actions.share")}</ButtonText>
               </Button>
 
               <Button
@@ -148,22 +142,16 @@ export function InviteLinkSection({
                 ) : (
                   <RefreshCw size={16} color={IconColors.default} />
                 )}
-                <ButtonText className="ml-1">
-                  {t("groups.settings.regenerate")}
-                </ButtonText>
+                <ButtonText className="ml-1">{t("groups.settings.regenerate")}</ButtonText>
               </Button>
             </HStack>
 
             {/* Warning */}
-            <Text className="text-xs text-typography-400">
-              {t("groups.settings.tokenWarning")}
-            </Text>
+            <Text className="text-xs text-typography-400">{t("groups.settings.tokenWarning")}</Text>
           </>
         ) : (
           <VStack space="sm" className="items-center py-4">
-            <Text className="text-center text-typography-500">
-              {t("groups.settings.noToken")}
-            </Text>
+            <Text className="text-center text-typography-500">{t("groups.settings.noToken")}</Text>
             <Button
               variant="solid"
               action="primary"

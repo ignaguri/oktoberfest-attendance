@@ -28,10 +28,7 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
   }, [data, router]);
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-yellow-50 to-orange-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-yellow-50 to-orange-50">
       <div className="flex flex-col items-center gap-4">
         <HeartHandshake className="size-16" />
 
@@ -73,8 +70,8 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
 
         <div className="mt-2 text-center text-sm text-gray-500">
           <p className="flex items-center gap-1">
-            Made with <Heart className="size-4" /> and some{" "}
-            <Beer className="size-4" /> by ProstCounter
+            Made with <Heart className="size-4" /> and some <Beer className="size-4" /> by
+            ProstCounter
           </p>
         </div>
       </div>

@@ -62,9 +62,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       if (profile.preferred_language) {
         languageToUse = profile.preferred_language;
       } else {
-        languageToUse = detectBrowserLanguage([
-          ...SUPPORTED_LANGUAGES,
-        ] as string[]);
+        languageToUse = detectBrowserLanguage([...SUPPORTED_LANGUAGES] as string[]);
       }
 
       if (i18n.language !== languageToUse) {
@@ -106,10 +104,6 @@ export { i18n };
 /**
  * Translate API error codes to localized messages
  */
-export function translateError(
-  t: TFunction,
-  code: string,
-  _fallback?: string,
-): string {
+export function translateError(t: TFunction, code: string, _fallback?: string): string {
   return t(`apiErrors.${code}`);
 }

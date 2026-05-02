@@ -29,10 +29,7 @@ describe("Tent Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -157,9 +154,7 @@ describe("Tent Routes - Unit Tests", () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
       // Mock empty tent list
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const req = createAuthRequest(`/tents?festivalId=${festivalId}`, {
         method: "GET",
@@ -320,12 +315,9 @@ describe("Tent Routes - Unit Tests", () => {
   describe("Authentication", () => {
     it("should require authentication for GET /tents", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
-      const req = new Request(
-        `http://localhost/tents?festivalId=${festivalId}`,
-        {
-          method: "GET",
-        },
-      );
+      const req = new Request(`http://localhost/tents?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,

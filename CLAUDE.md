@@ -68,17 +68,18 @@ For the full system architecture, monorepo structure, API routes, testing infras
 
 ### Key Packages
 
-| Package | Path | Purpose |
-|---------|------|---------|
-| `@prostcounter/api` | `packages/api/` | Hono API routes & business logic |
-| `@prostcounter/api-client` | `packages/api-client/` | Auto-generated type-safe API client |
-| `@prostcounter/shared` | `packages/shared/` | Shared utilities, types, schemas, i18n, hooks |
-| `@prostcounter/db` | `packages/db/` | Database types (generated from Supabase) |
-| `@prostcounter/ui` | `packages/ui/` | Shared UI utilities (`cn()`, etc.) |
+| Package                    | Path                   | Purpose                                       |
+| -------------------------- | ---------------------- | --------------------------------------------- |
+| `@prostcounter/api`        | `packages/api/`        | Hono API routes & business logic              |
+| `@prostcounter/api-client` | `packages/api-client/` | Auto-generated type-safe API client           |
+| `@prostcounter/shared`     | `packages/shared/`     | Shared utilities, types, schemas, i18n, hooks |
+| `@prostcounter/db`         | `packages/db/`         | Database types (generated from Supabase)      |
+| `@prostcounter/ui`         | `packages/ui/`         | Shared UI utilities (`cn()`, etc.)            |
 
 ### Regenerating the API Client
 
 After changing Hono API routes:
+
 1. `pnpm --filter=@prostcounter/api generate-spec` - Generate OpenAPI spec
 2. `pnpm --filter=@prostcounter/api-client generate` - Generate TypeScript client
 

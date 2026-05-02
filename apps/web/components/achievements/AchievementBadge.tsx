@@ -129,19 +129,12 @@ export function AchievementBadge({
         className,
       )}
     >
-      <span className={cn("text-base", size === "sm" && "text-sm")}>
-        {displayIcon}
-      </span>
+      <span className={cn("text-base", size === "sm" && "text-sm")}>{displayIcon}</span>
 
       <span className="truncate">{translatedName}</span>
 
       {showPoints && (
-        <span
-          className={cn(
-            "ml-1 text-xs font-normal opacity-75",
-            size === "sm" && "text-xs",
-          )}
-        >
+        <span className={cn("ml-1 text-xs font-normal opacity-75", size === "sm" && "text-xs")}>
           {points}pts
         </span>
       )}

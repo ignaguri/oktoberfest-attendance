@@ -29,9 +29,7 @@ test.describe("Attendance Flows", () => {
   });
 
   test.describe("FLOW_ATT_001: Quick Attendance from Home Page", () => {
-    test("should display quick attendance section on home page", async ({
-      page,
-    }) => {
+    test("should display quick attendance section on home page", async ({ page }) => {
       const homePage = new HomePage(page);
 
       // Wait for the form to be ready
@@ -144,9 +142,7 @@ test.describe("Attendance Flows", () => {
   });
 
   test.describe("FLOW_ATT_003: Decrement Beer Count", () => {
-    test("should decrement beer count when count is above 0", async ({
-      page,
-    }) => {
+    test("should decrement beer count when count is above 0", async ({ page }) => {
       const homePage = new HomePage(page);
 
       // Check if festival is active

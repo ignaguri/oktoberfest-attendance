@@ -31,15 +31,8 @@ export interface ApiClientProviderProps {
 /**
  * Provider component that makes the API client available to shared hooks
  */
-export function ApiClientProvider({
-  client,
-  children,
-}: ApiClientProviderProps) {
-  return (
-    <ApiClientContext.Provider value={client}>
-      {children}
-    </ApiClientContext.Provider>
-  );
+export function ApiClientProvider({ client, children }: ApiClientProviderProps) {
+  return <ApiClientContext.Provider value={client}>{children}</ApiClientContext.Provider>;
 }
 
 /**

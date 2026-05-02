@@ -18,12 +18,7 @@ import {
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
 import { Button, ButtonText } from "@/components/ui/button";
-import {
-  Checkbox,
-  CheckboxIcon,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from "@/components/ui/checkbox";
+import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/components/ui/checkbox";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { LabeledSwitchRow } from "@/components/ui/labeled-switch-row";
@@ -156,10 +151,7 @@ export function GroupSelectorSheet({
                 <Text className="text-xs font-medium uppercase tracking-wide text-typography-500">
                   {t("location.groups.selectGroups")}
                 </Text>
-                <ScrollView
-                  style={{ maxHeight: 250 }}
-                  showsVerticalScrollIndicator={false}
-                >
+                <ScrollView style={{ maxHeight: 250 }} showsVerticalScrollIndicator={false}>
                   <VStack space="sm">
                     {groups.map((group: Group) => {
                       const isSelected = selectedGroupIds.includes(group.id);
