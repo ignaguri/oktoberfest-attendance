@@ -17,13 +17,9 @@ function withAsyncStorageMavenRepo(config) {
 
     // Insert the maven repo line right before the jitpack line or as a new entry
     // in allprojects > repositories
-    const jitpackPattern =
-      /(\s*maven\s*\{\s*url\s*'https:\/\/www\.jitpack\.io'\s*\})/;
+    const jitpackPattern = /(\s*maven\s*\{\s*url\s*'https:\/\/www\.jitpack\.io'\s*\})/;
     if (jitpackPattern.test(buildGradle)) {
-      config.modResults.contents = buildGradle.replace(
-        jitpackPattern,
-        `$1\n${mavenLine}`,
-      );
+      config.modResults.contents = buildGradle.replace(jitpackPattern, `$1\n${mavenLine}`);
     } else {
       // Fallback: insert before the closing brace of allprojects > repositories
       config.modResults.contents = buildGradle.replace(

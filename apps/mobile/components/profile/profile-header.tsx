@@ -6,12 +6,7 @@ import { Camera } from "lucide-react-native";
 import React from "react";
 import { type Control, Controller, type FieldErrors } from "react-hook-form";
 
-import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -53,11 +48,7 @@ export function ProfileHeader({
   const { t } = useTranslation();
 
   return (
-    <Card
-      size="lg"
-      variant="elevated"
-      className={cn(!isEditing && "items-center")}
-    >
+    <Card size="lg" variant="elevated" className={cn(!isEditing && "items-center")}>
       <VStack space="lg" className={cn(!isEditing ? "items-center" : "w-full")}>
         <Pressable
           onPress={onAvatarPress}
@@ -94,9 +85,7 @@ export function ProfileHeader({
               {profile?.full_name || profile?.username || "User"}
             </Text>
             {profile?.username && profile?.full_name && (
-              <Text className="text-sm text-typography-600">
-                @{profile.username}
-              </Text>
+              <Text className="text-sm text-typography-600">@{profile.username}</Text>
             )}
             <Text className="text-typography-500">{user?.email}</Text>
             <Button
@@ -113,9 +102,7 @@ export function ProfileHeader({
           <VStack space="lg" className="w-full">
             {/* Email (read-only) - First position */}
             <VStack space="xs">
-              <Text className="text-sm font-medium text-typography-700">
-                {t("profile.email")}
-              </Text>
+              <Text className="text-sm font-medium text-typography-700">{t("profile.email")}</Text>
               <Input variant="outline" size="md" isDisabled>
                 <InputField value={user?.email || ""} editable={false} />
               </Input>
@@ -130,11 +117,7 @@ export function ProfileHeader({
                 control={control}
                 name="username"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    variant="outline"
-                    size="md"
-                    isInvalid={!!errors.username}
-                  >
+                  <Input variant="outline" size="md" isInvalid={!!errors.username}>
                     <InputField
                       placeholder={t("profile.usernamePlaceholder")}
                       value={value}
@@ -147,9 +130,7 @@ export function ProfileHeader({
                 )}
               />
               {errors.username && (
-                <Text className="mt-1 text-sm text-error-600">
-                  {errors.username.message}
-                </Text>
+                <Text className="mt-1 text-sm text-error-600">{errors.username.message}</Text>
               )}
             </VStack>
 

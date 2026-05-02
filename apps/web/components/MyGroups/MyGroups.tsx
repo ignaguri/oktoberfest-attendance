@@ -36,9 +36,7 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
       <div className="flex flex-wrap justify-center gap-2">
         {(error || !groups || groups.length === 0) && (
           <div className="px-2 text-center">
-            <p className="mb-2 text-sm text-gray-500">
-              {t("groups.noGroupsYet")}
-            </p>
+            <p className="mb-2 text-sm text-gray-500">{t("groups.noGroupsYet")}</p>
             {showGroupsLink && (
               <Button asChild variant="yellow" size="sm">
                 <Link href="/groups">{t("groups.joinOrCreate")}</Link>

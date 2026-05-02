@@ -69,8 +69,7 @@ export function useBeerPictureUpload({
 
         return pendingPhotos;
       } catch (err) {
-        const pickError =
-          err instanceof Error ? err : new Error("Failed to pick images");
+        const pickError = err instanceof Error ? err : new Error("Failed to pick images");
         setError(pickError);
         onError?.(pickError);
         return null;

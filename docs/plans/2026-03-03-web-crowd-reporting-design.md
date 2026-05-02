@@ -45,6 +45,7 @@ Highlights / LeaderboardPreview / AchievementHighlight
 ## Data Flow
 
 All hooks and APIs already exist:
+
 - `useTentCrowdStatus(festivalId)` — aggregated tent crowd levels
 - `useTentCrowdReports(tentId, festivalId)` — individual reports (for rate-limit check)
 - `useSubmitCrowdReport()` — submit mutation (auto-invalidates queries)
@@ -53,10 +54,10 @@ All hooks and APIs already exist:
 
 ## Files
 
-| Action | File |
-|--------|------|
-| Create | `apps/web/components/crowd/CrowdStatusCard.tsx` |
-| Create | `apps/web/components/crowd/CrowdReportDialog.tsx` |
+| Action | File                                                         |
+| ------ | ------------------------------------------------------------ |
+| Create | `apps/web/components/crowd/CrowdStatusCard.tsx`              |
+| Create | `apps/web/components/crowd/CrowdReportDialog.tsx`            |
 | Modify | `apps/web/app/(private)/home/page.tsx` — add CrowdStatusCard |
 
 No new API endpoints, hooks, schemas, or i18n keys needed.

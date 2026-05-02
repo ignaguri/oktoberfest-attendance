@@ -46,8 +46,7 @@ try {
 const fallbackHandler = (_req: NextRequest) => {
   return NextResponse.json(
     {
-      error:
-        "Novu is not configured. Set NOVU_SECRET_KEY environment variable.",
+      error: "Novu is not configured. Set NOVU_SECRET_KEY environment variable.",
     },
     { status: 503 },
   );

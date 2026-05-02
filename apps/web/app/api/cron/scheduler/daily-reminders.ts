@@ -33,9 +33,7 @@ export async function processDailyReminderNotifications(
     await Promise.allSettled(
       batch
         .filter((user) => user.user_id != null)
-        .map((user) =>
-          notifications.notifyDailyReminder(user.user_id!, { dayOfYear }),
-        ),
+        .map((user) => notifications.notifyDailyReminder(user.user_id!, { dayOfYear })),
     );
 
     if (batch.length < BATCH_SIZE) return;

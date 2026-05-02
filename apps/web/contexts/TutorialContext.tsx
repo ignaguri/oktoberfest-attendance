@@ -2,13 +2,7 @@
 
 import { useFestival } from "@prostcounter/shared/contexts";
 import type { ReactNode } from "react";
-import {
-  createContext,
-  startTransition,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, startTransition, useContext, useEffect, useState } from "react";
 
 import { TUTORIAL_CONSTANTS } from "@/components/Tutorial/constants";
 import { useCompleteTutorial } from "@/hooks/useProfile";
@@ -31,9 +25,7 @@ interface TutorialContextType {
   canGoPrevious: boolean;
 }
 
-const TutorialContext = createContext<TutorialContextType | undefined>(
-  undefined,
-);
+const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
 interface TutorialProviderProps {
   children: ReactNode;
@@ -68,11 +60,8 @@ export function TutorialProvider({
         // Handle special cases for dynamic targeting
         if (step.id === "groups") {
           // Check if user has groups - if not, target the "Join or Create a Group" button
-          const groupsContainer = document.querySelector(
-            '[data-tutorial="groups"]',
-          );
-          const joinButton =
-            groupsContainer?.querySelector('a[href="/groups"]');
+          const groupsContainer = document.querySelector('[data-tutorial="groups"]');
+          const joinButton = groupsContainer?.querySelector('a[href="/groups"]');
 
           if (joinButton) {
             // User has no groups, target the button instead
@@ -96,9 +85,7 @@ export function TutorialProvider({
         const element = document.querySelector(step.target);
         if (!element) {
           // eslint-disable-next-line no-console
-          console.debug(
-            `Tutorial: Skipping step "${step.id}" - element not found: ${step.target}`,
-          );
+          console.debug(`Tutorial: Skipping step "${step.id}" - element not found: ${step.target}`);
           return false;
         }
 
@@ -134,9 +121,7 @@ export function TutorialProvider({
   }, [isActive]);
 
   const currentStep =
-    isActive && currentStepIndex < visibleSteps.length
-      ? visibleSteps[currentStepIndex]
-      : null;
+    isActive && currentStepIndex < visibleSteps.length ? visibleSteps[currentStepIndex] : null;
 
   const canGoNext = currentStepIndex < visibleSteps.length - 1;
   const canGoPrevious = currentStepIndex > 0;
@@ -214,11 +199,7 @@ export function TutorialProvider({
     canGoPrevious,
   };
 
-  return (
-    <TutorialContext.Provider value={value}>
-      {children}
-    </TutorialContext.Provider>
-  );
+  return <TutorialContext.Provider value={value}>{children}</TutorialContext.Provider>;
 }
 
 export function useTutorial() {

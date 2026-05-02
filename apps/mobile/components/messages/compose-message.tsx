@@ -41,12 +41,7 @@ interface ComposeMessageProps {
  * - Toggle between message and alert type
  * - Send button with loading state
  */
-export function ComposeMessage({
-  isOpen,
-  onClose,
-  festivalId,
-  onSuccess,
-}: ComposeMessageProps) {
+export function ComposeMessage({ isOpen, onClose, festivalId, onSuccess }: ComposeMessageProps) {
   const { t } = useTranslation();
   const [content, setContent] = useState("");
   const [messageType, setMessageType] = useState<GroupMessageType>("message");
@@ -116,18 +111,12 @@ export function ComposeMessage({
               >
                 <MessageSquare
                   size={18}
-                  color={
-                    messageType === "message"
-                      ? Colors.primary[500]
-                      : IconColors.muted
-                  }
+                  color={messageType === "message" ? Colors.primary[500] : IconColors.muted}
                 />
                 <Text
                   className={cn(
                     "text-sm font-medium",
-                    messageType === "message"
-                      ? "text-primary-600"
-                      : "text-typography-500",
+                    messageType === "message" ? "text-primary-600" : "text-typography-500",
                   )}
                 >
                   {t("groups.messages.compose.typeMessage")}
@@ -146,18 +135,12 @@ export function ComposeMessage({
               >
                 <AlertTriangle
                   size={18}
-                  color={
-                    messageType === "alert"
-                      ? Colors.primary[500]
-                      : IconColors.muted
-                  }
+                  color={messageType === "alert" ? Colors.primary[500] : IconColors.muted}
                 />
                 <Text
                   className={cn(
                     "text-sm font-medium",
-                    messageType === "alert"
-                      ? "text-primary-600"
-                      : "text-typography-500",
+                    messageType === "alert" ? "text-primary-600" : "text-typography-500",
                   )}
                 >
                   {t("groups.messages.compose.typeAlert")}
@@ -180,10 +163,7 @@ export function ComposeMessage({
               />
               <HStack className="items-center justify-between">
                 <Text
-                  className={cn(
-                    "text-xs",
-                    isOverLimit ? "text-error-500" : "text-typography-400",
-                  )}
+                  className={cn("text-xs", isOverLimit ? "text-error-500" : "text-typography-400")}
                 >
                   {t("groups.messages.compose.charCount", {
                     count: charCount,

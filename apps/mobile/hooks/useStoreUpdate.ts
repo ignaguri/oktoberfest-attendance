@@ -28,9 +28,7 @@ async function fetchAppStoreVersion(): Promise<string | null> {
   if (!bundleId) return null;
 
   try {
-    const response = await fetch(
-      `https://itunes.apple.com/lookup?bundleId=${bundleId}`,
-    );
+    const response = await fetch(`https://itunes.apple.com/lookup?bundleId=${bundleId}`);
     if (!response.ok) {
       logger.error(`App Store lookup failed: ${response.status}`);
       return null;
@@ -75,9 +73,7 @@ export function useStoreUpdate() {
 
       const storeVersion = await fetchAppStoreVersion();
       if (storeVersion && isNewerVersion(currentVersion, storeVersion)) {
-        logger.info(
-          `Store update available: ${currentVersion} → ${storeVersion}`,
-        );
+        logger.info(`Store update available: ${currentVersion} → ${storeVersion}`);
         setIsStoreUpdateAvailable(true);
       }
     } catch (error) {
@@ -92,14 +88,11 @@ export function useStoreUpdate() {
 
     checkForStoreUpdate();
 
-    const subscription = AppState.addEventListener(
-      "change",
-      (status: AppStateStatus) => {
-        if (status === "active") {
-          checkForStoreUpdate();
-        }
-      },
-    );
+    const subscription = AppState.addEventListener("change", (status: AppStateStatus) => {
+      if (status === "active") {
+        checkForStoreUpdate();
+      }
+    });
 
     return () => subscription.remove();
   }, [checkForStoreUpdate]);

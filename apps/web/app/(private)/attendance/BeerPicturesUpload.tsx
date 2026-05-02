@@ -63,8 +63,7 @@ export function BeerPicturesUpload({
   onPicturesUpdate,
 }: BeerPicturesUploadProps) {
   const { t } = useTranslation();
-  const [allPictureUrls, setAllPictureUrls] =
-    useState<string[]>(existingPictureUrls);
+  const [allPictureUrls, setAllPictureUrls] = useState<string[]>(existingPictureUrls);
 
   const {
     handleSubmit,
@@ -102,9 +101,7 @@ export function BeerPicturesUpload({
       const updatedUrls = [...allPictureUrls, ...newUrls];
       setAllPictureUrls(updatedUrls);
       onPicturesUpdate(updatedUrls);
-      toast.success(
-        t("notifications.success.picturesUploaded", { count: newUrls.length }),
-      );
+      toast.success(t("notifications.success.picturesUploaded", { count: newUrls.length }));
       reset();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -123,10 +120,7 @@ export function BeerPicturesUpload({
     const files = Array.from(event.currentTarget.files || []);
     const newPictures = [
       ...watchedPictures,
-      ...files.slice(
-        0,
-        MAX_PICTURES - allPictureUrls.length - watchedPictures.length,
-      ),
+      ...files.slice(0, MAX_PICTURES - allPictureUrls.length - watchedPictures.length),
     ];
     setValue("pictures", newPictures);
   };
@@ -137,10 +131,7 @@ export function BeerPicturesUpload({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center gap-4"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center gap-4">
       <Input
         type="file"
         accept="image/*"
@@ -150,10 +141,7 @@ export function BeerPicturesUpload({
         id="beer-pictures-upload"
         errorMsg={errors.pictures?.message}
       />
-      <Label
-        htmlFor="beer-pictures-upload"
-        className={buttonVariants({ variant: "outline" })}
-      >
+      <Label htmlFor="beer-pictures-upload" className={buttonVariants({ variant: "outline" })}>
         <div className="flex items-center gap-2">
           <Camera size={24} />
           <span>
@@ -214,9 +202,7 @@ export function BeerPicturesUpload({
             </span>
             <Switch
               checked={watchedVisibility === "public"}
-              onCheckedChange={(checked) =>
-                setValue("visibility", checked ? "public" : "private")
-              }
+              onCheckedChange={(checked) => setValue("visibility", checked ? "public" : "private")}
             />
           </div>
         </div>

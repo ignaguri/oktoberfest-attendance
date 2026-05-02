@@ -15,9 +15,7 @@ import { ConsumptionService } from "../services/consumption.service";
 // Query schema for listing consumptions
 const ListConsumptionsQuerySchema = z.object({
   festivalId: z.string().uuid({ message: "Invalid festival ID" }),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
 });
 
 // Response schema for listing consumptions
@@ -45,8 +43,7 @@ const logConsumptionRoute = createRoute({
   path: "/consumption",
   tags: ["consumption"],
   summary: "Log a new beer or drink consumption",
-  description:
-    "Records a consumption and updates the attendance record with computed totals",
+  description: "Records a consumption and updates the attendance record with computed totals",
   request: {
     body: {
       content: {
@@ -113,8 +110,7 @@ const listConsumptionsRoute = createRoute({
   path: "/consumption",
   tags: ["consumption"],
   summary: "List consumptions for a date",
-  description:
-    "Get all consumptions for the authenticated user on a specific date",
+  description: "Get all consumptions for the authenticated user on a specific date",
   request: {
     query: ListConsumptionsQuerySchema,
   },
@@ -159,11 +155,7 @@ app.openapi(listConsumptionsRoute, async (c) => {
   const { festivalId, date } = c.req.valid("query");
 
   const consumptionRepo = new SupabaseConsumptionRepository(supabase);
-  const consumptions = await consumptionRepo.findByFestivalAndDate(
-    user.id,
-    festivalId,
-    date,
-  );
+  const consumptions = await consumptionRepo.findByFestivalAndDate(user.id, festivalId, date);
 
   return c.json({ consumptions }, 200);
 });
@@ -232,10 +224,7 @@ app.openapi(deleteConsumptionRoute, async (c) => {
   const consumptionRepo = new SupabaseConsumptionRepository(supabase);
   await consumptionRepo.delete(id, user.id);
 
-  return c.json(
-    { success: true, message: "Consumption deleted successfully" },
-    200,
-  );
+  return c.json({ success: true, message: "Consumption deleted successfully" }, 200);
 });
 
 export default app;

@@ -18,9 +18,7 @@ export const reportSupabaseException = (
     Sentry.setUser(userData);
   }
 
-  Sentry.captureException(
-    new Error(`Supabase Error in action "${fnName}": ${errorDetails}`),
-  );
+  Sentry.captureException(new Error(`Supabase Error in action "${fnName}": ${errorDetails}`));
 };
 
 export const reportSupabaseAuthException = (
@@ -40,9 +38,7 @@ export const reportSupabaseAuthException = (
     Sentry.setUser(userData);
   }
 
-  Sentry.captureException(
-    new Error(`Supabase Auth Error in action "${fnName}": ${errorDetails}`),
-  );
+  Sentry.captureException(new Error(`Supabase Auth Error in action "${fnName}": ${errorDetails}`));
 };
 
 export const reportNotificationException = (
@@ -54,9 +50,7 @@ export const reportNotificationException = (
     Sentry.setUser(userData);
   }
 
-  Sentry.captureException(
-    new Error(`Notification Error in action "${fnName}": ${error.message}`),
-  );
+  Sentry.captureException(new Error(`Notification Error in action "${fnName}": ${error.message}`));
 };
 
 export const reportApiException = (
@@ -68,9 +62,7 @@ export const reportApiException = (
     Sentry.setUser(userData);
   }
 
-  Sentry.captureException(
-    new Error(`API Error in action "${fnName}": ${error.message}`),
-  );
+  Sentry.captureException(new Error(`API Error in action "${fnName}": ${error.message}`));
 };
 
 export const reportLog = (message: string, level: SeverityLevel) => {

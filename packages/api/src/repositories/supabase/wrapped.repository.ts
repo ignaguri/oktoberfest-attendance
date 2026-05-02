@@ -7,11 +7,7 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import {
-  DatabaseError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../middleware/error";
+import { DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
 import type { IWrappedRepository } from "../interfaces/wrapped.repository";
 
 /**
@@ -27,19 +23,14 @@ const ACCESS_CONFIG = {
 export class SupabaseWrappedRepository implements IWrappedRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
-  async getCached(
-    userId: string,
-    festivalId: string,
-  ): Promise<WrappedData | null> {
+  async getCached(userId: string, festivalId: string): Promise<WrappedData | null> {
     const { data, error } = await this.supabase.rpc("get_wrapped_data_cached", {
       p_user_id: userId,
       p_festival_id: festivalId,
     });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch cached wrapped data: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch cached wrapped data: ${error.message}`);
     }
 
     if (!data) return null;
@@ -47,11 +38,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     return this.mapToWrappedData(data as any, userId, festivalId);
   }
 
-  async generate(
-    userId: string,
-    festivalId: string,
-    force = false,
-  ): Promise<WrappedData> {
+  async generate(userId: string, festivalId: string, force = false): Promise<WrappedData> {
     // If force regeneration, invalidate cache first
     if (force) {
       await this.invalidateCache(userId, festivalId);
@@ -64,9 +51,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to generate wrapped data: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to generate wrapped data: ${error.message}`);
     }
 
     if (!data) {
@@ -83,9 +68,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to invalidate wrapped cache: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to invalidate wrapped cache: ${error.message}`);
     }
   }
 
@@ -95,17 +78,12 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       .select("id")
       .eq("user_id", userId)
       .eq("festival_id", festivalId)
-      .gte(
-        "updated_at",
-        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      ) // Within last 24 hours
+      .gte("updated_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Within last 24 hours
       .single();
 
     if (error && error.code !== PgErrorCode.NO_ROWS) {
       // Ignore "no rows" error
-      throw new DatabaseError(
-        `Failed to check wrapped cache: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to check wrapped cache: ${error.message}`);
     }
 
     return !!data;
@@ -114,11 +92,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
   /**
    * Map database JSON to WrappedData schema
    */
-  private mapToWrappedData(
-    data: any,
-    userId: string,
-    festivalId: string,
-  ): WrappedData {
+  private mapToWrappedData(data: any, userId: string, festivalId: string): WrappedData {
     return {
       userId,
       festivalId,
@@ -155,10 +129,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     };
   }
 
-  async checkAccess(
-    userId: string,
-    festivalId: string,
-  ): Promise<WrappedAccessResult> {
+  async checkAccess(userId: string, festivalId: string): Promise<WrappedAccessResult> {
     // Check if user is in allowed list
     const isAllowedUser = ACCESS_CONFIG.allowedUsers.includes(userId);
     if (isAllowedUser) {
@@ -224,9 +195,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     return { allowed: true };
   }
 
-  async getAvailableFestivals(
-    userId: string,
-  ): Promise<AvailableWrappedFestival[]> {
+  async getAvailableFestivals(userId: string): Promise<AvailableWrappedFestival[]> {
     // In development, show all festivals
     // In production, only show ended festivals
     let festivalQuery = this.supabase
@@ -247,11 +216,10 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     }
 
     // Check which festivals user has data for
-    const { data: userAttendances, error: attendanceError } =
-      await this.supabase
-        .from("attendances")
-        .select("festival_id")
-        .eq("user_id", userId);
+    const { data: userAttendances, error: attendanceError } = await this.supabase
+      .from("attendances")
+      .select("festival_id")
+      .eq("user_id", userId);
 
     if (attendanceError) {
       throw new DatabaseError(
@@ -259,9 +227,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       );
     }
 
-    const festivalIdsWithData = new Set(
-      (userAttendances || []).map((a) => a.festival_id),
-    );
+    const festivalIdsWithData = new Set((userAttendances || []).map((a) => a.festival_id));
 
     return festivals.map((festival) => ({
       id: festival.id,
@@ -294,9 +260,7 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     );
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to regenerate wrapped cache: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to regenerate wrapped cache: ${error.message}`);
     }
 
     return regeneratedCount || 0;

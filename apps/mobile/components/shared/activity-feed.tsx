@@ -139,16 +139,9 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
           {activities.map((activity, index) => (
             <View
               key={`${activity.user_id}-${activity.activity_time}-${index}`}
-              className={
-                index < activities.length - 1
-                  ? "border-b border-outline-100"
-                  : ""
-              }
+              className={index < activities.length - 1 ? "border-b border-outline-100" : ""}
             >
-              <ActivityItem
-                activity={activity}
-                festivalId={currentFestival?.id}
-              />
+              <ActivityItem activity={activity} festivalId={currentFestival?.id} />
             </View>
           ))}
         </VStack>
@@ -165,9 +158,7 @@ export function ActivityFeed({ onRefresh }: ActivityFeedProps) {
           >
             {isFetchingNextPage && <ButtonSpinner color={Colors.gray[500]} />}
             <ButtonText>
-              {isFetchingNextPage
-                ? t("common.status.loading")
-                : t("home.activityFeed.loadMore")}
+              {isFetchingNextPage ? t("common.status.loading") : t("home.activityFeed.loadMore")}
             </ButtonText>
           </Button>
         )}

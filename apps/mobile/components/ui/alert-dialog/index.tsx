@@ -2,16 +2,9 @@
 import { createAlertDialog } from "@gluestack-ui/core/alert-dialog/creator";
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import {
-  useStyleContext,
-  withStyleContext,
-} from "@gluestack-ui/utils/nativewind-utils";
+import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import type { MotionComponentProps } from "@legendapp/motion";
-import {
-  AnimatePresence,
-  createMotionAnimatedComponent,
-  Motion,
-} from "@legendapp/motion";
+import { AnimatePresence, createMotionAnimatedComponent, Motion } from "@legendapp/motion";
 import { cssInterop } from "nativewind";
 import React, { useCallback, useState } from "react";
 import type { ViewStyle } from "react-native";
@@ -91,9 +84,7 @@ const alertDialogBackdropStyle = tva({
   base: "absolute bottom-0 left-0 right-0 top-0 bg-background-dark web:cursor-default",
 });
 
-type IAlertDialogProps = React.ComponentPropsWithoutRef<
-  typeof UIAccessibleAlertDialog
-> &
+type IAlertDialogProps = React.ComponentPropsWithoutRef<typeof UIAccessibleAlertDialog> &
   VariantProps<typeof alertDialogStyle>;
 
 type IAlertDialogContentProps = React.ComponentPropsWithoutRef<
@@ -116,9 +107,7 @@ type IAlertDialogFooterProps = React.ComponentPropsWithoutRef<
 > &
   VariantProps<typeof alertDialogFooterStyle>;
 
-type IAlertDialogBodyProps = React.ComponentPropsWithoutRef<
-  typeof UIAccessibleAlertDialog.Body
-> &
+type IAlertDialogBodyProps = React.ComponentPropsWithoutRef<typeof UIAccessibleAlertDialog.Body> &
   VariantProps<typeof alertDialogBodyStyle>;
 
 type IAlertDialogBackdropProps = React.ComponentPropsWithoutRef<

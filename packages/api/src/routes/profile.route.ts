@@ -120,11 +120,7 @@ app.openapi(getPublicProfileRoute, async (c) => {
   const profileRepo = new SupabaseProfileRepository(supabase);
 
   try {
-    const profile = await profileRepo.getPublicProfile(
-      userId,
-      festivalId,
-      user?.id,
-    );
+    const profile = await profileRepo.getPublicProfile(userId, festivalId, user?.id);
     return c.json({ profile }, 200);
   } catch {
     return c.json({ error: "Not Found", message: "User not found" }, 404);
@@ -222,10 +218,7 @@ app.openapi(deleteProfileRoute, async (c) => {
   // Then delete the auth user using service role
   await deleteAuthUser(user.id);
 
-  return c.json(
-    { success: true, message: "Account deleted successfully" },
-    200,
-  );
+  return c.json({ success: true, message: "Account deleted successfully" }, 200);
 });
 
 // GET /profile/tutorial - Get tutorial status
@@ -394,8 +387,7 @@ const getHighlightsRoute = createRoute({
   path: "/profile/highlights",
   tags: ["profile"],
   summary: "Get user highlights",
-  description:
-    "Returns statistics and highlights for the user's festival attendance",
+  description: "Returns statistics and highlights for the user's festival attendance",
   request: {
     query: z.object({
       festivalId: z.string().uuid({ message: "Invalid festival ID" }),
@@ -537,10 +529,7 @@ app.openapi(confirmAvatarUploadRoute, async (c) => {
   const { fileName } = c.req.valid("json");
 
   const profileRepo = new SupabaseProfileRepository(supabase);
-  const confirmedFileName = await profileRepo.confirmAvatarUpload(
-    user.id,
-    fileName,
-  );
+  const confirmedFileName = await profileRepo.confirmAvatarUpload(user.id, fileName);
 
   return c.json({ success: true, fileName: confirmedFileName }, 200);
 });

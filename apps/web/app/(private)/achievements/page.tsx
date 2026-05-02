@@ -1,10 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import type {
-  AchievementCategory,
-  AchievementWithProgress,
-} from "@prostcounter/shared/schemas";
+import type { AchievementCategory, AchievementWithProgress } from "@prostcounter/shared/schemas";
 import { useState } from "react";
 
 import { AchievementGrid } from "@/components/achievements/AchievementGrid";
@@ -17,12 +14,8 @@ import { useTranslation } from "@/lib/i18n/client";
 export default function AchievementsPage() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const { data, loading: isLoading } = useAchievementsWithProgress(
-    currentFestival?.id,
-  );
-  const [activeTab, setActiveTab] = useState<"all" | AchievementCategory>(
-    "all",
-  );
+  const { data, loading: isLoading } = useAchievementsWithProgress(currentFestival?.id);
+  const [activeTab, setActiveTab] = useState<"all" | AchievementCategory>("all");
 
   const achievements = data?.data || [];
   const stats = data?.stats;
@@ -30,9 +23,7 @@ export default function AchievementsPage() {
   const filteredAchievements =
     activeTab === "all"
       ? achievements
-      : achievements.filter(
-          (a: AchievementWithProgress) => a.category === activeTab,
-        );
+      : achievements.filter((a: AchievementWithProgress) => a.category === activeTab);
 
   const unlockedAchievements = filteredAchievements.filter(
     (a: AchievementWithProgress) => a.is_unlocked,
@@ -45,9 +36,7 @@ export default function AchievementsPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold">
-            {t("achievements.pageTitle")}
-          </h1>
+          <h1 className="mb-4 text-2xl font-bold">{t("achievements.pageTitle")}</h1>
           <p className="text-gray-600">{t("achievements.selectFestival")}</p>
         </div>
       </div>
@@ -58,9 +47,7 @@ export default function AchievementsPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="text-center">
-          <h1 className="mb-2 text-3xl font-bold">
-            {t("achievements.pageTitle")}
-          </h1>
+          <h1 className="mb-2 text-3xl font-bold">{t("achievements.pageTitle")}</h1>
           <p className="text-gray-600">{t("common.status.loading")}</p>
         </div>
       </div>
@@ -70,9 +57,7 @@ export default function AchievementsPage() {
   return (
     <div className="container mx-auto space-y-6 py-8">
       <div className="text-center">
-        <h1 className="mb-2 text-3xl font-bold">
-          {t("achievements.pageTitle")}
-        </h1>
+        <h1 className="mb-2 text-3xl font-bold">{t("achievements.pageTitle")}</h1>
         <p className="text-gray-600">
           {t("achievements.trackProgress", { festival: currentFestival.name })}
         </p>
@@ -94,11 +79,7 @@ export default function AchievementsPage() {
                 {t("achievements.stats.percentUnlocked", {
                   percent:
                     stats.total_achievements > 0
-                      ? Math.round(
-                          (stats.unlocked_achievements /
-                            stats.total_achievements) *
-                            100,
-                        )
+                      ? Math.round((stats.unlocked_achievements / stats.total_achievements) * 100)
                       : 0,
                 })}
               </p>
@@ -112,12 +93,8 @@ export default function AchievementsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-2xl font-bold text-blue-600">
-                {stats.total_points}
-              </div>
-              <p className="text-sm text-gray-600">
-                {t("achievements.stats.achievementPoints")}
-              </p>
+              <div className="text-2xl font-bold text-blue-600">{stats.total_points}</div>
+              <p className="text-sm text-gray-600">{t("achievements.stats.achievementPoints")}</p>
             </CardContent>
           </Card>
 
@@ -129,27 +106,20 @@ export default function AchievementsPage() {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-1">
-                {Object.entries(stats.breakdown_by_rarity).map(
-                  ([rarity, rarityData]) => {
-                    const data = rarityData as {
-                      unlocked: number;
-                      total: number;
-                    };
-                    return (
-                      <div
-                        key={rarity}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="capitalize">
-                          {t(`achievements.rarity.${rarity}`)}:
-                        </span>
-                        <span className="font-medium">
-                          {data.unlocked}/{data.total}
-                        </span>
-                      </div>
-                    );
-                  },
-                )}
+                {Object.entries(stats.breakdown_by_rarity).map(([rarity, rarityData]) => {
+                  const data = rarityData as {
+                    unlocked: number;
+                    total: number;
+                  };
+                  return (
+                    <div key={rarity} className="flex items-center justify-between text-sm">
+                      <span className="capitalize">{t(`achievements.rarity.${rarity}`)}:</span>
+                      <span className="font-medium">
+                        {data.unlocked}/{data.total}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -163,17 +133,12 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_category)
-                  .filter(
-                    ([_, catData]) => (catData as { total: number }).total > 0,
-                  )
+                  .filter(([_, catData]) => (catData as { total: number }).total > 0)
                   .slice(0, 3)
                   .map(([category, catData]) => {
                     const data = catData as { unlocked: number; total: number };
                     return (
-                      <div
-                        key={category}
-                        className="flex items-center justify-between text-sm"
-                      >
+                      <div key={category} className="flex items-center justify-between text-sm">
                         <span className="capitalize">
                           {t(`achievements.categories.${category}`)}:
                         </span>
@@ -221,9 +186,7 @@ export default function AchievementsPage() {
               },
             ]}
             placeholder={t("achievements.filter.selectCategory")}
-            onSelect={(option) =>
-              setActiveTab(option.value as typeof activeTab)
-            }
+            onSelect={(option) => setActiveTab(option.value as typeof activeTab)}
           />
         </div>
 
@@ -236,10 +199,7 @@ export default function AchievementsPage() {
             </h2>
 
             <div className="flex items-center gap-2">
-              <Badge
-                variant="default"
-                className="border-green-200 bg-green-100 text-green-800"
-              >
+              <Badge variant="default" className="border-green-200 bg-green-100 text-green-800">
                 {unlockedAchievements.length} {t("achievements.unlocked")}
               </Badge>
               <Badge variant="outline">
@@ -250,25 +210,15 @@ export default function AchievementsPage() {
 
           {unlockedAchievements.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-green-700">
-                {t("achievements.completed")}
-              </h3>
-              <AchievementGrid
-                achievements={unlockedAchievements}
-                showProgress={true}
-              />
+              <h3 className="text-lg font-medium text-green-700">{t("achievements.completed")}</h3>
+              <AchievementGrid achievements={unlockedAchievements} showProgress={true} />
             </div>
           )}
 
           {lockedAchievements.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-700">
-                {t("achievements.inProgress")}
-              </h3>
-              <AchievementGrid
-                achievements={lockedAchievements}
-                showProgress={true}
-              />
+              <h3 className="text-lg font-medium text-gray-700">{t("achievements.inProgress")}</h3>
+              <AchievementGrid achievements={lockedAchievements} showProgress={true} />
             </div>
           )}
 
@@ -278,9 +228,7 @@ export default function AchievementsPage() {
               <h3 className="mb-2 text-lg font-semibold text-gray-900">
                 {t("achievements.empty.title")}
               </h3>
-              <p className="text-gray-600">
-                {t("achievements.empty.description")}
-              </p>
+              <p className="text-gray-600">{t("achievements.empty.description")}</p>
             </div>
           )}
         </div>

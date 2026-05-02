@@ -50,6 +50,4 @@ export const GetActivityFeedResponseSchema = z.object({
   hasMore: z.boolean(),
 });
 
-export type GetActivityFeedResponse = z.infer<
-  typeof GetActivityFeedResponseSchema
->;
+export type GetActivityFeedResponse = z.infer<typeof GetActivityFeedResponseSchema>;

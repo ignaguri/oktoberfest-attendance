@@ -12,11 +12,7 @@ interface TutorialSpotlightProps {
   className?: string;
 }
 
-export function TutorialSpotlight({
-  target,
-  isActive,
-  className,
-}: TutorialSpotlightProps) {
+export function TutorialSpotlight({ target, isActive, className }: TutorialSpotlightProps) {
   const [position, setPosition] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const spotlightRef = useRef<HTMLDivElement>(null);

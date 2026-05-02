@@ -2,13 +2,7 @@ import { cn } from "@prostcounter/ui";
 import { Eye, EyeOff, Info, Users } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, RefreshControl, ScrollView, View } from "react-native";
 
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
@@ -42,15 +36,12 @@ export default function PhotoPrivacyScreen() {
     try {
       // Fetch global setting and group settings
       const [globalResponse, groupsResponse] = await Promise.all([
-        apiClient.photos
-          .getGlobalSettings()
-          .catch(() => ({ hidePhotosFromAllGroups: false })),
+        apiClient.photos.getGlobalSettings().catch(() => ({ hidePhotosFromAllGroups: false })),
         apiClient.photos.getAllGroupSettings().catch(() => ({ settings: [] })),
       ]);
 
       setSettings({
-        hidePhotosFromAllGroups:
-          globalResponse.hidePhotosFromAllGroups ?? false,
+        hidePhotosFromAllGroups: globalResponse.hidePhotosFromAllGroups ?? false,
         groups: groupsResponse.settings ?? [],
       });
     } catch (error) {
@@ -87,10 +78,7 @@ export default function PhotoPrivacyScreen() {
         ...prev,
         hidePhotosFromAllGroups: previousValue,
       }));
-      Alert.alert(
-        t("common.status.error"),
-        t("profile.photoPrivacy.updateError"),
-      );
+      Alert.alert(t("common.status.error"), t("profile.photoPrivacy.updateError"));
     } finally {
       setIsSaving(false);
     }
@@ -120,15 +108,10 @@ export default function PhotoPrivacyScreen() {
       setSettings((prev) => ({
         ...prev,
         groups: prev.groups.map((g) =>
-          g.groupId === groupId
-            ? { ...g, hidePhotosFromGroup: previousValue }
-            : g,
+          g.groupId === groupId ? { ...g, hidePhotosFromGroup: previousValue } : g,
         ),
       }));
-      Alert.alert(
-        t("common.status.error"),
-        t("profile.photoPrivacy.updateError"),
-      );
+      Alert.alert(t("common.status.error"), t("profile.photoPrivacy.updateError"));
     } finally {
       setIsSaving(false);
     }
@@ -145,9 +128,7 @@ export default function PhotoPrivacyScreen() {
   return (
     <ScrollView
       className="flex-1 bg-background-50"
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
       <View className="p-4">
         {/* Description */}
@@ -174,9 +155,7 @@ export default function PhotoPrivacyScreen() {
                 <Eye size={24} color={Colors.success[500]} />
               )}
               <View className="flex-1">
-                <Text className="text-typography-900">
-                  {t("profile.photoPrivacy.hideFromAll")}
-                </Text>
+                <Text className="text-typography-900">{t("profile.photoPrivacy.hideFromAll")}</Text>
                 <Text className="text-sm text-typography-500">
                   {t("profile.photoPrivacy.hideFromAllDescription")}
                 </Text>
@@ -217,8 +196,7 @@ export default function PhotoPrivacyScreen() {
                 key={group.groupId}
                 className={cn(
                   "flex-row items-center justify-between py-3",
-                  index < settings.groups.length - 1 &&
-                    "border-b border-outline-100",
+                  index < settings.groups.length - 1 && "border-b border-outline-100",
                 )}
               >
                 <View className="flex-1 flex-row items-center gap-3">
@@ -240,9 +218,7 @@ export default function PhotoPrivacyScreen() {
                 </View>
                 <Switch
                   value={group.hidePhotosFromGroup}
-                  onValueChange={(value) =>
-                    handleGroupToggle(group.groupId, value)
-                  }
+                  onValueChange={(value) => handleGroupToggle(group.groupId, value)}
                   disabled={isSaving || settings.hidePhotosFromAllGroups}
                   trackColor={{
                     false: SwitchColorsDestructive.trackOff,

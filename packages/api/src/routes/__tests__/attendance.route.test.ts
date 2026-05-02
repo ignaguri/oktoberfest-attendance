@@ -29,10 +29,7 @@ describe("Attendance Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -110,12 +107,9 @@ describe("Attendance Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess(mockTentVisits)),
       );
 
-      const req = createAuthRequest(
-        `/attendance?festivalId=${festivalId}&limit=10&offset=0`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/attendance?festivalId=${festivalId}&limit=10&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -162,21 +156,14 @@ describe("Attendance Routes - Unit Tests", () => {
       );
 
       // Mock data query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       // Mock tent visits query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/attendance?festivalId=${festivalId}&limit=10&offset=0`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/attendance?festivalId=${festivalId}&limit=10&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -225,16 +212,11 @@ describe("Attendance Routes - Unit Tests", () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(mockBuilder);
 
       // Mock tent visits query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/attendance?festivalId=${festivalId}&limit=5&offset=5`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/attendance?festivalId=${festivalId}&limit=5&offset=5`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -269,17 +251,12 @@ describe("Attendance Routes - Unit Tests", () => {
 
       // Mock count query with error
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to count attendances", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to count attendances", "PGRST000")),
       );
 
-      const req = createAuthRequest(
-        `/attendance?festivalId=${festivalId}&limit=10&offset=0`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/attendance?festivalId=${festivalId}&limit=10&offset=0`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -315,9 +292,7 @@ describe("Attendance Routes - Unit Tests", () => {
       );
 
       // Mock photo delete (deleteByAttendanceId)
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // Mock attendance delete - verify ownership check
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
@@ -398,9 +373,7 @@ describe("Attendance Routes - Unit Tests", () => {
       );
 
       // Mock deleteByAttendanceId (photo cleanup)
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess(null)),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
       // Mock ownership check in delete() - different user
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
@@ -462,9 +435,7 @@ describe("Attendance Routes - Unit Tests", () => {
 
       // Mock delete operation with error
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to delete attendance", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to delete attendance", "PGRST000")),
       );
 
       const req = createAuthRequest(`/attendance/${attendanceId}`, {

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useFriendshipStatus,
-  useSendFriendRequest,
-} from "@prostcounter/shared/hooks";
+import { useFriendshipStatus, useSendFriendRequest } from "@prostcounter/shared/hooks";
 import { Check, Clock, Loader2, UserPlus } from "lucide-react";
 import { useCallback } from "react";
 
@@ -58,10 +55,7 @@ export function AddFriendButton({
           variant="outline"
           size={size}
           disabled
-          className={cn(
-            "border-green-300 text-green-700 hover:bg-green-50",
-            className,
-          )}
+          className={cn("border-green-300 text-green-700 hover:bg-green-50", className)}
         >
           <Check className="size-4" />
           {t("friends.status.friends")}
@@ -83,12 +77,7 @@ export function AddFriendButton({
 
     case "pending_received":
       return (
-        <Button
-          variant="outline"
-          size={size}
-          onClick={onRespond}
-          className={className}
-        >
+        <Button variant="outline" size={size} onClick={onRespond} className={className}>
           {t("friends.status.pendingReceived")}
         </Button>
       );

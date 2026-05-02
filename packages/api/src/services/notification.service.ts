@@ -2,17 +2,13 @@ import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import type { Database } from "@prostcounter/db";
 import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
-import {
-  DEFAULT_AVATAR_URL,
-  NOTIFICATION_WORKFLOWS,
-} from "@prostcounter/shared/constants";
+import { DEFAULT_AVATAR_URL, NOTIFICATION_WORKFLOWS } from "@prostcounter/shared/constants";
 import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
 
-type NotificationPreferences =
-  Database["public"]["Tables"]["user_notification_preferences"]["Row"];
+type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
 type SubscriberProfile = {
   email?: string;
@@ -32,9 +28,7 @@ function isConflictError(error: unknown): boolean {
   const status = e.statusCode ?? e.status ?? e.code;
   if (status === 409) return true;
   const message = error instanceof Error ? error.message : String(error);
-  return (
-    message.includes("409") || message.toLowerCase().includes("already exists")
-  );
+  return message.includes("409") || message.toLowerCase().includes("already exists");
 }
 
 /**
@@ -62,18 +56,14 @@ export class NotificationService {
 
   private requireExpoIntegrationId(): string {
     if (!this.expoIntegrationId) {
-      throw new Error(
-        "NOVU_EXPO_INTEGRATION_ID is not set; refusing to register Expo push token",
-      );
+      throw new Error("NOVU_EXPO_INTEGRATION_ID is not set; refusing to register Expo push token");
     }
     return this.expoIntegrationId;
   }
 
   private requireFcmIntegrationId(): string {
     if (!this.fcmIntegrationId) {
-      throw new Error(
-        "NOVU_FCM_INTEGRATION_ID is not set; refusing to register FCM token",
-      );
+      throw new Error("NOVU_FCM_INTEGRATION_ID is not set; refusing to register FCM token");
     }
     return this.fcmIntegrationId;
   }
@@ -145,10 +135,7 @@ export class NotificationService {
       return { success: true };
     } catch (error) {
       logger.error({ error, userId }, "Error registering Expo push token");
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to register push token";
+      const errorMessage = error instanceof Error ? error.message : "Failed to register push token";
       return { success: false, error: errorMessage };
     }
   }
@@ -224,10 +211,8 @@ export class NotificationService {
   ): Promise<{ success: boolean }> {
     const updatePayload: Record<string, unknown> = {};
     if (profile?.email !== undefined) updatePayload.email = profile.email;
-    if (profile?.firstName !== undefined)
-      updatePayload.firstName = profile.firstName;
-    if (profile?.lastName !== undefined)
-      updatePayload.lastName = profile.lastName;
+    if (profile?.firstName !== undefined) updatePayload.firstName = profile.firstName;
+    if (profile?.lastName !== undefined) updatePayload.lastName = profile.lastName;
     if (profile?.avatar !== undefined) updatePayload.avatar = profile.avatar;
 
     if (Object.keys(updatePayload).length === 0) {
@@ -252,17 +237,11 @@ export class NotificationService {
             "Novu SDK ResponseValidationError on subscriber patch — treating as success",
           ),
       );
-      logger.info(
-        { userId },
-        "Novu subscriber already existed — updated profile",
-      );
+      logger.info({ userId }, "Novu subscriber already existed — updated profile");
     } catch (updateError) {
       // Subscriber exists and can receive notifications even if the profile
       // patch failed. Credential update (the push path) is the real signal.
-      logger.error(
-        { updateError, userId },
-        "Failed to update existing Novu subscriber after 409",
-      );
+      logger.error({ updateError, userId }, "Failed to update existing Novu subscriber after 409");
     }
     return { success: true };
   }
@@ -289,9 +268,7 @@ export class NotificationService {
   /**
    * Get user's notification preferences
    */
-  async getUserNotificationPreferences(
-    userId: string,
-  ): Promise<NotificationPreferences | null> {
+  async getUserNotificationPreferences(userId: string): Promise<NotificationPreferences | null> {
     const { data, error } = await this.supabase
       .from("user_notification_preferences")
       .select("*")
@@ -313,23 +290,20 @@ export class NotificationService {
     userId: string,
     preferences: UpdateNotificationPreferencesInput,
   ): Promise<boolean> {
-    const { error } = await this.supabase
-      .from("user_notification_preferences")
-      .upsert(
-        {
-          user_id: userId,
-          push_enabled: preferences.pushEnabled,
-          group_join_enabled: preferences.groupJoinEnabled,
-          checkin_enabled: preferences.checkinEnabled,
-          reminders_enabled: preferences.remindersEnabled,
-          achievement_notifications_enabled:
-            preferences.achievementNotificationsEnabled,
-          group_notifications_enabled: preferences.groupNotificationsEnabled,
-          daily_reminder_enabled: preferences.dailyReminderEnabled,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" },
-      );
+    const { error } = await this.supabase.from("user_notification_preferences").upsert(
+      {
+        user_id: userId,
+        push_enabled: preferences.pushEnabled,
+        group_join_enabled: preferences.groupJoinEnabled,
+        checkin_enabled: preferences.checkinEnabled,
+        reminders_enabled: preferences.remindersEnabled,
+        achievement_notifications_enabled: preferences.achievementNotificationsEnabled,
+        group_notifications_enabled: preferences.groupNotificationsEnabled,
+        daily_reminder_enabled: preferences.dailyReminderEnabled,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
 
     if (error) {
       logger.error({ error }, "Error updating notification preferences");
@@ -498,10 +472,7 @@ export class NotificationService {
         .single();
 
       if (userError || !user) {
-        logger.error(
-          { error: userError },
-          "Error fetching user for location sharing notification",
-        );
+        logger.error({ error: userError }, "Error fetching user for location sharing notification");
         return;
       }
 
@@ -520,9 +491,7 @@ export class NotificationService {
         }
 
         targetGroupIds =
-          userGroups
-            ?.map((g) => g.group_id)
-            .filter((id): id is string => id !== null) || [];
+          userGroups?.map((g) => g.group_id).filter((id): id is string => id !== null) || [];
       }
 
       if (targetGroupIds.length === 0) {
@@ -553,9 +522,7 @@ export class NotificationService {
       }
 
       // Get notification preferences for these members (checkin_enabled)
-      const memberIds = [
-        ...new Set(groupMembers.map((member) => member.user_id)),
-      ];
+      const memberIds = [...new Set(groupMembers.map((member) => member.user_id))];
 
       const { data: membersToNotify, error: prefsError } = await this.supabase
         .from("user_notification_preferences")
@@ -564,10 +531,7 @@ export class NotificationService {
         .eq("checkin_enabled", true);
 
       if (prefsError) {
-        logger.error(
-          { error: prefsError },
-          "Error fetching member preferences",
-        );
+        logger.error({ error: prefsError }, "Error fetching member preferences");
         return;
       }
 
@@ -590,9 +554,7 @@ export class NotificationService {
           .filter((g) => g.name);
 
         const groupNamesText =
-          memberGroupsData.length > 0
-            ? memberGroupsData.map((g) => g.name).join(", ")
-            : "Group";
+          memberGroupsData.length > 0 ? memberGroupsData.map((g) => g.name).join(", ") : "Group";
         const firstGroupId = memberGroupsData[0]?.id || "";
 
         return this.novu.trigger({
@@ -680,10 +642,7 @@ export class NotificationService {
    * Notify a user when they receive a friend request
    * (respects push_enabled preference)
    */
-  async notifyFriendRequest(
-    requesterId: string,
-    addresseeId: string,
-  ): Promise<void> {
+  async notifyFriendRequest(requesterId: string, addresseeId: string): Promise<void> {
     try {
       // Get requester's profile info
       const { data: requester, error: requesterError } = await this.supabase
@@ -707,8 +666,7 @@ export class NotificationService {
         return;
       }
 
-      const requesterName =
-        requester.username || requester.full_name || "Someone";
+      const requesterName = requester.username || requester.full_name || "Someone";
       const requesterAvatar = requester.avatar_url || DEFAULT_AVATAR_URL;
 
       await this.novu.trigger({
@@ -747,10 +705,7 @@ export class NotificationService {
         .single();
 
       if (userError || !user) {
-        logger.error(
-          { error: userError },
-          "Error fetching user for tent checkin",
-        );
+        logger.error({ error: userError }, "Error fetching user for tent checkin");
         return;
       }
 
@@ -788,10 +743,7 @@ export class NotificationService {
         .eq("checkin_enabled", true);
 
       if (prefsError) {
-        logger.error(
-          { error: prefsError },
-          "Error fetching member preferences",
-        );
+        logger.error({ error: prefsError }, "Error fetching member preferences");
         return;
       }
 
@@ -811,8 +763,7 @@ export class NotificationService {
           .map((gm) => (gm.groups as any)?.name)
           .filter(Boolean);
 
-        const groupNamesText =
-          memberGroups.length > 0 ? memberGroups.join(", ") : "Group";
+        const groupNamesText = memberGroups.length > 0 ? memberGroups.join(", ") : "Group";
 
         return this.novu.trigger({
           workflowId: NOTIFICATION_WORKFLOWS.TENT_CHECKIN,

@@ -22,11 +22,7 @@ export function VersionChecker() {
         ),
         action: (
           <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={applyUpdate}
-              className="bg-green-600 hover:bg-green-700"
-            >
+            <Button size="sm" onClick={applyUpdate} className="bg-green-600 hover:bg-green-700">
               <RefreshCw size={16} className="mr-1" />
               {t("common.updates.updateNow")}
             </Button>

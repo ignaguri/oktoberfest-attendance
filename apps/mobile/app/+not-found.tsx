@@ -36,9 +36,7 @@ export default function NotFoundScreen() {
           onPress={handleGoHome}
           className="mt-8 rounded-full bg-yellow-500 px-8 py-4 active:bg-yellow-600"
         >
-          <Text className="text-center font-bold text-white">
-            {t("common.buttons.goHome")}
-          </Text>
+          <Text className="text-center font-bold text-white">{t("common.buttons.goHome")}</Text>
         </TouchableOpacity>
       </View>
     </>

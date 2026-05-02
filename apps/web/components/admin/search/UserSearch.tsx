@@ -57,12 +57,7 @@ export function UserSearch({
     [searchState],
   );
 
-  const {
-    data: searchResult,
-    isLoading,
-    error,
-    refetch,
-  } = useUserSearch(searchFilters);
+  const { data: searchResult, isLoading, error, refetch } = useUserSearch(searchFilters);
 
   // Type guard to ensure searchResult has the expected structure
   const hasValidSearchResult =
@@ -98,9 +93,7 @@ export function UserSearch({
   const handleSort = useCallback(
     (sortBy: string) => {
       const newSortOrder =
-        searchState.sortBy === sortBy && searchState.sortOrder === "asc"
-          ? "desc"
-          : "asc";
+        searchState.sortBy === sortBy && searchState.sortOrder === "asc" ? "desc" : "asc";
       searchState.updateSorting(sortBy, newSortOrder);
     },
     [searchState],
@@ -191,11 +184,7 @@ export function UserSearch({
         </div>
         <div className="flex gap-2">
           {onUserEdit && (
-            <Button
-              onClick={() => onUserEdit(user)}
-              size="sm"
-              title="Edit user information"
-            >
+            <Button onClick={() => onUserEdit(user)} size="sm" title="Edit user information">
               Edit
             </Button>
           )}
@@ -215,9 +204,7 @@ export function UserSearch({
     [onUserEdit, onUserDelete, searchState.search],
   );
 
-  const renderItem = (renderUserItem || defaultRenderUserItem) as (
-    user: any,
-  ) => React.ReactNode;
+  const renderItem = (renderUserItem || defaultRenderUserItem) as (user: any) => React.ReactNode;
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -250,9 +237,7 @@ export function UserSearch({
               disabled={isLoading}
               title="Refresh search results"
             >
-              <RefreshCw
-                className={cn("h-4 w-4", isLoading && "animate-spin")}
-              />
+              <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
             </Button>
           )}
 
@@ -262,13 +247,10 @@ export function UserSearch({
                 variant="outline"
                 size="sm"
                 onClick={handleSortCreatedAt}
-                className={cn(
-                  searchState.sortBy === "created_at" && "bg-muted",
-                )}
+                className={cn(searchState.sortBy === "created_at" && "bg-muted")}
                 title={`Sort by creation date (${searchState.sortBy === "created_at" && searchState.sortOrder === "asc" ? "descending" : "ascending"})`}
               >
-                {searchState.sortBy === "created_at" &&
-                searchState.sortOrder === "asc" ? (
+                {searchState.sortBy === "created_at" && searchState.sortOrder === "asc" ? (
                   <SortAsc className="h-4 w-4" />
                 ) : (
                   <SortDesc className="h-4 w-4" />
@@ -281,8 +263,7 @@ export function UserSearch({
                 className={cn(searchState.sortBy === "full_name" && "bg-muted")}
                 title={`Sort by name (${searchState.sortBy === "full_name" && searchState.sortOrder === "asc" ? "descending" : "ascending"})`}
               >
-                {searchState.sortBy === "full_name" &&
-                searchState.sortOrder === "asc" ? (
+                {searchState.sortBy === "full_name" && searchState.sortOrder === "asc" ? (
                   <SortAsc className="h-4 w-4" />
                 ) : (
                   <SortDesc className="h-4 w-4" />
@@ -302,9 +283,7 @@ export function UserSearch({
               {searchResult.totalCount !== 1 ? "s" : ""} found
             </span>
             {searchState.hasSearch && (
-              <Badge variant="outline">
-                &ldquo;{searchState.search}&rdquo;
-              </Badge>
+              <Badge variant="outline">&ldquo;{searchState.search}&rdquo;</Badge>
             )}
             {searchState.hasActiveFilters && (
               <Badge variant="outline">
@@ -333,9 +312,7 @@ export function UserSearch({
       {/* Search Results */}
       <SearchResults
         isLoading={isLoading}
-        isEmpty={
-          !isLoading && hasValidSearchResult && searchResult.users.length === 0
-        }
+        isEmpty={!isLoading && hasValidSearchResult && searchResult.users.length === 0}
         emptyMessage="No users found"
         searchTerm={searchState.search}
       >
@@ -358,9 +335,7 @@ export function UserSearch({
       {/* Error State */}
       {error && (
         <div className="py-8 text-center">
-          <p className="text-destructive mb-4">
-            Error loading users: {error.message}
-          </p>
+          <p className="text-destructive mb-4">Error loading users: {error.message}</p>
           <Button onClick={handleRefresh} variant="outline">
             Try Again
           </Button>

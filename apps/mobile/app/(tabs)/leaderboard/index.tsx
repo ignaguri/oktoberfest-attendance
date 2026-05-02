@@ -61,13 +61,10 @@ export default function LeaderboardScreen() {
   const entries = data ?? [];
 
   // Handle sort change (column and direction)
-  const handleSortChange = useCallback(
-    (criteria: WinningCriteria, order: SortOrder) => {
-      setSortBy(criteria);
-      setSortOrder(order);
-    },
-    [],
-  );
+  const handleSortChange = useCallback((criteria: WinningCriteria, order: SortOrder) => {
+    setSortBy(criteria);
+    setSortOrder(order);
+  }, []);
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
@@ -93,11 +90,7 @@ export default function LeaderboardScreen() {
     return (
       <ScrollView className="flex-1 bg-background-50">
         <VStack space="md" className="p-4">
-          <Card
-            variant="outline"
-            size="md"
-            className="items-center bg-white p-6"
-          >
+          <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Trophy size={48} color={IconColors.disabled} />
             <Text className="mt-2 text-center text-typography-500">
               {t("leaderboard.noFestival")}
@@ -123,15 +116,9 @@ export default function LeaderboardScreen() {
         }
       >
         <VStack space="md" className="p-4">
-          <Card
-            variant="outline"
-            size="md"
-            className="items-center bg-white p-6"
-          >
+          <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Trophy size={48} color={IconColors.error} />
-            <Text className="mt-2 text-center text-error-600">
-              {t("leaderboard.error")}
-            </Text>
+            <Text className="mt-2 text-center text-error-600">{t("leaderboard.error")}</Text>
             <Text className="mt-1 text-center text-sm text-typography-400">
               {t("common.actions.pullToRefresh")}
             </Text>
@@ -170,9 +157,7 @@ export default function LeaderboardScreen() {
                 <Text className="text-base font-semibold text-primary-800">
                   {t("achievements.viewMyAchievements")}
                 </Text>
-                <Text className="text-sm text-primary-600">
-                  {t("achievements.viewProgress")}
-                </Text>
+                <Text className="text-sm text-primary-600">{t("achievements.viewProgress")}</Text>
               </VStack>
             </HStack>
             <ChevronRight size={24} color={Colors.primary[600]} />
@@ -191,9 +176,7 @@ export default function LeaderboardScreen() {
             })}
           </Heading>
         </HStack>
-        <Text className="text-xs text-typography-400">
-          {t("leaderboard.scoringNote")}
-        </Text>
+        <Text className="text-xs text-typography-400">{t("leaderboard.scoringNote")}</Text>
 
         {/* Leaderboard with sortable columns */}
         <Leaderboard

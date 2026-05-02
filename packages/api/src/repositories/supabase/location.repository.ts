@@ -9,34 +9,20 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
-import {
-  ConflictError,
-  DatabaseError,
-  NotFoundError,
-} from "../../middleware/error";
+import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
 import type { ILocationRepository } from "../interfaces/location.repository";
 
 export class SupabaseLocationRepository implements ILocationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
-  async startSession(
-    userId: string,
-    input: StartLocationSessionInput,
-  ): Promise<LocationSession> {
+  async startSession(userId: string, input: StartLocationSessionInput): Promise<LocationSession> {
     // Check if user already has an active session for this festival
-    const existingSession = await this.getActiveSession(
-      userId,
-      input.festivalId,
-    );
+    const existingSession = await this.getActiveSession(userId, input.festivalId);
     if (existingSession) {
-      throw new ConflictError(
-        "User already has an active location session for this festival",
-      );
+      throw new ConflictError("User already has an active location session for this festival");
     }
 
-    const expiresAt = new Date(
-      Date.now() + (input.durationMinutes || 120) * 60 * 1000,
-    );
+    const expiresAt = new Date(Date.now() + (input.durationMinutes || 120) * 60 * 1000);
 
     const insertPayload = {
       user_id: userId,
@@ -99,25 +85,17 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
         session = retrySession;
       } else {
-        throw new DatabaseError(
-          `Failed to create location session: ${sessionError.message}`,
-        );
+        throw new DatabaseError(`Failed to create location session: ${sessionError.message}`);
       }
     }
 
     if (!session) {
-      throw new DatabaseError(
-        "Failed to create location session: No data returned",
-      );
+      throw new DatabaseError("Failed to create location session: No data returned");
     }
 
     // If specific groups are provided, populate location_session_members
     let sharedGroupIds: string[] | null = null;
-    if (
-      input.visibility === "specific" &&
-      input.groupIds &&
-      input.groupIds.length > 0
-    ) {
+    if (input.visibility === "specific" && input.groupIds && input.groupIds.length > 0) {
       const membersToInsert = input.groupIds.map((groupId) => ({
         session_id: session.id,
         group_id: groupId,
@@ -129,10 +107,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
 
       if (membersError) {
         // Log error but don't fail the session creation
-        logger.error(
-          { err: membersError },
-          "Failed to insert location session members",
-        );
+        logger.error({ err: membersError }, "Failed to insert location session members");
       } else {
         sharedGroupIds = input.groupIds;
       }
@@ -146,10 +121,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
     return this.mapToSession(session, sharedGroupIds);
   }
 
-  async stopSession(
-    sessionId: string,
-    userId: string,
-  ): Promise<LocationSession> {
+  async stopSession(sessionId: string, userId: string): Promise<LocationSession> {
     const { data, error } = await this.supabase
       .from("location_sessions")
       .update({
@@ -173,10 +145,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
     return this.mapToSession(data);
   }
 
-  async getActiveSession(
-    userId: string,
-    festivalId: string,
-  ): Promise<LocationSession | null> {
+  async getActiveSession(userId: string, festivalId: string): Promise<LocationSession | null> {
     const { data, error } = await this.supabase
       .from("location_sessions")
       .select()
@@ -187,9 +156,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .single();
 
     if (error && error.code !== PgErrorCode.NO_ROWS) {
-      throw new DatabaseError(
-        `Failed to fetch active session: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch active session: ${error.message}`);
     }
 
     if (!data) return null;
@@ -206,19 +173,13 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .gt("expires_at", new Date().toISOString());
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch active sessions: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch active sessions: ${error.message}`);
     }
 
     return data.map((s) => this.mapToSession(s));
   }
 
-  async updateLocation(
-    sessionId: string,
-    userId: string,
-    location: LocationPoint,
-  ): Promise<void> {
+  async updateLocation(sessionId: string, userId: string, location: LocationPoint): Promise<void> {
     // Verify session belongs to user and is active
     const { data: session, error: sessionError } = await this.supabase
       .from("location_sessions")
@@ -233,20 +194,16 @@ export class SupabaseLocationRepository implements ILocationRepository {
     }
 
     // Insert new location point
-    const { error: locationError } = await this.supabase
-      .from("location_points")
-      .insert({
-        session_id: sessionId,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        accuracy: location.accuracy || null,
-        recorded_at: location.timestamp,
-      });
+    const { error: locationError } = await this.supabase.from("location_points").insert({
+      session_id: sessionId,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      accuracy: location.accuracy || null,
+      recorded_at: location.timestamp,
+    });
 
     if (locationError) {
-      throw new DatabaseError(
-        `Failed to update location: ${locationError.message}`,
-      );
+      throw new DatabaseError(`Failed to update location: ${locationError.message}`);
     }
 
     // Update session's updated_at timestamp
@@ -267,19 +224,14 @@ export class SupabaseLocationRepository implements ILocationRepository {
     // the caller's current position from their own active session, so the
     // latitude/longitude args are not passed through — kept in the interface
     // for the route handler's response shape.
-    const { data, error } = await this.supabase.rpc(
-      "get_nearby_group_members",
-      {
-        input_user_id: userId,
-        input_festival_id: festivalId,
-        radius_meters: radiusMeters,
-      },
-    );
+    const { data, error } = await this.supabase.rpc("get_nearby_group_members", {
+      input_user_id: userId,
+      input_festival_id: festivalId,
+      radius_meters: radiusMeters,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch nearby members: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch nearby members: ${error.message}`);
     }
 
     return (data || []).map((m: any) => ({
@@ -306,9 +258,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
     const { error } = await this.supabase.rpc("expire_old_location_sessions");
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to expire old sessions: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to expire old sessions: ${error.message}`);
     }
   }
 
@@ -355,9 +305,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
     const { data, error } = await query;
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch active sessions: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch active sessions: ${error.message}`);
     }
 
     return (data || []).map((s: any) => ({
@@ -410,18 +358,13 @@ export class SupabaseLocationRepository implements ILocationRepository {
       .select("id");
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to cleanup expired sessions: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to cleanup expired sessions: ${error.message}`);
     }
 
     return data?.length || 0;
   }
 
-  private mapToSession(
-    data: any,
-    sharedGroupIds?: string[] | null,
-  ): LocationSession {
+  private mapToSession(data: any, sharedGroupIds?: string[] | null): LocationSession {
     return {
       id: data.id,
       userId: data.user_id,

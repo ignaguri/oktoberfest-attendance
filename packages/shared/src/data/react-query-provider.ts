@@ -127,10 +127,7 @@ export function useDataProvider(): DataProvider {
         queryClient.invalidateQueries({
           predicate: (query) => {
             const actualKey = query.queryKey;
-            if (
-              !Array.isArray(actualKey) ||
-              actualKey.length < queryKey.length
-            ) {
+            if (!Array.isArray(actualKey) || actualKey.length < queryKey.length) {
               return false;
             }
             // Check if the query key starts with the provided prefix

@@ -1,8 +1,5 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  type UnifiedFeedItem,
-  useUnifiedFeed,
-} from "@prostcounter/shared/hooks";
+import { type UnifiedFeedItem, useUnifiedFeed } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { MessageSquarePlus, Newspaper, RefreshCw } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -174,11 +171,7 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
           {feedItems.map((item, index) => (
             <View
               key={item.feedItemId}
-              className={
-                index < feedItems.length - 1
-                  ? "border-b border-outline-100"
-                  : ""
-              }
+              className={index < feedItems.length - 1 ? "border-b border-outline-100" : ""}
             >
               <FeedItemRenderer
                 item={item}
@@ -201,9 +194,7 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
           >
             {isFetchingNextPage && <ButtonSpinner color={Colors.gray[500]} />}
             <ButtonText>
-              {isFetchingNextPage
-                ? t("common.status.loading")
-                : t("home.unifiedFeed.loadMore")}
+              {isFetchingNextPage ? t("common.status.loading") : t("home.unifiedFeed.loadMore")}
             </ButtonText>
           </Button>
         )}
@@ -232,21 +223,13 @@ interface FeedItemRendererProps {
   currentUserId?: string;
 }
 
-function FeedItemRenderer({
-  item,
-  festivalId,
-  currentUserId,
-}: FeedItemRendererProps) {
+function FeedItemRenderer({ item, festivalId, currentUserId }: FeedItemRendererProps) {
   switch (item.feedType) {
     case "activity":
       return <ActivityItem activity={item.data} festivalId={festivalId} />;
     case "message":
       return (
-        <MessageItem
-          message={item.data}
-          currentUserId={currentUserId}
-          festivalId={festivalId}
-        />
+        <MessageItem message={item.data} currentUserId={currentUserId} festivalId={festivalId} />
       );
     default:
       return null;

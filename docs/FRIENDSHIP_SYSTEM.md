@@ -38,23 +38,23 @@ Once two users are friends, they gain full visibility into each other's festival
 
 ### Visibility Granted
 
-| Data | Without Friendship | With Friendship |
-|------|-------------------|-----------------|
+| Data                        | Without Friendship | With Friendship         |
+| --------------------------- | ------------------ | ----------------------- |
 | Activity feed (beer counts) | Only group members | Group members + friends |
-| Tent check-ins | Only group members | Group members + friends |
-| Beer photos | Only group members | Group members + friends |
-| Reservations | Only group members | Group members + friends |
-| Messages | Only group members | Group members + friends |
+| Tent check-ins              | Only group members | Group members + friends |
+| Beer photos                 | Only group members | Group members + friends |
+| Reservations                | Only group members | Group members + friends |
+| Messages                    | Only group members | Group members + friends |
 
 ### Key Differences from Groups
 
-| Aspect | Groups | Friendships |
-|--------|--------|-------------|
-| Scope | Tied to a specific festival | Global, across all festivals |
-| Creation | One user creates, others join via invite | Mutual request/accept |
-| Size | Many members | Always 1-to-1 |
-| Removal | Leave the group | Unfriend |
-| Auto-visibility | Immediate on join | Immediate on accept |
+| Aspect          | Groups                                   | Friendships                  |
+| --------------- | ---------------------------------------- | ---------------------------- |
+| Scope           | Tied to a specific festival              | Global, across all festivals |
+| Creation        | One user creates, others join via invite | Mutual request/accept        |
+| Size            | Many members                             | Always 1-to-1                |
+| Removal         | Leave the group                          | Unfriend                     |
+| Auto-visibility | Immediate on join                        | Immediate on accept          |
 
 ## Database Design
 
@@ -92,20 +92,20 @@ Friend operations (send, accept, decline) use `SECURITY DEFINER` functions to ha
 
 ## API Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/friends` | List accepted friends |
-| `GET` | `/friends/requests/incoming` | Pending incoming requests |
-| `GET` | `/friends/requests/outgoing` | Pending outgoing requests |
-| `GET` | `/friends/requests/count` | Badge count for pending requests |
-| `POST` | `/friends/request` | Send friend request |
-| `POST` | `/friends/request/:id/accept` | Accept request |
-| `POST` | `/friends/request/:id/decline` | Decline request |
-| `DELETE` | `/friends/request/:id` | Cancel outgoing request |
-| `DELETE` | `/friends/:userId` | Unfriend |
-| `GET` | `/friends/suggestions` | People you may know |
-| `GET` | `/friends/search?q=` | Search users by name/username |
-| `GET` | `/friends/status/:userId` | Friendship status with a user |
+| Method   | Path                           | Description                      |
+| -------- | ------------------------------ | -------------------------------- |
+| `GET`    | `/friends`                     | List accepted friends            |
+| `GET`    | `/friends/requests/incoming`   | Pending incoming requests        |
+| `GET`    | `/friends/requests/outgoing`   | Pending outgoing requests        |
+| `GET`    | `/friends/requests/count`      | Badge count for pending requests |
+| `POST`   | `/friends/request`             | Send friend request              |
+| `POST`   | `/friends/request/:id/accept`  | Accept request                   |
+| `POST`   | `/friends/request/:id/decline` | Decline request                  |
+| `DELETE` | `/friends/request/:id`         | Cancel outgoing request          |
+| `DELETE` | `/friends/:userId`             | Unfriend                         |
+| `GET`    | `/friends/suggestions`         | People you may know              |
+| `GET`    | `/friends/search?q=`           | Search users by name/username    |
+| `GET`    | `/friends/status/:userId`      | Friendship status with a user    |
 
 ## Profile Modal Integration
 
@@ -115,13 +115,13 @@ Tapping any user's avatar (activity feed, leaderboard, friends list) opens a pro
 
 Displayed between the user's name and their stats:
 
-| Status | Display |
-|--------|---------|
-| `self` | Hidden (own profile) |
-| `friends` | Green "Friends" badge with check icon |
-| `pending_sent` | Muted "Request Sent" badge with clock icon |
-| `pending_received` | "Accept Request" button (primary action) |
-| `none` | "Add Friend" button (primary action) |
+| Status             | Display                                    |
+| ------------------ | ------------------------------------------ |
+| `self`             | Hidden (own profile)                       |
+| `friends`          | Green "Friends" badge with check icon      |
+| `pending_sent`     | Muted "Request Sent" badge with clock icon |
+| `pending_received` | "Accept Request" button (primary action)   |
+| `none`             | "Add Friend" button (primary action)       |
 
 Buttons trigger mutations (`useSendFriendRequest`, `useAcceptFriendRequest`) and the modal updates immediately via cache invalidation of the `public-profile` query key.
 

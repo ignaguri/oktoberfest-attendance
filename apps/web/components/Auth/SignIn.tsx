@@ -4,10 +4,7 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  type SignInFormData,
-  signInSchema,
-} from "@prostcounter/shared/schemas";
+import { type SignInFormData, signInSchema } from "@prostcounter/shared/schemas";
 import { Eye, EyeOff } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "next-view-transitions";
@@ -87,9 +84,7 @@ export default function SignIn() {
 
   return (
     <div className="card">
-      <h2 className="w-full p-0 text-center text-2xl font-semibold">
-        {t("auth.signIn.title")}
-      </h2>
+      <h2 className="w-full p-0 text-center text-2xl font-semibold">{t("auth.signIn.title")}</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="column w-full">
         <Label htmlFor="email">{t("auth.signIn.emailLabel")}</Label>
@@ -122,21 +117,14 @@ export default function SignIn() {
           {...register("password")}
         />
 
-        <Button
-          variant="yellow"
-          className="self-center"
-          type="submit"
-          disabled={isSubmitting}
-        >
+        <Button variant="yellow" className="self-center" type="submit" disabled={isSubmitting}>
           {isSubmitting ? t("common.status.loading") : t("auth.signIn.submit")}
         </Button>
       </form>
 
       <div className="flex w-full items-center gap-4">
         <div className="h-px flex-1 bg-gray-300"></div>
-        <span className="text-sm text-gray-500">
-          {t("auth.signIn.orContinueWith")}
-        </span>
+        <span className="text-sm text-gray-500">{t("auth.signIn.orContinueWith")}</span>
         <div className="h-px flex-1 bg-gray-300"></div>
       </div>
 

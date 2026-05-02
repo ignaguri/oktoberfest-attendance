@@ -41,12 +41,7 @@ export function MarketingHeader() {
           href={isLoggedIn ? "/home" : marketingUrl("/", lang)}
           className="flex items-center gap-2 text-lg font-bold text-gray-900"
         >
-          <Image
-            src={AppLogo}
-            alt="ProstCounter Logo"
-            className="size-8"
-            priority
-          />
+          <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" priority />
           <span translate="no">ProstCounter</span>
         </Link>
 
@@ -64,9 +59,7 @@ export function MarketingHeader() {
           <MarketingLanguageSelector />
           <Button variant="yellow" size="sm" asChild>
             <Link href={isLoggedIn ? "/home" : "/sign-in"}>
-              {isLoggedIn
-                ? t("marketing.header.goToApp")
-                : t("marketing.header.signIn")}
+              {isLoggedIn ? t("marketing.header.goToApp") : t("marketing.header.signIn")}
             </Link>
           </Button>
         </div>
@@ -104,9 +97,7 @@ export function MarketingHeader() {
                 href={isLoggedIn ? "/home" : "/sign-in"}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {isLoggedIn
-                  ? t("marketing.header.goToApp")
-                  : t("marketing.header.signIn")}
+                {isLoggedIn ? t("marketing.header.goToApp") : t("marketing.header.signIn")}
               </Link>
             </Button>
           </div>

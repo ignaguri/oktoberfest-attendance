@@ -59,9 +59,7 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
       ...(data.social_stats.top_3_rankings.length > 0
         ? [{ key: "rankings", component: RankingsSlide }]
         : []),
-      ...(data.comparisons
-        ? [{ key: "comparisons", component: ComparisonsSlide }]
-        : []),
+      ...(data.comparisons ? [{ key: "comparisons", component: ComparisonsSlide }] : []),
       { key: "outro", component: OutroSlide },
     ],
     [data],
@@ -109,9 +107,7 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="text-xl text-gray-600">
-            No wrapped data available for this festival
-          </p>
+          <p className="text-xl text-gray-600">No wrapped data available for this festival</p>
         </div>
       </div>
     );
@@ -162,9 +158,7 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
           const SlideComponent = slide.component;
           return (
             <SwiperSlide key={slide.key} virtualIndex={index}>
-              {({ isActive }) => (
-                <SlideComponent data={data} isActive={isActive} />
-              )}
+              {({ isActive }) => <SlideComponent data={data} isActive={isActive} />}
             </SwiperSlide>
           );
         })}
@@ -181,9 +175,7 @@ export function WrappedLoading() {
     <div className="flex h-screen items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50">
       <div className="flex flex-col items-center gap-4">
         <LoadingSpinner size={48} />
-        <p className="text-xl font-semibold text-gray-700">
-          Preparing your wrapped...
-        </p>
+        <p className="text-xl font-semibold text-gray-700">Preparing your wrapped...</p>
       </div>
     </div>
   );
@@ -198,9 +190,7 @@ export function WrappedError({ message }: { message?: string }) {
       <div className="max-w-md px-6 text-center">
         <div className="mb-4 text-6xl">😕</div>
         <h2 className="mb-2 text-2xl font-bold text-gray-800">Oops!</h2>
-        <p className="text-gray-600">
-          {message || "Something went wrong loading your wrapped"}
-        </p>
+        <p className="text-gray-600">{message || "Something went wrong loading your wrapped"}</p>
       </div>
     </div>
   );

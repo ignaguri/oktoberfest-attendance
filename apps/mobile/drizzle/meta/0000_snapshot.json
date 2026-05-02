@@ -190,19 +190,12 @@
       "indexes": {
         "idx_user_achievements_user": {
           "name": "idx_user_achievements_user",
-          "columns": [
-            "user_id",
-            "festival_id"
-          ],
+          "columns": ["user_id", "festival_id"],
           "isUnique": false
         },
         "user_achievements_user_achievement_festival": {
           "name": "user_achievements_user_achievement_festival",
-          "columns": [
-            "user_id",
-            "achievement_id",
-            "festival_id"
-          ],
+          "columns": ["user_id", "achievement_id", "festival_id"],
           "isUnique": true
         }
       },
@@ -211,12 +204,8 @@
           "name": "user_achievements_achievement_id_achievements_id_fk",
           "tableFrom": "user_achievements",
           "tableTo": "achievements",
-          "columnsFrom": [
-            "achievement_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["achievement_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -224,12 +213,8 @@
           "name": "user_achievements_festival_id_festivals_id_fk",
           "tableFrom": "user_achievements",
           "tableTo": "festivals",
-          "columnsFrom": [
-            "festival_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -318,34 +303,23 @@
       "indexes": {
         "idx_attendances_user_festival": {
           "name": "idx_attendances_user_festival",
-          "columns": [
-            "user_id",
-            "festival_id"
-          ],
+          "columns": ["user_id", "festival_id"],
           "isUnique": false
         },
         "idx_attendances_date": {
           "name": "idx_attendances_date",
-          "columns": [
-            "date"
-          ],
+          "columns": ["date"],
           "isUnique": false
         },
         "idx_attendances_dirty": {
           "name": "idx_attendances_dirty",
-          "columns": [
-            "_dirty"
-          ],
+          "columns": ["_dirty"],
           "isUnique": false,
           "where": "\"attendances\".\"_dirty\" = 1"
         },
         "attendances_user_festival_date": {
           "name": "attendances_user_festival_date",
-          "columns": [
-            "user_id",
-            "festival_id",
-            "date"
-          ],
+          "columns": ["user_id", "festival_id", "date"],
           "isUnique": true
         }
       },
@@ -354,12 +328,8 @@
           "name": "attendances_festival_id_festivals_id_fk",
           "tableFrom": "attendances",
           "tableTo": "festivals",
-          "columnsFrom": [
-            "festival_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -456,16 +426,12 @@
       "indexes": {
         "idx_beer_pictures_attendance": {
           "name": "idx_beer_pictures_attendance",
-          "columns": [
-            "attendance_id"
-          ],
+          "columns": ["attendance_id"],
           "isUnique": false
         },
         "idx_beer_pictures_pending": {
           "name": "idx_beer_pictures_pending",
-          "columns": [
-            "_pending_upload"
-          ],
+          "columns": ["_pending_upload"],
           "isUnique": false,
           "where": "\"beer_pictures\".\"_pending_upload\" = 1"
         }
@@ -475,12 +441,8 @@
           "name": "beer_pictures_attendance_id_attendances_id_fk",
           "tableFrom": "beer_pictures",
           "tableTo": "attendances",
-          "columnsFrom": [
-            "attendance_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["attendance_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -611,23 +573,17 @@
       "indexes": {
         "idx_consumptions_attendance": {
           "name": "idx_consumptions_attendance",
-          "columns": [
-            "attendance_id"
-          ],
+          "columns": ["attendance_id"],
           "isUnique": false
         },
         "idx_consumptions_idempotency": {
           "name": "idx_consumptions_idempotency",
-          "columns": [
-            "idempotency_key"
-          ],
+          "columns": ["idempotency_key"],
           "isUnique": false
         },
         "idx_consumptions_dirty": {
           "name": "idx_consumptions_dirty",
-          "columns": [
-            "_dirty"
-          ],
+          "columns": ["_dirty"],
           "isUnique": false,
           "where": "\"consumptions\".\"_dirty\" = 1"
         }
@@ -637,12 +593,8 @@
           "name": "consumptions_attendance_id_attendances_id_fk",
           "tableFrom": "consumptions",
           "tableTo": "attendances",
-          "columnsFrom": [
-            "attendance_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["attendance_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -650,12 +602,8 @@
           "name": "consumptions_tent_id_tents_id_fk",
           "tableFrom": "consumptions",
           "tableTo": "tents",
-          "columnsFrom": [
-            "tent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -869,24 +817,17 @@
       "indexes": {
         "idx_group_members_user": {
           "name": "idx_group_members_user",
-          "columns": [
-            "user_id"
-          ],
+          "columns": ["user_id"],
           "isUnique": false
         },
         "idx_group_members_group": {
           "name": "idx_group_members_group",
-          "columns": [
-            "group_id"
-          ],
+          "columns": ["group_id"],
           "isUnique": false
         },
         "group_members_group_user": {
           "name": "group_members_group_user",
-          "columns": [
-            "group_id",
-            "user_id"
-          ],
+          "columns": ["group_id", "user_id"],
           "isUnique": true
         }
       },
@@ -895,12 +836,8 @@
           "name": "group_members_group_id_groups_id_fk",
           "tableFrom": "group_members",
           "tableTo": "groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1012,12 +949,8 @@
           "name": "groups_festival_id_festivals_id_fk",
           "tableFrom": "groups",
           "tableTo": "festivals",
-          "columnsFrom": [
-            "festival_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1254,17 +1187,12 @@
       "indexes": {
         "idx_sync_queue_status": {
           "name": "idx_sync_queue_status",
-          "columns": [
-            "status",
-            "created_at"
-          ],
+          "columns": ["status", "created_at"],
           "isUnique": false
         },
         "idx_sync_queue_depends": {
           "name": "idx_sync_queue_depends",
-          "columns": [
-            "depends_on"
-          ],
+          "columns": ["depends_on"],
           "isUnique": false
         }
       },
@@ -1355,12 +1283,8 @@
           "name": "drink_type_prices_festival_id_festivals_id_fk",
           "tableFrom": "drink_type_prices",
           "tableTo": "festivals",
-          "columnsFrom": [
-            "festival_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1368,12 +1292,8 @@
           "name": "drink_type_prices_festival_tent_id_festival_tents_id_fk",
           "tableFrom": "drink_type_prices",
           "tableTo": "festival_tents",
-          "columnsFrom": [
-            "festival_tent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_tent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1461,17 +1381,12 @@
       "indexes": {
         "idx_festival_tents_festival": {
           "name": "idx_festival_tents_festival",
-          "columns": [
-            "festival_id"
-          ],
+          "columns": ["festival_id"],
           "isUnique": false
         },
         "festival_tents_festival_tent": {
           "name": "festival_tents_festival_tent",
-          "columns": [
-            "festival_id",
-            "tent_id"
-          ],
+          "columns": ["festival_id", "tent_id"],
           "isUnique": true
         }
       },
@@ -1480,12 +1395,8 @@
           "name": "festival_tents_festival_id_festivals_id_fk",
           "tableFrom": "festival_tents",
           "tableTo": "festivals",
-          "columnsFrom": [
-            "festival_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1493,12 +1404,8 @@
           "name": "festival_tents_tent_id_tents_id_fk",
           "tableFrom": "festival_tents",
           "tableTo": "tents",
-          "columnsFrom": [
-            "tent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1572,20 +1479,12 @@
       "indexes": {
         "idx_tent_visits_user_festival": {
           "name": "idx_tent_visits_user_festival",
-          "columns": [
-            "user_id",
-            "festival_id"
-          ],
+          "columns": ["user_id", "festival_id"],
           "isUnique": false
         },
         "tent_visits_user_tent_festival_date": {
           "name": "tent_visits_user_tent_festival_date",
-          "columns": [
-            "user_id",
-            "tent_id",
-            "festival_id",
-            "visit_date"
-          ],
+          "columns": ["user_id", "tent_id", "festival_id", "visit_date"],
           "isUnique": true
         }
       },
@@ -1594,12 +1493,8 @@
           "name": "tent_visits_tent_id_tents_id_fk",
           "tableFrom": "tent_visits",
           "tableTo": "tents",
-          "columnsFrom": [
-            "tent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1607,12 +1502,8 @@
           "name": "tent_visits_festival_id_festivals_id_fk",
           "tableFrom": "tent_visits",
           "tableTo": "festivals",
-          "columnsFrom": [
-            "festival_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["festival_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

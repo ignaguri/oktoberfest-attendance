@@ -29,10 +29,7 @@ describe("Consumption Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -413,9 +410,7 @@ describe("Consumption Routes - Unit Tests", () => {
 
       // Mock consumption create with error
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to create consumption", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to create consumption", "PGRST000")),
       );
 
       const req = createAuthRequest("/consumption", {

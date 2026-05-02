@@ -32,9 +32,7 @@ describe("Group Routes Integration (Local DB)", () => {
     });
 
     if (authError || !authData.user || !authData.session) {
-      throw new Error(
-        `Failed to create test user: ${authError?.message || "Unknown error"}`,
-      );
+      throw new Error(`Failed to create test user: ${authError?.message || "Unknown error"}`);
     }
 
     testUser = {
@@ -78,10 +76,7 @@ describe("Group Routes Integration (Local DB)", () => {
     // Use admin client to bypass RLS policies
 
     // 1. Delete group members first
-    await supabaseAdmin
-      .from("group_members")
-      .delete()
-      .in("group_id", createdGroupIds);
+    await supabaseAdmin.from("group_members").delete().in("group_id", createdGroupIds);
 
     // 2. Delete groups
     await supabaseAdmin.from("groups").delete().in("id", createdGroupIds);
@@ -146,15 +141,12 @@ describe("Group Routes Integration (Local DB)", () => {
 
   it("should list user's groups with member count", async () => {
     // Create a test group using RPC function
-    const { data: groupData } = await supabaseAdmin.rpc(
-      "create_group_with_member",
-      {
-        p_group_name: "List Test Group",
-        p_user_id: testUser.id,
-        p_festival_id: testFestival.id,
-        p_winning_criteria_id: 1, // days_attended
-      },
-    );
+    const { data: groupData } = await supabaseAdmin.rpc("create_group_with_member", {
+      p_group_name: "List Test Group",
+      p_user_id: testUser.id,
+      p_festival_id: testFestival.id,
+      p_winning_criteria_id: 1, // days_attended
+    });
 
     const group = groupData![0];
     createdGroupIds.push(group.group_id);
@@ -193,27 +185,22 @@ describe("Group Routes Integration (Local DB)", () => {
 
   it("should prevent duplicate group membership", async () => {
     // Create a test group using RPC function (automatically adds creator as member)
-    const { data: groupData } = await supabaseAdmin.rpc(
-      "create_group_with_member",
-      {
-        p_group_name: "Duplicate Test Group",
-        p_user_id: testUser.id,
-        p_festival_id: testFestival.id,
-        p_winning_criteria_id: 2,
-      },
-    );
+    const { data: groupData } = await supabaseAdmin.rpc("create_group_with_member", {
+      p_group_name: "Duplicate Test Group",
+      p_user_id: testUser.id,
+      p_festival_id: testFestival.id,
+      p_winning_criteria_id: 2,
+    });
 
     const group = groupData![0];
     createdGroupIds.push(group.group_id);
 
     // Creator is already a member from the RPC function
     // Try to add same member again - should fail due to unique constraint
-    const { error: secondError } = await supabaseAdmin
-      .from("group_members")
-      .insert({
-        group_id: group.group_id,
-        user_id: testUser.id,
-      });
+    const { error: secondError } = await supabaseAdmin.from("group_members").insert({
+      group_id: group.group_id,
+      user_id: testUser.id,
+    });
 
     expect(secondError).not.toBeNull();
     expect(secondError!.code).toBe("23505"); // PostgreSQL unique violation

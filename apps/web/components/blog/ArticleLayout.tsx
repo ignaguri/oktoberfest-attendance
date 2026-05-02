@@ -4,29 +4,15 @@ import { Link } from "next-view-transitions";
 
 import type { BlogPost } from "@/lib/blog";
 
-import {
-  categoryColors,
-  dateLocaleMap,
-  localizeCategory,
-  localizeTag,
-} from "./blog-i18n";
+import { categoryColors, dateLocaleMap, localizeCategory, localizeTag } from "./blog-i18n";
 
-const uiTranslations: Record<
-  SupportedLanguage,
-  { backToBlog: string; minRead: string }
-> = {
+const uiTranslations: Record<SupportedLanguage, { backToBlog: string; minRead: string }> = {
   en: { backToBlog: "Back to Blog", minRead: "min read" },
   de: { backToBlog: "Zurück zum Blog", minRead: "Min. Lesezeit" },
   es: { backToBlog: "Volver al Blog", minRead: "min de lectura" },
 };
 
-export function ArticleLayout({
-  post,
-  children,
-}: {
-  post: BlogPost;
-  children: React.ReactNode;
-}) {
+export function ArticleLayout({ post, children }: { post: BlogPost; children: React.ReactNode }) {
   const locale = post.locale || "en";
   const t = uiTranslations[locale];
   const dateFmtLocale = dateLocaleMap[locale];

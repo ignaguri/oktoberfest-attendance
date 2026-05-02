@@ -18,9 +18,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({
             request,
           });
@@ -83,14 +81,9 @@ export async function updateSession(request: NextRequest) {
     });
   } else if (
     !user &&
-    ![
-      "/auth",
-      "/sign-in",
-      "/sign-up",
-      "/reset-password",
-      "/error",
-      "/download",
-    ].includes(request.nextUrl.pathname)
+    !["/auth", "/sign-in", "/sign-up", "/reset-password", "/error", "/download"].includes(
+      request.nextUrl.pathname,
+    )
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
@@ -100,10 +93,7 @@ export async function updateSession(request: NextRequest) {
     if (url.search.includes("token")) {
       const token = url.search.split("token=")[1];
       url.searchParams.delete("token");
-      url.searchParams.set(
-        "redirect",
-        request.nextUrl.pathname + "?token=" + token,
-      );
+      url.searchParams.set("redirect", request.nextUrl.pathname + "?token=" + token);
     } else {
       url.searchParams.set("redirect", request.nextUrl.pathname);
     }

@@ -28,9 +28,7 @@ export type FestivalTentInsert = {
 /**
  * Get all tents available for a specific festival
  */
-export async function getFestivalTents(
-  festivalId: string,
-): Promise<TentWithPrice[]> {
+export async function getFestivalTents(festivalId: string): Promise<TentWithPrice[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -67,9 +65,7 @@ export async function getFestivalTents(
 /**
  * Get all tents not currently assigned to a specific festival
  */
-export async function getAvailableTents(
-  festivalId: string,
-): Promise<Tables<"tents">[]> {
+export async function getAvailableTents(festivalId: string): Promise<Tables<"tents">[]> {
   const supabase = await createClient();
 
   // Get tent IDs that are already assigned to this festival
@@ -169,10 +165,7 @@ export async function addAllAvailableTentsToFestival(
 /**
  * Remove a tent from a festival
  */
-export async function removeTentFromFestival(
-  festivalId: string,
-  tentId: string,
-): Promise<void> {
+export async function removeTentFromFestival(festivalId: string, tentId: string): Promise<void> {
   const supabase = await createClient();
 
   // Check if tent has any attendance records first
@@ -340,12 +333,10 @@ export async function copyTentsToFestival(
   }));
 
   // Insert tents (ignore conflicts - tent already exists in target festival)
-  const { error: insertError } = await supabase
-    .from("festival_tents")
-    .upsert(insertData, {
-      onConflict: "festival_id,tent_id",
-      ignoreDuplicates: true,
-    });
+  const { error: insertError } = await supabase.from("festival_tents").upsert(insertData, {
+    onConflict: "festival_id,tent_id",
+    ignoreDuplicates: true,
+  });
 
   if (insertError) {
     reportSupabaseException("copyTentsToFestival", insertError);
@@ -400,8 +391,7 @@ export async function getFestivalTentStats(festivalId: string) {
     });
 
     if (prices.length > 0) {
-      stats.avg_price =
-        prices.reduce((sum, price) => sum + price, 0) / prices.length;
+      stats.avg_price = prices.reduce((sum, price) => sum + price, 0) / prices.length;
     }
   }
 

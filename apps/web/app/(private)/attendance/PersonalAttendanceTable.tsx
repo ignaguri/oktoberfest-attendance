@@ -38,17 +38,12 @@ const PersonalAttendanceTable = ({
 }: PersonalAttendanceTableProps) => {
   const { t } = useTranslation();
   const [isVisitedTentsDialogOpen, setVisitedTentsDialogOpen] = useState(false);
-  const [isDeleteAttendanceDialogOpen, setDeleteAttendanceDialogOpen] =
-    useState(false);
-  const [selectedAttendance, setSelectedAttendance] = useState<string | null>(
-    null,
-  );
-  const { mutate: deleteAttendanceMutation, loading: isDeleting } =
-    useDeleteAttendance();
+  const [isDeleteAttendanceDialogOpen, setDeleteAttendanceDialogOpen] = useState(false);
+  const [selectedAttendance, setSelectedAttendance] = useState<string | null>(null);
+  const { mutate: deleteAttendanceMutation, loading: isDeleting } = useDeleteAttendance();
 
   const tentVisitsForDate = useMemo(() => {
-    return data?.find((attendance) => attendance.date === selectedAttendance)
-      ?.tentVisits;
+    return data?.find((attendance) => attendance.date === selectedAttendance)?.tentVisits;
   }, [data, selectedAttendance]);
 
   const selectedAttendanceData = useMemo(() => {
@@ -82,20 +77,14 @@ const PersonalAttendanceTable = ({
     {
       accessorKey: "date",
       header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t("attendance.table.date")}
-        />
+        <DataTableColumnHeader column={column} title={t("attendance.table.date")} />
       ),
       cell: ({ row }) => formatDate(new Date(row.original.date), "dd/MM/yyyy"),
     },
     {
       accessorKey: "beerCount",
       header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t("attendance.table.amount")}
-        />
+        <DataTableColumnHeader column={column} title={t("attendance.table.amount")} />
       ),
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
@@ -107,10 +96,7 @@ const PersonalAttendanceTable = ({
     {
       accessorKey: "tentVisits",
       header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t("attendance.table.tents")}
-        />
+        <DataTableColumnHeader column={column} title={t("attendance.table.tents")} />
       ),
       cell: ({ row }) => (
         <Button
@@ -125,9 +111,7 @@ const PersonalAttendanceTable = ({
     },
     {
       id: "delete",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
       enableSorting: false,
       cell: ({ row }) => (
         <Button
@@ -187,24 +171,16 @@ const PersonalAttendanceTable = ({
             </div>
           ))}
       </ResponsiveDialog>
-      <Dialog
-        open={isDeleteAttendanceDialogOpen}
-        onOpenChange={setDeleteAttendanceDialogOpen}
-      >
+      <Dialog open={isDeleteAttendanceDialogOpen} onOpenChange={setDeleteAttendanceDialogOpen}>
         <DialogOverlay />
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("attendance.delete.title")}</DialogTitle>
-            <DialogDescription>
-              {t("attendance.delete.confirm")}
-            </DialogDescription>
+            <DialogDescription>{t("attendance.delete.confirm")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button
-                variant="outline"
-                onClick={() => setDeleteAttendanceDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setDeleteAttendanceDialogOpen(false)}>
                 {t("common.buttons.cancel")}
               </Button>
             </DialogClose>
@@ -218,9 +194,7 @@ const PersonalAttendanceTable = ({
                 }
               }}
             >
-              {isDeleting
-                ? t("common.buttons.loading")
-                : t("common.buttons.confirm")}
+              {isDeleting ? t("common.buttons.loading") : t("common.buttons.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

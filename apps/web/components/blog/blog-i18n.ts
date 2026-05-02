@@ -15,10 +15,7 @@ export const dateLocaleMap: Record<SupportedLanguage, string> = {
   es: "es-ES",
 };
 
-export const categoryNames: Record<
-  BlogCategory,
-  Record<SupportedLanguage, string>
-> = {
+export const categoryNames: Record<BlogCategory, Record<SupportedLanguage, string>> = {
   festivals: { en: "Festivals", de: "Feste", es: "Festivales" },
   tips: { en: "Tips", de: "Tipps", es: "Consejos" },
   culture: { en: "Culture", de: "Kultur", es: "Cultura" },
@@ -102,10 +99,7 @@ const tagNames: Record<string, Record<SupportedLanguage, string>> = {
   },
 };
 
-export function localizeCategory(
-  category: string,
-  locale: SupportedLanguage,
-): string {
+export function localizeCategory(category: string, locale: SupportedLanguage): string {
   return (
     categoryNames[category as BlogCategory]?.[locale] ??
     category.charAt(0).toUpperCase() + category.slice(1)

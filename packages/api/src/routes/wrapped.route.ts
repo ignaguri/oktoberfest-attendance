@@ -140,11 +140,7 @@ app.openapi(generateWrappedRoute, async (c) => {
   const wrappedRepo = new SupabaseWrappedRepository(supabase);
   const wrappedService = new WrappedService(wrappedRepo);
 
-  const result = await wrappedService.generateWrapped(
-    user.id,
-    festivalId,
-    force,
-  );
+  const result = await wrappedService.generateWrapped(user.id, festivalId, force);
 
   return c.json(result, 200);
 });
@@ -155,8 +151,7 @@ const checkAccessRoute = createRoute({
   path: "/wrapped/{festivalId}/access",
   tags: ["wrapped"],
   summary: "Check wrapped access",
-  description:
-    "Checks if the user is allowed to access wrapped data for a specific festival.",
+  description: "Checks if the user is allowed to access wrapped data for a specific festival.",
   request: {
     params: z.object({
       festivalId: z.uuid({ error: "Invalid festival ID" }),
@@ -204,8 +199,7 @@ const getAvailableFestivalsRoute = createRoute({
   path: "/wrapped/festivals",
   tags: ["wrapped"],
   summary: "Get available wrapped festivals",
-  description:
-    "Returns a list of festivals for which wrapped data is available for the user.",
+  description: "Returns a list of festivals for which wrapped data is available for the user.",
   responses: {
     200: {
       description: "Available festivals list",
@@ -247,8 +241,7 @@ const regenerateCacheRoute = createRoute({
   path: "/wrapped/regenerate",
   tags: ["wrapped"],
   summary: "Regenerate wrapped cache (admin only)",
-  description:
-    "Admin function to regenerate cached wrapped data for specific users or festivals.",
+  description: "Admin function to regenerate cached wrapped data for specific users or festivals.",
   request: {
     body: {
       content: {
@@ -310,11 +303,7 @@ app.openapi(regenerateCacheRoute, async (c) => {
   const wrappedRepo = new SupabaseWrappedRepository(supabase);
   const wrappedService = new WrappedService(wrappedRepo);
 
-  const result = await wrappedService.regenerateCache(
-    user.id,
-    body.festivalId,
-    body.userId,
-  );
+  const result = await wrappedService.regenerateCache(user.id, body.festivalId, body.userId);
 
   return c.json(result, 200);
 });

@@ -29,10 +29,7 @@ export class LocationService {
    * @param data - Session configuration
    * @returns Created session
    */
-  async startSession(
-    userId: string,
-    data: StartLocationSessionInput,
-  ): Promise<LocationSession> {
+  async startSession(userId: string, data: StartLocationSessionInput): Promise<LocationSession> {
     // Validate duration
     const duration = data.durationMinutes || 120;
     if (duration < 5 || duration > 480) {
@@ -40,10 +37,7 @@ export class LocationService {
     }
 
     // Check for existing active session - return it if exists (idempotent)
-    const existing = await this.locationRepo.getActiveSession(
-      userId,
-      data.festivalId,
-    );
+    const existing = await this.locationRepo.getActiveSession(userId, data.festivalId);
 
     if (existing) {
       // Return existing session instead of erroring - makes API idempotent
@@ -68,10 +62,7 @@ export class LocationService {
    * @param userId - User ID (for authorization)
    * @returns Updated session
    */
-  async stopSession(
-    sessionId: string,
-    userId: string,
-  ): Promise<LocationSession> {
+  async stopSession(sessionId: string, userId: string): Promise<LocationSession> {
     const session = await this.locationRepo.stopSession(sessionId, userId);
 
     // TODO: Optionally notify group members
@@ -87,10 +78,7 @@ export class LocationService {
    * @param festivalId - Festival ID
    * @returns Active session if exists
    */
-  async getActiveSession(
-    userId: string,
-    festivalId: string,
-  ): Promise<LocationSession | null> {
+  async getActiveSession(userId: string, festivalId: string): Promise<LocationSession | null> {
     return this.locationRepo.getActiveSession(userId, festivalId);
   }
 
@@ -117,11 +105,7 @@ export class LocationService {
    * @param userId - User ID (for authorization)
    * @param location - New location data
    */
-  async updateLocation(
-    sessionId: string,
-    userId: string,
-    location: LocationPoint,
-  ): Promise<void> {
+  async updateLocation(sessionId: string, userId: string, location: LocationPoint): Promise<void> {
     // Validate latitude/longitude
     if (
       location.latitude < -90 ||
@@ -170,12 +154,7 @@ export class LocationService {
     }
 
     // Validate coordinates
-    if (
-      latitude < -90 ||
-      latitude > 90 ||
-      longitude < -180 ||
-      longitude > 180
-    ) {
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
       throw new ValidationError(ErrorCodes.INVALID_COORDINATES);
     }
 
@@ -243,10 +222,7 @@ export class LocationService {
    * @param sessionId - Session ID to stop
    * @returns Updated session
    */
-  async forceStopSession(
-    adminUserId: string,
-    sessionId: string,
-  ): Promise<LocationSession> {
+  async forceStopSession(adminUserId: string, sessionId: string): Promise<LocationSession> {
     const isAdmin = await this.isAdmin(adminUserId);
     if (!isAdmin) {
       throw new ForbiddenError(ErrorCodes.FORBIDDEN);

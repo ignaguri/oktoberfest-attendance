@@ -44,9 +44,7 @@ export function formatPercentage(percent: number): string {
 /**
  * Get festival year from festival name or dates
  */
-export function getFestivalYear(
-  festivalInfo: WrappedData["festival_info"],
-): number {
+export function getFestivalYear(festivalInfo: WrappedData["festival_info"]): number {
   // Try to extract year from festival name first
   const yearMatch = festivalInfo.name.match(/\d{4}/);
   if (yearMatch) {
@@ -60,9 +58,7 @@ export function getFestivalYear(
 /**
  * Calculate total achievement points
  */
-export function calculateTotalPoints(
-  achievements: WrappedData["achievements"],
-): number {
+export function calculateTotalPoints(achievements: WrappedData["achievements"]): number {
   return achievements.reduce((sum, achievement) => sum + achievement.points, 0);
 }
 
@@ -100,9 +96,7 @@ export function getTopTents(
   tentBreakdown: WrappedData["tent_stats"]["tent_breakdown"],
   limit: number = 5,
 ) {
-  return tentBreakdown
-    .sort((a, b) => b.visit_count - a.visit_count)
-    .slice(0, limit);
+  return tentBreakdown.sort((a, b) => b.visit_count - a.visit_count).slice(0, limit);
 }
 
 /**
@@ -159,9 +153,7 @@ export function sortAchievements(achievements: WrappedData["achievements"]) {
 /**
  * Check if comparison shows improvement vs last year
  */
-export function isImprovement(
-  vsLastYear: WrappedData["comparisons"]["vs_last_year"],
-): {
+export function isImprovement(vsLastYear: WrappedData["comparisons"]["vs_last_year"]): {
   beers: boolean;
   days: boolean;
   overall: boolean;
@@ -179,9 +171,7 @@ export function isImprovement(
  * Calculate number of groups where user ranked in podium (1st, 2nd, 3rd place)
  */
 export function calculatePodiumGroupsCount(data: WrappedData): number {
-  return data.social_stats.top_3_rankings.filter(
-    (ranking) => ranking.position <= 3,
-  ).length;
+  return data.social_stats.top_3_rankings.filter((ranking) => ranking.position <= 3).length;
 }
 
 /**

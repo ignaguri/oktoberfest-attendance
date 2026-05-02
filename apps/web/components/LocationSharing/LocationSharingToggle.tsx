@@ -27,20 +27,13 @@ export const LocationSharingToggle = ({
 }: LocationSharingToggleProps) => {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const {
-    startLocationSharing,
-    stopLocationSharing,
-    isUpdatingLocation,
-    isStoppingSharing,
-  } = useLocationSharing(currentFestival?.id);
+  const { startLocationSharing, stopLocationSharing, isUpdatingLocation, isStoppingSharing } =
+    useLocationSharing(currentFestival?.id);
 
   // eslint-disable-next-line no-console
   console.log("LocationSharingToggle - Current festival:", currentFestival?.id);
   // eslint-disable-next-line no-console
-  console.log(
-    "LocationSharingToggle - Has group sharing enabled:",
-    hasGroupSharingEnabled,
-  );
+  console.log("LocationSharingToggle - Has group sharing enabled:", hasGroupSharingEnabled);
   // eslint-disable-next-line no-console
   console.log("LocationSharingToggle - Is sharing:", isSharing);
 
@@ -126,14 +119,10 @@ export const LocationSharingToggle = ({
         }
       } else {
         const errorMessage =
-          error instanceof Error
-            ? error.message
-            : t("notifications.error.generic");
+          error instanceof Error ? error.message : t("notifications.error.generic");
 
         // Handle specific API errors
-        if (
-          errorMessage.includes("Location sharing not enabled for any groups")
-        ) {
+        if (errorMessage.includes("Location sharing not enabled for any groups")) {
           toast.error(t("location.sharing.noGroupsEnabled"));
         } else {
           toast.error(errorMessage);

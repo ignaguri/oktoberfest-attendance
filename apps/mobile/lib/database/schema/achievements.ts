@@ -1,10 +1,4 @@
-import {
-  index,
-  integer,
-  sqliteTable,
-  text,
-  unique,
-} from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 import { offlineColumns } from "./common";
 import { ACHIEVEMENT_CATEGORIES, ACHIEVEMENT_RARITIES } from "./enums";

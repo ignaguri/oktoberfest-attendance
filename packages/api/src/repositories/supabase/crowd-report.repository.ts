@@ -29,21 +29,14 @@ export class SupabaseCrowdReportRepository implements ICrowdReportRepository {
       festivalId: row.festival_id,
       reportCount: Number(row.report_count) || 0,
       crowdLevel: row.crowd_level,
-      avgWaitMinutes: row.avg_wait_minutes
-        ? Number(row.avg_wait_minutes)
-        : null,
+      avgWaitMinutes: row.avg_wait_minutes ? Number(row.avg_wait_minutes) : null,
       lastReportedAt: row.last_reported_at,
     }));
   }
 
-  async getTentReports(
-    tentId: string,
-    festivalId: string,
-  ): Promise<CrowdReportWithUser[]> {
+  async getTentReports(tentId: string, festivalId: string): Promise<CrowdReportWithUser[]> {
     // Get reports from last 30 minutes with user profile info
-    const thirtyMinutesAgo = new Date(
-      Date.now() - 30 * 60 * 1000,
-    ).toISOString();
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
     const { data, error } = await this.supabase
       .from("tent_crowd_reports")
@@ -112,9 +105,7 @@ export class SupabaseCrowdReportRepository implements ICrowdReportRepository {
       .single();
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to submit crowd report: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to submit crowd report: ${error.message}`);
     }
 
     return {
@@ -136,9 +127,7 @@ export class SupabaseCrowdReportRepository implements ICrowdReportRepository {
       .gte("created_at", fiveMinutesAgo);
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to check recent reports: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to check recent reports: ${error.message}`);
     }
 
     return (count ?? 0) > 0;

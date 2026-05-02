@@ -21,15 +21,12 @@ export function useLocation() {
   const [isPermissionLoading, setIsPermissionLoading] = useState(true);
 
   // Location state
-  const [currentLocation, setCurrentLocation] =
-    useState<Location.LocationObject | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<Location.LocationObject | null>(null);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
   // Subscription reference for watching location
-  const locationSubscription = useRef<Location.LocationSubscription | null>(
-    null,
-  );
+  const locationSubscription = useRef<Location.LocationSubscription | null>(null);
 
   /**
    * Load initial permission status from storage and sync with device
@@ -47,10 +44,7 @@ export function useLocation() {
         let actualStatus: LocationPermissionStatus = "undetermined";
         if (foreground.status === "denied") {
           actualStatus = "denied";
-        } else if (
-          foreground.status === "granted" &&
-          background.status === "granted"
-        ) {
+        } else if (foreground.status === "granted" && background.status === "granted") {
           actualStatus = "background";
         } else if (foreground.status === "granted") {
           actualStatus = "foreground";
@@ -80,117 +74,108 @@ export function useLocation() {
    * Request foreground location permission
    * @returns true if granted, false otherwise
    */
-  const requestForegroundPermission =
-    useCallback(async (): Promise<boolean> => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+  const requestForegroundPermission = useCallback(async (): Promise<boolean> => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
 
-        if (status === "granted") {
-          setPermissionStatusState("foreground");
-          await setLocationPermissionStatus("foreground");
-          return true;
-        }
-
-        setPermissionStatusState("denied");
-        await setLocationPermissionStatus("denied");
-        return false;
-      } catch (error) {
-        logger.error("Error requesting foreground permission", error);
-        return false;
+      if (status === "granted") {
+        setPermissionStatusState("foreground");
+        await setLocationPermissionStatus("foreground");
+        return true;
       }
-    }, []);
+
+      setPermissionStatusState("denied");
+      await setLocationPermissionStatus("denied");
+      return false;
+    } catch (error) {
+      logger.error("Error requesting foreground permission", error);
+      return false;
+    }
+  }, []);
 
   /**
    * Request background location permission (must have foreground first)
    * @returns true if granted, false otherwise
    */
-  const requestBackgroundPermission =
-    useCallback(async (): Promise<boolean> => {
-      try {
-        // Check if foreground permission is granted first
-        const foreground = await Location.getForegroundPermissionsAsync();
-        if (foreground.status !== "granted") {
-          logger.warn(
-            "Must have foreground permission before requesting background",
-          );
-          return false;
-        }
-
-        const { status } = await Location.requestBackgroundPermissionsAsync();
-
-        if (status === "granted") {
-          setPermissionStatusState("background");
-          await setLocationPermissionStatus("background");
-          return true;
-        }
-
-        // Keep foreground status if background was denied
-        return false;
-      } catch (error) {
-        logger.error("Error requesting background permission", error);
+  const requestBackgroundPermission = useCallback(async (): Promise<boolean> => {
+    try {
+      // Check if foreground permission is granted first
+      const foreground = await Location.getForegroundPermissionsAsync();
+      if (foreground.status !== "granted") {
+        logger.warn("Must have foreground permission before requesting background");
         return false;
       }
-    }, []);
+
+      const { status } = await Location.requestBackgroundPermissionsAsync();
+
+      if (status === "granted") {
+        setPermissionStatusState("background");
+        await setLocationPermissionStatus("background");
+        return true;
+      }
+
+      // Keep foreground status if background was denied
+      return false;
+    } catch (error) {
+      logger.error("Error requesting background permission", error);
+      return false;
+    }
+  }, []);
 
   /**
    * Request both foreground and background permissions
    * @returns "background" | "foreground" | "denied" based on what was granted
    */
-  const requestAllPermissions =
-    useCallback(async (): Promise<LocationPermissionStatus> => {
-      const foregroundGranted = await requestForegroundPermission();
+  const requestAllPermissions = useCallback(async (): Promise<LocationPermissionStatus> => {
+    const foregroundGranted = await requestForegroundPermission();
 
-      if (!foregroundGranted) {
-        return "denied";
-      }
+    if (!foregroundGranted) {
+      return "denied";
+    }
 
-      const backgroundGranted = await requestBackgroundPermission();
-      return backgroundGranted ? "background" : "foreground";
-    }, [requestForegroundPermission, requestBackgroundPermission]);
+    const backgroundGranted = await requestBackgroundPermission();
+    return backgroundGranted ? "background" : "foreground";
+  }, [requestForegroundPermission, requestBackgroundPermission]);
 
   /**
    * Get current location once
    */
-  const getCurrentLocation =
-    useCallback(async (): Promise<Location.LocationObject | null> => {
-      if (
-        permissionStatus !== "foreground" &&
-        permissionStatus !== "background"
-      ) {
-        logger.warn("Permission not granted");
+  const getCurrentLocation = useCallback(async (): Promise<Location.LocationObject | null> => {
+    if (permissionStatus !== "foreground" && permissionStatus !== "background") {
+      logger.warn("Permission not granted");
+      return null;
+    }
+
+    setIsLocationLoading(true);
+    setLocationError(null);
+
+    try {
+      // Check if location services are enabled before attempting
+      const servicesEnabled = await checkLocationServicesEnabled();
+      if (!servicesEnabled) {
+        setLocationError(t("location.errors.servicesDisabled"));
+        logger.warn("Location services disabled on device");
         return null;
       }
 
-      setIsLocationLoading(true);
-      setLocationError(null);
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
 
-      try {
-        // Check if location services are enabled before attempting
-        const servicesEnabled = await checkLocationServicesEnabled();
-        if (!servicesEnabled) {
-          setLocationError(t("location.errors.servicesDisabled"));
-          logger.warn("Location services disabled on device");
-          return null;
-        }
-
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-
-        setCurrentLocation(location);
-        return location;
-      } catch (error) {
-        const errorDetail = error instanceof Error ? error.message : "unknown";
-        setLocationError(t("location.errors.locationUnavailable"));
-        // Location unavailability is expected (GPS off, no signal) — warn, not error
-        logger.warn("Could not get current location", {
-          error: errorDetail,
-        });
-        return null;
-      } finally {
-        setIsLocationLoading(false);
-      }
-    }, [permissionStatus, t]); // checkLocationServicesEnabled is stable (no deps) so omitted
+      setCurrentLocation(location);
+      return location;
+    } catch (error) {
+      const errorDetail = error instanceof Error ? error.message : "unknown";
+      setLocationError(t("location.errors.locationUnavailable"));
+      // Location unavailability is expected (GPS off, no signal) — warn, not error
+      logger.warn("Could not get current location", {
+        error: errorDetail,
+      });
+      return null;
+    } finally {
+      setIsLocationLoading(false);
+    }
+  }, [permissionStatus, t]); // checkLocationServicesEnabled is stable (no deps) so omitted
 
   /**
    * Start watching location updates
@@ -206,10 +191,7 @@ export function useLocation() {
         timeInterval?: number;
       },
     ): Promise<boolean> => {
-      if (
-        permissionStatus !== "foreground" &&
-        permissionStatus !== "background"
-      ) {
+      if (permissionStatus !== "foreground" && permissionStatus !== "background") {
         logger.warn("Permission not granted for watching");
         return false;
       }
@@ -264,22 +246,20 @@ export function useLocation() {
   /**
    * Check if location services are enabled on the device
    */
-  const checkLocationServicesEnabled =
-    useCallback(async (): Promise<boolean> => {
-      try {
-        return await Location.hasServicesEnabledAsync();
-      } catch (error) {
-        logger.error("Error checking location services", error);
-        return false;
-      }
-    }, []);
+  const checkLocationServicesEnabled = useCallback(async (): Promise<boolean> => {
+    try {
+      return await Location.hasServicesEnabledAsync();
+    } catch (error) {
+      logger.error("Error checking location services", error);
+      return false;
+    }
+  }, []);
 
   return {
     // Permission state
     permissionStatus,
     isPermissionLoading,
-    hasPermission:
-      permissionStatus === "foreground" || permissionStatus === "background",
+    hasPermission: permissionStatus === "foreground" || permissionStatus === "background",
     hasBackgroundPermission: permissionStatus === "background",
 
     // Location state

@@ -17,11 +17,7 @@ export function HomeSkeleton() {
   return (
     <VStack space="md">
       {/* Festival Status Skeleton */}
-      <Card
-        size="md"
-        variant="filled"
-        className="border border-outline-200 bg-background-100"
-      >
+      <Card size="md" variant="filled" className="border border-outline-200 bg-background-100">
         <HStack space="sm" className="items-center justify-center">
           <Skeleton variant="circular" className="h-7 w-7" />
           <Skeleton variant="rounded" className="h-5 w-40" />

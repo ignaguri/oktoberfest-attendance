@@ -24,17 +24,10 @@ interface ErrorStateProps {
  * Reusable error state component for displaying errors with optional retry.
  * Use this when a data fetch or operation fails.
  */
-export function ErrorState({
-  error,
-  message,
-  title,
-  onRetry,
-  showRetry = true,
-}: ErrorStateProps) {
+export function ErrorState({ error, message, title, onRetry, showRetry = true }: ErrorStateProps) {
   const { t } = useTranslation();
 
-  const errorMessage =
-    message || error?.message || t("common.errors.unexpected");
+  const errorMessage = message || error?.message || t("common.errors.unexpected");
 
   const errorTitle = title || t("common.errors.title");
 

@@ -6,13 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function JoinGroupErrorPage() {
@@ -132,12 +126,8 @@ export default function JoinGroupErrorPage() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
               <Icon className="h-8 w-8 text-yellow-600" />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              {errorContent.title}
-            </CardTitle>
-            <CardDescription className="text-gray-600">
-              {errorContent.description}
-            </CardDescription>
+            <CardTitle className="text-2xl font-bold text-gray-900">{errorContent.title}</CardTitle>
+            <CardDescription className="text-gray-600">{errorContent.description}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
             <Alert>
@@ -151,9 +141,7 @@ export default function JoinGroupErrorPage() {
                 return (
                   <Button
                     key={index}
-                    variant={
-                      action.variant === "default" ? "darkYellow" : "outline"
-                    }
+                    variant={action.variant === "default" ? "darkYellow" : "outline"}
                     className="w-fit justify-center"
                     onClick={() => {
                       if (action.path === "back") {
@@ -178,8 +166,7 @@ export default function JoinGroupErrorPage() {
                     <span>{t("joinGroup.error.expired.needNew")}</span>
                   </AlertTitle>
                   <AlertDescription>
-                    {t("joinGroup.error.expired.askMember")}{" "}
-                    {t("joinGroup.error.expired.hint")}
+                    {t("joinGroup.error.expired.askMember")} {t("joinGroup.error.expired.hint")}
                   </AlertDescription>
                 </Alert>
               </div>

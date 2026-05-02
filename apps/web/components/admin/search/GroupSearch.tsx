@@ -1,21 +1,11 @@
 "use client";
 
-import {
-  Calendar,
-  Filter,
-  RefreshCw,
-  SortAsc,
-  SortDesc,
-  Users,
-} from "lucide-react";
+import { Calendar, Filter, RefreshCw, SortAsc, SortDesc, Users } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  useGroupSearch,
-  useGroupSearchMutations,
-} from "@/hooks/useGroupSearch";
+import { useGroupSearch, useGroupSearchMutations } from "@/hooks/useGroupSearch";
 import { useSearchState } from "@/hooks/useSearchState";
 import type { GroupSearchFilters } from "@/lib/data/search-query-keys";
 import { cn } from "@/lib/utils";
@@ -64,12 +54,7 @@ export function GroupSearch({
     [searchState],
   );
 
-  const {
-    data: searchResult,
-    isLoading,
-    error,
-    refetch,
-  } = useGroupSearch(searchFilters);
+  const { data: searchResult, isLoading, error, refetch } = useGroupSearch(searchFilters);
 
   // Type guard to ensure searchResult has the expected structure
   const hasValidSearchResult =
@@ -86,9 +71,7 @@ export function GroupSearch({
   const handleSort = useCallback(
     (sortBy: string) => {
       const newSortOrder =
-        searchState.sortBy === sortBy && searchState.sortOrder === "asc"
-          ? "desc"
-          : "asc";
+        searchState.sortBy === sortBy && searchState.sortOrder === "asc" ? "desc" : "asc";
       searchState.updateSorting(sortBy, newSortOrder);
     },
     [searchState],
@@ -119,9 +102,7 @@ export function GroupSearch({
             <h3 className="text-lg font-medium">{group.name}</h3>
           </div>
           {group.description && (
-            <p className="text-muted-foreground mb-2 line-clamp-2 text-sm">
-              {group.description}
-            </p>
+            <p className="text-muted-foreground mb-2 line-clamp-2 text-sm">{group.description}</p>
           )}
           <div className="text-muted-foreground flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1">
@@ -130,19 +111,13 @@ export function GroupSearch({
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              <span>
-                Created {new Date(group.created_at).toLocaleDateString()}
-              </span>
+              <span>Created {new Date(group.created_at).toLocaleDateString()}</span>
             </div>
           </div>
         </div>
         <div className="flex gap-2">
           {onGroupEdit && (
-            <Button
-              onClick={() => onGroupEdit(group)}
-              size="sm"
-              title="Edit group information"
-            >
+            <Button onClick={() => onGroupEdit(group)} size="sm" title="Edit group information">
               Edit
             </Button>
           )}
@@ -162,9 +137,7 @@ export function GroupSearch({
     [onGroupEdit, onGroupDelete],
   );
 
-  const renderItem = (renderGroupItem || defaultRenderGroupItem) as (
-    group: any,
-  ) => React.ReactNode;
+  const renderItem = (renderGroupItem || defaultRenderGroupItem) as (group: any) => React.ReactNode;
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -190,9 +163,7 @@ export function GroupSearch({
               disabled={isLoading}
               title="Refresh search results"
             >
-              <RefreshCw
-                className={cn("h-4 w-4", isLoading && "animate-spin")}
-              />
+              <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
             </Button>
           )}
 
@@ -202,13 +173,10 @@ export function GroupSearch({
                 variant="outline"
                 size="sm"
                 onClick={() => handleSort("created_at")}
-                className={cn(
-                  searchState.sortBy === "created_at" && "bg-muted",
-                )}
+                className={cn(searchState.sortBy === "created_at" && "bg-muted")}
                 title={`Sort by creation date (${searchState.sortBy === "created_at" && searchState.sortOrder === "asc" ? "descending" : "ascending"})`}
               >
-                {searchState.sortBy === "created_at" &&
-                searchState.sortOrder === "asc" ? (
+                {searchState.sortBy === "created_at" && searchState.sortOrder === "asc" ? (
                   <SortAsc className="h-4 w-4" />
                 ) : (
                   <SortDesc className="h-4 w-4" />
@@ -221,8 +189,7 @@ export function GroupSearch({
                 className={cn(searchState.sortBy === "name" && "bg-muted")}
                 title={`Sort by name (${searchState.sortBy === "name" && searchState.sortOrder === "asc" ? "descending" : "ascending"})`}
               >
-                {searchState.sortBy === "name" &&
-                searchState.sortOrder === "asc" ? (
+                {searchState.sortBy === "name" && searchState.sortOrder === "asc" ? (
                   <SortAsc className="h-4 w-4" />
                 ) : (
                   <SortDesc className="h-4 w-4" />
@@ -242,9 +209,7 @@ export function GroupSearch({
               {searchResult.totalCount !== 1 ? "s" : ""} found
             </span>
             {searchState.hasSearch && (
-              <Badge variant="outline">
-                &ldquo;{searchState.search}&rdquo;
-              </Badge>
+              <Badge variant="outline">&ldquo;{searchState.search}&rdquo;</Badge>
             )}
             {searchState.hasActiveFilters && (
               <Badge variant="outline">
@@ -273,9 +238,7 @@ export function GroupSearch({
       {/* Search Results */}
       <SearchResults
         isLoading={isLoading}
-        isEmpty={
-          !isLoading && hasValidSearchResult && searchResult.groups.length === 0
-        }
+        isEmpty={!isLoading && hasValidSearchResult && searchResult.groups.length === 0}
         emptyMessage="No groups found"
         searchTerm={searchState.search}
       >
@@ -298,9 +261,7 @@ export function GroupSearch({
       {/* Error State */}
       {error && (
         <div className="py-8 text-center">
-          <p className="text-destructive mb-4">
-            Error loading groups: {error.message}
-          </p>
+          <p className="text-destructive mb-4">Error loading groups: {error.message}</p>
           <Button onClick={handleRefresh} variant="outline">
             Try Again
           </Button>

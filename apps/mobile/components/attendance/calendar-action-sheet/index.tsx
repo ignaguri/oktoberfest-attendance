@@ -1,8 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  AttendanceWithTotals,
-  Reservation,
-} from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { endOfDay, isAfter, isBefore, startOfDay } from "date-fns";
 import { X } from "lucide-react-native";
@@ -22,10 +19,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
-import {
-  type AttendanceSuccessData,
-  AttendanceTabContent,
-} from "./attendance-tab-content";
+import { type AttendanceSuccessData, AttendanceTabContent } from "./attendance-tab-content";
 import { ReservationTabContent } from "./reservation-tab-content";
 import { type Tab, TabBar } from "./tab-bar";
 
@@ -114,13 +108,7 @@ export function CalendarActionSheet({
     if (existingReservation) return "reservation";
 
     return "attendance";
-  }, [
-    checkInMode,
-    isFutureDate,
-    isPastDate,
-    existingAttendance,
-    existingReservation,
-  ]);
+  }, [checkInMode, isFutureDate, isPastDate, existingAttendance, existingReservation]);
 
   // Reset active tab when sheet opens
   useEffect(() => {
@@ -158,9 +146,7 @@ export function CalendarActionSheet({
 
         {/* Header with close button */}
         <HStack className="mb-2 w-full items-center justify-between px-2">
-          <Text className="text-lg font-semibold text-typography-900">
-            {formattedDate}
-          </Text>
+          <Text className="text-lg font-semibold text-typography-900">{formattedDate}</Text>
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={IconColors.default} />
           </Pressable>
@@ -168,11 +154,7 @@ export function CalendarActionSheet({
 
         {/* Tab Bar */}
         <VStack className="mb-4 w-full px-2">
-          <TabBar
-            tabs={availableTabs}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
+          <TabBar tabs={availableTabs} activeTab={activeTab} onTabChange={handleTabChange} />
         </VStack>
 
         {/* Tab Content */}

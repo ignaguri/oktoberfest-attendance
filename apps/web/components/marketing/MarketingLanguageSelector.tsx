@@ -27,9 +27,7 @@ function getLocalizedUrl(pathname: string, newLocale: string): string | null {
     const contentPath = localeMatch
       ? rest.slice(localeMatch[0].length - (localeMatch[2] === "/" ? 1 : 0))
       : rest;
-    return newLocale === "en"
-      ? `/blog${contentPath}`
-      : `/blog/${newLocale}${contentPath}`;
+    return newLocale === "en" ? `/blog${contentPath}` : `/blog/${newLocale}${contentPath}`;
   }
 
   // Download page: /download, /de/download, /es/download
@@ -80,10 +78,7 @@ export function MarketingLanguageSelector() {
 
   return (
     <div className="relative inline-flex items-center">
-      <Globe
-        size={16}
-        className="pointer-events-none absolute left-2 text-gray-500"
-      />
+      <Globe size={16} className="pointer-events-none absolute left-2 text-gray-500" />
       <select
         value={currentLang}
         onChange={handleChange}

@@ -22,9 +22,7 @@ export function GroupListItem({ group, onPress }: GroupListItemProps) {
       <Card variant="outline" size="md" className="bg-white">
         <HStack className="items-center justify-between">
           <VStack space="xs" className="flex-1">
-            <Text className="text-lg font-semibold text-typography-900">
-              {group.name}
-            </Text>
+            <Text className="text-lg font-semibold text-typography-900">{group.name}</Text>
             <HStack space="xs" className="items-center">
               <Users size={14} color={IconColors.muted} />
               <Text className="text-sm text-typography-500">

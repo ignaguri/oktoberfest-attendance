@@ -6,10 +6,7 @@ import { cn } from "@prostcounter/ui";
 import { AlertTriangle, Globe, Pin, Trash2, Users } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  TappableAvatar,
-  UserProfileModal,
-} from "@/components/shared/user-profile-modal";
+import { TappableAvatar, UserProfileModal } from "@/components/shared/user-profile-modal";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -35,12 +32,7 @@ interface MessageItemProps {
  * - Visibility indicator (groups/public)
  * - Delete action for own messages
  */
-export function MessageItem({
-  message,
-  currentUserId,
-  onDelete,
-  festivalId,
-}: MessageItemProps) {
+export function MessageItem({ message, currentUserId, onDelete, festivalId }: MessageItemProps) {
   const { t } = useTranslation();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const isOwn = currentUserId === message.userId;
@@ -61,8 +53,7 @@ export function MessageItem({
     }
   }, [message.createdAt]);
 
-  const displayName =
-    message.username || message.fullName || t("common.unknown");
+  const displayName = message.username || message.fullName || t("common.unknown");
 
   const handleDelete = useCallback(() => {
     onDelete?.(message.id);
@@ -91,10 +82,7 @@ export function MessageItem({
         <VStack className="flex-1">
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
-              <Text
-                className="text-sm font-medium text-typography-900"
-                numberOfLines={1}
-              >
+              <Text className="text-sm font-medium text-typography-900" numberOfLines={1}>
                 {displayName}
               </Text>
               {/* Visibility indicator */}
@@ -103,9 +91,7 @@ export function MessageItem({
               ) : (
                 <Users size={12} color={IconColors.muted} />
               )}
-              {isAlert && (
-                <AlertTriangle size={14} color={Colors.primary[500]} />
-              )}
+              {isAlert && <AlertTriangle size={14} color={Colors.primary[500]} />}
               {isPinned && <Pin size={12} color={IconColors.muted} />}
             </HStack>
             <Text className="text-xs text-typography-400">{timeAgo}</Text>

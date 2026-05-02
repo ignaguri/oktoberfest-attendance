@@ -1,10 +1,7 @@
 "use client";
 
 import { TZDate } from "@date-fns/tz";
-import {
-  IMAGE_PLACEHOLDER_BASE64,
-  TIMEZONE,
-} from "@prostcounter/shared/constants";
+import { IMAGE_PLACEHOLDER_BASE64, TIMEZONE } from "@prostcounter/shared/constants";
 import { format } from "date-fns";
 import { Camera } from "lucide-react";
 import Image from "next/image";
@@ -120,9 +117,7 @@ export function GalleryGrid({ galleryData, groupId }: GalleryGridProps) {
                           fill
                           className={cn(
                             "transform-gpu rounded-lg object-cover transition-all duration-300 will-change-transform",
-                            isLoaded
-                              ? "opacity-100 group-hover:scale-105"
-                              : "opacity-0",
+                            isLoaded ? "opacity-100 group-hover:scale-105" : "opacity-0",
                           )}
                           loading="lazy"
                           sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 200px"

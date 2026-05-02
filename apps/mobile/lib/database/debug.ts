@@ -79,9 +79,7 @@ export interface SyncQueueEntry {
 /**
  * Get comprehensive database statistics
  */
-export async function getDatabaseStats(
-  db: SQLite.SQLiteDatabase,
-): Promise<DatabaseStats> {
+export async function getDatabaseStats(db: SQLite.SQLiteDatabase): Promise<DatabaseStats> {
   const tables: TableStats[] = [];
 
   // Get stats for each syncable table
@@ -157,9 +155,7 @@ export async function getDatabaseStats(
 /**
  * Get all dirty records across all mutable tables
  */
-export async function getDirtyRecords(
-  db: SQLite.SQLiteDatabase,
-): Promise<DirtyRecord[]> {
+export async function getDirtyRecords(db: SQLite.SQLiteDatabase): Promise<DirtyRecord[]> {
   const dirtyRecords: DirtyRecord[] = [];
 
   for (const tableName of MUTABLE_TABLES) {
@@ -199,9 +195,7 @@ export async function getDirtyRecordsForTable(
   db: SQLite.SQLiteDatabase,
   tableName: string,
 ): Promise<Record<string, unknown>[]> {
-  return db.getAllAsync<Record<string, unknown>>(
-    `SELECT * FROM ${tableName} WHERE _dirty = 1`,
-  );
+  return db.getAllAsync<Record<string, unknown>>(`SELECT * FROM ${tableName} WHERE _dirty = 1`);
 }
 
 // =============================================================================
@@ -225,9 +219,7 @@ export async function getPendingSyncOperations(
 /**
  * Get failed sync operations
  */
-export async function getFailedOperations(
-  db: SQLite.SQLiteDatabase,
-): Promise<SyncQueueEntry[]> {
+export async function getFailedOperations(db: SQLite.SQLiteDatabase): Promise<SyncQueueEntry[]> {
   return db.getAllAsync<SyncQueueEntry>(
     `SELECT id, operation, table_name, record_id, status, retry_count, last_error, created_at
      FROM _sync_queue
@@ -243,18 +235,15 @@ export async function retryOperation(
   db: SQLite.SQLiteDatabase,
   operationId: string,
 ): Promise<void> {
-  await db.runAsync(
-    `UPDATE _sync_queue SET status = 'pending', retry_count = 0 WHERE id = ?`,
-    [operationId],
-  );
+  await db.runAsync(`UPDATE _sync_queue SET status = 'pending', retry_count = 0 WHERE id = ?`, [
+    operationId,
+  ]);
 }
 
 /**
  * Retry all failed operations
  */
-export async function retryAllFailedOperations(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
+export async function retryAllFailedOperations(db: SQLite.SQLiteDatabase): Promise<number> {
   const result = await db.runAsync(
     `UPDATE _sync_queue SET status = 'pending', retry_count = 0 WHERE status = 'failed'`,
   );
@@ -264,12 +253,8 @@ export async function retryAllFailedOperations(
 /**
  * Delete all failed operations (permanently remove from queue)
  */
-export async function deleteFailedOperations(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
-  const result = await db.runAsync(
-    `DELETE FROM _sync_queue WHERE status = 'failed'`,
-  );
+export async function deleteFailedOperations(db: SQLite.SQLiteDatabase): Promise<number> {
+  const result = await db.runAsync(`DELETE FROM _sync_queue WHERE status = 'failed'`);
   return result.changes;
 }
 
@@ -284,9 +269,7 @@ export async function markTableDirty(
   db: SQLite.SQLiteDatabase,
   tableName: string,
 ): Promise<number> {
-  const result = await db.runAsync(
-    `UPDATE ${tableName} SET _dirty = 1 WHERE _deleted = 0`,
-  );
+  const result = await db.runAsync(`UPDATE ${tableName} SET _dirty = 1 WHERE _deleted = 0`);
   return result.changes;
 }
 
@@ -298,20 +281,14 @@ export async function markRecordDirty(
   tableName: string,
   recordId: string,
 ): Promise<void> {
-  await db.runAsync(`UPDATE ${tableName} SET _dirty = 1 WHERE id = ?`, [
-    recordId,
-  ]);
+  await db.runAsync(`UPDATE ${tableName} SET _dirty = 1 WHERE id = ?`, [recordId]);
 }
 
 /**
  * Clear sync metadata to force full re-sync
  */
-export async function clearSyncMetadata(
-  db: SQLite.SQLiteDatabase,
-): Promise<void> {
-  await db.runAsync(
-    `UPDATE _sync_metadata SET last_sync_at = NULL, last_pull_cursor = NULL`,
-  );
+export async function clearSyncMetadata(db: SQLite.SQLiteDatabase): Promise<void> {
+  await db.runAsync(`UPDATE _sync_metadata SET last_sync_at = NULL, last_pull_cursor = NULL`);
 }
 
 // =============================================================================
@@ -351,9 +328,7 @@ export async function exportDatabaseAsJson(
 
   for (const tableName of SYNCABLE_TABLES) {
     try {
-      const records = await db.getAllAsync<Record<string, unknown>>(
-        `SELECT * FROM ${tableName}`,
-      );
+      const records = await db.getAllAsync<Record<string, unknown>>(`SELECT * FROM ${tableName}`);
       data[tableName] = records;
     } catch {
       data[tableName] = [];
@@ -405,18 +380,14 @@ export async function clearAllData(db: SQLite.SQLiteDatabase): Promise<void> {
 /**
  * Clear completed sync operations (housekeeping)
  */
-export async function clearCompletedSyncOperations(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
+export async function clearCompletedSyncOperations(db: SQLite.SQLiteDatabase): Promise<number> {
   return cleanupCompletedOperations(db);
 }
 
 /**
  * Clear orphaned photos from filesystem
  */
-export async function cleanupOrphanedPhotoFiles(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
+export async function cleanupOrphanedPhotoFiles(db: SQLite.SQLiteDatabase): Promise<number> {
   return cleanupOrphanedPhotos(db);
 }
 
@@ -564,9 +535,7 @@ export async function profileCommonQueries(
 /**
  * Log database state for debugging
  */
-export async function logDatabaseState(
-  db: SQLite.SQLiteDatabase,
-): Promise<void> {
+export async function logDatabaseState(db: SQLite.SQLiteDatabase): Promise<void> {
   logger.debug("=".repeat(60));
   logger.debug("[Debug] DATABASE STATE");
   logger.debug("=".repeat(60));
@@ -591,9 +560,7 @@ export async function logDatabaseState(
   logger.debug("\n📷 Photos:");
   logger.debug(`  Total: ${stats.photos.total}`);
   logger.debug(`  Pending upload: ${stats.photos.pending}`);
-  logger.debug(
-    `  Pending size: ${(stats.photos.pendingSizeBytes / 1024 / 1024).toFixed(2)} MB`,
-  );
+  logger.debug(`  Pending size: ${(stats.photos.pendingSizeBytes / 1024 / 1024).toFixed(2)} MB`);
 
   logger.debug("\n💾 Database Size:");
   logger.debug(`  ${(stats.databaseSizeBytes / 1024 / 1024).toFixed(2)} MB`);

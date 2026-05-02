@@ -33,17 +33,11 @@ type ISwitchProps = React.ComponentProps<typeof UISwitch> & {
   className?: string;
 };
 
-const Switch = React.forwardRef<
-  React.ComponentRef<typeof UISwitch>,
-  ISwitchProps
->(function Switch({ className, size = "md", ...props }, ref) {
-  return (
-    <UISwitch
-      ref={ref}
-      {...props}
-      className={switchStyle({ size, class: className })}
-    />
-  );
+const Switch = React.forwardRef<React.ComponentRef<typeof UISwitch>, ISwitchProps>(function Switch(
+  { className, size = "md", ...props },
+  ref,
+) {
+  return <UISwitch ref={ref} {...props} className={switchStyle({ size, class: className })} />;
 });
 
 Switch.displayName = "Switch";

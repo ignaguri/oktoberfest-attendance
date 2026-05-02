@@ -3,11 +3,7 @@
 import { cva } from "class-variance-authority";
 import React from "react";
 
-import {
-  Avatar as AvatarUI,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar as AvatarUI, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 

@@ -23,10 +23,7 @@ interface ErrorBoundaryState {
  * Error Boundary component that catches JavaScript errors in child components.
  * Displays a fallback UI instead of crashing the entire app.
  */
-class ErrorBoundaryClass extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -57,9 +54,7 @@ class ErrorBoundaryClass extends Component<
         return this.props.fallback;
       }
 
-      return (
-        <ErrorFallback error={this.state.error} onReset={this.handleReset} />
-      );
+      return <ErrorFallback error={this.state.error} onReset={this.handleReset} />;
     }
 
     return this.props.children;
@@ -84,14 +79,10 @@ function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
         <Heading size="xl" className="text-error-600">
           {t("common.errors.title")}
         </Heading>
-        <Text className="text-center text-typography-500">
-          {t("common.errors.unexpected")}
-        </Text>
+        <Text className="text-center text-typography-500">{t("common.errors.unexpected")}</Text>
         {__DEV__ && error && (
           <View className="rounded-md bg-background-100 p-3">
-            <Text className="font-mono text-xs text-error-500">
-              {error.message}
-            </Text>
+            <Text className="font-mono text-xs text-error-500">{error.message}</Text>
           </View>
         )}
         <Button action="primary" onPress={onReset}>

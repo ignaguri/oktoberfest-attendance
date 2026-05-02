@@ -44,9 +44,7 @@ test.describe("Leaderboard Flows", () => {
       await leaderboardPage.waitForLoad();
 
       // Either criteria selector or empty state should be visible
-      const hasCriteria = await leaderboardPage.winningCriteriaLabel
-        .isVisible()
-        .catch(() => false);
+      const hasCriteria = await leaderboardPage.winningCriteriaLabel.isVisible().catch(() => false);
       const hasHeading = await leaderboardPage.pageHeading.isVisible();
 
       expect(hasHeading).toBeTruthy();
@@ -58,9 +56,7 @@ test.describe("Leaderboard Flows", () => {
   });
 
   test.describe("FLOW_LDB_002: Change Winning Criteria", () => {
-    test("should have winning criteria dropdown when festival is selected", async ({
-      page,
-    }) => {
+    test("should have winning criteria dropdown when festival is selected", async ({ page }) => {
       const leaderboardPage = new LeaderboardPage(page);
 
       await leaderboardPage.goto();
@@ -91,9 +87,7 @@ test.describe("Leaderboard Flows", () => {
   });
 
   test.describe("FLOW_LDB_003: View User Position", () => {
-    test("should display leaderboard table when data exists", async ({
-      page,
-    }) => {
+    test("should display leaderboard table when data exists", async ({ page }) => {
       const leaderboardPage = new LeaderboardPage(page);
 
       await leaderboardPage.goto();

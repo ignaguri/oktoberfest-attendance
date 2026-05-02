@@ -40,11 +40,7 @@ export function CrowdLevelBadge({
 
   if (!crowdLevel) {
     if (compact) return null;
-    return (
-      <Text className="text-xs text-typography-400">
-        {t("crowdReport.noReports")}
-      </Text>
-    );
+    return <Text className="text-xs text-typography-400">{t("crowdReport.noReports")}</Text>;
   }
 
   const dotColor = CrowdColors[crowdLevel];
@@ -55,10 +51,7 @@ export function CrowdLevelBadge({
     <HStack space="xs" className="items-center">
       <View className={cn("rounded-full px-2 py-0.5", bgClass)}>
         <HStack space="xs" className="items-center">
-          <View
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: dotColor }}
-          />
+          <View className="h-2 w-2 rounded-full" style={{ backgroundColor: dotColor }} />
           <Text className={cn("text-xs font-medium", textClass)}>
             {t(`crowdReport.levels.${crowdLevel}`)}
           </Text>

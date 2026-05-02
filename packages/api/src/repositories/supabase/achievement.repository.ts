@@ -1,8 +1,5 @@
 import type { Database } from "@prostcounter/db";
-import type {
-  ListAchievementsQuery,
-  UserAchievement,
-} from "@prostcounter/shared";
+import type { ListAchievementsQuery, UserAchievement } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";

@@ -54,9 +54,7 @@ export async function readPromptHistory(): Promise<PromptHistory> {
   }
 }
 
-export async function recordPromptShown(
-  attendanceCount: number,
-): Promise<void> {
+export async function recordPromptShown(attendanceCount: number): Promise<void> {
   await Promise.all([
     AsyncStorage.setItem(LAST_PROMPTED_AT_KEY, String(Date.now())),
     AsyncStorage.setItem(LAST_PROMPTED_COUNT_KEY, String(attendanceCount)),

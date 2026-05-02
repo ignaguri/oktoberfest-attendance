@@ -19,8 +19,7 @@ const listFestivalsRoute = createRoute({
   path: "/festivals",
   tags: ["festivals"],
   summary: "List all festivals",
-  description:
-    "Returns list of festivals with optional filtering by status or active state",
+  description: "Returns list of festivals with optional filtering by status or active state",
   request: {
     query: ListFestivalsQuerySchema,
   },

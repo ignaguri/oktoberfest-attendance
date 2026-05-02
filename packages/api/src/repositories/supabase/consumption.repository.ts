@@ -44,14 +44,11 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       }
 
       // Use database function for price resolution (handles cascade)
-      const { data: price, error: priceError } = await this.supabase.rpc(
-        "get_drink_price_cents",
-        {
-          p_festival_id: attendance.festival_id,
-          p_tent_id: tentId,
-          p_drink_type: drinkType,
-        },
-      );
+      const { data: price, error: priceError } = await this.supabase.rpc("get_drink_price_cents", {
+        p_festival_id: attendance.festival_id,
+        p_tent_id: tentId,
+        p_drink_type: drinkType,
+      });
 
       if (priceError || price === null) {
         // Fallback to system default
@@ -119,9 +116,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       if (attError.code === PgErrorCode.NO_ROWS) {
         return [];
       }
-      throw new DatabaseError(
-        `Failed to fetch attendance: ${attError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch attendance: ${attError.message}`);
     }
 
     // Get consumptions for this attendance
@@ -139,9 +134,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       .maybeSingle();
 
     if (fetchError) {
-      throw new DatabaseError(
-        `Failed to fetch consumption: ${fetchError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch consumption: ${fetchError.message}`);
     }
 
     if (!consumption) {

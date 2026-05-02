@@ -10,11 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { pullGroups, pullUserAchievements } from "../sync/pull-groups";
-import {
-  pullAchievements,
-  pullFestivals,
-  pullTents,
-} from "../sync/pull-reference";
+import { pullAchievements, pullFestivals, pullTents } from "../sync/pull-reference";
 import { pullAttendances, pullProfile } from "../sync/pull-user-data";
 import { createSyncManager, SyncManager } from "../sync/sync-manager";
 
@@ -205,38 +201,32 @@ function createMockDb() {
   };
 
   return {
-    getFirstAsync: vi
-      .fn()
-      .mockImplementation(async (query: string, params?: unknown[]) => {
-        // Parse table name from query
-        const match = query.match(/FROM\s+(\w+)/i);
-        const table = match?.[1];
-        if (!table || !records[table]) return null;
+    getFirstAsync: vi.fn().mockImplementation(async (query: string, params?: unknown[]) => {
+      // Parse table name from query
+      const match = query.match(/FROM\s+(\w+)/i);
+      const table = match?.[1];
+      if (!table || !records[table]) return null;
 
-        const id = params?.[0];
-        return records[table].find((r) => r.id === id) ?? null;
-      }),
-    getAllAsync: vi
-      .fn()
-      .mockImplementation(async (query: string, _params?: unknown[]) => {
-        const match = query.match(/FROM\s+(\w+)/i);
+      const id = params?.[0];
+      return records[table].find((r) => r.id === id) ?? null;
+    }),
+    getAllAsync: vi.fn().mockImplementation(async (query: string, _params?: unknown[]) => {
+      const match = query.match(/FROM\s+(\w+)/i);
+      const table = match?.[1];
+      if (!table || !records[table]) return [];
+      return records[table];
+    }),
+    runAsync: vi.fn().mockImplementation(async (query: string, params?: unknown[]) => {
+      // Track inserts for verification
+      if (query.includes("INSERT INTO")) {
+        const match = query.match(/INSERT INTO\s+(\w+)/i);
         const table = match?.[1];
-        if (!table || !records[table]) return [];
-        return records[table];
-      }),
-    runAsync: vi
-      .fn()
-      .mockImplementation(async (query: string, params?: unknown[]) => {
-        // Track inserts for verification
-        if (query.includes("INSERT INTO")) {
-          const match = query.match(/INSERT INTO\s+(\w+)/i);
-          const table = match?.[1];
-          if (table && records[table]) {
-            records[table].push({ id: params?.[0] as string });
-          }
+        if (table && records[table]) {
+          records[table].push({ id: params?.[0] as string });
         }
-        return { changes: 1 };
-      }),
+      }
+      return { changes: 1 };
+    }),
     execAsync: vi.fn().mockResolvedValue(undefined),
     // Helper for tests to access mock records
     _records: records,
@@ -252,9 +242,7 @@ describe("SyncManager", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDb = createMockDb();
-    syncManager = createSyncManager(
-      mockDb as unknown as Parameters<typeof createSyncManager>[0],
-    );
+    syncManager = createSyncManager(mockDb as unknown as Parameters<typeof createSyncManager>[0]);
   });
 
   describe("constructor", () => {
@@ -395,10 +383,7 @@ describe("Pull functions", () => {
       const db = mockDb as unknown as Parameters<typeof pullAttendances>[0];
       const results = await pullAttendances(db, "festival-1");
 
-      expect(results.map((r) => r.table)).toEqual([
-        "attendances",
-        "tent_visits",
-      ]);
+      expect(results.map((r) => r.table)).toEqual(["attendances", "tent_visits"]);
     });
   });
 
@@ -413,9 +398,7 @@ describe("Pull functions", () => {
 
   describe("pullUserAchievements", () => {
     it("should pull unlocked achievements", async () => {
-      const db = mockDb as unknown as Parameters<
-        typeof pullUserAchievements
-      >[0];
+      const db = mockDb as unknown as Parameters<typeof pullUserAchievements>[0];
       const result = await pullUserAchievements(db, "festival-1");
 
       expect(result.table).toBe("user_achievements");
@@ -426,9 +409,7 @@ describe("Pull functions", () => {
 describe("createSyncManager", () => {
   it("should create a SyncManager with factory function", () => {
     const mockDb = createMockDb();
-    const manager = createSyncManager(
-      mockDb as unknown as Parameters<typeof createSyncManager>[0],
-    );
+    const manager = createSyncManager(mockDb as unknown as Parameters<typeof createSyncManager>[0]);
 
     expect(manager).toBeInstanceOf(SyncManager);
   });

@@ -31,12 +31,7 @@ export function WatchBridge() {
       return;
     }
 
-    const {
-      access_token,
-      refresh_token,
-      expires_at,
-      user: sessionUser,
-    } = session;
+    const { access_token, refresh_token, expires_at, user: sessionUser } = session;
     if (!access_token || !refresh_token || !sessionUser?.id) return;
 
     syncSessionToWatch({

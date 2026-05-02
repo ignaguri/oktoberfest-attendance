@@ -5,32 +5,20 @@ import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { getTopTents } from "@prostcounter/shared/wrapped";
 import { motion } from "framer-motion";
 
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-} from "./BaseSlide";
+import { BaseSlide, SlideContent, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 interface TentExplorerSlideProps {
   data: WrappedData;
   isActive?: boolean;
 }
 
-export function TentExplorerSlide({
-  data,
-  isActive = false,
-}: TentExplorerSlideProps) {
+export function TentExplorerSlide({ data, isActive = false }: TentExplorerSlideProps) {
   const { t } = useTranslation();
-  const { unique_tents, favorite_tent, tent_diversity_pct, tent_breakdown } =
-    data.tent_stats;
+  const { unique_tents, favorite_tent, tent_diversity_pct, tent_breakdown } = data.tent_stats;
   const topTents = getTopTents(tent_breakdown, 3);
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-green-50 to-emerald-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-green-50 to-emerald-50">
       <SlideTitle>{t("wrapped.tentExplorer.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.tentExplorer.subtitle")}</SlideSubtitle>
 
@@ -38,28 +26,18 @@ export function TentExplorerSlide({
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-white p-4 text-center shadow">
             <p className="text-3xl font-bold text-yellow-600">{unique_tents}</p>
-            <p className="text-sm text-gray-600">
-              {t("wrapped.tentExplorer.uniqueTents")}
-            </p>
+            <p className="text-sm text-gray-600">{t("wrapped.tentExplorer.uniqueTents")}</p>
           </div>
           <div className="rounded-lg bg-white p-4 text-center shadow">
-            <p className="text-3xl font-bold text-yellow-600">
-              {tent_diversity_pct.toFixed(0)}%
-            </p>
-            <p className="text-sm text-gray-600">
-              {t("wrapped.tentExplorer.diversity")}
-            </p>
+            <p className="text-3xl font-bold text-yellow-600">{tent_diversity_pct.toFixed(0)}%</p>
+            <p className="text-sm text-gray-600">{t("wrapped.tentExplorer.diversity")}</p>
           </div>
         </div>
 
         {favorite_tent && (
           <div className="rounded-lg bg-white p-4 text-center shadow">
-            <p className="mb-1 text-sm text-gray-600">
-              {t("wrapped.tentExplorer.favorite")}
-            </p>
-            <p className="text-2xl font-bold text-yellow-600">
-              {favorite_tent}
-            </p>
+            <p className="mb-1 text-sm text-gray-600">{t("wrapped.tentExplorer.favorite")}</p>
+            <p className="text-2xl font-bold text-yellow-600">{favorite_tent}</p>
           </div>
         )}
 
@@ -81,12 +59,8 @@ export function TentExplorerSlide({
                   animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-3 shadow"
                 >
-                  <span className="font-medium text-gray-700">
-                    {tent.tent_name}
-                  </span>
-                  <span className="font-bold text-yellow-600">
-                    {tent.visit_count}x
-                  </span>
+                  <span className="font-medium text-gray-700">{tent.tent_name}</span>
+                  <span className="font-bold text-yellow-600">{tent.visit_count}x</span>
                 </motion.div>
               ))}
             </div>

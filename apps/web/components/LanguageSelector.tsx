@@ -31,9 +31,7 @@ export function LanguageSelector({
 
   useEffect(() => {
     // Detect browser language for display purposes
-    setDetectedLanguage(
-      detectBrowserLanguage([...SUPPORTED_LANGUAGES] as string[]),
-    );
+    setDetectedLanguage(detectBrowserLanguage([...SUPPORTED_LANGUAGES] as string[]));
   }, []);
 
   const handleChange = async (value: string) => {
@@ -60,9 +58,7 @@ export function LanguageSelector({
       <Label htmlFor="language-selector" className="font-semibold">
         {t("profile.languageSettings.title")}
       </Label>
-      <p className="mb-2 text-sm text-gray-600">
-        {t("profile.languageSettings.description")}
-      </p>
+      <p className="mb-2 text-sm text-gray-600">{t("profile.languageSettings.description")}</p>
       <Select
         value={getDisplayValue()}
         onValueChange={handleChange}
@@ -75,9 +71,7 @@ export function LanguageSelector({
           <SelectItem value="auto">
             {currentLanguage === null
               ? t("profile.languageSettings.autoDetectCurrent", {
-                  language: t(
-                    `profile.languageSettings.languages.${detectedLanguage}` as const,
-                  ),
+                  language: t(`profile.languageSettings.languages.${detectedLanguage}` as const),
                 })
               : t("profile.languageSettings.autoDetect")}
           </SelectItem>

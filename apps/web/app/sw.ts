@@ -69,8 +69,7 @@ const customRuntimeCaching: RuntimeCaching[] = [
   // API routes - Network First for fresh data
   {
     matcher: ({ url }) =>
-      url.pathname.startsWith("/api/") &&
-      !url.pathname.startsWith("/api/image/"),
+      url.pathname.startsWith("/api/") && !url.pathname.startsWith("/api/image/"),
     handler: new NetworkFirst({
       cacheName: "api-cache",
       networkTimeoutSeconds: 3,
@@ -137,11 +136,7 @@ function startUpdateChecking() {
           });
         }
       } catch (error) {
-        swLogger.error(
-          "Failed to check for updates",
-          swLogger.updateCheck(),
-          error as Error,
-        );
+        swLogger.error("Failed to check for updates", swLogger.updateCheck(), error as Error);
       }
     },
     4 * 60 * 60 * 1000,
@@ -234,10 +229,7 @@ self.addEventListener("push", (event) => {
   };
 
   pushEvent.waitUntil(
-    (self as any).registration.showNotification(
-      data.title || "ProstCounter 🍻",
-      options,
-    ),
+    (self as any).registration.showNotification(data.title || "ProstCounter 🍻", options),
   );
 });
 
@@ -248,23 +240,18 @@ self.addEventListener("notificationclick", (event) => {
 
   if (notificationEvent.action === "view" || !notificationEvent.action) {
     notificationEvent.waitUntil(
-      (self as any).clients
-        .matchAll({ type: "window" })
-        .then((clients: any) => {
-          // Check if there is already a window/tab open with the target URL
-          for (const client of clients) {
-            if (
-              client.url.includes((self as any).registration.scope) &&
-              "focus" in client
-            ) {
-              return client.focus();
-            }
+      (self as any).clients.matchAll({ type: "window" }).then((clients: any) => {
+        // Check if there is already a window/tab open with the target URL
+        for (const client of clients) {
+          if (client.url.includes((self as any).registration.scope) && "focus" in client) {
+            return client.focus();
           }
-          // If not, open a new window/tab with the target URL
-          if ((self as any).clients.openWindow) {
-            return (self as any).clients.openWindow("/home");
-          }
-        }),
+        }
+        // If not, open a new window/tab with the target URL
+        if ((self as any).clients.openWindow) {
+          return (self as any).clients.openWindow("/home");
+        }
+      }),
     );
   }
   // 'dismiss' action doesn't need any special handling - notification is already closed

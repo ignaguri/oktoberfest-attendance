@@ -66,9 +66,7 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
               accessibilityLabel={t("wrapped.cta.viewButton")}
               accessibilityRole="button"
             >
-              <Text className="font-semibold text-white">
-                {t("wrapped.cta.viewButton")}
-              </Text>
+              <Text className="font-semibold text-white">{t("wrapped.cta.viewButton")}</Text>
             </Pressable>
           )}
         </VStack>

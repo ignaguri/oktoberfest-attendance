@@ -85,10 +85,7 @@ export class PhotoService {
    * @param userId - User ID (for authorization)
    * @returns Array of beer pictures
    */
-  async getPhotosForAttendance(
-    attendanceId: string,
-    userId: string,
-  ): Promise<BeerPicture[]> {
+  async getPhotosForAttendance(attendanceId: string, userId: string): Promise<BeerPicture[]> {
     return this.photoRepo.findByAttendance(attendanceId, userId);
   }
 
@@ -146,11 +143,7 @@ export class PhotoService {
    * @param caption - New caption text
    * @returns Updated picture
    */
-  async updateCaption(
-    pictureId: string,
-    userId: string,
-    caption: string,
-  ): Promise<BeerPicture> {
+  async updateCaption(pictureId: string, userId: string, caption: string): Promise<BeerPicture> {
     // Validate caption length
     if (caption.length > 500) {
       throw new ValidationError(ErrorCodes.CAPTION_TOO_LONG);
@@ -182,10 +175,7 @@ export class PhotoService {
     userId: string,
     hidePhotosFromAllGroups: boolean,
   ): Promise<GlobalPhotoSettings> {
-    return this.photoRepo.updateGlobalPhotoSettings(
-      userId,
-      hidePhotosFromAllGroups,
-    );
+    return this.photoRepo.updateGlobalPhotoSettings(userId, hidePhotosFromAllGroups);
   }
 
   /**
@@ -195,10 +185,7 @@ export class PhotoService {
    * @param groupId - Group ID
    * @returns Group photo settings
    */
-  async getGroupPhotoSettings(
-    userId: string,
-    groupId: string,
-  ): Promise<GroupPhotoSettings> {
+  async getGroupPhotoSettings(userId: string, groupId: string): Promise<GroupPhotoSettings> {
     return this.photoRepo.getGroupPhotoSettings(userId, groupId);
   }
 
@@ -215,11 +202,7 @@ export class PhotoService {
     groupId: string,
     hidePhotosFromGroup: boolean,
   ): Promise<GroupPhotoSettings> {
-    return this.photoRepo.updateGroupPhotoSettings(
-      userId,
-      groupId,
-      hidePhotosFromGroup,
-    );
+    return this.photoRepo.updateGroupPhotoSettings(userId, groupId, hidePhotosFromGroup);
   }
 
   /**
@@ -228,9 +211,7 @@ export class PhotoService {
    * @param userId - User ID
    * @returns Array of group photo settings
    */
-  async getAllGroupPhotoSettings(
-    userId: string,
-  ): Promise<GroupPhotoSettings[]> {
+  async getAllGroupPhotoSettings(userId: string): Promise<GroupPhotoSettings[]> {
     return this.photoRepo.getAllGroupPhotoSettings(userId);
   }
 
@@ -265,10 +246,6 @@ export class PhotoService {
     visibility: PhotoVisibility,
   ): Promise<number> {
     // Repository handles ownership verification
-    return this.photoRepo.bulkUpdatePhotoVisibility(
-      userId,
-      photoIds,
-      visibility,
-    );
+    return this.photoRepo.bulkUpdatePhotoVisibility(userId, photoIds, visibility);
   }
 }

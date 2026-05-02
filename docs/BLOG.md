@@ -16,6 +16,7 @@ Each article is an `.mdx` file with YAML frontmatter. **All articles must exist 
 ## Writing a Blog Article
 
 Frontmatter format:
+
 ```yaml
 ---
 title: "Article Title"
@@ -23,10 +24,10 @@ description: "Short description for previews and SEO"
 date: "2026-04-09"
 lastModified: "2026-04-09"
 author: "ProstCounter Team"
-category: "festivals"           # festivals | tips | culture | news
+category: "festivals" # festivals | tips | culture | news
 tags: ["oktoberfest", "2026", "guide"]
 featuredImage: "/images/prost-counter-og-1.jpg"
-locale: "en"                    # en | de | es
+locale: "en" # en | de | es
 ---
 ```
 

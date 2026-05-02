@@ -19,10 +19,7 @@ interface ConfirmAlertDialogProps {
   onClose: () => void;
 }
 
-export function ConfirmAlertDialog({
-  dialog,
-  onClose,
-}: ConfirmAlertDialogProps) {
+export function ConfirmAlertDialog({ dialog, onClose }: ConfirmAlertDialogProps) {
   const { t } = useTranslation();
   const isDestructive = dialog.type === "destructive";
 
@@ -31,10 +28,7 @@ export function ConfirmAlertDialog({
       <AlertDialogBackdrop />
       <AlertDialogContent>
         <AlertDialogHeader>
-          <Heading
-            size="lg"
-            className={isDestructive ? "text-error-600" : "text-typography-950"}
-          >
+          <Heading size="lg" className={isDestructive ? "text-error-600" : "text-typography-950"}>
             {dialog.title}
           </Heading>
         </AlertDialogHeader>
@@ -46,12 +40,7 @@ export function ConfirmAlertDialog({
         <AlertDialogFooter className="gap-3">
           {dialog.onConfirm ? (
             <>
-              <Button
-                variant="outline"
-                action="secondary"
-                onPress={onClose}
-                className="flex-1"
-              >
+              <Button variant="outline" action="secondary" onPress={onClose} className="flex-1">
                 <ButtonText>{t("common.buttons.cancel")}</ButtonText>
               </Button>
               <Button
@@ -63,9 +52,7 @@ export function ConfirmAlertDialog({
                 className="flex-1"
               >
                 <ButtonText>
-                  {isDestructive
-                    ? t("common.buttons.confirm")
-                    : t("common.buttons.ok")}
+                  {isDestructive ? t("common.buttons.confirm") : t("common.buttons.ok")}
                 </ButtonText>
               </Button>
             </>

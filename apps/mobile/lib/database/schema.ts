@@ -34,12 +34,7 @@ export { festivals } from "./schema/festivals";
 export { groupMembers, groups } from "./schema/groups";
 export { profiles } from "./schema/profiles";
 export { syncMetadata, syncQueue } from "./schema/sync-tables";
-export {
-  drinkTypePrices,
-  festivalTents,
-  tents,
-  tentVisits,
-} from "./schema/tents";
+export { drinkTypePrices, festivalTents, tents, tentVisits } from "./schema/tents";
 export { winningCriteria } from "./schema/winning-criteria";
 
 // =============================================================================
@@ -55,12 +50,7 @@ import type { Festival } from "./schema/festivals";
 import type { Group, GroupMember } from "./schema/groups";
 import type { Profile } from "./schema/profiles";
 import type { SyncMetadataRow, SyncQueueRow } from "./schema/sync-tables";
-import type {
-  DrinkTypePrice,
-  FestivalTent,
-  Tent,
-  TentVisit,
-} from "./schema/tents";
+import type { DrinkTypePrice, FestivalTent, Tent, TentVisit } from "./schema/tents";
 import type { WinningCriteriaRow } from "./schema/winning-criteria";
 
 export type LocalFestival = Festival;
@@ -139,13 +129,9 @@ import type * as SQLite from "expo-sqlite";
  * Gets the current schema version from the database.
  * Returns 0 if no version is set.
  */
-export async function getSchemaVersion(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
+export async function getSchemaVersion(db: SQLite.SQLiteDatabase): Promise<number> {
   try {
-    const result = await db.getFirstAsync<{ user_version: number }>(
-      "PRAGMA user_version",
-    );
+    const result = await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version");
     return result?.user_version ?? 0;
   } catch {
     return 0;
@@ -155,10 +141,7 @@ export async function getSchemaVersion(
 /**
  * Sets the schema version in the database.
  */
-export async function setSchemaVersion(
-  db: SQLite.SQLiteDatabase,
-  version: number,
-): Promise<void> {
+export async function setSchemaVersion(db: SQLite.SQLiteDatabase, version: number): Promise<void> {
   await db.execAsync(`PRAGMA user_version = ${version}`);
 }
 
@@ -200,11 +183,7 @@ export const REFERENCE_TABLES: readonly string[] = [
 ];
 
 /** Runtime validation for table names used in dynamic SQL */
-const VALID_TABLE_NAMES = new Set<string>([
-  ...SYNCABLE_TABLES,
-  "_sync_metadata",
-  "_sync_queue",
-]);
+const VALID_TABLE_NAMES = new Set<string>([...SYNCABLE_TABLES, "_sync_metadata", "_sync_queue"]);
 
 export function assertValidTable(name: string): asserts name is SyncableTable {
   if (!VALID_TABLE_NAMES.has(name)) {

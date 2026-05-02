@@ -1,11 +1,4 @@
-import {
-  index,
-  integer,
-  real,
-  sqliteTable,
-  text,
-  unique,
-} from "drizzle-orm/sqlite-core";
+import { index, integer, real, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 import { offlineColumns } from "./common";
 import { DRINK_TYPES } from "./enums";

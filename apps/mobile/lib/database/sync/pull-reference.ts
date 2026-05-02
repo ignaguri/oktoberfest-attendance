@@ -18,9 +18,7 @@ import type { PullResult } from "./types";
 /**
  * Pull festivals from server
  */
-export async function pullFestivals(
-  db: SQLite.SQLiteDatabase,
-): Promise<PullResult> {
+export async function pullFestivals(db: SQLite.SQLiteDatabase): Promise<PullResult> {
   const result: PullResult = {
     table: "festivals",
     inserted: 0,
@@ -40,10 +38,7 @@ export async function pullFestivals(
       );
 
       // Generate short_name from name (API doesn't return this field)
-      const shortName = festival.name
-        .substring(0, 20)
-        .toLowerCase()
-        .replace(/\s+/g, "-");
+      const shortName = festival.name.substring(0, 20).toLowerCase().replace(/\s+/g, "-");
 
       if (existing) {
         // Update if server is newer
@@ -135,10 +130,9 @@ export async function pullTents(
 
     for (const ft of festivalTents) {
       const tent = ft.tent;
-      const existing = await db.getFirstAsync<LocalTent>(
-        "SELECT * FROM tents WHERE id = ?",
-        [tent.id],
-      );
+      const existing = await db.getFirstAsync<LocalTent>("SELECT * FROM tents WHERE id = ?", [
+        tent.id,
+      ]);
 
       if (existing) {
         await db.runAsync(
@@ -181,9 +175,7 @@ export async function pullTents(
 /**
  * Pull achievements from server
  */
-export async function pullAchievements(
-  db: SQLite.SQLiteDatabase,
-): Promise<PullResult> {
+export async function pullAchievements(db: SQLite.SQLiteDatabase): Promise<PullResult> {
   const result: PullResult = {
     table: "achievements",
     inserted: 0,

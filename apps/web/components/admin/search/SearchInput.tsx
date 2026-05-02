@@ -60,12 +60,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       onClear?.();
     }, [onChange, onClear]);
 
-    const handleChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        setLocalValue(e.target.value);
-      },
-      [],
-    );
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      setLocalValue(e.target.value);
+    }, []);
 
     return (
       <div className={cn("relative", className)}>
@@ -79,10 +76,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={handleChange}
           placeholder={placeholder}
           disabled={disabled || isLoading}
-          className={cn(
-            showSearchIcon && "pl-10",
-            showClearButton && localValue && "pr-10",
-          )}
+          className={cn(showSearchIcon && "pl-10", showClearButton && localValue && "pr-10")}
         />
         {isLoading && (
           <Loader2 className="text-muted-foreground absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin" />

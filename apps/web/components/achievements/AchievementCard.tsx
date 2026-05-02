@@ -3,13 +3,7 @@
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
@@ -80,9 +74,7 @@ export function AchievementCard({
             >
               {displayName}
             </CardTitle>
-            <CardDescription className="mt-1 text-sm">
-              {displayDescription}
-            </CardDescription>
+            <CardDescription className="mt-1 text-sm">{displayDescription}</CardDescription>
           </div>
 
           <div className="flex flex-col items-end gap-2">
@@ -131,9 +123,7 @@ export function AchievementCard({
                 <div className="rounded-lg border border-green-200 bg-green-100 p-2">
                   <div className="flex items-center gap-2 text-sm text-green-800">
                     <span className="text-base">✅</span>
-                    <span className="font-medium">
-                      {t("achievements.card.completed")}
-                    </span>
+                    <span className="font-medium">{t("achievements.card.completed")}</span>
                   </div>
                   <div className="mt-1 text-xs text-green-600">
                     {new Date(unlocked_at).toLocaleDateString(i18n.language, {

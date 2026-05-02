@@ -34,14 +34,9 @@ const INJECTIONS = [
 function writePlistKey(src, key, value) {
   // Replace the existing pair if present — tolerate any whitespace between
   // the two elements so we stay robust across formatter output.
-  const existingRe = new RegExp(
-    `([ \\t]*)<key>${key}</key>\\s*<string>[^<]*</string>`,
-  );
+  const existingRe = new RegExp(`([ \\t]*)<key>${key}</key>\\s*<string>[^<]*</string>`);
   if (existingRe.test(src)) {
-    return src.replace(
-      existingRe,
-      `$1<key>${key}</key>\n$1<string>${value}</string>`,
-    );
+    return src.replace(existingRe, `$1<key>${key}</key>\n$1<string>${value}</string>`);
   }
   // Otherwise insert right before the closing '  </dict>\n</plist>' (the two
   // leading spaces are the root <dict>'s indent). Match the full sequence so
@@ -61,15 +56,10 @@ module.exports = function withWatchInfoPlistEnv(config) {
   return withDangerousMod(config, [
     "ios",
     async (cfg) => {
-      const plistPath = path.join(
-        cfg.modRequest.projectRoot,
-        WATCH_INFO_PLIST_PATH,
-      );
+      const plistPath = path.join(cfg.modRequest.projectRoot, WATCH_INFO_PLIST_PATH);
 
       if (!fs.existsSync(plistPath)) {
-        console.warn(
-          `withWatchInfoPlistEnv: ${plistPath} not found — skipping.`,
-        );
+        console.warn(`withWatchInfoPlistEnv: ${plistPath} not found — skipping.`);
         return cfg;
       }
 
@@ -79,18 +69,14 @@ module.exports = function withWatchInfoPlistEnv(config) {
       for (const { key, envVar } of INJECTIONS) {
         const value = process.env[envVar];
         if (!value) {
-          console.log(
-            `withWatchInfoPlistEnv: ${envVar} not set — skipping ${key}.`,
-          );
+          console.log(`withWatchInfoPlistEnv: ${envVar} not set — skipping ${key}.`);
           continue;
         }
         const updated = writePlistKey(src, key, value);
         if (updated !== src) {
           src = updated;
           changed = true;
-          console.log(
-            `withWatchInfoPlistEnv: injected ${key} into ${WATCH_INFO_PLIST_PATH}`,
-          );
+          console.log(`withWatchInfoPlistEnv: injected ${key} into ${WATCH_INFO_PLIST_PATH}`);
         }
       }
 

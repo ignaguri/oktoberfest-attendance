@@ -21,9 +21,7 @@ function createMockSupabase(reminders: any[] = [], prompts: any[] = []) {
         return {
           select: vi.fn().mockReturnValue({
             in: vi.fn().mockResolvedValue({
-              data: reminders
-                .concat(prompts)
-                .map((r) => ({ id: r.tent_id, name: "Tent" })),
+              data: reminders.concat(prompts).map((r) => ({ id: r.tent_id, name: "Tent" })),
             }),
           }),
         } as any;
@@ -72,13 +70,9 @@ describe("processReservationNotifications", () => {
       new Date().toISOString(),
     );
 
-    expect(
-      (notifications as any).notifyReservationReminder,
-    ).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyReservationReminder).toHaveBeenCalledTimes(1);
     expect((supabase as any).__updates.length).toBeGreaterThan(0);
-    expect((supabase as any).__updates[0].payload).toHaveProperty(
-      "reminder_sent_at",
-    );
+    expect((supabase as any).__updates[0].payload).toHaveProperty("reminder_sent_at");
   });
 
   it("sends prompts and marks prompt_sent_at", async () => {
@@ -98,12 +92,8 @@ describe("processReservationNotifications", () => {
       new Date().toISOString(),
     );
 
-    expect(
-      (notifications as any).notifyReservationPrompt,
-    ).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyReservationPrompt).toHaveBeenCalledTimes(1);
     expect((supabase as any).__updates.length).toBeGreaterThan(0);
-    expect((supabase as any).__updates.at(-1).payload).toHaveProperty(
-      "prompt_sent_at",
-    );
+    expect((supabase as any).__updates.at(-1).payload).toHaveProperty("prompt_sent_at");
   });
 });

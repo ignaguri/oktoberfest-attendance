@@ -1,11 +1,7 @@
 import { z } from "zod";
 
 // Friendship status enum
-export const FriendshipStatusSchema = z.enum([
-  "pending",
-  "accepted",
-  "declined",
-]);
+export const FriendshipStatusSchema = z.enum(["pending", "accepted", "declined"]);
 export type FriendshipStatus = z.infer<typeof FriendshipStatusSchema>;
 
 // Friend profile (accepted friendship)
@@ -80,16 +76,12 @@ export type ListFriendsResponse = z.infer<typeof ListFriendsResponseSchema>;
 export const ListFriendRequestsResponseSchema = z.object({
   data: z.array(FriendRequestSchema),
 });
-export type ListFriendRequestsResponse = z.infer<
-  typeof ListFriendRequestsResponseSchema
->;
+export type ListFriendRequestsResponse = z.infer<typeof ListFriendRequestsResponseSchema>;
 
 export const FriendRequestCountResponseSchema = z.object({
   count: z.number().int(),
 });
-export type FriendRequestCountResponse = z.infer<
-  typeof FriendRequestCountResponseSchema
->;
+export type FriendRequestCountResponse = z.infer<typeof FriendRequestCountResponseSchema>;
 
 export const FriendActionResponseSchema = z.object({
   success: z.boolean(),
@@ -102,9 +94,7 @@ export type FriendActionResponse = z.infer<typeof FriendActionResponseSchema>;
 export const ListFriendSuggestionsResponseSchema = z.object({
   data: z.array(FriendSuggestionSchema),
 });
-export type ListFriendSuggestionsResponse = z.infer<
-  typeof ListFriendSuggestionsResponseSchema
->;
+export type ListFriendSuggestionsResponse = z.infer<typeof ListFriendSuggestionsResponseSchema>;
 
 export const SearchUserResultSchema = z.object({
   id: z.string().uuid(),

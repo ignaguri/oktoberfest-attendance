@@ -75,23 +75,15 @@ export default function InstallPWA() {
           <h1 className="text-lg font-medium">{t("pwa.install.title")}</h1>
           {showIOSInstructions ? (
             <div className="flex flex-col gap-3 text-left text-sm">
-              <p className="text-muted-foreground">
-                {t("pwa.install.appStore.message")}
-              </p>
+              <p className="text-muted-foreground">{t("pwa.install.appStore.message")}</p>
               <Button asChild className="w-full">
-                <a
-                  href={APP_STORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
                   {t("pwa.install.appStore.button")}
                 </a>
               </Button>
             </div>
           ) : (
-            <p className="text-muted-foreground text-left text-sm">
-              {t("pwa.install.message")}
-            </p>
+            <p className="text-muted-foreground text-left text-sm">{t("pwa.install.message")}</p>
           )}
         </div>
         <div className="flex items-center justify-center gap-2 border-t p-4">

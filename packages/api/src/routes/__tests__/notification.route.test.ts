@@ -59,10 +59,7 @@ describe("Notification Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -101,10 +98,7 @@ describe("Notification Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body).toEqual({ success: true, novuRegistered: true });
-      expect(mockNotificationService.registerPushToken).toHaveBeenCalledWith(
-        mockUser.id,
-        fcmToken,
-      );
+      expect(mockNotificationService.registerPushToken).toHaveBeenCalledWith(mockUser.id, fcmToken);
     });
 
     it("should return success: false when registration fails", async () => {
@@ -189,15 +183,12 @@ describe("Notification Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body).toEqual({ success: true });
-      expect(mockNotificationService.subscribeUser).toHaveBeenCalledWith(
-        mockUser.id,
-        {
-          email: subscribeData.email,
-          firstName: subscribeData.firstName,
-          lastName: subscribeData.lastName,
-          avatar: subscribeData.avatar,
-        },
-      );
+      expect(mockNotificationService.subscribeUser).toHaveBeenCalledWith(mockUser.id, {
+        email: subscribeData.email,
+        firstName: subscribeData.firstName,
+        lastName: subscribeData.lastName,
+        avatar: subscribeData.avatar,
+      });
     });
 
     it("should subscribe user with minimal data (empty object)", async () => {
@@ -218,15 +209,12 @@ describe("Notification Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body).toEqual({ success: true });
-      expect(mockNotificationService.subscribeUser).toHaveBeenCalledWith(
-        mockUser.id,
-        {
-          email: undefined,
-          firstName: undefined,
-          lastName: undefined,
-          avatar: undefined,
-        },
-      );
+      expect(mockNotificationService.subscribeUser).toHaveBeenCalledWith(mockUser.id, {
+        email: undefined,
+        firstName: undefined,
+        lastName: undefined,
+        avatar: undefined,
+      });
     });
 
     it("should subscribe user with only email", async () => {
@@ -313,9 +301,7 @@ describe("Notification Routes - Unit Tests", () => {
         updated_at: "2024-01-01T00:00:00Z",
       };
 
-      mockNotificationService.getUserNotificationPreferences.mockResolvedValueOnce(
-        mockPreferences,
-      );
+      mockNotificationService.getUserNotificationPreferences.mockResolvedValueOnce(mockPreferences);
 
       const req = createAuthRequest("/notifications/preferences", {
         method: "GET",
@@ -342,9 +328,7 @@ describe("Notification Routes - Unit Tests", () => {
     });
 
     it("should return null when no preferences found", async () => {
-      mockNotificationService.getUserNotificationPreferences.mockResolvedValueOnce(
-        null,
-      );
+      mockNotificationService.getUserNotificationPreferences.mockResolvedValueOnce(null);
 
       const req = createAuthRequest("/notifications/preferences", {
         method: "GET",
@@ -373,9 +357,7 @@ describe("Notification Routes - Unit Tests", () => {
         updated_at: null,
       };
 
-      mockNotificationService.getUserNotificationPreferences.mockResolvedValueOnce(
-        mockPreferences,
-      );
+      mockNotificationService.getUserNotificationPreferences.mockResolvedValueOnce(mockPreferences);
 
       const req = createAuthRequest("/notifications/preferences", {
         method: "GET",
@@ -395,9 +377,7 @@ describe("Notification Routes - Unit Tests", () => {
 
   describe("PUT /notifications/preferences", () => {
     it("should update all notification preferences", async () => {
-      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(
-        true,
-      );
+      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(true);
 
       const updateData = {
         pushEnabled: true,
@@ -421,15 +401,14 @@ describe("Notification Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body).toEqual({ success: true });
-      expect(
-        mockNotificationService.updateUserNotificationPreferences,
-      ).toHaveBeenCalledWith(mockUser.id, updateData);
+      expect(mockNotificationService.updateUserNotificationPreferences).toHaveBeenCalledWith(
+        mockUser.id,
+        updateData,
+      );
     });
 
     it("should update single preference", async () => {
-      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(
-        true,
-      );
+      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(true);
 
       const req = createAuthRequest("/notifications/preferences", {
         method: "PUT",
@@ -444,15 +423,14 @@ describe("Notification Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body).toEqual({ success: true });
-      expect(
-        mockNotificationService.updateUserNotificationPreferences,
-      ).toHaveBeenCalledWith(mockUser.id, { pushEnabled: false });
+      expect(mockNotificationService.updateUserNotificationPreferences).toHaveBeenCalledWith(
+        mockUser.id,
+        { pushEnabled: false },
+      );
     });
 
     it("should allow empty update (no changes)", async () => {
-      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(
-        true,
-      );
+      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(true);
 
       const req = createAuthRequest("/notifications/preferences", {
         method: "PUT",
@@ -470,9 +448,7 @@ describe("Notification Routes - Unit Tests", () => {
     });
 
     it("should return success: false when update fails", async () => {
-      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(
-        false,
-      );
+      mockNotificationService.updateUserNotificationPreferences.mockResolvedValueOnce(false);
 
       const req = createAuthRequest("/notifications/preferences", {
         method: "PUT",

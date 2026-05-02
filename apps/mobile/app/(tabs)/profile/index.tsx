@@ -6,10 +6,7 @@ import {
   useUpdateProfile,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  type UpdateProfileInput,
-  UpdateProfileSchema,
-} from "@prostcounter/shared/schemas";
+import { type UpdateProfileInput, UpdateProfileSchema } from "@prostcounter/shared/schemas";
 import * as Application from "expo-application";
 import { useRouter } from "expo-router";
 import { Lock, LogOut, Puzzle, Users } from "lucide-react-native";
@@ -41,10 +38,7 @@ import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import {
-  useAdaptedProfile,
-  useSyncRefresh,
-} from "@/lib/database/adapted-hooks";
+import { useAdaptedProfile, useSyncRefresh } from "@/lib/database/adapted-hooks";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -62,11 +56,7 @@ export default function ProfileScreen() {
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
   // Data hooks (offline-first: reads from local SQLite)
-  const {
-    data: profile,
-    loading: isLoading,
-    error: profileError,
-  } = useAdaptedProfile(user?.id);
+  const { data: profile, loading: isLoading, error: profileError } = useAdaptedProfile(user?.id);
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
   const { data: friendRequestCount } = useFriendRequestCount();
   const updateProfileMutation = useUpdateProfile();
@@ -145,10 +135,7 @@ export default function ProfileScreen() {
   const handleResetTutorial = useCallback(async () => {
     try {
       await resetTutorialMutation.mutateAsync(undefined);
-      showDialog(
-        t("common.status.success"),
-        t("profile.tutorial.resetSuccess"),
-      );
+      showDialog(t("common.status.success"), t("profile.tutorial.resetSuccess"));
     } catch {
       showDialog(t("common.status.error"), t("profile.tutorial.resetError"));
     }
@@ -184,10 +171,7 @@ export default function ProfileScreen() {
           await deleteProfileMutation.mutateAsync(undefined);
           await signOut();
         } catch {
-          showDialog(
-            t("common.status.error"),
-            t("profile.deleteAccount.error"),
-          );
+          showDialog(t("common.status.error"), t("profile.deleteAccount.error"));
           setShowDeleteConfirm(false);
         }
       },
@@ -239,9 +223,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       className="flex-1 bg-background-50"
-      refreshControl={
-        <RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
     >
       <VStack space="lg" className="p-4 pb-20">
         {/* Profile Header */}
@@ -260,25 +242,16 @@ export default function ProfileScreen() {
         />
 
         {/* Friends Section */}
-        <Pressable
-          onPress={() => router.push("/friends")}
-          accessibilityLabel={t("friends.title")}
-        >
+        <Pressable onPress={() => router.push("/friends")} accessibilityLabel={t("friends.title")}>
           <Card size="md" variant="elevated">
             <HStack className="items-center justify-between">
               <HStack space="md" className="items-center">
                 <Users size={22} color={IconColors.primary} />
-                <Text className="text-lg font-semibold">
-                  {t("friends.title")}
-                </Text>
+                <Text className="text-lg font-semibold">{t("friends.title")}</Text>
               </HStack>
               <HStack space="sm" className="items-center">
                 {friendRequestCount != null && friendRequestCount > 0 && (
-                  <Badge
-                    action="error"
-                    variant="solid"
-                    className="rounded-full"
-                  >
+                  <Badge action="error" variant="solid" className="rounded-full">
                     <BadgeText>{friendRequestCount}</BadgeText>
                   </Badge>
                 )}
@@ -325,11 +298,7 @@ export default function ProfileScreen() {
         </Card>
 
         {/* Tutorial Section */}
-        <Card
-          size="md"
-          variant="outline"
-          className="border-yellow-200 bg-yellow-50"
-        >
+        <Card size="md" variant="outline" className="border-yellow-200 bg-yellow-50">
           <VStack space="md" className="items-center">
             <Text className="text-lg font-semibold text-yellow-800">
               {t("profile.tutorial.title")}
@@ -348,9 +317,7 @@ export default function ProfileScreen() {
               {resetTutorialMutation.loading ? (
                 <ButtonSpinner color={Colors.primary[600]} />
               ) : (
-                <ButtonText className="text-yellow-700">
-                  {t("profile.tutorial.button")}
-                </ButtonText>
+                <ButtonText className="text-yellow-700">{t("profile.tutorial.button")}</ButtonText>
               )}
             </Button>
           </VStack>
@@ -358,18 +325,10 @@ export default function ProfileScreen() {
 
         {/* Dev-only Components Showcase Link */}
         {__DEV__ && (
-          <Card
-            size="md"
-            variant="outline"
-            className="border-purple-200 bg-purple-50"
-          >
+          <Card size="md" variant="outline" className="border-purple-200 bg-purple-50">
             <VStack space="md" className="items-center">
-              <Text className="text-lg font-semibold text-purple-800">
-                {t("dev.title")}
-              </Text>
-              <Text className="text-center text-sm text-purple-700">
-                {t("dev.description")}
-              </Text>
+              <Text className="text-lg font-semibold text-purple-800">{t("dev.title")}</Text>
+              <Text className="text-center text-sm text-purple-700">{t("dev.description")}</Text>
               <Button
                 variant="outline"
                 action="secondary"
@@ -378,9 +337,7 @@ export default function ProfileScreen() {
                 accessibilityLabel={t("dev.components.openShowcase")}
               >
                 <Puzzle size={18} color="#7c3aed" />
-                <ButtonText className="text-purple-700">
-                  {t("dev.components.showcase")}
-                </ButtonText>
+                <ButtonText className="text-purple-700">{t("dev.components.showcase")}</ButtonText>
               </Button>
             </VStack>
           </Card>
@@ -401,8 +358,7 @@ export default function ProfileScreen() {
 
         {/* App Version */}
         <Text className="text-center text-xs text-typography-400">
-          v{Application.nativeApplicationVersion} (
-          {Application.nativeBuildVersion})
+          v{Application.nativeApplicationVersion} ({Application.nativeBuildVersion})
         </Text>
       </VStack>
 

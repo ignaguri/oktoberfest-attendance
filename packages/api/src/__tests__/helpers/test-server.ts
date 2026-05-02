@@ -31,10 +31,7 @@ export function createMockUser(overrides?: Partial<User>): User {
 /**
  * Create test request with auth headers
  */
-export function createAuthRequest(
-  path: string,
-  options?: RequestInit,
-): Request {
+export function createAuthRequest(path: string, options?: RequestInit): Request {
   return new Request(`http://localhost${path}`, {
     ...options,
     headers: {

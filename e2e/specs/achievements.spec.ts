@@ -56,9 +56,7 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.waitForLoad();
 
       // Check if stats are visible (may not be if no festival selected)
-      const hasStats = await achievementsPage.totalProgressCard
-        .isVisible()
-        .catch(() => false);
+      const hasStats = await achievementsPage.totalProgressCard.isVisible().catch(() => false);
 
       if (hasStats) {
         await achievementsPage.expectStatsVisible();
@@ -77,9 +75,7 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.waitForLoad();
 
       // Check if category dropdown exists
-      const hasDropdown = await achievementsPage.categoryDropdown
-        .isVisible()
-        .catch(() => false);
+      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
 
       if (hasDropdown) {
         await achievementsPage.openCategoryDropdown();
@@ -107,18 +103,12 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.waitForLoad();
 
       // Check if badges are visible when data is loaded
-      const hasDropdown = await achievementsPage.categoryDropdown
-        .isVisible()
-        .catch(() => false);
+      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
 
       if (hasDropdown) {
         // Unlocked and Locked badges should be visible
-        const hasUnlocked = await achievementsPage.unlockedBadge
-          .isVisible()
-          .catch(() => false);
-        const hasLocked = await achievementsPage.lockedBadge
-          .isVisible()
-          .catch(() => false);
+        const hasUnlocked = await achievementsPage.unlockedBadge.isVisible().catch(() => false);
+        const hasLocked = await achievementsPage.lockedBadge.isVisible().catch(() => false);
 
         // At least one badge type should be visible
         expect(hasUnlocked || hasLocked).toBeTruthy();
@@ -135,15 +125,12 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.waitForLoad();
 
       // Check if data is loaded
-      const hasDropdown = await achievementsPage.categoryDropdown
-        .isVisible()
-        .catch(() => false);
+      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
 
       if (hasDropdown) {
         // Either completed, in-progress, or empty message should be visible
         const hasCompleted = await achievementsPage.hasCompletedAchievements();
-        const hasInProgress =
-          await achievementsPage.hasInProgressAchievements();
+        const hasInProgress = await achievementsPage.hasInProgressAchievements();
         const hasEmpty = await achievementsPage.noAchievementsMessage
           .isVisible()
           .catch(() => false);

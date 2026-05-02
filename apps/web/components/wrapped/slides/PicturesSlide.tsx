@@ -9,12 +9,7 @@ import { useEffect, useState } from "react";
 
 import { cn, shuffleArray } from "@/lib/utils";
 
-import {
-  BaseSlide,
-  SlideContent,
-  SlideSubtitle,
-  SlideTitle,
-} from "./BaseSlide";
+import { BaseSlide, SlideContent, SlideSubtitle, SlideTitle } from "./BaseSlide";
 
 /**
  * Extract file path from a full Supabase storage URL or return the path as-is
@@ -114,10 +109,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
   };
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-green-50 to-emerald-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-green-50 to-emerald-50">
       <SlideTitle>{t("wrapped.pictures.title")}</SlideTitle>
       <SlideSubtitle>{t("wrapped.pictures.subtitle")}</SlideSubtitle>
 
@@ -126,9 +118,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
           <div className="w-full max-w-4xl">
             <div className="mb-6 flex items-center justify-center gap-2 text-lg text-gray-700">
               <Camera className="size-5" />
-              <span>
-                {t("wrapped.pictures.count", { count: pictures.length })}
-              </span>
+              <span>{t("wrapped.pictures.count", { count: pictures.length })}</span>
             </div>
 
             <div className="relative h-96 w-full sm:h-[28rem] md:h-[32rem]">
@@ -199,9 +189,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                           transition={{ duration: 0.3 }}
                         >
                           <p className="text-xs font-medium text-white">
-                            {new Date(
-                              picture.attendance_date,
-                            ).toLocaleDateString()}
+                            {new Date(picture.attendance_date).toLocaleDateString()}
                           </p>
                         </motion.div>
                       </div>
@@ -229,8 +217,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
               No photos captured this festival
             </p>
             <p className="text-gray-500">
-              Next time, remember to snap some pictures of your festival
-              adventures!
+              Next time, remember to snap some pictures of your festival adventures!
             </p>
           </div>
         )}

@@ -18,10 +18,7 @@ export interface ITentRepository {
    * @param tentId - Tent ID
    * @returns Festival tent with pricing, or null if not found
    */
-  findFestivalTent(
-    festivalId: string,
-    tentId: string,
-  ): Promise<FestivalTent | null>;
+  findFestivalTent(festivalId: string, tentId: string): Promise<FestivalTent | null>;
 
   /**
    * Find tents near a given location using PostGIS

@@ -13,32 +13,15 @@ import { apiClient } from "../../api-client";
 import { runUploadFileOp } from "../photo-queue";
 import { type ProcessorResult, QueueProcessor } from "../queue-processor";
 import { MUTABLE_TABLES } from "../schema";
-import {
-  cleanupOrphanConsumptions,
-  getQueueStats,
-  getSyncMetadata,
-} from "../sync-queue";
-import {
-  pullGroupMembers,
-  pullGroups,
-  pullUserAchievements,
-} from "./pull-groups";
+import { cleanupOrphanConsumptions, getQueueStats, getSyncMetadata } from "../sync-queue";
+import { pullGroupMembers, pullGroups, pullUserAchievements } from "./pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "./pull-reference";
-import {
-  pullAttendances,
-  pullConsumptions,
-  pullProfile,
-} from "./pull-user-data";
+import { pullAttendances, pullConsumptions, pullProfile } from "./pull-user-data";
 import { pushDelete, pushInsert, pushUpdate } from "./push-handlers";
 import type { PullResult, SyncOptions, SyncResult } from "./types";
 
 // Re-export types for consumers
-export type {
-  PullResult,
-  SyncDirection,
-  SyncOptions,
-  SyncResult,
-} from "./types";
+export type { PullResult, SyncDirection, SyncOptions, SyncResult } from "./types";
 
 export class SyncManager {
   private db: SQLite.SQLiteDatabase;
@@ -113,9 +96,7 @@ export class SyncManager {
       result.success = result.failed === 0;
     } catch (error) {
       result.success = false;
-      result.errors.push(
-        error instanceof Error ? error.message : "Unknown sync error",
-      );
+      result.errors.push(error instanceof Error ? error.message : "Unknown sync error");
     } finally {
       this.isSyncing = false;
       this.abortController = null;
@@ -187,21 +168,11 @@ export class SyncManager {
 
     processor.registerHandler("INSERT", async (op) => {
       const payload = JSON.parse(op.payload);
-      await pushInsert(
-        op.table_name,
-        op.record_id,
-        payload,
-        op.idempotency_key,
-      );
+      await pushInsert(op.table_name, op.record_id, payload, op.idempotency_key);
     });
     processor.registerHandler("UPDATE", async (op) => {
       const payload = JSON.parse(op.payload);
-      await pushUpdate(
-        op.table_name,
-        op.record_id,
-        payload,
-        op.idempotency_key,
-      );
+      await pushUpdate(op.table_name, op.record_id, payload, op.idempotency_key);
     });
     processor.registerHandler("DELETE", async (op) => {
       await pushDelete(op.table_name, op.record_id);
@@ -213,11 +184,7 @@ export class SyncManager {
           `UPLOAD_FILE op missing festivalId in payload (op.id=${op.id}, table=${op.table_name}, record_id=${op.record_id})`,
         );
       }
-      await runUploadFileOp(
-        this.db,
-        { recordId: op.record_id, festivalId },
-        { apiClient },
-      );
+      await runUploadFileOp(this.db, { recordId: op.record_id, festivalId }, { apiClient });
     });
 
     // retryFailed() resets failed ops with retries left back to pending and

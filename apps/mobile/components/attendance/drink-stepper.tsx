@@ -72,9 +72,7 @@ export function DrinkStepper({
   const mostRecentConsumption = useMemo(() => {
     if (typeConsumptions.length === 0) return null;
     return typeConsumptions.reduce((latest, current) => {
-      return new Date(current.recordedAt) > new Date(latest.recordedAt)
-        ? current
-        : latest;
+      return new Date(current.recordedAt) > new Date(latest.recordedAt) ? current : latest;
     });
   }, [typeConsumptions]);
 
@@ -97,13 +95,7 @@ export function DrinkStepper({
     } finally {
       onMutationEnd?.();
     }
-  }, [
-    canDecrement,
-    mostRecentConsumption,
-    deleteConsumption,
-    onMutationStart,
-    onMutationEnd,
-  ]);
+  }, [canDecrement, mostRecentConsumption, deleteConsumption, onMutationStart, onMutationEnd]);
 
   const handleIncrement = useCallback(async () => {
     if (!canIncrement) return;
@@ -160,10 +152,7 @@ export function DrinkStepper({
         {deleteConsumption.isPending ? (
           <ActivityIndicator size="small" color={IconColors.primary} />
         ) : (
-          <Minus
-            size={28}
-            color={canDecrement ? IconColors.primary : IconColors.disabled}
-          />
+          <Minus size={28} color={canDecrement ? IconColors.primary : IconColors.disabled} />
         )}
       </Pressable>
 
@@ -172,9 +161,7 @@ export function DrinkStepper({
         <Text
           className={cn(
             "text-4xl font-bold",
-            disabled || isLoading
-              ? "text-typography-400"
-              : "text-typography-900",
+            disabled || isLoading ? "text-typography-400" : "text-typography-900",
           )}
         >
           {count}
@@ -198,10 +185,7 @@ export function DrinkStepper({
         {logConsumption.isPending ? (
           <ActivityIndicator size="small" color={IconColors.primary} />
         ) : (
-          <Plus
-            size={28}
-            color={canIncrement ? IconColors.primary : IconColors.disabled}
-          />
+          <Plus size={28} color={canIncrement ? IconColors.primary : IconColors.disabled} />
         )}
       </Pressable>
     </HStack>

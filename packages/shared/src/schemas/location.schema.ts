@@ -88,19 +88,12 @@ export const StartLocationSessionSchema = z
      */
     shareWithFriends: z.boolean().optional().default(false),
   })
-  .refine(
-    (data) =>
-      data.visibility !== "specific" ||
-      (data.groupIds && data.groupIds.length > 0),
-    {
-      message: "groupIds is required when visibility is 'specific'",
-      path: ["groupIds"],
-    },
-  );
+  .refine((data) => data.visibility !== "specific" || (data.groupIds && data.groupIds.length > 0), {
+    message: "groupIds is required when visibility is 'specific'",
+    path: ["groupIds"],
+  });
 
-export type StartLocationSessionInput = z.infer<
-  typeof StartLocationSessionSchema
->;
+export type StartLocationSessionInput = z.infer<typeof StartLocationSessionSchema>;
 
 /**
  * Start location session response
@@ -109,9 +102,7 @@ export const StartLocationSessionResponseSchema = z.object({
   session: LocationSessionSchema,
 });
 
-export type StartLocationSessionResponse = z.infer<
-  typeof StartLocationSessionResponseSchema
->;
+export type StartLocationSessionResponse = z.infer<typeof StartLocationSessionResponseSchema>;
 
 /**
  * Stop location session request
@@ -121,9 +112,7 @@ export const StopLocationSessionSchema = z.object({
   sessionId: z.uuid({ error: "Invalid session ID" }),
 });
 
-export type StopLocationSessionInput = z.infer<
-  typeof StopLocationSessionSchema
->;
+export type StopLocationSessionInput = z.infer<typeof StopLocationSessionSchema>;
 
 /**
  * Stop location session response
@@ -133,9 +122,7 @@ export const StopLocationSessionResponseSchema = z.object({
   session: LocationSessionSchema,
 });
 
-export type StopLocationSessionResponse = z.infer<
-  typeof StopLocationSessionResponseSchema
->;
+export type StopLocationSessionResponse = z.infer<typeof StopLocationSessionResponseSchema>;
 
 /**
  * Update location request
@@ -155,9 +142,7 @@ export const UpdateLocationResponseSchema = z.object({
   success: z.boolean(),
 });
 
-export type UpdateLocationResponse = z.infer<
-  typeof UpdateLocationResponseSchema
->;
+export type UpdateLocationResponse = z.infer<typeof UpdateLocationResponseSchema>;
 
 /**
  * Get nearby members query
@@ -167,13 +152,7 @@ export const GetNearbyMembersQuerySchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
   latitude: z.coerce.number().min(-90).max(90),
   longitude: z.coerce.number().min(-180).max(180),
-  radiusMeters: z.coerce
-    .number()
-    .int()
-    .min(100)
-    .max(5000)
-    .optional()
-    .default(1000), // 1km default
+  radiusMeters: z.coerce.number().int().min(100).max(5000).optional().default(1000), // 1km default
 });
 
 export type GetNearbyMembersQuery = z.infer<typeof GetNearbyMembersQuerySchema>;
@@ -187,9 +166,7 @@ export const GetNearbyMembersResponseSchema = z.object({
   radiusMeters: z.number().int(),
 });
 
-export type GetNearbyMembersResponse = z.infer<
-  typeof GetNearbyMembersResponseSchema
->;
+export type GetNearbyMembersResponse = z.infer<typeof GetNearbyMembersResponseSchema>;
 
 /**
  * Get active sessions for user
@@ -200,9 +177,7 @@ export const GetLocationSessionsQuerySchema = z.object({
   activeOnly: z.coerce.boolean().optional().default(true),
 });
 
-export type GetLocationSessionsQuery = z.infer<
-  typeof GetLocationSessionsQuerySchema
->;
+export type GetLocationSessionsQuery = z.infer<typeof GetLocationSessionsQuerySchema>;
 
 /**
  * Get location sessions response
@@ -211,6 +186,4 @@ export const GetLocationSessionsResponseSchema = z.object({
   sessions: z.array(LocationSessionSchema),
 });
 
-export type GetLocationSessionsResponse = z.infer<
-  typeof GetLocationSessionsResponseSchema
->;
+export type GetLocationSessionsResponse = z.infer<typeof GetLocationSessionsResponseSchema>;

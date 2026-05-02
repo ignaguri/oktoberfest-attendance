@@ -18,30 +18,21 @@ interface PackageJson {
 
 // Get current version from package.json
 function getCurrentVersion(): string {
-  const packageJson: PackageJson = JSON.parse(
-    fs.readFileSync(PACKAGE_JSON_PATH, "utf8"),
-  );
+  const packageJson: PackageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, "utf8"));
   return packageJson.version;
 }
 
 // Update version in package.json
 function updatePackageJson(newVersion: string): void {
-  const packageJson: PackageJson = JSON.parse(
-    fs.readFileSync(PACKAGE_JSON_PATH, "utf8"),
-  );
+  const packageJson: PackageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, "utf8"));
   packageJson.version = newVersion;
-  fs.writeFileSync(
-    PACKAGE_JSON_PATH,
-    JSON.stringify(packageJson, null, 2) + "\n",
-  );
+  fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(packageJson, null, 2) + "\n");
   console.log(`✅ Updated package.json to version ${newVersion}`);
 }
 
 // Update version.ts is no longer needed - version comes from package.json
 function updateVersionTs(newVersion: string): void {
-  console.log(
-    `ℹ️  Version ${newVersion} will be available at build time from package.json`,
-  );
+  console.log(`ℹ️  Version ${newVersion} will be available at build time from package.json`);
 }
 
 // Helper function to get commit type emoji
@@ -105,11 +96,7 @@ function generateRepositoryChangelog(newVersion: string): number {
     };
 
     commits.forEach((commit) => {
-      if (
-        commit.match(
-          /^(feat|fix|docs|style|refactor|perf|test|chore|breaking):/,
-        )
-      ) {
+      if (commit.match(/^(feat|fix|docs|style|refactor|perf|test|chore|breaking):/)) {
         const type = commit.match(/^(\w+):/)?.[1];
         if (type && commitsByType[type]) {
           const description = commit.replace(/^\w+:\s*/, "");
@@ -203,9 +190,7 @@ function main(): void {
         process.exit(1);
       }
       if (!/^\d+\.\d+\.\d+$/.test(version)) {
-        console.error(
-          "❌ Invalid version format. Use semantic versioning (e.g., 1.2.3)",
-        );
+        console.error("❌ Invalid version format. Use semantic versioning (e.g., 1.2.3)");
         process.exit(1);
       }
       newVersion = version;
@@ -254,9 +239,4 @@ if (require.main === module) {
   main();
 }
 
-export {
-  generateRepositoryChangelog,
-  getCurrentVersion,
-  updatePackageJson,
-  updateVersionTs,
-};
+export { generateRepositoryChangelog, getCurrentVersion, updatePackageJson, updateVersionTs };

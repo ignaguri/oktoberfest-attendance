@@ -1,16 +1,8 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  type UnifiedFeedItem,
-  useUnifiedFeed,
-} from "@prostcounter/shared/hooks";
-import {
-  Loader2,
-  MessageSquarePlus,
-  RadioTower,
-  RefreshCw,
-} from "lucide-react";
+import { type UnifiedFeedItem, useUnifiedFeed } from "@prostcounter/shared/hooks";
+import { Loader2, MessageSquarePlus, RadioTower, RefreshCw } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -41,9 +33,7 @@ const NewsFeedHeader = ({
         <div className="flex items-center gap-2">
           {t("home.unifiedFeed.title")}
           {itemCount !== undefined && (
-            <span className="text-muted-foreground text-sm font-normal">
-              ({itemCount})
-            </span>
+            <span className="text-muted-foreground text-sm font-normal">({itemCount})</span>
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -67,9 +57,7 @@ const NewsFeedHeader = ({
               className="size-8"
               title={t("home.refreshFeed")}
             >
-              <RefreshCw
-                className={cn("size-4", isRefreshing && "animate-spin")}
-              />
+              <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
             </Button>
           )}
         </div>
@@ -78,13 +66,7 @@ const NewsFeedHeader = ({
   );
 };
 
-function FeedItemRenderer({
-  item,
-  festivalId,
-}: {
-  item: UnifiedFeedItem;
-  festivalId?: string;
-}) {
+function FeedItemRenderer({ item, festivalId }: { item: UnifiedFeedItem; festivalId?: string }) {
   switch (item.feedType) {
     case "activity":
       return <ActivityItem activity={item.data} />;
@@ -143,9 +125,7 @@ const NewsFeed = () => {
         />
         <CardContent>
           <div className="py-8 text-center">
-            <p className="text-muted-foreground text-sm">
-              {t("home.unifiedFeed.error")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("home.unifiedFeed.error")}</p>
           </div>
         </CardContent>
         {currentFestival?.id && (
@@ -171,9 +151,7 @@ const NewsFeed = () => {
         <CardContent>
           <div className="py-8 text-center">
             <RadioTower className="text-muted-foreground mx-auto mb-4 size-12" />
-            <p className="text-muted-foreground text-sm">
-              {t("home.unifiedFeed.empty")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("home.unifiedFeed.empty")}</p>
           </div>
         </CardContent>
         {currentFestival?.id && (
@@ -199,11 +177,7 @@ const NewsFeed = () => {
       <CardContent>
         <div className="flex flex-col gap-4">
           {feedItems.map((item) => (
-            <FeedItemRenderer
-              key={item.feedItemId}
-              item={item}
-              festivalId={currentFestival?.id}
-            />
+            <FeedItemRenderer key={item.feedItemId} item={item} festivalId={currentFestival?.id} />
           ))}
 
           {hasNextPage && (

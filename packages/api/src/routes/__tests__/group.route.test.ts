@@ -31,10 +31,7 @@ describe("Group Routes", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -177,21 +174,13 @@ describe("Group Routes", () => {
       // Also need to mock member count queries for each group
       vi.mocked(mockSupabase.from)
         // 1. Main query: groups with winning_criteria join
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupsDbRows)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupsDbRows)))
         // 2. Member count for Group 1
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 5 }),
-        )
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 5 }))
         // 3. Member count for Group 2
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 3 }),
-        );
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 3 }));
 
-      const req = createAuthRequest(
-        "/groups?festivalId=223e4567-e89b-12d3-a456-426614174000",
-      );
+      const req = createAuthRequest("/groups?festivalId=223e4567-e89b-12d3-a456-426614174000");
       const res = await app.request(req as Request);
       const json = (await res.json()) as { data: GroupWithMembers[] };
 
@@ -205,9 +194,7 @@ describe("Group Routes", () => {
         // Main query with no results
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        "/groups?festivalId=623e4567-e89b-12d3-a456-426614174000",
-      );
+      const req = createAuthRequest("/groups?festivalId=623e4567-e89b-12d3-a456-426614174000");
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(200);
@@ -236,21 +223,13 @@ describe("Group Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. findById: select().eq().single()
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
         // 2. findById - member count: select().eq()
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 10 }),
-        )
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 10 }))
         // 3. isMember check: select().eq().eq().maybeSingle()
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ id: "member-123" })),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ id: "member-123" })));
 
-      const req = createAuthRequest(
-        "/groups/723e4567-e89b-12d3-a456-426614174000",
-      );
+      const req = createAuthRequest("/groups/723e4567-e89b-12d3-a456-426614174000");
       const res = await app.request(req as Request);
       const json = await res.json();
 
@@ -267,9 +246,7 @@ describe("Group Routes", () => {
         // 1. findById: returns not found (PGRST116)
         .mockReturnValueOnce(createMockChain(mockSupabaseNotFound()));
 
-      const req = createAuthRequest(
-        "/groups/823e4567-e89b-12d3-a456-426614174000",
-      );
+      const req = createAuthRequest("/groups/823e4567-e89b-12d3-a456-426614174000");
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(404);
@@ -299,33 +276,22 @@ describe("Group Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. joinGroup - findById: select().eq().single()
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
         // 2. joinGroup - findById member count: select().eq()
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 0 }),
-        )
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 0 }))
         // 3. addMember - isMember check: select().eq().eq().maybeSingle()
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)))
         // 4. addMember - findById: select().eq().single()
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
         // 5. addMember - findById member count: select().eq()
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 0 }),
-        )
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 0 }))
         // 6. addMember - insert: insert()
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
 
-      const req = createAuthRequest(
-        "/groups/923e4567-e89b-12d3-a456-426614174000/join",
-        {
-          method: "POST",
-          body: JSON.stringify({ inviteToken: "valid-token" }),
-        },
-      );
+      const req = createAuthRequest("/groups/923e4567-e89b-12d3-a456-426614174000/join", {
+        method: "POST",
+        body: JSON.stringify({ inviteToken: "valid-token" }),
+      });
 
       const res = await app.request(req as Request);
       const json = await res.json();
@@ -340,13 +306,10 @@ describe("Group Routes", () => {
         // 1. joinGroup - findById: returns not found (PGRST116)
         .mockReturnValueOnce(createMockChain(mockSupabaseNotFound()));
 
-      const req = createAuthRequest(
-        "/groups/a23e4567-e89b-12d3-a456-426614174000/join",
-        {
-          method: "POST",
-          body: JSON.stringify({ inviteToken: "invalid-token" }),
-        },
-      );
+      const req = createAuthRequest("/groups/a23e4567-e89b-12d3-a456-426614174000/join", {
+        method: "POST",
+        body: JSON.stringify({ inviteToken: "invalid-token" }),
+      });
 
       const res = await app.request(req as Request);
       expect(res.status).toBe(404);
@@ -379,13 +342,9 @@ describe("Group Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. leaveGroup - findById: select().eq().single()
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
         // 2. leaveGroup - findById member count: select().eq()
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 5 }),
-        )
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 5 }))
         // 3. leaveGroup - isMember check: select().eq().eq().maybeSingle()
         .mockReturnValueOnce(
           createMockChain(
@@ -399,12 +358,9 @@ describe("Group Routes", () => {
         // 4. removeMember: delete().eq().eq()
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
 
-      const req = createAuthRequest(
-        "/groups/b23e4567-e89b-12d3-a456-426614174000/leave",
-        {
-          method: "POST",
-        },
-      );
+      const req = createAuthRequest("/groups/b23e4567-e89b-12d3-a456-426614174000/leave", {
+        method: "POST",
+      });
 
       const res = await app.request(req as Request);
       const json = await res.json();
@@ -428,22 +384,15 @@ describe("Group Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. leaveGroup - findById: select().eq().single()
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockGroupDbRow)),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
         // 2. leaveGroup - findById member count: select().eq()
-        .mockReturnValueOnce(
-          createMockChain({ ...mockSupabaseSuccess(null), count: 5 }),
-        )
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 5 }))
         // 3. leaveGroup - isMember check: returns null (not a member)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
-      const req = createAuthRequest(
-        "/groups/c23e4567-e89b-12d3-a456-426614174000/leave",
-        {
-          method: "POST",
-        },
-      );
+      const req = createAuthRequest("/groups/c23e4567-e89b-12d3-a456-426614174000/leave", {
+        method: "POST",
+      });
 
       const res = await app.request(req as Request);
       expect(res.status).toBe(403); // ForbiddenError when not a member

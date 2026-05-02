@@ -278,10 +278,7 @@ export const authMiddleware = createMiddleware(async (c, next) => {
   }
 
   const token = authHeader.slice(7);
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-  );
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
 
   const {
     data: { user },
@@ -331,9 +328,7 @@ export function createAuthRequest(url: string, options?: RequestInit);
 // 3. test-supabase.ts - Real Supabase clients
 export function createTestSupabaseAdmin(): SupabaseClient<Database>;
 export function createTestSupabaseAnon(): SupabaseClient<Database>;
-export function createTestSupabaseWithAuth(
-  token: string,
-): SupabaseClient<Database>;
+export function createTestSupabaseWithAuth(token: string): SupabaseClient<Database>;
 ```
 
 ### Environment Setup
@@ -540,10 +535,7 @@ Next.js `unstable_cache` for performance:
 ```typescript
 const getCachedTents = unstable_cache(
   async (festivalId: string, supabase: SupabaseClient) => {
-    const { data, error } = await supabase
-      .from("tents")
-      .select("*")
-      .eq("festival_id", festivalId);
+    const { data, error } = await supabase.from("tents").select("*").eq("festival_id", festivalId);
 
     if (error) throw new DatabaseError(error.message);
     return data;

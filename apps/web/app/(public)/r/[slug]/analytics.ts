@@ -9,10 +9,7 @@ type RedirectSlug = "bugs" | "feedback" | "donate" | "github";
  * @param slug - The redirect slug that was accessed
  * @param destinationUrl - The URL the user was redirected to
  */
-export function trackRedirect(
-  slug: RedirectSlug,
-  destinationUrl: string,
-): void {
+export function trackRedirect(slug: RedirectSlug, destinationUrl: string): void {
   // Only track in production
   if (!IS_PROD) {
     logger.debug("Redirect tracked", {

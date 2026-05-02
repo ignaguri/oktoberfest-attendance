@@ -43,9 +43,7 @@ interface QuickAttendanceContextType {
   setOnCrowdFabPress: (handler: (() => void) | null) => void;
 }
 
-const QuickAttendanceContext = createContext<QuickAttendanceContextType | null>(
-  null,
-);
+const QuickAttendanceContext = createContext<QuickAttendanceContextType | null>(null);
 
 interface QuickAttendanceProviderProps {
   children: ReactNode;
@@ -55,18 +53,11 @@ interface QuickAttendanceProviderProps {
  * Provider for quick attendance sheet state.
  * Allows any component to open the sheet with optional preselected tent.
  */
-export function QuickAttendanceProvider({
-  children,
-}: QuickAttendanceProviderProps) {
+export function QuickAttendanceProvider({ children }: QuickAttendanceProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [preselectedTentId, setPreselectedTentId] = useState<
-    string | undefined
-  >();
-  const [preselectedTentName, setPreselectedTentName] = useState<
-    string | undefined
-  >();
-  const [pendingCrowdReport, setPendingCrowdReport] =
-    useState<PendingCrowdReport | null>(null);
+  const [preselectedTentId, setPreselectedTentId] = useState<string | undefined>();
+  const [preselectedTentName, setPreselectedTentName] = useState<string | undefined>();
+  const [pendingCrowdReport, setPendingCrowdReport] = useState<PendingCrowdReport | null>(null);
   const [showCrowdFab, setShowCrowdFab] = useState(false);
   // Wrap function in object to prevent React from invoking it as a state updater
   const [crowdFabHandler, setCrowdFabHandler] = useState<{
@@ -139,9 +130,7 @@ export function QuickAttendanceProvider({
   );
 
   return (
-    <QuickAttendanceContext.Provider value={value}>
-      {children}
-    </QuickAttendanceContext.Provider>
+    <QuickAttendanceContext.Provider value={value}>{children}</QuickAttendanceContext.Provider>
   );
 }
 
@@ -152,9 +141,7 @@ export function QuickAttendanceProvider({
 export function useQuickAttendance(): QuickAttendanceContextType {
   const context = useContext(QuickAttendanceContext);
   if (!context) {
-    throw new Error(
-      "useQuickAttendance must be used within a QuickAttendanceProvider",
-    );
+    throw new Error("useQuickAttendance must be used within a QuickAttendanceProvider");
   }
   return context;
 }

@@ -65,9 +65,7 @@ export function OutroSlide({ data, isActive, onClose }: OutroSlideProps) {
           transition={{ type: "timing", duration: 500, delay: 500 }}
           className="items-center rounded-2xl bg-white/70 px-6 py-4"
         >
-          <Text className="text-sm text-gray-500">
-            {data.festival_info?.name ?? ""}
-          </Text>
+          <Text className="text-sm text-gray-500">{data.festival_info?.name ?? ""}</Text>
           <Text className="mt-1 text-lg font-bold text-gray-800">
             {t("wrapped.outro.summary.beers", {
               count: data.basic_stats?.total_beers ?? 0,
@@ -98,9 +96,7 @@ export function OutroSlide({ data, isActive, onClose }: OutroSlideProps) {
           >
             <Share2 size={20} color={IconColors.white} />
             <Text className="text-base font-semibold text-white">
-              {isSharing
-                ? t("wrapped.outro.sharing")
-                : t("wrapped.outro.share")}
+              {isSharing ? t("wrapped.outro.sharing") : t("wrapped.outro.share")}
             </Text>
           </Pressable>
         </Motion.View>

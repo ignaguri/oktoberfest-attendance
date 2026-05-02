@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  AttendanceWithTotalsSchema,
-  TentVisitRowSchema,
-} from "./consumption.schema";
+import { AttendanceWithTotalsSchema, TentVisitRowSchema } from "./consumption.schema";
 
 /**
  * Query parameters for listing attendances
@@ -28,9 +25,7 @@ export const ListAttendancesResponseSchema = z.object({
   offset: z.number().int(),
 });
 
-export type ListAttendancesResponse = z.infer<
-  typeof ListAttendancesResponseSchema
->;
+export type ListAttendancesResponse = z.infer<typeof ListAttendancesResponseSchema>;
 
 /**
  * Path parameters for attendance by ID
@@ -50,9 +45,7 @@ export const DeleteAttendanceResponseSchema = z.object({
   message: z.string(),
 });
 
-export type DeleteAttendanceResponse = z.infer<
-  typeof DeleteAttendanceResponseSchema
->;
+export type DeleteAttendanceResponse = z.infer<typeof DeleteAttendanceResponseSchema>;
 
 /**
  * Create/update attendance request
@@ -60,9 +53,7 @@ export type DeleteAttendanceResponse = z.infer<
  */
 export const CreateAttendanceSchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
   tents: z.array(z.uuid()).default([]),
   amount: z.number().int().min(0).default(0),
 });
@@ -77,9 +68,7 @@ export const CreateAttendanceResponseSchema = z.object({
   tentsChanged: z.boolean(),
 });
 
-export type CreateAttendanceResponse = z.infer<
-  typeof CreateAttendanceResponseSchema
->;
+export type CreateAttendanceResponse = z.infer<typeof CreateAttendanceResponseSchema>;
 
 /**
  * Update personal attendance request (no notifications)
@@ -87,16 +76,12 @@ export type CreateAttendanceResponse = z.infer<
  */
 export const UpdatePersonalAttendanceSchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
   tents: z.array(z.uuid()).default([]),
   amount: z.number().int().min(0).default(0),
 });
 
-export type UpdatePersonalAttendanceInput = z.infer<
-  typeof UpdatePersonalAttendanceSchema
->;
+export type UpdatePersonalAttendanceInput = z.infer<typeof UpdatePersonalAttendanceSchema>;
 
 /**
  * Update personal attendance response
@@ -119,9 +104,7 @@ export const CheckInFromReservationParamSchema = z.object({
   reservationId: z.uuid({ error: "Invalid reservation ID" }),
 });
 
-export type CheckInFromReservationParam = z.infer<
-  typeof CheckInFromReservationParamSchema
->;
+export type CheckInFromReservationParam = z.infer<typeof CheckInFromReservationParamSchema>;
 
 /**
  * Check-in from reservation response
@@ -138,14 +121,10 @@ export const CheckInFromReservationResponseSchema = z.object({
  */
 export const GetAttendanceByDateQuerySchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
 });
 
-export type GetAttendanceByDateQuery = z.infer<
-  typeof GetAttendanceByDateQuerySchema
->;
+export type GetAttendanceByDateQuery = z.infer<typeof GetAttendanceByDateQuerySchema>;
 
 /**
  * Picture reference with ID for deletion (minimal schema)
@@ -175,6 +154,4 @@ export const GetAttendanceByDateResponseSchema = z.object({
   attendance: AttendanceByDateSchema.nullable(),
 });
 
-export type GetAttendanceByDateResponse = z.infer<
-  typeof GetAttendanceByDateResponseSchema
->;
+export type GetAttendanceByDateResponse = z.infer<typeof GetAttendanceByDateResponseSchema>;

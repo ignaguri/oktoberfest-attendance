@@ -11,11 +11,7 @@
 import { QueryKeys } from "@prostcounter/shared/data";
 
 import { uploadAvatar } from "@/components/Avatar/actions";
-import {
-  useInvalidateQueries,
-  useMutation,
-  useQuery,
-} from "@/lib/data/react-query-provider";
+import { useInvalidateQueries, useMutation, useQuery } from "@/lib/data/react-query-provider";
 import { getUser } from "@/lib/sharedActions";
 
 // Re-export shared profile hooks

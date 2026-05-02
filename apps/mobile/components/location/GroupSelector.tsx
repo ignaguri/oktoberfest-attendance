@@ -11,12 +11,7 @@ import { Check, Users } from "lucide-react-native";
 import { useCallback, useEffect, useMemo } from "react";
 import { ScrollView } from "react-native";
 
-import {
-  Checkbox,
-  CheckboxIcon,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from "@/components/ui/checkbox";
+import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/components/ui/checkbox";
 import { HStack } from "@/components/ui/hstack";
 import { LabeledSwitchRow } from "@/components/ui/labeled-switch-row";
 import { Pressable } from "@/components/ui/pressable";
@@ -99,9 +94,7 @@ export function GroupSelector({
     return (
       <HStack className="items-center justify-center py-4">
         <Spinner size="small" color={Colors.primary[500]} />
-        <Text className="ml-2 text-sm text-typography-500">
-          {t("common.loading")}
-        </Text>
+        <Text className="ml-2 text-sm text-typography-500">{t("common.loading")}</Text>
       </HStack>
     );
   }
@@ -110,9 +103,7 @@ export function GroupSelector({
     return (
       <HStack space="sm" className="items-center py-3">
         <Users size={16} color={IconColors.muted} />
-        <Text className="text-sm text-typography-500">
-          {t("location.groups.noGroups")}
-        </Text>
+        <Text className="text-sm text-typography-500">{t("location.groups.noGroups")}</Text>
       </HStack>
     );
   }
@@ -175,9 +166,7 @@ export function GroupSelector({
                       {group.name}
                     </CheckboxLabel>
                   </Checkbox>
-                  <Text className="text-xs text-typography-400">
-                    {group.memberCount || 0}
-                  </Text>
+                  <Text className="text-xs text-typography-400">{group.memberCount || 0}</Text>
                 </HStack>
               </Pressable>
             );

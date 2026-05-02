@@ -3,13 +3,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
 import { useSearchParams } from "next/navigation";
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { CheckInPromptDialog } from "@/components/reservations/CheckInPromptDialog";
@@ -57,9 +51,7 @@ export default function AttendancePage() {
     if (!reservationData) return null;
     return {
       id: reservationData.id,
-      tent: reservationData.tentName
-        ? { name: reservationData.tentName }
-        : null,
+      tent: reservationData.tentName ? { name: reservationData.tentName } : null,
       start_at: reservationData.startAt,
       visible_to_groups: reservationData.visibleToGroups,
       note: reservationData.note,
@@ -121,9 +113,7 @@ export default function AttendancePage() {
   if (festivalLoading || attendancesLoading || !currentFestival) {
     return (
       <div className="flex w-full max-w-lg flex-col gap-6">
-        <p className="text-center text-gray-600">
-          {t("common.status.loading")}
-        </p>
+        <p className="text-center text-gray-600">{t("common.status.loading")}</p>
       </div>
     );
   }
@@ -139,10 +129,7 @@ export default function AttendancePage() {
         onDateSelect={handleDateSelect}
         onAttendanceDelete={handleAttendanceDelete}
       />
-      <CheckInPromptDialog
-        reservation={reservation}
-        onCheckIn={handleCheckIn}
-      />
+      <CheckInPromptDialog reservation={reservation} onCheckIn={handleCheckIn} />
     </div>
   );
 }

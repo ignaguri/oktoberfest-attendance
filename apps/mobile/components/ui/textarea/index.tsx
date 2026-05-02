@@ -2,10 +2,7 @@
 import { createTextarea } from "@gluestack-ui/core/textarea/creator";
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import {
-  useStyleContext,
-  withStyleContext,
-} from "@gluestack-ui/utils/nativewind-utils";
+import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import type { TextareaSize, TextareaVariant } from "@prostcounter/ui";
 import React from "react";
 import { TextInput, View } from "react-native";
@@ -48,10 +45,7 @@ const textareaInputStyle = tva({
 /**
  * Textarea Props - implements @prostcounter/ui TextareaProps contract
  */
-type ITextareaProps = Omit<
-  React.ComponentProps<typeof UITextarea>,
-  "context"
-> & {
+type ITextareaProps = Omit<React.ComponentProps<typeof UITextarea>, "context"> & {
   /** Size of the textarea - from contract */
   size?: TextareaSize;
   /** Variant style of the textarea - from contract */
@@ -60,22 +54,18 @@ type ITextareaProps = Omit<
   className?: string;
 };
 
-const Textarea = React.forwardRef<
-  React.ComponentRef<typeof UITextarea>,
-  ITextareaProps
->(function Textarea(
-  { className, variant = "default", size = "md", ...props },
-  ref,
-) {
-  return (
-    <UITextarea
-      ref={ref}
-      {...props}
-      className={textareaStyle({ variant, class: className })}
-      context={{ size }}
-    />
-  );
-});
+const Textarea = React.forwardRef<React.ComponentRef<typeof UITextarea>, ITextareaProps>(
+  function Textarea({ className, variant = "default", size = "md", ...props }, ref) {
+    return (
+      <UITextarea
+        ref={ref}
+        {...props}
+        className={textareaStyle({ variant, class: className })}
+        context={{ size }}
+      />
+    );
+  },
+);
 
 type ITextareaInputProps = React.ComponentProps<typeof UITextarea.Input> &
   VariantProps<typeof textareaInputStyle>;

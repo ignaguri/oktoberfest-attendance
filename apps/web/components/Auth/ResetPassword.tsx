@@ -4,10 +4,7 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  type ResetPasswordFormData,
-  resetPasswordSchema,
-} from "@prostcounter/shared/schemas";
+import { type ResetPasswordFormData, resetPasswordSchema } from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -53,12 +50,7 @@ const ResetPassword = () => {
           type="email"
           {...register("email")}
         />
-        <Button
-          type="submit"
-          className="self-center"
-          variant="yellow"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" className="self-center" variant="yellow" disabled={isSubmitting}>
           {t("auth.resetPassword.submit")}
         </Button>
       </form>

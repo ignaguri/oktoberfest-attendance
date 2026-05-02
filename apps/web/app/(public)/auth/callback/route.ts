@@ -13,21 +13,14 @@ export async function GET(req: NextRequest) {
 
   // Handle OAuth error from provider
   if (error) {
-    logger.error(
-      "OAuth provider error",
-      logger.apiRoute("auth/callback", { error }),
-    );
+    logger.error("OAuth provider error", logger.apiRoute("auth/callback", { error }));
     return NextResponse.redirect(
-      new URL(
-        `/sign-in?error=oauth_failed&details=${encodeURIComponent(error)}`,
-        req.url,
-      ),
+      new URL(`/sign-in?error=oauth_failed&details=${encodeURIComponent(error)}`, req.url),
     );
   }
 
   if (code) {
-    const { error: exchangeError } =
-      await supabase.auth.exchangeCodeForSession(code);
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
       logger.error(
@@ -48,13 +41,7 @@ export async function GET(req: NextRequest) {
   const redirectUrl = redirect ? decodeURIComponent(redirect) : "/home";
 
   // Validate redirect URL to prevent open redirects
-  const validRedirects = [
-    "/home",
-    "/profile",
-    "/attendance",
-    "/groups",
-    "/leaderboard",
-  ];
+  const validRedirects = ["/home", "/profile", "/attendance", "/groups", "/leaderboard"];
 
   // Only allow relative paths, and compare only the pathname
   let finalRedirect = "/home";

@@ -5,10 +5,7 @@ import type { BlogCategory, BlogPostMeta } from "@/lib/blog";
 import { ArticleCard } from "./ArticleCard";
 import { localizeCategory } from "./blog-i18n";
 
-const categoryDescriptions: Record<
-  BlogCategory,
-  Record<SupportedLanguage, string>
-> = {
+const categoryDescriptions: Record<BlogCategory, Record<SupportedLanguage, string>> = {
   festivals: {
     en: "Guides and information about Munich beer festivals",
     de: "Guides und Informationen zu Münchner Bierfesten",
@@ -52,9 +49,7 @@ export function CategoryView({
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          {label}
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{label}</h1>
         <p className="mt-2 text-lg text-gray-500">{description}</p>
       </header>
 

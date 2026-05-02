@@ -8,10 +8,7 @@
  * Push token registration still requires explicit user action (permissions).
  */
 
-import {
-  useCurrentProfile,
-  useSubscribeToNotifications,
-} from "@prostcounter/shared/hooks";
+import { useCurrentProfile, useSubscribeToNotifications } from "@prostcounter/shared/hooks";
 import { splitFullName } from "@prostcounter/shared/utils";
 import { useEffect, useRef } from "react";
 
@@ -46,9 +43,7 @@ export function NovuAutoSubscriber() {
 
         if (result.success) {
           hasSubscribed.current = true;
-          logger.debug(
-            "[NovuAutoSubscriber] User registered as Novu subscriber",
-          );
+          logger.debug("[NovuAutoSubscriber] User registered as Novu subscriber");
         } else {
           logger.warn("[NovuAutoSubscriber] Subscribe failed:", result.error);
         }

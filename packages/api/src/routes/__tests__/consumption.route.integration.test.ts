@@ -38,9 +38,7 @@ describe("Consumption Routes Integration (Local DB)", () => {
     });
 
     if (authError || !authData.user || !authData.session) {
-      throw new Error(
-        `Failed to create test user: ${authError?.message || "Unknown error"}`,
-      );
+      throw new Error(`Failed to create test user: ${authError?.message || "Unknown error"}`);
     }
 
     testUser = {
@@ -109,9 +107,7 @@ describe("Consumption Routes Integration (Local DB)", () => {
       .single();
 
     if (tentError || !tent) {
-      throw new Error(
-        `Failed to create test tent: ${tentError?.message || "Unknown error"}`,
-      );
+      throw new Error(`Failed to create test tent: ${tentError?.message || "Unknown error"}`);
     }
 
     testTent = {
@@ -131,22 +127,13 @@ describe("Consumption Routes Integration (Local DB)", () => {
     // Use admin client to bypass RLS policies
 
     // 1. Delete tent visits first
-    await supabaseAdmin
-      .from("tent_visits")
-      .delete()
-      .in("id", createdTentVisitIds);
+    await supabaseAdmin.from("tent_visits").delete().in("id", createdTentVisitIds);
 
     // 2. Delete consumptions (must be before attendances due to FK)
-    await supabaseAdmin
-      .from("consumptions")
-      .delete()
-      .in("id", createdConsumptionIds);
+    await supabaseAdmin.from("consumptions").delete().in("id", createdConsumptionIds);
 
     // 3. Delete attendances
-    await supabaseAdmin
-      .from("attendances")
-      .delete()
-      .in("id", createdAttendanceIds);
+    await supabaseAdmin.from("attendances").delete().in("id", createdAttendanceIds);
 
     // 4. Delete festival-tent association
     if (testFestival?.id && testTent?.id) {
@@ -225,12 +212,11 @@ describe("Consumption Routes Integration (Local DB)", () => {
     createdConsumptionIds.push(consumption!.id);
 
     // Query attendance_with_totals view to verify computed fields
-    const { data: attendanceWithTotals, error: totalsError } =
-      await userSupabase
-        .from("attendance_with_totals")
-        .select("*")
-        .eq("id", attendance!.id)
-        .single();
+    const { data: attendanceWithTotals, error: totalsError } = await userSupabase
+      .from("attendance_with_totals")
+      .select("*")
+      .eq("id", attendance!.id)
+      .single();
 
     expect(totalsError).toBeNull();
     expect(attendanceWithTotals).toBeDefined();
@@ -527,9 +513,7 @@ describe("Consumption Routes Integration (Local DB)", () => {
     expect(afterDelete!.total_spent_cents).toBe(1620);
 
     // Remove from tracking since deleted
-    createdConsumptionIds = createdConsumptionIds.filter(
-      (id) => id !== consumption1!.id,
-    );
+    createdConsumptionIds = createdConsumptionIds.filter((id) => id !== consumption1!.id);
   });
 
   it("should prevent user from accessing another user's consumption (RLS)", async () => {

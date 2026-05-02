@@ -182,9 +182,7 @@ export class QueueProcessor {
   ): Promise<{ success: boolean; skipped?: boolean; error?: string }> {
     // Check if operation has exceeded max retries
     if (op.retry_count >= this.options.maxRetries) {
-      logger.debug(
-        `[QueueProcessor] Operation ${op.id} exceeded max retries, skipping`,
-      );
+      logger.debug(`[QueueProcessor] Operation ${op.id} exceeded max retries, skipping`);
       return { success: false, skipped: true, error: "Max retries exceeded" };
     }
 
@@ -196,9 +194,7 @@ export class QueueProcessor {
       );
 
       if (dependency && dependency.status !== "completed") {
-        logger.debug(
-          `[QueueProcessor] Operation ${op.id} waiting for dependency ${op.depends_on}`,
-        );
+        logger.debug(`[QueueProcessor] Operation ${op.id} waiting for dependency ${op.depends_on}`);
         return {
           success: false,
           skipped: true,
@@ -210,9 +206,7 @@ export class QueueProcessor {
     // Get handler for this operation type
     const handler = this.operationHandlers.get(op.operation);
     if (!handler) {
-      logger.warn(
-        `[QueueProcessor] No handler for operation type: ${op.operation}`,
-      );
+      logger.warn(`[QueueProcessor] No handler for operation type: ${op.operation}`);
       return { success: false, error: `No handler for ${op.operation}` };
     }
 
@@ -226,12 +220,7 @@ export class QueueProcessor {
       // Mark the record as clean if this was a data operation
       if (op.operation !== "UPLOAD_FILE") {
         const now = new Date().toISOString();
-        await markRecordClean(
-          this.db,
-          op.table_name as SyncableTable,
-          op.record_id,
-          now,
-        );
+        await markRecordClean(this.db, op.table_name as SyncableTable, op.record_id, now);
       }
 
       return { success: true };
@@ -241,9 +230,7 @@ export class QueueProcessor {
 
       // Schedule retry with backoff
       const delay = this.calculateBackoff(op.retry_count);
-      logger.debug(
-        `[QueueProcessor] Operation ${op.id} failed, will retry after ${delay}ms`,
-      );
+      logger.debug(`[QueueProcessor] Operation ${op.id} failed, will retry after ${delay}ms`);
 
       return { success: false, error: errorMsg };
     }
@@ -325,9 +312,7 @@ export class QueueProcessor {
    * Clear completed operations from the queue
    */
   async clearCompleted(): Promise<number> {
-    const result = await this.db.runAsync(
-      "DELETE FROM _sync_queue WHERE status = 'completed'",
-    );
+    const result = await this.db.runAsync("DELETE FROM _sync_queue WHERE status = 'completed'");
     return result.changes;
   }
 
@@ -396,9 +381,7 @@ export async function withRetry<T>(
         );
 
         options.onRetry?.(attempt + 1, lastError);
-        logger.debug(
-          `[withRetry] Attempt ${attempt + 1} failed, retrying in ${delay}ms`,
-        );
+        logger.debug(`[withRetry] Attempt ${attempt + 1} failed, retrying in ${delay}ms`);
 
         await sleep(delay);
       }

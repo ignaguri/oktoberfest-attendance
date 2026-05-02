@@ -41,15 +41,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const {
-      festivalId,
-      latitude,
-      longitude,
-      accuracy,
-      heading,
-      speed,
-      altitude,
-    } = result.data;
+    const { festivalId, latitude, longitude, accuracy, heading, speed, altitude } = result.data;
 
     // Check authentication
     const {
@@ -79,10 +71,7 @@ export async function POST(request: NextRequest) {
       reportSupabaseException("checkLocationSharingGroups", groupsError, {
         id: user.id,
       });
-      return NextResponse.json(
-        { error: "Failed to check sharing permissions" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to check sharing permissions" }, { status: 500 });
     }
 
     if (!count || count === 0) {
@@ -119,10 +108,7 @@ export async function POST(request: NextRequest) {
       reportSupabaseException("updateUserLocation", locationError, {
         id: user.id,
       });
-      return NextResponse.json(
-        { error: "Failed to update location" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to update location" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -132,10 +118,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error in POST /api/location-sharing/location:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -181,10 +164,7 @@ export async function GET(request: NextRequest) {
       reportSupabaseException("getCurrentLocation", locationError, {
         id: user.id,
       });
-      return NextResponse.json(
-        { error: "Failed to fetch current location" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to fetch current location" }, { status: 500 });
     }
 
     const hasActiveLocation = (locationRows?.length ?? 0) > 0;
@@ -204,17 +184,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (nearbyError) {
-      reportSupabaseException(
-        "getNearbyGroupMembers",
-        nearbyError as PostgrestError,
-        {
-          id: user.id,
-        },
-      );
-      return NextResponse.json(
-        { error: "Failed to fetch nearby members" },
-        { status: 500 },
-      );
+      reportSupabaseException("getNearbyGroupMembers", nearbyError as PostgrestError, {
+        id: user.id,
+      });
+      return NextResponse.json({ error: "Failed to fetch nearby members" }, { status: 500 });
     }
 
     const currentLocation = locationRows?.[0] ?? null;
@@ -227,10 +200,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error in GET /api/location-sharing/location:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -242,10 +212,7 @@ export async function DELETE(request: NextRequest) {
 
     const festivalId = searchParams.get("festivalId");
     if (!festivalId) {
-      return NextResponse.json(
-        { error: "festivalId parameter is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "festivalId parameter is required" }, { status: 400 });
     }
 
     // Check authentication
@@ -267,19 +234,13 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       reportSupabaseException("stopLocationSharing", error, { id: user.id });
-      return NextResponse.json(
-        { error: "Failed to stop location sharing" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to stop location sharing" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error in DELETE /api/location-sharing/location:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

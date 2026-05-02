@@ -15,19 +15,14 @@ interface RankingsSlideProps {
 export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
   const { t } = useTranslation();
   const { top_3_rankings } = data.social_stats;
-  const { days_attended, total_beers, avg_beers } =
-    data.global_leaderboard_positions;
+  const { days_attended, total_beers, avg_beers } = data.global_leaderboard_positions;
 
   const hasGroupRankings = top_3_rankings.length > 0;
-  const hasGlobalPositions =
-    days_attended !== null || total_beers !== null || avg_beers !== null;
+  const hasGlobalPositions = days_attended !== null || total_beers !== null || avg_beers !== null;
 
   if (!hasGroupRankings && !hasGlobalPositions) {
     return (
-      <BaseSlide
-        isActive={isActive}
-        className="bg-gradient-to-br from-orange-50 to-red-50"
-      >
+      <BaseSlide isActive={isActive} className="bg-gradient-to-br from-orange-50 to-red-50">
         <SlideTitle>{t("wrapped.rankings.title")}</SlideTitle>
         <p className="text-gray-600">{t("wrapped.rankings.subtitle")}</p>
       </BaseSlide>
@@ -42,10 +37,7 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
   };
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-orange-50 to-red-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-orange-50 to-red-50">
       <SlideTitle>{t("wrapped.rankings.title")}</SlideTitle>
 
       <div className="flex w-full max-w-2xl flex-col gap-6">
@@ -69,15 +61,9 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
                   animate={isActive ? "visible" : "hidden"}
                   className="flex items-center justify-between rounded-lg bg-white p-3 shadow-lg"
                 >
-                  <span className="text-4xl">
-                    {getMedalEmoji(ranking.position)}
-                  </span>
-                  <p className="line-clamp-2 font-semibold text-gray-800">
-                    {ranking.group_name}
-                  </p>
-                  <span className="text-3xl font-bold text-yellow-600">
-                    #{ranking.position}
-                  </span>
+                  <span className="text-4xl">{getMedalEmoji(ranking.position)}</span>
+                  <p className="line-clamp-2 font-semibold text-gray-800">{ranking.group_name}</p>
+                  <span className="text-3xl font-bold text-yellow-600">#{ranking.position}</span>
                 </motion.div>
               ))}
             </div>
@@ -106,13 +92,9 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
                   <CalendarDays className="size-8" />
                   <div className="flex flex-col gap-1">
                     <p className="font-semibold text-gray-800">Days attended</p>
-                    <p className="text-sm text-gray-500">
-                      Position #{days_attended}
-                    </p>
+                    <p className="text-sm text-gray-500">Position #{days_attended}</p>
                   </div>
-                  <div className="text-3xl font-bold text-yellow-600">
-                    #{days_attended}
-                  </div>
+                  <div className="text-3xl font-bold text-yellow-600">#{days_attended}</div>
                 </motion.div>
               )}
 
@@ -130,13 +112,9 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
                   <Beer className="size-8" />
                   <div>
                     <p className="font-semibold text-gray-800">Total beers</p>
-                    <p className="text-sm text-gray-500">
-                      Position #{total_beers}
-                    </p>
+                    <p className="text-sm text-gray-500">Position #{total_beers}</p>
                   </div>
-                  <div className="text-3xl font-bold text-yellow-600">
-                    #{total_beers}
-                  </div>
+                  <div className="text-3xl font-bold text-yellow-600">#{total_beers}</div>
                 </motion.div>
               )}
 
@@ -154,13 +132,9 @@ export function RankingsSlide({ data, isActive = false }: RankingsSlideProps) {
                   <DiamondPercent className="size-8" />
                   <div>
                     <p className="font-semibold text-gray-800">Average beers</p>
-                    <p className="text-sm text-gray-500">
-                      Position #{avg_beers}
-                    </p>
+                    <p className="text-sm text-gray-500">Position #{avg_beers}</p>
                   </div>
-                  <div className="text-3xl font-bold text-yellow-600">
-                    #{avg_beers}
-                  </div>
+                  <div className="text-3xl font-bold text-yellow-600">#{avg_beers}</div>
                 </motion.div>
               )}
             </div>

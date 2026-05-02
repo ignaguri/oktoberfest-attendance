@@ -31,10 +31,7 @@ export class GroupService {
   /**
    * List groups for a user
    */
-  async listUserGroups(
-    userId: string,
-    query?: ListGroupsQuery,
-  ): Promise<GroupWithMembers[]> {
+  async listUserGroups(userId: string, query?: ListGroupsQuery): Promise<GroupWithMembers[]> {
     return await this.groupRepo.listUserGroups(userId, query);
   }
 
@@ -62,11 +59,7 @@ export class GroupService {
    * Join a group
    * Can join by group ID (if already member) or by invite token
    */
-  async joinGroup(
-    groupId: string,
-    userId: string,
-    inviteToken?: string,
-  ): Promise<void> {
+  async joinGroup(groupId: string, userId: string, inviteToken?: string): Promise<void> {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
@@ -107,11 +100,7 @@ export class GroupService {
    * Update group settings
    * Only the group creator can update
    */
-  async updateGroup(
-    groupId: string,
-    userId: string,
-    data: UpdateGroupInput,
-  ): Promise<Group> {
+  async updateGroup(groupId: string, userId: string, data: UpdateGroupInput): Promise<Group> {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
@@ -151,11 +140,7 @@ export class GroupService {
    * Remove a member from a group
    * Only the group creator can remove members (except themselves)
    */
-  async removeMember(
-    groupId: string,
-    requesterId: string,
-    targetUserId: string,
-  ): Promise<void> {
+  async removeMember(groupId: string, requesterId: string, targetUserId: string): Promise<void> {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
@@ -206,10 +191,7 @@ export class GroupService {
    * Get group gallery
    * Only group members can view the gallery
    */
-  async getGallery(
-    groupId: string,
-    userId: string,
-  ): Promise<GroupGalleryPhoto[]> {
+  async getGallery(groupId: string, userId: string): Promise<GroupGalleryPhoto[]> {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {

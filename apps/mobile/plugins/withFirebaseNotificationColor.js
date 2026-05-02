@@ -21,8 +21,7 @@ function withFirebaseNotificationColor(config) {
     }
 
     const metaDataArray = application["meta-data"];
-    const firebaseColorKey =
-      "com.google.firebase.messaging.default_notification_color";
+    const firebaseColorKey = "com.google.firebase.messaging.default_notification_color";
 
     // Find the Firebase notification color meta-data element
     const existingIndex = metaDataArray.findIndex(
@@ -32,9 +31,7 @@ function withFirebaseNotificationColor(config) {
     if (existingIndex >= 0) {
       // Add tools:replace to existing element
       metaDataArray[existingIndex].$["tools:replace"] = "android:resource";
-      console.log(
-        "Added tools:replace to existing Firebase notification color meta-data",
-      );
+      console.log("Added tools:replace to existing Firebase notification color meta-data");
     } else {
       // Add new meta-data element with tools:replace
       metaDataArray.push({
@@ -44,9 +41,7 @@ function withFirebaseNotificationColor(config) {
           "tools:replace": "android:resource",
         },
       });
-      console.log(
-        "Added Firebase notification color meta-data with tools:replace",
-      );
+      console.log("Added Firebase notification color meta-data with tools:replace");
     }
 
     return config;

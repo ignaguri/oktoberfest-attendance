@@ -20,11 +20,7 @@ interface AuthFooterLinkProps {
  * Displays a prefix text followed by a clickable link.
  * Used for navigation between auth screens (e.g., "Don't have an account? Sign Up").
  */
-export function AuthFooterLink({
-  prefix,
-  linkText,
-  href,
-}: AuthFooterLinkProps) {
+export function AuthFooterLink({ prefix, linkText, href }: AuthFooterLinkProps) {
   const router = useRouter();
 
   return (

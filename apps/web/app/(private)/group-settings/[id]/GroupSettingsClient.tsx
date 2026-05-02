@@ -27,11 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  useRemoveMember,
-  useRenewInviteToken,
-  useUpdateGroup,
-} from "@/hooks/useGroups";
+import { useRemoveMember, useRenewInviteToken, useUpdateGroup } from "@/hooks/useGroups";
 import { useWinningCriterias } from "@/hooks/useLeaderboard";
 import { useCurrentUser } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
@@ -80,8 +76,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   // Mutations
   const { mutateAsync: updateGroup, loading: isUpdating } = useUpdateGroup();
   const { mutateAsync: removeMember, loading: isRemoving } = useRemoveMember();
-  const { mutateAsync: renewToken, loading: isGeneratingToken } =
-    useRenewInviteToken();
+  const { mutateAsync: renewToken, loading: isGeneratingToken } = useRenewInviteToken();
 
   const {
     register,
@@ -172,8 +167,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       handleCopyToClipboard(newToken);
     } catch (error) {
       toast.error(t("notifications.error.tokenRegenFailed"), {
-        description:
-          error instanceof Error ? error.message : t("common.errors.generic"),
+        description: error instanceof Error ? error.message : t("common.errors.generic"),
       });
     }
   }, [isCreator, group.id, renewToken, handleCopyToClipboard, t]);
@@ -188,10 +182,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <Label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <Label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 {t("groups.create.nameLabel")}
               </Label>
               <Input
@@ -205,10 +196,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
             </div>
 
             <div>
-              <Label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <Label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 {t("groups.settings.descriptionLabel")}
               </Label>
               <Textarea
@@ -232,12 +220,10 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 id="winning_criteria_id"
                 options={[
                   {
-                    options: (winningCriterias ?? []).map(
-                      (criteria: WinningCriteriaOption) => ({
-                        value: criteria.id.toString(),
-                        label: t(`groups.winningCriteria.${criteria.name}`),
-                      }),
-                    ),
+                    options: (winningCriterias ?? []).map((criteria: WinningCriteriaOption) => ({
+                      value: criteria.id.toString(),
+                      label: t(`groups.winningCriteria.${criteria.name}`),
+                    })),
                   },
                 ]}
                 placeholder="Select winning criteria"
@@ -253,9 +239,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
             {isCreator && (
               <div>
                 <Button type="submit" variant="yellow" disabled={isUpdating}>
-                  {isUpdating
-                    ? t("common.buttons.loading")
-                    : t("groups.settings.updateButton")}
+                  {isUpdating ? t("common.buttons.loading") : t("groups.settings.updateButton")}
                 </Button>
               </div>
             )}
@@ -271,13 +255,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
               {t("groups.settings.inviteLink")}
             </h3>
             <div className="mb-4 space-y-2">
-              <p className="text-sm text-gray-600">
-                {t("groups.settings.inviteLinkDescription")}
-              </p>
+              <p className="text-sm text-gray-600">{t("groups.settings.inviteLinkDescription")}</p>
               <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
-                <p className="font-medium">
-                  {t("groups.settings.tokenExpiresTitle")}
-                </p>
+                <p className="font-medium">{t("groups.settings.tokenExpiresTitle")}</p>
                 <p>{t("groups.settings.tokenExpiresDescription")}</p>
               </div>
             </div>
@@ -328,9 +308,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
       )}
 
       <div className="mt-4">
-        <h3 className="mb-2 text-xl font-semibold">
-          {t("groups.settings.members")}
-        </h3>
+        <h3 className="mb-2 text-xl font-semibold">{t("groups.settings.members")}</h3>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -382,9 +360,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("groups.settings.confirmRemoveTitle")}</DialogTitle>
-            <DialogDescription>
-              {t("groups.settings.confirmRemoveDescription")}
-            </DialogDescription>
+            <DialogDescription>{t("groups.settings.confirmRemoveDescription")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
@@ -396,14 +372,8 @@ export default function GroupSettingsClient({ group, members }: Props) {
                 {t("common.buttons.cancel")}
               </Button>
             </DialogClose>
-            <Button
-              variant="destructive"
-              onClick={handleRemoveMember}
-              disabled={isRemoving}
-            >
-              {isRemoving
-                ? t("common.buttons.loading")
-                : t("common.buttons.confirm")}
+            <Button variant="destructive" onClick={handleRemoveMember} disabled={isRemoving}>
+              {isRemoving ? t("common.buttons.loading") : t("common.buttons.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

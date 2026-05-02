@@ -120,32 +120,19 @@ The existing PWA uses Next.js server actions for all backend logic. These are in
 ```typescript
 // packages/api/src/repositories/interfaces/attendance.repository.ts
 export interface IAttendanceRepository {
-  findByUserAndFestival(
-    userId: string,
-    festivalId: string,
-  ): Promise<Attendance[]>;
-  findByDate(
-    userId: string,
-    festivalId: string,
-    date: string,
-  ): Promise<Attendance | null>;
+  findByUserAndFestival(userId: string, festivalId: string): Promise<Attendance[]>;
+  findByDate(userId: string, festivalId: string, date: string): Promise<Attendance | null>;
   create(data: CreateAttendanceDTO): Promise<Attendance>;
   update(id: string, data: UpdateAttendanceDTO): Promise<Attendance>;
   delete(id: string): Promise<void>;
-  addConsumption(
-    attendanceId: string,
-    data: CreateConsumptionDTO,
-  ): Promise<Consumption>;
+  addConsumption(attendanceId: string, data: CreateConsumptionDTO): Promise<Consumption>;
 }
 
 // packages/api/src/repositories/supabase/attendance.repository.ts
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
   constructor(private supabase: SupabaseClient) {}
 
-  async findByUserAndFestival(
-    userId: string,
-    festivalId: string,
-  ): Promise<Attendance[]> {
+  async findByUserAndFestival(userId: string, festivalId: string): Promise<Attendance[]> {
     const { data, error } = await this.supabase
       .from("attendances")
       .select("*, consumptions(*), tent_visits(*, tent:tents(*))")
@@ -177,16 +164,9 @@ export class ConsumptionService {
     private notificationService: NotificationService,
   ) {}
 
-  async logConsumption(
-    userId: string,
-    data: LogConsumptionInput,
-  ): Promise<Attendance> {
+  async logConsumption(userId: string, data: LogConsumptionInput): Promise<Attendance> {
     // 1. Get or create attendance for date
-    let attendance = await this.attendanceRepo.findByDate(
-      userId,
-      data.festivalId,
-      data.date,
-    );
+    let attendance = await this.attendanceRepo.findByDate(userId, data.festivalId, data.date);
 
     if (!attendance) {
       attendance = await this.attendanceRepo.create({
@@ -197,10 +177,7 @@ export class ConsumptionService {
     }
 
     // 2. Get base price (tent override or festival default)
-    const basePrice = await this.festivalRepo.getBeerPrice(
-      data.festivalId,
-      data.tentId,
-    );
+    const basePrice = await this.festivalRepo.getBeerPrice(data.festivalId, data.tentId);
 
     // 3. Add consumption record with drink type
     await this.consumptionRepo.create({
@@ -218,19 +195,11 @@ export class ConsumptionService {
 
     // 5. Send tent check-in notification to groups (only for beer/radler)
     if (data.tentId && ["beer", "radler"].includes(data.drinkType ?? "beer")) {
-      this.notificationService.notifyTentCheckIn(
-        userId,
-        data.festivalId,
-        data.tentId,
-      );
+      this.notificationService.notifyTentCheckIn(userId, data.festivalId, data.tentId);
     }
 
     // 6. Return attendance with computed totals
-    return this.attendanceRepo.findByDateWithTotals(
-      userId,
-      data.festivalId,
-      data.date,
-    );
+    return this.attendanceRepo.findByDateWithTotals(userId, data.festivalId, data.date);
   }
 }
 ```
@@ -244,14 +213,7 @@ import { zValidator } from "@hono/zod-validator";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { z } from "zod";
 
-const DrinkTypeSchema = z.enum([
-  "beer",
-  "radler",
-  "alcohol_free",
-  "wine",
-  "soft_drink",
-  "other",
-]);
+const DrinkTypeSchema = z.enum(["beer", "radler", "alcohol_free", "wine", "soft_drink", "other"]);
 
 const LogConsumptionSchema = z.object({
   festivalId: z.string().uuid(),
@@ -295,16 +257,13 @@ const logConsumptionRoute = createRoute({
   },
 });
 
-export const attendanceRouter = new OpenAPIHono().openapi(
-  logAttendanceRoute,
-  async (c) => {
-    const user = c.get("user"); // From auth middleware
-    const body = c.req.valid("json");
+export const attendanceRouter = new OpenAPIHono().openapi(logAttendanceRoute, async (c) => {
+  const user = c.get("user"); // From auth middleware
+  const body = c.req.valid("json");
 
-    const attendance = await attendanceService.logAttendance(user.id, body);
-    return c.json(attendance);
-  },
-);
+  const attendance = await attendanceService.logAttendance(user.id, body);
+  return c.json(attendance);
+});
 ```
 
 ### 1.8 Type-Safe Client Generation
@@ -377,10 +336,7 @@ export const authMiddleware = createMiddleware(async (c, next) => {
   }
 
   const token = authHeader.slice(7);
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-  );
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
 
   const {
     data: { user },
@@ -559,12 +515,7 @@ prostcounter/
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": [
-    "NODE_ENV",
-    "SUPABASE_URL",
-    "SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_KEY"
-  ],
+  "globalEnv": ["NODE_ENV", "SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_KEY"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -1624,13 +1575,7 @@ interface WrappedData {
   timeline: { date; beers; spent; tents }[];
 
   personality: {
-    type:
-      | "Explorer"
-      | "Champion"
-      | "Loyalist"
-      | "Social Butterfly"
-      | "Consistent"
-      | "Casual";
+    type: "Explorer" | "Champion" | "Loyalist" | "Social Butterfly" | "Consistent" | "Casual";
     traits: string[];
   };
 
@@ -1923,8 +1868,7 @@ const queryKeys = {
 
   wrapped: (festivalId: string) => ["wrapped", festivalId] as const,
 
-  nearbyMembers: (festivalId: string) =>
-    ["location", "nearby", festivalId] as const,
+  nearbyMembers: (festivalId: string) => ["location", "nearby", festivalId] as const,
 };
 ```
 
@@ -2346,10 +2290,7 @@ export class WrappedService {
    * 2. After festival: Use cached data if available and not stale
    * 3. First request after festival end: Compute & cache permanently
    */
-  async getWrappedData(
-    userId: string,
-    festivalId: string,
-  ): Promise<WrappedData> {
+  async getWrappedData(userId: string, festivalId: string): Promise<WrappedData> {
     const festival = await this.festivalRepo.findById(festivalId);
     const isFestivalActive = festival.status !== "ended";
 
@@ -2400,10 +2341,7 @@ export class WrappedService {
   /**
    * Full wrapped computation - only run after festival ends
    */
-  private async computeFullWrapped(
-    userId: string,
-    festivalId: string,
-  ): Promise<WrappedData> {
+  private async computeFullWrapped(userId: string, festivalId: string): Promise<WrappedData> {
     // Run all expensive computations in parallel
     const [
       basicStats,
@@ -2457,9 +2395,7 @@ async function refreshFestivalStats() {
   `);
 
   if (activeFestival) {
-    await db.query(
-      "REFRESH MATERIALIZED VIEW CONCURRENTLY user_festival_stats",
-    );
+    await db.query("REFRESH MATERIALIZED VIEW CONCURRENTLY user_festival_stats");
   }
 }
 
@@ -2477,9 +2413,7 @@ async function precomputeAllWrapped(festivalId: string) {
 
   // Process in batches to avoid overload
   for (const batch of chunk(users, 50)) {
-    await Promise.all(
-      batch.map((user) => wrappedService.getWrappedData(user.id, festivalId)),
-    );
+    await Promise.all(batch.map((user) => wrappedService.getWrappedData(user.id, festivalId)));
   }
 }
 ```

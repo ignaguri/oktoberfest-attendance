@@ -32,10 +32,7 @@ describe("Photo Social Routes", () => {
     app.use("*", async (c, next) => {
       const authHeader = c.req.header("Authorization");
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
       c.set("user", mockUser);
       c.set("supabase", mockSupabase);
@@ -81,17 +78,11 @@ describe("Photo Social Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Fetch reactions
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockReactions)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockReactions)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -121,15 +112,11 @@ describe("Photo Social Routes", () => {
     it("should return empty reactions when none exist", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Fetch reactions - empty
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -158,16 +145,10 @@ describe("Photo Social Routes", () => {
       ];
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockReactions)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockReactions)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -188,16 +169,10 @@ describe("Photo Social Routes", () => {
       ];
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockReactions)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockReactions)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -210,9 +185,7 @@ describe("Photo Social Routes", () => {
         // Membership check returns null (not a member)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -221,9 +194,7 @@ describe("Photo Social Routes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const req = new Request(
-        `http://localhost/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = new Request(`http://localhost/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
@@ -232,26 +203,18 @@ describe("Photo Social Routes", () => {
     it("should return 500 when database query fails", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check succeeds
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Fetch reactions fails
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Database connection error")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Database connection error")));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(500);
     });
 
     it("should return 400 for invalid photoId format", async () => {
-      const req = createAuthRequest(
-        `/photos/invalid-uuid/reactions?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/invalid-uuid/reactions?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
@@ -263,9 +226,7 @@ describe("Photo Social Routes", () => {
     it("should add a reaction successfully", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Insert reaction
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
@@ -283,16 +244,11 @@ describe("Photo Social Routes", () => {
     it("should return 409 when reaction already exists (unique constraint)", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Insert fails with unique constraint violation
         .mockReturnValueOnce(
           createMockChain(
-            mockSupabaseError(
-              "duplicate key value violates unique constraint",
-              "23505",
-            ),
+            mockSupabaseError("duplicate key value violates unique constraint", "23505"),
           ),
         );
 
@@ -337,13 +293,9 @@ describe("Photo Social Routes", () => {
     it("should return 500 when insert fails with non-constraint error", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Insert fails with generic error
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Connection refused")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Connection refused")));
 
       const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions`, {
         method: "POST",
@@ -397,9 +349,7 @@ describe("Photo Social Routes", () => {
     it("should return 500 when delete fails", async () => {
       vi.mocked(mockSupabase.from)
         // Delete fails
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Database error")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Database error")));
 
       const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions`, {
         method: "DELETE",
@@ -446,17 +396,11 @@ describe("Photo Social Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Fetch comments
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockComments)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockComments)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -486,15 +430,11 @@ describe("Photo Social Routes", () => {
     it("should return empty comments list when none exist", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Fetch comments - empty
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -514,16 +454,10 @@ describe("Photo Social Routes", () => {
       ];
 
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess(mockComments)),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockComments)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -536,9 +470,7 @@ describe("Photo Social Routes", () => {
         // Membership check returns null
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -547,9 +479,7 @@ describe("Photo Social Routes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const req = new Request(
-        `http://localhost/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`,
-      );
+      const req = new Request(`http://localhost/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
@@ -558,26 +488,18 @@ describe("Photo Social Routes", () => {
     it("should return 500 when database query fails", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check succeeds
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Fetch comments fails
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Database connection error")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Database connection error")));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(500);
     });
 
     it("should return 400 for invalid photoId format", async () => {
-      const req = createAuthRequest(
-        `/photos/invalid-uuid/comments?groupId=${GROUP_ID}`,
-      );
+      const req = createAuthRequest(`/photos/invalid-uuid/comments?groupId=${GROUP_ID}`);
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
@@ -595,9 +517,7 @@ describe("Photo Social Routes", () => {
 
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Insert comment
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockComment)));
 
@@ -656,13 +576,9 @@ describe("Photo Social Routes", () => {
     it("should return 500 when insert fails", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })),
-        )
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
         // 2. Insert fails
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Insert failed")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Insert failed")));
 
       const req = createAuthRequest(`/photos/${PHOTO_ID}/comments`, {
         method: "POST",
@@ -695,16 +611,11 @@ describe("Photo Social Routes", () => {
     it("should delete own comment successfully", async () => {
       vi.mocked(mockSupabase.from)
         // Delete with count: "exact" returns count=1
-        .mockReturnValueOnce(
-          createMockChain({ data: null, error: null, count: 1 }),
-        );
+        .mockReturnValueOnce(createMockChain({ data: null, error: null, count: 1 }));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments/${COMMENT_ID}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments/${COMMENT_ID}`, {
+        method: "DELETE",
+      });
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -715,16 +626,11 @@ describe("Photo Social Routes", () => {
     it("should return 404 when comment not found or not owned by user", async () => {
       vi.mocked(mockSupabase.from)
         // Delete with count: "exact" returns count=0
-        .mockReturnValueOnce(
-          createMockChain({ data: null, error: null, count: 0 }),
-        );
+        .mockReturnValueOnce(createMockChain({ data: null, error: null, count: 0 }));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments/${COMMENT_ID}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments/${COMMENT_ID}`, {
+        method: "DELETE",
+      });
       const res = await app.request(req as Request);
       const json = (await res.json()) as any;
 
@@ -733,12 +639,9 @@ describe("Photo Social Routes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const req = new Request(
-        `http://localhost/photos/${PHOTO_ID}/comments/${COMMENT_ID}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = new Request(`http://localhost/photos/${PHOTO_ID}/comments/${COMMENT_ID}`, {
+        method: "DELETE",
+      });
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(401);
@@ -747,40 +650,29 @@ describe("Photo Social Routes", () => {
     it("should return 500 when delete fails", async () => {
       vi.mocked(mockSupabase.from)
         // Delete fails with error
-        .mockReturnValueOnce(
-          createMockChain(mockSupabaseError("Database error")),
-        );
+        .mockReturnValueOnce(createMockChain(mockSupabaseError("Database error")));
 
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments/${COMMENT_ID}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments/${COMMENT_ID}`, {
+        method: "DELETE",
+      });
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(500);
     });
 
     it("should return 400 for invalid photoId format", async () => {
-      const req = createAuthRequest(
-        `/photos/invalid-uuid/comments/${COMMENT_ID}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = createAuthRequest(`/photos/invalid-uuid/comments/${COMMENT_ID}`, {
+        method: "DELETE",
+      });
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
     });
 
     it("should return 400 for invalid commentId format", async () => {
-      const req = createAuthRequest(
-        `/photos/${PHOTO_ID}/comments/invalid-uuid`,
-        {
-          method: "DELETE",
-        },
-      );
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/comments/invalid-uuid`, {
+        method: "DELETE",
+      });
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);

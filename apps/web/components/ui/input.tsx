@@ -6,9 +6,7 @@ import { cn } from "@/lib/utils";
 
 // Extend the contract with web-specific implementation props
 export interface InputProps
-  extends
-    Omit<React.ComponentProps<"input">, keyof InputPropsContract>,
-    InputPropsContract {
+  extends Omit<React.ComponentProps<"input">, keyof InputPropsContract>, InputPropsContract {
   rightElement?: React.ReactNode;
 }
 
@@ -19,19 +17,12 @@ function isTranslationKey(str: string): boolean {
   return /^[a-zA-Z]+(\.[a-zA-Z_]+)+$/.test(str);
 }
 
-function Input({
-  className,
-  type,
-  errorMsg,
-  rightElement,
-  ...props
-}: InputProps) {
+function Input({ className, type, errorMsg, rightElement, ...props }: InputProps) {
   const { t } = useTranslation();
   const errorId = React.useId();
 
   // Translate error message if it looks like a translation key
-  const translatedErrorMsg =
-    errorMsg && isTranslationKey(errorMsg) ? t(errorMsg) : errorMsg;
+  const translatedErrorMsg = errorMsg && isTranslationKey(errorMsg) ? t(errorMsg) : errorMsg;
 
   return (
     <div className="w-full">
@@ -53,9 +44,7 @@ function Input({
           {...props}
         />
         {rightElement && (
-          <div className="absolute inset-y-0 right-0 flex items-center">
-            {rightElement}
-          </div>
+          <div className="absolute inset-y-0 right-0 flex items-center">{rightElement}</div>
         )}
       </div>
       {translatedErrorMsg && (

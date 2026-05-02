@@ -188,11 +188,9 @@ app.openapi(sendRequestRoute, async (c) => {
   const novuApiKey = process.env.NOVU_API_KEY;
   if (novuApiKey) {
     const notificationService = new NotificationService(supabase, novuApiKey);
-    notificationService
-      .notifyFriendRequest(user.id, addresseeId)
-      .catch((err) => {
-        logger.error({ err }, "[friend-request] notification failed");
-      });
+    notificationService.notifyFriendRequest(user.id, addresseeId).catch((err) => {
+      logger.error({ err }, "[friend-request] notification failed");
+    });
   }
 
   return c.json(result, 200);

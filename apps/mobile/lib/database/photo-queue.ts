@@ -185,14 +185,7 @@ export async function savePendingPhoto(
       id, attendance_id, user_id, picture_url, visibility, created_at,
       _synced_at, _deleted, _dirty, _pending_upload, _local_uri
     ) VALUES (?, ?, ?, NULL, ?, ?, NULL, 0, 1, 1, ?)`,
-    [
-      photoId,
-      input.attendanceId,
-      input.userId,
-      input.visibility || "public",
-      now,
-      permanentPath,
-    ],
+    [photoId, input.attendanceId, input.userId, input.visibility || "public", now, permanentPath],
   );
 
   // Queue upload operation
@@ -304,9 +297,7 @@ export async function getPendingPhotosForAttendance(
 /**
  * Get all pending photos across all attendances
  */
-export async function getAllPendingPhotos(
-  db: SQLite.SQLiteDatabase,
-): Promise<LocalBeerPicture[]> {
+export async function getAllPendingPhotos(db: SQLite.SQLiteDatabase): Promise<LocalBeerPicture[]> {
   return db.getAllAsync<LocalBeerPicture>(
     `SELECT * FROM beer_pictures
      WHERE _deleted = 0
@@ -391,9 +382,7 @@ export interface UploadPhotoOptions {
         fileType: string;
         fileSize: number;
       }) => Promise<{ uploadUrl: string; pictureId: string }>;
-      confirmUpload: (
-        pictureId: string,
-      ) => Promise<{ id: string; pictureUrl: string }>;
+      confirmUpload: (pictureId: string) => Promise<{ id: string; pictureUrl: string }>;
     };
   };
   /** Compression options */
@@ -479,12 +468,7 @@ export async function uploadPendingPhoto(
            _dirty = 0,
            _synced_at = ?
        WHERE id = ?`,
-      [
-        confirmedPhoto.id,
-        confirmedPhoto.pictureUrl,
-        new Date().toISOString(),
-        photo.id,
-      ],
+      [confirmedPhoto.id, confirmedPhoto.pictureUrl, new Date().toISOString(), photo.id],
     );
 
     // 6. Clean up local file
@@ -533,9 +517,7 @@ export async function processPendingPhotoUploads(
     };
   }
 
-  logger.debug(
-    `[PhotoQueue] Processing ${pendingPhotos.length} pending photos`,
-  );
+  logger.debug(`[PhotoQueue] Processing ${pendingPhotos.length} pending photos`);
 
   const results: PhotoUploadResult[] = [];
   let succeeded = 0;
@@ -552,9 +534,7 @@ export async function processPendingPhotoUploads(
     }
   }
 
-  logger.debug(
-    `[PhotoQueue] Upload complete: ${succeeded} succeeded, ${failed} failed`,
-  );
+  logger.debug(`[PhotoQueue] Upload complete: ${succeeded} succeeded, ${failed} failed`);
 
   return {
     processed: pendingPhotos.length,
@@ -590,12 +570,7 @@ export async function runUploadFileOp(
     return;
   }
 
-  const result = await uploadPendingPhoto(
-    db,
-    photo,
-    payload.festivalId,
-    options,
-  );
+  const result = await uploadPendingPhoto(db, photo, payload.festivalId, options);
 
   if (!result.success) {
     throw new Error(result.error || "Photo upload failed");
@@ -629,9 +604,7 @@ export async function cleanupLocalPhoto(localUri: string): Promise<void> {
  * Clean up all orphaned local photos
  * (Photos that exist in FileSystem but not in database)
  */
-export async function cleanupOrphanedPhotos(
-  db: SQLite.SQLiteDatabase,
-): Promise<number> {
+export async function cleanupOrphanedPhotos(db: SQLite.SQLiteDatabase): Promise<number> {
   const dirPath = getPendingUploadsDir();
   const dirInfo = await getInfoAsync(dirPath);
 
@@ -708,9 +681,7 @@ export interface PhotoQueueStats {
 /**
  * Get photo queue statistics
  */
-export async function getPhotoQueueStats(
-  db: SQLite.SQLiteDatabase,
-): Promise<PhotoQueueStats> {
+export async function getPhotoQueueStats(db: SQLite.SQLiteDatabase): Promise<PhotoQueueStats> {
   const totalResult = await db.getFirstAsync<{ count: number }>(
     "SELECT COUNT(*) as count FROM beer_pictures WHERE _deleted = 0",
   );

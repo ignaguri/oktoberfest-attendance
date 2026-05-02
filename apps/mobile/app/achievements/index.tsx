@@ -65,9 +65,7 @@ export default function AchievementsScreen() {
 
   // Offline state — achievements require server-side progress calculation
   if (!isOnline) {
-    return (
-      <OfflineScreen messageKey="common.offline.achievementsUnavailable" />
-    );
+    return <OfflineScreen messageKey="common.offline.achievementsUnavailable" />;
   }
 
   // Loading state (initial or festival loading)
@@ -84,11 +82,7 @@ export default function AchievementsScreen() {
     return (
       <ScrollView className="flex-1 bg-background-50">
         <VStack space="md" className="p-4">
-          <Card
-            variant="outline"
-            size="md"
-            className="items-center bg-white p-6"
-          >
+          <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Award size={48} color={IconColors.disabled} />
             <Text className="mt-2 text-center text-typography-500">
               {t("achievements.noFestival")}
@@ -114,15 +108,9 @@ export default function AchievementsScreen() {
         }
       >
         <VStack space="md" className="p-4">
-          <Card
-            variant="outline"
-            size="md"
-            className="items-center bg-white p-6"
-          >
+          <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Award size={48} color={IconColors.error} />
-            <Text className="mt-2 text-center text-error-600">
-              {t("achievements.error")}
-            </Text>
+            <Text className="mt-2 text-center text-error-600">{t("achievements.error")}</Text>
             <Text className="mt-1 text-center text-sm text-typography-400">
               {t("common.actions.pullToRefresh")}
             </Text>
@@ -156,10 +144,7 @@ export default function AchievementsScreen() {
             </Heading>
             <VStack space="sm">
               {unlockedAchievements.map((achievement) => (
-                <AchievementCard
-                  key={achievement.id}
-                  achievement={achievement}
-                />
+                <AchievementCard key={achievement.id} achievement={achievement} />
               ))}
             </VStack>
           </VStack>
@@ -173,11 +158,7 @@ export default function AchievementsScreen() {
             </Heading>
             <VStack space="sm">
               {lockedAchievements.map((achievement) => (
-                <AchievementCard
-                  key={achievement.id}
-                  achievement={achievement}
-                  showProgress
-                />
+                <AchievementCard key={achievement.id} achievement={achievement} showProgress />
               ))}
             </VStack>
           </VStack>
@@ -185,15 +166,9 @@ export default function AchievementsScreen() {
 
         {/* Empty State */}
         {achievements.length === 0 && (
-          <Card
-            variant="outline"
-            size="md"
-            className="items-center bg-white p-6"
-          >
+          <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Award size={48} color={IconColors.muted} />
-            <Text className="mt-2 text-center text-typography-500">
-              {t("achievements.empty")}
-            </Text>
+            <Text className="mt-2 text-center text-typography-500">{t("achievements.empty")}</Text>
           </Card>
         )}
       </VStack>

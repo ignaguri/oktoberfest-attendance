@@ -33,12 +33,7 @@ import { searchKeys } from "@/lib/data/search-query-keys";
 import { logger } from "@/lib/logger";
 import { getAvatarUrl } from "@/lib/utils";
 
-import {
-  deleteGroup,
-  getGroupMembers,
-  getWinningCriteria,
-  updateGroup,
-} from "../actions";
+import { deleteGroup, getGroupMembers, getWinningCriteria, updateGroup } from "../actions";
 
 const GroupEditForm = ({
   group,
@@ -110,14 +105,10 @@ const GroupEditForm = ({
         </Label>
         <Select
           value={selectedCriteriaId?.toString()}
-          onValueChange={(value) =>
-            setValue("winning_criteria_id", parseInt(value))
-          }
+          onValueChange={(value) => setValue("winning_criteria_id", parseInt(value))}
         >
           <SelectTrigger>
-            <SelectValue
-              placeholder={t("admin.groups.form.winningCriteriaPlaceholder")}
-            />
+            <SelectValue placeholder={t("admin.groups.form.winningCriteriaPlaceholder")} />
           </SelectTrigger>
           <SelectContent>
             {winningCriteria.map((criteria) => (
@@ -139,23 +130,16 @@ const GroupEditForm = ({
         </Label>
         <div className="max-h-40 overflow-y-auto rounded-md border p-2">
           {members.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              {t("admin.groups.form.membersEmpty")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("admin.groups.form.membersEmpty")}</p>
           ) : (
             <div className="space-y-2">
               {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="bg-muted flex items-center gap-2 rounded p-2"
-                >
+                <div key={member.id} className="bg-muted flex items-center gap-2 rounded p-2">
                   <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full">
                     {member.profiles.avatar_url ? (
                       <Image
                         src={getAvatarUrl(member.profiles.avatar_url) || ""}
-                        alt={
-                          member.profiles.full_name || member.profiles.username
-                        }
+                        alt={member.profiles.full_name || member.profiles.username}
                         width={32}
                         height={32}
                         className="h-8 w-8 rounded-full"
@@ -189,9 +173,7 @@ const GroupEditForm = ({
 
       {/* Invite Token Section */}
       <div>
-        <Label className="mb-2 block font-semibold">
-          {t("admin.groups.form.inviteLink")}
-        </Label>
+        <Label className="mb-2 block font-semibold">{t("admin.groups.form.inviteLink")}</Label>
 
         <div className="space-y-3">
           <div className="flex space-x-2">
@@ -246,14 +228,10 @@ const GroupEditForm = ({
 const GroupList = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [selectedGroup, setSelectedGroup] = useState<Tables<"groups"> | null>(
-    null,
-  );
+  const [selectedGroup, setSelectedGroup] = useState<Tables<"groups"> | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog
   const [members, setMembers] = useState<any[]>([]);
-  const [winningCriteria, setWinningCriteria] = useState<
-    Tables<"winning_criteria">[]
-  >([]);
+  const [winningCriteria, setWinningCriteria] = useState<Tables<"winning_criteria">[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
@@ -303,9 +281,7 @@ const GroupList = () => {
 
     setIsGeneratingToken(true);
     try {
-      const { inviteToken: newToken } = await apiClient.groups.renewToken(
-        selectedGroup.id,
-      );
+      const { inviteToken: newToken } = await apiClient.groups.renewToken(selectedGroup.id);
       setInviteToken(newToken);
       toast.success(t("notifications.success.tokenRegenerated"), {
         description: t("notifications.descriptions.tokenRegenerated"),

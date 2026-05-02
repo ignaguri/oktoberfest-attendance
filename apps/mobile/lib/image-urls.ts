@@ -3,10 +3,7 @@
  * Uses direct Supabase storage URLs
  */
 
-import {
-  createGetAvatarUrl,
-  createGetBeerPictureUrl,
-} from "@prostcounter/shared";
+import { createGetAvatarUrl, createGetBeerPictureUrl } from "@prostcounter/shared";
 
 import { logger } from "./logger";
 import { supabaseUrl } from "./supabase";

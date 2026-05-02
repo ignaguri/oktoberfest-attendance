@@ -1,14 +1,8 @@
 import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useGroupLeaderboard,
-  useGroupSettings,
-} from "@prostcounter/shared/hooks";
+import { useGroupLeaderboard, useGroupSettings } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  LeaderboardEntry,
-  WinningCriteria,
-} from "@prostcounter/shared/schemas";
+import type { LeaderboardEntry, WinningCriteria } from "@prostcounter/shared/schemas";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -95,9 +89,7 @@ export default function GroupDetailScreen() {
   const group = groupResponse?.data;
 
   // Fetch leaderboard
-  const criteriaId = group
-    ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria]
-    : 0;
+  const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;
   const {
     data: leaderboardData,
     loading: isLoadingLeaderboard,
@@ -116,17 +108,11 @@ export default function GroupDetailScreen() {
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
 
   // Sorting state for leaderboard
-  const [sortColumn, setSortColumn] = useState<WinningCriteria | undefined>(
-    undefined,
-  );
+  const [sortColumn, setSortColumn] = useState<WinningCriteria | undefined>(undefined);
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
-  const shareMessage = group
-    ? t("groups.share.message", { name: group.name })
-    : "";
-  const shareUrl = group?.inviteToken
-    ? buildGroupInviteUrl(group.inviteToken)
-    : "";
+  const shareMessage = group ? t("groups.share.message", { name: group.name }) : "";
+  const shareUrl = group?.inviteToken ? buildGroupInviteUrl(group.inviteToken) : "";
   const shareText = group?.inviteToken ? `${shareMessage}\n\n${shareUrl}` : "";
 
   const handleShare = useCallback(() => {
@@ -148,10 +134,7 @@ export default function GroupDetailScreen() {
         await Linking.openURL(whatsappUrl);
         setIsShareSheetOpen(false);
       } else {
-        showDialog(
-          t("common.status.error"),
-          t("groups.share.whatsappNotInstalled"),
-        );
+        showDialog(t("common.status.error"), t("groups.share.whatsappNotInstalled"));
       }
     } catch (error) {
       logger.error("Failed to open WhatsApp:", error);
@@ -197,13 +180,10 @@ export default function GroupDetailScreen() {
   }, []);
 
   // Handle sort change
-  const handleSortChange = useCallback(
-    (criteria: WinningCriteria, order: SortOrder) => {
-      setSortColumn(criteria);
-      setSortOrder(order);
-    },
-    [],
-  );
+  const handleSortChange = useCallback((criteria: WinningCriteria, order: SortOrder) => {
+    setSortColumn(criteria);
+    setSortOrder(order);
+  }, []);
 
   // Handle gallery navigation
   const handleGallery = useCallback(() => {
@@ -244,15 +224,8 @@ export default function GroupDetailScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <Users size={48} color={IconColors.disabled} />
-        <Text className="mt-4 text-center text-typography-500">
-          {t("groups.detail.notFound")}
-        </Text>
-        <Button
-          variant="outline"
-          action="secondary"
-          className="mt-4"
-          onPress={() => router.back()}
-        >
+        <Text className="mt-4 text-center text-typography-500">{t("groups.detail.notFound")}</Text>
+        <Button variant="outline" action="secondary" className="mt-4" onPress={() => router.back()}>
           <ButtonText>{t("common.buttons.goBack")}</ButtonText>
         </Button>
       </View>
@@ -266,12 +239,7 @@ export default function GroupDetailScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
         className="flex-1 bg-background-50"
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching ?? false}
-            onRefresh={onRefresh}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={onRefresh} />}
       >
         <VStack space="lg" className="p-4">
           {/* Group Info Card */}
@@ -291,88 +259,44 @@ export default function GroupDetailScreen() {
                     </Text>
                   </HStack>
                 </VStack>
-                <Badge
-                  action="warning"
-                  variant="solid"
-                  size="md"
-                  className="bg-primary-500"
-                >
+                <Badge action="warning" variant="solid" size="md" className="bg-primary-500">
                   <Trophy size={12} color={IconColors.white} />
-                  <BadgeText className="ml-1 text-white">
-                    {criteriaLabel}
-                  </BadgeText>
+                  <BadgeText className="ml-1 text-white">{criteriaLabel}</BadgeText>
                 </Badge>
               </HStack>
 
               {/* Description */}
               {group.description && (
-                <Text className="text-sm text-typography-600">
-                  {group.description}
-                </Text>
+                <Text className="text-sm text-typography-600">{group.description}</Text>
               )}
 
               {/* Action Buttons */}
               <HStack space="sm" className="mt-2 flex-wrap">
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  size="sm"
-                  onPress={handleShare}
-                >
+                <Button variant="outline" action="secondary" size="sm" onPress={handleShare}>
                   <Share2 size={16} color={IconColors.default} />
-                  <ButtonText className="ml-1">
-                    {t("groups.actions.share")}
-                  </ButtonText>
+                  <ButtonText className="ml-1">{t("groups.actions.share")}</ButtonText>
                 </Button>
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  size="sm"
-                  onPress={handleQRCode}
-                >
+                <Button variant="outline" action="secondary" size="sm" onPress={handleQRCode}>
                   <QrCode size={16} color={IconColors.default} />
-                  <ButtonText className="ml-1">
-                    {t("groups.actions.qrCode")}
-                  </ButtonText>
+                  <ButtonText className="ml-1">{t("groups.actions.qrCode")}</ButtonText>
                 </Button>
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  size="sm"
-                  onPress={handleGallery}
-                >
+                <Button variant="outline" action="secondary" size="sm" onPress={handleGallery}>
                   {/* eslint-disable-next-line jsx-a11y/alt-text */}
                   <Image
                     size={16}
                     color={IconColors.default}
                     accessibilityLabel={t("groups.actions.gallery")}
                   />
-                  <ButtonText className="ml-1">
-                    {t("groups.actions.gallery")}
-                  </ButtonText>
+                  <ButtonText className="ml-1">{t("groups.actions.gallery")}</ButtonText>
                 </Button>
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  size="sm"
-                  onPress={handleMessages}
-                >
+                <Button variant="outline" action="secondary" size="sm" onPress={handleMessages}>
                   <MessageCircle size={16} color={IconColors.default} />
-                  <ButtonText className="ml-1">
-                    {t("groups.actions.messages")}
-                  </ButtonText>
+                  <ButtonText className="ml-1">{t("groups.actions.messages")}</ButtonText>
                 </Button>
                 {isCreator && (
-                  <Button
-                    variant="solid"
-                    action="primary"
-                    size="sm"
-                    onPress={handleSettings}
-                  >
+                  <Button variant="solid" action="primary" size="sm" onPress={handleSettings}>
                     <Settings size={16} color={IconColors.white} />
-                    <ButtonText className="ml-1">
-                      {t("groups.actions.settings")}
-                    </ButtonText>
+                    <ButtonText className="ml-1">{t("groups.actions.settings")}</ButtonText>
                   </Button>
                 )}
               </HStack>
@@ -387,9 +311,7 @@ export default function GroupDetailScreen() {
               </Text>
               {isLoadingLeaderboard && <Spinner size="small" />}
             </HStack>
-            <Text className="text-xs text-typography-400">
-              {t("leaderboard.scoringNote")}
-            </Text>
+            <Text className="text-xs text-typography-400">{t("leaderboard.scoringNote")}</Text>
 
             <Leaderboard
               entries={(leaderboardData as LeaderboardEntry[]) || []}
@@ -412,11 +334,7 @@ export default function GroupDetailScreen() {
           <AlertDialogHeader>
             <Heading
               size="lg"
-              className={
-                dialog.type === "destructive"
-                  ? "text-error-600"
-                  : "text-typography-950"
-              }
+              className={dialog.type === "destructive" ? "text-error-600" : "text-typography-950"}
             >
               {dialog.title}
             </Heading>
@@ -447,10 +365,7 @@ export default function GroupDetailScreen() {
       )}
 
       {/* Share Action Sheet */}
-      <Actionsheet
-        isOpen={isShareSheetOpen}
-        onClose={() => setIsShareSheetOpen(false)}
-      >
+      <Actionsheet isOpen={isShareSheetOpen} onClose={() => setIsShareSheetOpen(false)}>
         <ActionsheetBackdrop />
         <ActionsheetContent>
           <ActionsheetDragIndicatorWrapper>
@@ -462,21 +377,15 @@ export default function GroupDetailScreen() {
             </Text>
             <ActionsheetItem onPress={shareViaWhatsApp}>
               <MessageCircle size={20} color={IconColors.primary} />
-              <ActionsheetItemText>
-                {t("groups.share.viaWhatsApp")}
-              </ActionsheetItemText>
+              <ActionsheetItemText>{t("groups.share.viaWhatsApp")}</ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={copyToClipboard}>
               <Copy size={20} color={IconColors.default} />
-              <ActionsheetItemText>
-                {t("groups.share.copyToClipboard")}
-              </ActionsheetItemText>
+              <ActionsheetItemText>{t("groups.share.copyToClipboard")}</ActionsheetItemText>
             </ActionsheetItem>
             <ActionsheetItem onPress={openNativeShare}>
               <MoreHorizontal size={20} color={IconColors.default} />
-              <ActionsheetItemText>
-                {t("groups.share.moreOptions")}
-              </ActionsheetItemText>
+              <ActionsheetItemText>{t("groups.share.moreOptions")}</ActionsheetItemText>
             </ActionsheetItem>
           </VStack>
         </ActionsheetContent>

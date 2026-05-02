@@ -14,21 +14,9 @@ interface ComparisonsSlideProps {
   isActive: boolean;
 }
 
-function DiffIndicator({
-  value,
-  suffix = "",
-}: {
-  value: number;
-  suffix?: string;
-}) {
+function DiffIndicator({ value, suffix = "" }: { value: number; suffix?: string }) {
   const isPositive = value > 0;
-  const color = cn(
-    isPositive
-      ? "text-green-600"
-      : value < 0
-        ? "text-red-500"
-        : "text-gray-500",
-  );
+  const color = cn(isPositive ? "text-green-600" : value < 0 ? "text-red-500" : "text-gray-500");
   const sign = value > 0 ? "+" : "";
 
   return (
@@ -46,9 +34,7 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
   return (
     <BaseSlide isActive={isActive} backgroundClassName={cn("bg-teal-50")}>
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.comparisons.title")}
-        </SlideTitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.comparisons.title")}</SlideTitle>
 
         {/* vs Festival Average */}
         <VStack space="sm">
@@ -69,13 +55,8 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
               transition={{ type: "timing", duration: 400, delay: 300 }}
               className="flex-1 items-center rounded-2xl bg-white/70 p-4"
             >
-              <Text className="text-sm text-gray-500">
-                {t("wrapped.comparisons.beers")}
-              </Text>
-              <DiffIndicator
-                value={data.comparisons.vs_festival_avg.beers_diff_pct}
-                suffix="%"
-              />
+              <Text className="text-sm text-gray-500">{t("wrapped.comparisons.beers")}</Text>
+              <DiffIndicator value={data.comparisons.vs_festival_avg.beers_diff_pct} suffix="%" />
             </Motion.View>
             <Motion.View
               initial={{ opacity: 0, y: 20 }}
@@ -83,13 +64,8 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
               transition={{ type: "timing", duration: 400, delay: 450 }}
               className="flex-1 items-center rounded-2xl bg-white/70 p-4"
             >
-              <Text className="text-sm text-gray-500">
-                {t("wrapped.comparisons.days")}
-              </Text>
-              <DiffIndicator
-                value={data.comparisons.vs_festival_avg.days_diff_pct}
-                suffix="%"
-              />
+              <Text className="text-sm text-gray-500">{t("wrapped.comparisons.days")}</Text>
+              <DiffIndicator value={data.comparisons.vs_festival_avg.days_diff_pct} suffix="%" />
             </Motion.View>
           </HStack>
         </VStack>
@@ -106,8 +82,7 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
                 {t("wrapped.comparisons.vsLastYear")}
               </Text>
               <Text className="text-center text-xs text-gray-400">
-                {t("wrapped.comparisons.vs")}{" "}
-                {data.comparisons.vs_last_year.prev_festival_name}
+                {t("wrapped.comparisons.vs")} {data.comparisons.vs_last_year.prev_festival_name}
               </Text>
             </Motion.View>
 
@@ -118,12 +93,8 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
                 transition={{ type: "timing", duration: 400, delay: 700 }}
                 className="flex-1 items-center rounded-2xl bg-white/70 p-4"
               >
-                <Text className="text-sm text-gray-500">
-                  {t("wrapped.comparisons.beers")}
-                </Text>
-                <DiffIndicator
-                  value={data.comparisons.vs_last_year.beers_diff}
-                />
+                <Text className="text-sm text-gray-500">{t("wrapped.comparisons.beers")}</Text>
+                <DiffIndicator value={data.comparisons.vs_last_year.beers_diff} />
               </Motion.View>
               <Motion.View
                 initial={{ opacity: 0, y: 20 }}
@@ -131,12 +102,8 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
                 transition={{ type: "timing", duration: 400, delay: 850 }}
                 className="flex-1 items-center rounded-2xl bg-white/70 p-4"
               >
-                <Text className="text-sm text-gray-500">
-                  {t("wrapped.comparisons.days")}
-                </Text>
-                <DiffIndicator
-                  value={data.comparisons.vs_last_year.days_diff}
-                />
+                <Text className="text-sm text-gray-500">{t("wrapped.comparisons.days")}</Text>
+                <DiffIndicator value={data.comparisons.vs_last_year.days_diff} />
               </Motion.View>
             </HStack>
           </VStack>

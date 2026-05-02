@@ -84,9 +84,7 @@ export function LocationPermissionPrompt({
                   >
                     <benefit.icon size={20} color={Colors.primary[500]} />
                   </View>
-                  <Text className="flex-1 text-sm text-typography-700">
-                    {benefit.text}
-                  </Text>
+                  <Text className="flex-1 text-sm text-typography-700">{benefit.text}</Text>
                 </HStack>
               ))}
             </VStack>
@@ -117,9 +115,7 @@ export function LocationPermissionPrompt({
             }}
             accessibilityLabel={t("location.skip")}
           >
-            <ButtonText className="text-typography-500">
-              {t("location.skip")}
-            </ButtonText>
+            <ButtonText className="text-typography-500">{t("location.skip")}</ButtonText>
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

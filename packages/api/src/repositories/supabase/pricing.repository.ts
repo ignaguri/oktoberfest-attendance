@@ -1,9 +1,5 @@
 import type { Database } from "@prostcounter/db";
-import type {
-  DrinkType,
-  GetDrinkPriceResponse,
-  PriceSource,
-} from "@prostcounter/shared";
+import type { DrinkType, GetDrinkPriceResponse, PriceSource } from "@prostcounter/shared";
 import { DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -57,8 +53,7 @@ export class SupabasePricingRepository {
           .eq("drink_type", drinkType)
           .limit(1);
 
-        source =
-          festivalPrice && festivalPrice.length > 0 ? "festival" : "default";
+        source = festivalPrice && festivalPrice.length > 0 ? "festival" : "default";
       }
     } else {
       // No tent, check festival
@@ -69,8 +64,7 @@ export class SupabasePricingRepository {
         .eq("drink_type", drinkType)
         .limit(1);
 
-      source =
-        festivalPrice && festivalPrice.length > 0 ? "festival" : "default";
+      source = festivalPrice && festivalPrice.length > 0 ? "festival" : "default";
     }
 
     return {
@@ -82,9 +76,7 @@ export class SupabasePricingRepository {
   /**
    * Get all drink prices for a festival (defaults only, not tent overrides)
    */
-  async getFestivalPrices(
-    festivalId: string,
-  ): Promise<Record<DrinkType, number>> {
+  async getFestivalPrices(festivalId: string): Promise<Record<DrinkType, number>> {
     const { data, error } = await this.supabase
       .from("drink_type_prices")
       .select("drink_type, price_cents")

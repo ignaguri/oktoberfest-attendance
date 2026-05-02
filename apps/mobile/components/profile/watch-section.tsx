@@ -1,13 +1,6 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  Check,
-  CircleDashed,
-  Radio,
-  RefreshCw,
-  Watch,
-  X,
-} from "lucide-react-native";
+import { Check, CircleDashed, Radio, RefreshCw, Watch, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { Platform } from "react-native";
 
@@ -55,9 +48,7 @@ export function WatchSection() {
       render: () => (
         <HStack className="items-center gap-2 rounded-lg bg-success-500 px-4 py-3">
           <Check size={18} color={Colors.white} />
-          <Text className="font-medium text-white">
-            {t("profile.appleWatch.syncSuccess")}
-          </Text>
+          <Text className="font-medium text-white">{t("profile.appleWatch.syncSuccess")}</Text>
         </HStack>
       ),
     });
@@ -115,9 +106,7 @@ export function WatchSection() {
       </Text>
 
       {!isPaired ? (
-        <Text className="text-sm text-typography-500">
-          {t("profile.appleWatch.notPaired")}
-        </Text>
+        <Text className="text-sm text-typography-500">{t("profile.appleWatch.notPaired")}</Text>
       ) : !isWatchAppInstalled ? (
         <VStack space="xs">
           <Text className="text-sm text-typography-900">
@@ -130,10 +119,7 @@ export function WatchSection() {
       ) : (
         <VStack space="md">
           <HStack className="flex-wrap gap-2">
-            <StatusPill
-              label={t("profile.appleWatch.status.paired")}
-              active={isPaired}
-            />
+            <StatusPill label={t("profile.appleWatch.status.paired")} active={isPaired} />
             <StatusPill
               label={t("profile.appleWatch.status.installed")}
               active={isWatchAppInstalled}
@@ -165,9 +151,7 @@ export function WatchSection() {
               action="secondary"
               onPress={handlePing}
               disabled={!isReachable || isPinging}
-              accessibilityLabel={t(
-                "profile.appleWatch.testConnectionA11yLabel",
-              )}
+              accessibilityLabel={t("profile.appleWatch.testConnectionA11yLabel")}
               accessibilityHint={t("profile.appleWatch.testConnectionA11yHint")}
             >
               {isPinging ? (

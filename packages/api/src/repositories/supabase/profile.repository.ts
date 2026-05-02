@@ -33,9 +33,7 @@ export class SupabaseProfileRepository {
   async getProfileShort(userId: string, email?: string): Promise<ProfileShort> {
     const { data, error } = await this.supabase
       .from("profiles")
-      .select(
-        "full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount",
-      )
+      .select("full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount")
       .eq("id", userId)
       .single();
 
@@ -105,9 +103,7 @@ export class SupabaseProfileRepository {
         friendshipStatus = "friends";
       } else if (friendship.status === "pending") {
         friendshipStatus =
-          friendship.requester_id === currentUserId
-            ? "pending_sent"
-            : "pending_received";
+          friendship.requester_id === currentUserId ? "pending_sent" : "pending_received";
       } else {
         friendshipStatus = "none";
       }
@@ -144,10 +140,7 @@ export class SupabaseProfileRepository {
     };
   }
 
-  async updateProfile(
-    userId: string,
-    input: UpdateProfileInput,
-  ): Promise<Profile> {
+  async updateProfile(userId: string, input: UpdateProfileInput): Promise<Profile> {
     const { data, error } = await this.supabase
       .from("profiles")
       .update({
@@ -183,20 +176,11 @@ export class SupabaseProfileRepository {
 
     await this.supabase.from("reservations").delete().eq("user_id", userId);
 
-    await this.supabase
-      .from("user_achievements")
-      .delete()
-      .eq("user_id", userId);
+    await this.supabase.from("user_achievements").delete().eq("user_id", userId);
 
-    await this.supabase
-      .from("user_notification_preferences")
-      .delete()
-      .eq("user_id", userId);
+    await this.supabase.from("user_notification_preferences").delete().eq("user_id", userId);
 
-    await (this.supabase as any)
-      .from("user_locations")
-      .delete()
-      .eq("user_id", userId);
+    await (this.supabase as any).from("user_locations").delete().eq("user_id", userId);
     await (this.supabase as any)
       .from("location_sharing_preferences")
       .delete()
@@ -214,9 +198,7 @@ export class SupabaseProfileRepository {
     }
 
     if (!deleted || deleted.length === 0) {
-      throw new Error(
-        `Profile delete affected 0 rows for id=${userId}; likely RLS policy blocked`,
-      );
+      throw new Error(`Profile delete affected 0 rows for id=${userId}; likely RLS policy blocked`);
     }
   }
 
@@ -228,9 +210,7 @@ export class SupabaseProfileRepository {
       .single();
 
     if (error || !data) {
-      throw new Error(
-        `Failed to get tutorial status: ${error?.message || "No data returned"}`,
-      );
+      throw new Error(`Failed to get tutorial status: ${error?.message || "No data returned"}`);
     }
 
     return {
@@ -429,9 +409,7 @@ export class SupabaseProfileRepository {
 
     // Replace localhost with actual network IP for mobile access (upload URLs only)
     const supabaseUrl =
-      process.env.SUPABASE_PUBLIC_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      "";
+      process.env.SUPABASE_PUBLIC_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
     const uploadUrl = replaceLocalhostInUrl(data.signedUrl, supabaseUrl);
 
     return {

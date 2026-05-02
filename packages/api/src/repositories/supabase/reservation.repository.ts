@@ -8,20 +8,13 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import {
-  DatabaseError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../middleware/error";
+import { DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
 import type { IReservationRepository } from "../interfaces/reservation.repository";
 
 export class SupabaseReservationRepository implements IReservationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
-  async create(
-    userId: string,
-    input: CreateReservationInput,
-  ): Promise<Reservation> {
+  async create(userId: string, input: CreateReservationInput): Promise<Reservation> {
     const { data, error } = await this.supabase
       .from("reservations")
       .insert({
@@ -91,10 +84,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       query = query.gte("start_at", new Date().toISOString());
     }
 
-    const { data, error, count } = await query.range(
-      offset,
-      offset + limit - 1,
-    );
+    const { data, error, count } = await query.range(offset, offset + limit - 1);
 
     if (error) {
       throw new DatabaseError(`Failed to list reservations: ${error.message}`);
@@ -117,13 +107,8 @@ export class SupabaseReservationRepository implements IReservationRepository {
       return reservation; // Already checked in, return as-is
     }
 
-    if (
-      reservation.status === "cancelled" ||
-      reservation.status === "expired"
-    ) {
-      throw new ForbiddenError(
-        "Cannot check in to a cancelled or expired reservation",
-      );
+    if (reservation.status === "cancelled" || reservation.status === "expired") {
+      throw new ForbiddenError("Cannot check in to a cancelled or expired reservation");
     }
 
     const { data, error } = await this.supabase
@@ -138,9 +123,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .single();
 
     if (error || !data) {
-      throw new DatabaseError(
-        `Failed to check in: ${error?.message || "No data returned"}`,
-      );
+      throw new DatabaseError(`Failed to check in: ${error?.message || "No data returned"}`);
     }
 
     return this.mapToReservation(data);
@@ -167,11 +150,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
     return this.mapToReservation(data);
   }
 
-  async update(
-    id: string,
-    userId: string,
-    input: UpdateReservationInput,
-  ): Promise<Reservation> {
+  async update(id: string, userId: string, input: UpdateReservationInput): Promise<Reservation> {
     // Build update object with only provided fields
     const updateData: TablesUpdate<"reservations"> = {};
 
@@ -236,9 +215,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       .is("reminder_sent_at", null);
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch upcoming reservations: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch upcoming reservations: ${error.message}`);
     }
 
     return data.map((r) => this.mapToReservation(r));

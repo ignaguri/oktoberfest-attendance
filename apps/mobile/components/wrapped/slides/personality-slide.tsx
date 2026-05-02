@@ -1,10 +1,7 @@
 import { Motion } from "@legendapp/motion";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import {
-  getPersonalityEmoji,
-  getTraitEmoji,
-} from "@prostcounter/shared/wrapped";
+import { getPersonalityEmoji, getTraitEmoji } from "@prostcounter/shared/wrapped";
 import { useMemo } from "react";
 import { View } from "react-native";
 
@@ -24,20 +21,13 @@ export function PersonalitySlide({ data, isActive }: PersonalitySlideProps) {
 
   const personalityType = data.personality.type;
   const traits = data.personality.traits;
-  const emoji = useMemo(
-    () => getPersonalityEmoji(personalityType),
-    [personalityType],
-  );
+  const emoji = useMemo(() => getPersonalityEmoji(personalityType), [personalityType]);
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-pink-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.personalitySlide.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.personalitySlide.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.personalitySlide.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.personalitySlide.subtitle")}</SlideSubtitle>
 
         {/* Personality type card */}
         <Motion.View

@@ -30,11 +30,7 @@ import { logger } from "@/lib/logger";
 import { initializeDatabase } from "./init";
 import { ALL_LOCAL_PREFIXES } from "./query-keys";
 import type { SyncManager } from "./sync/sync-manager";
-import {
-  createSyncManager,
-  type SyncOptions,
-  type SyncResult,
-} from "./sync/sync-manager";
+import { createSyncManager, type SyncOptions, type SyncResult } from "./sync/sync-manager";
 import { getQueueStats } from "./sync-queue";
 
 // =============================================================================
@@ -88,9 +84,7 @@ const ONLINE_SYNC_DELAY = 2000;
 // Context
 // =============================================================================
 
-export const OfflineContext = createContext<OfflineContextType | undefined>(
-  undefined,
-);
+export const OfflineContext = createContext<OfflineContextType | undefined>(undefined);
 
 // =============================================================================
 // Provider Component
@@ -145,9 +139,7 @@ export function OfflineDataProvider({
         if (!mounted) {
           // Don't close the database - React Strict Mode will remount
           // and the new instance needs the database connection
-          logger.debug(
-            "[OfflineProvider] Unmounted during init, skipping setup",
-          );
+          logger.debug("[OfflineProvider] Unmounted during init, skipping setup");
           return;
         }
 
@@ -164,11 +156,7 @@ export function OfflineDataProvider({
       } catch (err) {
         logger.error("[OfflineProvider] Initialization failed:", err);
         if (mounted) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Failed to initialize database",
-          );
+          setError(err instanceof Error ? err.message : "Failed to initialize database");
         }
       }
     }
@@ -239,10 +227,7 @@ export function OfflineDataProvider({
               queryClient.invalidateQueries({ queryKey: [prefix] }),
             ),
           );
-        } else if (
-          result.errors.length === 1 &&
-          result.errors[0] === "Sync already in progress"
-        ) {
+        } else if (result.errors.length === 1 && result.errors[0] === "Sync already in progress") {
           // Concurrent sync attempt is not a real error — silently ignore
         } else {
           setSyncStatus("error");
@@ -254,8 +239,7 @@ export function OfflineDataProvider({
 
         return result;
       } catch (err) {
-        const errorMsg =
-          err instanceof Error ? err.message : "Unknown sync error";
+        const errorMsg = err instanceof Error ? err.message : "Unknown sync error";
         setSyncStatus("error");
         setError(errorMsg);
 
@@ -306,9 +290,7 @@ export function OfflineDataProvider({
   // Get SyncManager instance
   const getSyncManager = useCallback((): SyncManager => {
     if (!syncManagerRef.current) {
-      throw new Error(
-        "SyncManager not initialized. Wait for isReady to be true.",
-      );
+      throw new Error("SyncManager not initialized. Wait for isReady to be true.");
     }
     return syncManagerRef.current;
   }, []);
@@ -363,51 +345,31 @@ export function OfflineDataProvider({
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    effectiveIsOnline,
-    isReady,
-    festivalId,
-    userId,
-    disableAutoSync,
-    performSync,
-  ]);
+  }, [effectiveIsOnline, isReady, festivalId, userId, disableAutoSync, performSync]);
 
   // Sync on app foreground
   useEffect(() => {
     if (Platform.OS === "web" || disableAutoSync) return;
 
-    const subscription = AppState.addEventListener(
-      "change",
-      (nextAppState: AppStateStatus) => {
-        // App came to foreground
+    const subscription = AppState.addEventListener("change", (nextAppState: AppStateStatus) => {
+      // App came to foreground
+      if (appStateRef.current.match(/inactive|background/) && nextAppState === "active") {
+        // Check if we should sync
+        const now = Date.now();
         if (
-          appStateRef.current.match(/inactive|background/) &&
-          nextAppState === "active"
+          isReady &&
+          effectiveIsOnline &&
+          festivalId &&
+          now - lastSyncTimeRef.current >= MIN_SYNC_INTERVAL
         ) {
-          // Check if we should sync
-          const now = Date.now();
-          if (
-            isReady &&
-            effectiveIsOnline &&
-            festivalId &&
-            now - lastSyncTimeRef.current >= MIN_SYNC_INTERVAL
-          ) {
-            performSync({ festivalId, userId, direction: "pull" });
-          }
+          performSync({ festivalId, userId, direction: "pull" });
         }
-        appStateRef.current = nextAppState;
-      },
-    );
+      }
+      appStateRef.current = nextAppState;
+    });
 
     return () => subscription.remove();
-  }, [
-    isReady,
-    effectiveIsOnline,
-    festivalId,
-    userId,
-    disableAutoSync,
-    performSync,
-  ]);
+  }, [isReady, effectiveIsOnline, festivalId, userId, disableAutoSync, performSync]);
 
   // Context value - memoized to prevent unnecessary re-renders of consumers
   const contextValue: OfflineContextType = useMemo(
@@ -445,11 +407,7 @@ export function OfflineDataProvider({
     ],
   );
 
-  return (
-    <OfflineContext.Provider value={contextValue}>
-      {children}
-    </OfflineContext.Provider>
-  );
+  return <OfflineContext.Provider value={contextValue}>{children}</OfflineContext.Provider>;
 }
 
 // =============================================================================
@@ -540,9 +498,7 @@ export function useOfflineSafe(): OfflineContextType {
  * Fire-and-forget push sync with a single retry after 3s on failure.
  * No-op if offline or context unavailable.
  */
-export function triggerBackgroundPush(
-  offlineContext: OfflineContextType | undefined | null,
-): void {
+export function triggerBackgroundPush(offlineContext: OfflineContextType | undefined | null): void {
   if (!offlineContext?.isOnline) return;
   offlineContext
     .sync({ direction: "push" })

@@ -7,8 +7,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * Use for test setup/teardown operations
  */
 export function createTestSupabaseAdmin(): SupabaseClient<Database> {
-  const supabaseUrl =
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
@@ -26,8 +25,7 @@ export function createTestSupabaseAdmin(): SupabaseClient<Database> {
  * Use for testing actual user operations
  */
 export function createTestSupabaseAnon(): SupabaseClient<Database> {
-  const supabaseUrl =
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey =
     process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -44,11 +42,8 @@ export function createTestSupabaseAnon(): SupabaseClient<Database> {
  * Create authenticated Supabase client with user token
  * Respects RLS policies with user context
  */
-export function createTestSupabaseWithAuth(
-  token: string,
-): SupabaseClient<Database> {
-  const supabaseUrl =
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+export function createTestSupabaseWithAuth(token: string): SupabaseClient<Database> {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey =
     process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

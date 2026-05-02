@@ -1,8 +1,4 @@
-import {
-  useGroupSearch,
-  useJoinGroup,
-  useJoinGroupByToken,
-} from "@prostcounter/shared/hooks";
+import { useGroupSearch, useJoinGroup, useJoinGroupByToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchGroupResult } from "@prostcounter/shared/schemas";
 import { ChevronRight, Key, Link, Search, Users, X } from "lucide-react-native";
@@ -36,12 +32,7 @@ interface JoinGroupSheetProps {
   onSuccess: () => void;
 }
 
-export function JoinGroupSheet({
-  isOpen,
-  onClose,
-  festivalId,
-  onSuccess,
-}: JoinGroupSheetProps) {
+export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinGroupSheetProps) {
   const { t } = useTranslation();
   const joinGroup = useJoinGroup();
   const joinGroupByToken = useJoinGroupByToken();
@@ -49,17 +40,12 @@ export function JoinGroupSheet({
   // UI State
   const [mode, setMode] = useState<JoinMode>("search");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState<SearchGroupResult | null>(
-    null,
-  );
+  const [selectedGroup, setSelectedGroup] = useState<SearchGroupResult | null>(null);
   const [inviteToken, setInviteToken] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   // Search query - debounced via React Query
-  const { data: searchResults, loading: isSearching } = useGroupSearch(
-    searchQuery,
-    festivalId,
-  );
+  const { data: searchResults, loading: isSearching } = useGroupSearch(searchQuery, festivalId);
 
   // Reset state when sheet opens/closes
   useEffect(() => {
@@ -99,19 +85,10 @@ export function JoinGroupSheet({
     } catch (err: any) {
       logger.error("Failed to join group:", err);
       // Extract error message from API response
-      const message =
-        err?.response?.data?.message || err?.message || t("groups.join.error");
+      const message = err?.response?.data?.message || err?.message || t("groups.join.error");
       setError(message);
     }
-  }, [
-    mode,
-    selectedGroup,
-    inviteToken,
-    joinGroup,
-    joinGroupByToken,
-    onSuccess,
-    t,
-  ]);
+  }, [mode, selectedGroup, inviteToken, joinGroup, joinGroupByToken, onSuccess, t]);
 
   const handleGroupSelect = useCallback((group: SearchGroupResult) => {
     setSelectedGroup(group);
@@ -129,9 +106,7 @@ export function JoinGroupSheet({
 
   const isJoining = joinGroup.loading || joinGroupByToken.loading;
   const canJoin =
-    mode === "search"
-      ? selectedGroup && inviteToken.length > 0
-      : inviteToken.length > 0;
+    mode === "search" ? selectedGroup && inviteToken.length > 0 : inviteToken.length > 0;
 
   // Search Results View
   const renderSearchResults = () => {
@@ -141,9 +116,7 @@ export function JoinGroupSheet({
       return (
         <VStack className="items-center py-8">
           <ActivityIndicator color={Colors.primary[500]} />
-          <Text className="mt-2 text-sm text-typography-500">
-            {t("groups.join.searching")}
-          </Text>
+          <Text className="mt-2 text-sm text-typography-500">{t("groups.join.searching")}</Text>
         </VStack>
       );
     }
@@ -152,9 +125,7 @@ export function JoinGroupSheet({
       return (
         <VStack className="items-center py-8">
           <Users size={48} color={IconColors.disabled} />
-          <Text className="mt-2 text-sm text-typography-500">
-            {t("groups.join.noResults")}
-          </Text>
+          <Text className="mt-2 text-sm text-typography-500">{t("groups.join.noResults")}</Text>
         </VStack>
       );
     }
@@ -167,9 +138,7 @@ export function JoinGroupSheet({
               <Card variant="outline" size="sm" className="bg-background-0">
                 <HStack className="items-center justify-between">
                   <VStack space="xs">
-                    <Text className="font-medium text-typography-900">
-                      {group.name}
-                    </Text>
+                    <Text className="font-medium text-typography-900">{group.name}</Text>
                     <HStack space="xs" className="items-center">
                       <Users size={12} color={IconColors.muted} />
                       <Text className="text-xs text-typography-500">
@@ -209,9 +178,7 @@ export function JoinGroupSheet({
         {selectedGroup && (
           <Card variant="elevated" size="md" className="bg-background-0">
             <VStack space="sm">
-              <Text className="font-semibold text-typography-900">
-                {selectedGroup.name}
-              </Text>
+              <Text className="font-semibold text-typography-900">{selectedGroup.name}</Text>
               <HStack space="xs" className="items-center">
                 <Users size={14} color={IconColors.muted} />
                 <Text className="text-sm text-typography-500">
@@ -226,16 +193,11 @@ export function JoinGroupSheet({
 
         <VStack space="sm">
           <Text className="text-sm font-medium text-typography-700">
-            {isPasswordMode
-              ? t("groups.join.passwordLabel")
-              : t("groups.join.tokenLabel")}
+            {isPasswordMode ? t("groups.join.passwordLabel") : t("groups.join.tokenLabel")}
           </Text>
           <Input size="md">
             <InputSlot className="pl-3">
-              <InputIcon
-                as={isPasswordMode ? Key : Link}
-                color={IconColors.muted}
-              />
+              <InputIcon as={isPasswordMode ? Key : Link} color={IconColors.muted} />
             </InputSlot>
             <InputField
               placeholder={
@@ -250,9 +212,7 @@ export function JoinGroupSheet({
             />
           </Input>
           <Text className="text-xs text-typography-400">
-            {isPasswordMode
-              ? t("groups.join.passwordHelp")
-              : t("groups.join.tokenHelp")}
+            {isPasswordMode ? t("groups.join.passwordHelp") : t("groups.join.tokenHelp")}
           </Text>
           {error && <Text className="text-sm text-error-600">{error}</Text>}
         </VStack>
@@ -267,9 +227,7 @@ export function JoinGroupSheet({
             isDisabled={isJoining}
           >
             <ButtonText>
-              {selectedGroup
-                ? t("common.buttons.back")
-                : t("common.buttons.cancel")}
+              {selectedGroup ? t("common.buttons.back") : t("common.buttons.cancel")}
             </ButtonText>
           </Button>
           <Button
@@ -325,13 +283,9 @@ export function JoinGroupSheet({
               >
                 <Search
                   size={16}
-                  color={
-                    mode === "search" ? IconColors.white : IconColors.default
-                  }
+                  color={mode === "search" ? IconColors.white : IconColors.default}
                 />
-                <ButtonText className="ml-1">
-                  {t("groups.join.searchMode")}
-                </ButtonText>
+                <ButtonText className="ml-1">{t("groups.join.searchMode")}</ButtonText>
               </Button>
               <Button
                 variant={mode === "token" ? "solid" : "outline"}
@@ -345,15 +299,8 @@ export function JoinGroupSheet({
                   setError(null);
                 }}
               >
-                <Link
-                  size={16}
-                  color={
-                    mode === "token" ? IconColors.white : IconColors.default
-                  }
-                />
-                <ButtonText className="ml-1">
-                  {t("groups.join.tokenMode")}
-                </ButtonText>
+                <Link size={16} color={mode === "token" ? IconColors.white : IconColors.default} />
+                <ButtonText className="ml-1">{t("groups.join.tokenMode")}</ButtonText>
               </Button>
             </HStack>
 

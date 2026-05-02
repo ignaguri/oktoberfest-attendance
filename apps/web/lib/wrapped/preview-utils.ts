@@ -3,9 +3,7 @@ import { toPng } from "html-to-image";
 /**
  * Generate share image using proper html-to-image approach with refs
  */
-export async function generateShareImageFromElement(
-  element: HTMLElement,
-): Promise<Blob | null> {
+export async function generateShareImageFromElement(element: HTMLElement): Promise<Blob | null> {
   try {
     // Detect Safari for specific handling
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

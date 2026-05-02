@@ -47,8 +47,7 @@ const getFestivalStatusBadgeProps = (
 };
 
 export function FestivalSelector({ className }: FestivalSelectorProps) {
-  const { currentFestival, festivals, setCurrentFestival, isLoading } =
-    useFestival();
+  const { currentFestival, festivals, setCurrentFestival, isLoading } = useFestival();
   const [isOpen, setIsOpen] = useState(false);
 
   if (isLoading) {
@@ -69,8 +68,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
 
   // If there's only one festival, show it without the dialog
   if (festivals.length <= 1) {
-    const { firstLetter, lastTwoDigits } =
-      getFestivalDisplayInfo(currentFestival);
+    const { firstLetter, lastTwoDigits } = getFestivalDisplayInfo(currentFestival);
     return (
       <div
         className={cn(
@@ -83,15 +81,12 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
           {firstLetter}
           <sub className="text-sm">{lastTwoDigits}</sub>
         </span>
-        <span className="hidden text-sm font-medium sm:block">
-          {currentFestival.name}
-        </span>
+        <span className="hidden text-sm font-medium sm:block">{currentFestival.name}</span>
       </div>
     );
   }
 
-  const { firstLetter, lastTwoDigits } =
-    getFestivalDisplayInfo(currentFestival);
+  const { firstLetter, lastTwoDigits } = getFestivalDisplayInfo(currentFestival);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -108,9 +103,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
             {firstLetter}
             <sub className="text-sm">{lastTwoDigits}</sub>
           </span>
-          <span className="hidden text-sm font-medium sm:block">
-            {currentFestival.name}
-          </span>
+          <span className="hidden text-sm font-medium sm:block">{currentFestival.name}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
@@ -133,8 +126,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                 variant={isSelected ? "default" : "outline"}
                 className={cn(
                   "h-auto w-full justify-start p-4",
-                  isSelected &&
-                    "border-yellow-500 bg-yellow-500 hover:bg-yellow-600",
+                  isSelected && "border-yellow-500 bg-yellow-500 hover:bg-yellow-600",
                 )}
                 onClick={() => {
                   setCurrentFestival(festival);
@@ -145,9 +137,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                   <div
                     className={cn(
                       "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md font-semibold",
-                      isSelected
-                        ? "bg-white text-yellow-500"
-                        : "bg-yellow-500 text-white",
+                      isSelected ? "bg-white text-yellow-500" : "bg-yellow-500 text-white",
                     )}
                   >
                     <span className="text-base">
@@ -166,9 +156,7 @@ export function FestivalSelector({ className }: FestivalSelectorProps) {
                       {format(parseISO(festival.startDate), "MMM d")} -{" "}
                       {format(parseISO(festival.endDate), "MMM d, yyyy")}
                     </div>
-                    <span className="text-muted-foreground text-xs">
-                      {festival.location}
-                    </span>
+                    <span className="text-muted-foreground text-xs">{festival.location}</span>
                   </div>
                 </div>
               </Button>

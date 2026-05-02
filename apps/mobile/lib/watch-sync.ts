@@ -29,11 +29,7 @@ function getStorage(): ExtensionStorageLike | null {
  * so blindly writing all five keys wakes the bridge up to five times
  * per sync. Skip writes where the value already matches.
  */
-function setIfChanged(
-  storage: ExtensionStorageLike,
-  key: string,
-  value: string,
-): void {
+function setIfChanged(storage: ExtensionStorageLike, key: string, value: string): void {
   if (storage.get(key) === value) return;
   storage.set(key, value);
 }

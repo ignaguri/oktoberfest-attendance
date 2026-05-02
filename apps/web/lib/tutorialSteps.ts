@@ -90,18 +90,14 @@ export const getTutorialStepIndex = (stepId: string): number => {
   return tutorialSteps.findIndex((step) => step.id === stepId);
 };
 
-export const getNextStep = (
-  currentStepId: string,
-): TutorialStep | undefined => {
+export const getNextStep = (currentStepId: string): TutorialStep | undefined => {
   const currentIndex = getTutorialStepIndex(currentStepId);
   return currentIndex >= 0 && currentIndex < tutorialSteps.length - 1
     ? tutorialSteps[currentIndex + 1]
     : undefined;
 };
 
-export const getPreviousStep = (
-  currentStepId: string,
-): TutorialStep | undefined => {
+export const getPreviousStep = (currentStepId: string): TutorialStep | undefined => {
   const currentIndex = getTutorialStepIndex(currentStepId);
   return currentIndex > 0 ? tutorialSteps[currentIndex - 1] : undefined;
 };

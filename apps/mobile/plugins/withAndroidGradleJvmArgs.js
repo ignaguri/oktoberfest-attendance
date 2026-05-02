@@ -21,9 +21,7 @@ const mergeJvmArgs = (existing) => {
 const withAndroidGradleJvmArgs = (config) =>
   withGradleProperties(config, (cfg) => {
     const props = cfg.modResults;
-    const existing = props.find(
-      (p) => p.type === "property" && p.key === JVM_ARGS_KEY,
-    );
+    const existing = props.find((p) => p.type === "property" && p.key === JVM_ARGS_KEY);
     const merged = mergeJvmArgs(existing?.value);
 
     if (existing) {

@@ -7,12 +7,7 @@ import { cn } from "@/lib/utils";
  */
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <Card
-      className={cn(
-        "min-h-[120px] rounded-lg border border-gray-200 shadow-lg",
-        className,
-      )}
-    >
+    <Card className={cn("min-h-[120px] rounded-lg border border-gray-200 shadow-lg", className)}>
       <CardHeader>
         <Skeleton className="mx-auto h-6 w-32" />
       </CardHeader>

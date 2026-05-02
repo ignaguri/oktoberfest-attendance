@@ -12,10 +12,7 @@ interface TabStackLayoutProps {
  * Reusable Stack layout for tab screens.
  * Provides consistent header styling across all tabs.
  */
-export function TabStackLayout({
-  titleKey,
-  headerShown = true,
-}: TabStackLayoutProps) {
+export function TabStackLayout({ titleKey, headerShown = true }: TabStackLayoutProps) {
   const { t } = useTranslation();
 
   return (

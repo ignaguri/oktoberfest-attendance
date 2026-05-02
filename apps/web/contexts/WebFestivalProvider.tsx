@@ -14,7 +14,5 @@ interface WebFestivalProviderProps {
  * This client component wraps the shared FestivalProvider with localStorage storage
  */
 export function WebFestivalProvider({ children }: WebFestivalProviderProps) {
-  return (
-    <FestivalProvider storage={webFestivalStorage}>{children}</FestivalProvider>
-  );
+  return <FestivalProvider storage={webFestivalStorage}>{children}</FestivalProvider>;
 }

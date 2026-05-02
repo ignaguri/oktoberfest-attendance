@@ -42,9 +42,7 @@ const LocationSessionManagement = () => {
   const [sessions, setSessions] = useState<LocationSessionWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCleaningUp, setIsCleaningUp] = useState(false);
-  const [stoppingSessionId, setStoppingSessionId] = useState<string | null>(
-    null,
-  );
+  const [stoppingSessionId, setStoppingSessionId] = useState<string | null>(null);
 
   const fetchSessions = useCallback(async () => {
     setIsLoading(true);
@@ -97,15 +95,12 @@ const LocationSessionManagement = () => {
         return;
       }
 
-      const response = await fetch(
-        `/api/v1/admin/location/sessions/${sessionId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
+      const response = await fetch(`/api/v1/admin/location/sessions/${sessionId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
         },
-      );
+      });
 
       if (!response.ok) {
         throw new Error("Failed to stop session");
@@ -147,9 +142,7 @@ const LocationSessionManagement = () => {
       }
 
       const data = await response.json();
-      toast.success(
-        t("admin.location.cleanupSuccess", { count: data.cleanedCount }),
-      );
+      toast.success(t("admin.location.cleanupSuccess", { count: data.cleanedCount }));
       fetchSessions();
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -177,15 +170,8 @@ const LocationSessionManagement = () => {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">{t("admin.location.title")}</h2>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchSessions}
-            disabled={isLoading}
-          >
-            <RefreshCw
-              className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
-            />
+          <Button variant="outline" size="sm" onClick={fetchSessions} disabled={isLoading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             {t("admin.location.refresh")}
           </Button>
           <Button
@@ -194,21 +180,15 @@ const LocationSessionManagement = () => {
             onClick={handleCleanupExpired}
             disabled={isCleaningUp}
           >
-            {isCleaningUp
-              ? t("admin.location.cleaning")
-              : t("admin.location.cleanupExpired")}
+            {isCleaningUp ? t("admin.location.cleaning") : t("admin.location.cleanupExpired")}
           </Button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="py-8 text-center text-gray-500">
-          {t("admin.location.loading")}
-        </div>
+        <div className="py-8 text-center text-gray-500">{t("admin.location.loading")}</div>
       ) : sessions.length === 0 ? (
-        <div className="py-8 text-center text-gray-500">
-          {t("admin.location.noSessions")}
-        </div>
+        <div className="py-8 text-center text-gray-500">{t("admin.location.noSessions")}</div>
       ) : (
         <div className="rounded-md border">
           <Table>
@@ -218,9 +198,7 @@ const LocationSessionManagement = () => {
                 <TableHead>{t("admin.location.columns.festival")}</TableHead>
                 <TableHead>{t("admin.location.columns.startedAt")}</TableHead>
                 <TableHead>{t("admin.location.columns.expiresAt")}</TableHead>
-                <TableHead className="text-right">
-                  {t("admin.location.columns.actions")}
-                </TableHead>
+                <TableHead className="text-right">{t("admin.location.columns.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -230,9 +208,7 @@ const LocationSessionManagement = () => {
                     <div>
                       <div className="font-medium">{session.user.username}</div>
                       {session.user.fullName && (
-                        <div className="text-sm text-gray-500">
-                          {session.user.fullName}
-                        </div>
+                        <div className="text-sm text-gray-500">{session.user.fullName}</div>
                       )}
                     </div>
                   </TableCell>
@@ -240,11 +216,7 @@ const LocationSessionManagement = () => {
                   <TableCell>{formatDate(session.startedAt)}</TableCell>
                   <TableCell>
                     <span
-                      className={
-                        isExpired(session.expiresAt)
-                          ? "text-red-500"
-                          : "text-green-600"
-                      }
+                      className={isExpired(session.expiresAt) ? "text-red-500" : "text-green-600"}
                     >
                       {formatDate(session.expiresAt)}
                     </span>

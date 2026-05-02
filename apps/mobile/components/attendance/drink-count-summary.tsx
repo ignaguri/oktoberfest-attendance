@@ -20,15 +20,7 @@ interface DrinkCountSummaryProps {
 /**
  * Get the icon component for a drink type
  */
-function DrinkIcon({
-  type,
-  size,
-  color,
-}: {
-  type: DrinkType;
-  size: number;
-  color: string;
-}) {
+function DrinkIcon({ type, size, color }: { type: DrinkType; size: number; color: string }) {
   switch (type) {
     case "beer":
     case "radler":
@@ -97,12 +89,10 @@ export function DrinkCountSummary({
 
   // Filter to only visible types with non-zero counts
   const visibleCounts = useMemo(() => {
-    return VISIBLE_DRINK_TYPES.filter((type) => counts[type] > 0).map(
-      (type) => ({
-        type,
-        count: counts[type],
-      }),
-    );
+    return VISIBLE_DRINK_TYPES.filter((type) => counts[type] > 0).map((type) => ({
+      type,
+      count: counts[type],
+    }));
   }, [counts]);
 
   const total = totalDrinks ?? consumptions.length;
@@ -110,11 +100,7 @@ export function DrinkCountSummary({
   if (compact) {
     return (
       <HStack space="md" className="flex-wrap items-center">
-        {showTotal && (
-          <Text className="text-sm font-medium text-typography-700">
-            {total}
-          </Text>
-        )}
+        {showTotal && <Text className="text-sm font-medium text-typography-700">{total}</Text>}
         {visibleCounts.map(({ type, count }) => (
           <HStack key={type} space="xs" className="items-center">
             <DrinkIcon type={type} size={14} color={getDrinkColor(type)} />
@@ -140,9 +126,7 @@ export function DrinkCountSummary({
           {visibleCounts.map(({ type, count }) => (
             <HStack key={type} space="xs" className="items-center">
               <DrinkIcon type={type} size={16} color={getDrinkColor(type)} />
-              <Text className="text-sm font-medium text-typography-700">
-                {count}
-              </Text>
+              <Text className="text-sm font-medium text-typography-700">{count}</Text>
             </HStack>
           ))}
         </HStack>

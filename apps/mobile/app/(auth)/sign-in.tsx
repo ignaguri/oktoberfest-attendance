@@ -1,19 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  type SignInFormData,
-  signInSchema,
-} from "@prostcounter/shared/schemas";
+import { type SignInFormData, signInSchema } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
@@ -35,13 +26,8 @@ import { IconColors } from "@/lib/constants/colors";
 export default function SignInScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const {
-    signIn,
-    signInWithGoogle,
-    signInWithFacebook,
-    signInWithApple,
-    restoreSession,
-  } = useAuth();
+  const { signIn, signInWithGoogle, signInWithFacebook, signInWithApple, restoreSession } =
+    useAuth();
 
   const {
     isAvailable: isBiometricAvailable,
@@ -60,10 +46,8 @@ export default function SignInScreen() {
 
   // Biometric prompt states
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
-  const [showBiometricEnablePrompt, setShowBiometricEnablePrompt] =
-    useState(false);
-  const [isBiometricAuthenticating, setIsBiometricAuthenticating] =
-    useState(false);
+  const [showBiometricEnablePrompt, setShowBiometricEnablePrompt] = useState(false);
+  const [isBiometricAuthenticating, setIsBiometricAuthenticating] = useState(false);
   const [storedEmail, setStoredEmail] = useState<string | null>(null);
 
   // Track if biometric check has been performed to avoid race conditions
@@ -151,11 +135,7 @@ export default function SignInScreen() {
         sessionError.message?.includes("invalid") ||
         sessionError.message?.includes("No stored session");
 
-      setError(
-        isExpired
-          ? t("auth.biometric.sessionExpired")
-          : t("auth.biometric.restoreFailed"),
-      );
+      setError(isExpired ? t("auth.biometric.sessionExpired") : t("auth.biometric.restoreFailed"));
       setShowBiometricPrompt(false);
       if (storedEmail) setValue("email", storedEmail);
       return;
@@ -205,9 +185,7 @@ export default function SignInScreen() {
     setIsFacebookLoading(false);
 
     if (error && error.message !== "Authentication was cancelled") {
-      setError(
-        t("auth.signIn.errors.providerFailed", { provider: "Facebook" }),
-      );
+      setError(t("auth.signIn.errors.providerFailed", { provider: "Facebook" }));
     }
   };
 
@@ -222,8 +200,7 @@ export default function SignInScreen() {
     }
   };
 
-  const isAnyLoading =
-    isLoading || isGoogleLoading || isFacebookLoading || isAppleLoading;
+  const isAnyLoading = isLoading || isGoogleLoading || isFacebookLoading || isAppleLoading;
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
@@ -290,10 +267,7 @@ export default function SignInScreen() {
             </Button>
 
             {/* Forgot Password Link */}
-            <Pressable
-              onPress={() => router.push("/(auth)/forgot-password")}
-              className="mt-4 py-2"
-            >
+            <Pressable onPress={() => router.push("/(auth)/forgot-password")} className="mt-4 py-2">
               <Text className="text-center font-medium text-primary-600">
                 {t("auth.signIn.forgotPassword")}
               </Text>

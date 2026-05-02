@@ -18,13 +18,8 @@ export async function processReservationNotifications(
     const tentIds: string[] = Array.from(
       new Set(dueReminders.map((r) => r.tent_id).filter(Boolean) as string[]),
     );
-    const { data: tents } = await supabase
-      .from("tents")
-      .select("id, name")
-      .in("id", tentIds);
-    const tentIdToName = new Map<string, string>(
-      (tents || []).map((t) => [t.id, t.name]),
-    );
+    const { data: tents } = await supabase.from("tents").select("id, name").in("id", tentIds);
+    const tentIdToName = new Map<string, string>((tents || []).map((t) => [t.id, t.name]));
 
     await Promise.allSettled(
       dueReminders.map((r) =>
@@ -54,13 +49,8 @@ export async function processReservationNotifications(
     const tentIds: string[] = Array.from(
       new Set(duePrompts.map((r) => r.tent_id).filter(Boolean) as string[]),
     );
-    const { data: tents } = await supabase
-      .from("tents")
-      .select("id, name")
-      .in("id", tentIds);
-    const tentIdToName = new Map<string, string>(
-      (tents || []).map((t) => [t.id, t.name]),
-    );
+    const { data: tents } = await supabase.from("tents").select("id, name").in("id", tentIds);
+    const tentIdToName = new Map<string, string>((tents || []).map((t) => [t.id, t.name]));
 
     await Promise.allSettled(
       duePrompts.map((r) =>

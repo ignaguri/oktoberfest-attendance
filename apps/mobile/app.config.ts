@@ -18,13 +18,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.prostcounter.app",
     usesAppleSignIn: true,
     googleServicesFile: "./GoogleService-Info.plist",
-    associatedDomains: [
-      "applinks:prostcounter.fun",
-      "applinks:www.prostcounter.fun",
-    ],
+    associatedDomains: ["applinks:prostcounter.fun", "applinks:www.prostcounter.fun"],
     infoPlist: {
-      NSFaceIDUsageDescription:
-        "Use Face ID to quickly sign in to your ProstCounter account",
+      NSFaceIDUsageDescription: "Use Face ID to quickly sign in to your ProstCounter account",
       NSPhotoLibraryUsageDescription:
         "ProstCounter needs access to your photo library to let you upload beer pictures to your daily attendance log and share them with your group members in the gallery. For example, you can select a photo of your beer to document your Oktoberfest experience.",
       NSCameraUsageDescription:
@@ -33,12 +29,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         "ProstCounter uses your location to share with friends and show nearby tents",
       NSLocationAlwaysAndWhenInUseUsageDescription:
         "Allow background location to keep sharing your location with friends while using other apps",
-      UIBackgroundModes: [
-        "remote-notification",
-        "location",
-        "fetch",
-        "processing",
-      ],
+      UIBackgroundModes: ["remote-notification", "location", "fetch", "processing"],
       BGTaskSchedulerPermittedIdentifiers: [
         "PROSTCOUNTER_BACKGROUND_SYNC",
         "PROSTCOUNTER_BACKGROUND_LOCATION",

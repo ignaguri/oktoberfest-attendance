@@ -57,10 +57,7 @@ describe("Photo Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -374,18 +371,13 @@ describe("Photo Routes - Unit Tests", () => {
       expect(body.picture.id).toBe(pictureId);
       expect(body.picture.url).toBe(mockPicture.pictureUrl);
       expect(body.picture.attendanceId).toBe(attendanceId);
-      expect(mockPhotoService.confirmUpload).toHaveBeenCalledWith(
-        pictureId,
-        mockUser.id,
-      );
+      expect(mockPhotoService.confirmUpload).toHaveBeenCalledWith(pictureId, mockUser.id);
     });
 
     it("should return 404 when photo not found", async () => {
       const pictureId = "323e4567-e89b-12d3-a456-426614174999";
 
-      mockPhotoService.confirmUpload.mockRejectedValueOnce(
-        new NotFoundError("Photo not found"),
-      );
+      mockPhotoService.confirmUpload.mockRejectedValueOnce(new NotFoundError("Photo not found"));
 
       const req = createAuthRequest(`/photos/${pictureId}/confirm`, {
         method: "POST",
@@ -468,12 +460,7 @@ describe("Photo Routes - Unit Tests", () => {
       });
 
       expect(res.status).toBe(200);
-      expect(mockPhotoService.listPhotos).toHaveBeenCalledWith(
-        mockUser.id,
-        festivalId,
-        50,
-        0,
-      );
+      expect(mockPhotoService.listPhotos).toHaveBeenCalledWith(mockUser.id, festivalId, 50, 0);
     });
 
     it("should support pagination", async () => {
@@ -495,12 +482,7 @@ describe("Photo Routes - Unit Tests", () => {
       const body = (await res.json()) as any;
       expect(body.limit).toBe(20);
       expect(body.offset).toBe(40);
-      expect(mockPhotoService.listPhotos).toHaveBeenCalledWith(
-        mockUser.id,
-        undefined,
-        20,
-        40,
-      );
+      expect(mockPhotoService.listPhotos).toHaveBeenCalledWith(mockUser.id, undefined, 20, 40);
     });
 
     it("should validate limit range", async () => {
@@ -569,18 +551,13 @@ describe("Photo Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       expect(body.success).toBe(true);
-      expect(mockPhotoService.deletePhoto).toHaveBeenCalledWith(
-        pictureId,
-        mockUser.id,
-      );
+      expect(mockPhotoService.deletePhoto).toHaveBeenCalledWith(pictureId, mockUser.id);
     });
 
     it("should return 404 when photo not found", async () => {
       const pictureId = "323e4567-e89b-12d3-a456-426614174999";
 
-      mockPhotoService.deletePhoto.mockRejectedValueOnce(
-        new NotFoundError("Photo not found"),
-      );
+      mockPhotoService.deletePhoto.mockRejectedValueOnce(new NotFoundError("Photo not found"));
 
       const req = createAuthRequest(`/photos/${pictureId}`, {
         method: "DELETE",

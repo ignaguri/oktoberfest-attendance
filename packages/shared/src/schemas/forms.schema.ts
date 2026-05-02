@@ -23,10 +23,7 @@ export const ProfileFormSchema = z.object({
     .nullable()
     .refine(
       (val) =>
-        val === null ||
-        SUPPORTED_LANGUAGES.includes(
-          val as (typeof SUPPORTED_LANGUAGES)[number],
-        ),
+        val === null || SUPPORTED_LANGUAGES.includes(val as (typeof SUPPORTED_LANGUAGES)[number]),
       {
         error: "validation.language.invalid",
       },
@@ -40,35 +37,21 @@ export const ProfileFormSchema = z.object({
 
 export type CreateGroupForm = z.infer<typeof CreateGroupFormSchema>;
 export const CreateGroupFormSchema = z.object({
-  groupName: z
-    .string()
-    .min(1, { error: "validation.groupName.required" })
-    .trim(),
-  password: z
-    .string()
-    .min(1, { error: "validation.groupPassword.required" })
-    .trim(),
+  groupName: z.string().min(1, { error: "validation.groupName.required" }).trim(),
+  password: z.string().min(1, { error: "validation.groupPassword.required" }).trim(),
 });
 
 export type JoinGroupForm = z.infer<typeof JoinGroupFormSchema>;
 export const JoinGroupFormSchema = z.object({
-  groupName: z
-    .string()
-    .min(1, { error: "validation.groupName.required" })
-    .trim(),
-  password: z
-    .string()
-    .min(1, { error: "validation.groupPassword.required" })
-    .trim(),
+  groupName: z.string().min(1, { error: "validation.groupName.required" }).trim(),
+  password: z.string().min(1, { error: "validation.groupPassword.required" }).trim(),
 });
 
 export type GroupSettingsForm = z.infer<typeof GroupSettingsFormSchema>;
 export const GroupSettingsFormSchema = z.object({
   name: z.string().min(1, { error: "validation.groupName.required" }).trim(),
   description: z.string().optional(),
-  winning_criteria_id: z
-    .number()
-    .min(1, { error: "validation.winningCriteria.required" }),
+  winning_criteria_id: z.number().min(1, { error: "validation.winningCriteria.required" }),
 });
 
 // =============================================================================
@@ -108,9 +91,7 @@ export function createDetailedAttendanceFormSchema(
     .refine(
       (data) => {
         // Must select at least one tent if beer count is 0
-        return (
-          data.amount !== 0 || (data.amount === 0 && data.tents.length > 0)
-        );
+        return data.amount !== 0 || (data.amount === 0 && data.tents.length > 0);
       },
       {
         error: "validation.tent.required",
@@ -119,9 +100,7 @@ export function createDetailedAttendanceFormSchema(
     );
 }
 
-export type DetailedAttendanceForm = z.infer<
-  ReturnType<typeof createDetailedAttendanceFormSchema>
->;
+export type DetailedAttendanceForm = z.infer<ReturnType<typeof createDetailedAttendanceFormSchema>>;
 
 // =============================================================================
 // Reservation Forms
@@ -131,9 +110,7 @@ export type ReservationForm = z.infer<typeof ReservationFormSchema>;
 export const ReservationFormSchema = z.object({
   tentId: z.string().min(1, { error: "validation.tent.required" }),
   startAt: z.date({ error: "validation.date.required" }),
-  reminderOffsetMinutes: z
-    .number()
-    .min(0, { error: "validation.reminder.min" }),
+  reminderOffsetMinutes: z.number().min(0, { error: "validation.reminder.min" }),
   visibleToGroups: z.boolean(),
 });
 
@@ -146,24 +123,18 @@ export const PhotoVisibilityFormSchema = z.object({
   visibility: z.enum(["public", "private"]).default("public"),
 });
 
-export type GlobalPhotoSettingsForm = z.infer<
-  typeof GlobalPhotoSettingsFormSchema
->;
+export type GlobalPhotoSettingsForm = z.infer<typeof GlobalPhotoSettingsFormSchema>;
 export const GlobalPhotoSettingsFormSchema = z.object({
   hide_photos_from_all_groups: z.boolean().default(false),
 });
 
-export type GroupPhotoSettingsForm = z.infer<
-  typeof GroupPhotoSettingsFormSchema
->;
+export type GroupPhotoSettingsForm = z.infer<typeof GroupPhotoSettingsFormSchema>;
 export const GroupPhotoSettingsFormSchema = z.object({
   group_id: z.uuid(),
   hide_photos_from_group: z.boolean().default(false),
 });
 
-export type BulkPhotoVisibilityForm = z.infer<
-  typeof BulkPhotoVisibilityFormSchema
->;
+export type BulkPhotoVisibilityForm = z.infer<typeof BulkPhotoVisibilityFormSchema>;
 export const BulkPhotoVisibilityFormSchema = z.object({
   photo_ids: z.array(z.uuid()).min(1, { error: "validation.photo.selectOne" }),
   visibility: z.enum(["public", "private"]),

@@ -34,12 +34,8 @@ export function AppHeader() {
           accessibilityLabel={t("app.logo")}
         />
         <View className="flex-row">
-          <Text className="text-3xl font-extrabold text-primary-600">
-            {t("app.namePart1")}
-          </Text>
-          <Text className="text-3xl font-extrabold text-primary-500">
-            {t("app.namePart2")}
-          </Text>
+          <Text className="text-3xl font-extrabold text-primary-600">{t("app.namePart1")}</Text>
+          <Text className="text-3xl font-extrabold text-primary-500">{t("app.namePart2")}</Text>
         </View>
       </View>
 

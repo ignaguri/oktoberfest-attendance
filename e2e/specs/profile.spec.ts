@@ -18,10 +18,7 @@ test.describe("Profile Flows", () => {
     const homePage = new HomePage(page);
 
     await signInPage.goto();
-    await signInPage.signInAndWaitForHome(
-      PROFILE_TEST_USER.email,
-      PROFILE_TEST_USER.password,
-    );
+    await signInPage.signInAndWaitForHome(PROFILE_TEST_USER.email, PROFILE_TEST_USER.password);
     await homePage.expectOnHomePage();
 
     // Wait for page to fully load before dismissing overlays

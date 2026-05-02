@@ -170,10 +170,7 @@ export default function TentManagement() {
     }
   };
 
-  const handleAddExistingTent = async (
-    tentId: string,
-    beerPrice?: number | null,
-  ) => {
+  const handleAddExistingTent = async (tentId: string, beerPrice?: number | null) => {
     try {
       await addTentToFestival(selectedFestival, tentId, beerPrice);
       toast.success(t("notifications.success.tentAddedToFestival"));
@@ -219,18 +216,11 @@ export default function TentManagement() {
 
   const handleCopyTents = async (data: AdminCopyTentsForm) => {
     try {
-      await copyTentsToFestival(
-        data.sourceFestivalId,
-        selectedFestival,
-        data.tentIds,
-        {
-          copyPrices: data.copyPrices,
-          overridePrice: data.overridePrice,
-        },
-      );
-      toast.success(
-        t("notifications.success.tentsCopied", { count: data.tentIds.length }),
-      );
+      await copyTentsToFestival(data.sourceFestivalId, selectedFestival, data.tentIds, {
+        copyPrices: data.copyPrices,
+        overridePrice: data.overridePrice,
+      });
+      toast.success(t("notifications.success.tentsCopied", { count: data.tentIds.length }));
       copyTentsForm.reset();
       setShowCopyDialog(false);
       await loadFestivalData();
@@ -285,13 +275,8 @@ export default function TentManagement() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="festival-select">
-              {t("admin.tents.selectFestival")}
-            </Label>
-            <Select
-              value={selectedFestival}
-              onValueChange={setSelectedFestival}
-            >
+            <Label htmlFor="festival-select">{t("admin.tents.selectFestival")}</Label>
+            <Select value={selectedFestival} onValueChange={setSelectedFestival}>
               <SelectTrigger>
                 <SelectValue placeholder={t("admin.tents.chooseFestival")} />
               </SelectTrigger>
@@ -309,35 +294,25 @@ export default function TentManagement() {
           {tentStats && (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div className="text-center">
-                <div className="text-2xl font-bold">
-                  {tentStats.total_tents}
-                </div>
-                <div className="text-muted-foreground text-sm">
-                  {t("admin.tents.stats.total")}
-                </div>
+                <div className="text-2xl font-bold">{tentStats.total_tents}</div>
+                <div className="text-muted-foreground text-sm">{t("admin.tents.stats.total")}</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">
-                  {tentStats.with_custom_pricing}
-                </div>
+                <div className="text-2xl font-bold">{tentStats.with_custom_pricing}</div>
                 <div className="text-muted-foreground text-sm">
                   {t("admin.tents.stats.customPricing")}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">
-                  {tentStats.avg_price > 0
-                    ? `€${tentStats.avg_price.toFixed(2)}`
-                    : "N/A"}
+                  {tentStats.avg_price > 0 ? `€${tentStats.avg_price.toFixed(2)}` : "N/A"}
                 </div>
                 <div className="text-muted-foreground text-sm">
                   {t("admin.tents.stats.avgPrice")}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">
-                  {Object.keys(tentStats.categories).length}
-                </div>
+                <div className="text-2xl font-bold">{Object.keys(tentStats.categories).length}</div>
                 <div className="text-muted-foreground text-sm">
                   {t("admin.tents.stats.categories")}
                 </div>
@@ -360,20 +335,15 @@ export default function TentManagement() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>
-                    {t("admin.tents.dialog.createTitle")}
-                  </DialogTitle>
+                  <DialogTitle>{t("admin.tents.dialog.createTitle")}</DialogTitle>
                   <DialogDescription>
-                    {t("admin.tents.dialog.createDescription")}{" "}
-                    {selectedFestivalData?.name}
+                    {t("admin.tents.dialog.createDescription")} {selectedFestivalData?.name}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={createTentForm.handleSubmit(handleCreateTent)}>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="tent-name">
-                        {t("admin.tents.form.name")}
-                      </Label>
+                      <Label htmlFor="tent-name">{t("admin.tents.form.name")}</Label>
                       <Input
                         id="tent-name"
                         {...createTentForm.register("name")}
@@ -386,21 +356,13 @@ export default function TentManagement() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="tent-category">
-                        {t("admin.tents.form.category")}
-                      </Label>
+                      <Label htmlFor="tent-category">{t("admin.tents.form.category")}</Label>
                       <Select
                         value={createTentForm.watch("category") || ""}
-                        onValueChange={(value) =>
-                          createTentForm.setValue("category", value)
-                        }
+                        onValueChange={(value) => createTentForm.setValue("category", value)}
                       >
                         <SelectTrigger>
-                          <SelectValue
-                            placeholder={t(
-                              "admin.tents.form.categoryPlaceholder",
-                            )}
-                          />
+                          <SelectValue placeholder={t("admin.tents.form.categoryPlaceholder")} />
                         </SelectTrigger>
                         <SelectContent>
                           {TENT_CATEGORIES.map((category) => (
@@ -413,46 +375,34 @@ export default function TentManagement() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="tent-latitude">
-                          {t("admin.tents.form.latitude")}
-                        </Label>
+                        <Label htmlFor="tent-latitude">{t("admin.tents.form.latitude")}</Label>
                         <Input
                           id="tent-latitude"
                           type="number"
                           step="0.0001"
-                          placeholder={t(
-                            "admin.tents.form.latitudePlaceholder",
-                          )}
+                          placeholder={t("admin.tents.form.latitudePlaceholder")}
                           {...createTentForm.register("latitude", {
                             valueAsNumber: true,
-                            setValueAs: (value) =>
-                              value === "" ? null : value,
+                            setValueAs: (value) => (value === "" ? null : value),
                           })}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="tent-longitude">
-                          {t("admin.tents.form.longitude")}
-                        </Label>
+                        <Label htmlFor="tent-longitude">{t("admin.tents.form.longitude")}</Label>
                         <Input
                           id="tent-longitude"
                           type="number"
                           step="0.0001"
-                          placeholder={t(
-                            "admin.tents.form.longitudePlaceholder",
-                          )}
+                          placeholder={t("admin.tents.form.longitudePlaceholder")}
                           {...createTentForm.register("longitude", {
                             valueAsNumber: true,
-                            setValueAs: (value) =>
-                              value === "" ? null : value,
+                            setValueAs: (value) => (value === "" ? null : value),
                           })}
                         />
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="beer-price">
-                        {t("admin.tents.form.beerPrice")}
-                      </Label>
+                      <Label htmlFor="beer-price">{t("admin.tents.form.beerPrice")}</Label>
                       <div className="relative">
                         <Euro className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                         <Input
@@ -462,13 +412,10 @@ export default function TentManagement() {
                           min="0"
                           max="50"
                           className="pl-10"
-                          placeholder={t(
-                            "admin.tents.form.beerPricePlaceholder",
-                          )}
+                          placeholder={t("admin.tents.form.beerPricePlaceholder")}
                           {...createTentForm.register("beer_price", {
                             valueAsNumber: true,
-                            setValueAs: (value) =>
-                              value === "" ? null : value,
+                            setValueAs: (value) => (value === "" ? null : value),
                           })}
                         />
                       </div>
@@ -480,10 +427,7 @@ export default function TentManagement() {
                     </div>
                   </div>
                   <DialogFooter className="mt-6">
-                    <Button
-                      type="submit"
-                      disabled={createTentForm.formState.isSubmitting}
-                    >
+                    <Button type="submit" disabled={createTentForm.formState.isSubmitting}>
                       {createTentForm.formState.isSubmitting
                         ? t("admin.tents.buttons.creating")
                         : t("admin.tents.buttons.createTent")}
@@ -504,8 +448,7 @@ export default function TentManagement() {
                 <DialogHeader>
                   <DialogTitle>{t("admin.tents.dialog.copyTitle")}</DialogTitle>
                   <DialogDescription>
-                    {t("admin.tents.dialog.copyDescription")}{" "}
-                    {selectedFestivalData?.name}
+                    {t("admin.tents.dialog.copyDescription")} {selectedFestivalData?.name}
                   </DialogDescription>
                 </DialogHeader>
                 <CopyTentsDialog
@@ -528,18 +471,12 @@ export default function TentManagement() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="py-4 text-center">
-                  {t("admin.tents.loading")}
-                </div>
+                <div className="py-4 text-center">{t("admin.tents.loading")}</div>
               ) : festivalTents.length === 0 ? (
                 <div className="py-8 text-center">
                   <Tent className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-                  <h3 className="mb-2 text-lg font-semibold">
-                    {t("admin.tents.empty.noTents")}
-                  </h3>
-                  <p className="mb-4 text-gray-600">
-                    {t("admin.tents.empty.noTentsDescription")}
-                  </p>
+                  <h3 className="mb-2 text-lg font-semibold">{t("admin.tents.empty.noTents")}</h3>
+                  <p className="mb-4 text-gray-600">{t("admin.tents.empty.noTentsDescription")}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -547,12 +484,8 @@ export default function TentManagement() {
                     <TentCard
                       key={tent.id}
                       tent={tent}
-                      festivalDefaultPrice={
-                        selectedFestivalData?.beer_cost || 16.2
-                      }
-                      onUpdatePrice={(price) =>
-                        handleUpdatePrice(tent.id, price)
-                      }
+                      festivalDefaultPrice={selectedFestivalData?.beer_cost || 16.2}
+                      onUpdatePrice={(price) => handleUpdatePrice(tent.id, price)}
                       onRemove={() => handleRemoveTent(tent.id)}
                     />
                   ))}
@@ -567,9 +500,7 @@ export default function TentManagement() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>
-                      {t("admin.tents.sections.availableTents")}
-                    </CardTitle>
+                    <CardTitle>{t("admin.tents.sections.availableTents")}</CardTitle>
                     <p className="text-muted-foreground text-sm">
                       {t("admin.tents.sections.availableTentsDescription")}
                     </p>
@@ -589,25 +520,17 @@ export default function TentManagement() {
               <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {availableTents.map((tent) => (
-                    <div
-                      key={tent.id}
-                      className="space-y-2 rounded-lg border p-4"
-                    >
+                    <div key={tent.id} className="space-y-2 rounded-lg border p-4">
                       <div className="flex items-start justify-between">
                         <div>
                           <h4 className="font-medium">{tent.name}</h4>
                           {tent.category && (
-                            <Badge
-                              variant={getCategoryBadgeVariant(tent.category)}
-                            >
+                            <Badge variant={getCategoryBadgeVariant(tent.category)}>
                               {tent.category}
                             </Badge>
                           )}
                         </div>
-                        <Button
-                          size="sm"
-                          onClick={() => handleAddExistingTent(tent.id)}
-                        >
+                        <Button size="sm" onClick={() => handleAddExistingTent(tent.id)}>
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
@@ -659,11 +582,7 @@ function TentCard({
           {tent.category && <Badge variant="secondary">{tent.category}</Badge>}
         </div>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setIsEditing(!isEditing)}
-          >
+          <Button size="sm" variant="ghost" onClick={() => setIsEditing(!isEditing)}>
             <Edit className="h-4 w-4" />
           </Button>
           <Button size="sm" variant="ghost" onClick={onRemove}>
@@ -674,9 +593,7 @@ function TentCard({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-sm">
-            {t("attendance.price")}:
-          </span>
+          <span className="text-muted-foreground text-sm">{t("attendance.price")}:</span>
           {isEditing ? (
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -695,11 +612,7 @@ function TentCard({
               <Button size="sm" onClick={handleSavePrice}>
                 {t("admin.tents.buttons.save")}
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setIsEditing(false)}
-              >
+              <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
                 {t("admin.tents.buttons.cancel")}
               </Button>
             </div>
@@ -707,9 +620,7 @@ function TentCard({
             <div className="flex items-center gap-2">
               <span className="font-medium">€{effectivePrice.toFixed(2)}</span>
               {tent.beer_price === null && (
-                <Badge variant="outline">
-                  {t("admin.tents.badges.default")}
-                </Badge>
+                <Badge variant="outline">{t("admin.tents.badges.default")}</Badge>
               )}
             </div>
           )}
@@ -772,9 +683,7 @@ function CopyTentsDialog({
           onValueChange={(value) => form.setValue("sourceFestivalId", value)}
         >
           <SelectTrigger>
-            <SelectValue
-              placeholder={t("admin.tents.dialog.sourceFestivalPlaceholder")}
-            />
+            <SelectValue placeholder={t("admin.tents.dialog.sourceFestivalPlaceholder")} />
           </SelectTrigger>
           <SelectContent>
             {festivals.map((festival) => (
@@ -799,9 +708,7 @@ function CopyTentsDialog({
                     if (checked) {
                       setSelectedTents([...selectedTents, tent.id]);
                     } else {
-                      setSelectedTents(
-                        selectedTents.filter((id) => id !== tent.id),
-                      );
+                      setSelectedTents(selectedTents.filter((id) => id !== tent.id));
                     }
                   }}
                 />
@@ -831,22 +738,14 @@ function CopyTentsDialog({
           id="copyPrices"
           checked={form.watch("copyPrices")}
           onCheckedChange={(checked) =>
-            form.setValue(
-              "copyPrices",
-              checked === "indeterminate" ? false : checked,
-            )
+            form.setValue("copyPrices", checked === "indeterminate" ? false : checked)
           }
         />
-        <Label htmlFor="copyPrices">
-          {t("admin.tents.dialog.copyTentPrices")}
-        </Label>
+        <Label htmlFor="copyPrices">{t("admin.tents.dialog.copyTentPrices")}</Label>
       </div>
 
       <DialogFooter>
-        <Button
-          type="submit"
-          disabled={selectedTents.length === 0 || form.formState.isSubmitting}
-        >
+        <Button type="submit" disabled={selectedTents.length === 0 || form.formState.isSubmitting}>
           {form.formState.isSubmitting
             ? t("admin.tents.buttons.copying")
             : t("admin.tents.buttons.copyTents", {

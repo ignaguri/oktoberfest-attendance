@@ -15,15 +15,7 @@ import LocationSessionManagement from "./components/LocationSessionManagement";
 import TentManagement from "./components/TentManagement";
 import UserList from "./components/UserList";
 
-const tabValues = [
-  "users",
-  "groups",
-  "festivals",
-  "tents",
-  "cache",
-  "images",
-  "location",
-];
+const tabValues = ["users", "groups", "festivals", "tents", "cache", "images", "location"];
 
 export default function AdminPage() {
   const { t } = useTranslation();
@@ -62,14 +54,10 @@ export default function AdminPage() {
         <TabsList>
           <TabsTrigger value="users">{t("admin.tabs.users")}</TabsTrigger>
           <TabsTrigger value="groups">{t("admin.tabs.groups")}</TabsTrigger>
-          <TabsTrigger value="festivals">
-            {t("admin.tabs.festivals")}
-          </TabsTrigger>
+          <TabsTrigger value="festivals">{t("admin.tabs.festivals")}</TabsTrigger>
           <TabsTrigger value="tents">{t("admin.tabs.tents")}</TabsTrigger>
           <TabsTrigger value="cache">{t("admin.tabs.cache")}</TabsTrigger>
-          <TabsTrigger value="images">
-            {t("admin.tabs.imageConversion")}
-          </TabsTrigger>
+          <TabsTrigger value="images">{t("admin.tabs.imageConversion")}</TabsTrigger>
           <TabsTrigger value="location">{t("admin.tabs.location")}</TabsTrigger>
         </TabsList>
 

@@ -59,9 +59,7 @@ export function UpdatePrompt({
         </AlertDialogHeader>
 
         <AlertDialogBody>
-          <Text className="text-center text-typography-600">
-            {t(descriptionKey)}
-          </Text>
+          <Text className="text-center text-typography-600">{t(descriptionKey)}</Text>
         </AlertDialogBody>
 
         <AlertDialogFooter className="flex-col gap-2 pt-4">
@@ -84,9 +82,7 @@ export function UpdatePrompt({
             disabled={isLoading}
             accessibilityLabel={t(dismissButtonKey)}
           >
-            <ButtonText className="text-typography-500">
-              {t(dismissButtonKey)}
-            </ButtonText>
+            <ButtonText className="text-typography-500">{t(dismissButtonKey)}</ButtonText>
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

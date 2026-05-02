@@ -1,13 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
-import {
-  differenceInDays,
-  isAfter,
-  isBefore,
-  parseISO,
-  startOfDay,
-} from "date-fns";
+import { differenceInDays, isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import { Clock, Flag, PartyPopper } from "lucide-react-native";
 
 import { Card } from "@/components/ui/card";
@@ -93,20 +87,12 @@ export function FestivalStatus() {
   const config = STATUS_CONFIG[status];
 
   return (
-    <Card
-      size="md"
-      variant="filled"
-      className={cn(config.bgColor, "border border-outline-200")}
-    >
+    <Card size="md" variant="filled" className={cn(config.bgColor, "border border-outline-200")}>
       <HStack space="sm" className="items-center justify-center">
         {config.icon}
-        <Text className={cn("text-base font-semibold", config.textColor)}>
-          {message}
-        </Text>
+        <Text className={cn("text-base font-semibold", config.textColor)}>{message}</Text>
         <Text className="text-typography-400">•</Text>
-        <Text className="text-base font-bold text-typography-700">
-          {currentFestival.name}
-        </Text>
+        <Text className="text-base font-bold text-typography-700">{currentFestival.name}</Text>
       </HStack>
     </Card>
   );

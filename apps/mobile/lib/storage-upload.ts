@@ -63,8 +63,6 @@ export async function putToStorageWithDiagnostics({
         ...extra,
       },
     });
-    throw new Error(
-      `Storage upload failed (${response.status} on ${extra.uploadHost})`,
-    );
+    throw new Error(`Storage upload failed (${response.status} on ${extra.uploadHost})`);
   }
 }

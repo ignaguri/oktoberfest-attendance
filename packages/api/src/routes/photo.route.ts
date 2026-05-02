@@ -165,8 +165,7 @@ const listPhotosRoute = createRoute({
   path: "/photos",
   tags: ["photos"],
   summary: "List user photos",
-  description:
-    "Retrieves all beer pictures for the authenticated user with optional filters",
+  description: "Retrieves all beer pictures for the authenticated user with optional filters",
   request: {
     query: GetPhotosQuerySchema,
   },

@@ -6,11 +6,7 @@ import type {
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 
-import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "../middleware/error";
+import { ConflictError, ForbiddenError, NotFoundError } from "../middleware/error";
 import type { IFriendRepository } from "../repositories/interfaces";
 
 export class FriendService {
@@ -56,9 +52,7 @@ export class FriendService {
         case "SELF_REQUEST":
           throw new ForbiddenError(ErrorCodes.SELF_FRIEND_REQUEST);
         default:
-          throw new ConflictError(
-            result.message || "Failed to send friend request",
-          );
+          throw new ConflictError(result.message || "Failed to send friend request");
       }
     }
 
@@ -85,9 +79,7 @@ export class FriendService {
         case "INVALID_STATUS":
           throw new ConflictError(ErrorCodes.INVALID_FRIEND_REQUEST);
         default:
-          throw new ConflictError(
-            result.message || "Failed to accept friend request",
-          );
+          throw new ConflictError(result.message || "Failed to accept friend request");
       }
     }
 
@@ -109,9 +101,7 @@ export class FriendService {
         case "INVALID_STATUS":
           throw new ConflictError(ErrorCodes.INVALID_FRIEND_REQUEST);
         default:
-          throw new ConflictError(
-            result.message || "Failed to decline friend request",
-          );
+          throw new ConflictError(result.message || "Failed to decline friend request");
       }
     }
 
@@ -139,20 +129,13 @@ export class FriendService {
       username: string | null;
       fullName: string | null;
       avatarUrl: string | null;
-      friendshipStatus:
-        | "friends"
-        | "pending_sent"
-        | "pending_received"
-        | "none";
+      friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none";
     }[]
   > {
     return await this.friendRepo.searchUsers(userId, query);
   }
 
-  async getFriendshipStatus(
-    userId: string,
-    otherUserId: string,
-  ): Promise<FriendshipStatusCheck> {
+  async getFriendshipStatus(userId: string, otherUserId: string): Promise<FriendshipStatusCheck> {
     return await this.friendRepo.getFriendshipStatus(userId, otherUserId);
   }
 }

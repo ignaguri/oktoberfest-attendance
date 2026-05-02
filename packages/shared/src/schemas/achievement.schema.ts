@@ -17,12 +17,7 @@ export type AchievementCategory = z.infer<typeof AchievementCategorySchema>;
 /**
  * Achievement rarity enum
  */
-export const AchievementRaritySchema = z.enum([
-  "common",
-  "rare",
-  "epic",
-  "legendary",
-]);
+export const AchievementRaritySchema = z.enum(["common", "rare", "epic", "legendary"]);
 
 export type AchievementRarity = z.infer<typeof AchievementRaritySchema>;
 
@@ -37,10 +32,7 @@ export const AchievementSchema = z.object({
   icon: z.string(),
   points: z.number().int(),
   rarity: AchievementRaritySchema,
-  condition: z.record(
-    z.string(),
-    z.union([z.string(), z.number(), z.boolean(), z.null()]),
-  ),
+  condition: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -82,9 +74,7 @@ export const ListAchievementsResponseSchema = z.object({
   data: z.array(UserAchievementSchema),
 });
 
-export type ListAchievementsResponse = z.infer<
-  typeof ListAchievementsResponseSchema
->;
+export type ListAchievementsResponse = z.infer<typeof ListAchievementsResponseSchema>;
 
 /**
  * Evaluate achievements request
@@ -94,9 +84,7 @@ export const EvaluateAchievementsSchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
 });
 
-export type EvaluateAchievementsInput = z.infer<
-  typeof EvaluateAchievementsSchema
->;
+export type EvaluateAchievementsInput = z.infer<typeof EvaluateAchievementsSchema>;
 
 /**
  * Evaluate achievements response
@@ -106,9 +94,7 @@ export const EvaluateAchievementsResponseSchema = z.object({
   totalPoints: z.number().int(),
 });
 
-export type EvaluateAchievementsResponse = z.infer<
-  typeof EvaluateAchievementsResponseSchema
->;
+export type EvaluateAchievementsResponse = z.infer<typeof EvaluateAchievementsResponseSchema>;
 
 /**
  * Achievement progress (for locked achievements)
@@ -142,9 +128,7 @@ export const AchievementWithProgressSchema = z.object({
   user_progress: AchievementProgressSchema.optional(),
 });
 
-export type AchievementWithProgress = z.infer<
-  typeof AchievementWithProgressSchema
->;
+export type AchievementWithProgress = z.infer<typeof AchievementWithProgressSchema>;
 
 /**
  * Category/rarity breakdown stats
@@ -162,10 +146,7 @@ export const AchievementStatsSchema = z.object({
   total_achievements: z.number().int(),
   unlocked_achievements: z.number().int(),
   total_points: z.number().int(),
-  breakdown_by_category: z.record(
-    AchievementCategorySchema,
-    BreakdownStatsSchema,
-  ),
+  breakdown_by_category: z.record(AchievementCategorySchema, BreakdownStatsSchema),
   breakdown_by_rarity: z.record(AchievementRaritySchema, BreakdownStatsSchema),
 });
 
@@ -183,9 +164,7 @@ export const AchievementLeaderboardEntrySchema = z.object({
   total_points: z.number().int(),
 });
 
-export type AchievementLeaderboardEntry = z.infer<
-  typeof AchievementLeaderboardEntrySchema
->;
+export type AchievementLeaderboardEntry = z.infer<typeof AchievementLeaderboardEntrySchema>;
 
 /**
  * GET /achievements/with-progress response

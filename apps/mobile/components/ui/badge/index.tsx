@@ -2,10 +2,7 @@
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/core/icon/creator";
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import {
-  useStyleContext,
-  withStyleContext,
-} from "@gluestack-ui/utils/nativewind-utils";
+import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import type { BadgeAction, BadgeSize, BadgeVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React, { useMemo } from "react";
@@ -135,10 +132,7 @@ function Badge({
   className,
   ...props
 }: IBadgeProps) {
-  const contextValue = useMemo(
-    () => ({ action, variant, size }),
-    [action, variant, size],
-  );
+  const contextValue = useMemo(() => ({ action, variant, size }), [action, variant, size]);
 
   return (
     <ContextView
@@ -154,74 +148,58 @@ function Badge({
 type IBadgeTextProps = React.ComponentPropsWithoutRef<typeof Text> &
   VariantProps<typeof badgeTextStyle>;
 
-const BadgeText = React.forwardRef<
-  React.ComponentRef<typeof Text>,
-  IBadgeTextProps
->(function BadgeText({ children, className, size, ...props }, ref) {
-  const { size: parentSize, action: parentAction } = useStyleContext(SCOPE);
-  return (
-    <Text
-      ref={ref}
-      className={badgeTextStyle({
-        parentVariants: {
-          size: parentSize,
-          action: parentAction,
-        },
-        size,
-        class: className,
-      })}
-      {...props}
-    >
-      {children}
-    </Text>
-  );
-});
+const BadgeText = React.forwardRef<React.ComponentRef<typeof Text>, IBadgeTextProps>(
+  function BadgeText({ children, className, size, ...props }, ref) {
+    const { size: parentSize, action: parentAction } = useStyleContext(SCOPE);
+    return (
+      <Text
+        ref={ref}
+        className={badgeTextStyle({
+          parentVariants: {
+            size: parentSize,
+            action: parentAction,
+          },
+          size,
+          class: className,
+        })}
+        {...props}
+      >
+        {children}
+      </Text>
+    );
+  },
+);
 
 type IBadgeIconProps = React.ComponentPropsWithoutRef<typeof PrimitiveIcon> &
   VariantProps<typeof badgeIconStyle>;
 
-const BadgeIcon = React.forwardRef<
-  React.ComponentRef<typeof Svg>,
-  IBadgeIconProps
->(function BadgeIcon({ className, size, ...props }, ref) {
-  const { size: parentSize, action: parentAction } = useStyleContext(SCOPE);
+const BadgeIcon = React.forwardRef<React.ComponentRef<typeof Svg>, IBadgeIconProps>(
+  function BadgeIcon({ className, size, ...props }, ref) {
+    const { size: parentSize, action: parentAction } = useStyleContext(SCOPE);
 
-  if (typeof size === "number") {
+    if (typeof size === "number") {
+      return (
+        <UIIcon ref={ref} {...props} className={badgeIconStyle({ class: className })} size={size} />
+      );
+    } else if ((props?.height !== undefined || props?.width !== undefined) && size === undefined) {
+      return <UIIcon ref={ref} {...props} className={badgeIconStyle({ class: className })} />;
+    }
     return (
       <UIIcon
-        ref={ref}
+        className={badgeIconStyle({
+          parentVariants: {
+            size: parentSize,
+            action: parentAction,
+          },
+          size,
+          class: className,
+        })}
         {...props}
-        className={badgeIconStyle({ class: className })}
-        size={size}
+        ref={ref}
       />
     );
-  } else if (
-    (props?.height !== undefined || props?.width !== undefined) &&
-    size === undefined
-  ) {
-    return (
-      <UIIcon
-        ref={ref}
-        {...props}
-        className={badgeIconStyle({ class: className })}
-      />
-    );
-  }
-  return (
-    <UIIcon
-      className={badgeIconStyle({
-        parentVariants: {
-          size: parentSize,
-          action: parentAction,
-        },
-        size,
-        class: className,
-      })}
-      {...props}
-      ref={ref}
-    />
-  );
-});
+  },
+);
 
 Badge.displayName = "Badge";
 BadgeText.displayName = "BadgeText";

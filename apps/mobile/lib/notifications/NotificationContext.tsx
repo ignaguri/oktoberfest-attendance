@@ -1,13 +1,7 @@
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import type { ReactNode } from "react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import {
   clearFCMToken,
@@ -57,9 +51,7 @@ interface NotificationContextType {
   clearNotificationState: () => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined,
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 /**
  * Notification Provider
@@ -89,9 +81,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     try {
       // Validate EXPO_PROJECT_ID is set before attempting to get token
       if (!EXPO_PROJECT_ID) {
-        logger.error(
-          "EAS project ID is not configured in app.config.ts. Cannot get push token.",
-        );
+        logger.error("EAS project ID is not configured in app.config.ts. Cannot get push token.");
         return null;
       }
 
@@ -127,8 +117,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         }
 
         // Check actual device permission status and sync with stored state
-        const { status: deviceStatus } =
-          await Notifications.getPermissionsAsync();
+        const { status: deviceStatus } = await Notifications.getPermissionsAsync();
 
         // Map expo permission status to our status type
         let actualStatus: NotificationPermissionStatus = "undetermined";
@@ -140,9 +129,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         // If device status differs from stored status, use device status (source of truth)
         if (actualStatus !== storedStatus) {
-          logger.debug(
-            `Syncing permission status: stored=${storedStatus}, device=${actualStatus}`,
-          );
+          logger.debug(`Syncing permission status: stored=${storedStatus}, device=${actualStatus}`);
           setPermissionStatusState(actualStatus);
           await setNotificationPermissionStatus(actualStatus);
         } else if (storedStatus) {
@@ -153,9 +140,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         // If permission is granted but no token stored, try to get one
         if (actualStatus === "granted" && !storedToken) {
-          logger.debug(
-            "Permission granted but no token, attempting to get Expo push token...",
-          );
+          logger.debug("Permission granted but no token, attempting to get Expo push token...");
           const token = await getExpoPushToken();
           if (token) {
             await saveExpoPushToken(token);
@@ -194,8 +179,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       await markPromptAsShown();
 
       // Request permission
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
 
       if (existingStatus === "granted") {
         setPermissionStatusState("granted");
@@ -241,9 +225,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // Check actual device permission status (not React state which may be stale)
       const { status } = await Notifications.getPermissionsAsync();
       if (status !== "granted") {
-        logger.warn(
-          "Cannot register for push notifications without permission",
-        );
+        logger.warn("Cannot register for push notifications without permission");
         return null;
       }
 
@@ -320,11 +302,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     clearNotificationState,
   };
 
-  return (
-    <NotificationContext.Provider value={value}>
-      {children}
-    </NotificationContext.Provider>
-  );
+  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }
 
 /**
@@ -333,9 +311,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 export function useNotificationContext() {
   const context = useContext(NotificationContext);
   if (context === undefined) {
-    throw new Error(
-      "useNotificationContext must be used within a NotificationProvider",
-    );
+    throw new Error("useNotificationContext must be used within a NotificationProvider");
   }
   return context;
 }

@@ -17,11 +17,7 @@ export interface UseSearchHistoryOptions {
 }
 
 export function useSearchHistory(options: UseSearchHistoryOptions = {}) {
-  const {
-    maxItems = 50,
-    storageKey = "search-history",
-    debounceMs: _debounceMs = 1000,
-  } = options;
+  const { maxItems = 50, storageKey = "search-history", debounceMs: _debounceMs = 1000 } = options;
 
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -132,9 +128,7 @@ export function useSearchHistory(options: UseSearchHistoryOptions = {}) {
       const query = currentQuery.toLowerCase();
       return history
         .filter(
-          (item) =>
-            item.query.toLowerCase().includes(query) &&
-            item.query.toLowerCase() !== query,
+          (item) => item.query.toLowerCase().includes(query) && item.query.toLowerCase() !== query,
         )
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, limit)

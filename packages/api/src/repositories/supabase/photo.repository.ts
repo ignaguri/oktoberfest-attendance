@@ -11,11 +11,7 @@ import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
-import {
-  DatabaseError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../middleware/error";
+import { DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
 import type { IPhotoRepository } from "../interfaces/photo.repository";
 
 export class SupabasePhotoRepository implements IPhotoRepository {
@@ -72,26 +68,19 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .single();
 
     if (pictureError) {
-      throw new DatabaseError(
-        `Failed to create picture record: ${pictureError.message}`,
-      );
+      throw new DatabaseError(`Failed to create picture record: ${pictureError.message}`);
     }
 
     // Replace localhost with actual network IP for mobile access (upload URLs only)
     const supabaseUrl =
-      process.env.SUPABASE_PUBLIC_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      "";
+      process.env.SUPABASE_PUBLIC_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
     const uploadUrl = replaceLocalhostInUrl(uploadData.signedUrl, supabaseUrl);
 
     // Get public URL for the response (but don't store it)
     const { data: publicUrlData } = this.supabase.storage
       .from(this.BUCKET_NAME)
       .getPublicUrl(filePath);
-    const publicUrl = replaceLocalhostInUrl(
-      publicUrlData.publicUrl,
-      supabaseUrl,
-    );
+    const publicUrl = replaceLocalhostInUrl(publicUrlData.publicUrl, supabaseUrl);
 
     return {
       uploadUrl,
@@ -118,10 +107,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     return this.mapToBeerPicture(data);
   }
 
-  async findByAttendance(
-    attendanceId: string,
-    userId: string,
-  ): Promise<BeerPicture[]> {
+  async findByAttendance(attendanceId: string, userId: string): Promise<BeerPicture[]> {
     // Verify attendance ownership
     const { data: attendance, error: attError } = await this.supabase
       .from("attendances")
@@ -164,10 +150,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       query = query.eq("attendances.festival_id", festivalId);
     }
 
-    const { data, error, count } = await query.range(
-      offset,
-      offset + limit - 1,
-    );
+    const { data, error, count } = await query.range(offset, offset + limit - 1);
 
     if (error) {
       throw new DatabaseError(`Failed to list pictures: ${error.message}`);
@@ -201,9 +184,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       try {
         const url = new URL(filePath);
         const pathParts = url.pathname.split("/");
-        filePath = pathParts
-          .slice(pathParts.indexOf(this.BUCKET_NAME) + 1)
-          .join("/");
+        filePath = pathParts.slice(pathParts.indexOf(this.BUCKET_NAME) + 1).join("/");
       } catch {
         // If URL parsing fails, assume it's already a path
       }
@@ -248,10 +229,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
    * Used when deleting an attendance to avoid FK constraint violation.
    * Storage files are kept for potential data restoration.
    */
-  async deleteByAttendanceId(
-    attendanceId: string,
-    userId: string,
-  ): Promise<void> {
+  async deleteByAttendanceId(attendanceId: string, userId: string): Promise<void> {
     // Delete database records only (keep storage files for potential restoration)
     const { error: dbError } = await this.supabase
       .from("beer_pictures")
@@ -264,17 +242,11 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     }
   }
 
-  async updateCaption(
-    _pictureId: string,
-    _userId: string,
-    _caption: string,
-  ): Promise<BeerPicture> {
+  async updateCaption(_pictureId: string, _userId: string, _caption: string): Promise<BeerPicture> {
     // Note: Current schema doesn't have caption field
     // This is a stub for future enhancement
     // TODO: Add caption field to beer_pictures table
-    throw new DatabaseError(
-      "Caption feature not yet implemented - schema needs update",
-    );
+    throw new DatabaseError("Caption feature not yet implemented - schema needs update");
   }
 
   private mapToBeerPicture(data: any): BeerPicture {
@@ -292,17 +264,12 @@ export class SupabasePhotoRepository implements IPhotoRepository {
   // ===== Photo Privacy Settings =====
 
   async getGlobalPhotoSettings(userId: string): Promise<GlobalPhotoSettings> {
-    const { data, error } = await this.supabase.rpc(
-      "get_user_photo_global_settings",
-      {
-        p_user_id: userId,
-      },
-    );
+    const { data, error } = await this.supabase.rpc("get_user_photo_global_settings", {
+      p_user_id: userId,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch global photo settings: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch global photo settings: ${error.message}`);
     }
 
     // Return default if no settings exist
@@ -317,18 +284,13 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     userId: string,
     hidePhotosFromAllGroups: boolean,
   ): Promise<GlobalPhotoSettings> {
-    const { error } = await this.supabase.rpc(
-      "update_user_photo_global_settings",
-      {
-        p_user_id: userId,
-        p_hide_photos_from_all_groups: hidePhotosFromAllGroups,
-      },
-    );
+    const { error } = await this.supabase.rpc("update_user_photo_global_settings", {
+      p_user_id: userId,
+      p_hide_photos_from_all_groups: hidePhotosFromAllGroups,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to update global photo settings: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to update global photo settings: ${error.message}`);
     }
 
     return {
@@ -337,10 +299,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     };
   }
 
-  async getGroupPhotoSettings(
-    userId: string,
-    groupId: string,
-  ): Promise<GroupPhotoSettings> {
+  async getGroupPhotoSettings(userId: string, groupId: string): Promise<GroupPhotoSettings> {
     // Get group name
     const { data: group, error: groupError } = await this.supabase
       .from("groups")
@@ -352,18 +311,13 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
     }
 
-    const { data, error } = await this.supabase.rpc(
-      "get_user_group_photo_settings",
-      {
-        p_user_id: userId,
-        p_group_id: groupId,
-      },
-    );
+    const { data, error } = await this.supabase.rpc("get_user_group_photo_settings", {
+      p_user_id: userId,
+      p_group_id: groupId,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to fetch group photo settings: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch group photo settings: ${error.message}`);
     }
 
     // Return default if no settings exist
@@ -392,19 +346,14 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
     }
 
-    const { error } = await this.supabase.rpc(
-      "update_user_group_photo_settings",
-      {
-        p_user_id: userId,
-        p_group_id: groupId,
-        p_hide_photos_from_group: hidePhotosFromGroup,
-      },
-    );
+    const { error } = await this.supabase.rpc("update_user_group_photo_settings", {
+      p_user_id: userId,
+      p_group_id: groupId,
+      p_hide_photos_from_group: hidePhotosFromGroup,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to update group photo settings: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to update group photo settings: ${error.message}`);
     }
 
     return {
@@ -415,9 +364,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     };
   }
 
-  async getAllGroupPhotoSettings(
-    userId: string,
-  ): Promise<GroupPhotoSettings[]> {
+  async getAllGroupPhotoSettings(userId: string): Promise<GroupPhotoSettings[]> {
     // Get all groups the user is a member of
     const { data: memberships, error: membershipError } = await this.supabase
       .from("group_members")
@@ -430,9 +377,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .eq("user_id", userId);
 
     if (membershipError) {
-      throw new DatabaseError(
-        `Failed to fetch group memberships: ${membershipError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch group memberships: ${membershipError.message}`);
     }
 
     if (!memberships || memberships.length === 0) {
@@ -448,9 +393,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     );
 
     if (settingsError) {
-      throw new DatabaseError(
-        `Failed to fetch all group photo settings: ${settingsError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch all group photo settings: ${settingsError.message}`);
     }
 
     // Create a map of group_id -> settings
@@ -495,9 +438,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .single();
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to update photo visibility: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to update photo visibility: ${error.message}`);
     }
 
     return this.mapToBeerPicture(data);
@@ -515,14 +456,11 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .in("id", photoIds);
 
     if (selectError) {
-      throw new DatabaseError(
-        `Failed to verify photo ownership: ${selectError.message}`,
-      );
+      throw new DatabaseError(`Failed to verify photo ownership: ${selectError.message}`);
     }
 
     // Check for unauthorized photos
-    const unauthorizedPhotos =
-      photos?.filter((p) => p.user_id !== userId) || [];
+    const unauthorizedPhotos = photos?.filter((p) => p.user_id !== userId) || [];
     if (unauthorizedPhotos.length > 0) {
       throw new ForbiddenError("Some photos do not belong to the current user");
     }
@@ -535,9 +473,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .eq("user_id", userId);
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to update photos visibility: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to update photos visibility: ${error.message}`);
     }
 
     return photoIds.length;

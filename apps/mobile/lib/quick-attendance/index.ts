@@ -1,4 +1,1 @@
-export {
-  QuickAttendanceProvider,
-  useQuickAttendance,
-} from "./QuickAttendanceContext";
+export { QuickAttendanceProvider, useQuickAttendance } from "./QuickAttendanceContext";

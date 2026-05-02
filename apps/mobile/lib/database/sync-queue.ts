@@ -68,10 +68,10 @@ export async function updateLastSyncAt(
   tableName: SyncableTable,
   timestamp: string,
 ): Promise<void> {
-  await db.runAsync(
-    `UPDATE _sync_metadata SET last_sync_at = ? WHERE table_name = ?`,
-    [timestamp, tableName],
-  );
+  await db.runAsync(`UPDATE _sync_metadata SET last_sync_at = ? WHERE table_name = ?`, [
+    timestamp,
+    tableName,
+  ]);
 }
 
 /**
@@ -82,18 +82,16 @@ export async function updatePullCursor(
   tableName: SyncableTable,
   cursor: string,
 ): Promise<void> {
-  await db.runAsync(
-    `UPDATE _sync_metadata SET last_pull_cursor = ? WHERE table_name = ?`,
-    [cursor, tableName],
-  );
+  await db.runAsync(`UPDATE _sync_metadata SET last_pull_cursor = ? WHERE table_name = ?`, [
+    cursor,
+    tableName,
+  ]);
 }
 
 /**
  * Gets all sync metadata records.
  */
-export async function getAllSyncMetadata(
-  db: SQLite.SQLiteDatabase,
-): Promise<SyncMetadata[]> {
+export async function getAllSyncMetadata(db: SQLite.SQLiteDatabase): Promise<SyncMetadata[]> {
   return db.getAllAsync<SyncMetadata>(`SELECT * FROM _sync_metadata`);
 }
 
@@ -146,9 +144,7 @@ export async function enqueueOperation(
     ],
   );
 
-  logger.debug(
-    `[SyncQueue] Enqueued ${operation} for ${tableName}/${recordId}`,
-  );
+  logger.debug(`[SyncQueue] Enqueued ${operation} for ${tableName}/${recordId}`);
   return id;
 }
 
@@ -176,9 +172,7 @@ export async function getPendingOperations(
 /**
  * Gets all pending operations (including those with unmet dependencies).
  */
-export async function getAllPendingOperations(
-  db: SQLite.SQLiteDatabase,
-): Promise<SyncQueueItem[]> {
+export async function getAllPendingOperations(db: SQLite.SQLiteDatabase): Promise<SyncQueueItem[]> {
   return db.getAllAsync<SyncQueueItem>(
     `SELECT * FROM _sync_queue WHERE status = 'pending' ORDER BY created_at ASC`,
   );
@@ -212,10 +206,10 @@ export async function updateOperationStatus(
       [status, error, operationId],
     );
   } else {
-    await db.runAsync(
-      `UPDATE _sync_queue SET status = ?, last_error = NULL WHERE id = ?`,
-      [status, operationId],
-    );
+    await db.runAsync(`UPDATE _sync_queue SET status = ?, last_error = NULL WHERE id = ?`, [
+      status,
+      operationId,
+    ]);
   }
 }
 
@@ -257,9 +251,7 @@ export async function retryOperation(
   db: SQLite.SQLiteDatabase,
   operationId: string,
 ): Promise<void> {
-  await db.runAsync(`UPDATE _sync_queue SET status = 'pending' WHERE id = ?`, [
-    operationId,
-  ]);
+  await db.runAsync(`UPDATE _sync_queue SET status = 'pending' WHERE id = ?`, [operationId]);
 }
 
 /**
@@ -279,9 +271,7 @@ export async function cleanupCompletedOperations(
   );
 
   if (result.changes > 0) {
-    logger.debug(
-      `[SyncQueue] Cleaned up ${result.changes} completed operations`,
-    );
+    logger.debug(`[SyncQueue] Cleaned up ${result.changes} completed operations`);
   }
   return result.changes;
 }
@@ -344,9 +334,7 @@ export async function markRecordDirty(
   tableName: SyncableTable,
   recordId: string,
 ): Promise<void> {
-  await db.runAsync(`UPDATE ${tableName} SET _dirty = 1 WHERE id = ?`, [
-    recordId,
-  ]);
+  await db.runAsync(`UPDATE ${tableName} SET _dirty = 1 WHERE id = ?`, [recordId]);
 }
 
 /**
@@ -358,10 +346,10 @@ export async function markRecordClean(
   recordId: string,
   syncedAt: string,
 ): Promise<void> {
-  await db.runAsync(
-    `UPDATE ${tableName} SET _dirty = 0, _synced_at = ? WHERE id = ?`,
-    [syncedAt, recordId],
-  );
+  await db.runAsync(`UPDATE ${tableName} SET _dirty = 0, _synced_at = ? WHERE id = ?`, [
+    syncedAt,
+    recordId,
+  ]);
 }
 
 /**
@@ -371,9 +359,7 @@ export async function getDirtyRecords<T>(
   db: SQLite.SQLiteDatabase,
   tableName: SyncableTable,
 ): Promise<T[]> {
-  return db.getAllAsync<T>(
-    `SELECT * FROM ${tableName} WHERE _dirty = 1 AND _deleted = 0`,
-  );
+  return db.getAllAsync<T>(`SELECT * FROM ${tableName} WHERE _dirty = 1 AND _deleted = 0`);
 }
 
 /**
@@ -433,26 +419,16 @@ export async function cleanupOrphanConsumptions(
 
   const placeholders = orphans.map(() => "?").join(",");
   const consumptionIds = orphans.map((o) => o.id);
-  const queueIds = orphans
-    .map((o) => o.queue_id)
-    .filter((q): q is string => !!q);
+  const queueIds = orphans.map((o) => o.queue_id).filter((q): q is string => !!q);
 
-  await db.runAsync(
-    `DELETE FROM consumptions WHERE id IN (${placeholders})`,
-    consumptionIds,
-  );
+  await db.runAsync(`DELETE FROM consumptions WHERE id IN (${placeholders})`, consumptionIds);
 
   if (queueIds.length > 0) {
     const qPlaceholders = queueIds.map(() => "?").join(",");
-    await db.runAsync(
-      `DELETE FROM _sync_queue WHERE id IN (${qPlaceholders})`,
-      queueIds,
-    );
+    await db.runAsync(`DELETE FROM _sync_queue WHERE id IN (${qPlaceholders})`, queueIds);
   }
 
-  logger.debug(
-    `[SyncQueue] Cleaned up ${orphans.length} orphan consumption rows`,
-  );
+  logger.debug(`[SyncQueue] Cleaned up ${orphans.length} orphan consumption rows`);
   return orphans.length;
 }
 
@@ -468,10 +444,7 @@ export async function softDeleteRecord(
   tableName: SyncableTable,
   recordId: string,
 ): Promise<void> {
-  await db.runAsync(
-    `UPDATE ${tableName} SET _deleted = 1, _dirty = 1 WHERE id = ?`,
-    [recordId],
-  );
+  await db.runAsync(`UPDATE ${tableName} SET _deleted = 1, _dirty = 1 WHERE id = ?`, [recordId]);
 }
 
 /**
@@ -482,9 +455,7 @@ export async function purgeDeletedRecords(
   db: SQLite.SQLiteDatabase,
   tableName: SyncableTable,
 ): Promise<number> {
-  const result = await db.runAsync(
-    `DELETE FROM ${tableName} WHERE _deleted = 1 AND _dirty = 0`,
-  );
+  const result = await db.runAsync(`DELETE FROM ${tableName} WHERE _deleted = 1 AND _dirty = 0`);
   return result.changes;
 }
 

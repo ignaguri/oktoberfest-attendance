@@ -11,10 +11,11 @@ export const ALLOWED_EMOJIS = [
   "\u{1F92E}", // face vomiting
 ] as const;
 
-export const EmojiSchema = z.string().refine(
-  (val) => (ALLOWED_EMOJIS as readonly string[]).includes(val),
-  { message: "Invalid emoji. Must be one of the allowed reactions." },
-);
+export const EmojiSchema = z
+  .string()
+  .refine((val) => (ALLOWED_EMOJIS as readonly string[]).includes(val), {
+    message: "Invalid emoji. Must be one of the allowed reactions.",
+  });
 
 // ===== Reaction Schemas =====
 
@@ -25,9 +26,7 @@ export const GetPhotoReactionsQuerySchema = z.object({
   groupId: z.string().uuid("Invalid group ID"),
 });
 
-export type GetPhotoReactionsQuery = z.infer<
-  typeof GetPhotoReactionsQuerySchema
->;
+export type GetPhotoReactionsQuery = z.infer<typeof GetPhotoReactionsQuerySchema>;
 
 /**
  * A user who reacted with a specific emoji
@@ -59,9 +58,7 @@ export const GetPhotoReactionsResponseSchema = z.object({
   userReactions: z.array(z.string()),
 });
 
-export type GetPhotoReactionsResponse = z.infer<
-  typeof GetPhotoReactionsResponseSchema
->;
+export type GetPhotoReactionsResponse = z.infer<typeof GetPhotoReactionsResponseSchema>;
 
 /**
  * Body for POST /photos/:photoId/reactions
@@ -81,9 +78,7 @@ export const RemovePhotoReactionSchema = z.object({
   emoji: EmojiSchema,
 });
 
-export type RemovePhotoReactionInput = z.infer<
-  typeof RemovePhotoReactionSchema
->;
+export type RemovePhotoReactionInput = z.infer<typeof RemovePhotoReactionSchema>;
 
 // ===== Comment Schemas =====
 
@@ -117,9 +112,7 @@ export const GetPhotoCommentsResponseSchema = z.object({
   comments: z.array(PhotoCommentSchema),
 });
 
-export type GetPhotoCommentsResponse = z.infer<
-  typeof GetPhotoCommentsResponseSchema
->;
+export type GetPhotoCommentsResponse = z.infer<typeof GetPhotoCommentsResponseSchema>;
 
 /**
  * Body for POST /photos/:photoId/comments
@@ -145,9 +138,7 @@ export const AddPhotoCommentResponseSchema = z.object({
   }),
 });
 
-export type AddPhotoCommentResponse = z.infer<
-  typeof AddPhotoCommentResponseSchema
->;
+export type AddPhotoCommentResponse = z.infer<typeof AddPhotoCommentResponseSchema>;
 
 /**
  * Success response for mutations

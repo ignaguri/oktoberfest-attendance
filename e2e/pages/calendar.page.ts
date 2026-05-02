@@ -124,9 +124,7 @@ export class CalendarPage extends BasePage {
    */
   async getSelectedDateText(): Promise<string> {
     // The date is displayed as a text like "September 21, 2024"
-    const dateContainer = this.page.locator(
-      "[class*='CardFooter'] .text-xs.font-medium",
-    );
+    const dateContainer = this.page.locator("[class*='CardFooter'] .text-xs.font-medium");
     return (await dateContainer.textContent()) || "";
   }
 
@@ -134,9 +132,7 @@ export class CalendarPage extends BasePage {
    * Check if there are events for the selected date
    */
   async hasEvents(): Promise<boolean> {
-    const noEventsVisible = await this.noEventsMessage
-      .isVisible()
-      .catch(() => false);
+    const noEventsVisible = await this.noEventsMessage.isVisible().catch(() => false);
     return !noEventsVisible;
   }
 

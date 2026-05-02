@@ -59,15 +59,7 @@ export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl" | "icon";
 /**
  * Button group spacing options
  */
-export type ButtonGroupSpace =
-  | "xs"
-  | "sm"
-  | "md"
-  | "lg"
-  | "xl"
-  | "2xl"
-  | "3xl"
-  | "4xl";
+export type ButtonGroupSpace = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 
 /**
  * Gluestack Button Props - used by both web and mobile implementations
@@ -177,15 +169,7 @@ export interface ButtonColorTokens {
 // Input
 // ============================================================================
 
-export type InputType =
-  | "text"
-  | "password"
-  | "email"
-  | "number"
-  | "tel"
-  | "url"
-  | "date"
-  | "file";
+export type InputType = "text" | "password" | "email" | "number" | "tel" | "url" | "date" | "file";
 
 /**
  * Input size determines height

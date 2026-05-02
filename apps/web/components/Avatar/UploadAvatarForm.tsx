@@ -24,11 +24,7 @@ export interface UploadAvatarFormProps {
   onUpload?: (url: string) => void;
 }
 
-export default function UploadAvatarForm({
-  className,
-  uid,
-  onUpload,
-}: UploadAvatarFormProps) {
+export default function UploadAvatarForm({ className, uid, onUpload }: UploadAvatarFormProps) {
   const { t } = useTranslation();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -57,15 +53,11 @@ export default function UploadAvatarForm({
       reset();
       setPreviewUrl(null);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("common.errors.generic"),
-      );
+      toast.error(error instanceof Error ? error.message : t("common.errors.generic"));
     }
   };
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];
     if (file) {
       setValue("avatar", file);
@@ -79,10 +71,7 @@ export default function UploadAvatarForm({
 
   return (
     <div className={className}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-center gap-4"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center gap-4">
         <AvatarPreview
           url={null}
           previewUrl={previewUrl}
@@ -93,10 +82,7 @@ export default function UploadAvatarForm({
             email: "no.name@email.com",
           }}
         />
-        <Label
-          htmlFor="avatar-upload"
-          className={buttonVariants({ variant: "outline" })}
-        >
+        <Label htmlFor="avatar-upload" className={buttonVariants({ variant: "outline" })}>
           Choose picture
         </Label>
         <Input

@@ -5,10 +5,7 @@ import { startTransition, useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type {
-  ComboboxOption,
-  ComboboxOptionGroup,
-} from "@/components/ui/combobox";
+import type { ComboboxOption, ComboboxOptionGroup } from "@/components/ui/combobox";
 import {
   Command,
   CommandEmpty,
@@ -17,11 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface MultiSelectProps {
@@ -97,9 +90,7 @@ export function MultiSelect({
             )}
             disabled={disabled}
           >
-            {selected.length > 0
-              ? `${selected.length} selected`
-              : placeholder || "Select options"}
+            {selected.length > 0 ? `${selected.length} selected` : placeholder || "Select options"}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -115,10 +106,7 @@ export function MultiSelect({
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandList>
               {options.map((group, groupIndex) => (
-                <CommandGroup
-                  key={group.title || `group-${groupIndex}`}
-                  heading={group.title}
-                >
+                <CommandGroup key={group.title || `group-${groupIndex}`} heading={group.title}>
                   {group.options.map((option: ComboboxOption) => (
                     <CommandItem
                       key={option.value}

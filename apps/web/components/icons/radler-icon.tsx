@@ -14,12 +14,7 @@ interface RadlerIconProps {
  */
 export function RadlerIcon({ className }: RadlerIconProps) {
   return (
-    <span
-      className={cn(
-        "relative inline-flex items-center justify-center",
-        className,
-      )}
-    >
+    <span className={cn("relative inline-flex items-center justify-center", className)}>
       {/* Main Beer Glass */}
       <Beer className="h-5 w-5" />
 

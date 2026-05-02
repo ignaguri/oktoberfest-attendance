@@ -27,8 +27,7 @@ export function TutorialOverlay() {
     skipTutorial,
   } = useTutorial();
 
-  const [targetMeasurement, setTargetMeasurement] =
-    useState<TargetMeasurement | null>(null);
+  const [targetMeasurement, setTargetMeasurement] = useState<TargetMeasurement | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   // Measure the target when step changes
@@ -115,10 +114,7 @@ export function TutorialOverlay() {
     >
       <Box className="flex-1" pointerEvents="box-none">
         {/* Dark overlay with spotlight cutout */}
-        <TutorialSpotlight
-          targetMeasurement={targetMeasurement}
-          visible={isReady}
-        />
+        <TutorialSpotlight targetMeasurement={targetMeasurement} visible={isReady} />
 
         {/* Tooltip with step info */}
         <TutorialTooltip

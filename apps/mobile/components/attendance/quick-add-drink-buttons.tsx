@@ -29,15 +29,7 @@ interface QuickAddDrinkButtonsProps {
 /**
  * Get the icon component for a drink type
  */
-function DrinkIcon({
-  type,
-  size,
-  color,
-}: {
-  type: DrinkType;
-  size: number;
-  color: string;
-}) {
+function DrinkIcon({ type, size, color }: { type: DrinkType; size: number; color: string }) {
   switch (type) {
     case "beer":
     case "radler":
@@ -183,11 +175,7 @@ export function QuickAddDrinkButtons({
               ) : isSuccess ? (
                 <Check size={24} color={Colors.success[500]} />
               ) : (
-                <DrinkIcon
-                  type={type}
-                  size={24}
-                  color={isDisabled ? IconColors.disabled : color}
-                />
+                <DrinkIcon type={type} size={24} color={isDisabled ? IconColors.disabled : color} />
               )}
               <Text
                 className={cn(

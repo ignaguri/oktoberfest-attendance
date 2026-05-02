@@ -9,9 +9,7 @@
 const args = process.argv.slice(2);
 const urlArgIndex = args.indexOf("--url");
 const baseUrl =
-  urlArgIndex !== -1 && args[urlArgIndex + 1]
-    ? args[urlArgIndex + 1]
-    : "http://localhost:3008";
+  urlArgIndex !== -1 && args[urlArgIndex + 1] ? args[urlArgIndex + 1] : "http://localhost:3008";
 
 const cronSecret: string =
   process.env.CRON_SECRET ??

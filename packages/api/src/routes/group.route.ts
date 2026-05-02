@@ -32,8 +32,7 @@ const createGroupRoute = createRoute({
   path: "/groups",
   tags: ["groups"],
   summary: "Create a new group",
-  description:
-    "Creates a group and automatically adds the creator as the first member",
+  description: "Creates a group and automatically adds the creator as the first member",
   request: {
     body: {
       content: {
@@ -86,8 +85,7 @@ const searchGroupsRoute = createRoute({
   path: "/groups/search",
   tags: ["groups"],
   summary: "Search groups by name",
-  description:
-    "Search for groups by name. Returns public group info (no invite tokens).",
+  description: "Search for groups by name. Returns public group info (no invite tokens).",
   request: {
     query: SearchGroupsQuerySchema,
   },
@@ -564,8 +562,7 @@ const removeMemberRoute = createRoute({
   path: "/groups/{id}/members/{userId}",
   tags: ["groups"],
   summary: "Remove a member from group",
-  description:
-    "Remove a user from the group. Only the group creator can do this.",
+  description: "Remove a user from the group. Only the group creator can do this.",
   request: {
     params: GroupMemberParamSchema,
   },
@@ -640,8 +637,7 @@ const renewTokenRoute = createRoute({
   path: "/groups/{id}/token/renew",
   tags: ["groups"],
   summary: "Regenerate invite token",
-  description:
-    "Generate a new invite token for the group. Only the group creator can do this.",
+  description: "Generate a new invite token for the group. Only the group creator can do this.",
   request: {
     params: GroupIdParamSchema,
   },
@@ -710,8 +706,7 @@ const getGalleryRoute = createRoute({
   path: "/groups/{id}/gallery",
   tags: ["groups"],
   summary: "Get group photo gallery",
-  description:
-    "Returns all public photos shared by group members for the group's festival",
+  description: "Returns all public photos shared by group members for the group's festival",
   request: {
     params: GroupIdParamSchema,
   },
@@ -780,8 +775,7 @@ const joinByTokenRoute = createRoute({
   path: "/groups/join-by-token",
   tags: ["groups"],
   summary: "Join a group by invite token",
-  description:
-    "Join a group using only the invite token, without knowing the group ID",
+  description: "Join a group using only the invite token, without knowing the group ID",
   request: {
     body: {
       content: {

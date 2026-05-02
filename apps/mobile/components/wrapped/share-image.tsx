@@ -1,9 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import {
-  getBestGlobalPosition,
-  prepareShareImageData,
-} from "@prostcounter/shared/wrapped";
+import { getBestGlobalPosition, prepareShareImageData } from "@prostcounter/shared/wrapped";
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 
@@ -83,13 +80,8 @@ export function ShareImage({ data }: ShareImageProps) {
             >
               #{bestGlobal.position}
             </Text>
-            <Text
-              className="mt-0.5 text-xs text-gray-400"
-              style={{ lineHeight: 16 }}
-            >
-              {t(
-                `wrapped.shareImage.criteriaLabels.${bestGlobal.criteria}` as const,
-              )}
+            <Text className="mt-0.5 text-xs text-gray-400" style={{ lineHeight: 16 }}>
+              {t(`wrapped.shareImage.criteriaLabels.${bestGlobal.criteria}` as const)}
             </Text>
           </View>
         )}
@@ -108,24 +100,13 @@ export function ShareImage({ data }: ShareImageProps) {
   );
 }
 
-function StatCard({
-  label,
-  value,
-  emoji,
-}: {
-  label: string;
-  value: string;
-  emoji: string;
-}) {
+function StatCard({ label, value, emoji }: { label: string; value: string; emoji: string }) {
   return (
     <View className="flex-1 items-center rounded-2xl bg-white px-3 py-4">
       <Text className="text-xl" style={{ lineHeight: 32 }}>
         {emoji}
       </Text>
-      <Text
-        className="mt-1 text-2xl font-bold text-gray-800"
-        style={{ lineHeight: 36 }}
-      >
+      <Text className="mt-1 text-2xl font-bold text-gray-800" style={{ lineHeight: 36 }}>
         {value}
       </Text>
       <Text className="mt-1 text-xs text-gray-500" style={{ lineHeight: 16 }}>

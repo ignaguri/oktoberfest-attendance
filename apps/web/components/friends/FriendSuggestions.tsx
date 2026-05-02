@@ -58,11 +58,7 @@ export function FriendSuggestions() {
                   </p>
                 )}
               </div>
-              <AddFriendButton
-                userId={suggestion.id}
-                initialStatus="none"
-                size="sm"
-              />
+              <AddFriendButton userId={suggestion.id} initialStatus="none" size="sm" />
             </CardContent>
           </Card>
         ))}

@@ -51,9 +51,7 @@ function ensureTaskDefined() {
       const userId = await AsyncStorage.getItem("current_user_id");
 
       if (!festivalId || !userId) {
-        logger.debug(
-          "[BackgroundSync] No festival or user ID found, skipping sync",
-        );
+        logger.debug("[BackgroundSync] No festival or user ID found, skipping sync");
         return BackgroundTaskResult.Success;
       }
 
@@ -103,8 +101,7 @@ export async function registerBackgroundSync(
     ensureTaskDefined();
 
     // Check if task is already registered
-    const isRegistered =
-      await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
     if (isRegistered) {
       logger.debug("[BackgroundSync] Task already registered");
       return true;
@@ -135,8 +132,7 @@ export async function unregisterBackgroundSync(): Promise<boolean> {
   }
 
   try {
-    const isRegistered =
-      await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
     if (!isRegistered) {
       return true;
     }

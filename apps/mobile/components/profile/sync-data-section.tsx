@@ -39,10 +39,7 @@ export function SyncDataSection() {
       return;
     }
     if (!hasFestival) {
-      showDialog(
-        t("common.status.error"),
-        t("profile.syncData.errorNoFestival"),
-      );
+      showDialog(t("common.status.error"), t("profile.syncData.errorNoFestival"));
       return;
     }
     showDialog(
@@ -55,11 +52,7 @@ export function SyncDataSection() {
 
   return (
     <>
-      <Card
-        size="sm"
-        variant="outline"
-        className="border-yellow-200 bg-yellow-50"
-      >
+      <Card size="sm" variant="outline" className="border-yellow-200 bg-yellow-50">
         <VStack space="sm" className="items-center">
           <Text className="text-center text-xs text-yellow-700">
             {t("profile.syncData.helper")}
@@ -77,14 +70,10 @@ export function SyncDataSection() {
             {isResyncing ? (
               <>
                 <ButtonSpinner color={Colors.primary[600]} />
-                <ButtonText className="text-yellow-700">
-                  {t("profile.syncData.syncing")}
-                </ButtonText>
+                <ButtonText className="text-yellow-700">{t("profile.syncData.syncing")}</ButtonText>
               </>
             ) : (
-              <ButtonText className="text-yellow-700">
-                {t("profile.syncData.button")}
-              </ButtonText>
+              <ButtonText className="text-yellow-700">{t("profile.syncData.button")}</ButtonText>
             )}
           </Button>
         </VStack>

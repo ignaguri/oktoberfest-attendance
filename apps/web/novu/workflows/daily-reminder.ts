@@ -49,8 +49,7 @@ export const dailyReminderWorkflow = workflow(
       async (controls: any) => {
         // dayOfYear is 1-based (Jan 1 => 1), so subtract 1 before modulo
         // to start the rotation at index 0 on day 1.
-        const messageIndex =
-          (payload.dayOfYear - 1) % MOTIVATIONAL_MESSAGES.length;
+        const messageIndex = (payload.dayOfYear - 1) % MOTIVATIONAL_MESSAGES.length;
         const message = MOTIVATIONAL_MESSAGES[messageIndex];
 
         return {
@@ -66,15 +65,11 @@ export const dailyReminderWorkflow = workflow(
           pushSubject: z
             .string()
             .default("")
-            .describe(
-              "Push notification title (leave empty for rotating messages)",
-            ),
+            .describe("Push notification title (leave empty for rotating messages)"),
           pushBody: z
             .string()
             .default("")
-            .describe(
-              "Push notification body (leave empty for rotating messages)",
-            ),
+            .describe("Push notification body (leave empty for rotating messages)"),
         }),
       },
     );

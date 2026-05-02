@@ -2,16 +2,7 @@ import { formatRelativeTime } from "@prostcounter/shared";
 import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  Award,
-  Beer,
-  BeerOff,
-  Camera,
-  CupSoda,
-  MapPin,
-  Users,
-  Wine,
-} from "lucide-react-native";
+import { Award, Beer, BeerOff, Camera, CupSoda, MapPin, Users, Wine } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { Image } from "react-native";
 
@@ -32,11 +23,7 @@ interface ActivityItemProps {
 }
 
 // Type-safe accessor for activity_data properties
-function getActivityDataValue<T>(
-  data: Record<string, unknown>,
-  key: string,
-  defaultValue: T,
-): T {
+function getActivityDataValue<T>(data: Record<string, unknown>, key: string, defaultValue: T): T {
   const value = data[key];
   if (value === undefined || value === null) return defaultValue;
   return value as T;
@@ -123,14 +110,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
     setSelectedUserId(null);
   }, []);
 
-  const {
-    username,
-    full_name,
-    avatar_url,
-    activity_time,
-    activity_type,
-    activity_data,
-  } = activity;
+  const { username, full_name, avatar_url, activity_time, activity_type, activity_data } = activity;
 
   // Format relative time using shared utility
   const timeAgo = useMemo(() => {
@@ -151,11 +131,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
           "drink_type",
           undefined,
         );
-        const drinkCount = getActivityDataValue<number>(
-          activity_data,
-          "drink_count",
-          0,
-        );
+        const drinkCount = getActivityDataValue<number>(activity_data, "drink_count", 0);
 
         // Fall back to beer_count for old activities
         const beerCount = getActivityDataValue<number>(
@@ -178,11 +154,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
       }
 
       case "tent_checkin": {
-        const tentName = getActivityDataValue(
-          activity_data,
-          "tent_name",
-          t("activityFeed.aTent"),
-        );
+        const tentName = getActivityDataValue(activity_data, "tent_name", t("activityFeed.aTent"));
         return t("activityFeed.checkedInto", {
           tent: tentName,
         });
@@ -248,10 +220,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         <VStack className="flex-1">
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
-              <Text
-                className="text-sm font-medium text-typography-900"
-                numberOfLines={1}
-              >
+              <Text className="text-sm font-medium text-typography-900" numberOfLines={1}>
                 {displayName}
               </Text>
               {getActivityIcon(activity_type, activity_data)}
@@ -263,10 +232,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
 
           {/* Photo thumbnail for photo uploads */}
           {activity_type === "photo_upload" && fullPictureUrl && (
-            <Pressable
-              onPress={() => handleImagePress(fullPictureUrl)}
-              className="mt-2"
-            >
+            <Pressable onPress={() => handleImagePress(fullPictureUrl)} className="mt-2">
               <Image
                 source={{ uri: fullPictureUrl }}
                 className="h-16 w-16 rounded-lg"
@@ -279,10 +245,7 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         </VStack>
 
         {/* Image Preview Modal */}
-        <ImagePreviewModal
-          imageUri={previewImage}
-          onClose={handleClosePreview}
-        />
+        <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />
       </HStack>
 
       {/* User Profile Modal */}

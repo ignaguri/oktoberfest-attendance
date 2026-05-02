@@ -29,10 +29,7 @@ export class ReservationService {
    * @param data - Reservation data
    * @returns Created reservation
    */
-  async createReservation(
-    userId: string,
-    data: CreateReservationInput,
-  ): Promise<Reservation> {
+  async createReservation(userId: string, data: CreateReservationInput): Promise<Reservation> {
     // Validate reservation is in the future
     const startAt = new Date(data.startAt);
     const now = new Date();
@@ -96,14 +93,7 @@ export class ReservationService {
     limit = 50,
     offset = 0,
   ): Promise<{ data: Reservation[]; total: number }> {
-    return this.reservationRepo.list(
-      userId,
-      festivalId,
-      status,
-      upcoming,
-      limit,
-      offset,
-    );
+    return this.reservationRepo.list(userId, festivalId, status, upcoming, limit, offset);
   }
 
   /**
@@ -203,9 +193,7 @@ export class ReservationService {
 
     // Validate end time if provided
     if (data.endAt) {
-      const startAt = data.startAt
-        ? new Date(data.startAt)
-        : new Date(existing.startAt);
+      const startAt = data.startAt ? new Date(data.startAt) : new Date(existing.startAt);
       const endAt = new Date(data.endAt);
 
       if (endAt <= startAt) {

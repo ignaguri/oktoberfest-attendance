@@ -1,20 +1,9 @@
-import type {
-  LocationSession,
-  LocationSessionMember,
-  NearbyTent,
-} from "@prostcounter/shared";
+import type { LocationSession, LocationSessionMember, NearbyTent } from "@prostcounter/shared";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import * as Location from "expo-location";
 import type { ReactNode } from "react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
 import {
@@ -93,23 +82,15 @@ interface LocationContextType {
   requestPermission: () => Promise<boolean>;
   requestBackgroundPermission: () => Promise<boolean>;
   markPromptAsShown: () => Promise<void>;
-  startSharing: (
-    festivalId: string,
-    options?: StartSharingOptions,
-  ) => Promise<StartSharingResult>;
+  startSharing: (festivalId: string, options?: StartSharingOptions) => Promise<StartSharingResult>;
   stopSharing: () => Promise<boolean>;
   startLocalTracking: (festivalId?: string) => Promise<boolean>;
   stopLocalTracking: () => void;
-  refreshNearby: (
-    festivalId?: string,
-    locationOverride?: Location.LocationObject,
-  ) => Promise<void>;
+  refreshNearby: (festivalId?: string, locationOverride?: Location.LocationObject) => Promise<void>;
   clearLocationState: () => Promise<void>;
 }
 
-const LocationContext = createContext<LocationContextType | undefined>(
-  undefined,
-);
+const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
 /**
  * Location Provider
@@ -125,15 +106,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [hasPromptBeenShown, setHasPromptBeenShown] = useState(false);
 
   // Session state
-  const [activeSession, setActiveSession] = useState<LocationSession | null>(
-    null,
-  );
+  const [activeSession, setActiveSession] = useState<LocationSession | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   // Nearby state
-  const [nearbyMembers, setNearbyMembers] = useState<LocationSessionMember[]>(
-    [],
-  );
+  const [nearbyMembers, setNearbyMembers] = useState<LocationSessionMember[]>([]);
   const [nearbyTents, setNearbyTents] = useState<NearbyTent[]>([]);
   const [isNearbyLoading, setIsNearbyLoading] = useState(false);
 
@@ -212,15 +189,8 @@ export function LocationProvider({ children }: { children: ReactNode }) {
    * @param options - Visibility + duration knobs; see StartSharingOptions
    */
   const startSharing = useCallback(
-    async (
-      festivalId: string,
-      options: StartSharingOptions = {},
-    ): Promise<StartSharingResult> => {
-      const {
-        durationMinutes = 120,
-        groupIds,
-        shareWithFriends = false,
-      } = options;
+    async (festivalId: string, options: StartSharingOptions = {}): Promise<StartSharingResult> => {
+      const { durationMinutes = 120, groupIds, shareWithFriends = false } = options;
       if (!location.hasPermission) {
         logger.warn("No permission to start sharing");
         return {
@@ -311,9 +281,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             backgroundWarning = t("location.warnings.backgroundNotStarted");
           }
         } else if (!location.hasBackgroundPermission) {
-          backgroundWarning = t(
-            "location.warnings.backgroundPermissionNotGranted",
-          );
+          backgroundWarning = t("location.warnings.backgroundPermissionNotGranted");
         }
 
         // Start foreground watching as well
@@ -339,10 +307,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         // Differentiate error types for better debugging
         let errorMessage = "Failed to start location sharing";
         if (error instanceof Error) {
-          if (
-            error.message.includes("permission") ||
-            error.message.includes("Location")
-          ) {
+          if (error.message.includes("permission") || error.message.includes("Location")) {
             logger.error("Permission error starting sharing", error);
             errorMessage = "Location permission error";
           } else if (
@@ -449,10 +414,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             })
           : Promise.resolve(null);
 
-        const [tentsResult, membersResult] = await Promise.all([
-          tentsPromise,
-          membersPromise,
-        ]);
+        const [tentsResult, membersResult] = await Promise.all([tentsPromise, membersPromise]);
 
         if (tentsResult?.tents) {
           setNearbyTents(tentsResult.tents);
@@ -704,11 +666,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     clearLocationState,
   };
 
-  return (
-    <LocationContext.Provider value={value}>
-      {children}
-    </LocationContext.Provider>
-  );
+  return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
 }
 
 /**
@@ -717,9 +675,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 export function useLocationContext() {
   const context = useContext(LocationContext);
   if (context === undefined) {
-    throw new Error(
-      "useLocationContext must be used within a LocationProvider",
-    );
+    throw new Error("useLocationContext must be used within a LocationProvider");
   }
   return context;
 }

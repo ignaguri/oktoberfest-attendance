@@ -33,11 +33,7 @@ export { DataProvider as QueryProvider } from "./query-client";
 export { useAttendances, useDeleteAttendance } from "../../hooks/useAttendance";
 
 // Festival hooks
-export {
-  useActiveFestival,
-  useFestivalById,
-  useFestivals,
-} from "../../hooks/useFestival";
+export { useActiveFestival, useFestivalById, useFestivals } from "../../hooks/useFestival";
 
 // Leaderboard hooks
 export {
@@ -74,10 +70,7 @@ export {
 export { useGroupCalendar, usePersonalCalendar } from "../../hooks/useCalendar";
 
 // Achievement hooks
-export {
-  useAvailableAchievements,
-  useUserAchievements,
-} from "../../hooks/useAchievements";
+export { useAvailableAchievements, useUserAchievements } from "../../hooks/useAchievements";
 
 // Admin hooks
 export {

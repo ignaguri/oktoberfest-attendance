@@ -41,20 +41,14 @@ export async function signInWithGoogle(): Promise<{
     }
 
     // Open browser for OAuth flow
-    const result = await WebBrowser.openAuthSessionAsync(
-      data.url,
-      redirectUri,
-      {
-        showInRecents: true,
-      },
-    );
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUri, {
+      showInRecents: true,
+    });
 
     if (result.type === "success") {
       // Extract the tokens from the URL
       const url = result.url;
-      const params = new URLSearchParams(
-        url.split("#")[1] || url.split("?")[1],
-      );
+      const params = new URLSearchParams(url.split("#")[1] || url.split("?")[1]);
       const accessToken = params.get("access_token");
       const refreshToken = params.get("refresh_token");
 
@@ -105,20 +99,14 @@ export async function signInWithFacebook(): Promise<{
     }
 
     // Open browser for OAuth flow
-    const result = await WebBrowser.openAuthSessionAsync(
-      data.url,
-      redirectUri,
-      {
-        showInRecents: true,
-      },
-    );
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUri, {
+      showInRecents: true,
+    });
 
     if (result.type === "success") {
       // Extract the tokens from the URL
       const url = result.url;
-      const params = new URLSearchParams(
-        url.split("#")[1] || url.split("?")[1],
-      );
+      const params = new URLSearchParams(url.split("#")[1] || url.split("?")[1]);
       const accessToken = params.get("access_token");
       const refreshToken = params.get("refresh_token");
 

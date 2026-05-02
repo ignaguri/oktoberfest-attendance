@@ -29,8 +29,7 @@ export const MessageItem = ({ message, festivalId }: MessageItemProps) => {
     }
   }, [message.createdAt]);
 
-  const displayName =
-    message.username || message.fullName || t("common.unknown");
+  const displayName = message.username || message.fullName || t("common.unknown");
 
   return (
     <div
@@ -77,9 +76,7 @@ export const MessageItem = ({ message, festivalId }: MessageItemProps) => {
           <span className="text-muted-foreground text-xs">{timeAgo}</span>
         </div>
 
-        <p className="text-muted-foreground text-left text-sm">
-          {message.content}
-        </p>
+        <p className="text-muted-foreground text-left text-sm">{message.content}</p>
 
         {isAlert && (
           <Badge className="mt-1 bg-yellow-500 text-xs text-white hover:bg-yellow-600">

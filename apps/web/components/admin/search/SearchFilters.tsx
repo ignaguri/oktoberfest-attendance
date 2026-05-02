@@ -56,9 +56,7 @@ export function SearchFilters({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const hasActiveFilters = filters.some((filter) => {
     if (filter.type === "checkbox") {
-      return Array.isArray(filter.value)
-        ? filter.value.length > 0
-        : filter.value;
+      return Array.isArray(filter.value) ? filter.value.length > 0 : filter.value;
     }
     if (filter.type === "dateRange") {
       return filter.value?.from || filter.value?.to;
@@ -116,16 +114,11 @@ export function SearchFilters({
                       if (checked) {
                         filter.onChange([...checkboxValue, option.value]);
                       } else {
-                        filter.onChange(
-                          checkboxValue.filter((v) => v !== option.value),
-                        );
+                        filter.onChange(checkboxValue.filter((v) => v !== option.value));
                       }
                     }}
                   />
-                  <Label
-                    htmlFor={`${filter.key}-${option.value}`}
-                    className="text-sm font-normal"
-                  >
+                  <Label htmlFor={`${filter.key}-${option.value}`} className="text-sm font-normal">
                     {option.label}
                   </Label>
                 </div>
@@ -197,12 +190,7 @@ export function SearchFilters({
         </div>
         <div className="flex items-center gap-2">
           {showClearAll && hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClearAll}
-              className="h-8 px-2"
-            >
+            <Button variant="ghost" size="sm" onClick={onClearAll} className="h-8 px-2">
               <X className="mr-1 h-3 w-3" />
               Clear All
             </Button>

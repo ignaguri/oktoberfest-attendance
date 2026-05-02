@@ -3,11 +3,7 @@ import { z } from "zod";
 /**
  * Group winning criteria enum
  */
-export const WinningCriteriaSchema = z.enum([
-  "days_attended",
-  "total_beers",
-  "avg_beers",
-]);
+export const WinningCriteriaSchema = z.enum(["days_attended", "total_beers", "avg_beers"]);
 
 export type WinningCriteria = z.infer<typeof WinningCriteriaSchema>;
 
@@ -55,11 +51,7 @@ export type CreateGroupInput = z.infer<typeof CreateGroupSchema>;
  * PUT /api/v1/groups/:id
  */
 export const UpdateGroupSchema = z.object({
-  name: z
-    .string()
-    .min(1)
-    .max(100, "Group name must be 100 characters or less")
-    .optional(),
+  name: z.string().min(1).max(100, "Group name must be 100 characters or less").optional(),
   winningCriteriaId: z.number().int().min(1).max(3).optional(),
   description: z.string().max(500).nullable().optional(),
 });
@@ -165,9 +157,7 @@ export const ListGroupMembersResponseSchema = z.object({
   data: z.array(GroupMemberSchema),
 });
 
-export type ListGroupMembersResponse = z.infer<
-  typeof ListGroupMembersResponseSchema
->;
+export type ListGroupMembersResponse = z.infer<typeof ListGroupMembersResponseSchema>;
 
 /**
  * User ID parameter for member removal

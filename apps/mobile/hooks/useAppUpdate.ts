@@ -89,14 +89,11 @@ export function useAppUpdate() {
     checkForUpdate();
 
     // Check when app returns to foreground
-    const subscription = AppState.addEventListener(
-      "change",
-      (status: AppStateStatus) => {
-        if (status === "active") {
-          checkForUpdate();
-        }
-      },
-    );
+    const subscription = AppState.addEventListener("change", (status: AppStateStatus) => {
+      if (status === "active") {
+        checkForUpdate();
+      }
+    });
 
     return () => subscription.remove();
   }, [checkForUpdate]);

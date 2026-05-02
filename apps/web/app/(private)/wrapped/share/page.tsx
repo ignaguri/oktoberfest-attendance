@@ -119,16 +119,9 @@ export default function ShareImagePage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <Button
-        onClick={handleDownload}
-        disabled={isGenerating}
-        size="lg"
-        variant="yellow"
-      >
+      <Button onClick={handleDownload} disabled={isGenerating} size="lg" variant="yellow">
         <Download className="mr-2 h-4 w-4" />
-        {isGenerating
-          ? t("home.wrapped.generatingButton")
-          : t("home.wrapped.downloadAgain")}
+        {isGenerating ? t("home.wrapped.generatingButton") : t("home.wrapped.downloadAgain")}
       </Button>
 
       {/* Centered ShareImage at proper scale */}

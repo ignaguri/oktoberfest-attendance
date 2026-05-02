@@ -8,12 +8,7 @@ import {
   withStyleContext,
 } from "@gluestack-ui/utils/nativewind-utils";
 // Import contract types from shared UI package
-import type {
-  ButtonAction,
-  ButtonGroupSpace,
-  ButtonSize,
-  ButtonVariant,
-} from "@prostcounter/ui";
+import type { ButtonAction, ButtonGroupSpace, ButtonSize, ButtonVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
@@ -106,26 +101,22 @@ const buttonStyle = tva({
     {
       action: "primary",
       variant: "outline",
-      class:
-        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
+      class: "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "secondary",
       variant: "outline",
-      class:
-        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
+      class: "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "positive",
       variant: "outline",
-      class:
-        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
+      class: "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "negative",
       variant: "outline",
-      class:
-        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
+      class: "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     // primaryDark compound variants
     {
@@ -137,21 +128,18 @@ const buttonStyle = tva({
     {
       action: "primaryDark",
       variant: "outline",
-      class:
-        "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
+      class: "bg-transparent data-[active=true]:bg-transparent data-[hover=true]:bg-background-50",
     },
     {
       action: "primaryDark",
       variant: "ghost",
-      class:
-        "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
+      class: "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
     },
     // ghost variant compound variants for all actions
     {
       action: "primary",
       variant: "ghost",
-      class:
-        "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
+      class: "bg-transparent data-[active=true]:bg-primary-200 data-[hover=true]:bg-primary-100",
     },
     {
       action: "secondary",
@@ -162,14 +150,12 @@ const buttonStyle = tva({
     {
       action: "positive",
       variant: "ghost",
-      class:
-        "bg-transparent data-[active=true]:bg-success-200 data-[hover=true]:bg-success-100",
+      class: "bg-transparent data-[active=true]:bg-success-200 data-[hover=true]:bg-success-100",
     },
     {
       action: "negative",
       variant: "ghost",
-      class:
-        "bg-transparent data-[active=true]:bg-error-200 data-[hover=true]:bg-error-100",
+      class: "bg-transparent data-[active=true]:bg-error-200 data-[hover=true]:bg-error-100",
     },
   ],
 });
@@ -186,8 +172,7 @@ const buttonTextStyle = tva({
         "text-typography-500 data-[active=true]:text-typography-700 data-[hover=true]:text-typography-600",
       positive:
         "text-success-600 data-[active=true]:text-success-700 data-[hover=true]:text-success-600",
-      negative:
-        "text-error-600 data-[active=true]:text-error-700 data-[hover=true]:text-error-600",
+      negative: "text-error-600 data-[active=true]:text-error-700 data-[hover=true]:text-error-600",
     },
     variant: {
       solid:
@@ -251,8 +236,7 @@ const buttonTextStyle = tva({
     {
       variant: "outline",
       action: "negative",
-      class:
-        "text-error-500 data-[active=true]:text-error-500 data-[hover=true]:text-error-500",
+      class: "text-error-500 data-[active=true]:text-error-500 data-[hover=true]:text-error-500",
     },
     // primaryDark compound variants
     {
@@ -295,8 +279,7 @@ const buttonTextStyle = tva({
     {
       variant: "ghost",
       action: "negative",
-      class:
-        "text-error-600 data-[active=true]:text-error-800 data-[hover=true]:text-error-700",
+      class: "text-error-600 data-[active=true]:text-error-800 data-[hover=true]:text-error-700",
     },
   ],
 });
@@ -328,8 +311,7 @@ const buttonIconStyle = tva({
         "text-typography-500 data-[active=true]:text-typography-700 data-[hover=true]:text-typography-600",
       positive:
         "text-success-600 data-[active=true]:text-success-700 data-[hover=true]:text-success-600",
-      negative:
-        "text-error-600 data-[active=true]:text-error-700 data-[hover=true]:text-error-600",
+      negative: "text-error-600 data-[active=true]:text-error-700 data-[hover=true]:text-error-600",
     },
   },
   parentCompoundVariants: [
@@ -391,8 +373,7 @@ const buttonIconStyle = tva({
     {
       variant: "ghost",
       action: "negative",
-      class:
-        "text-error-600 data-[active=true]:text-error-800 data-[hover=true]:text-error-700",
+      class: "text-error-600 data-[active=true]:text-error-800 data-[hover=true]:text-error-700",
     },
   ],
 });
@@ -425,10 +406,7 @@ const buttonGroupStyle = tva({
 /**
  * Button Props - implements @prostcounter/ui ButtonProps contract
  */
-type IButtonProps = Omit<
-  React.ComponentPropsWithoutRef<typeof UIButton>,
-  "context"
-> & {
+type IButtonProps = Omit<React.ComponentPropsWithoutRef<typeof UIButton>, "context"> & {
   /** Semantic color action - from contract */
   action?: ButtonAction;
   /** Visual style variant - from contract */
@@ -439,14 +417,8 @@ type IButtonProps = Omit<
   className?: string;
 };
 
-const Button = React.forwardRef<
-  React.ElementRef<typeof UIButton>,
-  IButtonProps
->(
-  (
-    { className, variant = "solid", size = "md", action = "primary", ...props },
-    ref,
-  ) => {
+const Button = React.forwardRef<React.ElementRef<typeof UIButton>, IButtonProps>(
+  ({ className, variant = "solid", size = "md", action = "primary", ...props }, ref) => {
     return (
       <UIButton
         ref={ref}
@@ -461,34 +433,33 @@ const Button = React.forwardRef<
 type IButtonTextProps = React.ComponentPropsWithoutRef<typeof UIButton.Text> &
   VariantProps<typeof buttonTextStyle> & { className?: string };
 
-const ButtonText = React.forwardRef<
-  React.ElementRef<typeof UIButton.Text>,
-  IButtonTextProps
->(({ className, variant, size, action, ...props }, ref) => {
-  const {
-    variant: parentVariant,
-    size: parentSize,
-    action: parentAction,
-  } = useStyleContext(SCOPE);
+const ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IButtonTextProps>(
+  ({ className, variant, size, action, ...props }, ref) => {
+    const {
+      variant: parentVariant,
+      size: parentSize,
+      action: parentAction,
+    } = useStyleContext(SCOPE);
 
-  return (
-    <UIButton.Text
-      ref={ref}
-      {...props}
-      className={buttonTextStyle({
-        parentVariants: {
-          variant: parentVariant,
-          size: parentSize,
-          action: parentAction,
-        },
-        variant,
-        size,
-        action,
-        class: className,
-      })}
-    />
-  );
-});
+    return (
+      <UIButton.Text
+        ref={ref}
+        {...props}
+        className={buttonTextStyle({
+          parentVariants: {
+            variant: parentVariant,
+            size: parentSize,
+            action: parentAction,
+          },
+          variant,
+          size,
+          action,
+          class: className,
+        })}
+      />
+    );
+  },
+);
 
 const ButtonSpinner = UIButton.Spinner;
 
@@ -500,60 +471,50 @@ type IButtonIcon = React.ComponentPropsWithoutRef<typeof UIButton.Icon> &
     width?: number;
   };
 
-const ButtonIcon = React.forwardRef<
-  React.ElementRef<typeof UIButton.Icon>,
-  IButtonIcon
->(({ className, size, ...props }, ref) => {
-  const {
-    variant: parentVariant,
-    size: parentSize,
-    action: parentAction,
-  } = useStyleContext(SCOPE);
+const ButtonIcon = React.forwardRef<React.ElementRef<typeof UIButton.Icon>, IButtonIcon>(
+  ({ className, size, ...props }, ref) => {
+    const {
+      variant: parentVariant,
+      size: parentSize,
+      action: parentAction,
+    } = useStyleContext(SCOPE);
 
-  if (typeof size === "number") {
+    if (typeof size === "number") {
+      return (
+        <UIButton.Icon
+          ref={ref}
+          {...props}
+          className={buttonIconStyle({ class: className })}
+          size={size}
+        />
+      );
+    } else if ((props.height !== undefined || props.width !== undefined) && size === undefined) {
+      return (
+        <UIButton.Icon ref={ref} {...props} className={buttonIconStyle({ class: className })} />
+      );
+    }
     return (
       <UIButton.Icon
-        ref={ref}
         {...props}
-        className={buttonIconStyle({ class: className })}
-        size={size}
+        className={buttonIconStyle({
+          parentVariants: {
+            size: parentSize,
+            variant: parentVariant,
+            action: parentAction,
+          },
+          size,
+          class: className,
+        })}
+        ref={ref}
       />
     );
-  } else if (
-    (props.height !== undefined || props.width !== undefined) &&
-    size === undefined
-  ) {
-    return (
-      <UIButton.Icon
-        ref={ref}
-        {...props}
-        className={buttonIconStyle({ class: className })}
-      />
-    );
-  }
-  return (
-    <UIButton.Icon
-      {...props}
-      className={buttonIconStyle({
-        parentVariants: {
-          size: parentSize,
-          variant: parentVariant,
-          action: parentAction,
-        },
-        size,
-        class: className,
-      })}
-      ref={ref}
-    />
-  );
-});
+  },
+);
 
 /**
  * ButtonGroup Props - implements @prostcounter/ui ButtonGroupProps contract
  */
-type IButtonGroupProps = React.ComponentPropsWithoutRef<
-  typeof UIButton.Group
-> & {
+type IButtonGroupProps = React.ComponentPropsWithoutRef<typeof UIButton.Group> & {
   /** Gap between buttons - from contract */
   space?: ButtonGroupSpace;
   /** Whether buttons are visually attached */
@@ -564,20 +525,8 @@ type IButtonGroupProps = React.ComponentPropsWithoutRef<
   className?: string;
 };
 
-const ButtonGroup = React.forwardRef<
-  React.ElementRef<typeof UIButton.Group>,
-  IButtonGroupProps
->(
-  (
-    {
-      className,
-      space = "md",
-      isAttached = false,
-      flexDirection = "column",
-      ...props
-    },
-    ref,
-  ) => {
+const ButtonGroup = React.forwardRef<React.ElementRef<typeof UIButton.Group>, IButtonGroupProps>(
+  ({ className, space = "md", isAttached = false, flexDirection = "column", ...props }, ref) => {
     return (
       <UIButton.Group
         className={buttonGroupStyle({

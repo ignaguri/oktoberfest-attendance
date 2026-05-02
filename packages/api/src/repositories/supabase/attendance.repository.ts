@@ -108,9 +108,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("festival_id", festivalId);
 
     if (countError) {
-      throw new DatabaseError(
-        `Failed to count attendances: ${countError.message}`,
-      );
+      throw new DatabaseError(`Failed to count attendances: ${countError.message}`);
     }
 
     // Get paginated data
@@ -135,9 +133,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("festival_id", festivalId);
 
     if (tentVisitsError) {
-      throw new DatabaseError(
-        `Failed to fetch tent visits: ${tentVisitsError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
     }
 
     // Map attendances and enrich with tent visits
@@ -204,9 +200,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .maybeSingle();
 
     if (fetchError) {
-      throw new DatabaseError(
-        `Failed to fetch attendance: ${fetchError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch attendance: ${fetchError.message}`);
     }
 
     if (!attendance) {
@@ -255,21 +249,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       now.getUTCMilliseconds(),
     );
 
-    const { data, error } = await this.supabase.rpc(
-      "add_or_update_attendance_with_tents",
-      {
-        p_user_id: userId,
-        p_beer_count: 0,
-        p_tent_ids: input.tents,
-        p_date: dateWithTime.toISOString(),
-        p_festival_id: input.festivalId,
-      },
-    );
+    const { data, error } = await this.supabase.rpc("add_or_update_attendance_with_tents", {
+      p_user_id: userId,
+      p_beer_count: 0,
+      p_tent_ids: input.tents,
+      p_date: dateWithTime.toISOString(),
+      p_festival_id: input.festivalId,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to create/update attendance: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to create/update attendance: ${error.message}`);
     }
 
     if (!data || data.length === 0) {
@@ -299,21 +288,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       now.getUTCMilliseconds(),
     );
 
-    const { data, error } = await this.supabase.rpc(
-      "update_personal_attendance_with_tents",
-      {
-        p_user_id: userId,
-        p_date: dateWithTime.toISOString(),
-        p_beer_count: 0,
-        p_tent_ids: input.tents.length > 0 ? input.tents : [],
-        p_festival_id: input.festivalId,
-      },
-    );
+    const { data, error } = await this.supabase.rpc("update_personal_attendance_with_tents", {
+      p_user_id: userId,
+      p_date: dateWithTime.toISOString(),
+      p_beer_count: 0,
+      p_tent_ids: input.tents.length > 0 ? input.tents : [],
+      p_festival_id: input.festivalId,
+    });
 
     if (error) {
-      throw new DatabaseError(
-        `Failed to update personal attendance: ${error.message}`,
-      );
+      throw new DatabaseError(`Failed to update personal attendance: ${error.message}`);
     }
 
     if (!data || data.length === 0) {
@@ -368,9 +352,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       if (attendanceError.code === PgErrorCode.NO_ROWS) {
         return null; // Not found
       }
-      throw new DatabaseError(
-        `Failed to fetch attendance: ${attendanceError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch attendance: ${attendanceError.message}`);
     }
 
     if (!attendance) {
@@ -378,12 +360,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     }
 
     // Validate required fields from view
-    if (
-      !attendance.id ||
-      !attendance.user_id ||
-      !attendance.festival_id ||
-      !attendance.date
-    ) {
+    if (!attendance.id || !attendance.user_id || !attendance.festival_id || !attendance.date) {
       throw new DatabaseError("Invalid attendance data from view");
     }
 
@@ -397,9 +374,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("festival_id", festivalId);
 
     if (tentVisitsError) {
-      throw new DatabaseError(
-        `Failed to fetch tent visits: ${tentVisitsError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
     }
 
     // Filter tent visits for this specific date
@@ -425,9 +400,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       .eq("attendance_id", attendance.id);
 
     if (picturesError) {
-      throw new DatabaseError(
-        `Failed to fetch beer pictures: ${picturesError.message}`,
-      );
+      throw new DatabaseError(`Failed to fetch beer pictures: ${picturesError.message}`);
     }
 
     // Build pictures array with IDs for deletion support

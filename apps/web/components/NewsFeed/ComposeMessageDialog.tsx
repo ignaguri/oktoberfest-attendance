@@ -125,12 +125,7 @@ export function ComposeMessageDialog({
               className="border-border bg-background text-foreground placeholder:text-muted-foreground min-h-[100px] resize-none rounded-lg border p-3 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none"
               autoFocus
             />
-            <span
-              className={cn(
-                "text-xs",
-                isOverLimit ? "text-red-500" : "text-muted-foreground",
-              )}
-            >
+            <span className={cn("text-xs", isOverLimit ? "text-red-500" : "text-muted-foreground")}>
               {t("groups.messages.compose.charCount", {
                 count: charCount,
                 max: MAX_CHARS,

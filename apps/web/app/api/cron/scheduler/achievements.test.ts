@@ -46,11 +46,7 @@ function createMockSupabase({ userEvents = [], groupEvents = [] }: Events) {
               id,
               name: `Ach ${id}`,
               description: `Desc ${id}`,
-              rarity: id.includes("epic")
-                ? "epic"
-                : id.includes("rare")
-                  ? "rare"
-                  : "common",
+              rarity: id.includes("epic") ? "epic" : id.includes("rare") ? "rare" : "common",
             })),
           })),
         })),
@@ -147,9 +143,7 @@ describe("processAchievementNotifications", () => {
 
     await processAchievementNotifications(supabase, notifications);
 
-    expect(
-      (notifications as any).notifyAchievementUnlocked,
-    ).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyAchievementUnlocked).toHaveBeenCalledTimes(1);
   });
 
   it("notifies group for rare/epic and sets group_notified_at", async () => {
@@ -169,8 +163,6 @@ describe("processAchievementNotifications", () => {
 
     await processAchievementNotifications(supabase, notifications);
 
-    expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledTimes(
-      1,
-    );
+    expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledTimes(1);
   });
 });

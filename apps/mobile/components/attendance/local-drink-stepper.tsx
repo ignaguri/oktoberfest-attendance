@@ -71,10 +71,7 @@ export function LocalDrinkStepper({
         accessibilityRole="button"
         accessibilityState={{ disabled: !canDecrement }}
       >
-        <Minus
-          size={20}
-          color={canDecrement ? IconColors.primary : IconColors.disabled}
-        />
+        <Minus size={20} color={canDecrement ? IconColors.primary : IconColors.disabled} />
       </Pressable>
 
       {/* Count display */}
@@ -103,10 +100,7 @@ export function LocalDrinkStepper({
         accessibilityRole="button"
         accessibilityState={{ disabled: !canIncrement }}
       >
-        <Plus
-          size={20}
-          color={canIncrement ? IconColors.primary : IconColors.disabled}
-        />
+        <Plus size={20} color={canIncrement ? IconColors.primary : IconColors.disabled} />
       </Pressable>
     </HStack>
   );

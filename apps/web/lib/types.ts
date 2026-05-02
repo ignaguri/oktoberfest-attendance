@@ -9,24 +9,18 @@ export type MaybeSession = Session | null;
 
 // Multi-Festival Types
 export type Festival = Database["public"]["Tables"]["festivals"]["Row"];
-export type FestivalInsert =
-  Database["public"]["Tables"]["festivals"]["Insert"];
-export type FestivalUpdate =
-  Database["public"]["Tables"]["festivals"]["Update"];
+export type FestivalInsert = Database["public"]["Tables"]["festivals"]["Insert"];
+export type FestivalUpdate = Database["public"]["Tables"]["festivals"]["Update"];
 
 export type FestivalType = Database["public"]["Enums"]["festival_type_enum"];
-export type FestivalStatus =
-  Database["public"]["Enums"]["festival_status_enum"];
+export type FestivalStatus = Database["public"]["Enums"]["festival_status_enum"];
 
-export type FestivalTent =
-  Database["public"]["Tables"]["festival_tents"]["Row"];
-export type FestivalTentInsert =
-  Database["public"]["Tables"]["festival_tents"]["Insert"];
+export type FestivalTent = Database["public"]["Tables"]["festival_tents"]["Row"];
+export type FestivalTentInsert = Database["public"]["Tables"]["festival_tents"]["Insert"];
 
 // Updated core types with festival_id
 export type Attendance = Database["public"]["Tables"]["attendances"]["Row"];
-export type AttendanceInsert =
-  Database["public"]["Tables"]["attendances"]["Insert"];
+export type AttendanceInsert = Database["public"]["Tables"]["attendances"]["Insert"];
 
 export type Group = Database["public"]["Tables"]["groups"]["Row"];
 export type GroupInsert = Database["public"]["Tables"]["groups"]["Insert"];
@@ -83,8 +77,4 @@ export interface GalleryItem {
   picture_data: PictureData[];
 }
 
-export type CalendarEventType =
-  | "attendance"
-  | "reservation"
-  | "beer_summary"
-  | "tent_visit";
+export type CalendarEventType = "attendance" | "reservation" | "beer_summary" | "tent_visit";

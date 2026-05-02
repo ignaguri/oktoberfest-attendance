@@ -95,10 +95,7 @@ export function TutorialTooltip({
   const description = t(`${step.translationKey}.description`);
 
   // Calculate tooltip position
-  const tooltipStyle = calculateTooltipPosition(
-    step.tooltipPosition,
-    targetMeasurement,
-  );
+  const tooltipStyle = calculateTooltipPosition(step.tooltipPosition, targetMeasurement);
 
   return (
     <Animated.View
@@ -134,9 +131,7 @@ export function TutorialTooltip({
                 key={index}
                 className={cn(
                   "mx-1 h-2 rounded-full",
-                  index === currentIndex
-                    ? "w-6 bg-primary-500"
-                    : "w-2 bg-gray-300",
+                  index === currentIndex ? "w-6 bg-primary-500" : "w-2 bg-gray-300",
                 )}
               />
             ))}
@@ -169,9 +164,7 @@ export function TutorialTooltip({
                   onPress={onPrevious}
                   accessibilityLabel={t("mobileTutorial.buttons.previous")}
                 >
-                  <ButtonText>
-                    {t("mobileTutorial.buttons.previous")}
-                  </ButtonText>
+                  <ButtonText>{t("mobileTutorial.buttons.previous")}</ButtonText>
                 </Button>
               )}
 
@@ -220,8 +213,7 @@ function calculateTooltipPosition(
     };
   }
 
-  const targetBottom =
-    targetMeasurement.pageY + targetMeasurement.height + padding;
+  const targetBottom = targetMeasurement.pageY + targetMeasurement.height + padding;
   const targetTop = targetMeasurement.pageY - padding;
 
   if (position === "bottom") {

@@ -32,10 +32,7 @@ describe("Crowd Report Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -79,10 +76,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess(mockCrowdStatus)),
       );
 
-      const req = createAuthRequest(
-        `/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -114,14 +110,11 @@ describe("Crowd Report Routes - Unit Tests", () => {
     });
 
     it("should return empty array when no crowd data exists", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -138,10 +131,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
         createMockChain({ data: null, error: null }),
       );
 
-      const req = createAuthRequest(
-        `/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -155,15 +147,12 @@ describe("Crowd Report Routes - Unit Tests", () => {
 
     it("should return 500 on database error", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to fetch crowd status", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to fetch crowd status", "PGRST000")),
       );
 
-      const req = createAuthRequest(
-        `/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -177,10 +166,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
     });
 
     it("should validate festivalId is a valid UUID", async () => {
-      const req = createAuthRequest(
-        "/tents/crowd-status?festivalId=invalid-uuid",
-        { method: "GET" },
-      );
+      const req = createAuthRequest("/tents/crowd-status?festivalId=invalid-uuid", {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -220,10 +208,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess(mockCrowdStatus)),
       );
 
-      const req = createAuthRequest(
-        `/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -236,10 +223,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
     });
 
     it("should require authentication", async () => {
-      const req = new Request(
-        `http://localhost/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = new Request(`http://localhost/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -287,10 +273,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess(mockReports)),
       );
 
-      const req = createAuthRequest(
-        `/tents/${tentId}/crowd-reports?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/${tentId}/crowd-reports?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -328,14 +313,11 @@ describe("Crowd Report Routes - Unit Tests", () => {
     });
 
     it("should return empty array when no reports exist", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
-      const req = createAuthRequest(
-        `/tents/${tentId}/crowd-reports?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/${tentId}/crowd-reports?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -352,10 +334,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
         createMockChain({ data: null, error: null }),
       );
 
-      const req = createAuthRequest(
-        `/tents/${tentId}/crowd-reports?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/${tentId}/crowd-reports?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -369,15 +350,12 @@ describe("Crowd Report Routes - Unit Tests", () => {
 
     it("should return 500 on database error", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to fetch tent reports", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to fetch tent reports", "PGRST000")),
       );
 
-      const req = createAuthRequest(
-        `/tents/${tentId}/crowd-reports?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/${tentId}/crowd-reports?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -391,10 +369,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
     });
 
     it("should validate tentId is a valid UUID", async () => {
-      const req = createAuthRequest(
-        `/tents/invalid-uuid/crowd-reports?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/invalid-uuid/crowd-reports?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -405,10 +382,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
     });
 
     it("should validate festivalId is a valid UUID", async () => {
-      const req = createAuthRequest(
-        `/tents/${tentId}/crowd-reports?festivalId=invalid-uuid`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/${tentId}/crowd-reports?festivalId=invalid-uuid`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -449,10 +425,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess(mockReports)),
       );
 
-      const req = createAuthRequest(
-        `/tents/${tentId}/crowd-reports?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = createAuthRequest(`/tents/${tentId}/crowd-reports?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -502,12 +477,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
       );
 
       // Second call: submitReport (insert + select + single)
-      const insertChain = createMockChain(
-        mockSupabaseSuccess(mockCreatedReport),
-      );
-      insertChain.single.mockResolvedValue(
-        mockSupabaseSuccess(mockCreatedReport),
-      );
+      const insertChain = createMockChain(mockSupabaseSuccess(mockCreatedReport));
+      insertChain.single.mockResolvedValue(mockSupabaseSuccess(mockCreatedReport));
       vi.mocked(mockSupabase.from).mockReturnValueOnce(insertChain);
 
       const req = createAuthRequest(`/tents/${tentId}/crowd-report`, {
@@ -528,14 +499,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
       });
       // Verify both from() calls happened
       expect(mockSupabase.from).toHaveBeenCalledTimes(2);
-      expect(mockSupabase.from).toHaveBeenNthCalledWith(
-        1,
-        "tent_crowd_reports",
-      );
-      expect(mockSupabase.from).toHaveBeenNthCalledWith(
-        2,
-        "tent_crowd_reports",
-      );
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "tent_crowd_reports");
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(2, "tent_crowd_reports");
     });
 
     it("should submit a report without waitTimeMinutes", async () => {
@@ -557,12 +522,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
       );
 
       // submitReport
-      const insertChain = createMockChain(
-        mockSupabaseSuccess(mockCreatedReport),
-      );
-      insertChain.single.mockResolvedValue(
-        mockSupabaseSuccess(mockCreatedReport),
-      );
+      const insertChain = createMockChain(mockSupabaseSuccess(mockCreatedReport));
+      insertChain.single.mockResolvedValue(mockSupabaseSuccess(mockCreatedReport));
       vi.mocked(mockSupabase.from).mockReturnValueOnce(insertChain);
 
       const req = createAuthRequest(`/tents/${tentId}/crowd-report`, {
@@ -605,9 +566,7 @@ describe("Crowd Report Routes - Unit Tests", () => {
     it("should return 500 when hasRecentReport database query fails", async () => {
       // hasRecentReport database error
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to check recent reports", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to check recent reports", "PGRST000")),
       );
 
       const req = createAuthRequest(`/tents/${tentId}/crowd-report`, {
@@ -767,15 +726,11 @@ describe("Crowd Report Routes - Unit Tests", () => {
         // Reset the mock chain for each iteration
         const mockFrom = vi
           .fn()
-          .mockImplementation(() =>
-            createMockChain({ data: null, error: null }),
-          );
+          .mockImplementation(() => createMockChain({ data: null, error: null }));
         (mockSupabase as any).from = mockFrom;
 
         // hasRecentReport
-        mockFrom.mockReturnValueOnce(
-          createMockChain({ data: null, error: null, count: 0 }),
-        );
+        mockFrom.mockReturnValueOnce(createMockChain({ data: null, error: null, count: 0 }));
 
         // submitReport
         const mockCreatedReport = {
@@ -784,12 +739,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
           wait_time_minutes: null,
           created_at: "2026-02-25T14:35:00Z",
         };
-        const insertChain = createMockChain(
-          mockSupabaseSuccess(mockCreatedReport),
-        );
-        insertChain.single.mockResolvedValue(
-          mockSupabaseSuccess(mockCreatedReport),
-        );
+        const insertChain = createMockChain(mockSupabaseSuccess(mockCreatedReport));
+        insertChain.single.mockResolvedValue(mockSupabaseSuccess(mockCreatedReport));
         mockFrom.mockReturnValueOnce(insertChain);
 
         const req = createAuthRequest(`/tents/${tentId}/crowd-report`, {
@@ -821,10 +772,9 @@ describe("Crowd Report Routes - Unit Tests", () => {
 
   describe("Authentication", () => {
     it("should require authentication for GET /tents/crowd-status", async () => {
-      const req = new Request(
-        `http://localhost/tents/crowd-status?festivalId=${festivalId}`,
-        { method: "GET" },
-      );
+      const req = new Request(`http://localhost/tents/crowd-status?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,

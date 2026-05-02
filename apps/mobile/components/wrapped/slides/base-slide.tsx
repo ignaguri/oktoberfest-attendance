@@ -56,9 +56,7 @@ export function SlideTitle({ children, isActive, delay = 0 }: SlideTitleProps) {
       animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
       transition={{ type: "timing", duration: 500, delay }}
     >
-      <Text className="text-center text-3xl font-bold text-gray-800">
-        {children}
-      </Text>
+      <Text className="text-center text-3xl font-bold text-gray-800">{children}</Text>
     </Motion.View>
   );
 }
@@ -69,11 +67,7 @@ interface SlideSubtitleProps {
   delay?: number;
 }
 
-export function SlideSubtitle({
-  children,
-  isActive,
-  delay = 100,
-}: SlideSubtitleProps) {
+export function SlideSubtitle({ children, isActive, delay = 100 }: SlideSubtitleProps) {
   return (
     <Motion.View
       initial={{ opacity: 0, y: 10 }}
@@ -93,13 +87,7 @@ interface StatItemProps {
   delay?: number;
 }
 
-export function StatItem({
-  label,
-  value,
-  icon,
-  isActive,
-  delay = 0,
-}: StatItemProps) {
+export function StatItem({ label, value, icon, isActive, delay = 0 }: StatItemProps) {
   return (
     <Motion.View
       initial={{ opacity: 0, y: 20 }}

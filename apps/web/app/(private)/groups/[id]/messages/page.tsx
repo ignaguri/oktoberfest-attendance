@@ -31,18 +31,12 @@ export default function MessagesPage({ params }: MessagesPageProps) {
   const [composeOpen, setComposeOpen] = useState(false);
 
   const pinnedMessages = useMemo(
-    () =>
-      (messages as GroupMessageItem[]).filter(
-        (m: GroupMessageItem) => m.pinned,
-      ),
+    () => (messages as GroupMessageItem[]).filter((m: GroupMessageItem) => m.pinned),
     [messages],
   );
 
   const regularMessages = useMemo(
-    () =>
-      (messages as GroupMessageItem[]).filter(
-        (m: GroupMessageItem) => !m.pinned,
-      ),
+    () => (messages as GroupMessageItem[]).filter((m: GroupMessageItem) => !m.pinned),
     [messages],
   );
 
@@ -97,11 +91,7 @@ export default function MessagesPage({ params }: MessagesPageProps) {
               </CardHeader>
               <CardContent className="flex flex-col gap-1 p-2">
                 {pinnedMessages.map((msg: GroupMessageItem) => (
-                  <MessageItem
-                    key={msg.id}
-                    message={msg}
-                    onDelete={handleDelete}
-                  />
+                  <MessageItem key={msg.id} message={msg} onDelete={handleDelete} />
                 ))}
               </CardContent>
             </Card>
@@ -112,11 +102,7 @@ export default function MessagesPage({ params }: MessagesPageProps) {
             <Card>
               <CardContent className="flex flex-col gap-1 p-2">
                 {regularMessages.map((msg: GroupMessageItem) => (
-                  <MessageItem
-                    key={msg.id}
-                    message={msg}
-                    onDelete={handleDelete}
-                  />
+                  <MessageItem key={msg.id} message={msg} onDelete={handleDelete} />
                 ))}
               </CardContent>
             </Card>
@@ -130,9 +116,7 @@ export default function MessagesPage({ params }: MessagesPageProps) {
               disabled={isFetchingNextPage}
               className="w-full"
             >
-              {isFetchingNextPage
-                ? t("common.buttons.loading")
-                : t("common.buttons.loadMore")}
+              {isFetchingNextPage ? t("common.buttons.loading") : t("common.buttons.loadMore")}
             </Button>
           )}
         </div>

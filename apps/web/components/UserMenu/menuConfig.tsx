@@ -168,19 +168,13 @@ export const getMenuSections = (t: TFunction): MenuSectionWithLabel[] => {
 /**
  * Get menu items by section with translated labels
  */
-export const getMenuItemsBySection = (
-  t: TFunction,
-  sectionId: string,
-): MenuItemWithLabel[] => {
+export const getMenuItemsBySection = (t: TFunction, sectionId: string): MenuItemWithLabel[] => {
   return getMenuItems(t).filter((item) => item.section === sectionId);
 };
 
 /**
  * Get a single menu item by ID with translated label
  */
-export const getMenuItemById = (
-  t: TFunction,
-  id: string,
-): MenuItemWithLabel | undefined => {
+export const getMenuItemById = (t: TFunction, id: string): MenuItemWithLabel | undefined => {
   return getMenuItems(t).find((item) => item.id === id);
 };

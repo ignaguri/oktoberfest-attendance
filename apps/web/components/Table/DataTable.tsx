@@ -53,10 +53,7 @@ export function DataTable<TData, TValue>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}
@@ -70,9 +67,7 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`cursor-pointer ${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                }`}
+                className={`cursor-pointer ${index % 2 === 0 ? "bg-white" : "bg-gray-100"}`}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

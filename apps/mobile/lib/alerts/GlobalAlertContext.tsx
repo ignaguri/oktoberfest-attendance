@@ -1,12 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react-native";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { View } from "react-native";
 
 import {
@@ -99,21 +93,15 @@ export function GlobalAlertProvider({ children }: GlobalAlertProviderProps) {
   const { t } = useTranslation();
   const [alert, setAlert] = useState<GlobalAlert | null>(null);
 
-  const showAlert = useCallback(
-    (title: string, message: string, type: AlertType = "info") => {
-      setAlert({ id: Date.now().toString(), title, message, type });
-    },
-    [],
-  );
+  const showAlert = useCallback((title: string, message: string, type: AlertType = "info") => {
+    setAlert({ id: Date.now().toString(), title, message, type });
+  }, []);
 
   const dismissAlert = useCallback(() => {
     setAlert(null);
   }, []);
 
-  const contextValue = useMemo(
-    () => ({ showAlert, dismissAlert }),
-    [showAlert, dismissAlert],
-  );
+  const contextValue = useMemo(() => ({ showAlert, dismissAlert }), [showAlert, dismissAlert]);
 
   return (
     <GlobalAlertContext.Provider value={contextValue}>
@@ -135,9 +123,7 @@ export function GlobalAlertProvider({ children }: GlobalAlertProviderProps) {
             </Heading>
           </AlertDialogHeader>
           <AlertDialogBody>
-            <Text className="text-center text-typography-600">
-              {alert?.message}
-            </Text>
+            <Text className="text-center text-typography-600">{alert?.message}</Text>
           </AlertDialogBody>
           <AlertDialogFooter className="pt-4">
             <Button

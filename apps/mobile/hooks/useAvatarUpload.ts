@@ -32,15 +32,14 @@ export function useAvatarUpload({
   onError,
 }: UseAvatarUploadOptions = {}): UseAvatarUploadReturn {
   const invalidateQueries = useInvalidateQueries();
-  const { pickImages, isUploading, setIsUploading, error, showError } =
-    useImageUpload({
-      onError,
-      compress: {
-        maxSize: 800,
-        quality: 0.8,
-      },
-      errorMessageKey: "imageUpload.errors.avatarUploadFailed",
-    });
+  const { pickImages, isUploading, setIsUploading, error, showError } = useImageUpload({
+    onError,
+    compress: {
+      maxSize: 800,
+      quality: 0.8,
+    },
+    errorMessageKey: "imageUpload.errors.avatarUploadFailed",
+  });
 
   async function pickImage(source: ImageSource) {
     const images = await pickImages(source);
@@ -54,12 +53,11 @@ export function useAvatarUpload({
       setIsUploading(true);
 
       // Step 1: Get signed upload URL
-      const { uploadUrl, fileName } =
-        await apiClient.profile.getAvatarUploadUrl({
-          fileName: image.originalFileName,
-          fileType: image.mimeType,
-          fileSize: image.arrayBuffer.byteLength,
-        });
+      const { uploadUrl, fileName } = await apiClient.profile.getAvatarUploadUrl({
+        fileName: image.originalFileName,
+        fileType: image.mimeType,
+        fileSize: image.arrayBuffer.byteLength,
+      });
 
       // Step 2: Upload compressed image directly to storage
       // Fix URL for local dev: replace localhost with the mobile client's Supabase host
@@ -82,8 +80,7 @@ export function useAvatarUpload({
 
       onSuccess?.(fileName);
     } catch (err) {
-      const uploadError =
-        err instanceof Error ? err : new Error("Upload failed");
+      const uploadError = err instanceof Error ? err : new Error("Upload failed");
       showError(uploadError);
     } finally {
       setIsUploading(false);

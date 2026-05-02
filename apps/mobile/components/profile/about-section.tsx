@@ -4,15 +4,7 @@ import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
-import {
-  Bug,
-  ChevronRight,
-  Lightbulb,
-  Share2,
-  Shield,
-  Sparkles,
-  Star,
-} from "lucide-react-native";
+import { Bug, ChevronRight, Lightbulb, Share2, Shield, Sparkles, Star } from "lucide-react-native";
 import { useCallback } from "react";
 
 import { Card } from "@/components/ui/card";
@@ -130,12 +122,7 @@ export function AboutSection() {
           onPress={requestReviewManually}
           bordered
         />
-        <ActionRow
-          label={t("profile.about.shareApp")}
-          Icon={Share2}
-          onPress={shareApp}
-          bordered
-        />
+        <ActionRow label={t("profile.about.shareApp")} Icon={Share2} onPress={shareApp} bordered />
 
         {LINKS.map((link, index) => (
           <LinkRow

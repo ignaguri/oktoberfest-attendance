@@ -22,8 +22,7 @@ import { useTranslation } from "@/lib/i18n/client";
 export function FriendRequests() {
   const { t } = useTranslation();
   const { data: incoming, loading: incomingLoading } = useFriendRequests();
-  const { data: outgoing, loading: outgoingLoading } =
-    useOutgoingFriendRequests();
+  const { data: outgoing, loading: outgoingLoading } = useOutgoingFriendRequests();
 
   const loading = incomingLoading || outgoingLoading;
   const hasIncoming = incoming && incoming.length > 0;
@@ -134,22 +133,13 @@ function IncomingRequestCard({ request }: RequestCardProps) {
           }}
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium">
-            {profile.fullName || profile.username}
-          </p>
+          <p className="truncate font-medium">{profile.fullName || profile.username}</p>
           {profile.username && profile.fullName && (
-            <p className="text-muted-foreground truncate text-sm">
-              @{profile.username}
-            </p>
+            <p className="text-muted-foreground truncate text-sm">@{profile.username}</p>
           )}
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="yellow"
-            size="sm"
-            onClick={handleAccept}
-            disabled={accept.loading}
-          >
+          <Button variant="yellow" size="sm" onClick={handleAccept} disabled={accept.loading}>
             {accept.loading ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
@@ -157,12 +147,7 @@ function IncomingRequestCard({ request }: RequestCardProps) {
             )}
             {t("friends.request.accept")}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDecline}
-            disabled={decline.loading}
-          >
+          <Button variant="outline" size="sm" onClick={handleDecline} disabled={decline.loading}>
             {decline.loading ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
@@ -204,26 +189,13 @@ function OutgoingRequestCard({ request }: RequestCardProps) {
           }}
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium">
-            {profile.fullName || profile.username}
-          </p>
+          <p className="truncate font-medium">{profile.fullName || profile.username}</p>
           {profile.username && profile.fullName && (
-            <p className="text-muted-foreground truncate text-sm">
-              @{profile.username}
-            </p>
+            <p className="text-muted-foreground truncate text-sm">@{profile.username}</p>
           )}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCancel}
-          disabled={cancel.loading}
-        >
-          {cancel.loading ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <X className="size-4" />
-          )}
+        <Button variant="outline" size="sm" onClick={handleCancel} disabled={cancel.loading}>
+          {cancel.loading ? <Loader2 className="size-4 animate-spin" /> : <X className="size-4" />}
           {t("friends.request.cancel")}
         </Button>
       </CardContent>

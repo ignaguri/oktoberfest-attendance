@@ -71,20 +71,14 @@ export async function GET(request: NextRequest) {
       reportSupabaseException("getLocationSharingPreferences", error, {
         id: user.id,
       });
-      return NextResponse.json(
-        { error: "Failed to fetch preferences" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to fetch preferences" }, { status: 500 });
     }
 
     return NextResponse.json({ preferences });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error in GET /api/location-sharing/preferences:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -104,13 +98,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const {
-      groupId,
-      festivalId,
-      sharingEnabled,
-      autoEnableOnCheckin,
-      notificationEnabled,
-    } = result.data;
+    const { groupId, festivalId, sharingEnabled, autoEnableOnCheckin, notificationEnabled } =
+      result.data;
 
     // Check authentication
     const {
@@ -130,10 +119,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (membershipError || !membership) {
-      return NextResponse.json(
-        { error: "Not a member of this group" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: "Not a member of this group" }, { status: 403 });
     }
 
     // Upsert location sharing preferences
@@ -160,27 +146,17 @@ export async function POST(request: NextRequest) {
       reportSupabaseException("updateLocationSharingPreferences", error, {
         id: user.id,
       });
-      return NextResponse.json(
-        { error: "Failed to update preferences" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to update preferences" }, { status: 500 });
     }
 
     // Send notification if sharing was enabled
     if (sharingEnabled) {
       try {
         const notificationService = createNotificationService();
-        await notificationService.notifyLocationSharing(
-          user.id,
-          groupId,
-          "started",
-        );
+        await notificationService.notifyLocationSharing(user.id, groupId, "started");
       } catch (_notifError) {
         // eslint-disable-next-line no-console
-        console.warn(
-          "Failed to send location sharing notification:",
-          _notifError,
-        );
+        console.warn("Failed to send location sharing notification:", _notifError);
         // Don't fail the request if notification fails
       }
     }
@@ -189,9 +165,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error in POST /api/location-sharing/preferences:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

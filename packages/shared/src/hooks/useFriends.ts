@@ -4,13 +4,7 @@
  * Uses ApiClientContext to get the platform-specific API client
  */
 
-import {
-  useApiClient,
-  useQuery,
-  useMutation,
-  useInvalidateQueries,
-  QueryKeys,
-} from "../data";
+import { useApiClient, useQuery, useMutation, useInvalidateQueries, QueryKeys } from "../data";
 
 /**
  * Hook to fetch accepted friends list

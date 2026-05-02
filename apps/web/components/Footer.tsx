@@ -19,12 +19,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             <Heart size={16} aria-hidden />
             <span>{t("footer.by")}</span>
           </span>
-          <Link
-            href="/r/github"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
+          <Link href="/r/github" target="_blank" rel="noopener noreferrer" className="underline">
             @ignaguri
           </Link>
         </div>
@@ -77,11 +72,7 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
               ·
             </span>
 
-            <Link
-              href="/privacy"
-              aria-label={t("footer.links.privacy")}
-              className="underline"
-            >
+            <Link href="/privacy" aria-label={t("footer.links.privacy")} className="underline">
               {t("footer.links.privacy")}
             </Link>
           </div>

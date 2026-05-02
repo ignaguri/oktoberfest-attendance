@@ -26,10 +26,7 @@ export function AttendanceDialog() {
     <Drawer open={open} onOpenChange={(o) => !o && handleClose()}>
       <DrawerContent className="max-h-[96vh] overflow-y-auto">
         <div className="mx-auto w-full max-w-lg p-4">
-          <DetailedAttendanceForm
-            onAttendanceUpdate={handleClose}
-            selectedDate={selectedDate}
-          />
+          <DetailedAttendanceForm onAttendanceUpdate={handleClose} selectedDate={selectedDate} />
         </div>
       </DrawerContent>
     </Drawer>

@@ -3,11 +3,7 @@ import type { FriendRequest } from "@prostcounter/shared/schemas";
 import { getInitials } from "@prostcounter/ui";
 import { useCallback } from "react";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -67,13 +63,9 @@ export function FriendRequestCard({
           </Avatar>
 
           <VStack space="xs" className="flex-1">
-            <Text className="text-base font-semibold text-typography-900">
-              {displayName}
-            </Text>
+            <Text className="text-base font-semibold text-typography-900">{displayName}</Text>
             {profile.username && profile.fullName && (
-              <Text className="text-sm text-typography-500">
-                @{profile.username}
-              </Text>
+              <Text className="text-sm text-typography-500">@{profile.username}</Text>
             )}
           </VStack>
         </HStack>

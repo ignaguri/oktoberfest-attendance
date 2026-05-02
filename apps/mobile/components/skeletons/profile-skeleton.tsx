@@ -60,11 +60,7 @@ export function ProfileSkeleton() {
       </Card>
 
       {/* Tutorial Section Skeleton */}
-      <Card
-        size="md"
-        variant="outline"
-        className="border-yellow-200 bg-yellow-50"
-      >
+      <Card size="md" variant="outline" className="border-yellow-200 bg-yellow-50">
         <VStack space="md" className="items-center">
           <Skeleton variant="rounded" className="h-5 w-24" />
           <Skeleton variant="rounded" className="h-4 w-48" />

@@ -3,11 +3,7 @@
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  isIOS,
-  isPWAInstalled,
-  supportsBeforeInstallPrompt,
-} from "@/lib/utils";
+import { isIOS, isPWAInstalled, supportsBeforeInstallPrompt } from "@/lib/utils";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -98,15 +94,9 @@ interface UseInstallPWAOptions {
 }
 
 export function useInstallPWA(options: UseInstallPWAOptions = {}) {
-  const {
-    enableAutoShow = false,
-    onPromptShow,
-    onInstallSuccess,
-    onPromptClose,
-  } = options;
+  const { enableAutoShow = false, onPromptShow, onInstallSuccess, onPromptClose } = options;
   const [canInstall, setCanInstall] = useState(false);
-  const [promptInstall, setPromptInstall] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [promptInstall, setPromptInstall] = useState<BeforeInstallPromptEvent | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -196,13 +186,7 @@ export function useInstallPWA(options: UseInstallPWAOptions = {}) {
       window.removeEventListener("beforeinstallprompt", handler);
       window.removeEventListener("appinstalled", checkInstalled);
     };
-  }, [
-    isClient,
-    enableAutoShow,
-    onPromptShow,
-    getPromptCount,
-    incrementPromptCount,
-  ]);
+  }, [isClient, enableAutoShow, onPromptShow, getPromptCount, incrementPromptCount]);
 
   const installPWA = useCallback(async () => {
     if (!promptInstall && !showIOSInstructions) {

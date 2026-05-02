@@ -35,20 +35,10 @@ export function AuthHeader({ size = "lg", tagline }: AuthHeaderProps) {
 
       {/* App Name with gradient-like styling */}
       <View className="mt-3 flex-row">
-        <Text
-          className={cn(
-            "font-bold text-primary-600",
-            isLarge ? "text-3xl" : "text-2xl",
-          )}
-        >
+        <Text className={cn("font-bold text-primary-600", isLarge ? "text-3xl" : "text-2xl")}>
           {t("app.namePart1")}
         </Text>
-        <Text
-          className={cn(
-            "font-bold text-primary-500",
-            isLarge ? "text-3xl" : "text-2xl",
-          )}
-        >
+        <Text className={cn("font-bold text-primary-500", isLarge ? "text-3xl" : "text-2xl")}>
           {t("app.namePart2")}
         </Text>
       </View>

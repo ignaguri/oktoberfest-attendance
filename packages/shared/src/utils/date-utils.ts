@@ -73,10 +73,7 @@ export function formatLocalized(date: Date, formatStr: string): string {
  * // Returns: "2024-09-15" (in Europe/Berlin timezone)
  * ```
  */
-export function formatDateForDatabase(
-  date: Date,
-  timezone: string = TIMEZONE,
-): string {
+export function formatDateForDatabase(date: Date, timezone: string = TIMEZONE): string {
   const tzDate = new TZDate(date, timezone);
   return format(tzDate, "yyyy-MM-dd");
 }
@@ -101,10 +98,7 @@ export function formatDateForDatabase(
  * // Returns: "2024-09-15T18:00:00.000+02:00" (in Europe/Berlin timezone)
  * ```
  */
-export function formatTimestampForDatabase(
-  date: Date,
-  timezone: string = TIMEZONE,
-): string {
+export function formatTimestampForDatabase(date: Date, timezone: string = TIMEZONE): string {
   const tzDate = new TZDate(date, timezone);
   return tzDate.toISOString();
 }

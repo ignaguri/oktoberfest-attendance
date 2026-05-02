@@ -41,9 +41,7 @@ export function DangerZone({
                 onPress={onCancelDelete}
                 accessibilityLabel={t("common.buttons.cancel")}
               >
-                <ButtonText className="text-red-600">
-                  {t("common.buttons.cancel")}
-                </ButtonText>
+                <ButtonText className="text-red-600">{t("common.buttons.cancel")}</ButtonText>
               </Button>
               <Button
                 className="flex-1 bg-red-500"

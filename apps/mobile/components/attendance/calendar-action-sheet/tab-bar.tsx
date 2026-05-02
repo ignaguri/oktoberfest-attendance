@@ -2,11 +2,7 @@ import { cn } from "@prostcounter/ui";
 import { useCallback } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";

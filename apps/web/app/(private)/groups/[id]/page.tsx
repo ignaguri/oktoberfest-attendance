@@ -10,11 +10,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import QRButton from "@/components/QR/QRButton";
 import ShareButton from "@/components/ShareButton/ShareButton";
 import { Button } from "@/components/ui/button";
-import {
-  useCurrentUser,
-  useGroupLeaderboard,
-  useGroupSettings,
-} from "@/lib/data";
+import { useCurrentUser, useGroupLeaderboard, useGroupSettings } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 import type { WinningCriteria } from "@/lib/types";
 
@@ -44,16 +40,16 @@ export default function GroupPage() {
 
   // The group data is nested inside the response
   const group = groupResponse?.data;
-  const isCreator =
-    !!group && !!currentUser && group.createdBy === currentUser.id;
+  const isCreator = !!group && !!currentUser && group.createdBy === currentUser.id;
   const inviteToken = group?.inviteToken ?? null;
 
   // Fetch leaderboard
-  const criteriaId = group
-    ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria]
-    : 0;
-  const { data: leaderboardData, loading: isLoadingLeaderboard } =
-    useGroupLeaderboard(groupId, criteriaId, currentFestival?.id || "");
+  const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;
+  const { data: leaderboardData, loading: isLoadingLeaderboard } = useGroupLeaderboard(
+    groupId,
+    criteriaId,
+    currentFestival?.id || "",
+  );
 
   const isLoading = isLoadingGroup || isLoadingLeaderboard;
   const isMember = group?.isMember ?? false;
@@ -71,9 +67,7 @@ export default function GroupPage() {
   if (groupError) {
     return (
       <div className="w-full max-w-lg text-center">
-        <p className="text-red-500">
-          {t("notifications.error.groupLoadFailed")}
-        </p>
+        <p className="text-red-500">{t("notifications.error.groupLoadFailed")}</p>
       </div>
     );
   }
@@ -139,18 +133,13 @@ export default function GroupPage() {
         />
       </div>
 
-      {group.description && (
-        <p className="mb-4 text-gray-600">{group.description}</p>
-      )}
+      {group.description && <p className="mb-4 text-gray-600">{group.description}</p>}
 
       <p className="mb-4 text-sm font-medium text-gray-500">
-        {t("groups.create.winningCriteria")}:{" "}
-        {t(`groups.winningCriteria.${group.winningCriteria}`)}
+        {t("groups.create.winningCriteria")}: {t(`groups.winningCriteria.${group.winningCriteria}`)}
       </p>
 
-      <p className="text-muted-foreground mb-2 text-xs">
-        {t("leaderboard.scoringNote")}
-      </p>
+      <p className="text-muted-foreground mb-2 text-xs">{t("leaderboard.scoringNote")}</p>
       <div className="flex flex-col gap-4">
         <Leaderboard
           entries={leaderboardEntries}
@@ -181,9 +170,7 @@ export default function GroupPage() {
             </Button>
           </div>
           <Button asChild variant="darkYellow">
-            <Link href={`/group-settings/${groupId}`}>
-              {t("groups.settings.title")}
-            </Link>
+            <Link href={`/group-settings/${groupId}`}>{t("groups.settings.title")}</Link>
           </Button>
           <div className="flex items-center gap-2">
             <QRButton

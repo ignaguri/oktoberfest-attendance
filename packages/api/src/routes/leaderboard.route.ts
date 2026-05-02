@@ -9,10 +9,7 @@ import {
 
 import type { AuthContext } from "../middleware/auth";
 import { ForbiddenError, NotFoundError } from "../middleware/error";
-import {
-  SupabaseGroupRepository,
-  SupabaseLeaderboardRepository,
-} from "../repositories/supabase";
+import { SupabaseGroupRepository, SupabaseLeaderboardRepository } from "../repositories/supabase";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -63,8 +60,7 @@ const globalLeaderboardRoute = createRoute({
   path: "/leaderboard",
   tags: ["leaderboard"],
   summary: "Get global leaderboard",
-  description:
-    "Returns ranked list of all users for a festival with pagination",
+  description: "Returns ranked list of all users for a festival with pagination",
   request: {
     query: GlobalLeaderboardQuerySchema,
   },

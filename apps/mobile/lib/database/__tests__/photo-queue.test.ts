@@ -64,9 +64,7 @@ function createMockDb() {
 }
 
 // Create mock photo
-function createMockPhoto(
-  overrides: Partial<LocalBeerPicture> = {},
-): LocalBeerPicture {
+function createMockPhoto(overrides: Partial<LocalBeerPicture> = {}): LocalBeerPicture {
   return {
     id: "photo-123",
     attendance_id: "attendance-123",
@@ -425,13 +423,11 @@ describe("enqueuePendingPhotosForAttendance", () => {
     // as an error rather than reporting success on the partial subset.
     const fileSystem = await import("expo-file-system/legacy");
     let call = 0;
-    (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockImplementation(
-      async () => {
-        call += 1;
-        if (call === 2) throw new Error("copy failed");
-        return undefined;
-      },
-    );
+    (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockImplementation(async () => {
+      call += 1;
+      if (call === 2) throw new Error("copy failed");
+      return undefined;
+    });
 
     const db = {
       getFirstAsync: vi.fn().mockResolvedValue(null),
@@ -441,10 +437,7 @@ describe("enqueuePendingPhotosForAttendance", () => {
 
     await expect(
       enqueuePendingPhotosForAttendance(db as never, {
-        pendingPhotos: [
-          { localUri: "file:///mock/a.jpg" },
-          { localUri: "file:///mock/b.jpg" },
-        ],
+        pendingPhotos: [{ localUri: "file:///mock/a.jpg" }, { localUri: "file:///mock/b.jpg" }],
         attendanceId: "att-1",
         userId: "user-1",
         festivalId: "festival-1",
@@ -453,9 +446,7 @@ describe("enqueuePendingPhotosForAttendance", () => {
     ).rejects.toThrow(/Failed to queue 1 of 2 photo/);
 
     // Reset for other tests
-    (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockResolvedValue(
-      undefined,
-    );
+    (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
   });
 });
 
@@ -489,9 +480,7 @@ describe("runUploadFileOp", () => {
 
   it("is a no-op when the photo is already uploaded", async () => {
     const db = {
-      getFirstAsync: vi
-        .fn()
-        .mockResolvedValue(createMockPhoto({ _pending_upload: 0 })),
+      getFirstAsync: vi.fn().mockResolvedValue(createMockPhoto({ _pending_upload: 0 })),
       getAllAsync: vi.fn().mockResolvedValue([]),
       runAsync: vi.fn().mockResolvedValue({ changes: 0 }),
     };

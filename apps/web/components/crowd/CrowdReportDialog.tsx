@@ -1,10 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useSubmitCrowdReport,
-  useTentCrowdReports,
-} from "@prostcounter/shared/hooks";
+import { useSubmitCrowdReport, useTentCrowdReports } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { AlertCircle, Send } from "lucide-react";
@@ -77,9 +74,7 @@ export function CrowdReportDialog({
 
   const [selectedTentId, setSelectedTentId] = useState<string | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<CrowdLevel | null>(null);
-  const [waitTimeMinutes, setWaitTimeMinutes] = useState<number | undefined>(
-    undefined,
-  );
+  const [waitTimeMinutes, setWaitTimeMinutes] = useState<number | undefined>(undefined);
 
   // Sync preselectedTentId into state when the dialog opens. The dialog is
   // always mounted (just hidden), so useState only runs once — prop changes
@@ -91,10 +86,7 @@ export function CrowdReportDialog({
   }, [open, preselectedTentId]);
 
   // Check rate limit for selected tent
-  const { reports } = useTentCrowdReports(
-    selectedTentId ?? undefined,
-    festivalId,
-  );
+  const { reports } = useTentCrowdReports(selectedTentId ?? undefined, festivalId);
 
   // eslint-disable-next-line react-hooks/purity -- Date.now() is intentionally impure; we want the current time each render
   const minutesSinceLastReport = getMinutesSinceLastReport(reports, Date.now());
@@ -120,15 +112,7 @@ export function CrowdReportDialog({
         toast.error(t("crowdReport.error"));
       }
     }
-  }, [
-    selectedTentId,
-    selectedLevel,
-    festivalId,
-    waitTimeMinutes,
-    submitReport,
-    onOpenChange,
-    t,
-  ]);
+  }, [selectedTentId, selectedLevel, festivalId, waitTimeMinutes, submitReport, onOpenChange, t]);
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
@@ -154,9 +138,7 @@ export function CrowdReportDialog({
         <div className="flex flex-col gap-4">
           {/* Tent Selector */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">
-              {t("attendance.tent.selectTents")}
-            </label>
+            <label className="text-sm font-medium">{t("attendance.tent.selectTents")}</label>
             <SingleSelect
               options={tents.map((group) => ({
                 title: group.category,
@@ -183,9 +165,7 @@ export function CrowdReportDialog({
 
           {/* Crowd Level Picker */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">
-              {t("crowdReport.selectLevel")}
-            </label>
+            <label className="text-sm font-medium">{t("crowdReport.selectLevel")}</label>
             <div
               className="grid grid-cols-4 gap-2"
               role="radiogroup"
@@ -207,12 +187,7 @@ export function CrowdReportDialog({
                         : "border-gray-200 bg-gray-50 hover:bg-gray-100",
                     )}
                   >
-                    <span
-                      className={cn(
-                        "size-3 rounded-full",
-                        CROWD_LEVEL_COLORS[level],
-                      )}
-                    />
+                    <span className={cn("size-3 rounded-full", CROWD_LEVEL_COLORS[level])} />
                     <span
                       className={cn(
                         "text-xs font-medium",
@@ -230,12 +205,8 @@ export function CrowdReportDialog({
           {/* Wait Time */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">
-                {t("crowdReport.waitTimeLabel")}
-              </label>
-              <span className="text-xs text-gray-400">
-                {t("crowdReport.waitTimeOptional")}
-              </span>
+              <label className="text-sm font-medium">{t("crowdReport.waitTimeLabel")}</label>
+              <span className="text-xs text-gray-400">{t("crowdReport.waitTimeOptional")}</span>
             </div>
             <div
               className="flex flex-wrap gap-1.5"
@@ -249,9 +220,7 @@ export function CrowdReportDialog({
                     key={minutes}
                     type="button"
                     aria-pressed={isSelected}
-                    onClick={() =>
-                      setWaitTimeMinutes(isSelected ? undefined : minutes)
-                    }
+                    onClick={() => setWaitTimeMinutes(isSelected ? undefined : minutes)}
                     className={cn(
                       "rounded-lg border px-3 py-1.5 text-sm transition-colors",
                       isSelected
@@ -268,9 +237,7 @@ export function CrowdReportDialog({
 
           {/* Inline error for rate-limit */}
           {error && error.includes("5 minutes") && (
-            <p className="text-sm text-red-600">
-              {t("crowdReport.rateLimited")}
-            </p>
+            <p className="text-sm text-red-600">{t("crowdReport.rateLimited")}</p>
           )}
 
           {/* Submit */}

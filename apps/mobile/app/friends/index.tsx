@@ -12,11 +12,7 @@ import {
   useUnfriend,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  Friend,
-  FriendRequest,
-  FriendSuggestion,
-} from "@prostcounter/shared/schemas";
+import type { Friend, FriendRequest, FriendSuggestion } from "@prostcounter/shared/schemas";
 import { getInitials } from "@prostcounter/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Search, UserPlus, Users, UserX } from "lucide-react-native";
@@ -35,11 +31,7 @@ import {
   AlertDialogHeader,
   useAlertDialog,
 } from "@/components/ui/alert-dialog";
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -59,9 +51,7 @@ export default function FriendsScreen() {
 
   // Tab state - supports deep linking via ?tab=requests
   const { tab } = useLocalSearchParams<{ tab?: string }>();
-  const [activeTab, setActiveTab] = useState<TabType>(
-    tab === "requests" ? "requests" : "friends",
-  );
+  const [activeTab, setActiveTab] = useState<TabType>(tab === "requests" ? "requests" : "friends");
 
   // Sync tab state when URL param changes (e.g. navigating back with different tab)
   useEffect(() => {
@@ -74,11 +64,7 @@ export default function FriendsScreen() {
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
   // Data hooks
-  const {
-    data: friends,
-    loading: friendsLoading,
-    refetch: refetchFriends,
-  } = useFriends();
+  const { data: friends, loading: friendsLoading, refetch: refetchFriends } = useFriends();
   const {
     data: suggestions,
     loading: suggestionsLoading,
@@ -182,9 +168,7 @@ export default function FriendsScreen() {
     <SafeAreaView className="flex-1 bg-background-50" edges={[]}>
       {/* Header */}
       <HStack className="items-center justify-between px-4 pb-2 pt-3">
-        <Text className="text-2xl font-bold text-typography-900">
-          {t("friends.title")}
-        </Text>
+        <Text className="text-2xl font-bold text-typography-900">{t("friends.title")}</Text>
         <Pressable
           onPress={() => router.push("/friends/search")}
           className="rounded-full p-2"
@@ -348,11 +332,7 @@ function MyFriendsTab({
 
   const renderFriendItem = ({ item }: { item: Friend }) => (
     <View className="px-4 py-1">
-      <FriendCard
-        friend={item}
-        festivalId={festivalId}
-        onUnfriend={onUnfriend}
-      />
+      <FriendCard friend={item} festivalId={festivalId} onUnfriend={onUnfriend} />
     </View>
   );
 
@@ -395,9 +375,7 @@ function MyFriendsTab({
     return (
       <VStack space="md" className="items-center px-8 pt-16">
         <Users size={56} color={Colors.gray[300]} />
-        <Text className="text-center text-base text-typography-500">
-          {t("friends.empty")}
-        </Text>
+        <Text className="text-center text-base text-typography-500">{t("friends.empty")}</Text>
         <Button
           variant="solid"
           action="primary"
@@ -465,10 +443,7 @@ function SuggestionCard({ suggestion, onAdd, loading }: SuggestionCardProps) {
   }, [onAdd, suggestion.id]);
 
   return (
-    <VStack
-      space="sm"
-      className="w-32 items-center rounded-2xl bg-white p-3 shadow-sm"
-    >
+    <VStack space="sm" className="w-32 items-center rounded-2xl bg-white p-3 shadow-sm">
       <Avatar size="lg">
         {suggestion.avatarUrl ? (
           <AvatarImage source={{ uri: getAvatarUrl(suggestion.avatarUrl) }} />
@@ -478,17 +453,11 @@ function SuggestionCard({ suggestion, onAdd, loading }: SuggestionCardProps) {
       </Avatar>
 
       <VStack space="xs" className="items-center">
-        <Text
-          className="text-center text-sm font-semibold text-typography-900"
-          numberOfLines={1}
-        >
+        <Text className="text-center text-sm font-semibold text-typography-900" numberOfLines={1}>
           {displayName}
         </Text>
         {sharedGroupsText && (
-          <Text
-            className="text-center text-xs text-typography-500"
-            numberOfLines={1}
-          >
+          <Text className="text-center text-xs text-typography-500" numberOfLines={1}>
             {sharedGroupsText}
           </Text>
         )}
@@ -554,8 +523,7 @@ function RequestsTab({
     );
   }
 
-  const isEmpty =
-    incomingRequests.length === 0 && outgoingRequests.length === 0;
+  const isEmpty = incomingRequests.length === 0 && outgoingRequests.length === 0;
 
   return (
     <ScrollView

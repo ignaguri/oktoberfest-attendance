@@ -77,38 +77,22 @@ const getActivityDescription = (activity: ActivityFeedItem, t: TFunction) => {
 
   switch (activity_type) {
     case "beer_count_update":
-      const beerCount = getActivityDataValue<number>(
-        activity_data,
-        "beer_count",
-        0,
-      );
+      const beerCount = getActivityDataValue<number>(activity_data, "beer_count", 0);
       return t("activityFeed.drankBeers", { count: beerCount });
 
     case "tent_checkin":
-      const tentName = getActivityDataValue(
-        activity_data,
-        "tent_name",
-        t("activityFeed.aTent"),
-      );
+      const tentName = getActivityDataValue(activity_data, "tent_name", t("activityFeed.aTent"));
       return t("activityFeed.checkedInto", { tent: tentName });
 
     case "photo_upload":
       return t("activityFeed.uploadedPhoto");
 
     case "group_join":
-      const groupName = getActivityDataValue(
-        activity_data,
-        "group_name",
-        t("activityFeed.aGroup"),
-      );
+      const groupName = getActivityDataValue(activity_data, "group_name", t("activityFeed.aGroup"));
       return t("activityFeed.joinedGroup", { group: groupName });
 
     case "achievement_unlock":
-      const rarity = getActivityDataValue<string | undefined>(
-        activity_data,
-        "rarity",
-        undefined,
-      );
+      const rarity = getActivityDataValue<string | undefined>(activity_data, "rarity", undefined);
       return rarity
         ? t("activityFeed.unlockedAchievementRarity", {
             rarity: t(`achievements.rarity.${rarity}`),
@@ -182,9 +166,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
             <span className="truncate text-sm font-medium transition-colors hover:text-yellow-600">
               {displayName}
             </span>
-            <span className="text-yellow-600">
-              {getActivityIcon(activity_type)}
-            </span>
+            <span className="text-yellow-600">{getActivityIcon(activity_type)}</span>
           </div>
           <span className="text-muted-foreground text-xs">{timeAgo}</span>
         </div>
@@ -202,26 +184,10 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
               undefined,
             ) && (
               <AchievementBadge
-                name={getActivityDataValue(
-                  activity_data,
-                  "achievement_name",
-                  "",
-                )}
-                icon={getActivityDataValue(
-                  activity_data,
-                  "achievement_icon",
-                  "trophy",
-                )}
-                rarity={getActivityDataValue<AchievementRarity>(
-                  activity_data,
-                  "rarity",
-                  "common",
-                )}
-                points={getActivityDataValue(
-                  activity_data,
-                  "achievement_points",
-                  0,
-                )}
+                name={getActivityDataValue(activity_data, "achievement_name", "")}
+                icon={getActivityDataValue(activity_data, "achievement_icon", "trophy")}
+                rarity={getActivityDataValue<AchievementRarity>(activity_data, "rarity", "common")}
+                points={getActivityDataValue(activity_data, "achievement_points", 0)}
                 isUnlocked={true}
                 size="sm"
                 showPoints={false}
@@ -259,10 +225,7 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
         )}
       </div>
 
-      <ImageModal
-        imageUrl={selectedImage}
-        onClose={() => setSelectedImage(null)}
-      />
+      <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />
     </div>
   );
 };

@@ -68,13 +68,7 @@ describe("Table Categorization", () => {
   });
 
   it("should have core tables in syncable list", () => {
-    const coreTables = [
-      "festivals",
-      "profiles",
-      "attendances",
-      "consumptions",
-      "beer_pictures",
-    ];
+    const coreTables = ["festivals", "profiles", "attendances", "consumptions", "beer_pictures"];
     for (const table of coreTables) {
       expect(SYNCABLE_TABLES).toContain(table);
     }
@@ -165,9 +159,7 @@ describe("Table Creation Order", () => {
 
 describe("Index Definitions", () => {
   it("should have index on sync queue status", () => {
-    const statusIndex = CREATE_INDEXES_SQL.find((sql) =>
-      sql.includes("idx_sync_queue_status"),
-    );
+    const statusIndex = CREATE_INDEXES_SQL.find((sql) => sql.includes("idx_sync_queue_status"));
     expect(statusIndex).toBeDefined();
     expect(statusIndex).toContain("status");
     expect(statusIndex).toContain("created_at");

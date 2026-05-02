@@ -47,9 +47,7 @@ export function CrowdStatusSummary({ festivalId }: CrowdStatusSummaryProps) {
       <Card size="md" variant="elevated" className="p-3">
         <HStack space="sm" className="items-center justify-center py-2">
           <ActivityIndicator size="small" color={Colors.primary[500]} />
-          <Text className="text-sm text-typography-500">
-            {t("common.buttons.loading")}
-          </Text>
+          <Text className="text-sm text-typography-500">{t("common.buttons.loading")}</Text>
         </HStack>
       </Card>
     );
@@ -82,9 +80,7 @@ export function CrowdStatusSummary({ festivalId }: CrowdStatusSummaryProps) {
               })}
             >
               <HStack className="items-center justify-between">
-                <Text className="flex-1 text-sm text-typography-700">
-                  {tent.tentName}
-                </Text>
+                <Text className="flex-1 text-sm text-typography-700">{tent.tentName}</Text>
                 <HStack space="sm" className="items-center">
                   <CrowdLevelBadge
                     crowdLevel={tent.crowdLevel}

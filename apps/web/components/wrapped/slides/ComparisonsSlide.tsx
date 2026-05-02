@@ -12,19 +12,13 @@ interface ComparisonsSlideProps {
   isActive?: boolean;
 }
 
-export function ComparisonsSlide({
-  data,
-  isActive = false,
-}: ComparisonsSlideProps) {
+export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlideProps) {
   const { t } = useTranslation();
 
   // Handle case where comparisons data might be null
   if (!data.comparisons) {
     return (
-      <BaseSlide
-        isActive={isActive}
-        className="bg-gradient-to-br from-teal-50 to-cyan-50"
-      >
+      <BaseSlide isActive={isActive} className="bg-gradient-to-br from-teal-50 to-cyan-50">
         <SlideTitle>{t("wrapped.comparisons.title")}</SlideTitle>
         <div className="text-center text-gray-600">
           <p>No comparison data available for this festival</p>
@@ -43,10 +37,7 @@ export function ComparisonsSlide({
   };
 
   return (
-    <BaseSlide
-      isActive={isActive}
-      className="bg-gradient-to-br from-teal-50 to-cyan-50"
-    >
+    <BaseSlide isActive={isActive} className="bg-gradient-to-br from-teal-50 to-cyan-50">
       <SlideTitle>{t("wrapped.comparisons.title")}</SlideTitle>
 
       <div className="w-full max-w-2xl space-y-6">
@@ -58,9 +49,7 @@ export function ComparisonsSlide({
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <span className="text-gray-700">
-                  {t("wrapped.comparisons.beers")}
-                </span>
+                <span className="text-gray-700">{t("wrapped.comparisons.beers")}</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_festival_avg.beers_diff_pct || 0)}
                   <span className="font-bold text-gray-800">
@@ -69,9 +58,7 @@ export function ComparisonsSlide({
                 </div>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <span className="text-gray-700">
-                  {t("wrapped.comparisons.days")}
-                </span>
+                <span className="text-gray-700">{t("wrapped.comparisons.days")}</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_festival_avg.days_diff_pct || 0)}
                   <span className="font-bold text-gray-800">
@@ -92,9 +79,7 @@ export function ComparisonsSlide({
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <span className="text-gray-700">
-                  {t("wrapped.comparisons.beers")}
-                </span>
+                <span className="text-gray-700">{t("wrapped.comparisons.beers")}</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_last_year.beers_diff || 0)}
                   <span className="font-bold text-gray-800">
@@ -104,9 +89,7 @@ export function ComparisonsSlide({
                 </div>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <span className="text-gray-700">
-                  {t("wrapped.comparisons.days")}
-                </span>
+                <span className="text-gray-700">{t("wrapped.comparisons.days")}</span>
                 <div className="flex items-center gap-2">
                   {getIcon(vs_last_year.days_diff || 0)}
                   <span className="font-bold text-gray-800">
@@ -122,9 +105,7 @@ export function ComparisonsSlide({
         {/* No data message */}
         {!vs_festival_avg && !vs_last_year && (
           <div className="rounded-xl bg-white p-6 text-center shadow-lg">
-            <p className="text-gray-600">
-              No comparison data available for this festival
-            </p>
+            <p className="text-gray-600">No comparison data available for this festival</p>
           </div>
         )}
       </div>

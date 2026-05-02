@@ -68,9 +68,7 @@ export function AttendanceDatePicker({
       <DrawerContent className="w-auto overflow-hidden p-0">
         <DrawerHeader className="sr-only">
           <DrawerTitle>{t("home.datePicker.title")}</DrawerTitle>
-          <DrawerDescription>
-            {t("home.datePicker.description")}
-          </DrawerDescription>
+          <DrawerDescription>{t("home.datePicker.description")}</DrawerDescription>
         </DrawerHeader>
         <Calendar
           mode="single"
@@ -83,10 +81,7 @@ export function AttendanceDatePicker({
             }
             setOpen(false);
           }}
-          className={cn(
-            "mx-auto [--cell-size:clamp(0px,calc(100vw/7.5),52px)]",
-            calendarClassName,
-          )}
+          className={cn("mx-auto [--cell-size:clamp(0px,calc(100vw/7.5),52px)]", calendarClassName)}
           startMonth={subMonths(festivalStartDate, 1)}
           endMonth={addMonths(festivalEndDate, 1)}
           disabled={[{ before: festivalStartDate }, { after: festivalEndDate }]}

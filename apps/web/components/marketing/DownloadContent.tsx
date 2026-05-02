@@ -74,10 +74,7 @@ export function DownloadContent() {
         </motion.p>
 
         {/* Platform cards */}
-        <motion.div
-          className="mb-12 grid gap-4 sm:grid-cols-3"
-          variants={stagger}
-        >
+        <motion.div className="mb-12 grid gap-4 sm:grid-cols-3" variants={stagger}>
           {platformKeys.map((platform) => (
             <motion.div
               key={platform.key}
@@ -88,20 +85,14 @@ export function DownloadContent() {
                 size={32}
                 className={`mx-auto mb-3 ${platform.available ? "text-yellow-500" : "text-gray-300"}`}
               />
-              <h2 className="text-lg font-bold text-gray-900">
-                {platform.name}
-              </h2>
+              <h2 className="text-lg font-bold text-gray-900">{platform.name}</h2>
               <p className="mb-4 text-sm text-gray-500">
                 {t(`marketing.download.${platform.key}.description`)}
               </p>
               {platform.available ? (
                 <Button variant="yellow" size="sm" asChild className="w-fit">
                   {platform.href.startsWith("http") ? (
-                    <a
-                      href={platform.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={platform.href} target="_blank" rel="noopener noreferrer">
                       <Download size={16} />
                       {t(`marketing.download.${platform.key}.action`)}
                     </a>
@@ -113,9 +104,7 @@ export function DownloadContent() {
                 </Button>
               ) : (
                 <Button variant="outline" size="sm" asChild className="w-full">
-                  <Link href={platform.href}>
-                    {t(`marketing.download.${platform.key}.action`)}
-                  </Link>
+                  <Link href={platform.href}>{t(`marketing.download.${platform.key}.action`)}</Link>
                 </Button>
               )}
             </motion.div>
@@ -137,9 +126,7 @@ export function DownloadContent() {
             height={200}
             className="mx-auto"
           />
-          <p className="mt-4 text-xs text-gray-400">
-            {t("marketing.download.opensAppStore")}
-          </p>
+          <p className="mt-4 text-xs text-gray-400">{t("marketing.download.opensAppStore")}</p>
         </motion.div>
 
         {/* Apple Watch Companion */}

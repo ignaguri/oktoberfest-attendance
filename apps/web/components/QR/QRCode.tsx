@@ -35,10 +35,6 @@ export default function QRCode({ value, size = 200, className }: QRCodeProps) {
   }, [value, size]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{ maxWidth: "100%", height: "auto" }}
-    />
+    <canvas ref={canvasRef} className={className} style={{ maxWidth: "100%", height: "auto" }} />
   );
 }

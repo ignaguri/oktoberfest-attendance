@@ -6,12 +6,7 @@ import { z } from "zod";
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const MAX_FILE_SIZE_MB = 10;
 export const MAX_PICTURES = 10;
-export const VALID_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-] as const;
+export const VALID_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"] as const;
 
 export type ValidImageType = (typeof VALID_IMAGE_TYPES)[number];
 

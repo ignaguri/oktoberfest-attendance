@@ -26,11 +26,7 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
 import type { SyncQueueItem } from "@/lib/database/schema";
-import {
-  deleteOperation,
-  getFailedOperations,
-  retryOperation,
-} from "@/lib/database/sync-queue";
+import { deleteOperation, getFailedOperations, retryOperation } from "@/lib/database/sync-queue";
 import { logger } from "@/lib/logger";
 
 interface FailedOperationsSheetProps {
@@ -41,10 +37,7 @@ interface FailedOperationsSheetProps {
 /**
  * Sheet displaying failed sync operations with retry/delete options
  */
-export function FailedOperationsSheet({
-  isOpen,
-  onClose,
-}: FailedOperationsSheetProps) {
+export function FailedOperationsSheet({ isOpen, onClose }: FailedOperationsSheetProps) {
   const { t } = useTranslation();
   const { isReady, getDb, sync, refreshPendingCount } = useOfflineSafe();
 
@@ -132,14 +125,7 @@ export function FailedOperationsSheet({
     } finally {
       setIsLoading(false);
     }
-  }, [
-    isReady,
-    getDb,
-    failedOps,
-    sync,
-    loadFailedOperations,
-    refreshPendingCount,
-  ]);
+  }, [isReady, getDb, failedOps, sync, loadFailedOperations, refreshPendingCount]);
 
   const handleDismissAll = useCallback(async () => {
     if (!isReady) return;
@@ -206,9 +192,7 @@ export function FailedOperationsSheet({
             </VStack>
           ) : failedOps.length === 0 ? (
             <VStack className="items-center py-8">
-              <Text className="text-typography-500">
-                {t("sync.failedOps.noFailures")}
-              </Text>
+              <Text className="text-typography-500">{t("sync.failedOps.noFailures")}</Text>
             </VStack>
           ) : (
             <>
@@ -230,10 +214,7 @@ export function FailedOperationsSheet({
                         <Text className="font-medium text-typography-900">
                           {getOperationLabel(op)}
                         </Text>
-                        <Text
-                          className="text-xs text-error-600"
-                          numberOfLines={2}
-                        >
+                        <Text className="text-xs text-error-600" numberOfLines={2}>
                           {op.last_error || t("sync.failedOps.unknownError")}
                         </Text>
                         <Text className="text-xs text-typography-400">

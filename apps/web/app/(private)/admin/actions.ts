@@ -20,8 +20,7 @@ const getCachedUsers = unstable_cache(
     // If searching, use a more efficient approach with proper pagination
     if (search) {
       // First, get all users from auth to search by email
-      const { data: allUsers, error: usersError } =
-        await supabase.auth.admin.listUsers();
+      const { data: allUsers, error: usersError } = await supabase.auth.admin.listUsers();
       if (usersError) {
         throw new Error("Error fetching users: " + usersError.message);
       }
@@ -53,24 +52,15 @@ const getCachedUsers = unstable_cache(
       ]);
 
       if (nameResults.error) {
-        throw new Error(
-          "Error fetching profiles: " + nameResults.error.message,
-        );
+        throw new Error("Error fetching profiles: " + nameResults.error.message);
       }
       if (usernameResults.error) {
-        throw new Error(
-          "Error fetching profiles: " + usernameResults.error.message,
-        );
+        throw new Error("Error fetching profiles: " + usernameResults.error.message);
       }
 
       // Combine and deduplicate results
-      const allProfiles = [
-        ...(nameResults.data || []),
-        ...(usernameResults.data || []),
-      ];
-      const uniqueProfiles = Array.from(
-        new Map(allProfiles.map((p) => [p.id, p])).values(),
-      );
+      const allProfiles = [...(nameResults.data || []), ...(usernameResults.data || [])];
+      const uniqueProfiles = Array.from(new Map(allProfiles.map((p) => [p.id, p])).values());
 
       const profileCount = uniqueProfiles.length;
       const profiles = uniqueProfiles;
@@ -92,9 +82,7 @@ const getCachedUsers = unstable_cache(
         emailMatchingUserIds.length +
         (profileCount || 0) -
         allMatchingUserIds.filter(
-          (id) =>
-            emailMatchingUserIds.includes(id) &&
-            profileMatchingUserIds.includes(id),
+          (id) => emailMatchingUserIds.includes(id) && profileMatchingUserIds.includes(id),
         ).length;
 
       // Apply pagination to the combined results
@@ -103,9 +91,7 @@ const getCachedUsers = unstable_cache(
       const paginatedUserIds = allMatchingUserIds.slice(startIndex, endIndex);
 
       // Get the paginated users
-      const paginatedUsers = allUsers.users.filter((user) =>
-        paginatedUserIds.includes(user.id),
-      );
+      const paginatedUsers = allUsers.users.filter((user) => paginatedUserIds.includes(user.id));
 
       // Get profiles for the paginated users
       const { data: userProfiles, error: profileFetchError } = await supabase
@@ -114,9 +100,7 @@ const getCachedUsers = unstable_cache(
         .in("id", paginatedUserIds);
 
       if (profileFetchError) {
-        throw new Error(
-          "Error fetching user profiles: " + profileFetchError.message,
-        );
+        throw new Error("Error fetching user profiles: " + profileFetchError.message);
       }
 
       // Combine users with their profiles
@@ -136,10 +120,8 @@ const getCachedUsers = unstable_cache(
     }
 
     // No search - get all users with pagination
-    const { data: users, error: usersError } =
-      await supabase.auth.admin.listUsers();
-    if (usersError)
-      throw new Error("Error fetching users: " + usersError.message);
+    const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
+    if (usersError) throw new Error("Error fetching users: " + usersError.message);
 
     const totalCount = users.users.length;
     const totalPages = Math.ceil(totalCount / limit);
@@ -155,8 +137,7 @@ const getCachedUsers = unstable_cache(
       .from("profiles")
       .select("*")
       .in("id", userIds);
-    if (profileError)
-      throw new Error("Error fetching profiles: " + profileError.message);
+    if (profileError) throw new Error("Error fetching profiles: " + profileError.message);
 
     // Combine auth and profile data
     const combinedUsers = paginatedUsers.map((user) => ({
@@ -178,11 +159,7 @@ const getCachedUsers = unstable_cache(
   },
 );
 
-export async function getUsers(
-  search?: string,
-  page: number = 1,
-  limit: number = 50,
-) {
+export async function getUsers(search?: string, page: number = 1, limit: number = 50) {
   return getCachedUsers(search, page, limit);
 }
 
@@ -205,19 +182,13 @@ export async function updateUserAuth(
     updatedFields: Object.keys(userData),
   });
 
-  const { data, error } = await supabase.auth.admin.updateUserById(
-    userId,
-    userData,
-  );
+  const { data, error } = await supabase.auth.admin.updateUserById(userId, userData);
   if (error) throw new Error("Error updating user auth: " + error.message);
   revalidatePath("/admin");
   return data;
 }
 
-export async function updateUserProfile(
-  userId: string,
-  profileData: Partial<Tables<"profiles">>,
-) {
+export async function updateUserProfile(userId: string, profileData: Partial<Tables<"profiles">>) {
   const supabase = await createClient(true);
   const { data, error } = await supabase
     .from("profiles")
@@ -263,10 +234,7 @@ export async function getGroups() {
   }));
 }
 
-export async function updateGroup(
-  groupId: string,
-  groupData: Partial<Tables<"groups">>,
-) {
+export async function updateGroup(groupId: string, groupData: Partial<Tables<"groups">>) {
   const supabase = await createClient(true);
   const { data, error } = await supabase
     .from("groups")
@@ -323,13 +291,9 @@ export async function getGroupMembers(groupId: string) {
 
 export async function getWinningCriteria() {
   const supabase = await createClient(true);
-  const { data: criteria, error } = await supabase
-    .from("winning_criteria")
-    .select("*")
-    .order("id");
+  const { data: criteria, error } = await supabase.from("winning_criteria").select("*").order("id");
 
-  if (error)
-    throw new Error("Error fetching winning criteria: " + error.message);
+  if (error) throw new Error("Error fetching winning criteria: " + error.message);
   return criteria;
 }
 
@@ -345,10 +309,7 @@ export async function getUserAttendances(userId: string) {
   // Fetch tent visits for each attendance
   const attendancesWithTents = await Promise.all(
     attendances.map(async (attendance) => {
-      const tentVisits = await getTentVisitsForAttendance(
-        userId,
-        new Date(attendance.date),
-      );
+      const tentVisits = await getTentVisitsForAttendance(userId, new Date(attendance.date));
       return {
         ...attendance,
         tent_ids: tentVisits.map((visit) => visit.tent_id), // Extract tent IDs
@@ -393,9 +354,7 @@ export async function updateAttendance(
       visit_date: attendanceData.date!,
     }));
 
-    const { error: tentVisitError } = await supabase
-      .from("tent_visits")
-      .insert(tentVisits);
+    const { error: tentVisitError } = await supabase.from("tent_visits").insert(tentVisits);
 
     if (tentVisitError) {
       throw new Error("Error adding tent visits: " + tentVisitError.message);
@@ -408,10 +367,7 @@ export async function updateAttendance(
 
 export async function deleteAttendance(attendanceId: string) {
   const supabase = await createClient(true);
-  const { error } = await supabase
-    .from("attendances")
-    .delete()
-    .eq("id", attendanceId);
+  const { error } = await supabase.from("attendances").delete().eq("id", attendanceId);
   if (error) throw new Error("Error deleting attendance: " + error.message);
   revalidatePath("/admin");
 }
@@ -475,8 +431,7 @@ export async function convertAndUpdateImage(path: string) {
       upsert: true,
     });
 
-  if (uploadError)
-    throw new Error("Error uploading converted image: " + uploadError.message);
+  if (uploadError) throw new Error("Error uploading converted image: " + uploadError.message);
 
   // Update the profile
   const { error: updateError } = await supabase
@@ -484,8 +439,7 @@ export async function convertAndUpdateImage(path: string) {
     .update({ avatar_url: fileName })
     .eq("avatar_url", path);
 
-  if (updateError)
-    throw new Error("Error updating profile: " + updateError.message);
+  if (updateError) throw new Error("Error updating profile: " + updateError.message);
 
   // Delete the old image
   await deleteImage(path);

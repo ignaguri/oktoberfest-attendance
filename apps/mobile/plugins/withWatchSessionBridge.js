@@ -325,9 +325,7 @@ module.exports = function withWatchSessionBridge(config) {
       src = src + "\n" + BRIDGE_CLASS_SNIPPET;
 
       fs.writeFileSync(appDelegatePath, src, "utf-8");
-      console.log(
-        "withWatchSessionBridge: Injected WatchSessionBridge into AppDelegate.swift.",
-      );
+      console.log("withWatchSessionBridge: Injected WatchSessionBridge into AppDelegate.swift.");
 
       return cfg;
     },

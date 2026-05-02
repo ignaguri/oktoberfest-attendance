@@ -1,10 +1,7 @@
 "use client";
 import { createProgress } from "@gluestack-ui/core/progress/creator";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import {
-  useStyleContext,
-  withStyleContext,
-} from "@gluestack-ui/utils/nativewind-utils";
+import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 // Import contract types from shared UI package
 import type { ProgressOrientation, ProgressSize } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
@@ -134,37 +131,30 @@ type IProgressProps = React.ComponentProps<typeof UIProgress> & {
   className?: string;
 };
 
-type IProgressFilledTrackProps = React.ComponentProps<
-  typeof UIProgress.FilledTrack
-> & {
+type IProgressFilledTrackProps = React.ComponentProps<typeof UIProgress.FilledTrack> & {
   /** Additional className for styling */
   className?: string;
 };
 
-const Progress = React.forwardRef<
-  React.ComponentRef<typeof UIProgress>,
-  IProgressProps
->(function Progress(
-  { className, size = "md", orientation = "horizontal", ...props },
-  ref,
-) {
-  return (
-    <UIProgress
-      ref={ref}
-      {...props}
-      className={progressStyle({ size, orientation, class: className })}
-      context={{ size, orientation }}
-      orientation={orientation}
-    />
-  );
-});
+const Progress = React.forwardRef<React.ComponentRef<typeof UIProgress>, IProgressProps>(
+  function Progress({ className, size = "md", orientation = "horizontal", ...props }, ref) {
+    return (
+      <UIProgress
+        ref={ref}
+        {...props}
+        className={progressStyle({ size, orientation, class: className })}
+        context={{ size, orientation }}
+        orientation={orientation}
+      />
+    );
+  },
+);
 
 const ProgressFilledTrack = React.forwardRef<
   React.ComponentRef<typeof UIProgress.FilledTrack>,
   IProgressFilledTrackProps
 >(function ProgressFilledTrack({ className, ...props }, ref) {
-  const { size: parentSize, orientation: parentOrientation } =
-    useStyleContext(SCOPE);
+  const { size: parentSize, orientation: parentOrientation } = useStyleContext(SCOPE);
 
   return (
     <UIProgress.FilledTrack

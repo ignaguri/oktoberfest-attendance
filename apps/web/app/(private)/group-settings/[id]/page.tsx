@@ -44,9 +44,7 @@ export default function GroupSettingsPage({ params }: Props) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-4">
         <LoadingSpinner />
-        <span className="text-sm text-gray-500">
-          {t("groups.settings.loading")}
-        </span>
+        <span className="text-sm text-gray-500">{t("groups.settings.loading")}</span>
       </div>
     );
   }
@@ -55,9 +53,7 @@ export default function GroupSettingsPage({ params }: Props) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-4">
         <LoadingSpinner />
-        <span className="text-sm text-gray-500">
-          {t("common.status.loading")}
-        </span>
+        <span className="text-sm text-gray-500">{t("common.status.loading")}</span>
       </div>
     );
   }

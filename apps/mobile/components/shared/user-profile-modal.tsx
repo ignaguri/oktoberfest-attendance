@@ -5,24 +5,11 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { getInitials } from "@prostcounter/ui";
-import {
-  Beer,
-  Calendar,
-  Check,
-  Clock,
-  TrendingUp,
-  UserPlus,
-  Users,
-  X,
-} from "lucide-react-native";
+import { Beer, Calendar, Check, Clock, TrendingUp, UserPlus, Users, X } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { useCallback } from "react";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -51,13 +38,7 @@ export interface UserProfileData {
     totalBeers: number;
     avgBeers: number;
   } | null;
-  friendshipStatus?:
-    | "friends"
-    | "pending_sent"
-    | "pending_received"
-    | "none"
-    | "self"
-    | null;
+  friendshipStatus?: "friends" | "pending_sent" | "pending_received" | "none" | "self" | null;
   sharedGroups?: number | null;
 }
 
@@ -117,9 +98,7 @@ export function UserProfileModal({
           {loading ? (
             <VStack className="items-center py-8">
               <Spinner size="large" color={Colors.primary[500]} />
-              <Text className="mt-2 text-typography-500">
-                {t("common.loading")}
-              </Text>
+              <Text className="mt-2 text-typography-500">{t("common.loading")}</Text>
             </VStack>
           ) : profile ? (
             <VStack space="md" className="items-center">
@@ -148,20 +127,14 @@ export function UserProfileModal({
                   </Text>
                 )}
                 {profile.fullName && (
-                  <Text className="text-sm text-typography-500">
-                    {profile.fullName}
-                  </Text>
+                  <Text className="text-sm text-typography-500">{profile.fullName}</Text>
                 )}
               </VStack>
 
               {/* Friendship badge / action button */}
-              {profile.friendshipStatus &&
-                profile.friendshipStatus !== "self" && (
-                  <MobileFriendshipBadge
-                    status={profile.friendshipStatus}
-                    userId={userId}
-                  />
-                )}
+              {profile.friendshipStatus && profile.friendshipStatus !== "self" && (
+                <MobileFriendshipBadge status={profile.friendshipStatus} userId={userId} />
+              )}
 
               {/* Stats - only shown if we have stats */}
               {profile.stats && (
@@ -216,9 +189,7 @@ export function UserProfileModal({
             </VStack>
           ) : (
             <VStack className="items-center py-4">
-              <Text className="text-typography-500">
-                {t("activityFeed.profileNotFound")}
-              </Text>
+              <Text className="text-typography-500">{t("activityFeed.profileNotFound")}</Text>
             </VStack>
           )}
         </ModalBody>
@@ -359,14 +330,9 @@ export function TappableAvatar({
       {children || (
         <Avatar size={size}>
           {avatarUrl ? (
-            <AvatarImage
-              source={{ uri: getAvatarUrl(avatarUrl) }}
-              alt={displayName}
-            />
+            <AvatarImage source={{ uri: getAvatarUrl(avatarUrl) }} alt={displayName} />
           ) : (
-            <AvatarFallbackText>
-              {getInitials({ fullName, username })}
-            </AvatarFallbackText>
+            <AvatarFallbackText>{getInitials({ fullName, username })}</AvatarFallbackText>
           )}
         </Avatar>
       )}

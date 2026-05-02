@@ -4,15 +4,8 @@ import type { Tables } from "@prostcounter/db";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import {
-  deleteGroup,
-  getGroups,
-  updateGroup,
-} from "@/app/(private)/admin/actions";
-import {
-  type GroupSearchFilters,
-  searchKeys,
-} from "@/lib/data/search-query-keys";
+import { deleteGroup, getGroups, updateGroup } from "@/app/(private)/admin/actions";
+import { type GroupSearchFilters, searchKeys } from "@/lib/data/search-query-keys";
 
 // Import the server actions
 
@@ -53,8 +46,7 @@ export function useGroupSearch(filters: GroupSearchFilters = {}) {
         filteredGroups = groups.filter(
           (group) =>
             group.name.toLowerCase().includes(search.toLowerCase()) ||
-            (group.description &&
-              group.description.toLowerCase().includes(search.toLowerCase())),
+            (group.description && group.description.toLowerCase().includes(search.toLowerCase())),
         );
       }
 
@@ -135,29 +127,26 @@ export function useOptimisticGroupUpdate() {
 
   const updateGroupInCache = useCallback(
     (groupId: string, updates: Partial<Group>) => {
-      queryClient.setQueriesData(
-        { queryKey: searchKeys.all },
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueriesData({ queryKey: searchKeys.all }, (oldData: any) => {
+        if (!oldData) return oldData;
 
-          if (Array.isArray(oldData)) {
-            return oldData.map((group: Group) =>
+        if (Array.isArray(oldData)) {
+          return oldData.map((group: Group) =>
+            group.id === groupId ? { ...group, ...updates } : group,
+          );
+        }
+
+        if (oldData?.groups) {
+          return {
+            ...oldData,
+            groups: oldData.groups.map((group: Group) =>
               group.id === groupId ? { ...group, ...updates } : group,
-            );
-          }
+            ),
+          };
+        }
 
-          if (oldData?.groups) {
-            return {
-              ...oldData,
-              groups: oldData.groups.map((group: Group) =>
-                group.id === groupId ? { ...group, ...updates } : group,
-              ),
-            };
-          }
-
-          return oldData;
-        },
-      );
+        return oldData;
+      });
     },
     [queryClient],
   );

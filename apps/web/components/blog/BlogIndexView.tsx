@@ -8,8 +8,7 @@ import { localizeCategory } from "./blog-i18n";
 
 const uiText: Record<SupportedLanguage, { subtitle: string; empty: string }> = {
   en: {
-    subtitle:
-      "Your guide to Munich beer festivals, Oktoberfest tips, and more.",
+    subtitle: "Your guide to Munich beer festivals, Oktoberfest tips, and more.",
     empty: "No articles yet. Check back soon!",
   },
   de: {
@@ -17,16 +16,13 @@ const uiText: Record<SupportedLanguage, { subtitle: string; empty: string }> = {
     empty: "Noch keine Artikel. Schau bald wieder vorbei!",
   },
   es: {
-    subtitle:
-      "Tu guía de festivales cerveceros de Múnich, consejos para el Oktoberfest y más.",
+    subtitle: "Tu guía de festivales cerveceros de Múnich, consejos para el Oktoberfest y más.",
     empty: "Aún no hay artículos. ¡Vuelve pronto!",
   },
 };
 
 function categoryHref(cat: string, locale: SupportedLanguage): string {
-  return locale === "en"
-    ? `/blog/category/${cat}`
-    : `/blog/${locale}/category/${cat}`;
+  return locale === "en" ? `/blog/category/${cat}` : `/blog/${locale}/category/${cat}`;
 }
 
 export function BlogIndexView({
@@ -43,9 +39,7 @@ export function BlogIndexView({
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Blog
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Blog</h1>
         <p className="mt-2 text-lg text-gray-500">{t.subtitle}</p>
 
         {/* Category filters */}

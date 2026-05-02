@@ -56,14 +56,8 @@ export class HomePage extends BasePage {
     // The structure is: [button -] [text "X drank today"] [button +]
     this.beerCountDisplay = page.getByText(/\d+ 🍺 drank today/);
     // Use locator relative to the parent container of beer count
-    this.beerDecrementButton = this.beerCountDisplay
-      .locator("..")
-      .locator("button")
-      .first();
-    this.beerIncrementButton = this.beerCountDisplay
-      .locator("..")
-      .locator("button")
-      .last();
+    this.beerDecrementButton = this.beerCountDisplay.locator("..").locator("button").first();
+    this.beerIncrementButton = this.beerCountDisplay.locator("..").locator("button").last();
 
     // Navigation
     this.navbar = page.getByRole("navigation");
@@ -166,9 +160,7 @@ export class HomePage extends BasePage {
       const gotItButton = this.page.getByRole("button", { name: /^got it$/i });
 
       // Wait briefly for button to appear
-      await gotItButton
-        .waitFor({ state: "visible", timeout: 2000 })
-        .catch(() => {});
+      await gotItButton.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
 
       if (await gotItButton.isVisible().catch(() => false)) {
         await gotItButton.click({ force: true });
@@ -188,9 +180,7 @@ export class HomePage extends BasePage {
       const skipButton = this.page.getByRole("button", { name: /^skip$/i });
 
       // Wait briefly for button to appear
-      await skipButton
-        .waitFor({ state: "visible", timeout: 2000 })
-        .catch(() => {});
+      await skipButton.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
 
       if (await skipButton.isVisible().catch(() => false)) {
         await skipButton.click({ force: true });

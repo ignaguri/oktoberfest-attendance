@@ -10,11 +10,7 @@ import type * as SQLite from "expo-sqlite";
 import { logger } from "@/lib/logger";
 
 import { apiClient } from "../../api-client";
-import type {
-  LocalGroup,
-  LocalGroupMember,
-  LocalUserAchievement,
-} from "../schema";
+import type { LocalGroup, LocalGroupMember, LocalUserAchievement } from "../schema";
 import { generateUUID, updateLastSyncAt } from "../sync-queue";
 import type { PullResult } from "./types";
 
@@ -38,10 +34,9 @@ export async function pullGroups(
     const now = new Date().toISOString();
 
     for (const group of groups) {
-      const existing = await db.getFirstAsync<LocalGroup>(
-        "SELECT * FROM groups WHERE id = ?",
-        [group.id],
-      );
+      const existing = await db.getFirstAsync<LocalGroup>("SELECT * FROM groups WHERE id = ?", [
+        group.id,
+      ]);
 
       if (existing) {
         await db.runAsync(
@@ -49,13 +44,7 @@ export async function pullGroups(
             name = ?, description = ?, winning_criteria_id = ?,
             _synced_at = ?, _dirty = 0
           WHERE id = ?`,
-          [
-            group.name,
-            group.description ?? null,
-            group.winningCriteria,
-            now,
-            group.id,
-          ],
+          [group.name, group.description ?? null, group.winningCriteria, now, group.id],
         );
         result.updated++;
       } else {
@@ -166,10 +155,7 @@ export async function pullGroupMembers(
         }
       } catch (error) {
         // Log per-group error but continue with other groups
-        logger.error(
-          `[SyncManager] Pull members for group ${group.id} failed:`,
-          error,
-        );
+        logger.error(`[SyncManager] Pull members for group ${group.id} failed:`, error);
       }
     }
 

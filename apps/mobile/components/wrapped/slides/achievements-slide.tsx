@@ -29,20 +29,13 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
     [data.achievements],
   );
 
-  const totalPoints = useMemo(
-    () => calculateTotalPoints(data.achievements),
-    [data.achievements],
-  );
+  const totalPoints = useMemo(() => calculateTotalPoints(data.achievements), [data.achievements]);
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-yellow-50">
       <VStack space="lg" className="flex-1 justify-center">
-        <SlideTitle isActive={isActive}>
-          {t("wrapped.achievements.title")}
-        </SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.achievements.subtitle")}
-        </SlideSubtitle>
+        <SlideTitle isActive={isActive}>{t("wrapped.achievements.title")}</SlideTitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.achievements.subtitle")}</SlideSubtitle>
 
         <StatItem
           label={t("wrapped.achievements.totalPoints")}
@@ -69,9 +62,7 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
               className="flex-row items-center rounded-xl bg-white/70 px-4 py-3"
             >
               <View style={{ width: 36, alignItems: "center" }}>
-                <Text className="text-2xl">
-                  {ICON_MAP[achievement.icon] || "🏆"}
-                </Text>
+                <Text className="text-2xl">{ICON_MAP[achievement.icon] || "🏆"}</Text>
               </View>
               <VStack space="xs" className="ml-2 flex-1">
                 <Text className="text-sm font-semibold text-gray-800">
@@ -81,9 +72,7 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
                   <View
                     className="h-2 w-2 rounded-full"
                     style={{
-                      backgroundColor:
-                        RARITY_COLORS[achievement.rarity] ||
-                        RARITY_COLORS.common,
+                      backgroundColor: RARITY_COLORS[achievement.rarity] || RARITY_COLORS.common,
                     }}
                   />
                   <Text className="text-xs capitalize text-gray-500">

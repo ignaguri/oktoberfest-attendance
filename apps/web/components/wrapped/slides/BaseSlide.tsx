@@ -100,23 +100,13 @@ export function BaseSlide({
 /**
  * Slide title component
  */
-export function SlideTitle({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function SlideTitle({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <motion.h1
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.2, duration: 0.5 }}
-      className={cn(
-        "mb-4 text-center text-4xl font-bold",
-        "text-gray-800",
-        className,
-      )}
+      className={cn("mb-4 text-center text-4xl font-bold", "text-gray-800", className)}
     >
       {children}
     </motion.h1>

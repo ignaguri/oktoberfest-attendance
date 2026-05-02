@@ -38,6 +38,4 @@ export const GetCalendarEventsResponseSchema = z.object({
   festivalEndDate: z.string().nullable().optional(),
 });
 
-export type GetCalendarEventsResponse = z.infer<
-  typeof GetCalendarEventsResponseSchema
->;
+export type GetCalendarEventsResponse = z.infer<typeof GetCalendarEventsResponseSchema>;

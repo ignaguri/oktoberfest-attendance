@@ -159,8 +159,7 @@ const listReservationsRoute = createRoute({
   path: "/reservations",
   tags: ["reservations"],
   summary: "List user reservations",
-  description:
-    "Retrieves all reservations for the authenticated user with optional filters",
+  description: "Retrieves all reservations for the authenticated user with optional filters",
   request: {
     query: GetReservationsQuerySchema,
   },
@@ -337,8 +336,7 @@ const updateReservationRoute = createRoute({
   path: "/reservations/{id}",
   tags: ["reservations"],
   summary: "Update a reservation",
-  description:
-    "Updates an existing reservation. Only provided fields will be updated.",
+  description: "Updates an existing reservation. Only provided fields will be updated.",
   request: {
     params: ReservationIdParamSchema,
     body: {
@@ -403,11 +401,7 @@ app.openapi(updateReservationRoute, async (c) => {
   const reservationRepo = new SupabaseReservationRepository(supabase);
   const reservationService = new ReservationService(reservationRepo);
 
-  const reservation = await reservationService.updateReservation(
-    id,
-    user.id,
-    data,
-  );
+  const reservation = await reservationService.updateReservation(id, user.id, data);
 
   return c.json({ reservation }, 200);
 });

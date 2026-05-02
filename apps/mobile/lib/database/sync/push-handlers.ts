@@ -123,10 +123,7 @@ export async function pushUpdate(
 /**
  * Push a DELETE operation to server
  */
-export async function pushDelete(
-  tableName: string,
-  recordId: string,
-): Promise<void> {
+export async function pushDelete(tableName: string, recordId: string): Promise<void> {
   switch (tableName) {
     case "attendances":
       await apiClient.attendance.delete(recordId);

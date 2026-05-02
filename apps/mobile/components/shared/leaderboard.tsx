@@ -14,11 +14,7 @@ import {
 } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  Avatar,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -55,10 +51,7 @@ const POSITION_COLORS = {
 } as const;
 
 // Column configuration for sorting
-const COLUMN_CONFIG: Record<
-  WinningCriteria,
-  { icon: typeof Calendar; label: string }
-> = {
+const COLUMN_CONFIG: Record<WinningCriteria, { icon: typeof Calendar; label: string }> = {
   days_attended: { icon: Calendar, label: "Days" },
   total_beers: { icon: Beer, label: "Beers" },
   avg_beers: { icon: TrendingUp, label: "Avg" },
@@ -97,13 +90,8 @@ function SortableHeader({
   return (
     <Pressable onPress={onPress} className={cn(width, "py-1")}>
       <HStack className="items-center justify-center" space="xs">
-        <Icon
-          size={14}
-          color={isActive ? Colors.primary[600] : IconColors.muted}
-        />
-        {isActive && (
-          <SortIcon size={10} color={Colors.primary[600]} strokeWidth={3} />
-        )}
+        <Icon size={14} color={isActive ? Colors.primary[600] : IconColors.muted} />
+        {isActive && <SortIcon size={10} color={Colors.primary[600]} strokeWidth={3} />}
       </HStack>
     </Pressable>
   );
@@ -138,15 +126,11 @@ export function Leaderboard({
   sortOrder = "desc",
 }: LeaderboardProps) {
   const { t } = useTranslation();
-  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(
-    null,
-  );
+  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(null);
 
   // Fetch friendship status for the selected user
   const selectedUserId =
-    selectedUser && selectedUser.userId !== currentUserId
-      ? selectedUser.userId
-      : undefined;
+    selectedUser && selectedUser.userId !== currentUserId ? selectedUser.userId : undefined;
   const { data: friendshipData } = useFriendshipStatus(selectedUserId);
 
   const handleUserPress = useCallback((entry: LeaderboardEntry) => {
@@ -170,9 +154,7 @@ export function Leaderboard({
         avgBeers: selectedUser.avgBeers ?? 0,
       },
       friendshipStatus:
-        selectedUser.userId === currentUserId
-          ? "self"
-          : (friendshipData?.status ?? null),
+        selectedUser.userId === currentUserId ? "self" : (friendshipData?.status ?? null),
     };
   }, [selectedUser, currentUserId, friendshipData]);
 
@@ -184,9 +166,7 @@ export function Leaderboard({
       if (sortable && onSortChange) {
         // If clicking the same column, toggle direction; otherwise, default to desc
         const newOrder: SortOrder =
-          criteria === currentSortColumn && sortOrder === "desc"
-            ? "asc"
-            : "desc";
+          criteria === currentSortColumn && sortOrder === "desc" ? "asc" : "desc";
         onSortChange(criteria, newOrder);
       }
     },
@@ -258,18 +238,13 @@ export function Leaderboard({
             // Use index + 1 for display position when sorting is active
             const displayPosition = sortable ? index + 1 : entry.position;
             const isTopThree = displayPosition <= 3;
-            const positionStyle = isTopThree
-              ? POSITION_COLORS[displayPosition as 1 | 2 | 3]
-              : null;
+            const positionStyle = isTopThree ? POSITION_COLORS[displayPosition as 1 | 2 | 3] : null;
             const isLast = index === sortedEntries.length - 1;
 
             const displayName = entry.username || entry.fullName || "Unknown";
 
             return (
-              <Pressable
-                key={entry.userId}
-                onPress={() => handleUserPress(entry)}
-              >
+              <Pressable key={entry.userId} onPress={() => handleUserPress(entry)}>
                 <HStack
                   className={cn(
                     "items-center px-3 py-2.5",
@@ -322,19 +297,12 @@ export function Leaderboard({
                     <Text
                       className={cn(
                         "flex-1 text-sm",
-                        isCurrentUser
-                          ? "font-semibold text-primary-700"
-                          : "text-typography-900",
+                        isCurrentUser ? "font-semibold text-primary-700" : "text-typography-900",
                       )}
                       numberOfLines={1}
                     >
                       {displayName}
-                      {isCurrentUser && (
-                        <Text className="text-xs text-typography-500">
-                          {" "}
-                          (You)
-                        </Text>
-                      )}
+                      {isCurrentUser && <Text className="text-xs text-typography-500"> (You)</Text>}
                     </Text>
                   </HStack>
 
@@ -367,9 +335,7 @@ export function Leaderboard({
                         : "text-typography-800",
                     )}
                   >
-                    {typeof entry.avgBeers === "number"
-                      ? entry.avgBeers.toFixed(1)
-                      : "0.0"}
+                    {typeof entry.avgBeers === "number" ? entry.avgBeers.toFixed(1) : "0.0"}
                   </Text>
                 </HStack>
               </Pressable>

@@ -31,11 +31,7 @@ async function AuthCheck() {
   return null;
 }
 
-export default function PrivateLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PrivateLayout({ children }: { children: React.ReactNode }) {
   return (
     <WebFestivalProvider>
       <NotificationProvider>

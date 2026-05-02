@@ -1,7 +1,4 @@
-import type {
-  BadgeAction,
-  BadgeVariant as ContractBadgeVariant,
-} from "@prostcounter/ui";
+import type { BadgeAction, BadgeVariant as ContractBadgeVariant } from "@prostcounter/ui";
 import { cva } from "class-variance-authority";
 import { Slot as SlotPrimitive } from "radix-ui";
 import * as React from "react";
@@ -16,14 +13,12 @@ const badgeVariants = cva(
       variant: {
         default:
           "border-transparent bg-primary text-primary-foreground shadow-sm hover:bg-primary/80",
-        success:
-          "border-transparent bg-green-600 text-green-100 shadow-sm hover:bg-green-600/80",
+        success: "border-transparent bg-green-600 text-green-100 shadow-sm hover:bg-green-600/80",
         secondary:
           "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
         destructive:
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20",
-        outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
       },
     },
     defaultVariants: {
@@ -51,13 +46,7 @@ interface BadgeProps extends React.ComponentProps<"span"> {
   asChild?: boolean;
 }
 
-function Badge({
-  className,
-  action,
-  variant,
-  asChild = false,
-  ...props
-}: BadgeProps) {
+function Badge({ className, action, variant, asChild = false, ...props }: BadgeProps) {
   const Comp = asChild ? SlotPrimitive.Slot : "span";
 
   // Determine final variant: if action is provided, use contract mapping

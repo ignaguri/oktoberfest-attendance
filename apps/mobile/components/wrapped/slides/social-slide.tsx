@@ -21,9 +21,7 @@ export function SocialSlide({ data, isActive }: SocialSlideProps) {
     <BaseSlide isActive={isActive} backgroundClassName="bg-purple-50">
       <VStack space="lg" className="flex-1 justify-center">
         <SlideTitle isActive={isActive}>{t("wrapped.social.title")}</SlideTitle>
-        <SlideSubtitle isActive={isActive}>
-          {t("wrapped.social.subtitle")}
-        </SlideSubtitle>
+        <SlideSubtitle isActive={isActive}>{t("wrapped.social.subtitle")}</SlideSubtitle>
 
         <View className="mt-6">
           <VStack space="md">

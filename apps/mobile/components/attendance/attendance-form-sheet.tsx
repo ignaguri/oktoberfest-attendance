@@ -1,9 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type {
-  AttendanceWithTotals,
-  TentVisit,
-} from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, TentVisit } from "@prostcounter/shared/schemas";
 import {
   createDetailedAttendanceFormSchema,
   type DetailedAttendanceForm,
@@ -101,15 +98,11 @@ export function AttendanceFormSheet({
   const [showTentSelector, setShowTentSelector] = useState(false);
   const [photos, setPhotos] = useState<BeerPicture[]>([]);
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
-  const [photosMarkedForRemoval, setPhotosMarkedForRemoval] = useState<
-    string[]
-  >([]);
+  const [photosMarkedForRemoval, setPhotosMarkedForRemoval] = useState<string[]>([]);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   // Local drink counts - tracks desired counts before save
-  const [localDrinkCounts, setLocalDrinkCounts] = useState<
-    Record<DrinkType, number>
-  >({
+  const [localDrinkCounts, setLocalDrinkCounts] = useState<Record<DrinkType, number>>({
     beer: 0,
     radler: 0,
     wine: 0,
@@ -124,19 +117,14 @@ export function AttendanceFormSheet({
   const deleteAttendance = useLocalDeleteAttendance();
 
   const dateString =
-    selectedDate && !isNaN(selectedDate.getTime())
-      ? format(selectedDate, "yyyy-MM-dd")
-      : "";
+    selectedDate && !isNaN(selectedDate.getTime()) ? format(selectedDate, "yyyy-MM-dd") : "";
 
   // Fetch consumptions for this date (local-first from SQLite)
   const { data: consumptionsData } = useAdaptedConsumptionsByDate(
     isOpen ? festivalId : undefined,
     isOpen ? dateString : undefined,
   );
-  const consumptions = useMemo(
-    () => consumptionsData || [],
-    [consumptionsData],
-  );
+  const consumptions = useMemo(() => consumptionsData || [], [consumptionsData]);
 
   // Calculate counts per drink type from API consumptions (initial values)
   const drinkCounts = useMemo(() => {
@@ -158,10 +146,7 @@ export function AttendanceFormSheet({
 
   // Calculate total local drinks
   const totalLocalDrinks = useMemo(() => {
-    return Object.values(localDrinkCounts).reduce(
-      (sum, count) => sum + count,
-      0,
-    );
+    return Object.values(localDrinkCounts).reduce((sum, count) => sum + count, 0);
   }, [localDrinkCounts]);
 
   // Track previous isOpen state to detect when sheet opens
@@ -175,15 +160,13 @@ export function AttendanceFormSheet({
 
   // Create dynamic schema based on festival dates
   const formSchema = useMemo(
-    () =>
-      createDetailedAttendanceFormSchema(festivalStartDate, festivalEndDate),
+    () => createDetailedAttendanceFormSchema(festivalStartDate, festivalEndDate),
     [festivalStartDate, festivalEndDate],
   );
 
   // Use fresh tent visits from API when available, fall back to prop data
   const freshTentVisits: TentVisit[] = useMemo(
-    () =>
-      attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [],
+    () => attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [],
     [attendanceWithPhotos?.tentVisits, existingAttendance?.tentVisits],
   );
 
@@ -196,8 +179,7 @@ export function AttendanceFormSheet({
         ...new Set(freshTentVisits.map((tv: TentVisit) => tv.tentId)),
       ];
       return {
-        amount:
-          existingAttendance.drinkCount || existingAttendance.beerCount || 0,
+        amount: existingAttendance.drinkCount || existingAttendance.beerCount || 0,
         date: new Date(existingAttendance.date),
         tents: uniqueTentIds,
       };
@@ -272,12 +254,10 @@ export function AttendanceFormSheet({
     if (isOpen && attendanceWithPhotos?.pictures?.length) {
       // Use the pictures array which includes proper IDs for deletion
       setPhotos(
-        attendanceWithPhotos.pictures.map(
-          (pic: { id: string; pictureUrl: string }) => ({
-            id: pic.id,
-            pictureUrl: pic.pictureUrl,
-          }),
-        ),
+        attendanceWithPhotos.pictures.map((pic: { id: string; pictureUrl: string }) => ({
+          id: pic.id,
+          pictureUrl: pic.pictureUrl,
+        })),
       );
     }
   }, [isOpen, attendanceWithPhotos]);
@@ -314,10 +294,7 @@ export function AttendanceFormSheet({
           checkInTime,
         };
       })
-      .sort(
-        (a, b) =>
-          new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime(),
-      );
+      .sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime());
   }, [freshTentVisits, tents]);
 
   // Get selected tents from form - these are what user currently has selected
@@ -339,16 +316,10 @@ export function AttendanceFormSheet({
     const allOptions = tents.flatMap((group) => group.options);
 
     // Build a map of tent visits by tent ID (most recent visit for each tent)
-    const latestVisitByTent = new Map<
-      string,
-      { visitDate: string; checkInTime: string }
-    >();
+    const latestVisitByTent = new Map<string, { visitDate: string; checkInTime: string }>();
     for (const visit of freshTentVisits) {
       const existing = latestVisitByTent.get(visit.tentId);
-      if (
-        !existing ||
-        new Date(visit.visitDate) > new Date(existing.visitDate)
-      ) {
+      if (!existing || new Date(visit.visitDate) > new Date(existing.visitDate)) {
         latestVisitByTent.set(visit.tentId, {
           visitDate: visit.visitDate,
           checkInTime: format(parseISO(visit.visitDate), "HH:mm"),
@@ -415,22 +386,17 @@ export function AttendanceFormSheet({
   );
 
   // Handle local drink count change (without API call)
-  const handleLocalDrinkCountChange = useCallback(
-    (drinkType: DrinkType, newCount: number) => {
-      setLocalDrinkCounts((prev) => ({
-        ...prev,
-        [drinkType]: newCount,
-      }));
-    },
-    [],
-  );
+  const handleLocalDrinkCountChange = useCallback((drinkType: DrinkType, newCount: number) => {
+    setLocalDrinkCounts((prev) => ({
+      ...prev,
+      [drinkType]: newCount,
+    }));
+  }, []);
 
   // Toggle photo marked for removal (clicking X on existing photos)
   const handleTogglePhotoRemoval = useCallback((photoId: string) => {
     setPhotosMarkedForRemoval((prev) =>
-      prev.includes(photoId)
-        ? prev.filter((id) => id !== photoId)
-        : [...prev, photoId],
+      prev.includes(photoId) ? prev.filter((id) => id !== photoId) : [...prev, photoId],
     );
   }, []);
 
@@ -453,13 +419,7 @@ export function AttendanceFormSheet({
     } catch (error) {
       logger.error("Failed to delete attendance:", error);
     }
-  }, [
-    existingAttendance?.id,
-    deleteAttendance,
-    festivalId,
-    onSuccess,
-    onClose,
-  ]);
+  }, [existingAttendance?.id, deleteAttendance, festivalId, onSuccess, onClose]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(false);
@@ -486,9 +446,7 @@ export function AttendanceFormSheet({
           {/* Header */}
           <HStack className="mb-4 w-full items-center justify-between px-2">
             <Text className="text-lg font-semibold text-typography-900">
-              {isEditMode
-                ? t("attendance.form.editTitle")
-                : t("attendance.form.addTitle")}
+              {isEditMode ? t("attendance.form.editTitle") : t("attendance.form.addTitle")}
             </Text>
             <Pressable onPress={onClose} hitSlop={8}>
               <X size={24} color={IconColors.default} />
@@ -508,9 +466,7 @@ export function AttendanceFormSheet({
                     className="flex-1 items-center rounded-lg bg-background-100 px-4 py-3"
                   >
                     <Calendar size={18} color={IconColors.muted} />
-                    <Text className="text-base text-typography-700">
-                      {formattedDate}
-                    </Text>
+                    <Text className="text-base text-typography-700">{formattedDate}</Text>
                   </HStack>
                   {/* Delete Button - Only in edit mode */}
                   {isEditMode && (
@@ -574,16 +530,9 @@ export function AttendanceFormSheet({
                   {combinedTentDisplay.length > 0 ? (
                     <HStack className="flex-wrap gap-2">
                       {combinedTentDisplay.map((tent) => (
-                        <Badge
-                          key={tent.id}
-                          action="info"
-                          variant="outline"
-                          size="md"
-                        >
+                        <Badge key={tent.id} action="info" variant="outline" size="md">
                           <BadgeText className="normal-case">
-                            {tent.checkInTime
-                              ? `${tent.label} (${tent.checkInTime})`
-                              : tent.label}
+                            {tent.checkInTime ? `${tent.label} (${tent.checkInTime})` : tent.label}
                           </BadgeText>
                         </Badge>
                       ))}
@@ -632,9 +581,7 @@ export function AttendanceFormSheet({
               isDisabled={isProcessing}
             >
               <ButtonText>
-                {isSaving
-                  ? t("attendance.form.saving")
-                  : t("common.buttons.save")}
+                {isSaving ? t("attendance.form.saving") : t("common.buttons.save")}
               </ButtonText>
             </Button>
           </HStack>
@@ -652,11 +599,7 @@ export function AttendanceFormSheet({
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        isOpen={showDeleteConfirm}
-        onClose={handleCancelDelete}
-        size="md"
-      >
+      <AlertDialog isOpen={showDeleteConfirm} onClose={handleCancelDelete} size="md">
         <AlertDialogBackdrop />
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -686,9 +629,7 @@ export function AttendanceFormSheet({
               isDisabled={isDeleting}
             >
               <ButtonText>
-                {isDeleting
-                  ? t("common.status.deleting")
-                  : t("common.buttons.delete")}
+                {isDeleting ? t("common.status.deleting") : t("common.buttons.delete")}
               </ButtonText>
             </Button>
           </AlertDialogFooter>

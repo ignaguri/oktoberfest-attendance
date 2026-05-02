@@ -25,14 +25,11 @@ export function useFocusManager() {
       return;
     }
 
-    const subscription = AppState.addEventListener(
-      "change",
-      (status: AppStateStatus) => {
-        // Tell React Query when app is "focused" (active in foreground)
-        // This triggers refetchOnWindowFocus for stale queries
-        focusManager.setFocused(status === "active");
-      },
-    );
+    const subscription = AppState.addEventListener("change", (status: AppStateStatus) => {
+      // Tell React Query when app is "focused" (active in foreground)
+      // This triggers refetchOnWindowFocus for stale queries
+      focusManager.setFocused(status === "active");
+    });
 
     return () => subscription.remove();
   }, []);

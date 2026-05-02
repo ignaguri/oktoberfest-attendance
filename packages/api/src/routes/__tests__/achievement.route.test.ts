@@ -29,10 +29,7 @@ describe("Achievement Routes - Unit Tests", () => {
 
       // Routes without auth header should fail with 401
       if (!authHeader) {
-        return c.json(
-          { error: "Unauthorized", message: "Missing authorization header" },
-          401,
-        );
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
       }
 
       // Set mock user and supabase for authenticated requests
@@ -181,12 +178,9 @@ describe("Achievement Routes - Unit Tests", () => {
         createMockChain(mockSupabaseSuccess(mockAchievements)),
       );
 
-      const req = createAuthRequest(
-        `/achievements?festivalId=${festivalId}&category=social`,
-        {
-          method: "GET",
-        },
-      );
+      const req = createAuthRequest(`/achievements?festivalId=${festivalId}&category=social`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,
@@ -203,9 +197,7 @@ describe("Achievement Routes - Unit Tests", () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
       // Mock empty achievements
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const req = createAuthRequest(`/achievements?festivalId=${festivalId}`, {
         method: "GET",
@@ -252,9 +244,7 @@ describe("Achievement Routes - Unit Tests", () => {
 
       // Mock database error
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseError("Failed to list achievements", "PGRST000"),
-        ),
+        createMockChain(mockSupabaseError("Failed to list achievements", "PGRST000")),
       );
 
       const req = createAuthRequest(`/achievements?festivalId=${festivalId}`, {
@@ -348,13 +338,10 @@ describe("Achievement Routes - Unit Tests", () => {
       });
 
       // Verify RPC was called correctly
-      expect(mockSupabase.rpc).toHaveBeenCalledWith(
-        "evaluate_user_achievements",
-        {
-          p_user_id: mockUser.id,
-          p_festival_id: festivalId,
-        },
-      );
+      expect(mockSupabase.rpc).toHaveBeenCalledWith("evaluate_user_achievements", {
+        p_user_id: mockUser.id,
+        p_festival_id: festivalId,
+      });
     });
 
     it("should handle case with no new achievements", async () => {
@@ -397,9 +384,7 @@ describe("Achievement Routes - Unit Tests", () => {
 
       // Mock getTotalPoints query
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess([{ achievements: { points: 10 } }]),
-        ),
+        createMockChain(mockSupabaseSuccess([{ achievements: { points: 10 } }])),
       );
 
       const req = createAuthRequest("/achievements/evaluate", {
@@ -432,9 +417,7 @@ describe("Achievement Routes - Unit Tests", () => {
       } as any);
 
       // Mock listUserAchievements - no new achievements
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       // Mock getTotalPoints query with multiple achievements
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
@@ -529,12 +512,9 @@ describe("Achievement Routes - Unit Tests", () => {
   describe("Authentication", () => {
     it("should require authentication for GET /achievements", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
-      const req = new Request(
-        `http://localhost/achievements?festivalId=${festivalId}`,
-        {
-          method: "GET",
-        },
-      );
+      const req = new Request(`http://localhost/achievements?festivalId=${festivalId}`, {
+        method: "GET",
+      });
 
       const res = await app.request(req.url, {
         method: req.method,

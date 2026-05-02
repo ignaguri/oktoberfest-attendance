@@ -32,11 +32,7 @@ export interface IConsumptionRepository {
    * @param date - Date string in YYYY-MM-DD format
    * @returns Array of consumption records
    */
-  findByFestivalAndDate(
-    userId: string,
-    festivalId: string,
-    date: string,
-  ): Promise<Consumption[]>;
+  findByFestivalAndDate(userId: string, festivalId: string, date: string): Promise<Consumption[]>;
 
   /**
    * Delete a consumption record

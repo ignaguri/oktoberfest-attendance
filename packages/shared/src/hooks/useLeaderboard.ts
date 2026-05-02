@@ -7,10 +7,7 @@
 import { useApiClient, useQuery, QueryKeys } from "../data";
 
 // Map winning criteria IDs to API enum values
-const CRITERIA_ID_TO_SORT_BY: Record<
-  number,
-  "days_attended" | "total_beers" | "avg_beers"
-> = {
+const CRITERIA_ID_TO_SORT_BY: Record<number, "days_attended" | "total_beers" | "avg_beers"> = {
   1: "days_attended",
   2: "total_beers",
   3: "avg_beers",
@@ -44,11 +41,7 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
 /**
  * Hook to fetch group leaderboard data
  */
-export function useGroupLeaderboard(
-  groupId: string,
-  criteriaId: number,
-  festivalId: string,
-) {
+export function useGroupLeaderboard(groupId: string, criteriaId: number, festivalId: string) {
   const apiClient = useApiClient();
 
   return useQuery(

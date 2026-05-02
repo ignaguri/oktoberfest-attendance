@@ -19,9 +19,7 @@ export default async function GroupLocationPage({
       <GroupMembersMap radiusMeters={1000} />
 
       <div className="mt-4 space-y-2 text-center">
-        <p className="text-muted-foreground text-sm">
-          {t("groups.location.shareDescription")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("groups.location.shareDescription")}</p>
         <p className="text-muted-foreground text-xs">
           {t("groups.location.controlNote")}{" "}
           <Link href="/profile" className="underline hover:no-underline">

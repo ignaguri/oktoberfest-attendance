@@ -14,10 +14,7 @@ interface EmptyGroupsStateProps {
   onJoinGroup: () => void;
 }
 
-export function EmptyGroupsState({
-  onCreateGroup,
-  onJoinGroup,
-}: EmptyGroupsStateProps) {
+export function EmptyGroupsState({ onCreateGroup, onJoinGroup }: EmptyGroupsStateProps) {
   const { t } = useTranslation();
 
   return (
@@ -30,9 +27,7 @@ export function EmptyGroupsState({
             <Heading size="lg" className="text-center text-typography-900">
               {t("groups.empty.title")}
             </Heading>
-            <Text className="text-center text-typography-500">
-              {t("groups.empty.description")}
-            </Text>
+            <Text className="text-center text-typography-500">{t("groups.empty.description")}</Text>
           </VStack>
 
           <VStack space="md" className="w-full">
@@ -44,9 +39,7 @@ export function EmptyGroupsState({
               onPress={onCreateGroup}
             >
               <Plus size={20} color={IconColors.white} />
-              <ButtonText className="ml-2">
-                {t("groups.actions.create")}
-              </ButtonText>
+              <ButtonText className="ml-2">{t("groups.actions.create")}</ButtonText>
             </Button>
 
             <Button
@@ -57,9 +50,7 @@ export function EmptyGroupsState({
               onPress={onJoinGroup}
             >
               <UserPlus size={20} color={IconColors.default} />
-              <ButtonText className="ml-2">
-                {t("groups.actions.join")}
-              </ButtonText>
+              <ButtonText className="ml-2">{t("groups.actions.join")}</ButtonText>
             </Button>
           </VStack>
         </VStack>

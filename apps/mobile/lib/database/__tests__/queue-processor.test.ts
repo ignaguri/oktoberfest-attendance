@@ -7,12 +7,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  createQueueProcessor,
-  QueueProcessor,
-  sleep,
-  withRetry,
-} from "../queue-processor";
+import { createQueueProcessor, QueueProcessor, sleep, withRetry } from "../queue-processor";
 import type { SyncQueueItem } from "../schema";
 
 // Mock the sync-queue module
@@ -40,9 +35,7 @@ function createMockDb() {
 }
 
 // Create mock sync queue item
-function createMockOperation(
-  overrides: Partial<SyncQueueItem> = {},
-): SyncQueueItem {
+function createMockOperation(overrides: Partial<SyncQueueItem> = {}): SyncQueueItem {
   return {
     id: "op-1",
     operation: "INSERT",
@@ -406,10 +399,7 @@ describe("withRetry", () => {
   });
 
   it("should call onRetry callback", async () => {
-    const fn = vi
-      .fn()
-      .mockRejectedValueOnce(new Error("Fail"))
-      .mockResolvedValue("success");
+    const fn = vi.fn().mockRejectedValueOnce(new Error("Fail")).mockResolvedValue("success");
 
     const onRetry = vi.fn();
 
@@ -424,10 +414,7 @@ describe("withRetry", () => {
   });
 
   it("should respect maxDelay", async () => {
-    const fn = vi
-      .fn()
-      .mockRejectedValueOnce(new Error("Fail"))
-      .mockResolvedValue("success");
+    const fn = vi.fn().mockRejectedValueOnce(new Error("Fail")).mockResolvedValue("success");
 
     const start = Date.now();
     await withRetry(fn, {

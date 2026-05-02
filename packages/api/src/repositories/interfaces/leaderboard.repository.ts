@@ -15,9 +15,7 @@ export interface ILeaderboardRepository {
    * @param query - Query parameters (festivalId, sortBy, limit, offset)
    * @returns Array of leaderboard entries and total count
    */
-  getGlobal(
-    query: GlobalLeaderboardQuery,
-  ): Promise<{ data: LeaderboardEntry[]; total: number }>;
+  getGlobal(query: GlobalLeaderboardQuery): Promise<{ data: LeaderboardEntry[]; total: number }>;
 
   /**
    * Get group leaderboard
@@ -25,10 +23,7 @@ export interface ILeaderboardRepository {
    * @param query - Query parameters (sortBy)
    * @returns Array of leaderboard entries
    */
-  getForGroup(
-    groupId: string,
-    query?: GroupLeaderboardQuery,
-  ): Promise<LeaderboardEntry[]>;
+  getForGroup(groupId: string, query?: GroupLeaderboardQuery): Promise<LeaderboardEntry[]>;
 
   /**
    * Get winning criteria options

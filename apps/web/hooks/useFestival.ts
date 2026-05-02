@@ -5,8 +5,4 @@
  * The ApiClientProvider is set up in lib/data/query-client.tsx
  */
 
-export {
-  useActiveFestival,
-  useFestivalById,
-  useFestivals,
-} from "@prostcounter/shared/hooks";
+export { useActiveFestival, useFestivalById, useFestivals } from "@prostcounter/shared/hooks";

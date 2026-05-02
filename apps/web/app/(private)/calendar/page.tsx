@@ -13,11 +13,7 @@ export default function PersonalCalendarPage() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const festivalId = currentFestival?.id;
 
-  const {
-    data: events,
-    loading: eventsLoading,
-    error,
-  } = usePersonalCalendar(festivalId || "");
+  const { data: events, loading: eventsLoading, error } = usePersonalCalendar(festivalId || "");
 
   const isLoading = festivalLoading || eventsLoading;
 
@@ -38,17 +34,11 @@ export default function PersonalCalendarPage() {
     );
   }
 
-  const initialMonth = currentFestival
-    ? new Date(currentFestival.startDate)
-    : new Date();
+  const initialMonth = currentFestival ? new Date(currentFestival.startDate) : new Date();
 
-  const festivalStartDate = currentFestival
-    ? new Date(currentFestival.startDate)
-    : undefined;
+  const festivalStartDate = currentFestival ? new Date(currentFestival.startDate) : undefined;
 
-  const festivalEndDate = currentFestival
-    ? new Date(currentFestival.endDate)
-    : undefined;
+  const festivalEndDate = currentFestival ? new Date(currentFestival.endDate) : undefined;
 
   return (
     <div className="container flex flex-col items-center p-4">

@@ -1,21 +1,9 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import {
-  useLanguage,
-  useTipCalculation,
-  useUpdateProfile,
-} from "@prostcounter/shared/hooks";
+import { useLanguage, useTipCalculation, useUpdateProfile } from "@prostcounter/shared/hooks";
 import type { SupportedLanguage } from "@prostcounter/shared/i18n";
-import {
-  LANGUAGE_NAMES,
-  SUPPORTED_LANGUAGES,
-  useTranslation,
-} from "@prostcounter/shared/i18n";
+import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES, useTranslation } from "@prostcounter/shared/i18n";
 import type { Festival, TipMode } from "@prostcounter/shared/schemas";
-import {
-  getTipModeDescriptions,
-  getTipModeLabels,
-  TIP_MODES,
-} from "@prostcounter/shared/utils";
+import { getTipModeDescriptions, getTipModeLabels, TIP_MODES } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { format, parseISO } from "date-fns";
 import { useRouter } from "expo-router";
@@ -62,9 +50,7 @@ interface SettingsSectionProps {
   onBiometricToggle: (value: boolean) => void;
 }
 
-const getFestivalStatus = (
-  festival: Festival,
-): "upcoming" | "active" | "ended" => {
+const getFestivalStatus = (festival: Festival): "upcoming" | "active" | "ended" => {
   const now = new Date();
   // Use parseISO to avoid UTC timezone issues with date-only strings
   const start = parseISO(festival.startDate);
@@ -102,14 +88,11 @@ export function SettingsSection({
   const [showTipModeSheet, setShowTipModeSheet] = useState(false);
   const [showFixedAmountInput, setShowFixedAmountInput] = useState(false);
   const [pendingFixedInput, setPendingFixedInput] = useState(false);
-  const [fixedAmountText, setFixedAmountText] = useState(
-    tipFixedAmount?.toString() ?? "",
-  );
+  const [fixedAmountText, setFixedAmountText] = useState(tipFixedAmount?.toString() ?? "");
 
   const getBiometricLabel = () => {
     if (biometricType === "facial") return t("biometric.labels.faceId");
-    if (biometricType === "fingerprint")
-      return t("biometric.labels.fingerprint");
+    if (biometricType === "fingerprint") return t("biometric.labels.fingerprint");
     return t("profile.biometric.label");
   };
 
@@ -181,9 +164,7 @@ export function SettingsSection({
         <View className="flex-row items-center gap-3">
           <CalendarDays size={24} color={IconColors.primary} />
           <View>
-            <Text className="text-typography-900">
-              {t("festival.selector.title")}
-            </Text>
+            <Text className="text-typography-900">{t("festival.selector.title")}</Text>
             <Text className="text-sm text-typography-500">
               {currentFestival?.name || t("festival.selector.noFestival")}
             </Text>
@@ -193,10 +174,7 @@ export function SettingsSection({
       </Pressable>
 
       {/* Festival Selection Sheet */}
-      <Actionsheet
-        isOpen={showFestivalSheet}
-        onClose={() => setShowFestivalSheet(false)}
-      >
+      <Actionsheet isOpen={showFestivalSheet} onClose={() => setShowFestivalSheet(false)}>
         <ActionsheetBackdrop />
         <ActionsheetContent className="pb-8">
           <ActionsheetDragIndicatorWrapper>
@@ -225,16 +203,12 @@ export function SettingsSection({
                   <VStack space="xs" className="flex-1">
                     <HStack space="sm" className="items-center">
                       <ActionsheetItemText
-                        className={
-                          isSelected ? "font-semibold text-primary-600" : ""
-                        }
+                        className={isSelected ? "font-semibold text-primary-600" : ""}
                       >
                         {festival.name}
                       </ActionsheetItemText>
                       <Badge size="sm" className={cn("rounded-md", badgeClass)}>
-                        <BadgeText className={cn("capitalize", textClass)}>
-                          {status}
-                        </BadgeText>
+                        <BadgeText className={cn("capitalize", textClass)}>{status}</BadgeText>
                       </Badge>
                     </HStack>
                     <Text className="text-xs text-typography-400">
@@ -242,14 +216,10 @@ export function SettingsSection({
                       {format(parseISO(festival.endDate), "MMM d, yyyy")}
                     </Text>
                     {festival.location && (
-                      <Text className="text-xs text-typography-400">
-                        {festival.location}
-                      </Text>
+                      <Text className="text-xs text-typography-400">{festival.location}</Text>
                     )}
                   </VStack>
-                  {isSelected && (
-                    <Check size={20} color={Colors.primary[500]} />
-                  )}
+                  {isSelected && <Check size={20} color={Colors.primary[500]} />}
                 </HStack>
               </ActionsheetItem>
             );
@@ -296,9 +266,7 @@ export function SettingsSection({
         <View className="flex-row items-center gap-3">
           <Bell size={24} color={IconColors.default} />
           <View>
-            <Text className="text-typography-900">
-              {t("profile.notifications.title")}
-            </Text>
+            <Text className="text-typography-900">{t("profile.notifications.title")}</Text>
             <Text className="text-sm text-typography-500">
               {t("profile.notifications.description")}
             </Text>
@@ -317,9 +285,7 @@ export function SettingsSection({
         <View className="flex-row items-center gap-3">
           <ImageIcon size={24} color={IconColors.default} />
           <View>
-            <Text className="text-typography-900">
-              {t("profile.photoPrivacy.title")}
-            </Text>
+            <Text className="text-typography-900">{t("profile.photoPrivacy.title")}</Text>
             <Text className="text-sm text-typography-500">
               {t("profile.photoPrivacy.shortDescription")}
             </Text>
@@ -339,19 +305,14 @@ export function SettingsSection({
           <Languages size={24} color={IconColors.default} />
           <Box>
             <Text className="text-typography-900">{t("profile.language")}</Text>
-            <Text className="text-sm text-typography-500">
-              {currentLanguageName}
-            </Text>
+            <Text className="text-sm text-typography-500">{currentLanguageName}</Text>
           </Box>
         </Box>
         <ChevronRight size={24} color={IconColors.muted} />
       </Pressable>
 
       {/* Language Selection Sheet */}
-      <Actionsheet
-        isOpen={showLanguageSheet}
-        onClose={() => setShowLanguageSheet(false)}
-      >
+      <Actionsheet isOpen={showLanguageSheet} onClose={() => setShowLanguageSheet(false)}>
         <ActionsheetBackdrop />
         <ActionsheetContent className="pb-8">
           <ActionsheetDragIndicatorWrapper>
@@ -382,9 +343,7 @@ export function SettingsSection({
                   >
                     {LANGUAGE_NAMES[lang]}
                   </Text>
-                  {isSelected && (
-                    <Check size={20} color={Colors.primary[500]} />
-                  )}
+                  {isSelected && <Check size={20} color={Colors.primary[500]} />}
                 </Box>
               </ActionsheetItem>
             );
@@ -402,14 +361,10 @@ export function SettingsSection({
         <Box className="flex-row items-center gap-3">
           <Coins size={24} color={IconColors.default} />
           <Box>
-            <Text className="text-typography-900">
-              {t("profile.tipMode.title")}
-            </Text>
+            <Text className="text-typography-900">{t("profile.tipMode.title")}</Text>
             <Text className="text-sm text-typography-500">
               {tipModeLabels[tipMode]}
-              {tipMode === "fixed" && tipFixedAmount
-                ? ` (€${tipFixedAmount})`
-                : ""}
+              {tipMode === "fixed" && tipFixedAmount ? ` (€${tipFixedAmount})` : ""}
             </Text>
           </Box>
         </Box>
@@ -449,13 +404,9 @@ export function SettingsSection({
                     >
                       {tipModeLabels[mode]}
                     </Text>
-                    <Text className="text-xs text-typography-400">
-                      {tipModeDescriptions[mode]}
-                    </Text>
+                    <Text className="text-xs text-typography-400">{tipModeDescriptions[mode]}</Text>
                   </VStack>
-                  {isSelected && (
-                    <Check size={20} color={Colors.primary[500]} />
-                  )}
+                  {isSelected && <Check size={20} color={Colors.primary[500]} />}
                 </HStack>
               </ActionsheetItem>
             );
@@ -464,10 +415,7 @@ export function SettingsSection({
       </Actionsheet>
 
       {/* Fixed Amount Input Sheet */}
-      <Actionsheet
-        isOpen={showFixedAmountInput}
-        onClose={handleFixedAmountSave}
-      >
+      <Actionsheet isOpen={showFixedAmountInput} onClose={handleFixedAmountSave}>
         <ActionsheetBackdrop />
         <ActionsheetContent className="pb-8">
           <ActionsheetDragIndicatorWrapper>

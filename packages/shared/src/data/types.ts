@@ -55,11 +55,7 @@ export interface DataQueryOptions {
   refetchOnReconnect?: boolean;
 }
 
-export interface DataMutationOptions<
-  TData = unknown,
-  TVariables = unknown,
-  TContext = unknown,
-> {
+export interface DataMutationOptions<TData = unknown, TVariables = unknown, TContext = unknown> {
   /** Called before mutation executes - use for optimistic updates */
   onMutate?: (variables: TVariables) => Promise<TContext> | TContext;
   /** Called on successful mutation */

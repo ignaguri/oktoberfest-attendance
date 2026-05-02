@@ -32,13 +32,11 @@ export async function uploadAvatar(formData: FormData) {
     throw new Error("Error compressing image");
   }
   const fileName = `${userId}_${uuidv4()}.webp`;
-  const { error } = await supabase.storage
-    .from("avatars")
-    .upload(fileName, compressedBuffer, {
-      contentType: "image/webp",
-      cacheControl: "3600",
-      upsert: false,
-    });
+  const { error } = await supabase.storage.from("avatars").upload(fileName, compressedBuffer, {
+    contentType: "image/webp",
+    cacheControl: "3600",
+    upsert: false,
+  });
   if (error) {
     reportLog("Error uploading avatar: " + error.message, "error");
     throw new Error(`Error uploading avatar: ${error.message}`);

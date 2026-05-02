@@ -68,11 +68,7 @@ export interface IReservationRepository {
    * @param data - Fields to update
    * @returns Updated reservation
    */
-  update(
-    id: string,
-    userId: string,
-    data: UpdateReservationInput,
-  ): Promise<Reservation>;
+  update(id: string, userId: string, data: UpdateReservationInput): Promise<Reservation>;
 
   /**
    * Get upcoming reservations that need reminders

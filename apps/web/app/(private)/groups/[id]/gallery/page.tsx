@@ -29,9 +29,7 @@ export default function GalleryPage({ params }: GalleryPageProps) {
         <h1 className="mb-4 text-2xl font-bold">{t("groups.gallery.title")}</h1>
         <div className="flex h-full flex-col items-center justify-center gap-4">
           <LoadingSpinner />
-          <span className="text-sm text-gray-500">
-            {t("groups.gallery.loading")}
-          </span>
+          <span className="text-sm text-gray-500">{t("groups.gallery.loading")}</span>
         </div>
       </div>
     );

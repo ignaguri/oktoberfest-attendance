@@ -3,13 +3,7 @@
 import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
 import { getFCMToken, onMessageListener } from "@/lib/firebase";
@@ -33,9 +27,7 @@ type ApiPreferences = {
 };
 
 // Convert API response to DB type
-const mapApiToDbPreferences = (
-  api: ApiPreferences,
-): NotificationPreferences => ({
+const mapApiToDbPreferences = (api: ApiPreferences): NotificationPreferences => ({
   id: "", // DB type requires id but API doesn't return it - use empty string as placeholder
   user_id: api.userId,
   push_enabled: api.pushEnabled,
@@ -86,16 +78,12 @@ interface NotificationContextType {
   canShowWhatsNew: boolean;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined,
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [preferences, setPreferences] =
-    useState<NotificationPreferences | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [pushSupported, setPushSupported] = useState(false);
-  const [pushPermission, setPushPermission] =
-    useState<NotificationPermission | null>(null);
+  const [pushPermission, setPushPermission] = useState<NotificationPermission | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
@@ -174,8 +162,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   // Check push notification support and permission, get FCM token
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const supported =
-        "Notification" in window && "serviceWorker" in navigator;
+      const supported = "Notification" in window && "serviceWorker" in navigator;
       setPushSupported(supported);
 
       if (supported) {
@@ -318,25 +305,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       if (updates.push_enabled !== undefined && updates.push_enabled !== null) {
         apiUpdates.pushEnabled = updates.push_enabled;
       }
-      if (
-        updates.reminders_enabled !== undefined &&
-        updates.reminders_enabled !== null
-      ) {
+      if (updates.reminders_enabled !== undefined && updates.reminders_enabled !== null) {
         apiUpdates.remindersEnabled = updates.reminders_enabled;
       }
       if (
         updates.group_notifications_enabled !== undefined &&
         updates.group_notifications_enabled !== null
       ) {
-        apiUpdates.groupNotificationsEnabled =
-          updates.group_notifications_enabled;
+        apiUpdates.groupNotificationsEnabled = updates.group_notifications_enabled;
       }
       if (
         updates.achievement_notifications_enabled !== undefined &&
         updates.achievement_notifications_enabled !== null
       ) {
-        apiUpdates.achievementNotificationsEnabled =
-          updates.achievement_notifications_enabled;
+        apiUpdates.achievementNotificationsEnabled = updates.achievement_notifications_enabled;
       }
 
       await apiClient.notifications.updatePreferences(apiUpdates);
@@ -410,11 +392,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     canShowWhatsNew,
   };
 
-  return (
-    <NotificationContext.Provider value={value}>
-      {children}
-    </NotificationContext.Provider>
-  );
+  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }
 
 // Default context value for use outside NotificationProvider (e.g., on public pages)

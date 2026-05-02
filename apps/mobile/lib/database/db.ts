@@ -17,12 +17,7 @@ import { festivals } from "./schema/festivals";
 import { groupMembers, groups } from "./schema/groups";
 import { profiles } from "./schema/profiles";
 import { syncMetadata, syncQueue } from "./schema/sync-tables";
-import {
-  drinkTypePrices,
-  festivalTents,
-  tents,
-  tentVisits,
-} from "./schema/tents";
+import { drinkTypePrices, festivalTents, tents, tentVisits } from "./schema/tents";
 import { winningCriteria } from "./schema/winning-criteria";
 
 export const schema = {

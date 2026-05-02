@@ -3,12 +3,7 @@ import { z } from "zod";
 /**
  * Crowd level enum matching the database enum
  */
-export const CrowdLevelSchema = z.enum([
-  "empty",
-  "moderate",
-  "crowded",
-  "full",
-]);
+export const CrowdLevelSchema = z.enum(["empty", "moderate", "crowded", "full"]);
 
 export type CrowdLevel = z.infer<typeof CrowdLevelSchema>;
 
@@ -70,9 +65,7 @@ export const GetCrowdStatusResponseSchema = z.object({
   data: z.array(TentCrowdStatusSchema),
 });
 
-export type GetCrowdStatusResponse = z.infer<
-  typeof GetCrowdStatusResponseSchema
->;
+export type GetCrowdStatusResponse = z.infer<typeof GetCrowdStatusResponseSchema>;
 
 /**
  * Query parameters for tent crowd reports
@@ -82,9 +75,7 @@ export const GetTentCrowdReportsQuerySchema = z.object({
   festivalId: z.string().uuid({ message: "Invalid festival ID" }),
 });
 
-export type GetTentCrowdReportsQuery = z.infer<
-  typeof GetTentCrowdReportsQuerySchema
->;
+export type GetTentCrowdReportsQuery = z.infer<typeof GetTentCrowdReportsQuerySchema>;
 
 /**
  * Response for tent crowd reports
@@ -93,9 +84,7 @@ export const GetTentCrowdReportsResponseSchema = z.object({
   data: z.array(CrowdReportWithUserSchema),
 });
 
-export type GetTentCrowdReportsResponse = z.infer<
-  typeof GetTentCrowdReportsResponseSchema
->;
+export type GetTentCrowdReportsResponse = z.infer<typeof GetTentCrowdReportsResponseSchema>;
 
 /**
  * Request body for submitting a crowd report
@@ -121,6 +110,4 @@ export const SubmitCrowdReportResponseSchema = z.object({
   }),
 });
 
-export type SubmitCrowdReportResponse = z.infer<
-  typeof SubmitCrowdReportResponseSchema
->;
+export type SubmitCrowdReportResponse = z.infer<typeof SubmitCrowdReportResponseSchema>;

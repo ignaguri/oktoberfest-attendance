@@ -4,13 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 
 import { Button, ButtonText } from "@/components/ui/button";
-import {
-  Modal,
-  ModalBackdrop,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-} from "@/components/ui/modal";
+import { Modal, ModalBackdrop, ModalBody, ModalContent, ModalFooter } from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
 
 interface BiometricPromptProps {
@@ -46,9 +40,7 @@ export function BiometricPrompt({
 
   const BiometricIcon = biometricType === "facial" ? ScanFace : Fingerprint;
   const biometricName =
-    biometricType === "facial"
-      ? t("biometric.labels.faceId")
-      : t("biometric.labels.fingerprint");
+    biometricType === "facial" ? t("biometric.labels.faceId") : t("biometric.labels.fingerprint");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -57,11 +49,7 @@ export function BiometricPrompt({
         <ModalBody className="pt-6">
           <View className="items-center">
             {isAuthenticating ? (
-              <ActivityIndicator
-                size="large"
-                color="#F59E0B"
-                className="my-4"
-              />
+              <ActivityIndicator size="large" color="#F59E0B" className="my-4" />
             ) : (
               <View className="mb-4 rounded-full bg-primary-100 p-4">
                 <BiometricIcon size={48} className="text-primary-600" />
@@ -146,9 +134,7 @@ export function BiometricEnablePrompt({
 
   const BiometricIcon = biometricType === "facial" ? ScanFace : Fingerprint;
   const biometricName =
-    biometricType === "facial"
-      ? t("biometric.labels.faceId")
-      : t("biometric.labels.fingerprint");
+    biometricType === "facial" ? t("biometric.labels.faceId") : t("biometric.labels.fingerprint");
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -185,13 +171,7 @@ export function BiometricEnablePrompt({
             <ButtonText>{t("auth.biometric.enableButton")}</ButtonText>
           </Button>
 
-          <Button
-            action="secondary"
-            variant="ghost"
-            size="lg"
-            onPress={onSkip}
-            className="w-full"
-          >
+          <Button action="secondary" variant="ghost" size="lg" onPress={onSkip} className="w-full">
             <ButtonText>{t("auth.biometric.skipButton")}</ButtonText>
           </Button>
         </ModalFooter>

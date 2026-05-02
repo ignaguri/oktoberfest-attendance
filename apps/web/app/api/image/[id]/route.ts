@@ -66,10 +66,7 @@ function extractFilePath(urlOrPath: string, bucket: string): string {
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   let decodedId = decodeURIComponent(id);
   const { searchParams } = new URL(request.url);
@@ -89,10 +86,7 @@ export async function GET(
   bucketParam = bucketParam || "avatars";
 
   if (!ALLOWED_BUCKETS[bucketParam as AllowedBucket]) {
-    return NextResponse.json(
-      { error: "Invalid bucket specified" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid bucket specified" }, { status: 400 });
   }
 
   const bucket = bucketParam as AllowedBucket;
@@ -105,9 +99,7 @@ export async function GET(
     const supabase = await createClient(true);
 
     // Try to download the file directly first
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .download(filePath);
+    const { data, error } = await supabase.storage.from(bucket).download(filePath);
 
     if (error) {
       logger.error(
@@ -121,18 +113,14 @@ export async function GET(
     const arrayBuffer = await data.arrayBuffer();
 
     // Generate ETag based on content hash
-    const etag = crypto
-      .createHash("md5")
-      .update(Buffer.from(arrayBuffer))
-      .digest("hex");
+    const etag = crypto.createHash("md5").update(Buffer.from(arrayBuffer)).digest("hex");
 
     // Cache-Control strategy for authenticated image content:
     // - private: only browser cache, not CDN/proxy (since auth required)
     // - max-age=31536000: cache for 1 year (images have unique paths with timestamps)
     // - immutable: never revalidate (file paths are unique per upload)
     // - stale-while-revalidate=86400: serve stale while fetching new (1 day grace)
-    const cacheControl =
-      "private, max-age=31536000, immutable, stale-while-revalidate=86400";
+    const cacheControl = "private, max-age=31536000, immutable, stale-while-revalidate=86400";
 
     // Check If-None-Match header for conditional requests
     const ifNoneMatch = request.headers.get("if-none-match");
@@ -162,9 +150,6 @@ export async function GET(
       logger.apiRoute("image/[id]", { imageId: filePath, bucket }),
       error as Error,
     );
-    return NextResponse.json(
-      { error: "Error fetching image" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Error fetching image" }, { status: 500 });
   }
 }

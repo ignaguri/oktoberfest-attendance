@@ -95,8 +95,5 @@ export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
  * Helper to check if a value is a valid error code
  */
 export function isErrorCode(value: unknown): value is ErrorCode {
-  return (
-    typeof value === "string" &&
-    Object.values(ErrorCodes).includes(value as ErrorCode)
-  );
+  return typeof value === "string" && Object.values(ErrorCodes).includes(value as ErrorCode);
 }

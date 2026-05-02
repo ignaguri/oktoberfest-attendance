@@ -21,9 +21,7 @@ export function AchievementGrid({
     return (
       <div className="py-12 text-center">
         <div className="mb-4 text-4xl">🏆</div>
-        <h3 className="mb-2 text-lg font-semibold text-gray-900">
-          No achievements yet
-        </h3>
+        <h3 className="mb-2 text-lg font-semibold text-gray-900">No achievements yet</h3>
         <p className="text-gray-600">
           Start attending festivals and recording beers to unlock achievements!
         </p>
@@ -32,12 +30,7 @@ export function AchievementGrid({
   }
 
   return (
-    <div
-      className={cn(
-        "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3",
-        className,
-      )}
-    >
+    <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3", className)}>
       {achievements.map((achievement) => (
         <AchievementCard
           key={achievement.id}

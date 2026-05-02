@@ -18,10 +18,7 @@ test.describe("Calendar Flows", () => {
     const homePage = new HomePage(page);
 
     await signInPage.goto();
-    await signInPage.signInAndWaitForHome(
-      CALENDAR_TEST_USER.email,
-      CALENDAR_TEST_USER.password,
-    );
+    await signInPage.signInAndWaitForHome(CALENDAR_TEST_USER.email, CALENDAR_TEST_USER.password);
     await homePage.expectOnHomePage();
 
     // Wait for page to fully load before dismissing overlays
@@ -83,9 +80,7 @@ test.describe("Calendar Flows", () => {
       await calendarPage.expectCalendarLoaded();
 
       // Check if festival is active (button enabled) or ended (button disabled)
-      const isButtonEnabled = await calendarPage.addAttendanceButton
-        .isEnabled()
-        .catch(() => false);
+      const isButtonEnabled = await calendarPage.addAttendanceButton.isEnabled().catch(() => false);
       if (!isButtonEnabled) {
         // Festival is over - button is disabled, skip this test
         test.skip();
@@ -102,9 +97,7 @@ test.describe("Calendar Flows", () => {
   });
 
   test.describe("FLOW_CAL_005: View Events for Date", () => {
-    test("should display events section for selected date", async ({
-      page,
-    }) => {
+    test("should display events section for selected date", async ({ page }) => {
       const calendarPage = new CalendarPage(page);
 
       await calendarPage.goto();

@@ -15,16 +15,11 @@ const ICON_SIZE = 20;
 export default function ShareAppButton() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const {
-    showQRCode,
-    isWebShareSupported,
-    shareViaWhatsApp,
-    shareViaNative,
-    toggleQRCode,
-  } = useShare({
-    title: "ProstCounter App",
-    text: t("home.shareAppDialog.shareText"),
-  });
+  const { showQRCode, isWebShareSupported, shareViaWhatsApp, shareViaNative, toggleQRCode } =
+    useShare({
+      title: "ProstCounter App",
+      text: t("home.shareAppDialog.shareText"),
+    });
 
   const title = t("home.shareAppDialog.title");
   const description = t("home.shareAppDialog.description");
@@ -43,9 +38,7 @@ export default function ShareAppButton() {
           </Button>
         )}
         <Button variant="secondary" onClick={toggleQRCode}>
-          {showQRCode
-            ? t("home.shareAppDialog.hideQRCode")
-            : t("home.shareAppDialog.showQRCode")}
+          {showQRCode ? t("home.shareAppDialog.hideQRCode") : t("home.shareAppDialog.showQRCode")}
         </Button>
         {showQRCode && (
           <div className="mt-4">
@@ -60,14 +53,7 @@ export default function ShareAppButton() {
         )}
       </div>
     ),
-    [
-      shareViaNative,
-      shareViaWhatsApp,
-      toggleQRCode,
-      isWebShareSupported,
-      showQRCode,
-      t,
-    ],
+    [shareViaNative, shareViaWhatsApp, toggleQRCode, isWebShareSupported, showQRCode, t],
   );
 
   return (

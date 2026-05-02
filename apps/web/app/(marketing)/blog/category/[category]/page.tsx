@@ -4,11 +4,7 @@ import { notFound } from "next/navigation";
 
 import { CategoryView } from "@/components/blog/CategoryView";
 import type { BlogCategory } from "@/lib/blog";
-import {
-  getCategories,
-  getPostsByCategory,
-  VALID_CATEGORIES,
-} from "@/lib/blog";
+import { getCategories, getPostsByCategory, VALID_CATEGORIES } from "@/lib/blog";
 
 export const revalidate = 3600;
 
@@ -19,11 +15,7 @@ export async function generateStaticParams(): Promise<Params[]> {
   return categories.map((category) => ({ category }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { category } = await params;
   const label = category.charAt(0).toUpperCase() + category.slice(1);
 
@@ -41,11 +33,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
+export default async function CategoryPage({ params }: { params: Promise<Params> }) {
   const { category } = await params;
 
   if (!VALID_CATEGORIES.includes(category as BlogCategory)) {
@@ -54,11 +42,5 @@ export default async function CategoryPage({
 
   const posts = await getPostsByCategory(category as BlogCategory, "en");
 
-  return (
-    <CategoryView
-      category={category as BlogCategory}
-      posts={posts}
-      locale="en"
-    />
-  );
+  return <CategoryView category={category as BlogCategory} posts={posts} locale="en" />;
 }

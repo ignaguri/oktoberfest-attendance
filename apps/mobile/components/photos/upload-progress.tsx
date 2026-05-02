@@ -7,13 +7,7 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Image,
-  Upload,
-} from "lucide-react-native";
+import { AlertCircle, CheckCircle, Clock, Image, Upload } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, View } from "react-native";
 
@@ -100,9 +94,7 @@ export function UploadProgressList({
 
   const totalProgress =
     photos.length > 0
-      ? Math.round(
-          photos.reduce((acc, p) => acc + p.progress, 0) / photos.length,
-        )
+      ? Math.round(photos.reduce((acc, p) => acc + p.progress, 0) / photos.length)
       : 0;
 
   return (
@@ -112,9 +104,7 @@ export function UploadProgressList({
         <HStack className="items-center justify-between">
           <HStack space="sm" className="items-center">
             <Upload size={ICON_SIZE} color={Colors.primary[500]} />
-            <Text className="font-semibold text-typography-900">
-              {t("photos.upload.title")}
-            </Text>
+            <Text className="font-semibold text-typography-900">{t("photos.upload.title")}</Text>
           </HStack>
 
           {/* Status counts */}
@@ -122,9 +112,7 @@ export function UploadProgressList({
             {completedCount > 0 && (
               <HStack space="xs" className="items-center">
                 <CheckCircle size={14} color={Colors.success[500]} />
-                <Text className="text-xs text-success-500">
-                  {completedCount}
-                </Text>
+                <Text className="text-xs text-success-500">{completedCount}</Text>
               </HStack>
             )}
             {failedCount > 0 && (
@@ -136,9 +124,7 @@ export function UploadProgressList({
             {pendingCount > 0 && (
               <HStack space="xs" className="items-center">
                 <Clock size={14} color={Colors.gray[500]} />
-                <Text className="text-xs text-typography-500">
-                  {pendingCount}
-                </Text>
+                <Text className="text-xs text-typography-500">{pendingCount}</Text>
               </HStack>
             )}
           </HStack>
@@ -154,9 +140,7 @@ export function UploadProgressList({
                   total: photos.length,
                 })}
               </Text>
-              <Text className="text-sm font-medium text-primary-500">
-                {totalProgress}%
-              </Text>
+              <Text className="text-sm font-medium text-primary-500">{totalProgress}%</Text>
             </HStack>
             <Progress value={totalProgress} size="sm">
               <ProgressFilledTrack />
@@ -168,11 +152,7 @@ export function UploadProgressList({
         {photos.length <= 5 && (
           <VStack space="sm">
             {photos.map((photo) => (
-              <PhotoProgressItem
-                key={photo.id}
-                photo={photo}
-                onRetry={onRetry}
-              />
+              <PhotoProgressItem key={photo.id} photo={photo} onRetry={onRetry} />
             ))}
           </VStack>
         )}
@@ -278,9 +258,7 @@ function PhotoProgressItem({ photo, onRetry }: PhotoProgressItemProps) {
         {getStatusIcon()}
         {photo.status === "failed" && onRetry && (
           <Button variant="link" size="xs" onPress={() => onRetry(photo.id)}>
-            <ButtonText className="text-xs">
-              {t("common.actions.retry")}
-            </ButtonText>
+            <ButtonText className="text-xs">{t("common.actions.retry")}</ButtonText>
           </Button>
         )}
       </HStack>
@@ -345,12 +323,7 @@ export function UploadProgressBadge({
         ) : (
           <Clock size={12} color={Colors.gray[500]} />
         )}
-        <Text
-          className={cn(
-            "text-xs",
-            isUploading ? "text-primary-600" : "text-typography-600",
-          )}
-        >
+        <Text className={cn("text-xs", isUploading ? "text-primary-600" : "text-typography-600")}>
           {isUploading
             ? t("photos.upload.inProgress")
             : t("photos.upload.pending", { count: pendingCount })}
