@@ -1,4 +1,4 @@
-import type { Database } from "@prostcounter/db";
+import type { Database, TablesUpdate } from "@prostcounter/db";
 import type {
   CreateGroupInput,
   Group,
@@ -231,8 +231,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
   }
 
   async update(groupId: string, data: UpdateGroupInput): Promise<Group> {
-    // Build update object
-    const updateData: Record<string, unknown> = {};
+    const updateData: TablesUpdate<"groups"> = {};
 
     if (data.name !== undefined) {
       updateData.name = data.name;

@@ -84,6 +84,7 @@ describe("Group Routes", () => {
         count: null,
         status: 200,
         statusText: "OK",
+        success: true,
       });
 
       const req = createAuthRequest("/groups", {

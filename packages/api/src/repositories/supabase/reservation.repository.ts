@@ -1,4 +1,4 @@
-import type { Database } from "@prostcounter/db";
+import type { Database, TablesUpdate } from "@prostcounter/db";
 import type {
   CreateReservationInput,
   Reservation,
@@ -173,7 +173,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
     input: UpdateReservationInput,
   ): Promise<Reservation> {
     // Build update object with only provided fields
-    const updateData: Record<string, unknown> = {};
+    const updateData: TablesUpdate<"reservations"> = {};
 
     if (input.startAt !== undefined) {
       updateData.start_at = input.startAt;
