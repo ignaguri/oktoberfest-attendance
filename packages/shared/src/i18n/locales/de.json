@@ -2308,21 +2308,31 @@
       "failed": "Authentifizierung fehlgeschlagen"
     }
   },
-  "pwa": {
-    "install": {
-      "title": "ProstCounter installieren",
-      "message": "Installiere unsere App für ein besseres Erlebnis",
-      "button": "Installieren",
-      "later": "Vielleicht später",
-      "instructions": {
-        "ios": "Tippe auf Teilen → Zum Home-Bildschirm",
-        "android": "Tippe auf Menü → App installieren",
-        "desktop": "Klicke auf Installieren in der Adressleiste"
-      },
-      "appStore": {
-        "message": "ProstCounter ist jetzt im App Store! Hol dir das volle Erlebnis.",
-        "button": "Im App Store laden"
-      }
+  "installBanner": {
+    "ios": {
+      "title": "Hol dir ProstCounter für iOS",
+      "message": "Verfolge dein Festival, wetteifere mit Freunden und behalte jeden Bierzähler.",
+      "cta": "Im App Store laden",
+      "pwaToggle": "Oder zum Home-Bildschirm hinzufügen",
+      "pwaInstructions": "Tippe in Safari auf Teilen und wähle „Zum Home-Bildschirm“."
+    },
+    "android": {
+      "title": "Hol dir ProstCounter für Android",
+      "message": "Verfolge dein Festival, wetteifere mit Freunden und behalte jeden Bierzähler.",
+      "cta": "Bei Google Play laden"
+    },
+    "desktop": {
+      "installTitle": "ProstCounter installieren",
+      "installMessage": "Hefte ProstCounter an dein Dock für schnellen Zugriff.",
+      "installCta": "Installieren",
+      "phoneTitle": "Hol dir ProstCounter aufs Handy",
+      "phoneMessage": "Scanne den Code oder lade aus deinem Store.",
+      "phoneExpand": "Aufs Handy holen",
+      "qrAlt": "QR-Code zum Herunterladen von ProstCounter"
+    },
+    "common": {
+      "dismiss": "Nicht jetzt",
+      "close": "Schließen"
     }
   },
   "navigation": {
@@ -2533,6 +2543,7 @@
       "title": "Bereit fürs nächste Fest?",
       "subtitle": "Lade ProstCounter herunter und starte noch heute dein Bierfest-Abenteuer.",
       "downloadIos": "Für iOS herunterladen",
+      "downloadAndroid": "Bei Google Play laden",
       "tryWebApp": "Web-App ausprobieren",
       "scanToDownload": "Scannen, um die App herunterzuladen"
     },
@@ -2544,8 +2555,8 @@
         "action": "Im App Store laden"
       },
       "android": {
-        "description": "Demnächst verfügbar",
-        "action": "Benachrichtigt werden"
+        "description": "Android-Handys & Tablets",
+        "action": "Bei Google Play laden"
       },
       "webApp": {
         "description": "Jeder Browser, jedes Gerät",
@@ -2557,7 +2568,7 @@
         "requirements": "Benötigt watchOS 10 oder neuer"
       },
       "scanWithPhone": "Mit dem Handy scannen",
-      "opensAppStore": "Öffnet den App Store auf iOS-Geräten"
+      "opensAppStore": "QR öffnet den App Store — Android-Nutzer tippen oben auf den Button"
     },
     "footer": {
       "tagline": "Verfolge deine Bierfest-Besuche und tritt gegen Freunde an.",
@@ -2572,6 +2583,7 @@
       },
       "downloadLinks": {
         "iosAppStore": "iOS App Store",
+        "androidPlayStore": "Google Play Store",
         "allPlatforms": "Alle Plattformen",
         "tryWebApp": "Web-App ausprobieren"
       },

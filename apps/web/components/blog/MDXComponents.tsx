@@ -4,8 +4,7 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
-
-const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
+import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 
 const ctaTranslations: Record<
   SupportedLanguage,
@@ -120,13 +119,22 @@ function DownloadButtonsInner({ locale = "en" }: { locale?: SupportedLanguage })
   return (
     <div className="my-6 flex flex-wrap items-center gap-4">
       <a
-        href={APP_STORE_URL}
+        href={IOS_APP_STORE_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
       >
         <Download size={16} className="mr-2" />
         App Store
+      </a>
+      <a
+        href={ANDROID_PLAY_STORE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+      >
+        <Download size={16} className="mr-2" />
+        Google Play
       </a>
       <Button variant="yellow" size="sm" asChild>
         <Link href="/sign-up">{t.tryWeb}</Link>

@@ -5,7 +5,6 @@ import Image from "next/image";
 
 import { AchievementHighlight } from "@/components/achievements/AchievementHighlight";
 import { CrowdStatusCard } from "@/components/crowd/CrowdStatusCard";
-import InstallPWA from "@/components/InstallPWA";
 import MyGroups from "@/components/MyGroups/MyGroups";
 import { NewsFeed } from "@/components/NewsFeed";
 import ShareAppButton from "@/components/ShareAppButton";
@@ -104,7 +103,6 @@ export default function Home() {
           </AccordionItem>
         </Accordion>
 
-        <InstallPWA />
         <TutorialOverlay />
       </div>
     </TutorialProvider>

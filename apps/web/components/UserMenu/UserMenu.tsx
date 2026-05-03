@@ -33,7 +33,7 @@ import {
   getMenuSections,
 } from "@/components/UserMenu/menuConfig";
 import { WhatsNew } from "@/components/WhatsNew";
-import { useInstallPWA } from "@/hooks/use-install-pwa";
+import { useInstallBanner } from "@/hooks/use-install-banner";
 import { getFestivalStatus } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
 import type { FestivalStatus } from "@/lib/types";
@@ -74,7 +74,7 @@ const getFestivalStatusBadgeProps = (
 export function UserMenu({ profileData, className }: UserMenuProps) {
   const { t } = useTranslation();
   const { currentFestival, festivals, setCurrentFestival, isLoading } = useFestival();
-  const { canInstall, installPWA } = useInstallPWA();
+  const { canInstall, triggerInstall } = useInstallBanner({ enabled: false });
   const [isOpen, setIsOpen] = useState(false);
   const [isFestivalModalOpen, setIsFestivalModalOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -114,7 +114,7 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
       if (item.id === "installApp") {
         return {
           ...item,
-          onClick: installPWA,
+          onClick: triggerInstall,
           disabled: !canInstall,
         };
       }

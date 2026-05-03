@@ -6,11 +6,10 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
+import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { i18n, useTranslation } from "@/lib/i18n/client";
 import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
-
-const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -210,7 +209,7 @@ export function LandingContent() {
               </ul>
 
               <a
-                href={APP_STORE_URL}
+                href={IOS_APP_STORE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
@@ -321,13 +320,22 @@ export function LandingContent() {
             className="flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <a
-              href={APP_STORE_URL}
+              href={IOS_APP_STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition hover:bg-gray-100"
             >
               <Download size={18} className="mr-2" />
               {t("marketing.cta.downloadIos")}
+            </a>
+            <a
+              href={ANDROID_PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition hover:bg-gray-100"
+            >
+              <Download size={18} className="mr-2" />
+              {t("marketing.cta.downloadAndroid")}
             </a>
             <Button
               variant="yellowOutline"

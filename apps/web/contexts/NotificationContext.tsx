@@ -71,10 +71,10 @@ interface NotificationContextType {
   // Loading states
   loading: boolean;
   isWhatsNewVisible: boolean;
-  isInstallPWAVisible: boolean;
+  isInstallBannerVisible: boolean;
   setWhatsNewVisible: (visible: boolean) => void;
-  setInstallPWAVisible: (visible: boolean) => void;
-  canShowInstallPWA: boolean;
+  setInstallBannerVisible: (visible: boolean) => void;
+  canShowInstallBanner: boolean;
   canShowWhatsNew: boolean;
 }
 
@@ -89,42 +89,40 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [userSynced, setUserSynced] = useState<string | null>(null); // Track synced user ID
 
-  // New coordination state for WhatsNew and InstallPWA
+  // Coordination state for WhatsNew and the install banner
   const [isWhatsNewVisible, setIsWhatsNewVisible] = useState(false);
-  const [isInstallPWAVisible, setIsInstallPWAVisible] = useState(false);
+  const [isInstallBannerVisible, setIsInstallBannerVisible] = useState(false);
 
   const supabase = createSupabaseBrowserClient();
 
   // Coordination logic: only one can be visible at a time
-  const canShowInstallPWA = !isWhatsNewVisible;
-  const canShowWhatsNew = !isInstallPWAVisible;
+  const canShowInstallBanner = !isWhatsNewVisible;
+  const canShowWhatsNew = !isInstallBannerVisible;
 
   const setWhatsNewVisible = (visible: boolean) => {
     setIsWhatsNewVisible(visible);
-    // If WhatsNew becomes visible, ensure InstallPWA is hidden
     if (visible) {
-      setIsInstallPWAVisible(false);
+      setIsInstallBannerVisible(false);
     }
   };
 
-  const setInstallPWAVisible = (visible: boolean) => {
-    setIsInstallPWAVisible(visible);
-    // If InstallPWA becomes visible, ensure WhatsNew is hidden
+  const setInstallBannerVisible = (visible: boolean) => {
+    setIsInstallBannerVisible(visible);
     if (visible) {
       setIsWhatsNewVisible(false);
     }
   };
 
-  // Additional coordination: auto-hide InstallPWA after a delay if WhatsNew is shown
+  // Auto-hide install banner shortly after WhatsNew becomes visible (smooth transition)
   useEffect(() => {
-    if (isWhatsNewVisible && isInstallPWAVisible) {
+    if (isWhatsNewVisible && isInstallBannerVisible) {
       const timer = setTimeout(() => {
-        setIsInstallPWAVisible(false);
-      }, 300); // Small delay for smooth transition
+        setIsInstallBannerVisible(false);
+      }, 300);
 
       return () => clearTimeout(timer);
     }
-  }, [isWhatsNewVisible, isInstallPWAVisible]);
+  }, [isWhatsNewVisible, isInstallBannerVisible]);
 
   // Get current user
   useEffect(() => {
@@ -385,10 +383,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     registerFCMTokenWithNovu,
     loading,
     isWhatsNewVisible,
-    isInstallPWAVisible,
+    isInstallBannerVisible,
     setWhatsNewVisible,
-    setInstallPWAVisible,
-    canShowInstallPWA,
+    setInstallBannerVisible,
+    canShowInstallBanner,
     canShowWhatsNew,
   };
 
@@ -407,10 +405,10 @@ const defaultContextValue: NotificationContextType = {
   registerFCMTokenWithNovu: async () => false,
   loading: false,
   isWhatsNewVisible: false,
-  isInstallPWAVisible: false,
+  isInstallBannerVisible: false,
   setWhatsNewVisible: () => {},
-  setInstallPWAVisible: () => {},
-  canShowInstallPWA: false,
+  setInstallBannerVisible: () => {},
+  canShowInstallBanner: false,
   canShowWhatsNew: false,
 };
 

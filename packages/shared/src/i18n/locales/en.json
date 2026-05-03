@@ -2542,21 +2542,31 @@
       "retryAll": "Retry All"
     }
   },
-  "pwa": {
-    "install": {
-      "title": "Install ProstCounter",
-      "message": "Install our app for a better experience",
-      "button": "Install",
-      "later": "Maybe later",
-      "instructions": {
-        "ios": "Tap Share → Add to Home Screen",
-        "android": "Tap menu → Install app",
-        "desktop": "Click install in address bar"
-      },
-      "appStore": {
-        "message": "ProstCounter is now on the App Store! Get the full experience.",
-        "button": "Download on the App Store"
-      }
+  "installBanner": {
+    "ios": {
+      "title": "Get ProstCounter on iOS",
+      "message": "Track your festival, compete with friends, and never lose a beer count.",
+      "cta": "Get on the App Store",
+      "pwaToggle": "Or add to Home Screen",
+      "pwaInstructions": "Tap the Share button in Safari, then choose \"Add to Home Screen\"."
+    },
+    "android": {
+      "title": "Get ProstCounter on Android",
+      "message": "Track your festival, compete with friends, and never lose a beer count.",
+      "cta": "Get it on Google Play"
+    },
+    "desktop": {
+      "installTitle": "Install ProstCounter",
+      "installMessage": "Pin ProstCounter to your dock for quick access.",
+      "installCta": "Install",
+      "phoneTitle": "Get ProstCounter on your phone",
+      "phoneMessage": "Scan the code or grab it from your store.",
+      "phoneExpand": "Get it on your phone",
+      "qrAlt": "QR code to download ProstCounter"
+    },
+    "common": {
+      "dismiss": "Not now",
+      "close": "Close"
     }
   },
   "navigation": {
@@ -2836,6 +2846,7 @@
       "title": "Ready for the next festival?",
       "subtitle": "Download ProstCounter and start tracking your beer festival adventure today.",
       "downloadIos": "Download on iOS",
+      "downloadAndroid": "Get it on Google Play",
       "tryWebApp": "Try the Web App",
       "scanToDownload": "Scan to download on your phone"
     },
@@ -2847,8 +2858,8 @@
         "action": "Download on the App Store"
       },
       "android": {
-        "description": "Coming soon",
-        "action": "Get notified"
+        "description": "Android phones & tablets",
+        "action": "Get it on Google Play"
       },
       "webApp": {
         "description": "Any browser, any device",
@@ -2860,7 +2871,7 @@
         "requirements": "Requires watchOS 10 or later"
       },
       "scanWithPhone": "Scan with your phone",
-      "opensAppStore": "Opens the App Store on iOS devices"
+      "opensAppStore": "QR opens the App Store — Android users tap the button above"
     },
     "footer": {
       "tagline": "Track your beer festival attendance and compete with friends.",
@@ -2875,6 +2886,7 @@
       },
       "downloadLinks": {
         "iosAppStore": "iOS App Store",
+        "androidPlayStore": "Google Play Store",
         "allPlatforms": "All Platforms",
         "tryWebApp": "Try the Web App"
       },

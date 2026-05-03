@@ -6,9 +6,8 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
+import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n/client";
-
-const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -28,15 +27,15 @@ const platformKeys = [
     key: "ios",
     icon: Smartphone,
     name: "iOS",
-    href: APP_STORE_URL,
+    href: IOS_APP_STORE_URL,
     available: true,
   },
   {
     key: "android",
     icon: Smartphone,
     name: "Android",
-    href: "/sign-up",
-    available: false,
+    href: ANDROID_PLAY_STORE_URL,
+    available: true,
   },
   {
     key: "webApp",

@@ -41,6 +41,15 @@ export function isIOS(): boolean {
 }
 
 /**
+ * Checks if the current device is Android
+ * @returns boolean indicating if the device is Android
+ */
+export function isAndroid(): boolean {
+  if (typeof window === "undefined") return false;
+  return /Android/i.test(navigator.userAgent);
+}
+
+/**
  * Checks if the browser supports the beforeinstallprompt event
  * @returns boolean indicating if beforeinstallprompt is supported
  */
