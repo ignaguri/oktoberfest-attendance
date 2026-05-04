@@ -3,11 +3,11 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { ChevronDown, Download, Smartphone, X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
-import { useInstallBanner } from "@/hooks/use-install-banner";
+import { useInstallBanner, type Store } from "@/hooks/use-install-banner";
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -16,10 +16,21 @@ export default function AppInstallBanner() {
   const { setInstallBannerVisible, canShowInstallBanner } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleShow = useCallback(() => {
+    setIsOpen(true);
+    setInstallBannerVisible(true);
+  }, [setInstallBannerVisible]);
+
+  const handleHide = useCallback(() => {
+    setIsOpen(false);
+    setInstallBannerVisible(false);
+  }, [setInstallBannerVisible]);
+
   const {
     variant,
     shouldShow,
-    installPWA,
+    canAddToHomeScreen,
+    triggerInstall,
     dismiss,
     trackStoreClick,
     iosInstructionsOpen,
@@ -28,14 +39,8 @@ export default function AppInstallBanner() {
     toggleDesktopQr,
   } = useInstallBanner({
     enabled: canShowInstallBanner,
-    onShow: () => {
-      setIsOpen(true);
-      setInstallBannerVisible(true);
-    },
-    onClose: () => {
-      setIsOpen(false);
-      setInstallBannerVisible(false);
-    },
+    onShow: handleShow,
+    onClose: handleHide,
   });
 
   if (!variant || (!shouldShow && !isOpen)) return null;
@@ -68,6 +73,7 @@ export default function AppInstallBanner() {
 
         {variant === "ios" && (
           <IOSContent
+            canAddToHomeScreen={canAddToHomeScreen}
             iosInstructionsOpen={iosInstructionsOpen}
             toggleIosInstructions={toggleIosInstructions}
             onStoreClick={() => trackStoreClick("ios")}
@@ -82,7 +88,7 @@ export default function AppInstallBanner() {
         )}
         {variant === "desktop-pwa" && (
           <DesktopPwaContent
-            installPWA={installPWA}
+            installPWA={triggerInstall}
             qrOpen={desktopQrOpen}
             toggleQr={toggleDesktopQr}
             onStoreClick={trackStoreClick}
@@ -107,11 +113,13 @@ function BannerHeader({ icon, title }: { icon: React.ReactNode; title: string })
 }
 
 function IOSContent({
+  canAddToHomeScreen,
   iosInstructionsOpen,
   toggleIosInstructions,
   onStoreClick,
   onDismiss,
 }: {
+  canAddToHomeScreen: boolean;
   iosInstructionsOpen: boolean;
   toggleIosInstructions: () => void;
   onStoreClick: () => void;
@@ -137,20 +145,24 @@ function IOSContent({
             {t("installBanner.ios.cta")}
           </a>
         </Button>
-        <button
-          type="button"
-          onClick={toggleIosInstructions}
-          className="text-muted-foreground hover:text-foreground flex w-full items-center justify-center gap-1 text-xs"
-        >
-          {t("installBanner.ios.pwaToggle")}
-          <ChevronDown
-            className={cn("size-3 transition-transform", iosInstructionsOpen && "rotate-180")}
-          />
-        </button>
-        {iosInstructionsOpen && (
-          <p className="text-muted-foreground rounded-md bg-gray-50 p-2 text-xs dark:bg-gray-900">
-            {t("installBanner.ios.pwaInstructions")}
-          </p>
+        {canAddToHomeScreen && (
+          <>
+            <button
+              type="button"
+              onClick={toggleIosInstructions}
+              className="text-muted-foreground hover:text-foreground flex w-full items-center justify-center gap-1 text-xs"
+            >
+              {t("installBanner.ios.pwaToggle")}
+              <ChevronDown
+                className={cn("size-3 transition-transform", iosInstructionsOpen && "rotate-180")}
+              />
+            </button>
+            {iosInstructionsOpen && (
+              <p className="text-muted-foreground rounded-md bg-gray-50 p-2 text-xs dark:bg-gray-900">
+                {t("installBanner.ios.pwaInstructions")}
+              </p>
+            )}
+          </>
         )}
       </div>
       <BannerFooter onDismiss={onDismiss} />
@@ -198,10 +210,10 @@ function DesktopPwaContent({
   onStoreClick,
   onDismiss,
 }: {
-  installPWA: () => Promise<void>;
+  installPWA: () => void;
   qrOpen: boolean;
   toggleQr: () => void;
-  onStoreClick: (store: "ios" | "android") => void;
+  onStoreClick: (store: Store) => void;
   onDismiss: () => void;
 }) {
   const { t } = useTranslation();
@@ -239,7 +251,7 @@ function DesktopQrContent({
   onStoreClick,
   onDismiss,
 }: {
-  onStoreClick: (store: "ios" | "android") => void;
+  onStoreClick: (store: Store) => void;
   onDismiss: () => void;
 }) {
   const { t } = useTranslation();
@@ -260,7 +272,7 @@ function DesktopQrContent({
   );
 }
 
-function PhoneSection({ onStoreClick }: { onStoreClick: (store: "ios" | "android") => void }) {
+function PhoneSection({ onStoreClick }: { onStoreClick: (store: Store) => void }) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center gap-3 pt-2">

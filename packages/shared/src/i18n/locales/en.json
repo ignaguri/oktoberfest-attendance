@@ -2567,6 +2567,11 @@
     "common": {
       "dismiss": "Not now",
       "close": "Close"
+    },
+    "toast": {
+      "unavailable": "Installation not available on this device.",
+      "success": "App installed successfully!",
+      "failed": "Installation failed. Please try again later."
     }
   },
   "navigation": {

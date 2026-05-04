@@ -2333,6 +2333,11 @@
     "common": {
       "dismiss": "Nicht jetzt",
       "close": "Schließen"
+    },
+    "toast": {
+      "unavailable": "Installation auf diesem Gerät nicht verfügbar.",
+      "success": "App erfolgreich installiert!",
+      "failed": "Installation fehlgeschlagen. Bitte später erneut versuchen."
     }
   },
   "navigation": {

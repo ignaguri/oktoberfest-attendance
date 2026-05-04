@@ -3,7 +3,7 @@
 import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
 import { getFCMToken, onMessageListener } from "@/lib/firebase";
@@ -89,31 +89,30 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [userSynced, setUserSynced] = useState<string | null>(null); // Track synced user ID
 
-  // Coordination state for WhatsNew and the install banner
   const [isWhatsNewVisible, setIsWhatsNewVisible] = useState(false);
   const [isInstallBannerVisible, setIsInstallBannerVisible] = useState(false);
 
   const supabase = createSupabaseBrowserClient();
 
-  // Coordination logic: only one can be visible at a time
+  // Only one of WhatsNew / install banner can be visible at a time.
   const canShowInstallBanner = !isWhatsNewVisible;
   const canShowWhatsNew = !isInstallBannerVisible;
 
-  const setWhatsNewVisible = (visible: boolean) => {
+  const setWhatsNewVisible = useCallback((visible: boolean) => {
     setIsWhatsNewVisible(visible);
     if (visible) {
       setIsInstallBannerVisible(false);
     }
-  };
+  }, []);
 
-  const setInstallBannerVisible = (visible: boolean) => {
+  const setInstallBannerVisible = useCallback((visible: boolean) => {
     setIsInstallBannerVisible(visible);
     if (visible) {
       setIsWhatsNewVisible(false);
     }
-  };
+  }, []);
 
-  // Auto-hide install banner shortly after WhatsNew becomes visible (smooth transition)
+  // Smooth transition: hide install banner shortly after WhatsNew opens.
   useEffect(() => {
     if (isWhatsNewVisible && isInstallBannerVisible) {
       const timer = setTimeout(() => {
@@ -276,7 +275,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       });
   }, [pushSupported, pushPermission]);
 
-  const updatePreferences = async (
+  const updatePreferences = useCallback(async (
     updates: Partial<
       Pick<
         NotificationPreferences,
@@ -329,9 +328,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       throw error;
     }
-  };
+  }, [user]);
 
-  const requestPushPermission = async (): Promise<boolean> => {
+  const requestPushPermission = useCallback(async (): Promise<boolean> => {
     if (!pushSupported) {
       throw new Error("Push notifications not supported");
     }
@@ -370,25 +369,44 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       throw error;
     }
-  };
+  }, [pushSupported, pushPermission, fcmToken, registerFCMTokenWithNovu, updatePreferences]);
 
-  const value: NotificationContextType = {
-    user,
-    preferences,
-    updatePreferences,
-    pushSupported,
-    pushPermission,
-    requestPushPermission,
-    fcmToken,
-    registerFCMTokenWithNovu,
-    loading,
-    isWhatsNewVisible,
-    isInstallBannerVisible,
-    setWhatsNewVisible,
-    setInstallBannerVisible,
-    canShowInstallBanner,
-    canShowWhatsNew,
-  };
+  const value = useMemo<NotificationContextType>(
+    () => ({
+      user,
+      preferences,
+      updatePreferences,
+      pushSupported,
+      pushPermission,
+      requestPushPermission,
+      fcmToken,
+      registerFCMTokenWithNovu,
+      loading,
+      isWhatsNewVisible,
+      isInstallBannerVisible,
+      setWhatsNewVisible,
+      setInstallBannerVisible,
+      canShowInstallBanner,
+      canShowWhatsNew,
+    }),
+    [
+      user,
+      preferences,
+      updatePreferences,
+      pushSupported,
+      pushPermission,
+      requestPushPermission,
+      fcmToken,
+      registerFCMTokenWithNovu,
+      loading,
+      isWhatsNewVisible,
+      isInstallBannerVisible,
+      setWhatsNewVisible,
+      setInstallBannerVisible,
+      canShowInstallBanner,
+      canShowWhatsNew,
+    ],
+  );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }

@@ -37,7 +37,9 @@ export function isPWAInstalled(): boolean {
  */
 export function isIOS(): boolean {
   if (typeof window === "undefined") return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) return true;
+  // iPadOS 13+ Safari reports as "Macintosh"; touch support disambiguates.
+  return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
 }
 
 /**
