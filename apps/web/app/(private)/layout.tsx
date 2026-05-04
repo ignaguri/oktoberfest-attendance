@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import AppInstallBanner from "@/components/AppInstallBanner";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Footer from "@/components/Footer";
@@ -46,6 +47,7 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
                 {children}
                 <WhatsNew />
                 <VersionChecker />
+                <AppInstallBanner />
               </Suspense>
             </ErrorBoundary>
           </main>

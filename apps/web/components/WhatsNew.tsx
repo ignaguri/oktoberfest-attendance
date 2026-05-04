@@ -62,9 +62,9 @@ export function WhatsNew({ open, onOpenChange, isManualTrigger = false }: WhatsN
       (currentVersion !== APP_VERSION || lastSeenVersion !== APP_VERSION) &&
       shouldShowCurrentVersion
     ) {
-      // Add a small delay to give InstallPWA priority on initial load
+      // Add a small delay to give the install banner priority on initial load
       const timer = setTimeout(() => {
-        // Only show if we can show WhatsNew (not conflicting with InstallPWA)
+        // Only show if we can show WhatsNew (not conflicting with the install banner)
         if (canShowWhatsNew) {
           setIsOpen(true);
           setWhatsNewVisible(true);

@@ -3,7 +3,7 @@
 import type { Tables } from "@prostcounter/db";
 import type { User } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { apiClient } from "@/lib/api-client";
 import { getFCMToken, onMessageListener } from "@/lib/firebase";
@@ -71,10 +71,10 @@ interface NotificationContextType {
   // Loading states
   loading: boolean;
   isWhatsNewVisible: boolean;
-  isInstallPWAVisible: boolean;
+  isInstallBannerVisible: boolean;
   setWhatsNewVisible: (visible: boolean) => void;
-  setInstallPWAVisible: (visible: boolean) => void;
-  canShowInstallPWA: boolean;
+  setInstallBannerVisible: (visible: boolean) => void;
+  canShowInstallBanner: boolean;
   canShowWhatsNew: boolean;
 }
 
@@ -89,42 +89,39 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [userSynced, setUserSynced] = useState<string | null>(null); // Track synced user ID
 
-  // New coordination state for WhatsNew and InstallPWA
   const [isWhatsNewVisible, setIsWhatsNewVisible] = useState(false);
-  const [isInstallPWAVisible, setIsInstallPWAVisible] = useState(false);
+  const [isInstallBannerVisible, setIsInstallBannerVisible] = useState(false);
 
   const supabase = createSupabaseBrowserClient();
 
-  // Coordination logic: only one can be visible at a time
-  const canShowInstallPWA = !isWhatsNewVisible;
-  const canShowWhatsNew = !isInstallPWAVisible;
+  // Only one of WhatsNew / install banner can be visible at a time.
+  const canShowInstallBanner = !isWhatsNewVisible;
+  const canShowWhatsNew = !isInstallBannerVisible;
 
-  const setWhatsNewVisible = (visible: boolean) => {
+  const setWhatsNewVisible = useCallback((visible: boolean) => {
     setIsWhatsNewVisible(visible);
-    // If WhatsNew becomes visible, ensure InstallPWA is hidden
     if (visible) {
-      setIsInstallPWAVisible(false);
+      setIsInstallBannerVisible(false);
     }
-  };
+  }, []);
 
-  const setInstallPWAVisible = (visible: boolean) => {
-    setIsInstallPWAVisible(visible);
-    // If InstallPWA becomes visible, ensure WhatsNew is hidden
+  const setInstallBannerVisible = useCallback((visible: boolean) => {
+    setIsInstallBannerVisible(visible);
     if (visible) {
       setIsWhatsNewVisible(false);
     }
-  };
+  }, []);
 
-  // Additional coordination: auto-hide InstallPWA after a delay if WhatsNew is shown
+  // Smooth transition: hide install banner shortly after WhatsNew opens.
   useEffect(() => {
-    if (isWhatsNewVisible && isInstallPWAVisible) {
+    if (isWhatsNewVisible && isInstallBannerVisible) {
       const timer = setTimeout(() => {
-        setIsInstallPWAVisible(false);
-      }, 300); // Small delay for smooth transition
+        setIsInstallBannerVisible(false);
+      }, 300);
 
       return () => clearTimeout(timer);
     }
-  }, [isWhatsNewVisible, isInstallPWAVisible]);
+  }, [isWhatsNewVisible, isInstallBannerVisible]);
 
   // Get current user
   useEffect(() => {
@@ -278,7 +275,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       });
   }, [pushSupported, pushPermission]);
 
-  const updatePreferences = async (
+  const updatePreferences = useCallback(async (
     updates: Partial<
       Pick<
         NotificationPreferences,
@@ -331,9 +328,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       throw error;
     }
-  };
+  }, [user]);
 
-  const requestPushPermission = async (): Promise<boolean> => {
+  const requestPushPermission = useCallback(async (): Promise<boolean> => {
     if (!pushSupported) {
       throw new Error("Push notifications not supported");
     }
@@ -372,25 +369,44 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       throw error;
     }
-  };
+  }, [pushSupported, pushPermission, fcmToken, registerFCMTokenWithNovu, updatePreferences]);
 
-  const value: NotificationContextType = {
-    user,
-    preferences,
-    updatePreferences,
-    pushSupported,
-    pushPermission,
-    requestPushPermission,
-    fcmToken,
-    registerFCMTokenWithNovu,
-    loading,
-    isWhatsNewVisible,
-    isInstallPWAVisible,
-    setWhatsNewVisible,
-    setInstallPWAVisible,
-    canShowInstallPWA,
-    canShowWhatsNew,
-  };
+  const value = useMemo<NotificationContextType>(
+    () => ({
+      user,
+      preferences,
+      updatePreferences,
+      pushSupported,
+      pushPermission,
+      requestPushPermission,
+      fcmToken,
+      registerFCMTokenWithNovu,
+      loading,
+      isWhatsNewVisible,
+      isInstallBannerVisible,
+      setWhatsNewVisible,
+      setInstallBannerVisible,
+      canShowInstallBanner,
+      canShowWhatsNew,
+    }),
+    [
+      user,
+      preferences,
+      updatePreferences,
+      pushSupported,
+      pushPermission,
+      requestPushPermission,
+      fcmToken,
+      registerFCMTokenWithNovu,
+      loading,
+      isWhatsNewVisible,
+      isInstallBannerVisible,
+      setWhatsNewVisible,
+      setInstallBannerVisible,
+      canShowInstallBanner,
+      canShowWhatsNew,
+    ],
+  );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }
@@ -407,10 +423,10 @@ const defaultContextValue: NotificationContextType = {
   registerFCMTokenWithNovu: async () => false,
   loading: false,
   isWhatsNewVisible: false,
-  isInstallPWAVisible: false,
+  isInstallBannerVisible: false,
   setWhatsNewVisible: () => {},
-  setInstallPWAVisible: () => {},
-  canShowInstallPWA: false,
+  setInstallBannerVisible: () => {},
+  canShowInstallBanner: false,
   canShowWhatsNew: false,
 };
 

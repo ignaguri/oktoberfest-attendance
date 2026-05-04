@@ -4,11 +4,10 @@ import { Beer } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 
+import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { i18n, useTranslation } from "@/lib/i18n/client";
 import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
-
-const APP_STORE_URL = "https://apps.apple.com/de/app/prostcounter/id6758376527";
 
 export function MarketingFooter() {
   const { t } = useTranslation();
@@ -77,12 +76,22 @@ export function MarketingFooter() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href={APP_STORE_URL}
+                  href={IOS_APP_STORE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
                   {t("marketing.footer.downloadLinks.iosAppStore")}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={ANDROID_PLAY_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  {t("marketing.footer.downloadLinks.androidPlayStore")}
                 </a>
               </li>
               <li>

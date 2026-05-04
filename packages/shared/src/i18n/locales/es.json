@@ -2542,21 +2542,36 @@
       "retryAll": "Reintentar todas"
     }
   },
-  "pwa": {
-    "install": {
-      "title": "Instalar ProstCounter",
-      "message": "Instalá nuestra app para una mejor experiencia",
-      "button": "Instalar",
-      "later": "Tal vez más tarde",
-      "instructions": {
-        "ios": "Tocá Compartir → Agregar a pantalla de inicio",
-        "android": "Tocá menú → Instalar app",
-        "desktop": "Hacé click en instalar en la barra de direcciones"
-      },
-      "appStore": {
-        "message": "¡ProstCounter ya está en el App Store! Obtén la experiencia completa.",
-        "button": "Descargar en el App Store"
-      }
+  "installBanner": {
+    "ios": {
+      "title": "Conseguí ProstCounter para iOS",
+      "message": "Registrá tu festival, competí con amigos y no pierdas ni un brindis.",
+      "cta": "Conseguir en el App Store",
+      "pwaToggle": "O agregá a la pantalla de inicio",
+      "pwaInstructions": "Tocá el botón Compartir en Safari y elegí «Agregar a pantalla de inicio»."
+    },
+    "android": {
+      "title": "Conseguí ProstCounter para Android",
+      "message": "Registrá tu festival, competí con amigos y no pierdas ni un brindis.",
+      "cta": "Disponible en Google Play"
+    },
+    "desktop": {
+      "installTitle": "Instalar ProstCounter",
+      "installMessage": "Anclá ProstCounter al dock para acceso rápido.",
+      "installCta": "Instalar",
+      "phoneTitle": "Conseguí ProstCounter en tu teléfono",
+      "phoneMessage": "Escaneá el código o descargalo desde tu tienda.",
+      "phoneExpand": "Conseguilo en tu teléfono",
+      "qrAlt": "Código QR para descargar ProstCounter"
+    },
+    "common": {
+      "dismiss": "Ahora no",
+      "close": "Cerrar"
+    },
+    "toast": {
+      "unavailable": "La instalación no está disponible en este dispositivo.",
+      "success": "¡App instalada con éxito!",
+      "failed": "Falló la instalación. Probá de nuevo más tarde."
     }
   },
   "navigation": {
@@ -2836,6 +2851,7 @@
       "title": "¿Listo para el próximo festival?",
       "subtitle": "Descarga ProstCounter y empieza a registrar tu aventura cervecera hoy.",
       "downloadIos": "Descargar en iOS",
+      "downloadAndroid": "Disponible en Google Play",
       "tryWebApp": "Probar la app web",
       "scanToDownload": "Escanea para descargar en tu móvil"
     },
@@ -2847,8 +2863,8 @@
         "action": "Descargar en el App Store"
       },
       "android": {
-        "description": "Próximamente",
-        "action": "Recibir notificación"
+        "description": "Móviles y tablets Android",
+        "action": "Disponible en Google Play"
       },
       "webApp": {
         "description": "Cualquier navegador, cualquier dispositivo",
@@ -2860,7 +2876,7 @@
         "requirements": "Requiere watchOS 10 o posterior"
       },
       "scanWithPhone": "Escanea con tu móvil",
-      "opensAppStore": "Abre el App Store en dispositivos iOS"
+      "opensAppStore": "El QR abre el App Store — los usuarios de Android tocan el botón de arriba"
     },
     "footer": {
       "tagline": "Registra tu asistencia a festivales cerveceros y compite con amigos.",
@@ -2875,6 +2891,7 @@
       },
       "downloadLinks": {
         "iosAppStore": "iOS App Store",
+        "androidPlayStore": "Google Play Store",
         "allPlatforms": "Todas las plataformas",
         "tryWebApp": "Probar la app web"
       },

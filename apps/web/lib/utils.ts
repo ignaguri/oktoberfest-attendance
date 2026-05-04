@@ -37,7 +37,18 @@ export function isPWAInstalled(): boolean {
  */
 export function isIOS(): boolean {
   if (typeof window === "undefined") return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) return true;
+  // iPadOS 13+ Safari reports as "Macintosh"; touch support disambiguates.
+  return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+}
+
+/**
+ * Checks if the current device is Android
+ * @returns boolean indicating if the device is Android
+ */
+export function isAndroid(): boolean {
+  if (typeof window === "undefined") return false;
+  return /Android/i.test(navigator.userAgent);
 }
 
 /**
