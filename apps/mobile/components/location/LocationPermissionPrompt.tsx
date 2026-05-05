@@ -1,6 +1,8 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import * as WebBrowser from "expo-web-browser";
 import { MapPin, Navigation, Shield, Users } from "lucide-react-native";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import {
   AlertDialog,
@@ -92,6 +94,16 @@ export function LocationPermissionPrompt({
             <Text className="text-center text-xs text-typography-500">
               {t("location.promptNote")}
             </Text>
+
+            <Pressable
+              onPress={() => WebBrowser.openBrowserAsync(`${PROD_URL}/privacy`)}
+              accessibilityRole="link"
+              accessibilityLabel={t("location.privacyPolicyLink")}
+            >
+              <Text className="text-center text-xs text-primary-600 underline">
+                {t("location.privacyPolicyLink")}
+              </Text>
+            </Pressable>
           </VStack>
         </AlertDialogBody>
 
