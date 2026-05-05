@@ -1,5 +1,72 @@
 # Changelog
 
+## [0.9.1] - 2026-05-05
+
+### ✨ Features
+
+- add daily push notification reminder for app engagement (#227)
+- add Frühlingsfest 2026 festival, tents, and blog article (#226)
+- add user-configurable tip calculation (#224)
+- count radler as 0.5 beer in leaderboard (#215)
+- add friendship system with request/accept flow (#207)
+- iOS App Store promotion + Wrapped drink breakdown slide (#204)
+- pre-release fixes for v0.8.0 release (#181)
+- unified feed, groupless messages & social API tests (#179)
+- Expo mobile app with full feature parity (#88)
+- Hono backend migration with comprehensive API layer (#82)
+
+### 🐛 Bug Fixes
+
+- skip tutorial auto-start when festival is not active (#228)
+- reduce Sentry noise from location errors and add FK validation (#225)
+- iOS bug batch - leaderboard, groups, delete, offline (#211)
+- location session duplicate + attendance delete 404 (#209)
+- Sentry production bugs (error parsing, price mismatch, offline ID sync) (#205)
+- avatar URL validation and Novu SDK upgrade (#140)
+- handle server-side rendering in useMediaQuery hook
+- `MIDDLEWARE_INVOCATION_FAILED` error (#81)
+
+### 📚 Documentation
+
+- slim CLAUDE.md and extract blog/builds runbooks
+- improve CLAUDE.md — add blog section, trim duplication
+- add branch workflow rule to CLAUDE.md
+
+### ♻️ Code Refactoring
+
+- use PROD_URL constant and deduplicate BlogLocale (#220)
+
+### 🔧 Maintenance
+
+- migrate ESLint+Prettier to oxlint + oxfmt (#242)
+- remove Claude Code Review workflow (#238)
+- merge feat/location-share-with-friends
+- merge fix/upload-diagnostics
+- merge fix/qr-code-join-deeplink
+- merge fix/web-qr-share-deeplink
+- merge fix/silent-delete-hazards
+- merge fix/attendance-delete-silent-success
+- track only Info.plist from generated ios/ directory
+- gitignore build artifacts, videos, and local caches
+- add root tsconfig and web app gitignore
+- add production env vars to EAS and maven plugin
+- bump version to 1.3.3
+- upgrade dependencies (safe patches + lucide v1.0) (#213)
+- bump mobile to v1.1.2 and configure Play Store submission
+- bump web to v1.0.0 and mobile to v1.1.1
+- upgrade dependencies across monorepo (#206)
+- disable dependabot and upgrade dependencies (#202)
+- ignore root-level ios/android directories
+- ignore Tailwind v4 in Dependabot for mobile/root
+- add Dependabot ignore rules for Expo SDK-locked deps
+- add EAS build credentials to .gitignore
+- optimize .easignore to reduce EAS build upload size
+- update dependencies in package.json and pnpm-lock.yaml
+- apply prettier formatting to all files (#87)
+- remove generated SW files and update documentation (#83)
+- enhance todo comment
+- adjustments to server side of wrapped
+
 ## [0.8.0] - 2026-03-05
 
 ### ✨ Features
