@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
       <div className="prose prose-lg max-w-none space-y-6">
         <p className="mb-8 text-sm text-gray-600">
           <strong>Last updated:</strong>{" "}
-          {new Date("2025-09-05").toLocaleDateString("de-DE", {
+          {new Date("2026-05-05").toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -65,6 +65,48 @@ export default function PrivacyPolicy() {
             <li>Device information necessary for app functionality</li>
             <li>IP address for security and service provision</li>
           </ul>
+
+          <h3 className="mt-6 mb-3 text-xl font-medium">2.4 Location Information (Mobile App)</h3>
+          <p>
+            The ProstCounter mobile app can collect your device&apos;s precise location when you opt
+            in to <strong>Location Sharing</strong>. Location data is{" "}
+            <strong>not collected by default</strong> and is only collected after you explicitly
+            enable sharing from within the app.
+          </p>
+          <ul className="ml-4 list-inside list-disc space-y-2">
+            <li>
+              <strong>What we collect:</strong> precise GPS coordinates (latitude, longitude),
+              accuracy in meters, and a timestamp
+            </li>
+            <li>
+              <strong>When we collect it:</strong> only while a location sharing session is active.
+              Sessions last up to a duration you choose (default 2 hours, maximum 4 hours) and
+              expire automatically
+            </li>
+            <li>
+              <strong>Foreground and background:</strong> while a session is active, location is
+              always collected while the app is open. If you separately grant the OS-level
+              background location permission, collection also continues while the app is closed or
+              minimized so your group members and friends can continue to see your position on the
+              festival map. Without that grant, collection is foreground-only and pauses when the
+              app is backgrounded
+            </li>
+            <li>
+              <strong>Cadence:</strong> approximately every 30 seconds or every 50 meters of
+              movement, whichever happens first
+            </li>
+            <li>
+              <strong>Why we collect it:</strong> to show your real-time position on the festival
+              map to the people you&apos;ve chosen to share with, and to suggest tents that are
+              near you
+            </li>
+            <li>
+              <strong>Your control:</strong> you can stop sharing at any time from the location
+              sharing toggle in the app, which immediately ends the session and stops collection.
+              You can also revoke the OS-level location permission at any time from your device
+              settings
+            </li>
+          </ul>
         </section>
 
         <section>
@@ -78,6 +120,10 @@ export default function PrivacyPolicy() {
             <li>Generate achievements and statistics</li>
             <li>Improve the app through analytics and error monitoring</li>
             <li>Respond to your questions and provide customer support</li>
+            <li>
+              Share your real-time location with your group members and accepted friends when you
+              opt in to location sharing in the mobile app
+            </li>
           </ul>
           <p className="mt-4">
             <strong>We do not:</strong> Send marketing emails, sell your data, or use your
@@ -116,6 +162,11 @@ export default function PrivacyPolicy() {
             <li>Your username and statistics are visible to other users in leaderboards</li>
             <li>Photos and attendance data are visible to members of groups you join</li>
             <li>Achievement information may be visible to other users</li>
+            <li>
+              When you enable location sharing, your real-time location is visible to members of
+              the groups you&apos;ve enabled sharing for and to your accepted friends, until you
+              disable sharing or the session expires
+            </li>
           </ul>
 
           <h3 className="mt-6 mb-3 text-xl font-medium">4.3 Legal Requirements</h3>
@@ -142,6 +193,12 @@ export default function PrivacyPolicy() {
             We retain your personal information for up to 3 years from your last activity on the
             platform. After this period, your data will be automatically deleted unless you actively
             use the service.
+          </p>
+          <p className="mt-4">
+            <strong>Location data:</strong> location points are short-lived and are automatically
+            deleted within 24 hours of being recorded. Sharing sessions themselves expire
+            automatically (default 2 hours, maximum 4 hours) and are then marked inactive so no
+            further location data is collected against them.
           </p>
           <p className="mt-4">
             <strong>Account Deletion:</strong> You can delete your account and all associated data

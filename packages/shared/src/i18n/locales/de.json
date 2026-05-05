@@ -1717,8 +1717,9 @@
       "privacy": "Nur für deine Gruppenmitglieder und Freunde sichtbar"
     },
     "promptTitle": "Standort teilen",
-    "promptDescription": "Aktiviere Standortfreigabe, um Freunde zu finden und Zelte in der Nähe zu entdecken",
-    "promptNote": "Du kannst die Standortfreigabe jederzeit deaktivieren",
+    "promptDescription": "ProstCounter erfasst den genauen Standort deines Geräts, um deine Echtzeit-Position auf der Festivalkarte mit deinen Gruppenmitgliedern und akzeptierten Freunden zu teilen und Zelte in deiner Nähe vorzuschlagen. Wenn du zusätzlich die Hintergrund-Standortberechtigung des Betriebssystems erteilst, läuft die Erfassung weiter, während die App geschlossen oder im Hintergrund ist.",
+    "promptNote": "Du kannst die Standortfreigabe jederzeit über den Standort-Schalter auf der Start- oder Kartenseite beenden – die Sitzung wird sofort beendet und die Erfassung gestoppt.",
+    "privacyPolicyLink": "Datenschutzerklärung lesen",
     "enable": "Standort aktivieren",
     "skip": "Vielleicht später"
   },
