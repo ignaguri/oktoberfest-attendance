@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
       <div className="prose prose-lg max-w-none space-y-6">
         <p className="mb-8 text-sm text-gray-600">
           <strong>Last updated:</strong>{" "}
-          {new Date("2026-05-05").toLocaleDateString("de-DE", {
+          {new Date("2026-05-05").toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -85,9 +85,11 @@ export default function PrivacyPolicy() {
             </li>
             <li>
               <strong>Foreground and background:</strong> while a session is active, location is
-              collected both while the app is open and in the background (when the app is closed or
-              minimized) so your group members and friends can continue to see your position on the
-              festival map
+              always collected while the app is open. If you separately grant the OS-level
+              background location permission, collection also continues while the app is closed or
+              minimized so your group members and friends can continue to see your position on the
+              festival map. Without that grant, collection is foreground-only and pauses when the
+              app is backgrounded
             </li>
             <li>
               <strong>Cadence:</strong> approximately every 30 seconds or every 50 meters of
@@ -195,8 +197,8 @@ export default function PrivacyPolicy() {
           <p className="mt-4">
             <strong>Location data:</strong> location points are short-lived and are automatically
             deleted within 24 hours of being recorded. Sharing sessions themselves expire
-            automatically (default 2 hours, maximum 4 hours) and are deleted on a rolling basis once
-            inactive.
+            automatically (default 2 hours, maximum 4 hours) and are then marked inactive so no
+            further location data is collected against them.
           </p>
           <p className="mt-4">
             <strong>Account Deletion:</strong> You can delete your account and all associated data

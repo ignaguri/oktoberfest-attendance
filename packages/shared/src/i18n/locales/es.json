@@ -1962,8 +1962,8 @@
       "privacy": "Solo visible para los miembros de tu grupo y tus amigos"
     },
     "promptTitle": "Compartí tu ubicación",
-    "promptDescription": "ProstCounter recopila la ubicación precisa de tu dispositivo, incluso en segundo plano mientras la aplicación está cerrada, para compartir tu posición en tiempo real con los miembros de tu grupo y tus amigos aceptados en el mapa del festival y para sugerirte carpas cercanas.",
-    "promptNote": "Podés detener la ubicación en cualquier momento desde tu perfil; la sesión finaliza al instante y se detiene la recopilación.",
+    "promptDescription": "ProstCounter recopila la ubicación precisa de tu dispositivo para compartir tu posición en tiempo real con los miembros de tu grupo y tus amigos aceptados en el mapa del festival y para sugerirte carpas cercanas. Si además otorgás el permiso de ubicación en segundo plano del sistema operativo, la recopilación continúa mientras la aplicación está cerrada o en segundo plano.",
+    "promptNote": "Podés detener la ubicación en cualquier momento desde el control de ubicación en la pantalla de inicio o el mapa; la sesión finaliza al instante y se detiene la recopilación.",
     "privacyPolicyLink": "Leé nuestra política de privacidad",
     "enable": "Activar ubicación",
     "skip": "Quizás después"

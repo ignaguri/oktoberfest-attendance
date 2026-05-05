@@ -1879,8 +1879,8 @@
       "privacy": "Only visible to your group members and friends"
     },
     "promptTitle": "Share Your Location",
-    "promptDescription": "ProstCounter will collect your device's precise location, including in the background while the app is closed, to share your real-time position with your group members and accepted friends on the festival map and to suggest nearby tents.",
-    "promptNote": "You can stop location sharing at any time from your profile, which immediately ends the session and stops collection.",
+    "promptDescription": "ProstCounter will collect your device's precise location to share your real-time position with your group members and accepted friends on the festival map and to suggest nearby tents. If you also grant the OS-level background location permission, collection continues while the app is closed or in the background.",
+    "promptNote": "You can stop location sharing at any time from the location toggle on the home or map screen, which immediately ends the session and stops collection.",
     "privacyPolicyLink": "Read our Privacy Policy",
     "enable": "Enable Location",
     "skip": "Maybe Later",

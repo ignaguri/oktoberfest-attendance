@@ -2,7 +2,10 @@ import { PROD_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import * as WebBrowser from "expo-web-browser";
 import { MapPin, Navigation, Shield, Users } from "lucide-react-native";
+import { useCallback } from "react";
 import { Pressable, View } from "react-native";
+
+import { logger } from "@/lib/logger";
 
 import {
   AlertDialog,
@@ -39,6 +42,14 @@ export function LocationPermissionPrompt({
   onSkip,
 }: LocationPermissionPromptProps) {
   const { t } = useTranslation();
+
+  const openPrivacyPolicy = useCallback(async () => {
+    try {
+      await WebBrowser.openBrowserAsync(`${PROD_URL}/privacy`);
+    } catch (error) {
+      logger.error("Failed to open privacy policy:", error);
+    }
+  }, []);
 
   const benefits = [
     {
@@ -96,7 +107,7 @@ export function LocationPermissionPrompt({
             </Text>
 
             <Pressable
-              onPress={() => WebBrowser.openBrowserAsync(`${PROD_URL}/privacy`)}
+              onPress={openPrivacyPolicy}
               accessibilityRole="link"
               accessibilityLabel={t("location.privacyPolicyLink")}
             >
