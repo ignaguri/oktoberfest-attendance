@@ -95,15 +95,24 @@ Both are canonical, split by domain:
 There is duplication (both define several `notify*` methods). Consolidation is explicitly out of
 scope; this spec only reconciles the payload keys each live trigger actually sends.
 
-## Environment caveat (dev vs prod)
+## Environment access (dev + prod both reachable via MCP)
 
-The Novu MCP API key is the **Development** environment key (prod exposes no API key). All cloud
-inspection so far is the **dev** environment. In Novu, prod is built by **promoting** changes from
-dev. Therefore:
+Two Novu MCP servers are configured: `novu` (Development env key) and `novu-prod` (Production env
+key). Both environments can be inspected and edited directly via MCP.
 
-- All dashboard template edits happen in **dev** first, are verified, then **promoted to prod**.
-- Prod workflow/integration state must be verified separately (likely manually via the dashboard,
-  since the MCP can't reach prod with the current key).
+**Prod state verified (2026-06-02):**
+- Same **9 workflows** as dev, all `origin: "novu-cloud"`, all ACTIVE → the drift is identical in
+  prod. `friend-request` last triggered **2026-05-05** (the blank-name bug is live for real users).
+- Prod has **no demo/onboarding workflows** — the 6 samples exist only in dev. Workflow cleanup
+  (work area E) is therefore **dev-only**.
+- Prod push integrations: `expo` (`expo-push`, `primary: false`) and `fcm`
+  (`firebase-cloud-messaging-native-prod`, `primary: false`). Both active, neither primary — same
+  smell as dev. The prod FCM identifier matches `.env.example`; dev uses the un-suffixed
+  `firebase-cloud-messaging-native` (env-specific, not a bug).
+
+**Approach:** apply each template fix in **dev** first, trigger-verify, then apply the same fix in
+**prod** via `novu-prod` MCP (or promote via the dashboard) and re-verify. No manual-only step is
+required since prod is directly reachable.
 
 ## Reconciliation Table (target = keys the trigger sends)
 
@@ -142,7 +151,8 @@ rather than rely on fragile template logic — decided per workflow during imple
   `app/api/cron/scheduler/daily-reminders.ts` + its wiring in `scheduler/route.ts`; the
   `DAILY_REMINDER` entries in `packages/shared/src/constants/notifications.ts`
   (`NOTIFICATION_WORKFLOWS` and `NOTIFICATION_PUSH_TYPES` if unused elsewhere); any related tests.
-- Cloud: deactivate then delete the `daily-reminder` workflow (dev), promote to prod.
+- Cloud: deactivate then delete the `daily-reminder` workflow in **both** dev (`novu`) and prod
+  (`novu-prod`) via MCP. Deactivate first; only delete after the code removal is deployed.
 
 ### C. Reconcile payload contracts (per Reconciliation Table)
 - For each remaining workflow: fetch cloud template, edit dashboard template vars to match the
@@ -150,22 +160,23 @@ rather than rely on fragile template logic — decided per workflow during imple
 - Apply in dev, verify, promote to prod.
 
 ### D. Push integration hygiene
-- Set the **Expo Push** integration as the **primary** push integration (dev + prod), since the
-  app now sends Expo tokens.
+- Set the **Expo Push** integration as the **primary** push integration in **both** dev and prod
+  (`set_primary_integration` via the respective MCP), since the app now sends Expo tokens.
 - Decide on the FCM integration: deactivate/remove if the FCM path is fully retired, OR keep if
   some installed clients still send FCM tokens. Confirm against `registerPushToken` auto-detection
   (`ExponentPushToken[` → Expo, else FCM) and current app versions in the field.
-- Reconcile env identifiers: `.env.example` has `NOVU_FCM_INTEGRATION_ID=firebase-cloud-messaging-native-prod`
-  but the dev integration identifier is `firebase-cloud-messaging-native`. Verify prod identifiers
-  and align env vars; if FCM is removed, drop `NOVU_FCM_INTEGRATION_ID` and the `registerFCMToken`
-  path.
+  **(Open decision — pending product/user call.)**
+- Env identifiers are environment-specific and already correct: prod `NOVU_FCM_INTEGRATION_ID=firebase-cloud-messaging-native-prod`
+  (matches prod integration), dev uses `firebase-cloud-messaging-native`. No env change needed
+  unless FCM is removed — then drop `NOVU_FCM_INTEGRATION_ID` and the `registerFCMToken` path.
 
 ### E. General cleanup
 - Clear/fix the stale Development env bridge URL
   (`deploy-preview-8--onboarding-sandbox.netlify.app/api/novu`) via MCP, or leave inert if removing
   the bridge concept makes it harmless.
-- Delete the 6 inactive onboarding sample workflows: `demo-comment-on-task`, `demo-verify-otp`,
-  `demo-apartment-review`, `demo-recent-login`, `demo-password-reset`, `a-new-member-joining-the-team`.
+- Delete the 6 inactive onboarding sample workflows (**dev only** — prod has none):
+  `demo-comment-on-task`, `demo-verify-otp`, `demo-apartment-review`, `demo-recent-login`,
+  `demo-password-reset`, `a-new-member-joining-the-team`.
 
 ## Verification
 
