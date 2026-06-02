@@ -676,23 +676,6 @@ export class NotificationService {
     }
   }
 
-  /**
-   * Send daily reminder push notification to a user.
-   * Called from cron which pre-filters by daily_reminder_enabled — no per-user preference check needed.
-   */
-  async notifyDailyReminder(userId: string, payload: { dayOfYear: number }): Promise<void> {
-    try {
-      await this.novu.trigger({
-        workflowId: NOTIFICATION_WORKFLOWS.DAILY_REMINDER,
-        to: userId,
-        payload,
-      });
-    } catch (error) {
-      reportNotificationException("notifyDailyReminder", error as Error, {
-        id: userId,
-      });
-    }
-  }
 }
 
 // Factory function to create instance on demand

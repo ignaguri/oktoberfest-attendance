@@ -1,5 +1,4 @@
 import { workflow } from "@novu/framework";
-import { NOTIFICATION_PUSH_TYPES } from "@prostcounter/shared/constants";
 import { z } from "zod";
 
 export const DAILY_REMINDER_WORKFLOW_ID = "daily-reminder" as const;
@@ -56,7 +55,7 @@ export const dailyReminderWorkflow = workflow(
           subject: controls.pushSubject || message.subject,
           body: controls.pushBody || message.body,
           data: {
-            type: NOTIFICATION_PUSH_TYPES.DAILY_REMINDER,
+            type: "daily-reminder",
           },
         };
       },

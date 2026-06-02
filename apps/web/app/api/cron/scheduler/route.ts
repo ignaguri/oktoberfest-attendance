@@ -5,7 +5,6 @@ import { createNotificationService } from "@/lib/services/notifications";
 import { createClient } from "@/utils/supabase/server";
 
 import { processAchievementNotifications } from "./achievements";
-import { processDailyReminderNotifications } from "./daily-reminders";
 import { processReservationNotifications } from "./reservations";
 
 export const runtime = "nodejs";
@@ -26,8 +25,6 @@ export async function POST(req: Request) {
   await processReservationNotifications(supabase, notifications, baseUrl, nowIso);
 
   await processAchievementNotifications(supabase, notifications);
-
-  await processDailyReminderNotifications(supabase, notifications);
 
   return NextResponse.json({ ok: true });
 }
