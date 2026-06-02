@@ -314,6 +314,49 @@ git commit -m "chore(novu): remove bridge route, code-first workflows, sync scri
 
 ## Phase 3 — Reconcile dashboard templates (cloud: dev → prod)
 
+> ### ⚠️ REVISED 2026-06-02 — dashboard-only; do NOT use MCP `update_workflow`
+>
+> **Discovery during execution:** the `mcp__novu__update_workflow` MCP tool is **lossy**. Its step `controlValues` schema does not support the in-app `data` object, nor the `primaryAction.url` redirect form our templates actually use (it only models `primaryAction.redirect.url` + `label`). On every write it **silently strips the in-app `data` object and the `primaryAction.url` redirect**, and it **resets `active:false`** unless `active:true` is passed explicitly. In-app tap routing depends on `data` (`apps/mobile/app/notifications.tsx` → `getNotificationRoute(notification.data)`), so MCP writes cause real regressions. **All Phase 3 template edits are therefore performed in the Novu dashboard**, not via MCP. (One MCP write already hit dev `friend-request` before this was discovered — see fix below.)
+>
+> **Authoritative trigger payloads (verified from code, the source of truth):**
+> | Workflow | Keys the live trigger actually sends | Template verdict |
+> |---|---|---|
+> | `friend-request` | `requesterName, requesterAvatar, requesterId` | **fix** (template used `senderName`/`senderAvatar`) |
+> | `tent-check-in-notification` | `userName, tentName, groupName, userAvatar` | ✓ already correct |
+> | `group-join-notification` | `joinerName, groupName, joinerAvatar, groupId` | ✓ already correct |
+> | `location-sharing-notification` | `sharerName, groupName, sharerAvatar, groupId, action` | ✓ already correct |
+> | `achievement-unlocked` | `achievementName, description?, rarity, achievementId` | **fix** (used `achievementDescription` + never-sent `points`) |
+> | `group-achievement-unlocked` | `achieverName, achievementName, rarity, groupName?` | **fix** (used never-sent `achievementDescription` + `groupId`) |
+> | `reservation-reminder-notification` | `reservationId, tentName, startAtISO, festivalName?` | **fix** (used never-sent `reservationTime`) |
+> | `reservation-check-in-prompt` | `reservationId, tentName, deepLinkUrl` | ✓ already correct |
+>
+> Dev and prod templates are identical except `friend-request` (prod still has the old broken text; dev was MCP-edited — text fixed but `data` dropped). Only **4 workflows** need edits.
+>
+> **Dashboard navigation:** Novu dashboard → select environment (Development first, then Production) → Workflows → open workflow → click the step → edit fields in the right-hand controls panel → **Save** → (publish if prompted). Re-confirm the workflow stays **Active** after saving.
+>
+> #### Edit 1 — `friend-request`
+> - **DEV only:** open In-App step → **Data** field → set to `{ "type": "friend-request" }` (repairs the object the MCP write dropped; text is already fixed to `requesterName`/`requesterAvatar`).
+> - **PROD only:** In-App **subject** → `{{payload.requesterName}} sent you a friend request` · In-App **body** → `{{payload.requesterName}} wants to be your friend! Tap to accept or decline.` · In-App **avatar** → `{{payload.requesterAvatar}}` · Push **body** → `{{payload.requesterName}} wants to be your friend!` · (In-App **Data** already `{"type":"friend-request"}` — leave it.)
+>
+> #### Edit 2 — `achievement-unlocked` (DEV + PROD, identical)
+> - In-App **body** → `Congrats! {{payload.description}}`
+> - Push **body** → `You earned the "{{payload.achievementName}}" achievement!`
+> - (Leave In-App Data `{"type":"achievement-unlocked","achievementName":"{{payload.achievementName}}"}` and redirect `/profile` as-is — both valid.)
+>
+> #### Edit 3 — `group-achievement-unlocked` (DEV + PROD, identical)
+> - In-App **body** → `Your group {{payload.groupName}} just unlocked: {{payload.achievementName}}! Thanks to {{payload.achieverName}}.`
+> - In-App **redirect** (`primaryAction.url`) → `/achievements` (was broken `/groups/{{payload.groupId}}`; `groupId` is not sent for this workflow).
+>
+> #### Edit 4 — `reservation-reminder-notification` (DEV + PROD, identical)
+> - In-App **body** → `You have a reservation at {{payload.tentName}} coming up. See you there!`
+> - Push **body** → `Reminder: your reservation at {{payload.tentName}} is coming up.`
+>
+> **No change** (verified correct in both envs): `tent-check-in-notification`, `group-join-notification`, `location-sharing-notification`, `reservation-check-in-prompt`.
+>
+> **Verification after each env:** trigger the edited workflow against a test subscriber (dev: `user1@example.com` id `d26406e5-81ad-49f8-83e1-a0e2a297d05c`; prod: your own account only — never a real end-user) with a representative payload, and confirm the rendered in-app/push output has no literal `{{payload...}}` tokens and no blanks. The controller can drive these test triggers via MCP (`trigger_workflow`) — that is a read-equivalent and safe.
+>
+> The original MCP-based Task 3.1/3.2 steps below are **superseded** by this runbook and retained only for historical context.
+
 For EACH workflow in the Reconciliation reference table (8 workflows; `daily-reminder` is excluded — it's deleted in Phase 5). Do dev first, verify, then prod. Use the MCP `update_workflow` tool which requires the full workflow object (`name`, `workflowId`, `origin: "novu-cloud"`, `steps[]`); fetch current state first and only change `controlValues` strings.
 
 > `update_workflow` enforces `{{payload.variableName}}` syntax. Keep `data` objects (e.g. `{ "type": "friend-request" }`) and `primaryAction`/`redirect` blocks as-is unless the table says otherwise.
