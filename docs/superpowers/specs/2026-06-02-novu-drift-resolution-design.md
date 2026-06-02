@@ -77,6 +77,7 @@ primary is a delivery risk.
 ## Key Decisions
 
 - **Source of truth: Cloud / dashboard.** (Option A, chosen 2026-06-02.)
+- **FCM push integration: keep active** as a fallback (Expo set primary). (Chosen 2026-06-02.)
 - **Reconciliation direction: prefer editing dashboard templates** to match the keys triggers
   already send. Only edit trigger code where a template needs a field that isn't sent at all, or
   where the trigger sends a non-display-ready value (e.g. ISO timestamp) that the template can't
@@ -162,13 +163,12 @@ rather than rely on fragile template logic — decided per workflow during imple
 ### D. Push integration hygiene
 - Set the **Expo Push** integration as the **primary** push integration in **both** dev and prod
   (`set_primary_integration` via the respective MCP), since the app now sends Expo tokens.
-- Decide on the FCM integration: deactivate/remove if the FCM path is fully retired, OR keep if
-  some installed clients still send FCM tokens. Confirm against `registerPushToken` auto-detection
-  (`ExponentPushToken[` → Expo, else FCM) and current app versions in the field.
-  **(Open decision — pending product/user call.)**
+- **Keep the FCM integration active** (decision 2026-06-02) as a fallback for older installed
+  clients that may still send FCM tokens. Expo becomes primary; FCM stays active. Retain the
+  `registerFCMToken` path and `NOVU_FCM_INTEGRATION_ID` env. (Optional future task: remove FCM after
+  a deprecation window once analytics confirm no FCM tokens are being registered.)
 - Env identifiers are environment-specific and already correct: prod `NOVU_FCM_INTEGRATION_ID=firebase-cloud-messaging-native-prod`
-  (matches prod integration), dev uses `firebase-cloud-messaging-native`. No env change needed
-  unless FCM is removed — then drop `NOVU_FCM_INTEGRATION_ID` and the `registerFCMToken` path.
+  (matches prod integration), dev uses `firebase-cloud-messaging-native`. No env change needed.
 
 ### E. General cleanup
 - Clear/fix the stale Development env bridge URL
