@@ -1051,8 +1051,6 @@
       "groupActivity": "Gruppen-Aktivität",
       "reminders": "Erinnerungen",
       "remindersDescription": "Reservierungserinnerungen und Check-in-Aufforderungen",
-      "dailyReminder": "Tägliche Erinnerung",
-      "dailyReminderDescription": "Tägliche Push-Erinnerung zum Öffnen der App",
       "info": "du kannst deine Benachrichtigungseinstellungen jederzeit ändern",
       "updateError": "Aktualisierung der Benachrichtigungseinstellungen fehlgeschlagen",
       "noToken": "Push-Benachrichtigungs-Token konnte nicht abgerufen werden. Bitte versuche es erneut.",
