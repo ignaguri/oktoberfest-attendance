@@ -36,8 +36,6 @@
     "release:minor": "pnpm run version:minor && git add . && git commit -m \"chore: bump version\" && git tag v$(pnpm exec tsx scripts/version.ts show) && git push && git push --tags",
     "release:major": "pnpm run version:major && git add . && git commit -m \"chore: bump version\" && git tag v$(pnpm exec tsx scripts/version.ts show) && git push && git push --tags",
     "prepare": "husky",
-    "novu:sync": "tsx scripts/novu-sync.ts",
-    "novu:local": "npx novu@latest dev -p 3008 -r /api/novu",
     "cron:trigger": "tsx scripts/trigger-cron.ts",
     "e2e": "playwright test",
     "e2e:headed": "playwright test --headed",

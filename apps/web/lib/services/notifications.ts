@@ -1,43 +1,20 @@
 import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import type { Tables } from "@prostcounter/db";
-import { DEFAULT_AVATAR_URL, DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
+import {
+  DEFAULT_AVATAR_URL,
+  DEV_URL,
+  IS_PROD,
+  NOTIFICATION_WORKFLOWS,
+  PROD_URL,
+} from "@prostcounter/shared/constants";
 import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
 
-import { ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/achievement-unlocked";
-import { DAILY_REMINDER_WORKFLOW_ID } from "@/novu/workflows/daily-reminder";
-import { GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID } from "@/novu/workflows/group-achievement-unlocked";
-import { GROUP_JOIN_WORKFLOW_ID } from "@/novu/workflows/group-join";
-import { LOCATION_SHARING_WORKFLOW_ID } from "@/novu/workflows/location-sharing";
-import { RESERVATION_PROMPT_WORKFLOW_ID } from "@/novu/workflows/reservation-prompt";
-import { RESERVATION_REMINDER_WORKFLOW_ID } from "@/novu/workflows/reservation-reminder";
-import { TENT_CHECKIN_WORKFLOW_ID } from "@/novu/workflows/tent-check-in";
 import { reportNotificationException, reportSupabaseException } from "@/utils/sentry";
 
 type NotificationPreferences = Tables<"user_notification_preferences">;
-
-/**
- * Notification workflow identifiers
- * These should match the workflow IDs configured in Novu
- */
-export const NOTIFICATION_WORKFLOWS = {
-  GROUP_JOIN: GROUP_JOIN_WORKFLOW_ID,
-  LOCATION_SHARING: LOCATION_SHARING_WORKFLOW_ID,
-  TENT_CHECKIN: TENT_CHECKIN_WORKFLOW_ID,
-  RESERVATION_REMINDER: RESERVATION_REMINDER_WORKFLOW_ID,
-  RESERVATION_CHECKIN_PROMPT: RESERVATION_PROMPT_WORKFLOW_ID,
-  ACHIEVEMENT_UNLOCKED: ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
-  GROUP_ACHIEVEMENT_UNLOCKED: GROUP_ACHIEVEMENT_UNLOCKED_WORKFLOW_ID,
-  DAILY_REMINDER: DAILY_REMINDER_WORKFLOW_ID,
-} as const;
-
-/**
- * Type for notification workflow IDs
- */
-export type NotificationWorkflowId =
-  (typeof NOTIFICATION_WORKFLOWS)[keyof typeof NOTIFICATION_WORKFLOWS];
 
 export class NotificationService {
   private supabase;
@@ -676,23 +653,6 @@ export class NotificationService {
     }
   }
 
-  /**
-   * Send daily reminder push notification to a user.
-   * Called from cron which pre-filters by daily_reminder_enabled — no per-user preference check needed.
-   */
-  async notifyDailyReminder(userId: string, payload: { dayOfYear: number }): Promise<void> {
-    try {
-      await this.novu.trigger({
-        workflowId: NOTIFICATION_WORKFLOWS.DAILY_REMINDER,
-        to: userId,
-        payload,
-      });
-    } catch (error) {
-      reportNotificationException("notifyDailyReminder", error as Error, {
-        id: userId,
-      });
-    }
-  }
 }
 
 // Factory function to create instance on demand

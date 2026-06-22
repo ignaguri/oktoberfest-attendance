@@ -6,7 +6,7 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { splitFullName } from "@prostcounter/shared/utils";
-import { Bell, CalendarClock, Clock, ExternalLink, Trophy, Users } from "lucide-react-native";
+import { Bell, Clock, ExternalLink, Trophy, Users } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -72,7 +72,6 @@ export default function NotificationSettingsScreen() {
     reminders_enabled: preferences?.remindersEnabled ?? true,
     achievement_notifications_enabled: preferences?.achievementNotificationsEnabled ?? true,
     group_notifications_enabled: preferences?.groupNotificationsEnabled ?? true,
-    daily_reminder_enabled: preferences?.dailyReminderEnabled ?? true,
     push_enabled: preferences?.pushEnabled ?? false,
   };
 
@@ -80,8 +79,7 @@ export default function NotificationSettingsScreen() {
     key:
       | "reminders_enabled"
       | "achievement_notifications_enabled"
-      | "group_notifications_enabled"
-      | "daily_reminder_enabled",
+      | "group_notifications_enabled",
     value: boolean,
   ) => {
     // Map snake_case to camelCase for API
@@ -89,14 +87,12 @@ export default function NotificationSettingsScreen() {
       reminders_enabled: "remindersEnabled",
       achievement_notifications_enabled: "achievementNotificationsEnabled",
       group_notifications_enabled: "groupNotificationsEnabled",
-      daily_reminder_enabled: "dailyReminderEnabled",
     };
 
     const apiKey = apiKeyMap[key] as
       | "remindersEnabled"
       | "achievementNotificationsEnabled"
-      | "groupNotificationsEnabled"
-      | "dailyReminderEnabled";
+      | "groupNotificationsEnabled";
 
     try {
       await updatePreferences.mutateAsync({ [apiKey]: value });
@@ -273,7 +269,7 @@ export default function NotificationSettingsScreen() {
             </View>
 
             {/* Group Notifications */}
-            <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
+            <View className="flex-row items-center justify-between py-3">
               <View className="flex-1 flex-row items-center gap-3">
                 <Users size={24} color={IconColors.default} />
                 <View className="flex-1">
@@ -286,31 +282,6 @@ export default function NotificationSettingsScreen() {
               <Switch
                 value={mappedPreferences.group_notifications_enabled}
                 onValueChange={(value) => handleToggle("group_notifications_enabled", value)}
-                disabled={isSaving}
-                trackColor={{
-                  false: SwitchColors.trackOff,
-                  true: SwitchColors.trackOn,
-                }}
-                thumbColor={SwitchColors.thumb}
-              />
-            </View>
-
-            {/* Daily Reminder */}
-            <View className="flex-row items-center justify-between py-3">
-              <View className="flex-1 flex-row items-center gap-3">
-                <CalendarClock size={24} color={IconColors.default} />
-                <View className="flex-1">
-                  <Text className="text-typography-900">
-                    {t("profile.notifications.dailyReminder")}
-                  </Text>
-                  <Text className="text-sm text-typography-500">
-                    {t("profile.notifications.dailyReminderDescription")}
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={mappedPreferences.daily_reminder_enabled}
-                onValueChange={(value) => handleToggle("daily_reminder_enabled", value)}
                 disabled={isSaving}
                 trackColor={{
                   false: SwitchColors.trackOff,

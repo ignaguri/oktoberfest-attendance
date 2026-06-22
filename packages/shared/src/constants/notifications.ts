@@ -23,7 +23,6 @@ export const NOTIFICATION_WORKFLOWS = {
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
-  DAILY_REMINDER: "daily-reminder",
 } as const;
 
 export type NotificationWorkflowId =
@@ -42,7 +41,6 @@ export const NOTIFICATION_PUSH_TYPES = {
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
-  DAILY_REMINDER: "daily-reminder",
 } as const;
 
 export type NotificationPushType =
@@ -95,9 +93,6 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
         return payload.reservationId
           ? `/attendance?checkInReservationId=${payload.reservationId}`
           : "/attendance";
-
-      case NOTIFICATION_PUSH_TYPES.DAILY_REMINDER:
-        return "/home";
     }
   }
 
