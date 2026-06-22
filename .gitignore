@@ -93,6 +93,7 @@ apps/mobile/credentials/
 
 # Claude agent local data
 .superpowers/
+docs/superpowers/
 .claude/settings.json
 
 # Mobile build artifacts
