@@ -93,6 +93,7 @@ export type ApiQueryParams<
 export {
   createTypedApiClient,
   ApiError,
+  AuthRequiredError,
   type ApiClientConfig as TypedApiClientConfig,
   type ApiResponse as TypedApiResponse,
   type TypedApiClient,
