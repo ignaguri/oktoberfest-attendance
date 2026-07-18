@@ -1,5 +1,5 @@
-import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useRouter } from "expo-router";
+import type { NativeStackNavigationOptions } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 
 import { Button } from "@/components/ui/button";
