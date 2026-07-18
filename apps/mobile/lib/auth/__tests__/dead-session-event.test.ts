@@ -33,7 +33,7 @@ vi.mock("../secure-storage", () => ({
   storeUserEmail: vi.fn(),
 }));
 
-import { isDeadSessionSignOut } from "../AuthContext";
+import { isDeadSessionSignOut, runUserSignOut } from "../AuthContext";
 
 describe("isDeadSessionSignOut", () => {
   it("is true for a library-driven SIGNED_OUT (not user-initiated)", () => {
@@ -45,5 +45,26 @@ describe("isDeadSessionSignOut", () => {
   it("is false for non-sign-out events", () => {
     expect(isDeadSessionSignOut("TOKEN_REFRESHED", false)).toBe(false);
     expect(isDeadSessionSignOut("SIGNED_IN", false)).toBe(false);
+  });
+});
+
+describe("runUserSignOut", () => {
+  it("marks the ref, leaving it set for the SIGNED_OUT event to clear", async () => {
+    const userInitiatedRef = { current: false };
+    await runUserSignOut(userInitiatedRef, async () => {});
+    expect(userInitiatedRef.current).toBe(true);
+  });
+
+  it("clears the ref when sign-out throws, so a later eviction still warns", async () => {
+    const userInitiatedRef = { current: false };
+    const signOutError = new Error("network down");
+    await expect(
+      runUserSignOut(userInitiatedRef, async () => {
+        throw signOutError;
+      }),
+    ).rejects.toThrow(signOutError);
+    expect(userInitiatedRef.current).toBe(false);
+    // With the flag cleared, a subsequent library eviction is not suppressed.
+    expect(isDeadSessionSignOut("SIGNED_OUT", userInitiatedRef.current)).toBe(true);
   });
 });

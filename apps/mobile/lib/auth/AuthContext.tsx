@@ -54,6 +54,29 @@ export function isDeadSessionSignOut(event: string, userInitiated: boolean): boo
   return event === "SIGNED_OUT" && !userInitiated;
 }
 
+/**
+ * Runs a user-initiated sign-out, marking the ref so the auth listener can tell
+ * this SIGNED_OUT apart from a library-driven dead-session eviction. On success
+ * the ref stays set until the SIGNED_OUT event clears it. If the sign-out call
+ * throws, no SIGNED_OUT event will arrive to clear the ref, so clear it here;
+ * otherwise a later genuine eviction would be misclassified and its warning
+ * suppressed. Reset only on the failure path, never in a finally: a finally
+ * would clear the ref before the async SIGNED_OUT lands and mislabel a real
+ * user sign-out as a dead session.
+ */
+export async function runUserSignOut(
+  userInitiatedRef: { current: boolean },
+  signOut: () => Promise<unknown>,
+): Promise<void> {
+  userInitiatedRef.current = true;
+  try {
+    await signOut();
+  } catch (error) {
+    userInitiatedRef.current = false;
+    throw error;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -140,8 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    userInitiatedSignOutRef.current = true;
-    await supabase.auth.signOut();
+    await runUserSignOut(userInitiatedSignOutRef, () => supabase.auth.signOut());
     await clearAllAuthData();
     // Clear local SQLite data to avoid stale data from previous user session
     try {
