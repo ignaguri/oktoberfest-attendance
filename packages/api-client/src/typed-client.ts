@@ -101,6 +101,18 @@ export class ApiError extends Error {
 }
 
 /**
+ * Thrown when an authenticated request cannot be made because no valid
+ * session token is available. Distinct from ApiError (which represents an
+ * HTTP response). Never retried by the client.
+ */
+export class AuthRequiredError extends Error {
+  constructor(message = "No authenticated session available") {
+    super(message);
+    this.name = "AuthRequiredError";
+  }
+}
+
+/**
  * Parse JSON response with error handling and type safety
  */
 async function parseJsonResponse<T>(response: Response): Promise<T> {

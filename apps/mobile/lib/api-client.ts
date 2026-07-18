@@ -5,14 +5,14 @@
  * with platform-specific auth configuration.
  */
 
-import { ApiError, type ApiHeaders, createTypedApiClient } from "@prostcounter/api-client";
+import { ApiError, AuthRequiredError, type ApiHeaders, createTypedApiClient } from "@prostcounter/api-client";
 import Constants from "expo-constants";
 
 import { logger } from "./logger";
 import { supabase } from "./supabase";
 
 // Re-export ApiError for convenience
-export { ApiError };
+export { ApiError, AuthRequiredError };
 
 /**
  * Base URL for API requests
@@ -36,27 +36,13 @@ function withAuth(token: string): ApiHeaders {
   return { ...BASE_HEADERS, Authorization: `Bearer ${token}` };
 }
 
-// Deduplicates concurrent token refresh calls
-let refreshPromise: Promise<string | null> | null = null;
-
-async function refreshAccessToken(): Promise<string | null> {
-  try {
-    const { data: refreshed, error } = await supabase.auth.refreshSession();
-    if (error || !refreshed.session?.access_token) {
-      logger.warn("Supabase session refresh failed", {
-        hasError: !!error,
-      });
-      return null;
-    }
-    return refreshed.session.access_token;
-  } catch {
-    logger.warn("Supabase session refresh threw an exception");
-    return null;
-  }
-}
-
 /**
- * Get auth headers for API requests using Supabase mobile client
+ * Get auth headers for API requests using the Supabase mobile client.
+ *
+ * supabase-js owns token refresh: getSession() refreshes an expired token
+ * internally and dedupes concurrent refreshes. If no usable token is
+ * available afterward, we THROW rather than send an anonymous request that
+ * would deterministically 401.
  */
 async function getAuthHeaders(): Promise<ApiHeaders> {
   const {
@@ -64,33 +50,10 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
   } = await supabase.auth.getSession();
 
   if (session?.access_token) {
-    const expiresAt = session.expires_at;
-    const now = Math.floor(Date.now() / 1000);
-
-    // Proactively refresh tokens near expiry to avoid 401s on app resume
-    if (expiresAt && expiresAt - now < 60) {
-      if (!refreshPromise) {
-        refreshPromise = refreshAccessToken().finally(() => {
-          refreshPromise = null;
-        });
-      }
-      const newToken = await refreshPromise;
-
-      if (newToken) {
-        return withAuth(newToken);
-      }
-
-      // Refresh failed — don't send an already-expired token
-      if (expiresAt <= now) {
-        return BASE_HEADERS;
-      }
-      // Token not yet expired, send it and accept it may expire mid-flight
-    }
-
     return withAuth(session.access_token);
   }
 
-  return BASE_HEADERS;
+  throw new AuthRequiredError();
 }
 
 /**

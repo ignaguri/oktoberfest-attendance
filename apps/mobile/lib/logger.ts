@@ -176,9 +176,19 @@ class Logger {
   }
 
   logApiResponse(method: string, url: string, status: number, data?: unknown) {
-    if (status >= 400) {
-      // Log error responses at error level so they're always visible
+    if (status >= 500) {
+      // Server errors are real problems -> Sentry event via error().
       this.error(`API Error Response: ${method} ${url} - ${status}`, undefined, {
+        method,
+        url,
+        status,
+        data: truncateData(data),
+      });
+    } else if (status >= 400) {
+      // Client errors (401/404/409/...) are expected outcomes. Log at warn for
+      // dev visibility; the Sentry RN integration already records the xhr as a
+      // breadcrumb, so we do NOT send a separate Sentry event.
+      this.warn(`API Error Response: ${method} ${url} - ${status}`, {
         method,
         url,
         status,
