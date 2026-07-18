@@ -22,7 +22,11 @@ import type {
   DataMutationOptions,
 } from "./types";
 
-function mapQueryOptions(
+/**
+ * Exported for testing only; not part of the package's public API
+ * (deliberately not re-exported from `./index.ts`).
+ */
+export function mapQueryOptions(
   options?: DataQueryOptions,
 ): Omit<UseQueryOptions, "queryKey" | "queryFn"> {
   if (!options) return {};
@@ -31,7 +35,9 @@ function mapQueryOptions(
     enabled: options.enabled,
     gcTime: options.gcTime,
     staleTime: options.staleTime,
-    retry: options.retry,
+    // Only forward `retry` when explicitly set. Emitting `retry: undefined`
+    // would override the QueryClient default retry predicate.
+    ...(options.retry !== undefined ? { retry: options.retry } : {}),
     refetchOnWindowFocus: options.refetchOnWindowFocus,
     refetchOnReconnect: options.refetchOnReconnect,
   };

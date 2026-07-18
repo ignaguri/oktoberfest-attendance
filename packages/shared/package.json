@@ -20,7 +20,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
@@ -33,7 +36,8 @@
     "@tanstack/react-query": "^5.100.8",
     "@types/react": "^19.2.14",
     "react": "19.2.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.5"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
