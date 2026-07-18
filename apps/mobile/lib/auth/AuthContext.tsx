@@ -1,6 +1,14 @@
 import * as Sentry from "@sentry/react-native";
 import type { Session, User } from "@supabase/supabase-js";
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { identifyDevice } from "vexo-analytics";
 
 import { clearAllData } from "@/lib/database/debug";
@@ -41,9 +49,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/** A SIGNED_OUT the user did not trigger means the library evicted a dead session. */
+export function isDeadSessionSignOut(event: string, userInitiated: boolean): boolean {
+  return event === "SIGNED_OUT" && !userInitiated;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const userInitiatedSignOutRef = useRef(false);
 
   useEffect(() => {
     // Get initial session
@@ -72,7 +86,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (isDeadSessionSignOut(event, userInitiatedSignOutRef.current)) {
+        Sentry.captureMessage("Session expired: signed out by auth library", {
+          level: "warning",
+          tags: { source: "auth", reason: "dead_session" },
+        });
+      }
+      if (event === "SIGNED_OUT") {
+        userInitiatedSignOutRef.current = false;
+      }
+
       setSession(session);
 
       // Set Sentry user context for error tracking
@@ -116,6 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    userInitiatedSignOutRef.current = true;
     await supabase.auth.signOut();
     await clearAllAuthData();
     // Clear local SQLite data to avoid stale data from previous user session
