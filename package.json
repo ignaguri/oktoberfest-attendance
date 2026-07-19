@@ -44,9 +44,9 @@
     "ios": "expo run:ios"
   },
   "dependencies": {
-    "expo": "~55.0.19",
+    "expo": "~57.0.7",
     "react": "19.2.5",
-    "react-native": "0.83.2"
+    "react-native": "0.86.0"
   },
   "devDependencies": {
     "@novu/api": "^3.16.0",

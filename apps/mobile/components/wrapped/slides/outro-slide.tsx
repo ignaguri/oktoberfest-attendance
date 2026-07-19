@@ -5,7 +5,7 @@ import * as Haptics from "expo-haptics";
 import { Share2 } from "lucide-react-native";
 import { useCallback, useRef } from "react";
 import { Pressable, View } from "react-native";
-import ViewShot from "react-native-view-shot";
+import ViewShot, { type ViewShotRef } from "react-native-view-shot";
 
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -23,7 +23,7 @@ interface OutroSlideProps {
 
 export function OutroSlide({ data, isActive, onClose }: OutroSlideProps) {
   const { t } = useTranslation();
-  const shareRef = useRef<ViewShot>(null);
+  const shareRef = useRef<ViewShotRef>(null);
   const { handleShare, isSharing } = useWrappedShare(data, shareRef);
 
   const onSharePress = useCallback(async () => {

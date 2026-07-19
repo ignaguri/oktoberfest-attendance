@@ -2,14 +2,14 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import * as Sharing from "expo-sharing";
 import { useCallback, useMemo, useState } from "react";
-import type ViewShot from "react-native-view-shot";
+import type { ViewShotRef } from "react-native-view-shot";
 
 import { logger } from "@/lib/logger";
 
 /**
  * Hook for capturing and sharing the wrapped share image
  */
-export function useWrappedShare(data: WrappedData, shareRef: React.RefObject<ViewShot | null>) {
+export function useWrappedShare(data: WrappedData, shareRef: React.RefObject<ViewShotRef | null>) {
   const { t } = useTranslation();
   const [isSharing, setIsSharing] = useState(false);
 
