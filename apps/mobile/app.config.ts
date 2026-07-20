@@ -29,6 +29,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         "ProstCounter uses your location to share with friends and show nearby tents",
       NSLocationAlwaysAndWhenInUseUsageDescription:
         "Allow background location to keep sharing your location with friends while using other apps",
+      NSMotionUsageDescription:
+        "ProstCounter uses device motion to power smooth, responsive animations as you interact with the app.",
       UIBackgroundModes: ["remote-notification", "location", "fetch", "processing"],
       BGTaskSchedulerPermittedIdentifiers: [
         "PROSTCOUNTER_BACKGROUND_SYNC",
