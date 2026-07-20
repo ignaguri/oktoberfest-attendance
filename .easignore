@@ -20,9 +20,11 @@ apps/mobile/ios/build/
 # Expo local dev cache
 apps/mobile/.expo/
 
-# Android build cache
-apps/mobile/android/.gradle/
-apps/mobile/android/app/build/
+# Android native project - EAS regenerates it via `expo prebuild --clean`
+# (production profile prebuildCommand). Uploading the local android/ leaks
+# absolute local paths from android/build/generated/autolinking/autolinking.json,
+# which breaks EAS autolinking (e.g. netinfo "project directory does not exist").
+apps/mobile/android/
 
 # Supabase local dev files
 supabase/
