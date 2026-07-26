@@ -59,7 +59,7 @@
     "react": "19.2.8",
     "react-confetti-explosion": "^3.0.3",
     "react-datepicker": "9.1.0",
-    "react-day-picker": "^9.14.0",
+    "react-day-picker": "^10.0.1",
     "react-dom": "19.2.8",
     "react-hook-form": "^7.83.0",
     "react-i18next": "^17.0.11",
