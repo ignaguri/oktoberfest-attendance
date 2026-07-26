@@ -34,8 +34,11 @@ export function useWrappedData(festivalId?: string) {
       });
 
       if (error) {
+        // Throw rather than returning null: null is indistinguishable from "no wrapped
+        // data yet", so a real failure (e.g. the statement timeout this used to hit on
+        // uncached past festivals) silently rendered the empty state and never surfaced.
         logger.error("Failed to fetch wrapped data", error);
-        return null;
+        throw new Error(`Failed to fetch wrapped data: ${error.message}`, { cause: error });
       }
 
       logger.debug("[WrappedData] RPC response", {

@@ -32,9 +32,10 @@ export function useWrappedData(festivalId?: string) {
       });
 
       if (error) {
-        // eslint-disable-next-line no-console
-        console.error("Failed to fetch wrapped data:", error);
-        return null;
+        // Throw rather than returning null: null is indistinguishable from "no wrapped
+        // data yet", so a real failure (e.g. the statement timeout this used to hit on
+        // uncached past festivals) silently rendered the empty state and never surfaced.
+        throw new Error(`Failed to fetch wrapped data: ${error.message}`, { cause: error });
       }
 
       return data as unknown as WrappedData;

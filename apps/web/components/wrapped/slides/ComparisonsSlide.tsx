@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import { formatPercentage, isImprovement } from "@prostcounter/shared/wrapped";
+import { formatPercentage, formatPercentile, isImprovement } from "@prostcounter/shared/wrapped";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 import { BaseSlide, SlideTitle } from "./BaseSlide";
@@ -30,6 +30,12 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
   const { vs_festival_avg, vs_last_year } = data.comparisons;
   const improvement = vs_last_year ? isImprovement(vs_last_year) : null;
 
+  // Percentile rank is the better statistic, but cache rows written before it was added
+  // only carry the mean-based diff, so fall back to that until they are regenerated.
+  const hasPercentile =
+    vs_festival_avg?.beers_percentile !== undefined &&
+    vs_festival_avg?.days_percentile !== undefined;
+
   const getIcon = (diff: number) => {
     if (diff > 0) return <ArrowUp className="size-5 text-green-500" />;
     if (diff < 0) return <ArrowDown className="size-5 text-red-500" />;
@@ -45,26 +51,60 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
         {vs_festival_avg && (
           <div className="rounded-xl bg-white p-6 shadow-lg">
             <h3 className="mb-4 text-center text-lg font-semibold text-gray-700">
-              {t("wrapped.comparisons.vsFestivalAvg")}
+              {t(
+                hasPercentile
+                  ? "wrapped.comparisons.vsAttendees"
+                  : "wrapped.comparisons.vsFestivalAvg",
+              )}
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">{t("wrapped.comparisons.beers")}</span>
-                <div className="flex items-center gap-2">
-                  {getIcon(vs_festival_avg.beers_diff_pct || 0)}
-                  <span className="font-bold text-gray-800">
-                    {formatPercentage(vs_festival_avg.beers_diff_pct || 0)}
-                  </span>
-                </div>
+                {hasPercentile ? (
+                  <div className="text-right">
+                    <span className="font-bold text-gray-800">
+                      {t("wrapped.comparisons.betterThan", {
+                        percent: formatPercentile(vs_festival_avg.beers_percentile ?? 0),
+                      })}
+                    </span>
+                    {vs_festival_avg.median_beers !== undefined && (
+                      <p className="text-xs text-gray-500">
+                        {t("wrapped.comparisons.typical", { value: vs_festival_avg.median_beers })}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {getIcon(vs_festival_avg.beers_diff_pct || 0)}
+                    <span className="font-bold text-gray-800">
+                      {formatPercentage(vs_festival_avg.beers_diff_pct || 0)}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">{t("wrapped.comparisons.days")}</span>
-                <div className="flex items-center gap-2">
-                  {getIcon(vs_festival_avg.days_diff_pct || 0)}
-                  <span className="font-bold text-gray-800">
-                    {formatPercentage(vs_festival_avg.days_diff_pct || 0)}
-                  </span>
-                </div>
+                {hasPercentile ? (
+                  <div className="text-right">
+                    <span className="font-bold text-gray-800">
+                      {t("wrapped.comparisons.betterThan", {
+                        percent: formatPercentile(vs_festival_avg.days_percentile ?? 0),
+                      })}
+                    </span>
+                    {vs_festival_avg.median_days !== undefined && (
+                      <p className="text-xs text-gray-500">
+                        {t("wrapped.comparisons.typical", { value: vs_festival_avg.median_days })}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {getIcon(vs_festival_avg.days_diff_pct || 0)}
+                    <span className="font-bold text-gray-800">
+                      {formatPercentage(vs_festival_avg.days_diff_pct || 0)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

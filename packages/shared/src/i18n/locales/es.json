@@ -1741,6 +1741,9 @@
     "comparisons": {
       "title": "Cómo te comparás",
       "vsFestivalAvg": "vs Promedio del Festival",
+      "vsAttendees": "Cómo te ubicás",
+      "betterThan": "Mejor que el {{percent}} de los asistentes",
+      "typical": "Típico: {{value}}",
       "vsLastYear": "vs Año Pasado",
       "vs": "vs",
       "beers": "Cervezas",

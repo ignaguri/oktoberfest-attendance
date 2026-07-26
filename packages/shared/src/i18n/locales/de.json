@@ -1494,6 +1494,9 @@
     "comparisons": {
       "title": "Wie du im Vergleich abschneidest",
       "vsFestivalAvg": "vs Festivaldurchschnitt",
+      "vsAttendees": "Dein Rang",
+      "betterThan": "Besser als {{percent}} der Teilnehmenden",
+      "typical": "Typisch: {{value}}",
       "vsLastYear": "vs Letztes Jahr",
       "vs": "vs",
       "beers": "Maß",

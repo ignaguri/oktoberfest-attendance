@@ -1741,6 +1741,9 @@
     "comparisons": {
       "title": "How you compare",
       "vsFestivalAvg": "vs Festival Average",
+      "vsAttendees": "How you rank",
+      "betterThan": "Better than {{percent}} of attendees",
+      "typical": "Typical: {{value}}",
       "vsLastYear": "vs Last Year",
       "vs": "vs",
       "beers": "Beers",

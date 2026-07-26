@@ -42,6 +42,15 @@ export function formatPercentage(percent: number): string {
 }
 
 /**
+ * Format a percentile rank for display. Whole numbers read better than decimals
+ * here ("better than 86% of attendees"), and the extra precision is meaningless
+ * on festivals with only a few dozen attendees.
+ */
+export function formatPercentile(percent: number): string {
+  return `${Math.round(percent)}%`;
+}
+
+/**
  * Get festival year from festival name or dates
  */
 export function getFestivalYear(festivalInfo: WrappedData["festival_info"]): number {
