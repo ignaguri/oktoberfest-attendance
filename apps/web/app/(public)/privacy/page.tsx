@@ -97,8 +97,8 @@ export default function PrivacyPolicy() {
             </li>
             <li>
               <strong>Why we collect it:</strong> to show your real-time position on the festival
-              map to the people you&apos;ve chosen to share with, and to suggest tents that are
-              near you
+              map to the people you&apos;ve chosen to share with, and to suggest tents that are near
+              you
             </li>
             <li>
               <strong>Your control:</strong> you can stop sharing at any time from the location
@@ -163,9 +163,9 @@ export default function PrivacyPolicy() {
             <li>Photos and attendance data are visible to members of groups you join</li>
             <li>Achievement information may be visible to other users</li>
             <li>
-              When you enable location sharing, your real-time location is visible to members of
-              the groups you&apos;ve enabled sharing for and to your accepted friends, until you
-              disable sharing or the session expires
+              When you enable location sharing, your real-time location is visible to members of the
+              groups you&apos;ve enabled sharing for and to your accepted friends, until you disable
+              sharing or the session expires
             </li>
           </ul>
 

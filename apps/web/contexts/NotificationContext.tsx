@@ -275,60 +275,63 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       });
   }, [pushSupported, pushPermission]);
 
-  const updatePreferences = useCallback(async (
-    updates: Partial<
-      Pick<
-        NotificationPreferences,
-        | "reminders_enabled"
-        | "group_notifications_enabled"
-        | "achievement_notifications_enabled"
-        | "push_enabled"
-      >
-    >,
-  ) => {
-    if (!user || !user.id) {
-      return;
-    }
-
-    try {
-      // Map snake_case to camelCase for API
-      const apiUpdates: {
-        pushEnabled?: boolean;
-        remindersEnabled?: boolean;
-        groupNotificationsEnabled?: boolean;
-        achievementNotificationsEnabled?: boolean;
-      } = {};
-
-      if (updates.push_enabled !== undefined && updates.push_enabled !== null) {
-        apiUpdates.pushEnabled = updates.push_enabled;
-      }
-      if (updates.reminders_enabled !== undefined && updates.reminders_enabled !== null) {
-        apiUpdates.remindersEnabled = updates.reminders_enabled;
-      }
-      if (
-        updates.group_notifications_enabled !== undefined &&
-        updates.group_notifications_enabled !== null
-      ) {
-        apiUpdates.groupNotificationsEnabled = updates.group_notifications_enabled;
-      }
-      if (
-        updates.achievement_notifications_enabled !== undefined &&
-        updates.achievement_notifications_enabled !== null
-      ) {
-        apiUpdates.achievementNotificationsEnabled = updates.achievement_notifications_enabled;
+  const updatePreferences = useCallback(
+    async (
+      updates: Partial<
+        Pick<
+          NotificationPreferences,
+          | "reminders_enabled"
+          | "group_notifications_enabled"
+          | "achievement_notifications_enabled"
+          | "push_enabled"
+        >
+      >,
+    ) => {
+      if (!user || !user.id) {
+        return;
       }
 
-      await apiClient.notifications.updatePreferences(apiUpdates);
+      try {
+        // Map snake_case to camelCase for API
+        const apiUpdates: {
+          pushEnabled?: boolean;
+          remindersEnabled?: boolean;
+          groupNotificationsEnabled?: boolean;
+          achievementNotificationsEnabled?: boolean;
+        } = {};
 
-      // Reload preferences after update
-      const apiPreferences = await apiClient.notifications.getPreferences();
-      if (apiPreferences) {
-        setPreferences(mapApiToDbPreferences(apiPreferences));
+        if (updates.push_enabled !== undefined && updates.push_enabled !== null) {
+          apiUpdates.pushEnabled = updates.push_enabled;
+        }
+        if (updates.reminders_enabled !== undefined && updates.reminders_enabled !== null) {
+          apiUpdates.remindersEnabled = updates.reminders_enabled;
+        }
+        if (
+          updates.group_notifications_enabled !== undefined &&
+          updates.group_notifications_enabled !== null
+        ) {
+          apiUpdates.groupNotificationsEnabled = updates.group_notifications_enabled;
+        }
+        if (
+          updates.achievement_notifications_enabled !== undefined &&
+          updates.achievement_notifications_enabled !== null
+        ) {
+          apiUpdates.achievementNotificationsEnabled = updates.achievement_notifications_enabled;
+        }
+
+        await apiClient.notifications.updatePreferences(apiUpdates);
+
+        // Reload preferences after update
+        const apiPreferences = await apiClient.notifications.getPreferences();
+        if (apiPreferences) {
+          setPreferences(mapApiToDbPreferences(apiPreferences));
+        }
+      } catch (error) {
+        throw error;
       }
-    } catch (error) {
-      throw error;
-    }
-  }, [user]);
+    },
+    [user],
+  );
 
   const requestPushPermission = useCallback(async (): Promise<boolean> => {
     if (!pushSupported) {

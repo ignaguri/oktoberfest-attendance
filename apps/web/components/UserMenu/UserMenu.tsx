@@ -306,8 +306,8 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
           {/* Render each section */}
           {menuSections.map((section) => {
             const sectionItems = getMenuItemsBySection(t, section.id);
-            const itemsWithHandlers = sectionItems.map(
-              (item) => menuItemsWithHandlers.find((handlerItem) => handlerItem.id === item.id)!,
+            const itemsWithHandlers = sectionItems.map((item) =>
+              menuItemsWithHandlers.find((handlerItem) => handlerItem.id === item.id)!,
             );
 
             return (

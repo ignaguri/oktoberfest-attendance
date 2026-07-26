@@ -5,7 +5,12 @@
  * with platform-specific auth configuration.
  */
 
-import { ApiError, AuthRequiredError, type ApiHeaders, createTypedApiClient } from "@prostcounter/api-client";
+import {
+  ApiError,
+  AuthRequiredError,
+  type ApiHeaders,
+  createTypedApiClient,
+} from "@prostcounter/api-client";
 import Constants from "expo-constants";
 
 import { logger } from "./logger";
