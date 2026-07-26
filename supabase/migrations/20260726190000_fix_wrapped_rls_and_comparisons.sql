@@ -24,7 +24,7 @@
 
 -- Helper function: get effective drink count for an attendance
 -- Returns consumptions count if > 0, otherwise falls back to legacy beer_count
-CREATE OR REPLACE FUNCTION _get_effective_drink_count(p_attendance_id UUID)
+CREATE OR REPLACE FUNCTION "public"."_get_effective_drink_count"(p_attendance_id UUID)
 RETURNS INT
 LANGUAGE sql
 STABLE
