@@ -62,7 +62,7 @@
     "typescript": "5.9.3"
   },
   "engines": {
-    "node": ">=20 <25"
+    "node": ">=22 <25"
   },
   "packageManager": "pnpm@10.14.0",
   "pnpm": {
