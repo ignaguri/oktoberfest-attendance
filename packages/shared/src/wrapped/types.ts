@@ -147,6 +147,16 @@ export interface WrappedData {
       days_diff_pct: number;
       avg_beers: number;
       avg_days: number;
+      /**
+       * Percentile rank and median, preferred over the mean-based *_diff_pct above:
+       * the mean is skewed by one-day attendees and by the top of the range, so almost
+       * everyone lands "above average". Optional because cache rows written before
+       * these were added do not carry them.
+       */
+      median_beers?: number;
+      median_days?: number;
+      beers_percentile?: number;
+      days_percentile?: number;
     };
     vs_last_year: {
       beers_diff: number;

@@ -30,6 +30,7 @@ export {
   formatCurrency,
   formatNumber,
   formatPercentage,
+  formatPercentile,
   getFestivalYear,
   calculateTotalPoints,
   hasWrappedData,

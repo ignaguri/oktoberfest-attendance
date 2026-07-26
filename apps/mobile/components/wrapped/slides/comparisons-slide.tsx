@@ -1,6 +1,7 @@
 import { Motion } from "@legendapp/motion";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
+import { formatPercentile } from "@prostcounter/shared/wrapped";
 import { cn } from "@prostcounter/ui";
 
 import { HStack } from "@/components/ui/hstack";
@@ -28,8 +29,33 @@ function DiffIndicator({ value, suffix = "" }: { value: number; suffix?: string 
   );
 }
 
+function PercentileValue({ percentile, median }: { percentile: number; median?: number }) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <Text className="text-center text-lg font-bold text-gray-800">
+        {t("wrapped.comparisons.betterThan", { percent: formatPercentile(percentile) })}
+      </Text>
+      {median !== undefined && (
+        <Text className="text-center text-xs text-gray-500">
+          {t("wrapped.comparisons.typical", { value: median })}
+        </Text>
+      )}
+    </>
+  );
+}
+
 export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
   const { t } = useTranslation();
+
+  const vsFestivalAvg = data.comparisons?.vs_festival_avg;
+  const vsLastYear = data.comparisons?.vs_last_year;
+
+  // Percentile rank is the better statistic, but cache rows written before it was added
+  // only carry the mean-based diff, so fall back to that until they are regenerated.
+  const hasPercentile =
+    vsFestivalAvg?.beers_percentile !== undefined && vsFestivalAvg?.days_percentile !== undefined;
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName={cn("bg-teal-50")}>
@@ -37,6 +63,7 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
         <SlideTitle isActive={isActive}>{t("wrapped.comparisons.title")}</SlideTitle>
 
         {/* vs Festival Average */}
+        {vsFestivalAvg && (
         <VStack space="sm">
           <Motion.View
             initial={{ opacity: 0 }}
@@ -44,7 +71,11 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
             transition={{ type: "timing", duration: 300, delay: 200 }}
           >
             <Text className="text-center text-sm font-semibold text-gray-600">
-              {t("wrapped.comparisons.vsFestivalAvg")}
+              {t(
+                hasPercentile
+                  ? "wrapped.comparisons.vsAttendees"
+                  : "wrapped.comparisons.vsFestivalAvg",
+              )}
             </Text>
           </Motion.View>
 
@@ -56,7 +87,14 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
               className="flex-1 items-center rounded-2xl bg-white/70 p-4"
             >
               <Text className="text-sm text-gray-500">{t("wrapped.comparisons.beers")}</Text>
-              <DiffIndicator value={data.comparisons.vs_festival_avg.beers_diff_pct} suffix="%" />
+              {hasPercentile ? (
+                <PercentileValue
+                  percentile={vsFestivalAvg.beers_percentile ?? 0}
+                  median={vsFestivalAvg.median_beers}
+                />
+              ) : (
+                <DiffIndicator value={vsFestivalAvg.beers_diff_pct} suffix="%" />
+              )}
             </Motion.View>
             <Motion.View
               initial={{ opacity: 0, y: 20 }}
@@ -65,13 +103,21 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
               className="flex-1 items-center rounded-2xl bg-white/70 p-4"
             >
               <Text className="text-sm text-gray-500">{t("wrapped.comparisons.days")}</Text>
-              <DiffIndicator value={data.comparisons.vs_festival_avg.days_diff_pct} suffix="%" />
+              {hasPercentile ? (
+                <PercentileValue
+                  percentile={vsFestivalAvg.days_percentile ?? 0}
+                  median={vsFestivalAvg.median_days}
+                />
+              ) : (
+                <DiffIndicator value={vsFestivalAvg.days_diff_pct} suffix="%" />
+              )}
             </Motion.View>
           </HStack>
         </VStack>
+        )}
 
         {/* vs Last Year */}
-        {data.comparisons.vs_last_year && (
+        {vsLastYear && (
           <VStack space="sm" className="mt-2">
             <Motion.View
               initial={{ opacity: 0 }}
@@ -82,7 +128,7 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
                 {t("wrapped.comparisons.vsLastYear")}
               </Text>
               <Text className="text-center text-xs text-gray-400">
-                {t("wrapped.comparisons.vs")} {data.comparisons.vs_last_year.prev_festival_name}
+                {t("wrapped.comparisons.vs")} {vsLastYear.prev_festival_name}
               </Text>
             </Motion.View>
 
@@ -94,7 +140,7 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
                 className="flex-1 items-center rounded-2xl bg-white/70 p-4"
               >
                 <Text className="text-sm text-gray-500">{t("wrapped.comparisons.beers")}</Text>
-                <DiffIndicator value={data.comparisons.vs_last_year.beers_diff} />
+                <DiffIndicator value={vsLastYear.beers_diff} />
               </Motion.View>
               <Motion.View
                 initial={{ opacity: 0, y: 20 }}
@@ -103,7 +149,7 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
                 className="flex-1 items-center rounded-2xl bg-white/70 p-4"
               >
                 <Text className="text-sm text-gray-500">{t("wrapped.comparisons.days")}</Text>
-                <DiffIndicator value={data.comparisons.vs_last_year.days_diff} />
+                <DiffIndicator value={vsLastYear.days_diff} />
               </Motion.View>
             </HStack>
           </VStack>
