@@ -5,8 +5,9 @@ import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { Archive, Bell, CheckCheck } from "lucide-react-native";
 import { useCallback, useRef } from "react";
-import { ActivityIndicator, Animated, FlatList, Image, RefreshControl, View } from "react-native";
-import { Swipeable } from "react-native-gesture-handler";
+import { ActivityIndicator, FlatList, Image, RefreshControl, View } from "react-native";
+import Swipeable, { type SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
+import Animated, { interpolate, useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -22,20 +23,14 @@ interface NotificationItemProps {
   onArchive: (notification: Notification) => void;
 }
 
-function renderRightActions(
-  _progress: Animated.AnimatedInterpolation<number>,
-  dragX: Animated.AnimatedInterpolation<number>,
-  label: string,
-) {
-  const scale = dragX.interpolate({
-    inputRange: [-80, 0],
-    outputRange: [1, 0.5],
-    extrapolate: "clamp",
-  });
+function RightAction({ progress, label }: { progress: SharedValue<number>; label: string }) {
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(progress.value, [0, 1], [0.5, 1], "clamp") }],
+  }));
 
   return (
     <View className="mx-3 mb-2 items-center justify-center rounded-xl bg-red-500 px-6">
-      <Animated.View style={{ transform: [{ scale }] }} className="items-center">
+      <Animated.View style={animatedStyle} className="items-center">
         <Archive size={20} color={IconColors.white} />
         <Text className="mt-1 text-xs text-white">{label}</Text>
       </Animated.View>
@@ -47,7 +42,7 @@ function NotificationItem({ notification, onPress, onArchive }: NotificationItem
   const { t } = useTranslation();
   const timeAgo = formatRelativeTime(new Date(notification.createdAt));
   const isRead = notification.isRead;
-  const swipeableRef = useRef<Swipeable>(null);
+  const swipeableRef = useRef<SwipeableMethods>(null);
 
   const handleSwipeOpen = useCallback(async () => {
     swipeableRef.current?.close();
@@ -61,9 +56,9 @@ function NotificationItem({ notification, onPress, onArchive }: NotificationItem
   return (
     <Swipeable
       ref={swipeableRef}
-      renderRightActions={(progress, dragX) =>
-        renderRightActions(progress, dragX, t("profile.notifications.archive"))
-      }
+      renderRightActions={(progress) => (
+        <RightAction progress={progress} label={t("profile.notifications.archive")} />
+      )}
       onSwipeableOpen={handleSwipeOpen}
       overshootRight={false}
     >
