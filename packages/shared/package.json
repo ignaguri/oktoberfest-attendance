@@ -26,18 +26,18 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@date-fns/tz": "^1.4.1",
-    "date-fns": "^4.1.0",
-    "i18next": "^26.0.8",
-    "react-i18next": "^17.0.6",
-    "zod": "^4.4.2"
+    "@date-fns/tz": "^1.5.0",
+    "date-fns": "^4.4.0",
+    "i18next": "^26.3.6",
+    "react-i18next": "^17.0.11",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.100.8",
-    "@types/react": "^19.2.14",
-    "react": "19.2.5",
+    "@tanstack/react-query": "^5.101.4",
+    "@types/react": "^19.2.17",
+    "react": "19.2.8",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
