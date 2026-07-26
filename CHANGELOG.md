@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.9.3] - 2026-07-27
+
+### 🐛 Bug Fixes
+
+- stop past-festival wrapped timing out on cache miss (#255)
+- add NSMotionUsageDescription for CoreMotion (ITMS-90683) (#254)
+- stop cold-start 401 storm (PROST-COUNTER-86) (#251)
+
+### 🔧 Maintenance
+
+- bump @types/node, fix missing expo-file-system dep (#258)
+- bump mobile-only majors (firebase, gesture-handler, more) (#257)
+- patch/minor bump + backbone tooling + web majors (#256)
+- bump to 0.9.2 / mobile 1.5.2 + fix EAS android upload (#253)
+- migrate to Expo SDK 57 (RN 0.86), unblock Xcode 26 (#252)
+- pin transitive deps to patch security advisories (#250)
+- patch security advisories via overrides (#249)
+- resolve code/cloud workflow drift (#248)
+- patch security advisories across web, mobile, api (#247)
+
 ## [0.9.2] - 2026-07-19
 
 ## [0.9.1] - 2026-05-05

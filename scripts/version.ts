@@ -96,10 +96,10 @@ function generateRepositoryChangelog(newVersion: string): number {
     };
 
     commits.forEach((commit) => {
-      if (commit.match(/^(feat|fix|docs|style|refactor|perf|test|chore|breaking):/)) {
-        const type = commit.match(/^(\w+):/)?.[1];
+      if (commit.match(/^(feat|fix|docs|style|refactor|perf|test|chore|breaking)(\([^)]+\))?:/)) {
+        const type = commit.match(/^(\w+)(\([^)]+\))?:/)?.[1];
         if (type && commitsByType[type]) {
-          const description = commit.replace(/^\w+:\s*/, "");
+          const description = commit.replace(/^\w+(\([^)]+\))?:\s*/, "");
           commitsByType[type].push(description);
         }
       }
