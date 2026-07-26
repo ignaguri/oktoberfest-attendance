@@ -64,56 +64,56 @@ export function ComparisonsSlide({ data, isActive }: ComparisonsSlideProps) {
 
         {/* vs Festival Average */}
         {vsFestivalAvg && (
-        <VStack space="sm">
-          <Motion.View
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isActive ? 1 : 0 }}
-            transition={{ type: "timing", duration: 300, delay: 200 }}
-          >
-            <Text className="text-center text-sm font-semibold text-gray-600">
-              {t(
-                hasPercentile
-                  ? "wrapped.comparisons.vsAttendees"
-                  : "wrapped.comparisons.vsFestivalAvg",
-              )}
-            </Text>
-          </Motion.View>
+          <VStack space="sm">
+            <Motion.View
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isActive ? 1 : 0 }}
+              transition={{ type: "timing", duration: 300, delay: 200 }}
+            >
+              <Text className="text-center text-sm font-semibold text-gray-600">
+                {t(
+                  hasPercentile
+                    ? "wrapped.comparisons.vsAttendees"
+                    : "wrapped.comparisons.vsFestivalAvg",
+                )}
+              </Text>
+            </Motion.View>
 
-          <HStack space="md">
-            <Motion.View
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
-              transition={{ type: "timing", duration: 400, delay: 300 }}
-              className="flex-1 items-center rounded-2xl bg-white/70 p-4"
-            >
-              <Text className="text-sm text-gray-500">{t("wrapped.comparisons.beers")}</Text>
-              {hasPercentile ? (
-                <PercentileValue
-                  percentile={vsFestivalAvg.beers_percentile ?? 0}
-                  median={vsFestivalAvg.median_beers}
-                />
-              ) : (
-                <DiffIndicator value={vsFestivalAvg.beers_diff_pct} suffix="%" />
-              )}
-            </Motion.View>
-            <Motion.View
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
-              transition={{ type: "timing", duration: 400, delay: 450 }}
-              className="flex-1 items-center rounded-2xl bg-white/70 p-4"
-            >
-              <Text className="text-sm text-gray-500">{t("wrapped.comparisons.days")}</Text>
-              {hasPercentile ? (
-                <PercentileValue
-                  percentile={vsFestivalAvg.days_percentile ?? 0}
-                  median={vsFestivalAvg.median_days}
-                />
-              ) : (
-                <DiffIndicator value={vsFestivalAvg.days_diff_pct} suffix="%" />
-              )}
-            </Motion.View>
-          </HStack>
-        </VStack>
+            <HStack space="md">
+              <Motion.View
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
+                transition={{ type: "timing", duration: 400, delay: 300 }}
+                className="flex-1 items-center rounded-2xl bg-white/70 p-4"
+              >
+                <Text className="text-sm text-gray-500">{t("wrapped.comparisons.beers")}</Text>
+                {hasPercentile ? (
+                  <PercentileValue
+                    percentile={vsFestivalAvg.beers_percentile ?? 0}
+                    median={vsFestivalAvg.median_beers}
+                  />
+                ) : (
+                  <DiffIndicator value={vsFestivalAvg.beers_diff_pct} suffix="%" />
+                )}
+              </Motion.View>
+              <Motion.View
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
+                transition={{ type: "timing", duration: 400, delay: 450 }}
+                className="flex-1 items-center rounded-2xl bg-white/70 p-4"
+              >
+                <Text className="text-sm text-gray-500">{t("wrapped.comparisons.days")}</Text>
+                {hasPercentile ? (
+                  <PercentileValue
+                    percentile={vsFestivalAvg.days_percentile ?? 0}
+                    median={vsFestivalAvg.median_days}
+                  />
+                ) : (
+                  <DiffIndicator value={vsFestivalAvg.days_diff_pct} suffix="%" />
+                )}
+              </Motion.View>
+            </HStack>
+          </VStack>
         )}
 
         {/* vs Last Year */}

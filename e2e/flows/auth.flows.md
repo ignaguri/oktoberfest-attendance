@@ -259,10 +259,10 @@ User attempts to sign up with passwords that don't match and sees a validation e
 
 ### Selectors
 
-| Element                | Locator | Value                  |
+| Element | Locator | Value |
 | ---------------------- | ------- | ---------------------- | ---------------------- |
-| Confirm password input | Label   | /confirm password/i    |
-| Error message          | Text    | /passwords don't match | passwords must match/i |
+| Confirm password input | Label | /confirm password/i |
+| Error message | Text | /passwords don't match | passwords must match/i |
 
 ### E2E Test Reference
 
@@ -301,10 +301,10 @@ User attempts to sign up with an invalid email format and sees a validation erro
 
 ### Selectors
 
-| Element       | Locator | Value          |
+| Element | Locator | Value |
 | ------------- | ------- | -------------- | ------------- |
-| Email input   | Label   | /^email$/i     |
-| Error message | Text    | /invalid email | valid email/i |
+| Email input | Label | /^email$/i |
+| Error message | Text | /invalid email | valid email/i |
 
 ### E2E Test Reference
 

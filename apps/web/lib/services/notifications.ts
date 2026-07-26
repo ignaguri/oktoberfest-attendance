@@ -652,7 +652,6 @@ export class NotificationService {
       return { success: false, error: "Failed to send notification" };
     }
   }
-
 }
 
 // Factory function to create instance on demand

@@ -76,10 +76,7 @@ export default function NotificationSettingsScreen() {
   };
 
   const handleToggle = async (
-    key:
-      | "reminders_enabled"
-      | "achievement_notifications_enabled"
-      | "group_notifications_enabled",
+    key: "reminders_enabled" | "achievement_notifications_enabled" | "group_notifications_enabled",
     value: boolean,
   ) => {
     // Map snake_case to camelCase for API

@@ -81,10 +81,7 @@ export default function AppInstallBanner() {
           />
         )}
         {variant === "android" && (
-          <AndroidContent
-            onStoreClick={() => trackStoreClick("android")}
-            onDismiss={handleClose}
-          />
+          <AndroidContent onStoreClick={() => trackStoreClick("android")} onDismiss={handleClose} />
         )}
         {variant === "desktop-pwa" && (
           <DesktopPwaContent
@@ -224,9 +221,7 @@ function DesktopPwaContent({
           icon={<Download className="size-5" />}
           title={t("installBanner.desktop.installTitle")}
         />
-        <p className="text-muted-foreground text-sm">
-          {t("installBanner.desktop.installMessage")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("installBanner.desktop.installMessage")}</p>
         <Button onClick={installPWA} className="w-full">
           {t("installBanner.desktop.installCta")}
         </Button>
@@ -236,9 +231,7 @@ function DesktopPwaContent({
           className="text-muted-foreground hover:text-foreground flex w-full items-center justify-center gap-1 text-xs"
         >
           {t("installBanner.desktop.phoneExpand")}
-          <ChevronDown
-            className={cn("size-3 transition-transform", qrOpen && "rotate-180")}
-          />
+          <ChevronDown className={cn("size-3 transition-transform", qrOpen && "rotate-180")} />
         </button>
         {qrOpen && <PhoneSection onStoreClick={onStoreClick} />}
       </div>
@@ -262,9 +255,7 @@ function DesktopQrContent({
           icon={<Smartphone className="size-5" />}
           title={t("installBanner.desktop.phoneTitle")}
         />
-        <p className="text-muted-foreground text-sm">
-          {t("installBanner.desktop.phoneMessage")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("installBanner.desktop.phoneMessage")}</p>
         <PhoneSection onStoreClick={onStoreClick} />
       </div>
       <BannerFooter onDismiss={onDismiss} />

@@ -3,12 +3,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const getSession = vi.fn();
 
 vi.mock("../supabase", () => ({
-  supabase: { auth: { get getSession() { return getSession; } } },
+  supabase: {
+    auth: {
+      get getSession() {
+        return getSession;
+      },
+    },
+  },
 }));
 vi.mock("../logger", () => ({
   logger: {
-    info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn(),
-    logApiRequest: vi.fn(), logApiResponse: vi.fn(), logApiError: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    logApiRequest: vi.fn(),
+    logApiResponse: vi.fn(),
+    logApiError: vi.fn(),
   },
 }));
 vi.mock("expo-constants", () => ({
@@ -16,12 +27,20 @@ vi.mock("expo-constants", () => ({
 }));
 
 async function callFestivalsAndCaptureHeaders() {
-  const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => ({
-    ok: true, status: 200,
-    headers: new Headers({ "content-type": "application/json" }),
-    clone() { return this; },
-    async json() { return { festivals: [] }; },
-  }) as unknown as Response);
+  const fetchMock = vi.fn(
+    async (_url: string, _init?: RequestInit) =>
+      ({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        clone() {
+          return this;
+        },
+        async json() {
+          return { festivals: [] };
+        },
+      }) as unknown as Response,
+  );
   vi.stubGlobal("fetch", fetchMock);
   const { apiClient } = await import("../api-client");
   await apiClient.festivals.list().catch(() => {});
@@ -36,7 +55,9 @@ describe("getAuthHeaders (via apiClient)", () => {
 
   it("attaches a Bearer token when a session exists", async () => {
     getSession.mockResolvedValue({
-      data: { session: { access_token: "tok-123", expires_at: Math.floor(Date.now() / 1000) + 3600 } },
+      data: {
+        session: { access_token: "tok-123", expires_at: Math.floor(Date.now() / 1000) + 3600 },
+      },
     });
     const fetchMock = await callFestivalsAndCaptureHeaders();
     const headers = fetchMock.mock.calls[0]![1]!.headers as Record<string, string>;
