@@ -245,6 +245,9 @@ UPDATE festivals SET is_active = false WHERE is_active = true;
 INSERT INTO tents (id, name, category, latitude, longitude) VALUES
   ('c0000000-0000-4000-b000-000000000001', 'Bartls Flößerstadl', 'small', 48.13138, 11.54925),
   ('c0000000-0000-4000-b000-000000000002', 'Hühnerbraterei Poschner', 'small', 48.13266, 11.54864)
+-- ON CONFLICT guard matches the Frühlingsfest precedent. Note the whole migration is wrapped in
+-- a transaction, so a failure rolls back entirely and there is no partial state to retry over.
+-- The guard only matters if someone deletes the festival row by hand and re-runs this file.
 ON CONFLICT (id) DO NOTHING;
 
 -- Step 3: Fix the long-standing misspelling.
@@ -493,6 +496,10 @@ Expected exactly:
 
 Any mismatch: STOP and report which column differed.
 
+Caveat on `active_count`: the local Supabase instance is shared, and its seed data may carry
+additional festivals. If `active_count` is not 1, report which other festival is active rather
+than assuming the migration failed. `active_festival` must still be `oktoberfest-2026`.
+
 - [ ] **Step 4: Confirm the trigger populated PostGIS geometry**
 
 ```sql
@@ -668,16 +675,15 @@ If a link was obtained, Task 7 uses it verbatim. If the campaign generator is no
 
 ---
 
-## Task 7: Add campaign parameters to both broadcasts and snapshot the HTML
+## Task 7: Add campaign parameters to both broadcasts
 
 **Pre-check:** Task 5 finished with `news.prostcounter.fun` verified and tracking enabled. Confirm both draft broadcasts still exist and are `status: draft` via `mcp__resend__list-broadcasts`. If either is `sent`, STOP.
 
-**Files:**
-- Create: `docs/email/2026-08-bulletin.html`
+**Files:** none. The HTML snapshot file is created in Task 8.
 
 **Interfaces:**
 - Consumes: the Apple link decision from Task 6, the verified domain from Task 5.
-- Produces: two updated draft broadcasts, ready to send in Tasks 8 and 9.
+- Produces: two updated draft broadcasts, ready to send in Tasks 8 and 9. The final HTML body, consumed by Task 8 Step 5.
 
 The three URLs, used in both the HTML and plain-text bodies:
 
@@ -727,30 +733,9 @@ Same call, with:
 
 Call `mcp__resend__get-broadcast` for each ID. Confirm for both: `from` is the `news.` address, the subject is unchanged (`ProstCounter now has real apps (and a few other things worth checking out)`), all five HTML URLs carry parameters, and status is still `draft`.
 
-- [ ] **Step 6: Write the HTML snapshot to the repo**
-
-Create `docs/email/2026-08-bulletin.html` containing the final HTML, prefixed with:
-
-```html
-<!--
-  Snapshot of the August 2026 "what's new" bulletin, as sent.
-  Resend is the source of truth for what actually shipped; this file is a
-  point-in-time copy kept so a future bulletin starts from an edit rather than
-  a rebuild. It is not read by any code and is not kept in sync automatically.
-
-  Campaign: aug2026-whatsnew
-  Sent from: ignacio@news.prostcounter.fun
-  Broadcasts: d193c030-d7a4-4ff9-b42c-93dc3bdf2940 (batch 1),
-              455968b3-3358-46fa-95c6-bc01fe2dae87 (batch 2)
--->
-```
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add docs/email/2026-08-bulletin.html
-git commit -m "docs(email): snapshot Aug 2026 bulletin with campaign params"
-```
+The HTML snapshot is deliberately NOT written in this task. It lives in Task 8 Steps 5 and 6, after
+the test send has proven the HTML renders, so the committed snapshot can never be a version that was
+found broken and then changed.
 
 ---
 
@@ -760,7 +745,8 @@ Human-gated: requires reading a real inbox and judging rendering.
 
 **Pre-check:** Task 7 Step 5 passed. If not, STOP.
 
-**Files:** none.
+**Files:**
+- Create: `docs/email/2026-08-bulletin.html`
 
 - [ ] **Step 1: Send a test to the author's own address**
 
@@ -781,6 +767,35 @@ If a link lands without its parameters, STOP. Store-side attribution would be si
 - [ ] **Step 4: Confirm the send is healthy in Resend**
 
 Call `mcp__resend__list-emails` with `limit: 5`. Expected: the test email present with status `delivered`. If `bounced` or `complained`, STOP.
+
+- [ ] **Step 5: Write the HTML snapshot to the repo**
+
+Only now that the HTML is proven to render. Use the broadcast HTML from Task 7, with the template
+tokens `{{{FIRST_NAME|there}}}` and `{{{RESEND_UNSUBSCRIBE_URL}}}` intact — NOT the substituted
+test-send variant from Step 1.
+
+Create `docs/email/2026-08-bulletin.html` prefixed with:
+
+```html
+<!--
+  Snapshot of the August 2026 "what's new" bulletin, as sent.
+  Resend is the source of truth for what actually shipped; this file is a
+  point-in-time copy kept so a future bulletin starts from an edit rather than
+  a rebuild. It is not read by any code and is not kept in sync automatically.
+
+  Campaign: aug2026-whatsnew
+  Sent from: ignacio@news.prostcounter.fun
+  Broadcasts: d193c030-d7a4-4ff9-b42c-93dc3bdf2940 (batch 1),
+              455968b3-3358-46fa-95c6-bc01fe2dae87 (batch 2)
+-->
+```
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add docs/email/2026-08-bulletin.html
+git commit -m "docs(email): snapshot Aug 2026 bulletin with campaign params"
+```
 
 ---
 
