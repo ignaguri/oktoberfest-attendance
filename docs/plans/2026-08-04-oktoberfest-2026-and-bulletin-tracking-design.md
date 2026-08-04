@@ -96,6 +96,33 @@ Verified during design; the implementation depends on these.
   `prostcounter.fun` links are captured automatically with no code change.
 - Nothing in CI applies migrations. Production is reached with `pnpm sup:db:push`.
 
+## Revision, 2026-08-04: sections 2 and 5 partly void
+
+Section 2 (split the sending domain) could not be built. Resend's free plan permits exactly one
+custom domain and `account.prostcounter.fun` holds the slot, so creating `news.prostcounter.fun`
+returns `403 "Your plan includes 1 domain. Upgrade to add more."`
+
+Three routes were weighed: Resend Pro at 20 USD/month, a separate provider for marketing mail, or
+dropping click tracking. On the provider option, Brevo, Kit, EmailOctopus and MailerLite were all
+checked and every free tier stamps its own branding onto the email, which is a poor fit for a
+customer-facing product announcement; the paid tiers cost about the same as Resend Pro while also
+requiring a full re-setup and leaving the stack split across two dashboards.
+
+The decision was to stay free and drop click tracking. Consequences:
+
+- No `news.prostcounter.fun`. The sender remains `ignacio@account.prostcounter.fun`, which is what the
+  two approved test sends already used. Resend open and click tracking stay off everywhere.
+- Section 5's "per-link clicks and opens: Resend broadcast detail" no longer holds. Resend reports
+  delivery, bounces and complaints only.
+- The two-batch send stays: the 100-per-day cap is a plan limit independent of domains.
+- The transactional/marketing reputation split described in section 2 is not achieved. Acceptable for
+  a one-off send to an opted-in-by-signup list, but it is a real reason to revisit if recurring
+  bulletins ever happen.
+- The store-side parameters in section 3 become the only per-channel signal, which makes the Apple
+  provider token more valuable, not less.
+
+Sections 1, 3, 4 and 6 are unaffected.
+
 ## Design
 
 ### 1. Oktoberfest 2026 data

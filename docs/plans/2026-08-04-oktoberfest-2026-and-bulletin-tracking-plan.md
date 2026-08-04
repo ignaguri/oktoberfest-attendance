@@ -4,11 +4,37 @@
 
 **Goal:** Get Oktoberfest 2026 into production with correct tent data and coordinates, then send the already-drafted bulletin to 139 users with per-link and store-side attribution.
 
-**Architecture:** One SQL migration creates the festival, inserts two new tents, replaces every fabricated tent coordinate with an OpenStreetMap-sourced one, and links 40 tents with 2026 prices. Separately, a new Resend sending subdomain (`news.prostcounter.fun`) carries open/click tracking so the existing `account.prostcounter.fun` domain, which sends Supabase Auth mail, is never touched. Campaign parameters go on the three links in the two existing draft broadcasts.
+**Architecture:** One SQL migration creates the festival, inserts two new tents, replaces every fabricated tent coordinate with an OpenStreetMap-sourced one, and links 40 tents with 2026 prices. Separately, campaign parameters go on the three links in the two existing draft broadcasts, so attribution comes from the URLs themselves: GA4 for web sessions, Play Console and App Store Connect for installs. See the REVISION note below: the originally planned `news.prostcounter.fun` sending subdomain and Resend click tracking were dropped, and the existing `account.prostcounter.fun` sender stays as-is with tracking off.
 
 **Tech Stack:** Supabase (Postgres + PostGIS), Supabase CLI, Resend MCP, Vercel CLI (DNS), Chrome DevTools MCP (App Store Connect), GA4.
 
 **Stop-and-ask protocol:** If at any step you encounter state that contradicts the plan — file missing, function signature differs, test passes when expected to fail, unfamiliar code in target lines, dependency version unavailable, or any expectation in this plan does not match reality — STOP. Do not improvise, do not work around it, do not pick the closest interpretation. Report the discrepancy and wait for guidance.
+
+## REVISION 2026-08-04: no separate sending domain, no click tracking
+
+Task 5 could not be executed. Resend's free plan permits exactly one custom domain and
+`account.prostcounter.fun` holds the slot, so `create-domain` returns
+`403 "Your plan includes 1 domain. Upgrade to add more."`
+
+Options were Resend Pro at 20 USD/month, a second provider for marketing mail (Brevo, Kit,
+EmailOctopus and MailerLite were all checked; every free tier stamps its own branding on the
+email), or dropping click tracking. The decision was to drop click tracking and stay free.
+
+What this changes:
+
+- **Task 5 is cancelled.** No `news.prostcounter.fun`, no DNS records, no tracking flags. Resend
+  open and click tracking stay OFF everywhere, including on `account.prostcounter.fun`, which must
+  remain untouched.
+- **The From address stays `Ignacio from ProstCounter <ignacio@account.prostcounter.fun>`**, which is
+  what the two already-approved test sends used. Tasks 7 and 8 must NOT change it.
+- **No per-link click counts and no open rates.** Links are not rewritten, so Task 8 verifies the
+  raw hrefs carry their parameters rather than verifying a tracking redirect preserves them.
+- **The two-batch send stays.** The 100-per-day cap is a free-plan limit independent of domains.
+- **Task 6 becomes materially more important.** Without click tracking, the Apple `pt`/`ct` link is
+  the only way to learn anything about how the iOS button performed. Same for the Play `referrer`.
+
+Measurement surfaces that survive: GA4 web sessions from the `utm_*` params, Play Console installs
+from `referrer`, App Store Connect installs from `pt`/`ct`.
 
 ## Global Constraints
 
@@ -591,7 +617,18 @@ Load the app, check the home screen shows a "starts in N days" info alert naming
 
 ---
 
-## Task 5: Create the news. sending domain with tracking
+## Task 5: CANCELLED — create the news. sending domain with tracking
+
+**Do not execute this task.** See the REVISION note at the top of this plan. Resend's free plan caps
+the account at one custom domain and `account.prostcounter.fun` holds it. Nothing in this task ran:
+no domain was created, no DNS records were added, and no tracking flags were changed on any domain.
+
+`account.prostcounter.fun` must keep Open Tracking and Click Tracking both `false`. Do not call
+`mcp__resend__update-domain` against it under any circumstances.
+
+The original steps are retained below for the record only.
+
+### Original (not to be executed)
 
 **Pre-check:** Confirm with `mcp__resend__list-domains` that `account.prostcounter.fun` still shows `Open Tracking: false` and `Click Tracking: false`. If either is true, someone changed it; STOP.
 
@@ -677,12 +714,12 @@ If a link was obtained, Task 7 uses it verbatim. If the campaign generator is no
 
 ## Task 7: Add campaign parameters to both broadcasts
 
-**Pre-check:** Task 5 finished with `news.prostcounter.fun` verified and tracking enabled. Confirm both draft broadcasts still exist and are `status: draft` via `mcp__resend__list-broadcasts`. If either is `sent`, STOP.
+**Pre-check:** Confirm both draft broadcasts still exist and are `status: draft` via `mcp__resend__list-broadcasts`. If either is `sent`, STOP. Task 5 is cancelled and is NOT a prerequisite; see the REVISION note at the top of this plan.
 
 **Files:** none. The HTML snapshot file is created in Task 8.
 
 **Interfaces:**
-- Consumes: the Apple link decision from Task 6, the verified domain from Task 5.
+- Consumes: the Apple link decision from Task 6.
 - Produces: two updated draft broadcasts, ready to send in Tasks 8 and 9. The final HTML body, consumed by Task 8 Step 5.
 
 The three URLs, used in both the HTML and plain-text bodies:
@@ -716,11 +753,11 @@ Note: the Play URL already contains a `?`, so `referrer` is appended with `&`. T
 
 Call `mcp__resend__update-broadcast` with:
 - `broadcastId`: `d193c030-d7a4-4ff9-b42c-93dc3bdf2940`
-- `from`: `Ignacio from ProstCounter <ignacio@news.prostcounter.fun>`
+- `from`: `Ignacio from ProstCounter <ignacio@account.prostcounter.fun>`
 - `segmentId`: `ab9269de-d777-42e3-a22e-3c67fe0d589b`
 - `html` and `text`: the updated bodies
 
-`from` and `segmentId` must be included even though they are already set; the API requires them on update.
+`from` and `segmentId` must be included even though they are already set; the API requires them on update. The `from` value above is UNCHANGED from what the broadcast already carries, and it must stay that way: there is no `news.` domain. Do not invent a different sender.
 
 - [ ] **Step 4: Update Batch 2 with the identical bodies**
 
@@ -731,7 +768,7 @@ Same call, with:
 
 - [ ] **Step 5: Verify both broadcasts**
 
-Call `mcp__resend__get-broadcast` for each ID. Confirm for both: `from` is the `news.` address, the subject is unchanged (`ProstCounter now has real apps (and a few other things worth checking out)`), all five HTML URLs carry parameters, and status is still `draft`.
+Call `mcp__resend__get-broadcast` for each ID. Confirm for both: `from` is still `Ignacio from ProstCounter <ignacio@account.prostcounter.fun>`, the subject is unchanged (`ProstCounter now has real apps (and a few other things worth checking out)`), all five HTML URLs carry parameters, and status is still `draft`.
 
 The HTML snapshot is deliberately NOT written in this task. It lives in Task 8 Steps 5 and 6, after
 the test send has proven the HTML renders, so the committed snapshot can never be a version that was
@@ -750,7 +787,7 @@ Human-gated: requires reading a real inbox and judging rendering.
 
 - [ ] **Step 1: Send a test to the author's own address**
 
-Use `mcp__resend__send-email` with `from: Ignacio from ProstCounter <ignacio@news.prostcounter.fun>`, `to: ignacioguri@gmail.com`, the exact subject and HTML from the updated broadcast.
+Use `mcp__resend__send-email` with `from: Ignacio from ProstCounter <ignacio@account.prostcounter.fun>`, `to: ignacioguri@gmail.com`, the exact subject and HTML from the updated broadcast.
 
 Note: a direct send will not include the `{{{FIRST_NAME|there}}}` or `{{{RESEND_UNSUBSCRIBE_URL}}}` substitutions, which only resolve for broadcasts. Replace those two tokens with `there` and `https://example.com/unsub` for the test only. Do not save that version anywhere.
 
@@ -758,11 +795,20 @@ Note: a direct send will not include the `{{{FIRST_NAME|there}}}` or `{{{RESEND_
 
 Confirm: header renders with the yellow background and the app icon loads; body text is unchanged; all three buttons render; nothing shows a raw template token.
 
-- [ ] **Step 3: [HUMAN] Verify link rewriting preserves parameters**
+- [ ] **Step 3: [HUMAN] Verify each link carries its parameters**
 
-Hover or long-press each button. Each href should now be a Resend tracking URL rather than the raw destination, which proves click tracking is active. Click each one and confirm the final landed URL still carries its parameters: the web link keeps its four `utm_*` params, the Play link keeps `referrer`, the Apple link keeps `pt`/`ct`/`mt` if a token was obtained.
+Click tracking is OFF, so hrefs are NOT rewritten. Each button's href should be the raw destination
+with its parameters visible on hover or long-press. That is the expected state; a Resend tracking URL
+here would mean click tracking got enabled on `account.prostcounter.fun` by mistake, which is a STOP
+condition because it puts password-reset links at risk.
 
-If a link lands without its parameters, STOP. Store-side attribution would be silently broken.
+Confirm each href and then that each click lands correctly:
+- web link carries all four `utm_*` params
+- Play link carries `referrer` with its URL-encoded UTMs
+- Apple link carries `pt`/`ct`/`mt`, if Task 6 produced a token
+
+If a link lands without its parameters, STOP. Store-side attribution is the only iOS and Android
+signal we have left, so a dropped parameter loses the measurement entirely and silently.
 
 - [ ] **Step 4: Confirm the send is healthy in Resend**
 
@@ -784,7 +830,9 @@ Create `docs/email/2026-08-bulletin.html` prefixed with:
   a rebuild. It is not read by any code and is not kept in sync automatically.
 
   Campaign: aug2026-whatsnew
-  Sent from: ignacio@news.prostcounter.fun
+  Sent from: ignacio@account.prostcounter.fun
+  Tracking: none at the provider (Resend open/click tracking off). Attribution is
+            via URL parameters only: utm_* for GA4, referrer for Play, pt/ct for Apple.
   Broadcasts: d193c030-d7a4-4ff9-b42c-93dc3bdf2940 (batch 1),
               455968b3-3358-46fa-95c6-bc01fe2dae87 (batch 2)
 -->
@@ -891,7 +939,11 @@ git commit -m "docs: Oktoberfest 2026 tent data and sources for reference"
 
 ## Reading the results
 
-- Per-link clicks and opens: the Resend broadcast detail pages for the two broadcast IDs.
+- Delivery, bounces and complaints: the Resend broadcast detail pages for the two broadcast IDs. NOT clicks or opens; tracking is off, so Resend reports delivery only.
 - Web sessions and downstream behaviour: GA4, Acquisition, Traffic acquisition, filtered to `email / bulletin`.
 - Android installs: Play Console, Acquisition reports, filtered by `utm_campaign = aug2026-whatsnew`.
 - iOS installs: App Store Connect, App Analytics, Campaigns, campaign `aug2026-whatsnew`. Only populated if Task 6 produced a token.
+
+**Known blind spot:** there is no per-link click count and no open rate. If the web link shows GA4
+sessions but the stores show no installs, that is indistinguishable from nobody tapping the store
+buttons at all. Accepted as the cost of staying on the free plan.
