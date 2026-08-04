@@ -841,6 +841,54 @@ More than 26 hours later, call `mcp__resend__get-broadcast` and `mcp__resend__li
 
 ---
 
+## Task 10: Oktoberfest 2026 reference doc for future blog use
+
+Order-independent: can run any time after Task 1. Not a dependency of any other task.
+
+**Files:**
+- Create: `docs/festivals/oktoberfest-2026-reference.md`
+
+**Interfaces:**
+- Consumes: the approved tables in Task 1 of this plan file.
+- Produces: nothing other tasks depend on.
+
+Purpose: preserve the researched data and its provenance as raw material for a future blog post. This is a reference document, NOT a blog article. Do not write it to `apps/web/content/blog/`, do not add MDX frontmatter, and do not produce de/es translations. Those rules apply to real blog articles under `docs/BLOG.md`; this file is internal reference material only.
+
+- [ ] **Step 1: Write the reference document**
+
+Read ONLY the "Task 1" section of `docs/plans/2026-08-04-oktoberfest-2026-and-bulletin-tracking-plan.md` for the three tent tables. Do not read the rest of the plan.
+
+The document must contain, in this order:
+
+1. **Festival facts:** 191st Oktoberfest, 19 September to 4 October 2026, 16 days, Theresienwiese (48.1314, 11.5498). Maß range EUR 14.80 to 15.90. Festival base price EUR 15.80. The Oide Wiesn runs in 2026 (the Zentral-Landwirtschaftsfest that displaces it is not due again until 2028).
+2. **Full tent table:** all 40 tents with name, category, Maß price, latitude, longitude, copied from the Task 1 tables. Add a column marking whether the price was published for 2026 or inherited from the festival default. The 13 inherited ones are: Bodo's Cafézelt, Café Theres', Feisingers, Glöckle-Wirt, Goldener Hahn, Heimer, Heinz, Hühnerbraterei Poschner, Münchner Knödelei, Rischart's Café Kaiserschmarrn, Schiebl's Kaffeehaferl, Wiesn Guglhupf, Wildstuben.
+3. **What changed for 2026:** Bartls Flößerstadl (398 seats) is new and replaces Münchner Stubn on the same plot. Bodo's Cafézelt was rebuilt in wood, replacing its aluminium structure, capacity unchanged at 587. The Paulaner-Festzelt has new operators, Christine and Lorenz Stiftl, who previously ran the Schützenlisl. Michael Bietsch moved from the Historische Kegelbahn into the Volkssängerzelt Schützenlisl, which now serves Hacker-Pschorr from wooden casks. Sabine Erhard took over the Historische Kegelbahn. The Museumszelt gained a photography exhibition on Oktoberfest postcards. `Herzkasperlzelt` and `Zur Schönheitskönigin` are not in the 2026 lineup.
+4. **Notable price facts, useful for a post:** the EUR 15 barrier was broken in almost every large tent for 2026. Joint most expensive beer at EUR 15.90: Armbrustschützen, Bräurosl, Löwenbräu. Cheapest large tent: Augustiner-Festhalle at EUR 14.90. Cheapest on the grounds: Museumszelt at EUR 14.80. The Weinzelt's Weißbier Maß is EUR 17.80, the dearest pour anywhere on the Wiesn.
+5. **Data caveats,** stated plainly so a future post does not overclaim: Bartls Flößerstadl's EUR 15.70 comes from a single source, and that source also miscategorised it as a large tent. 13 small-tent prices were never published per-tent and are the festival default, not researched values. Münchner Weißbiergarten and Wiesn Guglhupf have no coordinate source and are recorded as NULL. Museumszelt is EUR 14.80 per the 2026 source; a separate table gave EUR 14.60 but was labelled 2025.
+6. **A short note on the coordinate correction,** which is itself a good blog anecdote: the coordinates shipped before this migration were placeholders, described as "approximate" in `supabase/migrations/20260126000000_postgis_tent_coordinates.sql`. Sorted by position they fell on an evenly spaced diagonal line across Theresienwiese. Measured against OSM, Marstall-Festzelt was off by roughly 900 m, the Museumszelt by roughly 650 m, and the Hofbräu-Festzelt by roughly 235 m. The giveaway that the new data is right: OSM places the Oide Wiesn tents south of the main tents, matching the real grounds, whereas the placeholders put them to the east.
+7. **Sources,** as a list of links:
+   - <https://www.oktoberfest.de/en>
+   - <https://www.munichtourism.org/oktoberfest-dates-schedule/>
+   - <https://wiesnkini.de/zelte/bierpreis/>
+   - <https://www.in-muenchen.de/stadtleben/oktoberfest-wiesn-preise.html>
+   - <https://www.oktoberfest.de/en/beer-tents/small-tents>
+   - <https://www.oktoberfest.de/en/tents/tents-oide-wiesn/festival-tents-oide-wiesn-event-glance>
+   - <https://www.muenchen.de/veranstaltungen/oktoberfest/aktuell/oktoberfest-2026-das-ist-neu-auf-der-wiesn>
+   - <https://www.falstaff.com/de/news/neuer-wiesn-wirt-floesserstadl-ersetzt-muenchner-stubn-auf-dem-oktoberfest>
+   - <https://www.muenchen.de/veranstaltungen/wiesn-kleine-zelte/bartls-floesserstadl>
+   - OpenStreetMap via the Overpass API, ODbL licensed, snapshot 2026-08-04
+
+Attribute the coordinates to OpenStreetMap contributors and name the ODbL licence explicitly. That attribution is a licence requirement if any of this reaches a published post.
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add docs/festivals/oktoberfest-2026-reference.md
+git commit -m "docs: Oktoberfest 2026 tent data and sources for reference"
+```
+
+---
+
 ## Reading the results
 
 - Per-link clicks and opens: the Resend broadcast detail pages for the two broadcast IDs.
