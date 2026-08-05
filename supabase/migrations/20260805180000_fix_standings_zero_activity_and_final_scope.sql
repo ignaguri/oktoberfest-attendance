@@ -9,6 +9,13 @@
 --    is created in an active festival and the nightly cron runs, one member
 --    unlocks group_wins/podium_finishes before anyone has done anything.
 --    Fix: only rank members with real activity.
+--
+--    This changes what member_count means: it now counts ACTIVE members
+--    ranked in this snapshot, not raw group membership. A 5-member group
+--    with 1 active member now stores member_count=1, correctly denying
+--    group_wins/podium_finishes (which require member_count >= 2) rather
+--    than crediting a win nobody actually competed for. max(rank) =
+--    member_count still holds; nothing else in the repo reads this column.
 CREATE OR REPLACE FUNCTION public.refresh_festival_group_standings(p_festival_id uuid)
 RETURNS integer
 LANGUAGE plpgsql
@@ -56,6 +63,9 @@ BEGIN
   RETURN v_rows_written;
 END;
 $function$;
+
+COMMENT ON FUNCTION public.refresh_festival_group_standings(uuid) IS
+  'Recomputes final group standings for a festival. Safe to re-run; deletes and rebuilds. Ranks by each group''s own winning_criteria_id. Only members with real activity (total_beers > 0 OR days_attended > 0) are ranked, so member_count reflects active members ranked in this snapshot, not raw group membership.';
 
 -- 2. get_achievement_metrics counted rank=1 from ANY standings snapshot,
 --    including the active festival's nightly refresh mid-competition.
@@ -175,11 +185,11 @@ BEGIN
     'group_wins',              (SELECT count(*) FROM festival_group_standings s
                                   JOIN festivals f ON f.id = s.festival_id
                                   WHERE s.user_id = p_user_id AND s.rank = 1 AND s.member_count >= 2
-                                    AND f.end_date <= CURRENT_DATE),
+                                    AND f.end_date < CURRENT_DATE),
     'podium_finishes',         (SELECT count(*) FROM festival_group_standings s
                                   JOIN festivals f ON f.id = s.festival_id
                                   WHERE s.user_id = p_user_id AND s.rank <= 3 AND s.member_count >= 2
-                                    AND f.end_date <= CURRENT_DATE),
+                                    AND f.end_date < CURRENT_DATE),
     'active_days_total',       (SELECT count(*) FROM user_active_days uad
                                   WHERE uad.user_id = p_user_id),
     'active_day_streak_max',   (SELECT max_streak FROM active_streak),
