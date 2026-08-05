@@ -6,33 +6,61 @@ import type { NotificationService } from "@/lib/services/notifications";
 
 import { processAchievementNotifications } from "./achievements";
 
+type GroupRecipient = {
+  user_id: string;
+  festival_id: string | null;
+  recipient_ids: string[];
+};
+
 type Events = {
   userEvents?: any[];
   groupEvents?: any[];
+  groupRecipients?: GroupRecipient[];
 };
 
-function createMockSupabase({ userEvents = [], groupEvents = [] }: Events) {
+const DEFAULT_GROUP_RECIPIENTS: GroupRecipient[] = [
+  {
+    user_id: "u2",
+    festival_id: "f1",
+    recipient_ids: ["other1", "other2"],
+  },
+];
+
+function createMockSupabase({
+  userEvents = [],
+  groupEvents = [],
+  groupRecipients = DEFAULT_GROUP_RECIPIENTS,
+}: Events) {
   const updates: any[] = [];
 
   function from(table: string) {
     if (table === "achievement_events") {
       return {
         select: vi.fn(() => ({
-          is: vi.fn((col: string) => ({
-            in: vi.fn(() => ({
-              not: vi.fn(() => ({
+          is: vi.fn((col: string) => {
+            const rows = col === "user_notified_at" ? userEvents : groupEvents;
+            return {
+              in: vi.fn(() => ({
+                // Faithfully filters the fixture rather than ignoring its
+                // arguments, so tests asserting on the result are actually
+                // pinned to this call happening with these exact args.
+                not: vi.fn((filterCol: string, operator: string, value: unknown) => ({
+                  limit: vi.fn(() => ({
+                    data:
+                      filterCol === "festival_id" && operator === "is" && value === null
+                        ? rows.filter((row: any) => row.festival_id !== null)
+                        : rows,
+                  })),
+                })),
                 limit: vi.fn(() => ({
-                  data: col === "user_notified_at" ? userEvents : groupEvents,
+                  data: rows,
                 })),
               })),
               limit: vi.fn(() => ({
-                data: col === "user_notified_at" ? userEvents : groupEvents,
+                data: rows,
               })),
-            })),
-            limit: vi.fn(() => ({
-              data: col === "user_notified_at" ? userEvents : groupEvents,
-            })),
-          })),
+            };
+          }),
         })),
         update: vi.fn((payload: any) => ({
           in: vi.fn((_col: string, ids: string[]) => {
@@ -108,13 +136,7 @@ function createMockSupabase({ userEvents = [], groupEvents = [] }: Events) {
       if (fnName === "get_group_achievement_recipients") {
         // Mock the RPC function to return group recipients
         return {
-          data: [
-            {
-              user_id: "u2",
-              festival_id: "f1",
-              recipient_ids: ["other1", "other2"],
-            },
-          ],
+          data: groupRecipients,
         };
       }
       return { data: [] };
@@ -151,6 +173,30 @@ describe("processAchievementNotifications", () => {
     expect((notifications as any).notifyAchievementUnlocked).toHaveBeenCalledTimes(1);
   });
 
+  it("still notifies the user for a lifetime unlock with a null festival_id", async () => {
+    const supabase = createMockSupabase({
+      userEvents: [
+        {
+          id: "e3",
+          user_id: "u4",
+          achievement_id: "a4_lifetime",
+          festival_id: null,
+          rarity: "common",
+          user_notified_at: null,
+        },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    expect((notifications as any).notifyAchievementUnlocked).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyAchievementUnlocked).toHaveBeenCalledWith(
+      "u4",
+      expect.objectContaining({ achievementId: "a4_lifetime" }),
+    );
+  });
+
   it("notifies group for rare/epic and sets group_notified_at", async () => {
     const supabase = createMockSupabase({
       groupEvents: [
@@ -169,5 +215,45 @@ describe("processAchievementNotifications", () => {
     await processAchievementNotifications(supabase, notifications);
 
     expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledTimes(1);
+  });
+
+  it("excludes lifetime (null festival_id) events from the group notification path", async () => {
+    const supabase = createMockSupabase({
+      groupEvents: [
+        {
+          id: "eA",
+          user_id: "u2",
+          achievement_id: "a2_epic",
+          festival_id: "f1",
+          rarity: "epic",
+          group_notified_at: null,
+        },
+        {
+          id: "eB",
+          user_id: "u3",
+          achievement_id: "a3_epic",
+          festival_id: null,
+          rarity: "epic",
+          group_notified_at: null,
+        },
+      ],
+      // A recipient IS registered for the null-festival row (u3). If the
+      // .not("festival_id", "is", null) filter were ever removed, this event
+      // would find a recipient and notifyGroupAchievement would fire twice,
+      // failing the toHaveBeenCalledTimes(1) assertion below.
+      groupRecipients: [
+        { user_id: "u2", festival_id: "f1", recipient_ids: ["other1", "other2"] },
+        { user_id: "u3", festival_id: null, recipient_ids: ["other3"] },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledWith(
+      ["other1", "other2"],
+      expect.objectContaining({ achievementName: "Ach a2_epic" }),
+    );
   });
 });
