@@ -20,6 +20,11 @@ function createMockSupabase({ userEvents = [], groupEvents = [] }: Events) {
         select: vi.fn(() => ({
           is: vi.fn((col: string) => ({
             in: vi.fn(() => ({
+              not: vi.fn(() => ({
+                limit: vi.fn(() => ({
+                  data: col === "user_notified_at" ? userEvents : groupEvents,
+                })),
+              })),
               limit: vi.fn(() => ({
                 data: col === "user_notified_at" ? userEvents : groupEvents,
               })),

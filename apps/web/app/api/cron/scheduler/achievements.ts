@@ -46,6 +46,9 @@ export async function processAchievementNotifications(
     .select("id, user_id, achievement_id, festival_id, rarity, group_notified_at")
     .is("group_notified_at", null)
     .in("rarity", ["rare", "epic"])
+    // Lifetime unlocks carry a NULL festival_id and have no festival group
+    // audience to notify, so exclude them from the group notification path.
+    .not("festival_id", "is", null)
     .limit(200);
 
   if (Array.isArray(groupEvents) && groupEvents.length) {

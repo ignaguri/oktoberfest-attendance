@@ -38,7 +38,7 @@ export type Database = {
         Row: {
           achievement_id: string
           created_at: string
-          festival_id: string
+          festival_id: string | null
           group_notified_at: string | null
           id: string
           rarity: Database["public"]["Enums"]["achievement_rarity_enum"]
@@ -48,7 +48,7 @@ export type Database = {
         Insert: {
           achievement_id: string
           created_at?: string
-          festival_id: string
+          festival_id?: string | null
           group_notified_at?: string | null
           id?: string
           rarity: Database["public"]["Enums"]["achievement_rarity_enum"]
@@ -58,7 +58,7 @@ export type Database = {
         Update: {
           achievement_id?: string
           created_at?: string
-          festival_id?: string
+          festival_id?: string | null
           group_notified_at?: string | null
           id?: string
           rarity?: Database["public"]["Enums"]["achievement_rarity_enum"]
