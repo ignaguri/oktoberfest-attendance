@@ -3031,3 +3031,24 @@ All of the following must be true before Plan 2 begins:
 - [ ] `user_active_days` gains a row on authenticated requests.
 - [ ] `festival_group_standings` is populated for every festival, with contiguous ranks per group.
 - [ ] The legacy plpgsql engine is still present and untouched.
+
+## Deploying Plan 1
+
+Two steps have no migration or cron to run them automatically — found during the
+final whole-branch review, where "populated locally" was mistaken for "populated,"
+full stop. Do both once, after the migrations run, before calling Plan 1 live:
+
+1. **Seed the registry.** `pnpm --filter=@prostcounter/api sync:achievements`
+   against production (`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` set to the
+   real project). Until this runs, `achievements` has only the 41 legacy rows,
+   `GET /achievements/with-progress` returns an empty list, and nothing can
+   unlock (`insertUnlocks` resolves zero slugs).
+2. **Backfill standings for every past and current festival**, not just the
+   active one — the nightly cron only ever refreshes the currently-active
+   festival. For each festival: `SELECT refresh_festival_group_standings(id)
+   FROM festivals;`. Without this, the two lifetime competitive series
+   (`group_wins`, `podium_finishes` — 8 of 90 rungs) read an empty table for
+   any festival that predates the cron ever running for it.
+
+Neither step is destructive or repeatable-unsafe: both are idempotent
+upserts/replacements, safe to re-run.
