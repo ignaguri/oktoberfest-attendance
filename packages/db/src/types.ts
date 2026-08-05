@@ -1920,6 +1920,10 @@ export type Database = {
           username: string
         }[]
       }
+      get_achievement_metrics: {
+        Args: { p_festival_id: string; p_user_id: string }
+        Returns: Json
+      }
       get_drink_price_cents: {
         Args: {
           p_drink_type?: Database["public"]["Enums"]["drink_type"]
