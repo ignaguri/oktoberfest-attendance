@@ -1,6 +1,7 @@
 import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
 import { NextResponse } from "next/server";
 
+import { logger } from "@/lib/logger";
 import { createNotificationService } from "@/lib/services/notifications";
 import { createClient } from "@/utils/supabase/server";
 
@@ -25,6 +26,27 @@ export async function POST(req: Request) {
   await processReservationNotifications(supabase, notifications, baseUrl, nowIso);
 
   await processAchievementNotifications(supabase, notifications);
+
+  // Refresh competitive standings for the active festival.
+  // Past festivals are immutable and were materialised once at creation time.
+  const { data: activeFestival } = await supabase
+    .from("festivals")
+    .select("id")
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (activeFestival) {
+    const { error: standingsError } = await supabase.rpc("refresh_festival_group_standings", {
+      p_festival_id: activeFestival.id,
+    });
+    if (standingsError) {
+      logger.error(
+        "Failed to refresh festival group standings",
+        logger.apiRoute("cron/scheduler", { festivalId: activeFestival.id }),
+        standingsError,
+      );
+    }
+  }
 
   return NextResponse.json({ ok: true });
 }

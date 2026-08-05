@@ -2118,6 +2118,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      refresh_festival_group_standings: {
+        Args: { p_festival_id: string }
+        Returns: number
+      }
       regenerate_wrapped_data_cache: {
         Args: {
           p_admin_user_id?: string
