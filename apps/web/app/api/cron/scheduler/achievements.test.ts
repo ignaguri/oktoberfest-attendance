@@ -84,7 +84,7 @@ function createMockSupabase({
           in: vi.fn((_col: string, ids: string[]) => ({
             data: ids.map((id) => ({
               id,
-              name: `Ach ${id}`,
+              name: id.includes("newengine") ? `achievements.${id}.name` : `Ach ${id}`,
               description: `Desc ${id}`,
               rarity: id.includes("legendary")
                 ? "legendary"
@@ -93,6 +93,9 @@ function createMockSupabase({
                   : id.includes("rare")
                     ? "rare"
                     : "common",
+              // New-engine achievements carry a slug; legacy ones don't.
+              // Notification muting is keyed off this, not rarity or id shape.
+              slug: id.includes("newengine") ? id : null,
             })),
           })),
         })),
@@ -272,6 +275,89 @@ describe("processAchievementNotifications", () => {
     await processAchievementNotifications(supabase, notifications);
 
     expect((notifications as any).notifyGroupAchievement).not.toHaveBeenCalled();
+  });
+
+  it("mutes a new-engine user achievement (marked notified, no push sent)", async () => {
+    const supabase = createMockSupabase({
+      userEvents: [
+        {
+          id: "e6",
+          user_id: "u1",
+          achievement_id: "a6_newengine",
+          festival_id: "f1",
+          rarity: "common",
+          user_notified_at: null,
+        },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    expect((notifications as any).notifyAchievementUnlocked).not.toHaveBeenCalled();
+    expect((supabase as any).__updates).toContainEqual(
+      expect.objectContaining({ table: "achievement_events", ids: ["e6"] }),
+    );
+  });
+
+  it("notifies legacy but mutes new-engine when both are pending together", async () => {
+    const supabase = createMockSupabase({
+      userEvents: [
+        {
+          id: "e7",
+          user_id: "u1",
+          achievement_id: "a7_legacy",
+          festival_id: "f1",
+          rarity: "common",
+          user_notified_at: null,
+        },
+        {
+          id: "e8",
+          user_id: "u1",
+          achievement_id: "a8_newengine",
+          festival_id: "f1",
+          rarity: "common",
+          user_notified_at: null,
+        },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    // Both events are marked handled either way, but only the legacy one
+    // actually sends a push.
+    expect((notifications as any).notifyAchievementUnlocked).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyAchievementUnlocked).toHaveBeenCalledWith(
+      "u1",
+      expect.objectContaining({ achievementId: "a7_legacy" }),
+    );
+    expect((supabase as any).__updates).toContainEqual(
+      expect.objectContaining({ table: "achievement_events", ids: expect.arrayContaining(["e7", "e8"]) }),
+    );
+  });
+
+  it("mutes a new-engine group achievement (marked notified, no push sent)", async () => {
+    const supabase = createMockSupabase({
+      groupEvents: [
+        {
+          id: "e9",
+          user_id: "u2",
+          achievement_id: "a9_newengine",
+          festival_id: "f1",
+          rarity: "epic",
+          group_notified_at: null,
+        },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    expect((notifications as any).notifyGroupAchievement).not.toHaveBeenCalled();
+    expect((supabase as any).__updates).toContainEqual(
+      expect.objectContaining({ table: "achievement_events", ids: ["e9"] }),
+    );
   });
 
   it("excludes lifetime (null festival_id) events from the group notification path", async () => {
