@@ -1,4 +1,5 @@
 // Export all Supabase repository implementations
+export * from "./achievement-metrics.repository";
 export * from "./achievement.repository";
 export * from "./attendance.repository";
 export * from "./calendar.repository";
