@@ -3580,7 +3580,7 @@ export interface paths {
             parameters: {
                 query: {
                     festivalId: string;
-                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                 };
                 header?: never;
                 path?: never;
@@ -3618,7 +3618,7 @@ export interface paths {
                                     name: string;
                                     description: string;
                                     /** @enum {string} */
-                                    category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                                    category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                                     icon: string;
                                     points: number;
                                     /** @enum {string} */
@@ -3713,7 +3713,7 @@ export interface paths {
                                     name: string;
                                     description: string;
                                     /** @enum {string} */
-                                    category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                                    category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                                     icon: string;
                                     points: number;
                                     /** @enum {string} */
@@ -3763,7 +3763,7 @@ export interface paths {
             parameters: {
                 query: {
                     festivalId: string;
-                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                 };
                 header?: never;
                 path?: never;
@@ -3784,7 +3784,7 @@ export interface paths {
                                 name: string;
                                 description: string;
                                 /** @enum {string} */
-                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                                 icon: string;
                                 points: number;
                                 /** @enum {string} */
@@ -3836,6 +3836,16 @@ export interface paths {
                                         points: number;
                                     };
                                     special?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    drinking?: {
+                                        total: number;
+                                        unlocked: number;
+                                        points: number;
+                                    };
+                                    dedication?: {
                                         total: number;
                                         unlocked: number;
                                         points: number;
@@ -3904,7 +3914,7 @@ export interface paths {
             parameters: {
                 query: {
                     festivalId: string;
-                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                    category?: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                 };
                 header?: never;
                 path?: never;
@@ -3986,7 +3996,7 @@ export interface paths {
                                 name: string;
                                 description: string;
                                 /** @enum {string} */
-                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special";
+                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
                                 icon: string;
                                 points: number;
                                 /** @enum {string} */

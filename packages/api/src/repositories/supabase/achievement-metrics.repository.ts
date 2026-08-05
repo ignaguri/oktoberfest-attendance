@@ -46,6 +46,34 @@ export class AchievementMetricsRepository {
   }
 
   /**
+   * Slugs the user already holds, mapped to when each was unlocked. Same
+   * dual-scope query as getHeldSlugs (festival rows plus lifetime rows).
+   */
+  async getHeldSlugsWithUnlockDates(
+    userId: string,
+    festivalId: string,
+  ): Promise<Map<string, string>> {
+    const { data, error } = await this.supabase
+      .from("user_achievements")
+      .select("unlocked_at, achievements(slug)")
+      .eq("user_id", userId)
+      .or(`festival_id.eq.${festivalId},festival_id.is.null`);
+
+    if (error) {
+      throw new DatabaseError(`Failed to fetch held achievement unlock dates: ${error.message}`);
+    }
+
+    const dates = new Map<string, string>();
+    for (const row of data ?? []) {
+      const slug = (row as { achievements: { slug: string | null } | null }).achievements?.slug;
+      if (slug && row.unlocked_at) {
+        dates.set(slug, row.unlocked_at);
+      }
+    }
+    return dates;
+  }
+
+  /**
    * Inserts unlock rows. Lifetime unlocks are stored with a NULL festival_id.
    * Conflicts are ignored so concurrent evaluations cannot double-insert.
    */

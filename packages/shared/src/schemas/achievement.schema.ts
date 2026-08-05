@@ -10,6 +10,8 @@ export const AchievementCategorySchema = z.enum([
   "social",
   "competitive",
   "special",
+  "drinking",
+  "dedication",
 ]);
 
 export type AchievementCategory = z.infer<typeof AchievementCategorySchema>;

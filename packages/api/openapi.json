@@ -6311,7 +6311,9 @@
                 "explorer",
                 "social",
                 "competitive",
-                "special"
+                "special",
+                "drinking",
+                "dedication"
               ]
             },
             "required": false,
@@ -6392,7 +6394,9 @@
                                   "explorer",
                                   "social",
                                   "competitive",
-                                  "special"
+                                  "special",
+                                  "drinking",
+                                  "dedication"
                                 ]
                               },
                               "icon": {
@@ -6581,7 +6585,9 @@
                                   "explorer",
                                   "social",
                                   "competitive",
-                                  "special"
+                                  "special",
+                                  "drinking",
+                                  "dedication"
                                 ]
                               },
                               "icon": {
@@ -6702,7 +6708,9 @@
                 "explorer",
                 "social",
                 "competitive",
-                "special"
+                "special",
+                "drinking",
+                "dedication"
               ]
             },
             "required": false,
@@ -6741,7 +6749,9 @@
                               "explorer",
                               "social",
                               "competitive",
-                              "special"
+                              "special",
+                              "drinking",
+                              "dedication"
                             ]
                           },
                           "icon": {
@@ -6949,6 +6959,44 @@
                                 "unlocked",
                                 "points"
                               ]
+                            },
+                            "drinking": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
+                            },
+                            "dedication": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "unlocked": {
+                                  "type": "integer"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "unlocked",
+                                "points"
+                              ]
                             }
                           }
                         },
@@ -7107,7 +7155,9 @@
                 "explorer",
                 "social",
                 "competitive",
-                "special"
+                "special",
+                "drinking",
+                "dedication"
               ]
             },
             "required": false,
@@ -7237,7 +7287,9 @@
                               "explorer",
                               "social",
                               "competitive",
-                              "special"
+                              "special",
+                              "drinking",
+                              "dedication"
                             ]
                           },
                           "icon": {

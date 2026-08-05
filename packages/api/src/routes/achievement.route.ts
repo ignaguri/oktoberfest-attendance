@@ -214,9 +214,10 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
   const metricsRepo = new AchievementMetricsRepository(supabase);
   const achievementService = new AchievementService(metricsRepo);
 
-  const [{ progress }, heldSlugs, registry] = await Promise.all([
+  const [{ progress }, heldSlugs, unlockDates, registry] = await Promise.all([
     achievementService.getProgress(user.id, query.festivalId),
     metricsRepo.getHeldSlugs(user.id, query.festivalId),
+    metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId),
     supabase
       .from("achievements")
       .select("id, slug, series_id, tier, scope, category, points, icon, name, description")
@@ -287,7 +288,7 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
       created_at: "",
       updated_at: "",
       is_unlocked: isUnlocked,
-      unlocked_at: null,
+      unlocked_at: isUnlocked && row.slug ? (unlockDates.get(row.slug) ?? null) : null,
       user_progress: {
         current_value: currentValue,
         target_value: targetValue,
