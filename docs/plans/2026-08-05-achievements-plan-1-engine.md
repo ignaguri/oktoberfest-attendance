@@ -2532,7 +2532,9 @@ function recordActiveDay(supabase: SupabaseClient, userId: string, platform?: st
     })
     .then(({ error }) => {
       if (error) {
-        logger.warn("Failed to record active day", { userId, error: error.message });
+        // pino: mergingObject first, message second (see auth.ts:106, error.ts:107,159 for the
+        // established convention) — the reverse order silently drops the fields from log output.
+        logger.warn({ userId, error: error.message }, "Failed to record active day");
       }
     });
 }
@@ -2589,8 +2591,15 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.record_user_active_day(uuid, text, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.record_user_active_day(uuid, text, text) TO service_role;
+-- Postgres grants EXECUTE to PUBLIC by default, and anon inherits it via PUBLIC.
+-- The auth.uid() check above already stops anon from writing anyone's row (anon
+-- has no JWT, so auth.uid() is NULL, and IS DISTINCT FROM only passes when
+-- p_user_id is also NULL, which then fails user_active_days' NOT NULL/FK on
+-- user_id) — but leaving it anon-executable still contradicts the explicit-grant
+-- convention this repo just adopted for every other SECURITY DEFINER function
+-- (see fix/harden-security-definer-grants). Revoke first, then grant narrowly.
+REVOKE EXECUTE ON FUNCTION public.record_user_active_day(uuid, text, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.record_user_active_day(uuid, text, text) TO authenticated, service_role;
 ```
 
 Apply via `mcp__supabase-local__execute_sql`.
@@ -2808,10 +2817,49 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
   }
 
   const progressBySeries = new Map(progress.map((entry) => [entry.seriesId, entry]));
+  const seriesById = new Map(SERIES.map((series) => [series.id, series]));
 
+  // `progress` from evaluate() has ONE entry per series: the series' overall
+  // standing toward whichever locked tier comes next. But `registry.data`
+  // has one ROW PER TIER (80 of the 90 rows: 20 series x 4 tiers), and
+  // AchievementWithProgressSchema gives every row its own user_progress. If
+  // every tier row of a series just reused the single series-level entry,
+  // every locked tier beyond the immediately-next one would display the
+  // WRONG target and percentage (borrowed from whatever tier happens to be
+  // "next", not its own threshold) — e.g. a tier-3 row with target 25 would
+  // show target 10 (tier 2's number) while the user is still working on
+  // tier 2. So each row computes its own target from that tier's definition,
+  // and its own percentage using the same floor/span formula evaluate() uses
+  // for the "next" tier, just anchored to THIS row's tier instead.
   const achievements: AchievementWithProgress[] = (registry.data ?? []).map((row) => {
     const isUnlocked = row.slug ? heldSlugs.has(row.slug) : false;
     const seriesProgress = row.series_id ? progressBySeries.get(row.series_id) : undefined;
+
+    let currentValue = isUnlocked ? 1 : 0;
+    let targetValue = 1;
+    let percentage = isUnlocked ? 100 : 0;
+
+    if (row.series_id && row.tier && seriesProgress) {
+      const series = seriesById.get(row.series_id);
+      const ownTierDef = series?.tiers.find((t) => t.tier === row.tier);
+      const priorTierDef = series?.tiers.find((t) => t.tier === row.tier - 1);
+      const floor = priorTierDef?.target ?? 0;
+      const target = ownTierDef?.target ?? seriesProgress.nextTarget ?? 1;
+
+      currentValue = seriesProgress.currentValue;
+      targetValue = target;
+
+      if (isUnlocked) {
+        percentage = 100;
+      } else {
+        // Same formula as evaluate()'s progress calc, anchored to this row's
+        // own tier rather than only ever the next one.
+        const span = target - floor;
+        const gained = currentValue - floor;
+        percentage =
+          span <= 0 ? 100 : Math.max(0, Math.min(100, Math.round((gained / span) * 100)));
+      }
+    }
 
     return {
       id: row.id,
@@ -2828,9 +2876,9 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
       is_unlocked: isUnlocked,
       unlocked_at: null,
       user_progress: {
-        current_value: seriesProgress?.currentValue ?? (isUnlocked ? 1 : 0),
-        target_value: seriesProgress?.nextTarget ?? 1,
-        percentage: isUnlocked ? 100 : (seriesProgress?.percentage ?? 0),
+        current_value: currentValue,
+        target_value: targetValue,
+        percentage,
         last_updated: new Date().toISOString(),
       },
     } as AchievementWithProgress;
@@ -2888,6 +2936,8 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
 Add near the top of `achievement.route.ts`:
 
 ```ts
+import { SERIES } from "@prostcounter/shared/achievements";
+
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
 import { AchievementService } from "../services/achievement.service";
 
