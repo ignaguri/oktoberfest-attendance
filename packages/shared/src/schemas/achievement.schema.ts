@@ -32,7 +32,6 @@ export const AchievementSchema = z.object({
   icon: z.string(),
   points: z.number().int(),
   rarity: AchievementRaritySchema,
-  condition: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -215,3 +214,26 @@ export const ListAvailableAchievementsResponseSchema = z.object({
 export type ListAvailableAchievementsResponse = z.infer<
   typeof ListAvailableAchievementsResponseSchema
 >;
+
+/**
+ * A single achievement unlock, as returned inline from the write path
+ * (e.g. POST /consumption) when logging an event unlocks something.
+ */
+export const UnlockedAchievementSchema = z.object({
+  slug: z.string(),
+  seriesId: z.string().nullable(),
+  tier: z.number().int().min(1).max(4),
+  category: z.enum([
+    "drinking",
+    "attendance",
+    "explorer",
+    "social",
+    "competitive",
+    "dedication",
+  ]),
+  scope: z.enum(["festival", "lifetime"]),
+  glyph: z.string(),
+  points: z.number().int(),
+});
+
+export type UnlockedAchievement = z.infer<typeof UnlockedAchievementSchema>;

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { UnlockedAchievementSchema } from "./achievement.schema";
+
 /**
  * Drink type enum matching database enum
  */
@@ -108,8 +110,11 @@ export type AttendanceWithTotals = z.infer<typeof AttendanceWithTotalsSchema>;
 
 /**
  * Response schema for logging consumption
- * Returns the attendance record with updated totals
+ * Returns the attendance record with updated totals, plus any achievements
+ * that were unlocked as a result of this consumption.
  */
-export const LogConsumptionResponseSchema = AttendanceWithTotalsSchema;
+export const LogConsumptionResponseSchema = AttendanceWithTotalsSchema.extend({
+  unlocked: z.array(UnlockedAchievementSchema).default([]),
+});
 
 export type LogConsumptionResponse = z.infer<typeof LogConsumptionResponseSchema>;
