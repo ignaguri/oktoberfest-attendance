@@ -29,11 +29,19 @@ export async function POST(req: Request) {
 
   // Refresh competitive standings for the active festival.
   // Past festivals are immutable and were materialised once at creation time.
-  const { data: activeFestival } = await supabase
+  const { data: activeFestival, error: activeFestivalError } = await supabase
     .from("festivals")
     .select("id")
     .eq("is_active", true)
     .maybeSingle();
+
+  if (activeFestivalError) {
+    logger.error(
+      "Failed to look up active festival for standings refresh",
+      logger.apiRoute("cron/scheduler"),
+      activeFestivalError,
+    );
+  }
 
   if (activeFestival) {
     const { error: standingsError } = await supabase.rpc("refresh_festival_group_standings", {
