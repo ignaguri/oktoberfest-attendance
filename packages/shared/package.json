@@ -16,7 +16,8 @@
     "./hooks": "./src/hooks/index.ts",
     "./constants": "./src/constants/index.ts",
     "./contexts": "./src/contexts/index.ts",
-    "./wrapped": "./src/wrapped/index.ts"
+    "./wrapped": "./src/wrapped/index.ts",
+    "./achievements": "./src/achievements/index.ts"
   },
   "scripts": {
     "build": "tsc",

@@ -25,7 +25,6 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
           icon,
           points,
           rarity,
-          condition,
           created_at,
           updated_at
         )
@@ -88,7 +87,6 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
         icon: achievement.icon,
         points: achievement.points,
         rarity: achievement.rarity,
-        condition: achievement.condition,
         createdAt: achievement.created_at,
         updatedAt: achievement.updated_at,
       },

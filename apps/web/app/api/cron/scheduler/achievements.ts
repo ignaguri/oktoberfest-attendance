@@ -17,12 +17,20 @@ export async function processAchievementNotifications(
     const achievementIds = Array.from(new Set(userEvents.map((e) => e.achievement_id)));
     const { data: achievements } = await supabase
       .from("achievements")
-      .select("id, name, description, rarity")
+      .select("id, name, description, rarity, slug")
       .in("id", achievementIds);
     const achIdToMeta = new Map<string, any>((achievements || []).map((a) => [a.id, a]));
 
+    // New-engine achievements (achievements.slug is set) still carry the raw
+    // i18n key as their name (e.g. "achievements.drinks_total.t2.name") until
+    // Plan 3 ships real copy. Sending that as notification text would be
+    // garbage, so those events are muted: marked notified without a push,
+    // and never retried. Legacy achievements (slug is null) already have
+    // real names and notify as before.
+    const legacyUserEvents = userEvents.filter((e) => !achIdToMeta.get(e.achievement_id)?.slug);
+
     await Promise.allSettled(
-      userEvents.map((e) =>
+      legacyUserEvents.map((e) =>
         notifications.notifyAchievementUnlocked(e.user_id, {
           achievementId: e.achievement_id,
           achievementName: achIdToMeta.get(e.achievement_id)?.name || "",
@@ -45,7 +53,10 @@ export async function processAchievementNotifications(
     .from("achievement_events")
     .select("id, user_id, achievement_id, festival_id, rarity, group_notified_at")
     .is("group_notified_at", null)
-    .in("rarity", ["rare", "epic"])
+    .in("rarity", ["rare", "epic", "legendary"])
+    // Lifetime unlocks carry a NULL festival_id and have no festival group
+    // audience to notify, so exclude them from the group notification path.
+    .not("festival_id", "is", null)
     .limit(200);
 
   if (Array.isArray(groupEvents) && groupEvents.length) {
@@ -61,9 +72,14 @@ export async function processAchievementNotifications(
     const achievementIds = Array.from(new Set(groupEvents.map((e) => e.achievement_id)));
     const { data: achievements } = await supabase
       .from("achievements")
-      .select("id, name, rarity")
+      .select("id, name, rarity, slug")
       .in("id", achievementIds);
     const achIdToMeta = new Map<string, any>((achievements || []).map((a) => [a.id, a]));
+
+    // Same mute as the user-notification path above: new-engine achievements
+    // (slug set) still have a raw i18n key for a name until Plan 3 ships
+    // real copy, so they're muted rather than announced to a whole group.
+    const legacyGroupEvents = groupEvents.filter((e) => !achIdToMeta.get(e.achievement_id)?.slug);
 
     // Use RPC function to get all group achievement recipients in a single query
     // This eliminates the N+1 query pattern
@@ -80,7 +96,7 @@ export async function processAchievementNotifications(
     });
 
     // Process each group event and send notifications
-    const notificationPromises = groupEvents.map((e) => {
+    const notificationPromises = legacyGroupEvents.map((e) => {
       const key = `${e.user_id}:${e.festival_id}`;
       const recipientIds = recipientMap.get(key);
 

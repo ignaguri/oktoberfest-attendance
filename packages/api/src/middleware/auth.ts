@@ -14,6 +14,41 @@ export type AuthContext = {
 };
 
 /**
+ * Record that this user was active today.
+ *
+ * Deliberately not awaited by the caller: this must add zero latency to any
+ * request. Failures are swallowed because activity tracking must never break
+ * an authenticated request.
+ *
+ * Feeds the "active_days_total" and "active_day_streak_max" achievement metrics,
+ * and provides DAU/WAU/MAU and retention data that is otherwise unobtainable —
+ * auth.users.last_sign_in_at keeps only the most recent value.
+ */
+function recordActiveDay(
+  supabase: SupabaseClient,
+  userId: string,
+  platform?: string,
+  appVersion?: string,
+): void {
+  void supabase
+    .rpc("record_user_active_day", {
+      p_user_id: userId,
+      p_platform: platform ?? null,
+      p_app_version: appVersion ?? null,
+    })
+    .then(({ error }) => {
+      if (error) {
+        // pino: mergingObject first, message second (see auth.ts:106, error.ts:107,159 for the
+        // established convention) — the reverse order silently drops the fields from log output.
+        logger.warn(
+          { userId, error: error.message },
+          "Failed to record active day",
+        );
+      }
+    });
+}
+
+/**
  * Authentication middleware
  * Validates Supabase JWT token from Authorization header
  * Adds authenticated user and supabase client to context
@@ -63,6 +98,13 @@ export const authMiddleware = createMiddleware<AuthContext>(async (c, next) => {
   // Add user and supabase client to context
   c.set("user", user);
   c.set("supabase", supabase);
+
+  recordActiveDay(
+    supabase,
+    user.id,
+    c.req.header("X-Client-Platform"),
+    c.req.header("X-Client-Version"),
+  );
 
   await next();
 });
