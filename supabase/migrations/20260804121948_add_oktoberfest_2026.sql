@@ -8,6 +8,12 @@
 -- The existing tent_location_trigger keeps the PostGIS `location` column in sync from
 -- latitude/longitude, so no geometry is written by hand here.
 
+-- This is the only migration in the repo with an explicit transaction. It is deliberate: the
+-- nine steps below are one logical change (deactivate the old festival, insert the new one,
+-- relink 40 tents) and a partial apply would leave no festival active at all. `supabase db push`
+-- does not wrap migrations in an outer transaction, so BEGIN here does not nest; this file
+-- applied to production on 2026-08-04 and is recorded with BEGIN and COMMIT as its first and
+-- last statements. If you copy this file as a template, drop the wrapper unless you need it.
 BEGIN;
 
 -- Step 1: Only one festival may be active (idx_festivals_single_active is a unique partial
@@ -30,8 +36,13 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE tents SET name = 'Museumszelt'
 WHERE id = '655190b1-ca0d-4d5a-8def-74f8a20f1e2b';
 
--- Step 4: Replace fabricated coordinates with OSM-sourced ones, for the 2026 lineup only.
--- Tents belonging to other festivals are deliberately untouched.
+-- Step 4: Replace fabricated coordinates with OSM-sourced ones.
+-- The id list is the 2026 lineup, but `tents` is a shared table: 25 of these rows are also
+-- linked to Oktoberfest 2025 and 2024 via festival_tents, so those festivals see the new
+-- coordinates too. That is intended. The old values were fabricated for every festival that
+-- used them, and the tents stand in the same physical spots year to year, so the OSM
+-- coordinates are the correct ones for the earlier festivals as well. Tents never linked to
+-- Oktoberfest 2026 (for example the Frühlingsfest-only rows) keep whatever they had.
 UPDATE tents AS t SET latitude = v.lat, longitude = v.lon
 FROM (VALUES
   -- Large tents
