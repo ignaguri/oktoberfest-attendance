@@ -2,6 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type { AchievementMetrics, UnlockedAchievement } from "@prostcounter/shared/achievements";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../../lib/logger";
 import { DatabaseError } from "../../middleware/error";
 
 export class AchievementMetricsRepository {
@@ -101,6 +102,21 @@ export class AchievementMetricsRepository {
       if (row.slug) {
         slugToId.set(row.slug, row.id);
       }
+    }
+
+    // A slug the evaluator produced but the registry doesn't have means the
+    // sync script (pnpm --filter=@prostcounter/api sync:achievements) hasn't
+    // run since a definition was added, or has drifted. Log loudly rather
+    // than silently dropping it: a silent drop means this unlock is never
+    // persisted and gets silently recomputed on every future evaluation.
+    const unresolvedSlugs = unlocks
+      .map((unlock) => unlock.slug)
+      .filter((slug) => !slugToId.has(slug));
+    if (unresolvedSlugs.length > 0) {
+      logger.error(
+        { userId, festivalId, unresolvedSlugs },
+        "Achievement registry is missing slugs the evaluator unlocked; run the registry sync",
+      );
     }
 
     const payload = unlocks

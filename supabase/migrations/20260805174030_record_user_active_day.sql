@@ -10,8 +10,14 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Callers may only record activity for themselves.
-  IF auth.uid() IS DISTINCT FROM p_user_id THEN
+  -- A caller with a JWT may only record activity for themselves. A caller
+  -- with no JWT is service_role (cron / server-side), which is allowed to
+  -- record on behalf of any user -- matches the guard convention used by
+  -- every other SECURITY DEFINER function in this repo (see
+  -- fix/harden-security-definer-grants). The previous `IS DISTINCT FROM`
+  -- form always raised for service_role, since auth.uid() is NULL there and
+  -- p_user_id is not, making the service_role grant below non-functional.
+  IF auth.uid() IS NOT NULL AND auth.uid() <> p_user_id THEN
     RAISE EXCEPTION 'record_user_active_day: user mismatch';
   END IF;
 
