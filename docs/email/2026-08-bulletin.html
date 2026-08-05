@@ -1,0 +1,121 @@
+<!--
+  Snapshot of the August 2026 "what's new" bulletin, as sent.
+  Resend is the source of truth for what actually shipped; this file is a
+  point-in-time copy kept so a future bulletin starts from an edit rather than
+  a rebuild. It is not read by any code and is not kept in sync automatically.
+
+  Campaign: aug2026-whatsnew
+  Sent from: ignacio@account.prostcounter.fun
+  Broadcasts: d193c030-d7a4-4ff9-b42c-93dc3bdf2940 (batch 1, 96 recipients),
+              455968b3-3358-46fa-95c6-bc01fe2dae87 (batch 2, 43 recipients)
+
+  Tracking: none at the provider. Resend open/click tracking is OFF on
+            account.prostcounter.fun and must stay off, because that domain also
+            sends Supabase Auth mail and click tracking rewrites links, which can
+            let a mail scanner consume a one-time password-reset token.
+            Attribution is via URL parameters only:
+              utm_*     -> GA4 (web and blog links)
+              referrer  -> Play Console acquisition reports
+              pt / ct   -> App Store Connect campaigns (pt=128467983)
+
+  Template tokens: {{{FIRST_NAME|there}}} and {{{RESEND_UNSUBSCRIBE_URL}}} are
+  resolved by Resend at broadcast send time. They only work for broadcasts, not
+  for one-off send-email calls, so substitute them by hand when sending tests.
+
+  Gotcha: mcp__resend__update-broadcast treats an omitted `name` as "clear it"
+  and silently renames the broadcast to "Untitled". Always pass `name`.
+
+  Split into two batches because the Resend free plan caps sending at 100
+  emails/day and pauses rather than queueing once the cap is hit.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>What's new in ProstCounter</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f5f5f4;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f5f4;">
+<tr>
+<td align="center" style="padding:24px 16px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden;">
+<tr>
+<td align="center" bgcolor="#F59E0B" style="background-color:#F59E0B; padding:24px;">
+<img src="https://prostcounter.fun/apple-touch-icon.png" width="56" height="56" alt="ProstCounter" border="0" style="display:block; margin:0 auto 10px auto; border-radius:12px;">
+<div style="font-family:Arial, Helvetica, sans-serif; font-size:22px; font-weight:bold; letter-spacing:0.3px; color:#ffffff; text-shadow:0 1px 2px rgba(0,0,0,0.15);">ProstCounter</div>
+</td>
+</tr>
+<tr>
+<td style="padding:32px 32px 8px 32px; font-family:Arial, Helvetica, sans-serif;">
+<p style="margin:0 0 16px 0; font-size:16px; line-height:24px; color:#1c1917;">Hey {{{FIRST_NAME|there}}},</p>
+<p style="margin:0 0 20px 0; font-size:16px; line-height:24px; color:#1c1917;">It's been a while since you last checked in. Here's what's changed:</p>
+</td>
+</tr>
+<tr>
+<td style="padding:0 32px; font-family:Arial, Helvetica, sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr><td style="padding:0 0 14px 0; font-size:15px; line-height:22px; color:#1c1917;"><strong>Native apps for iOS and Android.</strong> No more relying on the web version: get the real thing from the App Store or Google Play.</td></tr>
+<tr><td style="padding:0 0 14px 0; font-size:15px; line-height:22px; color:#1c1917;"><strong>Live location sharing.</strong> Opt in with your group and see who's nearby on a map, handy for finding each other in a packed tent.</td></tr>
+<tr><td style="padding:0 0 14px 0; font-size:15px; line-height:22px; color:#1c1917;"><strong>Friends.</strong> Add friends and see their activity, not just your group's.</td></tr>
+<tr><td style="padding:0 0 14px 0; font-size:15px; line-height:22px; color:#1c1917;"><strong>Unified feed.</strong> One place for everything happening across your groups.</td></tr>
+<tr><td style="padding:0 0 14px 0; font-size:15px; line-height:22px; color:#1c1917;"><strong>Wrapped.</strong> An end-of-festival recap of your drinking (or restraint).</td></tr>
+<tr><td style="padding:0 0 14px 0; font-size:15px; line-height:22px; color:#1c1917;">Smaller stuff: configurable tips, and radler now counts as half a beer.</td></tr>
+<tr><td style="padding:0 0 8px 0; font-size:15px; line-height:22px; color:#1c1917;"><strong>Guides.</strong> There's <a href="https://prostcounter.fun/blog?utm_source=email&utm_medium=bulletin&utm_campaign=aug2026-whatsnew&utm_content=blog" style="color:#D97706; text-decoration:underline;">a blog</a> now: tent guides, what a day on the Wiesn actually costs, traditions, and a full rundown on Oktoberfest 2026.</td></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:24px 32px 8px 32px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+<td align="center" style="padding:0 0 12px 0;">
+<!--[if mso]>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://apps.apple.com/app/apple-store/id6758376527?pt=128467983&ct=aug2026-whatsnew&mt=8" style="height:44px;v-text-anchor:middle;width:260px;" arcsize="12%" fillcolor="#D97706">
+<w:anchorlock/>
+<center style="color:#ffffff;font-family:Arial,sans-serif;font-size:15px;">Get it on the App Store</center>
+</v:roundrect>
+<![endif]-->
+<!--[if !mso]><!-->
+<a href="https://apps.apple.com/app/apple-store/id6758376527?pt=128467983&ct=aug2026-whatsnew&mt=8" style="display:inline-block; width:260px; background-color:#D97706; color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:15px; line-height:44px; text-align:center; text-decoration:none; border-radius:6px;">Get it on the App Store</a>
+<!--<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" style="padding:0 0 12px 0;">
+<!--[if mso]>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://play.google.com/store/apps/details?id=com.prostcounter.app&referrer=utm_source%3Demail%26utm_medium%3Dbulletin%26utm_campaign%3Daug2026-whatsnew" style="height:44px;v-text-anchor:middle;width:260px;" arcsize="12%" fillcolor="#D97706">
+<w:anchorlock/>
+<center style="color:#ffffff;font-family:Arial,sans-serif;font-size:15px;">Get it on Google Play</center>
+</v:roundrect>
+<![endif]-->
+<!--[if !mso]><!-->
+<a href="https://play.google.com/store/apps/details?id=com.prostcounter.app&referrer=utm_source%3Demail%26utm_medium%3Dbulletin%26utm_campaign%3Daug2026-whatsnew" style="display:inline-block; width:260px; background-color:#D97706; color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:15px; line-height:44px; text-align:center; text-decoration:none; border-radius:6px;">Get it on Google Play</a>
+<!--<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center">
+<a href="https://prostcounter.fun/?utm_source=email&utm_medium=bulletin&utm_campaign=aug2026-whatsnew&utm_content=web" style="display:inline-block; width:260px; background-color:#ffffff; color:#D97706; font-family:Arial, Helvetica, sans-serif; font-size:15px; line-height:42px; text-align:center; text-decoration:none; border-radius:6px; border:1px solid #D97706;">Open ProstCounter on the web</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:24px 32px 32px 32px; font-family:Arial, Helvetica, sans-serif;">
+<p style="margin:0; font-size:15px; line-height:22px; color:#1c1917;">Cheers,<br>Ignacio (ProstCounter)</p>
+</td>
+</tr>
+<tr>
+<td style="padding:16px 32px; background-color:#fafaf9; border-top:1px solid #e7e5e4; font-family:Arial, Helvetica, sans-serif;">
+<p style="margin:0; font-size:12px; line-height:18px; color:#78716c;">Don't want emails like this? <a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color:#78716c; text-decoration:underline;">Unsubscribe</a></p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
