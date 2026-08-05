@@ -40,22 +40,29 @@ function createMockSupabase({
           is: vi.fn((col: string) => {
             const rows = col === "user_notified_at" ? userEvents : groupEvents;
             return {
-              in: vi.fn(() => ({
-                // Faithfully filters the fixture rather than ignoring its
-                // arguments, so tests asserting on the result are actually
-                // pinned to this call happening with these exact args.
-                not: vi.fn((filterCol: string, operator: string, value: unknown) => ({
-                  limit: vi.fn(() => ({
-                    data:
-                      filterCol === "festival_id" && operator === "is" && value === null
-                        ? rows.filter((row: any) => row.festival_id !== null)
-                        : rows,
+              // Faithfully filters the fixture rather than ignoring its
+              // arguments, so tests asserting on the result are actually
+              // pinned to this call happening with these exact args.
+              in: vi.fn((inCol: string, allowed: unknown) => {
+                const scoped =
+                  inCol === "rarity" && Array.isArray(allowed)
+                    ? rows.filter((row: any) => (allowed as string[]).includes(row.rarity))
+                    : rows;
+
+                return {
+                  not: vi.fn((filterCol: string, operator: string, value: unknown) => ({
+                    limit: vi.fn(() => ({
+                      data:
+                        filterCol === "festival_id" && operator === "is" && value === null
+                          ? scoped.filter((row: any) => row.festival_id !== null)
+                          : scoped,
+                    })),
                   })),
-                })),
-                limit: vi.fn(() => ({
-                  data: rows,
-                })),
-              })),
+                  limit: vi.fn(() => ({
+                    data: scoped,
+                  })),
+                };
+              }),
               limit: vi.fn(() => ({
                 data: rows,
               })),
@@ -79,7 +86,13 @@ function createMockSupabase({
               id,
               name: `Ach ${id}`,
               description: `Desc ${id}`,
-              rarity: id.includes("epic") ? "epic" : id.includes("rare") ? "rare" : "common",
+              rarity: id.includes("legendary")
+                ? "legendary"
+                : id.includes("epic")
+                  ? "epic"
+                  : id.includes("rare")
+                    ? "rare"
+                    : "common",
             })),
           })),
         })),
@@ -215,6 +228,50 @@ describe("processAchievementNotifications", () => {
     await processAchievementNotifications(supabase, notifications);
 
     expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifies group for legendary unlocks, the rarest tier", async () => {
+    const supabase = createMockSupabase({
+      groupEvents: [
+        {
+          id: "e4",
+          user_id: "u2",
+          achievement_id: "a4_legendary",
+          festival_id: "f1",
+          rarity: "legendary",
+          group_notified_at: null,
+        },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledTimes(1);
+    expect((notifications as any).notifyGroupAchievement).toHaveBeenCalledWith(
+      ["other1", "other2"],
+      expect.objectContaining({ rarity: "legendary" }),
+    );
+  });
+
+  it("does not notify group for common unlocks", async () => {
+    const supabase = createMockSupabase({
+      groupEvents: [
+        {
+          id: "e5",
+          user_id: "u2",
+          achievement_id: "a5_plain",
+          festival_id: "f1",
+          rarity: "common",
+          group_notified_at: null,
+        },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await processAchievementNotifications(supabase, notifications);
+
+    expect((notifications as any).notifyGroupAchievement).not.toHaveBeenCalled();
   });
 
   it("excludes lifetime (null festival_id) events from the group notification path", async () => {

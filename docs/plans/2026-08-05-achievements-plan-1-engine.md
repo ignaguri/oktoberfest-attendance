@@ -2299,6 +2299,8 @@ import { ALL_DEFINITIONS, isSeries, slugFor } from "@prostcounter/shared/achieve
 import type { AchievementCategory, AchievementScope } from "@prostcounter/shared/achievements";
 import { createClient } from "@supabase/supabase-js";
 
+type AchievementRarity = "common" | "rare" | "epic" | "legendary";
+
 interface RegistryRow {
   slug: string;
   series_id: string | null;
@@ -2307,9 +2309,30 @@ interface RegistryRow {
   category: AchievementCategory;
   points: number;
   icon: string;
+  rarity: AchievementRarity;
   name: string;
   description: string;
   is_active: boolean;
+}
+
+/**
+ * The achievements table still carries the legacy `rarity` enum, and the
+ * notification cron filters on it. Until Plan 2 replaces rarity with tier,
+ * derive one from the other so new achievements keep notifying.
+ */
+const RARITY_BY_TIER: Record<number, AchievementRarity> = {
+  1: "common",
+  2: "rare",
+  3: "epic",
+  4: "legendary",
+};
+
+function rarityForTier(tier: number): AchievementRarity {
+  const rarity = RARITY_BY_TIER[tier];
+  if (!rarity) {
+    throw new Error(`No rarity mapping for tier ${tier}`);
+  }
+  return rarity;
 }
 
 export function buildRegistryRows(): RegistryRow[] {
@@ -2327,6 +2350,7 @@ export function buildRegistryRows(): RegistryRow[] {
           category: definition.category,
           points: tierDef.points,
           icon: definition.glyph,
+          rarity: rarityForTier(tierDef.tier),
           name: `achievements.${slug}.name`,
           description: `achievements.${slug}.description`,
           is_active: true,
@@ -2342,6 +2366,7 @@ export function buildRegistryRows(): RegistryRow[] {
         category: definition.category,
         points: definition.points,
         icon: definition.glyph,
+        rarity: rarityForTier(definition.tier),
         name: `achievements.${slug}.name`,
         description: `achievements.${slug}.description`,
         is_active: true,
@@ -2394,6 +2419,8 @@ if (process.argv[1]?.endsWith("sync-achievement-registry.ts")) {
 ```
 
 Note on `category`: the DB column is `achievement_category_enum`, whose current values are `consumption, attendance, explorer, social, competitive, special`. The new category names (`drinking`, `dedication`) are **not** in that enum yet. Step 2 adds them.
+
+Note on `rarity`: `achievements.rarity` is `NOT NULL DEFAULT 'common'`, and a trigger copies it into `achievement_events.rarity`, which the notification cron filters on. If the sync omitted `rarity`, all 90 new rows would land as `common` and **no** new achievement would ever produce a group notification. Deriving rarity from tier keeps the existing notification path working without a schema change; Plan 2 replaces the column with `tier` outright.
 
 - [ ] **Step 2: Extend the category enum**
 
