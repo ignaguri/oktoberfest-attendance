@@ -70,6 +70,50 @@ export interface AchievementMetrics {
 
 export type MetricKey = keyof AchievementMetrics;
 
+/**
+ * Every metric key, derived so TypeScript enforces both directions: `satisfies
+ * Record<MetricKey, true>` fails to compile if a key is missing, and object
+ * literals get excess-property checking against `satisfies`, so an unknown
+ * key fails too. A hand-maintained array (the shape this replaced) can drift
+ * silently in either direction — this can't, which is the property that
+ * matters here, since a silent drift between this list and the SQL function
+ * is exactly how the previous achievements engine died.
+ */
+const METRIC_KEYS_RECORD = {
+  drinks_total: true,
+  drinks_day_max: true,
+  drink_types_distinct: true,
+  volume_ml_total: true,
+  tip_cents_total: true,
+  spend_cents_total: true,
+  days_attended: true,
+  attendance_streak_max: true,
+  tents_distinct: true,
+  groups_joined: true,
+  photos_uploaded: true,
+  reactions_given: true,
+  crowd_reports: true,
+  festivals_attended: true,
+  festival_types_distinct: true,
+  friends_accepted: true,
+  group_wins: true,
+  podium_finishes: true,
+  active_days_total: true,
+  active_day_streak_max: true,
+  attended_opening_day: true,
+  attended_closing_day: true,
+  attended_every_day: true,
+  attended_every_weekend_day: true,
+  visited_all_large_tents: true,
+  created_group: true,
+  logged_first_drink: true,
+  uploaded_first_photo: true,
+  profile_complete: true,
+  wrapped_viewed: true,
+} as const satisfies Record<MetricKey, true>;
+
+export const ACHIEVEMENT_METRIC_KEYS = Object.keys(METRIC_KEYS_RECORD) as MetricKey[];
+
 export type NumericMetricKey = {
   [K in MetricKey]: AchievementMetrics[K] extends number ? K : never;
 }[MetricKey];

@@ -1,48 +1,17 @@
 // packages/shared/src/achievements/definitions.test.ts
 import { describe, expect, it } from "vitest";
 
+import { ACHIEVEMENT_METRIC_KEYS, isSeries, slugFor } from "./types";
 import { ALL_DEFINITIONS, ALL_SLUGS, ONE_OFFS, SERIES } from "./definitions";
-import { isSeries, slugFor } from "./types";
-import type { AchievementMetrics } from "./types";
 
 /**
- * A zero-valued instance of AchievementMetrics. Its keys are the source of
- * truth for which metrics exist. If a definition names a metric absent here,
- * the SQL function will never supply it and the achievement is unreachable —
- * which is exactly how the previous engine died.
+ * ACHIEVEMENT_METRIC_KEYS is the source of truth for which metrics exist,
+ * derived from AchievementMetrics itself (see types.ts) rather than
+ * hand-maintained here. If a definition names a metric absent from the
+ * interface, the SQL function will never supply it and the achievement is
+ * unreachable — which is exactly how the previous engine died.
  */
-const METRIC_KEYS: Array<keyof AchievementMetrics> = [
-  "drinks_total",
-  "drinks_day_max",
-  "drink_types_distinct",
-  "volume_ml_total",
-  "tip_cents_total",
-  "spend_cents_total",
-  "days_attended",
-  "attendance_streak_max",
-  "tents_distinct",
-  "groups_joined",
-  "photos_uploaded",
-  "reactions_given",
-  "crowd_reports",
-  "festivals_attended",
-  "festival_types_distinct",
-  "friends_accepted",
-  "group_wins",
-  "podium_finishes",
-  "active_days_total",
-  "active_day_streak_max",
-  "attended_opening_day",
-  "attended_closing_day",
-  "attended_every_day",
-  "attended_every_weekend_day",
-  "visited_all_large_tents",
-  "created_group",
-  "logged_first_drink",
-  "uploaded_first_photo",
-  "profile_complete",
-  "wrapped_viewed",
-];
+const METRIC_KEYS = ACHIEVEMENT_METRIC_KEYS;
 
 describe("achievement definitions", () => {
   it("has 20 series and 10 one-offs", () => {

@@ -2,6 +2,8 @@
 // Run with: pnpm --filter=@prostcounter/api test -- --run achievement-unlock.integration
 import { describe, expect, it } from "vitest";
 
+import { ACHIEVEMENT_METRIC_KEYS } from "@prostcounter/shared/achievements";
+
 import { createTestSupabaseAdmin } from "../../__tests__/helpers/test-supabase";
 import { AchievementMetricsRepository } from "../../repositories/supabase/achievement-metrics.repository";
 import { AchievementService } from "../../services/achievement.service";
@@ -23,8 +25,11 @@ describe("achievement unlocking against a real database", () => {
     const repo = new AchievementMetricsRepository(supabaseAdmin);
     const service = new AchievementService(repo);
 
+    // Compares the real SQL function's key set against AchievementMetrics,
+    // not just a count: a renamed or dropped SQL key would pass a bare
+    // toHaveLength(30) (still 30 keys, just the wrong ones) but fails this.
     const metrics = await repo.getMetrics(target.user_id as string, target.festival_id);
-    expect(Object.keys(metrics)).toHaveLength(30);
+    expect(Object.keys(metrics).sort()).toEqual([...ACHIEVEMENT_METRIC_KEYS].sort());
 
     const unlocked = await service.evaluateAndUnlock(
       target.user_id as string,
