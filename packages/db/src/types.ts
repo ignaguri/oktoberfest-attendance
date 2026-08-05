@@ -2212,6 +2212,8 @@ export type Database = {
         | "social"
         | "competitive"
         | "special"
+        | "drinking"
+        | "dedication"
       achievement_rarity_enum: "common" | "rare" | "epic" | "legendary"
       activity_type_enum:
         | "beer_count_update"
@@ -2375,6 +2377,8 @@ export const Constants = {
         "social",
         "competitive",
         "special",
+        "drinking",
+        "dedication",
       ],
       achievement_rarity_enum: ["common", "rare", "epic", "legendary"],
       activity_type_enum: [

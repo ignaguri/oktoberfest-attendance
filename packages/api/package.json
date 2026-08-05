@@ -11,6 +11,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "generate-spec": "tsx src/scripts/generate-openapi.ts",
+    "sync:achievements": "tsx src/scripts/sync-achievement-registry.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "type-check": "tsc --noEmit",
