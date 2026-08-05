@@ -22,8 +22,13 @@ ALTER TABLE public.achievements
   ADD CONSTRAINT achievements_tier_check
   CHECK (tier IS NULL OR tier BETWEEN 1 AND 4);
 
+-- Plain unique index, not partial: Postgres unique indexes already treat NULL
+-- as distinct by default, so this alone lets the legacy NULL-slug rows
+-- coexist. A partial index here would block PostgREST/supabase-js upsert's
+-- ON CONFLICT (slug) inference, which cannot target a partial index without
+-- a matching WHERE predicate it has no way to express.
 CREATE UNIQUE INDEX IF NOT EXISTS achievements_slug_key
-  ON public.achievements (slug) WHERE slug IS NOT NULL;
+  ON public.achievements (slug);
 
 CREATE INDEX IF NOT EXISTS achievements_series_tier
   ON public.achievements (series_id, tier);
@@ -40,6 +45,20 @@ ALTER TABLE public.user_achievements
 ALTER TABLE public.user_achievements
   ADD CONSTRAINT user_achievements_unique
   UNIQUE NULLS NOT DISTINCT (user_id, achievement_id, festival_id);
+
+-- The achievement_events outbox that insert_achievement_event_from_unlock()
+-- writes into mirrors the same lifetime-scope need: lifetime unlocks have no
+-- festival, so the event that notifies the user about one must survive
+-- without one too. Only the group-notification path stays festival-scoped.
+ALTER TABLE public.achievement_events ALTER COLUMN festival_id DROP NOT NULL;
+
+COMMENT ON COLUMN public.achievement_events.festival_id IS
+  'NULL for lifetime-scope achievement unlocks, which are not tied to a festival.';
+
+-- New category names the enum does not yet carry. Old values stay for now;
+-- Plan 2 removes them after the remap.
+ALTER TYPE public.achievement_category_enum ADD VALUE IF NOT EXISTS 'drinking';
+ALTER TYPE public.achievement_category_enum ADD VALUE IF NOT EXISTS 'dedication';
 
 -- 3. App activity tracking. Also serves BI: DAU/WAU/MAU, retention, platform split.
 CREATE TABLE IF NOT EXISTS public.user_active_days (
