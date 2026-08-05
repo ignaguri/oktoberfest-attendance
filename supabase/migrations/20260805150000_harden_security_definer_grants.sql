@@ -9,13 +9,15 @@
 -- Every API route sits behind authMiddleware (packages/api/src/index.ts), so no
 -- legitimate anon caller exists for any of them.
 --
--- Three remedies are applied below:
+-- Four remedies are applied below:
 --   1. Functions that trust a p_user_id parameter get an auth.uid() guard.
 --   2. regenerate_wrapped_data_cache gets a real admin check (its old one was
 --      skippable) and a pinned search_path.
 --   3. All 16 get explicit grants: REVOKE FROM PUBLIC, anon (revoking from anon
 --      alone is not enough, it inherits via PUBLIC), then GRANT to the roles
 --      that actually call them.
+--   4. The 10 functions in section 3 whose bodies are unchanged here (grants
+--      only) but had no search_path pinned at all get one via ALTER FUNCTION.
 --
 -- The guard pattern mirrors the existing one in
 -- 20260726190000_fix_wrapped_rls_and_comparisons.sql: allow when there is no
@@ -256,7 +258,6 @@ SET search_path TO 'public', 'extensions'
 AS $function$
 DECLARE
   v_regenerated_count INTEGER := 0;
-  v_query TEXT;
 BEGIN
   -- Authorization comes from the JWT, not from p_admin_user_id. A caller with
   -- no JWT is service_role (cron / server-side), which is allowed.
@@ -265,50 +266,31 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
-  -- Build dynamic query based on provided parameters
-  v_query := '
-    WITH calculated_data AS (
-      SELECT
-        wdc.user_id,
-        wdc.festival_id,
-        get_wrapped_data(wdc.user_id, wdc.festival_id) as new_data
-      FROM wrapped_data_cache wdc
-      WHERE 1=1';
+  -- Static parameterized query: the old version built this as dynamic SQL,
+  -- appending "$1"/"$2" placeholders only for the params that were non-NULL.
+  -- That numbering broke whenever p_user_id was NULL and p_festival_id
+  -- wasn't (the festival-only admin path), since the query referenced $2
+  -- but EXECUTE only bound one parameter.
+  WITH calculated_data AS (
+    SELECT
+      wdc.user_id,
+      wdc.festival_id,
+      get_wrapped_data(wdc.user_id, wdc.festival_id) as new_data
+    FROM wrapped_data_cache wdc
+    WHERE (p_user_id IS NULL OR wdc.user_id = p_user_id)
+      AND (p_festival_id IS NULL OR wdc.festival_id = p_festival_id)
+  )
+  UPDATE wrapped_data_cache
+  SET
+    wrapped_data = calculated_data.new_data,
+    generated_by = 'admin',
+    updated_at = NOW()
+  FROM calculated_data
+  WHERE wrapped_data_cache.user_id = calculated_data.user_id
+    AND wrapped_data_cache.festival_id = calculated_data.festival_id
+    AND calculated_data.new_data IS NOT NULL;
 
-  IF p_user_id IS NOT NULL THEN
-    v_query := v_query || ' AND wdc.user_id = $1';
-  END IF;
-
-  IF p_festival_id IS NOT NULL THEN
-    v_query := v_query || ' AND wdc.festival_id = $2';
-  END IF;
-
-  v_query := v_query || '
-    )
-    UPDATE wrapped_data_cache
-    SET
-      wrapped_data = calculated_data.new_data,
-      generated_by = ''admin'',
-      updated_at = NOW()
-    FROM calculated_data
-    WHERE wrapped_data_cache.user_id = calculated_data.user_id
-      AND wrapped_data_cache.festival_id = calculated_data.festival_id
-      AND calculated_data.new_data IS NOT NULL';
-
-  -- Execute the query with appropriate parameters
-  IF p_user_id IS NOT NULL AND p_festival_id IS NOT NULL THEN
-    EXECUTE v_query USING p_user_id, p_festival_id;
-    GET DIAGNOSTICS v_regenerated_count = ROW_COUNT;
-  ELSIF p_user_id IS NOT NULL THEN
-    EXECUTE v_query USING p_user_id;
-    GET DIAGNOSTICS v_regenerated_count = ROW_COUNT;
-  ELSIF p_festival_id IS NOT NULL THEN
-    EXECUTE v_query USING p_festival_id;
-    GET DIAGNOSTICS v_regenerated_count = ROW_COUNT;
-  ELSE
-    EXECUTE v_query;
-    GET DIAGNOSTICS v_regenerated_count = ROW_COUNT;
-  END IF;
+  GET DIAGNOSTICS v_regenerated_count = ROW_COUNT;
 
   RETURN v_regenerated_count;
 END;
@@ -376,3 +358,24 @@ GRANT EXECUTE ON FUNCTION public.join_group_with_token(uuid, uuid) TO authentica
 
 REVOKE EXECUTE ON FUNCTION public.regenerate_wrapped_data_cache(uuid, uuid, uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.regenerate_wrapped_data_cache(uuid, uuid, uuid) TO authenticated, service_role;
+
+-- ---------------------------------------------------------------------------
+-- 4. Pin search_path on the rest of the SECURITY DEFINER functions above
+-- ---------------------------------------------------------------------------
+-- These 10 keep their existing bodies (only their grants change above), but
+-- had no search_path pinned at all. A SECURITY DEFINER function with an
+-- unpinned search_path resolves its unqualified table/function references
+-- against whatever search_path the calling session set, so a caller could in
+-- principle shadow a table these functions rely on. None of them call
+-- anything outside the public schema, so pinning to 'public' is sufficient.
+
+ALTER FUNCTION public.cleanup_old_location_points() SET search_path TO 'public';
+ALTER FUNCTION public.cleanup_old_rate_limit_records() SET search_path TO 'public';
+ALTER FUNCTION public.expire_old_location_sessions() SET search_path TO 'public';
+ALTER FUNCTION public.record_notification_rate_limit(uuid, uuid, text) SET search_path TO 'public';
+ALTER FUNCTION public.check_notification_rate_limit(uuid, text, uuid, integer) SET search_path TO 'public';
+ALTER FUNCTION public.get_group_achievement_recipients(uuid[], uuid[]) SET search_path TO 'public';
+ALTER FUNCTION public.is_group_member(uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.calculate_achievement_progress(uuid, uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.check_achievement_conditions(uuid, uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.evaluate_achievement_progress(uuid, uuid, uuid) SET search_path TO 'public';
