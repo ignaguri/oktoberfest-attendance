@@ -1,5 +1,6 @@
 import type { AchievementCategory, AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
 import { GLYPH_FALLBACK_ICONS, getCategoryColor, TIER_RING_WIDTH } from "@prostcounter/shared/achievements";
+import { cn } from "@prostcounter/ui";
 import {
   Award,
   Beaker,
@@ -72,6 +73,12 @@ const SIZE_PX: Record<"sm" | "md" | "lg", number> = {
   lg: 56,
 };
 
+const SIZE_CLASSES: Record<"sm" | "md" | "lg", string> = {
+  sm: "w-8 h-8",
+  md: "w-10 h-10",
+  lg: "w-14 h-14",
+};
+
 interface AchievementBadgeProps {
   glyph: GlyphId;
   category: AchievementCategory;
@@ -95,16 +102,16 @@ export function AchievementBadge({
   const FallbackIcon =
     FALLBACK_ICON_COMPONENTS[
       GLYPH_FALLBACK_ICONS[glyph] as keyof typeof FALLBACK_ICON_COMPONENTS
-    ];
+    ] ?? Trophy;
 
   return (
     <View
+      className={cn(
+        "items-center justify-center",
+        SIZE_CLASSES[size],
+        isUnlocked ? "opacity-100" : "opacity-40",
+      )}
       style={{
-        width: diameter,
-        height: diameter,
-        alignItems: "center",
-        justifyContent: "center",
-        opacity: isUnlocked ? 1 : 0.4,
         shadowColor: glowsForTier ? ringColor : undefined,
         shadowOpacity: glowsForTier ? 0.6 : 0,
         shadowRadius: glowsForTier ? 6 : 0,

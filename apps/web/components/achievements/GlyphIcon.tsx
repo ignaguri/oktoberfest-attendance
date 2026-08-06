@@ -71,6 +71,6 @@ export function GlyphIcon({ glyph, sizePx }: GlyphIconProps) {
   const FallbackIcon =
     FALLBACK_ICON_COMPONENTS[
       GLYPH_FALLBACK_ICONS[glyph] as keyof typeof FALLBACK_ICON_COMPONENTS
-    ];
+    ] ?? Trophy;
   return <FallbackIcon size={sizePx} />;
 }

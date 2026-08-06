@@ -41,7 +41,8 @@ export function AchievementBadge({
   className,
 }: AchievementBadgeProps) {
   const { t } = useTranslation();
-  const [imageFailed, setImageFailed] = useState(false);
+  const [failedIcon, setFailedIcon] = useState<string | null>(null);
+  const imageFailed = failedIcon === icon;
 
   const translatedName = t(name);
   const diameter = SIZE_PX[size];
@@ -69,7 +70,7 @@ export function AchievementBadge({
             alt=""
             width={diameter * 0.6}
             height={diameter * 0.6}
-            onError={() => setImageFailed(true)}
+            onError={() => setFailedIcon(icon)}
           />
         ) : (
           <GlyphIcon glyph={icon as GlyphId} sizePx={diameter * 0.5} />

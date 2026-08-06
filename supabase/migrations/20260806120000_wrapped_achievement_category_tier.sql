@@ -371,7 +371,7 @@ BEGIN
         'description', a.description,
         'icon', a.icon,
         'category', a.category,
-        'tier', a.tier,
+        'tier', COALESCE(a.tier, 1),
         'points', a.points,
         'rarity', a.rarity,
         'unlocked_at', ua.unlocked_at

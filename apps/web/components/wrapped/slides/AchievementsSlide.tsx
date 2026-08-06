@@ -1,5 +1,6 @@
 "use client";
 
+import type { AchievementCategory } from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { calculateTotalPoints, sortAchievements } from "@prostcounter/shared/wrapped";
@@ -56,7 +57,7 @@ export function AchievementsSlide({ data, isActive = false }: AchievementsSlideP
               <AchievementBadge
                 name={achievement.name}
                 icon={achievement.icon}
-                category={achievement.category}
+                category={achievement.category as AchievementCategory}
                 tier={achievement.tier as 1 | 2 | 3 | 4}
                 rarity={achievement.rarity as AchievementRarity}
                 points={achievement.points}
