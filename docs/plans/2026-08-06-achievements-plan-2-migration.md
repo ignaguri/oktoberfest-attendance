@@ -83,6 +83,11 @@
   **Why:** 297 of 377 production users have never attended anything but can still hold `profile_complete` or `friends_added.*`. Enumerating only from `attendances` would silently deny them.
   **If wrong:** STOP and ask.
 
+- **Question:** `AchievementMetricsRepository.getMetrics/getHeldSlugs/insertUnlocks` all type `festivalId` as `string`, and the generated `Database["public"]["Functions"]["get_achievement_metrics"]["Args"]` type says `p_festival_id: string` too. Does the lifetime pass need its own duplicated query logic in the script, or does the repository get widened?
+  **Decision:** Widen all three repository methods to `festivalId: string | null`. Confirmed by grepping every call site (`achievement.route.ts`, `consumption.route.ts` via `achievement.service.ts`) that all pass a real festival id string today, so this is additive and backward compatible. The generated RPC `Args` type is a pre-existing inaccuracy — the SQL parameter has no `NOT NULL` constraint and the function computes lifetime metrics independently of `p_festival_id` (proven in Task 3 Step 0) — so the call site casts past it with a comment rather than regenerating the whole `packages/db/src/types.ts`, which is out of scope for this plan.
+  **Why:** Reusing the existing Zod-validated `getMetrics` and the existing `insertUnlocks` upsert logic is safer than a parallel hand-rolled version in the script, and the repository is the natural owner of "how do we call `get_achievement_metrics`."
+  **If wrong:** STOP and ask.
+
 - **Question:** Is `get_achievement_metrics(user, NULL)` actually safe, or does it error / return NULLs?
   **Decision:** Safe by construction, but **unverified by execution** — the planner's database role lacked EXECUTE on the function, which is granted only to `authenticated, service_role`. Reading the function body: `fest` resolves to zero rows, `user_att` is empty because `festival_id = NULL` is never true, and `attended_every_day` evaluates to `NULL AND false` = `false` rather than NULL. Task 3 Step 0 makes the implementer prove this before writing any code.
   **If wrong:** STOP. If the RPC errors or returns NULL for any boolean key, the lifetime pass needs a different mechanism and the plan must be revised.
@@ -122,7 +127,7 @@ Follow conventions established in the files you are modifying and in `CLAUDE.md`
 - **Scripts:** live in `packages/api/src/scripts/`, registered in `packages/api/package.json` `scripts`, run via `tsx`. Read `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` from env and throw if absent. See `sync-achievement-registry.ts` for the exact shape, including the `process.argv[1]?.endsWith(...)` guard that keeps the module importable by tests.
 - **Migrations:** header comment explaining *why*, not just what. Idempotent DDL (`IF NOT EXISTS`, `DROP ... IF EXISTS` then `CREATE`). See `supabase/migrations/20260805150000_harden_security_definer_grants.sql`.
 - **Imports:** type-only imports use `import type`. Path alias `@/` maps to each package's `src/`.
-- **Tests:** Vitest with `globals: true`, so `describe`/`it`/`expect` need no import. Unit tests live beside their subject as `*.test.ts`.
+- **Tests:** Vitest. Despite `globals: true` in `vitest.config.ts`, every test file in this package imports `describe`/`expect`/`it` from `"vitest"` explicitly (verified 2026-08-06) — `tsc --noEmit` doesn't pick up vitest's ambient globals, so an unimported test file fails `pnpm type-check` even though `vitest run` passes it. Follow the established pattern: import explicitly. Unit tests live beside their subject as `*.test.ts`.
 - **Braces:** always use braces on `if`/`else` bodies, even single-line ones.
 - **Naming:** descriptive variable names. `fallbackTimerId`, not `fallback`.
 
@@ -147,6 +152,7 @@ Task 3 produces application code and begins with a failing test, as it must. Tas
 
 | Path | Change |
 | --- | --- |
+| `packages/api/src/repositories/supabase/achievement-metrics.repository.ts` | Widen `getMetrics`/`getHeldSlugs`/`getHeldSlugsWithUnlockDates`/`insertUnlocks` to accept `festivalId: string \| null`, so the backfill's lifetime pass reuses the same tested class. See Open Questions Resolved. |
 | `packages/api/package.json` | Add `backfill:achievements` script entry |
 
 **Read but not modified:** `packages/shared/src/achievements/{definitions,evaluator,types}.ts`, `packages/api/src/scripts/sync-achievement-registry.ts`, `apps/web/app/api/cron/scheduler/achievements.ts`.
@@ -523,6 +529,8 @@ Expected: a jsonb object containing all 30 metric keys, where every festival-sco
 
 ```ts
 // packages/api/src/scripts/backfill-achievements.test.ts
+import { describe, expect, it } from "vitest";
+
 import { enumerateBackfillPairs, summariseDelta } from "./backfill-achievements";
 
 describe("enumerateBackfillPairs", () => {
