@@ -64,7 +64,9 @@ describe("achievement locale coverage", () => {
           const categoryLabel = resolve(node, ["categories", category]);
           const filterLabel = resolve(node, ["filter", category]);
           expect(typeof categoryLabel).toBe("string");
+          expect((categoryLabel as string) ?? "").not.toBe("");
           expect(typeof filterLabel).toBe("string");
+          expect((filterLabel as string) ?? "").not.toBe("");
         }
       });
     }

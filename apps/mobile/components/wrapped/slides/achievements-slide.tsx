@@ -66,7 +66,7 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
               </View>
               <VStack space="xs" className="ml-2 flex-1">
                 <Text className="text-sm font-semibold text-gray-800">
-                  {t(achievement.name, { defaultValue: achievement.name })}
+                  {t(achievement.name)}
                 </Text>
                 <HStack space="sm" className="items-center">
                   <View

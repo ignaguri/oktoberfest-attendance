@@ -867,16 +867,16 @@
       "t4": { "name": "Leyenda del Podio", "description": "Terminá entre los 3 primeros de un grupo 25 veces" }
     },
     "active_days": {
-      "t1": { "name": "Buen Comienzo", "description": "Estuviste activo 5 días diferentes" },
-      "t2": { "name": "Cara Conocida", "description": "Estuviste activo 25 días diferentes" },
-      "t3": { "name": "Veterano de Ley", "description": "Estuviste activo 75 días diferentes" },
-      "t4": { "name": "Pilar de la Casa", "description": "Estuviste activo 200 días diferentes" }
+      "t1": { "name": "Buen Comienzo", "description": "Registrá actividad en 5 días diferentes" },
+      "t2": { "name": "Cara Conocida", "description": "Registrá actividad en 25 días diferentes" },
+      "t3": { "name": "Veterano de Ley", "description": "Registrá actividad en 75 días diferentes" },
+      "t4": { "name": "Pilar de la Casa", "description": "Registrá actividad en 200 días diferentes" }
     },
     "active_day_streak": {
-      "t1": { "name": "Entrando en Calor", "description": "Estuviste activo 3 días seguidos" },
-      "t2": { "name": "En Llamas", "description": "Estuviste activo 7 días seguidos" },
-      "t3": { "name": "Hábito Formado", "description": "Estuviste activo 21 días seguidos" },
-      "t4": { "name": "Racha Imparable", "description": "Estuviste activo 60 días seguidos" }
+      "t1": { "name": "Entrando en Calor", "description": "Registrá actividad 3 días seguidos" },
+      "t2": { "name": "En Llamas", "description": "Registrá actividad 7 días seguidos" },
+      "t3": { "name": "Hábito Formado", "description": "Registrá actividad 21 días seguidos" },
+      "t4": { "name": "Racha Imparable", "description": "Registrá actividad 60 días seguidos" }
     },
     "crowd_reports": {
       "t1": { "name": "Primer Reporte", "description": "Enviá 1 reporte de aglomeración en este festival" },

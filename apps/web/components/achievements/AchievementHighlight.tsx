@@ -78,9 +78,7 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
                 {recentAchievements.map((achievement: AchievementWithProgress) => (
                   <div key={achievement.id} className="flex flex-col items-center gap-2">
                     <AchievementBadge
-                      name={t(achievement.name, {
-                        defaultValue: achievement.name,
-                      })}
+                      name={achievement.name}
                       icon={achievement.icon}
                       rarity={achievement.rarity}
                       points={achievement.points}
