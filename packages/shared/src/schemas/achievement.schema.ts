@@ -120,6 +120,7 @@ export const AchievementWithProgressSchema = z.object({
   icon: z.string(),
   points: z.number().int(),
   rarity: AchievementRaritySchema,
+  tier: z.number().int().min(1).max(4),
   conditions: z.record(z.string(), z.unknown()).default({}),
   is_active: z.boolean(),
   created_at: z.string(),
