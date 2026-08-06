@@ -1,7 +1,6 @@
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import { createClient } from "@/utils/supabase/server";
@@ -98,6 +97,11 @@ export async function POST(request: NextRequest) {
     let compressedBuffer: Buffer;
 
     try {
+      // Imported here rather than at module scope: sharp carries native
+      // bindings, and a top-level import puts it in the shared server chunk
+      // every SSR route loads, so a broken binary takes down pages that have
+      // nothing to do with images.
+      const { default: sharp } = await import("sharp");
       compressedBuffer = await sharp(buffer)
         .rotate() // Auto-rotate based on EXIF
         .resize({ width: 1000, height: 1000, fit: "inside" })

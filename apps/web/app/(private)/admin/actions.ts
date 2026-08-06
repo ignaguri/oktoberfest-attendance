@@ -4,7 +4,6 @@ import "server-only";
 
 import type { Tables } from "@prostcounter/db";
 import { revalidatePath, unstable_cache } from "next/cache";
-import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import { formatTimestampForDatabase } from "@/lib/date-utils";
@@ -450,6 +449,11 @@ export async function convertAndUpdateImage(path: string) {
 
 async function convertToWebP(imageBuffer: ArrayBuffer): Promise<Buffer> {
   try {
+    // Imported here rather than at module scope: sharp carries native
+    // bindings, and a top-level import puts it in the shared server chunk
+    // every SSR route loads, so a broken binary takes down pages that have
+    // nothing to do with images.
+    const { default: sharp } = await import("sharp");
     const webpBuffer = await sharp(Buffer.from(imageBuffer))
       .rotate()
       .resize({ width: 800, height: 800, fit: "inside" })

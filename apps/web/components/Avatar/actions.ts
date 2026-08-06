@@ -3,7 +3,6 @@
 import "server-only";
 
 import { revalidatePath } from "next/cache";
-import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
 import { reportLog, reportSupabaseException } from "@/utils/sentry";
@@ -22,6 +21,11 @@ export async function uploadAvatar(formData: FormData) {
   const buffer = await file.arrayBuffer();
   let compressedBuffer;
   try {
+    // Imported here rather than at module scope: sharp carries native
+    // bindings, and a top-level import puts it in the shared server chunk
+    // every SSR route loads, so a broken binary takes down pages that have
+    // nothing to do with images.
+    const { default: sharp } = await import("sharp");
     compressedBuffer = await sharp(buffer)
       .rotate()
       .resize({ width: 800, height: 800, fit: "inside" })
