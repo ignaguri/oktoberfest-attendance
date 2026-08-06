@@ -154,16 +154,23 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Every unlock just inserted above created an unnotified outbox row via
-  // trg_user_achievements_insert_event. Left alone, Plan 3 removing the
-  // slug-based notification mute would fire a push storm at every user this
-  // script touched. Stamp them all as notified now so that mute removal is
-  // safe later.
+  // Every unlock just inserted above created an outbox row via
+  // trg_user_achievements_insert_event with both notified columns NULL. Left
+  // alone, Plan 3 removing the slug-based notification mute would fire a push
+  // storm at every user this script touched. Stamp them all as notified now
+  // so that mute removal is safe later.
+  //
+  // Filtered on EITHER column, not just user_notified_at: the notification
+  // cron runs independently on its own schedule and could race with this
+  // script, stamping user_notified_at on a freshly inserted row before this
+  // step runs. Filtering on user_notified_at alone would then skip that row
+  // entirely, leaving group_notified_at permanently NULL and exactly
+  // reproducing the push-storm risk this step exists to close.
   const stampedAt = new Date().toISOString();
   const { error: stampError, count: stampedCount } = await supabase
     .from("achievement_events")
     .update({ user_notified_at: stampedAt, group_notified_at: stampedAt }, { count: "exact" })
-    .is("user_notified_at", null);
+    .or("user_notified_at.is.null,group_notified_at.is.null");
 
   if (stampError) {
     throw new Error(`Failed to stamp achievement events: ${stampError.message}`);

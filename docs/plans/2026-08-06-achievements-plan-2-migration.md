@@ -612,7 +612,7 @@ const stampedAt = new Date().toISOString();
 const { error: stampError, count: stampedCount } = await supabase
   .from("achievement_events")
   .update({ user_notified_at: stampedAt, group_notified_at: stampedAt }, { count: "exact" })
-  .is("user_notified_at", null);
+  .or("user_notified_at.is.null,group_notified_at.is.null");
 
 if (stampError) {
   throw new Error(`Failed to stamp achievement events: ${stampError.message}`);
@@ -621,7 +621,7 @@ if (stampError) {
 console.log(`Stamped ${stampedCount ?? 0} achievement events as notified.`);
 ```
 
-Note the update filters on `user_notified_at IS NULL` only; rows where just `group_notified_at` is null are also covered because the backfill's own inserts leave both null together.
+The filter matches EITHER column being null, not just `user_notified_at`. A row inserted by this script starts with both null, but the notification cron runs independently on its own schedule and can race with a long-running backfill: it could stamp `user_notified_at` on a freshly inserted row before this step runs, in which case filtering on `user_notified_at IS NULL` alone would skip that row and leave `group_notified_at` permanently NULL — exactly the push-storm risk this step exists to close.
 
 - [ ] **Step 4: Run the tests to confirm they pass**
 
@@ -714,10 +714,12 @@ pnpm --filter=@prostcounter/api backfill:achievements
 - [ ] **Step 6: [HUMAN] Verify no notification is pending**
 
 ```sql
-SELECT count(*) AS unnotified FROM achievement_events WHERE user_notified_at IS NULL;
+SELECT count(*) AS unnotified
+FROM achievement_events
+WHERE user_notified_at IS NULL OR group_notified_at IS NULL;
 ```
 
-Expected: **0**. If non-zero, the stamping step failed — do not deploy Plan 3 until this reads zero.
+Expected: **0**. Checks both columns, not just `user_notified_at`: the notification cron runs independently and can race with the script, so a row can end up with only one column stamped. If non-zero, the stamping step failed — do not deploy Plan 3 until this reads zero.
 
 - [ ] **Step 7: [HUMAN] Confirm no user lost a badge**
 
