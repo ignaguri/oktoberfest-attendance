@@ -23,27 +23,7 @@ const nextConfig: NextConfig = {
   // Transpile shared packages for proper bundling
   transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
-  // sharp ships native bindings (libvips); bundling it breaks the linux-x64
-  // binary at runtime with ERR_DLOPEN_FAILED. Marking it external makes Next.js
-  // require() it directly from node_modules instead of tracing/bundling it.
-  serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64", "sharp"],
-  // Output file tracing follows static imports/requires, not sharp's dlopen()
-  // call for its native libvips binary, so the .so file gets silently
-  // dropped from the deployed serverless function without this. Marking
-  // sharp external (above) fixes bundling; this fixes packaging.
-  //
-  // Tracing picks up sharp's .node addon on its own, but not the
-  // libvips-cpp shared library that addon dlopens via RPATH — nothing
-  // references it statically. It must be added by hand.
-  //
-  // The glob targets .pnpm directly: node_modules/@img/* are symlinks into
-  // the pnpm store, and globs don't descend into symlinked directories, so
-  // a glob over node_modules/@img matches the links and none of their
-  // contents. These paths are the real files.
-  outputFileTracingRoot: join(__dirname, "../.."),
-  outputFileTracingIncludes: {
-    "/**/*": ["../../node_modules/.pnpm/@img+*/node_modules/@img/**/*"],
-  },
+  serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64"],
   // Turbopack configuration
   turbopack: {
     resolveAlias: {
