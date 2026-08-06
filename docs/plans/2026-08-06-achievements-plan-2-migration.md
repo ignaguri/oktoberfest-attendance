@@ -87,6 +87,11 @@
   **Decision:** Safe by construction, but **unverified by execution** — the planner's database role lacked EXECUTE on the function, which is granted only to `authenticated, service_role`. Reading the function body: `fest` resolves to zero rows, `user_att` is empty because `festival_id = NULL` is never true, and `attended_every_day` evaluates to `NULL AND false` = `false` rather than NULL. Task 3 Step 0 makes the implementer prove this before writing any code.
   **If wrong:** STOP. If the RPC errors or returns NULL for any boolean key, the lifetime pass needs a different mechanism and the plan must be revised.
 
+- **Question:** What if a user already holds the remap's target achievement via the new engine?
+  **Decision:** Skip the repoint for that identity (the badge already exists) and pull the surviving row's `unlocked_at` back to the earliest legacy equivalent. The orphaned legacy row is removed by the cascade.
+  **Why:** Found by dry-running the migration on 2026-08-06: local data already had 29 unlocks on new achievements and the repoint hit `duplicate key value violates unique constraint "user_achievements_unique"`. Production has zero such rows *today*, but the live engine can create one at any moment between the registry sync and the migration, so the guard is load-bearing, not defensive decoration.
+  **If wrong:** STOP and ask.
+
 - **Question:** How many rows should the remap produce?
   **Decision:** Exactly **296** from 403 legacy unlocks, with **0** dropped. 107 collapse via tier collisions (e.g. `beerRookie` + `halfwayThere` + `seriousDrinker` all map to `drinks_total.t1`).
   **Why:** Computed against production on 2026-08-06 with the exact mapping in Task 1.
@@ -235,11 +240,17 @@ BEGIN
   END IF;
 END $$;
 
+-- Scratch tables are session-scoped, not ON COMMIT DROP: applied outside an
+-- explicit transaction psql autocommits each statement, which would drop them
+-- the instant they were created. Dropped explicitly at the end instead.
+DROP TABLE IF EXISTS pg_temp.legacy_remap;
+DROP TABLE IF EXISTS pg_temp.remap_plan;
+
 CREATE TEMP TABLE legacy_remap (
   legacy_key text PRIMARY KEY,
   new_slug   text NOT NULL,
   new_scope  text NOT NULL CHECK (new_scope IN ('festival', 'lifetime'))
-) ON COMMIT DROP;
+);
 
 INSERT INTO legacy_remap (legacy_key, new_slug, new_scope) VALUES
   ('festivalNewcomer',   'days_attended.t1',      'festival'),
@@ -280,27 +291,56 @@ BEGIN
   END IF;
 END $$;
 
--- Repoint the surviving unlock for each target identity, keeping the earliest.
-WITH mapped AS (
-  SELECT
-    ua.id          AS ua_id,
-    ua.user_id     AS user_id,
-    na.id          AS new_achievement_id,
-    CASE WHEN r.new_scope = 'lifetime' THEN NULL ELSE ua.festival_id END AS new_festival_id,
-    ua.unlocked_at AS unlocked_at
-  FROM public.user_achievements ua
-  JOIN public.achievements la
-    ON la.id = ua.achievement_id
-   AND la.slug IS NULL
-  JOIN legacy_remap r
-    ON r.legacy_key = replace(replace(la.name, 'achievements.items.', ''), '.name', '')
-  JOIN public.achievements na
-    ON na.slug = r.new_slug
-),
-winners AS (
+-- Resolve every legacy unlock to its target identity once, so the two
+-- statements below read the same plan instead of recomputing the join.
+CREATE TEMP TABLE remap_plan AS
+SELECT
+  ua.id          AS ua_id,
+  ua.user_id     AS user_id,
+  na.id          AS new_achievement_id,
+  CASE WHEN r.new_scope = 'lifetime' THEN NULL ELSE ua.festival_id END AS new_festival_id,
+  ua.unlocked_at AS unlocked_at
+FROM public.user_achievements ua
+JOIN public.achievements la
+  ON la.id = ua.achievement_id
+ AND la.slug IS NULL
+JOIN legacy_remap r
+  ON r.legacy_key = replace(replace(la.name, 'achievements.items.', ''), '.name', '')
+JOIN public.achievements na
+  ON na.slug = r.new_slug;
+
+-- A user may ALREADY hold the target achievement via the new engine, in which
+-- case the legacy row cannot be repointed onto it without violating
+-- user_achievements_unique. Production has no such rows today (every unlock
+-- still points at a legacy achievement), but local dev data does, and the live
+-- engine can create them at any time. Pull the surviving row's unlocked_at back
+-- to the earliest legacy equivalent so collapsing never costs the user their
+-- original unlock date.
+UPDATE public.user_achievements ua
+SET unlocked_at = earliest.earliest_unlocked_at
+FROM (
+  SELECT user_id, new_achievement_id, new_festival_id, min(unlocked_at) AS earliest_unlocked_at
+  FROM remap_plan
+  GROUP BY user_id, new_achievement_id, new_festival_id
+) earliest
+WHERE ua.user_id        = earliest.user_id
+  AND ua.achievement_id = earliest.new_achievement_id
+  AND ua.festival_id IS NOT DISTINCT FROM earliest.new_festival_id
+  AND ua.unlocked_at    > earliest.earliest_unlocked_at;
+
+-- Repoint the surviving unlock for each target identity, keeping the earliest
+-- and skipping identities the user already holds.
+WITH winners AS (
   SELECT DISTINCT ON (user_id, new_achievement_id, new_festival_id)
     ua_id, new_achievement_id, new_festival_id
-  FROM mapped
+  FROM remap_plan p
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM public.user_achievements existing
+    WHERE existing.user_id        = p.user_id
+      AND existing.achievement_id = p.new_achievement_id
+      AND existing.festival_id IS NOT DISTINCT FROM p.new_festival_id
+  )
   ORDER BY user_id, new_achievement_id, new_festival_id, unlocked_at ASC, ua_id
 )
 UPDATE public.user_achievements ua
@@ -313,6 +353,9 @@ WHERE ua.id = w.ua_id;
 -- unlocks and the 403 never-notified achievement_events that referenced them.
 -- Both FKs are ON DELETE CASCADE.
 DELETE FROM public.achievements WHERE slug IS NULL;
+
+DROP TABLE IF EXISTS pg_temp.remap_plan;
+DROP TABLE IF EXISTS pg_temp.legacy_remap;
 ```
 
 - [ ] **Step 3: Apply against the local instance**
