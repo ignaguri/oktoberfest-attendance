@@ -689,12 +689,12 @@
       "categoriesTitle": "Achievement Categories",
       "selectCategory": "Select category",
       "all": "All Achievements",
-      "consumption": "Beer Achievements",
+      "drinking": "Drinking Achievements",
       "attendance": "Days Achievements",
       "explorer": "Tents Achievements",
       "social": "Social Achievements",
       "competitive": "Compete Achievements",
-      "special": "Special Achievements"
+      "dedication": "Dedication Achievements"
     },
     "empty": {
       "title": "No achievements in this category",
@@ -702,11 +702,10 @@
     },
     "categories": {
       "attendance": "Attendance",
-      "consumption": "Consumption",
+      "drinking": "Drinking",
       "social": "Social",
       "explorer": "Explorer",
-      "veteran": "Veteran",
-      "special": "Special",
+      "dedication": "Dedication",
       "competitive": "Competitive"
     },
     "rarity": {
@@ -727,6 +726,172 @@
     "viewMyAchievements": "See my achievements",
     "viewProgress": "View your progress and unlocked badges",
     "points": "pts",
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum"
+    },
+    "drinks_total": {
+      "t1": { "name": "First Round", "description": "Have 3 drinks this festival" },
+      "t2": { "name": "Steady Drinker", "description": "Have 10 drinks this festival" },
+      "t3": { "name": "Mass Master", "description": "Have 25 drinks this festival" },
+      "t4": { "name": "Legendary Thirst", "description": "Have 50 drinks this festival" }
+    },
+    "drinks_day_max": {
+      "t1": { "name": "Solid Session", "description": "Drink 3 beers in a single day" },
+      "t2": { "name": "Big Day", "description": "Drink 5 beers in a single day" },
+      "t3": { "name": "Heavy Hitter", "description": "Drink 8 beers in a single day" },
+      "t4": { "name": "Unstoppable", "description": "Drink 12 beers in a single day" }
+    },
+    "drink_variety": {
+      "t1": { "name": "Sampler", "description": "Try 2 different drink types" },
+      "t2": { "name": "Taste Explorer", "description": "Try 3 different drink types" },
+      "t3": { "name": "Connoisseur", "description": "Try 4 different drink types" },
+      "t4": { "name": "Full Menu", "description": "Try 5 different drink types" }
+    },
+    "volume_total": {
+      "t1": { "name": "First Litres", "description": "Drink 5 litres this festival" },
+      "t2": { "name": "Twenty Down", "description": "Drink 20 litres this festival" },
+      "t3": { "name": "Half Hectolitre", "description": "Drink 50 litres this festival" },
+      "t4": { "name": "Century Litres", "description": "Drink 100 litres this festival" }
+    },
+    "tips_total": {
+      "t1": { "name": "Generous Start", "description": "Tip €5 total this festival" },
+      "t2": { "name": "Big Tipper", "description": "Tip €20 total this festival" },
+      "t3": { "name": "Crowd Favourite", "description": "Tip €50 total this festival" },
+      "t4": { "name": "Legendary Tipper", "description": "Tip €100 total this festival" }
+    },
+    "spend_total": {
+      "t1": { "name": "Opening the Wallet", "description": "Spend €100 this festival" },
+      "t2": { "name": "Big Spender", "description": "Spend €300 this festival" },
+      "t3": { "name": "High Roller", "description": "Spend €600 this festival" },
+      "t4": { "name": "No Limits", "description": "Spend €1,000 this festival" }
+    },
+    "first_drink": {
+      "name": "First Drop",
+      "description": "Log your first drink ever"
+    },
+    "days_attended": {
+      "t1": { "name": "Showed Up", "description": "Attend 1 day of the festival" },
+      "t2": { "name": "Regular", "description": "Attend 3 days of the festival" },
+      "t3": { "name": "Dedicated", "description": "Attend 6 days of the festival" },
+      "t4": { "name": "Festival Fixture", "description": "Attend 10 days of the festival" }
+    },
+    "attendance_streak": {
+      "t1": { "name": "Two in a Row", "description": "Attend 2 days in a row" },
+      "t2": { "name": "On a Roll", "description": "Attend 3 days in a row" },
+      "t3": { "name": "Streak Master", "description": "Attend 5 days in a row" },
+      "t4": { "name": "Unbroken Chain", "description": "Attend 7 days in a row" }
+    },
+    "opening_day": {
+      "name": "Opening Day",
+      "description": "Attend on the festival's opening day"
+    },
+    "closing_day": {
+      "name": "Last Call",
+      "description": "Attend on the festival's closing day"
+    },
+    "every_weekend_day": {
+      "name": "Weekend Warrior",
+      "description": "Attend every weekend day of the festival"
+    },
+    "full_festival": {
+      "name": "Full Festival",
+      "description": "Attend every single day of the festival"
+    },
+    "tents_visited": {
+      "t1": { "name": "Tent Curious", "description": "Visit 3 different tents" },
+      "t2": { "name": "Tent Hopper", "description": "Visit 6 different tents" },
+      "t3": { "name": "Tent Explorer", "description": "Visit 10 different tents" },
+      "t4": { "name": "Tent Master", "description": "Visit 15 different tents" }
+    },
+    "festivals_attended": {
+      "t1": { "name": "First Festival", "description": "Attend your first festival" },
+      "t2": { "name": "Festival Regular", "description": "Attend 3 different festivals" },
+      "t3": { "name": "Festival Veteran", "description": "Attend 5 different festivals" },
+      "t4": { "name": "Festival Legend", "description": "Attend 8 different festivals" }
+    },
+    "festival_types": {
+      "t1": { "name": "First Style", "description": "Attend your first type of festival" },
+      "t2": { "name": "Branching Out", "description": "Attend 2 different types of festival" },
+      "t3": { "name": "Well Travelled", "description": "Attend 3 different types of festival" },
+      "t4": { "name": "Festival Connoisseur", "description": "Attend 4 different types of festival" }
+    },
+    "all_large_tents": {
+      "name": "Grand Tour",
+      "description": "Visit every large tent at the festival"
+    },
+    "groups_joined": {
+      "t1": { "name": "Joined Up", "description": "Join 1 group this festival" },
+      "t2": { "name": "Team Player", "description": "Join 2 groups this festival" },
+      "t3": { "name": "Networked", "description": "Join 4 groups this festival" },
+      "t4": { "name": "Social Hub", "description": "Join 6 groups this festival" }
+    },
+    "friends_added": {
+      "t1": { "name": "First Friend", "description": "Add your first friend" },
+      "t2": { "name": "Growing Circle", "description": "Add 5 friends" },
+      "t3": { "name": "Popular", "description": "Add 15 friends" },
+      "t4": { "name": "Social Butterfly", "description": "Add 30 friends" }
+    },
+    "photos_uploaded": {
+      "t1": { "name": "Say Cheese", "description": "Upload 1 photo this festival" },
+      "t2": { "name": "Photo Enthusiast", "description": "Upload 10 photos this festival" },
+      "t3": { "name": "Photo Album", "description": "Upload 25 photos this festival" },
+      "t4": { "name": "Memory Keeper", "description": "Upload 50 photos this festival" }
+    },
+    "reactions_given": {
+      "t1": { "name": "Showing Love", "description": "React to 5 photos this festival" },
+      "t2": { "name": "Supportive", "description": "React to 25 photos this festival" },
+      "t3": { "name": "Cheerleader", "description": "React to 75 photos this festival" },
+      "t4": { "name": "Reaction Machine", "description": "React to 150 photos this festival" }
+    },
+    "first_photo": {
+      "name": "First Snap",
+      "description": "Upload your first photo ever"
+    },
+    "created_group": {
+      "name": "Group Founder",
+      "description": "Create a group"
+    },
+    "group_wins": {
+      "t1": { "name": "First Win", "description": "Win first place in a group once" },
+      "t2": { "name": "Serial Winner", "description": "Win first place in a group 3 times" },
+      "t3": { "name": "Group Champion", "description": "Win first place in a group 6 times" },
+      "t4": { "name": "Dynasty", "description": "Win first place in a group 10 times" }
+    },
+    "podium_finishes": {
+      "t1": { "name": "On the Podium", "description": "Finish top 3 in a group once" },
+      "t2": { "name": "Podium Regular", "description": "Finish top 3 in a group 5 times" },
+      "t3": { "name": "Consistent Contender", "description": "Finish top 3 in a group 12 times" },
+      "t4": { "name": "Podium Legend", "description": "Finish top 3 in a group 25 times" }
+    },
+    "active_days": {
+      "t1": { "name": "Getting Started", "description": "Be active on 5 different days" },
+      "t2": { "name": "Regular Face", "description": "Be active on 25 different days" },
+      "t3": { "name": "Old Faithful", "description": "Be active on 75 different days" },
+      "t4": { "name": "Lifer", "description": "Be active on 200 different days" }
+    },
+    "active_day_streak": {
+      "t1": { "name": "Warming Up", "description": "Be active 3 days in a row" },
+      "t2": { "name": "On Fire", "description": "Be active 7 days in a row" },
+      "t3": { "name": "Habit Formed", "description": "Be active 21 days in a row" },
+      "t4": { "name": "Unstoppable Streak", "description": "Be active 60 days in a row" }
+    },
+    "crowd_reports": {
+      "t1": { "name": "First Report", "description": "Submit 1 crowd report this festival" },
+      "t2": { "name": "Regular Reporter", "description": "Submit 5 crowd reports this festival" },
+      "t3": { "name": "Crowd Watcher", "description": "Submit 15 crowd reports this festival" },
+      "t4": { "name": "Community Pillar", "description": "Submit 30 crowd reports this festival" }
+    },
+    "profile_complete": {
+      "name": "Profile Complete",
+      "description": "Set your avatar, username, and full name"
+    },
+    "wrapped_viewed": {
+      "name": "Year in Review",
+      "description": "View your Wrapped"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {

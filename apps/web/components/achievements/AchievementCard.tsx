@@ -16,16 +16,6 @@ interface AchievementCardProps {
   showProgress?: boolean;
 }
 
-// Map category values to translation keys
-const CATEGORY_KEYS: Record<string, string> = {
-  consumption: "achievements.categories.consumption",
-  attendance: "achievements.categories.attendance",
-  explorer: "achievements.categories.explorer",
-  social: "achievements.categories.social",
-  competitive: "achievements.categories.competitive",
-  special: "achievements.categories.special",
-};
-
 export function AchievementCard({
   achievement,
   className,
@@ -44,14 +34,11 @@ export function AchievementCard({
     user_progress,
   } = achievement;
 
-  // Translate name and description (they are now i18n keys from database)
-  const displayName = t(name, { defaultValue: name });
-  const displayDescription = t(description, { defaultValue: description });
-  const displayRarity = t(`achievements.rarity.${rarity}`, {
-    defaultValue: rarity,
-  });
-  const categoryKey = CATEGORY_KEYS[category] || category;
-  const displayCategory = t(categoryKey, { defaultValue: category });
+  // Translate name and description (real i18n keys from the achievements table)
+  const displayName = t(name);
+  const displayDescription = t(description);
+  const displayRarity = t(`achievements.rarity.${rarity}`);
+  const displayCategory = t(`achievements.categories.${category}`);
 
   return (
     <Card
