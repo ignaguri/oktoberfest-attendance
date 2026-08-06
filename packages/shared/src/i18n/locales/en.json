@@ -732,6 +732,46 @@
       "gold": "Gold",
       "platinum": "Platinum"
     },
+    "drinks_total": {
+      "t1": { "name": "First Round", "description": "Have 3 drinks this festival" },
+      "t2": { "name": "Steady Drinker", "description": "Have 10 drinks this festival" },
+      "t3": { "name": "Mass Master", "description": "Have 25 drinks this festival" },
+      "t4": { "name": "Legendary Thirst", "description": "Have 50 drinks this festival" }
+    },
+    "drinks_day_max": {
+      "t1": { "name": "Solid Session", "description": "Drink 3 beers in a single day" },
+      "t2": { "name": "Big Day", "description": "Drink 5 beers in a single day" },
+      "t3": { "name": "Heavy Hitter", "description": "Drink 8 beers in a single day" },
+      "t4": { "name": "Unstoppable", "description": "Drink 12 beers in a single day" }
+    },
+    "drink_variety": {
+      "t1": { "name": "Sampler", "description": "Try 2 different drink types" },
+      "t2": { "name": "Taste Explorer", "description": "Try 3 different drink types" },
+      "t3": { "name": "Connoisseur", "description": "Try 4 different drink types" },
+      "t4": { "name": "Full Menu", "description": "Try 5 different drink types" }
+    },
+    "volume_total": {
+      "t1": { "name": "First Litres", "description": "Drink 5 litres this festival" },
+      "t2": { "name": "Twenty Down", "description": "Drink 20 litres this festival" },
+      "t3": { "name": "Half Hectolitre", "description": "Drink 50 litres this festival" },
+      "t4": { "name": "Century Litres", "description": "Drink 100 litres this festival" }
+    },
+    "tips_total": {
+      "t1": { "name": "Generous Start", "description": "Tip €5 total this festival" },
+      "t2": { "name": "Big Tipper", "description": "Tip €20 total this festival" },
+      "t3": { "name": "Crowd Favourite", "description": "Tip €50 total this festival" },
+      "t4": { "name": "Legendary Tipper", "description": "Tip €100 total this festival" }
+    },
+    "spend_total": {
+      "t1": { "name": "Opening the Wallet", "description": "Spend €100 this festival" },
+      "t2": { "name": "Big Spender", "description": "Spend €300 this festival" },
+      "t3": { "name": "High Roller", "description": "Spend €600 this festival" },
+      "t4": { "name": "No Limits", "description": "Spend €1,000 this festival" }
+    },
+    "first_drink": {
+      "name": "First Drop",
+      "description": "Log your first drink ever"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {

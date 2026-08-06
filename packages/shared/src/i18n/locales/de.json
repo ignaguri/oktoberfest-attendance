@@ -697,6 +697,46 @@
       "gold": "Gold",
       "platinum": "Platin"
     },
+    "drinks_total": {
+      "t1": { "name": "Erste Runde", "description": "Trink 3 Getränke bei diesem Fest" },
+      "t2": { "name": "Standfester Trinker", "description": "Trink 10 Getränke bei diesem Fest" },
+      "t3": { "name": "Maß-Meister", "description": "Trink 25 Getränke bei diesem Fest" },
+      "t4": { "name": "Legendärer Durst", "description": "Trink 50 Getränke bei diesem Fest" }
+    },
+    "drinks_day_max": {
+      "t1": { "name": "Solide Session", "description": "Trink an einem Tag 3 Bier" },
+      "t2": { "name": "Großer Tag", "description": "Trink an einem Tag 5 Bier" },
+      "t3": { "name": "Schwergewicht", "description": "Trink an einem Tag 8 Bier" },
+      "t4": { "name": "Unaufhaltsam", "description": "Trink an einem Tag 12 Bier" }
+    },
+    "drink_variety": {
+      "t1": { "name": "Kostprobe", "description": "Probier 2 verschiedene Getränkearten" },
+      "t2": { "name": "Geschmacks-Entdecker", "description": "Probier 3 verschiedene Getränkearten" },
+      "t3": { "name": "Kenner", "description": "Probier 4 verschiedene Getränkearten" },
+      "t4": { "name": "Volle Karte", "description": "Probier 5 verschiedene Getränkearten" }
+    },
+    "volume_total": {
+      "t1": { "name": "Erste Liter", "description": "Trink 5 Liter bei diesem Fest" },
+      "t2": { "name": "Zwanzig geschafft", "description": "Trink 20 Liter bei diesem Fest" },
+      "t3": { "name": "Halbes Hektoliter", "description": "Trink 50 Liter bei diesem Fest" },
+      "t4": { "name": "Hundert Liter", "description": "Trink 100 Liter bei diesem Fest" }
+    },
+    "tips_total": {
+      "t1": { "name": "Großzügiger Start", "description": "Gib insgesamt 5 € Trinkgeld bei diesem Fest" },
+      "t2": { "name": "Guter Trinkgeldgeber", "description": "Gib insgesamt 20 € Trinkgeld bei diesem Fest" },
+      "t3": { "name": "Publikumsliebling", "description": "Gib insgesamt 50 € Trinkgeld bei diesem Fest" },
+      "t4": { "name": "Legendärer Trinkgeldgeber", "description": "Gib insgesamt 100 € Trinkgeld bei diesem Fest" }
+    },
+    "spend_total": {
+      "t1": { "name": "Geldbeutel geöffnet", "description": "Gib 100 € bei diesem Fest aus" },
+      "t2": { "name": "Großzügiger Ausgeber", "description": "Gib 300 € bei diesem Fest aus" },
+      "t3": { "name": "Hochroller", "description": "Gib 600 € bei diesem Fest aus" },
+      "t4": { "name": "Keine Grenzen", "description": "Gib 1.000 € bei diesem Fest aus" }
+    },
+    "first_drink": {
+      "name": "Erster Schluck",
+      "description": "Erfasse dein allererstes Getränk"
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {

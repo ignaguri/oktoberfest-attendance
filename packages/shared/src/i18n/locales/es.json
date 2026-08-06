@@ -732,6 +732,46 @@
       "gold": "Oro",
       "platinum": "Platino"
     },
+    "drinks_total": {
+      "t1": { "name": "Primera Ronda", "description": "Tomá 3 bebidas en este festival" },
+      "t2": { "name": "Bebedor Constante", "description": "Tomá 10 bebidas en este festival" },
+      "t3": { "name": "Maestro del Maß", "description": "Tomá 25 bebidas en este festival" },
+      "t4": { "name": "Sed Legendaria", "description": "Tomá 50 bebidas en este festival" }
+    },
+    "drinks_day_max": {
+      "t1": { "name": "Sesión Sólida", "description": "Tomá 3 cervezas en un solo día" },
+      "t2": { "name": "Gran Día", "description": "Tomá 5 cervezas en un solo día" },
+      "t3": { "name": "Peso Pesado", "description": "Tomá 8 cervezas en un solo día" },
+      "t4": { "name": "Imparable", "description": "Tomá 12 cervezas en un solo día" }
+    },
+    "drink_variety": {
+      "t1": { "name": "Degustador", "description": "Probá 2 tipos de bebida diferentes" },
+      "t2": { "name": "Explorador de Sabores", "description": "Probá 3 tipos de bebida diferentes" },
+      "t3": { "name": "Conocedor", "description": "Probá 4 tipos de bebida diferentes" },
+      "t4": { "name": "Carta Completa", "description": "Probá 5 tipos de bebida diferentes" }
+    },
+    "volume_total": {
+      "t1": { "name": "Primeros Litros", "description": "Tomá 5 litros en este festival" },
+      "t2": { "name": "Veinte Superados", "description": "Tomá 20 litros en este festival" },
+      "t3": { "name": "Medio Hectolitro", "description": "Tomá 50 litros en este festival" },
+      "t4": { "name": "Cien Litros", "description": "Tomá 100 litros en este festival" }
+    },
+    "tips_total": {
+      "t1": { "name": "Comienzo Generoso", "description": "Dejá un total de 5 € de propina en este festival" },
+      "t2": { "name": "Buen Propinador", "description": "Dejá un total de 20 € de propina en este festival" },
+      "t3": { "name": "Favorito del Público", "description": "Dejá un total de 50 € de propina en este festival" },
+      "t4": { "name": "Propinador Legendario", "description": "Dejá un total de 100 € de propina en este festival" }
+    },
+    "spend_total": {
+      "t1": { "name": "Billetera Abierta", "description": "Gastá 100 € en este festival" },
+      "t2": { "name": "Gran Gastador", "description": "Gastá 300 € en este festival" },
+      "t3": { "name": "Apostador Alto", "description": "Gastá 600 € en este festival" },
+      "t4": { "name": "Sin Límites", "description": "Gastá 1000 € en este festival" }
+    },
+    "first_drink": {
+      "name": "Primera Gota",
+      "description": "Registrá tu primera bebida de todas"
+    },
     "complete": "Completar",
     "items": {
       "firstDrop": {
