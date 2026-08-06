@@ -1,91 +1,20 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import type { AchievementCategory, AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
+import { getCategoryColor, TIER_RING_WIDTH } from "@prostcounter/shared/achievements";
+import { useState } from "react";
+
 import { useTranslation } from "@/lib/i18n/client";
 import type { AchievementRarity } from "@/lib/types/achievements";
 import { cn } from "@/lib/utils";
 
-const rarityConfig = {
-  common: {
-    bgColor: "bg-gray-100 hover:bg-gray-200",
-    textColor: "text-gray-800",
-    borderColor: "border-gray-300",
-    variant: "outline" as const,
-  },
-  rare: {
-    bgColor: "bg-blue-100 hover:bg-blue-200",
-    textColor: "text-blue-800",
-    borderColor: "border-blue-300",
-    variant: "secondary" as const,
-  },
-  epic: {
-    bgColor: "bg-purple-100 hover:bg-purple-200",
-    textColor: "text-purple-800",
-    borderColor: "border-purple-300",
-    variant: "default" as const,
-  },
-  legendary: {
-    bgColor: "bg-yellow-100 hover:bg-yellow-200",
-    textColor: "text-yellow-800",
-    borderColor: "border-yellow-300",
-    variant: "default" as const,
-  },
-} as const;
-
-const iconMap = {
-  // Consumption
-  first_beer: "🍺",
-  beer_mug: "🍺",
-  beer_bottle: "🍻",
-  beer_cheers: "🍻",
-  trophy: "🏆",
-  fire: "🔥",
-  lightning: "⚡",
-
-  // Attendance
-  wave: "👋",
-  calendar: "📅",
-  star: "⭐",
-  crown: "👑",
-  flame: "🔥",
-  weekend: "🎉",
-  sunrise: "🌅",
-
-  // Explorer
-  tent: "⛺",
-  map: "🗺️",
-  compass: "🧭",
-  guide: "🗺️",
-  master: "🎯",
-
-  // Social
-  handshake: "🤝",
-  butterfly: "🦋",
-  leader: "🚀",
-  medal: "🥇",
-  podium: "🏆",
-  camera: "📸",
-  photo_album: "📚",
-
-  // Competitive
-  competition: "🏁",
-  rising_star: "🌟",
-  legend: "👑",
-  multi_trophy: "🏆",
-
-  // Special
-  veteran: "🎖️",
-  multi_year: "🎖️",
-  money_bag: "💰",
-  consistency: "📊",
-  perfect: "💯",
-  first_day: "🎯",
-  closing: "🎊",
-} as const;
+import { GlyphIcon } from "./GlyphIcon";
 
 interface AchievementBadgeProps {
   name: string;
   icon: string;
+  category?: AchievementCategory;
+  tier?: AchievementTier;
   rarity: AchievementRarity;
   points: number;
   isUnlocked: boolean;
@@ -94,10 +23,17 @@ interface AchievementBadgeProps {
   className?: string;
 }
 
+const SIZE_PX: Record<"sm" | "md" | "lg", number> = {
+  sm: 32,
+  md: 40,
+  lg: 56,
+};
+
 export function AchievementBadge({
   name,
   icon,
-  rarity,
+  category,
+  tier,
   points,
   isUnlocked,
   size = "md",
@@ -105,39 +41,46 @@ export function AchievementBadge({
   className,
 }: AchievementBadgeProps) {
   const { t } = useTranslation();
-  const config = rarityConfig[rarity];
-  const displayIcon = iconMap[icon as keyof typeof iconMap] || "🏆";
+  const [imageFailed, setImageFailed] = useState(false);
 
-  // Achievement name is stored as an i18n key, so translate it
   const translatedName = t(name);
-
-  const sizeStyles = {
-    sm: "text-xs px-1.5 py-0.5",
-    md: "text-sm px-2 py-1",
-    lg: "text-base px-3 py-2",
-  };
+  const diameter = SIZE_PX[size];
+  const strokeWidth = tier !== undefined ? TIER_RING_WIDTH[tier] : TIER_RING_WIDTH[1];
+  const ringColor = category !== undefined ? getCategoryColor(category) : getCategoryColor("");
+  const glowsForTier = tier !== undefined && tier >= 3;
+  const imagePath = `/achievements/glyphs/${icon}.png`;
 
   return (
-    <Badge
-      variant={config.variant}
-      className={cn(
-        "inline-flex items-center gap-1.5 font-medium transition-colors",
-        sizeStyles[size],
-        isUnlocked
-          ? `${config.bgColor} ${config.textColor} ${config.borderColor}`
-          : "border-gray-200 bg-gray-50 text-gray-400 opacity-60",
-        className,
-      )}
-    >
-      <span className={cn("text-base", size === "sm" && "text-sm")}>{displayIcon}</span>
+    <span className={cn("inline-flex items-center gap-1.5", className)}>
+      <span
+        className="relative inline-flex shrink-0 items-center justify-center rounded-full"
+        style={{
+          width: diameter,
+          height: diameter,
+          border: `${strokeWidth}px solid ${ringColor}`,
+          opacity: isUnlocked ? 1 : 0.4,
+          boxShadow: glowsForTier ? `0 0 8px ${ringColor}` : undefined,
+        }}
+      >
+        {!imageFailed ? (
+          // eslint-disable-next-line nextjs/no-img-element -- dynamic, possibly-missing static asset; next/image requires a known-good src
+          <img
+            src={imagePath}
+            alt=""
+            width={diameter * 0.6}
+            height={diameter * 0.6}
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <GlyphIcon glyph={icon as GlyphId} sizePx={diameter * 0.5} />
+        )}
+      </span>
 
-      <span className="truncate">{translatedName}</span>
+      {name !== "" && <span className="truncate text-sm">{translatedName}</span>}
 
       {showPoints && (
-        <span className={cn("ml-1 text-xs font-normal opacity-75", size === "sm" && "text-xs")}>
-          {points}pts
-        </span>
+        <span className="ml-1 text-xs font-normal opacity-75">{points}pts</span>
       )}
-    </Badge>
+    </span>
   );
 }
