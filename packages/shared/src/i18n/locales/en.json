@@ -854,6 +854,18 @@
       "name": "Group Founder",
       "description": "Create a group"
     },
+    "group_wins": {
+      "t1": { "name": "First Win", "description": "Win first place in a group once" },
+      "t2": { "name": "Serial Winner", "description": "Win first place in a group 3 times" },
+      "t3": { "name": "Group Champion", "description": "Win first place in a group 6 times" },
+      "t4": { "name": "Dynasty", "description": "Win first place in a group 10 times" }
+    },
+    "podium_finishes": {
+      "t1": { "name": "On the Podium", "description": "Finish top 3 in a group once" },
+      "t2": { "name": "Podium Regular", "description": "Finish top 3 in a group 5 times" },
+      "t3": { "name": "Consistent Contender", "description": "Finish top 3 in a group 12 times" },
+      "t4": { "name": "Podium Legend", "description": "Finish top 3 in a group 25 times" }
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {

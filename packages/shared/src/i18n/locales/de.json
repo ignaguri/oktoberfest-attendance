@@ -819,6 +819,18 @@
       "name": "Gruppengründer",
       "description": "Erstell eine Gruppe"
     },
+    "group_wins": {
+      "t1": { "name": "Erster Sieg", "description": "Gewinn einmal den ersten Platz in einer Gruppe" },
+      "t2": { "name": "Serien-Sieger", "description": "Gewinn 3-mal den ersten Platz in einer Gruppe" },
+      "t3": { "name": "Gruppen-Champion", "description": "Gewinn 6-mal den ersten Platz in einer Gruppe" },
+      "t4": { "name": "Dynastie", "description": "Gewinn 10-mal den ersten Platz in einer Gruppe" }
+    },
+    "podium_finishes": {
+      "t1": { "name": "Auf dem Podium", "description": "Erreich einmal die Top 3 in einer Gruppe" },
+      "t2": { "name": "Podium-Stammgast", "description": "Erreich 5-mal die Top 3 in einer Gruppe" },
+      "t3": { "name": "Beständiger Herausforderer", "description": "Erreich 12-mal die Top 3 in einer Gruppe" },
+      "t4": { "name": "Podium-Legende", "description": "Erreich 25-mal die Top 3 in einer Gruppe" }
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {
