@@ -3,6 +3,8 @@
  * Provider-agnostic type definitions for the Wrapped slide system
  */
 
+import type { AchievementCategory } from "../achievements/types";
+
 /**
  * Slide type enumeration
  */
@@ -131,6 +133,8 @@ export interface WrappedData {
     name: string;
     description: string;
     icon: string;
+    category: AchievementCategory;
+    tier: number;
     points: number;
     rarity: string;
     unlocked_at: string;
