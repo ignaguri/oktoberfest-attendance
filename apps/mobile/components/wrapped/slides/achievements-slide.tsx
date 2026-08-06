@@ -1,4 +1,5 @@
 import { Motion } from "@legendapp/motion";
+import type { GlyphId } from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import {
@@ -9,7 +10,7 @@ import {
 import { useMemo } from "react";
 import { View } from "react-native";
 
-import { ICON_MAP } from "@/components/achievements/achievement-card";
+import { AchievementBadge } from "@/components/achievements/achievement-badge";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -62,7 +63,13 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
               className="flex-row items-center rounded-xl bg-white/70 px-4 py-3"
             >
               <View style={{ width: 36, alignItems: "center" }}>
-                <Text className="text-2xl">{ICON_MAP[achievement.icon] || "🏆"}</Text>
+                <AchievementBadge
+                  glyph={achievement.icon as GlyphId}
+                  category={achievement.category}
+                  tier={achievement.tier as 1 | 2 | 3 | 4}
+                  isUnlocked
+                  size="sm"
+                />
               </View>
               <VStack space="xs" className="ml-2 flex-1">
                 <Text className="text-sm font-semibold text-gray-800">
