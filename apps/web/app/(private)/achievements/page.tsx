@@ -165,8 +165,8 @@ export default function AchievementsPage() {
                 options: [
                   { value: "all", label: t("achievements.filter.all") },
                   {
-                    value: "consumption",
-                    label: t("achievements.filter.consumption"),
+                    value: "drinking",
+                    label: t("achievements.filter.drinking"),
                   },
                   {
                     value: "attendance",
@@ -181,7 +181,10 @@ export default function AchievementsPage() {
                     value: "competitive",
                     label: t("achievements.filter.competitive"),
                   },
-                  { value: "special", label: t("achievements.filter.special") },
+                  {
+                    value: "dedication",
+                    label: t("achievements.filter.dedication"),
+                  },
                 ],
               },
             ]}
