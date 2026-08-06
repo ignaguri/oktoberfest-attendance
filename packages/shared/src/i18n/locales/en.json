@@ -800,6 +800,28 @@
       "name": "Full Festival",
       "description": "Attend every single day of the festival"
     },
+    "tents_visited": {
+      "t1": { "name": "Tent Curious", "description": "Visit 3 different tents" },
+      "t2": { "name": "Tent Hopper", "description": "Visit 6 different tents" },
+      "t3": { "name": "Tent Explorer", "description": "Visit 10 different tents" },
+      "t4": { "name": "Tent Master", "description": "Visit 15 different tents" }
+    },
+    "festivals_attended": {
+      "t1": { "name": "First Festival", "description": "Attend your first festival" },
+      "t2": { "name": "Festival Regular", "description": "Attend 3 different festivals" },
+      "t3": { "name": "Festival Veteran", "description": "Attend 5 different festivals" },
+      "t4": { "name": "Festival Legend", "description": "Attend 8 different festivals" }
+    },
+    "festival_types": {
+      "t1": { "name": "First Style", "description": "Attend your first type of festival" },
+      "t2": { "name": "Branching Out", "description": "Attend 2 different types of festival" },
+      "t3": { "name": "Well Travelled", "description": "Attend 3 different types of festival" },
+      "t4": { "name": "Festival Connoisseur", "description": "Attend 4 different types of festival" }
+    },
+    "all_large_tents": {
+      "name": "Grand Tour",
+      "description": "Visit every large tent at the festival"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {

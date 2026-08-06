@@ -765,6 +765,28 @@
       "name": "Ganzes Fest",
       "description": "Besuch jeden einzelnen Tag des Fests"
     },
+    "tents_visited": {
+      "t1": { "name": "Zeltneugierig", "description": "Besuch 3 verschiedene Zelte" },
+      "t2": { "name": "Zelt-Hopper", "description": "Besuch 6 verschiedene Zelte" },
+      "t3": { "name": "Zelt-Entdecker", "description": "Besuch 10 verschiedene Zelte" },
+      "t4": { "name": "Zelt-Meister", "description": "Besuch 15 verschiedene Zelte" }
+    },
+    "festivals_attended": {
+      "t1": { "name": "Erstes Fest", "description": "Besuch dein erstes Fest" },
+      "t2": { "name": "Fest-Stammgast", "description": "Besuch 3 verschiedene Feste" },
+      "t3": { "name": "Fest-Veteran", "description": "Besuch 5 verschiedene Feste" },
+      "t4": { "name": "Fest-Legende", "description": "Besuch 8 verschiedene Feste" }
+    },
+    "festival_types": {
+      "t1": { "name": "Erster Stil", "description": "Besuch deine erste Festart" },
+      "t2": { "name": "Horizont erweitert", "description": "Besuch 2 verschiedene Festarten" },
+      "t3": { "name": "Weitgereist", "description": "Besuch 3 verschiedene Festarten" },
+      "t4": { "name": "Fest-Kenner", "description": "Besuch 4 verschiedene Festarten" }
+    },
+    "all_large_tents": {
+      "name": "Große Tour",
+      "description": "Besuch jedes große Zelt beim Fest"
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {

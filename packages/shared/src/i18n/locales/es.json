@@ -800,6 +800,28 @@
       "name": "Festival Completo",
       "description": "Asistí todos los días del festival"
     },
+    "tents_visited": {
+      "t1": { "name": "Carpa Curiosa", "description": "Visitá 3 carpas diferentes" },
+      "t2": { "name": "Saltacarpas", "description": "Visitá 6 carpas diferentes" },
+      "t3": { "name": "Explorador de Carpas", "description": "Visitá 10 carpas diferentes" },
+      "t4": { "name": "Maestro de Carpas", "description": "Visitá 15 carpas diferentes" }
+    },
+    "festivals_attended": {
+      "t1": { "name": "Primer Festival", "description": "Asistí a tu primer festival" },
+      "t2": { "name": "Habitué de Festivales", "description": "Asistí a 3 festivales diferentes" },
+      "t3": { "name": "Veterano de Festivales", "description": "Asistí a 5 festivales diferentes" },
+      "t4": { "name": "Leyenda de Festivales", "description": "Asistí a 8 festivales diferentes" }
+    },
+    "festival_types": {
+      "t1": { "name": "Primer Estilo", "description": "Asistí a tu primer tipo de festival" },
+      "t2": { "name": "Ampliando Horizontes", "description": "Asistí a 2 tipos de festival diferentes" },
+      "t3": { "name": "Bien Viajado", "description": "Asistí a 3 tipos de festival diferentes" },
+      "t4": { "name": "Conocedor de Festivales", "description": "Asistí a 4 tipos de festival diferentes" }
+    },
+    "all_large_tents": {
+      "name": "Gran Recorrido",
+      "description": "Visitá todas las carpas grandes del festival"
+    },
     "complete": "Completar",
     "items": {
       "firstDrop": {
