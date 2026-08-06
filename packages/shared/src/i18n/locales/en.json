@@ -772,6 +772,34 @@
       "name": "First Drop",
       "description": "Log your first drink ever"
     },
+    "days_attended": {
+      "t1": { "name": "Showed Up", "description": "Attend 1 day of the festival" },
+      "t2": { "name": "Regular", "description": "Attend 3 days of the festival" },
+      "t3": { "name": "Dedicated", "description": "Attend 6 days of the festival" },
+      "t4": { "name": "Festival Fixture", "description": "Attend 10 days of the festival" }
+    },
+    "attendance_streak": {
+      "t1": { "name": "Two in a Row", "description": "Attend 2 days in a row" },
+      "t2": { "name": "On a Roll", "description": "Attend 3 days in a row" },
+      "t3": { "name": "Streak Master", "description": "Attend 5 days in a row" },
+      "t4": { "name": "Unbroken Chain", "description": "Attend 7 days in a row" }
+    },
+    "opening_day": {
+      "name": "Opening Day",
+      "description": "Attend on the festival's opening day"
+    },
+    "closing_day": {
+      "name": "Last Call",
+      "description": "Attend on the festival's closing day"
+    },
+    "every_weekend_day": {
+      "name": "Weekend Warrior",
+      "description": "Attend every weekend day of the festival"
+    },
+    "full_festival": {
+      "name": "Full Festival",
+      "description": "Attend every single day of the festival"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {

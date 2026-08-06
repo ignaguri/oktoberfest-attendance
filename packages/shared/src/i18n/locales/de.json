@@ -737,6 +737,34 @@
       "name": "Erster Schluck",
       "description": "Erfasse dein allererstes Getränk"
     },
+    "days_attended": {
+      "t1": { "name": "Dabei gewesen", "description": "Besuch das Fest an 1 Tag" },
+      "t2": { "name": "Stammgast", "description": "Besuch das Fest an 3 Tagen" },
+      "t3": { "name": "Treuer Besucher", "description": "Besuch das Fest an 6 Tagen" },
+      "t4": { "name": "Fest-Urgestein", "description": "Besuch das Fest an 10 Tagen" }
+    },
+    "attendance_streak": {
+      "t1": { "name": "Zwei in Folge", "description": "Besuch das Fest 2 Tage in Folge" },
+      "t2": { "name": "Im Lauf", "description": "Besuch das Fest 3 Tage in Folge" },
+      "t3": { "name": "Serien-Meister", "description": "Besuch das Fest 5 Tage in Folge" },
+      "t4": { "name": "Ungebrochene Kette", "description": "Besuch das Fest 7 Tage in Folge" }
+    },
+    "opening_day": {
+      "name": "Eröffnungstag",
+      "description": "Sei am Eröffnungstag des Fests dabei"
+    },
+    "closing_day": {
+      "name": "Letzte Runde",
+      "description": "Sei am letzten Tag des Fests dabei"
+    },
+    "every_weekend_day": {
+      "name": "Wochenend-Krieger",
+      "description": "Besuch jeden Wochenendtag des Fests"
+    },
+    "full_festival": {
+      "name": "Ganzes Fest",
+      "description": "Besuch jeden einzelnen Tag des Fests"
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {

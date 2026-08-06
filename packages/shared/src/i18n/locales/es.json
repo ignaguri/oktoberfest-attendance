@@ -772,6 +772,34 @@
       "name": "Primera Gota",
       "description": "Registrá tu primera bebida de todas"
     },
+    "days_attended": {
+      "t1": { "name": "Presente", "description": "Asistí 1 día al festival" },
+      "t2": { "name": "Habitué", "description": "Asistí 3 días al festival" },
+      "t3": { "name": "Dedicado", "description": "Asistí 6 días al festival" },
+      "t4": { "name": "Fijo del Festival", "description": "Asistí 10 días al festival" }
+    },
+    "attendance_streak": {
+      "t1": { "name": "Dos Seguidos", "description": "Asistí 2 días seguidos" },
+      "t2": { "name": "En Racha", "description": "Asistí 3 días seguidos" },
+      "t3": { "name": "Maestro de Rachas", "description": "Asistí 5 días seguidos" },
+      "t4": { "name": "Cadena Inquebrantable", "description": "Asistí 7 días seguidos" }
+    },
+    "opening_day": {
+      "name": "Día de Apertura",
+      "description": "Asistí el día de apertura del festival"
+    },
+    "closing_day": {
+      "name": "Última Llamada",
+      "description": "Asistí el último día del festival"
+    },
+    "every_weekend_day": {
+      "name": "Guerrero de Fin de Semana",
+      "description": "Asistí todos los días de fin de semana del festival"
+    },
+    "full_festival": {
+      "name": "Festival Completo",
+      "description": "Asistí todos los días del festival"
+    },
     "complete": "Completar",
     "items": {
       "firstDrop": {
