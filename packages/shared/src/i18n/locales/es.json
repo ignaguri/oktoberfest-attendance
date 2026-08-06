@@ -822,6 +822,38 @@
       "name": "Gran Recorrido",
       "description": "Visitá todas las carpas grandes del festival"
     },
+    "groups_joined": {
+      "t1": { "name": "Sumado", "description": "Unite a 1 grupo en este festival" },
+      "t2": { "name": "Jugador de Equipo", "description": "Unite a 2 grupos en este festival" },
+      "t3": { "name": "Bien Conectado", "description": "Unite a 4 grupos en este festival" },
+      "t4": { "name": "Centro Social", "description": "Unite a 6 grupos en este festival" }
+    },
+    "friends_added": {
+      "t1": { "name": "Primer Amigo", "description": "Agregá tu primer amigo" },
+      "t2": { "name": "Círculo Creciente", "description": "Agregá 5 amigos" },
+      "t3": { "name": "Popular", "description": "Agregá 15 amigos" },
+      "t4": { "name": "Mariposa Social", "description": "Agregá 30 amigos" }
+    },
+    "photos_uploaded": {
+      "t1": { "name": "Decí Whisky", "description": "Subí 1 foto en este festival" },
+      "t2": { "name": "Entusiasta de Fotos", "description": "Subí 10 fotos en este festival" },
+      "t3": { "name": "Álbum de Fotos", "description": "Subí 25 fotos en este festival" },
+      "t4": { "name": "Guardián de Recuerdos", "description": "Subí 50 fotos en este festival" }
+    },
+    "reactions_given": {
+      "t1": { "name": "Mostrando Cariño", "description": "Reaccioná a 5 fotos en este festival" },
+      "t2": { "name": "Solidario", "description": "Reaccioná a 25 fotos en este festival" },
+      "t3": { "name": "Animador", "description": "Reaccioná a 75 fotos en este festival" },
+      "t4": { "name": "Máquina de Reacciones", "description": "Reaccioná a 150 fotos en este festival" }
+    },
+    "first_photo": {
+      "name": "Primera Foto",
+      "description": "Subí tu primerísima foto"
+    },
+    "created_group": {
+      "name": "Fundador de Grupo",
+      "description": "Creá un grupo"
+    },
     "complete": "Completar",
     "items": {
       "firstDrop": {

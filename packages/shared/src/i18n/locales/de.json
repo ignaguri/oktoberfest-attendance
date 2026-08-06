@@ -787,6 +787,38 @@
       "name": "Große Tour",
       "description": "Besuch jedes große Zelt beim Fest"
     },
+    "groups_joined": {
+      "t1": { "name": "Beigetreten", "description": "Tritt bei diesem Fest 1 Gruppe bei" },
+      "t2": { "name": "Teamplayer", "description": "Tritt bei diesem Fest 2 Gruppen bei" },
+      "t3": { "name": "Gut vernetzt", "description": "Tritt bei diesem Fest 4 Gruppen bei" },
+      "t4": { "name": "Sozialer Mittelpunkt", "description": "Tritt bei diesem Fest 6 Gruppen bei" }
+    },
+    "friends_added": {
+      "t1": { "name": "Erster Freund", "description": "Füg deinen ersten Freund hinzu" },
+      "t2": { "name": "Wachsender Kreis", "description": "Füg 5 Freunde hinzu" },
+      "t3": { "name": "Beliebt", "description": "Füg 15 Freunde hinzu" },
+      "t4": { "name": "Geselliger Schmetterling", "description": "Füg 30 Freunde hinzu" }
+    },
+    "photos_uploaded": {
+      "t1": { "name": "Sag Cheese", "description": "Lad 1 Foto bei diesem Fest hoch" },
+      "t2": { "name": "Foto-Fan", "description": "Lad 10 Fotos bei diesem Fest hoch" },
+      "t3": { "name": "Fotoalbum", "description": "Lad 25 Fotos bei diesem Fest hoch" },
+      "t4": { "name": "Erinnerungshüter", "description": "Lad 50 Fotos bei diesem Fest hoch" }
+    },
+    "reactions_given": {
+      "t1": { "name": "Zuneigung zeigen", "description": "Reagier bei diesem Fest auf 5 Fotos" },
+      "t2": { "name": "Unterstützend", "description": "Reagier bei diesem Fest auf 25 Fotos" },
+      "t3": { "name": "Cheerleader", "description": "Reagier bei diesem Fest auf 75 Fotos" },
+      "t4": { "name": "Reaktions-Maschine", "description": "Reagier bei diesem Fest auf 150 Fotos" }
+    },
+    "first_photo": {
+      "name": "Erster Schnappschuss",
+      "description": "Lad dein allererstes Foto hoch"
+    },
+    "created_group": {
+      "name": "Gruppengründer",
+      "description": "Erstell eine Gruppe"
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {

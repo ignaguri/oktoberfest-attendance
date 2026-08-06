@@ -822,6 +822,38 @@
       "name": "Grand Tour",
       "description": "Visit every large tent at the festival"
     },
+    "groups_joined": {
+      "t1": { "name": "Joined Up", "description": "Join 1 group this festival" },
+      "t2": { "name": "Team Player", "description": "Join 2 groups this festival" },
+      "t3": { "name": "Networked", "description": "Join 4 groups this festival" },
+      "t4": { "name": "Social Hub", "description": "Join 6 groups this festival" }
+    },
+    "friends_added": {
+      "t1": { "name": "First Friend", "description": "Add your first friend" },
+      "t2": { "name": "Growing Circle", "description": "Add 5 friends" },
+      "t3": { "name": "Popular", "description": "Add 15 friends" },
+      "t4": { "name": "Social Butterfly", "description": "Add 30 friends" }
+    },
+    "photos_uploaded": {
+      "t1": { "name": "Say Cheese", "description": "Upload 1 photo this festival" },
+      "t2": { "name": "Photo Enthusiast", "description": "Upload 10 photos this festival" },
+      "t3": { "name": "Photo Album", "description": "Upload 25 photos this festival" },
+      "t4": { "name": "Memory Keeper", "description": "Upload 50 photos this festival" }
+    },
+    "reactions_given": {
+      "t1": { "name": "Showing Love", "description": "React to 5 photos this festival" },
+      "t2": { "name": "Supportive", "description": "React to 25 photos this festival" },
+      "t3": { "name": "Cheerleader", "description": "React to 75 photos this festival" },
+      "t4": { "name": "Reaction Machine", "description": "React to 150 photos this festival" }
+    },
+    "first_photo": {
+      "name": "First Snap",
+      "description": "Upload your first photo ever"
+    },
+    "created_group": {
+      "name": "Group Founder",
+      "description": "Create a group"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {
