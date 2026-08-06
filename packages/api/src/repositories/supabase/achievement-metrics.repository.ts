@@ -63,10 +63,15 @@ const AchievementMetricsSchema = z.object({
 export class AchievementMetricsRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
-  async getMetrics(userId: string, festivalId: string): Promise<AchievementMetrics> {
+  async getMetrics(userId: string, festivalId: string | null): Promise<AchievementMetrics> {
     const { data, error } = await this.supabase.rpc("get_achievement_metrics", {
       p_user_id: userId,
-      p_festival_id: festivalId,
+      // The generated Args type says `string`, but the SQL parameter has no
+      // NOT NULL constraint and the function computes lifetime metrics
+      // independently of festival scope when this is NULL (verified against
+      // a live database on 2026-08-06). The generated type just doesn't
+      // capture per-argument nullability.
+      p_festival_id: festivalId as unknown as string,
     });
 
     if (error) {
@@ -87,12 +92,12 @@ export class AchievementMetricsRepository {
    * Slugs the user already holds, covering both scopes: rows for this festival
    * plus lifetime rows, which carry a NULL festival_id.
    */
-  async getHeldSlugs(userId: string, festivalId: string): Promise<Set<string>> {
+  async getHeldSlugs(userId: string, festivalId: string | null): Promise<Set<string>> {
     const { data, error } = await this.supabase
       .from("user_achievements")
       .select("achievements(slug)")
       .eq("user_id", userId)
-      .or(`festival_id.eq.${festivalId},festival_id.is.null`);
+      .or(festivalId === null ? "festival_id.is.null" : `festival_id.eq.${festivalId},festival_id.is.null`);
 
     if (error) {
       throw new DatabaseError(`Failed to fetch held achievements: ${error.message}`);
@@ -114,13 +119,13 @@ export class AchievementMetricsRepository {
    */
   async getHeldSlugsWithUnlockDates(
     userId: string,
-    festivalId: string,
+    festivalId: string | null,
   ): Promise<Map<string, string>> {
     const { data, error } = await this.supabase
       .from("user_achievements")
       .select("unlocked_at, achievements(slug)")
       .eq("user_id", userId)
-      .or(`festival_id.eq.${festivalId},festival_id.is.null`);
+      .or(festivalId === null ? "festival_id.is.null" : `festival_id.eq.${festivalId},festival_id.is.null`);
 
     if (error) {
       throw new DatabaseError(`Failed to fetch held achievement unlock dates: ${error.message}`);
@@ -142,7 +147,7 @@ export class AchievementMetricsRepository {
    */
   async insertUnlocks(
     userId: string,
-    festivalId: string,
+    festivalId: string | null,
     unlocks: UnlockedAchievement[],
   ): Promise<UnlockedAchievement[]> {
     if (unlocks.length === 0) {
@@ -178,6 +183,21 @@ export class AchievementMetricsRepository {
       logger.error(
         { userId, festivalId, unresolvedSlugs },
         "Achievement registry is missing slugs the evaluator unlocked; run the registry sync",
+      );
+    }
+
+    // A festival-scoped unlock with a null festivalId would insert a row that
+    // can never be looked up again (getHeldSlugs matches festival-scoped rows
+    // by exact festival_id). It should never happen: a NULL festivalId call
+    // only occurs for the lifetime-metrics pass, where every festival-scoped
+    // metric reads 0/false, so evaluate() cannot produce a festival-scoped
+    // unlock. Guarded explicitly rather than trusted implicitly.
+    const orphanedFestivalUnlock = unlocks.find(
+      (unlock) => unlock.scope !== "lifetime" && festivalId === null,
+    );
+    if (orphanedFestivalUnlock) {
+      throw new DatabaseError(
+        `insertUnlocks received a festival-scoped unlock (${orphanedFestivalUnlock.slug}) with no festivalId`,
       );
     }
 
