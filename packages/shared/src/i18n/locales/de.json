@@ -831,6 +831,32 @@
       "t3": { "name": "Beständiger Herausforderer", "description": "Erreich 12-mal die Top 3 in einer Gruppe" },
       "t4": { "name": "Podium-Legende", "description": "Erreich 25-mal die Top 3 in einer Gruppe" }
     },
+    "active_days": {
+      "t1": { "name": "Guter Start", "description": "Sei an 5 verschiedenen Tagen aktiv" },
+      "t2": { "name": "Bekanntes Gesicht", "description": "Sei an 25 verschiedenen Tagen aktiv" },
+      "t3": { "name": "Alter Hase", "description": "Sei an 75 verschiedenen Tagen aktiv" },
+      "t4": { "name": "Urgestein", "description": "Sei an 200 verschiedenen Tagen aktiv" }
+    },
+    "active_day_streak": {
+      "t1": { "name": "Warmlaufen", "description": "Sei 3 Tage in Folge aktiv" },
+      "t2": { "name": "In Fahrt", "description": "Sei 7 Tage in Folge aktiv" },
+      "t3": { "name": "Gewohnheit gebildet", "description": "Sei 21 Tage in Folge aktiv" },
+      "t4": { "name": "Unaufhaltsame Serie", "description": "Sei 60 Tage in Folge aktiv" }
+    },
+    "crowd_reports": {
+      "t1": { "name": "Erste Meldung", "description": "Reich bei diesem Fest 1 Andrang-Meldung ein" },
+      "t2": { "name": "Regelmäßiger Melder", "description": "Reich bei diesem Fest 5 Andrang-Meldungen ein" },
+      "t3": { "name": "Andrang-Beobachter", "description": "Reich bei diesem Fest 15 Andrang-Meldungen ein" },
+      "t4": { "name": "Stütze der Gemeinschaft", "description": "Reich bei diesem Fest 30 Andrang-Meldungen ein" }
+    },
+    "profile_complete": {
+      "name": "Profil vollständig",
+      "description": "Leg Avatar, Benutzername und vollständigen Namen fest"
+    },
+    "wrapped_viewed": {
+      "name": "Jahresrückblick",
+      "description": "Sieh dir deinen Jahresrückblick an"
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {

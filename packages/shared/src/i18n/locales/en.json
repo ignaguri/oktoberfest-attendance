@@ -866,6 +866,32 @@
       "t3": { "name": "Consistent Contender", "description": "Finish top 3 in a group 12 times" },
       "t4": { "name": "Podium Legend", "description": "Finish top 3 in a group 25 times" }
     },
+    "active_days": {
+      "t1": { "name": "Getting Started", "description": "Be active on 5 different days" },
+      "t2": { "name": "Regular Face", "description": "Be active on 25 different days" },
+      "t3": { "name": "Old Faithful", "description": "Be active on 75 different days" },
+      "t4": { "name": "Lifer", "description": "Be active on 200 different days" }
+    },
+    "active_day_streak": {
+      "t1": { "name": "Warming Up", "description": "Be active 3 days in a row" },
+      "t2": { "name": "On Fire", "description": "Be active 7 days in a row" },
+      "t3": { "name": "Habit Formed", "description": "Be active 21 days in a row" },
+      "t4": { "name": "Unstoppable Streak", "description": "Be active 60 days in a row" }
+    },
+    "crowd_reports": {
+      "t1": { "name": "First Report", "description": "Submit 1 crowd report this festival" },
+      "t2": { "name": "Regular Reporter", "description": "Submit 5 crowd reports this festival" },
+      "t3": { "name": "Crowd Watcher", "description": "Submit 15 crowd reports this festival" },
+      "t4": { "name": "Community Pillar", "description": "Submit 30 crowd reports this festival" }
+    },
+    "profile_complete": {
+      "name": "Profile Complete",
+      "description": "Set your avatar, username, and full name"
+    },
+    "wrapped_viewed": {
+      "name": "Year in Review",
+      "description": "View your Wrapped"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {

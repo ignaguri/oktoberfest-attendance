@@ -866,6 +866,32 @@
       "t3": { "name": "Contendiente Constante", "description": "Terminá entre los 3 primeros de un grupo 12 veces" },
       "t4": { "name": "Leyenda del Podio", "description": "Terminá entre los 3 primeros de un grupo 25 veces" }
     },
+    "active_days": {
+      "t1": { "name": "Buen Comienzo", "description": "Estuviste activo 5 días diferentes" },
+      "t2": { "name": "Cara Conocida", "description": "Estuviste activo 25 días diferentes" },
+      "t3": { "name": "Veterano de Ley", "description": "Estuviste activo 75 días diferentes" },
+      "t4": { "name": "Pilar de la Casa", "description": "Estuviste activo 200 días diferentes" }
+    },
+    "active_day_streak": {
+      "t1": { "name": "Entrando en Calor", "description": "Estuviste activo 3 días seguidos" },
+      "t2": { "name": "En Llamas", "description": "Estuviste activo 7 días seguidos" },
+      "t3": { "name": "Hábito Formado", "description": "Estuviste activo 21 días seguidos" },
+      "t4": { "name": "Racha Imparable", "description": "Estuviste activo 60 días seguidos" }
+    },
+    "crowd_reports": {
+      "t1": { "name": "Primer Reporte", "description": "Enviá 1 reporte de aglomeración en este festival" },
+      "t2": { "name": "Reportero Regular", "description": "Enviá 5 reportes de aglomeración en este festival" },
+      "t3": { "name": "Observador de Multitudes", "description": "Enviá 15 reportes de aglomeración en este festival" },
+      "t4": { "name": "Pilar de la Comunidad", "description": "Enviá 30 reportes de aglomeración en este festival" }
+    },
+    "profile_complete": {
+      "name": "Perfil Completo",
+      "description": "Configurá tu avatar, nombre de usuario y nombre completo"
+    },
+    "wrapped_viewed": {
+      "name": "Resumen del Año",
+      "description": "Mirá tu Resumen del Año"
+    },
     "complete": "Completar",
     "items": {
       "firstDrop": {
