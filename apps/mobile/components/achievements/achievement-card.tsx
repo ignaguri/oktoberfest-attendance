@@ -1,3 +1,8 @@
+import type {
+  AchievementCategory,
+  AchievementTier,
+  GlyphId,
+} from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AchievementRarity, AchievementWithProgress } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
@@ -12,54 +17,8 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 
+import { AchievementBadge } from "./achievement-badge";
 import { AchievementProgressBar } from "./achievement-progress-bar";
-
-// Icon mapping from achievement icon key to emoji
-export const ICON_MAP: Record<string, string> = {
-  // Consumption
-  first_beer: "🍺",
-  beer_mug: "🍺",
-  beer_bottle: "🍻",
-  beer_cheers: "🍻",
-  trophy: "🏆",
-  fire: "🔥",
-  lightning: "⚡",
-  // Attendance
-  wave: "👋",
-  calendar: "📅",
-  star: "⭐",
-  crown: "👑",
-  flame: "🔥",
-  weekend: "🎉",
-  sunrise: "🌅",
-  // Explorer
-  tent: "⛺",
-  map: "🗺️",
-  compass: "🧭",
-  guide: "🗺️",
-  master: "🎯",
-  // Social
-  handshake: "🤝",
-  butterfly: "🦋",
-  leader: "🚀",
-  medal: "🥇",
-  podium: "🏆",
-  camera: "📸",
-  photo_album: "📚",
-  // Competitive
-  competition: "🏁",
-  rising_star: "🌟",
-  legend: "👑",
-  multi_trophy: "🏆",
-  // Special
-  veteran: "🎖️",
-  multi_year: "🎖️",
-  money_bag: "💰",
-  consistency: "📊",
-  perfect: "💯",
-  first_day: "🎯",
-  closing: "🎊",
-};
 
 // Rarity styling configuration
 const RARITY_STYLES: Record<AchievementRarity, { bg: string; text: string; border: string }> = {
@@ -100,6 +59,7 @@ export function AchievementCard({ achievement, showProgress = true }: Achievemen
     description,
     category,
     rarity,
+    tier,
     points,
     icon,
     is_unlocked,
@@ -107,7 +67,6 @@ export function AchievementCard({ achievement, showProgress = true }: Achievemen
     user_progress,
   } = achievement;
 
-  const displayIcon = ICON_MAP[icon] || "🏆";
   const rarityStyle = RARITY_STYLES[rarity];
 
   // Translate name and description (real i18n keys from the achievements table)
@@ -136,14 +95,17 @@ export function AchievementCard({ achievement, showProgress = true }: Achievemen
         {/* Header: Icon + Name/Description + Rarity */}
         <HStack space="sm" className="items-start">
           {/* Icon */}
-          <View
-            className={cn(
-              "items-center justify-center rounded-lg p-2",
-              is_unlocked ? "bg-green-100" : "bg-gray-100",
-            )}
-          >
-            <Text className="text-2xl">{displayIcon}</Text>
-          </View>
+          {/* category/tier are DB-sourced (schema-typed as a wider legacy-inclusive category
+              set and a bare number); AchievementBadge's getCategoryColor/ring-width lookups
+              handle any value gracefully at runtime, so these are safe narrowing casts, same
+              rationale as the icon-as-GlyphId cast above. */}
+          <AchievementBadge
+            glyph={icon as GlyphId}
+            category={category as AchievementCategory}
+            tier={tier as AchievementTier}
+            isUnlocked={is_unlocked}
+            size="md"
+          />
 
           {/* Name and Description */}
           <VStack className="flex-1" space="xs">
