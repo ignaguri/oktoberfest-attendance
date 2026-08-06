@@ -654,12 +654,12 @@
       "categoriesTitle": "Erfolgs-Kategorien",
       "selectCategory": "Kategorie wählen",
       "all": "Alle Erfolge",
-      "consumption": "Bier-Erfolge",
+      "drinking": "Trink-Erfolge",
       "attendance": "Tage-Erfolge",
       "explorer": "Zelt-Erfolge",
       "social": "Soziale Erfolge",
       "competitive": "Wettbewerbs-Erfolge",
-      "special": "Spezielle Erfolge"
+      "dedication": "Hingabe-Erfolge"
     },
     "empty": {
       "title": "Keine Erfolge in dieser Kategorie",
@@ -667,11 +667,10 @@
     },
     "categories": {
       "attendance": "Anwesenheit",
-      "consumption": "Konsum",
+      "drinking": "Trinken",
       "social": "Sozial",
       "explorer": "Entdecker",
-      "veteran": "Veteran",
-      "special": "Spezial",
+      "dedication": "Hingabe",
       "competitive": "Wettbewerb"
     },
     "rarity": {
@@ -692,6 +691,12 @@
     "viewMyAchievements": "Meine Erfolge ansehen",
     "viewProgress": "deinen Fortschritt und freigeschaltete Abzeichen ansehen",
     "points": "Pkt",
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silber",
+      "gold": "Gold",
+      "platinum": "Platin"
+    },
     "complete": "Abschließen",
     "items": {
       "firstDrop": {

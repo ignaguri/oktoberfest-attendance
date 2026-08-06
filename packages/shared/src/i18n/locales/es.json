@@ -689,12 +689,12 @@
       "categoriesTitle": "Categorías de logros",
       "selectCategory": "Seleccioná una categoría",
       "all": "Todos los logros",
-      "consumption": "Logros de cerveza",
+      "drinking": "Logros de bebida",
       "attendance": "Logros de días",
       "explorer": "Logros de carpas",
       "social": "Logros sociales",
       "competitive": "Logros competitivos",
-      "special": "Logros especiales"
+      "dedication": "Logros de dedicación"
     },
     "empty": {
       "title": "No hay logros en esta categoría",
@@ -702,11 +702,10 @@
     },
     "categories": {
       "attendance": "Asistencia",
-      "consumption": "Consumo",
+      "drinking": "Bebida",
       "social": "Social",
       "explorer": "Explorador",
-      "veteran": "Veterano",
-      "special": "Especial",
+      "dedication": "Dedicación",
       "competitive": "Competitivo"
     },
     "rarity": {
@@ -727,6 +726,12 @@
     "viewMyAchievements": "Ver mis logros",
     "viewProgress": "Mirá tu progreso y medallas desbloqueadas",
     "points": "pts",
+    "tiers": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino"
+    },
     "complete": "Completar",
     "items": {
       "firstDrop": {

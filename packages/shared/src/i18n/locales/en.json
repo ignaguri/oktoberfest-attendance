@@ -689,12 +689,12 @@
       "categoriesTitle": "Achievement Categories",
       "selectCategory": "Select category",
       "all": "All Achievements",
-      "consumption": "Beer Achievements",
+      "drinking": "Drinking Achievements",
       "attendance": "Days Achievements",
       "explorer": "Tents Achievements",
       "social": "Social Achievements",
       "competitive": "Compete Achievements",
-      "special": "Special Achievements"
+      "dedication": "Dedication Achievements"
     },
     "empty": {
       "title": "No achievements in this category",
@@ -702,11 +702,10 @@
     },
     "categories": {
       "attendance": "Attendance",
-      "consumption": "Consumption",
+      "drinking": "Drinking",
       "social": "Social",
       "explorer": "Explorer",
-      "veteran": "Veteran",
-      "special": "Special",
+      "dedication": "Dedication",
       "competitive": "Competitive"
     },
     "rarity": {
@@ -727,6 +726,12 @@
     "viewMyAchievements": "See my achievements",
     "viewProgress": "View your progress and unlocked badges",
     "points": "pts",
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum"
+    },
     "complete": "Complete",
     "items": {
       "firstDrop": {
