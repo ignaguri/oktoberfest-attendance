@@ -23,7 +23,10 @@ const nextConfig: NextConfig = {
   // Transpile shared packages for proper bundling
   transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
-  serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64"],
+  // sharp ships native bindings (libvips); bundling it breaks the linux-x64
+  // binary at runtime with ERR_DLOPEN_FAILED. Marking it external makes Next.js
+  // require() it directly from node_modules instead of tracing/bundling it.
+  serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64", "sharp"],
   // Turbopack configuration
   turbopack: {
     resolveAlias: {
