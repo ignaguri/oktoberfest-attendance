@@ -31,8 +31,18 @@ const nextConfig: NextConfig = {
   // call for its native libvips binary, so the .so file gets silently
   // dropped from the deployed serverless function without this. Marking
   // sharp external (above) fixes bundling; this fixes packaging.
+  //
+  // This is a pnpm workspace: apps/web/node_modules/@img doesn't exist at
+  // all (only apps/web/node_modules/sharp, a symlink into the root pnpm
+  // store) — @img's platform packages live only in the monorepo root's
+  // node_modules. A glob relative to apps/web silently matched nothing, so
+  // both the root and the include paths must point at the workspace root.
+  outputFileTracingRoot: join(__dirname, "../.."),
   outputFileTracingIncludes: {
-    "/**/*": ["./node_modules/sharp/**/*", "./node_modules/@img/**/*"],
+    "/**/*": [
+      join(__dirname, "../../node_modules/sharp/**/*"),
+      join(__dirname, "../../node_modules/@img/**/*"),
+    ],
   },
   // Turbopack configuration
   turbopack: {
