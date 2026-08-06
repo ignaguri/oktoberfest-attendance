@@ -37,9 +37,7 @@ export function AchievementCard({
   // Translate name and description (real i18n keys from the achievements table)
   const displayName = t(name);
   const displayDescription = t(description);
-  const displayRarity = t(`achievements.rarity.${rarity}`, {
-    defaultValue: rarity,
-  });
+  const displayRarity = t(`achievements.rarity.${rarity}`);
   const displayCategory = t(`achievements.categories.${category}`);
 
   return (
