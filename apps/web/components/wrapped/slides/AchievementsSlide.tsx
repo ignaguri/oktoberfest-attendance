@@ -56,6 +56,8 @@ export function AchievementsSlide({ data, isActive = false }: AchievementsSlideP
               <AchievementBadge
                 name={achievement.name}
                 icon={achievement.icon}
+                category={achievement.category}
+                tier={achievement.tier as 1 | 2 | 3 | 4}
                 rarity={achievement.rarity as AchievementRarity}
                 points={achievement.points}
                 isUnlocked={true}

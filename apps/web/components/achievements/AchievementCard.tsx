@@ -1,5 +1,6 @@
 "use client";
 
+import type { AchievementCategory, AchievementTier } from "@prostcounter/shared/achievements";
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ export function AchievementCard({
     description,
     category,
     rarity,
+    tier,
     points,
     icon,
     is_unlocked,
@@ -68,6 +70,8 @@ export function AchievementCard({
             <AchievementBadge
               name=""
               icon={icon}
+              category={category as AchievementCategory}
+              tier={tier as AchievementTier}
               rarity={rarity}
               points={points}
               isUnlocked={is_unlocked}
