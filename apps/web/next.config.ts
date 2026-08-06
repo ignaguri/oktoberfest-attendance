@@ -32,17 +32,17 @@ const nextConfig: NextConfig = {
   // dropped from the deployed serverless function without this. Marking
   // sharp external (above) fixes bundling; this fixes packaging.
   //
-  // This is a pnpm workspace: apps/web/node_modules/@img doesn't exist at
-  // all (only apps/web/node_modules/sharp, a symlink into the root pnpm
-  // store) — @img's platform packages live only in the monorepo root's
-  // node_modules. A glob relative to apps/web silently matched nothing, so
-  // both the root and the include paths must point at the workspace root.
+  // Tracing picks up sharp's .node addon on its own, but not the
+  // libvips-cpp shared library that addon dlopens via RPATH — nothing
+  // references it statically. It must be added by hand.
+  //
+  // The glob targets .pnpm directly: node_modules/@img/* are symlinks into
+  // the pnpm store, and globs don't descend into symlinked directories, so
+  // a glob over node_modules/@img matches the links and none of their
+  // contents. These paths are the real files.
   outputFileTracingRoot: join(__dirname, "../.."),
   outputFileTracingIncludes: {
-    "/**/*": [
-      join(__dirname, "../../node_modules/sharp/**/*"),
-      join(__dirname, "../../node_modules/@img/**/*"),
-    ],
+    "/**/*": ["../../node_modules/.pnpm/@img+*/node_modules/@img/**/*"],
   },
   // Turbopack configuration
   turbopack: {
