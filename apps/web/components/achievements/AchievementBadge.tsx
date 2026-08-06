@@ -109,7 +109,7 @@ export function AchievementBadge({
   const displayIcon = iconMap[icon as keyof typeof iconMap] || "🏆";
 
   // Achievement name is stored as an i18n key, so translate it
-  const translatedName = t(name, { defaultValue: name });
+  const translatedName = t(name);
 
   const sizeStyles = {
     sm: "text-xs px-1.5 py-0.5",

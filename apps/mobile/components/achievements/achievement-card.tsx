@@ -85,16 +85,6 @@ const RARITY_STYLES: Record<AchievementRarity, { bg: string; text: string; borde
   },
 };
 
-// Category translation keys
-const CATEGORY_KEYS: Record<string, string> = {
-  consumption: "achievements.categories.consumption",
-  attendance: "achievements.categories.attendance",
-  explorer: "achievements.categories.explorer",
-  social: "achievements.categories.social",
-  competitive: "achievements.categories.competitive",
-  special: "achievements.categories.special",
-};
-
 interface AchievementCardProps {
   achievement: AchievementWithProgress;
   showProgress?: boolean;
@@ -119,15 +109,14 @@ export function AchievementCard({ achievement, showProgress = true }: Achievemen
 
   const displayIcon = ICON_MAP[icon] || "🏆";
   const rarityStyle = RARITY_STYLES[rarity];
-  const categoryKey = CATEGORY_KEYS[category] || category;
 
-  // Translate name and description (they are now i18n keys from database)
-  const displayName = t(name, { defaultValue: name });
-  const displayDescription = t(description, { defaultValue: description });
+  // Translate name and description (real i18n keys from the achievements table)
+  const displayName = t(name);
+  const displayDescription = t(description);
   const displayRarity = t(`achievements.rarity.${rarity}`, {
     defaultValue: rarity,
   });
-  const displayCategory = t(categoryKey, { defaultValue: category });
+  const displayCategory = t(`achievements.categories.${category}`);
 
   // Format unlock date
   const formattedUnlockDate = useMemo(() => {
