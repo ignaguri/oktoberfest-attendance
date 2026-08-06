@@ -1,5 +1,6 @@
 "use client";
 
+import type { AchievementCategory, AchievementTier } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
 import { Link } from "next-view-transitions";
@@ -80,6 +81,8 @@ export function AchievementHighlight({ className }: AchievementHighlightProps) {
                     <AchievementBadge
                       name={achievement.name}
                       icon={achievement.icon}
+                      category={achievement.category as AchievementCategory}
+                      tier={achievement.tier as AchievementTier}
                       rarity={achievement.rarity}
                       points={achievement.points}
                       isUnlocked={true}

@@ -283,6 +283,7 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
       icon: row.icon,
       points: row.points,
       rarity: tierToRarity(row.tier),
+      tier: row.tier ?? 1,
       conditions: {},
       is_active: true,
       created_at: "",
