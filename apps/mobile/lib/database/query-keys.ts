@@ -41,9 +41,6 @@ export const localKeys = {
   achievements: {
     all: ["local-achievements"] as const,
   },
-  userAchievements: {
-    all: (festivalId?: string) => ["local-user-achievements", festivalId] as const,
-  },
   beerPictures: {
     byAttendance: (attendanceId?: string) => ["local-beer-pictures", attendanceId] as const,
   },

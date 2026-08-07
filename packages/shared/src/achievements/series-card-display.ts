@@ -3,17 +3,23 @@ import type { SeriesCard, SeriesCategory, SeriesTier } from "../schemas/achievem
 
 /**
  * Render order of the category sections, shared so web and mobile cannot
- * disagree about it. Type-only import above keeps this module free of any
- * runtime dependency on the schemas package.
+ * disagree about it. Keyed as an exhaustive Record rather than a plain array
+ * literal so adding a category to `SeriesCategorySchema` without updating
+ * this map is a compile error, not a silently-vanishing section on both
+ * screens.
  */
-export const SERIES_CATEGORY_ORDER: SeriesCategory[] = [
-  "drinking",
-  "attendance",
-  "explorer",
-  "social",
-  "competitive",
-  "dedication",
-];
+const CATEGORY_RENDER_ORDER: Record<SeriesCategory, number> = {
+  drinking: 0,
+  attendance: 1,
+  explorer: 2,
+  social: 3,
+  competitive: 4,
+  dedication: 5,
+};
+
+export const SERIES_CATEGORY_ORDER: SeriesCategory[] = (
+  Object.keys(CATEGORY_RENDER_ORDER) as SeriesCategory[]
+).sort((a, b) => CATEGORY_RENDER_ORDER[a] - CATEGORY_RENDER_ORDER[b]);
 
 /**
  * The rung whose copy and badge the card shows: the highest one unlocked, or
