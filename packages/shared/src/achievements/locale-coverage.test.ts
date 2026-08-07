@@ -69,6 +69,29 @@ describe("achievement locale coverage", () => {
           expect((filterLabel as string) ?? "").not.toBe("");
         }
       });
+
+      it(`${localeName}: has the scope, rail and progress copy`, () => {
+        const paths = [
+          ["scope", "festival"],
+          ["scope", "allTime"],
+          ["closeToUnlocking"],
+          ["progressToNext"],
+        ];
+
+        for (const path of paths) {
+          const label = resolve(node, path);
+          expect(typeof label).toBe("string");
+          expect((label as string) ?? "").not.toBe("");
+        }
+      });
+
+      it(`${localeName}: keeps every placeholder in progressToNext`, () => {
+        const label = resolve(node, ["progressToNext"]) as string;
+
+        for (const placeholder of ["{{current}}", "{{target}}", "{{remaining}}"]) {
+          expect(label).toContain(placeholder);
+        }
+      });
     }
   });
 

@@ -678,6 +678,12 @@
     "trackProgress": "Track your progress and unlock achievements at {{festival}}",
     "completed": "Completed",
     "inProgress": "In Progress",
+    "closeToUnlocking": "Close to unlocking",
+    "progressToNext": "{{current}}/{{target}} · {{remaining}} to go",
+    "scope": {
+      "festival": "This festival",
+      "allTime": "All time"
+    },
     "stats": {
       "totalProgress": "Total Progress",
       "percentUnlocked": "{{percent}}% unlocked",
