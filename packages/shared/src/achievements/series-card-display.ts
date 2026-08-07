@@ -73,3 +73,50 @@ export function splitCardsByCompletion(cards: SeriesCard[]): {
     inProgress: inProgress.sort(byRungsClearedDesc),
   };
 }
+
+/** One rail entry: a card plus the numbers the rail prints beside it. */
+export interface CloseToUnlockingEntry {
+  card: SeriesCard;
+  currentValue: number;
+  nextTarget: number;
+  /** Units still needed for the next rung. Never negative — the API caps currentValue. */
+  remaining: number;
+  /** 0-100, currentValue as a share of nextTarget, so the bar agrees with the "22/25" text. */
+  percentage: number;
+}
+
+/**
+ * The cards closest to their next rung, nearest first.
+ *
+ * Ranked by raw remaining count rather than percentage: "3 to go" is a more
+ * useful prompt than "88% of the way" regardless of how large the target is.
+ * `progress === null` already excludes one-offs and fully cleared series, so
+ * there is no separate completion test here.
+ *
+ * The sort is stable, so cards needing the same amount keep the order the API
+ * sent them in — definition order, the same tie-break splitCardsByCompletion uses.
+ */
+export function selectCloseToUnlocking(
+  cards: SeriesCard[],
+  limit = 3,
+): CloseToUnlockingEntry[] {
+  const entries: CloseToUnlockingEntry[] = [];
+
+  for (const card of cards) {
+    if (card.progress === null) {
+      continue;
+    }
+
+    const { currentValue, nextTarget } = card.progress;
+
+    entries.push({
+      card,
+      currentValue,
+      nextTarget,
+      remaining: nextTarget - currentValue,
+      percentage: Math.round((currentValue / nextTarget) * 100),
+    });
+  }
+
+  return entries.sort((a, b) => a.remaining - b.remaining).slice(0, limit);
+}

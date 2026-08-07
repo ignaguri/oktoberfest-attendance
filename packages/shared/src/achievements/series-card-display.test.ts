@@ -6,10 +6,15 @@ import {
   getActiveTier,
   isCardCompleted,
   SERIES_CATEGORY_ORDER,
+  selectCloseToUnlocking,
   splitCardsByCompletion,
 } from "./series-card-display";
 
-function seriesCard(id: string, currentTier: number): SeriesCard {
+function seriesCard(
+  id: string,
+  currentTier: number,
+  progress: SeriesCard["progress"] = null,
+): SeriesCard {
   return {
     id,
     category: "drinking",
@@ -23,6 +28,7 @@ function seriesCard(id: string, currentTier: number): SeriesCard {
       isUnlocked: tier <= currentTier,
       unlockedAt: tier <= currentTier ? "2026-09-20T10:00:00Z" : null,
     })),
+    progress,
   };
 }
 
@@ -42,6 +48,7 @@ function oneOffCard(id: string, difficulty: number, unlocked: boolean): SeriesCa
         unlockedAt: unlocked ? "2026-09-20T10:00:00Z" : null,
       },
     ],
+    progress: null,
   };
 }
 
@@ -128,5 +135,59 @@ describe("tierToRarity", () => {
   it("falls back to common for missing tiers", () => {
     expect(tierToRarity(null)).toBe("common");
     expect(tierToRarity(undefined)).toBe("common");
+  });
+});
+
+describe("selectCloseToUnlocking", () => {
+  it("returns nothing when no card has progress", () => {
+    expect(selectCloseToUnlocking([seriesCard("a", 0), oneOffCard("b", 4, false)])).toEqual([]);
+  });
+
+  it("skips one-offs and fully cleared series", () => {
+    const entries = selectCloseToUnlocking([
+      oneOffCard("one_off", 4, false),
+      seriesCard("maxed", 4),
+      seriesCard("live", 1, { currentValue: 8, nextTarget: 10 }),
+    ]);
+
+    expect(entries.map((entry) => entry.card.id)).toEqual(["live"]);
+  });
+
+  it("ranks by remaining count ascending, not by percentage", () => {
+    const entries = selectCloseToUnlocking([
+      seriesCard("far", 0, { currentValue: 90, nextTarget: 100 }),
+      seriesCard("near", 0, { currentValue: 1, nextTarget: 4 }),
+    ]);
+
+    expect(entries.map((entry) => entry.card.id)).toEqual(["near", "far"]);
+    expect(entries.map((entry) => entry.remaining)).toEqual([3, 10]);
+  });
+
+  it("keeps the input order between cards with the same remaining count", () => {
+    const entries = selectCloseToUnlocking([
+      seriesCard("first", 0, { currentValue: 2, nextTarget: 5 }),
+      seriesCard("second", 0, { currentValue: 7, nextTarget: 10 }),
+    ]);
+
+    expect(entries.map((entry) => entry.card.id)).toEqual(["first", "second"]);
+  });
+
+  it("caps the list at three by default and honours an explicit limit", () => {
+    const cards = [1, 2, 3, 4, 5].map((index) =>
+      seriesCard(`s${index}`, 0, { currentValue: 0, nextTarget: index }),
+    );
+
+    expect(selectCloseToUnlocking(cards)).toHaveLength(3);
+    expect(selectCloseToUnlocking(cards, 1).map((entry) => entry.card.id)).toEqual(["s1"]);
+  });
+
+  it("reports the percentage as the share of the next target", () => {
+    const [entry] = selectCloseToUnlocking([
+      seriesCard("live", 1, { currentValue: 22, nextTarget: 25 }),
+    ]);
+
+    expect(entry.percentage).toBe(88);
+    expect(entry.currentValue).toBe(22);
+    expect(entry.nextTarget).toBe(25);
   });
 });
