@@ -1,6 +1,6 @@
 "use client";
 
-import { SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
+import { buildStats, SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import type {
   SeriesCard as SeriesCardData,
@@ -72,7 +72,7 @@ export default function AchievementsPage() {
   const allCards: SeriesCardData[] = data?.cards || [];
   // Both scopes arrive in one response — the tabs are a filter, not a refetch.
   const cards = allCards.filter((card) => card.scope === activeScope);
-  const stats = data?.stats;
+  const stats = data ? buildStats(cards) : undefined;
 
   const visibleCategories =
     activeCategory === "all" ? SERIES_CATEGORY_ORDER : [activeCategory as SeriesCategory];

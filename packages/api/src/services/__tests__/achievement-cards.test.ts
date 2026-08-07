@@ -4,7 +4,7 @@ import { ONE_OFFS, selectCloseToUnlocking, SERIES } from "@prostcounter/shared/a
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { buildRecentUnlocks, buildSeriesCards, buildStats } from "../achievement-cards";
+import { buildRecentUnlocks, buildSeriesCards } from "../achievement-cards";
 
 describe("buildSeriesCards", () => {
   it("returns one card per definition, series first, in definition order", () => {
@@ -116,47 +116,6 @@ describe("buildRecentUnlocks", () => {
 
     expect(buildRecentUnlocks(buildSeriesCards(unlockDates, new Map()))).toHaveLength(10);
     expect(buildRecentUnlocks(buildSeriesCards(unlockDates, new Map()), 3)).toHaveLength(3);
-  });
-});
-
-describe("buildStats", () => {
-  it("counts every rung, not every card", () => {
-    const stats = buildStats(buildSeriesCards(new Map(), new Map()));
-
-    expect(stats.total_achievements).toBe(SERIES.length * 4 + ONE_OFFS.length);
-    expect(stats.unlocked_achievements).toBe(0);
-    expect(stats.total_points).toBe(0);
-  });
-
-  it("has exactly the six live category buckets", () => {
-    const stats = buildStats(buildSeriesCards(new Map(), new Map()));
-
-    expect(Object.keys(stats.breakdown_by_category).sort()).toEqual([
-      "attendance",
-      "competitive",
-      "dedication",
-      "drinking",
-      "explorer",
-      "social",
-    ]);
-  });
-
-  it("accumulates unlocked counts and points into both breakdowns", () => {
-    const unlockDates = new Map([
-      ["drinks_total.t1", "2026-09-20T10:00:00Z"],
-      ["drinks_total.t2", "2026-09-21T10:00:00Z"],
-      ["full_festival", "2026-10-05T10:00:00Z"],
-    ]);
-
-    const stats = buildStats(buildSeriesCards(unlockDates, new Map()));
-
-    expect(stats.unlocked_achievements).toBe(3);
-    expect(stats.total_points).toBe(10 + 50 + 600);
-    expect(stats.breakdown_by_category.drinking).toMatchObject({ unlocked: 2, points: 60 });
-    expect(stats.breakdown_by_category.attendance).toMatchObject({ unlocked: 1, points: 600 });
-    expect(stats.breakdown_by_rarity.common).toMatchObject({ unlocked: 1, points: 10 });
-    expect(stats.breakdown_by_rarity.rare).toMatchObject({ unlocked: 1, points: 50 });
-    expect(stats.breakdown_by_rarity.legendary).toMatchObject({ unlocked: 1, points: 600 });
   });
 });
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { tierToRarity } from "./badge-tokens";
 import {
+  buildStats,
   getActiveTier,
   isCardCompleted,
   SERIES_CATEGORY_ORDER,
@@ -189,5 +190,41 @@ describe("selectCloseToUnlocking", () => {
     expect(entry.percentage).toBe(88);
     expect(entry.currentValue).toBe(22);
     expect(entry.nextTarget).toBe(25);
+  });
+});
+
+describe("buildStats", () => {
+  it("counts every rung, not every card", () => {
+    const stats = buildStats([seriesCard("drinks_total", 0), oneOffCard("full_festival", 4, false)]);
+
+    expect(stats.total_achievements).toBe(5); // 4 rungs + 1 one-off rung
+    expect(stats.unlocked_achievements).toBe(0);
+    expect(stats.total_points).toBe(0);
+  });
+
+  it("has exactly the six live category buckets", () => {
+    const stats = buildStats([seriesCard("drinks_total", 0)]);
+
+    expect(Object.keys(stats.breakdown_by_category).sort()).toEqual([
+      "attendance",
+      "competitive",
+      "dedication",
+      "drinking",
+      "explorer",
+      "social",
+    ]);
+  });
+
+  it("accumulates unlocked counts and points into both breakdowns", () => {
+    const stats = buildStats([seriesCard("drinks_total", 2), oneOffCard("full_festival", 4, true)]);
+
+    // seriesCard(id, 2) unlocks tiers 1-2 at points 10 and 20 (tier * 10); oneOffCard difficulty 4 is 600 points.
+    expect(stats.unlocked_achievements).toBe(3);
+    expect(stats.total_points).toBe(10 + 20 + 600);
+    expect(stats.breakdown_by_category.drinking).toMatchObject({ unlocked: 2, points: 30 });
+    expect(stats.breakdown_by_category.attendance).toMatchObject({ unlocked: 1, points: 600 });
+    expect(stats.breakdown_by_rarity.common).toMatchObject({ unlocked: 1, points: 10 });
+    expect(stats.breakdown_by_rarity.rare).toMatchObject({ unlocked: 1, points: 20 });
+    expect(stats.breakdown_by_rarity.legendary).toMatchObject({ unlocked: 1, points: 600 });
   });
 });

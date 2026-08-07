@@ -10,11 +10,12 @@ import {
   ListAvailableAchievementsResponseSchema,
 } from "@prostcounter/shared";
 import { evaluate } from "@prostcounter/shared/achievements";
+import { buildStats } from "@prostcounter/shared/achievements";
 
 import type { AuthContext } from "../middleware/auth";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
 import { SupabaseAchievementRepository } from "../repositories/supabase";
-import { buildRecentUnlocks, buildSeriesCards, buildStats } from "../services/achievement-cards";
+import { buildRecentUnlocks, buildSeriesCards } from "../services/achievement-cards";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();

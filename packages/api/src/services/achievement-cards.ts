@@ -1,12 +1,4 @@
-import type {
-  AchievementRarity,
-  AchievementStats,
-  BreakdownStats,
-  RecentUnlock,
-  SeriesCard,
-  SeriesCategory,
-  SeriesTier,
-} from "@prostcounter/shared";
+import type { RecentUnlock, SeriesCard, SeriesTier } from "@prostcounter/shared";
 import type { SeriesProgress } from "@prostcounter/shared/achievements";
 import { ONE_OFFS, SERIES, slugFor, tierToRarity } from "@prostcounter/shared/achievements";
 
@@ -20,10 +12,6 @@ function nameKeyFor(slug: string): string {
 /** A rung's slug, recovered from the card it belongs to. One-offs have a single rung. */
 function slugForCardTier(card: SeriesCard, tier: SeriesTier): string {
   return card.tiers.length > 1 ? `${card.id}.t${tier.tier}` : card.id;
-}
-
-function emptyBreakdown(): BreakdownStats {
-  return { total: 0, unlocked: 0, points: 0 };
 }
 
 /**
@@ -164,59 +152,4 @@ export function buildRecentUnlocks(
   unlocks.sort((a, b) => Date.parse(b.unlockedAt) - Date.parse(a.unlockedAt));
 
   return unlocks.slice(0, limit);
-}
-
-/**
- * Totals over rungs, not cards: 90 unlockable slugs across 30 cards. Rarity
- * buckets come from each rung's own tier, so a card contributes to several.
- */
-export function buildStats(cards: SeriesCard[]): AchievementStats {
-  const breakdownByCategory: Record<SeriesCategory, BreakdownStats> = {
-    drinking: emptyBreakdown(),
-    attendance: emptyBreakdown(),
-    explorer: emptyBreakdown(),
-    social: emptyBreakdown(),
-    competitive: emptyBreakdown(),
-    dedication: emptyBreakdown(),
-  };
-
-  const breakdownByRarity: Record<AchievementRarity, BreakdownStats> = {
-    common: emptyBreakdown(),
-    rare: emptyBreakdown(),
-    epic: emptyBreakdown(),
-    legendary: emptyBreakdown(),
-  };
-
-  let totalAchievements = 0;
-  let unlockedAchievements = 0;
-  let totalPoints = 0;
-
-  for (const card of cards) {
-    const categoryBucket = breakdownByCategory[card.category];
-
-    for (const tier of card.tiers) {
-      const rarityBucket = breakdownByRarity[tierToRarity(tier.tier)];
-
-      totalAchievements++;
-      categoryBucket.total++;
-      rarityBucket.total++;
-
-      if (tier.isUnlocked) {
-        unlockedAchievements++;
-        totalPoints += tier.points;
-        categoryBucket.unlocked++;
-        categoryBucket.points += tier.points;
-        rarityBucket.unlocked++;
-        rarityBucket.points += tier.points;
-      }
-    }
-  }
-
-  return {
-    total_achievements: totalAchievements,
-    unlocked_achievements: unlockedAchievements,
-    total_points: totalPoints,
-    breakdown_by_category: breakdownByCategory,
-    breakdown_by_rarity: breakdownByRarity,
-  };
 }

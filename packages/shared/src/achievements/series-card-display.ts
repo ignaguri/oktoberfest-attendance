@@ -1,5 +1,14 @@
 // packages/shared/src/achievements/series-card-display.ts
-import type { SeriesCard, SeriesCategory, SeriesTier } from "../schemas/achievement.schema";
+import type {
+  AchievementRarity,
+  AchievementStats,
+  BreakdownStats,
+  SeriesCard,
+  SeriesCategory,
+  SeriesTier,
+} from "../schemas/achievement.schema";
+
+import { tierToRarity } from "./badge-tokens";
 
 /**
  * Render order of the category sections, shared so web and mobile cannot
@@ -116,4 +125,63 @@ export function selectCloseToUnlocking(cards: SeriesCard[], limit = 3): CloseToU
   }
 
   return entries.sort((a, b) => a.remaining - b.remaining).slice(0, limit);
+}
+
+function emptyBreakdown(): BreakdownStats {
+  return { total: 0, unlocked: 0, points: 0 };
+}
+
+/**
+ * Totals over rungs, not cards: 90 unlockable slugs across 30 cards. Rarity
+ * buckets come from each rung's own tier, so a card contributes to several.
+ */
+export function buildStats(cards: SeriesCard[]): AchievementStats {
+  const breakdownByCategory: Record<SeriesCategory, BreakdownStats> = {
+    drinking: emptyBreakdown(),
+    attendance: emptyBreakdown(),
+    explorer: emptyBreakdown(),
+    social: emptyBreakdown(),
+    competitive: emptyBreakdown(),
+    dedication: emptyBreakdown(),
+  };
+
+  const breakdownByRarity: Record<AchievementRarity, BreakdownStats> = {
+    common: emptyBreakdown(),
+    rare: emptyBreakdown(),
+    epic: emptyBreakdown(),
+    legendary: emptyBreakdown(),
+  };
+
+  let totalAchievements = 0;
+  let unlockedAchievements = 0;
+  let totalPoints = 0;
+
+  for (const card of cards) {
+    const categoryBucket = breakdownByCategory[card.category];
+
+    for (const tier of card.tiers) {
+      const rarityBucket = breakdownByRarity[tierToRarity(tier.tier)];
+
+      totalAchievements++;
+      categoryBucket.total++;
+      rarityBucket.total++;
+
+      if (tier.isUnlocked) {
+        unlockedAchievements++;
+        totalPoints += tier.points;
+        categoryBucket.unlocked++;
+        categoryBucket.points += tier.points;
+        rarityBucket.unlocked++;
+        rarityBucket.points += tier.points;
+      }
+    }
+  }
+
+  return {
+    total_achievements: totalAchievements,
+    unlocked_achievements: unlockedAchievements,
+    total_points: totalPoints,
+    breakdown_by_category: breakdownByCategory,
+    breakdown_by_rarity: breakdownByRarity,
+  };
 }

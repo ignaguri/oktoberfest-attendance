@@ -1,4 +1,4 @@
-import { SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
+import { buildStats, SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -100,8 +100,8 @@ export default function AchievementsScreen() {
   }, [achievementsResponse, activeScope]);
 
   const stats = useMemo(() => {
-    return achievementsResponse?.stats || null;
-  }, [achievementsResponse]);
+    return achievementsResponse ? buildStats(cards) : null;
+  }, [achievementsResponse, cards]);
 
   const visibleCategories = useMemo(() => {
     return activeCategory === "all"
