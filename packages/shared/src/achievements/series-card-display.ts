@@ -96,14 +96,11 @@ export interface CloseToUnlockingEntry {
  * The sort is stable, so cards needing the same amount keep the order the API
  * sent them in — definition order, the same tie-break splitCardsByCompletion uses.
  */
-export function selectCloseToUnlocking(
-  cards: SeriesCard[],
-  limit = 3,
-): CloseToUnlockingEntry[] {
+export function selectCloseToUnlocking(cards: SeriesCard[], limit = 3): CloseToUnlockingEntry[] {
   const entries: CloseToUnlockingEntry[] = [];
 
   for (const card of cards) {
-    if (card.progress === null) {
+    if (card.progress == null) {
       continue;
     }
 

@@ -1,6 +1,8 @@
+import { SeriesCardSchema } from "@prostcounter/shared";
 import type { SeriesProgress } from "@prostcounter/shared/achievements";
-import { ONE_OFFS, SERIES } from "@prostcounter/shared/achievements";
+import { ONE_OFFS, selectCloseToUnlocking, SERIES } from "@prostcounter/shared/achievements";
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 
 import { buildRecentUnlocks, buildSeriesCards, buildStats } from "../achievement-cards";
 
@@ -18,7 +20,9 @@ describe("buildSeriesCards", () => {
   });
 
   it("gives an untouched series four locked rungs and currentTier 0", () => {
-    const card = buildSeriesCards(new Map(), new Map()).find((entry) => entry.id === "drinks_total");
+    const card = buildSeriesCards(new Map(), new Map()).find(
+      (entry) => entry.id === "drinks_total",
+    );
 
     expect(card?.currentTier).toBe(0);
     expect(card?.tiers).toHaveLength(4);
@@ -33,7 +37,9 @@ describe("buildSeriesCards", () => {
       ["drinks_total.t2", "2026-09-21T10:00:00Z"],
     ]);
 
-    const card = buildSeriesCards(unlockDates, new Map()).find((entry) => entry.id === "drinks_total");
+    const card = buildSeriesCards(unlockDates, new Map()).find(
+      (entry) => entry.id === "drinks_total",
+    );
 
     expect(card?.currentTier).toBe(2);
     expect(card?.tiers.map((tier) => tier.isUnlocked)).toEqual([true, true, false, false]);
@@ -45,11 +51,16 @@ describe("buildSeriesCards", () => {
       [1, 2, 3, 4].map((tier) => [`drinks_total.t${tier}`, "2026-09-20T10:00:00Z"] as const),
     );
 
-    expect(buildSeriesCards(unlockDates, new Map()).find((entry) => entry.id === "drinks_total")?.currentTier).toBe(4);
+    expect(
+      buildSeriesCards(unlockDates, new Map()).find((entry) => entry.id === "drinks_total")
+        ?.currentTier,
+    ).toBe(4);
   });
 
   it("maps a one-off to a single-rung card keeping its difficulty tier", () => {
-    const locked = buildSeriesCards(new Map(), new Map()).find((entry) => entry.id === "full_festival");
+    const locked = buildSeriesCards(new Map(), new Map()).find(
+      (entry) => entry.id === "full_festival",
+    );
 
     expect(locked?.tiers).toHaveLength(1);
     expect(locked?.currentTier).toBe(0);
@@ -177,10 +188,9 @@ describe("buildSeriesCards progress", () => {
   });
 
   it("is always null for a one-off", () => {
-    const card = buildSeriesCards(
-      new Map(),
-      progressFor("first_drink", 1),
-    ).find((entry) => entry.id === "first_drink");
+    const card = buildSeriesCards(new Map(), progressFor("first_drink", 1)).find(
+      (entry) => entry.id === "first_drink",
+    );
 
     expect(card?.progress).toBeNull();
   });
@@ -216,5 +226,18 @@ describe("buildSeriesCards progress", () => {
     );
 
     expect(card?.progress).toBeNull();
+  });
+});
+
+describe("buildSeriesCards pipeline", () => {
+  it("produces cards that satisfy the response schema and feed the rail", () => {
+    const unlockDates = new Map([
+      ["drinks_total.t1", "2026-09-20T10:00:00Z"],
+      ["drinks_total.t2", "2026-09-21T10:00:00Z"],
+    ]);
+    const cards = buildSeriesCards(unlockDates, progressFor("drinks_total", 30));
+
+    expect(() => z.array(SeriesCardSchema).parse(cards)).not.toThrow();
+    expect(selectCloseToUnlocking(cards).length).toBeGreaterThan(0);
   });
 });

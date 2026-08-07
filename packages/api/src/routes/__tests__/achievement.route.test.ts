@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { emptyMetrics } from "../../__tests__/helpers/achievement-metrics";
 import {
   createMockChain,
   createMockSupabase,
   mockSupabaseError,
   mockSupabaseSuccess,
 } from "../../__tests__/helpers/mock-supabase";
-import { emptyMetrics } from "../../__tests__/helpers/achievement-metrics";
 import {
   createAuthRequest,
   createMockUser,
@@ -531,17 +531,6 @@ describe("Achievement Routes - Unit Tests", () => {
         error: null,
       } as any);
 
-      // getProgress -> getHeldSlugs
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess([
-            { achievements: { slug: "drinks_total.t1" } },
-            { achievements: { slug: "drinks_total.t2" } },
-            { achievements: { slug: "first_drink" } },
-          ]),
-        ),
-      );
-
       const req = createAuthRequest(`/achievements/with-progress?festivalId=${festivalId}`, {
         method: "GET",
       });
@@ -580,16 +569,12 @@ describe("Achievement Routes - Unit Tests", () => {
     it("returns every card locked when the user holds nothing", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: emptyMetrics(),
         error: null,
       } as any);
-
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
 
       const req = createAuthRequest(`/achievements/with-progress?festivalId=${festivalId}`, {
         method: "GET",

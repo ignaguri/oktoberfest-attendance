@@ -76,7 +76,7 @@ export function SeriesCardDetailSheet({ card, isOpen, onClose }: SeriesCardDetai
                         date: formatLocalized(new Date(tier.unlockedAt), "MMM d, yyyy"),
                       })}
                     </Text>
-                  ) : isNextRung && card.progress !== null ? (
+                  ) : isNextRung && card.progress != null ? (
                     <Text className="text-xs text-typography-500">
                       {t("achievements.progressToNext", {
                         current: card.progress.currentValue,
