@@ -123,41 +123,6 @@ export const EvaluateAchievementsResponseSchema = z.object({
 export type EvaluateAchievementsResponse = z.infer<typeof EvaluateAchievementsResponseSchema>;
 
 /**
- * Achievement progress (for locked achievements)
- */
-export const AchievementProgressSchema = z.object({
-  current_value: z.number(),
-  target_value: z.number(),
-  percentage: z.number(),
-  last_updated: z.string(),
-});
-
-export type AchievementProgress = z.infer<typeof AchievementProgressSchema>;
-
-/**
- * Achievement with progress (includes both locked and unlocked)
- */
-export const AchievementWithProgressSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string(),
-  description: z.string(),
-  category: AchievementCategorySchema,
-  icon: z.string(),
-  points: z.number().int(),
-  rarity: AchievementRaritySchema,
-  tier: z.number().int().min(1).max(4),
-  conditions: z.record(z.string(), z.unknown()).default({}),
-  is_active: z.boolean(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  is_unlocked: z.boolean(),
-  unlocked_at: z.string().nullable().optional(),
-  user_progress: AchievementProgressSchema.optional(),
-});
-
-export type AchievementWithProgress = z.infer<typeof AchievementWithProgressSchema>;
-
-/**
  * One rung of a card. For a tiered series this is one of four; for a one-off
  * it is the only entry, and its `tier` is the one-off's difficulty rather
  * than a position in a ladder.
