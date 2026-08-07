@@ -9,8 +9,7 @@ import {
   ListAchievementsResponseSchema,
   ListAvailableAchievementsResponseSchema,
 } from "@prostcounter/shared";
-import { evaluate } from "@prostcounter/shared/achievements";
-import { buildStats } from "@prostcounter/shared/achievements";
+import { buildStats, evaluate } from "@prostcounter/shared/achievements";
 
 import type { AuthContext } from "../middleware/auth";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
