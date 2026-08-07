@@ -3778,39 +3778,40 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data: {
-                                /** Format: uuid */
+                            cards: {
+                                id: string;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                currentTier: number;
+                                tiers: {
+                                    tier: number;
+                                    name: string;
+                                    points: number;
+                                    isUnlocked: boolean;
+                                    unlockedAt: string | null;
+                                }[];
+                            }[];
+                            recentUnlocks: {
                                 id: string;
                                 name: string;
-                                description: string;
+                                glyph: string;
                                 /** @enum {string} */
-                                category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
-                                icon: string;
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                tier: number;
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
                                 points: number;
-                                /** @enum {string} */
-                                rarity: "common" | "rare" | "epic" | "legendary";
-                                /** @default {} */
-                                conditions: {
-                                    [key: string]: unknown;
-                                };
-                                is_active: boolean;
-                                created_at: string;
-                                updated_at: string;
-                                is_unlocked: boolean;
-                                unlocked_at?: string | null;
-                                user_progress?: {
-                                    current_value: number;
-                                    target_value: number;
-                                    percentage: number;
-                                    last_updated: string;
-                                };
+                                unlockedAt: string;
                             }[];
                             stats: {
                                 total_achievements: number;
                                 unlocked_achievements: number;
                                 total_points: number;
                                 breakdown_by_category: {
-                                    consumption?: {
+                                    drinking?: {
                                         total: number;
                                         unlocked: number;
                                         points: number;
@@ -3831,16 +3832,6 @@ export interface paths {
                                         points: number;
                                     };
                                     competitive?: {
-                                        total: number;
-                                        unlocked: number;
-                                        points: number;
-                                    };
-                                    special?: {
-                                        total: number;
-                                        unlocked: number;
-                                        points: number;
-                                    };
-                                    drinking?: {
                                         total: number;
                                         unlocked: number;
                                         points: number;
